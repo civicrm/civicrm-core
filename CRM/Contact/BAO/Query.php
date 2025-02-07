@@ -4812,7 +4812,8 @@ civicrm_relationship.start_date > {$today}
     if (!is_array($values)) {
       return FALSE;
     }
-    if (($operator = CRM_Utils_Array::value(1, $values)) == FALSE) {
+    $operator = $values[1] ?? FALSE;
+    if (!$operator) {
       return FALSE;
     }
     return in_array($operator, CRM_Core_DAO::acceptedSQLOperators());

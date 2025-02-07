@@ -572,7 +572,7 @@ class CRM_Core_Permission {
       $item['access_callback'][0] == 'CRM_Core_Permission' &&
       $item['access_callback'][1] == 'checkMenu'
     ) {
-      $op = CRM_Utils_Array::value(1, $item['access_arguments'], 'and');
+      $op = $item['access_arguments'][1] ?? 'and';
       return self::checkMenu($item['access_arguments'][0], $op);
     }
     else {

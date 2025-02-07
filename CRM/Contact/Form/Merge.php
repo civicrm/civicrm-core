@@ -261,7 +261,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         // on the form.
         if (substr($element[1], 0, 13) === 'move_location') {
           $element[4] = array_merge(
-            (array) CRM_Utils_Array::value(4, $element, []),
+            (array) ($element[4] ?? []),
             [
               'data-location' => substr($element[1], 14),
               'data-is_location' => TRUE,
@@ -270,7 +270,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         if (substr($element[1], 0, 15) === 'location_blocks') {
           // @todo We could add some data elements here to make jquery manipulation more straight-forward
           // @todo consider enabling if it is an add & defaulting to true.
-          $element[4] = array_merge((array) CRM_Utils_Array::value(4, $element, []), ['disabled' => TRUE]);
+          $element[4] = array_merge((array) ($element[4] ?? []), ['disabled' => TRUE]);
         }
         $newCheckBox = $this->addElement($element[0],
           $element[1],

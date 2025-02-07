@@ -245,7 +245,7 @@ class CRM_Contact_Page_AJAX {
         // first check if there is any existing relationship present with same parameters.
         // If yes then update the relationship by setting active and start date to current time
         $relationship = civicrm_api3('Relationship', 'get', $params)['values'];
-        $params = array_merge(CRM_Utils_Array::value(0, $relationship, $params), [
+        $params = array_merge($relationship[0] ?? $params, [
           'start_date' => 'now',
           'is_active' => TRUE,
           'end_date' => '',
