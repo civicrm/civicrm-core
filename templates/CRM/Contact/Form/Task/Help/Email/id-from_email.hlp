@@ -13,7 +13,7 @@
     {/crmPermission}
 {/if}
 {crmPermission has='administer CiviCRM'}
-    {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
-  <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit general email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
+    {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/site_email_address"}{/capture}
+  <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a> to add or edit general email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
 {/crmPermission}
 {/htxt}

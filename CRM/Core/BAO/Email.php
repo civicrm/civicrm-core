@@ -309,7 +309,7 @@ AND    reset_date IS NULL
    *   an array of email ids
    */
   public static function getFromEmail() {
-    // add all configured FROM email addresses
+    // add all configured site email addresses
     $fromEmailValues = self::domainEmails();
 
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {

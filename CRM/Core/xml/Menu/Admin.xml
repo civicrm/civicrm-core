@@ -265,14 +265,6 @@
      <weight>10</weight>
   </item>
   <item>
-     <path>civicrm/admin/options/from_email_address</path>
-     <title>From Email Addresses</title>
-     <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
-     <page_callback>CRM_Admin_Page_Options</page_callback>
-     <adminGroup>Communications</adminGroup>
-     <weight>20</weight>
-  </item>
-  <item>
      <path>civicrm/admin/messageTemplates</path>
      <title>Message Templates</title>
      <desc>Message templates allow you to save and re-use messages with layouts which you can use when sending email to one or more contacts.</desc>

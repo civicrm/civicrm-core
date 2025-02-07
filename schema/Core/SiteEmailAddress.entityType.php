@@ -14,9 +14,9 @@ return [
     'label_field' => 'display_name',
   ],
   'getPaths' => fn() => [
-    'browse' => 'civicrm/admin/options/from_email_address',
-    'add' => 'civicrm/admin/form/site-email-address',
-    'update' => 'civicrm/admin/form/site-email-address#?email=[id]',
+    'browse' => 'civicrm/admin/options/site_email_address',
+    'add' => 'civicrm/admin/form/site_email_address',
+    'update' => 'civicrm/admin/form/site_email_address#?email=[id]',
   ],
   'getIndices' => fn() => [
     'index_domain_id_is_default' => [

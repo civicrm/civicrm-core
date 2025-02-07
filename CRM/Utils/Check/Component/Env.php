@@ -183,12 +183,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
     $domainName    = $domain->name;
-    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/from_email_address", "&reset=1");
+    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/site_email_address");
     $fixDomainName = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1");
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       if (!$domainName || $domainName == 'Default Domain Name') {
-        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default FROM Email Address </a> (for system-generated emails).",
+        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default Site Email Address </a> (for system-generated emails).",
           [
             1 => $fixDomainName,
             2 => $fixEmailUrl,
@@ -196,7 +196,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         );
       }
       else {
-        $msg = ts('Please enter a <a href="%1">default FROM Email Address</a> (for system-generated emails).',
+        $msg = ts('Please enter a <a href="%1">default Site Email Address</a> (for system-generated emails).',
           [1 => $fixEmailUrl]);
       }
     }
