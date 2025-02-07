@@ -22,5 +22,6 @@ if (!defined('CIVI_SETUP')) {
     $e->getModel()->extensions[] = 'authx';
     $e->getModel()->extensions[] = 'civiimport';
     $e->getModel()->extensions[] = 'message_admin';
+    $e->getModel()->extensions[] = 'riverlea';
 
   });
