@@ -44,14 +44,14 @@
   --crm-c-code-background: var(--crm-c-background3); /* background for code regions */
   --crm-c-primary: var(--crm-c-blue);
   --crm-c-primary-hover: var(--crm-c-blue-darker);
-  --crm-c-primary-text: var(--crm-c-light-text); /* text colour when on top of primary */
+  --crm-c-primary-text: var(--crm-c-text-light); /* text colour when on top of primary */
   --crm-c-secondary: var(--crm-c-purple);
   --crm-c-secondary-hover: var(--crm-c-purple-dark);
   --crm-c-success: var(--crm-c-green);
   --crm-c-success-text: var(--crm-c-dark-text);
   --crm-c-alert: var(--crm-c-red);
   --crm-c-warning-text: var(--crm-c-dark-text);
-  --crm-c-info-text: var(--crm-c-light-text);
+  --crm-c-info-text: var(--crm-c-text-light);
 /* Shadows */
   --crm-block-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
   --crm-popup-shadow: var(--crm-block-shadow);
@@ -168,7 +168,7 @@
   --crm-dash-tab-border-hover: unset;
   --crm-dash-tab-col: unset;
   --crm-dash-tab-count-bg: var(--crm-c-primary);
-  --crm-dash-tab-count-col: var(--crm-c-light-text);
+  --crm-dash-tab-count-col: var(--crm-c-text-light);
   --crm-dash-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-dash-icon-size: var(--crm-m2);
   --crm-dash-box-shadow: inset 0 3px 18px -5px rgba(0, 0, 0, 0.25);
@@ -179,7 +179,7 @@
   --crm-dash-label-bg: var(--crm-c-background);
   --crm-dash-header-bg: var(--crm-c-gray-900);
   --crm-dash-header-bg2: var(--crm-c-gray-800);
-  --crm-dash-header-col: var(--crm-c-light-text);
+  --crm-dash-header-col: var(--crm-c-text-light);
   --crm-dash-header-size: var(--crm-l);
   --crm-dash-header-padding: var(--crm-r) var(--crm-r1);
   --crm-dash-image-size: 100px;
@@ -198,7 +198,7 @@
   --crm-dashlet-bg: var(--crm-c-background);
   --crm-dashlet-padding: 0;
   --crm-dashlet-header-bg: var(--crm-c-secondary);
-  --crm-dashlet-header-col: var(--crm-c-light-text);
+  --crm-dashlet-header-col: var(--crm-c-text-light);
   --crm-dashlet-header-padding: var(--crm-padding-reg);
   --crm-dashlet-tabs-border: var(--crm-tabs-border);
 /* Notifications */

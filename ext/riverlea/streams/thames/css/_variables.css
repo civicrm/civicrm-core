@@ -61,7 +61,7 @@
   --crm-c-dark-teal: #3e8079;
 /* PRACTICAL COLOURS */
   --crm-c-text: #000000dd; /* thames */
-  --crm-c-light-text: #fff;
+  --crm-c-text-light: #fff;
   --crm-c-dark-text: var(--crm-c-text);
   --crm-c-link: var(--crm-c-blue-dark);
   --crm-c-link-hover: var(--crm-c-blue-darker);
@@ -76,20 +76,20 @@
   --crm-c-code-background: var(--crm-c-blue-overlay2); /* background for code regions */
   --crm-c-primary: var(--crm-c-blue-dark); /* primary button bgs */ /* thames */
   --crm-c-primary-hover: var(--crm-c-blue-darker); /* thames */
-  --crm-c-primary-text: var(--crm-c-light-text);
+  --crm-c-primary-text: var(--crm-c-text-light);
   --crm-c-primary-hover-text: white; /* thames */
   --crm-c-secondary: #c9e1f1; /* buttons */ /* thames */
   --crm-c-secondary-hover: #a1cef3; /* thames */
   --crm-c-secondary-text: var(--crm-c-blue-darker); /* thames */
-  --crm-c-secondary-hover-text: var(--crm-c-light-text); /* thames todo */
+  --crm-c-secondary-hover-text: var(--crm-c-text-light); /* thames todo */
   --crm-c-success: var(--crm-c-green-dark);
-  --crm-c-success-text: var(--crm-c-light-text);
+  --crm-c-success-text: var(--crm-c-text-light);
   --crm-c-alert: var(--crm-c-red-dark); /* thames */
-  --crm-c-alert-text: var(--crm-c-light-text);
+  --crm-c-alert-text: var(--crm-c-text-light);
   --crm-c-warning: var(--crm-c-amber); /* bg on .btn-warning, .label-warming but border on notification .alert */
   --crm-c-warning-text: var(--crm-c-text);
   --crm-c-info: var(--crm-c-blue-dark);
-  --crm-c-info-text: var(--crm-c-light-text);
+  --crm-c-info-text: var(--crm-c-text-light);
   --crm-c-focus: var(--crm-c-blue-dark);
   --crm-c-inactive: #696969;
 }
@@ -338,7 +338,7 @@
   --crm-dash-tab-border-width: 0; /* to remove border on one side for hanging tabs */
   --crm-dash-tab-col: unset; /* thames */
   --crm-dash-tab-count-bg: var(--crm-c-primary); /* thames */
-  --crm-dash-tab-count-col: var(--crm-c-light-text); /* thames */
+  --crm-dash-tab-count-col: var(--crm-c-text-light); /* thames */
   --crm-dash-tab-width: 100%;
   --crm-dash-tab-align: none;
   --crm-dash-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */ /* thames */
@@ -452,7 +452,7 @@
   --crm-wizard-height: 30px;
   --crm-wizard-radius: var(--crm-l);
   --crm-wizard-angle: 0px;
-  --crm-wizard-active-col: var(--crm-c-light-text);
+  --crm-wizard-active-col: var(--crm-c-text-light);
   --crm-wizard-active-bg: var(--crm-c-link);
   --crm-wizard-border: var(--crm-c-divider);
   --crm-wizard-bg: var(--crm-c-page-background);

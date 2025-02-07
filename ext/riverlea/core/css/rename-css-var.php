@@ -42,7 +42,7 @@ $names = explode("\n", <<<TXT
 --crm-inactive          --crm-c-inactive
 --crm-info              --crm-c-info
 --crm-info-text         --crm-c-info-text
---crm-light-text        --crm-c-light-text
+--crm-light-text        --crm-c-text-light
 --crm-link              --crm-c-link
 --crm-link-hover        --crm-c-link-hover
 --crm-page-background   --crm-c-page-background

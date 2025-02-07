@@ -1848,7 +1848,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 #bootstrap-theme .navbar-default {
   background-color: var(--crm-c-darkest);
   border-color: var(--crm-c-darkest);
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
 }
 #bootstrap-theme .nav-justified,
 #bootstrap-theme .nav-tabs.nav-justified {
@@ -3385,7 +3385,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   display: inline;
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
   font-weight: normal;
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
@@ -3400,13 +3400,13 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme a.label:hover,
 #bootstrap-theme a.label:focus {
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
   text-decoration: none;
   cursor: var(--crm-hover-clickable);
 }
 #bootstrap-theme .label-default {
   background-color: var(--crm-c-text);
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
 }
 #bootstrap-theme .label-default[href]:hover,
 #bootstrap-theme .label-default[href]:focus {

@@ -45,7 +45,7 @@
   --crm-c-dark-teal: #3e8079;
 /* Practical colours */
   --crm-c-text: #464354;
-  --crm-c-light-text: #fff;
+  --crm-c-text-light: #fff;
   --crm-c-dark-text: var(--crm-c-text);
   --crm-c-link: var(--crm-c-blue-dark);
   --crm-c-link-hover: var(--crm-c-blue-darker);
@@ -60,20 +60,20 @@
   --crm-c-code-background: var(--crm-c-background2); /* background for code regions */
   --crm-c-primary: var(--crm-c-gray-700);
   --crm-c-primary-hover: var(--crm-c-gray-800);
-  --crm-c-primary-text: var(--crm-c-light-text);
-  --crm-c-primary-hover-text: var(--crm-c-light-text);
+  --crm-c-primary-text: var(--crm-c-text-light);
+  --crm-c-primary-hover-text: var(--crm-c-text-light);
   --crm-c-secondary: #5d677b;
   --crm-c-secondary-hover: #3e485b;
-  --crm-c-secondary-text: var(--crm-c-light-text);
-  --crm-c-secondary-hover-text: var(--crm-c-light-text);
+  --crm-c-secondary-text: var(--crm-c-text-light);
+  --crm-c-secondary-hover-text: var(--crm-c-text-light);
   --crm-c-success: var(--crm-c-green-dark);
-  --crm-c-success-text: var(--crm-c-light-text);
+  --crm-c-success-text: var(--crm-c-text-light);
   --crm-c-alert: var(--crm-c-red-dark);
-  --crm-c-alert-text: var(--crm-c-light-text);
+  --crm-c-alert-text: var(--crm-c-text-light);
   --crm-c-warning: var(--crm-c-amber);
-  --crm-c-warning-text: var(--crm-c-light-text);
+  --crm-c-warning-text: var(--crm-c-text-light);
   --crm-c-info: var(--crm-c-blue-dark);
-  --crm-c-info-text: var(--crm-c-light-text);
+  --crm-c-info-text: var(--crm-c-text-light);
   --crm-c-focus: var(--crm-c-blue-dark);
   --crm-c-inactive: #696969;
 /* Shadows */
@@ -192,7 +192,7 @@
 /* .crm-accordion-bold */
   --crm-expand-header-bg: var(--crm-c-secondary);
   --crm-expand-header-bg-active: var(--crm-c-gray-900);
-  --crm-expand-header-color: var(--crm-c-light-text);
+  --crm-expand-header-color: var(--crm-c-text-light);
   --crm-expand-header-padding: var(--crm-s) var(--crm-m);
   --crm-expand-header-weight: bold;
   --crm-expand-header-font: var(--crm-font-bold);
@@ -337,7 +337,7 @@
   --crm-dialog-line: unset;
   --crm-dialog-inner-shadow: var(--crm-bottom-shadow);
   --crm-dialog-header-bg: var(--crm-c-secondary);
-  --crm-dialog-header-col: var(--crm-c-light-text);
+  --crm-dialog-header-col: var(--crm-c-text-light);
   --crm-dialog-header-size: var(--crm-r1);
   --crm-dialog-header-padding: var(--crm-m1) var(--crm-r);
   --crm-dialog-header-radius: var(--crm-dialog-radius);
@@ -363,7 +363,7 @@
   --crm-dropdown-padding: var(--crm-s);
   --crm-dropdown-radius: var(--crm-roundness);
   --crm-dropdown-bg: var(--crm-c-secondary-hover);
-  --crm-dropdown-col: var(--crm-c-light-text);
+  --crm-dropdown-col: var(--crm-c-text-light);
   --crm-dropdown-hover: var(--crm-c-text);
   --crm-dropdown-hover-bg: var(--crm-c-page-background);
   --crm-dropdown-border: 0;
@@ -375,7 +375,7 @@
 /* Notifications */
   --crm-notify-background: rgba(0,0,0,0.85);
   --crm-notify-padding: var(--crm-m2);
-  --crm-notify-col: var(--crm-c-light-text);
+  --crm-notify-col: var(--crm-c-text-light);
   --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: var(--crm-roundness);
   --crm-notify-alert: #d02e2e;
@@ -401,7 +401,7 @@
   --crm-wizard-radius: var(--crm-l);
   --crm-wizard-angle: 0px;
   --crm-wizard-arrow-thickness: 1px;
-  --crm-wizard-active-col: var(--crm-c-light-text);
+  --crm-wizard-active-col: var(--crm-c-text-light);
   --crm-wizard-active-bg: var(--crm-c-link);
   --crm-wizard-border: var(--crm-c-divider);
   --crm-wizard-bg: var(--crm-c-page-background);
