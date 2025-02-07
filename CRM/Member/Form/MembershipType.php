@@ -297,10 +297,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $errors['duration_interval'] = ts('Please enter a duration interval.');
     }
 
-    if (in_array(CRM_Utils_Array::value('auto_renew', $params), [
-      1,
-      2,
-    ])) {
+    if (in_array($params['auto_renew'] ?? 0, [1, 2])) {
       if (($params['duration_interval'] > 1 && $params['duration_unit'] === 'year') ||
         ($params['duration_interval'] > 12 && $params['duration_unit'] === 'month')
       ) {
