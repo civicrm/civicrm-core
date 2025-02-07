@@ -2059,7 +2059,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $adminVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('admin');
 
             foreach ($options as $key => $currentOption) {
-              $optionVisibility = CRM_Utils_Array::value('visibility_id', $currentOption, $publicVisibilityID);
+              $optionVisibility = $currentOption['visibility_id'] ?? $publicVisibilityID;
               if ($optionVisibility == $adminVisibilityID) {
                 unset($options[$key]);
               }

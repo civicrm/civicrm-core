@@ -73,7 +73,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     $this->assign('isShowLocation', $values['event']['is_show_location'] ?? NULL);
 
-    $eventCurrency = CRM_Utils_Array::value('currency', $values['event'], $config->defaultCurrency);
+    $eventCurrency = $values['event']['currency'] ?? $config->defaultCurrency;
     $this->assign('eventCurrency', $eventCurrency);
 
     // show event fees.
