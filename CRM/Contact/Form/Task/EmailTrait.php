@@ -324,6 +324,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
     return $defaults;
   }
 
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      // Because value contains <angle brackets>
+      'from_email_address',
+    ];
+  }
+
   /**
    * Process the form after the input has been submitted and validated.
    *
