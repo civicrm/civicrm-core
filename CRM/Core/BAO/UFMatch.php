@@ -90,8 +90,8 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       // Get logged in user ids, and set to session.
       if ($isUserLoggedIn) {
         $userIds = self::getUFValues();
-        $session->set('ufID', CRM_Utils_Array::value('uf_id', $userIds, ''));
-        $session->set('userID', CRM_Utils_Array::value('contact_id', $userIds, ''));
+        $session->set('ufID', $userIds['uf_id'] ?? '');
+        $session->set('userID', $userIds['contact_id'] ?? '');
       }
     }
 

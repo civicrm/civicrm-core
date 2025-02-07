@@ -264,8 +264,8 @@ class CRM_Core_JobManager {
    */
   private function apiResultToMessage($apiResult) {
     $status = ($apiResult['is_error'] ?? FALSE) ? ts('Failure') : ts('Success');
-    $msg = CRM_Utils_Array::value('error_message', $apiResult, 'empty error_message!');
-    $vals = CRM_Utils_Array::value('values', $apiResult, 'empty values!');
+    $msg = $apiResult['error_message'] ?? 'empty error_message!';
+    $vals = $apiResult['values'] ?? 'empty values!';
     if (is_array($msg)) {
       $msg = serialize($msg);
     }
