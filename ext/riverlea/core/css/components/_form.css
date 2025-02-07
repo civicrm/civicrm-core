@@ -806,7 +806,7 @@ input.crm-form-checkbox) + label {
 }
 .crm-container .ui-spinner a.ui-spinner-button:hover,
 .crm-container .ui-spinner a.ui-spinner-button:focus {
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
 }
 .crm-container .ui-spinner a.ui-spinner-button span::before {
   font-family: "FontAwesome";

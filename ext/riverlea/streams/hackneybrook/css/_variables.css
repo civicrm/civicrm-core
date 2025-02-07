@@ -75,7 +75,7 @@
   /* Tabs */
   --crm-tabs-border: var(--crm-c-divider);
   --crm-tab-count-bg: var(--crm-c-blue-dark);
-  --crm-tab-count-col: var(--crm-c-light-text);
+  --crm-tab-count-col: var(--crm-c-text-light);
   --crm-tab-border: 1px solid var(--crm-c-gray-400);
   /* Contact dashboard */
   --crm-dash-border: 0;
