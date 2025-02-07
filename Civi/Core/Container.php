@@ -173,13 +173,14 @@ class Container {
       // Putting session-cache in global scope means that QF form-state will endure across upgrades.
       // (*For better or worse -- mostly better.*)
       'session' => ['name' => 'CiviCRM Session', 'scope' => 'global'],
-      'long' => [],
+      'long' => ['withArray' => 'fast'],
       'groups' => ['name' => 'contact groups', 'withArray' => 'fast'],
       'navigation' => ['withArray' => 'fast'],
       'customData' => ['name' => 'custom data', 'withArray' => 'fast'],
       'fields' => ['name' => 'contact fields', 'withArray' => 'fast'],
       'contactTypes' => ['withArray' => 'fast'],
       'metadata' => ['withArray' => 'fast'],
+      'angular' => ['withArray' => 'fast'],
     ];
     // Use the FastArrayDecorator on caches where (1) we don't really care about TTL,
     // (2) they're accessed frequently, (3) there's not much risk of concurrency issues.
