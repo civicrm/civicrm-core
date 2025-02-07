@@ -113,7 +113,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     }
     $this->assign('showIsDefault', in_array(self::$_gName,
       [
-        'from_email_address',
         'email_greeting',
         'postal_greeting',
         'addressee',

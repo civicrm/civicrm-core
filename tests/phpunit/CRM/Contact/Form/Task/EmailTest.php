@@ -10,7 +10,7 @@
  */
 
 use Civi\Api4\Activity;
-use Civi\Api4\OptionValue;
+use Civi\Api4\SiteEmailAddress;
 
 /**
  * Test class for CRM_Contact_Form_Task_Email.
@@ -27,9 +27,9 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']);
     $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']);
 
-    $this->createTestEntity('OptionValue', [
-      'label' => '"Seamus Lee" <seamus@example.com>',
-      'option_group_id:name' => 'from_email_address',
+    $this->createTestEntity('SiteEmailAddress', [
+      'display_name' => 'Seamus Lee',
+      'email' => 'seamus@example.com',
     ], 'aussie');
   }
 
@@ -40,8 +40,8 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     Civi::settings()->set('allow_mail_from_logged_in_contact', 0);
-    if (!empty($this->ids['OptionValue'])) {
-      OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
+    if (!empty($this->ids['SiteEmailAddress'])) {
+      SiteEmailAddress::delete(FALSE)->addWhere('id', 'IN', $this->ids['SiteEmailAddress'])->execute();
     }
     parent::tearDown();
   }
@@ -52,11 +52,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
   public function testDomainEmailGeneration(): void {
     $emails = CRM_Core_BAO_Email::domainEmails();
     $this->assertNotEmpty($emails);
-    $optionValue = $this->callAPISuccess('OptionValue', 'Get', [
-      'id' => $this->ids['OptionValue']['aussie'],
-    ]);
     $this->assertArrayHasKey('"Seamus Lee" <seamus@example.com>', $emails);
-    $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->ids['OptionValue']['aussie']]['label']);
   }
 
   /**

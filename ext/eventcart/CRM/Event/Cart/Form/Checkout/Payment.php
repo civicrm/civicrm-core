@@ -335,7 +335,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $send_template_params = [
       'table' => 'civicrm_msg_template',
       'contactId' => $this->payer_contact_id,
-      'from' => current(CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE)),
+      'from' => CRM_Core_BAO_Domain::getFromEmail(),
       'groupName' => 'msg_tpl_workflow_event',
       'isTest' => FALSE,
       'toEmail' => $contact_details[1],

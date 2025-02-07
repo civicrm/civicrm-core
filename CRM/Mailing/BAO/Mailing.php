@@ -1090,13 +1090,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
       // Get the default from email address, if not provided.
       if (empty($defaults['from_email'])) {
-        $defaultAddress = CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE);
-        foreach ($defaultAddress as $id => $value) {
-          if (preg_match('/"(.*)" <(.*)>/', ($value ?? ''), $match)) {
-            $defaults['from_email'] = $match[2];
-            $defaults['from_name'] = $match[1];
-          }
-        }
+        $defaultAddress = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+        $defaults['from_email'] = $defaultAddress[1];
+        $defaults['from_name'] = $defaultAddress[0];
       }
 
       $params = array_merge($defaults, $params);

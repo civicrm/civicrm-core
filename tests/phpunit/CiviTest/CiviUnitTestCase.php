@@ -517,16 +517,15 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           'postal_code' => 6022,
         ],
       ]);
-      OptionValue::save(FALSE)
+      \Civi\Api4\SiteEmailAddress::save(FALSE)
         ->setMatch(
-          ['option_group_id', 'domain_id']
+          ['domain_id']
         )->setDefaults([
           'is_default' => 1,
-          'name' => '"FIXME" <info@EXAMPLE.ORG>',
-          'label' => '"FIXME" <info@EXAMPLE.ORG>',
-          'option_group_id:name' => 'from_email_address',
+          'display_name' => 'FIXME',
+          'email' => 'info@EXAMPLE.ORG',
         ])
-        ->setRecords([['domain_id' => 1, 'value' => 1], ['domain_id' => 2, 'value' => 2]])->execute();
+        ->setRecords([['domain_id' => 1], ['domain_id' => 2]])->execute();
     }
     catch (CRM_Core_Exception $e) {
       $this->fail('failed to re-instate domain contacts ' . $e->getMessage());
@@ -636,9 +635,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     if ($this->isLocationTypesOnPostAssert) {
       $this->assertLocationValidity();
     }
-    $this->assertCount(1, OptionGroup::get(FALSE)
-      ->addWhere('name', '=', 'from_email_address')
-      ->execute());
     if (!$this->isValidateFinancialsOnPostAssert) {
       return;
     }

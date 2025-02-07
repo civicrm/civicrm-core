@@ -343,7 +343,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'email_greeting',
       'postal_greeting',
       'addressee',
-      'from_email_address',
       'case_status',
       'encounter_medium',
       'case_type',
@@ -439,18 +438,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     }
 
-    if ($optionGroupName === 'from_email_address') {
-      $formEmail = CRM_Utils_Mail::pluckEmailFromHeader($fields['label']);
-      if (!CRM_Utils_Rule::email($formEmail)) {
-        $errors['label'] = ts('Please enter a valid email address.');
-      }
-
-      $formName = explode('"', $fields['label']);
-      if (empty($formName[1]) || count($formName) != 3) {
-        $errors['label'] = ts('Please follow the proper format for From Email Address');
-      }
-    }
-
     $dataType = self::getOptionGroupDataType($optionGroupName);
     if ($dataType && $optionGroupName !== 'activity_type') {
       $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
@@ -528,10 +515,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         $params['filter'] = $params['contact_type_id'];
       }
 
-      //make sure we only have a single space, CRM-6977 and dev/mail/15
-      if ($this->_gName == 'from_email_address') {
-        $params['label'] = $this->sanitizeFromEmailAddress($params['label']);
-      }
       // set value of filter if not present in params
       if ($this->_id && !array_key_exists('filter', $params)) {
         if ($this->_gName == 'participant_role') {
@@ -560,11 +543,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
   }
 
-  public function sanitizeFromEmailAddress($email) {
-    preg_match("/^\"(.*)\" *<([^@>]*@[^@>]*)>$/", $email, $parts);
-    return "\"{$parts[1]}\" <$parts[2]>";
-  }
-
   /**
    * Is the option group one of our greetings.
    *
@@ -579,9 +557,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @return array
    */
   protected function getFieldsToExcludeFromPurification(): array {
-    if ($this->_gName === 'from_email_address') {
-      return ['label'];
-    }
     return [];
   }
 

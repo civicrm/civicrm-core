@@ -1,0 +1,12 @@
+<af-form ctrl="afform">
+  <af-entity actions="{create: true, update: true}" type="SiteEmailAddress" name="email" label="Site Email Address 1" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="email" class="af-container" af-title="Site Email Address 1">
+    <div class="af-container af-layout-inline">
+      <af-field name="display_name" />
+      <af-field name="email" />
+    </div>
+    <af-field name="description" />
+    <af-field name="is_default" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>

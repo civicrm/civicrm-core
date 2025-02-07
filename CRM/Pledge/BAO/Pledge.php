@@ -883,8 +883,7 @@ SELECT  pledge.contact_id              as contact_id,
       $template = CRM_Core_Smarty::singleton();
 
       // set receipt from
-      $receiptFrom = CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE);
-      $receiptFrom = reset($receiptFrom);
+      $receiptFrom = CRM_Core_BAO_Domain::getFromEmail();
 
       foreach ($pledgeDetails as $paymentId => $details) {
         if (array_key_exists($details['contact_id'], $contactDetails)) {

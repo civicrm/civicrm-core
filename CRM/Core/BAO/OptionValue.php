@@ -551,11 +551,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
     $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE option_group_id = %1 AND id <> %2';
     $queryParams = [1 => [$optionGroupID, 'Integer'], 2 => [$id, 'Integer']];
 
-    // Limit update by domain of option. This is loaded if it is a domain option group.
-    if (!empty($optionValue->domain_id)) {
-      $query .= ' AND domain_id = %3';
-      $queryParams[3] = [(int) $optionValue->domain_id, 'Integer'];
-    }
     if (in_array($groupName, ['email_greeting', 'postal_greeting', 'addressee'], TRUE)) {
       $variableNumber = count($queryParams) + 1;
       $query .= ' AND filter = %' . $variableNumber;

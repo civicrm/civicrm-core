@@ -48,6 +48,7 @@ SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 {crmSqlData file="sql/civicrm_data/civicrm_tag.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_mailing_component.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_financial_type.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_site_email_address.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_option_group/*.sqldata.php" exclude=';(encounter_medium|soft_credit_type|recent_items_providers).sqldata.php$;'}
 
 -- CRM-6138

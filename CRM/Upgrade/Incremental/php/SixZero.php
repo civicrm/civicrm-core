@@ -28,6 +28,11 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
    *   The version number matching this function name
    */
   public function upgrade_6_0_alpha1($rev): void {
+    $this->addSnapshotTask('from_addresses', CRM_Utils_SQL_Select::from('civicrm_option_value')
+      ->where('option_group_id = (select id from civicrm_option_group where name = "from_email_address")')
+    );
+    $this->addTask('Install SiteEmailAddress entity', 'createEntityTable', '6.0.alpha1.SiteEmailAddress.entityType.php');
+    $this->addTask('Migrate from_email_address option group to SiteEmailAddress entity', 'migrateFromEmailAddressValues');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask(
       'Convert MembershipLog.modified_date to timestamp',
@@ -39,6 +44,43 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
     );
     $this->addTask('Set a default activity priority', 'addActivityPriorityDefault');
     $this->addSimpleExtensionTask(ts('enable dedupe backward compatibility'), ['legacydedupefinder']);
+  }
+
+  public static function migrateFromEmailAddressValues($rev): bool {
+    $select = <<<SQL
+SELECT
+    value AS id,
+    TRIM(BOTH '"' FROM SUBSTRING_INDEX(SUBSTRING_INDEX(TRIM(label), '"', 2), '"', -1)) AS display_name, -- Extract quoted part as the display_name
+    TRIM(BOTH '<>' FROM SUBSTRING_INDEX(SUBSTRING_INDEX(TRIM(label), '<', -1), '>', 1)) AS email, -- Extract part in brackets as email
+    description,
+    is_active,
+    is_default,
+    domain_id
+FROM
+    civicrm_option_value
+WHERE
+    option_group_id IN (SELECT id FROM civicrm_option_group WHERE name = 'from_email_address')
+SQL;
+    $values = CRM_Core_DAO::executeQuery($select)->fetchAll();
+
+    if (!$values) {
+      // Upgrade step has already run. Skip.
+      return TRUE;
+    }
+
+    $usedIds = [];
+    foreach ($values as &$value) {
+      // Ensure unique 'id' keys by incrementing duplicates
+      while (in_array($value['id'], $usedIds)) {
+        $value['id']++;
+      }
+      $usedIds[] = $value['id'];
+    }
+
+    CRM_Utils_SQL_Insert::into('civicrm_site_email_address')
+      ->rows($values)
+      ->execute();
+    return TRUE;
   }
 
   /**

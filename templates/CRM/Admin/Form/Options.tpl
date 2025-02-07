@@ -23,13 +23,6 @@
                 <span class="description">{ts}Enter the "class path" for this custom search here.{/ts}
              </td>
            </tr>
-        {elseif $gName eq 'from_email_address'}
-           <tr class="crm-admin-options-form-block-from_email_address">
-             <td class="label">{ts}FROM Email Address{/ts} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_option_value' field='label' id=$id}{/if}</td>
-             <td>{$form.label.html}<br />
-                <span class="description">{ts}Include double-quotes (&quot;) around the name and angle-brackets (&lt; &gt;) around the email address.<br />EXAMPLE: <em>&quot;Client Services&quot; &lt;clientservices@example.org&gt;</em>{/ts}<span>
-             </td>
-           </tr>
         {elseif $gName eq 'redaction_rule'}
            <tr class="crm-admin-options-form-block-expression">
              <td class="label">{ts}Match Value or Expression{/ts} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_option_value' field='label' id=$id}{/if}</td>

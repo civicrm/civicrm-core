@@ -130,7 +130,7 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * @var array
    */
-  private $_entityFields;
+  protected $_entityFields;
 
   /**
    * @var array
