@@ -30,7 +30,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
   public function upgrade_6_1_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
-    $this->addTask(ts('Replace Clear Caches & Reset Paths with Clear Caches in Nav Menu'), 'updateUpdateConfigBackendNavItem');
+    $this->addTask('Replace Clear Caches & Reset Paths with Clear Caches in Nav Menu', 'updateUpdateConfigBackendNavItem');
   }
 
   /**
@@ -41,30 +41,38 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
    * @return bool
    */
   public static function updateUpdateConfigBackendNavItem() {
-    // delete any entries to the path that no longer exists
-    \Civi\Api4\Navigation::delete(FALSE)
-      ->addWhere('url', '=', 'civicrm/admin/setting/updateConfigBackend?reset=1')
-      ->execute();
+    $domainID = CRM_Core_Config::domainID();
 
-    $systemSettingsNavItem = \Civi\Api4\Navigation::get(FALSE)
-      ->addWhere('name', '=', 'System Settings')
-      ->execute()
-      ->first()['id'] ?? NULL;
+    // delete any entries to the path that no longer exists
+    // doesn't seem necessary to restrict by domain?
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_navigation WHERE url = "civicrm/admin/setting/updateConfigBackend?reset=1"');
+
+    $systemSettingsNavItem = CRM_Core_DAO::singleValueQuery("SELECT id
+      FROM civicrm_navigation
+      WHERE name = 'System Settings' AND domain_id = {$domainID}
+    ");
 
     if (!$systemSettingsNavItem) {
       \Civi::log()->debug('Couldn\'t find System Settings Nav Menu Item to create new Clear Caches entry');
       return TRUE;
     }
 
-    // Q: how to handle multi domain?
-    \Civi\Api4\Navigation::create(FALSE)
-      ->addValue('url', 'civicrm/menu/rebuild?reset=1')
-      ->addValue('label', ts('Clear Caches'))
-      ->addValue('name', 'cache_clear')
-      ->addValue('has_separator', TRUE)
-      ->addValue('parent_id', $systemSettingsNavItem)
-      ->addValue('weight', 0)
-      ->execute();
+    $exists = CRM_Core_DAO::singleValueQuery("SELECT id
+      FROM civicrm_navigation
+      WHERE name = 'cache_clear' AND domain_id = {$domainID}
+    ");
+
+    if ($exists) {
+      // already exists, we can finish early
+      return TRUE;
+    }
+
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_navigation
+        (url, label, name, has_separator, parent_id, weight)
+      VALUES
+        ('civicrm/menu/rebuild?reset=1', 'cache_clear', 1, {$systemSettingsNavItem}, 0)
+    ");
 
     return TRUE;
   }
