@@ -1021,7 +1021,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $addressCnt = 1;
       foreach ($params['address'] as $cnt => $addressBlock) {
         if (($values['location_type_id'] ?? NULL) ==
-          CRM_Utils_Array::value('location_type_id', $addressBlock)
+          ($addressBlock['location_type_id'] ?? NULL)
         ) {
           $addressCnt = $cnt;
           break;

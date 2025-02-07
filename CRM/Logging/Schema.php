@@ -730,7 +730,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
           if ($civiTableSpecs[$col]['DATA_TYPE'] != ($logTableSpecs[$col]['DATA_TYPE'] ?? NULL)
             // We won't alter the log if the length is decreased in case some of the existing data won't fit.
-            || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
+            || ($civiTableSpecs[$col]['LENGTH'] ?? 0) > ($logTableSpecs[$col]['LENGTH'] ?? 0)
           ) {
             // if data-type is different, surely consider the column
             $diff['MODIFY'][] = $col;

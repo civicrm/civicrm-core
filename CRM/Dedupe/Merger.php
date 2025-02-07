@@ -2697,7 +2697,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // Put this field's location type at the top of the list
           $tmpIdList = $typeOptions['values'];
-          $defaultTypeId = [$thisTypeId => CRM_Utils_Array::value($thisTypeId, $tmpIdList)];
+          $defaultTypeId = [$thisTypeId => $tmpIdList[$thisTypeId] ?? NULL];
           unset($tmpIdList[$thisTypeId]);
 
           // Add the element
