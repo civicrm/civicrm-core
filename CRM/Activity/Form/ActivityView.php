@@ -103,7 +103,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $engagementLevel = $defaults['engagement_level'] ?? NULL;
     if ($engagementLevel) {
       $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
-      $values['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
+      $values['engagement_level'] = $engagementLevels[$engagementLevel] ?? $engagementLevel;
     }
 
     $values['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_activity', $activityId);
