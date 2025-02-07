@@ -22,10 +22,14 @@ use Civi;
 class Themes extends \Civi\Core\Service\AutoService {
 
   /**
-   * No theme only uses core CSS. It is what you get if your theme is set to an
-   * unavailable theme.
+   * Disable core CSS.
    */
-  const NO_THEME = 'none';
+  const NO_STYLES = 'none';
+
+  /**
+   * Core CSS only.
+   */
+  const NO_THEME = 'no_theme';
 
   /**
    * Fallback is a pseudotheme which can be included in "search_order".
@@ -201,15 +205,20 @@ class Themes extends \Civi\Core\Service\AutoService {
    */
   protected function buildAll() {
     $themes = [
-      self::NO_THEME => [
+      self::NO_STYLES => [
         'ext' => 'civicrm',
-        'title' => ts('None (Unstyled)'),
+        'title' => ts('No Styles'),
         'help' => ts('Disable CiviCRM\'s built-in CSS files.'),
-        'search_order' => ['none', self::FALLBACK_THEME],
+        'search_order' => [self::NO_STYLES, self::FALLBACK_THEME],
         'excludes' => [
           "css/civicrm.css",
           "css/bootstrap.css",
         ],
+      ],
+      self::NO_THEME => [
+        'ext' => 'civicrm',
+        'title' => ts('No Theme'),
+        'search_order' => [self::NO_THEME, self::FALLBACK_THEME],
       ],
       self::FALLBACK_THEME => [
         'ext' => 'civicrm',
