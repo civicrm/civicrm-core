@@ -66,8 +66,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
    */
   public $noRules = FALSE;
 
-  protected $temporaryTables = [];
-
   /**
    * Return a structure holding the supported tables, fields and their titles
    *
@@ -275,26 +273,26 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     }
 
     if ($params) {
-      $this->temporaryTables['dedupe'] = $dedupeTable = CRM_Utils_SQL_TempTable::build()
+      $dedupeTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
       $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe');
-      $this->temporaryTables['dedupe_copy'] = $dedupeCopyTemporaryTableObject->getName();
-      $insertClause = "INSERT INTO {$this->temporaryTables['dedupe']}  (id1, weight)";
+      $dedupeTableCopy = $dedupeCopyTemporaryTableObject->getName();
+      $insertClause = "INSERT INTO $dedupeTable  (id1, weight)";
       $groupByClause = "GROUP BY id1, weight";
-      $dupeCopyJoin = " JOIN {$this->temporaryTables['dedupe_copy']} ON {$this->temporaryTables['dedupe_copy']}.id1 = t1.column WHERE ";
+      $dupeCopyJoin = " JOIN $dedupeTableCopy dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
     }
     else {
-      $this->temporaryTables['dedupe'] = $dedupeTable = CRM_Utils_SQL_TempTable::build()
+      $dedupeTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)")->getName();
       $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe');
-      $this->temporaryTables['dedupe_copy'] = $dedupeCopyTemporaryTableObject->getName();
-      $insertClause = "INSERT INTO {$this->temporaryTables['dedupe']}  (id1, id2, weight)";
+      $dedupeTableCopy = $dedupeCopyTemporaryTableObject->getName();
+      $insertClause = "INSERT INTO $dedupeTable  (id1, id2, weight)";
       $groupByClause = "GROUP BY id1, id2, weight";
-      $dupeCopyJoin = " JOIN {$this->temporaryTables['dedupe_copy']} ON {$this->temporaryTables['dedupe_copy']}.id1 = t1.column AND {$this->temporaryTables['dedupe_copy']}.id2 = t2.column WHERE ";
+      $dupeCopyJoin = " JOIN $dedupeTableCopy dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
@@ -319,22 +317,22 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
             // drop dedupe_copy table just in case if its already there.
             $dedupeCopyTemporaryTableObject->drop();
             // get prepared to search within already found dupes if $searchWithinDupes flag is set
-            $dedupeCopyTemporaryTableObject->createWithQuery("SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}");
+            $dedupeCopyTemporaryTableObject->createWithQuery("SELECT * FROM $dedupeTable WHERE weight >= {$weightSum}");
 
             preg_match($patternColumn, $query, $matches);
             $query = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoin), $query);
 
             // CRM-19612: If there's a union, there will be two WHEREs, and you
             // can't use the temp table twice.
-            if (preg_match('/' . $this->temporaryTables['dedupe_copy'] . '[\S\s]*(union)[\S\s]*' . $this->temporaryTables['dedupe_copy'] . '/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
+            if (preg_match('/' . $dedupeTableCopy . '[\S\s]*(union)[\S\s]*' . $dedupeTableCopy . '/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
               // Make a second temp table:
-              $this->temporaryTables['dedupe_copy_2'] = CRM_Utils_SQL_TempTable::build()
+              $dedupeTableCopy2 = CRM_Utils_SQL_TempTable::build()
                 ->setCategory('dedupe')
-                ->createWithQuery("SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}")
+                ->createWithQuery("SELECT * FROM $dedupeTable WHERE weight >= {$weightSum}")
                 ->getName();
               // After the union, use that new temp table:
               $part1 = substr($query, 0, $matches[1][1]);
-              $query = $part1 . str_replace($this->temporaryTables['dedupe_copy'], $this->temporaryTables['dedupe_copy_2'], substr($query, $matches[1][1]));
+              $query = $part1 . str_replace($dedupeTableCopy, $dedupeTableCopy2, substr($query, $matches[1][1]));
             }
           }
           $searchWithinDupes = 1;
