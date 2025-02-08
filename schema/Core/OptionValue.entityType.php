@@ -193,7 +193,8 @@ return [
       'title' => ts('Domain ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
-      'description' => ts('Which Domain is this option value for'),
+      'deprecated' => TRUE,
+      'description' => ts('Unused deprecated column.'),
       'add' => '3.1',
       'input_attrs' => [
         'label' => ts('Domain'),
