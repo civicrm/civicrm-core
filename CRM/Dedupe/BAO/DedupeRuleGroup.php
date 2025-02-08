@@ -247,10 +247,11 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       $this->contactIds = $contactIDs;
       $this->params = $params;
     }
-    $this->id = $id;
+    $ruleGroup = $this;
+    $ruleGroup->id = $id;
     // make sure we've got a fetched dbrecord, not sure if this is enforced
     $this->find(TRUE);
-    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($this->id, $contactIDs, $params);
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, $params);
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
     if ($legacyMode && $optimizer->isUseReservedQuery()) {
@@ -264,9 +265,9 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     if ($legacyMode) {
       if (!$tableQueries) {
         // Just for the hook.... (which is deprecated).
-        $this->noRules = TRUE;
+        $ruleGroup->noRules = TRUE;
       }
-      CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
+      CRM_Utils_Hook::dupeQuery($ruleGroup, 'table', $tableQueries);
     }
     if (empty($tableQueries)) {
       return FALSE;
@@ -298,7 +299,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     $exclWeightSum = [];
 
     while (!empty($tableQueries)) {
-      [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
+      [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $ruleGroup->threshold, $exclWeightSum);
 
       if ($isInclusive) {
         // order queries by table count
