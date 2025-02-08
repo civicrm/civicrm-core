@@ -3,7 +3,6 @@
   <div class="standalone-auth-box">
     <form id=login-form>
       <img class="crm-logo" src="{$logoUrl}" alt="{ts escape='htmlattribute'}Logo for CiviCRM, with an intersecting blue and green triangle{/ts}">
-      {$statusMessages}
       <div class="input-wrapper">
         <label for="usernameInput" name=username class="form-label">{ts}Username{/ts}</label>
         <input type="text" class="form-control crm-form-text" id="usernameInput" >
