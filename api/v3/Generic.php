@@ -477,7 +477,7 @@ function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
     $fields = civicrm_api3_generic_getfields(['entity' => $apiRequest['entity'], ['params' => ['action' => 'create']]]);
     $params['field']['options'] = [];
     foreach ($fields['values'] as $name => $field) {
-      if (isset($field['pseudoconstant']) || CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_BOOLEAN) {
+      if (isset($field['pseudoconstant']) || ($field['type'] ?? NULL) == CRM_Utils_Type::T_BOOLEAN) {
         $params['field']['options'][$name] = $field['title'] ?? $name;
       }
     }

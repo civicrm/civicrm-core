@@ -35,7 +35,7 @@
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_create($params) {
-  $contactID = CRM_Utils_Array::value('contact_id', $params, $params['id'] ?? NULL);
+  $contactID = $params['contact_id'] ?? $params['id'] ?? NULL;
 
   if ($contactID && !empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
     throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
