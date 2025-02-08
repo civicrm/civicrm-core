@@ -60,11 +60,11 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     $this->setTitle(ts('Settings - Outbound Mail'));
     $this->add('text', 'sendmail_path', ts('Sendmail Path'));
     $this->add('text', 'sendmail_args', ts('Sendmail Argument'));
-    $this->add('text', 'smtpServer', ts('SMTP Server'), CRM_Utils_Array::value('smtpServer', $props));
-    $this->add('text', 'smtpPort', ts('SMTP Port'), CRM_Utils_Array::value('smtpPort', $props));
-    $this->addYesNo('smtpAuth', ts('Authentication?'), CRM_Utils_Array::value('smtpAuth', $props));
-    $this->addElement('text', 'smtpUsername', ts('SMTP Username'), CRM_Utils_Array::value('smtpUsername', $props));
-    $this->addElement('password', 'smtpPassword', ts('SMTP Password'), CRM_Utils_Array::value('smtpPassword', $props));
+    $this->add('text', 'smtpServer', ts('SMTP Server'), $props['smtpServer'] ?? NULL);
+    $this->add('text', 'smtpPort', ts('SMTP Port'), $props['smtpPort'] ?? NULL);
+    $this->addYesNo('smtpAuth', ts('Authentication?'), $props['smtpAuth'] ?? NULL);
+    $this->addElement('text', 'smtpUsername', ts('SMTP Username'), $props['smtpUsername'] ?? NULL);
+    $this->addElement('password', 'smtpPassword', ts('SMTP Password'), $props['smtpPassword'] ?? NULL);
 
     $this->_testButtonName = $this->getButtonName('refresh', 'test');
 
