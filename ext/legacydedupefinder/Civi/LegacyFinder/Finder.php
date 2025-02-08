@@ -32,7 +32,35 @@ class Finder extends AutoSubscriber {
     if (!$tempTable) {
       return;
     }
-    $dao = \CRM_Core_DAO::executeQuery($ruleGroup->thresholdQuery($event->checkPermissions));
+
+    $aclWhere = $aclFrom = '';
+    $dedupeTable = $tempTable;
+    $contactType = $ruleGroup->contact_type;
+    $threshold = $ruleGroup->threshold;
+
+    if ($event->checkPermissions) {
+      [$aclFrom, $aclWhere] = \CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
+      $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
+    }
+    $query = \CRM_Core_DAO::composeQuery("SELECT IF(dedupe.id1 < dedupe.id2, dedupe.id1, dedupe.id2) as id1,
+              IF(dedupe.id1 < dedupe.id2, dedupe.id2, dedupe.id1) as id2, dedupe.weight
+              FROM $dedupeTable dedupe JOIN civicrm_contact c1 ON dedupe.id1 = c1.id
+                JOIN civicrm_contact c2 ON dedupe.id2 = c2.id {$aclFrom}
+                LEFT JOIN civicrm_dedupe_exception exc
+                  ON dedupe.id1 = exc.contact_id1 AND dedupe.id2 = exc.contact_id2
+              WHERE c1.contact_type = %1 AND
+                    c2.contact_type = %1
+                     AND c1.is_deleted = 0 AND c2.is_deleted = 0
+                    {$aclWhere}
+                    AND weight >= %2 AND exc.contact_id1 IS NULL",
+      [
+        1 => [$contactType, 'String'],
+        2 => [$threshold, 'Integer'],
+      ]
+    );
+
+    \CRM_Utils_Hook::dupeQuery($ruleGroup, 'threshold', $query);
+    $dao = \CRM_Core_DAO::executeQuery($query);
     $duplicates = [];
     while ($dao->fetch()) {
       $duplicates[] = ['entity_id_1' => $dao->id1, 'entity_id_2' => $dao->id2, 'weight' => $dao->weight];
