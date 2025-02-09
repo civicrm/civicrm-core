@@ -189,7 +189,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @return bool
    */
   public static function isSearchContext($context) {
-    $searchContext = CRM_Utils_Array::value($context, self::validContext());
+    $searchContext = self::validContext()[$context] ?? FALSE;
     return (bool) $searchContext;
   }
 
@@ -584,10 +584,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->set('uf_group_id', $ufGroupID);
 
       // also get the object mode directly from the post value
-      $this->_componentMode = CRM_Utils_Array::value('component_mode', $_POST, $this->_componentMode);
+      $this->_componentMode = $_POST['component_mode'] ?? $this->_componentMode;
 
       // also get the operator from the post value if set
-      $this->_operator = CRM_Utils_Array::value('operator', $_POST, $this->_operator);
+      $this->_operator = $_POST['operator'] ?? $this->_operator;
       $this->_formValues['operator'] = $this->_operator;
       $this->set('operator', $this->_operator);
     }
@@ -668,7 +668,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
     }
     $this->assign('id', $ufGroupID);
-    $operator = CRM_Utils_Array::value('operator', $this->_formValues, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND);
+    $operator = $this->_formValues['operator'] ?? CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND;
     $this->set('queryOperator', $operator);
     if ($operator == CRM_Contact_BAO_Query::SEARCH_OPERATOR_OR) {
       $this->assign('operator', ts('OR'));
