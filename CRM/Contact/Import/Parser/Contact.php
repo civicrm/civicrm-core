@@ -1823,4 +1823,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     return \Civi::$statics[$cacheString];
   }
 
+  /**
+   * Get the metadata field for which importable fields does not key the actual field name.
+   *
+   * @return string[]
+   */
+  protected function getOddlyMappedMetadataFields(): array {
+    return [
+      'country_id' => 'country',
+      'state_province_id' => 'state_province',
+      'county_id' => 'county',
+      'email_greeting_id' => 'email_greeting',
+      'postal_greeting_id' => 'postal_greeting',
+      'addressee_id' => 'addressee',
+      'source' => 'contact_source',
+    ];
+  }
+
 }
