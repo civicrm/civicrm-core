@@ -413,7 +413,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       if (!empty($params['soft_credit_contact_id'][$key]) && empty($params['soft_credit_amount'][$key])) {
         $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
       }
-      if (!empty($params['soft_credit_amount']) && !empty($params['soft_credit_amount'][$key]) && CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value($key, $params['soft_credit_amount'])) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
+      if (!empty($params['soft_credit_amount'][$key]) && CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
         $errors["soft_credit_amount[$key]"] = ts('Soft credit amount should not be greater than the total amount');
       }
 
