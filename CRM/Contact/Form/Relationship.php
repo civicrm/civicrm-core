@@ -517,7 +517,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $jsData[$id] = array_filter(array_intersect_key($allRelationshipNames[$id], $whatWeWant));
         // Add user-friendly placeholder
         foreach (['a', 'b'] as $x) {
-          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : (CRM_Utils_Array::value("contact_type_$x", $jsData[$id]));
+          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : ($jsData[$id]["contact_type_$x"] ?? NULL);
           $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', [strtolower($contactTypes[$type]['label'])]) : ts('- select contact -');
         }
       }
