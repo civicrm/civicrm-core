@@ -72,6 +72,22 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
       '<div double="{a: \'abc\', &quot;b.c&quot;: \'b&c\'}" single=\'{"foo": &quot;bar&quot;}\'></div>',
       '<div double="{a: \'abc\', &quot;b.c&quot;: \'b&c\'}" single=\'{"foo": "bar"}\'></div>',
     ];
+    // Note if this fails it could be due to -> https://lab.civicrm.org/dev/core/-/issues/4305
+    $cases[8] = [
+      '<a href="{{foo}}" title="{{bar}}"></a>',
+      '<a href="{{foo}}" title="{{bar}}"></a>',
+    ];
+    $href_with_single_quotes_and_plus = <<<'EOT'
+    <a href="{{ row.data.foo%2F + #?params=# + row.data.bar }}" title="{{bar}}"></a>
+    EOT;
+    $cases[9] = [
+      $href_with_single_quotes_and_plus,
+      $href_with_single_quotes_and_plus,
+    ];
+    $cases[10] = [
+      '<a href="{{ row.data.foo%2F }}" title="{{bar}}"></a>',
+      '<a href="{{ row.data.foo%2F }}" title="{{bar}}"></a>',
+    ];
 
     return $cases;
   }
