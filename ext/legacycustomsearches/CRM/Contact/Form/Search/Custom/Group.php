@@ -136,10 +136,10 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
       ts('Tag Name') => 'tname',
     ];
 
-    $this->_includeGroups = CRM_Utils_Array::value('includeGroups', $this->_formValues, []);
-    $this->_excludeGroups = CRM_Utils_Array::value('excludeGroups', $this->_formValues, []);
-    $this->_includeTags = CRM_Utils_Array::value('includeTags', $this->_formValues, []);
-    $this->_excludeTags = CRM_Utils_Array::value('excludeTags', $this->_formValues, []);
+    $this->_includeGroups = $this->_formValues['includeGroups'] ?? [];
+    $this->_excludeGroups = $this->_formValues['excludeGroups'] ?? [];
+    $this->_includeTags = $this->_formValues['includeTags'] ?? [];
+    $this->_excludeTags = $this->_formValues['excludeTags'] ?? [];
 
     //define variables
     $this->_allSearch = FALSE;
