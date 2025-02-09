@@ -340,7 +340,7 @@ LIMIT 1
    */
   public static function overrideDefaultCurrency($params) {
     $config = CRM_Core_Config::singleton();
-    $config->defaultCurrency = CRM_Utils_Array::value('currency', $params, $config->defaultCurrency);
+    $config->defaultCurrency = $params['currency'] ?? $config->defaultCurrency;
   }
 
   /**

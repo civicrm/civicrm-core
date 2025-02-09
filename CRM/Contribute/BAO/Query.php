@@ -141,9 +141,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $qillName = array_search($name, $fieldAliases);
     }
     $pseudoExtraParam = [];
-    $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
-    $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_contribution');
-    $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
+    $fieldSpec = $fields[$fieldName] ?? [];
+    $tableName = $fieldSpec['table_name'] ?? 'civicrm_contribution';
+    $dataType = CRM_Utils_Type::typeToString($fieldSpec['type'] ?? NULL);
     if ($dataType === 'Timestamp' || $dataType === 'Date') {
       $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;

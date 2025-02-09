@@ -384,8 +384,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
             ->addWhere('id', '=', $contributionID)
             ->execute()
             ->first();
-          $totalAmount = (isset($params['total_amount']) ? (float) $params['total_amount'] : (float) CRM_Utils_Array::value('total_amount', $contribution));
-          $feeAmount = (isset($params['fee_amount']) ? (float) $params['fee_amount'] : (float) CRM_Utils_Array::value('fee_amount', $contribution));
+          $totalAmount = (isset($params['total_amount']) ? (float) $params['total_amount'] : (float) ($contribution['total_amount'] ?? 0));
+          $feeAmount = (isset($params['fee_amount']) ? (float) $params['fee_amount'] : (float) ($contribution['fee_amount'] ?? 0));
           $params['net_amount'] = $totalAmount - $feeAmount;
         }
       }
@@ -2296,7 +2296,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       FROM   civicrm_membership_payment
       WHERE  contribution_id = %1 ";
     $params = [1 => [$this->id, 'Integer']];
-    $ids['membership'] = (array) CRM_Utils_Array::value('membership', $ids, []);
+    $ids['membership'] = (array) ($ids['membership'] ?? []);
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
@@ -2688,7 +2688,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('selectPremium', FALSE);
     }
     $template->assign('title', $values['title'] ?? NULL);
-    $values['amount'] = CRM_Utils_Array::value('total_amount', $input, (CRM_Utils_Array::value('amount', $input)), NULL);
+    $values['amount'] = $input['total_amount'] ?? $input['amount'] ?? NULL;
     if (!$values['amount'] && isset($this->total_amount)) {
       $values['amount'] = $this->total_amount;
     }
@@ -3760,7 +3760,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // Use input value if supplied.
     if (!empty($input['receipt_from_email'])) {
       return [
-        CRM_Utils_Array::value('receipt_from_name', $input, ''),
+        $input['receipt_from_name'] ?? '',
         $input['receipt_from_email'],
       ];
     }
@@ -3807,7 +3807,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       FROM   civicrm_membership_payment
       WHERE  contribution_id = %1 ";
     $params = [1 => [$this->id, 'Integer']];
-    $ids['membership'] = (array) CRM_Utils_Array::value('membership', $ids, []);
+    $ids['membership'] = (array) ($ids['membership'] ?? []);
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {

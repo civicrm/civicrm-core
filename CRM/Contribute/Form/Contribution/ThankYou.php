@@ -59,7 +59,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
     $this->assign('linkTextUrl', $linkTextUrl ?? NULL);
     $this->assign('linkText', $linkText);
-    $this->setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
+    $this->setTitle($this->_values['thankyou_title'] ?? NULL);
     // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
     $this->assign('isShare', $this->_values['is_share']);
@@ -211,7 +211,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('trxn_id', $this->_trxnId);
 
     $this->assign('receive_date',
-      CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $this->_params))
+      CRM_Utils_Date::mysqlToIso($this->_params['receive_date'] ?? NULL)
     );
 
     $defaults = [];
