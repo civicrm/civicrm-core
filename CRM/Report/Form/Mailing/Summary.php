@@ -476,7 +476,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $this->beginPostProcess();
 
     // get the acl clauses built before we assemble the query
-    $this->buildACLClause(CRM_Utils_Array::value('civicrm_contact', $this->_aliases));
+    $this->buildACLClause($this->_aliases['civicrm_contact'] ?? NULL);
 
     $sql = $this->buildQuery(TRUE);
 
