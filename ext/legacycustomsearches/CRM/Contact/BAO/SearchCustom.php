@@ -44,9 +44,7 @@ class CRM_Contact_BAO_SearchCustom {
       }
 
       $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($ssID);
-      $customSearchID = CRM_Utils_Array::value('customSearchID',
-        $formValues
-      );
+      $customSearchID = $formValues['customSearchID'] ?? NULL;
     }
 
     if (!$customSearchID) {
