@@ -95,8 +95,8 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
     $this->assign('preset', $this->get('preset'));
     $this->assign('presets', CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name'));
     $this->assign('skins', $this->getCKSkins());
-    $this->assign('skin', CRM_Utils_Array::value('skin', $settings));
-    $this->assign('extraPlugins', CRM_Utils_Array::value('extraPlugins', $settings));
+    $this->assign('skin', $settings['skin'] ?? NULL);
+    $this->assign('extraPlugins', $settings['extraPlugins'] ?? NULL);
     $this->assign('configUrl', $configUrl);
   }
 
@@ -272,7 +272,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
         $items[$name] = Civi::paths()->getUrl(self::CONFIG_FILEPATH . $name . '.js', 'absolute');
       }
     }
-    return $preset ? CRM_Utils_Array::value($preset, $items) : $items;
+    return $preset ? ($items[$preset] ?? NULL) : $items;
   }
 
   /**
