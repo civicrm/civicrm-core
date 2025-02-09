@@ -987,11 +987,7 @@ HTACCESS;
       'jpg' => 'jpeg',
       'svg' => 'svg+xml',
     ];
-    $mimeType = 'image/' . CRM_Utils_Array::value(
-      $fileExtension,
-      $translateMimeTypes,
-      $fileExtension
-    );
+    $mimeType = 'image/' . ($translateMimeTypes[$fileExtension] ?? $fileExtension);
 
     return self::getFileURL($path, $mimeType, $url);
   }
