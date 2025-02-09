@@ -1025,7 +1025,7 @@ class CRM_Report_Form extends CRM_Core_Form {
               }
             }
             else {
-              if ((CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_INT) && is_array($field['default'])) {
+              if ((($field['type'] ?? NULL) & CRM_Utils_Type::T_INT) && is_array($field['default'])) {
                 $this->_defaults["{$fieldName}_min"] = $field['default']['min'] ?? NULL;
                 $this->_defaults["{$fieldName}_max"] = $field['default']['max'] ?? NULL;
               }
@@ -1065,7 +1065,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
         foreach ($table['order_bys'] as $fieldName => $field) {
           if (!empty($field['default']) || !empty($field['default_order']) ||
-            CRM_Utils_Array::value('default_is_section', $field) ||
+            !empty($field['default_is_section']) ||
             !empty($field['default_weight'])
           ) {
             $order_by = [
@@ -2050,7 +2050,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   public function whereClause(&$field, $op, $value, $min, $max) {
 
-    $type = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $field));
+    $type = CRM_Utils_Type::typeToString($field['type'] ?? NULL);
 
     // CRM-18010: Ensure type of each report filters
     if (!$type) {
@@ -3153,7 +3153,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           }
           elseif (array_key_exists('extends', $table)) {
             // For custom fields referenced in $this->_customGroupExtends
-            $fields = CRM_Utils_Array::value('fields', $table, []);
+            $fields = $table['fields'] ?? [];
           }
           else {
             continue;
@@ -3515,7 +3515,7 @@ class CRM_Report_Form extends CRM_Core_Form {
                 $value = $pair[$op];
               }
               elseif (is_array($val) && (!empty($val))) {
-                $options = CRM_Utils_Array::value('options', $field, []);
+                $options = $field['options'] ?? [];
                 foreach ($val as $key => $valIds) {
                   if (isset($options[$valIds])) {
                     $val[$key] = $options[$valIds];
@@ -4117,7 +4117,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
 
         if (!array_key_exists('type', $curFields[$fieldName])) {
-          $curFields[$fieldName]['type'] = CRM_Utils_Array::value('type', $curFilters[$fieldName], []);
+          $curFields[$fieldName]['type'] = $curFilters[$fieldName]['type'] ?? [];
         }
 
         if ($addFields) {
