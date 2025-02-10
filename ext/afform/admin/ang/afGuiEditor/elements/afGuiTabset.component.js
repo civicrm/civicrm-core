@@ -48,9 +48,15 @@
 
       this.addTab = function() {
         this.node['#children'].push({
-          '#tag': 'af-tab',
-          'title': ts('New Tab'),
-          '#children': [],
+          '#tag': 'details',
+          '#children': [
+            {
+              '#tag': 'summary',
+              '#children': [
+                ts('New Tab')
+              ]
+            }
+          ],
         });
         this.selectTab(this.node['#children'].length - 1);
       };
@@ -89,11 +95,11 @@
       // Set a search display in the tab to have the `total-count` attribue which will control the count shown in the tab
       function getSetCount(tabIndex, displayIndex) {
         if (arguments.length === 1) {
-          return ctrl.searchDisplays[tabIndex].findIndex(item => item.tag['total-count'] === '$parent.count');
+          return ctrl.searchDisplays[tabIndex].findIndex(item => item.tag['total-count'] === "'civi-tabset'");
         }
         ctrl.searchDisplays[tabIndex].forEach((item, index) => {
           if (index === displayIndex) {
-            item.tag['total-count'] = '$parent.count';
+            item.tag['total-count'] = "'civi-tabset'";
           } else {
             delete item.tag['total-count'];
           }

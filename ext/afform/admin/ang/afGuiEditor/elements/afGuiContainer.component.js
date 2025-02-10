@@ -364,7 +364,7 @@
         if (node['af-join']) {
           return 'join';
         }
-        if (node['#tag'] === 'af-tabset') {
+        if (node['#tag'] === 'civi-tabset') {
           return 'tabset';
         }
         if (node['#tag'] && node['#tag'] in afGui.meta.blocks) {

@@ -391,7 +391,7 @@ class CRM_Afform_ArrayHtml {
    */
   public function isNodeEditable(array $item) {
     // TODO: Make these more prominent/discoverable/hookable
-    $editableTags = ['af-field', 'af-form', 'af-tabset', 'af-tab'];
+    $editableTags = ['af-field', 'af-form', 'civi-tabset', 'details'];
     $editableAttributes = ['af-fieldset', 'af-join'];
     $editableClasses = ['af-container', 'af-text', 'af-button'];
     if (in_array($item['#tag'], $editableTags, TRUE)) {

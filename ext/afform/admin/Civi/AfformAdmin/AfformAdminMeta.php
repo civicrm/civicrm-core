@@ -257,10 +257,26 @@ class AfformAdminMeta {
         'tabset' => [
           'title' => E::ts('Tab Set'),
           'element' => [
-            '#tag' => 'af-tabset',
+            '#tag' => 'civi-tabset',
             '#children' => [
-              ['#tag' => 'af-tab', 'title' => E::ts('Tab 1'), '#children' => []],
-              ['#tag' => 'af-tab', 'title' => E::ts('Tab 2'), '#children' => []],
+              [
+                '#tag' => 'details',
+                '#children' => [
+                  [
+                    '#tag' => 'summary',
+                    '#children' => [E::ts('Tab 1')]
+                  ]
+                ]
+              ],
+              [
+                '#tag' => 'details',
+                '#children' => [
+                  [
+                    '#tag' => 'summary',
+                    '#children' => [E::ts('Tab 2')]
+                  ]
+                ]
+              ],
             ],
           ],
         ],
