@@ -30,11 +30,20 @@
 
       // bind class methods to the instance
       this.updateNav = this.updateNav.bind(this);
+      this.updateCounts = this.updateCounts.bind(this);
+
+      this.getNavForTab = this.getNavForTab.bind(this);
+      this.getCounterForTab = this.getCounterForTab.bind(this);
+
+      this.updateCounts = this.updateCounts.bind(this);
+
+      this.getNavForTab = this.getNavForTab.bind(this);
+      this.getCounterForTab = this.getCounterForTab.bind(this);
+
+      this.updateCounts = this.updateCounts.bind(this);
 
       this.openTab = this.openTab.bind(this);
       this.openTabById = this.openTabById.bind(this);
-
-      this.tabToNav = {};
     }
 
     connectedCallback() {
@@ -80,11 +89,14 @@
         tabTitle.style.display = 'none';
 
         const navItem = document.createElement('li');
-        this.tabToNav[tab] = navItem;
 
         const navAnchor = document.createElement('a');
         navAnchor.classList.add('crm-tabs-anchor');
         navAnchor.innerHTML = tabTitle.innerHTML;
+
+        const counter = document.createElement('em');
+        counter.classList.add('crm-tab-counter');
+        navAnchor.append(counter);
 
         navAnchor.addEventListener('click', (e) => {
             e.preventDefault();
@@ -101,13 +113,33 @@
       if (firstOpenTab) {
           this.openTab(firstOpenTab)
       }
+
+      this.updateCounts();
+    }
+
+    updateCounts() {
+      this.tabs.forEach((tab) => {
+        const counter = this.getCounterForTab(tab);
+        const count = tab.getAttribute('civi-tab-count');
+        counter.innerText = Number.isNaN(count) ? '' : count;
+      });
+    }
+
+    getNavForTab(tab) {
+      const index = this.tabs.indexOf(tab);
+      return Array.from(this.nav.children)[index];
+    }
+
+    getCounterForTab(tab) {
+      const nav = this.getNavForTab(tab);
+      return nav.querySelector('.crm-tab-counter');
     }
 
     openTab(tabToOpen) {
       // only this tab should be open
       this.tabs.forEach((tabToOpenOrClose) => tabToOpenOrClose.open = (tabToOpenOrClose === tabToOpen));
 
-      const navItemOpen = this.tabToNav[tabToOpen];
+      const navItemOpen = this.getNavForTab(tabToOpen);
       // only this nav item should be active
       this.tabHeaderItems.forEach((navItemOpenOrClosed) => navItemOpenOrClosed.classList.toggle('ui-tabs-selected', (navItemOpenOrClosed === navItemOpen)));
     }
