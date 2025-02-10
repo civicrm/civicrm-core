@@ -207,6 +207,7 @@ class CRM_Core_Resources_Common {
       "js/crm.ajax.js",
       "js/wysiwyg/crm.wysiwyg.js",
       "js/components/tabset.js",
+      "js/components/snippet.js",
     ];
 
     // Dynamic localization script
