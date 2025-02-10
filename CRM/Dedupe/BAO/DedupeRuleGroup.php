@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
@@ -194,29 +195,35 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     \CRM_Core_DAO::executeQuery($ruleGroup->tableDropQuery());
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public static function hook_civicrm_findDuplicates(GenericHookEvent $event): void {
     if (!empty($event->dedupeResults['handled'])) {
       // @todo - in time we can deprecate this & expect them to use stopPropagation().
       return;
     }
-    $ruleGroup = new CRM_Dedupe_BAO_DedupeRuleGroup();
 
     $optimizer = new CRM_Dedupe_FinderQueryOptimizer($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params']);
     $tableQueries = $optimizer->getRuleQueries();
     if (empty($tableQueries)) {
       return;
     }
-    $threshold = $ruleGroup->threshold;
 
-    $dedupeTable = $ruleGroup->runTablesQuery($event->dedupeParams['match_params'], $tableQueries, $threshold);
+    $ruleGroup = DedupeRuleGroup::get(FALSE)
+      ->addWhere('id', '=', $event->dedupeParams['rule_group_id'])
+      ->execute()
+      ->first();
+    $self = new self();
+    $dedupeTable = $self->runTablesQuery($event->dedupeParams['match_params'], $tableQueries, $ruleGroup['threshold']);
     if (!$dedupeTable) {
       $event->dedupeResults['ids'] = [];
       return;
     }
     $aclFrom = '';
     $aclWhere = '';
-    $contactType = $ruleGroup->contact_type;
-    $threshold = $ruleGroup->threshold;
     if ($event->dedupeParams['check_permission']) {
       [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
       $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
@@ -228,8 +235,8 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
                 AND weight >= %2";
 
     $dao = CRM_Core_DAO::executeQuery($query, [
-      1 => [$contactType, 'String'],
-      2 => [$threshold, 'Integer'],
+      1 => [$ruleGroup['contact_type'], 'String'],
+      2 => [$ruleGroup['threshold'], 'Integer'],
     ]);
     $dupes = [];
     while ($dao->fetch()) {
@@ -237,56 +244,8 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
         $dupes[] = $dao->id;
       }
     }
-    CRM_Core_DAO::executeQuery($ruleGroup->tableDropQuery());
+    CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS ' . $dedupeTable);
     $event->dedupeResults['ids'] = array_diff($dupes, $event->dedupeParams['excluded_contact_ids']);
-  }
-
-  /**
-   * Fill the dedupe finder table.
-   *
-   * @internal do not access from outside core.
-   *
-   * @param int $id
-   * @param array $contactIDs
-   * @param array $params
-   * @param bool $legacyMode
-   *   Legacy mode is called to give backward hook compatibility, in the legacydedupefinder
-   *   extension. It is intended to be transitional, with the non-legacy mode being
-   *   separated out and optimized once it no longer has to comply with the legacy
-   *   hook and reserved query methodology.
-   *
-   * @return false|string
-   * @throws \Civi\Core\Exception\DBQueryException
-   */
-  public function fillTable(int $id, array $contactIDs, array $params, $legacyMode = TRUE) {
-    $ruleGroup = $this;
-    $ruleGroup->id = $id;
-    // make sure we've got a fetched dbrecord, not sure if this is enforced
-    $ruleGroup->find(TRUE);
-    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, $params);
-    // Reserved Rule Groups can optionally get special treatment by
-    // implementing an optimization class and returning a query array.
-    if ($legacyMode && $optimizer->isUseReservedQuery()) {
-      $tableQueries = $optimizer->getReservedQuery();
-    }
-    else {
-      $tableQueries = $optimizer->getRuleQueries();
-    }
-    // if there are no rules in this rule group
-    // add an empty query fulfilling the pattern
-    if ($legacyMode) {
-      if (!$tableQueries) {
-        // Just for the hook.... (which is deprecated).
-        $ruleGroup->noRules = TRUE;
-      }
-      CRM_Utils_Hook::dupeQuery($ruleGroup, 'table', $tableQueries);
-    }
-    if (empty($tableQueries)) {
-      return FALSE;
-    }
-    $threshold = $ruleGroup->threshold;
-
-    return $this->runTablesQuery($params, $tableQueries, $threshold);
   }
 
   /**
