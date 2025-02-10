@@ -136,6 +136,12 @@
     }
 
     openTab(tabToOpen) {
+      // if the tab contains a snippet, refresh on open
+      const snippetContent = tabToOpen.querySelector('civi-snippet');
+      if (snippetContent) {
+        snippetContent.loadIfNotLoaded();
+      }
+
       // only this tab should be open
       this.tabs.forEach((tabToOpenOrClose) => tabToOpenOrClose.open = (tabToOpenOrClose === tabToOpen));
 

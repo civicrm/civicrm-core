@@ -15,21 +15,28 @@
       super();
 
       // bind class methods to the instance
-      this.refresh = this.refresh.bind(this);
+      this.load = this.load.bind(this);
+      this.loadIfNotLoaded = this.loadIfNotLoaded.bind(this);
     }
 
     connectedCallback() {
-      // initialise the nav header element
+      // track whether we have ever loaded
+      this.isLazy = !!this.getAttribute('lazy-load');
+
+      this.hasLoaded = false;
+
       if (!this.isLazy) {
-        this.refresh();
+        this.load();
       }
     }
 
-    get isLazy() {
-      return !!this.getAttribute('lazy-load');
-    }
+    load() {
+      // once we've loaded
+      this.hasLoaded = true;
 
-    refresh() {
+      // add a loading spinner
+      this.innerHTML = '<div class="crm-i fa-spinner fa-spin"></div>';
+
       const src = this.getAttribute('src');
       const url = URL.parse(src, document.location);
 
@@ -43,6 +50,12 @@
       fetch(url.toString())
       .then((response) => response.text())
       .then((text) => this.innerHTML = text);
+    }
+
+    loadIfNotLoaded() {
+      if (!this.hasLoaded) {
+        this.load();
+      }
     }
   }
 
