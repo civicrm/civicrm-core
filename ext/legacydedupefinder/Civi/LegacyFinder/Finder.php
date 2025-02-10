@@ -28,6 +28,7 @@ class Finder extends AutoSubscriber {
     if ($event->tableName) {
       $contactIDs = explode(',', \CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
     }
+    $ruleGroup->contactIds = $contactIDs;
     $tempTable = $ruleGroup->fillTable($ruleGroup->id, $contactIDs, []);
     if (!$tempTable) {
       return;
@@ -77,6 +78,7 @@ class Finder extends AutoSubscriber {
       return;
     }
     $rgBao = new \CRM_Dedupe_BAO_DedupeRuleGroup();
+    $rgBao->params = $event->dedupeParams['match_params'];
     $dedupeTable = $rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], TRUE);
     if (!$dedupeTable) {
       $event->dedupeResults['ids'] = [];
