@@ -150,7 +150,15 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     if ($event->tableName) {
       $contactIDs = explode(',', CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
     }
-    $tempTable = $ruleGroup->fillTable($ruleGroup->id, $contactIDs, [], FALSE);
+
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($ruleGroup->id, $contactIDs, []);
+    $tableQueries = $optimizer->getRuleQueries();
+    if (empty($tableQueries)) {
+      return;
+    }
+    $threshold = $ruleGroup->threshold;
+
+    $tempTable = $ruleGroup->runTablesQuery([], $tableQueries, $threshold);
     if (!$tempTable) {
       return;
     }
@@ -191,16 +199,24 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       // @todo - in time we can deprecate this & expect them to use stopPropagation().
       return;
     }
-    $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
-    $dedupeTable = $rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], FALSE);
+    $ruleGroup = new CRM_Dedupe_BAO_DedupeRuleGroup();
+
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params']);
+    $tableQueries = $optimizer->getRuleQueries();
+    if (empty($tableQueries)) {
+      return;
+    }
+    $threshold = $ruleGroup->threshold;
+
+    $dedupeTable = $ruleGroup->runTablesQuery($event->dedupeParams['match_params'], $tableQueries, $threshold);
     if (!$dedupeTable) {
       $event->dedupeResults['ids'] = [];
       return;
     }
     $aclFrom = '';
     $aclWhere = '';
-    $contactType = $rgBao->contact_type;
-    $threshold = $rgBao->threshold;
+    $contactType = $ruleGroup->contact_type;
+    $threshold = $ruleGroup->threshold;
     if ($event->dedupeParams['check_permission']) {
       [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
       $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
@@ -221,7 +237,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
         $dupes[] = $dao->id;
       }
     }
-    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
+    CRM_Core_DAO::executeQuery($ruleGroup->tableDropQuery());
     $event->dedupeResults['ids'] = array_diff($dupes, $event->dedupeParams['excluded_contact_ids']);
   }
 
