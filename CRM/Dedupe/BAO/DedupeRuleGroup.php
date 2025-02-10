@@ -243,14 +243,10 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
    * @throws \Civi\Core\Exception\DBQueryException
    */
   public function fillTable(int $id, array $contactIDs, array $params, $legacyMode = TRUE) {
-    if ($legacyMode) {
-      $this->contactIds = $contactIDs;
-      $this->params = $params;
-    }
     $ruleGroup = $this;
     $ruleGroup->id = $id;
     // make sure we've got a fetched dbrecord, not sure if this is enforced
-    $this->find(TRUE);
+    $ruleGroup->find(TRUE);
     $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, $params);
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
