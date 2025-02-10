@@ -258,6 +258,91 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that imports work when skipping already-existing duplicates.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportParticipantSkipDuplicates() :void {
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->eventCreatePaid(['title' => 'Second event'], [], 'second');
+    $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
+    $this->createTestEntity('Participant', [
+      'event_id' => $this->ids['Event']['PaidEvent'],
+      'contact_id' => $contactID,
+    ]);
+    $this->importCSV('participant_with_ext_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'external_identifier'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('DUPLICATE', $row['_status']);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $participants = Participant::get()
+      ->addWhere('contact_id', '=', $contactID)
+      ->addSelect('event_id.title')
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $participants);
+    $participant = $participants->first();
+    $this->assertEquals('Rain-forest Cup Youth Soccer Tournament', $participant['event_id.title']);
+    $participant = $participants->last();
+    $this->assertEquals('Second event', $participant['event_id.title']);
+  }
+
+  /**
+   * Test that imports work when ignoring (duplicating) already-existing duplicates.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportParticipantIgnoreDuplicates() :void {
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->eventCreatePaid(['title' => 'Second event'], [], 'second');
+    $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
+    $this->createTestEntity('Participant', [
+      'event_id' => $this->ids['Event']['PaidEvent'],
+      'contact_id' => $contactID,
+    ]);
+    $this->importCSV('participant_with_ext_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'external_identifier'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $participant = Participant::get()
+      ->addWhere('contact_id', '=', $contactID)
+      ->addSelect('event_id.title')
+      ->execute();
+    $this->assertCount(3, $participant);
+  }
+
+  /**
    * Test import parser match a contact using the dedupe rule with a custom field.
    *
    * It should match the created contact based on first name & custom field.
