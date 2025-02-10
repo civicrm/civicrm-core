@@ -618,7 +618,7 @@ WHERE li.contribution_id = %1";
       $count = count(CRM_Event_BAO_Participant::getParticipantIds($contributionId));
     }
     else {
-      $count = CRM_Utils_Array::value('count', civicrm_api3('MembershipPayment', 'getcount', ['contribution_id' => $contributionId]));
+      $count = civicrm_api3('MembershipPayment', 'getcount', ['contribution_id' => $contributionId]);
     }
     if ($count > 1) {
       $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
