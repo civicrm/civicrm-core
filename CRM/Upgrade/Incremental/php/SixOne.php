@@ -150,7 +150,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
    * @return bool
    */
   public static function updateFieldMappingsForImport(): bool {
-    $mappingFields = self::getMappingFieldsForImportType('Import Participant');
+    $mappingFields = self::getMappingFieldsForImportType(['Import Participant', 'Import Membership']);
     // The only possible contact field for participant import is email
     // as only the email rule can be selected. However, keeping the 'set'
     // together (from Contribution convert in FiveFiftyFour) feels like
@@ -193,14 +193,14 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
    * @throws \CRM_Core_Exception
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function getMappingFieldsForImportType(string $importType): CRM_Core_DAO {
+  public static function getMappingFieldsForImportType(array $importTypes): CRM_Core_DAO {
     $mappingTypeID = (int) CRM_Core_DAO::singleValueQuery("
       SELECT option_value.value
       FROM civicrm_option_value option_value
         INNER JOIN civicrm_option_group option_group
         ON option_group.id = option_value.option_group_id
         AND option_group.name =  'mapping_type'
-      WHERE option_value.name = '{$importType}'");
+      WHERE option_value.name IN ('" . implode("','", $importTypes) . "')");
 
     $mappingFields = CRM_Core_DAO::executeQuery('
       SELECT field.id, field.name FROM civicrm_mapping_field field

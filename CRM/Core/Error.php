@@ -34,8 +34,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Status code of various types of errors.
    */
   const FATAL_ERROR = 2;
+
+  /**
+   * @deprecated
+   */
   const DUPLICATE_CONTACT = 8001;
   const DUPLICATE_CONTRIBUTION = 8002;
+
+  /**
+   * @deprecated
+   */
   const DUPLICATE_PARTICIPANT = 8003;
 
   /**
