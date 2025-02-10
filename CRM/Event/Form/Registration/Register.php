@@ -163,7 +163,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //here we can't use parent $this->_allowWaitlist as user might
     //walk back and we might set this value in this postProcess.
     //(we set when spaces < group count and want to allow become part of waiting )
-    $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));
+    $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, $this->_values['event']['has_waitlist'] ?? NULL);
 
     // Get payment processors if appropriate for this event
     $this->_noFees = $suppressPayment = $this->isSuppressPayment();
@@ -600,7 +600,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     /// see https://lab.civicrm.org/dev/core/-/issues/5168
     if ($form->getPriceSetID() && !empty($fields['bypass_payment']) && $form->_allowConfirmation) {
       if ($spacesAvailable === 0 ||
-        (empty($fields['priceSetId']) && CRM_Utils_Array::value('additional_participants', $fields) < $spacesAvailable)
+        (empty($fields['priceSetId']) && ($fields['additional_participants'] ?? 0) < $spacesAvailable)
       ) {
         $errors['bypass_payment'] = ts("You have not been added to the waiting list because there are spaces available for this event. We recommend registering yourself for an available space instead.");
       }
