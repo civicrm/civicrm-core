@@ -84,7 +84,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     $fieldNameTypes = [];
     foreach ($fields as $name => $field) {
       // Assign date type to respective field name, which will be later used to modify operator list
-      $fieldNameTypes[$name] = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $field));
+      $fieldNameTypes[$name] = CRM_Utils_Type::typeToString($field['type'] ?? NULL);
       // it's necessary to know which of the fields are searchable by label
       if (isset($field['searchByLabel']) && $field['searchByLabel']) {
         $searchByLabelFields[] = $name;

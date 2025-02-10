@@ -385,7 +385,7 @@ LIMIT {$rowCount}
         //working here
         $result[] = [
           'text' => '"' . $dao->name . '" <' . $dao->email . '>',
-          'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
+          'id' => !empty($_GET['id']) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
         ];
       }
       CRM_Utils_JSON::output($result);
@@ -634,7 +634,7 @@ LIMIT {$rowCount}
       $searchRows[$count]['dst_email'] = $pairInfo['dst_email'] ?? NULL;
       $searchRows[$count]['dst_street'] = $pairInfo['dst_street'] ?? NULL;
       $searchRows[$count]['dst_postcode'] = $pairInfo['dst_postcode'] ?? NULL;
-      $searchRows[$count]['conflicts'] = str_replace("',", "',<br/>", CRM_Utils_Array::value('conflicts', $pair));
+      $searchRows[$count]['conflicts'] = str_replace("',", "',<br/>", $pair['conflicts'] ?? '');
       $searchRows[$count]['weight'] = $pair['weight'] ?? NULL;
 
       if (!empty($pairInfo['data']['canMerge'])) {
@@ -826,10 +826,10 @@ LIMIT {$rowCount}
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $name = $_REQUEST['name'] ?? NULL;
     $cacheKey = $_REQUEST['qfKey'] ?? NULL;
-    $state = CRM_Utils_Array::value('state', $_REQUEST, 'checked');
-    $variableType = CRM_Utils_Array::value('variableType', $_REQUEST, 'single');
+    $state = $_REQUEST['state'] ?? 'checked';
+    $variableType = $_REQUEST['variableType'] ?? 'single';
 
-    $actionToPerform = CRM_Utils_Array::value('action', $_REQUEST, 'select');
+    $actionToPerform = $_REQUEST['action'] ?? 'select';
 
     if ($variableType == 'multiple') {
       // action post value only works with multiple type variable
@@ -931,7 +931,7 @@ LIMIT {$rowCount}
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
-    $relationship_type_id = CRM_Utils_Type::escape(CRM_Utils_Array::value('relationship_type_id', $_GET), 'Integer', FALSE);
+    $relationship_type_id = CRM_Utils_Type::escape($_GET['relationship_type_id'] ?? NULL, 'Integer', FALSE);
 
     if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {
       return CRM_Utils_System::permissionDenied();

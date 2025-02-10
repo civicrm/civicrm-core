@@ -5387,7 +5387,7 @@ civicrm_relationship.start_date > {$today}
         $this->_where[$grouping][] = self::buildClause("{$tableName}.{$dbFieldName}", $op);
       }
 
-      $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+      $op = CRM_Core_SelectValues::getSearchBuilderOperators()[$op] ?? $op;
       $this->_qill[$grouping][] = "$fieldTitle $op $format";
     }
 
@@ -6182,7 +6182,7 @@ AND   displayRelType.is_active = 1
 
     // if Operator chosen is NULL/EMPTY then
     if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
-      return [CRM_Utils_Array::value($op, $qillOperators, $op), ''];
+      return [$qillOperators[$op] ?? $op, ''];
     }
 
     // @todo - if the right BAO is passed in special handling for the below
@@ -6244,7 +6244,7 @@ AND   displayRelType.is_active = 1
       $fieldValue = CRM_Utils_Date::customFormat($fieldValue);
     }
 
-    return [CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue];
+    return [$qillOperators[$op] ?? $op, $fieldValue];
   }
 
   /**

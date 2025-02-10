@@ -291,7 +291,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
           $this->addEntityRef($field, $values['label'], $attribute, $required);
         }
         else {
-          $this->add($values['type'], $field, $values['label'], $attribute, $required, CRM_Utils_Array::value('extra', $values));
+          $this->add($values['type'], $field, $values['label'], $attribute, $required, $values['extra'] ?? NULL);
         }
       }
     }

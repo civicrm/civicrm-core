@@ -294,7 +294,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($this->isLiveMode()) {
-      $activityIds = $this->createActivities($html_message, $this->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
+      $activityIds = $this->createActivities($html_message, $this->_contactIds, $formValues['subject'], $formValues['campaign_id'] ?? NULL);
     }
 
     if (!empty($formValues['document_file_path'])) {
@@ -494,7 +494,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
-    elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
+    elseif (($formValues['template'] ?? 0) > 0) {
       if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = {$formValues['format_id']} WHERE id = {$formValues['template']}";
       }

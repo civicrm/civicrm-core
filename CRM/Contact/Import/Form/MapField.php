@@ -330,7 +330,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function submit(array $params): void {
     // store mapping Id to display it in the preview page
-    $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
+    $this->set('loadMappingId', $params['mappingId'] ?? NULL);
 
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
