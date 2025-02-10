@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Participant;
 
 /**
  * class to parse membership csv files
@@ -93,48 +94,22 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         return;
       }
 
-      if ($this->isIgnoreDuplicates()) {
-        CRM_Core_Error::reset();
-        if (CRM_Event_BAO_Participant::checkDuplicate($participantParams, $result)) {
-          $participantID = array_pop($result);
+      if ($this->isSkipDuplicates()) {
+        $existingParticipant = Participant::get(FALSE)
+          ->addWhere('contact_id', '=', $participantParams['contact_id'])
+          ->addWhere('event_id', '=', $participantParams['event_id'])
+          ->execute()->first();
 
-          $error = CRM_Core_Error::createError("Found matching participant record.",
-            CRM_Core_Error::DUPLICATE_PARTICIPANT,
-            'Fatal', $participantID
-          );
-
-          $newParticipant = civicrm_api3_create_error($error->pop(),
-            [
-              'contactID' => $participantParams['contact_id'],
-              'participantID' => $participantID,
-            ]
-          );
-        }
-      }
-      else {
-        $newParticipant = civicrm_api3('Participant', 'create', $participantParams);
-      }
-
-      if (is_array($newParticipant) && civicrm_error($newParticipant)) {
-        if ($this->isSkipDuplicates()) {
-
-          $contactID = $newParticipant['contactID'] ?? NULL;
-          $participantID = $newParticipant['participantID'] ?? NULL;
+        if ($existingParticipant) {
           $url = CRM_Utils_System::url('civicrm/contact/view/participant',
-            "reset=1&id={$participantID}&cid={$contactID}&action=view", TRUE
+            "reset=1&id={$existingParticipant['id']}&cid={$existingParticipant['contact_id']}&action=view", TRUE
           );
-          if (is_array($newParticipant['error_message']) &&
-            ($participantID == $newParticipant['error_message']['params'][0])
-          ) {
-            $this->setImportStatus($rowNumber, 'DUPLICATE', $url);
-            return;
-          }
-          if ($newParticipant['error_message']) {
-            throw new CRM_Core_Exception($newParticipant['error_message']);
-          }
-          throw new CRM_Core_Exception(ts('Unknown error'));
+
+          $this->setImportStatus($rowNumber, 'DUPLICATE', $url);
+          return;
         }
       }
+      $newParticipant = civicrm_api3('Participant', 'create', $participantParams);
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
