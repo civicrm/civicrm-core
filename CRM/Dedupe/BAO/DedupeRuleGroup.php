@@ -157,16 +157,20 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     if (empty($tableQueries)) {
       return;
     }
-    $threshold = $ruleGroup->threshold;
 
-    $tempTable = $ruleGroup->runTablesQuery([], $tableQueries, $threshold);
+    $ruleGroup = DedupeRuleGroup::get(FALSE)
+      ->addWhere('id', '=', $ruleGroup->id)
+      ->execute()
+      ->first();
+    $self = new self();
+    $tempTable = $self->runTablesQuery([], $tableQueries, $ruleGroup['threshold']);
     if (!$tempTable) {
       return;
     }
     $aclFrom = $aclWhere = '';
     $dedupeTable = $tempTable;
-    $contactType = $ruleGroup->contact_type;
-    $threshold = $ruleGroup->threshold;
+    $contactType = $ruleGroup['contact_type'];
+    $threshold = $ruleGroup['threshold'];
 
     if ($event->checkPermissions) {
       [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
@@ -192,7 +196,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       $duplicates[] = ['entity_id_1' => $dao->id1, 'entity_id_2' => $dao->id2, 'weight' => $dao->weight];
     }
     $event->duplicates = $duplicates;
-    \CRM_Core_DAO::executeQuery($ruleGroup->tableDropQuery());
+    \CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS ' . $dedupeTable);
   }
 
   /**

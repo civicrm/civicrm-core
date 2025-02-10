@@ -29,7 +29,7 @@ class Finder extends AutoSubscriber {
       $contactIDs = explode(',', \CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
     }
     $ruleGroup->contactIds = $contactIDs;
-    // make sure we've got a fetched dbrecord, not sure if this is enforced
+    // make sure we've got a fetched db record, not sure if this is enforced
     $ruleGroup->find(TRUE);
     $tempTable = self::fillTable($ruleGroup, $ruleGroup->id, $contactIDs, []);
     if (!$tempTable) {
@@ -116,21 +116,21 @@ class Finder extends AutoSubscriber {
     $event->dedupeResults['ids'] = array_diff($dupes, $event->dedupeParams['excluded_contact_ids']);
   }
 
-
   /**
    * Fill the dedupe finder table.
    *
-   * @internal do not access from outside core.
+   * @internal do not access from outside core
    *
+   * @param \CRM_Dedupe_BAO_DedupeRuleGroup $ruleGroup
    * @param int $id
    * @param array $contactIDs
    * @param array $params
    *
    * @return false|string
-   * @throws \Civi\Core\Exception\DBQueryException
+   * @throws \CRM_Core_Exception
    */
   private static function fillTable($ruleGroup, int $id, array $contactIDs, array $params) {
-    $optimizer = new \CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, $params);
+    $optimizer = new FinderQueryOptimizer($id, $contactIDs, $params);
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
     if ($optimizer->isUseReservedQuery()) {
