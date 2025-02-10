@@ -104,9 +104,9 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     if (is_array($this->_groupTree) && !empty($this->_groupTree[$this->_groupId])) {
-      foreach ($this->_groupTree[$this->_groupId]['fields'] as & $field) {
+      foreach ($this->_groupTree[$this->_groupId]['fields'] as $field) {
         //add the form elements
-        CRM_Core_BAO_CustomField::addQuickFormElement($this, $field['element_name'], $field['id'], CRM_Utils_Array::value('is_required', $field));
+        CRM_Core_BAO_CustomField::addQuickFormElement($this, $field['element_name'], $field['id'], !empty($field['is_required']));
       }
 
       $this->assign('groupTree', $this->_groupTree);
