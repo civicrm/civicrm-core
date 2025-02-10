@@ -31,6 +31,7 @@
   <mixins>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
   </mixins>
   <upgrader>CiviMix\Schema\CivicrmAdminUi\AutomaticUpgrader</upgrader>
 </extension>
