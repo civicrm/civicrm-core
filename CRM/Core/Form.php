@@ -916,7 +916,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       // hack - addGroup uses an array to express variable spacing, read from the last element
-      $spacing[] = CRM_Utils_Array::value('spacing', $button, self::ATTR_SPACING);
+      $spacing[] = $button['spacing'] ?? self::ATTR_SPACING;
     }
     $this->addGroup($prevnext, 'buttons', '', $spacing, FALSE);
   }
@@ -1172,7 +1172,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      CRM_Core_Error::statusBounce(ts('Payment approval failed with message :') . $e->getMessage(), $payment->getCancelUrl($params['qfKey'], CRM_Utils_Array::value('participant_id', $params)));
+      CRM_Core_Error::statusBounce(ts('Payment approval failed with message :') . $e->getMessage(), $payment->getCancelUrl($params['qfKey'], $params['participant_id'] ?? NULL));
     }
 
     $this->set('pre_approval_parameters', $result['pre_approval_parameters']);
@@ -1897,7 +1897,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Handle custom fields
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       $fieldId = (int) substr($name, 7);
-      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $context == 'search', CRM_Utils_Array::value('label', $props));
+      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $context == 'search', $props['label'] ?? NULL);
     }
 
     // Core field - get metadata.
@@ -2015,7 +2015,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'Select':
       case 'Select2':
-        $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
+        $props['class'] = ($props['class'] ?? 'big') . ' crm-select2';
         // TODO: Add and/or option for fields that store multiple values
         return $this->add(strtolower($widget), $name, $label, $options, $required, $props);
 

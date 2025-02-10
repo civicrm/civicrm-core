@@ -29,8 +29,8 @@ function smarty_function_crmAPI($params, &$smarty) {
     return "crmAPI: missing 'entity' parameter";
   }
   $entity = $params['entity'];
-  $action = CRM_Utils_Array::value('action', $params, 'get');
-  $params['sequential'] = CRM_Utils_Array::value('sequential', $params, 1);
+  $action = $params['action'] ?? 'get';
+  $params['sequential'] = $params['sequential'] ?? 1;
   $var = $params['var'] ?? NULL;
   CRM_Utils_Array::remove($params, 'entity', 'action', 'var');
   try {
