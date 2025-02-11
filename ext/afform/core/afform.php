@@ -201,9 +201,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
       // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module
       // and assign contact id to required smarty variable
       if (empty($context['caller'])) {
-        // Preferred key is entity_id but also assign contact_id to maintain backwards compatibility with older afforms
         CRM_Core_Smarty::singleton()->assign('afformOptions', [
-          'entity_id' => $context['contact_id'],
           'contact_id' => $context['contact_id'],
         ]);
         Civi::service('angularjs.loader')->addModules($afform['module_name']);
@@ -244,7 +242,7 @@ function afform_civicrm_summaryActions(&$actions, $contactID) {
         'weight' => $afform['summary_weight'] ?? 0,
         'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
         'class' => 'crm-popup',
-        'href' => CRM_Utils_System::url($afform['server_route'], '', FALSE, "?entity_id=$contactID"),
+        'href' => CRM_Utils_System::url($afform['server_route'], '', FALSE, "?contact_id=$contactID"),
       ];
     }
   }
@@ -269,9 +267,7 @@ function afform_civicrm_pageRun(&$page) {
   $contact = NULL;
   $side = 'left';
   $weight = ['left' => 1, 'right' => 1];
-  // Preferred key is entity_id but also assign contact_id to maintain backwards compatibility with older afforms
   $afformOptions = [
-    'entity_id' => $cid,
     'contact_id' => $cid,
   ];
   foreach ($afforms as $afform) {

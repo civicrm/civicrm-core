@@ -156,7 +156,6 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
     $blockB = \CRM_Core_Region::instance('contact-basic-info-right')->get('afform:' . $this->formNames[1]);
     $this->assertStringContainsString("<af-form-tab-test1 options=", $blockB['markup']);
     $this->assertStringContainsString("\"contact_id\":$cid", $blockB['markup']);
-    $this->assertStringContainsString("\"entity_id\":$cid", $blockB['markup']);
 
     // Block for wrong contact type should not appear
     $this->assertNull(\CRM_Core_Region::instance('contact-basic-info-left')->get('afform:' . $this->formNames[0]));
