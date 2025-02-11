@@ -392,7 +392,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
         _authx_uf()->loginStateless($params['uid']);
         return TRUE;
       }
-      elseif (!empty($params['name'] && !empty($params['pass']))) {
+      elseif (!empty($params['name']) && !empty($params['pass'])) {
         // It seems from looking at the Drupal implementation, that
         // if given username we expect a correct password.
 
