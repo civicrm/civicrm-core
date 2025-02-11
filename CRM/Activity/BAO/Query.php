@@ -621,7 +621,7 @@ class CRM_Activity_BAO_Query {
 
     $query->_useDistinct = TRUE;
 
-    $label = ts('Activity Text (%1)', [1 => CRM_Utils_Array::value($activityOption, CRM_Core_SelectValues::activityTextOptions())]);
+    $label = ts('Activity Text (%1)', [1 => CRM_Core_SelectValues::activityTextOptions()[$activityOption] ?? '']);
     $clauses = [];
     if ($activityOption % 2 == 0) {
       $clauses[] = $query->buildClause('civicrm_activity.details', $op, $value, 'String');
