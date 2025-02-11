@@ -145,10 +145,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       \Civi::log()->warning('Non-array passed to appendBreadCrumb');
       return;
     }
-    $crumbs = \Civi::$statics[__CLASS__]['breadcrumb'] ?? [];
-    $crumbs += array_column($breadcrumbs, NULL, 'url');
-    \Civi::$statics[__CLASS__]['breadcrumb'] = $crumbs;
-    CRM_Core_Smarty::singleton()->assign('breadcrumb', array_values($crumbs));
+    $allCrumbs = array_merge(\Civi::$statics[__CLASS__]['breadcrumb'] ?? [], $breadcrumbs);
+    \Civi::$statics[__CLASS__]['breadcrumb'] = $allCrumbs;
+    CRM_Core_Smarty::singleton()->assign('breadcrumb', array_values($allCrumbs));
   }
 
   /**
