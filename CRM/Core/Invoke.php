@@ -379,8 +379,14 @@ class CRM_Core_Invoke {
     CRM_Extension_System::singleton()->getClassLoader()->refresh();
     CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
 
-    // also cleanup all caches
-    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
+    Civi::rebuild([
+      'files' => TRUE,
+      'tables' => TRUE,
+      'sessions' => $sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+      'metadata' => TRUE,
+      'system' => TRUE,
+      'userjob' => TRUE,
+    ]);
 
     CRM_Core_Menu::store();
 
