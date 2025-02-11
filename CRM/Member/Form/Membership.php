@@ -976,7 +976,6 @@ DESC limit 1");
         'toEmail' => $this->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
-        'contributionId' => $formValues['contribution_id'],
         'isTest' => (bool) ($this->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
           'userEnteredText' => $this->getSubmittedValue('receipt_text'),
