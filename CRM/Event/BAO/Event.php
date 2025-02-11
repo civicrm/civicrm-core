@@ -1195,12 +1195,8 @@ WHERE civicrm_event.is_active = 1
           $sendTemplateParams['toName'] = $displayName;
           $sendTemplateParams['toEmail'] = $notifyEmail;
           $sendTemplateParams['autoSubmitted'] = TRUE;
-          $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_confirm',
-            $values['event']
-          );
-          $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_confirm',
-            $values['event']
-          );
+          $sendTemplateParams['cc'] = $values['event']['cc_confirm'] ?? NULL;
+          $sendTemplateParams['bcc'] = $values['event']['bcc_confirm'] ?? NULL;
 
           if (Civi::settings()->get('invoice_is_email_pdf') && !empty($values['contributionId'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;
@@ -2301,9 +2297,7 @@ WHERE  ce.loc_block_id = $locBlockId";
               'campaign_id'
             );
             $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
-            $values[$fields['participant_campaign_id']['title']] = CRM_Utils_Array::value($campaignId,
-              $campaigns
-            );
+            $values[$fields['participant_campaign_id']['title']] = $campaigns[$campaignId] ?? NULL;
           }
           unset($fields['participant_campaign_id']);
         }

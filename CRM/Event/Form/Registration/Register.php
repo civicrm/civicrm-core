@@ -250,9 +250,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!empty($this->_fields)) {
       //load default campaign from page.
       if (array_key_exists('participant_campaign_id', $this->_fields)) {
-        $this->_defaults['participant_campaign_id'] = CRM_Utils_Array::value('campaign_id',
-          $this->_values['event']
-        );
+        $this->_defaults['participant_campaign_id'] = $this->_values['event']['campaign_id'] ?? NULL;
       }
 
       foreach ($this->_fields as $name => $field) {

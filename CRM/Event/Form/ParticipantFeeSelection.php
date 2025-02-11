@@ -639,11 +639,7 @@ SELECT  id, html_type
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       if (!$this->_mode) {
         if (isset($params['payment_instrument_id'])) {
-          $this->assign('paidBy',
-            CRM_Utils_Array::value($params['payment_instrument_id'],
-              $paymentInstrument
-            )
-          );
+          $this->assign('paidBy', $paymentInstrument[$params['payment_instrument_id']] ?? NULL);
         }
       }
 
