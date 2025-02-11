@@ -185,10 +185,67 @@ class Civi {
   }
 
   /**
-   * @param array{ext: bool, files: bool, tables: bool, session: bool, metadata: bool, system: bool, userjob: bool, menu: bool, perms: bool, strings: bool, settings: bool, cases: bool, triggers: bool, entities: bool}|null $targets
+   * Rebuild the system.
+   *
+   * This is more expansive than Civi::reset(). Where Civi::reset() targets ephemeral state within the current process,
+   * the rebuild targets shared data-structures used by all processes.
+   *
+   * Ex: Rebuild everything
+   *   Civi::rebuild('*');
+   * Ex: Rebuild the temp SQL data and the system-caches (and nothing else))
+   *   Civi::rebuild(['tables' => TRUE, 'system' => TRUE])
+   * Ex: Rebuild everything except the menu
+   *   Civi::rebuild(['*' => TRUE, 'menu' => FALSE])
+   *
+   * @param string|array{ext:bool,files:bool,tables:bool,sessions:bool,metadata:bool,system:bool,userjob:bool,menu:bool,perms:bool,strings:bool,settings:bool,cases:bool,triggers:bool,entities:bool}|null $targets
+   *   The special key '*' indicates that all flags should start as TRUE (but you may opt-out of specific ones).
+   *   Keys:
+   *     - ext: Rebuild list of extensions, their hooks/mixins, etc.
+   *     - files: Reset any temporary files. Recreate any mandatory flag-files.
+   *     - tables: Truncate and drop any SQL tables with expendable data (e.g. ACL caches and import-temp-tables).
+   *     - sessions: Reset any form-state stored in user-sessions
+   *     - metadata: Rebuild metadata about the available entities and fields
+   *     - system: Reset any cache-services defined by the system.
+   *     - userjob: Delete any expired UserJob records.
+   *     - menu: Rebuild the routing-table and nav-bars.
+   *     - perms: Republish the list of available permissions. (Some CMS's need to be notified.)
+   *     - strings: Reset caches involving visible strings (WordReplacements, JS ts()).
+   *     - settings: Rebuild the index of available settings and their values.
+   *     - cases: Somethingsomething.
+   *     - triggers: Rebuild the SQL triggers.
+   *     - entities: Reconcile the managed-entities.
    * @return void
    */
-  public static function rebuild(?array $targets = NULL): void {
+  public static function rebuild($targets): void {
+    // This is a rebuild-super-function. It was produced by merging three prior rebuild-super-functions.
+    // These three prior super-functions were all entwined. By merging them, we get a clearer view of
+    // what's going-on. Of course, "what's going-on" includes... confusing things. Have fun!
+
+    if (is_string($targets)) {
+      $targets = [$targets => TRUE];
+    }
+
+    $all = [
+      'ext' => TRUE,
+      'files' => TRUE,
+      'tables' => TRUE,
+      'sessions' => TRUE,
+      'metadata' => TRUE,
+      'system' => TRUE,
+      'userjob' => TRUE,
+      'menu' => TRUE,
+      'perms' => TRUE,
+      'strings' => TRUE,
+      'settings' => TRUE,
+      'cases' => TRUE,
+      'triggers' => TRUE,
+      'entities' => TRUE,
+    ];
+    if (!empty($targets['*'])) {
+      $targets = array_merge($all, $targets);
+      unset($targets['*']);
+    }
+
     $config = CRM_Core_Config::singleton();
 
     if (!empty($targets['ext'])) {
@@ -203,6 +260,12 @@ class Civi {
       $config->cleanup(1, FALSE);
     }
     if (!empty($targets['tables'])) {
+      // Truncate and drop various tables that track replaceable data (e.g. ACL caches and temp-tables).
+
+      // This is fun and confusing:
+      // - On systems with Memcache/Redis, 'tables' and 'system' are mostly independent.
+      // - On systems with SQL-based caches, 'tables' and 'system' are overlapping rebuilds,
+      //   but neither is strictly redundant with the other.
       CRM_Core_Config::clearDBCache();
     }
     if (!empty($targets['sessions'])) {
@@ -226,7 +289,7 @@ class Civi {
         Civi::cache('navigation')->flush();
         Civi::cache('customData')->flush();
         Civi::cache('contactTypes')->clear();
-        Civi::cache('metadata')->clear();
+        Civi::cache('metadata')->clear(); /* Again? Huh. */
         \Civi\Core\ClassScanner::cache('index')->flush();
         CRM_Extension_System::singleton()->getCache()->flush();
       }
@@ -241,6 +304,7 @@ class Civi {
 
       // clear asset builder folder
       \Civi::service('asset_builder')->clear(FALSE);
+      // ^^ This really doesn't make sense in this section, does it?
 
       // reset various static arrays used here
       CRM_Contact_BAO_Contact::$_importableFields = CRM_Contact_BAO_Contact::$_exportableFields
