@@ -185,6 +185,39 @@ class Civi {
   }
 
   /**
+   * @param array{files: bool, tables: bool, session: bool, metadata: bool, system: bool, userjob: bool}|null $targets
+   * @return void
+   */
+  public static function rebuild(?array $targets = NULL): void {
+    if (!empty($targets['files'])) {
+      CRM_Core_Config::singleton()->cleanup(1, FALSE);
+    }
+    if (!empty($targets['tables'])) {
+      CRM_Core_Config::clearDBCache();
+    }
+    if (!empty($targets['sessions'])) {
+      Civi::cache('session')->clear();
+    }
+    if (!empty($targets['metadata'])) {
+      Civi::cache('metadata')->clear();
+      CRM_Core_DAO_AllCoreTables::flush();
+    }
+    if (!empty($targets['system'])) {
+      CRM_Utils_System::flushCache();
+    }
+    if (!empty($targets['userjob'])) {
+      // (1) note this used to be earlier, but was crashing because of api4 instability
+      // during extension install
+      // (2) I'm not sure this belongs at such a low level...
+      Civi\Api4\UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
+    }
+    if (!empty($targets['sessions'])) {
+      $session = CRM_Core_Session::singleton();
+      $session->reset(2);
+    }
+  }
+
+  /**
    * @return CRM_Core_Resources
    */
   public static function resources() {

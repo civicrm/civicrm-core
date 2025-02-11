@@ -19,8 +19,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\UserJob;
-
 require_once 'Log.php';
 require_once 'Mail.php';
 
@@ -268,28 +266,17 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @see https://issues.civicrm.org/jira/browse/CRM-8739
    *
    * @param bool $sessionReset
+   * @deprecated
    */
   public function cleanupCaches($sessionReset = FALSE) {
-    // cleanup templates_c directory
-    $this->cleanup(1, FALSE);
-    // clear all caches
-    self::clearDBCache();
-    // Avoid clearing QuickForm sessions unless explicitly requested
-    if ($sessionReset) {
-      Civi::cache('session')->clear();
-    }
-    Civi::cache('metadata')->clear();
-    CRM_Core_DAO_AllCoreTables::flush();
-    CRM_Utils_System::flushCache();
-
-    // note this used to be earlier, but was crashing because of api4 instability
-    // during extension install
-    UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
-
-    if ($sessionReset) {
-      $session = CRM_Core_Session::singleton();
-      $session->reset(2);
-    }
+    Civi::rebuild([
+      'files' => TRUE,
+      'tables' => TRUE,
+      'sessions' => $sessionReset,
+      'metadata' => TRUE,
+      'system' => TRUE,
+      'userjob' => TRUE,
+    ]);
   }
 
   /**
