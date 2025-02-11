@@ -63,9 +63,9 @@ class DefaultComposer extends AutoService {
 
     $tpls = $this->createMessageTemplates($e);
     $tp->addMessage('subject', $tpls['subject'] ?? '', 'text/plain');
-    $tp->addMessage('body_text', isset($tpls['text']) ? $tpls['text'] : '',
+    $tp->addMessage('body_text', $tpls['text'] ?? '',
       'text/plain');
-    $tp->addMessage('body_html', isset($tpls['html']) ? $tpls['html'] : '',
+    $tp->addMessage('body_html', $tpls['html'] ?? '',
       'text/html');
 
     $hasContent = FALSE;
