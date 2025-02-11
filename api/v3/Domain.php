@@ -73,9 +73,7 @@ function civicrm_api3_domain_get($params) {
 
       if (!empty($values['location']['address'])) {
         foreach ($address_array as $value) {
-          $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
-          $values['location']['address'][1]
-          );
+          $domain['domain_address'][$value] = $values['location']['address'][1][$value] ?? NULL;
         }
       }
 

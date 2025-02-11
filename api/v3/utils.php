@@ -1985,7 +1985,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
     if ($value['data_type'] == 'Date' && ($value['time_format'] ?? 0) > 0) {
       $value['data_type'] = 'DateTime';
     }
-    $value['type'] = CRM_Utils_Array::value($value['data_type'], CRM_Core_BAO_CustomField::dataToType());
+    $value['type'] = CRM_Core_BAO_CustomField::dataToType()[$value['data_type']] ?? NULL;
     $ret['custom_' . $key] = $value;
   }
   return $ret;
