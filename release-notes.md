@@ -28,7 +28,7 @@ Released February 5, 2025
 
 ## CiviCRM 5.81.0
 
-eleased January 8, 2025
+Released January 8, 2025
 
 - **[Synopsis](release-notes/5.81.0.md#synopsis)**
 - **[Features](release-notes/5.81.0.md#features)**

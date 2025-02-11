@@ -225,7 +225,6 @@ trait CRM_Contact_Form_Task_PDFTrait {
    * Prepare form.
    */
   public function preProcessPDF(): void {
-    $form = $this;
     $defaults = [];
     $fromEmails = $this->getFromEmails();
     if (is_numeric(key($fromEmails))) {
@@ -235,8 +234,15 @@ trait CRM_Contact_Form_Task_PDFTrait {
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
       $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
     }
-    $form->setDefaults($defaults);
-    $form->setTitle(ts('Print/Merge Document'));
+    $this->setDefaults($defaults);
+    $this->setTitle(ts('Print/Merge Document'));
+  }
+
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      // Because value contains <angle brackets>
+      'from_email_address',
+    ];
   }
 
   /**
