@@ -5145,7 +5145,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'String',
       CRM_Core_DAO::$_nullObject,
       FALSE,
-      CRM_Utils_Array::value('task', $this->_params)
+      $this->_params['task'] ?? NULL
     ) ?? ''));
     // if contacts are added to group
     if (!empty($this->_params['groups']) && empty($this->_outputMode)) {
@@ -6052,9 +6052,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       if ($op) {
         return $this->whereClause($field,
           $op,
-          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          $this->_params["{$fieldName}_value"] ?? NULL,
+          $this->_params["{$fieldName}_min"] ?? NULL,
+          $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
     }
