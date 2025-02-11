@@ -44,7 +44,7 @@ class FormattingUtil {
         }
         self::formatInputValue($value, $name, $field);
         // Ensure we have an array for serialized fields
-        if (!empty($field['serialize'] && !is_array($value))) {
+        if (!empty($field['serialize']) && !is_array($value)) {
           $value = (array) $value;
         }
       }
