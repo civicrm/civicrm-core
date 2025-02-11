@@ -22,11 +22,9 @@
     {/if}
 
     {* Show link to Tell a Friend (CRM-2153) *}
-    {if $friendText}
-        <div id="tell-a-friend" class="crm-section tell_friend_link-section">
-            <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$friendText}</span></a>
-       </div><br /><br />
-    {/if}
+  {foreach from='extensionText' item='text'}
+    {$text}
+  {/foreach}
 
     {* Add button for donor to create their own Personal Campaign page *}
     {if $pcpLink}
