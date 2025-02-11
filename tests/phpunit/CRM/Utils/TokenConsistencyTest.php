@@ -1085,6 +1085,9 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{' . $entity . '.contribution_recur_id.cancel_date}' => 'Cancel Date',
       '{' . $entity . '.contribution_recur_id.cancel_reason}' => 'Cancellation Reason',
       '{' . $entity . '.contribution_recur_id.end_date}' => 'Recurring Contribution End Date',
+      '{' . $entity . '.contribution_recur_id.next_sched_contribution_date}' => 'Next Scheduled Contribution Date',
+      '{' . $entity . '.contribution_recur_id.failure_count}' => 'Number of Failures',
+      '{' . $entity . '.contribution_recur_id.failure_retry_date}' => 'Retry Failed Attempt Date',
       '{' . $entity . '.contribution_recur_id.financial_type_id}' => 'Financial Type ID',
     ];
   }
