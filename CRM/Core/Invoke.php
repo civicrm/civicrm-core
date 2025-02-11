@@ -262,11 +262,7 @@ class CRM_Core_Invoke {
 
       if (isset($item['return_url'])) {
         $session = CRM_Core_Session::singleton();
-        $args = CRM_Utils_Array::value(
-          'return_url_args',
-          $item,
-          'reset=1'
-        );
+        $args = $item['return_url_args'] ?? 'reset=1';
         $session->pushUserContext(CRM_Utils_System::url($item['return_url'], $args));
       }
 
