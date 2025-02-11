@@ -546,8 +546,7 @@ WHERE      e.id = %1
         $link = "civicrm/event/manage/{$key}";
         $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
 
-        $tabs[$key]['link'] = (isset($value['link']) ? $value['link'] :
-          CRM_Utils_System::url($link, $query));
+        $tabs[$key]['link'] = $value['link'] ?? CRM_Utils_System::url($link, $query);
       }
     }
 

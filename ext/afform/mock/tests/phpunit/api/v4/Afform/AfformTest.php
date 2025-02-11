@@ -52,7 +52,7 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
    */
   public function testGetUpdateRevert($formName, $originalMetadata): void {
     $get = function($arr, $key) {
-      return isset($arr[$key]) ? $arr[$key] : NULL;
+      return $arr[$key] ?? NULL;
     };
 
     $checkDashlet = function($afform) use ($formName) {
