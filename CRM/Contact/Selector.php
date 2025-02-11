@@ -705,10 +705,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $row[$property] = $result->$greeting;
         }
         elseif (isset($pseudoconstants[$property])) {
-          $row[$property] = CRM_Utils_Array::value(
-            $result->{$pseudoconstants[$property]['dbName']},
-            $pseudoconstants[$property]['values']
-          );
+          $row[$property] = $pseudoconstants[$property]['values'][$result->{$pseudoconstants[$property]['dbName']}] ?? NULL;
         }
         elseif (strpos($property, '-url') !== FALSE) {
           $websiteUrl = '';

@@ -1140,7 +1140,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     // Check for custom field values
 
     if (empty($fields['custom'])) {
-      $fields['custom'] = &CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $values),
+      $fields['custom'] = &CRM_Core_BAO_CustomField::getFields($values['contact_type'] ?? NULL,
         FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE
       );
     }
