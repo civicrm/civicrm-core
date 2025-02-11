@@ -52,7 +52,7 @@ class CRM_Report_Utils_Report {
 
     if ($optionVal) {
       $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
-      return [CRM_Utils_Array::value('id', $templateInfo), $optionVal];
+      return [$templateInfo['id'] ?? NULL, $optionVal];
     }
 
     return FALSE;
@@ -191,7 +191,7 @@ WHERE  inst.report_id = %1";
     if (empty($instanceInfo['attachments'])) {
       $instanceInfo['attachments'] = [];
     }
-    $params['attachments'] = array_merge(CRM_Utils_Array::value('attachments', $instanceInfo), $attachments);
+    $params['attachments'] = array_merge($instanceInfo['attachments'] ?? [], $attachments);
     $params['text'] = '';
     $params['html'] = $fileContent;
 
