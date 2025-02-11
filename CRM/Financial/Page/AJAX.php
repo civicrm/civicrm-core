@@ -433,7 +433,7 @@ class CRM_Financial_Page_AJAX {
         );
       }
       if ($financialItem->contact_id) {
-        $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(!empty($row[$financialItem->id]['contact_sub_type']) ? $row[$financialItem->id]['contact_sub_type'] : CRM_Utils_Array::value('contact_type', $row[$financialItem->id]), FALSE, $financialItem->contact_id);
+        $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(!empty($row[$financialItem->id]['contact_sub_type']) ? $row[$financialItem->id]['contact_sub_type'] : ($row[$financialItem->id]['contact_type'] ?? NULL), FALSE, $financialItem->contact_id);
       }
       // @todo: Is this right? Shouldn't it be adding to the array as we loop?
       $financialitems = $row;
