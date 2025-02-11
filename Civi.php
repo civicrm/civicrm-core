@@ -185,12 +185,22 @@ class Civi {
   }
 
   /**
-   * @param array{files: bool, tables: bool, session: bool, metadata: bool, system: bool, userjob: bool}|null $targets
+   * @param array{ext: bool, files: bool, tables: bool, session: bool, metadata: bool, system: bool, userjob: bool, menu: bool, perms: bool, strings: bool, settings: bool, cases: bool, triggers: bool, entities: bool}|null $targets
    * @return void
    */
   public static function rebuild(?array $targets = NULL): void {
+    $config = CRM_Core_Config::singleton();
+
+    if (!empty($targets['ext'])) {
+      $config->clearModuleList();
+
+      // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
+      CRM_Extension_System::singleton()->getClassLoader()->refresh();
+      CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
+    }
+
     if (!empty($targets['files'])) {
-      CRM_Core_Config::singleton()->cleanup(1, FALSE);
+      $config->cleanup(1, FALSE);
     }
     if (!empty($targets['tables'])) {
       CRM_Core_Config::clearDBCache();
@@ -214,6 +224,37 @@ class Civi {
     if (!empty($targets['sessions'])) {
       $session = CRM_Core_Session::singleton();
       $session->reset(2);
+    }
+    if (!empty($targets['menu'])) {
+      CRM_Core_Menu::store();
+      CRM_Core_BAO_Navigation::resetNavigation();
+    }
+    if (!empty($targets['perms'])) {
+      $config->cleanupPermissions();
+    }
+    if (!empty($targets['strings'])) {
+      // rebuild word replacement cache - pass false to prevent operations redundant with this fn
+      CRM_Core_BAO_WordReplacement::rebuild(FALSE);
+    }
+    if (!empty($targets['settings'])) {
+      Civi::service('settings_manager')->flush();
+    }
+    if (!empty($targets['strings'])) {
+      CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
+    }
+    if (!empty($targets['cases'])) {
+      CRM_Case_XMLRepository::singleton(TRUE);
+    }
+    if (!empty($targets['triggers'])) {
+      Civi::service('sql_triggers')->rebuild();
+      // (1) Rebuild Drupal 8/9/10 route cache only if "triggerRebuild" is set to TRUE as it's
+      // computationally very expensive and only needs to be done when routes change on the Civi-side.
+      // For example - when uninstalling an extension. We already set "triggerRebuild" to true for these operations.
+      // (2) FIXME: That ^^ seems silly now. Shouldn't it go under $targets['menu']?
+      $config->userSystem->invalidateRouteCache();
+    }
+    if (!empty($targets['entities'])) {
+      CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
     }
   }
 
