@@ -854,16 +854,16 @@ LIMIT  1
     $caseRoles['client'] = CRM_Case_BAO_Case::getContactNames($caseID);
     if ($isRedact) {
       foreach ($caseRoles['client'] as &$client) {
-        if (!array_key_exists(CRM_Utils_Array::value('sort_name', $client), $report->_redactionStringRules)) {
+        if (!array_key_exists($client['sort_name'] ?? NULL, $report->_redactionStringRules)) {
 
           $report->_redactionStringRules = CRM_Utils_Array::crmArrayMerge($report->_redactionStringRules,
             [($client['sort_name'] ?? NULL) => 'name_' . rand(10000, 100000)]
           );
         }
-        if (!array_key_exists(CRM_Utils_Array::value('display_name', $client), $report->_redactionStringRules)) {
+        if (!array_key_exists($client['display_name'] ?? NULL, $report->_redactionStringRules)) {
           $report->_redactionStringRules[$client['display_name'] ?? NULL] = $report->_redactionStringRules[$client['sort_name'] ?? NULL];
         }
-        $client['sort_name'] = $report->redact(CRM_Utils_Array::value('sort_name', $client), TRUE, $report->_redactionStringRules);
+        $client['sort_name'] = $report->redact($client['sort_name'] ?? NULL, TRUE, $report->_redactionStringRules);
         if (!empty($client['email']) &&
           !array_key_exists($client['email'], $report->_redactionStringRules)
         ) {
@@ -871,7 +871,7 @@ LIMIT  1
             [$client['email'] => 'email_' . rand(10000, 100000)]
           );
         }
-        $client['email'] = $report->redact(CRM_Utils_Array::value('email', $client), TRUE, $report->_redactionStringRules);
+        $client['email'] = $report->redact($client['email'] ?? NULL, TRUE, $report->_redactionStringRules);
 
         if (!empty($client['phone']) &&
           !array_key_exists($client['phone'], $report->_redactionStringRules)
@@ -880,7 +880,7 @@ LIMIT  1
             [$client['phone'] => 'phone_' . rand(10000, 100000)]
           );
         }
-        $client['phone'] = $report->redact(CRM_Utils_Array::value('phone', $client), TRUE, $report->_redactionStringRules);
+        $client['phone'] = $report->redact($client['phone'] ?? NULL, TRUE, $report->_redactionStringRules);
       }
     }
     // Retrieve ALL client relationships
