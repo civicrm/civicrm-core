@@ -44,6 +44,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
    * ID of contact being viewed
    *
+   * This only makes a difference if the case has > 1 client
+   *
    * @var int
    * @internal
    */
@@ -79,6 +81,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
+    $this->_caseID = $caseId = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_showRelatedCases = (bool) ($_GET['relatedCases'] ?? FALSE);
 
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
@@ -90,7 +93,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     if ($this->_showRelatedCases) {
       $relatedCases = $this->get('relatedCases');
       if (!isset($relatedCases)) {
-        $caseId = CRM_Utils_Request::retrieve('id', 'Integer');
         $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId);
       }
       $this->assign('relatedCases', $relatedCases);
@@ -102,20 +104,24 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->_hasAccessToAllCases = CRM_Core_Permission::check('access all cases and activities');
     $this->assign('hasAccessToAllCases', $this->_hasAccessToAllCases);
 
-    $this->assign('caseID', $this->_caseID = (int) $this->get('id'));
-
     $this->_caseClients = CRM_Case_BAO_Case::getContactNames($this->_caseID);
 
-    $cid = $this->get('cid');
+    $cid = (int) $this->get('cid');
 
     // If no cid supplied, use first case client
     if (!$cid) {
-      $cid = array_keys($this->_caseClients)[0];
+      $cid = (int) array_keys($this->_caseClients)[0];
+      $this->set('cid', $cid);
     }
-    elseif (!isset($this->_caseClients[$cid])) {
+    if (!isset($this->_caseClients[$cid])) {
       CRM_Core_Error::statusBounce("Contact $cid not a client of case " . $this->_caseID);
     }
-    $this->assign('contactID', $this->_contactID = (int) $cid);
+    // Fixme: How many different legacy ways can we set these variables?
+    $this->_contactID = $cid;
+    $this->assign('contactID', $cid);
+    $this->assign('contactId', $cid);
+    $this->assign('caseID', $caseId);
+    $this->assign('caseId', $caseId);
 
     // Access check.
     if (!CRM_Case_BAO_Case::accessCase($this->_caseID, FALSE)) {
@@ -218,6 +224,13 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       CRM_Core_Permission::VIEW
     );
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_caseID);
+
+    // Since cid is not necessarily in the url, fix breadcrumb (otherwise the link will look like `civicrm/contact/view?reset=1&cid=%%cid%%`)
+    CRM_Utils_System::resetBreadCrumb();
+    CRM_Utils_System::appendBreadCrumb([
+      ['title' => ts('CiviCRM'), 'url' => (string) Civi::url('current://civicrm', 'h')],
+      ['title' => ts('Contact Summary'), 'url' => (string) Civi::url("current://civicrm/contact/view?reset=1&cid=$cid", 'h')],
+    ]);
   }
 
   /**
