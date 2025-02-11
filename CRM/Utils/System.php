@@ -1505,6 +1505,12 @@ class CRM_Utils_System {
    * Reset the various system caches and some important static variables.
    *
    * @deprecated
+   *   Deprecated Feb 2025 in favor of Civi::rebuild().
+   *   Reassess after Jun 2026.
+   *   For an extension bridging before+after, suggest guard like:
+   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild([...]) :
+   *     else CRM_Utils_System::flushCache();)
+   *   Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
   public static function flushCache() {
     Civi::rebuild(['system' => TRUE]);

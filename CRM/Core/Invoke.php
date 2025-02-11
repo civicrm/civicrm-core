@@ -370,6 +370,13 @@ class CRM_Core_Invoke {
    * @param bool $sessionReset
    *
    * @throws Exception
+   * @deprecated
+   *   Deprecated Feb 2025 in favor of Civi::rebuild().
+   *   Reassess after Jun 2026.
+   *   For an extension bridging before+after, suggest guard like:
+   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild([...]) :
+   *     else CRM_Core_Invoke::rebuildMenuAndCaches();
+   *   Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
   public static function rebuildMenuAndCaches(bool $triggerRebuild = FALSE, bool $sessionReset = FALSE): void {
     Civi::rebuild([
