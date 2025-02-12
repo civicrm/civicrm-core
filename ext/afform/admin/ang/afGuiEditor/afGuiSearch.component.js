@@ -245,71 +245,6 @@
         return found.match;
       }
 
-      function filtersToArray() {
-        if (!ctrl.display.element.filters || ctrl.display.element.filters === '{}') {
-          return [];
-        }
-        // Split contents by commas, ignoring commas inside quotes
-        var rawValues = _.trim(ctrl.display.element.filters, '{}').split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
-        return _.transform(rawValues, function(result, raw) {
-          raw = _.trim(raw);
-          var split;
-          if (raw.charAt(0) === '"') {
-            split = raw.slice(1).split(/"[ ]*:/);
-          } else if (raw.charAt(0) === "'") {
-            split = raw.slice(1).split(/'[ ]*:/);
-          } else {
-            split = raw.split(':');
-          }
-          var key = _.trim(split[0]);
-          var value = _.trim(split[1]);
-          var mode = 'val';
-          if (value.indexOf('routeParams') === 0) {
-            mode = 'routeParams';
-          } else if (value.indexOf('options') === 0) {
-            mode = 'options';
-          }
-          var info = {
-            name: key,
-            mode: mode
-          };
-          // Object dot notation
-          if (mode !== 'val' && value.indexOf(mode + '.') === 0) {
-            info.value = value.replace(mode + '.', '');
-          }
-          // Object bracket notation
-          else if (mode !== 'val') {
-            info.value = decode(value.substring(value.indexOf('[') + 1, value.lastIndexOf(']')));
-          }
-          // Literal value
-          else {
-            info.value = decode(value);
-          }
-          result.push(info);
-        }, []);
-      }
-
-      // Convert javascript notation to value
-      function decode(encoded) {
-        // Single-quoted string
-        if (encoded.indexOf("'") === 0 && encoded.charAt(encoded.length - 1) === "'") {
-          return encoded.substring(1, encoded.length - 1);
-        }
-        // Anything else
-        return JSON.parse(encoded);
-      }
-
-      // Convert value to javascript notation
-      function encode(value) {
-        var encoded = JSON.stringify(value),
-          split = encoded.split('"');
-        // Convert double-quotes to single-quotes if possible
-        if (split.length === 3 && split[0] === '' && split[2] === '' && encoded.indexOf("'") < 0) {
-          return "'" + split[1] + "'";
-        }
-        return encoded;
-      }
-
       // Append a search filter
       this.addFilter = function(fieldName) {
         ctrl.filters.push({
@@ -339,40 +274,19 @@
         }
       };
 
-      // Convert filters array to js notation & add to crm-search-display element
+      // Update crm-search-display element filters
       function writeFilters() {
-        var output = [];
-        if (!ctrl.filters.length) {
-          if ('filters' in ctrl.display.element) {
-            delete ctrl.display.element.filters;
-          }
-          return;
+        const filterString = afGui.stringifyDisplayFilters(ctrl.filters);
+        if (filterString) {
+          ctrl.display.element.filters = filterString;
+        } else {
+          delete ctrl.display.element.filters;
         }
-        _.each(ctrl.filters, function(filter) {
-          var keyVal = [
-            // Enclose the key in quotes unless it is purely alphanumeric
-            filter.name.match(/\W/) ? encode(filter.name) : filter.name,
-          ];
-          // Object dot notation
-          if (filter.mode !== 'val' && !filter.value.match(/\W/)) {
-            keyVal.push(filter.mode + '.' + filter.value);
-          }
-          // Object bracket notation
-          else if (filter.mode !== 'val') {
-            keyVal.push(filter.mode + '[' + encode(filter.value) + ']');
-          }
-          // Literal value
-          else {
-            keyVal.push(encode(filter.value));
-          }
-          output.push(keyVal.join(': '));
-        });
-        ctrl.display.element.filters = '{' + output.join(', ') + '}';
       }
 
       this.$onInit = function() {
         this.meta = afGui.meta;
-        this.filters = filtersToArray();
+        this.filters = afGui.parseDisplayFilters(ctrl.display.element.filters);
         $scope.$watch('$ctrl.filters', writeFilters, true);
         // When a new block is saved, update the list
         $scope.$watchCollection('$ctrl.meta.blocks', function() {
