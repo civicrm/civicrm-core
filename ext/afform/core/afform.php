@@ -287,7 +287,7 @@ function afform_civicrm_pageRun(&$page) {
       'module' => $afform['module_name'],
       'directive' => $afform['directive_name'],
     ];
-    $content = CRM_Core_Smarty::singleton()->fetchWith('afform/InlineAfform.tpl', ['afformOptions' => $afformOptions, 'afform' => $block]);
+    $content = CRM_Core_Smarty::singleton()->fetchWith('afform/InlineAfform.tpl', ['afformOptions' => $afformOptions, 'block' => $block]);
     CRM_Core_Region::instance("contact-basic-info-$side")->add([
       'markup' => '<div class="crm-summary-block">' . $content . '</div>',
       'name' => 'afform:' . $afform['name'],
