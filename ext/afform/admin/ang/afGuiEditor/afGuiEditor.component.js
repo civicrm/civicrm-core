@@ -362,7 +362,7 @@
         let requiresServerRoute = false;
         editor.afform.placement.forEach(function(placement) {
           const item = editor.meta.afform_placement.find(item => item.id === placement);
-          if (item && item.grouping === 'server_route') {
+          if (item && item.filter) {
             requiresServerRoute = item.text;
           }
         });

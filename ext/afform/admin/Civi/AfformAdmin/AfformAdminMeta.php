@@ -14,7 +14,7 @@ class AfformAdminMeta {
    */
   public static function getAdminSettings() {
     $afformPlacement = \CRM_Utils_Array::formatForSelect2((array) \Civi\Api4\OptionValue::get(FALSE)
-      ->addSelect('value', 'label', 'icon', 'description', 'grouping')
+      ->addSelect('value', 'label', 'icon', 'description', 'grouping', 'filter')
       ->addWhere('is_active', '=', TRUE)
       ->addWhere('option_group_id:name', '=', 'afform_placement')
       ->addOrderBy('weight')
