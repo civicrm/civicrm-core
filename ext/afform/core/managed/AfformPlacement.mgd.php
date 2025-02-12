@@ -2,8 +2,8 @@
 
 use CRM_Afform_ExtensionUtil as E;
 
-// Option group for Afform.placement field
-return [
+// Defines OptionGroup for Afform.placement field
+$placements = [
   [
     'name' => 'AfformPlacement',
     'entity' => 'OptionGroup',
@@ -132,3 +132,29 @@ return [
     ],
   ],
 ];
+
+if (CRM_Core_Component::isEnabled('CiviCase')) {
+  $placements[] = [
+    'name' => 'AfformPlacement:case_summary_block',
+    'entity' => 'OptionValue',
+    'cleanup' => 'always',
+    'update' => 'always',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'afform_placement',
+        'name' => 'case_summary_block',
+        'value' => 'case_summary_block',
+        'label' => E::ts('Case Summary'),
+        'is_reserved' => TRUE,
+        'is_active' => TRUE,
+        'icon' => 'fa-folder-open',
+        'grouping' => 'Case,Contact',
+        'description' => E::ts('Add to the Case Summary screen.'),
+      ],
+      'match' => ['option_group_id', 'name'],
+    ],
+  ];
+}
+
+return $placements;
