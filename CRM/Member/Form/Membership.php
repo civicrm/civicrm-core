@@ -785,14 +785,10 @@ DESC limit 1");
         );
 
         if (!$startDate) {
-          $startDate = CRM_Utils_Array::value('start_date',
-            $defaultDates
-          );
+          $startDate = $defaultDates['start_date'] ?? NULL;
         }
         if (!$endDate) {
-          $endDate = CRM_Utils_Array::value('end_date',
-            $defaultDates
-          );
+          $endDate = $defaultDates['end_date'] ?? NULL;
         }
 
         //CRM-3724, check for availability of valid membership status.
