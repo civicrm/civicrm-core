@@ -972,6 +972,7 @@ class CRM_Core_Permission {
         'label' => $prefix . ts('administer CiviCRM System'),
         'description' => ts('Perform all system administration tasks in CiviCRM'),
         'implies' => [
+          'bypass maintenance mode',
           'edit system workflow message templates',
         ],
       ],
