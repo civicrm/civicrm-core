@@ -286,10 +286,14 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       'title' => $item['title'],
       'icon' => $item['icon'],
     ];
+    $entityIdFilter = \CRM_Utils_String::convertStringToSnakeCase($item['extends']) . '_id';
+    // Place in Contact Summary Tabs
     if ($item['extends'] === 'Contact') {
       $afform['placement'] = ['contact_summary_tab'];
     }
     elseif (CoreUtil::isContact($item['extends'])) {
+      // override e.g. "individual_id", we want "contact_id"
+      $entityIdFilter = 'contact_id';
       $afform['placement'] = ['contact_summary_tab'];
       $afform['summary_contact_type'] = [$item['extends']];
     }
@@ -308,6 +312,8 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
           'saved_search' => 'Custom_' . $item['name'] . '_Search',
           'display_type' => 'table',
           'search_display' => 'Custom_' . $item['name'] . '_Tab',
+          // 'contact_id', 'event_id', etc.
+          'entity_id_filter' => $entityIdFilter,
         ]
       );
     }

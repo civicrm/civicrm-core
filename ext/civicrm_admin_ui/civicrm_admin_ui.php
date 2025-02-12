@@ -88,7 +88,7 @@ function civicrm_admin_ui_civicrm_tabset($tabsetName, &$tabs, $context) {
     case 'civicrm/event/manage':
       $entities = ['Event'];
       \CRM_Core_Smarty::singleton()->assign('afformOptions', [
-        'entity_id' => $context['event_id'] ?? NULL,
+        'event_id' => $context['event_id'] ?? NULL,
       ]);
       break;
 

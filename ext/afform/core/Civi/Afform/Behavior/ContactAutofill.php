@@ -119,7 +119,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
       }
       // Autofill with current entity (e.g. on the contact summary screen)
       if (!$id && $autoFillMode === 'entity_id' && $apiRequest->getFillMode() === 'form') {
-        $id = $apiRequest->getArgs()['entity_id'] ?? NULL;
+        $id = $apiRequest->getArgs()['contact_id'] ?? NULL;
         if ($id) {
           $apiRequest->loadEntity($entity, [['id' => $id]]);
         }
