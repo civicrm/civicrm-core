@@ -245,12 +245,17 @@ class CRM_Core_BAO_ConfigSetting {
 
   /**
    * @param array $defaultValues
+   * @deprecated
+   *
+   * Does anyone use this function? Does it do what you expect?
    *
    * @return string
    * @throws Exception
    */
   public static function doSiteMove($defaultValues = []) {
-    $moveStatus = ts('Beginning site move process...') . '<br />';
+    $deprecatedMessage = ts('WARNING: doSiteMove is deprecated and might not do what you want');
+    \CRM_Core_Error::deprecatedWarning($deprecatedMessage);
+    $moveStatus = ts('Beginning site move process...') . '<br />' . $deprecatedMessage . '<br />';
     $settings = Civi::settings();
 
     foreach (array_merge(self::getPathSettings(), self::getUrlSettings()) as $key) {
