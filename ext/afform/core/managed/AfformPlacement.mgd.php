@@ -61,6 +61,7 @@ return [
         'is_reserved' => TRUE,
         'is_active' => TRUE,
         'icon' => 'fa-address-card-o',
+        'grouping' => 'Contact',
         'description' => E::ts('Add tab to contact summary page.'),
       ],
       'match' => ['option_group_id', 'name'],
@@ -81,6 +82,7 @@ return [
         'is_reserved' => TRUE,
         'is_active' => TRUE,
         'icon' => 'fa-columns',
+        'grouping' => 'Contact',
         'description' => E::ts('Add block to main contact summary tab.'),
       ],
       'match' => ['option_group_id', 'name'],
@@ -101,6 +103,7 @@ return [
         'is_reserved' => TRUE,
         'is_active' => TRUE,
         'icon' => 'fa-bars',
+        'grouping' => 'Contact',
         // Indicates that a server_route is required for this placement
         'filter' => 1,
         'description' => E::ts('Add to the contact summary actions menu.'),
