@@ -133,6 +133,16 @@ class CRM_Utils_Cache {
           $defaults['prefix'] = CIVICRM_DB_CACHE_PREFIX;
         }
         break;
+
+      case 'FileCache':
+        $defaults = [];
+        if (defined('CIVICRM_DB_CACHE_TIMEOUT')) {
+          $defaults['timeout'] = CIVICRM_DB_CACHE_TIMEOUT;
+        }
+        if (defined('CIVICRM_DB_CACHE_PREFIX')) {
+          $defaults['prefix'] = CIVICRM_DB_CACHE_PREFIX;
+        }
+        break;
     }
     return $defaults;
   }
@@ -192,7 +202,7 @@ class CRM_Utils_Cache {
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
-          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis'])) {
+          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis', 'FileCache'])) {
             $shortName = self::cleanKey($params['name'], 64);
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
