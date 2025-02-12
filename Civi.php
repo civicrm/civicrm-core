@@ -191,11 +191,11 @@ class Civi {
    * the rebuild targets shared data-structures used by all processes.
    *
    * Ex: Rebuild everything
-   *   Civi::rebuild('*');
+   *   Civi::rebuild('*')->execute();
    * Ex: Rebuild the temp SQL data and the system-caches (and nothing else))
-   *   Civi::rebuild(['tables' => TRUE, 'system' => TRUE])
+   *   Civi::rebuild(['tables' => TRUE, 'system' => TRUE])->execute();
    * Ex: Rebuild everything except the menu
-   *   Civi::rebuild(['*' => TRUE, 'menu' => FALSE])
+   *   Civi::rebuild(['*' => TRUE, 'menu' => FALSE])->execute();
    *
    * @param string|array{ext:bool,files:bool,tables:bool,sessions:bool,metadata:bool,system:bool,userjob:bool,menu:bool,perms:bool,strings:bool,settings:bool,cases:bool,triggers:bool,entities:bool}|null $targets
    *   The special key '*' indicates that all flags should start as TRUE (but you may opt-out of specific ones).
@@ -214,153 +214,11 @@ class Civi {
    *     - cases: Somethingsomething.
    *     - triggers: Rebuild the SQL triggers.
    *     - entities: Reconcile the managed-entities.
-   * @return void
+   *
+   * @return Civi\Core\Rebuilder
    */
-  public static function rebuild($targets): void {
-    // This is a rebuild-super-function. It was produced by merging three prior rebuild-super-functions.
-    // These three prior super-functions were all entwined. By merging them, we get a clearer view of
-    // what's going-on. Of course, "what's going-on" includes... confusing things. Have fun!
-
-    if (is_string($targets)) {
-      $targets = [$targets => TRUE];
-    }
-
-    $all = [
-      'ext' => TRUE,
-      'files' => TRUE,
-      'tables' => TRUE,
-      'sessions' => TRUE,
-      'metadata' => TRUE,
-      'system' => TRUE,
-      'userjob' => TRUE,
-      'menu' => TRUE,
-      'perms' => TRUE,
-      'strings' => TRUE,
-      'settings' => TRUE,
-      'cases' => TRUE,
-      'triggers' => TRUE,
-      'entities' => TRUE,
-    ];
-    if (!empty($targets['*'])) {
-      $targets = array_merge($all, $targets);
-      unset($targets['*']);
-    }
-
-    $config = CRM_Core_Config::singleton();
-
-    if (!empty($targets['ext'])) {
-      $config->clearModuleList();
-
-      // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
-      CRM_Extension_System::singleton()->getClassLoader()->refresh();
-      CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
-    }
-
-    if (!empty($targets['files'])) {
-      $config->cleanup(1, FALSE);
-    }
-    if (!empty($targets['tables'])) {
-      // Truncate and drop various tables that track replaceable data (e.g. ACL caches and temp-tables).
-
-      // This is fun and confusing:
-      // - On systems with Memcache/Redis, 'tables' and 'system' are mostly independent.
-      // - On systems with SQL-based caches, 'tables' and 'system' are overlapping rebuilds,
-      //   but neither is strictly redundant with the other.
-      CRM_Core_Config::clearDBCache();
-    }
-    if (!empty($targets['sessions'])) {
-      Civi::cache('session')->clear();
-    }
-    if (!empty($targets['metadata'])) {
-      Civi::cache('metadata')->clear();
-      CRM_Core_DAO_AllCoreTables::flush();
-    }
-    if (!empty($targets['system'])) {
-      // flush out all cache entries so we can reload new data
-      // a bit aggressive, but livable for now
-      CRM_Utils_Cache::singleton()->flush();
-
-      if (Civi\Core\Container::isContainerBooted()) {
-        Civi::cache('long')->flush();
-        Civi::cache('settings')->flush();
-        Civi::cache('js_strings')->flush();
-        Civi::cache('community_messages')->flush();
-        Civi::cache('groups')->flush();
-        Civi::cache('navigation')->flush();
-        Civi::cache('customData')->flush();
-        Civi::cache('contactTypes')->clear();
-        Civi::cache('metadata')->clear(); /* Again? Huh. */
-        \Civi\Core\ClassScanner::cache('index')->flush();
-        CRM_Extension_System::singleton()->getCache()->flush();
-      }
-
-      // also reset the various static memory caches
-
-      // reset the memory or array cache
-      Civi::cache('fields')->flush();
-
-      // reset ACL cache
-      CRM_ACL_BAO_Cache::resetCache();
-
-      // clear asset builder folder
-      \Civi::service('asset_builder')->clear(FALSE);
-      // ^^ This really doesn't make sense in this section, does it?
-
-      // reset various static arrays used here
-      CRM_Contact_BAO_Contact::$_importableFields = CRM_Contact_BAO_Contact::$_exportableFields
-        = CRM_Contribute_BAO_Contribution::$_importableFields
-          = CRM_Contribute_BAO_Contribution::$_exportableFields
-            = CRM_Pledge_BAO_Pledge::$_exportableFields
-              = CRM_Core_DAO::$_dbColumnValueCache = NULL;
-
-      CRM_Core_OptionGroup::flushAll();
-      CRM_Utils_PseudoConstant::flushAll();
-
-      if (Civi\Core\Container::isContainerBooted()) {
-        Civi::dispatcher()->dispatch('civi.core.clearcache');
-      }
-    }
-    if (!empty($targets['userjob'])) {
-      // (1) note this used to be earlier, but was crashing because of api4 instability
-      // during extension install
-      // (2) I'm not sure this belongs at such a low level...
-      Civi\Api4\UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
-    }
-    if (!empty($targets['sessions'])) {
-      $session = CRM_Core_Session::singleton();
-      $session->reset(2);
-    }
-    if (!empty($targets['menu'])) {
-      CRM_Core_Menu::store();
-      CRM_Core_BAO_Navigation::resetNavigation();
-    }
-    if (!empty($targets['perms'])) {
-      $config->cleanupPermissions();
-    }
-    if (!empty($targets['strings'])) {
-      // rebuild word replacement cache - pass false to prevent operations redundant with this fn
-      CRM_Core_BAO_WordReplacement::rebuild(FALSE);
-    }
-    if (!empty($targets['settings'])) {
-      Civi::service('settings_manager')->flush();
-    }
-    if (!empty($targets['strings'])) {
-      CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
-    }
-    if (!empty($targets['cases'])) {
-      CRM_Case_XMLRepository::singleton(TRUE);
-    }
-    if (!empty($targets['triggers'])) {
-      Civi::service('sql_triggers')->rebuild();
-      // (1) Rebuild Drupal 8/9/10 route cache only if "triggerRebuild" is set to TRUE as it's
-      // computationally very expensive and only needs to be done when routes change on the Civi-side.
-      // For example - when uninstalling an extension. We already set "triggerRebuild" to true for these operations.
-      // (2) FIXME: That ^^ seems silly now. Shouldn't it go under $targets['menu']?
-      $config->userSystem->invalidateRouteCache();
-    }
-    if (!empty($targets['entities'])) {
-      CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
-    }
+  public static function rebuild($targets): Civi\Core\Rebuilder {
+    return new Civi\Core\Rebuilder($targets);
   }
 
   /**

@@ -270,7 +270,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *   Deprecated Feb 2025 in favor of Civi::rebuild().
    *   Reassess after Jun 2026.
    *   For an extension bridging before+after, suggest guard like:
-   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild([...]) :
+   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild(...)->execute()
    *     else CRM_Core_Config::singleton()->cleanupCaches();
    *   Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
@@ -282,7 +282,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       'metadata' => TRUE,
       'system' => TRUE,
       'userjob' => TRUE,
-    ]);
+    ])->execute();
   }
 
   /**

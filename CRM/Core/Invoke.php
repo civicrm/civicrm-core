@@ -374,7 +374,7 @@ class CRM_Core_Invoke {
    *   Deprecated Feb 2025 in favor of Civi::rebuild().
    *   Reassess after Jun 2026.
    *   For an extension bridging before+after, suggest guard like:
-   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild([...]) :
+   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild(...)->execute()
    *     else CRM_Core_Invoke::rebuildMenuAndCaches();
    *   Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
@@ -394,7 +394,7 @@ class CRM_Core_Invoke {
       'cases' => TRUE,
       'triggers' => $triggerRebuild || CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
       'entities' => TRUE,
-    ]);
+    ])->execute();
 
   }
 
