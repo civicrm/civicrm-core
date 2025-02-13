@@ -48,6 +48,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
   protected function getSelect() {
     return ['id', 'name', 'title', 'is_multiple',
       'help_pre', 'help_post', 'extends', 'icon', 'style',
+      'extends_entity_column_value', 'weight',
     ];
   }
 
@@ -285,13 +286,16 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       'permission' => ['access all custom data'],
       'title' => $item['title'],
       'icon' => $item['icon'],
+      'summary_weight' => 100 + ($item['weight'] ?? 0),
     ];
-    if ($item['extends'] === 'Contact') {
+    if (CoreUtil::isContact($item['extends'])) {
       $afform['placement'] = ['contact_summary_tab'];
-    }
-    elseif (CoreUtil::isContact($item['extends'])) {
-      $afform['placement'] = ['contact_summary_tab'];
-      $afform['summary_contact_type'] = [$item['extends']];
+      if (!empty($item['extends_entity_column_value'])) {
+        $afform['summary_contact_type'] = (array) $item['extends_entity_column_value'];
+      }
+      elseif ($item['extends'] !== 'Contact') {
+        $afform['summary_contact_type'] = [$item['extends']];
+      }
     }
     else {
       // tabs for other entities are placed without any
