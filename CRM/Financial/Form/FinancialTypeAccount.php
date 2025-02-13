@@ -168,20 +168,38 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
       if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
         $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
         $financialAccountType = $financialAccountType[$this->_submitValues['account_relationship']] ?? NULL;
-        $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
+        $result = \Civi\Api4\FinancialAccount::get()
+          ->addSelect('id', 'label')
+          ->addWhere('financial_account_type_id', '=', $financialAccountType)
+          ->addWhere('is_active', '=', TRUE)
+          ->addOrderBy('label')
+          ->execute()
+          ->column('label', 'id');
 
         $financialAccountSelect = ['' => ts('- select -')] + $result;
       }
       else {
+        $result = \Civi\Api4\FinancialAccount::get()
+          ->addSelect('id', 'label')
+          ->addWhere('is_active', '=', TRUE)
+          ->addOrderBy('label')
+          ->execute()
+          ->column('label', 'id');
         $financialAccountSelect = [
           'select' => ts('- select -'),
-        ] + CRM_Contribute_PseudoConstant::financialAccount();
+        ] + $result;
       }
     }
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
       $financialAccountType = $financialAccountType[$this->_defaultValues['account_relationship']];
-      $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
+      $result = \Civi\Api4\FinancialAccount::get()
+        ->addSelect('id', 'label')
+        ->addWhere('financial_account_type_id', '=', $financialAccountType)
+        ->addWhere('is_active', '=', TRUE)
+        ->addOrderBy('label')
+        ->execute()
+        ->column('label', 'id');
 
       $financialAccountSelect = ['' => ts('- select -')] + $result;
     }

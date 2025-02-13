@@ -187,7 +187,13 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     // Financial Account of account type asset CRM-11515
     $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
-    $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
+    $financialAccount = \Civi\Api4\FinancialAccount::get()
+      ->addSelect('id', 'label')
+      ->addWhere('financial_account_type_id', '=', key($accountType))
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('label')
+      ->execute()
+      ->column('label', 'id');
     if ($fcount = count($financialAccount)) {
       $this->assign('financialAccount', $fcount);
     }
