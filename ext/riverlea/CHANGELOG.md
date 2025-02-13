@@ -1,3 +1,9 @@
+1.3.7-6.1alpha
+ - CHANGED - bg colours for Standalone login, to better handle darkmode login (ref #31991)
+
+1.3.6-6.0beta
+ - CHANGES AWAITED as being applied against 6.0 (https://github.com/civicrm/civicrm-core/pull/32077), kept separate for version numbering.
+
 1.3.5-6.0alpha
  - ADDED - padding to contact dashboard inline edit div (#107)
  - FIXED - Contact Layout Editor extension: double padding; broken right float (#107)
