@@ -212,3 +212,13 @@ html.crm-standalone body {
 html.crm-standalone #crm-container:has(.standalone-auth-form) {
   background: var(--crm-c-background);
 }
+.standalone-auth-box {
+  background-color: var(--crm-c-page-background);
+  border: var(--crm-c-divider);
+  padding: 1rem clamp(1rem, 3vw, 2rem) clamp(1rem, 3vw, 2rem)
+}
+.standalone-auth-form img.crm-logo {
+  padding: var(--crm-padding-reg);
+  border-radius: var(--crm-roundness);
+  margin: 0 auto 1rem;
+}

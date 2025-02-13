@@ -87,3 +87,6 @@
   --crm-icon-success-color: #4dc447;
   --crm-icon-warning-color: #fab488;
 }
+.standalone-auth-form img.crm-logo {
+  background-color: #fff;
+}

@@ -79,3 +79,6 @@
   --crm-dash-edit-border: 1px solid var(--crm-c-link-hover);
   --crm-filter-bg: var(--crm-c-blue-dark);
 }
+.standalone-auth-form img.crm-logo {
+  background-color: #fff;
+}

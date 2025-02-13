@@ -76,3 +76,6 @@
   --crm-c-code-background: var(--crm-c-background2);
   --crm-filter-item-background: var(--crm-c-background2);
 }
+.standalone-auth-form img.crm-logo {
+  background-color: #fff;
+}
