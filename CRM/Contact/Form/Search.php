@@ -193,7 +193,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     return (bool) $searchContext;
   }
 
-  public static function setModeValues() {
+  public static function setModeValues(): void {
     self::$_modeValues = [
       CRM_Contact_BAO_Query::MODE_CONTACTS => [
         'selectorName' => self::$_selectorName,
@@ -214,6 +214,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Contribute_Task',
         'component' => 'CiviContribute',
+        'contributionSummary' => [],
       ],
       CRM_Contact_BAO_Query::MODE_EVENT => [
         'selectorName' => 'CRM_Event_Selector_Search',
