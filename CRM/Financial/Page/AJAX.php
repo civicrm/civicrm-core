@@ -36,13 +36,25 @@ class CRM_Financial_Page_AJAX {
     }
     $defaultId = NULL;
     if ($_GET['_value'] === 'select') {
-      $result = CRM_Contribute_PseudoConstant::financialAccount();
+      $result = \Civi\Api4\FinancialAccount::get()
+        ->addSelect('id', 'label')
+        ->addWhere('is_active', '=', TRUE)
+        ->addOrderBy('label')
+        ->execute()
+        ->column('label', 'id');
     }
     else {
       $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
       $financialAccountType = $financialAccountType[$_GET['_value']] ?? NULL;
-      $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
+      $result = [];
       if ($financialAccountType) {
+        $result = \Civi\Api4\FinancialAccount::get()
+          ->addSelect('id', 'label')
+          ->addWhere('financial_account_type_id', '=', $financialAccountType)
+          ->addWhere('is_active', '=', TRUE)
+          ->addOrderBy('label')
+          ->execute()
+          ->column('label', 'id');
         $defaultId = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = $financialAccountType");
       }
     }
