@@ -201,4 +201,42 @@ class CustomFieldAlterTest extends Api4TestBase {
     $this->assertNull(\CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE '{$customGroup['table_name']}';"));
   }
 
+  public function testCustomFieldSearchIndex(): void {
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'CustomFieldIndexTest',
+      'extends' => 'Activity',
+    ]);
+
+    $field = $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'TestOptions',
+      'html_type' => 'Text',
+    ]);
+
+    // is_searchable defaults to FALSE, so no index
+    $query = "SHOW INDEX FROM {$customGroup['table_name']} WHERE Key_name = 'INDEX_{$field['column_name']}'";
+    $dao = \CRM_Core_DAO::executeQuery($query);
+    $this->assertEquals(0, $dao->N);
+
+    // Change is_searchable to TRUE
+    CustomField::update(FALSE)
+      ->addWhere('id', '=', $field['id'])
+      ->addValue('is_searchable', TRUE)
+      ->execute();
+
+    // Index added now that field is_searchable
+    $dao = \CRM_Core_DAO::executeQuery($query);
+    $this->assertEquals(1, $dao->N);
+
+    // Disable the field
+    CustomField::update(FALSE)
+      ->addWhere('id', '=', $field['id'])
+      ->addValue('is_active', FALSE)
+      ->execute();
+
+    // Index removed when field was disabled
+    $dao = \CRM_Core_DAO::executeQuery($query);
+    $this->assertEquals(0, $dao->N);
+  }
+
 }
