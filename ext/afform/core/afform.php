@@ -154,14 +154,30 @@ function afform_civicrm_managed(&$entities, $modules) {
  * Adds afforms as contact summary tabs.
  */
 function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
-  if ($tabsetName !== 'civicrm/contact/view') {
+  $tabPlacements = [
+    'civicrm/contact/view' => [
+      'placement' => 'contact_summary_tab',
+      'context' => 'contact_id',
+    ],
+    'civicrm/event/manage' => [
+      'placement' => 'event_manage_tab',
+      'context' => 'event_id',
+    ],
+  ];
+  if (!isset($tabPlacements[$tabsetName])) {
     return;
   }
-  $existingTabs = array_combine(array_keys($tabs), array_column($tabs, 'id'));
+  // Event tab should only be placed when viewing an event
+  if ($tabsetName === 'civicrm/event/manage' && empty($context['event_id'])) {
+    return;
+  }
+
+  $existingTabs = array_map(fn($key, $tab) => $tab['id'] ?? $key, array_keys($tabs), array_values($tabs));
+
   $contactTypes = array_merge((array) ($context['contact_type'] ?? []), $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get()
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type', 'summary_weight')
-    ->addWhere('placement', 'CONTAINS', 'contact_summary_tab')
+    ->addWhere('placement', 'CONTAINS', $tabPlacements[$tabsetName]['placement'])
     ->addOrderBy('title')
     ->execute();
   $weight = 111;
@@ -170,7 +186,8 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
       // Convention is to name the afform like "afformTabMyInfo" which gets the tab name "my_info"
       $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $afform['name']));
-      if (strpos($tabId, 'custom_') === 0) {
+      // Support overriding custom fields on the contact summary tab
+      if ($tabsetName === 'civicrm/contact/view' && str_starts_with($tabId, 'custom_')) {
         // custom group tab forms use name, but need to replace tabs using ID
         // remove 'afsearchTabCustom_' from the form name to get the group name
         $groupName = substr($afform['name'], 18);
@@ -187,7 +204,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
       if ($existingTab !== FALSE) {
         unset($tabs[$existingTab]);
       }
-      $tabs[] = [
+      $tabs[$tabId] = [
         'id' => $tabId,
         'title' => $afform['title'],
         'weight' => $afform['summary_weight'] ?? $weight++,
@@ -199,10 +216,11 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
         'directive' => $afform['directive_name'],
       ];
       // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module
-      // and assign contact id to required smarty variable
+      // and assign entity id to required smarty variable
       if (empty($context['caller'])) {
+        $entityId = $tabPlacements[$tabsetName]['context'];
         CRM_Core_Smarty::singleton()->assign('afformOptions', [
-          'contact_id' => $context['contact_id'],
+          $entityId => $context[$entityId],
         ]);
         Civi::service('angularjs.loader')->addModules($afform['module_name']);
       }

@@ -300,10 +300,8 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
         $afform['summary_contact_type'] = [$item['extends']];
       }
     }
-    else {
-      // tabs for other entities are placed without any
-      // additional afform meta
-      // @see civicrm_admin_ui_civicrm_tabset
+    elseif ($item['extends'] === 'Event') {
+      $afform['placement'] = ['event_manage_tab'];
     }
     if ($this->getLayout) {
       // TODO: the template should be a table or grid depending

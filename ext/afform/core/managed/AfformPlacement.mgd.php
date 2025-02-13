@@ -157,4 +157,28 @@ if (CRM_Core_Component::isEnabled('CiviCase')) {
   ];
 }
 
+if (CRM_Core_Component::isEnabled('CiviEvent')) {
+  $placements[] = [
+    'name' => 'AfformPlacement:event_manage_tab',
+    'entity' => 'OptionValue',
+    'cleanup' => 'always',
+    'update' => 'always',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'afform_placement',
+        'name' => 'event_manage_tab',
+        'value' => 'event_manage_tab',
+        'label' => E::ts('Manage Event Tab'),
+        'is_reserved' => TRUE,
+        'is_active' => TRUE,
+        'icon' => 'fa-calendar',
+        'grouping' => 'Event',
+        'description' => E::ts('Add tab to event management page.'),
+      ],
+      'match' => ['option_group_id', 'name'],
+    ],
+  ];
+}
+
 return $placements;
