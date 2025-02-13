@@ -11,8 +11,9 @@
   --crm-c-background4: var(--crm-c-gray-600);
   --crm-c-code-background: var(--crm-c-gray-200);
   --crm-c-primary: var(--crm-c-gray-800);
-  --crm-c-secondary: var(--crm-c-gray-800);
+  --crm-c-primary-text: #fff;
   --crm-c-primary-hover: var(--crm-c-gray-900);
+  --crm-c-secondary: var(--crm-c-gray-800);
   --crm-c-secondary-hover: var(--crm-c-gray-900);
   --crm-c-inactive: var(--crm-c-gray-400);
   --crm-c-amber: #993b00;
