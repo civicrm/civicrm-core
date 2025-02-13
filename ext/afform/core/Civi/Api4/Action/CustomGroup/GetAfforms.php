@@ -287,17 +287,22 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       'title' => $item['title'],
       'icon' => $item['icon'],
       'summary_weight' => 100 + ($item['weight'] ?? 0),
+      'placement_filters' => [],
     ];
     $entityIdFilter = \CRM_Utils_String::convertStringToSnakeCase($item['extends']) . '_id';
+    // Place in Contact Summary Tabs
     if (CoreUtil::isContact($item['extends'])) {
       // override e.g. "individual_id", we want "contact_id"
       $entityIdFilter = 'contact_id';
       $afform['placement'] = ['contact_summary_tab'];
+      // Add contact_type filter (extends == contact_type, extends_entity_column_value == contact_sub_type)
+      // Note: Afform placement_filters mixes contact_subtype in with contact_type
       if (!empty($item['extends_entity_column_value'])) {
-        $afform['summary_contact_type'] = (array) $item['extends_entity_column_value'];
+        $afform['placement_filters']['contact_type'] = (array) $item['extends_entity_column_value'];
       }
+      // Only add contact_type if a sub_type wasn't specified
       elseif ($item['extends'] !== 'Contact') {
-        $afform['summary_contact_type'] = [$item['extends']];
+        $afform['placement_filters']['contact_type'] = (array) $item['extends'];
       }
     }
     elseif ($item['extends'] === 'Event') {

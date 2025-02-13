@@ -44,13 +44,13 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
       ->addValue('name', $this->formNames[0])
       ->addValue('title', 'Test B')
       ->addValue('placement', ['contact_summary_tab'])
-      ->addValue('summary_contact_type', ['Organization'])
+      ->addValue('placement_filters', ['contact_type' => ['Organization']])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[1])
       ->addValue('title', 'Test C')
       ->addValue('placement', ['contact_summary_tab'])
-      ->addValue('summary_contact_type', ['FooBar'])
+      ->addValue('placement_filters', ['contact_type' => ['FooBar']])
       ->addValue('icon', 'smiley-face')
       ->execute();
     Afform::create()
@@ -62,8 +62,8 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
       ->addValue('name', $this->formNames[3])
       ->addValue('title', 'Test D')
       ->addValue('placement', ['contact_summary_tab'])
-      ->addValue('summary_contact_type', ['Individual'])
-      ->addValue('summary_weight', 99)
+      ->addValue('placement_filters', ['contact_type' => ['Individual']])
+      ->addValue('placement_weight', 99)
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[4])
@@ -117,14 +117,14 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
       ->addValue('title', 'Test B')
       ->addValue('type', 'search')
       ->addValue('placement', ['contact_summary_block'])
-      ->addValue('summary_contact_type', ['Individual', 'Household'])
+      ->addValue('placement_filters', ['contact_type' => ['Individual', 'Household']])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[1])
       ->addValue('title', 'Test C')
       ->addValue('type', 'form')
       ->addValue('placement', ['contact_summary_block'])
-      ->addValue('summary_contact_type', ['Farm'])
+      ->addValue('placement_filters', ['contact_type' => ['Farm']])
       ->addValue('icon', 'smiley-face')
       ->execute();
     Afform::create()
@@ -138,7 +138,7 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
       ->addValue('type', 'form')
       ->addValue('title', 'A Weight Test')
       ->addValue('placement', ['contact_summary_block'])
-      ->addValue('summary_weight', 99)
+      ->addValue('placement_weight', 99)
       ->execute();
 
     // Call pageRun hook and then assert afforms have been added to the appropriate region
@@ -146,19 +146,22 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
     $dummy->set('cid', $cid);
     \CRM_Utils_Hook::pageRun($dummy);
 
-    // TODO: Be more flexible
-    // The presence of any other afform blocks in the system might alter the left-right assumptions here
-    $blockA = \CRM_Core_Region::instance('contact-basic-info-left')->get('afform:' . $this->formNames[2]);
+    // Find an afform on the contact summary (either the left or right side)
+    $getFromRegion = function ($formName) {
+      return \CRM_Core_Region::instance('contact-basic-info-left')->get('afform:' . $formName)
+        ?: \CRM_Core_Region::instance('contact-basic-info-right')->get('afform:' . $formName);
+    };
+
+    $blockA = $getFromRegion($this->formNames[2]);
     $this->assertStringContainsString("<af-search-tab-test2 options=", $blockA['markup']);
     $this->assertStringContainsString("\"contact_id\":$cid", $blockA['markup']);
 
-    $blockB = \CRM_Core_Region::instance('contact-basic-info-right')->get('afform:' . $this->formNames[1]);
+    $blockB = $getFromRegion($this->formNames[1]);
     $this->assertStringContainsString("<af-form-tab-test1 options=", $blockB['markup']);
     $this->assertStringContainsString("\"contact_id\":$cid", $blockB['markup']);
 
     // Block for wrong contact type should not appear
-    $this->assertNull(\CRM_Core_Region::instance('contact-basic-info-left')->get('afform:' . $this->formNames[0]));
-    $this->assertNull(\CRM_Core_Region::instance('contact-basic-info-right')->get('afform:' . $this->formNames[0]));
+    $this->assertNull($getFromRegion($this->formNames[0]));
 
     // Ensure blocks show up in ContactLayoutEditor
     $blocks = [];

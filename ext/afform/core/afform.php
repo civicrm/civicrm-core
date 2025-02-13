@@ -176,13 +176,13 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
 
   $contactTypes = array_merge((array) ($context['contact_type'] ?? []), $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get()
-    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type', 'summary_weight')
+    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'placement_filters', 'placement_weight')
     ->addWhere('placement', 'CONTAINS', $tabPlacements[$tabsetName]['placement'])
     ->addOrderBy('title')
     ->execute();
   $weight = 111;
   foreach ($afforms as $afform) {
-    $summaryContactType = $afform['summary_contact_type'] ?? [];
+    $summaryContactType = $afform['placement_filters']['contact_type'] ?? [];
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
       // Convention is to name the afform like "afformTabMyInfo" which gets the tab name "my_info"
       $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $afform['name']));
@@ -207,7 +207,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
       $tabs[$tabId] = [
         'id' => $tabId,
         'title' => $afform['title'],
-        'weight' => $afform['summary_weight'] ?? $weight++,
+        'weight' => $afform['placement_weight'] ?? $weight++,
         'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
         'is_active' => TRUE,
         'contact_type' => _afform_get_contact_types($summaryContactType) ?: NULL,
@@ -247,17 +247,17 @@ function afform_civicrm_summaryActions(&$actions, $contactID) {
   }
   $contactTypes = array_merge([$contact['contact_type']], $contact['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get()
-    ->addSelect('name', 'title', 'icon', 'server_route', 'summary_contact_type', 'summary_weight')
+    ->addSelect('name', 'title', 'icon', 'server_route', 'placement_filters', 'placement_weight')
     ->addWhere('placement', 'CONTAINS', 'contact_summary_actions')
     ->addWhere('server_route', 'IS NOT EMPTY')
     ->addOrderBy('title')
     ->execute();
   foreach ($afforms as $afform) {
-    $summaryContactType = $afform['summary_contact_type'] ?? [];
+    $summaryContactType = $afform['placement_filters']['contact_type'] ?? [];
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
       $actions['otherActions'][$afform['name']] = [
         'title' => $afform['title'],
-        'weight' => $afform['summary_weight'] ?? 0,
+        'weight' => $afform['placement_weight'] ?? 0,
         'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
         'class' => 'crm-popup',
         'href' => CRM_Utils_System::url($afform['server_route'], '', FALSE, "?contact_id=$contactID"),
@@ -276,9 +276,9 @@ function afform_civicrm_pageRun(&$page) {
     return;
   }
   $afforms = Civi\Api4\Afform::get()
-    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
+    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'placement_filters')
     ->addWhere('placement', 'CONTAINS', 'contact_summary_block')
-    ->addOrderBy('summary_weight')
+    ->addOrderBy('placement_weight')
     ->addOrderBy('title')
     ->execute();
   $cid = $page->get('cid');
@@ -290,14 +290,14 @@ function afform_civicrm_pageRun(&$page) {
   ];
   foreach ($afforms as $afform) {
     // If Afform specifies a contact type, lookup the contact and compare
-    if (!empty($afform['summary_contact_type'])) {
+    if (!empty($afform['placement_filters']['contact_type'])) {
       // Contact.get only needs to happen once
       $contact ??= civicrm_api4('Contact', 'get', [
         'select' => ['contact_type', 'contact_sub_type'],
         'where' => [['id', '=', $cid]],
       ])->first();
       $contactTypes = array_merge([$contact['contact_type']], $contact['contact_sub_type'] ?? []);
-      if (!array_intersect($afform['summary_contact_type'], $contactTypes)) {
+      if (!array_intersect($afform['placement_filters']['contact_type'], $contactTypes)) {
         continue;
       }
     }
@@ -323,7 +323,7 @@ function afform_civicrm_pageRun(&$page) {
  */
 function afform_civicrm_contactSummaryBlocks(&$blocks) {
   $afforms = \Civi\Api4\Afform::get()
-    ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label', 'summary_contact_type'])
+    ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label', 'placement_filters'])
     ->addWhere('placement', 'CONTAINS', 'contact_summary_block')
     ->addOrderBy('title')
     ->execute();
@@ -338,7 +338,7 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
     ];
     // If the form specifies contact types, resolve them to just the parent types (Individual, Organization, Household)
     // because ContactLayout doesn't care about sub-types
-    $contactType = _afform_get_contact_types($afform['summary_contact_type'] ?? []);
+    $contactType = _afform_get_contact_types($afform['placement_filters']['contact_type'] ?? []);
     $blocks["afform_{$afform['type']}"]['blocks'][$afform['name']] = [
       'title' => $afform['title'],
       'contact_type' => $contactType ?: NULL,
@@ -364,9 +364,9 @@ function afform_civicrm_buildForm($formName, &$form) {
     return;
   }
   $afforms = Civi\Api4\Afform::get()
-    ->addSelect('name', 'title', 'module_name', 'directive_name', 'summary_contact_type')
+    ->addSelect('name', 'title', 'module_name', 'directive_name', 'placement_filters')
     ->addWhere('placement', 'CONTAINS', 'case_summary_block')
-    ->addOrderBy('summary_weight')
+    ->addOrderBy('placement_weight')
     ->addOrderBy('title')
     ->execute();
   $afformOptions = [
@@ -377,14 +377,14 @@ function afform_civicrm_buildForm($formName, &$form) {
   $weight = 1;
   foreach ($afforms as $afform) {
     // If Afform specifies a contact type, lookup the contact and compare
-    if (!empty($afform['summary_contact_type'])) {
+    if (!empty($afform['placement_filters']['contact_type'])) {
       // Contact.get only needs to happen once
       $contact ??= civicrm_api4('Contact', 'get', [
         'select' => ['contact_type', 'contact_sub_type'],
         'where' => [['id', '=', $form->get('cid')]],
       ])->first();
       $contactTypes = array_merge([$contact['contact_type']], $contact['contact_sub_type'] ?? []);
-      if (!array_intersect($afform['summary_contact_type'], $contactTypes)) {
+      if (!array_intersect($afform['placement_filters']['contact_type'], $contactTypes)) {
         continue;
       }
     }
