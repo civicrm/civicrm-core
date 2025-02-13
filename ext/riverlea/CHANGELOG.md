@@ -4,7 +4,7 @@
  - FIXED - code/pre formatting is wrapping on one line (#108)
  - FIXED - HackneyBrook/DarkMode: Notification text colour illegible (https://github.com/civicrm/civicrm-core/pull/31994)
  - CHANGED - Select2 search box now fills width of Select, neatens padding.
- - CHANGED - Swapped edit icon for add icon on add address on Contact Dashboard (#109)
+ - CHANGED - Swapped edit icon for add icon on add address on Contact Dashboard & tidied appearance (#109)
 
 1.3.5-6.0alpha
  - ADDED - padding to contact dashboard inline edit div (#107)
