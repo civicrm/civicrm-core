@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f31d9afa29112903a0ec52390903c67a",
+    "content-hash": "2e061582ca77bdc80bd3367b7c145d1a",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -5496,16 +5496,16 @@
         },
         {
             "name": "tplaner/when",
-            "version": "v3.1.5",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tplaner/When.git",
-                "reference": "8865acc235df8f57c2b229517c57c613b11ce4aa"
+                "reference": "c1170a188dff817ce3589eaee81a2a60712c7404"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tplaner/When/zipball/8865acc235df8f57c2b229517c57c613b11ce4aa",
-                "reference": "8865acc235df8f57c2b229517c57c613b11ce4aa",
+                "url": "https://api.github.com/repos/tplaner/When/zipball/c1170a188dff817ce3589eaee81a2a60712c7404",
+                "reference": "c1170a188dff817ce3589eaee81a2a60712c7404",
                 "shasum": ""
             },
             "require": {
@@ -5541,9 +5541,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tplaner/When/issues",
-                "source": "https://github.com/tplaner/When/tree/v3.1.5"
+                "source": "https://github.com/tplaner/When/tree/v3.2.0"
             },
-            "time": "2021-09-24T14:09:59+00:00"
+            "time": "2025-02-13T02:33:51+00:00"
         },
         {
             "name": "tubalmartin/cssmin",
@@ -5882,5 +5882,5 @@
     "platform-overrides": {
         "php": "8.0.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
