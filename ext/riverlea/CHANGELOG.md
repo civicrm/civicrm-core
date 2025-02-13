@@ -1,3 +1,10 @@
+1.3.6-6.1alpha
+ - FIXED - Responsive: make dashlets stack on Civi Dashboard under 990px (same as Greenwich)
+ - FIXED - Show Add Address without hover on Contact Dashboard (#109)
+ - ADDED - Swapped edit icon for add icon on add address on Contact Dashboard (#109)
+ - FIXED - code/pre formatting is wrapping on one line (#108)
+ - FIXED - HackneyBrook/DarkMode: Notification text colour illegible (https://github.com/civicrm/civicrm-core/pull/31994)
+
 1.3.5-6.0alpha
  - ADDED - padding to contact dashboard inline edit div (#107)
  - FIXED - Contact Layout Editor extension: double padding; broken right float (#107)
