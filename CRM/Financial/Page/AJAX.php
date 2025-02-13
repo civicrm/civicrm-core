@@ -93,10 +93,10 @@ class CRM_Financial_Page_AJAX {
       ],
     ];
 
-    $countResult = count($financialAccountType[$financialAccountTypeId]);
     if (!empty($result)) {
       foreach ($result as $id => $name) {
-        if (in_array($id, $financialAccountType[$financialAccountTypeId]) && $_GET['_value'] != 'select') {
+        if ($_GET['_value'] != 'select' && in_array($id, $financialAccountType[$financialAccountTypeId])) {
+          $countResult = count($financialAccountType[$financialAccountTypeId]);
           if ($countResult != 1) {
             $elements[] = [
               'name' => $name,
