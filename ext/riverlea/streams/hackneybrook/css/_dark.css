@@ -9,9 +9,9 @@
   --crm-c-background3: var(--crm-c-gray-700);
   --crm-c-background4: var(--crm-c-gray-600);
   --crm-c-code-background: var(--crm-c-gray-200);
-  --crm-c-primary: var(--crm-c-gray-800);
-  --crm-c-primary-text: #fff;
-  --crm-c-primary-hover: var(--crm-c-gray-900);
+  --crm-c-primary: var(--crm-c-background);
+  --crm-c-primary-text: var(--crm-c-text);
+  --crm-c-primary-hover: var(--crm-c-darkest);
   --crm-c-secondary: var(--crm-c-gray-800);
   --crm-c-secondary-hover: var(--crm-c-gray-900);
   --crm-c-inactive: var(--crm-c-gray-400);
