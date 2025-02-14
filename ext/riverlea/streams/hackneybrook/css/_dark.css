@@ -78,6 +78,7 @@
   --crm-dialog-header-bg: var(--crm-c-background2);
   --crm-dialog-body-bg: var(--crm-c-background2);
   --crm-notify-background: var(--crm-c-darkest);
+  --crm-notify-col: var(--crm-c-text);
   --crm-wizard-active-bg: var(--crm-c-blue-dark);
   --crm-form-block-background: var(--crm-c-background2);
   --crm-c-code-background: var(--crm-c-background2);

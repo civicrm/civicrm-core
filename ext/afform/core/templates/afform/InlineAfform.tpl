@@ -1,5 +1,5 @@
-<crm-angular-js modules="{$afform.module}">
+<crm-angular-js modules="{$block.module}">
   <form id="bootstrap-theme">
-    <{$afform.directive} options='{$afformOptions|@json_encode}'></{$afform.directive}>
+    <{$block.directive} options='{$afformOptions|@json_encode}'></{$block.directive}>
   </form>
 </crm-angular-js>

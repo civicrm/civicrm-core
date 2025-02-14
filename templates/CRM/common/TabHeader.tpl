@@ -27,15 +27,11 @@
         {/foreach}
       </ul>
 
-      {foreach from=$tabHeader key=tabName item=tabValue}
-        {if $tabValue.template}
+      {* Item must be named $block for compatibility with InlineAfform.tpl *}
+      {foreach from=$tabHeader key=tabName item=block}
+        {if $block.template}
           <div id="{$tabIdPrefix|default:'panel_'}{$tabName}" role="tabpanel">
-            {if $tabValue.module}
-              <!-- afform tab - need to pass module and directive to afform param -->
-              {include file=$tabValue.template afform=$tabValue}
-            {else}
-              {include file=$tabValue.template}
-            {/if}
+            {include file=$block.template}
           </div>
         {/if}
       {/foreach}
