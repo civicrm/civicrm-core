@@ -184,6 +184,21 @@ trait CRM_Queue_Queue_SqlTrait {
     $this->freeDAOs($items);
   }
 
+  /**
+   * An item was previously claimed. No work was even attempted.
+   *
+   * @param array $items
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function relinquishItems($items): void {
+    $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_queue_item SET release_time = NULL, run_count = run_count - 1 WHERE id IN (#ids) AND queue_name = @name', [
+      'ids' => CRM_Utils_Array::collect('id', $items),
+      'name' => $this->getName(),
+    ]);
+    CRM_Core_DAO::executeQuery($sql);
+    $this->releaseItems($items);
+  }
+
   protected function freeDAOs($mixed) {
     $mixed = (array) $mixed;
     foreach ($mixed as $item) {
