@@ -58,7 +58,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     // if contribute mode add contribution id
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
       $query->_select['contribution_id'] = "civicrm_contribution.id as contribution_id";
+      $query->_select['is_template'] = "civicrm_contribution.is_template as is_template";
       $query->_element['contribution_id'] = 1;
+      $query->_element['is_template'] = 1;
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
     }
 

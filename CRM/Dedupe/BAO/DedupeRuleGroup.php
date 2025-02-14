@@ -268,107 +268,9 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     if (empty($tableQueries)) {
       return FALSE;
     }
+    $threshold = $ruleGroup->threshold;
 
-    if ($params) {
-      $dedupeTable = CRM_Utils_SQL_TempTable::build()
-        ->setCategory('dedupe')
-        ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
-      $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
-        ->setCategory('dedupe');
-      $dedupeTableCopy = $dedupeCopyTemporaryTableObject->getName();
-      $insertClause = "INSERT INTO $dedupeTable  (id1, weight)";
-      $groupByClause = "GROUP BY id1, weight";
-      $dupeCopyJoin = " JOIN $dedupeTableCopy dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
-    }
-    else {
-      $dedupeTable = CRM_Utils_SQL_TempTable::build()
-        ->setCategory('dedupe')
-        ->createWithColumns("id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)")->getName();
-      $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
-        ->setCategory('dedupe');
-      $dedupeTableCopy = $dedupeCopyTemporaryTableObject->getName();
-      $insertClause = "INSERT INTO $dedupeTable  (id1, id2, weight)";
-      $groupByClause = "GROUP BY id1, id2, weight";
-      $dupeCopyJoin = " JOIN $dedupeTableCopy dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
-    }
-    $patternColumn = '/t1.(\w+)/';
-    $exclWeightSum = [];
-
-    while (!empty($tableQueries)) {
-      [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $ruleGroup->threshold, $exclWeightSum);
-
-      if ($isInclusive) {
-        // order queries by table count
-        self::orderByTableCount($tableQueries);
-
-        $weightSum = array_sum($exclWeightSum);
-        $searchWithinDupes = !empty($exclWeightSum) ? 1 : 0;
-
-        while (!empty($tableQueries)) {
-          // extract the next query ( and weight ) to be executed
-          $fieldWeight = array_keys($tableQueries);
-          $fieldWeight = $fieldWeight[0];
-          $query = array_shift($tableQueries);
-
-          if ($searchWithinDupes) {
-            // drop dedupe_copy table just in case if its already there.
-            $dedupeCopyTemporaryTableObject->drop();
-            // get prepared to search within already found dupes if $searchWithinDupes flag is set
-            $dedupeCopyTemporaryTableObject->createWithQuery("SELECT * FROM $dedupeTable WHERE weight >= {$weightSum}");
-
-            preg_match($patternColumn, $query, $matches);
-            $query = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoin), $query);
-
-            // CRM-19612: If there's a union, there will be two WHEREs, and you
-            // can't use the temp table twice.
-            if (preg_match('/' . $dedupeTableCopy . '[\S\s]*(union)[\S\s]*' . $dedupeTableCopy . '/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
-              // Make a second temp table:
-              $dedupeTableCopy2 = CRM_Utils_SQL_TempTable::build()
-                ->setCategory('dedupe')
-                ->createWithQuery("SELECT * FROM $dedupeTable WHERE weight >= {$weightSum}")
-                ->getName();
-              // After the union, use that new temp table:
-              $part1 = substr($query, 0, $matches[1][1]);
-              $query = $part1 . str_replace($dedupeTableCopy, $dedupeTableCopy2, substr($query, $matches[1][1]));
-            }
-          }
-          $searchWithinDupes = 1;
-
-          // construct and execute the intermediate query
-          $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
-          $dao = CRM_Core_DAO::executeQuery($query);
-
-          // FIXME: we need to be more accurate with affected rows, especially for insert vs duplicate insert.
-          // And that will help optimize further.
-          $affectedRows = $dao->affectedRows();
-
-          // In an inclusive situation, failure of any query means no further processing -
-          if ($affectedRows == 0) {
-            // reset to make sure no further execution is done.
-            $tableQueries = [];
-            break;
-          }
-          $weightSum = substr($fieldWeight, strrpos($fieldWeight, '.') + 1) + $weightSum;
-        }
-        // An exclusive situation -
-      }
-      elseif (!$isDie) {
-        // since queries are already sorted by weights, we can continue as is
-        $fieldWeight = array_keys($tableQueries);
-        $fieldWeight = $fieldWeight[0];
-        $query = array_shift($tableQueries);
-        $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
-        $dao = CRM_Core_DAO::executeQuery($query);
-        if ($dao->affectedRows() >= 1) {
-          $exclWeightSum[] = substr($fieldWeight, strrpos($fieldWeight, '.') + 1);
-        }
-      }
-      else {
-        // its a die situation
-        break;
-      }
-    }
-    return $dedupeTable;
+    return $this->runTablesQuery($params, $tableQueries, $threshold);
   }
 
   /**
@@ -548,6 +450,119 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     }
 
     return \Civi::$statics[__CLASS__]['rule_groups'][$rule_group_id]['contact_type'];
+  }
+
+  /**
+   * @internal this query is part of a refactoring process.
+   *
+   * @param array $params
+   * @param array $tableQueries
+   * @param int $threshold
+   *
+   * @return string
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function runTablesQuery(array $params, array $tableQueries, int $threshold): string {
+    if ($params) {
+      $dedupeTable = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe')
+        ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
+      $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe');
+      $dedupeTableCopy = $dedupeCopyTemporaryTableObject->getName();
+      $insertClause = "INSERT INTO $dedupeTable  (id1, weight)";
+      $groupByClause = "GROUP BY id1, weight";
+      $dupeCopyJoin = " JOIN $dedupeTableCopy dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
+    }
+    else {
+      $dedupeTable = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe')
+        ->createWithColumns("id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)")->getName();
+      $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe');
+      $dedupeTableCopy = $dedupeCopyTemporaryTableObject->getName();
+      $insertClause = "INSERT INTO $dedupeTable  (id1, id2, weight)";
+      $groupByClause = "GROUP BY id1, id2, weight";
+      $dupeCopyJoin = " JOIN $dedupeTableCopy dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
+    }
+    $patternColumn = '/t1.(\w+)/';
+    $exclWeightSum = [];
+
+    while (!empty($tableQueries)) {
+      [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum);
+
+      if ($isInclusive) {
+        // order queries by table count
+        self::orderByTableCount($tableQueries);
+
+        $weightSum = array_sum($exclWeightSum);
+        $searchWithinDupes = !empty($exclWeightSum) ? 1 : 0;
+
+        while (!empty($tableQueries)) {
+          // extract the next query ( and weight ) to be executed
+          $fieldWeight = array_keys($tableQueries);
+          $fieldWeight = $fieldWeight[0];
+          $query = array_shift($tableQueries);
+
+          if ($searchWithinDupes) {
+            // drop dedupe_copy table just in case if its already there.
+            $dedupeCopyTemporaryTableObject->drop();
+            // get prepared to search within already found dupes if $searchWithinDupes flag is set
+            $dedupeCopyTemporaryTableObject->createWithQuery("SELECT * FROM $dedupeTable WHERE weight >= {$weightSum}");
+
+            preg_match($patternColumn, $query, $matches);
+            $query = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoin), $query);
+
+            // CRM-19612: If there's a union, there will be two WHEREs, and you
+            // can't use the temp table twice.
+            if (preg_match('/' . $dedupeTableCopy . '[\S\s]*(union)[\S\s]*' . $dedupeTableCopy . '/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
+              // Make a second temp table:
+              $dedupeTableCopy2 = CRM_Utils_SQL_TempTable::build()
+                ->setCategory('dedupe')
+                ->createWithQuery("SELECT * FROM $dedupeTable WHERE weight >= {$weightSum}")
+                ->getName();
+              // After the union, use that new temp table:
+              $part1 = substr($query, 0, $matches[1][1]);
+              $query = $part1 . str_replace($dedupeTableCopy, $dedupeTableCopy2, substr($query, $matches[1][1]));
+            }
+          }
+          $searchWithinDupes = 1;
+
+          // construct and execute the intermediate query
+          $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
+          $dao = CRM_Core_DAO::executeQuery($query);
+
+          // FIXME: we need to be more accurate with affected rows, especially for insert vs duplicate insert.
+          // And that will help optimize further.
+          $affectedRows = $dao->affectedRows();
+
+          // In an inclusive situation, failure of any query means no further processing -
+          if ($affectedRows == 0) {
+            // reset to make sure no further execution is done.
+            $tableQueries = [];
+            break;
+          }
+          $weightSum = substr($fieldWeight, strrpos($fieldWeight, '.') + 1) + $weightSum;
+        }
+        // An exclusive situation -
+      }
+      elseif (!$isDie) {
+        // since queries are already sorted by weights, we can continue as is
+        $fieldWeight = array_keys($tableQueries);
+        $fieldWeight = $fieldWeight[0];
+        $query = array_shift($tableQueries);
+        $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
+        $dao = CRM_Core_DAO::executeQuery($query);
+        if ($dao->affectedRows() >= 1) {
+          $exclWeightSum[] = substr($fieldWeight, strrpos($fieldWeight, '.') + 1);
+        }
+      }
+      else {
+        // its a die situation
+        break;
+      }
+    }
+    return $dedupeTable;
   }
 
 }

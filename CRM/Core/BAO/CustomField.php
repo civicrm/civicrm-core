@@ -2727,7 +2727,7 @@ WHERE      f.id IN ($ids)";
         $field->text_length
       ),
       'required' => $field->is_required,
-      'searchable' => $field->is_searchable,
+      'searchable' => $field->is_searchable && $field->is_active,
     ];
 
     // For adding/dropping FK constraints
