@@ -307,6 +307,13 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     }
     elseif ($item['extends'] === 'Event') {
       $afform['placement'] = ['event_manage_tab'];
+      // Add event_type filter (extends_entity_column_value == event_type_id)
+      if (!empty($item['extends_entity_column_value'])) {
+        // Convert event_type_id to "event_type" (id -> name)
+        $eventTypes = \Civi::entity('Event')->getOptions('event_type_id');
+        $eventTypes = array_column($eventTypes, 'id', 'name');
+        $afform['placement_filters']['event_type'] = array_keys(array_intersect($eventTypes, $item['extends_entity_column_value']));
+      }
     }
     if ($this->getLayout) {
       // TODO: the template should be a table or grid depending
