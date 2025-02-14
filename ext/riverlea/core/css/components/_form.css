@@ -557,6 +557,9 @@ input.crm-form-checkbox) + label {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
+.select2-search {
+  padding: var(--crm-s);
+}
 .select2-search::after {
   font-family: "FontAwesome";
   font-style: normal;
@@ -574,6 +577,7 @@ input.crm-form-checkbox) + label {
   font-family: var(--crm-font);
   line-height: 20px;
   max-width: 100%;
+  width: 100%;
 }
 .crm-container .select2-results {
   font-size: var(--crm-m2);
@@ -662,7 +666,6 @@ input.crm-form-checkbox) + label {
 .select2-drop.select2-drop-active.crm-container li.select2-result-with-children {
   padding: 0;
 }
-
 
 /* Dates */
 

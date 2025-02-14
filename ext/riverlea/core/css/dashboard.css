@@ -200,3 +200,8 @@ fieldset.crm-inactive-dashlet-fieldset legend .crm-hover-button {
 .crm-dashlet .crm-search-display .form-inline {
   padding: var(--crm-padding-reg);
 }
+@media (max-width: 991px) {
+  #civicrm-dashboard > .crm-flex-box {
+    grid-template-columns: 1fr;
+  }
+}
