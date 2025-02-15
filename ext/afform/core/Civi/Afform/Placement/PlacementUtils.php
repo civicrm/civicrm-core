@@ -53,7 +53,15 @@ class PlacementUtils {
     return $filterField;
   }
 
-  public static function getEntityTypeFilterFields(string $entityName): array {
+  public static function getEntityTypeFilterLabel(string $entityName): ?string {
+    $filterFieldName = self::getEntityTypeFilterFields($entityName)[0] ?? NULL;
+    if ($filterFieldName) {
+      $filterField = \Civi::entity($entityName)->getField($filterFieldName);
+      return $filterField['input_attrs']['label'] ?? $filterField['title'];
+    }
+    return NULL;
+  }
+
   public static function getEntityTypeFilterFields(string $entityName, bool $addSuffix = FALSE): array {
     // For contacts, these 2 fields get merged to a single "contact_type" value
     if ($entityName === 'Contact') {
@@ -92,6 +100,24 @@ class PlacementUtils {
 
   public static function getAfformContextOptions(string $placement, array $context): array {
     return array_intersect_key($context, self::getPlacements()[$placement]['entities']);
+  }
+
+  public static function getEntityTypeFilterOptions(string $entityName): ?array {
+    // The contact_type filter includes contact types and subtypes
+    if ($entityName === 'Contact') {
+      $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
+      foreach ($contactTypes as &$contactType) {
+        $contactType['children'] = \CRM_Contact_BAO_ContactType::subTypeInfo($contactType['name']);
+      }
+      return \CRM_Utils_Array::formatForSelect2($contactTypes, 'label', 'name');
+    }
+    // All other filters, e.g. activity_type
+    $filterField = self::getEntityTypeFilterFields($entityName)[0] ?? NULL;
+    if (\Civi::entity($entityName)->getField($filterField)) {
+      $options = \Civi::entity($entityName)->getOptions($filterField);
+      return \CRM_Utils_Array::formatForSelect2($options, 'label', 'name');
+    }
+    return NULL;
   }
 
   public static function getAfformsForPlacement(string $placement): array {

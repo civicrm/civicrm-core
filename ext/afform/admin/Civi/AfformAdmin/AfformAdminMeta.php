@@ -13,7 +13,7 @@ class AfformAdminMeta {
   /**
    * @return array
    */
-  public static function getAdminSettings() {
+  public static function getAdminSettings(): array {
     $afformPlacement = \CRM_Utils_Array::formatForSelect2(PlacementUtils::getPlacements(), 'label', 'value');
     $afformTags = \CRM_Utils_Array::formatForSelect2((array) \Civi\Api4\Utils\AfformTags::getTagOptions());
     $afformTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
@@ -35,6 +35,8 @@ class AfformAdminMeta {
     return [
       'afform_type' => $afformTypes,
       'afform_placement' => $afformPlacement,
+      'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
+      'placement_filters' => self::getPlacementFilterOptions(),
       'afform_tags' => $afformTags,
       'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
     ];
@@ -346,6 +348,24 @@ class AfformAdminMeta {
     }
 
     return $data;
+  }
+
+  private static function getPlacementFilterOptions(): array {
+    $entities = $entityFilterOptions = [];
+    foreach (PlacementUtils::getPlacements() as $placement) {
+      $entities += $placement['entities'];
+    }
+    foreach ($entities as $entityName) {
+      $filterOptions = PlacementUtils::getEntityTypeFilterOptions($entityName);
+      if ($filterOptions) {
+        $entityFilterOptions[$entityName] = [
+          'name' => PlacementUtils::getEntityTypeFilterName($entityName),
+          'label' => PlacementUtils::getEntityTypeFilterLabel($entityName),
+          'options' => $filterOptions,
+        ];
+      }
+    }
+    return $entityFilterOptions;
   }
 
 }

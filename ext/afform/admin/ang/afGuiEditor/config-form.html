@@ -104,10 +104,10 @@
       </p>
     </div>
 
-    <div class="form-group" ng-if="editor.hasPlacementEntities()">
-      <div class="form-inline" ng-if="editor.getPlacementEntities().contact_id">
-        <label for="afform_summary_contact_type">{{:: ts('For') }}</label>
-        <input class="form-control" crm-autocomplete="'ContactType'" id="afform_summary_contact_type" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">
+    <div class="form-group" ng-if="editor.afform.placement.length">
+      <div class="form-inline" ng-repeat="entity in editor.getPlacementEntities()">
+        <label for="placement-filter-{{:: entity.filter.name }}">{{:: entity.filter.label }}</label>
+        <input class="form-control" ng-list crm-ui-select="{multiple: true, placeholder: ts('Any'), data: entity.filter.options}" id="placement-filter-{{:: entity.filter.name }}" ng-model="editor.afform.placement_filters[entity.filter.name]" >
       </div>
       <div class="form-inline">
         <label for="afform_summary_weight">{{:: ts('Position') }}</label>

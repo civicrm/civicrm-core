@@ -103,6 +103,11 @@
         }
         editor.afform.icon = editor.afform.icon || 'fa-list-alt';
         editor.afform.placement = editor.afform.placement || [];
+        // An empty object gets miscast by json_encode as [].
+        // FIXME: Maybe the Afform.get api ought to return empty arrays as NULL to avoid this problem.
+        if (!editor.afform.placement_filters || Array.isArray(editor.afform.placement_filters)) {
+          editor.afform.placement_filters = {};
+        }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
         $scope.entities = {};
@@ -345,12 +350,7 @@
       function getPlacementEntitiesFromMeta(metaPlacements) {
         const placements = {};
         metaPlacements.forEach((item) => {
-          if (item.grouping) {
-            item.grouping.split(',').forEach(value => {
-              const key = _.snakeCase(value) + '_id';
-              placements[key] = value;
-            });
-          }
+          _.extend(placements, editor.meta.placement_entities[item.id]);
         });
         return placements;
       }
@@ -385,6 +385,7 @@
                 key: key,
                 entity: placements[key],
                 label: getPlacementEntityLabel(placements[key]),
+                filter: editor.meta.placement_filters[placements[key]],
               };
             }
           });
@@ -399,6 +400,11 @@
           return;
         }
         const placementEntities = this.getPlacementEntities();
+        if (Object.keys(placementEntities).length) {
+          editor.afform.placement_filters = editor.afform.placement_filters || {};
+        } else {
+          delete editor.afform.placement_filters;
+        }
         Object.values(editor.searchDisplays).forEach((searchDisplay) => {
           const filterValues = [];
           // Remove any non-applicable filters
