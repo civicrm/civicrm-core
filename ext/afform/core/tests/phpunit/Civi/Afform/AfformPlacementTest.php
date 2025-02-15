@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @group headless
  */
-class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
+class AfformPlacementTest extends TestCase implements HeadlessInterface {
 
   use Api4TestTrait;
 
@@ -165,7 +165,10 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
 
     // Ensure blocks show up in ContactLayoutEditor
     $blocks = [];
-    afform_civicrm_contactSummaryBlocks($blocks);
+    $null = NULL;
+    \CRM_Utils_Hook::singleton()->invoke(['blocks'], $blocks,
+      $null, $null, $null, $null, $null, 'civicrm_contactSummaryBlocks'
+    );
 
     $this->assertEquals(['Individual', 'Household'], $blocks['afform_search']['blocks'][$this->formNames[0]]['contact_type']);
     // Sub-type should have been converted to parent type
@@ -176,6 +179,97 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
     $this->assertGreaterThan($order[$this->formNames[2]], $order[$this->formNames[1]]);
     // Unless explicit weight is given
     $this->assertGreaterThan($order[$this->formNames[3]], $order[$this->formNames[2]]);
+  }
+
+  public function testAfformCaseSummaryBlock(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->saveTestRecords('ContactType', [
+      'records' => [
+        ['name' => 'Ghost', 'label' => 'Ghost', 'parent_id:name' => 'Individual'],
+      ],
+      'match' => ['name'],
+    ]);
+
+    $cid = $this->createTestRecord('Individual', [
+      'contact_sub_type' => ['Ghost'],
+    ])['id'];
+
+    $cases = $this->saveTestRecords('Case', [
+      'records' => [
+        ['contact_id' => $cid, 'case_type_id:name' => 'housing_support'],
+      ],
+      'defaults' => [
+        'creator_id' => $this->createTestRecord('Individual')['id'],
+      ],
+    ]);
+
+    Afform::create()
+      ->addValue('name', $this->formNames[0])
+      ->addValue('title', 'Test A')
+      ->addValue('type', 'search')
+      ->addValue('placement', ['case_summary_block'])
+      ->addValue('placement_weight', 4)
+      ->addValue('placement_filters', [
+        'contact_type' => ['Organization', 'Household'],
+        'case_type' => ['housing_support'],
+      ])
+      ->execute();
+    Afform::create()
+      ->addValue('name', $this->formNames[1])
+      ->addValue('title', 'Test B')
+      ->addValue('type', 'form')
+      ->addValue('placement', ['case_summary_block'])
+      ->addValue('placement_weight', 3)
+      ->addValue('placement_filters', [
+        'contact_type' => ['Ghost'],
+        'case_type' => ['housing_support'],
+      ])
+      ->execute();
+    Afform::create()
+      ->addValue('name', $this->formNames[2])
+      ->addValue('type', 'form')
+      ->addValue('title', 'Test C')
+      ->addValue('placement', ['case_summary_block'])
+      ->addValue('placement_weight', 2)
+      ->addValue('placement_filters', [
+        'case_type' => ['adult_day_care_referral'],
+      ])
+      ->execute();
+    Afform::create()
+      ->addValue('name', $this->formNames[3])
+      ->addValue('type', 'form')
+      ->addValue('title', 'Test D')
+      ->addValue('placement', ['case_summary_block'])
+      ->addValue('placement_weight', 1)
+      ->execute();
+
+    // Call buildForm hook and then assert afforms have been added to the appropriate region
+    $caseView = new \CRM_Case_Form_CaseView();
+    $caseView->controller = new \CRM_Core_Controller_Simple('CRM_Case_Form_CaseView', 'Case');
+    $caseView->set('id', $cases[0]['id']);
+    $caseView->set('cid', $cid);
+    \CRM_Utils_Hook::buildForm('CRM_Case_Form_CaseView', $caseView);
+
+    // Find an afform on the case summary
+    $getFromRegion = function ($formName) {
+      return \CRM_Core_Region::instance('case-view-custom-data-view')->get('afform:' . $formName);
+    };
+
+    $blockA = $getFromRegion($this->formNames[0]);
+    $this->assertEmpty($blockA);
+
+    $blockB = $getFromRegion($this->formNames[1]);
+    $this->assertStringContainsString("\"contact_id\":$cid", $blockB['markup']);
+    $this->assertStringContainsString("\"case_id\":{$cases[0]['id']}", $blockB['markup']);
+    $this->assertEquals(3, $blockB['weight']);
+
+    $blockC = $getFromRegion($this->formNames[2]);
+    $this->assertEmpty($blockC);
+
+    $blockD = $getFromRegion($this->formNames[3]);
+    $this->assertStringContainsString("\"contact_id\":$cid", $blockD['markup']);
+    $this->assertStringContainsString("\"case_id\":{$cases[0]['id']}", $blockD['markup']);
+    $this->assertEquals(1, $blockD['weight']);
   }
 
 }

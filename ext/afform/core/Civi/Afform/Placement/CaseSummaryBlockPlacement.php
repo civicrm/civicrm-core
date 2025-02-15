@@ -55,7 +55,7 @@ class CaseSummaryBlockPlacement extends AutoSubscriber {
         \CRM_Core_Region::instance('case-view-custom-data-view')->add([
           'markup' => $content,
           'name' => 'afform:' . $afform['name'],
-          'weight' => $weight++,
+          'weight' => $afform['placement_weight'] ?? $weight++,
         ]);
         \Civi::service('angularjs.loader')->addModules($afform['module_name']);
       }
