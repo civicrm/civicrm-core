@@ -87,7 +87,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(503, http_response_code());
 
     // now add bypass maintenance mode permission
-    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'bypass maintenance mode'];
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'cms:bypass maintenance mode'];
     $response = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/get',
     ]);

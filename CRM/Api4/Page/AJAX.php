@@ -26,7 +26,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     $response = [];
 
     if (\CRM_Utils_System::isMaintenanceMode()) {
-      if (!CRM_Core_Permission::check(['bypass maintenance mode'])) {
+      if (!CRM_Core_Permission::check([['administer CiviCRM system', 'cms:bypass maintenance mode']])) {
         // HTTP 503 Service Unavailable
         $this->httpResponseCode = 503;
         $this->returnJSON([
