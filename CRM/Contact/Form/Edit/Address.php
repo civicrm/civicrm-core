@@ -131,7 +131,7 @@ class CRM_Contact_Form_Edit_Address {
     }
 
     $entityId = NULL;
-    if (!empty($form->_values['address']) && !empty($form->_values['address'][$blockId])) {
+    if (!empty($form->_values['address'][$blockId])) {
       $entityId = $form->_values['address'][$blockId]['id'];
     }
 

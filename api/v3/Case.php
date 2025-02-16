@@ -710,7 +710,7 @@ function civicrm_api3_case_getList($params) {
   require_once 'api/v3/Generic/Getlist.php';
   require_once 'api/v3/CaseContact.php';
   //CRM:19956 - Assign case_id param if both id and case_id is passed to retrieve the case
-  if (!empty($params['id']) && !empty($params['params']) && !empty($params['params']['case_id'])) {
+  if (!empty($params['id']) && !empty($params['params']['case_id'])) {
     $params['params']['case_id'] = ['IN' => $params['id']];
     unset($params['id']);
   }

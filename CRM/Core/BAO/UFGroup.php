@@ -2355,7 +2355,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           else {
             if (is_array($details)) {
               if ($fieldName === 'url'
-                && !empty($details['website'])
                 && !empty($details['website'][$locTypeId])
               ) {
                 $defaults[$fldName] = $details['website'][$locTypeId]['url'] ?? NULL;

@@ -39,7 +39,7 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
     if ($mid && $continue) {
       //CRM-15979 - check if abtest exist for mailing then redirect accordingly
       $abtest = CRM_Mailing_BAO_MailingAB::getABTest($mid);
-      if (!empty($abtest) && !empty($abtest->id)) {
+      if (!empty($abtest->id)) {
         $redirect = CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/abtest/' . $abtest->id);
       }
       else {

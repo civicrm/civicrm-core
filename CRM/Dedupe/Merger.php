@@ -2585,7 +2585,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // Now, build the table rows appropriately, based off the information on
     // the 'other' contact
-    if (!empty($locations['other']) && !empty($locations['other'][$blockName])) {
+    if (!empty($locations['other'][$blockName])) {
       foreach ($locations['other'][$blockName] as $count => $value) {
 
         $displayValue = $value[$blockInfo['displayField']];
