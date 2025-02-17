@@ -5,7 +5,6 @@
   --crm-c-link: var(--crm-c-amber);
   --crm-c-link-hover: var(--crm-c-amber-light);
   --crm-c-focus: var(--crm-c-link);
-  --crm-c-text-light: var(--crm-c-darkest);
   --crm-c-background: var(--crm-c-gray-900);
   --crm-c-page-background: var(--crm-c-darkest);
   --crm-c-code-background: var(--crm-c-background2);
