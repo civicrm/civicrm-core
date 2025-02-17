@@ -1697,7 +1697,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     foreach ($submitted as $key => $value) {
-      if (strpos($key, 'custom_') === 0) {
+      if (str_starts_with($key, 'custom_')) {
         $fieldID = (int) substr($key, 7);
         $fieldMetadata = CRM_Core_BAO_CustomField::getField($fieldID);
         if ($fieldMetadata) {
@@ -2304,7 +2304,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       elseif ($mode === 'aggressive') {
         unset($conflicts[$key]);
-        if (strpos($key, 'move_location_') !== 0) {
+        if (!str_starts_with($key, 'move_location_')) {
           // @todo - just handling plain contact fields for now because I think I need a bigger refactor
           // of the below to handle locations & will do as a follow up.
           $resolved['contact'][substr($key, 5)] = $migrationInfo[$key]['main'];
