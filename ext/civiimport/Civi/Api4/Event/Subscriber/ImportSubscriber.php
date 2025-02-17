@@ -213,6 +213,10 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       return \Civi::cache('metadata')->get($cacheKey);
     }
     $forms = [];
+    if (!\CRM_Core_Permission::check(['access CiviCRM'])) {
+      // Avoid causing backtrace during install due to lack of permission for SearchDisplay::get()
+      return $forms;
+    }
     try {
       $importSearches = SearchDisplay::get()
         ->addWhere('saved_search_id.name', 'LIKE', 'Import\_Summary\_%')
