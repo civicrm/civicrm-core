@@ -1121,9 +1121,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return $this->editableInfo[$key];
     }
     $getModeField = $this->getField($key);
-    // If field is an implicit join to another entity (not a custom group), use the original fk field
+    // If field is an implicit join to another entity, use the original fk field
+    // UNLESS it's a custom field (which the api treats the same as core fields) or a virtual join like `address_primary.city`
     if (!empty($getModeField['implicit_join']) && empty($getModeField['custom_field_id'])) {
-      return $this->getEditableInfo(substr($key, 0, -1 - strlen($getModeField['name'])));
+      $baseFieldName = substr($key, 0, -1 - strlen($getModeField['name']));
+      $baseField = $this->getField($baseFieldName);
+      if ($baseField && !empty($baseField['fk_entity']) && $baseField['type'] === 'Field') {
+        return $this->getEditableInfo($baseFieldName);
+      }
     }
     $result = NULL;
     if ($getModeField) {
@@ -1138,7 +1143,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $field = $createModeField + $getModeField;
       $idKey = CoreUtil::getIdFieldName($field['entity']);
       $path = (!empty($field['explicit_join']) ? $field['explicit_join'] . '.' : '');
-      $idPath = $path . $idKey;
+      // $baseFieldName is used for virtual joins e.g. email_primary.email
+      $idPath = $path . ($baseFieldName ?? $idKey);
       // Hack to support editing relationships
       if ($field['entity'] === 'RelationshipCache') {
         $field['entity'] = 'Relationship';
