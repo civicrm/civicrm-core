@@ -2341,12 +2341,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                         $defaults[$fldName] = $value[$fieldName];
                       }
                     }
-                    elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
+                    elseif (str_starts_with($fieldName, 'address_custom') && !empty($value[substr($fieldName, 8)])) {
                       $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
                     }
                   }
                 }
-                elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
+                elseif (str_starts_with($fieldName, 'address_custom') && !empty($value[substr($fieldName, 8)])) {
                   $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
                 }
               }
@@ -2484,7 +2484,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $fields = array_keys($profileFields);
       foreach ($fields as $val) {
         foreach ($required as $key => $field) {
-          if (strpos($val, $field) === 0) {
+          if (str_starts_with($val, $field)) {
             unset($required[$key]);
           }
         }

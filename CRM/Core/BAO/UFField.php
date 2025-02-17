@@ -61,7 +61,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\Ho
     }
 
     // Supply field_type if not set
-    if (empty($params['field_type']) && strpos($params['field_name'], 'formatting') !== 0) {
+    if (empty($params['field_type']) && !str_starts_with($params['field_name'], 'formatting')) {
       $params['field_type'] = CRM_Utils_Array::pathGet(self::getAvailableFieldsFlat(), [$params['field_name'], 'field_type']);
     }
     elseif (empty($params['field_type'])) {

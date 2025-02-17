@@ -609,7 +609,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['eventId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0) {
+      if (str_starts_with($token, '{domain.')) {
         unset($allTokens[$token]);
       }
     }
@@ -628,7 +628,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contributionId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0) {
+      if (str_starts_with($token, '{domain.')) {
         unset($allTokens[$token]);
       }
     }
@@ -646,7 +646,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0) {
+      if (str_starts_with($token, '{domain.')) {
         unset($allTokens[$token]);
       }
     }
@@ -665,7 +665,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['participantId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0 || strpos($token, '{event.') === 0) {
+      if (str_starts_with($token, '{domain.') === 0 || strpos($token, '{event.')) {
         unset($allTokens[$token]);
       }
     }
