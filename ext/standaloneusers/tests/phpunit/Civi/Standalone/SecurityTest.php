@@ -226,13 +226,15 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     // Check the message template generation
     $token = PasswordReset::updateToken($userID);
-    $workflow = SendPasswordResetEmail::preparePasswordResetWorkflow($user, $token);
+    $workflow = SendPasswordResetEmail::preparePasswordResetWorkflow($user, $token, 60);
     $this->assertNotNull($workflow);
     $result = $workflow->renderTemplate();
 
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['text']);
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['html']);
     $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
+    $this->assertStringContainsString('This link expires 60 minutes after the date of this email.', $result['text']);
+    $this->assertStringContainsString('This link expires 60 minutes after the date of this email.', $result['html']);
 
     // Fake an expired token
     $token = $this->storeFakePasswordResetToken($userID, time() - 1);
