@@ -244,54 +244,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
   }
 
   /**
-   * Fill the dedupe finder table.
-   *
-   * @internal do not access from outside core.
-   *
-   * @param int $id
-   * @param array $contactIDs
-   * @param array $params
-   * @param bool $legacyMode
-   *   Legacy mode is called to give backward hook compatibility, in the legacydedupefinder
-   *   extension. It is intended to be transitional, with the non-legacy mode being
-   *   separated out and optimized once it no longer has to comply with the legacy
-   *   hook and reserved query methodology.
-   *
-   * @return false|string
-   * @throws \Civi\Core\Exception\DBQueryException
-   */
-  public function fillTable(int $id, array $contactIDs, array $params, $legacyMode = TRUE) {
-    $ruleGroup = $this;
-    $ruleGroup->id = $id;
-    // make sure we've got a fetched dbrecord, not sure if this is enforced
-    $ruleGroup->find(TRUE);
-    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, $params);
-    // Reserved Rule Groups can optionally get special treatment by
-    // implementing an optimization class and returning a query array.
-    if ($legacyMode && $optimizer->isUseReservedQuery()) {
-      $tableQueries = $optimizer->getReservedQuery();
-    }
-    else {
-      $tableQueries = $optimizer->getRuleQueries();
-    }
-    // if there are no rules in this rule group
-    // add an empty query fulfilling the pattern
-    if ($legacyMode) {
-      if (!$tableQueries) {
-        // Just for the hook.... (which is deprecated).
-        $ruleGroup->noRules = TRUE;
-      }
-      CRM_Utils_Hook::dupeQuery($ruleGroup, 'table', $tableQueries);
-    }
-    if (empty($tableQueries)) {
-      return FALSE;
-    }
-    $threshold = $ruleGroup->threshold;
-
-    return $this->runTablesQuery($params, $tableQueries, $threshold);
-  }
-
-  /**
    * Function to determine if a given query set contains inclusive or exclusive set of weights.
    * The function assumes that the query set is already ordered by weight in desc order.
    * @param $tableQueries
