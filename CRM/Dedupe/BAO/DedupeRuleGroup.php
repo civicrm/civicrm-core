@@ -202,16 +202,22 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       // @todo - in time we can deprecate this & expect them to use stopPropagation().
       return;
     }
-    $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
-    $dedupeTable = $rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], FALSE);
-    if (!$dedupeTable) {
+    $ruleGroup = new CRM_Dedupe_BAO_DedupeRuleGroup();
+    $ruleGroup->id = $id = $event->dedupeParams['rule_group_id'];
+    $ruleGroup->find(TRUE);
+    $contactType = $ruleGroup->contact_type;
+    $threshold = $ruleGroup->threshold;
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, [], $event->dedupeParams['match_params']);
+    $tableQueries = $optimizer->getRuleQueries();
+    if (empty($tableQueries)) {
       $event->dedupeResults['ids'] = [];
       return;
     }
+
+    $dedupeTable = $ruleGroup->runTablesQuery($event->dedupeParams['match_params'], $tableQueries, $threshold);
+
     $aclFrom = '';
     $aclWhere = '';
-    $contactType = $rgBao->contact_type;
-    $threshold = $rgBao->threshold;
     if ($event->dedupeParams['check_permission']) {
       [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
       $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
