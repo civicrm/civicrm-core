@@ -51,9 +51,9 @@ class Validator {
 
   /**
    * FlexMailer constructor.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $dispatcher
    */
-  public function __construct(EventDispatcherInterface $dispatcher = NULL) {
+  public function __construct(?EventDispatcherInterface $dispatcher = NULL) {
     $this->dispatcher = $dispatcher ?: \Civi::service('dispatcher');
   }
 
