@@ -2105,7 +2105,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         }
       }
       foreach ($params as $key => $value) {
-        if (strpos($key, 'custom_') === 0) {
+        if (str_starts_with($key, 'custom_')) {
           $params[CRM_Core_BAO_CustomField::getLongNameFromShortName($key)] = $value;
           unset($params[$key]);
         }
