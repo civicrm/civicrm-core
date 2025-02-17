@@ -47,7 +47,7 @@
 /* Practical colours *
 --crm-c-text: #464354;
 --crm-c-text-light: #fff;
---crm-c-dark-text: var(--crm-c-text);
+--crm-c-text-dark: var(--crm-c-text);
 --crm-c-link: var(--crm-c-blue-dark);
 --crm-c-link-hover: var(--crm-c-blue-darker);
 --crm-c-divider: 1px solid var(--crm-c-gray-300);

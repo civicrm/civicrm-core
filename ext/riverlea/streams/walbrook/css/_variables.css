@@ -48,9 +48,9 @@
   --crm-c-secondary: var(--crm-c-purple);
   --crm-c-secondary-hover: var(--crm-c-purple-dark);
   --crm-c-success: var(--crm-c-green);
-  --crm-c-success-text: var(--crm-c-dark-text);
+  --crm-c-success-text: var(--crm-c-text-dark);
   --crm-c-alert: var(--crm-c-red);
-  --crm-c-warning-text: var(--crm-c-dark-text);
+  --crm-c-warning-text: var(--crm-c-text-dark);
   --crm-c-info-text: var(--crm-c-text-light);
 /* Shadows */
   --crm-block-shadow: 0 3px 18px 0 rgba(48,40,40,.25);

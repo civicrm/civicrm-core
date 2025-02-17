@@ -62,7 +62,7 @@
 /* PRACTICAL COLOURS */
   --crm-c-text: #000000dd; /* thames */
   --crm-c-text-light: #fff;
-  --crm-c-dark-text: var(--crm-c-text);
+  --crm-c-text-dark: var(--crm-c-text);
   --crm-c-link: var(--crm-c-blue-dark);
   --crm-c-link-hover: var(--crm-c-blue-darker);
   --crm-c-divider: 1px solid var(--crm-c-blue-overlay); /* thames */

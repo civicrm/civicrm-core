@@ -128,7 +128,7 @@
 #bootstrap-theme mark,
 #bootstrap-theme .mark {
   background: var(--crm-c-yellow);
-  color: var(--crm-c-text);
+  color: var(--crm-c-text-dark);
   padding: .2rem;
 }
 @media (min-width: 768px) {
