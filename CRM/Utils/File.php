@@ -1097,7 +1097,7 @@ HTACCESS;
     }
     $iconClasses = Civi::$statics[__CLASS__]['mimeIcons'];
     foreach ($iconClasses as $text => $icon) {
-      if (strpos(($mimeType ?? ''), $text) === 0) {
+      if (str_starts_with(($mimeType ?? ''), $text)) {
         return $icon;
       }
     }

@@ -1021,7 +1021,7 @@ AND    u.status = 1
     // Handle absolute urls
     // compares $url (which is some unknown/untrusted value from a third-party dev) to the CMS's base url (which is independent of civi's url)
     // to see if the url is within our Backdrop dir, if it is we are able to treated it as an internal url
-    if (strpos($url, $base_url) === 0) {
+    if (str_starts_with($url, $base_url)) {
       $file = trim(str_replace($base_url, '', $url), '/');
       // CRM-18130: Custom CSS URL not working if aliased or rewritten
       if (file_exists(BACKDROP_ROOT . $file)) {
@@ -1030,7 +1030,7 @@ AND    u.status = 1
       }
     }
     // Handle relative urls that are within the CiviCRM module directory
-    elseif (strpos($url, $base) === 0) {
+    elseif (str_starts_with($url, $base)) {
       $internal = TRUE;
       $url = $this->appendCoreDirectoryToResourceBase(dirname(backdrop_get_path('module', 'civicrm')) . '/') . trim(substr($url, strlen($base)), '/');
     }
