@@ -70,7 +70,7 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
 
         {\$resetUrlPlaintext}
 
-        {ts}This link expires one hour after the date of this email.{/ts}
+        {\$tokenTimeoutPlaintext}
 
         {domain.name}
         TXT,
@@ -79,7 +79,7 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
 
         <p><a href="{\$resetUrlHtml}">{\$resetUrlHtml}</a></p>
 
-        <p><strong>{ts}This link expires one hour after the date of this email.{/ts}</strong></p>
+        <p><strong>{\$tokenTimeoutHtml}</strong></p>
 
         <p>{domain.name}</p>
         HTML,
