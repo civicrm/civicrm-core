@@ -714,7 +714,7 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
     // we'll take it into account.
     if (!empty($params)) {
       foreach ($params as $name => $param) {
-        if (strpos($name, 'custom') === 0) {
+        if (str_starts_with($name, 'custom')) {
           $searchFields[] = $name;
         }
       }
