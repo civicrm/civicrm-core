@@ -3,16 +3,6 @@ use CRM_Standaloneusers_ExtensionUtil as E;
 
 $passwordResetSubject = '{ts}Password reset link for{/ts} {domain.name}';
 
-$passwordResetText = <<<TXT
-  {ts}A password reset link was requested for this account.  If this wasn't you (and nobody else can access this email account) you can safely ignore this email.{/ts}
-
-  {\$resetUrlPlaintext}
-
-  {\$tokenTimeoutPlaintext}
-
-  {domain.name}
-TXT;
-
 $passwordResetHtml = <<<HTML
   <p>{ts}A password reset link was requested for this account.&nbsp; If this wasn't you (and nobody else can access this email account) you can safely ignore this email.{/ts}</p>
 
@@ -38,7 +28,7 @@ return [
         'workflow_name' => 'password_reset',
         'msg_title' => E::ts('Password reset'),
         'msg_subject' => $passwordResetSubject,
-        'msg_text' => $passwordResetText,
+        'msg_text' => '',
         'msg_html' => $passwordResetHtml,
         'is_default' => FALSE,
         'is_reserved' => TRUE,
@@ -61,7 +51,7 @@ return [
         'workflow_name' => 'password_reset',
         'msg_title' => E::ts('Password reset'),
         'msg_subject' => $passwordResetSubject,
-        'msg_text' => $passwordResetText,
+        'msg_text' => '',
         'msg_html' => $passwordResetHtml,
         'is_default' => TRUE,
         'is_reserved' => FALSE,
