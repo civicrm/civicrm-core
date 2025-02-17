@@ -137,7 +137,7 @@ class Finder extends AutoSubscriber {
     $ruleGroup->id = $id;
     // make sure we've got a fetched dbrecord, not sure if this is enforced
     $ruleGroup->find(TRUE);
-    $optimizer = new \CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, $params);
+    $optimizer = new FinderQueryBuilder($id, $contactIDs, $params);
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
     if ($legacyMode && $optimizer->isUseReservedQuery()) {
