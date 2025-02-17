@@ -1032,7 +1032,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if (is_array($clause) && count($clause) === 3 && $clause[1] === '=') {
           // Because clauses are reversible, check both directions to see which side has a fieldName belonging to this join
           foreach ([0 => 2, 2 => 0] as $field => $value) {
-            if (strpos($clause[$field], $editable['explicit_join'] . '.') === 0) {
+            if (str_starts_with($clause[$field], $editable['explicit_join'] . '.')) {
               $fieldName = substr($clause[$field], strlen($editable['explicit_join']) + 1);
               // If the value is a field, get it from the data
               if (isset($data[$clause[$value]])) {
@@ -1578,7 +1578,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   protected function addSelectExpression(string $expr):void {
     if (!$this->getSelectExpression($expr)) {
       // Tokens for aggregated columns start with 'GROUP_CONCAT_'
-      if (strpos($expr, 'GROUP_CONCAT_') === 0) {
+      if (str_starts_with($expr, 'GROUP_CONCAT_')) {
         $expr = 'GROUP_CONCAT(UNIQUE ' . $this->getJoinFromAlias(explode('_', $expr, 3)[2]) . ') AS ' . $expr;
       }
       $this->_apiParams['select'][] = $expr;
@@ -1597,7 +1597,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $result = '';
     foreach ($this->_apiParams['join'] ?? [] as $join) {
       $joinName = explode(' AS ', $join[0])[1];
-      if (strpos($alias, $joinName) === 0) {
+      if (str_starts_with($alias, $joinName)) {
         $parsed = $joinName . '.' . substr($alias, strlen($joinName) + 1);
         // Ensure we are using the longest match
         if (strlen($parsed) > strlen($result)) {
