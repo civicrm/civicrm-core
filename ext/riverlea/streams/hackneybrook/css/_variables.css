@@ -71,7 +71,6 @@
   --crm-input-label-weight: normal;
   --crm-input-label-width: 10em;
   --crm-fieldset-border: 1px;
-  --crm-checkbox-list-col: var(--crm-c-text);
   /* Tabs */
   --crm-tabs-border: var(--crm-c-divider);
   --crm-tab-count-bg: var(--crm-c-blue-dark);

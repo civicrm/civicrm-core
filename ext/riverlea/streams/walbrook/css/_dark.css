@@ -61,7 +61,6 @@
   --crm-c-inactive: var(--crm-c-gray-400);
   --crm-input-color: var(--crm-c-text);
   --crm-input-description: var(--crm-c-gray-300);
-  --crm-checkbox-list-col: var(--crm-c-darkest);
   --crm-dialog-header-border-col: transparent;
   --crm-dialog-header-bg: var(--crm-c-background2);
   --crm-dialog-body-bg: var(--crm-c-background2);
