@@ -1930,7 +1930,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
 
     foreach ($params as $key => $value) {
-      if ($key === 'version' || strpos($key, 'api') === 0 || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
+      if ($key === 'version' || str_starts_with($key, 'api') || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
         continue;
       }
       if (in_array($key, $dateFields, TRUE)) {
