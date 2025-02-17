@@ -263,8 +263,17 @@ class Submit extends AbstractProcessor {
     if (isset($attributes['defn']['required']) && !$attributes['defn']['required']) {
       return NULL;
     }
+    // InputType set to 'DisplayOnly' which skips validation
+    if (($attributes['defn']['input_type'] ?? NULL) === 'DisplayOnly') {
+      return NULL;
+    }
+    // Load full field definition, because $attributes['defn'] only has the form markup
     $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
 
+    // With the full definition loaded, check input_type again
+    if (($attributes['defn']['input_type'] ?? $fullDefn['input_type']) === 'DisplayOnly') {
+      return NULL;
+    }
     // we don't need to validate the file fields as it's handled separately
     if ($fullDefn['input_type'] === 'File') {
       return NULL;
