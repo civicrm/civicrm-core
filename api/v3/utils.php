@@ -2351,7 +2351,7 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
   }
 
   // Hack for Profile formatting fields
-  if ($fieldName === 'field_name' && (strpos($value, 'formatting') === 0)) {
+  if ($fieldName === 'field_name' && (str_starts_with($value, 'formatting'))) {
     return;
   }
 
@@ -2415,7 +2415,7 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create'
   if (!$fieldName) {
     return FALSE;
   }
-  if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
+  if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7])) {
     return $fieldName;
   }
   if ($fieldName === (CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($entity) . '_id')) {

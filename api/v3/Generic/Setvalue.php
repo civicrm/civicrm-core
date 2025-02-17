@@ -48,7 +48,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
   }
   $fields = $fields['values'];
 
-  $isCustom = strpos($field, 'custom_') === 0;
+  $isCustom = str_starts_with($field, 'custom_');
   // Trim off the id portion of a multivalued custom field name
   $fieldKey = $isCustom && substr_count($field, '_') > 1 ? rtrim(rtrim($field, '1234567890'), '_') : $field;
   if (!array_key_exists($fieldKey, $fields)) {

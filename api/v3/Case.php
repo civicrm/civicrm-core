@@ -287,7 +287,7 @@ function civicrm_api3_case_get($params, $sql = NULL) {
     $sort = explode(', ', $options['sort']);
     $contactSort = NULL;
     foreach ($sort as $index => &$sortString) {
-      if (strpos($sortString, 'contact_id') === 0) {
+      if (str_starts_with($sortString, 'contact_id')) {
         $contactSort = $sortString;
         $sortString = '(1)';
         // Get sort field and direction
@@ -630,7 +630,7 @@ function _civicrm_api3_case_read(&$cases, $options) {
   // Bulk-load tags. Supports joins onto the tag entity.
   $tagGet = ['tag_id', 'entity_id'];
   foreach (array_keys($options['return']) as $key) {
-    if (strpos($key, 'tag_id.') === 0) {
+    if (str_starts_with($key, 'tag_id.')) {
       $tagGet[] = $key;
       $options['return']['tag_id'] = 1;
     }

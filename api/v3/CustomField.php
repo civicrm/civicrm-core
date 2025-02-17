@@ -33,7 +33,7 @@ function civicrm_api3_custom_field_create(array $params): array {
 
   // Legacy handling for old way of naming serialized fields
   if (!empty($params['html_type'])) {
-    if ($params['html_type'] === 'CheckBox' || strpos($params['html_type'], 'Multi-') === 0) {
+    if ($params['html_type'] === 'CheckBox' || str_starts_with($params['html_type'], 'Multi-')) {
       $params['serialize'] = 1;
     }
     $params['html_type'] = str_replace(['Multi-Select', 'Select Country', 'Select State/Province'], 'Select', $params['html_type']);
@@ -153,7 +153,7 @@ function civicrm_api3_custom_field_get($params) {
   if ($handleLegacy && !empty($params['html_type'])) {
     $serializedTypes = ['CheckBox', 'Multi-Select', 'Multi-Select Country', 'Multi-Select State/Province'];
     if (is_string($params['html_type'])) {
-      if (strpos($params['html_type'], 'Multi-Select') === 0) {
+      if (str_starts_with($params['html_type'], 'Multi-Select')) {
         $params['html_type'] = str_replace('Multi-Select', 'Select', $params['html_type']);
         $params['serialize'] = 1;
       }
