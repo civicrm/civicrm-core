@@ -897,7 +897,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $participantParams['custom'] = [];
     foreach ($form->_params as $paramName => $paramValue) {
-      if (strpos($paramName, 'custom_') === 0) {
+      if (str_starts_with($paramName, 'custom_')) {
         [$customFieldID, $customValueID] = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
         CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $participantParams['custom'], $paramValue, 'Participant', $customValueID);
 

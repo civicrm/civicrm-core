@@ -217,7 +217,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   public static function checkProfileComplete($fields, &$errors): ?int {
     $email = '';
     foreach ($fields as $fieldname => $fieldvalue) {
-      if (strpos($fieldname, 'email') === 0 && $fieldvalue) {
+      if (str_starts_with($fieldname, 'email') && $fieldvalue) {
         $email = $fieldvalue;
       }
     }
