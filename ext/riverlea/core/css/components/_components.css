@@ -33,24 +33,25 @@
 .crm-container ul.crm-checkbox-list li input {
   margin: 0;
 }
+.crm-container ul.crm-checkbox-list li:nth-child(2n) {
+  background-color: var(--crm-c-background3);
+}
 .crm-container ul.crm-checkbox-list li:has(input:checked) label {
   color: var(--crm-checkbox-list-col);
 }
+.crm-container ul.crm-checkbox-list li:has(input:checked) {
+  background-color: var(--crm-checkbox-list-bg);
+}
+.crm-container ul.crm-checkbox-list li:nth-child(2n):has(input:checked) {
+  background-color: var(--crm-checkbox-list-bg2);
+}
+
 .listing-box input.crm-form-checkbox {
   margin: 0 0 0 var(--crm-s);
 }
 tbody.scrollContent tr.alternateRow {
   background-color: var(--crm-c-background3);
   padding-inline: var(--crm-s) var(--crm-m2);
-}
-.crm-container ul.crm-checkbox-list li:nth-child(2n) {
-  background-color: var(--crm-c-background3);
-}
-.crm-container ul.crm-checkbox-list li:has(input:checked) {
-  background-color: var(--crm-c-yellow-light);
-}
-.crm-container ul.crm-checkbox-list li:nth-child(2n):has(input:checked) {
-  background-color: var(--crm-c-yellow-less-light);
 }
 
 /* Action Links */
