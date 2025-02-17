@@ -1872,7 +1872,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     // "Participant" but that would prevent extensions from creating enties with complex custom fields.
     $getEntityName = function($optionValueName) use ($extendsEntities) {
       foreach ($extendsEntities as $entityName) {
-        if (strpos($optionValueName, $entityName) === 0) {
+        if (str_starts_with($optionValueName, $entityName)) {
           return $entityName;
         }
       }
