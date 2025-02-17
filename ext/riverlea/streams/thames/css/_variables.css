@@ -60,9 +60,8 @@
   --crm-c-teal: #63c4b9;
   --crm-c-dark-teal: #3e8079;
 /* PRACTICAL COLOURS */
-  --crm-c-text: #000000dd; /* thames */
   --crm-c-text-light: #fff;
-  --crm-c-text-dark: var(--crm-c-text);
+  --crm-c-text-dark:  #000000dd; /* thames */
   --crm-c-link: var(--crm-c-blue-dark);
   --crm-c-link-hover: var(--crm-c-blue-darker);
   --crm-c-divider: 1px solid var(--crm-c-blue-overlay); /* thames */
@@ -294,7 +293,6 @@
   --crm-fieldset-border-color: var(--crm-c-gray-400);
   --crm-fieldset-border: 1px 0 0 0;
   --crm-fieldset-padding: var(--crm-padding-reg) var(--crm-padding-small);
-  --crm-checkbox-list-col: var(--crm-c-text);
 }
 :root {
 /* Tabs */
