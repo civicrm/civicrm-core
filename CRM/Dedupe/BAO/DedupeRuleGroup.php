@@ -148,19 +148,26 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
   public static function hook_civicrm_findExistingDuplicates(GenericHookEvent $event) {
     $ruleGroupIDs = $event->ruleGroupIDs;
     $ruleGroup = new \CRM_Dedupe_BAO_DedupeRuleGroup();
-    $ruleGroup->id = reset($ruleGroupIDs);
+    $ruleGroup->id = $id = reset($ruleGroupIDs);
+    $ruleGroup->find(TRUE);
+    $contactType = $ruleGroup->contact_type;
+    $threshold = $ruleGroup->threshold;
     $contactIDs = [];
     if ($event->tableName) {
       $contactIDs = explode(',', CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
     }
-    $tempTable = $ruleGroup->fillTable($ruleGroup->id, $contactIDs, [], FALSE);
-    if (!$tempTable) {
+
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, []);
+    $tableQueries = $optimizer->getRuleQueries();
+    if (empty($tableQueries)) {
+      return;
+    }
+
+    $dedupeTable = $ruleGroup->runTablesQuery([], $tableQueries, $threshold);
+    if (!$dedupeTable) {
       return;
     }
     $aclFrom = $aclWhere = '';
-    $dedupeTable = $tempTable;
-    $contactType = $ruleGroup->contact_type;
-    $threshold = $ruleGroup->threshold;
 
     if ($event->checkPermissions) {
       [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
