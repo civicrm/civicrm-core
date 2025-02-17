@@ -67,7 +67,8 @@ class Finder extends AutoSubscriber {
       $duplicates[] = ['entity_id_1' => $dao->id1, 'entity_id_2' => $dao->id2, 'weight' => $dao->weight];
     }
     $event->duplicates = $duplicates;
-    \CRM_Core_DAO::executeQuery($ruleGroup->tableDropQuery());
+    // Does it ever exist?
+    \CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS dedupe');
   }
 
   public static function findDuplicates(GenericHookEvent $event): void {
@@ -108,7 +109,8 @@ class Finder extends AutoSubscriber {
         $dupes[] = $dao->id;
       }
     }
-    \CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
+    // Does it ever exist?
+    \CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS dedupe');
     $event->dedupeResults['ids'] = array_diff($dupes, $event->dedupeParams['excluded_contact_ids']);
   }
 
