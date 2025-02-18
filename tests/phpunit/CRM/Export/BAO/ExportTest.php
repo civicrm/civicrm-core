@@ -1901,14 +1901,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function textExportParticipantSpecifyFieldsNoPayment(): void {
     $selectedFields = $this->getAllSpecifiableParticipantReturnFields();
     foreach ($selectedFields as $index => $field) {
-      if (strpos($field[1], 'componentPaymentField_') === 0) {
+      if (str_starts_with($field[1], 'componentPaymentField_')) {
         unset($selectedFields[$index]);
       }
     }
 
     $expected = $this->getAllSpecifiableParticipantReturnFields();
     foreach ($expected as $index => $field) {
-      if (strpos($index, 'componentPaymentField_') === 0) {
+      if (str_starts_with($index, 'componentPaymentField_')) {
         unset($expected[$index]);
       }
     }
