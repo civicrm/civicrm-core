@@ -96,7 +96,8 @@ class CiviReportTestCase extends CiviUnitTestCase {
   public function getArrayFromCsv($csvFile) {
     $arrFile = [];
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
-      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+      // php 8.x fgetcsv(): the $escape parameter must be provided as its default value will change.
+      while (($data = fgetcsv($handle, 1000, ",", '"', '\\')) !== FALSE) {
         $arrFile[] = $data;
       }
       fclose($handle);
