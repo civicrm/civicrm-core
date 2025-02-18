@@ -152,7 +152,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           throw new CRM_Core_Exception($e->getMessage());
         }
       }
-      elseif (!empty($optionsIds) && !empty($optionsIds['id'])) {
+      elseif (!empty($optionsIds['id'])) {
         $optionsLoad = civicrm_api3('price_field_value', 'get', ['id' => $optionsIds['id']]);
         $options = $optionsLoad['values'][$optionsIds['id']];
         $options['is_active'] = $params['is_active'] ?? 1;

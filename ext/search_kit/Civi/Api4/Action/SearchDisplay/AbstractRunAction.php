@@ -1032,7 +1032,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if (is_array($clause) && count($clause) === 3 && $clause[1] === '=') {
           // Because clauses are reversible, check both directions to see which side has a fieldName belonging to this join
           foreach ([0 => 2, 2 => 0] as $field => $value) {
-            if (strpos($clause[$field], $editable['explicit_join'] . '.') === 0) {
+            if (str_starts_with($clause[$field], $editable['explicit_join'] . '.')) {
               $fieldName = substr($clause[$field], strlen($editable['explicit_join']) + 1);
               // If the value is a field, get it from the data
               if (isset($data[$clause[$value]])) {
@@ -1121,9 +1121,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return $this->editableInfo[$key];
     }
     $getModeField = $this->getField($key);
-    // If field is an implicit join to another entity (not a custom group), use the original fk field
+    // If field is an implicit join to another entity, use the original fk field
+    // UNLESS it's a custom field (which the api treats the same as core fields) or a virtual join like `address_primary.city`
     if (!empty($getModeField['implicit_join']) && empty($getModeField['custom_field_id'])) {
-      return $this->getEditableInfo(substr($key, 0, -1 - strlen($getModeField['name'])));
+      $baseFieldName = substr($key, 0, -1 - strlen($getModeField['name']));
+      $baseField = $this->getField($baseFieldName);
+      if ($baseField && !empty($baseField['fk_entity']) && $baseField['type'] === 'Field') {
+        return $this->getEditableInfo($baseFieldName);
+      }
     }
     $result = NULL;
     if ($getModeField) {
@@ -1138,7 +1143,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $field = $createModeField + $getModeField;
       $idKey = CoreUtil::getIdFieldName($field['entity']);
       $path = (!empty($field['explicit_join']) ? $field['explicit_join'] . '.' : '');
-      $idPath = $path . $idKey;
+      // $baseFieldName is used for virtual joins e.g. email_primary.email
+      $idPath = $path . ($baseFieldName ?? $idKey);
       // Hack to support editing relationships
       if ($field['entity'] === 'RelationshipCache') {
         $field['entity'] = 'Relationship';
@@ -1578,7 +1584,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   protected function addSelectExpression(string $expr):void {
     if (!$this->getSelectExpression($expr)) {
       // Tokens for aggregated columns start with 'GROUP_CONCAT_'
-      if (strpos($expr, 'GROUP_CONCAT_') === 0) {
+      if (str_starts_with($expr, 'GROUP_CONCAT_')) {
         $expr = 'GROUP_CONCAT(UNIQUE ' . $this->getJoinFromAlias(explode('_', $expr, 3)[2]) . ') AS ' . $expr;
       }
       $this->_apiParams['select'][] = $expr;
@@ -1597,7 +1603,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $result = '';
     foreach ($this->_apiParams['join'] ?? [] as $join) {
       $joinName = explode(' AS ', $join[0])[1];
-      if (strpos($alias, $joinName) === 0) {
+      if (str_starts_with($alias, $joinName)) {
         $parsed = $joinName . '.' . substr($alias, strlen($joinName) + 1);
         // Ensure we are using the longest match
         if (strlen($parsed) > strlen($result)) {

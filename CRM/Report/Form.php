@@ -2820,8 +2820,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             continue;
           }
 
-          if (!empty($this->_params['group_bys']) &&
-            !empty($this->_params['group_bys'][$fieldName]) &&
+          if (!empty($this->_params['group_bys'][$fieldName]) &&
             !empty($this->_params['group_bys_freq'])
           ) {
             switch ($this->_params['group_bys_freq'][$fieldName] ?? NULL) {

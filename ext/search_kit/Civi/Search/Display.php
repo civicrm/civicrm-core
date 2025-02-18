@@ -57,7 +57,7 @@ class Display {
    * @param array|null $excludeActions
    * @return array[]
    */
-  public static function getEntityLinks(string $entity, $addLabel = FALSE, array $excludeActions = NULL): array {
+  public static function getEntityLinks(string $entity, $addLabel = FALSE, ?array $excludeActions = NULL): array {
     $apiParams = [
       'checkPermissions' => FALSE,
       'entityTitle' => $addLabel,

@@ -91,6 +91,9 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       if (!isset($afforms[$name]['placement']) && $this->_isFieldSelected('placement')) {
         self::convertLegacyPlacement($afforms[$name]);
       }
+      if (!isset($afforms[$name]['placement_filters'])) {
+        self::convertLegacyPlacementOptions($afforms[$name]);
+      }
     }
 
     // Format layouts
@@ -197,6 +200,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       $afform['placement'][] = 'contact_summary_' . $afform['contact_summary'];
     }
     unset($afform['is_dashlet'], $afform['is_token'], $afform['contact_summary']);
+  }
+
+  private static function convertLegacyPlacementOptions(array &$afform): void {
+    $afform['placement_weight'] ??= $afform['summary_weight'] ?? NULL;
+    $afform['placement_filters'] = [];
+    if (!empty($afform['summary_contact_type'])) {
+      $afform['placement_filters']['contact_type'] = $afform['summary_contact_type'];
+    }
+    unset($afform['summary_weight'], $afform['summary_contact_type']);
   }
 
 }

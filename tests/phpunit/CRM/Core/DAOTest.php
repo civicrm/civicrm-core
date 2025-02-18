@@ -448,7 +448,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       if ($constant === 'SERIALIZE_JSON' || $constant === 'SERIALIZE_PHP') {
         $constants[] = [$val, array_merge($simpleData, $complexData)];
       }
-      elseif (strpos($constant, 'SERIALIZE_') === 0) {
+      elseif (str_starts_with($constant, 'SERIALIZE_')) {
         $constants[] = [$val, $simpleData];
       }
     }

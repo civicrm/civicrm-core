@@ -731,7 +731,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   if (!empty($value['is_default'])) {
                     $fieldParams['default_option'] = $value['weight'];
                   }
-                  if (!empty($discountFieldIDs[$j]) && !empty($discountFieldIDs[$j][$value['weight']])) {
+                  if (!empty($discountFieldIDs[$j][$value['weight']])) {
                     $fieldParams['option_id'][$value['weight']] = $discountFieldIDs[$j][$value['weight']];
                     unset($discountFieldIDs[$j][$value['weight']]);
                   }

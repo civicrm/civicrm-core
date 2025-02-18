@@ -35,7 +35,7 @@ class CoreUtil {
   public static function getBAOFromApiName($entityName): ?string {
     // TODO: It would be nice to just call self::getInfoItem($entityName, 'dao')
     // but that currently causes test failures, probably due to early-bootstrap issues.
-    if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
+    if ($entityName === 'CustomValue' || str_starts_with($entityName, 'Custom_')) {
       $dao = \Civi\Api4\CustomValue::getInfo()['dao'];
     }
     else {

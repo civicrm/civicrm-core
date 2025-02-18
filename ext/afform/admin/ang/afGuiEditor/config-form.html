@@ -35,6 +35,14 @@
     </p>
   </div>
 
+  <div class="form-group">
+    <label for="afform_tags">
+      {{:: ts('Tags') }}
+    </label>
+    <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_tags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
+    <p class="help-block">{{:: ts('Tags can be used to keep track of your forms if Used For is set to include Afform.') }} <a target="_blank" href="/civicrm/tag?reset=1">{{:: ts('Manage Tags') }}</a></p>
+  </div>
+
   <!-- Placement options do not apply to blocks -->
   <fieldset ng-if=":: editor.afform.type !== 'block'">
     <legend>{{:: ts('Placement') }}</legend>
@@ -76,7 +84,7 @@
       <p class="help-block disabled" ng-if="!editor.afform.server_route">{{:: ts('Requires a page route') }}</p>
     </div>
 
-    <div class="form-group" ng-show="!!editor.afform.navigation || editor.isContactSummary()">
+    <div class="form-group" ng-show="!!editor.afform.navigation || editor.hasPlacementEntities()">
       <div class="form-inline">
         <label for="afform_icon">{{:: ts('Icon') }}</label>
         <input required id="afform_icon" ng-model="editor.afform.icon" crm-ui-icon-picker class="form-control">
@@ -96,22 +104,14 @@
       </p>
     </div>
 
-    <div class="form-group">
-      <label for="afform_tags">
-        {{:: ts('Tags') }}
-      </label>
-      <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_tags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
-      <p class="help-block">{{:: ts('Tags can be used to keep track of your forms if Used For is set to include Afform.') }} <a target="_blank" href="/civicrm/tag?reset=1">{{:: ts('Manage Tags') }}</a></p>
-    </div>
-
-    <div class="form-group" ng-if="editor.isContactSummary()">
-      <div class="form-inline">
-        <label for="afform_summary_contact_type">{{:: ts('For') }}</label>
-        <input class="form-control" crm-autocomplete="'ContactType'" id="afform_summary_contact_type" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">
+    <div class="form-group" ng-if="editor.afform.placement.length">
+      <div class="form-inline" ng-repeat="entity in editor.getPlacementEntities()">
+        <label for="placement-filter-{{:: entity.filter.name }}">{{:: entity.filter.label }}</label>
+        <input class="form-control" ng-list crm-ui-select="{multiple: true, placeholder: ts('Any'), data: entity.filter.options}" id="placement-filter-{{:: entity.filter.name }}" ng-model="editor.afform.placement_filters[entity.filter.name]" >
       </div>
       <div class="form-inline">
-        <label for="afform_summary_weight">{{:: ts('Position') }}</label>
-        <input class="form-control" type="number" id="afform_summary_weight" ng-model="editor.afform.summary_weight" placeholder="{{:: ts('Auto') }}">
+        <label for="afform_placement_weight">{{:: ts('Position') }}</label>
+        <input class="form-control" type="number" id="afform_placement_weight" ng-model="editor.afform.placement_weight" placeholder="{{:: ts('Auto') }}">
       </div>
     </div>
 

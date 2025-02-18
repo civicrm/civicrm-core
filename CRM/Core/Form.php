@@ -1786,7 +1786,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $props['placeholder'] = $placeholder;
     }
     // Handle custom field
-    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+    if (str_starts_with($name, 'custom_') && is_numeric($name[7])) {
       [, $id] = explode('_', $name);
       $label = $props['label'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
@@ -1895,7 +1895,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // Handle custom fields
-    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+    if (str_starts_with($name, 'custom_') && is_numeric($name[7])) {
       $fieldId = (int) substr($name, 7);
       return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $context == 'search', $props['label'] ?? NULL);
     }

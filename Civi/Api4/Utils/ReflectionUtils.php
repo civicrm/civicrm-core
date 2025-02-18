@@ -78,7 +78,7 @@ class ReflectionUtils {
       if (strlen($line) && $line[0] === ' ') {
         $line = substr($line, 1);
       }
-      if (strpos(ltrim($line), '@') === 0) {
+      if (str_starts_with(ltrim($line), '@')) {
         $words = explode(' ', ltrim($line, ' @'));
         $key = array_shift($words);
         $param = NULL;

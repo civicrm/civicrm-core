@@ -143,7 +143,7 @@ function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templat
   }
   if ($formName === 'CRM_Queue_Page_Monitor') {
     $jobName = CRM_Utils_Request::retrieveValue('name', 'String');
-    if (strpos($jobName, 'user_job_') === 0) {
+    if (str_starts_with($jobName, 'user_job_')) {
       try {
         $userJobID = (int) str_replace('user_job_', '', $jobName);
         $jobType = UserJob::get()->addWhere('id', '=', $userJobID)

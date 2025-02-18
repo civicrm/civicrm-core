@@ -1156,7 +1156,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   private function getCurrentRowCustomParams(): array {
     $return = [];
     foreach ($this->currentRow as $field => $value) {
-      if (strpos($field, 'custom_') === 0) {
+      if (str_starts_with($field, 'custom_')) {
         $return[$field] = $value;
       }
     }

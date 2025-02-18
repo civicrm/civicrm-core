@@ -1,8 +1,13 @@
 1.3.7-6.1alpha
  - CHANGED - bg colours for Standalone login, to better handle darkmode login (ref #31991)
 
-1.3.6-6.0beta
- - CHANGES AWAITED as being applied against 6.0 (https://github.com/civicrm/civicrm-core/pull/32077), kept separate for version numbering.
+1.3.6-6.1alpha
+ - FIXED - Responsive: make dashlets stack on Civi Dashboard under 990px (same as Greenwich)
+ - FIXED - Show Add Address without hover on Contact Dashboard (#109)
+ - FIXED - code/pre formatting is wrapping on one line (#108)
+ - FIXED - HackneyBrook/DarkMode: Notification text colour illegible (https://github.com/civicrm/civicrm-core/pull/31994)
+ - CHANGED - Select2 search box now fills width of Select, neatens padding.
+ - CHANGED - Swapped edit icon for add icon on add address on Contact Dashboard & tidied appearance (#109)
 
 1.3.5-6.0alpha
  - ADDED - padding to contact dashboard inline edit div (#107)

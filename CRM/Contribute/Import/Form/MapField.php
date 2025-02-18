@@ -59,7 +59,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $selectColumn2 = [];
     $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type');
     foreach (array_keys($selectColumn1) as $fieldName) {
-      if (strpos($fieldName, 'soft_credit__contact__') === 0) {
+      if (str_starts_with($fieldName, 'soft_credit__contact__')) {
         $selectColumn2[$fieldName] = $softCreditTypes;
       }
     }

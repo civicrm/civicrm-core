@@ -1,6 +1,5 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
-use Civi\Api4\MessageTemplate;
 use Civi\Api4\Navigation;
 
 /**
@@ -52,44 +51,9 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
       ['pass']
     )));
 
-    $this->createPasswordResetMessageTemplate();
-
     // `standaloneusers` is installed as part of the overall install process for `Standalone`.
     // A subsequent step will configure some default users (*depending on local options*).
     // See also: `StandaloneUsers.civi-setup.php`
-  }
-
-  protected function createPasswordResetMessageTemplate() {
-
-    $baseTpl = [
-      'workflow_name' => 'password_reset',
-      'msg_title' => 'Password reset',
-      'msg_subject' => '{ts}Password reset link for{/ts} {domain.name}',
-      'msg_text' => <<<TXT
-        {ts}A password reset link was requested for this account.  If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}
-
-        {\$resetUrlPlaintext}
-
-        {domain.name}
-        TXT,
-      'msg_html' => <<<HTML
-        <p>{ts}A password reset link was requested for this account.&nbsp; If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}</p>
-
-        <p><a href="{\$resetUrlHtml}">{\$resetUrlHtml}</a></p>
-
-        <p>{domain.name}</p>
-        HTML,
-    ];
-
-    // Create a "reserved" template. This is a pristine copy provided for reference.
-    MessageTemplate::save(FALSE)
-      ->setDefaults($baseTpl)
-      ->setRecords([
-        ['is_reserved' => TRUE, 'is_default' => FALSE],
-        ['is_reserved' => FALSE, 'is_default' => TRUE],
-      ])
-      ->execute();
-
   }
 
   /**

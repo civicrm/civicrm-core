@@ -70,30 +70,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
   }
 
   /**
-   * Is a file based reserved query configured.
-   *
-   * File based reserved queries were an early idea about how to optimise the dedupe queries.
-   *
-   * In theory extensions could implement them although there is no evidence any of them have.
-   * However, if these are implemented by core or by extensions we should not attempt to optimise
-   * the query by (e.g.) combining queries.
-   *
-   * In practice the queries implemented only return one query anyway
-   *
-   * @internal for core use only.
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   *
-   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
-   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised
-   */
-  public function isUseReservedQuery(): bool {
-    return $this->lookup('RuleGroup', 'is_reserved') &&
-      CRM_Utils_File::isIncludable('CRM/Dedupe/BAO/QueryBuilder/' . $this->lookup('RuleGroup', 'name') . '.php');
-  }
-
-  /**
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
@@ -226,30 +202,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
       return \CRM_Core_DAO::getReferencesToContactTable()[$tableName][0];
     }
     throw new CRM_Core_Exception('invalid field');
-  }
-
-  /**
-   * Get the reserved query based on a static class.
-   *
-   * This was an early idea about optimisation & extendability. It is likely
-   * there are no implementations of rules this way outside the 3 core files.
-   *
-   * It is also likely the core files can go once we are optimising the queries based on the
-   * rule.
-   *
-   * @internal  Do not call from outside of core.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public function getReservedQuery(): array {
-    $bao = new CRM_Dedupe_BAO_DedupeRuleGroup();
-    $bao->id = $this->lookup('RuleGroup', 'id');
-    $bao->find(TRUE);
-    $bao->params = $this->lookupParameters;
-    $bao->contactIds = $this->contactIDs;
-    $command = empty($this->lookupParameters) ? 'internal' : 'record';
-    return call_user_func(["CRM_Dedupe_BAO_QueryBuilder_" . $this->lookup('RuleGroup', 'name'), $command], $bao);
   }
 
   /**

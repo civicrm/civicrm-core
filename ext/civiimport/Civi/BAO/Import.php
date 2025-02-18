@@ -169,7 +169,7 @@ class Import extends CRM_Core_DAO {
     $userFieldIndex = 0;
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
-      if (strpos($result->Field, '_') !== 0) {
+      if (!str_starts_with($result->Field, '_')) {
         $columns[$result->Field]['label'] = ts('Import field') . ':' . ($headers[$userFieldIndex] ?? $result->Field);
         $columns[$result->Field]['data_type'] = 'String';
         $userFieldIndex++;
@@ -177,7 +177,7 @@ class Import extends CRM_Core_DAO {
       else {
         $columns[$result->Field]['label'] = ($result->Field === '_entity_id') ? E::ts('Row Imported to %1 ID', [1 => $entity]) : $result->Field;
         $columns[$result->Field]['fk_entity'] = ($result->Field === '_entity_id') ? $entity : NULL;
-        $columns[$result->Field]['data_type'] = strpos($result->Type, 'int') === 0 ? 'Integer' : 'String';
+        $columns[$result->Field]['data_type'] = str_starts_with($result->Type, 'int') ? 'Integer' : 'String';
       }
     }
     \Civi::cache('metadata')->set($cacheKey, $columns);

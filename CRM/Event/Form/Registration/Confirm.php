@@ -84,7 +84,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->assign('confirm_text', $this->getEventValue('confirm_text'));
     CRM_Utils_Hook::eventDiscount($this, $this->_params);
 
-    if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
+    if (!empty($this->_params[0]['discount']['applied'])) {
       $this->set('hookDiscount', $this->_params[0]['discount']);
     }
     $this->assign('hookDiscount', $this->_params[0]['discount'] ?? '');
@@ -403,7 +403,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // if a discount has been applied, lets now deduct it from the amount
     // and fix the fee level
-    if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
+    if (!empty($this->_params[0]['discount']['applied'])) {
       foreach ($this->_params as $k => $v) {
         if (($this->_params[$k]['amount'] ?? NULL) > 0 && !empty($this->_params[$k]['discountAmount'])) {
           $this->_params[$k]['amount'] -= $this->_params[$k]['discountAmount'];

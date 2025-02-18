@@ -1394,7 +1394,7 @@ class CRM_Utils_Array {
   public static function filterByPrefix(array &$collection, string $prefix): array {
     $filtered = [];
     foreach (array_keys($collection) as $key) {
-      if (!$prefix || strpos($key, $prefix) === 0) {
+      if (!$prefix || str_starts_with($key, $prefix)) {
         $filtered[substr($key, strlen($prefix))] = $collection[$key];
         unset($collection[$key]);
       }
@@ -1423,7 +1423,7 @@ class CRM_Utils_Array {
       }
       $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description', 'grouping', 'filter']));
     }
-    return $options;
+    return array_values($options);
   }
 
 }

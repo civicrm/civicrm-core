@@ -48,6 +48,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
   protected function getSelect() {
     return ['id', 'name', 'title', 'is_multiple',
       'help_pre', 'help_post', 'extends', 'icon', 'style',
+      'extends_entity_column_value', 'weight',
     ];
   }
 
@@ -285,22 +286,34 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       'permission' => ['access all custom data'],
       'title' => $item['title'],
       'icon' => $item['icon'],
+      'summary_weight' => 100 + ($item['weight'] ?? 0),
+      'placement_filters' => [],
     ];
     $entityIdFilter = \CRM_Utils_String::convertStringToSnakeCase($item['extends']) . '_id';
     // Place in Contact Summary Tabs
-    if ($item['extends'] === 'Contact') {
-      $afform['placement'] = ['contact_summary_tab'];
-    }
-    elseif (CoreUtil::isContact($item['extends'])) {
+    if (CoreUtil::isContact($item['extends'])) {
       // override e.g. "individual_id", we want "contact_id"
       $entityIdFilter = 'contact_id';
       $afform['placement'] = ['contact_summary_tab'];
-      $afform['summary_contact_type'] = [$item['extends']];
+      // Add contact_type filter (extends == contact_type, extends_entity_column_value == contact_sub_type)
+      // Note: Afform placement_filters mixes contact_subtype in with contact_type
+      if (!empty($item['extends_entity_column_value'])) {
+        $afform['placement_filters']['contact_type'] = (array) $item['extends_entity_column_value'];
+      }
+      // Only add contact_type if a sub_type wasn't specified
+      elseif ($item['extends'] !== 'Contact') {
+        $afform['placement_filters']['contact_type'] = (array) $item['extends'];
+      }
     }
-    else {
-      // tabs for other entities are placed without any
-      // additional afform meta
-      // @see civicrm_admin_ui_civicrm_tabset
+    elseif ($item['extends'] === 'Event') {
+      $afform['placement'] = ['event_manage_tab'];
+      // Add event_type filter (extends_entity_column_value == event_type_id)
+      if (!empty($item['extends_entity_column_value'])) {
+        // Convert event_type_id to "event_type" (id -> name)
+        $eventTypes = \Civi::entity('Event')->getOptions('event_type_id');
+        $eventTypes = array_column($eventTypes, 'id', 'name');
+        $afform['placement_filters']['event_type'] = array_keys(array_intersect($eventTypes, $item['extends_entity_column_value']));
+      }
     }
     if ($this->getLayout) {
       // TODO: the template should be a table or grid depending
