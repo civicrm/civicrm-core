@@ -432,7 +432,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
    * @return string
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function runTablesQuery(array $params, array $tableQueries, int $threshold): string {
+  private function runTablesQuery(array $params, array $tableQueries, int $threshold): string {
     if ($params) {
       $dedupeTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')

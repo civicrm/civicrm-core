@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -8,6 +9,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+namespace Civi\LegacyFinder;
 
 /**
  *
@@ -22,7 +25,7 @@ use Civi\Api4\DedupeRule;
  *
  * @internal subject to change.
  */
-class CRM_Dedupe_FinderQueryOptimizer {
+class FinderQueryBuilder {
   use EntityLookupTrait;
 
   private array $queries = [];
@@ -39,11 +42,12 @@ class CRM_Dedupe_FinderQueryOptimizer {
   /**
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \CRM_Core_Exception
+   * @noinspection DuplicatedCode
    */
   public function __construct(int $dedupeRuleGroupID, array $contactIDs, array $params) {
     $this->define('DedupeRuleGroup', 'RuleGroup', ['id' => $dedupeRuleGroupID]);
     foreach ($contactIDs as $cid) {
-      $this->contactIDs[] = CRM_Utils_Type::escape($cid, 'Integer');
+      $this->contactIDs[] = \CRM_Utils_Type::escape($cid, 'Integer');
     }
     $this->lookupParameters = $params;
     $rules = DedupeRule::get(FALSE)
@@ -70,18 +74,43 @@ class CRM_Dedupe_FinderQueryOptimizer {
   }
 
   /**
+   * Is a file based reserved query configured.
+   *
+   * File based reserved queries were an early idea about how to optimise the dedupe queries.
+   *
+   * In theory extensions could implement them although there is no evidence any of them have.
+   * However, if these are implemented by core or by extensions we should not attempt to optimise
+   * the query by (e.g.) combining queries.
+   *
+   * In practice the queries implemented only return one query anyway
+   *
+   * @internal for core use only.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   *
+   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
+   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised
+   */
+  public function isUseReservedQuery(): bool {
+    return $this->lookup('RuleGroup', 'is_reserved') &&
+      \CRM_Utils_File::isIncludable('CRM/Dedupe/BAO/QueryBuilder/' . $this->lookup('RuleGroup', 'name') . '.php');
+  }
+
+  /**
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
    * @param array $rule
    *
-   * @return string
+   * @return string|null
    *   SQL query performing the search
    *   or NULL if params is present and doesn't have and for a field.
    *
    * @throws \CRM_Core_Exception
    * @internal do not call from outside tested core code. No universe uses Feb 2024.
    *
+   * @noinspection DuplicatedCode
    */
   public function getQuery(array $rule): ?string {
 
@@ -97,7 +126,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
       $from = "{$rule['table']} t1";
       $str = 'NULL';
       if (isset($this->lookupParameters[$rule['table']][$rule['field']])) {
-        $str = trim(CRM_Utils_Type::escape($this->lookupParameters[$rule['table']][$rule['field']], 'String'));
+        $str = trim(\CRM_Utils_Type::escape($this->lookupParameters[$rule['table']][$rule['field']], 'String'));
       }
       if ($rule['length']) {
         $where[] = "SUBSTR(t1.{$rule['field']}, 1, {$rule['length']}) = SUBSTR('$str', 1, {$rule['length']})";
@@ -140,16 +169,17 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @param string $tableName
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   private function getRuleTableFilter(string $tableName): string {
     if ($tableName === 'civicrm_contact') {
       return "contact_type = '" . $this->lookup('RuleGroup', 'contact_type') . "'";
     }
-    $dynamicReferences = CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName] ?? NULL;
+    $dynamicReferences = \CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName] ?? NULL;
     if (!$dynamicReferences) {
       return '';
     }
-    if (!empty(CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName])) {
+    if (!empty(\CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName])) {
       return $dynamicReferences[1] . "= 'civicrm_contact'";
     }
     return '';
@@ -160,6 +190,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
    *
    * @return string
    * @throws \CRM_Core_Exception
+   * @noinspection DuplicatedCode
    */
   private function getRuleFieldFilter(array $rule): string {
     if ($rule['length']) {
@@ -172,7 +203,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
       "t1.{$rule['field']} = t2.{$rule['field']}",
     ];
 
-    if (in_array(CRM_Dedupe_BAO_DedupeRule::getFieldType($rule['field'], $rule['table']), CRM_Utils_Type::getTextTypes(), TRUE)) {
+    if (in_array(\CRM_Dedupe_BAO_DedupeRule::getFieldType($rule['field'], $rule['table']), \CRM_Utils_Type::getTextTypes(), TRUE)) {
       $innerJoinClauses[] = "t1.{$rule['field']} <> ''";
       $innerJoinClauses[] = "t2.{$rule['field']} <> ''";
     }
@@ -195,25 +226,48 @@ class CRM_Dedupe_FinderQueryOptimizer {
     if ($tableName === 'civicrm_contact') {
       return 'id';
     }
-    if (isset(CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName][0])) {
-      return CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName][0];
+    if (isset(\CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName][0])) {
+      return \CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName][0];
     }
     if (isset(\CRM_Core_DAO::getReferencesToContactTable()[$tableName][0])) {
       return \CRM_Core_DAO::getReferencesToContactTable()[$tableName][0];
     }
-    throw new CRM_Core_Exception('invalid field');
+    throw new \CRM_Core_Exception('invalid field');
+  }
+
+  /**
+   * Get the reserved query based on a static class.
+   *
+   * This was an early idea about optimisation & extendability. It is likely
+   * there are no implementations of rules this way outside the 3 core files.
+   *
+   * It is also likely the core files can go once we are optimising the queries based on the
+   * rule.
+   *
+   * @internal  Do not call from outside of core.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getReservedQuery(): array {
+    $bao = new \CRM_Dedupe_BAO_DedupeRuleGroup();
+    $bao->id = $this->lookup('RuleGroup', 'id');
+    $bao->find(TRUE);
+    $bao->params = $this->lookupParameters;
+    $bao->contactIds = $this->contactIDs;
+    $command = empty($this->lookupParameters) ? 'internal' : 'record';
+    return call_user_func(["CRM_Dedupe_BAO_QueryBuilder_" . $this->lookup('RuleGroup', 'name'), $command], $bao);
   }
 
   /**
    * Get the queries to fill the table for the various rules.
    *
-   * Return a set of SQL queries whose cummulative weights will mark matched
+   * Return a set of SQL queries whose cumulative weights will mark matched
    * records for the RuleGroup::thresholdQuery() to retrieve.
    *
+   * @return array
    * @internal do not call from outside tested core code.
    *
-   * @return array
-   * @throws \CRM_Core_Exception
    */
   public function getRuleQueries(): array {
     $queries = [];
