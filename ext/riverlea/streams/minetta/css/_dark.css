@@ -33,6 +33,7 @@
   --crm-block-shadow: 0;
   --crm-popup-shadow: 0 3px 18px 0 rgb(0,0,0);
   --crm-heading-bg: var(--crm-c-blue-dark);
+  --crm-heading-col: var(--crm-c-text-light);
   --crm-dashlet-bg: var(--crm-c-background2);
   --crm-dashlet-header-bg: var(--crm-c-background3);
   --crm-expand-header-bg: var(--crm-c-background3);
