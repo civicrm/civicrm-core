@@ -1053,7 +1053,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.title}' => 'Event Title',
       '{event.start_date}' => 'Event Start Date',
       '{event.end_date}' => 'Event End Date',
-      '{event.event_type_id:label}' => 'Type',
+      '{event.event_type_id:label}' => 'Event Type',
       '{event.summary}' => 'Event Summary',
       '{event.loc_block_id.email_id.email}' => 'Event Contact Email',
       '{event.loc_block_id.phone_id.phone}' => 'Event Contact Phone',

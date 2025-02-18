@@ -1423,7 +1423,7 @@ class CRM_Utils_Array {
       }
       $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description', 'grouping', 'filter']));
     }
-    return $options;
+    return array_values($options);
   }
 
 }
