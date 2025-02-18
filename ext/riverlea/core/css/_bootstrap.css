@@ -1293,7 +1293,7 @@
 #bootstrap-theme .form-control[disabled],
 #bootstrap-theme .form-control[readonly],
 fieldset[disabled] #bootstrap-theme .form-control {
-  background-color: #eee;
+  background-color: var(--crm-c-background2);
   opacity: 1;
 }
 #bootstrap-theme .form-control[disabled],
