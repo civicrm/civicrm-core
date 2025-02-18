@@ -1802,11 +1802,6 @@ LIKE %1
       $dao->N = TRUE;
     }
 
-    if (is_a($result, 'DB_Error')) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
-      return $result;
-    }
-
     return $dao;
   }
 
