@@ -96,7 +96,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
       $autoFillMode = $entity['autofill'] ?? '';
       $relatedContact = $entity['autofill-relationship'] ?? NULL;
-      if ($relatedContact && strpos($autoFillMode, 'relationship:') === 0) {
+      if ($relatedContact && str_starts_with($autoFillMode, 'relationship:')) {
         $event->addDependency($entityName, $relatedContact);
       }
     }
@@ -125,7 +125,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
         }
       }
       // Autofill by relationship
-      if (!$id && $relatedContact && strpos($autoFillMode, 'relationship:') === 0) {
+      if (!$id && $relatedContact && str_starts_with($autoFillMode, 'relationship:')) {
         $relationshipType = substr($autoFillMode, strlen('relationship:'));
         $relatedEntity = $event->getFormDataModel()->getEntity($relatedContact);
         if ($relatedEntity) {
