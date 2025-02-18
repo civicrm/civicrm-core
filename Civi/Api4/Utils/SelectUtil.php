@@ -55,7 +55,7 @@ class SelectUtil {
     $search = '/^' . str_replace('\*', '.*', preg_quote($search, '/')) . '$/';
     return array_values(array_filter($fieldNames, function($field) use ($search, $prefix) {
       // Exclude fields that don't have the same join prefix
-      if (($prefix !== '' && strpos($field, $prefix) !== 0) || substr_count($prefix, '.') !== substr_count($field, '.')) {
+      if (($prefix !== '' && !str_starts_with($field, $prefix)) || substr_count($prefix, '.') !== substr_count($field, '.')) {
         return FALSE;
       }
       // Now strip the prefix and compare field name to the pattern
