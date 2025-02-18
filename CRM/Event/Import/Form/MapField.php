@@ -30,6 +30,19 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
+   * Should contact fields be filtered which determining fields to show.
+   *
+   * This applies to Participant import as we put all contact fields in the metadata
+   * but only present those used for a match in QuickForm - the civiimport extension has
+   * more functionality to update and create.
+   *
+   * @return bool
+   */
+  protected function isFilterContactFields() : bool {
+    return TRUE;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -84,37 +97,15 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       foreach ($fields['mapper'] as $mapperPart) {
         $importKeys[] = $mapperPart[0];
       }
-      // FIXME: should use the schema titles, not redeclare them
-      $requiredFields = [
-        'contact_id' => ts('Contact ID'),
-        'event_id' => ts('Event ID'),
-      ];
+      $parser = $self->getParser();
+      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
+      $requiredError = $self->validateContactFields($rule, $fields['mapper'], ['external_identifier', 'contact_id', 'contact__id']);
 
-      $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields($self->getContactType(), $importKeys);
-      if (in_array('id', $importKeys)) {
+      if (!in_array('id', $importKeys) && !in_array('event_id', $importKeys)) {
         // ID is the only field we need, if present.
-        $requiredFields = [];
-      }
-      foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $importKeys)) {
-          if ($field === 'contact_id') {
-            if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys)
-            ) {
-              continue;
-            }
-            if ($self->isUpdateExisting()) {
-              $requiredError[] = ts('Missing required field: Provide Participant ID') . '<br />';
-            }
-            else {
-              $requiredError[] = ts('Missing required contact matching fields.') . " $contactFieldsBelowWeightMessage " . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
-            }
-          }
-          elseif (!in_array('event_title', $importKeys)) {
-            $requiredError[] = ts('Missing required field: Provide %1 or %2',
-                [1 => $title, 2 => 'Event Title']
-              ) . '<br />';
-          }
-        }
+        $requiredError[] = ts('Missing required field: Provide %1 or %2',
+            [1 => 'Event ID', 2 => 'Event Title']
+          ) . '<br />';
       }
     }
 

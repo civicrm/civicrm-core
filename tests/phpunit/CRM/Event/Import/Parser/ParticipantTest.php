@@ -366,7 +366,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'event_id'],
       ['name' => 'first_name'],
       ['name' => 'last_name'],
-      ['name' => $this->getCustomFieldName()],
+      ['name' => $this->getCustomFieldName('text', 4)],
       ['name' => 'role_id'],
       ['name' => 'status_id'],
       ['name' => 'register_date'],
@@ -375,6 +375,45 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $this->ids['Contact']['bob'])
       ->execute()->first();
     $this->assertEquals($this->ids['Event']['event'], $participant['event_id']);
+  }
+
+  /**
+   * Test that one of the following is enough
+   *  - contact_id + event_id + status_id
+   *  - external_identifier + event_id + status_id
+   *  - email_primary.email + event_id + status_id
+   *
+   * @dataProvider requiredFields
+   */
+  public function testRequiredFields(array $dataProvider): void {
+    $this->eventCreateUnpaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->individualCreate(['external_identifier' => 'abc', 'email' => 'jenny@example.com']);
+    $mapper = [
+      ['name' => 'event_id'],
+      ['name' => 'participant_id'],
+      ['name' => 'contact_id'],
+      ['name' => 'external_identifier'],
+      ['name' => 'email_primary.email'],
+      ['name' => 'status_id'],
+    ];
+    foreach ($mapper as $index => $field) {
+      if (!in_array($field['name'], $dataProvider)) {
+        $mapper[$index]['name'] = 'do_not_import';
+      }
+    }
+
+    $this->importCSV('participant_with_multiple_identifiers.csv', $mapper, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK, 'saveMapping' => FALSE]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+  }
+
+  public function requiredFields(): array {
+    return [
+      'contact_id' => [['contact_id', 'status_id', 'event_id']],
+      'external_identifier' => [['external_identifier', 'status_id', 'event_id']],
+      'email' => [['email_primary.email', 'status_id', 'event_id']],
+    ];
   }
 
   /**
