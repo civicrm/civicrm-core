@@ -772,7 +772,7 @@ EOHTML;
 
     $this->assertCount(1, $prefill['Individual1']['values']);
     $this->assertEquals('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEmpty($prefill['Individual1']['values'][0]['joins']['Phone'][0]);
+    $this->assertNull($prefill['Individual1']['values'][0]['joins']['Phone'][0]);
     $this->assertEquals('2-2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
 
     // Create one new phone, update the other

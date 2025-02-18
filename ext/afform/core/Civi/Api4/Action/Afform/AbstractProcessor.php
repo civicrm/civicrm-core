@@ -252,7 +252,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $items = array_column($joinResult, NULL, 'location_type_id');
       $joinResult = [];
       foreach ($join['data']['location_type_id'] as $locationType) {
-        $joinResult[] = $items[$locationType] ?? [];
+        $joinResult[] = $items[$locationType] ?? NULL;
       }
     }
     $this->_entityIds[$afEntity['name']][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinResult, [$joinIdField]);
