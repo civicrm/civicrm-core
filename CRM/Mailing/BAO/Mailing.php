@@ -906,7 +906,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // Generating URLs is expensive, so we only call it once for each of these 5 URLs.
     $genericURL = CRM_Utils_System::url('civicrm/mailing/genericUrlPath', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE);
     $urls = [
-      'forward' => str_replace('genericUrlPath', 'forward', $genericURL),
       'unsubscribeUrl' => str_replace('genericUrlPath', 'unsubscribe', $genericURL),
       'resubscribeUrl' => str_replace('genericUrlPath', 'resubscribe', $genericURL),
       'optOutUrl' => str_replace('genericUrlPath', 'optout', $genericURL),
@@ -1259,7 +1258,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'reply' => CRM_Mailing_Event_BAO_MailingEventReply::getTableName(),
       'unsubscribe' => CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName(),
       'bounce' => CRM_Mailing_Event_BAO_MailingEventBounce::getTableName(),
-      'forward' => CRM_Mailing_Event_BAO_MailingEventForward::getTableName(),
       'url' => CRM_Mailing_BAO_MailingTrackableURL::getTableName(),
       'urlopen' => CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTableName(),
       'component' => CRM_Mailing_BAO_MailingComponent::getTableName(),
@@ -1389,7 +1387,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
                             COUNT(DISTINCT {$t['queue']}.id) as queue,
                             COUNT(DISTINCT {$t['delivered']}.id) as delivered,
                             COUNT(DISTINCT {$t['reply']}.id) as reply,
-                            COUNT(DISTINCT {$t['forward']}.id) as forward,
                             COUNT(DISTINCT {$t['bounce']}.id) as bounce,
                             COUNT(DISTINCT {$t['urlopen']}.id) as url,
                             COUNT(DISTINCT civicrm_mailing_spool.id) as spool
@@ -1398,8 +1395,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
                     ON      {$t['queue']}.job_id = civicrm_mailing_job.id
             LEFT JOIN       {$t['reply']}
                     ON      {$t['reply']}.event_queue_id = {$t['queue']}.id
-            LEFT JOIN       {$t['forward']}
-                    ON      {$t['forward']}.event_queue_id = {$t['queue']}.id
             LEFT JOIN       {$t['bounce']}
                     ON      {$t['bounce']}.event_queue_id = {$t['queue']}.id
             LEFT JOIN       {$t['delivered']}
@@ -1420,7 +1415,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'queue',
       'delivered',
       'url',
-      'forward',
       'reply',
       'unsubscribe',
       'optout',
@@ -1490,7 +1484,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'delivered' => CRM_Utils_System::url($path, "$arg&event=delivered"),
         'bounce' => CRM_Utils_System::url($path, "$arg&event=bounce"),
         'unsubscribe' => CRM_Utils_System::url($path, "$arg&event=unsubscribe"),
-        'forward' => CRM_Utils_System::url($path, "$arg&event=forward"),
         'reply' => CRM_Utils_System::url($path, "$arg&event=reply"),
         'opened' => CRM_Utils_System::url($path, "$arg&event=opened"),
       ];
@@ -1563,7 +1556,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'bounce' => CRM_Utils_System::url($path, "$arg&event=bounce"),
       'unsubscribe' => CRM_Utils_System::url($path, "$arg&event=unsubscribe"),
       'optout' => CRM_Utils_System::url($path, "$arg&event=optout"),
-      'forward' => CRM_Utils_System::url($path, "$arg&event=forward"),
       'reply' => CRM_Utils_System::url($path, "$arg&event=reply"),
       'opened' => CRM_Utils_System::url($path, "$arg&event=opened"),
     ];
@@ -1576,7 +1568,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $action = array_sum(array_keys($actionLinks));
 
     $report['event_totals']['actionlinks'] = [];
-    foreach (['clicks', 'clicks_unique', 'queue', 'delivered', 'bounce', 'unsubscribe', 'forward', 'reply', 'opened', 'opened_unique', 'optout'] as $key) {
+    foreach (['clicks', 'clicks_unique', 'queue', 'delivered', 'bounce', 'unsubscribe', 'reply', 'opened', 'opened_unique', 'optout'] as $key) {
       $url = 'mailing/detail';
       $reportFilter = "reset=1&mailing_id_value={$mailing_id}";
       $searchFilter = "force=1&mailing_id=%%mid%%";
@@ -1589,11 +1581,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         case 'bounce':
           $url = "mailing/bounce";
           $searchFilter .= "&mailing_delivery_status=N";
-          break;
-
-        case 'forward':
-          $reportFilter .= "&is_forwarded_value=1";
-          $searchFilter .= "&mailing_forward=1";
           break;
 
         case 'reply':

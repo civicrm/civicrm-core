@@ -34,9 +34,6 @@
       <td>{$report.event_totals.url} ({$report.event_totals.clickthrough_rate|string_format:"%0.2f"}%)</td>
       <td>{$report.event_totals.actionlinks.clicks}</td></tr>
 {/if}
-<tr><td class="label"><a href="{$report.event_totals.links.forward}">{ts}Forwards{/ts}</a></td>
-    <td>{$report.event_totals.forward}</td>
-    <td>{$report.event_totals.actionlinks.forward}</td></tr>
 <tr><td class="label"><a href="{$report.event_totals.links.reply}">{ts}Replies{/ts}</a></td>
     <td>{$report.event_totals.reply}</td>
     <td>{$report.event_totals.actionlinks.reply}</td></tr>
