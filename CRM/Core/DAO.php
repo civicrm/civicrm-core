@@ -1786,11 +1786,6 @@ LIKE %1
       $dao = new $daoName();
     }
 
-    if ($trapException) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-    }
-
     if ($dao->isValidOption($options)) {
       $dao->setOptions($options);
     }
@@ -1800,11 +1795,6 @@ LIKE %1
     // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
     if (($options['result_buffering'] ?? NULL) === 0) {
       $dao->N = TRUE;
-    }
-
-    if (is_a($result, 'DB_Error')) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
-      return $result;
     }
 
     return $dao;
