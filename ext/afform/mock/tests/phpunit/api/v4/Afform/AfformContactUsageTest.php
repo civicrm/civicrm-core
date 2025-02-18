@@ -718,4 +718,65 @@ EOHTML;
     $this->assertEquals([$contactType], $contact['contact_sub_type']);
   }
 
+  public function testMultipleLocationJoins(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <div actions="{update: true, delete: true}" class="af-container">
+      <div class="af-container af-layout-inline">
+        <af-field name="first_name" />
+        <af-field name="last_name" />
+      </div>
+    </div>
+    <div af-join="Phone" actions="{update: true, delete: true}" data="{location_type_id: 1}">
+      <div class="af-container af-layout-inline">
+        <af-field name="phone" defn="{required: false, input_attrs: {}}" />
+        <af-field name="phone_ext" />
+      </div>
+    </div>
+    <div af-join="Phone" actions="{update: true, delete: true}" data="{location_type_id: 2}">
+      <div class="af-container af-layout-inline">
+        <af-field name="phone" defn="{required: false, input_attrs: {}}" />
+      </div>
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $cid = $this->createTestRecord('Individual', [
+      'first_name' => 'One',
+      'last_name' => 'Name',
+    ])['id'];
+
+    $this->saveTestRecords('Phone', [
+      'records' => [
+        ['phone' => '1-1', 'location_type_id' => 1, 'phone_ext' => '111'],
+        ['phone' => '2-2', 'location_type_id' => 2, 'phone_ext' => '222'],
+      ],
+      'defaults' => [
+        'contact_id' => $cid,
+      ],
+    ]);
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->setArgs(['Individual1' => $cid])
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertCount(1, $prefill['Individual1']['values']);
+    $this->assertEquals('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('1-1', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone']);
+    $this->assertEquals('2-2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
+    $this->assertEquals('111', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone_ext']);
+  }
+
 }
