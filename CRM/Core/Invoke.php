@@ -370,47 +370,32 @@ class CRM_Core_Invoke {
    * @param bool $sessionReset
    *
    * @throws Exception
+   * @deprecated
+   *   Deprecated Feb 2025 in favor of Civi::rebuild().
+   *   Reassess after Jun 2026.
+   *   For an extension bridging before+after, suggest guard like:
+   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild(...)->execute()
+   *     else CRM_Core_Invoke::rebuildMenuAndCaches();
+   *   Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
   public static function rebuildMenuAndCaches(bool $triggerRebuild = FALSE, bool $sessionReset = FALSE): void {
-    $config = CRM_Core_Config::singleton();
-    $config->clearModuleList();
+    Civi::rebuild([
+      'ext' => TRUE,
+      'files' => TRUE,
+      'tables' => TRUE,
+      'sessions' => $sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+      'metadata' => TRUE,
+      'system' => TRUE,
+      'userjob' => TRUE,
+      'menu' => TRUE,
+      'perms' => TRUE,
+      'strings' => TRUE,
+      'settings' => TRUE,
+      'cases' => TRUE,
+      'triggers' => $triggerRebuild || CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+      'entities' => TRUE,
+    ])->execute();
 
-    // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
-    CRM_Extension_System::singleton()->getClassLoader()->refresh();
-    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
-
-    // also cleanup all caches
-    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
-
-    CRM_Core_Menu::store();
-
-    // also reset navigation
-    CRM_Core_BAO_Navigation::resetNavigation();
-
-    // also cleanup module permissions
-    $config->cleanupPermissions();
-
-    // rebuild word replacement cache - pass false to prevent operations redundant with this fn
-    CRM_Core_BAO_WordReplacement::rebuild(FALSE);
-
-    Civi::service('settings_manager')->flush();
-    // Clear js caches
-    CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
-    CRM_Case_XMLRepository::singleton(TRUE);
-
-    // also rebuild triggers if requested explicitly
-    if (
-      $triggerRebuild ||
-      CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET')
-    ) {
-      Civi::service('sql_triggers')->rebuild();
-      // Rebuild Drupal 8/9/10 route cache only if "triggerRebuild" is set to TRUE as it's
-      // computationally very expensive and only needs to be done when routes change on the Civi-side.
-      // For example - when uninstalling an extension. We already set "triggerRebuild" to true for these operations.
-      $config->userSystem->invalidateRouteCache();
-    }
-
-    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 
 }
