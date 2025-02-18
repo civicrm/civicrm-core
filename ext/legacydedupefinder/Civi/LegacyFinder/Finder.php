@@ -29,7 +29,7 @@ class Finder extends AutoSubscriber {
       $contactIDs = explode(',', \CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
     }
     $ruleGroup->contactIds = $contactIDs;
-    $tempTable = $ruleGroup->fillTable($ruleGroup->id, $contactIDs, []);
+    $tempTable = self::fillTable($ruleGroup, $ruleGroup->id, $contactIDs, []);
     if (!$tempTable) {
       return;
     }
@@ -67,7 +67,8 @@ class Finder extends AutoSubscriber {
       $duplicates[] = ['entity_id_1' => $dao->id1, 'entity_id_2' => $dao->id2, 'weight' => $dao->weight];
     }
     $event->duplicates = $duplicates;
-    \CRM_Core_DAO::executeQuery($ruleGroup->tableDropQuery());
+    // Does it ever exist?
+    \CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS dedupe');
   }
 
   public static function findDuplicates(GenericHookEvent $event): void {
@@ -79,7 +80,7 @@ class Finder extends AutoSubscriber {
     }
     $rgBao = new \CRM_Dedupe_BAO_DedupeRuleGroup();
     $rgBao->params = $event->dedupeParams['match_params'];
-    $dedupeTable = $rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], TRUE);
+    $dedupeTable = self::fillTable($rgBao, $event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], TRUE);
     if (!$dedupeTable) {
       $event->dedupeResults['ids'] = [];
       return;
@@ -108,8 +109,58 @@ class Finder extends AutoSubscriber {
         $dupes[] = $dao->id;
       }
     }
-    \CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
+    // Does it ever exist?
+    \CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS dedupe');
     $event->dedupeResults['ids'] = array_diff($dupes, $event->dedupeParams['excluded_contact_ids']);
+  }
+
+  /**
+   * Fill the dedupe finder table.
+   *
+   * @param \CRM_Dedupe_BAO_DedupeRuleGroup $ruleGroup
+   * @param int $id
+   * @param array $contactIDs
+   * @param array $params
+   * @param bool $legacyMode
+   *   Legacy mode is called to give backward hook compatibility, in the legacydedupefinder
+   *   extension. It is intended to be transitional, with the non-legacy mode being
+   *   separated out and optimized once it no longer has to comply with the legacy
+   *   hook and reserved query methodology.
+   *
+   * @return false|string
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @internal do not access from outside core.
+   *
+   */
+  private static function fillTable(\CRM_Dedupe_BAO_DedupeRuleGroup $ruleGroup, int $id, array $contactIDs, array $params, $legacyMode = TRUE) {
+    $ruleGroup->id = $id;
+    // make sure we've got a fetched dbrecord, not sure if this is enforced
+    $ruleGroup->find(TRUE);
+    $optimizer = new \CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, $params);
+    // Reserved Rule Groups can optionally get special treatment by
+    // implementing an optimization class and returning a query array.
+    if ($legacyMode && $optimizer->isUseReservedQuery()) {
+      $tableQueries = $optimizer->getReservedQuery();
+    }
+    else {
+      $tableQueries = $optimizer->getRuleQueries();
+    }
+    // if there are no rules in this rule group
+    // add an empty query fulfilling the pattern
+    if ($legacyMode) {
+      if (!$tableQueries) {
+        // Just for the hook.... (which is deprecated).
+        $ruleGroup->noRules = TRUE;
+      }
+      \CRM_Utils_Hook::dupeQuery($ruleGroup, 'table', $tableQueries);
+    }
+    if (empty($tableQueries)) {
+      return FALSE;
+    }
+    $threshold = $ruleGroup->threshold;
+
+    return $ruleGroup->runTablesQuery($params, $tableQueries, $threshold);
   }
 
 }
