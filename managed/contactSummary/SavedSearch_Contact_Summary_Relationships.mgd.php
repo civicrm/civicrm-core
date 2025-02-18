@@ -5,8 +5,13 @@ $civiCaseEnabled = CRM_Core_Component::isEnabled('CiviCase');
 $joins = [
   [
     'Contact AS RelationshipCache_Contact_far_contact_id_01',
-    'LEFT',
+    'INNER',
     ['far_contact_id', '=', 'RelationshipCache_Contact_far_contact_id_01.id'],
+  ],
+  [
+    'RelationshipType AS RelationshipCache_RelationshipType_relationship_type_id_01',
+    'INNER',
+    ['relationship_type_id', '=', 'RelationshipCache_RelationshipType_relationship_type_id_01.id'],
   ],
 ];
 $links = [
@@ -107,6 +112,7 @@ return [
           'orderBy' => [],
           'where' => [
             ['RelationshipCache_Contact_far_contact_id_01.is_deleted', '=', FALSE],
+            ['RelationshipCache_RelationshipType_relationship_type_id_01.is_active', '=', TRUE],
           ],
           'groupBy' => [],
           'join' => $joins,
