@@ -31,6 +31,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
     $this->addTask('Replace Clear Caches & Reset Paths with Clear Caches in Nav Menu', 'updateUpdateConfigBackendNavItem');
+    $this->addTask('Disable "Enable Components" Nav Item', 'disableComponentsNavItem');
   }
 
   /**
@@ -81,6 +82,19 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
           'administer CiviCRM', {$domainID}
         )
     ");
+
+    return TRUE;
+  }
+
+  /**
+   * Disable 'Enable Components' nav menu item - redundant with Extensions screen now
+   *
+   * @return bool
+   */
+  public static function disableComponentsNavItem() {
+    $domainID = CRM_Core_Config::domainID();
+
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_navigation SET is_active = 0 WHERE name = 'Enable Components' AND domain_id = {$domainID}");
 
     return TRUE;
   }
