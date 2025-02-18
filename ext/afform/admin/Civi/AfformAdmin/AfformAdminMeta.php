@@ -252,6 +252,32 @@ class AfformAdminMeta {
             '#markup' => FALSE,
           ],
         ],
+        'tabset' => [
+          'title' => E::ts('Tab Set'),
+          'element' => [
+            '#tag' => 'civi-tabset',
+            '#children' => [
+              [
+                '#tag' => 'details',
+                '#children' => [
+                  [
+                    '#tag' => 'summary',
+                    '#children' => [E::ts('Tab 1')]
+                  ]
+                ]
+              ],
+              [
+                '#tag' => 'details',
+                '#children' => [
+                  [
+                    '#tag' => 'summary',
+                    '#children' => [E::ts('Tab 2')]
+                  ]
+                ]
+              ],
+            ],
+          ],
+        ],
         'submit' => [
           'title' => E::ts('Submit Button'),
           'afform_type' => ['form'],
