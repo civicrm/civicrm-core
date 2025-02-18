@@ -171,7 +171,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->importCSV('cancel_participant.csv', [
       ['name' => 'id'],
       ['name' => 'status_id'],
-      ['name' => $this->getCustomFieldName('radio')],
+      ['name' => $this->getCustomFieldName('radio', 4)],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -238,23 +238,24 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'status_id'],
       ['name' => 'register_date'],
       ['name' => 'do_not_import'],
-      ['name' => $this->getCustomFieldName('checkbox')],
+      ['name' => $this->getCustomFieldName('checkbox', 4)],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $result = $this->callAPISuccess('Participant', 'get', [
-      'contact_id' => $contactID,
-      'sequential' => TRUE,
-    ])['values'][0];
 
-    $this->assertEquals($row['event_title'], $result['event_title']);
-    $this->assertEquals($row['fee_amount'], $result['participant_fee_amount']);
-    $this->assertEquals($row['participant_source'], $result['participant_source']);
-    $this->assertEquals($row['participant_status'], $result['participant_status']);
-    $this->assertEquals('2022-12-07 00:00:00', $result['participant_register_date']);
-    $this->assertEquals(['Attendee', 'Volunteer'], $result['participant_role']);
-    $this->assertEquals(0, $result['participant_is_pay_later']);
-    $this->assertEquals(['P', 'M'], array_keys($result[$this->getCustomFieldName('checkbox')]));
+    $participant = Participant::get(FALSE)
+      ->addWhere('id', '=', $row['_entity_id'])
+      ->addSelect('*', 'event_id.title', 'status_id:label', 'role_id:label')
+      ->addSelect($this->getCustomFieldName('checkbox', 4))
+      ->execute()->first();
+    $this->assertEquals($row['event_title'], $participant['event_id.title']);
+    $this->assertEquals($row['fee_amount'], $participant['fee_amount']);
+    $this->assertEquals('Phoned up', $participant['source']);
+    $this->assertEquals($row['participant_status'], $participant['status_id:label']);
+    $this->assertEquals('2022-12-07 00:00:00', $participant['register_date']);
+    $this->assertEquals(['Attendee', 'Volunteer'], $participant['role_id:label']);
+    $this->assertEquals(0, $participant['is_pay_later']);
+    $this->assertEquals(['P', 'M'], $participant[$this->getCustomFieldName('checkbox', 4)]);
   }
 
   /**

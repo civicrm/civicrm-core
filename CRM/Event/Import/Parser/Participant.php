@@ -91,7 +91,9 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         if (!$this->isUpdateExisting()) {
           throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
         }
-        $newParticipant = civicrm_api3('Participant', 'create', $participantParams);
+        $newParticipant = Participant::update(FALSE)
+          ->setValues($participantParams)
+          ->execute()->first();
         $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
         return;
       }
@@ -111,7 +113,9 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           return;
         }
       }
-      $newParticipant = civicrm_api3('Participant', 'create', $participantParams);
+      $newParticipant = Participant::create(FALSE)
+        ->setValues($participantParams)
+        ->execute()->first();
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
@@ -128,6 +132,12 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
+      $allParticipantFields = (array) Participant::getFields()
+        ->addWhere('readonly', '=', FALSE)
+        ->addWhere('usage', 'CONTAINS', 'import')
+        ->setAction('save')
+        ->addOrderBy('title')
+        ->execute()->indexBy('name');
       $fields = array_merge(
         [
           '' => ['title' => ts('- do not import -')],
@@ -139,8 +149,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
             'options' => FALSE,
           ],
         ],
-        $this->getImportFieldsForEntity('Participant'),
-        CRM_Core_BAO_CustomField::getFieldsForImport('Participant')
+        $allParticipantFields
       );
       $contactFields = $this->getContactFields($this->getContactType());
       $fields['contact_id'] = $contactFields['id'];

@@ -144,7 +144,6 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
-
   /**
    * Update the fields that have been converted to apiv4 within the field mappings
    * - participant_import : email => email_primary.email (there are no other pre-existing contact fields)
@@ -172,7 +171,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       SELECT custom_field.id, custom_field.name, custom_group.name as custom_group_name
       FROM civicrm_custom_field custom_field INNER JOIN civicrm_custom_group custom_group
       ON custom_field.custom_group_id = custom_group.id
-      WHERE extends IN ("Contact", "Individual", "Organization", "Household")
+      WHERE extends IN ("Contact", "Individual", "Organization", "Household", "Participant")
     ');
     while ($customFields->fetch()) {
       $fieldsToConvert['custom_' . $customFields->id] = $customFields->custom_group_name . '.' . $customFields->name;
