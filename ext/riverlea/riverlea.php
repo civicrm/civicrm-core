@@ -88,6 +88,10 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
       \Civi\riverlea\DynamicCss::getCssParams()
     ));
   }
+  // TODO: add a non-admin permission for using Previewer
+  if (\CRM_Core_Permission::check('administer CiviCRM')) {
+    \Civi::resources()->addScriptFile('riverlea', 'js/previewer.js');
+  }
 }
 
 /**
