@@ -600,4 +600,22 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     return NULL;
   }
 
+  /**
+   * @param array $rule
+   * @param array $mapper
+   * @param array $contactIdentifierFields
+   *
+   * @return array
+   */
+  protected function validateContactFields(array $rule, array $mapper, array $contactIdentifierFields): array {
+    $mapperError = [];
+    if (!$this->isUpdateExisting()) {
+      $missingDedupeFields = $this->validateDedupeFieldsSufficientInMapping($rule, $mapper, $contactIdentifierFields);
+      if ($missingDedupeFields) {
+        $mapperError[] = $missingDedupeFields;
+      }
+    }
+    return $mapperError;
+  }
+
 }

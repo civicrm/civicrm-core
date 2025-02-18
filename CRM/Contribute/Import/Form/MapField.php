@@ -33,7 +33,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Should contact fields be filtered which determining fields to show.
    *
    * This applies to Contribution import as we put all contact fields in the metadata
-   * but only present those used for a match - but will permit create via LeXIM.
+   * but only present those used for a match in QuickForm - the civiimport extension has
+   * more functionality to update and create.
    *
    * @return bool
    */
@@ -136,12 +137,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     try {
       $parser = $self->getParser();
       $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-      if (!$self->isUpdateExisting()) {
-        $missingDedupeFields = $self->validateDedupeFieldsSufficientInMapping($rule, $fields['mapper'], ['external_identifier', 'contribution_contact_id', 'contact__id']);
-        if ($missingDedupeFields) {
-          $mapperError[] = $missingDedupeFields;
-        }
-      }
+      $mapperError = $self->validateContactFields($rule, $fields['mapper'], ['external_identifier', 'contribution_contact_id', 'contact__id']);
       $parser->validateMapping($fields['mapper']);
     }
     catch (CRM_Core_Exception $e) {

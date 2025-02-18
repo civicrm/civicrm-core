@@ -30,6 +30,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    */
   protected $isUpdatedForEntityRowParsing = TRUE;
 
+  protected string $baseEntity = 'Participant';
+
   /**
    * Get information about the provided job.
    *
@@ -80,7 +82,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         $participantParams['contact_id'] = !empty($participantParams['contact_id']) ? (int) $participantParams['contact_id'] : $existingParticipant['contact_id'];
       }
 
-      $participantParams['contact_id'] = $this->getContactID($contactParams, $participantParams['contact_id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      $participantParams['contact_id'] = $this->getContactID($contactParams, $participantParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
       // don't add to recent items, CRM-4399
       $participantParams['skipRecentView'] = TRUE;
 
@@ -138,12 +140,14 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           ],
         ],
         $this->getImportFieldsForEntity('Participant'),
-        CRM_Core_BAO_CustomField::getFieldsForImport('Participant'),
-        $this->getContactMatchingFields()
+        CRM_Core_BAO_CustomField::getFieldsForImport('Participant')
       );
-
+      $contactFields = $this->getContactFields($this->getContactType());
+      $fields['contact_id'] = $contactFields['id'];
+      unset($contactFields['id']);
       $fields['contact_id']['title'] .= ' (match to contact)';
       $fields['contact_id']['html']['label'] = $fields['contact_id']['title'];
+      $fields += $contactFields;
       $this->importableFieldsMetadata = $fields;
     }
   }
