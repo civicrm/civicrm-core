@@ -4509,15 +4509,6 @@ LOCK TABLES `civicrm_mailing_event_delivered` WRITE;
 UNLOCK TABLES;
 
 --
--- Dumping data for table `civicrm_mailing_event_forward`
---
-
-LOCK TABLES `civicrm_mailing_event_forward` WRITE;
-/*!40000 ALTER TABLE `civicrm_mailing_event_forward` DISABLE KEYS */;
-/*!40000 ALTER TABLE `civicrm_mailing_event_forward` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Dumping data for table `civicrm_mailing_event_opened`
 --
 
@@ -5211,7 +5202,6 @@ INSERT INTO `civicrm_menu` (`id`, `domain_id`, `path`, `path_arguments`, `title`
  (387,1,'civicrm/mailing/confirm',NULL,'Confirm','a:2:{i:0;s:19:\"CRM_Core_Permission\";i:1;s:9:\"checkMenu\";}','a:2:{i:0;a:1:{i:0;s:43:\"access CiviMail subscribe/unsubscribe pages\";}i:1;s:3:\"and\";}','s:24:\"CRM_Mailing_Page_Confirm\";',NULL,'a:2:{i:0;a:2:{s:5:\"title\";s:7:\"CiviCRM\";s:3:\"url\";s:16:\"/civicrm?reset=1\";}i:1;a:2:{s:5:\"title\";s:8:\"CiviMail\";s:3:\"url\";s:24:\"/civicrm/mailing?reset=1\";}}',NULL,NULL,4,1,1,1,0,660,1,0,0,'a:0:{}'),
  (388,1,'civicrm/mailing/subscribe',NULL,'Subscribe','a:2:{i:0;s:19:\"CRM_Core_Permission\";i:1;s:9:\"checkMenu\";}','a:2:{i:0;a:1:{i:0;s:43:\"access CiviMail subscribe/unsubscribe pages\";}i:1;s:3:\"and\";}','s:26:\"CRM_Mailing_Form_Subscribe\";',NULL,'a:2:{i:0;a:2:{s:5:\"title\";s:7:\"CiviCRM\";s:3:\"url\";s:16:\"/civicrm?reset=1\";}i:1;a:2:{s:5:\"title\";s:8:\"CiviMail\";s:3:\"url\";s:24:\"/civicrm/mailing?reset=1\";}}',NULL,NULL,4,1,1,1,0,660,1,0,0,'a:0:{}'),
  (389,1,'civicrm/mailing/report','mid=%%mid%%','Mailing Report','a:2:{i:0;s:19:\"CRM_Core_Permission\";i:1;s:9:\"checkMenu\";}','a:2:{i:0;a:2:{i:0;s:15:\"access CiviMail\";i:1;s:15:\"create mailings\";}i:1;s:2:\"or\";}','s:23:\"CRM_Mailing_Page_Report\";',NULL,'a:2:{i:0;a:2:{s:5:\"title\";s:7:\"CiviCRM\";s:3:\"url\";s:16:\"/civicrm?reset=1\";}i:1;a:2:{s:5:\"title\";s:8:\"CiviMail\";s:3:\"url\";s:24:\"/civicrm/mailing?reset=1\";}}',NULL,NULL,4,1,0,1,0,680,1,0,0,'a:0:{}'),
- (390,1,'civicrm/mailing/forward',NULL,'Forward Mailing','a:2:{i:0;s:19:\"CRM_Core_Permission\";i:1;s:9:\"checkMenu\";}','a:2:{i:0;a:1:{i:0;s:43:\"access CiviMail subscribe/unsubscribe pages\";}i:1;s:3:\"and\";}','s:31:\"CRM_Mailing_Form_ForwardMailing\";',NULL,'a:2:{i:0;a:2:{s:5:\"title\";s:7:\"CiviCRM\";s:3:\"url\";s:16:\"/civicrm?reset=1\";}i:1;a:2:{s:5:\"title\";s:8:\"CiviMail\";s:3:\"url\";s:24:\"/civicrm/mailing?reset=1\";}}',NULL,NULL,4,1,1,1,0,685,1,0,0,'a:0:{}'),
  (391,1,'civicrm/mailing/report/event',NULL,'Mailing Event','a:2:{i:0;s:19:\"CRM_Core_Permission\";i:1;s:9:\"checkMenu\";}','a:2:{i:0;a:1:{i:0;s:15:\"access CiviMail\";}i:1;s:3:\"and\";}','s:22:\"CRM_Mailing_Page_Event\";',NULL,'a:3:{i:0;a:2:{s:5:\"title\";s:7:\"CiviCRM\";s:3:\"url\";s:16:\"/civicrm?reset=1\";}i:1;a:2:{s:5:\"title\";s:8:\"CiviMail\";s:3:\"url\";s:24:\"/civicrm/mailing?reset=1\";}i:2;a:2:{s:5:\"title\";s:14:\"Mailing Report\";s:3:\"url\";s:47:\"/civicrm/mailing/report?reset=1&amp;mid=%%mid%%\";}}',NULL,NULL,4,1,0,1,0,695,1,0,0,'a:0:{}'),
  (392,1,'civicrm/ajax/template',NULL,NULL,'a:2:{i:0;s:19:\"CRM_Core_Permission\";i:1;s:9:\"checkMenu\";}','a:2:{i:0;a:1:{i:0;s:14:\"access CiviCRM\";}i:1;s:3:\"and\";}','a:2:{i:0;s:21:\"CRM_Mailing_Page_AJAX\";i:1;s:8:\"template\";}',NULL,'a:1:{i:0;a:2:{s:5:\"title\";s:7:\"CiviCRM\";s:3:\"url\";s:16:\"/civicrm?reset=1\";}}',NULL,NULL,NULL,1,0,1,0,1,1,0,0,'a:0:{}'),
  (393,1,'civicrm/mailing/view',NULL,'View Mailing','a:2:{i:0;s:19:\"CRM_Core_Permission\";i:1;s:9:\"checkMenu\";}','a:2:{i:0;a:3:{i:0;s:28:\"view public CiviMail content\";i:1;s:15:\"access CiviMail\";i:2;s:16:\"approve mailings\";}i:1;s:2:\"or\";}','s:21:\"CRM_Mailing_Page_View\";',NULL,'a:2:{i:0;a:2:{s:5:\"title\";s:7:\"CiviCRM\";s:3:\"url\";s:16:\"/civicrm?reset=1\";}i:1;a:2:{s:5:\"title\";s:8:\"CiviMail\";s:3:\"url\";s:24:\"/civicrm/mailing?reset=1\";}}',NULL,NULL,4,1,1,1,0,800,1,0,0,'a:0:{}'),
