@@ -1786,11 +1786,6 @@ LIKE %1
       $dao = new $daoName();
     }
 
-    if ($trapException) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-    }
-
     if ($dao->isValidOption($options)) {
       $dao->setOptions($options);
     }
