@@ -4,6 +4,7 @@ namespace api\v4\Afform;
 use Civi\Api4\Afform;
 use Civi\Api4\AfformSubmission;
 use Civi\Api4\Contact;
+use Civi\Api4\Phone;
 
 /**
  * Test case for Afform.checkAccess, Afform.prefill and Afform.submit.
@@ -755,15 +756,12 @@ EOHTML;
       'last_name' => 'Name',
     ])['id'];
 
-    $this->saveTestRecords('Phone', [
-      'records' => [
-        ['phone' => '1-1', 'location_type_id' => 1, 'phone_ext' => '111'],
-        ['phone' => '2-2', 'location_type_id' => 2, 'phone_ext' => '222'],
-      ],
-      'defaults' => [
-        'contact_id' => $cid,
-      ],
-    ]);
+    $phone2 = $this->createTestRecord('Phone', [
+      'phone' => '2-2',
+      'location_type_id' => 2,
+      'phone_ext' => '222',
+      'contact_id' => $cid,
+    ])['id'];
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
@@ -774,9 +772,91 @@ EOHTML;
 
     $this->assertCount(1, $prefill['Individual1']['values']);
     $this->assertEquals('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('1-1', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone']);
+    $this->assertEmpty($prefill['Individual1']['values'][0]['joins']['Phone'][0]);
     $this->assertEquals('2-2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
+
+    // Create one new phone, update the other
+    $submitValues = [
+      [
+        'fields' => ['first_name' => 'Firsty', 'last_name' => 'Lasty'],
+        'joins' => [
+          'Phone' => [
+            ['phone' => '1-1-1', 'phone_ext' => '111'],
+            ['id' => $phone2, 'phone' => '2-2-2'],
+          ],
+        ],
+      ],
+    ];
+    $submit = Afform::submit()
+      ->setName($this->formName)
+      ->setArgs(['Individual1' => $cid])
+      ->setValues(['Individual1' => $submitValues])
+      ->execute();
+
+    $phoneValues = Phone::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addOrderBy('location_type_id')
+      ->execute();
+
+    $this->assertCount(2, $phoneValues);
+    $this->assertEquals(1, $phoneValues[0]['location_type_id']);
+    $this->assertEquals('1-1-1', $phoneValues[0]['phone']);
+    $this->assertEquals('111', $phoneValues[0]['phone_ext']);
+    $this->assertEquals(2, $phoneValues[1]['location_type_id']);
+    $this->assertEquals('2-2-2', $phoneValues[1]['phone']);
+    $this->assertEquals('222', $phoneValues[1]['phone_ext']);
+
+    // Create a new contact with no phones
+    $cid = $this->createTestRecord('Individual', [
+      'first_name' => 'Two',
+      'last_name' => 'Name',
+    ])['id'];
+
+    // Create one new phone, update the other
+    $submitValues = [
+      [
+        'fields' => ['first_name' => 'Two', 'last_name' => 'Lasty'],
+        'joins' => [
+          'Phone' => [
+            ['phone' => '1', 'phone_ext' => '111'],
+            ['phone' => '2'],
+          ],
+        ],
+      ],
+    ];
+    $submit = Afform::submit()
+      ->setName($this->formName)
+      ->setArgs(['Individual1' => $cid])
+      ->setValues(['Individual1' => $submitValues])
+      ->execute();
+
+    $phoneValues = Phone::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addOrderBy('location_type_id')
+      ->execute();
+
+    $this->assertCount(2, $phoneValues);
+    $this->assertEquals(1, $phoneValues[0]['location_type_id']);
+    $this->assertEquals('1', $phoneValues[0]['phone']);
+    $this->assertEquals('111', $phoneValues[0]['phone_ext']);
+    $this->assertEquals(2, $phoneValues[1]['location_type_id']);
+    $this->assertEquals('2', $phoneValues[1]['phone']);
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->setArgs(['Individual1' => $cid])
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertCount(1, $prefill['Individual1']['values']);
+    $this->assertEquals('Two', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('1', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone']);
+    $this->assertEquals($phoneValues[0]['id'], $prefill['Individual1']['values'][0]['joins']['Phone'][0]['id']);
     $this->assertEquals('111', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone_ext']);
+    $this->assertEquals('2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
+    $this->assertEquals($phoneValues[1]['id'], $prefill['Individual1']['values'][0]['joins']['Phone'][1]['id']);
+
   }
 
 }

@@ -636,7 +636,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
             }
 
             // Merge in pre-set data
-            $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
+            foreach ($entity['joins'][$joinEntity]['data'] ?? [] as $dataKey => $dataVal) {
+              // For multiple location blocks, values will be in an array (see FormDataModel::parseFields)
+              if (is_array($dataVal) && array_key_exists($index, $dataVal)) {
+                $joinValues[$index][$dataKey] = $dataVal[$index];
+              }
+              else {
+                $joinValues[$index][$dataKey] = $dataVal;
+              }
+            }
           }
         }
         $entityValues[$entityName][] = $values;
