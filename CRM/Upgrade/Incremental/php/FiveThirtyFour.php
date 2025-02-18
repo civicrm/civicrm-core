@@ -240,7 +240,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
       MODIFY COLUMN `is_deductible` tinyint(4) DEFAULT 0 NOT NULL COMMENT 'Is this financial type tax-deductible? If true, contributions of this type may be fully OR partially deductible - non-deductible amount is stored in the Contribution record.',
       MODIFY COLUMN `is_reserved` tinyint(4) DEFAULT 0 NOT NULL COMMENT 'Is this a predefined system object?',
       MODIFY COLUMN `is_active` tinyint(4) DEFAULT 1 NOT NULL COMMENT 'Is this property active?'
-    ");
+    ", [], TRUE, NULL, FALSE, FALSE);
 
     return TRUE;
   }
