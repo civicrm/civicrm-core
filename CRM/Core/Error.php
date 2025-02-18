@@ -918,6 +918,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * @deprecated since 6.1 will be removed around 6.13
+   *
    * @param $message
    * @param int $code
    * @param string $level
@@ -926,6 +928,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @return object
    */
   public static function createError($message, $code = 8000, $level = 'Fatal', $params = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('something that is less silly');
     $error = CRM_Core_Error::singleton();
     $error->push($code, $level, [$params], $message);
     return $error;
