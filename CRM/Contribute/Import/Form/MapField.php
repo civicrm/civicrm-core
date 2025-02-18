@@ -137,7 +137,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $parser = $self->getParser();
       $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
       if (!$self->isUpdateExisting()) {
-        $missingDedupeFields = $self->validateDedupeFieldsSufficientInMapping($rule, $fields['mapper']);
+        $missingDedupeFields = $self->validateDedupeFieldsSufficientInMapping($rule, $fields['mapper'], ['external_identifier', 'contribution_contact_id', 'contact__id']);
         if ($missingDedupeFields) {
           $mapperError[] = $missingDedupeFields;
         }
@@ -202,44 +202,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     return $defaults;
-  }
-
-  /**
-   * Validate the the mapped fields contain enough to meet the dedupe rule lookup requirements.
-   *
-   * @param array $rule
-   * @param array $mapper
-   *
-   * @return string|false
-   *   Error string if insufficient.
-   */
-  protected function validateDedupeFieldsSufficientInMapping(array $rule, array $mapper): ?string {
-    $threshold = $rule['threshold'];
-    $ruleFields = $rule['fields'];
-    $weightSum = 0;
-    foreach ($mapper as $mapping) {
-      // Because api v4 style fields have a . and QuickForm multiselect js does
-      // not cope with a . the quick form layer will use a double underscore
-      // as a stand in (the angular layer will not)
-      $fieldName = str_replace('__', '.', $mapping[0]);
-      if (str_contains($fieldName, '.')) {
-        // If the field name contains a . - eg. address_primary.street_address
-        // we just want the part after the .
-        $fieldName = substr($fieldName, strpos($fieldName, '.') + 1);
-      }
-      if ($fieldName === 'external_identifier' || $fieldName === 'contribution_contact_id' || $fieldName === 'contact__id') {
-        // It is enough to have external identifier mapped.
-        $weightSum = $threshold;
-        break;
-      }
-      if (array_key_exists($fieldName, $ruleFields)) {
-        $weightSum += $ruleFields[$fieldName];
-      }
-    }
-    if ($weightSum < $threshold) {
-      return $rule['rule_message'];
-    }
-    return NULL;
   }
 
   /**
