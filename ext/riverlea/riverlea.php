@@ -90,11 +90,23 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
     ]);
   }
   if ($bundle->name === 'coreResources') {
-    // get DynamicCss asset
-    $bundle->addStyleUrl(\Civi::service('asset_builder')->getUrl(
+    // get DynamicCss asset URL
+    $riverUrl = \Civi::service('asset_builder')->getUrl(
       \Civi\riverlea\DynamicCss::CSS_FILE,
-      \Civi\riverlea\DynamicCss::getCssParams()
-    ));
+      Civi::service('riverlea.dynamic_css')->getCssParams()
+    );
+
+    $bundle->addStyleUrl($riverUrl);
+
+    // pass the river url to the clientside, so the previewer can easily remove it
+    \Civi::resources()->addVars('riverlea', [
+      'river_url' => $riverUrl,
+    ]);
+
+  }
+  // TODO: add a non-admin permission for using Previewer
+  if (\CRM_Core_Permission::check('administer CiviCRM')) {
+    \Civi::resources()->addScriptFile('riverlea', 'js/previewer.js');
   }
 }
 
@@ -114,4 +126,52 @@ function riverlea_civicrm_install() {
  */
 function riverlea_civicrm_enable() {
   _riverlea_civix_civicrm_enable();
+}
+
+/**
+ * Implements search tasks hook to add the `activate` action
+ *
+ * @param array $tasks
+ * @param bool $checkPermissions
+ * @param int|null $userId
+ */
+function riverlea_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userId) {
+  if ($checkPermissions && !CRM_Core_Permission::check('administer CiviCRM', $userId)) {
+    return;
+  }
+  $tasks['RiverleaStream']['activate_backend'] = [
+    'title' => E::ts('Activate for Backend'),
+    'icon' => 'fa-briefcase',
+    'number' => '=== 1',
+    'apiBatch' => [
+      'action' => 'activate',
+      'params' => ['backOrFront' => 'backend'],
+      'confirmMsg' => E::ts('Activate stream for backend pages?'),
+      'runMsg' => E::ts('Activating stream...'),
+      'successMsg' => E::ts('Stream activated. You may need to refresh the page or clear your browser cache to see the full effect.'),
+      'errorMsg' => E::ts('An error occurred while attempting to activate the stream.'),
+    ],
+  ];
+  $tasks['RiverleaStream']['activate_frontend'] = [
+    'title' => E::ts('Activate for Frontend'),
+    'icon' => 'fa-shop',
+    'number' => '=== 1',
+    'apiBatch' => [
+      'action' => 'activate',
+      'params' => ['backOrFront' => 'frontend'],
+      'confirmMsg' => E::ts('Activate stream for frontend pages?'),
+      'runMsg' => E::ts('Activating stream...'),
+      'successMsg' => E::ts('Stream activated. You may need to refresh the page or clear your browser cache to see the full effect.'),
+      'errorMsg' => E::ts('An error occurred while attempting to activate the stream.'),
+    ],
+  ];
+  $tasks['RiverleaStream']['preview'] = [
+    'title' => E::ts('Preview'),
+    'icon' => 'fa-eye',
+    'number' => '=== 1',
+    'crmPopup' => [
+      'path' => "/civicrm",
+      'data' => "{name: name.join(',')",
+    ],
+  ];
 }
