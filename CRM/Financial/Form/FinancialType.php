@@ -120,10 +120,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
       foreach (['is_active', 'is_reserved', 'is_deductible'] as $field) {
         $params[$field] ??= FALSE;
       }
-      $financialType = civicrm_api4('FinancialType', 'save', [
-        'records' => [$params],
-        'checkPermissions' => TRUE,
-      ])->first();
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+        $params['id'] ?? NULL,
+        'FinancialType'
+      );
+      $financialType = (array) CRM_Financial_BAO_FinancialType::writeRecord($params);
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType', 'reset=1&action=browse');
         CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', [1 => $params['label']]), ts('Saved'), 'success');
