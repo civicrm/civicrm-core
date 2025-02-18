@@ -94,7 +94,6 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
         ],
       ]);
 
-    $this->saveTestRecords('MailingEventForward', $twiceOneQueue);
     $this->saveTestRecords('MailingEventReply', $twiceOneQueue);
     $this->saveTestRecords('MailingEventUnsubscribe',
       [

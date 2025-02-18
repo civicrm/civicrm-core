@@ -644,7 +644,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'mailing_click_status',
           'mailing_reply_status',
           'mailing_optout',
-          'mailing_forward',
           'mailing_unsubscribe',
           'mailing_date_low',
           'mailing_date_high',
