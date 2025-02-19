@@ -564,7 +564,7 @@ class Api4SelectQuery extends Api4Query {
         if ($field['entity'] !== $joinEntity && $field['fk_entity'] === $joinEntity) {
           $conditions[] = $this->treeWalkClauses([$name, '=', "$alias.id"], 'ON');
         }
-        elseif (strpos($name, "$alias.") === 0 && substr_count($name, '.') === 1 && $field['fk_entity'] === $this->getEntity()) {
+        elseif (str_starts_with($name, "$alias.") && substr_count($name, '.') === 1 && $field['fk_entity'] === $this->getEntity()) {
           $conditions[] = $this->treeWalkClauses([$name, '=', 'id'], 'ON');
           $aclStack = ['id'];
         }

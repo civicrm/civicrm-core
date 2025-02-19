@@ -414,7 +414,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
     ]);
     $comparison = [];
     foreach ($tokenProcessor->listTokens() as $token => $label) {
-      if (strpos($token, '{domain.') === 0) {
+      if (str_starts_with($token, '{domain.')) {
         // domain token - ignore.
         continue;
       }
