@@ -146,7 +146,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
       'details' => $input['details'],
       'activity_type_id' => $input['activity_type'],
       'source_record_id' => ($input['activity_type'] === 'Bulk Email' ? $this->mailing_id : NULL),
-      'case_id' => (strpos($input['url'], 'caseid') === FALSE ? NULL : $this->case_id),
+      'case_id' => (!str_contains($input['url'], 'caseid') ? NULL : $this->case_id),
     ]);
 
     // We have to replace these at runtime because dataproviders are

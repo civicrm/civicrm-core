@@ -16,7 +16,7 @@ $GLOBALS['CIVICRM_FORCE_MODULES'][] = 'civitest';
 
 function civitest_civicrm_scanClasses(array &$classes): void {
   $phpunit = \Civi::paths()->getPath('[civicrm.root]/tests/phpunit');
-  if (strpos(get_include_path(), $phpunit) !== FALSE) {
+  if (str_contains(get_include_path(), $phpunit)) {
     \Civi\Core\ClassScanner::scanFolders($classes, $phpunit, 'CRM/*/WorkflowMessage', '_', '/Test$/');
     \Civi\Core\ClassScanner::scanFolders($classes, $phpunit, 'Civi/*/WorkflowMessage', '\\', '/Test$/');
     // Exclude all `*Test.php` files - if we load them, then phpunit gets confused.

@@ -137,7 +137,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
     $found = FALSE;
     foreach ($result['metadata']['sql'] as $sql) {
-      if (strpos($sql, " =  'Organization' ") !== FALSE) {
+      if (str_contains($sql, " =  'Organization' ")) {
         $found = TRUE;
       }
     }

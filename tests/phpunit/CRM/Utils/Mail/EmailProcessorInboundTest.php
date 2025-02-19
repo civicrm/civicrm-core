@@ -146,7 +146,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
       return;
     }
     // change the activity type depending on subject
-    if (strpos($mail->subject, 'for hooks') !== FALSE) {
+    if (str_contains($mail->subject, 'for hooks')) {
       $this->callAPISuccess('Activity', 'create', ['id' => $result['id'], 'activity_type_id' => 'Phone Call']);
     }
   }
