@@ -192,7 +192,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           break;
 
         default:
-          if (strpos($entityType, 'Model') !== FALSE) {
+          if (str_contains($entityType, 'Model')) {
             $entity = str_replace('Model', '', $entityType);
             $backboneModel = self::convertCiviModelToBackboneModel(
               $entity,
