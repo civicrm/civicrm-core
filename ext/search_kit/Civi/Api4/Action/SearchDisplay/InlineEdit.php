@@ -84,7 +84,7 @@ class InlineEdit extends Run {
     foreach ($columns as $columnIndex => $column) {
       // Editable column
       $editableInfo = $existingValues['columns'][$columnIndex]['edit'] ?? NULL;
-      if (array_key_exists($column['key'], $this->values) && $editableInfo) {
+      if ($editableInfo && array_key_exists($column['key'], $this->values)) {
         $value = $this->values[$column['key']];
         if (empty($editableInfo['nullable']) && ($value === NULL || $value === '')) {
           continue;
