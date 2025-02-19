@@ -55,7 +55,6 @@
   /* these colour descriptions are used prescriptively */
   --crm-c-yellow-light: var(--crm-c-dkblue-01);
   --crm-c-yellow-less-light: var(--crm-c-dkblue-02);
-  --crm-c-logo-text: #fff;
 }
 
 .crm-container div.crm-summary-row div.crm-label {
@@ -110,11 +109,7 @@
 }
 /* .crm-container .crm-search-nav-tabs { border-color: var(--crm-c-dkblue-01); } */
 
-/* Override standalone.css */
-.standalone-auth-box {
-  background: var(--crm-c-dkblue-01) !important;
-  color: white !important;
-}
+/* override standalone.css */
 #login-form {
   --crm-big-input: 100%;
 }
