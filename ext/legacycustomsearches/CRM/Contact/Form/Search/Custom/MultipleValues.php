@@ -223,7 +223,7 @@ contact_a.sort_name    as sort_name,
     $params = [];
     $name = $this->_formValues['sort_name'] ?? NULL;
     if ($name != NULL) {
-      if (strpos($name, '%') === FALSE) {
+      if (!str_contains($name, '%')) {
         $name = "%{$name}%";
       }
       $params[$count] = [$name, 'String'];

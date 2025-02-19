@@ -110,7 +110,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         }
       }
       catch (CryptoException $e) {
-        if (strpos($e->getMessage(), 'Expired token') !== FALSE) {
+        if (str_contains($e->getMessage(), 'Expired token')) {
           $check->reject('Expired token');
         }
 
