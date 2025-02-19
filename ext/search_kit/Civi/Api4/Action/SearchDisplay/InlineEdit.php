@@ -61,8 +61,13 @@ class InlineEdit extends Run {
   public function updateExistingRow(): void {
     // Apply rowKey to filters
     $entityName = $this->savedSearch['api_entity'];
-    $keyName = CoreUtil::getIdFieldName($entityName);
-    $this->applyFilter($keyName, $this->rowKey);
+    $keyName = $filterKey = CoreUtil::getIdFieldName($entityName);
+    // Hack to support relationships
+    if ($entityName === 'RelationshipCache') {
+      $filterKey = 'relationship_id';
+      $entityName = 'Relationship';
+    }
+    $this->applyFilter($filterKey, $this->rowKey);
     $this->return = NULL;
     $this->_apiParams['offset'] = 0;
 
@@ -79,7 +84,7 @@ class InlineEdit extends Run {
     foreach ($columns as $columnIndex => $column) {
       // Editable column
       $editableInfo = $existingValues['columns'][$columnIndex]['edit'] ?? NULL;
-      if (array_key_exists($column['key'], $this->values) && $editableInfo) {
+      if ($editableInfo && array_key_exists($column['key'], $this->values)) {
         $value = $this->values[$column['key']];
         if (empty($editableInfo['nullable']) && ($value === NULL || $value === '')) {
           continue;
