@@ -434,10 +434,11 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
  * unavailable on the host and port that you specify. By default CiviCRM will use
  * an in-memory array cache.
  *
- * To use the php extension memcache  use a value of 'Memcache'
- * To use the php extension memcached use a value of 'Memcached'
- * To use the php extension apc       use a value of 'APCcache'
- * To use the php extension redis     use a value of 'Redis'
+ * To use the php extension memcache    use a value of 'Memcache'
+ * To use the php extension memcached   use a value of 'Memcached'
+ * To use the php extension apc         use a value of 'APCcache'
+ * To use the php extension redis       use a value of 'Redis'
+ * To use the filesystem                use a value of 'FileCache'
  * To not use any caching (not recommended), use a value of 'NoCache'
  *
  */
