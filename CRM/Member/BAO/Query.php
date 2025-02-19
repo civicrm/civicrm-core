@@ -251,7 +251,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       case 'member_id':
       case 'member_campaign_id':
 
-        if (strpos($name, 'status') !== FALSE) {
+        if (str_contains($name, 'status')) {
           $name = 'status_id';
           $qillName = ts('Membership Status');
         }

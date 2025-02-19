@@ -686,7 +686,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           $parValue = substr(
             $dao->COLUMN_TYPE, $first + 1, strpos($dao->COLUMN_TYPE, ')') - $first - 1
           );
-          if (strpos($parValue, "'") === FALSE) {
+          if (!str_contains($parValue, "'")) {
             // no quote in value means column length
             \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = $parValue;
           }
@@ -831,7 +831,7 @@ COLS;
     $query = preg_replace("/^  [^`].*$/m", '', $query);
     $engine = strtoupper(empty($this->logTableSpec[$table]['engine']) ? self::ENGINE : $this->logTableSpec[$table]['engine']);
     $engine .= " " . ($this->logTableSpec[$table]['engine_config'] ?? '');
-    if (strpos($engine, 'ROW_FORMAT') !== FALSE) {
+    if (str_contains($engine, 'ROW_FORMAT')) {
       $query = preg_replace("/ROW_FORMAT=\w+/m", '', $query);
     }
     $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
