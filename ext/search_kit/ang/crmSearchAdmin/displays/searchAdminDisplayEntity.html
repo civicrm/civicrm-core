@@ -57,7 +57,7 @@
       </legend>
       <div class="form-inline crm-search-admin-flex-row">
         <label for="crm-search-admin-edit-col-{{ $index }}-name">{{:: ts('Name') }}</label>
-        <input id="crm-search-admin-edit-col-{{ $index }}-name" class="form-control crm-flex-1" type="text" ng-model="col.name">
+        <input id="crm-search-admin-edit-col-{{ $index }}-name" class="form-control crm-flex-1" type="text" ng-model="col.name" placeholder="{{$ctrl.createSqlName(col.key)}}">
         <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Label') }}</label>
         <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
         <button type="button" class="btn-xs" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
