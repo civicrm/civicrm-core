@@ -297,7 +297,7 @@ function _civicrm_api3_load_DAO($entity) {
  * @return CRM_Core_DAO|string
  */
 function _civicrm_api3_get_DAO($name) {
-  if (strpos($name, 'civicrm_api3') !== FALSE) {
+  if (str_contains($name, 'civicrm_api3')) {
     $last = strrpos($name, '_');
     // len ('civicrm_api3_') == 13
     $name = substr($name, 13, $last - 13);
@@ -403,7 +403,7 @@ function _civicrm_api3_separate_values(&$values) {
       if ($key === 'case_type_id') {
         $value = trim(str_replace($sp, ',', $value), ',');
       }
-      elseif (strpos($value, $sp) !== FALSE) {
+      elseif (str_contains($value, $sp)) {
         $value = explode($sp, trim($value, $sp));
       }
     }
@@ -1605,7 +1605,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
 
       case CRM_Utils_Type::T_MONEY:
         [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-        if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
+        if (str_contains(($op ?? ''), 'NULL') || str_contains(($op ?? ''), 'EMPTY')) {
           break;
         }
         foreach ((array) $fieldValue as $fieldvalue) {
@@ -1675,7 +1675,7 @@ function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields
  */
 function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
+  if (str_contains(($op ?? ''), 'NULL') || str_contains(($op ?? ''), 'EMPTY')) {
     return;
   }
 
@@ -1765,7 +1765,7 @@ function _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo, 
  */
 function _civicrm_api3_validate_unique_key(&$params, &$fieldName) {
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
+  if (str_contains(($op ?? ''), 'NULL') || str_contains(($op ?? ''), 'EMPTY')) {
     return;
   }
   $existing = civicrm_api($params['entity'], 'get', [
@@ -2064,7 +2064,7 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
     // FALSE will bypass the below validation and then the BAO will change it to 2 with a deprecation notice
     $fieldValue = FALSE;
   }
-  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
+  if (str_contains(($op ?? ''), 'NULL') || str_contains(($op ?? ''), 'EMPTY')) {
     return;
   }
 
@@ -2233,7 +2233,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity, $action) {
   $isGet = substr($action, 0, 3) === 'get';
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName, 'String');
-  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE || CRM_Utils_System::isNull($fieldValue)) {
+  if (str_contains(($op ?? ''), 'NULL') || str_contains(($op ?? ''), 'EMPTY') || CRM_Utils_System::isNull($fieldValue)) {
     return;
   }
 
@@ -2314,7 +2314,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
     $options = $options['values'] ?? [];
   }
 
-  if (is_string($fieldValue) && strpos($fieldValue, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+  if (is_string($fieldValue) && str_contains($fieldValue, CRM_Core_DAO::VALUE_SEPARATOR)) {
     $fieldValue = CRM_Utils_Array::explodePadded($fieldValue);
   }
   // If passed multiple options, validate each.

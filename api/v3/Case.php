@@ -283,7 +283,7 @@ function civicrm_api3_case_get($params, $sql = NULL) {
 
   // Order by case contact (primary client)
   // Ex: "contact_id", "contact_id.display_name", "contact_id.sort_name DESC".
-  if (!empty($options['sort']) && strpos($options['sort'], 'contact_id') !== FALSE) {
+  if (!empty($options['sort']) && str_contains($options['sort'], 'contact_id')) {
     $sort = explode(', ', $options['sort']);
     $contactSort = NULL;
     foreach ($sort as $index => &$sortString) {
