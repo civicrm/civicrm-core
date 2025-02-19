@@ -189,7 +189,7 @@ class FormDataModel {
             }
           }
         }
-        $this->entities[$entity]['joins'][$node['af-join']] = $joinProps;
+        $this->entities[$entity]['joins'][$node['af-join']] = $joinProps + $existingJoin;
         $this->parseFields($node['#children'] ?? [], $entity, $node['af-join'], NULL, $afIfConditions);
       }
       elseif (!empty($node['#children'])) {
