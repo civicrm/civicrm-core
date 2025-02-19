@@ -67,7 +67,7 @@ function legacycustomsearches_civicrm_buildGroupContactCache(array $savedSearch,
   }
   $searchSQL = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID)->contactIDs();
   $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
-  if (strpos($searchSQL, 'WHERE') === FALSE) {
+  if (!str_contains($searchSQL, 'WHERE')) {
     $searchSQL .= " WHERE contact_a.id $excludeClause";
   }
   else {
