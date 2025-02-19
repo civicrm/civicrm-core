@@ -613,7 +613,7 @@ class Requirements {
 
     // Ensure that the MySQL driver supports utf8mb4 encoding.
     $version = mysqli_get_client_info();
-    if (strpos($version, 'mysqlnd') !== FALSE) {
+    if (str_contains($version, 'mysqlnd')) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {

@@ -78,7 +78,7 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
    * @return bool
    */
   protected function isHookEvent($eventName) {
-    return (substr($eventName, 0, 5) === 'hook_') && (strpos($eventName, '::') === FALSE);
+    return (substr($eventName, 0, 5) === 'hook_') && (!str_contains($eventName, '::'));
   }
 
   /**

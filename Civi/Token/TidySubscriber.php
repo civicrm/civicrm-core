@@ -34,7 +34,7 @@ class TidySubscriber implements EventSubscriberInterface {
    * @noinspection PhpUnused
    */
   public function tidyHtml(TokenRenderEvent $e): void {
-    if (strpos($e->string, 'http') !== FALSE) {
+    if (str_contains($e->string, 'http')) {
       $e->string = str_replace(
         [
           'https://https://',

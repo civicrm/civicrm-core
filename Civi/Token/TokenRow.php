@@ -203,7 +203,7 @@ class TokenRow {
     // This is a bit of a clumsy wy of detecting a link field but if you look into the displayValue
     // function you will understand.... By assigning the url as a plain token the text version can
     // use it as plain text (not html re-converted which kinda works but not in subject lines)
-    if (is_string($fieldValue) && is_string($originalValue) && strpos($fieldValue, '<a href') !== FALSE && strpos($originalValue, '<a href') === FALSE) {
+    if (is_string($fieldValue) && is_string($originalValue) && str_contains($fieldValue, '<a href') && !str_contains($originalValue, '<a href')) {
       $this->format('text/plain')->tokens($entity, $customFieldName, $originalValue);
     }
 
