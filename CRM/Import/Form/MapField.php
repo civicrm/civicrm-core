@@ -558,4 +558,64 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     return $defaults;
   }
 
+  /**
+   * Validate the the mapped fields contain enough to meet the dedupe rule lookup requirements.
+   *
+   * @internal this function may change without notice.
+   *
+   * @param array $rule
+   * @param array $mapper Mapper array as submitted
+   * @param array $contactIdentifierFields Array of fields which in themselves uniquely identify a contact.
+   *   This array will likely have an import specific prefix.
+   *
+   * @return string|null
+   *   Error string if insufficient.
+   */
+  protected function validateDedupeFieldsSufficientInMapping(array $rule, array $mapper, array $contactIdentifierFields): ?string {
+    $threshold = $rule['threshold'];
+    $ruleFields = $rule['fields'];
+    $weightSum = 0;
+    foreach ($mapper as $mapping) {
+      // Because api v4 style fields have a . and QuickForm multiselect js does
+      // not cope with a . the quick form layer will use a double underscore
+      // as a stand in (the angular layer will not)
+      $fieldName = str_replace('__', '.', $mapping[0]);
+      if (str_contains($fieldName, '.')) {
+        // If the field name contains a . - eg. address_primary.street_address
+        // we just want the part after the .
+        $fieldName = substr($fieldName, strpos($fieldName, '.') + 1);
+      }
+      if (in_array($fieldName, $contactIdentifierFields)) {
+        // It is enough to have external identifier or contact ID mapped..
+        $weightSum = $threshold;
+        break;
+      }
+      if (array_key_exists($fieldName, $ruleFields)) {
+        $weightSum += $ruleFields[$fieldName];
+      }
+    }
+    if ($weightSum < $threshold) {
+      return $rule['rule_message'];
+    }
+    return NULL;
+  }
+
+  /**
+   * @param array $rule
+   * @param array $mapper
+   * @param array $contactIdentifierFields
+   *
+   * @return array
+   */
+  protected function validateContactFields(array $rule, array $mapper, array $contactIdentifierFields): array {
+    $mapperError = [];
+    if (!$this->isUpdateExisting()) {
+      $missingDedupeFields = $this->validateDedupeFieldsSufficientInMapping($rule, $mapper, $contactIdentifierFields);
+      if ($missingDedupeFields) {
+        $mapperError[] = $missingDedupeFields;
+      }
+    }
+    return $mapperError;
+  }
+
 }
