@@ -356,6 +356,11 @@ class CRM_Report_Form_Instance {
       $params['owner_id'] = 'null';
     }
     unset($formValues['add_to_my_reports']);
+    
+    // set 'is_reserved' to null if empty
+    if (empty($params['is_reserved'])) {
+      $params['is_reserved'] = 'null';
+    }
 
     // pass form_values as string
     $params['form_values'] = serialize($formValues);
