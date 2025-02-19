@@ -434,6 +434,10 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $activeGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::VIEW);
 
     foreach ($activeGroups as $group) {
+      // Skip if custom group has no enabled fields
+      if (!count($group['fields'])) {
+        continue;
+      }
       $id = "custom_{$group['id']}";
       $allTabs[] = [
         'id' => $id,

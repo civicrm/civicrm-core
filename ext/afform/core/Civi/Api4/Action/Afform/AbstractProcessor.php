@@ -252,7 +252,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $items = array_column($joinResult, NULL, 'location_type_id');
       $joinResult = [];
       foreach ($join['data']['location_type_id'] as $locationType) {
-        $joinResult[] = $items[$locationType] ?? [];
+        $joinResult[] = $items[$locationType] ?? NULL;
       }
     }
     $this->_entityIds[$afEntity['name']][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinResult, [$joinIdField]);
@@ -636,7 +636,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
             }
 
             // Merge in pre-set data
-            $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
+            foreach ($entity['joins'][$joinEntity]['data'] ?? [] as $dataKey => $dataVal) {
+              // For multiple location blocks, values will be in an array (see FormDataModel::parseFields)
+              if (is_array($dataVal) && array_key_exists($index, $dataVal)) {
+                $joinValues[$index][$dataKey] = $dataVal[$index];
+              }
+              else {
+                $joinValues[$index][$dataKey] = $dataVal;
+              }
+            }
           }
         }
         $entityValues[$entityName][] = $values;
