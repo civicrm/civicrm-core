@@ -113,8 +113,8 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
    */
   public function isValidName($name) {
     return preg_match(';^[a-zA-Z0-9\.\-_/]+$;', $name)
-    && strpos($name, '..') === FALSE
-    && strpos($name, '.') !== FALSE;
+    && !str_contains($name, '..')
+    && str_contains($name, '.');
   }
 
   /**

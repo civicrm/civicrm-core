@@ -840,7 +840,7 @@ class CRM_Export_BAO_ExportProcessor {
       // always add contact_a.id to the ORDER clause
       // so the order is deterministic
       //CRM-15301
-      if (strpos('contact_a.id', $order) === FALSE) {
+      if (!str_contains('contact_a.id', $order)) {
         $order .= ", contact_a.id";
       }
 

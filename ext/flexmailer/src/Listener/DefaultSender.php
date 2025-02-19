@@ -165,7 +165,7 @@ class DefaultSender extends AutoService {
     // SMTP response code is buried in the message.
     $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
 
-    if (strpos($message, 'Failed to write to socket') !== FALSE) {
+    if (str_contains($message, 'Failed to write to socket')) {
       return TRUE;
     }
 

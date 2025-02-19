@@ -91,7 +91,7 @@ class CRM_Utils_Money {
     // amount is already converted properly,
     // so don't mess with it again.
     // @todo deprecate handling for the html tags because .... WTF
-    if (strpos($amount, '<') === FALSE) {
+    if (!str_contains($amount, '<')) {
       $amount = self::replaceCurrencySeparators($amount);
     }
 

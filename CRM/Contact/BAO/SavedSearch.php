@@ -77,7 +77,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
         }
         // Check for a date range field, which might be a standard date
         // range or a relative date.
-        if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
+        if (str_contains($id, '_date_low') || str_contains($id, '_date_high')) {
           $entityName = strstr($id, '_date', TRUE);
 
           // This is the default, for non relative dates. We will overwrite

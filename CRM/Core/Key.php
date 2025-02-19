@@ -153,7 +153,7 @@ class CRM_Core_Key {
     $privateKey = self::privateKey();
     $sessionID = self::sessionID();
     $delim = chr(0);
-    if (strpos($sessionID, $delim) !== FALSE || strpos($name, $delim) !== FALSE) {
+    if (str_contains($sessionID, $delim) || str_contains($name, $delim)) {
       throw new \RuntimeException("Failed to generate signature. Malformed session-id or form-name.");
     }
     // The "prefix" gives some advisory details to help with debugging.

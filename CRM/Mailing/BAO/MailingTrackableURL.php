@@ -31,7 +31,7 @@ class CRM_Mailing_BAO_MailingTrackableURL extends CRM_Mailing_DAO_MailingTrackab
    *   The redirect/tracking url
    */
   public static function getTrackerURL($url, $mailing_id, $queue_id) {
-    if (strpos($url, '{') !== FALSE) {
+    if (str_contains($url, '{')) {
       return self::getTrackerURLForUrlWithTokens($url, $mailing_id, $queue_id);
     }
     else {
@@ -108,7 +108,7 @@ class CRM_Mailing_BAO_MailingTrackableURL extends CRM_Mailing_DAO_MailingTrackab
     }
 
     // If we have a token in the URL + path section, we can't tokenise.
-    if (strpos($parsed[1], '{') !== FALSE) {
+    if (str_contains($parsed[1], '{')) {
       return $url;
     }
 
@@ -122,7 +122,7 @@ class CRM_Mailing_BAO_MailingTrackableURL extends CRM_Mailing_DAO_MailingTrackab
 
       // Separate the tokenised from the static parts.
       foreach ($query_key_value_pairs as $_) {
-        if (strpos($_, '{') === FALSE) {
+        if (!str_contains($_, '{')) {
           $static_params[] = $_;
         }
         else {

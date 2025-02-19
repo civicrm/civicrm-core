@@ -128,7 +128,7 @@ class CRM_Afform_ArrayHtml {
       }
     }
 
-    if (isset($array['#markup']) && (!$this->formatWhitespace || strpos($array['#markup'], '<') === FALSE)) {
+    if (isset($array['#markup']) && (!$this->formatWhitespace || !str_contains($array['#markup'], '<'))) {
       $buf .= '>' . $array['#markup'] . '</' . $tag . '>';
     }
     elseif (isset($array['#markup'])) {
@@ -141,7 +141,7 @@ class CRM_Afform_ArrayHtml {
     else {
       $contents = $this->convertArraysToHtml($children);
       // No indentation if contents are only text
-      if (!$this->formatWhitespace || strpos($contents, '<') === FALSE) {
+      if (!$this->formatWhitespace || !str_contains($contents, '<')) {
         $buf .= '>' . $contents;
       }
       else {

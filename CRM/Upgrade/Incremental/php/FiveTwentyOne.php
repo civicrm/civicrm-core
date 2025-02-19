@@ -29,7 +29,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyOne extends CRM_Upgrade_Incremental_
       $optionGroups = \Civi\Api4\OptionGroup::get(FALSE)->execute();
       foreach ($optionGroups as $optionGroup) {
         $trimmedName = trim($optionGroup['name']);
-        if (strpos($trimmedName, ' ') !== FALSE) {
+        if (str_contains($trimmedName, ' ')) {
           $notConverted[] = $optionGroup['title'];
         }
       }
@@ -54,7 +54,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyOne extends CRM_Upgrade_Incremental_
       ->execute();
     foreach ($optionGroups as $optionGroup) {
       $name = trim($optionGroup['name']);
-      if (strpos($name, ' ') !== FALSE) {
+      if (str_contains($name, ' ')) {
         $fixedName = CRM_Utils_String::titleToVar(strtolower($name));
         $check = \Civi\Api4\OptionGroup::get()
           ->addWhere('name', '=', $fixedName)

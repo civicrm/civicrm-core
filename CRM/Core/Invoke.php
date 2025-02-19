@@ -273,7 +273,7 @@ class CRM_Core_Invoke {
       if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
         $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']));
       }
-      elseif (strpos($item['page_callback'], '_Form') !== FALSE) {
+      elseif (str_contains($item['page_callback'], '_Form')) {
         $wrapper = new CRM_Utils_Wrapper();
         $result = $wrapper->run(
           $item['page_callback'] ?? NULL,

@@ -1407,7 +1407,7 @@ WHERE civicrm_event.is_active = 1
           $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($params[$name]);
           $values[$index] = $campaigns[$params[$name]] ?? NULL;
         }
-        elseif (strpos($name, '-') !== FALSE) {
+        elseif (str_contains($name, '-')) {
           [$fieldName, $id] = CRM_Utils_System::explode('-', $name, 2);
           $detailName = str_replace(' ', '_', $name);
           if (in_array($fieldName, [

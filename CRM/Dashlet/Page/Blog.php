@@ -122,7 +122,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
           $description = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br><hr>");
           $description = preg_replace('/(<[^>]+) style=["\'].*?["\']/i', '$1', $description);
           // Add paragraph markup if it's missing.
-          if (strpos($description, '<p') === FALSE) {
+          if (!str_contains($description, '<p')) {
             $description = '<p>' . $description . '</p>';
           }
           $item['description'] = $description;

@@ -2099,7 +2099,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'nhas':
         if ($value !== NULL && strlen($value) > 0) {
           $value = CRM_Utils_Type::escape($value, $type);
-          if (strpos($value, '%') === FALSE) {
+          if (!str_contains($value, '%')) {
             $value = "'%{$value}%'";
           }
           else {
@@ -2157,7 +2157,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'ew':
         if ($value !== NULL && strlen($value) > 0) {
           $value = CRM_Utils_Type::escape($value, $type);
-          if (strpos($value, '%') === FALSE) {
+          if (!str_contains($value, '%')) {
             if ($op == 'sw') {
               $value = "'{$value}%'";
             }

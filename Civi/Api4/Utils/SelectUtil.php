@@ -22,11 +22,11 @@ class SelectUtil {
    * @return bool
    */
   public static function isFieldSelected($field, $selects) {
-    if (in_array($field, $selects) || (in_array('*', $selects) && strpos($field, '.') === FALSE)) {
+    if (in_array($field, $selects) || (in_array('*', $selects) && !str_contains($field, '.'))) {
       return TRUE;
     }
     foreach ($selects as $item) {
-      if (strpos($item, '*') !== FALSE && self::getMatchingFields($item, [$field])) {
+      if (str_contains($item, '*') && self::getMatchingFields($item, [$field])) {
         return TRUE;
       }
     }
@@ -46,7 +46,7 @@ class SelectUtil {
     // If the pattern is "select all" then we return all base fields (excluding those with a dot)
     if ($pattern === '*') {
       return array_values(array_filter($fieldNames, function($field) {
-        return strpos($field, '.') === FALSE;
+        return !str_contains($field, '.');
       }));
     }
     $dot = strrpos($pattern, '.');

@@ -39,14 +39,14 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFive extends CRM_Upgrade_Incremental
       $report = civicrm_api3('ReportInstance', 'getsingle', ['id' => $reports->id]);
       $reportFormValues = @unserialize($report['form_values']);
       foreach ($reportFormValues as $index => $value) {
-        if (strpos($index, '_relative') !== FALSE) {
+        if (str_contains($index, '_relative')) {
           $date_fields[] = str_replace('_relative', '', $index);
         }
       }
       foreach ($date_fields as $date_field) {
         foreach ($reportFormValues as $index => $value) {
           if ($index === $date_field . '_to' || $index === $date_field . '_from') {
-            $isEndOfDay = strpos($index, '_to') !== FALSE ? TRUE : FALSE;
+            $isEndOfDay = str_contains($index, '_to') ? TRUE : FALSE;
             // If We have stored in the database hours minutes seconds use them
             if (!empty($reportFormValues[$index . '_time'])) {
               $time = $reportFormValues[$index . '_time'];

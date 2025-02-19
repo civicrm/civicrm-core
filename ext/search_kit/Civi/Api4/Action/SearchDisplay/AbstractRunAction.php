@@ -326,7 +326,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function rewrite(string $rewrite, array $data, string $format = 'view'): string {
     // Cheap strpos to skip Smarty processing if not needed
-    $hasSmarty = strpos($rewrite, '{') !== FALSE;
+    $hasSmarty = str_contains($rewrite, '{');
     $output = $this->replaceTokens($rewrite, $data, $format);
     if ($hasSmarty) {
       $vars = [];
@@ -995,7 +995,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   private function getUrl(string $path, $query = NULL) {
-    if ($path[0] === '/' || strpos($path, 'http://') !== FALSE || strpos($path, 'https://') !== FALSE) {
+    if ($path[0] === '/' || str_contains($path, 'http://') || str_contains($path, 'https://')) {
       return $path;
     }
     // Use absolute urls when downloading spreadsheet
@@ -1831,7 +1831,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function getWhereClauseValues(): array {
     $values = [];
     foreach ($this->_apiParams['where'] as $clause) {
-      if (count($clause) > 2 && $clause[1] === '=' && empty($clause[3]) && strpos('(', $clause[0]) === FALSE) {
+      if (count($clause) > 2 && $clause[1] === '=' && empty($clause[3]) && !str_contains('(', $clause[0])) {
         $values[$clause[0]] = $clause[2];
       }
     }

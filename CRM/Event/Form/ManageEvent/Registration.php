@@ -722,7 +722,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
           // check each of the fields in the index against the profile field
           foreach ($index as $ifield => $icombos) {
-            if (strpos($field['name'], $ifield) !== FALSE) {
+            if (str_contains($field['name'], $ifield)) {
 
               // we found the field in the profile, now record it in the index
               foreach ($icombos as $icombo => $dontcare) {

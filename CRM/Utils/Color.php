@@ -100,7 +100,7 @@ class CRM_Utils_Color {
    * @return string|null
    */
   public static function nameToHex($colorName) {
-    if (strpos($colorName, '#') !== FALSE || strpos($colorName, '(') !== FALSE) {
+    if (str_contains($colorName, '#') || str_contains($colorName, '(')) {
       return NULL;
     }
     if (empty(Civi::$statics[__CLASS__]['names'])) {

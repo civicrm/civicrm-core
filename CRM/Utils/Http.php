@@ -49,7 +49,7 @@ class CRM_Utils_Http {
 
     $parts = preg_split('/, */', $value);
     foreach ($parts as $part) {
-      if (strpos($part, '=') !== FALSE) {
+      if (str_contains($part, '=')) {
         list ($key, $value) = explode('=', $part, 2);
         $result[$key] = $value;
       }

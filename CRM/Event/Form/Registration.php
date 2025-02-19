@@ -1131,7 +1131,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if (!$usedCache && $hasPriceFieldsCount) {
         $count = 0;
         foreach ($values as $valKey => $value) {
-          if (strpos($valKey, 'price_') === FALSE) {
+          if (!str_contains($valKey, 'price_')) {
             continue;
           }
           $priceFieldId = substr($valKey, 6);
@@ -1197,7 +1197,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     foreach ($params as $key => & $value) {
       $vals = [];
-      if (strpos($key, 'price_') !== FALSE) {
+      if (str_contains($key, 'price_')) {
         $fieldId = substr($key, 6);
         if (!array_key_exists($fieldId, $priceSetDetails['fields']) ||
           is_array($value) ||
@@ -1261,7 +1261,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
 
       foreach ($values as $valKey => $value) {
-        if (strpos($valKey, 'price_') === FALSE) {
+        if (!str_contains($valKey, 'price_')) {
           continue;
         }
 
@@ -1513,7 +1513,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
 
       foreach ($values as $valKey => $value) {
-        if (strpos($valKey, 'price_') === FALSE) {
+        if (!str_contains($valKey, 'price_')) {
           continue;
         }
         $priceFieldId = substr($valKey, 6);
