@@ -103,7 +103,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
       'value' => $this->reobjectify($value),
     ]);
 
-    $key_path = $this->KeyPath($key);
+    $key_path = $this->keyPath($key);
     if (!file_put_contents($this->getCacheFile($key_path), $serialized, LOCK_EX)) {
       return FALSE;
     }
@@ -120,7 +120,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
 
-    $key_path = $this->KeyPath($key);
+    $key_path = $this->keyPath($key);
     if (!isset($this->expiresCache[$key_path]) || time() >= $this->expiresCache[$key_path]) {
       $path = $this->getCacheFile($key_path);
       if (!file_exists($path)) {
@@ -171,7 +171,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    */
   public function delete($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    $key_path = $this->KeyPath($key);
+    $key_path = $this->keyPath($key);
     $path = $this->getCacheFile($key_path);
     $success = TRUE;
 
@@ -258,7 +258,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    */
   public function has($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    $key_path = $this->KeyPath($key);
+    $key_path = $this->keyPath($key);
     $this->get($key);
     return isset($this->expiresCache[$key_path]) && time() < $this->expiresCache[$key_path];
   }
@@ -282,7 +282,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    * @return string
    *   The prefix used as a directory plus the cleaned key.
    */
-  protected function KeyPath($key) {
+  protected function keyPath($key) {
     return $this->_prefix . $this->cleanKey($key);
   }
 
