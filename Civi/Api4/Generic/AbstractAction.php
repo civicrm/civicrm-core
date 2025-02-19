@@ -563,7 +563,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \Exception
    */
   public static function evaluateCondition($expr, $vars) {
-    if (strpos($expr, '}') !== FALSE || strpos($expr, '{') !== FALSE) {
+    if (str_contains($expr, '}') || str_contains($expr, '{')) {
       throw new \CRM_Core_Exception('Illegal character in expression');
     }
     $tpl = "{if $expr}1{else}0{/if}";

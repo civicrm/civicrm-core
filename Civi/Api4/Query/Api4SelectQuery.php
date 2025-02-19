@@ -171,7 +171,7 @@ class Api4SelectQuery extends Api4Query {
 
       // Expand wildcards in joins (the api wrapper already expanded non-joined wildcards)
       $wildFields = array_filter($select, function($item) {
-        return strpos($item, '*') !== FALSE && strpos($item, '.') !== FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
+        return str_contains($item, '*') && str_contains($item, '.') && !str_contains($item, '(') && !str_contains($item, ' ');
       });
 
       foreach ($wildFields as $wildField) {
