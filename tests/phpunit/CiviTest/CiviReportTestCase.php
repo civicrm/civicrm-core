@@ -97,7 +97,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
     $arrFile = [];
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
       // php 8.x fgetcsv(): the $escape parameter must be provided as its default value will change.
-      while (($data = fgetcsv($handle, 1000, ",", '"', '\\')) !== FALSE) {
+      while (($data = fgetcsv($handle, 1000, ",", '"', '')) !== FALSE) {
         $arrFile[] = $data;
       }
       fclose($handle);

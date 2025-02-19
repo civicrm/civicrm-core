@@ -208,7 +208,7 @@ class CiviContributeProcessor {
     }
 
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";
-    while (($data = fgetcsv($handle, 1000, $delimiter, '"', '\\')) !== FALSE) {
+    while (($data = fgetcsv($handle, 1000, $delimiter, '"', '')) !== FALSE) {
       if ($row !== 1) {
         $data['header'] = $header;
         $params = self::formatAPIParams($data,
