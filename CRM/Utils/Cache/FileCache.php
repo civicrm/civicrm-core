@@ -97,10 +97,10 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
     }
 
     $expires = CRM_Utils_Date::convertCacheTtlToExpires($ttl, self::DEFAULT_TIMEOUT);
-    $serialized = CRM_Core_BAO_Cache::encode([
+    $serialized = serialize([
       'created' => time(),
       'expires' => $expires,
-      'value' => $this->reobjectify($value),
+      'value' => $value,
     ]);
 
     $key_path = $this->keyPath($key);
@@ -130,7 +130,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
       if (!$cache) {
         return $default;
       }
-      $item = CRM_Core_BAO_Cache::decode($cache);
+      $item = unserialize($cache);
       if ($item !== FALSE) {
         $this->expiresCache[$key_path] = $item['expires'];
         $this->valueCache[$key_path] = $item['value'];
