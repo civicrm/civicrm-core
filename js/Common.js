@@ -1937,6 +1937,26 @@ if (!CRM.vars) CRM.vars = {};
     return (yiq >= 128) ? 'black' : 'white';
   };
 
+  const ALPHANUMERIC = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  CRM.utils.createRandom = function (length, charset) {
+    charset = charset || ALPHANUMERIC;
+    let result = '';
+    const chars = charset.length;
+    for (let i = 0; i < length; i++) {
+      result += charset.charAt(Math.floor(Math.random() * chars));
+    }
+    return result;
+  };
+
+  // Port of CRM_Utils_String::munge()
+  CRM.utils.munge = function (name, char = '_', len = 63) {
+    name = name.trim().replace(/[^a-zA-Z0-9]+/g, char);
+    if (!name.replace(/_/, '').length) {
+      name = CRM.utils.createRandom(len, ALPHANUMERIC);
+    }
+    return len ? name.substring(0, len) : name;
+  };
+
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
   $.ajaxPrefilter(function(s) {
     if (s.crossDomain) {
