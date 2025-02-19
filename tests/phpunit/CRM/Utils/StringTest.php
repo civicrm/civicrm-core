@@ -407,6 +407,158 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider convertStringToSnakeCaseProvider
+   */
+  public function testConvertStringToSnakeCase(string $input, string $expected): void {
+    $this->assertEquals($expected, CRM_Utils_String::convertStringToSnakeCase($input));
+  }
+
+  /**
+   * Data provider for testConvertStringToSnakeCase
+   *
+   * @return array
+   */
+  public function convertStringToSnakeCaseProvider(): array {
+    return [
+      // Test simple CamelCase to snake_case
+      ['MyThings', 'my_things'],
+
+      // Test with existing underscores
+      ['My_Things', 'my_things'],
+
+      // Test with multiple uppercase words
+      ['MyThingsAreCool', 'my_things_are_cool'],
+
+      // Test with a single word
+      ['Word', 'word'],
+
+      // Test with all uppercase letters
+      ['ABC', 'a_b_c'],
+
+      // Test with mixture of underscores and CamelCase
+      ['MyThing_One', 'my_thing_one'],
+
+      // Test with already snake_case input
+      ['snake_case', 'snake_case'],
+
+      // Test with special characters or numbers
+      ['SpecialCharacters123', 'special_characters123'],
+
+      // Edge case: empty string
+      ['', ''],
+
+      // Edge case: underscores only
+      ['_', '_'],
+
+      // Edge case: leading/trailing underscores (handled gracefully)
+      ['_MyThings_', '_my_things_'],
+    ];
+  }
+
+  /**
+   * @dataProvider convertStringToCamelProvider
+   */
+  public function testConvertStringToCamel(string $input, bool $ucFirst, string $expected): void {
+    $this->assertEquals($expected, CRM_Utils_String::convertStringToCamel($input, $ucFirst));
+  }
+
+  /**
+   * Data provider for testConvertStringToCamel
+   *
+   * @return array
+   */
+  public function convertStringToCamelProvider(): array {
+    return [
+      // Test with default ucfirst = TRUE
+      ['my_things', TRUE, 'MyThings'],
+      ['my-things', TRUE, 'MyThings'],
+      ['my things', TRUE, 'MyThings'],
+
+      // Test with ucfirst = FALSE (lower camelCase output)
+      ['my_things', FALSE, 'myThings'],
+      ['my-things', FALSE, 'myThings'],
+      ['my things', FALSE, 'myThings'],
+
+      // Test with multiple fragments and ucfirst = TRUE
+      ['convert-string-to-camel', TRUE, 'ConvertStringToCamel'],
+
+      // Test with multiple fragments and ucfirst = FALSE
+      ['convert-string-to-camel', FALSE, 'convertStringToCamel'],
+
+      // Test with already camel case input
+      ['MyThings', TRUE, 'MyThings'],
+      ['MyThings', FALSE, 'myThings'],
+
+      // Test with empty input
+      ['', TRUE, ''],
+      ['', FALSE, ''],
+
+      // Test with string having only special characters (should skip them)
+      ['_-_', TRUE, ''],
+      ['_-_', FALSE, ''],
+
+      // Single word tests
+      ['word', TRUE, 'Word'],
+      ['word', FALSE, 'word'],
+
+      // Leading/trailing special characters
+      ['_my_word_', TRUE, 'MyWord'],
+      ['_my_word_', FALSE, 'myWord'],
+    ];
+  }
+
+  /**
+   * @dataProvider convertStringToDashProvider
+   */
+  public function testConvertStringToDash(string $input, string $expected): void {
+    $this->assertEquals($expected, CRM_Utils_String::convertStringToDash($input));
+  }
+
+  /**
+   * Data provider for testConvertStringToDash
+   *
+   * @return array
+   */
+  public function convertStringToDashProvider(): array {
+    return [
+      // Test converting CamelCase to dash-case
+      ['CamelCase', 'camel-case'],
+      ['MyThingsAreCool', 'my-things-are-cool'],
+
+      // Test converting snake_case to dash-case
+      ['snake_case', 'snake-case'],
+      ['my_things_are_cool', 'my-things-are-cool'],
+
+      // Test converting with mixed underscores and spaces
+      ['snake case_input', 'snake-case-input'],
+
+      // Test converting dash-case to itself
+      ['dash-case', 'dash-case'],
+
+      // Test converting single word
+      ['word', 'word'],
+
+      // Test converting empty string
+      ['', ''],
+
+      // Test with multiple uppercase letters
+      ['ABC', 'a-b-c'],
+
+      // Test with leading and trailing special characters
+      ['_MyThings_', 'my-things'],
+
+      // Mixed input scenarios
+      ['Convert_this-String To Dash', 'convert-this-string-to-dash'],
+
+      // Edge case: special characters only (should skip them)
+      ['_-_', ''],
+
+      // Test already lower case sentence with spaces
+      ['my things are cool', 'my-things-are-cool'],
+    ];
+  }
+
+  /**
    * Test that we get a meaningful error if Smarty syntax is wrong.
    */
   public function testSmartyExceptionHandling(): void {
