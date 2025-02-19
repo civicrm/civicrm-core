@@ -112,6 +112,7 @@
 /* Override standalone.css */
 .standalone-auth-box {
   background: var(--crm-c-dkblue-01) !important;
+  color: white !important;
 }
 #login-form {
   --crm-big-input: 100%;
