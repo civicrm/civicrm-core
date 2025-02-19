@@ -30,8 +30,12 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
 
   /**
    * Max key length to be used for file systems.
+   *
+   * This applies separately to each folder-part/file-part.
+   *
+   * PSR-16 only requires 64 chars. So anything longer is generous.
    */
-  const MAX_KEY_LEN = 200;
+  const MAX_KEY_LEN = 100;
 
   /**
    * The default timeout to use.
@@ -270,7 +274,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    * @return string
    */
   protected function cleanKey($key) {
-    return $this->shortenPathSegment(preg_replace('/\s+|\W+/', '_', $key));
+    return $this->shortenPathSegment($key);
   }
 
   /**
@@ -310,13 +314,20 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    *   a unique hash attached.
    */
   protected function shortenPathSegment($segment) {
-    if (strlen($segment) > self::MAX_KEY_LEN) {
-      // Typically 24 characters in length.
-      $hash = CRM_Utils_String::base64UrlEncode(md5($segment, TRUE));
-      $subLen = self::MAX_KEY_LEN - 1 - strlen($segment);
-      $segment = substr($segment, 0, $subLen) . "_" . $hash;
+    // If name is particularly safe/readable, then pass-thru verbatim.
+    if (strlen($segment) <= self::MAX_KEY_LEN && preg_match('/^[a-zA-Z0-9\_\-]+$/', $segment)) {
+      // Exclude dots in order to prevent (a) collisions with 'hash.XXX.XXX.txt' and (b) accidental hiding in the directory-list.
+      return $segment;
     }
-    return $segment;
+    // If there is anything trixy in the name, then prefer hash-based identifier.
+    else {
+      return ('hash'
+        . '.' . substr(preg_replace('/[^a-zA-Z0-9]/', '', $segment), 0, 20)
+        // ^^ Give a mnemonic hint to admin browsing files
+        . '.' . hash('sha256', $segment)
+        // ^^ File-systems vary in case-sensitivity. Hex encoding is distinctive either way.
+        );
+    }
   }
 
   /**
