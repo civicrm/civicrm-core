@@ -63,6 +63,14 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       ->execute()
       ->column('name');
 
+    // Custom group has no enabled fields; nothing to generate.
+    if (!$item['field_names']) {
+      return [
+        'id' => $item['id'],
+        'forms' => $forms,
+      ];
+    }
+
     // restrict forms other than block to if Admin UI is enabled
     $hasAdminUi = \CRM_Extension_System::singleton()->getMapper()->isActiveModule('civicrm_admin_ui');
     if (!$hasAdminUi) {
