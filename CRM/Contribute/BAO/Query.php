@@ -219,7 +219,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'contribution_trxn_id':
       case 'contribution_check_number':
       case 'contribution_contact_id':
-      case (strpos($name, '_amount') !== FALSE):
+      case (str_contains($name, '_amount')):
       case 'contribution_campaign_id':
 
         $fieldNamesNotToStripContributionFrom = [

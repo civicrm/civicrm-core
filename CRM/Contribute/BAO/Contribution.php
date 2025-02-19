@@ -1767,7 +1767,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if ($dao->contribution_id &&
         $dao->is_pay_later &&
         $dao->contribution_status_id == $pendingStatusId &&
-        strpos($dao->source, $source) !== FALSE
+        str_contains($dao->source, $source)
       ) {
         $contributionId = $dao->contribution_id;
       }
