@@ -3183,11 +3183,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
         $_SESSION['_' . $form->controller->_name . '_container']['values']['Preview'] = $formValues;
         return $form;
 
-      case strpos($class, 'Search') !== FALSE:
+      case str_contains($class, 'Search'):
         $form->controller = new CRM_Contact_Controller_Search();
         break;
 
-      case strpos($class, '_Form_') !== FALSE:
+      case str_contains($class, '_Form_'):
         $form->controller = new CRM_Core_Controller_Simple($class, $form->getName());
         break;
 
@@ -3232,7 +3232,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     /** @var CRM_Core_Form $form */
     $form = new $class();
     $pageName = $pageName ?: $form->getName();
-    if (strpos($class, 'Search') !== FALSE) {
+    if (str_contains($class, 'Search')) {
       $form->controller = new CRM_Contact_Controller_Search();
     }
     else {

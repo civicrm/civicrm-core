@@ -57,7 +57,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $contacts = $this->callAPISuccess('Contact', 'create', $params);
     $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(TRUE);
     foreach ($contactTypes as $contactType => $ignore) {
-      if (strpos($contactType, $contactSubType) !== FALSE) {
+      if (str_contains($contactType, $contactSubType)) {
         $formValues = [
           'contact_type' => $contactType,
         ];
