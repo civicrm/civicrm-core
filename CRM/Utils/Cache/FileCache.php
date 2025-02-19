@@ -101,6 +101,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
       'created' => time(),
       'expires' => $expires,
       'value' => $value,
+      'key' => $key,
     ]);
 
     $key_path = $this->keyPath($key);
