@@ -201,7 +201,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
       ';^civicrm/ajax/api4/Afform/submitFile$;' => [
-        'allowFields' => $abstractProcessorParams,
+        'allowFields' => [...$abstractProcessorParams, 'token', 'modelName', 'fieldName', 'joinEntity', 'entityIndex', 'joinIndex'],
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
       ';^civicrm/ajax/api4/\w+/autocomplete$;' => [

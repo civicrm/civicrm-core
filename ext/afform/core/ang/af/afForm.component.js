@@ -131,9 +131,14 @@
       }
 
       // Used when submitting file fields
+      var token = new URLSearchParams(window.location.search).get('_aff');
+      var headers = {'X-Requested-With': 'XMLHttpRequest'};
+      if (token) {
+        headers['X-Civi-Auth-Afform'] = token;
+      }
       this.fileUploader = new FileUploader({
         url: CRM.url('civicrm/ajax/api4/Afform/submitFile'),
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        headers: headers,
         onCompleteAll: postProcess,
         onBeforeUploadItem: function(item) {
           status.resolve();
