@@ -71,7 +71,7 @@ class ReflectionUtils {
     $info = [];
     $param = NULL;
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $comment) as $num => $line) {
-      if (!$num || strpos($line, '*/') !== FALSE) {
+      if (!$num || str_contains($line, '*/')) {
         continue;
       }
       $line = ltrim(trim($line), '*');
@@ -190,7 +190,7 @@ class ReflectionUtils {
   public static function isMethodDeprecated(string $className, string $methodName): bool {
     $reflection = new \ReflectionClass($className);
     $docBlock = $reflection->getMethod($methodName)->getDocComment();
-    return strpos($docBlock, "@deprecated") !== FALSE;
+    return str_contains($docBlock, "@deprecated");
   }
 
   /**
