@@ -1226,7 +1226,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
                 $checkedValue = $value;
               }
               // Serialized values from db
-              elseif ($value === '' || strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+              elseif ($value === '' || str_contains($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
                 $checkedValue = CRM_Utils_Array::explodePadded($value);
               }
               // Comma-separated values e.g. from a select2 widget during reload on form error

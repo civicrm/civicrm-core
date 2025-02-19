@@ -437,7 +437,7 @@ ORDER BY weight";
       return CRM_Utils_System::url($path, $q, FALSE, $fragment);
     }
 
-    if (strpos($url, '&amp;') === FALSE) {
+    if (!str_contains($url, '&amp;')) {
       return htmlspecialchars($url);
     }
 

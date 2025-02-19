@@ -219,7 +219,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
-      if (strpos($fields['html_message'], $token) !== FALSE) {
+      if (str_contains($fields['html_message'], $token)) {
         $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
       }
     }

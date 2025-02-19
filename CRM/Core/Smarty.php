@@ -348,7 +348,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       $this->assign($name, $value);
     }
     else {
-      if (strpos($currentValue, $value) === FALSE) {
+      if (!str_contains($currentValue, $value)) {
         $this->assign($name, $currentValue . $value);
       }
     }
