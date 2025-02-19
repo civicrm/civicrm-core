@@ -356,14 +356,14 @@ class FormWrapper {
         $this->form->setAction(\CRM_Core_Action::BASIC);
         break;
 
-      case strpos($class, 'Search') !== FALSE:
+      case str_contains($class, 'Search'):
         $this->form->controller = new \CRM_Contact_Controller_Search();
         if ($class === 'CRM_Contact_Form_Search_Basic') {
           $this->form->setAction(\CRM_Core_Action::BASIC);
         }
         break;
 
-      case strpos($class, '_Form_') !== FALSE:
+      case str_contains($class, '_Form_'):
         $this->form->controller = new \CRM_Core_Controller_Simple($class, $this->form->getName());
         break;
 

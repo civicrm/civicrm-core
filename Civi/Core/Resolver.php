@@ -63,11 +63,11 @@ class Resolver {
       return $id;
     }
 
-    if (strpos($id, '::') !== FALSE) {
+    if (str_contains($id, '::')) {
       // Callback: Static method.
       return explode('::', $id);
     }
-    elseif (strpos($id, '://') !== FALSE) {
+    elseif (str_contains($id, '://')) {
       $url = parse_url($id);
       switch ($url['scheme']) {
         case 'obj':
