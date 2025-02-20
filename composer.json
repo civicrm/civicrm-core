@@ -260,6 +260,10 @@
         "url": "https://github.com/vakata/jstree/archive/3.3.8.zip",
         "ignore": [".*", "docs", "demo", "libs", "node_modules", "test", "libs", "jstree.jquery.json", "gruntfile.js", "package.json", "bower.json", "component.json", "LICENCE-MIT", "README.md"]
       },
+      "js-spark-md5": {
+        "version": "v3.0.2",
+        "url": "https://github.com/satazor/js-spark-md5/archive/refs/tags/{$version}.zip"
+      },
       "lodash-compat": {
         "url": "https://github.com/lodash/lodash-compat/archive/3.0.1.zip",
         "ignore": [".*", "*.log", "*.md", "component.json", "package.json", "node_modules"]

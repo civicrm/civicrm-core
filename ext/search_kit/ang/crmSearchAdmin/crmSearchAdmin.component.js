@@ -10,9 +10,21 @@
   //     return $delegate;
   //   });
   var hook = {
+    findCriticalChanges: [],
     preSaveDisplay: [],
     postSaveDisplay: []
   };
+
+  // Dispatch {hookName} on behalf of each {target}. Pass-through open-ended {data}.
+  function fireHooks(hookName, targets, data) {
+    if (hook[hookName].length) {
+      targets.forEach(function(target) {
+        hook[hookName].forEach(function(callback) {
+          callback(target, data);
+        });
+      });
+    }
+  }
 
   // Controller function for main crmSearchAdmin component
   var ctrl = function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, crmUiHelp) {
@@ -94,6 +106,7 @@
       this.savedSearch.form_values.join = this.savedSearch.form_values.join || {};
       this.savedSearch.groups = this.savedSearch.groups || [];
       this.savedSearch.tag_id = this.savedSearch.tag_id || [];
+      this.originalSavedSearch = _.cloneDeep(this.savedSearch);
       this.groupExists = !!this.savedSearch.groups.length;
 
       const path = $location.path();
@@ -156,6 +169,31 @@
       $scope.status = 'unsaved';
     }
 
+    // Generate the confirmation dialog
+    this.confirmSave = function() {
+      // Build displays. For each, identify the {original: ..., updated: ...} variants..
+      const targets = {}, data = {messages: []};
+      let newCount = 0;
+      ctrl.originalSavedSearch.displays.forEach(function(original) {
+        const key = original.id ? ('id_' + original.id) : ('new_' + (newCount++));
+        targets[key] = targets[key] || {};
+        targets[key].original = _.cloneDeep(original);
+      });
+      ctrl.savedSearch.displays.forEach(function(updated) {
+        const key = updated.id ? ('id_' + updated.id) : ('new_' + (newCount++));
+        targets[key] = targets[key] || {};
+        targets[key].updated = _.cloneDeep(updated);
+      });
+
+      fireHooks('findCriticalChanges', _.values(targets), data);
+      if (data.messages.length < 1) return {confirmed: true};
+      return {
+        title: ts('Are you sure?'),
+        template: '<p>' + ts('The following change(s) may affect other customizations:') +'</p><hr/><p ng-repeat="message in messages"><small>{{::message}}</small></p>',
+        export: data
+      };
+    };
+
     this.save = function() {
       if (!validate()) {
         return;
@@ -172,14 +210,7 @@
       }
       _.remove(params.displays, {trashed: true});
       if (params.displays && params.displays.length) {
-        // Call preSaveDisplay hook
-        if (hook.preSaveDisplay.length) {
-          params.displays.forEach(function(display) {
-            hook.preSaveDisplay.forEach(function(callback) {
-              callback(display, apiCalls);
-            });
-          });
-        }
+        fireHooks('preSaveDisplay', params.displays, apiCalls);
         chain.displays = ['SearchDisplay', 'replace', {where: [['saved_search_id', '=', '$id']], records: params.displays}];
       } else if (params.id) {
         apiCalls.deleteDisplays = ['SearchDisplay', 'delete', {where: [['saved_search_id', '=', params.id]]}];
@@ -200,12 +231,8 @@
       apiCalls.saved = ['SavedSearch', 'save', {records: [params], chain: chain}, 0];
       crmApi4(apiCalls).then(function(results) {
         // Call postSaveDisplay hook
-        if (chain.displays && hook.postSaveDisplay.length) {
-          results.saved.displays.forEach(function(display) {
-            hook.postSaveDisplay.forEach(function(callback) {
-              callback(display, results);
-            });
-          });
+        if (chain.displays) {
+          fireHooks('postSaveDisplay', results.saved.displays, results);
         }
         // After saving a new search, redirect to the edit url
         if (!ctrl.savedSearch.id) {
@@ -217,6 +244,7 @@
           ctrl.savedSearch.groups[0].id = results.saved.groups[0].id;
         }
         ctrl.savedSearch.displays = results.saved.displays || [];
+        ctrl.originalSavedSearch = _.cloneDeep(ctrl.savedSearch);
         // Wait until after onChangeAnything to update status
         $timeout(function() {
           $scope.status = newStatus;
