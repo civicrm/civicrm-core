@@ -1156,7 +1156,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
           }
         }
       }
-      elseif (strpos($name, '-') !== FALSE) {
+      elseif (str_contains($name, '-')) {
         [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $name, 3);
 
         if (!in_array($fieldName, $multipleFields)) {
@@ -1631,7 +1631,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     // add permissioning for profiles only if not registration
     if (!$skipPermission) {
       $permissionClause = CRM_Core_Permission::ufGroupClause($op, 'civicrm_uf_group.');
-      if (strpos($queryString, 'WHERE') !== FALSE) {
+      if (str_contains($queryString, 'WHERE')) {
         $queryString .= " AND $permissionClause ";
       }
       else {
@@ -3182,7 +3182,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     //check if contact email exist.
     $hasEmails = FALSE;
     foreach ($params as $name => $value) {
-      if (strpos($name, 'email-') !== FALSE) {
+      if (str_contains($name, 'email-')) {
         $hasEmails = TRUE;
         break;
       }

@@ -879,7 +879,7 @@ MODIFY      {$columnName} varchar( $length )
           continue;
         }
 
-        if (strpos($dao->Collation, '_bin') !== FALSE) {
+        if (str_contains($dao->Collation, '_bin')) {
           $tableCollation = $newBinaryCollation;
         }
         else {

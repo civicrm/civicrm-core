@@ -1563,7 +1563,7 @@ LIKE %1
 
     self::$_dbColumnValueCache ??= [];
 
-    while (strpos($daoName, '_BAO_') !== FALSE) {
+    while (str_contains($daoName, '_BAO_')) {
       $daoName = get_parent_class($daoName);
     }
 
@@ -3491,7 +3491,7 @@ SELECT contact_id
    */
   private function clearDbColumnValueCache() {
     $daoName = get_class($this);
-    while (strpos($daoName, '_BAO_') !== FALSE) {
+    while (str_contains($daoName, '_BAO_')) {
       $daoName = get_parent_class($daoName);
     }
     if (isset($this->id)) {

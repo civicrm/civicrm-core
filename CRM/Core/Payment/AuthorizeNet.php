@@ -456,7 +456,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @return bool|string
    */
   public function _substring_between(&$haystack, $start, $end) {
-    if (strpos($haystack, $start) === FALSE || strpos($haystack, $end) === FALSE) {
+    if (!str_contains($haystack, $start) || !str_contains($haystack, $end)) {
       return FALSE;
     }
     else {
