@@ -872,10 +872,12 @@ WHERE  id = %1";
    *
    * @return array
    */
-  public static function relationshipTypeOptions() {
+  public static function relationshipTypeOptions($fieldName = NULL, $options = []) {
     $relationshipTypes = [];
-    $relationshipLabels = self::relationshipType();
-    foreach (self::relationshipType('name') as $id => $type) {
+    $onlyActive = empty($options['include_disabled']) ? 1 : NULL;
+    $relationshipLabels = self::relationshipType('label', FALSE, $onlyActive);
+    $relationshipNames = self::relationshipType('name', FALSE, $onlyActive);
+    foreach ($relationshipNames as $id => $type) {
       $relationshipTypes[$type['name_a_b']] = $relationshipLabels[$id]['label_a_b'];
       if ($type['name_b_a'] && $type['name_b_a'] != $type['name_a_b']) {
         $relationshipTypes[$type['name_b_a']] = $relationshipLabels[$id]['label_b_a'];
