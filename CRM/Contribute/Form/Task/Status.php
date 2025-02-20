@@ -156,7 +156,7 @@ AND    co.id IN ( $contribIDs )";
   public static function formRule($fields) {
     $seen = $errors = [];
     foreach ($fields as $name => $value) {
-      if (strpos($name, 'trxn_id_') !== FALSE) {
+      if (str_contains($name, 'trxn_id_')) {
         if ($fields[$name]) {
           if (array_key_exists($value, $seen)) {
             $errors[$name] = ts('Transaction ID\'s must be unique. Include the account number for checks.');
@@ -165,7 +165,7 @@ AND    co.id IN ( $contribIDs )";
         }
       }
 
-      if ((strpos($name, 'check_number_') !== FALSE) && $value) {
+      if ((str_contains($name, 'check_number_')) && $value) {
         $contribID = substr($name, 13);
 
         if ($fields["payment_instrument_id_{$contribID}"] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check')) {
