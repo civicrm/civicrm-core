@@ -56,7 +56,6 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
     // See also: `StandaloneUsers.civi-setup.php`
   }
 
-
   /**
    * Example: Run an external SQL script when the module is uninstalled.
    */
@@ -100,6 +99,74 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
         PRIMARY KEY (`id`)
       )
       SQL);
+    return TRUE;
+  }
+
+  /**
+   * Check and cleanup if we have duplicated the editable password reset template when
+   * we added the *.mgd.php file
+   * This happens if there were user edits to the content before the addition of the managed
+   * record => in which case we need to switch the managed record to reference the pre-existing
+   * template record, and delete the extra one
+   */
+  public function upgrade_6000(): bool {
+    $dao = CRM_Core_DAO::executeQuery(<<<SQL
+      SELECT `template`.`id` AS `template_id`, `managed`.`id` AS `managed_id`
+      FROM
+        `civicrm_msg_template` `template`
+      LEFT JOIN
+        `civicrm_managed` `managed`
+      ON
+        `template`.`id` = `managed`.`entity_id`
+        AND `managed`.`entity_type` = 'MessageTemplate'
+      WHERE
+        `template`.`workflow_name` = 'password_reset'
+        AND `template`.`is_reserved` = 0
+      SQL);
+
+    $templates = $dao->fetchAll();
+
+    // ok we have 2 records => lets clean them up
+    $unmanagedTemplates = array_values(array_filter($templates, fn ($record) => !$record['managed_id']));
+    $managedTemplates = array_values(array_filter($templates, fn ($record) => !!$record['managed_id']));
+
+    $unmanagedTemplateCount = count($unmanagedTemplates);
+    $managedTemplateCount = count($managedTemplates);
+
+    if ($managedTemplateCount !== 1) {
+      throw new \CRM_Core_Exception("Found {$managedTemplateCount} managed templates for workflow_name password_reset with is_reserved = 0. Expected 1 so something is wrong.");
+    }
+
+    if (!$unmanagedTemplateCount) {
+      // we have 1 managed template and 0 unmanaged = perfect
+      // nothing more to do
+      return TRUE;
+    }
+
+    if ($unmanagedTemplateCount > 1) {
+      throw new \CRM_Core_Exception("Found {$managedTemplateCount} unmanaged templates for workflow_name password_reset with is_reserved = 0. Expected 0 or 1 so something is wrong.");
+    }
+
+    // ok we have 1 managed template and 1 unmanaged
+    // this is the expected situation to cleanup
+    // we want to preserve the original template (by linking it to the
+    // record in civicrm_managed) and then delete the extra one
+    $originalTemplateId = $unmanagedTemplates[0]['template_id'];
+    $managedRecordId = $managedTemplates[0]['managed_id'];
+    $extraTemplateId = $managedTemplates[0]['template_id'];
+
+    if (!$originalTemplateId || !$managedRecordId || !$extraTemplateId) {
+      // this shouldn't happen, but check just in case
+      throw new \CRM_Core_Exception("Missing an expected ID in standaloneusers upgrade_6000");
+    }
+
+    CRM_Core_DAO::executeQuery(<<<SQL
+      UPDATE `civicrm_managed` SET `entity_id` = {$originalTemplateId} WHERE `id` = {$managedRecordId}
+    SQL);
+    CRM_Core_DAO::executeQuery(<<<SQL
+      DELETE FROM `civicrm_msg_template` WHERE `id` = {$extraTemplateId}
+    SQL);
+
     return TRUE;
   }
 

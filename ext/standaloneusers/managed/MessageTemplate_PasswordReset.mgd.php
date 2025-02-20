@@ -46,6 +46,10 @@ return [
       'match' => [
         'workflow_name',
         'is_reserved',
+        // dont overwrite a user-edited template that exists before this was switched to a managed record
+        // this is not ideal as end up with 3 templates - but this is cleaned up in upgrade_6000 step
+        'msg_subject',
+        'msg_html',
       ],
       'values' => [
         'workflow_name' => 'password_reset',
