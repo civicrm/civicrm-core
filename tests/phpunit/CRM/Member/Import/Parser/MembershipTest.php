@@ -124,7 +124,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'last_name' => 'Anderson',
       'prefix_id' => 3,
       'suffix_id' => 3,
-      'email' => 'b@c.com',
+      'email_primary.email' => 'b@c.com',
       'contact_type' => 'Individual',
     ];
 
@@ -140,7 +140,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
         date('Y-m-d'),
       ],
       [
-        $contact2Params['email'],
+        $contact2Params['email_primary.email'],
         self::MEMBERSHIP_TYPE_NAME,
         $startDate2,
         $joinDate2,

@@ -474,8 +474,8 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     }
   }
 
-  public function testModifyMailingReceipientsIgnoreOptOut(): void {
-    $optOutContact = $this->individualCreate(['is_opt_out' => 1, 'email' => 'testoptout@example.com'], 'opt_out_individual');
+  public function testModifyMailingRecipientsIgnoreOptOut(): void {
+    $optOutContact = $this->individualCreate(['is_opt_out' => 1, 'email_primary.email' => 'testoptout@example.com'], 'opt_out_individual');
     $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $optOutContact,
       'group_id' => $this->_groupID,

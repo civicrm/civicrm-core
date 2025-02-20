@@ -2,6 +2,8 @@
 
 namespace Civi\Test;
 
+use Civi\Api4\Contact;
+
 /**
  * Class ContactTestTrait
  *
@@ -23,6 +25,8 @@ trait ContactTestTrait {
    * @var int
    */
   public $apiversion = 4;
+
+  private array $apiV4Fields = [];
 
   /**
    * Emulate a logged in user since certain functions use that.
@@ -154,7 +158,7 @@ trait ContactTestTrait {
       }
     }
     if ($contact_type === 'Individual') {
-      $params['email'] = strtolower(
+      $params['email_primary.email'] = strtolower(
         $params['first_name'] . '_' . $params['last_name'] . '@civicrm.org'
       );
       $params['prefix_id'] = 3;
@@ -175,7 +179,34 @@ trait ContactTestTrait {
    */
   private function _contactCreate(array $params, string $identifier = 'Contact'): int {
     $version = $this->_apiversion;
-    $this->_apiversion = 3;
+    $defaultVersion = 4;
+    // Assume api v4 is the default unless there are no incoming parameters that we
+    // can easily ascertain as api v4. (Currently not checking more than email & contact
+    // fields but they can always pass in version to use phone etc.
+    if (!isset($this->apiV4Fields[$params['contact_type']])) {
+      try {
+        $this->apiV4Fields[$params['contact_type']] = (array) Contact::getFields(FALSE)
+          ->addValue('contact_type', $params['contact_type'])
+          ->setAction('create')
+          ->execute()
+          ->indexBy('name');
+        $this->apiV4Fields[$params['contact_type']]['version'] = [];
+        $this->apiV4Fields[$params['contact_type']]['email_primary.email'] = [];
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->fail($e->getMessage());
+      }
+    }
+    $nonV4Fields = array_diff_key($params, $this->apiV4Fields[$params['contact_type']]);
+    if (!empty($nonV4Fields)) {
+      // Let's fall back to the earlier assumption of apiv3
+      $defaultVersion = 3;
+      if (isset($params['email_primary.email']) && !isset($params['email'])) {
+        $params['email'] = $params['email_primary.email'];
+      }
+    }
+
+    $this->_apiversion = $params['version'] ?? $defaultVersion;
     $result = $this->callAPISuccess('Contact', 'create', $params);
     $this->_apiversion = $version;
     $this->ids['Contact'][$identifier] = (int) $result['id'];
