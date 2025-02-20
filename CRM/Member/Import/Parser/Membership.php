@@ -101,7 +101,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     $this->validateRequiredFields($this->getRequiredFields(), $params['Membership']);
 
     //To check whether start date or join date is provided
-    if (empty($params['Membership']['start_date']) && empty($params['Membership']['join_date'])) {
+    if (empty($params['Membership']['id']) && empty($params['Membership']['start_date']) && empty($params['Membership']['join_date'])) {
       $errors[] = 'Membership Start Date is required to create a memberships.';
     }
     //fix for CRM-2219 Update Membership
@@ -123,7 +123,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   }
 
   /**
-   * Get required fields to create a contribution.
+   * Get required fields to create a membership.
    *
    * @return array
    */
@@ -132,7 +132,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   }
 
   /**
-   * Get required fields to match a contribution.
+   * Get required fields to match a membership.
    *
    * @return array
    */
