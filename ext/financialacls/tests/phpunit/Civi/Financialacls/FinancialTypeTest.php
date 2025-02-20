@@ -54,6 +54,10 @@ class FinancialTypeTest extends BaseTestClass {
               1 => $action_ts,
               2 => $type,
             ]),
+            'title' => ts('CiviCRM: %1 contributions of type %2', [
+              1 => $action_ts,
+              2 => $type,
+            ]),
             'description' => ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
             'implied_by' => [ts('%1 contributions of all types', [1 => $action_ts])],
             'parent' => $action_ts . ' contributions of all types',
@@ -64,6 +68,7 @@ class FinancialTypeTest extends BaseTestClass {
     }
     $this->assertEquals([
       'label' => ts('CiviCRM: administer CiviCRM Financial Types'),
+      'title' => ts('CiviCRM: administer CiviCRM Financial Types'),
       'description' => ts('Administer access to Financial Types'),
     ], $permissions['administer CiviCRM Financial Types']);
   }
