@@ -125,7 +125,7 @@ trait ContactTestTrait {
    * @return array
    *   properties of sample contact (ie. $params for API call)
    */
-  public function sampleContact(string $contact_type, int $seq = 0, bool $random = FALSE): array {
+  private function sampleContact(string $contact_type, int $seq = 0, bool $random = FALSE): array {
     $samples = [
       'Individual' => [
         // The number of values in each list need to be coprime numbers to not have duplicates
