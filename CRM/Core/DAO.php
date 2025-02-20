@@ -2937,6 +2937,7 @@ SELECT contact_id
   public static function buildOptions($fieldName, $context = NULL, $values = []) {
     $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_called_class());
     $entity = Civi::entity($entityName);
+    $legacyFieldName = $fieldName;
     // Legacy handling for custom field names in `custom_123` format
     if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7] ?? '')) {
       $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName($fieldName) ?? $fieldName;
@@ -2948,7 +2949,7 @@ SELECT contact_id
     }
     // Legacy handling for hook-based fields from `fields_callback`
     if (!$entity->getField($fieldName)) {
-      return CRM_Core_PseudoConstant::get(static::class, $fieldName, [], $context);
+      return CRM_Core_PseudoConstant::get(static::class, $legacyFieldName, [], $context);
     }
     $checkPermissions = (bool) ($values['check_permissions'] ?? ($context == 'create' || $context == 'search'));
     $includeDisabled = ($context == 'validate' || $context == 'get');
