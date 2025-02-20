@@ -278,12 +278,11 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   }
 
   public function testFindById(): void {
-    $params = $this->sampleContact('Individual', 4);
-    $existing_contact = $this->callAPISuccess('Contact', 'create', $params);
+    $existing_contact = $this->individualCreate();
     /** @var CRM_Contact_DAO_Contact $contact */
-    $contact = CRM_Contact_BAO_Contact::findById($existing_contact['id']);
-    $this->assertEquals($existing_contact['id'], $contact->id);
-    $deleted_contact_id = $existing_contact['id'];
+    $contact = CRM_Contact_BAO_Contact::findById($existing_contact);
+    $this->assertEquals($existing_contact, $contact->id);
+    $deleted_contact_id = $existing_contact;
     $this->contactDelete($contact->id);
     $exception_thrown = FALSE;
     try {
