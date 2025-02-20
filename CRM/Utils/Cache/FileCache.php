@@ -30,8 +30,12 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
 
   /**
    * Max key length to be used for file systems.
+   *
+   * This applies separately to each folder-part/file-part.
+   *
+   * PSR-16 only requires 64 chars. So anything longer is generous.
    */
-  const MAX_KEY_LEN = 200;
+  const MAX_KEY_LEN = 100;
 
   /**
    * The default timeout to use.
@@ -97,13 +101,14 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
     }
 
     $expires = CRM_Utils_Date::convertCacheTtlToExpires($ttl, self::DEFAULT_TIMEOUT);
-    $serialized = CRM_Core_BAO_Cache::encode([
+    $serialized = serialize([
       'created' => time(),
       'expires' => $expires,
-      'value' => $this->reobjectify($value),
+      'value' => $value,
+      'key' => $key,
     ]);
 
-    $key_path = $this->KeyPath($key);
+    $key_path = $this->keyPath($key);
     if (!file_put_contents($this->getCacheFile($key_path), $serialized, LOCK_EX)) {
       return FALSE;
     }
@@ -120,7 +125,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
 
-    $key_path = $this->KeyPath($key);
+    $key_path = $this->keyPath($key);
     if (!isset($this->expiresCache[$key_path]) || time() >= $this->expiresCache[$key_path]) {
       $path = $this->getCacheFile($key_path);
       if (!file_exists($path)) {
@@ -130,7 +135,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
       if (!$cache) {
         return $default;
       }
-      $item = CRM_Core_BAO_Cache::decode($cache);
+      $item = unserialize($cache);
       if ($item !== FALSE) {
         $this->expiresCache[$key_path] = $item['expires'];
         $this->valueCache[$key_path] = $item['value'];
@@ -171,7 +176,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    */
   public function delete($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    $key_path = $this->KeyPath($key);
+    $key_path = $this->keyPath($key);
     $path = $this->getCacheFile($key_path);
     $success = TRUE;
 
@@ -258,7 +263,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    */
   public function has($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    $key_path = $this->KeyPath($key);
+    $key_path = $this->keyPath($key);
     $this->get($key);
     return isset($this->expiresCache[$key_path]) && time() < $this->expiresCache[$key_path];
   }
@@ -269,7 +274,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    * @return string
    */
   protected function cleanKey($key) {
-    return $this->shortenPathSegment(preg_replace('/\s+|\W+/', '_', $key));
+    return $this->shortenPathSegment($key);
   }
 
   /**
@@ -282,7 +287,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    * @return string
    *   The prefix used as a directory plus the cleaned key.
    */
-  protected function KeyPath($key) {
+  protected function keyPath($key) {
     return $this->_prefix . $this->cleanKey($key);
   }
 
@@ -309,13 +314,20 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    *   a unique hash attached.
    */
   protected function shortenPathSegment($segment) {
-    if (strlen($segment) > self::MAX_KEY_LEN) {
-      // Typically 24 characters in length.
-      $hash = CRM_Utils_String::base64UrlEncode(md5($segment, TRUE));
-      $subLen = self::MAX_KEY_LEN - 1 - strlen($segment);
-      $segment = substr($segment, 0, $subLen) . "_" . $hash;
+    // If name is particularly safe/readable, then pass-thru verbatim.
+    if (strlen($segment) <= self::MAX_KEY_LEN && preg_match('/^[a-zA-Z0-9\_\-]+$/', $segment)) {
+      // Exclude dots in order to prevent (a) collisions with 'hash.XXX.XXX.txt' and (b) accidental hiding in the directory-list.
+      return $segment;
     }
-    return $segment;
+    // If there is anything trixy in the name, then prefer hash-based identifier.
+    else {
+      return ('hash'
+        . '.' . substr(preg_replace('/[^a-zA-Z0-9]/', '', $segment), 0, 20)
+        // ^^ Give a mnemonic hint to admin browsing files
+        . '.' . hash('sha256', $segment)
+        // ^^ File-systems vary in case-sensitivity. Hex encoding is distinctive either way.
+        );
+    }
   }
 
   /**
