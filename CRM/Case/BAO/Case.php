@@ -1143,7 +1143,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $caseActivities[$caseActivityId]['target_contact_name'] = $targetContact;
       }
       else {
-        if (strpos($caseActivities[$caseActivityId]['target_contact_name'], $targetContact) === FALSE) {
+        if (!str_contains($caseActivities[$caseActivityId]['target_contact_name'], $targetContact)) {
           $caseActivities[$caseActivityId]['target_contact_name'] .= '; ' . $targetContact;
         }
       }
@@ -1158,7 +1158,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $caseActivities[$caseActivityId]['assignee_contact_name'] = $assigneeContact;
       }
       else {
-        if (strpos($caseActivities[$caseActivityId]['assignee_contact_name'], $assigneeContact) === FALSE) {
+        if (!str_contains($caseActivities[$caseActivityId]['assignee_contact_name'], $assigneeContact)) {
           $caseActivities[$caseActivityId]['assignee_contact_name'] .= '; ' . $assigneeContact;
         }
       }
