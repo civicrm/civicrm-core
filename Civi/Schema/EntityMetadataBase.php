@@ -33,9 +33,11 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
 
   public function getField(string $fieldName): ?array {
     $field = $this->getFields()[$fieldName] ?? NULL;
+    // If not a core field, may be a custom field
     if (!$field && str_contains($fieldName, '.')) {
       [$customGroupName] = explode('.', $fieldName);
-      $field = $this->getCustomFields(['name' => $customGroupName])[$fieldName] ?? NULL;
+      // Include disabled custom fields so that getOptions handles them consistently
+      $field = $this->getCustomFields(['name' => $customGroupName, 'is_active' => NULL])[$fieldName] ?? NULL;
     }
     return $field;
   }

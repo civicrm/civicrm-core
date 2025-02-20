@@ -78,6 +78,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       $permittedIds = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
       $allGroups = array_intersect_key($allGroups, array_flip($permittedIds));
     }
+    // is_active = NULL means "we don't care"
+    if (!isset($filters['is_active'])) {
+      unset($filters['is_active']);
+    }
     if (!$filters) {
       return $allGroups;
     }
