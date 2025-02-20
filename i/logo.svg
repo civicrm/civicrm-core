@@ -15,7 +15,7 @@
     }
      @media (prefers-color-scheme: dark) {
        .crm-logo-text {
-         fill: var(--crm-c-logo-text, #fff);
+         fill: var(--crm-c-logo-text, #f0f0f0);
        }
      }
 
