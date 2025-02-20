@@ -11,7 +11,7 @@
   <description>{ts}The word CiviCRM with an intersecting blue and green triangle{/ts}</description>
   <style type="text/css">
     .crm-logo-text {
-      fill: var(--crm-c-logo-text, #000);
+      fill: var(--crm-c-logo-text, #086287);
     }
      @media (prefers-color-scheme: dark) {
        .crm-logo-text {
