@@ -173,6 +173,13 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
+   * Prevent tokens within URLs on comfirm_email_text from being munged.
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['confirm_email_text'];
+  }
+
+  /**
    * Fix what blocks to show/hide based on the default values set
    *
    * @param array $defaults

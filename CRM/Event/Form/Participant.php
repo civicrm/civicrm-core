@@ -2091,4 +2091,11 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     $this->assign('priceSet', $this->_priceSet);
   }
 
+  /**
+   * Prevent tokens within URLs on comfirm_email_text from being munged.
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['receipt_text'];
+  }
+
 }
