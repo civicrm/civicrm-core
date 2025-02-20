@@ -78,6 +78,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       $permittedIds = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
       $allGroups = array_intersect_key($allGroups, array_flip($permittedIds));
     }
+    // Boolean filters e.g. is_active should be unset if NULL
+    // For other types of fields, NULL is a valid comparison value, but not booleans
+    foreach ($filters as $filterKey => $filterValue) {
+      if (str_starts_with($filterKey, 'is_') && $filterValue === NULL) {
+        unset($filters[$filterKey]);
+      }
+    }
     if (!$filters) {
       return $allGroups;
     }
