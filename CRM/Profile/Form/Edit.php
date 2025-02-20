@@ -322,7 +322,7 @@ SELECT module,is_reserved
       $message = urlencode($message);
 
       $errorURL = $_POST['errorURL'];
-      if (strpos($errorURL, '?') !== FALSE) {
+      if (str_contains($errorURL, '?')) {
         $errorURL .= '&';
       }
       else {
