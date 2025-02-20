@@ -1326,6 +1326,15 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertContains('Alaska', $options['values']);
   }
 
+  public function testGetOptionsWithCustom(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => $this->entity], 'select', 'foo');
+    $this->callAPISuccess('CustomField', 'create', ['id' => $this->ids['CustomField']['fooselect'], 'is_active' => 0]);
+    $options = $this->callAPISuccess($this->entity, 'getoptions', ['field' => 'custom_' . $this->ids['CustomField']['fooselect']]);
+    $this->callAPISuccess('CustomField', 'create', ['id' => $this->ids['CustomField']['fooselect'], 'is_active' => 1]);
+    $options = $this->callAPISuccess($this->entity, 'getoptions', ['field' => 'custom_' . $this->ids['CustomField']['fooselect']]);
+    $this->assertEquals(['R' => 'Red', 'Y' => 'Yellow', 'G' => 'Green'], $options['values']);
+  }
+
   /**
    * Tests that using 'return' with a custom field not of type contact does not inappropriately filter.
    *
