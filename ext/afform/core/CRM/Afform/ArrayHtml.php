@@ -390,10 +390,16 @@ class CRM_Afform_ArrayHtml {
    * @return bool
    */
   public function isNodeEditable(array $item) {
-    if ($item['#tag'] === 'af-field' || $item['#tag'] === 'af-form' || isset($item['af-fieldset']) || isset($item['af-join'])) {
+    // TODO: Make these more prominent/discoverable/hookable
+    $editableTags = ['af-field', 'af-form', 'af-tabset', 'af-tab'];
+    $editableAttributes = ['af-fieldset', 'af-join'];
+    $editableClasses = ['af-container', 'af-text', 'af-button'];
+    if (in_array($item['#tag'], $editableTags, TRUE)) {
       return TRUE;
     }
-    $editableClasses = ['af-container', 'af-text', 'af-button'];
+    if (array_intersect($editableAttributes, array_keys($item))) {
+      return TRUE;
+    }
     $classes = explode(' ', $item['class'] ?? '');
     return (bool) array_intersect($editableClasses, $classes);
   }

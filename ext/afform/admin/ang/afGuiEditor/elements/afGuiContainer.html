@@ -1,4 +1,4 @@
-<div class="af-gui-bar {{ block ? 'af-gui-block-bar' : '' }}" ng-if="$ctrl.node['#tag']" ng-click="selectEntity()" >
+<div class="af-gui-bar {{ block ? 'af-gui-block-bar' : '' }}" ng-if="$ctrl.node['#tag'] && $ctrl.node['#tag'] !== 'af-tab'" ng-click="selectEntity()" >
   <div ng-if="!$ctrl.loading" class="form-inline" title="{{ $ctrl.getToolTip() }}">
     <span ng-if="block">{{ $ctrl.join ? ts($ctrl.join) + ':' : ts('Block:') }}</span>
     <select ng-if="block" ng-model="block.directive" ng-change="selectBlockDirective()" title="{{:: ts('Select block') }}">
@@ -18,7 +18,7 @@
   </div>
   <div ng-if="$ctrl.loading"><i class="crm-i fa-spin fa-spinner"></i></div>
 </div>
-<label class="af-gui-node-title af-gui-container-title af-gui-text-h3" ng-if="$ctrl.node['#tag'] && !block" title="{{:: ts('Container title') }}">
+<label class="af-gui-node-title af-gui-container-title af-gui-text-h3" ng-if="$ctrl.node['#tag'] && $ctrl.node['#tag'] !== 'af-tab' && !block" title="{{:: ts('Container title') }}">
   <i class="crm-i {{ $ctrl.getCollapsibleIcon() }}"></i>
   <span placeholder="{{:: ts('No title') }}" crm-ui-editable ng-model="$ctrl.getSetTitle" ng-model-options="{getterSetter: true}"></span>
 </label>
@@ -35,6 +35,7 @@
       <af-gui-container ng-switch-when="searchFieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" ng-class="{'af-entity-selected': isSelectedSearchFieldset(item)}" data-entity="{{ getSearchKey(item) }}" ></af-gui-container>
       <af-gui-search-display ng-switch-when="searchDisplay" node="item" class="af-gui-element"></af-gui-search-display>
       <af-gui-generic-element ng-switch-when="generic" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-generic" ></af-gui-generic-element>
+      <af-gui-tabset ng-switch-when="tabset" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-container af-gui-tabset" entity-name="$ctrl.entityName" data-entity="{{ $ctrl.getDataEntity() }}"></af-gui-tabset>
     </div>
   </div>
 </div>
