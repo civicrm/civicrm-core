@@ -1804,18 +1804,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       if (!$grouping) {
         return [];
       }
-      $getFieldsValues = [];
-      // For contact types
-      if (in_array($extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
-        $getFieldsValues['contact_type'] = $extends;
-        $extends = 'Contact';
-      }
       try {
         $field = civicrm_api4($extends, 'getFields', [
           'checkPermissions' => FALSE,
           'loadOptions' => ['id', 'name', 'label'],
           'where' => [['name', '=', $grouping]],
-          'values' => $getFieldsValues,
         ])->first();
         if ($field['options']) {
           return $field['options'];
