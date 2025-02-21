@@ -140,6 +140,7 @@ class CRM_Mailing_Event_BAO_MailingEventConfirm extends CRM_Mailing_Event_DAO_Ma
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'html' => $html,
       'text' => $text,
+      'contactId' => $contact_id,
     ];
     // send - ignore errors because the desired status change has already been successful
     CRM_Utils_Mail::send($mailParams);
