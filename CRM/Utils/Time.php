@@ -183,6 +183,10 @@ class CRM_Utils_Time {
     self::$callback = NULL;
   }
 
+  public static function isOverridden(): bool {
+    return isset(self::$callback);
+  }
+
   /**
    * Approximate time-comparison. $a and $b are considered equal if they
    * are within $threshold seconds of each other.
@@ -232,6 +236,37 @@ class CRM_Utils_Time {
       return $timeZoneOffset;
     }
     return NULL;
+  }
+
+  /**
+   * Rewrite a SQL query to use overridden date/time values for unit tests.
+   *
+   * @param string $query
+   *   The query to rewrite.
+   *
+   * @return string
+   *   The rewritten query with mocked time replacements.
+   */
+  public static function rewriteQuery(string $query): string {
+    // Replace date/time expressions with literal values.
+    $patterns = [
+      '/\bNOW\(\s*\)/' => '"' . self::date('Y-m-d H:i:s') . '"',
+      '/\bCURDATE\(\s*\)/' => '"' . self::date('Y-m-d') . '"',
+      '/\bCURTIME\(\s*\)/' => '"' . self::date('H:i:s') . '"',
+      '/\bCURRENT_DATE\b/' => '"' . self::date('Y-m-d') . '"',
+      '/\bCURRENT_TIME\b/' => '"' . self::date('H:i:s') . '"',
+      '/\bCURRENT_TIMESTAMP\b/' => '"' . self::date('Y-m-d H:i:s') . '"',
+      '/\bSYSDATE\(\)/' => '"' . self::date('Y-m-d H:i:s') . '"',
+      '/\bLOCALTIME\b/' => '"' . self::date('Y-m-d H:i:s') . '"',
+      '/\bLOCALTIMESTAMP\b/' => '"' . self::date('Y-m-d H:i:s') . '"',
+    ];
+
+    // Iterate over the patterns and replace matches in the query.
+    foreach ($patterns as $pattern => $replacement) {
+      $query = preg_replace($pattern, $replacement, $query);
+    }
+
+    return $query;
   }
 
 }
