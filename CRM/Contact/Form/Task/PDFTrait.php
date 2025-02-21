@@ -187,7 +187,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
-      if (strpos($fields['html_message'], $token) !== FALSE) {
+      if (str_contains($fields['html_message'], $token)) {
         $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
       }
     }
@@ -285,7 +285,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
    *     if the form controller does not exist), else FALSE
    */
   protected function isLiveMode(): bool {
-    return strpos($this->controller->getButtonName(), '_preview') === FALSE;
+    return !str_contains($this->controller->getButtonName(), '_preview');
   }
 
   /**

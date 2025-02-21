@@ -653,7 +653,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
-      if (strpos($fields['html_message'], $token) !== FALSE) {
+      if (str_contains($fields['html_message'], $token)) {
         $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
       }
     }

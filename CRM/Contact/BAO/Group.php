@@ -1017,7 +1017,7 @@ WHERE {$whereClause}";
     $title = $params['title'] ?? NULL;
     if ($title) {
       $clauses[] = "`groups`.title LIKE %1";
-      if (strpos($title, '%') !== FALSE) {
+      if (str_contains($title, '%')) {
         $params[1] = [$title, 'String', FALSE];
       }
       else {
@@ -1083,7 +1083,7 @@ WHERE {$whereClause}";
     $createdBy = $params['created_by'] ?? NULL;
     if ($createdBy) {
       $clauses[] = "createdBy.sort_name LIKE %6";
-      if (strpos($createdBy, '%') !== FALSE) {
+      if (str_contains($createdBy, '%')) {
         $params[6] = [$createdBy, 'String', FALSE];
       }
       else {
