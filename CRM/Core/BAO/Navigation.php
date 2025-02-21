@@ -912,6 +912,7 @@ ORDER BY weight";
             'label' => ts('CiviCRM Home'),
             'name' => 'CiviCRM Home',
             'url' => 'civicrm/dashboard?reset=1',
+            'icon' => 'crm-i fa-house-user',
             'weight' => 1,
           ],
         ];
@@ -921,6 +922,7 @@ ORDER BY weight";
               'label' => ts('Hide Menu'),
               'name' => 'Hide Menu',
               'url' => '#hidemenu',
+              'icon' => 'crm-i fa-minus',
               'weight' => 2,
             ],
           ];
@@ -931,6 +933,7 @@ ORDER BY weight";
               'label' => ts('Change Password'),
               'name' => 'Change Password',
               'url' => 'civicrm/admin/user/password',
+              'icon' => 'crm-i fa-keyboard',
               'weight' => 2,
             ],
           ];
@@ -940,6 +943,7 @@ ORDER BY weight";
             'label' => ts('Log out'),
             'name' => 'Log out',
             'url' => 'civicrm/logout?reset=1',
+            'icon' => 'crm-i fa-person-walking-arrow-right',
             'weight' => 3,
           ],
         ];
