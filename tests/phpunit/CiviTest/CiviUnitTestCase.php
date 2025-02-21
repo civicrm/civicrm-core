@@ -641,6 +641,10 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
     $this->validateAllPayments();
     $this->validateAllContributions();
+
+    if (($tf = getenv('TIME_FUNC')) != '') {
+      $this->fail("TIME_FUNC is $tf. Should be blank.");
+    }
   }
 
   /**
