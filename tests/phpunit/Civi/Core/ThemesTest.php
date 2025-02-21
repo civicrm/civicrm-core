@@ -54,10 +54,23 @@ class ThemesTest extends \CiviUnitTestCase {
 
     // --- Library of tests ---
 
-    // Use the default theme, Greenwich.
+    // Use Minetta from Riverlea
+    // TODO: why is Greenwich enabled here, but Riverlea is not?
+    // $cases[] = [
+    //   [],
+    //   'minetta',
+    //   'Minetta (RiverLea ~Greenwich)',
+    //   [
+    //     'civicrm-css/civicrm.css' => ["$civicrmBaseUrl/ext/riverlea/core/css/civicrm.css"],
+    //     'civicrm-css/joomla.css' => ["$civicrmBaseUrl/ext/riverlea/core/css/joomla.css"],
+    //     'test.extension.uitest-files/foo.css' => ["$civicrmBaseUrl/tests/extensions/test.extension.uitest/files/foo.css"],
+    //   ],
+    // ];
+
+    // Use Greenwich
     $cases[] = [
       [],
-      'default',
+      'greenwich',
       'Greenwich',
       [
         'civicrm-css/civicrm.css' => ["$civicrmBaseUrl/css/civicrm.css"],
@@ -82,11 +95,11 @@ class ThemesTest extends \CiviUnitTestCase {
       ],
     ];
 
-    // Misconfiguration: liza was previously used but then disappeared. Fallback to default, Greenwich.
+    // Misconfiguration: liza was previously used but then disappeared. Fallback to default, NO_THEME.
     $cases[] = [
       $hookJudy,
       'liza',
-      'Greenwich',
+      'No Theme',
       [
         'civicrm-css/civicrm.css' => ["$civicrmBaseUrl/css/civicrm.css"],
         'civicrm-css/joomla.css' => ["$civicrmBaseUrl/css/joomla.css"],
@@ -98,7 +111,7 @@ class ThemesTest extends \CiviUnitTestCase {
     $cases[] = [
       $hookJudy,
       'none',
-      'None (Unstyled)',
+      'No Styles',
       [
         'civicrm-css/civicrm.css' => [],
         'civicrm-css/joomla.css' => ["$civicrmBaseUrl/css/joomla.css"],
@@ -195,15 +208,20 @@ class ThemesTest extends \CiviUnitTestCase {
     return $map[$themeKey][$cssExt][$cssFile] ?? Themes::PASSTHRU;
   }
 
+  /**
+   * TODO with all these: why do we have greenwich not minetta here?
+   */
   public function testGetAll(): void {
     $all = \Civi::service('themes')->getAll();
     $this->assertTrue(isset($all['greenwich']));
+    // $this->assertTrue(isset($all['minetta']));
     $this->assertTrue(isset($all['_fallback_']));
   }
 
   public function testGetAvailable(): void {
     $all = \Civi::service('themes')->getAvailable();
     $this->assertTrue(isset($all['greenwich']));
+    // $this->assertTrue(isset($all['minetta']));
     $this->assertFalse(isset($all['_fallback_']));
   }
 
@@ -212,6 +230,7 @@ class ThemesTest extends \CiviUnitTestCase {
       'field' => 'theme_backend',
     ]);
     $this->assertTrue(isset($result['values']['greenwich']));
+    // $this->assertTrue(isset($result['values']['minetta']));
     $this->assertFalse(isset($result['values']['_fallback_']));
   }
 
