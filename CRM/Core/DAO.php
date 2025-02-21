@@ -525,6 +525,9 @@ class CRM_Core_DAO extends DB_DataObject {
     if ($i18nRewrite and $dbLocale) {
       $query = CRM_Core_I18n_Schema::rewriteQuery($query);
     }
+    if (CIVICRM_UF === 'UnitTests' && CRM_Utils_Time::isOverridden()) {
+      $query = CRM_Utils_Time::rewriteQuery($query);
+    }
 
     $ret = parent::query($query);
 
