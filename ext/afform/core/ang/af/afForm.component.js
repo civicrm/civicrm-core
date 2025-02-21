@@ -90,11 +90,15 @@
           ctrl.showSubmitButton = displaySubmitButton(args);
         }
         if (toLoad) {
+          if (params.fillMode === 'form') {
+            $element.block();
+          }
           return crmApi4('Afform', 'prefill', params)
             .then((result) => {
               // In some cases (noticed on Wordpress) the response header incorrectly outputs success when there's an error.
               if (result.error_message) {
                 disableForm(result.error_message);
+                $element.unblock();
                 return;
               }
               result.forEach((item) => {
@@ -105,8 +109,10 @@
                   angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name].data || {})});
                 });
               });
+              $element.unblock();
             }, (error) => {
               disableForm(error.error_message);
+              $element.unblock();
             });
         }
         // Clear existing join selection
