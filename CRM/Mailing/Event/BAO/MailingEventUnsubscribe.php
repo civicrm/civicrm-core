@@ -385,6 +385,7 @@ WHERE  email = %2
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'html' => $html,
       'text' => $text,
+      'contactId' => $eq->contact_id,
     ];
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'u', NULL, $queue_id, $eq->hash);
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
