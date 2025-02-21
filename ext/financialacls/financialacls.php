@@ -283,12 +283,12 @@ function financialacls_civicrm_permission(&$permissions) {
       'description' => E::ts('%1 contributions of all types', [1 => $action_ts]),
     ];
   }
-  $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate', ['check_permissions' => FALSE]);
+  $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, label FROM civicrm_financial_type')->fetchAll();
   foreach ($financialTypes as $type) {
     foreach ($actions as $action => $action_ts) {
-      $permissions[$action . ' contributions of type ' . $type] = [
-        'label' => E::ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
-        'description' => E::ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+      $permissions[$action . ' contributions of type ' . $type['name']] = [
+        'label' => E::ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type['label']]),
+        'description' => E::ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type['label']]),
         'implied_by' => [$action . ' contributions of all types'],
       ];
     }
@@ -410,8 +410,7 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
       $cacheKey = 'available_types_' . $context;
       if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
         foreach ($options as $finTypeId => $option) {
-          // FIXME: Translated labels as names === very bad. See https://lab.civicrm.org/dev/core/-/issues/5419
-          $type = is_string($option) ? $option : $option['label'];
+          $type = is_string($option) ? $option : $option['name'];
           if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
             unset($options[$finTypeId]);
           }
