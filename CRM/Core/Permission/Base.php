@@ -413,15 +413,18 @@ class CRM_Core_Permission_Base {
     CRM_Utils_Hook::permission($permissions);
 
     // Normalize permission array format.
-    // Historically, a string was acceptable (interpreted as label), as was a non-associative array.
+    // Historically, a string was acceptable (interpreted as title), as was a non-associative array.
     // Convert them all to associative arrays.
     foreach ($permissions as $name => $defn) {
       $defn = (array) $defn;
-      if (!isset($defn['label'])) {
-        CRM_Core_Error::deprecatedWarning("Permission '$name' should be declared with 'label' and 'description' keys. See https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_permission/");
+      // We are consolidating on title rather than label for these - accept either as label
+      // was the historical one.
+      // dev/core#5751
+      if (!isset($defn['title']) && !isset($defn['label'])) {
+        CRM_Core_Error::deprecatedWarning("Permission '$name' should be declared with 'title' and 'description' keys. See https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_permission/");
       }
       $permission = [
-        'label' => $defn['label'] ?? $defn[0],
+        'label' => $defn['title'] ?? $defn['label'] ?? $defn[0],
         'description' => $defn['description'] ?? $defn[1] ?? NULL,
         'disabled' => $defn['disabled'] ?? NULL,
         'implies' => $defn['implies'] ?? NULL,

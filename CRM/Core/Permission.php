@@ -611,6 +611,13 @@ class CRM_Core_Permission {
     $allPermissions = array_merge($permissions, $module_permissions);
     // Propagate implied_by permissions to their parents
     foreach ($allPermissions as $name => $permission) {
+      if (!empty($permission['label']) && empty($permission['title'])) {
+        // We have a mix of metadata historically - but have concluded we should
+        // migrate to title - hence ensuring it is present (but not removing label for
+        // backwards compatibility).
+        // dev/core#5751
+        $allPermissions[$name]['title'] = $permission['title'] = $permission['label'];
+      }
       foreach ($permission['implied_by'] ?? [] as $parent) {
         if (isset($allPermissions[$parent])) {
           $allPermissions[$parent]['implies'][] = $name;
