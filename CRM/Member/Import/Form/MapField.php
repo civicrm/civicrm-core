@@ -30,6 +30,17 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->addFormRule(['CRM_Member_Import_Form_MapField', 'formRule'], $this);
 
     $options = $this->getFieldOptions();
+    // Suppress non-match contact fields at the QuickForm layer as
+    // their use will only be on the angular layer.
+    foreach ($options as &$option) {
+      if ($option['is_contact']) {
+        foreach ($option['children'] as $index => $contactField) {
+          if (empty($contactField['match_rule'])) {
+            unset($option['children'][$index]);
+          }
+        }
+      }
+    }
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
       $this->add('select2', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), $options, FALSE, ['class' => 'big', 'placeholder' => ts('- do not import -')]);
     }

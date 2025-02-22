@@ -280,6 +280,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
 
       $contactFields = $this->getContactFields($this->getContactType());
       $fields['membership_contact_id'] = $contactFields['id'];
+      $fields['membership_contact_id']['match_rule'] = '*';
       $fields['membership_contact_id']['html']['label'] = $fields['membership_contact_id']['title'];
       $fields['membership_contact_id']['title'] .= ' ' . ts('(match to contact)');
       unset($contactFields['id']);
