@@ -236,16 +236,17 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    *   (reference ) an array of financial types
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
-   * @param bool $resetCache
-   *   load values from static cache
+   * @param bool $unused
+   *   unused param but we can't get rid of it because of param order
    * @param bool $includeDisabled
    *   Whether we should load in disabled FinancialTypes or Not
    *
    * @return array
    */
-  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE, $includeDisabled = FALSE) {
+  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $unused = FALSE, $includeDisabled = FALSE) {
     if (empty($financialTypes)) {
-      $financialTypes = CRM_Contribute_PseudoConstant::financialType(NULL, $includeDisabled);
+      $financialTypeOptions = \Civi::entity('Contribution')->getOptions('financial_type_id', [], $includeDisabled, TRUE);
+      $financialTypes = array_column($financialTypeOptions, 'label', 'id');
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;
