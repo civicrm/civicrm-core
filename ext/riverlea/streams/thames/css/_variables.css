@@ -252,9 +252,7 @@
   --crm-alert-background-help: var(--crm-c-blue-light); /* thames */
   --crm-alert-border-help: unset; /* thames */
   --crm-alert-text-help: unset; /* thames */
-  --crm-alert-background-warning: var(--crm-c-yellow-light);
   --crm-alert-border-warning: var(--crm-c-yellow);
-  --crm-alert-text-warning: var(--crm-c-text);
   --crm-alert-background-info: var(--crm-c-blue-light);
   --crm-alert-border-info: var(--crm-c-blue);
   --crm-alert-text-info: var(--crm-c-blue-darker);

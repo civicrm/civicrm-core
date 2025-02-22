@@ -56,7 +56,6 @@
   --crm-table-even-row: var(--crm-c-page-background);
   --crm-table-even-hover: var(--crm-c-gray-700);
   --crm-alert-text-help: var(--crm-c-text-light);
-  --crm-alert-text-warning: var(--crm-c-text-light);
   --crm-alert-background-info: var(--crm-c-blue-dark);
   --crm-alert-text-info: var(--crm-c-blue-light);
   --crm-c-inactive: var(--crm-c-gray-400);
