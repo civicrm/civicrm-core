@@ -1344,7 +1344,7 @@ class CRM_Utils_Token {
         if (!empty($token['name'])) {
           $tokens[$token['name']] = [];
         }
-        elseif (is_string($token) && strpos($token, ':') !== FALSE) {
+        elseif (is_string($token) && str_contains($token, ':')) {
           $tokens[$token] = [];
         }
       }

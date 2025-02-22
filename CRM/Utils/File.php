@@ -1173,7 +1173,7 @@ HTACCESS;
     set_error_handler(function($errno, $errstr) {
       // If this is open_basedir-related, convert it to an exception so we
       // can catch it.
-      if (strpos($errstr, 'open_basedir restriction in effect') !== FALSE) {
+      if (str_contains($errstr, 'open_basedir restriction in effect')) {
         throw new \ErrorException($errstr, $errno);
       }
       // Continue with normal error handling so other errors still happen.

@@ -134,9 +134,7 @@ class CRM_Utils_System {
           if ($name != $urlVar) {
             $name = rawurldecode($name);
             // check for arrays in parameters: site.php?foo[]=1&foo[]=2&foo[]=3
-            if ((strpos($name, '[') !== FALSE) &&
-              (strpos($name, ']') !== FALSE)
-            ) {
+            if (str_contains($name, '[') && str_contains($name, ']')) {
               $arrays[] = $qs[$i];
             }
             else {
@@ -1001,7 +999,7 @@ class CRM_Utils_System {
     }
 
     if (!array_key_exists($callback, self::$_callbacks)) {
-      if (strpos($callback, '::') !== FALSE) {
+      if (str_contains($callback, '::')) {
         [$className, $methodName] = explode('::', $callback);
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
         // ignore errors if any
@@ -1555,11 +1553,8 @@ class CRM_Utils_System {
       else {
         // Drupal setting
         global $civicrm_root;
-        if (strpos($civicrm_root,
-            DIRECTORY_SEPARATOR . 'sites' .
-            DIRECTORY_SEPARATOR . 'all' .
-            DIRECTORY_SEPARATOR . 'modules'
-          ) === FALSE
+        if (!str_contains($civicrm_root,
+          DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules')
         ) {
           $startPos = strpos($civicrm_root,
             DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
@@ -1807,7 +1802,7 @@ class CRM_Utils_System {
    * @return string|FALSE
    */
   public static function evalUrl($url) {
-    if (!$url || strpos($url, '{') === FALSE) {
+    if (!$url || !str_contains($url, '{')) {
       return $url;
     }
     else {

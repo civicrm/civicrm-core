@@ -303,7 +303,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       // Get Itemid using JInput::get()
       $input = Joomla\CMS\Factory::getApplication()->input;
       $itemIdNum = $input->get("Itemid");
-      if ($itemIdNum && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
+      if ($itemIdNum && (!str_contains($path, 'civicrm/payment/ipn'))) {
         $Itemid = "{$separator}Itemid=" . $itemIdNum;
       }
     }
@@ -1005,7 +1005,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // For Joomla CiviCRM Core files always live within the admistrator folder and $base_url is different on the frontend compared to the backend.
-    if (strpos($baseURL, 'administrator') === FALSE) {
+    if (!str_contains($baseURL, 'administrator')) {
       $userFrameworkResourceURL = $baseURL . "administrator/components/com_civicrm/civicrm/";
     }
     else {

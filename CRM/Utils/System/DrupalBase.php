@@ -619,10 +619,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function parseDrupalSiteNameFromRoot($civicrm_root) {
     $siteName = NULL;
-    if (strpos($civicrm_root,
-        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
-      ) === FALSE
-    ) {
+    if (!str_contains($civicrm_root, DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules')) {
       $startPos = strpos($civicrm_root,
         DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
       );

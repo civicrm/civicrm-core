@@ -784,7 +784,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'job_id' => $job['id'],
         'options' => ['sort' => "id desc", 'limit' => 1],
       ])['values'][0]['description'] ?? NULL;
-      if (!empty($lastExecutionMessage) && strpos($lastExecutionMessage, 'Failure') !== FALSE) {
+      if (!empty($lastExecutionMessage) && str_contains($lastExecutionMessage, 'Failure')) {
         $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
         $html .= '<tr>
           <td>' . $job['name'] . ' </td>
@@ -1045,7 +1045,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     // Ensure that the MySQL driver supports utf8mb4 encoding.
     $version = mysqli_get_client_info();
-    if (strpos($version, 'mysqlnd') !== FALSE) {
+    if (str_contains($version, 'mysqlnd')) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {

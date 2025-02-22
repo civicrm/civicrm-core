@@ -131,7 +131,7 @@ class CRM_Utils_Request {
     }
     // CRM-18384 - decode incorrect keys generated when &amp; is present in url
     foreach (($method ?? []) as $key => $value) {
-      if (strpos($key, 'amp;') !== FALSE) {
+      if (str_contains($key, 'amp;')) {
         $method[str_replace('amp;', '', $key)] = $method[$key];
         if (isset($method[$name])) {
           return $method[$name];
