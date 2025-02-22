@@ -77,7 +77,7 @@ details.af-container > *:last-of-type {
 }
 #bootstrap-theme .af-container-style-pane > .af-title {
   background-color: var(--crm-c-background5);
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
   border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
   position: absolute;
   top: 0;
