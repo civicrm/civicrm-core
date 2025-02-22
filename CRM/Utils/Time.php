@@ -248,22 +248,29 @@ class CRM_Utils_Time {
    *   The rewritten query with mocked time replacements.
    */
   public static function rewriteQuery(string $query): string {
-    // Replace date/time expressions with literal values.
+    $time = NULL;
+
+    // SQL date expressions => PHP date formats.
     $patterns = [
-      '/\bNOW\(\s*\)/' => '"' . self::date('Y-m-d H:i:s') . '"',
-      '/\bCURDATE\(\s*\)/' => '"' . self::date('Y-m-d') . '"',
-      '/\bCURTIME\(\s*\)/' => '"' . self::date('H:i:s') . '"',
-      '/\bCURRENT_DATE\b/' => '"' . self::date('Y-m-d') . '"',
-      '/\bCURRENT_TIME\b/' => '"' . self::date('H:i:s') . '"',
-      '/\bCURRENT_TIMESTAMP\b/' => '"' . self::date('Y-m-d H:i:s') . '"',
-      '/\bSYSDATE\(\)/' => '"' . self::date('Y-m-d H:i:s') . '"',
-      '/\bLOCALTIME\b/' => '"' . self::date('Y-m-d H:i:s') . '"',
-      '/\bLOCALTIMESTAMP\b/' => '"' . self::date('Y-m-d H:i:s') . '"',
+      '/\bNOW\(\s*\)/' => 'Y-m-d H:i:s',
+      '/\bCURDATE\(\s*\)/' => 'Y-m-d',
+      '/\bCURTIME\(\s*\)/' => 'H:i:s',
+      '/\bCURRENT_DATE\b/' => 'Y-m-d',
+      '/\bCURRENT_TIME\b/' => 'H:i:s',
+      '/\bCURRENT_TIMESTAMP\b/' => 'Y-m-d H:i:s',
+      '/\bSYSDATE\(\)/' => 'Y-m-d H:i:s',
+      '/\bLOCALTIME\b/' => 'Y-m-d H:i:s',
+      '/\bLOCALTIMESTAMP\b/' => 'Y-m-d H:i:s',
     ];
 
-    // Iterate over the patterns and replace matches in the query.
-    foreach ($patterns as $pattern => $replacement) {
-      $query = preg_replace($pattern, $replacement, $query);
+    // Callback ensures self::time() is called no more than once per query.
+    // During most unit tests, calling self::time() has the effect of advancing time by 500ms (default mode = `linear:500ms`).
+    // Stashing and re-using the value prevents the clock advancing more than expected.
+    foreach ($patterns as $pattern => $format) {
+      $query = preg_replace_callback($pattern, function() use ($format, &$time) {
+        $time ??= self::time();
+        return '"' . date($format, $time) . '"';
+      }, $query);
     }
 
     return $query;
