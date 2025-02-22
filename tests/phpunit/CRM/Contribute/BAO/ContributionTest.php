@@ -228,7 +228,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
     $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
-    $this->assertStringContainsString('b.financial_type_id IN (' . $permittedFinancialType . ')', $sql);
+    $this->assertStringContainsString('`b`.`financial_type_id` IN (' . $permittedFinancialType . ')', $sql);
 
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
@@ -260,8 +260,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
     $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
-    $this->assertStringContainsString('WHERE b.id NOT IN (0)', $sql);
+    $this->assertStringContainsString('`b`.`id` NOT IN (0)', $sql);
     $this->assertStringNotContainsString('b.financial_type_id', $sql);
+    $this->assertStringNotContainsString('`b`.`financial_type_id`', $sql);
     CRM_Core_DAO::executeQuery($sql);
   }
 
@@ -275,7 +276,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     if ($entity !== 'Contribution') {
       return;
     }
-    $clauses['id'] = 'NOT IN (0)';
+    $clauses['id'] = ['NOT IN (0)'];
   }
 
   /**

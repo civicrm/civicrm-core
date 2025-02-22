@@ -96,7 +96,7 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
       if ($entity === 'Contribution') {
         $unavailableTypes = _financialacls_civicrm_get_inaccessible_financial_types();
         if (!empty($unavailableTypes)) {
-          $clauses['id'][] = 'NOT IN (SELECT contribution_id FROM civicrm_line_item WHERE contribution_id IS NOT NULL AND financial_type_id IN (' . implode(',', $unavailableTypes) . '))';
+          $clauses['id'][] = 'AND NOT EXISTS (SELECT 1 FROM civicrm_line_item WHERE contribution_id = {id} AND financial_type_id IN (' . implode(',', $unavailableTypes) . '))';
         }
       }
       break;
