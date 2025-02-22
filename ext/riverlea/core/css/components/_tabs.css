@@ -96,7 +96,7 @@
 .crm-container .ui-tabs ul.ui-tabs-nav .crm-count-0 a em,
 .crm-container #mainTabContainer ul.ui-tabs-nav .crm-count-0 a em {
   background: var(--crm-c-background5);
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
 }
 .crm-container .ui-tabs ul li em:empty,
 .crm-container .nav-tabs .badge:empty { /* this is to keep the height of tabs with empty badges */

@@ -43,7 +43,7 @@ af-form > fieldset > legend {
 }
 .crm-container.crm-public .header-dark {
   background: var(--crm-c-secondary);
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
   padding: var(--crm-m1) var(--crm-f-fieldset-padding);
   font-family: var(--crm-font-bold);
   font-weight: bold;

@@ -5,7 +5,6 @@
   --crm-c-link: var(--crm-c-amber);
   --crm-c-link-hover: var(--crm-c-amber-light);
   --crm-c-focus: var(--crm-c-link);
-  --crm-c-text-light: var(--crm-c-darkest);
   --crm-c-background: var(--crm-c-gray-900);
   --crm-c-page-background: var(--crm-c-darkest);
   --crm-c-code-background: var(--crm-c-background2);
@@ -62,7 +61,6 @@
   --crm-c-inactive: var(--crm-c-gray-400);
   --crm-input-color: var(--crm-c-text);
   --crm-input-description: var(--crm-c-gray-300);
-  --crm-checkbox-list-col: var(--crm-c-text-light);
   --crm-dialog-header-border-col: transparent;
   --crm-dialog-header-bg: var(--crm-c-background2);
   --crm-dialog-body-bg: var(--crm-c-background2);
