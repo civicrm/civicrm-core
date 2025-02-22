@@ -71,39 +71,33 @@ class SendTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface,
       'body_html' => '<p>Your birthday is tomorrow!</p>',
       'subject' => 'Happy birthday {contact.first_name}!',
     ]);
-    $yearToUse = date('Y') + 1;
-    $cronRuns = [
+    $this->assertCronRuns([
       [
         // No birthdays tomorrow
-        'time' => $yearToUse . '-04-02 04:00:00',
+        'time' => '2025-04-02 04:00:00',
         'to' => [],
         'subjects' => [],
       ],
       [
-        'time' => $yearToUse . '-02-18 04:00:00',
+        'time' => '2025-02-18 04:00:00',
         'to' => [["b@$lastName"]],
         'all_recipients' => ["b@$lastName;alt1@$lastName"],
         'subjects' => ['Happy birthday B!'],
       ],
       [
         // Upcoming birthday but contact is deceased
-        'time' => $yearToUse . '-02-08 04:00:00',
+        'time' => '2025-02-08 04:00:00',
         'to' => [],
         'subjects' => [],
       ],
-    ];
-    // We can only run this case if the current year is a leap year.
-    // CRM_Utils_Time doesn't change what mysql CURDATE returns, so it will fail.
-    if ((new \IntlGregorianCalendar())->isLeapYear(date('Y'))) {
-      $cronRuns[] = [
+      [
         // On a non-leap-year, birthday is the 28th
-        'time' => $yearToUse . '-02-27 04:00:00',
+        'time' => '2025-02-27 04:00:00',
         'to' => [["a@$lastName"], ["aa@$lastName"]],
         'all_recipients' => ["a@$lastName;alt1@$lastName", "aa@$lastName;alt1@$lastName"],
         'subjects' => ['Happy birthday A!', 'Happy birthday AA!'],
-      ];
-    }
-    $this->assertCronRuns($cronRuns);
+      ],
+    ]);
   }
 
   public function testAlternateRecipients():void {
