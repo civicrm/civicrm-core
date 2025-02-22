@@ -63,6 +63,7 @@
 /* Type */
   --crm-link-decoration-hover: none;
   --crm-heading-bg: var(--crm-c-background3);
+  --crm-heading-col: var(--crm-c-text-dark);
   --crm-heading-padding: var(--crm-m2) var(--crm-m);
   --crm-heading-margin: 0;
   --crm-heading-radius: 0;
