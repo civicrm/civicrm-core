@@ -379,8 +379,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contactIDs = [];
     for ($i = 0; $i < 10; $i++) {
       $contactIDs[] = $this->individualCreate([
-        'first_name' => 'Alan' . substr(sha1(rand()), 0, 7),
-        'last_name' => 'Smith' . substr(sha1(rand()), 0, 4),
+        'first_name' => 'Alan' . bin2hex(random_bytes(4)),
+        'last_name' => 'Smith' . bin2hex(random_bytes(2)),
       ]);
     }
 

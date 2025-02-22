@@ -29,17 +29,17 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
    */
   public function testSend(): void {
     $contact_params_1 = [
-      'first_name' => substr(sha1(rand()), 0, 7),
+      'first_name' => bin2hex(random_bytes(4)),
       'last_name' => 'Anderson',
-      'email' => substr(sha1(rand()), 0, 7) . '@example.org',
+      'email' => bin2hex(random_bytes(4)) . '@example.org',
       'contact_type' => 'Individual',
     ];
     $contact_id_1 = $this->individualCreate($contact_params_1);
 
     $contact_params_2 = [
-      'first_name' => substr(sha1(rand()), 0, 7),
+      'first_name' => bin2hex(random_bytes(4)),
       'last_name' => 'Xylophone',
-      'email' => substr(sha1(rand()), 0, 7) . '@example.org',
+      'email' => bin2hex(random_bytes(4)) . '@example.org',
       'contact_type' => 'Individual',
     ];
     $contact_id_2 = $this->individualCreate($contact_params_2);

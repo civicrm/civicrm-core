@@ -50,7 +50,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
   public function testPublicCreateAllowed() {
     $initialMaxId = CRM_Core_DAO::singleValueQuery('SELECT max(id) FROM civicrm_contact');
 
-    $r = md5(random_bytes(16));
+    $r = bin2hex(random_bytes(16));
 
     $me = [0 => ['fields' => []]];
     $me[0]['fields']['first_name'] = 'Firsty' . $r;
@@ -75,7 +75,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       ->execute()
       ->first();
 
-    $r = md5(random_bytes(16));
+    $r = bin2hex(random_bytes(16));
 
     $me = [0 => ['fields' => []]];
     $me[0]['fields']['id'] = $contact['id'];

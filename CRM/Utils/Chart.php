@@ -270,7 +270,7 @@ class CRM_Utils_Chart {
         }
 
         // generate unique id for this chart instance
-        $uniqueId = md5(uniqid(rand(), TRUE));
+        $uniqueId = bin2hex(random_bytes(16));
 
         $theChart["chart_{$uniqueId}"]['size'] = ['xSize' => $xSize, 'ySize' => $ySize];
         $theChart["chart_{$uniqueId}"]['object'] = $chartObj;

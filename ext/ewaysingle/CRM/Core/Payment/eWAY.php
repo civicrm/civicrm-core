@@ -214,7 +214,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     // We use CiviCRM's param's 'invoiceID' as the unique transaction token to feed to eWAY
     // Trouble is that eWAY only accepts 16 chars for the token, while CiviCRM's invoiceID is an 32.
-    // As its made from a "$invoiceID = md5(uniqid(rand(), true));" then using the fierst 16 chars
+    // As its made from a "$invoiceID = bin2hex(random_bytes(16))" then using the first 16 chars
     // should be alright
     //----------------------------------------------------------------------------------------------------
     $uniqueTrnxNum = substr($params['invoiceID'], 0, 16);

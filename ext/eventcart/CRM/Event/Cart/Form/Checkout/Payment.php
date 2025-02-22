@@ -474,7 +474,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
 
     $params['now'] = date('YmdHis');
-    $params['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $params['invoiceID'] = bin2hex(random_bytes(16));
     $params['amount'] = $this->total;
     $params['financial_type_id'] = $this->financial_type_id;
     if ($this->payment_required && empty($params['is_pay_later'])) {

@@ -49,7 +49,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
   protected function searchContacts($contactSubType) {
     // create contact
     $params = [
-      'first_name' => 'Peter' . substr(sha1(rand()), 0, 4),
+      'first_name' => 'Peter' . bin2hex(random_bytes(2)),
       'last_name' => 'Lastname',
       'contact_type' => 'Individual',
       'contact_sub_type' => $contactSubType,
