@@ -89,7 +89,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
             $profile['participant_id'] = $this->getParticipantID();
             try {
               $fields = CRM_Event_BAO_Event::getProfileDisplay([$profile['id']],
-                $this->getParticipant()['contact_id'] ?? 0,
+                $this->getParticipant()['contact_id'] ?? NULL,
                 $this->getParticipantID(),
                 $this->getNote(),
               );
@@ -111,7 +111,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
                 }
                 try {
                   $fields = CRM_Event_BAO_Event::getProfileDisplay([$profile['id']],
-                    $participant['contact']['id'],
+                    $participant['contact']['id'] ?? NULL,
                     $participant['id'],
                     $this->getNote()
                   );
