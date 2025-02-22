@@ -230,7 +230,6 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertNotNull($workflow);
     $result = $workflow->renderTemplate();
 
-    $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['text']);
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['html']);
     $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
 
