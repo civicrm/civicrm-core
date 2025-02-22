@@ -212,3 +212,6 @@ html.crm-standalone body {
 html.crm-standalone #crm-container:has(.standalone-auth-form) {
   background: var(--crm-c-background);
 }
+html.crm-standalone .standalone-auth-box {
+  background: var(--crm-c-page-background);
+}

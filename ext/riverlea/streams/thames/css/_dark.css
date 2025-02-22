@@ -109,11 +109,7 @@
 }
 /* .crm-container .crm-search-nav-tabs { border-color: var(--crm-c-dkblue-01); } */
 
-/* Override standalone.css */
-.standalone-auth-box {
-  background: var(--crm-c-dkblue-01) !important;
-  color: white !important;
-}
+/* override standalone.css */
 #login-form {
   --crm-big-input: 100%;
 }

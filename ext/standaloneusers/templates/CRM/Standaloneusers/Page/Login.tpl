@@ -2,7 +2,7 @@
 <div class="standalone-auth-form">
   <div class="standalone-auth-box">
     <form id=login-form>
-      <img class="crm-logo" src="{$logoUrl}" alt="{ts escape='htmlattribute'}Logo for CiviCRM, with an intersecting blue and green triangle{/ts}">
+      {include file='CRM/common/logo.tpl'}
       <div class="input-wrapper">
         <label for="usernameInput" name=username class="form-label">{ts}Username{/ts}</label>
         <input type="text" class="form-control crm-form-text" id="usernameInput" >
@@ -36,7 +36,7 @@
       let errorMsg = '{/literal}{ts escape="js"}Unexpected error{/ts}{literal}';
       try {
         let originalUrl = location.href;
-        // Remove the current status popup messages. 
+        // Remove the current status popup messages.
         CRM.$('#crm-notification-container .ui-notify-message').remove();
         const response = await CRM.api4('User', 'login', {
           username: username.value,
