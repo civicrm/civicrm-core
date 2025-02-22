@@ -933,4 +933,8 @@ AND    u.status = 1
     return function_exists('ip_address') ? ip_address() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
   }
 
+  public function isMaintenanceMode(): bool {
+    return variable_get('maintenance_mode', FALSE);
+  }
+
 }
