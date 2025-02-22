@@ -29,6 +29,11 @@ class SendTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface,
     $this->mut = new \CiviMailUtils($this, TRUE);
   }
 
+  public function tearDown(): void {
+    \CRM_Utils_Time::resetTime();
+    parent::tearDown();
+  }
+
   public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()
       ->installMe(__DIR__)

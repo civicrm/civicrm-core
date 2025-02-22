@@ -540,6 +540,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;
+    CRM_Utils_Time::resetTime();
     $this->frozenTime = NULL;
 
     error_reporting(E_ALL & ~E_NOTICE);
