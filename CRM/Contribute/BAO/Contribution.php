@@ -4227,13 +4227,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $endDate = "$nextYear$monthDay";
     $havingClause = 'contribution_status_id = ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
-    $contributionBAO = new CRM_Contribute_BAO_Contribution();
-    $whereClauses = $contributionBAO->addSelectWhereClause();
-
-    $clauses = [];
-    foreach ($whereClauses as $key => $clause) {
-      $clauses[] = 'b.' . $key . ' ' . implode(' AND b.' . $key . ' ', (array) $clause);
-    }
+    $clauses = CRM_Contribute_BAO_Contribution::getSelectWhereClause('b');
     $clauses[] = 'b.contact_id IN (' . $contactIDs . ')';
     $clauses[] = 'b.is_test = 0';
     $clauses[] = 'b.receive_date >=' . $startDate . ' AND b.receive_date < ' . $endDate;
