@@ -34,9 +34,10 @@
   --crm-c-gray-500: #6c6c6c;
   --crm-c-gray-300: #e1dfdf;
   --crm-c-gray-200: #bdbdbd;
-  --crm-c-yellow-light: #665800;
-  --crm-c-yellow-less-light: #525209;
   --crm-c-divider: 1px solid var(--crm-c-gray-500);
+  --crm-checkbox-list-col: #665800;
+  --crm-checkbox-list-bg2: #525209;
+  --crm-checkbox-list-col: var(--crm-c-text-light);
   /* And others */
   --crm-c-focus: #00a3a5;
   --crm-btn-icon-bg: var(--crm-c-gray-700);
