@@ -98,10 +98,9 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
 
     $bundle->addStyleUrl($riverUrl);
 
-    // pass the river url to the clientside, so the previewer can easily remove it
-    \Civi::resources()->addVars('riverlea', [
-      'river_url' => $riverUrl,
-    ]);
+    // TODO: add a non-admin permission for using Previewer
+    if (\CRM_Core_Permission::check('administer CiviCRM')) {
+      \Civi::resources()->addScriptFile('riverlea', 'js/previewer.js');
 
       // pass the river url and dark mode setting to the clientside
       // so the previewer can easily work with them
@@ -113,10 +112,7 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
       ]);
     }
   }
-  // TODO: add a non-admin permission for using Previewer
-  if (\CRM_Core_Permission::check('administer CiviCRM')) {
-    \Civi::resources()->addScriptFile('riverlea', 'js/previewer.js');
-  }
+
 }
 
 /**
