@@ -243,18 +243,20 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    *
    * @return array
    */
-  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $unused = FALSE, $includeDisabled = FALSE) {
-    if (empty($financialTypes)) {
-      $query = 'SELECT id, label FROM civicrm_financial_type';
-      if (!$includeDisabled) {
-        $query .= ' WHERE is_active = 1';
-      }
-      $financialTypeOptions = CRM_Core_DAO::executeQuery($query)->fetchAll();
-      $financialTypes = array_column($financialTypeOptions, 'label', 'id');
+  public static function getAvailableFinancialTypes(&$financialTypes = [], $action = CRM_Core_Action::VIEW, $unused = FALSE, $includeDisabled = FALSE) {
+    $query = 'SELECT id, `name`, label FROM civicrm_financial_type';
+    if (!$includeDisabled) {
+      $query .= ' WHERE is_active = 1';
+    }
+    $financialTypeOptions = CRM_Core_DAO::executeQuery($query)->fetchAll();
+    if (!empty($financialTypes)) {
+      $financialTypeOptions = array_column($financialTypeOptions, NULL, 'id');
+      $financialTypeOptions = array_intersect_key($financialTypeOptions, $financialTypes);
     }
     if (!self::isACLFinancialTypeStatus()) {
-      return $financialTypes;
+      return array_column($financialTypeOptions, 'label', 'id');
     }
+
     $actions = [
       CRM_Core_Action::VIEW => 'view',
       CRM_Core_Action::UPDATE => 'edit',
@@ -263,14 +265,20 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
     ];
 
     if (!isset(\Civi::$statics[__CLASS__]['available_types_' . $action])) {
-      foreach ($financialTypes as $finTypeId => $type) {
-        if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
-          unset($financialTypes[$finTypeId]);
+      foreach ($financialTypeOptions as $type) {
+        if (CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type['name'])) {
+          $financialTypes[$type['id']] = $type['label'];
+        }
+        elseif (isset($financialTypes[$type['id']])) {
+          unset($financialTypes[$type['id']]);
         }
       }
       \Civi::$statics[__CLASS__]['available_types_' . $action] = $financialTypes;
     }
-    $financialTypes = \Civi::$statics[__CLASS__]['available_types_' . $action];
+    else {
+      $financialTypes = \Civi::$statics[__CLASS__]['available_types_' . $action];
+    }
+
     return \Civi::$statics[__CLASS__]['available_types_' . $action];
   }
 

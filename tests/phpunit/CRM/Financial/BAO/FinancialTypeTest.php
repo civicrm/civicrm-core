@@ -71,15 +71,21 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    */
   public function testGetAvailableFinancialTypes(): void {
     $this->setACL();
+    FinancialType::create(FALSE)
+      ->addValue('label', 'New FinType')
+      ->addValue('name', 'new_fin_type')
+      ->execute();
     $this->setPermissions([
       'view contributions of type Donation',
       'view contributions of type Member Dues',
+      'view contributions of type new_fin_type',
     ]);
     $types = [];
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
     $expectedResult = [
       1 => 'Donation',
       2 => 'Member Dues',
+      5 => 'New FinType',
     ];
     $this->assertEquals($expectedResult, $types, 'Verify that only certain financial types can be retrieved');
 
@@ -87,6 +93,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       'view contributions of type Donation',
     ]);
     unset($expectedResult[2]);
+    unset($expectedResult[5]);
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
     $this->assertEquals($expectedResult, $types, 'Verify that removing permission for a financial type restricts the available financial types');
   }
