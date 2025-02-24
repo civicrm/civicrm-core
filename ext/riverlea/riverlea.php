@@ -93,21 +93,23 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
     // get DynamicCss asset URL
     $riverUrl = \Civi::service('asset_builder')->getUrl(
       \Civi\riverlea\DynamicCss::CSS_FILE,
-      Civi::service('riverlea.dynamic_css')->getCssParams()
+      \Civi::service('riverlea.dynamic_css')->getCssParams()
     );
 
     $bundle->addStyleUrl($riverUrl);
 
-    // pass the river url to the clientside, so the previewer can easily remove it
-    \Civi::resources()->addVars('riverlea', [
-      'river_url' => $riverUrl,
-    ]);
+    // TODO: add a non-admin permission for using Previewer
+    if (\CRM_Core_Permission::check('administer CiviCRM')) {
+      \Civi::resources()->addScriptFile('riverlea', 'js/previewer.js');
 
+      // pass the river url to the clientside, so the previewer can easily remove it
+      \Civi::resources()->addVars('riverlea', [
+        'river_url' => $riverUrl,
+        'dark_mode' => \Civi::settings()->get(\CRM_Utils_System::isFrontendPage() ? 'riverlea_dark_mode_frontend' : 'riverlea_dark_mode_backend')
+      ]);
+    }
   }
-  // TODO: add a non-admin permission for using Previewer
-  if (\CRM_Core_Permission::check('administer CiviCRM')) {
-    \Civi::resources()->addScriptFile('riverlea', 'js/previewer.js');
-  }
+
 }
 
 /**

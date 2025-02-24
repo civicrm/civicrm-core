@@ -33,6 +33,10 @@
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>entity-types-php@2.0.0</mixin>
+    <mixin>afform-entity-php@1.0.0</mixin>
+    <mixin>ang-php@1.0.0</mixin>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
   </mixins>
   <upgrader>CiviMix\Schema\Riverlea\AutomaticUpgrader</upgrader>
 </extension>
