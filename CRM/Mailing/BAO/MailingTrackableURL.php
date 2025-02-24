@@ -60,19 +60,34 @@ class CRM_Mailing_BAO_MailingTrackableURL extends CRM_Mailing_DAO_MailingTrackab
 
       $hrefExists = FALSE;
 
-      $tracker = new CRM_Mailing_BAO_MailingTrackableURL();
       if (preg_match('/^href/i', $url)) {
         $url = preg_replace('/^href[ ]*=[ ]*[\'"](.*?)[\'"]$/i', '$1', $url);
         $hrefExists = TRUE;
       }
 
-      $tracker->url = $url;
-      $tracker->mailing_id = $mailing_id;
+      $turl = CRM_Utils_Type::escape(CRM_Mailing_BAO_MailingTrackableURL::getTableName(), 'MysqlColumnNameOrAlias');
 
-      if (!$tracker->find(TRUE)) {
+      // search for an existing identical url using the BINARY operator to avoid
+      // matching an entry which differs only by case or by trailing whitespace
+      $search = CRM_Core_DAO::executeQuery(
+        "SELECT `url`, `id` FROM $turl
+          WHERE BINARY $turl.`url` = %1 AND $turl.`mailing_id` = %2",
+        [
+          1 => [$url, 'String'],
+          2 => [$mailing_id, 'Integer'],
+        ]
+      );
+
+      if (!$search->fetch()) {
+        $tracker = new CRM_Mailing_BAO_MailingTrackableURL();
+        $tracker->url = $url;
+        $tracker->mailing_id = $mailing_id;
         $tracker->save();
+        $id = $tracker->id;
       }
-      $id = $tracker->id;
+      else {
+        $id = $search->id;
+      }
 
       $redirect = CRM_Utils_System::externUrl('extern/url', "u=$id");
       $urlCache[$mailing_id . $url] = $redirect;
