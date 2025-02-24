@@ -1,4 +1,9 @@
-1.3.6-6.1alpha
+1.3.7-6.0alpha
+ - FIXED - inline code/pre block issue. Also applied to keyboard elements. Override created for td > code. (#113)
+ - FIXED - API3 - illegible colours on Select2 description
+ - CHANGED - Version numbers on streams -> updated to latest.
+
+1.3.6-6.0alpha
  - FIXED - Responsive: make dashlets stack on Civi Dashboard under 990px (same as Greenwich)
  - FIXED - Show Add Address without hover on Contact Dashboard (#109)
  - FIXED - code/pre formatting is wrapping on one line (#108)
