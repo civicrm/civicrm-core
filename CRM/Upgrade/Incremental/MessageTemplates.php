@@ -385,6 +385,21 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_online_receipt', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '6.1.alpha1',
+        'upgrade_descriptor' => ts('Remove the Financial Type from contribution and event receipts. Rename Billing Address.'),
+        'templates' => [
+          ['name' => 'event_online_receipt', 'type' => 'html'],
+          ['name' => 'event_offline_receipt', 'type' => 'html'],
+          ['name' => 'contribution_online_receipt', 'type' => 'html'],
+          ['name' => 'contribution_offline_receipt', 'type' => 'html'],
+          ['name' => 'contribution_recurring_billing', 'type' => 'html'],
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
+          ['name' => 'membership_offline_receipt', 'type' => 'html'],
+          ['name' => 'membership_autorenew_billing', 'type' => 'html'],
+          ['name' => 'payment_or_refund_notification', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 

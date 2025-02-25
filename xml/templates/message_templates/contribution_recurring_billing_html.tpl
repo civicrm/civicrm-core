@@ -30,7 +30,7 @@
   <table style="width:100%; max-width:500px; border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
     <tr>
         <th {$headerStyle}>
-         {ts}Billing Name and Address{/ts}
+         {ts}Billing Address{/ts}
         </th>
        </tr>
        <tr>
