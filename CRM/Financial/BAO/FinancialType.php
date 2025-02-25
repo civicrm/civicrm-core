@@ -254,7 +254,8 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
       $financialTypeOptions = array_intersect_key($financialTypeOptions, $financialTypes);
     }
     if (!self::isACLFinancialTypeStatus()) {
-      return array_column($financialTypeOptions, 'label', 'id');
+      $financialTypes = array_column($financialTypeOptions, 'label', 'id');
+      return $financialTypes;
     }
 
     $actions = [
