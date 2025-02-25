@@ -77,12 +77,19 @@ function standaloneusers_civicrm_permission(&$permissions) {
     'label' => E::ts('CiviCRM Standalone Users: Allow users to access the reset password system'),
   ];
   // provide expected cms: permissions.
+  //
+  // This duplicates the list from CRM_Core_Permission_Base::getAvailablePermissions.
+  // It may be cleaner to extend via CRM_Core_Permission_Standalone::getAvailablePermissions (call parent and flip is_synthetic).
   $permissions['cms:administer users'] = [
     'label' => E::ts('CiviCRM Standalone Users: Administer user accounts'),
     'implies' => ['cms:view user account'],
   ];
   $permissions['cms:view user account'] = [
     'label' => E::ts('CiviCRM Standalone Users: View user accounts'),
+  ];
+  $permissions['cms:bypass maintenance mode'] = [
+    'label' => ts('CiviCRM Standalone Users: Bypass maintenance mode'),
+    'description' => ts('Allow to bypass maintenance mode checks - e.g. when using AJAX API'),
   ];
 }
 

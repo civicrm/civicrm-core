@@ -353,6 +353,8 @@ class CRM_Core_Invoke {
   /**
    * Show status in the footer (admin only)
    *
+   * If in Maintenance Mode, display a message to user
+   *
    * @param CRM_Core_Smarty $template
    */
   public static function statusCheck($template) {
@@ -363,6 +365,14 @@ class CRM_Core_Invoke {
     $status = Civi::cache('checks')->get('systemStatusCheckResult');
     $template->assign('footer_status_severity', $status);
     $template->assign('footer_status_message', CRM_Utils_Check::toStatusLabel($status));
+
+    // show user a warning if CiviCRM is in explicit maintenance mode
+    // NOTE: if maintenance mode is inherited from the CMS, we expect the CMS
+    // to issue its own warning
+    $coreMaintenanceMode = \Civi::settings()->get('core_maintenance_mode');
+    if ($coreMaintenanceMode && ($coreMaintenanceMode !== 'inherit')) {
+      \CRM_Core_Session::setStatus(ts('CiviCRM is currently in maintenance mode. To deactivate, update the <code>core_maintenance_mode</code> setting.'), ts('Maintenance Mode'), 'warning');
+    }
   }
 
   /**
