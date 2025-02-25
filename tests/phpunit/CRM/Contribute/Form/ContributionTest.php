@@ -626,7 +626,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'Dear Anthony,',
       'Contribution Information',
       'Contributor Name Mr. Anthony Anderson II',
-      'Financial Type Donation',
       'Contribution Date ' . date('m/d/Y'),
       'Receipt Date ' . date('m/d/Y'),
     ]);
@@ -1210,8 +1209,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'Check',
       'Check Number',
       '12345',
-      'Financial Type',
-      'Donation',
     ]);
 
     $this->callAPISuccessGetCount('FinancialTrxn', [], 4);

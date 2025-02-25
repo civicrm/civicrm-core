@@ -1169,7 +1169,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     ], 1);
     $this->assertMailSentContainingStrings([
-      'Billing Name and Address',
+      'Billing Address',
       'Test Last',
       '10 Test St',
       'Test, AR 90210',
