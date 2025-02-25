@@ -2,6 +2,7 @@
 namespace Civi\Token;
 
 use Brick\Money\Money;
+use Exception;
 
 /**
  * Class TokenRow
@@ -279,7 +280,13 @@ class TokenRow {
       case 'text/html':
         // Plain => HTML.
         foreach ($textTokens as $entity => $values) {
-          $entityFields = civicrm_api3($entity, "getFields", ['api_action' => 'get']);
+          try {
+            $entityFields = \Civi\API\Request::create($entity, 'get', ['version' => 4])->entityFields();
+          }
+          catch(Exception $e) {
+            // Not every "entity" is actually an entity - e.g. action.OptOutUrl.
+            continue;
+          }
           foreach ($values as $field => $value) {
             if (!isset($htmlTokens[$entity][$field])) {
               // CRM-18420 - Activity Details Field are enclosed within <p>,
@@ -288,7 +295,7 @@ class TokenRow {
               if ($entity == 'activity' && $field == 'details') {
                 $htmlTokens[$entity][$field] = $value;
               }
-              elseif (($entityFields['values'][$field]['data_type'] ?? NULL) === 'Memo') {
+              elseif (($entityFields[$field]['data_type'] ?? NULL) === 'Text') {
                 // Memo fields aka custom fields of type Note are html.
                 $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
