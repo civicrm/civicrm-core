@@ -268,6 +268,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   public function preProcess() {
     parent::preProcess();
     $this->_ccid = $this->get('ccid');
+    if ($this->_ccid) {
+      try {
+        $this->_membershipId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
+          $this->_ccid,
+          'membership_id',
+          'contribution_id'
+        );
+      }
+      catch (Throwable $e) {
+      }
+    }
 
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
@@ -1375,7 +1386,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $membershipTypeIDs
    *
    * @param bool $isPaidMembership
-   * @param array $membershipID
+   * @param int $membershipID
    *
    * @param int $financialTypeID
    *   Line items for payment options chosen on the form.
@@ -2870,7 +2881,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
     $memParams['line_item'] = $lineItems;
-    // @todo stop passing $ids (membership and userId may be set by this point)
+    $ids['membership'] = !empty($ids['membership']) ? $ids['membership'] : $membershipID;
     $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
