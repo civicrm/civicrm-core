@@ -2044,7 +2044,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    */
   public function getInvoiceID(): string {
     if (!$this->invoiceID) {
-      $this->invoiceID = md5(uniqid(rand(), TRUE));
+      $this->invoiceID = bin2hex(random_bytes(16));
     }
     return $this->invoiceID;
   }

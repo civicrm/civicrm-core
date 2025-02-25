@@ -51,7 +51,7 @@ class QueueTest extends Api4TestBase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testBasicLinearPolling(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
       'runner' => 'task',
@@ -105,7 +105,7 @@ class QueueTest extends Api4TestBase {
   }
 
   public function testBasicParallelPolling(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_parallel';
     $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
 
@@ -144,7 +144,7 @@ class QueueTest extends Api4TestBase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testBatchParallelPolling(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_parallel';
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
     $queue = \Civi::queue($queueName, [
       'type' => 'SqlParallel',
@@ -172,7 +172,7 @@ class QueueTest extends Api4TestBase {
   }
 
   public function testReset() {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_reset';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_reset';
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
     $queue = \Civi::queue($queueName, [
       'type' => 'SqlParallel',
@@ -192,7 +192,7 @@ class QueueTest extends Api4TestBase {
   }
 
   public function testRunLoop() {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_runloop';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_runloop';
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
     $queue = \Civi::queue($queueName, [
       'type' => 'SqlParallel',
@@ -235,7 +235,7 @@ class QueueTest extends Api4TestBase {
   }
 
   public function testRunLoop_abort() {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_runloopabort';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_runloopabort';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
       'runner' => 'task',
@@ -290,7 +290,7 @@ class QueueTest extends Api4TestBase {
   }
 
   public function testSelect(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_parallel';
     $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
 
@@ -307,7 +307,7 @@ class QueueTest extends Api4TestBase {
   }
 
   public function testSelectRunAs(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_select';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_select';
     $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
 
@@ -323,7 +323,7 @@ class QueueTest extends Api4TestBase {
   }
 
   public function testEmptyPoll(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_linear';
     $queue = \Civi::queue($queueName, ['type' => 'Sql', 'runner' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
 
@@ -343,7 +343,7 @@ class QueueTest extends Api4TestBase {
    * @dataProvider getDelayableDrivers
    */
   public function testDelayedStart(array $queueSpec) {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_delayed';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_delayed';
     $queue = \Civi::queue($queueName, $queueSpec);
     $this->assertQueueStats(0, 0, 0, $queue);
 
@@ -380,7 +380,7 @@ class QueueTest extends Api4TestBase {
    * @dataProvider getErrorModes
    */
   public function testRetryWithPoliteExhaustion(string $errorMode) {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
       'runner' => 'task',
@@ -422,7 +422,7 @@ class QueueTest extends Api4TestBase {
    * few tasks. But the third one works!
    */
   public function testRetryWithDelinquencyAndSuccess(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
       'runner' => 'task',
@@ -468,7 +468,7 @@ class QueueTest extends Api4TestBase {
   public function testRetryWithEventualFailure(string $errorMode) {
     \Civi::$statics[__CLASS__]['doSomethingResult'] = FALSE;
 
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
       'runner' => 'task',
@@ -518,7 +518,7 @@ class QueueTest extends Api4TestBase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testUserJobQueue_Completion(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_userjob';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_userjob';
 
     $firedQueueStatus = [];
     \Civi::dispatcher()->addListener('hook_civicrm_queueStatus', function($e) use (&$firedQueueStatus) {
@@ -578,7 +578,7 @@ class QueueTest extends Api4TestBase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testServiceQueue_NeverComplete(): void {
-    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_service';
+    $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_service';
 
     $firedQueueStatus = [];
     \Civi::dispatcher()->addListener('hook_civicrm_queueStatus', function($e) use (&$firedQueueStatus) {

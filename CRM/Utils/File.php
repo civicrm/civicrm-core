@@ -458,7 +458,7 @@ class CRM_Utils_File {
    * @return string
    */
   public static function makeFileName($name, bool $unicode = FALSE) {
-    $uniqID = md5(uniqid(rand(), TRUE));
+    $uniqID = bin2hex(random_bytes(16));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
       0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
@@ -509,7 +509,7 @@ class CRM_Utils_File {
    */
   public static function duplicate($filePath) {
     $oldName = pathinfo($filePath, PATHINFO_FILENAME);
-    $uniqID = md5(uniqid(rand(), TRUE));
+    $uniqID = bin2hex(random_bytes(16));
     $newName = preg_replace('/(_[\w]{32})$/', '', $oldName) . '_' . $uniqID;
     $newPath = str_replace($oldName, $newName, $filePath);
     copy($filePath, $newPath);
@@ -730,9 +730,6 @@ HTACCESS;
    * @see tempnam
    */
   public static function tempnam($prefix = 'tmp-') {
-    // $config = CRM_Core_Config::singleton();
-    // $nonce = md5(uniqid() . $config->dsn . $config->userFrameworkResourceURL);
-    // $fileName = "{$config->configAndLogDir}" . $prefix . $nonce . $suffix;
     $fileName = tempnam(sys_get_temp_dir(), $prefix);
     return $fileName;
   }

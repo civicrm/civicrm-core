@@ -154,7 +154,7 @@ trait ContactTestTrait {
     foreach ($samples[$contact_type] as $key => $values) {
       $params[$key] = $values[$seq % count($values)];
       if ($random) {
-        $params[$key] .= substr(sha1(mt_rand()), 0, 5);
+        $params[$key] .= bin2hex(random_bytes(3));
       }
     }
     if ($contact_type === 'Individual') {

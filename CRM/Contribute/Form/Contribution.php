@@ -1234,7 +1234,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     CRM_Contribute_Form_AdditionalInfo::postProcessCommon($params, $this->_params, $this);
 
     if (empty($this->_params['invoice_id'])) {
-      $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+      $this->_params['invoiceID'] = bin2hex(random_bytes(16));
     }
     else {
       $this->_params['invoiceID'] = $this->_params['invoice_id'];

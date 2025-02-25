@@ -790,7 +790,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'id' => $customField['id'],
       'token' => sprintf('{contact.custom_%s}', $customField['id']),
       'name' => sprintf('custom_%s', $customField['id']),
-      'value' => 'text ' . substr(sha1(mt_rand()), 0, 7),
+      'value' => 'text ' . bin2hex(random_bytes(4)),
     ];
 
     $this->fixtures['sched_on_custom_date'] = [

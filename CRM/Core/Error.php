@@ -509,7 +509,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     if ($log) {
       // Log the output to error_log with a unique reference.
-      $unique = substr(md5(random_bytes(32)), 0, 12);
+      $unique = bin2hex(random_bytes(6));
       error_log("errorID:$unique\n$out");
 
       if (!$checkPermission) {

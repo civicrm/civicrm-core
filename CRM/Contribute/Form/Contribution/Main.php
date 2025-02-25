@@ -1252,7 +1252,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->set('amount', $this->getMainContributionAmount());
 
     // generate and set an invoiceID for this transaction
-    $invoiceID = md5(uniqid(rand(), TRUE));
+    $invoiceID = bin2hex(random_bytes(16));
     $this->set('invoiceID', $invoiceID);
     $params['invoiceID'] = $invoiceID;
     $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];

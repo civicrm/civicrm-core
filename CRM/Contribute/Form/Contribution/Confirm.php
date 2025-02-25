@@ -1669,7 +1669,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
     $tempParams['amount'] = $minimumFee;
-    $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $tempParams['invoiceID'] = bin2hex(random_bytes(16));
     $isRecur = $tempParams['is_recur'] ?? NULL;
 
     //assign receive date when separate membership payment
@@ -1850,7 +1850,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     //this way the mocked up controller ignores the session stuff
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Contribute_Controller_Contribution();
-    $params['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $params['invoiceID'] = bin2hex(random_bytes(16));
 
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
 
