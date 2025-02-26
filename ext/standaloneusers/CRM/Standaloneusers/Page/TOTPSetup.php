@@ -60,7 +60,6 @@ class CRM_Standaloneusers_Page_TOTPSetup extends CRM_Core_Page {
     $barcodeobj = new TCPDF2DBarcode($url, 'QRCODE,H');
     $this->assign('totpqr', $barcodeobj->getBarcodeHTML(4, 4, 'black'));
 
-    $this->assign('logoUrl', E::url('images/civicrm-logo.png'));
     $this->assign('pageTitle', '');
     $this->assign('breadcrumb', NULL);
     parent::run();
