@@ -32,6 +32,30 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     $this->addTask('Update afform tab names', 'updateAfformTabs');
     $this->addTask('Update import mappings', 'updateFieldMappingsForImport');
     $this->addTask('Replace Clear Caches & Reset Paths with Clear Caches in Nav Menu', 'updateUpdateConfigBackendNavItem');
+
+    $this->addExtensionTask('Enable Riverlea extension', ['riverlea']);
+    $this->addTask('Freeze "default" theme to Greenwich', 'freezeDefaultThemeToGreenwich');
+  }
+
+  /**
+   * 'default' is being removed as a valid theme choice.
+   *
+   * It has always meant Greenwich, so sites previously on
+   * "default" change this to an explicit value Greenwich.
+   *
+   * @return bool
+   */
+  public static function freezeDefaultThemeToGreenwich() {
+    $themeSettings = ['theme_backend', 'theme_frontend'];
+
+    foreach ($themeSettings as $key) {
+      $value = \Civi::settings()->get($key);
+      if ($value === 'default') {
+        \Civi::settings()->set($key, 'greenwich');
+      }
+    }
+
+    return TRUE;
   }
 
   /**

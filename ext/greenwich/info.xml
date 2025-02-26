@@ -16,9 +16,6 @@
   </urls>
   <releaseDate>[civicrm.releaseDate]</releaseDate>
   <version>[civicrm.version]</version>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
   <develStage>stable</develStage>
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>

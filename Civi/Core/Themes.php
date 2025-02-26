@@ -22,10 +22,14 @@ use Civi;
 class Themes extends \Civi\Core\Service\AutoService {
 
   /**
-   * The "default" theme adapts based on the latest recommendation from civicrm.org
-   * by switching to DEFAULT_THEME at runtime.
+   * Disable core CSS.
    */
-  const DEFAULT_THEME = 'greenwich';
+  const NO_STYLES = 'none';
+
+  /**
+   * Core CSS only.
+   */
+  const NO_THEME = 'no_theme';
 
   /**
    * Fallback is a pseudotheme which can be included in "search_order".
@@ -68,13 +72,18 @@ class Themes extends \Civi\Core\Service\AutoService {
    */
   public function getActiveThemeKey() {
     if ($this->activeThemeKey === NULL) {
-      // Ambivalent: is it better to use $config->userFrameworkFrontend or $template->get('urlIsPublic')?
-      $config = \CRM_Core_Config::singleton();
-      $settingKey = $config->userSystem->isFrontEndPage() ? 'theme_frontend' : 'theme_backend';
+      $settingKey = \CRM_Utils_System::isFrontEndPage() ? 'theme_frontend' : 'theme_backend';
 
       $themeKey = Civi::settings()->get($settingKey);
+
+      // catch for if 'default' value has stuck around. for as long as anyone
+      // can remember default meant Greenwich
+      // TODO: remove this catch around 6.12?
       if ($themeKey === 'default') {
-        $themeKey = self::DEFAULT_THEME;
+        \Civi::log()->debug("Warning: found deprecated value 'default' for '{$settingKey}'. This will be interpreted as Greenwich but this handling may be removed in a future release.");
+        // fix it for you?
+        // Civi::settings()->set($settingKey, 'greenwich');
+        $themeKey = 'greenwich';
       }
 
       \CRM_Utils_Hook::activeTheme($themeKey, [
@@ -83,7 +92,7 @@ class Themes extends \Civi\Core\Service\AutoService {
       ]);
 
       $themes = $this->getAll();
-      $this->activeThemeKey = isset($themes[$themeKey]) ? $themeKey : self::DEFAULT_THEME;
+      $this->activeThemeKey = isset($themes[$themeKey]) ? $themeKey : self::NO_THEME;
     }
     return $this->activeThemeKey;
   }
@@ -196,26 +205,20 @@ class Themes extends \Civi\Core\Service\AutoService {
    */
   protected function buildAll() {
     $themes = [
-      'default' => [
+      self::NO_STYLES => [
         'ext' => 'civicrm',
-        'title' => ts('Automatic'),
-        'help' => ts('Determine a system default automatically'),
-        // This is an alias. url_callback, search_order don't matter.
-      ],
-      'greenwich' => [
-        'ext' => 'civicrm',
-        'title' => 'Greenwich',
-        'help' => ts('CiviCRM 4.x look-and-feel'),
-      ],
-      'none' => [
-        'ext' => 'civicrm',
-        'title' => ts('None (Unstyled)'),
+        'title' => ts('No Styles'),
         'help' => ts('Disable CiviCRM\'s built-in CSS files.'),
-        'search_order' => ['none', self::FALLBACK_THEME],
+        'search_order' => [self::NO_STYLES, self::FALLBACK_THEME],
         'excludes' => [
           "css/civicrm.css",
           "css/bootstrap.css",
         ],
+      ],
+      self::NO_THEME => [
+        'ext' => 'civicrm',
+        'title' => ts('No Theme'),
+        'search_order' => [self::NO_THEME, self::FALLBACK_THEME],
       ],
       self::FALLBACK_THEME => [
         'ext' => 'civicrm',

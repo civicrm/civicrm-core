@@ -1184,7 +1184,7 @@ return [
     'pseudoconstant' => array(
       'callback' => 'call://themes/getAvailable',
     ),
-    'default' => 'default',
+    'default' => 'no_theme',
     'add' => '5.16',
     'title' => ts('Frontend Theme'),
     'is_domain' => 1,
@@ -1209,7 +1209,7 @@ return [
     'pseudoconstant' => array(
       'callback' => 'call://themes/getAvailable',
     ),
-    'default' => 'default',
+    'default' => 'no_theme',
     'add' => '5.16',
     'title' => ts('Backend Theme'),
     'is_domain' => 1,
