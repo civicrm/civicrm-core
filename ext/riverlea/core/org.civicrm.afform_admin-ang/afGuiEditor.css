@@ -405,13 +405,13 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
-  color: var(--crm-c-info);
+  color: var(--crm-c-link);
 }
 #afGuiEditor .af-gui-add-element-button span {
   display: inline-block;
   width: 18px;
   height: 18px;
-  color: var(--crm-c-info);
+  color: var(--crm-c-link);
 }
 #bootstrap-theme #afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
   border-color: var(--crm-c-background2) !important;
@@ -430,7 +430,7 @@ af-gui-container > .af-gui-bar,
 }
 /* For editing field placeholder text */
 #afGuiEditor .af-gui-field-input input[type=text].form-control {
-  color: var(--crm-c-background5);
+  color: var(--crm-c-text);
 }
 #afGuiEditor .af-gui-field-input-type-number input[type=text].form-control {
   background-image: url('../images/number.png');
@@ -666,7 +666,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   background-color: var(--crm-c-background5);
 }
 #afGuiEditor .af-gui-bar > .form-inline > span {
-  color: var(--crm-c-background5);
+  color: var(--crm-c-text);
   font-style: italic;
 }
 #afGuiEditor .ui-sortable-helper .af-gui-palette-item {

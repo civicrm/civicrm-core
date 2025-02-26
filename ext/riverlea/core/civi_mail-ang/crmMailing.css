@@ -6,7 +6,8 @@
   height: 20em;
 }
 .crmMailing-recip-est {
-  background: var(--crm-c-yellow-less-light);
+  background: var(--crm-checkbox-list-bg);
+  color: var(--crm-checkbox-list-col);
   font-size: var(--crm-small-font-size);
   padding: var(--crm-padding-small);
   margin: 0 0 0 var(--crm-m);

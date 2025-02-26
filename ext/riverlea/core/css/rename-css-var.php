@@ -20,7 +20,7 @@ $names = explode("\n", <<<TXT
 --crm-blue-darker       --crm-c-blue-darker
 --crm-blue-light        --crm-c-blue-light
 --crm-dark-teal         --crm-c-dark-teal
---crm-dark-text         --crm-c-dark-text
+--crm-dark-text         --crm-c-text-dark
 --crm-darkest           --crm-c-darkest
 --crm-divider           --crm-c-divider
 --crm-drag-background   --crm-c-drag-background
@@ -42,7 +42,7 @@ $names = explode("\n", <<<TXT
 --crm-inactive          --crm-c-inactive
 --crm-info              --crm-c-info
 --crm-info-text         --crm-c-info-text
---crm-light-text        --crm-c-light-text
+--crm-light-text        --crm-c-text-light
 --crm-link              --crm-c-link
 --crm-link-hover        --crm-c-link-hover
 --crm-page-background   --crm-c-page-background

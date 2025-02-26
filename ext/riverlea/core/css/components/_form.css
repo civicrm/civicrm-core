@@ -495,6 +495,13 @@ input.crm-form-checkbox) + label {
   border-left: 0;
   background: var(--crm-c-background);
 }
+.select2-results .select2-disabled {
+  background: var(--crm-c-background2);
+  cursor: not-allowed;
+}
+.select2-results .select2-disabled > * {
+  cursor: not-allowed;
+}
 .crm-container .select2-container-multi .select2-choices {
   display: flex;
   flex-flow: wrap;
@@ -680,7 +687,8 @@ input.crm-form-checkbox) + label {
   flex-flow: wrap;
   gap: var(--crm-flex-gap);
 }
-.crm-container input.crm-form-time {
+.crm-container input.crm-form-time,
+#bootstrap-theme .input-group input.crm-form-time {
   width: 9ch;
 }
 .crm-container input.dateplugin,
@@ -806,7 +814,7 @@ input.crm-form-checkbox) + label {
 }
 .crm-container .ui-spinner a.ui-spinner-button:hover,
 .crm-container .ui-spinner a.ui-spinner-button:focus {
-  color: var(--crm-c-light-text);
+  color: var(--crm-c-text-light);
 }
 .crm-container .ui-spinner a.ui-spinner-button span::before {
   font-family: "FontAwesome";
