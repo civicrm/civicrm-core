@@ -5,7 +5,6 @@
   --crm-c-link: var(--crm-c-amber);
   --crm-c-link-hover: var(--crm-c-amber-light);
   --crm-c-focus: var(--crm-c-link);
-  --crm-c-text-light: var(--crm-c-darkest);
   --crm-c-background: var(--crm-c-gray-900);
   --crm-c-page-background: var(--crm-c-darkest);
   --crm-c-code-background: var(--crm-c-background2);
@@ -29,6 +28,7 @@
   --crm-block-shadow: 0 3px 18px 0 rgb(0,0,0);
   --crm-popup-shadow: 0 3px 18px 0 rgb(0,0,0);
   --crm-heading-bg: var(--crm-c-secondary);
+  --crm-heading-col: var(--crm-c-text-light);
   --crm-dashlet-bg: var(--crm-c-background2);
   --crm-dashlet-header-bg: var(--crm-c-background3);
   --crm-expand-header-bg: transparent;
@@ -56,13 +56,11 @@
   --crm-table-even-row: var(--crm-c-gray-800);
   --crm-table-even-hover: var(--crm-alert-border-info);
   --crm-alert-text-help: var(--crm-c-text);
-  --crm-alert-text-warning: var(--crm-c-text-light);
   --crm-alert-background-info: var(--crm-c-blue-dark);
   --crm-alert-text-info: var(--crm-c-blue-light);
   --crm-c-inactive: var(--crm-c-gray-400);
   --crm-input-color: var(--crm-c-text);
   --crm-input-description: var(--crm-c-gray-300);
-  --crm-checkbox-list-col: var(--crm-c-text-light);
   --crm-dialog-header-border-col: transparent;
   --crm-dialog-header-bg: var(--crm-c-background2);
   --crm-dialog-body-bg: var(--crm-c-background2);
@@ -71,6 +69,8 @@
   --crm-form-block-background: var(--crm-c-background2);
   --crm-btn-cancel-bg: #9b3d4b;
   --crm-btn-warning-bg: #7b4e14;
+  --crm-c-success-text: var(--crm-c-text-light);
+  --crm-c-warning-text: var(--crm-c-text-light);
   --crm-c-alert: var(--crm-btn-cancel-bg);
   --crm-c-warning: var(--crm-btn-warning-bg);
   --crm-btn-alert-bg: var(--crm-btn-cancel-bg);

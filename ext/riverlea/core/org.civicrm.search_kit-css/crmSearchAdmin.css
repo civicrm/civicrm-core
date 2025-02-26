@@ -417,7 +417,6 @@ crm-search-admin-import {
   position: absolute;
   top: 1px;
   right: 0;
-  background-color: white;
 }
 .crm-search-admin-relative .help-block { /* reduces help-block by width of crm-search-admin-right button */
   width: calc(100% - 180px);

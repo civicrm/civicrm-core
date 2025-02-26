@@ -1,7 +1,7 @@
 /*
     Name: HackneyBrook;
     Description: named after the Hackney Brook, a tributary of the River Lea that ran through Finsbury Park;
-    Riverlea version: 1.3.7;
+    Riverlea version: 1.3.8;
 */
 
 :root {
@@ -71,11 +71,10 @@
   --crm-input-label-weight: normal;
   --crm-input-label-width: 10em;
   --crm-fieldset-border: 1px;
-  --crm-checkbox-list-col: var(--crm-c-text);
   /* Tabs */
   --crm-tabs-border: var(--crm-c-divider);
   --crm-tab-count-bg: var(--crm-c-blue-dark);
-  --crm-tab-count-col: var(--crm-c-light-text);
+  --crm-tab-count-col: var(--crm-c-text-light);
   --crm-tab-border: 1px solid var(--crm-c-gray-400);
   /* Contact dashboard */
   --crm-dash-border: 0;

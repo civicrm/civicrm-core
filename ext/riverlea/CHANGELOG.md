@@ -1,3 +1,26 @@
+1.3.8-6.0alpha
+ - FIXED - solves various issues around the naming of crm-text-light and crm-text-dark (https://github.com/civicrm/civicrm-core/pull/31994);
+ - FIXED - Bootstrap Time input fields limit width, not 100%.
+ - FIXED - PrettyPrint code blocks  (e.g. on API4) should wrap when in limited space.
+ - FIXED - Contact Dashboard inline edit name - reset position and add drop-shadow to distinguish
+ - FIXED - All Dark - forces a light bg colour to 'prettyprint' code blocks as inverting the colours would require many replacements, also addresses some API3 code blocks.
+ - FIXED - All Dark - FormBuilder input text illegible, changed colour to 'crm-c-text'
+ - FIXED - ALL Dark - FomrBuilder GUI bar inline span colour illegible, changed colour to 'crm-c-text'
+ - FIXED - All Dark - Select2 'disabled' list items illegible, set bg colour and changed cursor icon to 'not-allowed'.
+ - FIXED - All Dark - FormBuilder crm-ui-editable region hover illegible, changed text colour from inherit to 'crm-c-text-dark' - created RL version of ang/crmUI.css to achieve.
+ - FIXED - ALL Dark - FormBuilder settings / gears icon was an illegible colour.
+ - FIXED - All Dark - SearchKit 'where' 'and' labels illegible. Changed colour to 'crm-primary-text' to match 'crm-primary' background.
+ - FIXED - All Dark - pie chart legend text made legible, setting text fill colour to 'crm-c-text'
+ - FIXED - All Dark - '.alert-warning' paragraph text given explicit colour to resolve clash with '.alert' paragraph colour.
+ - FIXED - Minetta & Hackney Dark illegible info alerts: 'crm-alert-text-info' changed to '-—crm-c-text-light' from '-—crm-c-blue-light'
+ - FIXED - Minetta & Hackney Dark - illegible alert buttons: removed '--crm-c-alert-text' & '-—crm-c-alert' from dark.css
+ - FIXED - Hackney * Thames Dark - warning alert text colour setting removed to make legible.
+ - FIXED - Minetta Dark - primary/primary hover darkened with dark.css variables to stand out on tab region navbar.
+ - FIXED - Walbrook Dark - Crm-c-success-text & crm-c-warning-text - change from dark to light as bg colours have changed.
+ - ADDED CSS VARIABLES - connected to first item at top
+    --crm-checkbox-list-bg:
+    --crm-checkbox-list-bg2:
+
 1.3.7-6.0alpha
  - FIXED - inline code/pre block issue. Also applied to keyboard elements. Override created for td > code. (#113)
  - FIXED - API3 - illegible colours on Select2 description

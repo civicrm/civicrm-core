@@ -22,6 +22,9 @@
 .crm-container .alert p {
   color: var(--crm-alert-text-help);
 }
+.crm-container .alert-warning p {
+  color: var(--crm-alert-text-warning);
+}
 .crm-container .help li,
 .crm-container .status li,
 .crm-container .messages li {
