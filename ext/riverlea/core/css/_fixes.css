@@ -590,6 +590,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 #api-generated tr td:first-of-type {
   width: var(--crm-input-label-width);
 }
+
 /* Display Preferences */
 
 tr.crm-preferences-display-form-block-contact_edit_options td:has(table) {

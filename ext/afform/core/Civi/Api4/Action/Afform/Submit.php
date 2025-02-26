@@ -313,8 +313,8 @@ class Submit extends AbstractProcessor {
       $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
       $maxlength = $fullDefn['input_attrs']['maxlength'] ?? NULL;
     }
-
-    if ($maxlength && strlen($value) > $maxlength) {
+    // Use mb_strlen() which better matches the behavior of javascript's String.length
+    if ($maxlength && mb_strlen($value) > $maxlength) {
       $fullDefn ??= FormDataModel::getField($apiEntity, $fieldName, 'create');
       $label = $attributes['defn']['label'] ?? $fullDefn['label'] ?? $fieldName;
       return E::ts('%1 has a max length of %2.', [1 => $label, 2 => $maxlength]);
