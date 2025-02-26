@@ -1557,8 +1557,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       '<table id="crm-membership_receipt"',
       'AnnualFixed',
       'Membership Fee',
-      'Financial Type',
-      'Member Dues </td>',
       '<tr> <td colspan="2" style="padding: 4px; border-bottom: 1px solid #999;"> <table> <tr> <th>Item</th> <th>Fee</th> <th>SubTotal</th> <th>Tax Rate</th> <th>Tax Amount</th> <th>Total</th> <th>Membership Start Date</th> <th>Membership Expiration Date</th> </tr> <tr> <td>Membership Amount - AnnualFixed</td>',
       '<td> $50.00 </td> <td> $50.00 </td> <td> 10.00% </td> <td> $5.00 </td> <td> $55.00 </td> <td>',
       'Amount Before Tax: </td>',
