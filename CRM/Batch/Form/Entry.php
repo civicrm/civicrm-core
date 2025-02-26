@@ -1041,6 +1041,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
     // @todo stop passing $ids (membership and userId may be set by this point)
+    // $ids['membership'] is the "current membership ID"
     $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
