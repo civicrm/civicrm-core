@@ -578,6 +578,11 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 }
 /* API3 explorer */
 
+.crm-container .select2-highlighted .api-field-desc,
+.crm-container .select2-highlighted .crm-marker,
+.crm-container .api-field-desc {
+  color: inherit;
+}
 #api-generated caption {
   font-weight: var(--crm-bold-weight);
   font-family: var(--crm-font-bold);
