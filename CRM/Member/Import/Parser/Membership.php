@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Membership;
 
 /**
  * class to parse membership csv files
@@ -26,6 +27,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    * @var array
    */
   protected $fieldMetadata = [];
+
+  protected string $baseEntity = 'Membership';
 
   /**
    * Has this parser been fixed to expect `getMappedRow` to break it up
@@ -166,12 +169,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       $formatted = $formatValues = $membershipParams;
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
-      if (!$this->isUpdateExisting()) {
-        $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
-          NULL,
-          'Membership'
-        );
-      }
 
       $startDate = $membershipParams['start_date'] ?? $existingMembership['start_date'] ?? NULL;
       // Assign join date equal to start date if join date is not provided.
@@ -216,7 +213,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         }
       }
 
-      $newMembership = civicrm_api3('membership', 'create', $formatted);
+      $newMembership = Membership::save()
+        ->addRecord($formatted)
+        ->execute()->first();
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $newMembership['id']);
       return CRM_Import_Parser::VALID;
 
@@ -276,33 +275,24 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     $fields = Civi::cache('fields')->get('membership_importable_fields' . $contactType);
     if (!$fields) {
       $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']]
-       + CRM_Member_DAO_Membership::import();
+        + (array) Membership::getFields()
+          ->addWhere('readonly', '=', FALSE)
+          ->addWhere('usage', 'CONTAINS', 'import')
+          ->setAction('save')
+          ->addOrderBy('title')
+          ->execute()->indexBy('name');
 
       $contactFields = $this->getContactFields($this->getContactType());
-      $fields['membership_contact_id'] = $contactFields['id'];
-      $fields['membership_contact_id']['html']['label'] = $fields['membership_contact_id']['title'];
-      $fields['membership_contact_id']['title'] .= ' ' . ts('(match to contact)');
+      $fields['contact_id'] = $contactFields['id'];
+      $fields['contact_id']['match_rule'] = '*';
+      $fields['contact_id']['entity'] = 'Contact';
+      $fields['contact_id']['html']['label'] = $fields['contact_id']['title'];
+      $fields['contact_id']['title'] .= ' ' . ts('(match to contact)');
       unset($contactFields['id']);
       $fields += $contactFields;
-      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Membership'));
       Civi::cache('fields')->set('membership_importable_fields' . $contactType, $fields);
     }
     return $fields;
-  }
-
-  /**
-   * Get the metadata field for which importable fields does not key the actual field name.
-   *
-   * @return string[]
-   */
-  protected function getOddlyMappedMetadataFields(): array {
-    $uniqueNames = ['membership_id', 'membership_contact_id', 'membership_start_date', 'membership_join_date', 'membership_end_date', 'membership_source', 'member_is_override', 'member_is_test', 'member_is_pay_later', 'member_campaign_id'];
-    $fields = [];
-    foreach ($uniqueNames as $name) {
-      $fields[$this->importableFieldsMetadata[$name]['name']] = $name;
-    }
-    // Include the parent fields as they could be present if required for matching ...in theory.
-    return array_merge($fields, parent::getOddlyMappedMetadataFields());
   }
 
 }

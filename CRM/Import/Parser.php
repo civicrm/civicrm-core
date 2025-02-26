@@ -1127,6 +1127,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     // See https://lab.civicrm.org/dev/core/-/issues/4317#note_91322 - a further hack for quickform not
     // handling dots in field names. One day we will get rid of the Quick form screen...
     $fieldMapName = str_replace('~~', '_.', $fieldMapName);
+    if (isset($this->baseEntity) && str_starts_with($fieldMapName, strtolower($this->baseEntity) . '.')) {
+      $fieldMapName = str_replace(strtolower($this->baseEntity) . '.', '', $fieldMapName);
+    }
     // This whole business of only loading metadata for one type when we actually need it for all is ... dubious.
     if (empty($this->getImportableFieldsMetadata()[$fieldMapName])) {
       if ($loadOptions || !$limitToContactType) {
@@ -1288,7 +1291,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     if ($value === 'invalid_import_value') {
       if (!is_numeric($key)) {
         $metadata = $this->getFieldMetadata($key);
-        $errors[] = $prefixString . ($metadata['html']['label'] ?? $metadata['title']);
+        $errors[] = $prefixString . ($metadata['label'] ?? $metadata['html']['label'] ?? $metadata['title']);
       }
       else {
         // Numeric key suggests we are drilling into option values

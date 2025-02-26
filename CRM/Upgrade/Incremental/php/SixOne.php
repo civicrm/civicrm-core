@@ -166,12 +166,24 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       'county_id' => 'address_primary.county_id',
       'state_province_id' => 'address_primary.state_province_id',
       'country_id' => 'address_primary.country_id',
+      'membership_id' => 'membership.id',
+      'membership_contact_id' => 'membership.contact_id',
+      'membership_start_date' => 'membership.start_date',
+      'membership_type_id' => 'membership.membership_type_id',
+      'membership_join_date' => 'membership.join_date',
+      'membership_end_date' => 'membership.end_date',
+      'membership_source' => 'membership.source',
+      'member_is_override' => 'membership.is_override',
+      'status_override_end_date' => 'membership.status_override_end_date',
+      'member_is_test' => 'membership.is_test',
+      'member_is_pay_later' => 'membership.is_pay_later',
+      'member_campaign_id' => 'membership.campaign_id',
     ];
     $customFields = CRM_Core_DAO::executeQuery('
       SELECT custom_field.id, custom_field.name, custom_group.name as custom_group_name
       FROM civicrm_custom_field custom_field INNER JOIN civicrm_custom_group custom_group
       ON custom_field.custom_group_id = custom_group.id
-      WHERE extends IN ("Contact", "Individual", "Organization", "Household", "Participant")
+      WHERE extends IN ("Contact", "Individual", "Organization", "Household", "Participant", "Membership")
     ');
     while ($customFields->fetch()) {
       $fieldsToConvert['custom_' . $customFields->id] = $customFields->custom_group_name . '.' . $customFields->name;
