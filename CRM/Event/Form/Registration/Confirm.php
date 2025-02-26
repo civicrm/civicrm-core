@@ -662,7 +662,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $allParticipantIds = array_merge([$registerByID], $this->_additionalParticipantIds);
       }
 
-      $entityTable = 'civicrm_participant';
       $totalTaxAmount = 0;
       foreach ($this->_lineItem as $key => $value) {
         if ($value == 'skip') {
@@ -671,10 +670,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if ($entityId = $allParticipantIds[$key] ?? NULL) {
           // do cleanup line  items if participant re-walking wizard.
           if ($this->_allowConfirmation) {
-            CRM_Price_BAO_LineItem::deleteLineItems($entityId, $entityTable);
+            CRM_Price_BAO_LineItem::deleteLineItems($entityId, 'civicrm_participant');
           }
           $lineItem[$this->_priceSetId] = $value;
-          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
+          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
         }
         if (\Civi::settings()->get('invoicing')) {
           foreach ($value as $line) {
