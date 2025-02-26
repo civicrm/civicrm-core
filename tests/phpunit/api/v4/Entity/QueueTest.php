@@ -171,6 +171,56 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals([6], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][2]);
   }
 
+  /**
+   * Similar to testBatchParallelPolling(). But the hook-listener doesn't directly manipulate
+   * queue-items. Instead, it uses the BasicHandlerTrait.
+   */
+  public function testBatchParallelPolling_WithBasicHandler(): void {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
+
+    $handler = new class() {
+
+      use \CRM_Queue_BasicHandlerTrait;
+
+      protected function runItem($item, \CRM_Queue_Queue $queue): void {
+        \Civi::$statics['QueueTest']['onHandlerLog'][] = $item->data['thingy'] * 10;
+      }
+
+    };
+    \Civi::dispatcher()->addListener('&hook_civicrm_queueRun_testHandler', [$handler, 'runBatch']);
+
+    $queue = \Civi::queue($queueName, [
+      'type' => 'SqlParallel',
+      'runner' => 'testHandler',
+      'error' => 'delete',
+      'batch_limit' => 3,
+    ]);
+    $this->assertQueueStats(0, 0, 0, $queue);
+
+    for ($i = 0; $i < 7; $i++) {
+      \Civi::queue($queueName)->createItem(['thingy' => $i]);
+    }
+    $this->assertQueueStats(7, 7, 0, $queue);
+
+    \Civi::$statics['QueueTest']['onHandlerLog'] = [];
+    $result = Queue::runItems(0)->setQueue($queueName)->execute();
+    $this->assertEquals(3, count($result));
+    $this->assertEquals([0, 10, 20], \Civi::$statics['QueueTest']['onHandlerLog']);
+    $this->assertQueueStats(4, 4, 0, $queue);
+
+    \Civi::$statics['QueueTest']['onHandlerLog'] = [];
+    $result = Queue::runItems(0)->setQueue($queueName)->execute();
+    $this->assertEquals(3, count($result));
+    $this->assertEquals([30, 40, 50], \Civi::$statics['QueueTest']['onHandlerLog']);
+    $this->assertQueueStats(1, 1, 0, $queue);
+
+    \Civi::$statics['QueueTest']['onHandlerLog'] = [];
+    $result = Queue::runItems(0)->setQueue($queueName)->execute();
+    $this->assertEquals(1, count($result));
+    $this->assertEquals([60], \Civi::$statics['QueueTest']['onHandlerLog']);
+    $this->assertQueueStats(0, 0, 0, $queue);
+  }
+
   public function testReset() {
     $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_reset';
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
