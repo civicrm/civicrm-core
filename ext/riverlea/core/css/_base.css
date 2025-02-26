@@ -334,7 +334,6 @@ dl dl {
 .crm-container h6 {
   color: var(--crm-c-text);
 }
-.crm-container kbd,
 .crm-container code {
   display: inline;
   background-color: var(--crm-c-code-background);
@@ -343,6 +342,7 @@ dl dl {
   border-radius: 2px;
   padding: 2px;
 }
+.crm-container kbd,
 .crm-container samp,
 .crm-container pre {
   display: block;
@@ -362,6 +362,14 @@ dl dl {
   color: inherit;
   background-color: transparent;
   border-radius: 0;
+}
+.crm-container pre.prettyprint {
+  background: var(--crm-c-text-light); /* method to force light bg on prettyprint code as inverting is too complex */
+  white-space: normal;
+}
+.crm-container pre.linenums {
+  background: var(--crm-c-text-light);
+  color: var(--crm-c-text-dark);
 }
 .crm-container td > code {
   display: block;

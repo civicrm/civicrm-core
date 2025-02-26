@@ -151,6 +151,10 @@ div.crm-inline-edit-form div.crm-clear {
   border: 0 solid transparent;
   width: 100%;
 }
+#contactname-block .crm-inline-edit.form {
+  left: 0;
+  box-shadow: var(--crm-popup-shadow);
+}
 #contactname-block .crm-inline-edit .crm-container {
   overflow: scroll !important; /* vs inline css */
 }
