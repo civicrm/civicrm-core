@@ -4001,9 +4001,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'is_test' => $membership['is_test'],
         'membership_type_id' => $membership['membership_type_id'],
         'membership_activity_status' => 'Completed',
+        'skipStatusCal' => 1,
       ];
 
-      $currentMembership = CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
+      $currentMembership = CRM_Member_BAO_Membership::getContactMembership(
+        $membershipParams['contact_id'],
         $membershipParams['membership_type_id'],
         $membershipParams['is_test'],
         $membershipParams['id']
@@ -4050,8 +4052,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
         // @todo - we should pass membership_type_id instead of null here but not
         // adding as not sure of testing
-        $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
-          $changeDate, NULL, $membershipParams['num_terms']
+        $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
+          $membershipParams['id'], $changeDate, NULL, $membershipParams['num_terms']
         );
         $dates['join_date'] = $currentMembership['join_date'];
       }
@@ -4060,7 +4062,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       else {
         //get the status for membership.
-        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'] ?? NULL,
+        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
+          $dates['start_date'] ?? NULL,
           $dates['end_date'] ?? NULL,
           $dates['join_date'] ?? NULL,
           'now',
@@ -4072,8 +4075,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         unset($dates['end_date']);
         $membershipParams['status_id'] = $calcStatus['id'] ?? 'New';
       }
-      //we might be renewing membership,
-      //so make status override false.
+      // We might be renewing membership so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
       $membership = civicrm_api3('Membership', 'create', $membershipParams);
