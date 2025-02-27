@@ -145,7 +145,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     // @todo - we should store this as a property & re-use in setDefaults - for now that's a bigger change.
     $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $this->_id]);
-    CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership);
 
     $this->assign('endDate', $this->getMembershipValue('end_date'));
     $this->assign('membershipStatus', $this->getMembershipValue('membership_status_id:name'));
@@ -742,7 +741,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($pending || in_array($currentMembership['status_id:name'], ['Pending', 'Cancelled'])) {
       return CRM_Member_BAO_Membership::create($memParams);
     }
-    $memParams['join_date'] = date('Ymd', CRM_Utils_Time::strtotime($currentMembership['join_date']));
 
     // CRM-7297 Membership Upsell - calculate dates based on new membership type
     $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
@@ -750,6 +748,14 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $memParams['membership_type_id'],
       $numRenewTerms
     );
+
+    // This used to be called in preProcess which meant that just opening the form updated the membership!
+    // We only want to call it once the form has been submitted.
+    CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeToday);
+
+    $memParams['join_date'] = date('Ymd', CRM_Utils_Time::strtotime($currentMembership['join_date']));
+    $isMembershipCurrent = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $currentMembership['status_id'], 'is_current_member');
+
     $memParams = array_merge($memParams, [
       'end_date' => $dates['end_date'] ?? NULL,
       'start_date' => $currentMembership['status_id.is_current_member'] ? $currentMembership['start_date'] : ($dates['start_date'] ?? NULL),
@@ -764,8 +770,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
     }
 
-    // @todo stop passing $ids (membership and userId may be set by this point)
-    CRM_Member_BAO_Membership::create($memParams, $ids);
+    CRM_Member_BAO_Membership::create($memParams);
   }
 
 }
