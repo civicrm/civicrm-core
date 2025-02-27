@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\LineItem;
+
 /**
  *
  * @package CRM
@@ -83,6 +85,55 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
   public static function del($id) {
     CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
+  }
+
+  /**
+   * Log a deprecated warning that there is a contribution with MembershipPayment records and missing LineItems
+   *
+   * @param int $contributionID
+   *
+   * @return void
+   */
+  private static function deprecatedWarning(int $contributionID) {
+    CRM_Core_Error::deprecatedWarning('ContributionID: ' . $contributionID . ' has memberships with MembershipPayment records but missing LineItems. MembershipPayment records are deprecated.');
+  }
+
+  /**
+   * Given a Membership ID we should be able to get the latest Contribution ID from the LineItems
+   * But we might not have LineItems, in which case we try to get it from the MembershipPayment record
+   *   if that exists and log a deprecation warning
+   *
+   * @param int $membershipID
+   *
+   * @return ?int
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @internal
+   */
+  public static function getLatestContributionIDFromLineitemAndFallbackToMembershipPayment(int $membershipID) {
+    $latestMembershipLineItem = LineItem::get(FALSE)
+      ->addSelect('contribution_id')
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $membershipID)
+      ->addOrderBy('contribution_id.receive_date', 'DESC')
+      ->execute()
+      ->first();
+    if (!empty($latestMembershipLineItem['contribution_id'])) {
+      $latestContributionID = $latestMembershipLineItem['contribution_id'];
+    }
+    else {
+      $membershipPayments = civicrm_api3('MembershipPayment', 'get', [
+        'sequential' => 1,
+        'return' => ["contribution_id.receive_date", "contribution_id"],
+        'membership_id' => $membershipID,
+        'options' => ['sort' => "contribution_id.receive_date DESC"],
+      ])['values'];
+      if (!empty($membershipPayments[0]['contribution_id'])) {
+        $latestContributionID = $membershipPayments[0]['contribution_id'];
+        self::deprecatedWarning($latestContributionID);
+      }
+    }
+    return $latestContributionID ?? NULL;
   }
 
 }
