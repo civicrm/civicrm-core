@@ -953,27 +953,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       ->addSelect('entity_id')
       ->execute()->indexBy('entity_id'));
 
-    $doubleCheckParams = [
-      'return' => 'membership_id',
-      'contribution_id' => $contributionID,
-    ];
-    if (!empty($membershipIDs)) {
-      $doubleCheckParams['membership_id'] = ['NOT IN' => $membershipIDs];
-    }
-    $membershipPayments = civicrm_api3('MembershipPayment', 'get', $doubleCheckParams)['values'];
-    if (!empty($membershipPayments)) {
-      $membershipIDs = [];
-      CRM_Core_Error::deprecatedWarning('Not having valid line items for membership payments is invalid.');
-      foreach ($membershipPayments as $membershipPayment) {
-        $membershipIDs[] = $membershipPayment['membership_id'];
-      }
-    }
+    $membershipIDs = CRM_Member_BAO_MembershipPayment::getMembershipPaymentsWithMissingLineitems($contributionID, $membershipIDs);
+
     if (empty($membershipIDs)) {
       return [];
     }
-    // We could combine this with the MembershipPayment.get - we'd
-    // need to re-wrangle the params (here or in the calling function)
-    // as they would then me membership.contact_id, membership.is_test etc
     return civicrm_api3('Membership', 'get', [
       'id' => ['IN' => $membershipIDs],
       'return' => ['id', 'contact_id', 'membership_type_id', 'is_test', 'status_id', 'end_date'],
