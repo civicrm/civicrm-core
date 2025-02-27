@@ -63,6 +63,10 @@
 
         function setTotalCount(rowCount) {
           if (ctrl.hasOwnProperty('totalCount')) {
+            if (ctrl.totalCount === 'civi-tabset') {
+              $element.closest('civi-tabset details')[0].setAttribute('civi-tab-count', rowCount);
+              $element.closest('civi-tabset')[0].updateCounts()
+            }
             ctrl.totalCount = rowCount;
           }
           if (contactTab) {
