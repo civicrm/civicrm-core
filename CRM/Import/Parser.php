@@ -890,13 +890,20 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     if (!is_array($requirement)) {
       // In this case we need to match the field....
       // if we do, then return empty, otherwise return
-      if (!empty($params[$requirement])) {
-        if (!is_array($params[$requirement])) {
+      if (isset($this->baseEntity)) {
+        $value = $params[$this->baseEntity][$requirement] ?? $params[$requirement] ?? NULL;
+      }
+      else {
+        $value = $params[$requirement] ?? NULL;
+      }
+
+      if ($value) {
+        if (!is_array($value)) {
           return [];
         }
         // Recurse the array looking for the key - eg. look for email
         // in a location values array
-        foreach ($params[$requirement] as $locationValues) {
+        foreach ($value as $locationValues) {
           if (!empty($locationValues[$requirement])) {
             return [];
           }
@@ -1403,7 +1410,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
           // Split values into arrays by entity.
           // Apiv4 name is currently only set for contact, & only in cases where it would
           // be used for the dedupe rule (ie Membership import).
-          $params[$entity][$fieldSpec['apiv4_name'] ?? $fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+          $params[$entity][$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
         }
         else {
           $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
