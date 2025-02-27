@@ -223,7 +223,7 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g membership_payment returns MembershipPayment
+   * e.g custom_field returns CustomField
    *
    * @param string $name
    * @param bool $legacyV3
