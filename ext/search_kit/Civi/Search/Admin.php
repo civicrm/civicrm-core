@@ -130,54 +130,58 @@ class Admin {
    * @throws \CRM_Core_Exception
    */
   public static function getSchema(): array {
-    $schema = [];
-    $entities = Entity::get()
-      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'parent_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
-      ->addWhere('searchable', '!=', 'none')
-      ->addOrderBy('title_plural')
-      ->setChain([
-        'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
-      ])->execute();
-    foreach ($entities as $entity) {
-      // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
-      if ($entity['get']) {
-        // Add links with translatable titles
-        $links = Display::getEntityLinks($entity['name']);
-        if ($links) {
-          $entity['links'] = array_values($links);
-        }
-        try {
-          $getFields = civicrm_api4($entity['name'], 'getFields', [
-            'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
-            'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
-            'orderBy' => ['label' => 'ASC'],
-          ])->indexBy('name');
-        }
-        catch (\CRM_Core_Exception $e) {
-          \Civi::log()->warning('Entity could not be loaded', ['entity' => $entity['name']]);
-          continue;
-        }
-        foreach ($getFields as $field) {
-          $field['fieldName'] = $field['name'];
-          // Hack for RelationshipCache to make Relationship fields editable
-          if ($entity['name'] === 'RelationshipCache') {
-            if (in_array($field['name'], ['is_active', 'start_date', 'end_date'])) {
-              $field['readonly'] = FALSE;
-            }
+    if (empty(\Civi::$statics[__METHOD__])) {
+      $entities = Entity::get()
+        ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
+        ->addWhere('searchable', '!=', 'none')
+        ->addOrderBy('title_plural')
+        ->setChain([
+          'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
+        ])
+        ->execute()->getArrayCopy();
+
+      foreach ($entities as $entity) {
+        // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
+        if ($entity['get']) {
+          // Add links with translatable titles
+          $links = Display::getEntityLinks($entity['name']);
+          if ($links) {
+            $entity['links'] = array_values($links);
           }
-          $entity['fields'][] = $field;
-        }
-        $entity['default_columns'] = self::getDefaultColumns($entity, $getFields);
-        $params = $entity['get'][0];
-        // Entity must support at least these params or it is too weird for search kit
-        if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
-          \CRM_Utils_Array::remove($params, 'checkPermissions', 'debug', 'chain', 'language', 'select', 'where', 'orderBy', 'limit', 'offset');
-          unset($entity['get']);
-          $schema[$entity['name']] = ['params' => array_keys($params)] + array_filter($entity);
+          try {
+            $getFields = civicrm_api4($entity['name'], 'getFields', [
+              'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
+              'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
+              'orderBy' => ['label' => 'ASC'],
+            ])->indexBy('name');
+          }
+          catch (\CRM_Core_Exception $e) {
+            \Civi::log()->warning('Entity could not be loaded', ['entity' => $entity['name']]);
+            continue;
+          }
+          foreach ($getFields as $field) {
+            $field['fieldName'] = $field['name'];
+            // Hack for RelationshipCache to make Relationship fields editable
+            if ($entity['name'] === 'RelationshipCache') {
+              if (in_array($field['name'], ['is_active', 'start_date', 'end_date'])) {
+                $field['readonly'] = FALSE;
+              }
+            }
+            $entity['fields'][] = $field;
+          }
+          $entity['default_columns'] = self::getDefaultColumns($entity, $getFields);
+          $params = $entity['get'][0];
+          // Entity must support at least these params or it is too weird for search kit
+          if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
+            \CRM_Utils_Array::remove($params, 'checkPermissions', 'debug', 'chain', 'language', 'select', 'where', 'orderBy', 'limit', 'offset');
+            unset($entity['get']);
+            $schema[$entity['name']] = ['params' => array_keys($params)] + array_filter($entity);
+          }
         }
       }
+      \Civi::$statics[__METHOD__] = $schema;
     }
-    return $schema;
+    return \Civi::$statics[__METHOD__];
   }
 
   /**
