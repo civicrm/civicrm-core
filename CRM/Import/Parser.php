@@ -247,6 +247,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param string $contactType
    *
    * @return array[]
+   * @throws \CRM_Core_Exception
    */
   protected function getContactFields(string $contactType): array {
     $contactFields = $this->getAllContactFields('');
@@ -383,62 +384,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   public function setContactSubType(?int $contactSubType): self {
     $this->_contactSubType = $contactSubType;
     return $this;
-  }
-
-  /**
-   * Add progress bar to the import process. Calculates time remaining, status etc.
-   *
-   * @param $statusID
-   *   status id of the import process saved in $config->uploadDir.
-   * @param bool $startImport
-   *   True when progress bar is to be initiated.
-   * @param $startTimestamp
-   *   Initial timestamp when the import was started.
-   * @param $prevTimestamp
-   *   Previous timestamp when this function was last called.
-   * @param $totalRowCount
-   *   Total number of rows in the import file.
-   *
-   * @deprecated
-   *
-   * @return NULL|$currTimestamp
-   */
-  public function progressImport($statusID, $startImport = TRUE, $startTimestamp = NULL, $prevTimestamp = NULL, $totalRowCount = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    $statusFile = CRM_Core_Config::singleton()->uploadDir . "status_{$statusID}.txt";
-
-    if ($startImport) {
-      $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
-      //do not force the browser to display the save dialog, CRM-7640
-      $contents = json_encode([0, $status]);
-      file_put_contents($statusFile, $contents);
-    }
-    else {
-      $rowCount = $this->_rowCount ?? $this->_lineCount;
-      $currTimestamp = time();
-      $time = ($currTimestamp - $prevTimestamp);
-      $recordsLeft = $totalRowCount - $rowCount;
-      if ($recordsLeft < 0) {
-        $recordsLeft = 0;
-      }
-      $estimatedTime = ($recordsLeft / 50) * $time;
-      $estMinutes = floor($estimatedTime / 60);
-      $timeFormatted = '';
-      if ($estMinutes > 1) {
-        $timeFormatted = $estMinutes . ' ' . ts('minutes') . ' ';
-        $estimatedTime = $estimatedTime - ($estMinutes * 60);
-      }
-      $timeFormatted .= round($estimatedTime) . ' ' . ts('seconds');
-      $processedPercent = (int ) (($rowCount * 100) / $totalRowCount);
-      $statusMsg = ts('%1 of %2 records - %3 remaining',
-        [1 => $rowCount, 2 => $totalRowCount, 3 => $timeFormatted]
-      );
-      $status = "<div class=\"description\">&nbsp; <strong>{$statusMsg}</strong></div>";
-      $contents = json_encode([$processedPercent, $status]);
-
-      file_put_contents($statusFile, $contents);
-      return $currTimestamp;
-    }
   }
 
   /**
@@ -1099,7 +1044,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return false|array
    *
-   * @throws \CRM_Core_Exception
    */
   protected function getFieldOptions(string $fieldName) {
     return $this->getFieldMetadata($fieldName, TRUE)['options'];
@@ -1209,7 +1153,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param string $fieldName
    *
    * @return mixed|null
-   * @throws \CRM_Core_Exception
    */
   protected function getFieldEntity(string $fieldName) {
     if ($fieldName === 'do_not_import' || $fieldName === '') {
@@ -1356,6 +1299,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @param string $fieldName
    * @param string $importedValue
+   *
+   * @return bool
    */
   protected function isAmbiguous(string $fieldName, $importedValue): bool {
     return !empty($this->ambiguousOptions[$fieldName][$this->getComparisonValue($importedValue)]);
@@ -1476,7 +1421,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * Also 'im_provider_id' is mapped to the 'real' field name 'provider_id'
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   protected function getFieldMappings(): array {
     $mappedFields = [];
@@ -1687,9 +1631,11 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * @param string $entity
+   * @param int $id
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   protected function checkEntityExists(string $entity, int $id): array {
     try {
@@ -1868,7 +1814,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
   /**
    * @param array $where
-   * @param $name
    *
    * @return mixed
    * @throws \CRM_Core_Exception
