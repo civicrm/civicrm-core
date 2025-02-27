@@ -2166,15 +2166,7 @@ WHERE {$whereClause}";
     $params['contribution_id'] = $contribution->id;
 
     // Create membership payment if it does not already exist
-    $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
-      'contribution_id' => $contribution->id,
-    ]);
-    if (empty($membershipPayment['count'])) {
-      civicrm_api3('MembershipPayment', 'create', [
-        'membership_id' => $params['membership_id'],
-        'contribution_id' => $contribution->id,
-      ]);
-    }
+    CRM_Member_BAO_MembershipPayment::legacyMembershipPaymentCreateIfNotExist($contribution->id, $params['membership_id']);
 
     return $contribution;
   }
