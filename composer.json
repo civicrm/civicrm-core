@@ -82,7 +82,7 @@
     "guzzlehttp/psr7": "^1.9 || ^2.0",
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",
-    "pear/log": "1.14.4",
+    "pear/log": "1.14.5",
     "adrienrn/php-mimetyper": "0.2.2",
     "civicrm/composer-downloads-plugin": "^3.0 || ^4.0",
     "laravel/serializable-closure": "^1.3",
