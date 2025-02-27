@@ -25,9 +25,15 @@ class CRM_Queue_TaskHandler extends AutoService implements EventSubscriberInterf
 
   use CRM_Queue_BasicHandlerTrait;
 
+  /**
+   * Symbolic name for the kinds of records that we handle.
+   * This matches column 'civicrm_queue.runner' and event 'hook_civicrm_queueRun_{NAME}'.
+   */
+  const TYPE_NAME = 'task';
+
   public static function getSubscribedEvents() {
     return [
-      '&hook_civicrm_queueRun_task' => 'runBatch',
+      '&hook_civicrm_queueRun_' . static::TYPE_NAME => 'runBatch',
     ];
   }
 
