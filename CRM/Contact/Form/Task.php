@@ -192,7 +192,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
         $selectedTypes = explode(' ', $selectedTypes);
       }
       foreach ($selectedTypes as $ct => $dontcare) {
-        if (strpos($ct, CRM_Core_DAO::VALUE_SEPARATOR) === FALSE) {
+        if (!str_contains($ct, CRM_Core_DAO::VALUE_SEPARATOR)) {
           $form->_contactTypes[] = $ct;
         }
         else {

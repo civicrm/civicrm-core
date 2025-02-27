@@ -329,7 +329,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $componentModes = [];
     foreach (self::$_modeValues as $id => & $value) {
-      if (strpos($value['component'], 'Civi') !== FALSE
+      if (str_contains($value['component'], 'Civi')
         && !array_key_exists($value['component'], $enabledComponents)
       ) {
         continue;
@@ -693,7 +693,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     self::setModeValues();
 
     $setDynamic = FALSE;
-    if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
+    if (str_contains(self::$_selectorName, 'CRM_Contact_Selector')) {
       $selector = new self::$_selectorName(
         $this->_customSearchClass,
         $this->_formValues,
@@ -816,7 +816,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
       $setDynamic = FALSE;
 
-      if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
+      if (str_contains(self::$_selectorName, 'CRM_Contact_Selector')) {
         $selector = new self::$_selectorName(
           $this->_customSearchClass,
           $this->_formValues,

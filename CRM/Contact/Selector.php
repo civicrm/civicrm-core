@@ -421,7 +421,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           if (!empty($field['in_selector']) &&
             !in_array($name, $skipFields)
           ) {
-            if (strpos($name, '-') !== FALSE) {
+            if (str_contains($name, '-')) {
               [$fieldName, $lType, $type] = CRM_Utils_System::explode('-', $name, 3);
 
               if ($lType === 'Primary') {
@@ -610,7 +610,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         if (!empty($field['in_selector']) &&
           !in_array($key, $skipFields)
         ) {
-          if (strpos($key, '-') !== FALSE) {
+          if (str_contains($key, '-')) {
             [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $key, 3);
 
             if ($id === 'Primary') {
@@ -707,7 +707,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (isset($pseudoconstants[$property])) {
           $row[$property] = $pseudoconstants[$property]['values'][$result->{$pseudoconstants[$property]['dbName']}] ?? NULL;
         }
-        elseif (strpos($property, '-url') !== FALSE) {
+        elseif (str_contains($property, '-url')) {
           $websiteUrl = '';
           $websiteKey = str_replace('-url', '', $property);
           $propertyArray = explode('-', $property);
@@ -720,7 +720,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           }
           $row[$property] = $websiteUrl;
         }
-        elseif (strpos($property, '-email') !== FALSE) {
+        elseif (str_contains($property, '-email')) {
           [$locType] = explode("-email", $property);
           $onholdProperty = "{$locType}-on_hold";
 
