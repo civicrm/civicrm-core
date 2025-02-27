@@ -226,31 +226,6 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
       'grouping' => 'mailing-fields',
     ];
 
-    $this->_columns['civicrm_mailing_event_forward'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_MailingEventForward',
-      'fields' => [
-        'forward_id' => [
-          'name' => 'id',
-          'title' => ts('Forwarded to Email'),
-        ],
-      ],
-      'filters' => [
-        'is_forwarded' => [
-          'name' => 'id',
-          'title' => ts('Forwarded'),
-          'type' => CRM_Utils_Type::T_INT,
-          'operatorType' => CRM_Report_Form::OP_SELECT,
-          'options' => [
-            '' => ts('Any'),
-            '0' => ts('No'),
-            '1' => ts('Yes'),
-          ],
-          'clause' => 'mailing_event_forward_civireport.id IS NULL',
-        ],
-      ],
-      'grouping' => 'mailing-fields',
-    ];
-
     $this->_columns['civicrm_email'] = [
       'dao' => 'CRM_Core_DAO_Email',
       'fields' => [
@@ -281,7 +256,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            if (in_array($fieldName, ['unsubscribe_id', 'optout_id', 'forward_id', 'reply_id'])) {
+            if (in_array($fieldName, ['unsubscribe_id', 'optout_id', 'reply_id'])) {
               $select[] = "IF({$field['dbAlias']} IS NULL, 'No', 'Yes') as {$tableName}_{$fieldName}";
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = $field['no_display'] ?? NULL;
@@ -404,24 +379,6 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     }
     else {
       unset($this->_columns['civicrm_mailing_event_unsubscribe']['filters']['is_optout']);
-    }
-
-    if (array_key_exists('forward_id', $this->_params['fields']) ||
-      is_numeric($this->_params['is_forwarded_value'] ?? '')
-    ) {
-      if (($this->_params['is_forwarded_value'] ?? NULL) == 1) {
-        $joinType = 'INNER';
-        $this->_columns['civicrm_mailing_event_forward']['filters']['is_forwarded']['clause'] = '(1)';
-      }
-      else {
-        $joinType = 'LEFT';
-      }
-      $this->_from .= "
-                {$joinType} JOIN  civicrm_mailing_event_forward {$this->_aliases['civicrm_mailing_event_forward']}
-                    ON  {$this->_aliases['civicrm_mailing_event_forward']}.event_queue_id = civicrm_mailing_event_queue.id";
-    }
-    else {
-      unset($this->_columns['civicrm_mailing_event_forward']['filters']['is_forwarded']);
     }
 
     $this->_from .= "
