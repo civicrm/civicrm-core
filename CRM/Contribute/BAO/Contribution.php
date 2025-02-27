@@ -953,27 +953,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       ->addSelect('entity_id')
       ->execute()->indexBy('entity_id'));
 
-    $doubleCheckParams = [
-      'return' => 'membership_id',
-      'contribution_id' => $contributionID,
-    ];
-    if (!empty($membershipIDs)) {
-      $doubleCheckParams['membership_id'] = ['NOT IN' => $membershipIDs];
-    }
-    $membershipPayments = civicrm_api3('MembershipPayment', 'get', $doubleCheckParams)['values'];
-    if (!empty($membershipPayments)) {
-      $membershipIDs = [];
-      CRM_Core_Error::deprecatedWarning('Not having valid line items for membership payments is invalid.');
-      foreach ($membershipPayments as $membershipPayment) {
-        $membershipIDs[] = $membershipPayment['membership_id'];
-      }
-    }
+    $membershipIDs = CRM_Member_BAO_MembershipPayment::getMembershipPaymentsWithMissingLineitems($contributionID, $membershipIDs);
+
     if (empty($membershipIDs)) {
       return [];
     }
-    // We could combine this with the MembershipPayment.get - we'd
-    // need to re-wrangle the params (here or in the calling function)
-    // as they would then me membership.contact_id, membership.is_test etc
     return civicrm_api3('Membership', 'get', [
       'id' => ['IN' => $membershipIDs],
       'return' => ['id', 'contact_id', 'membership_type_id', 'is_test', 'status_id', 'end_date'],
@@ -3420,7 +3404,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     elseif ($component == 'membership') {
-      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $id, 'contribution_id', 'membership_id');
+      $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($id);
     }
     else {
       $contributionId = $id;
@@ -4078,20 +4062,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       // We might be renewing membership so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
-      $membership = civicrm_api3('Membership', 'create', $membershipParams);
-      $membership = $membership['values'][$membership['id']];
+      $membershipBAO = CRM_Member_BAO_Membership::create($membershipParams);
+
       // Update activity to Completed.
       // Perhaps this should be in Membership::create? Test cover in
       // api_v3_ContributionTest.testPendingToCompleteContribution.
-      $priorMembershipStatus = $memberships[$membership['id']]['status_id'] ?? NULL;
+      $priorMembershipStatus = $memberships[$membershipBAO->id]['status_id'] ?? NULL;
       Activity::update(FALSE)->setValues([
         'status_id:name' => 'Completed',
         'subject' => ts('Status changed from %1 to %2'), [
           1 => CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $priorMembershipStatus),
-          2 => CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']),
+          2 => CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membershipBAO->status_id),
         ],
 
-      ])->addWhere('source_record_id', '=', $membership['id'])
+      ])->addWhere('source_record_id', '=', $membershipBAO->id)
         ->addWhere('status_id:name', '=', 'Scheduled')
         ->addWhere('activity_type_id:name', 'IN', ['Membership Signup', 'Membership Renewal'])
         ->execute();

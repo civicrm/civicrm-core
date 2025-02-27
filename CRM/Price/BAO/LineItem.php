@@ -62,16 +62,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
 
     $return = $lineItemBAO->save();
     if ($lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
-      $membershipPaymentParams = [
-        'membership_id' => $lineItemBAO->entity_id,
-        'contribution_id' => $lineItemBAO->contribution_id,
-      ];
-      if (!civicrm_api3('MembershipPayment', 'getcount', $membershipPaymentParams)) {
-        // If we are creating the membership payment row from the line item then we
-        // should have correct line item & membership payment should not need to fix.
-        $membershipPaymentParams['isSkipLineItem'] = TRUE;
-        civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
-      }
+      CRM_Member_BAO_MembershipPayment::legacyMembershipPaymentCreateIfNotExist($lineItemBAO->entity_id, $lineItemBAO->contribution_id, TRUE);
     }
     if ($lineItemBAO->entity_table === 'civicrm_participant' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
       $participantPaymentParams = [
@@ -613,16 +604,7 @@ WHERE li.contribution_id = %1";
 
     $lineItemObj->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId);
 
-    $count = 0;
-    if ($entity == 'participant') {
-      $count = count(CRM_Event_BAO_Participant::getParticipantIds($contributionId));
-    }
-    else {
-      $count = civicrm_api3('MembershipPayment', 'getcount', ['contribution_id' => $contributionId]);
-    }
-    if ($count > 1) {
-      $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
-    }
+    $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     $displayParticipantCount = '';
     if ($totalParticipant > 0) {
       $displayParticipantCount = ' Participant Count -' . $totalParticipant;
