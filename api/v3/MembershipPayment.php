@@ -13,7 +13,6 @@
  * This api exposes CiviCRM membership contribution link.
  *
  * @package CiviCRM_APIv3
- * @todo delete function doesn't exist
  */
 
 /**
