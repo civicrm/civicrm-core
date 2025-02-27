@@ -333,22 +333,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $isAddressCustomField = FALSE;
 
         foreach ($field as $value) {
-          $break = FALSE;
           if (is_array($value)) {
             foreach ($value as $name => $testForEmpty) {
-              if ($addressCustomFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
+              if (CRM_Core_BAO_CustomField::getKeyID($name)) {
                 $isAddressCustomField = TRUE;
                 break;
               }
 
               if (($testForEmpty === '' || $testForEmpty == NULL)) {
-                $break = TRUE;
                 break;
               }
             }
-          }
-          else {
-            $break = TRUE;
           }
 
         }
