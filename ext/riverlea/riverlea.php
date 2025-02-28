@@ -4,39 +4,47 @@ require_once 'riverlea.civix.php';
 use CRM_riverlea_ExtensionUtil as E;
 
 /**
- * Supports multiple theme variations/streams.
+ * Supply available streams to the theme hook
+ *
+ * Note: if this looks labour intensive, don't worry - the output
+ * is cached in \Civi\Core\Themes
  */
 function riverlea_civicrm_themes(&$themes) {
-  $themes['minetta'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Minetta (RiverLea ~Greenwich)',
-    'prefix' => 'streams/minetta/',
-    'search_order' => array('minetta', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['walbrook'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Walbrook (RiverLea ~Shoreditch/Island)',
-    'prefix' => 'streams/walbrook/',
-    'search_order' => array('walbrook', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['hackneybrook'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Hackney Brook (RiverLea ~Finsbury Park)',
-    'prefix' => 'streams/hackneybrook/',
-    'search_order' => array('hackneybrook', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['thames'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Thames (RiverLea ~Aah)',
-    'prefix' => 'streams/thames/',
-    'search_order' => array('thames', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['_riverlea_core_'] = array(
+  $streams = \Civi\riverlea\DynamicCss::getAvailableStreamMeta();
+
+  $streamsById = array_column($streams, NULL, 'id');
+
+  foreach ($streams as $name => $stream) {
+    $themeMeta = [
+      'title' => $stream['label'],
+      'search_order' => [],
+    ];
+
+    $extension = $stream['extension'];
+
+    // we only add the stream itself to the search order if
+    // it has an extension (which indicates it may have its own
+    // file overrides)
+    if ($extension) {
+      $themeMeta['search_order'][] = $name;
+
+      // used to resolve files from this stream
+      $themeMeta['ext'] = $extension;
+      $themeMeta['prefix'] = $stream['file_prefix'] ?? '';
+    }
+
+    $themeMeta['search_order'][] = '_riverlea_core_';
+    $themeMeta['search_order'][] = '_fallback_';
+
+    $themes[$name] = $themeMeta;
+  }
+
+  $themes['_riverlea_core_'] = [
     'ext' => 'riverlea',
     'title' => 'Riverlea: base theme',
     'prefix' => 'core/',
-    'search_order' => array('_riverlea_core_', '_fallback_'),
-  );
+    'search_order' => ['_riverlea_core_', '_fallback_'],
+  ];
 }
 
 /**
@@ -79,6 +87,10 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
       \Civi\riverlea\DynamicCss::CSS_FILE,
       \Civi\riverlea\DynamicCss::getCssParams()
     ));
+  }
+  // TODO: add a non-admin permission for using Previewer
+  if (\CRM_Core_Permission::check('administer CiviCRM')) {
+    \Civi::resources()->addScriptFile('riverlea', 'js/previewer.js');
   }
 }
 
