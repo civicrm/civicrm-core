@@ -312,16 +312,10 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // once we are rid of direct calls to the BAO::create from core
     // we will deprecate this stuff into the v3 api.
     if (($params['version'] ?? 0) !== 4) {
-      // @todo further cleanup required to remove use of $ids['contribution'] from here
       if (isset($ids['membership'])) {
-        $contributionID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
-          $membership->id,
-          'contribution_id',
-          'membership_id'
-        );
-        // @todo this is a temporary step to removing $ids['contribution'] completely
-        if (empty($params['contribution_id']) && !empty($contributionID)) {
-          $params['contribution_id'] = $contributionID;
+        $latestContributionID = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($membership->id);
+        if (empty($params['contribution_id']) && !empty($latestContributionID)) {
+          $params['contribution_id'] = $latestContributionID;
         }
       }
 
@@ -341,7 +335,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       // If the membership has no associated contribution then we ensure
       // the line items are 'correct' here. This is a lazy legacy
       // hack whereby they are deleted and recreated
-      if (empty($contributionID)) {
+      if (empty($latestContributionID)) {
         if (!empty($params['lineItems'])) {
           $params['line_item'] = $params['lineItems'];
         }
@@ -637,7 +631,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $params['source_record_id'] = $membershipId;
       CRM_Activity_BAO_Activity::deleteActivity($params);
     }
-    self::deleteMembershipPayment($membershipId, $preserveContrib);
+    CRM_Member_BAO_MembershipPayment::deleteMembershipPayment($membershipId, $preserveContrib);
     CRM_Price_BAO_LineItem::deleteLineItems($membershipId, 'civicrm_membership');
 
     $results = $membership->delete();
@@ -1413,32 +1407,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   }
 
   /**
-   * Delete the record that are associated with this Membership Payment.
-   *
-   * @param int $membershipId
-   * @param bool $preserveContrib
-   *
-   * @return object
-   *   $membershipPayment deleted membership payment object
-   */
-  public static function deleteMembershipPayment($membershipId, $preserveContrib = FALSE) {
-
-    $membershipPayment = new CRM_Member_DAO_MembershipPayment();
-    $membershipPayment->membership_id = $membershipId;
-    $membershipPayment->find();
-
-    while ($membershipPayment->fetch()) {
-      if (!$preserveContrib) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
-      }
-      CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
-      $membershipPayment->delete();
-      CRM_Utils_Hook::post('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
-    }
-    return $membershipPayment;
-  }
-
-  /**
    * Build an array of available membership types in the current context.
    *
    * While core does not do anything context specific extensions may filter
@@ -2172,15 +2140,7 @@ WHERE {$whereClause}";
     $params['contribution_id'] = $contribution->id;
 
     // Create membership payment if it does not already exist
-    $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
-      'contribution_id' => $contribution->id,
-    ]);
-    if (empty($membershipPayment['count'])) {
-      civicrm_api3('MembershipPayment', 'create', [
-        'membership_id' => $params['membership_id'],
-        'contribution_id' => $contribution->id,
-      ]);
-    }
+    CRM_Member_BAO_MembershipPayment::legacyMembershipPaymentCreateIfNotExist($contribution->id, $params['membership_id']);
 
     return $contribution;
   }

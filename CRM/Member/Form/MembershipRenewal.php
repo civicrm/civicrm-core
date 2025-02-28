@@ -183,11 +183,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['receive_date'] = $now . ' ' . CRM_Utils_Time::date('H:i:s');
 
     if ($defaults['id']) {
-      $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
-        $defaults['id'],
-        'contribution_id',
-        'membership_id'
-      );
+      $defaults['record_contribution'] = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($defaults['id']);
     }
 
     $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
