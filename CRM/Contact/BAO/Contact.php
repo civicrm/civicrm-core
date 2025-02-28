@@ -191,7 +191,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
     // Fixed in 1.5 by making hash optional, only do this in create mode, not update.
     if ((!isset($contact->hash) || !$contact->hash) && !$contact->id) {
       $allNull = FALSE;
-      $contact->hash = md5(uniqid(rand(), TRUE));
+      $contact->hash = bin2hex(random_bytes(16));
     }
 
     // Even if we don't need $employerId, it's important to call getFieldValue() before
@@ -1661,7 +1661,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     $multipleFields = ['website' => 'url'];
     foreach ($fields as $name => $dontCare) {
-      if (strpos($name, '-') !== FALSE) {
+      if (str_contains($name, '-')) {
         [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $name, 3);
 
         if (!in_array($fieldName, $multipleFields)) {
@@ -2190,7 +2190,7 @@ ORDER BY civicrm_email.is_primary DESC";
           if (isset($params[$key . '-provider_id'])) {
             $data['im'][$loc]['provider_id'] = $params[$key . '-provider_id'];
           }
-          if (strpos($key, '-provider_id') !== FALSE) {
+          if (str_contains($key, '-provider_id')) {
             $data['im'][$loc]['provider_id'] = $params[$key];
           }
           else {

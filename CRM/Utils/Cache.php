@@ -56,7 +56,7 @@ class CRM_Utils_Cache {
       // a generic method for utilizing any of the available db caches.
       $dbCacheClass = 'CRM_Utils_Cache_' . $className;
       $settings = self::getCacheSettings($className);
-      $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . 'default' . self::DELIMITER;
+      $settings['prefix'] = ($settings['prefix'] ?? '') . self::DELIMITER . 'default' . self::DELIMITER;
       self::$_singleton = new $dbCacheClass($settings);
     }
     return self::$_singleton;
@@ -133,6 +133,16 @@ class CRM_Utils_Cache {
           $defaults['prefix'] = CIVICRM_DB_CACHE_PREFIX;
         }
         break;
+
+      case 'FileCache':
+        $defaults = [];
+        if (defined('CIVICRM_DB_CACHE_TIMEOUT')) {
+          $defaults['timeout'] = CIVICRM_DB_CACHE_TIMEOUT;
+        }
+        if (defined('CIVICRM_DB_CACHE_PREFIX')) {
+          $defaults['prefix'] = CIVICRM_DB_CACHE_PREFIX;
+        }
+        break;
     }
     return $defaults;
   }
@@ -192,17 +202,14 @@ class CRM_Utils_Cache {
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
-          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis'])) {
-            $shortName = self::cleanKey($params['name'], 64);
-            $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
-            $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
-            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $shortName . $scopeId;
-            $cache = new $dbCacheClass($settings);
-            if (!empty($params['withArray'])) {
-              $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
-            }
+          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis', 'FileCache'])) {
+            $cache = static::createStandard(CIVICRM_DB_CACHE_CLASS, $scopeId, $params);
             break 2;
           }
+          break;
+
+        case 'FileCache':
+          $cache = static::createStandard($type, $scopeId, $params);
           break;
 
         case 'SqlGroup':
@@ -228,6 +235,18 @@ class CRM_Utils_Cache {
       return new CRM_Utils_Cache_CacheWrapper($cache, $params['service'] ?? $params['name'] ?? NULL);
     }
     throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
+  }
+
+  private static function createStandard(string $class, string $scopeId, array $params) {
+    $shortName = self::cleanKey($params['name'], 64);
+    $dbCacheClass = 'CRM_Utils_Cache_' . $class;
+    $settings = self::getCacheSettings($class);
+    $settings['prefix'] = ($settings['prefix'] ?? '') . self::DELIMITER . $shortName . $scopeId;
+    $cache = new $dbCacheClass($settings);
+    if (!empty($params['withArray'])) {
+      $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
+    }
+    return $cache;
   }
 
   private static function getVersionCode(): string {

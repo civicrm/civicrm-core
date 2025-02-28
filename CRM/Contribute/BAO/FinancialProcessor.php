@@ -75,13 +75,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);
       }
 
-      $financialAccount = CRM_Contribute_BAO_FinancialProcessor::getFinancialAccountForStatusChangeTrxn($params, CRM_Utils_Array::value('financial_account_id', $prevFinancialItem));
+      $financialAccount = CRM_Contribute_BAO_FinancialProcessor::getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
 
       $currency = $params['prevContribution']->currency;
       if ($params['contribution']->currency) {
         $currency = $params['contribution']->currency;
       }
-      $previousLineItemTotal = CRM_Utils_Array::value('line_total', $previousLineItems[$fieldValueId] ?? NULL, 0);
+      $previousLineItemTotal = $previousLineItems[$fieldValueId]['line_total'] ?? 0;
       $itemParams = [
         'transaction_date' => $receiveDate,
         'contact_id' => $params['prevContribution']->contact_id,
@@ -101,10 +101,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
         if ($context === 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
           // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
-          $taxAmount = CRM_Utils_Array::value('tax_amount', $previousLineItems[$fieldValueId] ?? NULL, 0);
+          $taxAmount = $previousLineItems[$fieldValueId]['tax_amount'] ?? 0;
         }
         elseif ($previousLineItemTotal != $lineItemDetails['line_total']) {
-          $taxAmount -= CRM_Utils_Array::value('tax_amount', $previousLineItems[$fieldValueId] ?? NULL, 0);
+          $taxAmount -= $previousLineItems[$fieldValueId]['tax_amount'] ?? 0;
         }
         if ($taxAmount != 0) {
           $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
@@ -180,7 +180,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     elseif ($context == 'changedStatus') {
       $cancelledTaxAmount = 0;
       if ($isARefund) {
-        $cancelledTaxAmount = CRM_Utils_Array::value('tax_amount', $lineItemDetails, '0.00');
+        $cancelledTaxAmount = $lineItemDetails['tax_amount'] ?? '0.00';
       }
       return CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * ((float) $lineItemDetails['line_total'] + (float) $cancelledTaxAmount);
     }
@@ -309,7 +309,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       // This is an update so original currency if none passed in.
-      $params['trxnParams']['currency'] = CRM_Utils_Array::value('currency', $params, $params['prevContribution']->currency);
+      $params['trxnParams']['currency'] = $params['currency'] ?? $params['prevContribution']->currency;
 
       $transactionIDs[] = CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
       $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);

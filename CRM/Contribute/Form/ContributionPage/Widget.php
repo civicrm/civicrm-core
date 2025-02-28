@@ -37,35 +37,15 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    */
   protected $_widget;
 
-  /**
-   * Name of the refresh button,
-   * used to display the widget preview
-   *
-   * @var string
-   */
-  protected $_refreshButtonName;
-
   public function preProcess() {
     parent::preProcess();
     $this->setSelectedChild('widget');
 
     $this->_widget = new CRM_Contribute_DAO_Widget();
     $this->_widget->contribution_page_id = $this->_id;
-    if (!$this->_widget->find(TRUE)) {
-      $this->_widget = NULL;
-    }
-    else {
-      $this->assign('widget_id', $this->_widget->id);
-
-      // check of home url is set, if set then it flash widget might be in use.
-      $this->assign('showStatus', FALSE);
-      if ($this->_widget->url_homepage) {
-        $this->assign('showStatus', TRUE);
-      }
-    }
-
+    $this->_widget->find(TRUE);
+    $this->assign('widget_id', !empty($this->_widget->id) ? $this->_widget->id : NULL);
     $this->assign('cpageId', $this->_id);
-
     $this->assign('widgetExternUrl', CRM_Utils_System::externUrl('extern/widget', "cpageId={$this->_id}&widgetId=" . ($this->_widget->id ?? '') . "&format=3"));
 
     $config = CRM_Core_Config::singleton();
@@ -97,55 +77,55 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
 
     $this->_colorFields = [
       'color_title' => [
-        ts('Title Text Color'),
+        ts('Title Text'),
         'color',
         FALSE,
         '#2786C2',
       ],
+      'color_main_bg' => [
+        ts('Title Background'),
+        'color',
+        FALSE,
+        '#B7E2FF',
+      ],
       'color_bar' => [
-        ts('Progress Bar Color'),
+        ts('Progress Bar'),
         'color',
         FALSE,
         '#2786C2',
       ],
       'color_main_text' => [
-        ts('Additional Text Color'),
+        ts('Additional Text'),
         'color',
         FALSE,
         '#FFFFFF',
       ],
       'color_main' => [
-        ts('Background Color'),
+        ts('Background'),
         'color',
         FALSE,
         '#96C0E7',
       ],
-      'color_main_bg' => [
-        ts('Background Color Top Area'),
-        'color',
-        FALSE,
-        '#B7E2FF',
-      ],
       'color_bg' => [
-        ts('Border Color'),
+        ts('Border'),
         'color',
         FALSE,
         '#96C0E7',
       ],
       'color_about_link' => [
-        ts('Button Text Color'),
+        ts('Button Text'),
         'color',
         FALSE,
         '#556C82',
       ],
       'color_button' => [
-        ts('Button Background Color'),
+        ts('Button Background'),
         'color',
         FALSE,
         '#FFFFFF',
       ],
       'color_homepage_link' => [
-        ts('Homepage Link Color'),
+        ts('Homepage Link'),
         'color',
         FALSE,
         '#FFFFFF',
@@ -186,7 +166,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
 
     $this->addElement('checkbox',
       'is_active',
-      ts('Enable Widget?'),
+      ts('Enable the Widget'),
       NULL,
       ['onclick' => "widgetBlock(this)"]
     );
@@ -213,12 +193,6 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     $this->assign('fields', $this->_fields);
     $this->assign('colorFields', $this->_colorFields);
 
-    $this->_refreshButtonName = $this->getButtonName('refresh');
-    $this->addElement('xbutton',
-      $this->_refreshButtonName,
-      ts('Save and Preview'),
-      ['type' => 'submit', 'class' => 'crm-button crm-form-submit crm-button-type-submit']
-    );
     parent::buildQuickForm();
     $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Widget', 'formRule'], $this);
   }
@@ -240,15 +214,6 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     if (!empty($params['is_active'])) {
       if (empty($params['title'])) {
         $errors['title'] = ts('Title is a required field.');
-      }
-      if (empty($params['about'])) {
-        $errors['about'] = ts('About is a required field.');
-      }
-
-      foreach ($params as $key => $val) {
-        if (substr($key, 0, 6) == 'color_' && empty($params[$key])) {
-          $errors[$key] = ts('%1 is a required field.', [1 => $self->_colorFields[$key][0]]);
-        }
       }
     }
     return empty($errors) ? TRUE : $errors;
@@ -274,10 +239,6 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     $widget->copyValues($params);
     $widget->save();
 
-    $buttonName = $this->controller->getButtonName();
-    if ($buttonName == $this->_refreshButtonName) {
-      return;
-    }
     parent::endPostProcess();
   }
 

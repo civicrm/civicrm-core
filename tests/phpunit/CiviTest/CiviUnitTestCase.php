@@ -384,6 +384,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
+    putenv('CIVICRM_DEDUPE_OPTIMIZER=TRUE');
     $this->originalSettings = \Civi::settings()->exportValues();
 
     // There doesn't seem to be a better way to get the current error handler.
@@ -539,6 +540,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;
+    CRM_Utils_Time::resetTime();
     $this->frozenTime = NULL;
 
     error_reporting(E_ALL & ~E_NOTICE);
@@ -1930,7 +1932,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
 
     foreach ($params as $key => $value) {
-      if ($key === 'version' || strpos($key, 'api') === 0 || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
+      if ($key === 'version' || str_starts_with($key, 'api') || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
         continue;
       }
       if (in_array($key, $dateFields, TRUE)) {
@@ -3183,11 +3185,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
         $_SESSION['_' . $form->controller->_name . '_container']['values']['Preview'] = $formValues;
         return $form;
 
-      case strpos($class, 'Search') !== FALSE:
+      case str_contains($class, 'Search'):
         $form->controller = new CRM_Contact_Controller_Search();
         break;
 
-      case strpos($class, '_Form_') !== FALSE:
+      case str_contains($class, '_Form_'):
         $form->controller = new CRM_Core_Controller_Simple($class, $form->getName());
         break;
 
@@ -3232,7 +3234,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     /** @var CRM_Core_Form $form */
     $form = new $class();
     $pageName = $pageName ?: $form->getName();
-    if (strpos($class, 'Search') !== FALSE) {
+    if (str_contains($class, 'Search')) {
       $form->controller = new CRM_Contact_Controller_Search();
     }
     else {
@@ -3568,8 +3570,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * @return array|int
    */
-  protected function createRuleGroup(): array {
-    return $this->createTestEntity('DedupeRuleGroup', [
+  protected function createRuleGroup($params = []): array {
+    return $this->createTestEntity('DedupeRuleGroup', $params + [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',

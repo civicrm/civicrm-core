@@ -125,11 +125,6 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     foreach ($optionValueFields as $optionValueField) {
       $field['pseudoconstant'] += ["{$optionValueField}_column" => $optionValueField];
     }
-
-    // Filter for domain-specific groups
-    if (\CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
-      $field['pseudoconstant']['condition'][] = 'domain_id = ' . \CRM_Core_Config::domainID();
-    }
   }
 
   private function formatOptionValues(array $optionValues): array {

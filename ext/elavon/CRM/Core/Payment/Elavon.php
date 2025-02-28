@@ -158,7 +158,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $requestFields);
 
     // Check to see if we have a duplicate before we send
-    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
+    if ($this->checkDupe($params['invoiceID'], $params['contributionID'] ?? NULL)) {
       throw new PaymentProcessorException('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.', 9003);
     }
 

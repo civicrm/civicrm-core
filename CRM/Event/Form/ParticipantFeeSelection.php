@@ -423,7 +423,7 @@ SELECT  id, html_type
         continue;
       }
 
-      $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, []);
+      $optionFullIds = $field['option_full_ids'] ?? [];
 
       //soft suppress required rule when option is full.
       if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
@@ -639,11 +639,7 @@ SELECT  id, html_type
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       if (!$this->_mode) {
         if (isset($params['payment_instrument_id'])) {
-          $this->assign('paidBy',
-            CRM_Utils_Array::value($params['payment_instrument_id'],
-              $paymentInstrument
-            )
-          );
+          $this->assign('paidBy', $paymentInstrument[$params['payment_instrument_id']] ?? NULL);
         }
       }
 
@@ -846,7 +842,7 @@ SELECT  id, html_type
       }
 
       foreach ($values as $valKey => $value) {
-        if (strpos($valKey, 'price_') === FALSE) {
+        if (!str_contains($valKey, 'price_')) {
           continue;
         }
 

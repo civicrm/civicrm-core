@@ -221,11 +221,9 @@ contact_a.sort_name    as sort_name,
     $count = 1;
     $clause = [];
     $params = [];
-    $name = CRM_Utils_Array::value('sort_name',
-      $this->_formValues
-    );
+    $name = $this->_formValues['sort_name'] ?? NULL;
     if ($name != NULL) {
-      if (strpos($name, '%') === FALSE) {
+      if (!str_contains($name, '%')) {
         $name = "%{$name}%";
       }
       $params[$count] = [$name, 'String'];
@@ -233,9 +231,7 @@ contact_a.sort_name    as sort_name,
       $count++;
     }
 
-    $contact_type = CRM_Utils_Array::value('contact_type',
-      $this->_formValues
-    );
+    $contact_type = $this->_formValues['contact_type'] ?? NULL;
     if ($contact_type != NULL) {
       $contactType = explode('__', $contact_type, 2);
       if (count($contactType) > 1) {
@@ -277,7 +273,7 @@ contact_a.sort_name    as sort_name,
    */
   public function alterRow(&$row) {
     foreach ($row as $fieldName => &$field) {
-      if (strpos($fieldName, 'custom_') === 0) {
+      if (str_starts_with($fieldName, 'custom_')) {
         $field = CRM_Core_BAO_CustomField::displayValue($field, $fieldName);
       }
     }

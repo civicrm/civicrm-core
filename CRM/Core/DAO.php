@@ -525,6 +525,9 @@ class CRM_Core_DAO extends DB_DataObject {
     if ($i18nRewrite and $dbLocale) {
       $query = CRM_Core_I18n_Schema::rewriteQuery($query);
     }
+    if (CIVICRM_UF === 'UnitTests' && CRM_Utils_Time::isOverridden()) {
+      $query = CRM_Utils_Time::rewriteQuery($query);
+    }
 
     $ret = parent::query($query);
 
@@ -1563,7 +1566,7 @@ LIKE %1
 
     self::$_dbColumnValueCache ??= [];
 
-    while (strpos($daoName, '_BAO_') !== FALSE) {
+    while (str_contains($daoName, '_BAO_')) {
       $daoName = get_parent_class($daoName);
     }
 
@@ -1786,11 +1789,6 @@ LIKE %1
       $dao = new $daoName();
     }
 
-    if ($trapException) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-    }
-
     if ($dao->isValidOption($options)) {
       $dao->setOptions($options);
     }
@@ -1800,11 +1798,6 @@ LIKE %1
     // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
     if (($options['result_buffering'] ?? NULL) === 0) {
       $dao->N = TRUE;
-    }
-
-    if (is_a($result, 'DB_Error')) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
-      return $result;
     }
 
     return $dao;
@@ -3502,7 +3495,7 @@ SELECT contact_id
    */
   private function clearDbColumnValueCache() {
     $daoName = get_class($this);
-    while (strpos($daoName, '_BAO_') !== FALSE) {
+    while (str_contains($daoName, '_BAO_')) {
       $daoName = get_parent_class($daoName);
     }
     if (isset($this->id)) {

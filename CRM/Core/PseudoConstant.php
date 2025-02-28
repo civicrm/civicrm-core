@@ -143,7 +143,7 @@ class CRM_Core_PseudoConstant {
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName);
 
     // Custom fields are not in the schema
-    if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
+    if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7])) {
       $customField = new CRM_Core_BAO_CustomField();
       $customField->id = (int) substr($fieldName, 7);
       $options = $customField->getOptions($context);
@@ -872,10 +872,12 @@ WHERE  id = %1";
    *
    * @return array
    */
-  public static function relationshipTypeOptions() {
+  public static function relationshipTypeOptions($fieldName = NULL, $options = []) {
     $relationshipTypes = [];
-    $relationshipLabels = self::relationshipType();
-    foreach (self::relationshipType('name') as $id => $type) {
+    $onlyActive = empty($options['include_disabled']) ? 1 : NULL;
+    $relationshipLabels = self::relationshipType('label', FALSE, $onlyActive);
+    $relationshipNames = self::relationshipType('name', FALSE, $onlyActive);
+    foreach ($relationshipNames as $id => $type) {
       $relationshipTypes[$type['name_a_b']] = $relationshipLabels[$id]['label_a_b'];
       if ($type['name_b_a'] && $type['name_b_a'] != $type['name_a_b']) {
         $relationshipTypes[$type['name_b_a']] = $relationshipLabels[$id]['label_b_a'];

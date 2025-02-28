@@ -8,6 +8,8 @@ $passwordResetHtml = <<<HTML
 
   <p><a href="{\$resetUrlHtml}">{\$resetUrlHtml}</a></p>
 
+  <p><strong>{\$tokenTimeoutHtml}</strong></p>
+
   <p>{domain.name}</p>
 HTML;
 

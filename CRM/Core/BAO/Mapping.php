@@ -472,8 +472,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
     }
 
     // Handle mapping for 'related contact' fields
-    if (count(explode('_', CRM_Utils_Array::value('1', $v))) > 2) {
-      [$id, $first, $second] = explode('_', CRM_Utils_Array::value('1', $v));
+    if (count(explode('_', $v['1'] ?? '')) > 2) {
+      [$id, $first, $second] = explode('_', $v['1']);
       if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
 
         if (!empty($v['2'])) {

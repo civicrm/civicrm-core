@@ -110,7 +110,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         }
       }
       catch (CryptoException $e) {
-        if (strpos($e->getMessage(), 'Expired token') !== FALSE) {
+        if (str_contains($e->getMessage(), 'Expired token')) {
           $check->reject('Expired token');
         }
 
@@ -201,7 +201,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
       ';^civicrm/ajax/api4/Afform/submitFile$;' => [
-        'allowFields' => $abstractProcessorParams,
+        'allowFields' => [...$abstractProcessorParams, 'token', 'modelName', 'fieldName', 'joinEntity', 'entityIndex', 'joinIndex'],
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
       ';^civicrm/ajax/api4/\w+/autocomplete$;' => [

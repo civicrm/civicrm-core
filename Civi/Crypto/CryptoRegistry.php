@@ -191,7 +191,7 @@ class CryptoRegistry extends AutoService {
    * @return bool
    */
   public function isValidKeyId($id) {
-    if (strpos($id, "\n") !== FALSE) {
+    if (str_contains($id, "\n")) {
       return FALSE;
     }
     return (bool) preg_match(';^[a-zA-Z0-9_\-\.:,=+/\;\\\\]+$;s', $id);

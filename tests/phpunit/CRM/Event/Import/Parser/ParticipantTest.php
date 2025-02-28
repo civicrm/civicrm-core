@@ -3,7 +3,8 @@
 /**
  *  File for the Participant import class
  */
-
+use Civi\Api4\DedupeRule;
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Participant;
 use Civi\Api4\UserJob;
 
@@ -15,6 +16,7 @@ use Civi\Api4\UserJob;
 class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
+  use CRMTraits_Import_ParserTrait;
 
   protected $entity = 'Participant';
 
@@ -40,6 +42,13 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'civicrm_uf_field',
       'civicrm_uf_group',
     ], TRUE);
+    DedupeRule::delete()
+      ->addWhere('rule_table', '!=', 'civicrm_email')
+      ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
+    DedupeRuleGroup::update(FALSE)
+      ->addWhere('name', '=', 'IndividualUnsupervised')
+      ->setValues(['is_reserved' => TRUE])
+      ->execute();
     parent::tearDown();
   }
 
@@ -162,7 +171,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->importCSV('cancel_participant.csv', [
       ['name' => 'id'],
       ['name' => 'status_id'],
-      ['name' => $this->getCustomFieldName('radio')],
+      ['name' => $this->getCustomFieldName('radio', 4)],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -204,7 +213,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Missing required fields: Event ID', $row['_status_message']);
+    $this->assertEquals('Missing required fields: Participant ID OR Event ID', $row['_status_message']);
   }
 
   /**
@@ -229,23 +238,183 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'status_id'],
       ['name' => 'register_date'],
       ['name' => 'do_not_import'],
-      ['name' => $this->getCustomFieldName('checkbox')],
+      ['name' => $this->getCustomFieldName('checkbox', 4)],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $result = $this->callAPISuccess('Participant', 'get', [
-      'contact_id' => $contactID,
-      'sequential' => TRUE,
-    ])['values'][0];
 
-    $this->assertEquals($row['event_title'], $result['event_title']);
-    $this->assertEquals($row['fee_amount'], $result['participant_fee_amount']);
-    $this->assertEquals($row['participant_source'], $result['participant_source']);
-    $this->assertEquals($row['participant_status'], $result['participant_status']);
-    $this->assertEquals('2022-12-07 00:00:00', $result['participant_register_date']);
-    $this->assertEquals(['Attendee', 'Volunteer'], $result['participant_role']);
-    $this->assertEquals(0, $result['participant_is_pay_later']);
-    $this->assertEquals(['P', 'M'], array_keys($result[$this->getCustomFieldName('checkbox')]));
+    $participant = Participant::get(FALSE)
+      ->addWhere('id', '=', $row['_entity_id'])
+      ->addSelect('*', 'event_id.title', 'status_id:label', 'role_id:label')
+      ->addSelect($this->getCustomFieldName('checkbox', 4))
+      ->execute()->first();
+    $this->assertEquals($row['event_title'], $participant['event_id.title']);
+    $this->assertEquals($row['fee_amount'], $participant['fee_amount']);
+    $this->assertEquals('Phoned up', $participant['source']);
+    $this->assertEquals($row['participant_status'], $participant['status_id:label']);
+    $this->assertEquals('2022-12-07 00:00:00', $participant['register_date']);
+    $this->assertEquals(['Attendee', 'Volunteer'], $participant['role_id:label']);
+    $this->assertEquals(0, $participant['is_pay_later']);
+    $this->assertEquals(['P', 'M'], $participant[$this->getCustomFieldName('checkbox', 4)]);
+  }
+
+  /**
+   * Test that imports work when skipping already-existing duplicates.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportParticipantSkipDuplicates() :void {
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->eventCreatePaid(['title' => 'Second event'], [], 'second');
+    $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
+    $this->createTestEntity('Participant', [
+      'event_id' => $this->ids['Event']['PaidEvent'],
+      'contact_id' => $contactID,
+    ]);
+    $this->importCSV('participant_with_ext_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'external_identifier'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('DUPLICATE', $row['_status']);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $participants = Participant::get()
+      ->addWhere('contact_id', '=', $contactID)
+      ->addSelect('event_id.title')
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $participants);
+    $participant = $participants->first();
+    $this->assertEquals('Rain-forest Cup Youth Soccer Tournament', $participant['event_id.title']);
+    $participant = $participants->last();
+    $this->assertEquals('Second event', $participant['event_id.title']);
+  }
+
+  /**
+   * Test that imports work when ignoring (duplicating) already-existing duplicates.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportParticipantIgnoreDuplicates() :void {
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->eventCreatePaid(['title' => 'Second event'], [], 'second');
+    $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
+    $this->createTestEntity('Participant', [
+      'event_id' => $this->ids['Event']['PaidEvent'],
+      'contact_id' => $contactID,
+    ]);
+    $this->importCSV('participant_with_ext_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'external_identifier'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $participant = Participant::get()
+      ->addWhere('contact_id', '=', $contactID)
+      ->addSelect('event_id.title')
+      ->execute();
+    $this->assertCount(3, $participant);
+  }
+
+  /**
+   * Test import parser match a contact using the dedupe rule with a custom field.
+   *
+   * It should match the created contact based on first name & custom field.
+   */
+  public function testImportWithCustomDedupeRule(): void {
+    $this->eventCreateUnpaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->addToDedupeRule();
+    // Setting this rule to not reserved is a bit artificial, although it does happen
+    // in the wild. The goal is to demonstrate that when we expose arbitrary dedupe
+    // rules it works, plus to ensure the code tidy up does not go backwards.
+    // We are already testing what was previously tested - ie contact_id,
+    // external_identifier or email, (email is the limit of the reserved
+    // un-supervised rule).
+    DedupeRuleGroup::update(FALSE)
+      ->addWhere('id', '=', $this->ids['DedupeRule']['unsupervised'])
+      ->setValues(['is_reserved' => FALSE])
+      ->execute();
+
+    $this->individualCreate([$this->getCustomFieldName() => 'secret code', 'first_name' => 'Bob', 'last_name' => 'Smith'], 'bob');
+    $this->importCSV('participant_with_dedupe_match.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'first_name'],
+      ['name' => 'last_name'],
+      ['name' => $this->getCustomFieldName('text', 4)],
+      ['name' => 'role_id'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+    ]);
+    $participant = Participant::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['bob'])
+      ->execute()->first();
+    $this->assertEquals($this->ids['Event']['event'], $participant['event_id']);
+  }
+
+  /**
+   * Test that one of the following is enough
+   *  - contact_id + event_id + status_id
+   *  - external_identifier + event_id + status_id
+   *  - email_primary.email + event_id + status_id
+   *
+   * @dataProvider requiredFields
+   */
+  public function testRequiredFields(array $dataProvider): void {
+    $this->eventCreateUnpaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->individualCreate(['external_identifier' => 'abc', 'email' => 'jenny@example.com']);
+    $mapper = [
+      ['name' => 'event_id'],
+      ['name' => 'participant_id'],
+      ['name' => 'contact_id'],
+      ['name' => 'external_identifier'],
+      ['name' => 'email_primary.email'],
+      ['name' => 'status_id'],
+    ];
+    foreach ($mapper as $index => $field) {
+      if (!in_array($field['name'], $dataProvider)) {
+        $mapper[$index]['name'] = 'do_not_import';
+      }
+    }
+
+    $this->importCSV('participant_with_multiple_identifiers.csv', $mapper, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK, 'saveMapping' => FALSE]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+  }
+
+  public function requiredFields(): array {
+    return [
+      'contact_id' => [['contact_id', 'status_id', 'event_id']],
+      'external_identifier' => [['external_identifier', 'status_id', 'event_id']],
+      'email' => [['email_primary.email', 'status_id', 'event_id']],
+    ];
   }
 
   /**

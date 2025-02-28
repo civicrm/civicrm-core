@@ -18,7 +18,7 @@
       </div>
       <div class="crm-flex-1 form-inline">
         <div class="btn-group">
-          <button type="button" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" ng-click="$ctrl.save()">
+          <button type="button" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" crm-confirm="$ctrl.confirmSave()" on-yes="$ctrl.save()">
             <i class="crm-i" ng-class="{'fa-check': status !== 'saving', 'fa-spin fa-spinner': status === 'saving'}"></i>
             <span ng-if="status === 'saved'">{{:: ts('Saved') }}</span>
             <span ng-if="status === 'unsaved'">{{:: ts('Save') }}</span>

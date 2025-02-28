@@ -269,11 +269,6 @@ class CRM_Core_Page {
     }
 
     $content = self::$_template->fetch(CRM_Utils_System::getContentTemplate());
-
-    // Render page header
-    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-      CRM_Utils_System::addHTMLHead($region->render(''));
-    }
     CRM_Utils_System::appendTPLFile($pageTemplateFile, $content);
 
     //its time to call the hook.

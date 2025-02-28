@@ -178,7 +178,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
     //Check if email column contains (On Hold) string.
     foreach ($rows[$contactID] as $key => $value) {
-      if (strpos($key, 'email') !== FALSE) {
+      if (str_contains($key, 'email')) {
         $this->assertStringContainsString('(On Hold)', (string) $value);
       }
     }

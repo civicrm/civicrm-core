@@ -114,7 +114,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $defaultDashlets = [];
     $defaults = ['blog' => 1, 'getting-started' => '0'];
     foreach ($defaults as $name => $column) {
-      if (!empty($allDashlets[$name]) && !empty($allDashlets[$name]['id'])) {
+      if (!empty($allDashlets[$name]['id'])) {
         $defaultDashlets[$name] = [
           'dashboard_id' => $allDashlets[$name]['id'],
           'is_active' => 1,

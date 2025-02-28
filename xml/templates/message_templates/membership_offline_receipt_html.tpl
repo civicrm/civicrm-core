@@ -72,17 +72,6 @@
                   {ts}Membership Fee{/ts}
                 </th>
               </tr>
-              {if {contribution.financial_type_id|boolean}}
-                <tr>
-                  <td {$labelStyle}>
-                    {ts}Financial Type{/ts}
-                  </td>
-                  <td {$valueStyle}>
-                    {contribution.financial_type_id:label}
-                  </td>
-                </tr>
-              {/if}
-
               {if $isShowLineItems}
                   <tr>
                     <td colspan="2" {$valueStyle}>
@@ -215,7 +204,7 @@
             {if !empty($billingName)}
               <tr>
                 <th {$headerStyle}>
-                  {ts}Billing Name and Address{/ts}
+                  {ts}Billing Address{/ts}
                 </th>
               </tr>
               <tr>

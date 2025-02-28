@@ -101,7 +101,7 @@ class Utils {
       (!empty($updatedAfform['server_route']) && $isChanged('title'));
   }
 
-  public static function formatViewValue(string $fieldName, array $fieldInfo, array $values, string $entityName = NULL, string $formName = NULL): string {
+  public static function formatViewValue(string $fieldName, array $fieldInfo, array $values, ?string $entityName = NULL, ?string $formName = NULL): string {
     $value = $values[$fieldName] ?? NULL;
     if (isset($value) && $value !== '') {
       $dataType = $fieldInfo['data_type'] ?? NULL;

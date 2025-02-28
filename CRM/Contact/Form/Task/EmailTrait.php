@@ -291,7 +291,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
           $this->addEntityRef($field, $values['label'], $attribute, $required);
         }
         else {
-          $this->add($values['type'], $field, $values['label'], $attribute, $required, CRM_Utils_Array::value('extra', $values));
+          $this->add($values['type'], $field, $values['label'], $attribute, $required, $values['extra'] ?? NULL);
         }
       }
     }
@@ -653,7 +653,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
-      if (strpos($fields['html_message'], $token) !== FALSE) {
+      if (str_contains($fields['html_message'], $token)) {
         $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
       }
     }

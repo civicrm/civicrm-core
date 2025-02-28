@@ -111,7 +111,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   protected function _itemsToGet($field) {
     foreach ($this->where as $clause) {
       // Look for exact-match operators (=, IN, or LIKE with no wildcard)
-      if ($clause[0] == $field && (in_array($clause[1], ['=', 'IN'], TRUE) || ($clause[1] == 'LIKE' && !(is_string($clause[2]) && strpos($clause[2], '%') !== FALSE)))) {
+      if ($clause[0] == $field && (in_array($clause[1], ['=', 'IN'], TRUE) || ($clause[1] == 'LIKE' && !(is_string($clause[2]) && str_contains($clause[2], '%'))))) {
         return (array) $clause[2];
       }
     }
@@ -132,7 +132,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    *   Returns true if any given fields are in use.
    */
   protected function _isFieldSelected(string ...$fieldNames) {
-    if ((!$this->select && strpos($fieldNames[0], ':') === FALSE) || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
+    if ((!$this->select && !str_contains($fieldNames[0], ':')) || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
       return TRUE;
     }
     return $this->_whereContains($fieldNames);

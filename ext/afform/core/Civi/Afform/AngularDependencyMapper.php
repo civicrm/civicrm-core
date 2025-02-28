@@ -55,10 +55,10 @@ class AngularDependencyMapper {
         continue;
       }
       foreach ($angularModules[$module]['exports'] as $symbolName => $symbolTypes) {
-        if (strpos($symbolTypes, 'A') !== FALSE) {
+        if (str_contains($symbolTypes, 'A')) {
           $revMap['attr'][$symbolName] = $module;
         }
-        if (strpos($symbolTypes, 'E') !== FALSE) {
+        if (str_contains($symbolTypes, 'E')) {
           $revMap['el'][$symbolName] = $module;
         }
       }

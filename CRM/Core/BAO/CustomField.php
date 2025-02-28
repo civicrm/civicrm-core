@@ -419,6 +419,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     // maximum backward-compatibility.
     // (for forward-compatibility... don't use this function)
     foreach ($customGroups as $customGroup) {
+      $extendsSubtypes = in_array($customGroup['extends'], CRM_Contact_BAO_ContactType::subTypes());
       foreach ($customGroup['fields'] as $customField) {
         $id = (string) $customField['id'];
         $fields[$id]['id'] = $id;
@@ -453,7 +454,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
         $fields[$id]['where'] = $customGroup['table_name'] . '.' . $customField['column_name'];
         // Probably we should use a different fn to get the extends tables but this is a refactor so not changing that now.
         $fields[$id]['extends_table'] = array_key_exists($customGroup['extends'], CRM_Core_BAO_CustomQuery::$extendsMap) ? CRM_Core_BAO_CustomQuery::$extendsMap[$customGroup['extends']] : '';
-        if (in_array($customGroup['extends'], CRM_Contact_BAO_ContactType::subTypes())) {
+        if ($extendsSubtypes) {
           // if $extends is a subtype, refer contact table
           $fields[$id]['extends_table'] = 'civicrm_contact';
         }
@@ -1117,7 +1118,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
           // In such cases we could just get intval($value) and fetch matching
           // option again, but this would not work if key is float like 5.6.
           // So we need to truncate trailing zeros to make it work as expected.
-          if ($display === '' && is_numeric($value) && strpos(($value ?? ''), '.') !== FALSE) {
+          if ($display === '' && is_numeric($value) && str_contains(($value ?? ''), '.')) {
             // Use round() to truncate trailing zeros, e.g:
             // 10.00 -> 10, 10.60 -> 10.6, 10.69 -> 10.69.
             $value = (string) round($value, 5);
@@ -2612,7 +2613,7 @@ WHERE      f.id IN ($ids)";
     if (in_array($field['data_type'], ['EntityReference', 'ContactReference', 'Date'])) {
       return FALSE;
     }
-    if (strpos($field['html_type'], 'Select') !== FALSE) {
+    if (str_contains($field['html_type'], 'Select')) {
       return TRUE;
     }
     return !empty($field['option_group_id']);
@@ -2630,7 +2631,7 @@ WHERE      f.id IN ($ids)";
     $html_type = is_object($field) ? $field->html_type : $field['html_type'];
     // APIv3 has a "legacy" mode where it returns old-style html_type of "Multi-Select"
     // If anyone is using this function in conjunction with legacy api output, we'll accomodate:
-    if ($html_type === 'CheckBox' || strpos($html_type, 'Multi') !== FALSE) {
+    if ($html_type === 'CheckBox' || str_contains($html_type, 'Multi')) {
       return TRUE;
     }
     // Otherwise this is the new standard as of 5.27
@@ -2727,7 +2728,7 @@ WHERE      f.id IN ($ids)";
         $field->text_length
       ),
       'required' => $field->is_required,
-      'searchable' => $field->is_searchable,
+      'searchable' => $field->is_searchable && $field->is_active,
     ];
 
     // For adding/dropping FK constraints

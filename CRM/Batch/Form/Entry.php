@@ -413,7 +413,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       if (!empty($params['soft_credit_contact_id'][$key]) && empty($params['soft_credit_amount'][$key])) {
         $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
       }
-      if (!empty($params['soft_credit_amount']) && !empty($params['soft_credit_amount'][$key]) && CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value($key, $params['soft_credit_amount'])) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
+      if (!empty($params['soft_credit_amount'][$key]) && CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
         $errors["soft_credit_amount[$key]"] = ts('Soft credit amount should not be greater than the total amount');
       }
 
@@ -671,10 +671,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             [$products, $options] = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
 
             $value['hidden_Premium'] = 1;
-            $value['product_option'] = CRM_Utils_Array::value(
-              $value['product_name'][1],
-              $options[$value['product_name'][0]]
-            );
+            $value['product_option'] = $options[$value['product_name'][0]][$value['product_name'][1]] ?? NULL;
 
             $premiumParams = [
               'product_id' => $value['product_name'][0],
@@ -1044,6 +1041,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
     // @todo stop passing $ids (membership and userId may be set by this point)
+    // $ids['membership'] is the "current membership ID"
     $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
@@ -1159,7 +1157,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   private function getCurrentRowCustomParams(): array {
     $return = [];
     foreach ($this->currentRow as $field => $value) {
-      if (strpos($field, 'custom_') === 0) {
+      if (str_starts_with($field, 'custom_')) {
         $return[$field] = $value;
       }
     }

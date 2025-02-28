@@ -3661,7 +3661,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $mut->checkMailLog([
       // billing header
-      'Billing Name and Address',
+      'Billing Address',
       // billing name
       'anthony_anderson@civicrm.org',
     ], [

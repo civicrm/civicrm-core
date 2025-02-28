@@ -253,6 +253,13 @@ if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_
   }
 }
 
+if (!defined('CIVICRM_DEDUPE_OPTIMIZER')) {
+  // This is a temporary define to allow us to phase in improved dedupe queries
+  // with some degree of caution. If you set this to TRUE
+  // then the queries used to dedupe contacts will be combined
+  // for better performance.
+  define('CIVICRM_DEDUPE_OPTIMIZER', FALSE);
+}
 /**
  * Define any CiviCRM Settings Overrides per https://docs.civicrm.org/sysadmin/en/latest/customize/settings/
  *
@@ -434,10 +441,11 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
  * unavailable on the host and port that you specify. By default CiviCRM will use
  * an in-memory array cache.
  *
- * To use the php extension memcache  use a value of 'Memcache'
- * To use the php extension memcached use a value of 'Memcached'
- * To use the php extension apc       use a value of 'APCcache'
- * To use the php extension redis     use a value of 'Redis'
+ * To use the php extension memcache    use a value of 'Memcache'
+ * To use the php extension memcached   use a value of 'Memcached'
+ * To use the php extension apc         use a value of 'APCcache'
+ * To use the php extension redis       use a value of 'Redis'
+ * To use the filesystem                use a value of 'FileCache'
  * To not use any caching (not recommended), use a value of 'NoCache'
  *
  */

@@ -23,7 +23,7 @@ function smarty_block_crmRegion($params, $content, &$smarty, &$repeat) {
   require_once 'CRM/Core/Region.php';
   $region = CRM_Core_Region::instance($params['name'], FALSE);
   if ($region) {
-    $result = $region->render($content, CRM_Utils_Array::value('allowCmsOverride', $params, TRUE));
+    $result = $region->render($content, $params['allowCmsOverride'] ?? TRUE);
     return $result;
   }
   else {

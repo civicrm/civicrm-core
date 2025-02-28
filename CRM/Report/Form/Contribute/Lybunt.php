@@ -447,7 +447,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * @return string
    */
   public function getYearFilterType() {
-    return CRM_Utils_Array::value('yid_op', $this->_params, 'calendar');
+    return $this->_params['yid_op'] ?? 'calendar';
   }
 
   /**
@@ -495,7 +495,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     // Perhaps that works on some other report? But here it just seems odd.
     $this->countStat($statistics, count($rows));
     if (!empty($rows)) {
-      if (!empty($this->rollupRow) && !empty($this->rollupRow['civicrm_contribution_last_year_total_amount'])) {
+      if (!empty($this->rollupRow['civicrm_contribution_last_year_total_amount'])) {
         $statistics['counts']['civicrm_contribution_last_year_total_amount'] = [
           'value' => $this->rollupRow['civicrm_contribution_last_year_total_amount'],
           'title' => $this->getLastYearColumnTitle(),
@@ -503,7 +503,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         ];
 
       }
-      if (!empty($this->rollupRow) && !empty($this->rollupRow['civicrm_contribution_civicrm_life_time_total'])) {
+      if (!empty($this->rollupRow['civicrm_contribution_civicrm_life_time_total'])) {
         $statistics['counts']['civicrm_contribution_civicrm_life_time_total'] = [
           'value' => $this->rollupRow['civicrm_contribution_civicrm_life_time_total'],
           'title' => ts('Total LifeTime'),

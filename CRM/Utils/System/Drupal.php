@@ -480,7 +480,7 @@ AND    u.status = 1
     define('DRUPAL_ROOT', $cmsPath);
 
     // For drupal multi-site CRM-11313
-    if ($realPath && strpos($realPath, 'sites/all/modules/') === FALSE) {
+    if ($realPath && !str_contains($realPath, 'sites/all/modules/')) {
       preg_match('@sites/([^/]*)/modules@s', $realPath, $matches);
       if (!empty($matches[1])) {
         $_SERVER['HTTP_HOST'] = $matches[1];

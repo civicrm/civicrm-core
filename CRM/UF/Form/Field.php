@@ -207,7 +207,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         $defaults['field_type'],
         ($defaults['field_type'] == "Formatting" ? "" : $defaults['field_name']),
         ($defaults['field_name'] == "url") ? $defaults['website_type_id'] : $defaults['location_type_id'],
-        CRM_Utils_Array::value('phone_type_id', $defaults),
+        $defaults['phone_type_id'] ?? NULL,
       ];
       $this->_gid = $defaults['uf_group_id'];
     }
@@ -548,7 +548,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         CRM_Core_BAO_UFField::resetInSelectorANDSearchable($this->_gid);
       }
 
-      $this->setMessageIfCountryNotAboveState($fieldName, CRM_Utils_Array::value('location_type_id', $apiFormattedParams), $apiFormattedParams['weight'], $apiFormattedParams['uf_group_id']);
+      $this->setMessageIfCountryNotAboveState($fieldName, $apiFormattedParams['location_type_id'] ?? NULL, $apiFormattedParams['weight'], $apiFormattedParams['uf_group_id']);
 
     }
     $buttonName = $this->controller->getButtonName();
@@ -804,7 +804,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $fieldType = $fields['field_name'][0];
 
     //get the group type.
-    $groupType = CRM_Core_BAO_UFGroup::calculateGroupType($self->_gid, FALSE, CRM_Utils_Array::value('field_id', $fields));
+    $groupType = CRM_Core_BAO_UFGroup::calculateGroupType($self->_gid, FALSE, $fields['field_id'] ?? NULL);
 
     switch ($fieldType) {
       case 'Contact':

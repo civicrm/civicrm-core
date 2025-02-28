@@ -617,9 +617,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             if ($op && !($fieldName === "contact_{$recordType}" && ($op === 'nnll' || $op === 'nll'))) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
               if ($field['name'] == 'include_case_activities') {
                 $clause = NULL;
@@ -964,7 +964,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         if (empty($this->_params['include_case_activities_value']) || empty($rows[$rowNum]['civicrm_case_activity_case_id'])) {
           // Generate a "view activity" link
           $actActionLinks = CRM_Activity_Selector_Activity::actionLinks($row['civicrm_activity_activity_type_id'],
-            CRM_Utils_Array::value('civicrm_activity_source_record_id', $rows[$rowNum]),
+            $rows[$rowNum]['civicrm_activity_source_record_id'] ?? NULL,
             FALSE,
             $rows[$rowNum]['civicrm_activity_id']
           );

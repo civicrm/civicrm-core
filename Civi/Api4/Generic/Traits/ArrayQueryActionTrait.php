@@ -256,7 +256,7 @@ trait ArrayQueryActionTrait {
       // With no SELECT specified, return all values that are keyed by plain field name; omit those with :pseudoconstant suffixes
       foreach ($values as &$value) {
         $value = array_filter($value, function($key) {
-          return strpos($key, ':') === FALSE;
+          return !str_contains($key, ':');
         }, ARRAY_FILTER_USE_KEY);
       }
     }

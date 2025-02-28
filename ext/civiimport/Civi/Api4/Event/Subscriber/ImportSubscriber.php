@@ -171,7 +171,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
   public function onApiAuthorize(AuthorizeEvent $event): void {
     $apiRequest = $event->getApiRequest();
     $entity = $apiRequest['entity'];
-    if (strpos($entity, 'Import_') === 0 && !in_array($event->getActionName(), ['getFields', 'getActions', 'checkAccess'], TRUE)) {
+    if (str_starts_with($entity, 'Import_') && !in_array($event->getActionName(), ['getFields', 'getActions', 'checkAccess'], TRUE)) {
       $userJobID = (int) (str_replace('Import_', '', $entity));
       if (!UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->selectRowCount()->execute()->count()) {
         throw new UnauthorizedException('Import access not permitted');

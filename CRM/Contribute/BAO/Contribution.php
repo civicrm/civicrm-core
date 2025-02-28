@@ -384,8 +384,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
             ->addWhere('id', '=', $contributionID)
             ->execute()
             ->first();
-          $totalAmount = (isset($params['total_amount']) ? (float) $params['total_amount'] : (float) CRM_Utils_Array::value('total_amount', $contribution));
-          $feeAmount = (isset($params['fee_amount']) ? (float) $params['fee_amount'] : (float) CRM_Utils_Array::value('fee_amount', $contribution));
+          $totalAmount = (isset($params['total_amount']) ? (float) $params['total_amount'] : (float) ($contribution['total_amount'] ?? 0));
+          $feeAmount = (isset($params['fee_amount']) ? (float) $params['fee_amount'] : (float) ($contribution['fee_amount'] ?? 0));
           $params['net_amount'] = $totalAmount - $feeAmount;
         }
       }
@@ -1767,7 +1767,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if ($dao->contribution_id &&
         $dao->is_pay_later &&
         $dao->contribution_status_id == $pendingStatusId &&
-        strpos($dao->source, $source) !== FALSE
+        str_contains($dao->source, $source)
       ) {
         $contributionId = $dao->contribution_id;
       }
@@ -2296,7 +2296,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       FROM   civicrm_membership_payment
       WHERE  contribution_id = %1 ";
     $params = [1 => [$this->id, 'Integer']];
-    $ids['membership'] = (array) CRM_Utils_Array::value('membership', $ids, []);
+    $ids['membership'] = (array) ($ids['membership'] ?? []);
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
@@ -2688,7 +2688,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('selectPremium', FALSE);
     }
     $template->assign('title', $values['title'] ?? NULL);
-    $values['amount'] = CRM_Utils_Array::value('total_amount', $input, (CRM_Utils_Array::value('amount', $input)), NULL);
+    $values['amount'] = $input['total_amount'] ?? $input['amount'] ?? NULL;
     if (!$values['amount'] && isset($this->total_amount)) {
       $values['amount'] = $this->total_amount;
     }
@@ -3056,6 +3056,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $oldFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['prevContribution']->financial_type_id, $accountRelationship);
           $newFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['financial_type_id'], $accountRelationship);
           if ($oldFinancialAccount != $newFinancialAccount) {
+            $params['trxnParams']['trxn_date'] = date('YmdHis');
             $params['total_amount'] = 0;
             // If we have a fee amount set reverse this as well.
             if (isset($params['fee_amount'])) {
@@ -3760,7 +3761,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // Use input value if supplied.
     if (!empty($input['receipt_from_email'])) {
       return [
-        CRM_Utils_Array::value('receipt_from_name', $input, ''),
+        $input['receipt_from_name'] ?? '',
         $input['receipt_from_email'],
       ];
     }
@@ -3807,7 +3808,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       FROM   civicrm_membership_payment
       WHERE  contribution_id = %1 ";
     $params = [1 => [$this->id, 'Integer']];
-    $ids['membership'] = (array) CRM_Utils_Array::value('membership', $ids, []);
+    $ids['membership'] = (array) ($ids['membership'] ?? []);
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
@@ -4000,9 +4001,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'is_test' => $membership['is_test'],
         'membership_type_id' => $membership['membership_type_id'],
         'membership_activity_status' => 'Completed',
+        'skipStatusCal' => 1,
       ];
 
-      $currentMembership = CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
+      $currentMembership = CRM_Member_BAO_Membership::getContactMembership(
+        $membershipParams['contact_id'],
         $membershipParams['membership_type_id'],
         $membershipParams['is_test'],
         $membershipParams['id']
@@ -4016,7 +4019,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         ->addOrderBy('id', 'DESC')
         ->execute()
         ->first();
-      if (!empty($preChangeMembership) && !empty($preChangeMembership['membership_type_id'])) {
+      if (!empty($preChangeMembership['membership_type_id'])) {
         $membershipParams['membership_type_id'] = $preChangeMembership['membership_type_id'];
       }
       if (empty($membership['end_date']) || (int) $membership['status_id'] !== CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
@@ -4049,8 +4052,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
         // @todo - we should pass membership_type_id instead of null here but not
         // adding as not sure of testing
-        $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
-          $changeDate, NULL, $membershipParams['num_terms']
+        $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
+          $membershipParams['id'], $changeDate, NULL, $membershipParams['num_terms']
         );
         $dates['join_date'] = $currentMembership['join_date'];
       }
@@ -4059,7 +4062,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       else {
         //get the status for membership.
-        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'] ?? NULL,
+        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
+          $dates['start_date'] ?? NULL,
           $dates['end_date'] ?? NULL,
           $dates['join_date'] ?? NULL,
           'now',
@@ -4071,8 +4075,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         unset($dates['end_date']);
         $membershipParams['status_id'] = $calcStatus['id'] ?? 'New';
       }
-      //we might be renewing membership,
-      //so make status override false.
+      // We might be renewing membership so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
       $membership = civicrm_api3('Membership', 'create', $membershipParams);
@@ -4226,13 +4229,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $endDate = "$nextYear$monthDay";
     $havingClause = 'contribution_status_id = ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
-    $contributionBAO = new CRM_Contribute_BAO_Contribution();
-    $whereClauses = $contributionBAO->addSelectWhereClause();
-
-    $clauses = [];
-    foreach ($whereClauses as $key => $clause) {
-      $clauses[] = 'b.' . $key . ' ' . implode(' AND b.' . $key . ' ', (array) $clause);
-    }
+    $clauses = CRM_Contribute_BAO_Contribution::getSelectWhereClause('b');
     $clauses[] = 'b.contact_id IN (' . $contactIDs . ')';
     $clauses[] = 'b.is_test = 0';
     $clauses[] = 'b.receive_date >=' . $startDate . ' AND b.receive_date < ' . $endDate;
@@ -4463,7 +4460,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (!empty($messageToken['contribution'])) {
       // lab.c.o mail#46 - show labels, not values, for custom fields with option values.
       foreach ($result['values'][$id] as $fieldName => $fieldValue) {
-        if (strpos($fieldName, 'custom_') === 0 && array_search($fieldName, $messageToken['contribution']) !== FALSE) {
+        if (str_starts_with($fieldName, 'custom_') && array_search($fieldName, $messageToken['contribution']) !== FALSE) {
           $result['values'][$id][$fieldName] = CRM_Core_BAO_CustomField::displayValue($result['values'][$id][$fieldName], $fieldName);
         }
       }

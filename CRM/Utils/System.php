@@ -134,9 +134,7 @@ class CRM_Utils_System {
           if ($name != $urlVar) {
             $name = rawurldecode($name);
             // check for arrays in parameters: site.php?foo[]=1&foo[]=2&foo[]=3
-            if ((strpos($name, '[') !== FALSE) &&
-              (strpos($name, ']') !== FALSE)
-            ) {
+            if (str_contains($name, '[') && str_contains($name, ']')) {
               $arrays[] = $qs[$i];
             }
             else {
@@ -1001,7 +999,7 @@ class CRM_Utils_System {
     }
 
     if (!array_key_exists($callback, self::$_callbacks)) {
-      if (strpos($callback, '::') !== FALSE) {
+      if (str_contains($callback, '::')) {
         [$className, $methodName] = explode('::', $callback);
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
         // ignore errors if any
@@ -1503,51 +1501,17 @@ class CRM_Utils_System {
 
   /**
    * Reset the various system caches and some important static variables.
+   *
+   * @deprecated
+   *   Deprecated Feb 2025 in favor of Civi::rebuild().
+   *   Reassess after Jun 2026.
+   *   For an extension bridging before+after, suggest guard like:
+   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild(...)->execute()
+   *     else CRM_Utils_System::flushCache();)
+   *   Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
   public static function flushCache() {
-    // flush out all cache entries so we can reload new data
-    // a bit aggressive, but livable for now
-    CRM_Utils_Cache::singleton()->flush();
-
-    if (Civi\Core\Container::isContainerBooted()) {
-      Civi::cache('long')->flush();
-      Civi::cache('settings')->flush();
-      Civi::cache('js_strings')->flush();
-      Civi::cache('community_messages')->flush();
-      Civi::cache('groups')->flush();
-      Civi::cache('navigation')->flush();
-      Civi::cache('customData')->flush();
-      Civi::cache('contactTypes')->clear();
-      Civi::cache('metadata')->clear();
-      \Civi\Core\ClassScanner::cache('index')->flush();
-      CRM_Extension_System::singleton()->getCache()->flush();
-    }
-
-    // also reset the various static memory caches
-
-    // reset the memory or array cache
-    Civi::cache('fields')->flush();
-
-    // reset ACL cache
-    CRM_ACL_BAO_Cache::resetCache();
-
-    // clear asset builder folder
-    \Civi::service('asset_builder')->clear(FALSE);
-
-    // reset various static arrays used here
-    CRM_Contact_BAO_Contact::$_importableFields = CRM_Contact_BAO_Contact::$_exportableFields
-      = CRM_Contribute_BAO_Contribution::$_importableFields
-        = CRM_Contribute_BAO_Contribution::$_exportableFields
-          = CRM_Pledge_BAO_Pledge::$_exportableFields
-            = CRM_Core_DAO::$_dbColumnValueCache = NULL;
-
-    CRM_Core_OptionGroup::flushAll();
-    CRM_Utils_PseudoConstant::flushAll();
-
-    if (Civi\Core\Container::isContainerBooted()) {
-      Civi::dispatcher()->dispatch('civi.core.clearcache');
-    }
-
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
   /**
@@ -1589,11 +1553,8 @@ class CRM_Utils_System {
       else {
         // Drupal setting
         global $civicrm_root;
-        if (strpos($civicrm_root,
-            DIRECTORY_SEPARATOR . 'sites' .
-            DIRECTORY_SEPARATOR . 'all' .
-            DIRECTORY_SEPARATOR . 'modules'
-          ) === FALSE
+        if (!str_contains($civicrm_root,
+          DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules')
         ) {
           $startPos = strpos($civicrm_root,
             DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
@@ -1841,7 +1802,7 @@ class CRM_Utils_System {
    * @return string|FALSE
    */
   public static function evalUrl($url) {
-    if (!$url || strpos($url, '{') === FALSE) {
+    if (!$url || !str_contains($url, '{')) {
       return $url;
     }
     else {

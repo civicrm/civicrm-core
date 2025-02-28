@@ -34,8 +34,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Status code of various types of errors.
    */
   const FATAL_ERROR = 2;
+
+  /**
+   * @deprecated
+   */
   const DUPLICATE_CONTACT = 8001;
   const DUPLICATE_CONTRIBUTION = 8002;
+
+  /**
+   * @deprecated
+   */
   const DUPLICATE_PARTICIPANT = 8003;
 
   /**
@@ -501,7 +509,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     if ($log) {
       // Log the output to error_log with a unique reference.
-      $unique = substr(md5(random_bytes(32)), 0, 12);
+      $unique = bin2hex(random_bytes(6));
       error_log("errorID:$unique\n$out");
 
       if (!$checkPermission) {
@@ -838,8 +846,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       $ret[] = sprintf(
         "%s(%s): %s%s(%s)",
-        CRM_Utils_Array::value('file', $trace, '[internal function]'),
-        CRM_Utils_Array::value('line', $trace, ''),
+        $trace['file'] ?? '[internal function]',
+        $trace['line'] ?? '',
         $className,
         $fnName,
         implode(", ", $args)
@@ -918,6 +926,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * @deprecated since 6.1 will be removed around 6.13
+   *
    * @param $message
    * @param int $code
    * @param string $level
@@ -926,6 +936,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @return object
    */
   public static function createError($message, $code = 8000, $level = 'Fatal', $params = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('something that is less silly');
     $error = CRM_Core_Error::singleton();
     $error->push($code, $level, [$params], $message);
     return $error;

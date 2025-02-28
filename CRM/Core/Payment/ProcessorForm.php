@@ -106,7 +106,7 @@ class CRM_Core_Payment_ProcessorForm {
       CRM_Core_Error::statusBounce(ts('Payment processor is not set for this page'));
     }
 
-    if (!empty($form->_membershipBlock) && !empty($form->_membershipBlock['is_separate_payment']) &&
+    if (!empty($form->_membershipBlock['is_separate_payment']) &&
       (!empty($form->_paymentProcessor['class_name']) &&
         !$paymentObject->supports('MultipleConcurrentPayments')
       )
@@ -130,7 +130,7 @@ class CRM_Core_Payment_ProcessorForm {
     // because payment processor is not selected
     $processorId = $form->getPaymentProcessorID();
     $billing_profile_id = CRM_Utils_Request::retrieve('billing_profile_id', 'String');
-    if (!empty($form->_values) && !empty($form->_values['is_billing_required'])) {
+    if (!empty($form->_values['is_billing_required'])) {
       $billing_profile_id = 'billing';
     }
     if (!empty($processorId)) {

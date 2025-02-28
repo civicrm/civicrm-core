@@ -333,29 +333,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $isAddressCustomField = FALSE;
 
         foreach ($field as $value) {
-          $break = FALSE;
           if (is_array($value)) {
             foreach ($value as $name => $testForEmpty) {
-              if ($addressCustomFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
+              if (CRM_Core_BAO_CustomField::getKeyID($name)) {
                 $isAddressCustomField = TRUE;
                 break;
               }
 
               if (($testForEmpty === '' || $testForEmpty == NULL)) {
-                $break = TRUE;
                 break;
               }
             }
           }
-          else {
-            $break = TRUE;
-          }
 
-          if (!$break) {
-            if (!empty($value['location_type_id'])) {
-              $this->formatLocationBlock($value, $formatted);
-            }
-          }
         }
         if (!$isAddressCustomField) {
           continue;
@@ -1106,67 +1096,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Format location block ready for importing.
-   *
-   * Note this formatting should all be by the time the code reaches this point
-   *
-   * There is some test coverage for this in
-   * CRM_Contact_Import_Parser_ContactTest e.g. testImportPrimaryAddress.
-   *
-   * @deprecated
-   *
-   * @param array $values
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   */
-  protected function formatLocationBlock(&$values) {
-    // @todo - remove this function.
-    // Original explantion .....
-    // Note: we doing multiple value formatting here for address custom fields, plus putting into right format.
-    // The actual formatting (like date, country ..etc) for address custom fields is taken care of while saving
-    // the address in CRM_Core_BAO_Address::create method
-    if (!empty($values['location_type_id'])) {
-      static $customFields = [];
-      if (empty($customFields)) {
-        $customFields = CRM_Core_BAO_CustomField::getFields('Address');
-      }
-      // make a copy of values, as we going to make changes
-      $newValues = $values;
-      foreach ($values as $key => $val) {
-        $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
-        if ($customFieldID && array_key_exists($customFieldID, $customFields)) {
-
-          $htmlType = $customFields[$customFieldID]['html_type'] ?? NULL;
-          if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]) && $val) {
-            $mulValues = explode(',', $val);
-            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-            $newValues[$key] = [];
-            foreach ($mulValues as $v1) {
-              foreach ($customOption as $v2) {
-                if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
-                  (strtolower($v2['value']) == strtolower(trim($v1)))
-                ) {
-                  if ($htmlType == 'CheckBox') {
-                    $newValues[$key][$v2['value']] = 1;
-                  }
-                  else {
-                    $newValues[$key][] = $v2['value'];
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      // consider new values
-      $values = $newValues;
-    }
-
-    return TRUE;
-  }
-
-  /**
    * Get the field metadata for the relevant entity.
    *
    * @param string $entity
@@ -1821,6 +1750,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     return \Civi::$statics[$cacheString];
+  }
+
+  /**
+   * Get the metadata field for which importable fields does not key the actual field name.
+   *
+   * @return string[]
+   */
+  protected function getOddlyMappedMetadataFields(): array {
+    return [
+      'country_id' => 'country',
+      'state_province_id' => 'state_province',
+      'county_id' => 'county',
+      'email_greeting_id' => 'email_greeting',
+      'postal_greeting_id' => 'postal_greeting',
+      'addressee_id' => 'addressee',
+      'source' => 'contact_source',
+    ];
   }
 
 }

@@ -278,12 +278,11 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   }
 
   public function testFindById(): void {
-    $params = $this->sampleContact('Individual', 4);
-    $existing_contact = $this->callAPISuccess('Contact', 'create', $params);
+    $existing_contact = $this->individualCreate();
     /** @var CRM_Contact_DAO_Contact $contact */
-    $contact = CRM_Contact_BAO_Contact::findById($existing_contact['id']);
-    $this->assertEquals($existing_contact['id'], $contact->id);
-    $deleted_contact_id = $existing_contact['id'];
+    $contact = CRM_Contact_BAO_Contact::findById($existing_contact);
+    $this->assertEquals($existing_contact, $contact->id);
+    $deleted_contact_id = $existing_contact;
     $this->contactDelete($contact->id);
     $exception_thrown = FALSE;
     try {
@@ -380,8 +379,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contactIDs = [];
     for ($i = 0; $i < 10; $i++) {
       $contactIDs[] = $this->individualCreate([
-        'first_name' => 'Alan' . substr(sha1(rand()), 0, 7),
-        'last_name' => 'Smith' . substr(sha1(rand()), 0, 4),
+        'first_name' => 'Alan' . bin2hex(random_bytes(4)),
+        'last_name' => 'Smith' . bin2hex(random_bytes(2)),
       ]);
     }
 
@@ -448,7 +447,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       if ($constant === 'SERIALIZE_JSON' || $constant === 'SERIALIZE_PHP') {
         $constants[] = [$val, array_merge($simpleData, $complexData)];
       }
-      elseif (strpos($constant, 'SERIALIZE_') === 0) {
+      elseif (str_starts_with($constant, 'SERIALIZE_')) {
         $constants[] = [$val, $simpleData];
       }
     }

@@ -897,7 +897,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $participantParams['custom'] = [];
     foreach ($form->_params as $paramName => $paramValue) {
-      if (strpos($paramName, 'custom_') === 0) {
+      if (str_starts_with($paramName, 'custom_')) {
         [$customFieldID, $customValueID] = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
         CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $participantParams['custom'], $paramValue, 'Participant', $customValueID);
 
@@ -1131,7 +1131,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if (!$usedCache && $hasPriceFieldsCount) {
         $count = 0;
         foreach ($values as $valKey => $value) {
-          if (strpos($valKey, 'price_') === FALSE) {
+          if (!str_contains($valKey, 'price_')) {
             continue;
           }
           $priceFieldId = substr($valKey, 6);
@@ -1197,7 +1197,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     foreach ($params as $key => & $value) {
       $vals = [];
-      if (strpos($key, 'price_') !== FALSE) {
+      if (str_contains($key, 'price_')) {
         $fieldId = substr($key, 6);
         if (!array_key_exists($fieldId, $priceSetDetails['fields']) ||
           is_array($value) ||
@@ -1261,7 +1261,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
 
       foreach ($values as $valKey => $value) {
-        if (strpos($valKey, 'price_') === FALSE) {
+        if (!str_contains($valKey, 'price_')) {
           continue;
         }
 
@@ -1513,7 +1513,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
 
       foreach ($values as $valKey => $value) {
-        if (strpos($valKey, 'price_') === FALSE) {
+        if (!str_contains($valKey, 'price_')) {
           continue;
         }
         $priceFieldId = substr($valKey, 6);
@@ -2059,7 +2059,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $adminVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('admin');
 
             foreach ($options as $key => $currentOption) {
-              $optionVisibility = CRM_Utils_Array::value('visibility_id', $currentOption, $publicVisibilityID);
+              $optionVisibility = $currentOption['visibility_id'] ?? $publicVisibilityID;
               if ($optionVisibility == $adminVisibilityID) {
                 unset($options[$key]);
               }

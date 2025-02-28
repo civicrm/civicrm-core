@@ -2285,8 +2285,8 @@ class CRM_Utils_Date {
   public static function datePickerValueWithTimeHasDate($value) {
     // If there's no : (time) or a : and a - (date) then return true
     return (
-      strpos($value, ':') === FALSE
-      || strpos($value, ':') !== FALSE && strpos($value, '-') !== FALSE
+      !str_contains($value, ':')
+      || str_contains($value, ':') && str_contains($value, '-')
     );
   }
 

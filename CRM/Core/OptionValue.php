@@ -82,10 +82,6 @@ class CRM_Core_OptionValue {
     if ($optionGroupID) {
       $dao->option_group_id = $optionGroupID;
 
-      if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
-        $dao->domain_id = CRM_Core_Config::domainID();
-      }
-
       $dao->orderBy($orderBy);
       $dao->find();
     }
@@ -137,7 +133,7 @@ class CRM_Core_OptionValue {
 
       $optionValue[$dao->id]['label'] = htmlspecialchars($optionValue[$dao->id]['label']);
       $optionValue[$dao->id]['order'] = $optionValue[$dao->id]['weight'];
-      $optionValue[$dao->id]['icon'] = CRM_Utils_Array::value('icon', $optionValue[$dao->id], '');
+      $optionValue[$dao->id]['icon'] = $optionValue[$dao->id]['icon'] ?? '';
       $optionValue[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
         [
           'id' => $dao->id,
@@ -199,7 +195,7 @@ class CRM_Core_OptionValue {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $optionValueID, 'weight', 'id');
       }
       $fieldValues = ['option_group_id' => $optionGroupID];
-      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues);
+      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, $params['weight'] ?? NULL, $fieldValues);
     }
     $params['option_group_id'] = $optionGroupID;
 
@@ -242,23 +238,14 @@ class CRM_Core_OptionValue {
    * @param int $optionGroupID
    * @param string $fieldName
    *   The name of the field in the DAO.
-   * @param bool $domainSpecific
-   *   Filter this check to the current domain.
-   *   Some optionGroups allow for same labels or same names but
-   *   they must be in different domains, so filter the check to
-   *   the current domain.
    *
    * @return bool
    *   true if object exists
    */
-  public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName, $domainSpecific) {
+  public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName) {
     $object = new $daoName();
     $object->$fieldName = $value;
     $object->option_group_id = $optionGroupID;
-
-    if ($domainSpecific) {
-      $object->domain_id = CRM_Core_Config::domainID();
-    }
 
     if ($object->find(TRUE)) {
       return $daoID && $object->id == $daoID;
@@ -433,10 +420,6 @@ FROM
     if ($groupName) {
       $where .= " AND option_group.name = %2";
       $params[2] = [$groupName, 'String'];
-    }
-
-    if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
-      $where .= " AND option_value.domain_id = " . CRM_Core_Config::domainID();
     }
 
     $query = $select . $from . $where . $order;

@@ -866,7 +866,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    $this->add('text', 'source', ts('Contribution Source'), CRM_Utils_Array::value('source', $attributes));
+    $this->add('text', 'source', ts('Contribution Source'), $attributes['source'] ?? NULL);
 
     // CRM-7362 --add campaigns.
     CRM_Campaign_BAO_Campaign::addCampaign($this, $this->_values['campaign_id'] ?? NULL);
@@ -1156,9 +1156,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->ajaxResponse['updateTabs']['#tab_activity'] = TRUE;
     if (!empty($this->_id) && CRM_Core_Permission::access('CiviMember')) {
-      $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_id]);
-      if ($membershipPaymentCount) {
-        $this->ajaxResponse['updateTabs']['#tab_member'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
+      $membershipCount = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
+      // @fixme: Probably don't need a variable here but the old code counted MembershipPayment records and only returned a count if > 0
+      if ($membershipCount) {
+        $this->ajaxResponse['updateTabs']['#tab_member'] = $membershipCount;
       }
     }
     if (!empty($this->_id) && CRM_Core_Permission::access('CiviEvent')) {
@@ -1224,10 +1225,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
     $this->_params['amount_level'] = 0;
     $this->_params['description'] = ts("Contribution submitted by a staff person using contributor's credit card");
-    $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
-      $this->_params,
-      CRM_Core_Config::singleton()->defaultCurrency
-    );
+    $this->_params['currencyID'] = $this->_params['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
 
     $this->_params['pcp_display_in_roll'] = $params['pcp_display_in_roll'] ?? NULL;
     $this->_params['pcp_roll_nickname'] = $params['pcp_roll_nickname'] ?? NULL;
@@ -1237,7 +1235,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     CRM_Contribute_Form_AdditionalInfo::postProcessCommon($params, $this->_params, $this);
 
     if (empty($this->_params['invoice_id'])) {
-      $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+      $this->_params['invoiceID'] = bin2hex(random_bytes(16));
     }
     else {
       $this->_params['invoiceID'] = $this->_params['invoice_id'];

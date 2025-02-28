@@ -303,7 +303,7 @@ class CRM_Admin_Page_AJAX {
   public static function getTagTree() {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $parent = CRM_Utils_Type::escape(($_GET['parent_id'] ?? 0), 'Integer');
-    $substring = CRM_Utils_Type::escape(CRM_Utils_Array::value('str', $_GET), 'String');
+    $substring = CRM_Utils_Type::escape($_GET['str'] ?? NULL, 'String');
     $result = [];
 
     $whereClauses = ['is_tagset <> 1'];

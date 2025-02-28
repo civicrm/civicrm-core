@@ -224,7 +224,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     if (empty($params['skipStatusCal'])) {
       $fieldsToLoad = [];
       foreach (['start_date', 'end_date', 'join_date'] as $dateField) {
-        if (!empty($params[$dateField]) && $params[$dateField] !== 'null' && strpos($params[$dateField], date('Ymd', CRM_Utils_Time::strtotime(trim($params[$dateField])))) !== 0) {
+        if (!empty($params[$dateField]) && $params[$dateField] !== 'null' && !str_starts_with($params[$dateField], date('Ymd', CRM_Utils_Time::strtotime(trim($params[$dateField]))))) {
           $params[$dateField] = date('Ymd', CRM_Utils_Time::strtotime(trim($params[$dateField])));
           // @todo enable this once core is using the api.
           // CRM_Core_Error::deprecatedWarning('Relying on the BAO to clean up dates is deprecated. Call membership create via the api');

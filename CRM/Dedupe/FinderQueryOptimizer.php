@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 use Civi\API\EntityLookupTrait;
+
 use Civi\Api4\DedupeRule;
 
 /**
@@ -28,9 +29,14 @@ class CRM_Dedupe_FinderQueryOptimizer {
   private array $queries = [];
 
   /**
-   * @var mixed
+   * Threshold weight for merge.
+   *
+   * This starts with an unreachable number and is set to the correct number
+   * provided there is a valid rule.
+   *
+   * @var int
    */
-  private int $threshold;
+  private int $threshold = 999999;
 
   private array $contactIDs = [];
 
@@ -67,30 +73,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
       }
       $this->threshold = $rule['dedupe_rule_group_id.threshold'];
     }
-  }
-
-  /**
-   * Is a file based reserved query configured.
-   *
-   * File based reserved queries were an early idea about how to optimise the dedupe queries.
-   *
-   * In theory extensions could implement them although there is no evidence any of them have.
-   * However, if these are implemented by core or by extensions we should not attempt to optimise
-   * the query by (e.g.) combining queries.
-   *
-   * In practice the queries implemented only return one query anyway
-   *
-   * @internal for core use only.
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   *
-   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
-   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised
-   */
-  public function isUseReservedQuery(): bool {
-    return $this->lookup('RuleGroup', 'is_reserved') &&
-      CRM_Utils_File::isIncludable('CRM/Dedupe/BAO/QueryBuilder/' . $this->lookup('RuleGroup', 'name') . '.php');
   }
 
   /**
@@ -229,30 +211,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
   }
 
   /**
-   * Get the reserved query based on a static class.
-   *
-   * This was an early idea about optimisation & extendability. It is likely
-   * there are no implementations of rules this way outside the 3 core files.
-   *
-   * It is also likely the core files can go once we are optimising the queries based on the
-   * rule.
-   *
-   * @internal  Do not call from outside of core.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public function getReservedQuery(): array {
-    $bao = new CRM_Dedupe_BAO_DedupeRuleGroup();
-    $bao->id = $this->lookup('RuleGroup', 'id');
-    $bao->find(TRUE);
-    $bao->params = $this->lookupParameters;
-    $bao->contactIds = $this->contactIDs;
-    $command = empty($this->lookupParameters) ? 'internal' : 'record';
-    return call_user_func(["CRM_Dedupe_BAO_QueryBuilder_" . $this->lookup('RuleGroup', 'name'), $command], $bao);
-  }
-
-  /**
    * Get the queries to fill the table for the various rules.
    *
    * Return a set of SQL queries whose cummulative weights will mark matched
@@ -261,7 +219,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @internal do not call from outside tested core code.
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   public function getRuleQueries(): array {
     $queries = [];
@@ -269,6 +226,223 @@ class CRM_Dedupe_FinderQueryOptimizer {
       $queries[$rule['key']] = $rule['query'];
     }
     return $queries;
+  }
+
+  /**
+   * Get any fields that should be combined.
+   *
+   * For example if we always use first_name and last_name together then
+   * we combine these 2 queries.
+   *
+   * @return array
+   */
+  public function getCombinableQueries(): array {
+    $possibleCombinations = [];
+    $validQueryCombinations = $this->getValidCombinations();
+
+    // First we compile an array of all possible field combinations
+    // ie each set of fields that occurs together at least once.
+    foreach ($validQueryCombinations as $validQueryCombination) {
+      $fieldCombinations = $this->getPowerSet($validQueryCombination);
+      foreach ($fieldCombinations as $fieldCombination) {
+        if (count($fieldCombination) > 1) {
+          $possibleCombinations[implode(',', array_values($fieldCombination))] = $fieldCombination;
+        }
+      }
+    }
+    $combinedFields = [];
+    foreach ($possibleCombinations as $key => $possibleCombination) {
+      if (!$this->isCombinationAlwaysTogether(array_values($this->getValidCombinations()), $possibleCombination)) {
+        unset($possibleCombinations[$key]);
+      }
+    }
+    // Now prune any subsets.
+    foreach ($possibleCombinations as $key => $possibleCombination) {
+      $otherCombinations = $possibleCombinations;
+      unset($otherCombinations[$key]);
+      if (!$this->isCombinationAlreadyCovered($otherCombinations, $possibleCombination)) {
+        $combinedFields[] = $possibleCombination;
+      }
+    }
+
+    return $combinedFields;
+  }
+
+  /**
+   * Get queries with queries within the same table that MUST be combined combined.
+   *
+   * For example if both first_name and last_name are required to meet the threshold then
+   * use one query that includes both.
+   */
+  public function getOptimizedQueries(): array {
+    $queries = $this->queries;
+    // We want to combine cross-tables but looking to do that as a follow on since that will require some
+    // more work to figure out. For single table regex does get us there.
+    foreach ($this->getCombinableQueriesByTable() as $queryCombinations) {
+      foreach ($queryCombinations as $queryDetails) {
+        if (count($queryDetails) < 2) {
+          // We can't yet combine across tables so skip this one for now.
+          continue;
+        }
+        $comboQueries = ['field' => [], 'criteria' => [], 'weight' => 0, 'table' => '', 'query' => ''];
+        foreach ($queryDetails as $queryDetail) {
+          $comboQueries['table'] = $queryDetail['table'];
+          $comboQueries['weight'] += $queryDetail['weight'];
+          $comboQueries['field'][] = $queryDetail['field'];
+          $comboQueries['query'] = $queryDetail['query'];
+          $criteria = [];
+          // The part of the query that relates to the field is in double brackets like this.
+          // ((t1.first_name IS NOT NULL AND t2.first_name IS NOT NULL AND t1.first_name = t2.first_name AND t1.first_name <> '' AND t2.first_name <> ''))
+          preg_match('/\((\(.+?\))\)/m', $queryDetail['query'], $criteria);
+          $comboQueries['criteria'][] = $criteria[1];
+          unset($queries[$queryDetail['key']]);
+        }
+        $combinedKey = $comboQueries['table'] . '.' . implode('_', $comboQueries['field']) . '.' . $comboQueries['weight'];
+        $combinedQuery['query'] = preg_replace('/\((\(.+?\))\)/m', implode(' AND ', $comboQueries['criteria']), $comboQueries['query']);
+        $combinedQuery['query'] = preg_replace('/( \d+ weight )/m', ' ' . $comboQueries['weight'] . ' weight ', $combinedQuery['query']);
+        $combinedQuery['weight'] = $comboQueries['weight'];
+        $combinedQuery['key'] = $combinedKey;
+        $queries[$combinedKey] = $combinedQuery;
+      }
+    }
+    uasort($queries, [$this, 'sortWeightDescending']);
+    $tableQueryFormat = [];
+    foreach ($queries as $query) {
+      $tableQueryFormat[$query['key']] = $query['query'];
+    }
+    return $tableQueryFormat;
+  }
+
+  /**
+   * Get queries that are combinable, keyed by table.
+   *
+   * A combinable query is one where the fields must both / all be matches if any of them
+   * are. e.g. if first_name is only ever enough to meet the threshold if last_name
+   * is also a match.
+   *
+   * @return array
+   *   Combinable query. Within each combination queries are keyed
+   *   by table. eg. if the threshold can only be met if first_name, last_name & email
+   *   are all matches then it would return the following.
+   *
+   *   [
+   *     ['civicrm_email' => [['field_name' => 'email'...., ], 'civicrm_contact' => [['field_name' => 'first_name'....], ['field_name' => 'last_name'....]]],
+   *   ]
+   *
+   */
+  public function getCombinableQueriesByTable(): array {
+    $singleTableCombinableQueries = [];
+    foreach ($this->getCombinableQueries() as $index => $combo) {
+      foreach ($combo as $key) {
+        $query = $this->queries[$key];
+        $singleTableCombinableQueries[$index][$query['table']][$query['field']] = $query;
+      }
+    }
+    return $singleTableCombinableQueries;
+  }
+
+  private function sortWeightDescending($a, $b) {
+    return ($a['weight'] > $b['weight']) ? -1 : 1;
+  }
+
+  /**
+   * Is the field combination already covered by another one in the array.
+   *
+   * Each field combination represents 2 ore more fields that are always used
+   * together to fulfill the rule & hence can be combined. For example we have a
+   * rule where 12 points are required and first name & last name are both worth 5
+   * points and birth date and nick name are both worth 2 points then the threshold
+   * can only be met with BOTH first name & last name & hence we should combine their
+   * queries.
+   *
+   * This would be true if the combination is for 2 fields but the same combination
+   * is already present in the opposite order or within a array covering 3 fields.
+   * fields. We want to combine the greatest number of fields that are combinable
+   * (as that will minimise queries) so the 3 field array is better than the 2 field array.
+   *
+   * @param array $allCombinations
+   * @param array $combination
+   *
+   * @return bool
+   */
+  private function isCombinationAlreadyCovered(array $allCombinations, array $combination): bool {
+    foreach ($allCombinations as $otherCombination) {
+      $isAllFieldsFound = empty(array_diff($combination, $otherCombination));
+      $isSomeFieldsFound = !empty(array_intersect($combination, $otherCombination));
+      if ($isSomeFieldsFound && $isAllFieldsFound) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Is the given combination of fields always used together?
+   *
+   * For example if the only way to get to the threshold is to have
+   * both first_name & last_name and these 2 fields are being passed in here
+   * then this will return TRUE.
+   *
+   * @param array $allCombinations
+   * @param array $combination
+   *   e.g ['civicrm_contact.first_name.7', 'civicrm_contact.last_name.8']
+   *
+   * @return bool
+   */
+  private function isCombinationAlwaysTogether(array $allCombinations, array $combination): bool {
+    foreach ($allCombinations as $validCombination) {
+      $someCombinationFieldsUsed = !empty(array_intersect($combination, array_keys($validCombination)));
+      $allCombinationFieldsUsed = empty(array_diff($combination, array_keys($validCombination)));
+      if ($someCombinationFieldsUsed && !$allCombinationFieldsUsed) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Get all combinations of the queries.
+   *
+   * This is taken from https://www.oreilly.com/library/view/php-cookbook/1565926811/ch04s25.html
+   * which assures us it is called a power set...
+   *
+   * @return array[]
+   */
+  private function getPowerSet($queries): array {
+    // initialize by adding the empty set. This is necessary for the logic of this function.
+    $results = [[]];
+    foreach (array_reverse(array_keys($queries)) as $element) {
+      foreach ($results as $combination) {
+        $results[] = array_merge([$element], $combination);
+      }
+    }
+    return $results;
+  }
+
+  /**
+   * @return array[]
+   */
+  public function getValidCombinations(): array {
+    $combinations = [];
+    foreach ($this->getPowerSet($this->queries) as $set) {
+      $combination = [];
+      foreach ($set as $queryKey) {
+        $combination[$queryKey] = $this->queries[$queryKey]['weight'];
+      }
+      if (array_sum($combination) >= $this->threshold) {
+        $combinations[] = $combination;
+      }
+    }
+    foreach ($combinations as $key => $combination) {
+      // Check if the combination was already enough without the last item.
+      // If so we discard it as that combination is already in the array (or has
+      // already been discorded on the same basis).
+      array_pop($combination);
+      if (array_sum($combination) >= $this->threshold) {
+        unset($combinations[$key]);
+      }
+    }
+    return $combinations;
   }
 
 }

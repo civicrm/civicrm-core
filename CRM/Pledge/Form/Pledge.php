@@ -156,10 +156,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     );
 
     // assign status.
-    $this->assign('status', CRM_Utils_Array::value(CRM_Utils_Array::value('status_id', $this->_values),
-      $pledgeStatus,
-      $defaultPledgeStatus
-    ));
+    $this->assign('status', $pledgeStatus[$this->_values['status_id'] ?? 0] ?? $defaultPledgeStatus);
 
     $this->assign('email', $this->getContactValue('email_primary.email'));
     return $defaults;

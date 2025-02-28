@@ -156,7 +156,7 @@ class AuthxRequestBuilder {
   }
 
   public function credApikey($cid) {
-    $api_key = md5(\random_bytes(16));
+    $api_key = bin2hex(\random_bytes(16));
     \civicrm_api3('Contact', 'create', [
       'id' => $cid,
       'api_key' => $api_key,

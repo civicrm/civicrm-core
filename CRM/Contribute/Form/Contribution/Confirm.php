@@ -1375,7 +1375,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $membershipTypeIDs
    *
    * @param bool $isPaidMembership
-   * @param array $membershipID
+   * @param int $membershipID
    *
    * @param int $financialTypeID
    *   Line items for payment options chosen on the form.
@@ -1480,9 +1480,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (isset($this->_params)) {
           $isPayLater = $this->_params['is_pay_later'] ?? NULL;
         }
-        $memParams = [
-          'campaign_id' => $this->_params['campaign_id'] ?? ($this->_values['campaign_id'] ?? NULL),
-        ];
 
         // @todo Move this into CRM_Member_BAO_Membership::processMembership
         if (!empty($membershipContribution)) {
@@ -1492,12 +1489,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $pending = FALSE;
         }
 
+        // @fixme: Can we use eg. $this->getSubmittedValue('campaign_id') ?: $this->getContributionPageValue('campaign_id');
+        $campaignID = $this->_params['campaign_id'] ?? ($this->_values['campaign_id'] ?? NULL);
+
         [$membership, $renewalMode, $dates] = self::legacyProcessMembership(
           $contactID, $membershipTypeID, $isTest,
           date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
           $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
-          $contributionRecurID, $membershipSource, $isPayLater, $memParams, $membershipContribution,
+          $contributionRecurID, $membershipSource, $isPayLater,
+          $campaignID,
+          $membershipContribution,
           $membershipLineItems
         );
 
@@ -1669,7 +1671,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
     $tempParams['amount'] = $minimumFee;
-    $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $tempParams['invoiceID'] = bin2hex(random_bytes(16));
     $isRecur = $tempParams['is_recur'] ?? NULL;
 
     //assign receive date when separate membership payment
@@ -1850,7 +1852,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     //this way the mocked up controller ignores the session stuff
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Contribute_Controller_Contribution();
-    $params['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $params['invoiceID'] = bin2hex(random_bytes(16));
 
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
 
@@ -2675,14 +2677,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contributionRecurID
    * @param $membershipSource
    * @param $isPayLater
-   * @param array $memParams
+   * @param int? $campaignID
    * @param null|CRM_Contribute_BAO_Contribution $contribution
    * @param array $lineItems
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function legacyProcessMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $memParams = [], $contribution = NULL, $lineItems = []) {
+  protected static function legacyProcessMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignID = NULL, $contribution = NULL, $lineItems = []) {
     $renewalMode = $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
@@ -2690,6 +2692,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
     $dates = [];
     $ids = [];
+
+    $memParams = [
+      'campaign_id' => $campaignID,
+    ];
 
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact

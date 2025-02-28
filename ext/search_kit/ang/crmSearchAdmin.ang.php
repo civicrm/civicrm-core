@@ -15,7 +15,7 @@ return [
   ],
   'bundles' => ['bootstrap3'],
   'basePages' => ['civicrm/admin/search'],
-  'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'ui.sortable', 'ui.bootstrap', 'api4', 'crmSearchTasks', 'crmRouteBinder', 'crmDialog'],
+  'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'ui.sortable', 'ui.bootstrap', 'api4', 'crmSearchTasks', 'crmRouteBinder', 'crmDialog', 'md5'],
   'settingsFactory' => ['\Civi\Search\Admin', 'getAdminSettings'],
   'permissions' => [
     'all CiviCRM permissions and ACLs',

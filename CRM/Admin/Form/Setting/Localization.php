@@ -110,9 +110,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    */
   public static function formRule($fields) {
     $errors = [];
-    if (($fields['monetaryThousandSeparator'] ?? NULL) ==
-      CRM_Utils_Array::value('monetaryDecimalPoint', $fields)
-    ) {
+    if (($fields['monetaryThousandSeparator'] ?? NULL) == ($fields['monetaryDecimalPoint'] ?? NULL)) {
       $errors['monetaryThousandSeparator'] = ts('Thousands Separator and Decimal Delimiter can not be the same.');
     }
 
@@ -200,7 +198,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     }
 
     // if we manipulated the language list, return to the localization admin screen
-    $return = (bool) (CRM_Utils_Array::value('makeMultilingual', $values) or CRM_Utils_Array::value('addLanguage', $values));
+    $return = (!empty($values['makeMultilingual']) || !empty($values['addLanguage']));
 
     // Update enabled currencies
     // we do this only to initialize monetary decimal point and thousand separator
@@ -221,7 +219,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     unset($filteredValues['addLanguage']);
     unset($filteredValues['languageLimit']);
 
-    Civi::settings()->set('languageLimit', CRM_Utils_Array::value('languageLimit', $values));
+    Civi::settings()->set('languageLimit', $values['languageLimit'] ?? NULL);
 
     // save all the settings
     parent::commonProcess($filteredValues);

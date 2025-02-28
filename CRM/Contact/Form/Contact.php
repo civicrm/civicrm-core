@@ -1000,7 +1000,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     //CRM-5143
     //if subtype is set, send subtype as extend to validate subtype customfield
-    $customFieldExtends = (CRM_Utils_Array::value('contact_sub_type', $params)) ? $params['contact_sub_type'] : $params['contact_type'];
+    $customFieldExtends = !empty($params['contact_sub_type']) ? $params['contact_sub_type'] : $params['contact_type'];
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       $this->_contactId,

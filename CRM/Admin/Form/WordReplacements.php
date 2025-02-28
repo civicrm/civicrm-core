@@ -199,7 +199,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     for ($i = 1; $i <= $this->_numStrings; $i++) {
       if (!empty($params['new'][$i]) && !empty($params['old'][$i])) {
         if (isset($params['enabled']) && !empty($params['enabled'][$i])) {
-          if (!empty($params['cb']) && !empty($params['cb'][$i])) {
+          if (!empty($params['cb'][$i])) {
             $enabled['exactMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
           else {

@@ -930,7 +930,7 @@ class CRM_Contact_BAO_Query {
                 $this->_pseudoConstantsSelect[$tName]['select'] = "{$field['where']} as `$name`";
                 $this->_pseudoConstantsSelect[$tName]['element'] = $name;
               }
-              elseif (strpos($name, 'contribution_soft_credit') !== FALSE) {
+              elseif (str_contains($name, 'contribution_soft_credit')) {
                 if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_params)) {
                   $this->_select[$name] = "{$field['where']} as `$name`";
                 }
@@ -1116,7 +1116,7 @@ class CRM_Contact_BAO_Query {
         }
 
         $cond = $elementType = '';
-        if (strpos($elementName, '-') !== FALSE) {
+        if (str_contains($elementName, '-')) {
           // this is either phone, email or IM
           [$elementName, $elementType] = explode('-', $elementName);
 
@@ -1190,7 +1190,7 @@ class CRM_Contact_BAO_Query {
           foreach ($this->_params as $id => $values) {
             if ((is_array($values) && $values[0] == $nm) ||
               (in_array($elementName, ['phone', 'im'])
-                && (strpos($values[0], $nm) !== FALSE)
+                && (str_contains($values[0], $nm))
               )
             ) {
               $addWhere = TRUE;
@@ -1280,7 +1280,7 @@ class CRM_Contact_BAO_Query {
                   if ($cond) {
                     $phoneTypeCondition = " AND `$tName`.$cond ";
                     //gross hack to pickup corrupted data also, CRM-7603
-                    if (strpos($cond, 'phone_type_id') !== FALSE) {
+                    if (str_contains($cond, 'phone_type_id')) {
                       $phoneTypeCondition = " AND ( `$tName`.$cond OR `$tName`.phone_type_id IS NULL ) ";
                       if (!empty($lCond)) {
                         $phoneTypeCondition .= " AND ( `$tName`.$lCond ) ";
@@ -1776,7 +1776,7 @@ class CRM_Contact_BAO_Query {
     if (!$useEquals && in_array($id, $likeNames)) {
       $result = [$id, 'LIKE', $values, 0, 1];
     }
-    elseif (is_string($values) && strpos($values, '%') !== FALSE) {
+    elseif (is_string($values) && str_contains($values, '%')) {
       $result = [$id, 'LIKE', $values, 0, 0];
     }
     elseif ($id == 'contact_type' ||
@@ -2332,7 +2332,7 @@ class CRM_Contact_BAO_Query {
       $this->_qill[$grouping][] = ts("%1 %2 %3", [
         1 => $field['title'],
         2 => $qillop,
-        3 => (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) ? $qillVal : "'$qillVal'",
+        3 => (str_contains($op, 'NULL') || str_contains($op, 'EMPTY')) ? $qillVal : "'$qillVal'",
       ]);
 
       if (is_array($value)) {
@@ -2345,7 +2345,7 @@ class CRM_Contact_BAO_Query {
           if (!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
             //Via Contact get api value is not in array(operator => array(values)) format ONLY for IN/NOT IN operators
             //so this condition will satisfy the search for now
-            if (strpos($op, 'IN') !== FALSE) {
+            if (str_contains($op, 'IN')) {
               $value = [$op => $value];
             }
             // we don't know when this might happen
@@ -2460,7 +2460,7 @@ class CRM_Contact_BAO_Query {
 
     foreach ($this->_element as $key => $dontCare) {
       if (property_exists($dao, $key)) {
-        if (strpos($key, '-') !== FALSE) {
+        if (str_contains($key, '-')) {
           $values = explode('-', $key);
           $lastElement = array_pop($values);
           $current = &$value;
@@ -2610,11 +2610,11 @@ class CRM_Contact_BAO_Query {
 
     foreach ($tables as $key => $value) {
       $k = 99;
-      if (strpos($key, '-') !== FALSE) {
+      if (str_contains($key, '-')) {
         $keyArray = explode('-', $key);
         $k = $info['civicrm_' . $keyArray[1]] ?? 99;
       }
-      elseif (strpos($key, '_') !== FALSE) {
+      elseif (str_contains($key, '_')) {
         $keyArray = explode('_', $key);
         if (is_numeric(array_pop($keyArray))) {
           $k = CRM_Utils_Array::value(implode('_', $keyArray), $info, 99);
@@ -2951,7 +2951,7 @@ class CRM_Contact_BAO_Query {
     $op = str_replace('=', 'LIKE', $op);
     $op = str_replace('!', 'NOT ', $op);
 
-    if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+    if (str_contains($op, 'NULL') || str_contains($op, 'EMPTY')) {
       $this->_where[$grouping][] = self::buildClause($alias, $op, $value, 'String');
     }
     elseif (is_array($value)) {
@@ -3003,7 +3003,7 @@ class CRM_Contact_BAO_Query {
     }
 
     if (is_array($value) && count($value) > 1) {
-      if (strpos($op, 'IN') === FALSE && strpos($op, 'NULL') === FALSE) {
+      if (!str_contains($op, 'IN') && !str_contains($op, 'NULL')) {
         throw new CRM_Core_Exception(ts("%1 is not a valid operator", [1 => $op]));
       }
       $this->_useDistinct = TRUE;
@@ -3093,7 +3093,7 @@ class CRM_Contact_BAO_Query {
           $gcTable = "civicrm_group_contact_{$this->_groupUniqueKey}";
           $joinClause = ["contact_a.id = {$gcTable}.contact_id"];
           $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
-          if (strpos($op, 'IN') !== FALSE) {
+          if (str_contains($op, 'IN')) {
             $groupClause[] = "{$gcTable}.group_id $op ( $groupIds ) AND {$gccTableAlias}.group_id IS NULL";
           }
           else {
@@ -3111,7 +3111,7 @@ class CRM_Contact_BAO_Query {
 
     [$qillop, $qillVal] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
     $this->_qill[$grouping][] = ts("Group(s) %1 %2", [1 => $qillop, 2 => $qillVal]);
-    if (strpos($op, 'NULL') === FALSE) {
+    if (!str_contains($op, 'NULL')) {
       $this->_qill[$grouping][] = ts("Group Status %1", [1 => implode(' ' . ts('or') . ' ', $this->getSelectedGroupStatuses($grouping))]);
     }
   }
@@ -3152,7 +3152,7 @@ class CRM_Contact_BAO_Query {
    * @throws \CRM_Core_Exception
    */
   public function addGroupContactCache($groups, $tableAlias, $joinTable, $op, $joinColumn = 'id') {
-    $isNullOp = (strpos($op, 'NULL') !== FALSE);
+    $isNullOp = (str_contains($op, 'NULL'));
     $groupsIds = $groups;
 
     $operator = ['=' => 'IN', '!=' => 'NOT IN'];
@@ -3162,7 +3162,7 @@ class CRM_Contact_BAO_Query {
     if (!$isNullOp && !$groups) {
       return NULL;
     }
-    elseif (strpos($op, 'IN') !== FALSE) {
+    elseif (str_contains($op, 'IN')) {
       $groups = [$op => $groups];
     }
     elseif (is_array($groups) && count($groups)) {
@@ -3410,7 +3410,7 @@ WHERE  $smartGroupClause
     $n = trim($value);
     $value = CRM_Core_DAO::escapeString($n);
     if ($wildcard) {
-      if (strpos($value, '%') === FALSE) {
+      if (!str_contains($value, '%')) {
         $value = "%$value%";
       }
       $op = 'LIKE';
@@ -3500,7 +3500,7 @@ WHERE  $smartGroupClause
     // Replace spaces with wildcards for a LIKE operation
     // UNLESS string contains a comma (this exception is a tiny bit questionable)
     // Also need to check if there is space in between sort name.
-    elseif ($op == 'LIKE' && strpos($value, ',') === FALSE && strpos($value, ' ') !== FALSE) {
+    elseif ($op == 'LIKE' && !str_contains($value, ',') && str_contains($value, ' ')) {
       $value = str_replace(' ', '%', $value);
     }
     $value = CRM_Core_DAO::escapeString(trim($value));
@@ -3612,7 +3612,7 @@ WHERE  $smartGroupClause
     // Strip non-numeric characters; allow wildcards
     $number = preg_replace('/[^\d%]/', '', $value);
     if ($number) {
-      if (strpos($number, '%') === FALSE) {
+      if (!str_contains($number, '%')) {
         $number = "%$number%";
       }
 
@@ -3656,7 +3656,7 @@ WHERE  $smartGroupClause
     $n = trim($value);
 
     if ($n) {
-      if (strpos($value, '%') === FALSE) {
+      if (!str_contains($value, '%')) {
         // only add wild card if not there
         $value = "%{$value}%";
       }
@@ -4812,7 +4812,8 @@ civicrm_relationship.start_date > {$today}
     if (!is_array($values)) {
       return FALSE;
     }
-    if (($operator = CRM_Utils_Array::value(1, $values)) == FALSE) {
+    $operator = $values[1] ?? FALSE;
+    if (!$operator) {
       return FALSE;
     }
     return in_array($operator, CRM_Core_DAO::acceptedSQLOperators());
@@ -5386,7 +5387,7 @@ civicrm_relationship.start_date > {$today}
         $this->_where[$grouping][] = self::buildClause("{$tableName}.{$dbFieldName}", $op);
       }
 
-      $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+      $op = CRM_Core_SelectValues::getSearchBuilderOperators()[$op] ?? $op;
       $this->_qill[$grouping][] = "$fieldTitle $op $format";
     }
 
@@ -5729,7 +5730,7 @@ civicrm_relationship.start_date > {$today}
     // skip if filter has already applied
     foreach ($_rTempCache as $acache) {
       foreach ($acache['queries'] as $aqcache) {
-        if (strpos($from, $aqcache['from']) !== FALSE) {
+        if (str_contains($from, $aqcache['from'])) {
           $having = NULL;
           return;
         }
@@ -5807,8 +5808,8 @@ AND   displayRelType.is_active = 1
     if (!is_array($this->_qill[0]) || !in_array($iqill, $this->_qill[0])) {
       $this->_qill[0][] = $iqill;
     }
-    if (strpos($from, $qcache['from']) === FALSE) {
-      if (strpos($from, "INNER JOIN") !== FALSE) {
+    if (!str_contains($from, $qcache['from'])) {
+      if (str_contains($from, "INNER JOIN")) {
         // lets replace all the INNER JOIN's in the $from so we dont exclude other data
         // this happens when we have an event_type in the quert (CRM-7969)
         $from = str_replace("INNER JOIN", "LEFT JOIN", $from);
@@ -6008,7 +6009,7 @@ AND   displayRelType.is_active = 1
           // and we can use the metadata to figure it out.
           // ideally this bit of IF will absorb & replace all the rest in time as we move to
           // more metadata based choices.
-          if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+          if (str_contains($val, CRM_Core_DAO::VALUE_SEPARATOR)) {
             $dbValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
             foreach ($dbValues as $pseudoValue) {
               $convertedValues[] = CRM_Core_PseudoConstant::getLabel($value['bao'], $value['idCol'], $pseudoValue);
@@ -6066,7 +6067,7 @@ AND   displayRelType.is_active = 1
 
         // return converted values in array format
         if ($return) {
-          if (strpos($key, '-') !== FALSE) {
+          if (str_contains($key, '-')) {
             $keyVal = explode('-', $key);
             $current = &$values;
             $lastElement = array_pop($keyVal);
@@ -6180,8 +6181,8 @@ AND   displayRelType.is_active = 1
     }
 
     // if Operator chosen is NULL/EMPTY then
-    if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
-      return [CRM_Utils_Array::value($op, $qillOperators, $op), ''];
+    if (str_contains($op, 'NULL') || str_contains($op, 'EMPTY')) {
+      return [$qillOperators[$op] ?? $op, ''];
     }
 
     // @todo - if the right BAO is passed in special handling for the below
@@ -6243,7 +6244,7 @@ AND   displayRelType.is_active = 1
       $fieldValue = CRM_Utils_Date::customFormat($fieldValue);
     }
 
-    return [CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue];
+    return [$qillOperators[$op] ?? $op, $fieldValue];
   }
 
   /**
@@ -6374,7 +6375,7 @@ AND   displayRelType.is_active = 1
 
           // always add contact_a.id to the ORDER clause
           // so the order is deterministic
-          if (strpos('contact_a.id', $orderBy) === FALSE) {
+          if (!str_contains('contact_a.id', $orderBy)) {
             $orderBy .= ", contact_a.id";
           }
         }

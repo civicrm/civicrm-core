@@ -282,7 +282,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         $this->add('select', 'membership_type_id[' . $i . ']', ts('Membership Type'),
           ['' => ' '] + $membershipTypes, FALSE, $js
         );
-        $this->add('text', 'membership_num_terms[' . $i . ']', ts('Number of Terms'), CRM_Utils_Array::value('membership_num_terms', $attributes));
+        $this->add('text', 'membership_num_terms[' . $i . ']', ts('Number of Terms'), $attributes['membership_num_terms'] ?? NULL);
       }
 
       // weight
@@ -679,7 +679,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_visibility_id'] = [1 => $params['visibility_id'] ?? NULL];
     }
 
-    $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
+    $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? $params['membership_num_terms'] ?? 1 : NULL;
 
     return CRM_Price_BAO_PriceField::create($params);
   }

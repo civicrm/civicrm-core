@@ -238,7 +238,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
         foreach ($table['filters'] as $fieldName => $field) {
 
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? NULL) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -250,8 +250,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
           else {
             $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if (($fieldName == 'grant_report_received') &&
-              (CRM_Utils_Array::value("{$fieldName}_value", $this->_params) ===
-                0)
+              (($this->_params["{$fieldName}_value"] ?? NULL) === 0)
             ) {
               $op = 'nll';
               $this->_params["{$fieldName}_value"] = NULL;
@@ -259,9 +258,9 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }

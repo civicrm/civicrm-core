@@ -766,17 +766,19 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testGetRowsElementsAndInfoSpecialInfo(): void {
     $contact1 = $this->individualCreate([
       'preferred_communication_method' => [],
-      'communication_style_id' => 'Familiar',
-      'prefix_id' => 'Mrs.',
-      'suffix_id' => 'III',
+      'communication_style_id:label' => 'Familiar',
+      'prefix_id:label' => 'Mrs.',
+      'suffix_id:label' => 'III',
+      'version' => 4,
     ]);
     $contact2 = $this->individualCreate([
-      'preferred_communication_method' => [
+      'preferred_communication_method:label' => [
         'SMS',
         'Fax',
       ],
-      'communication_style_id' => 'Formal',
-      'gender_id' => 'Female',
+      'communication_style_id:label' => 'Formal',
+      'gender_id:label' => 'Female',
+      'version' => 4,
     ]);
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($contact1, $contact2);
     $rows = $rowsElementsAndInfo['rows'];

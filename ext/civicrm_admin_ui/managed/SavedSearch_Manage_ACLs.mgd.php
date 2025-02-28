@@ -116,7 +116,7 @@ return [
               'dataType' => 'Boolean',
               'label' => E::ts('Mode'),
               'sortable' => TRUE,
-              'rewrite' => '{if "[deny]" eq "1"}' . E::ts('Deny') . '{else}' . E::ts('Allow') . '{/if}',
+              'rewrite' => '{if $deny}' . E::ts('Deny') . '{else}' . E::ts('Allow') . '{/if}',
             ],
             [
               'type' => 'field',

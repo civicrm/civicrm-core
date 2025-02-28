@@ -94,7 +94,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
         $params['name'] = $navLabel;
       }
 
-      $params['weight'] = self::calculateWeight(CRM_Utils_Array::value('parent_id', $params));
+      $params['weight'] = self::calculateWeight($params['parent_id'] ?? NULL);
     }
 
     return self::writeRecord($params);
@@ -437,7 +437,7 @@ ORDER BY weight";
       return CRM_Utils_System::url($path, $q, FALSE, $fragment);
     }
 
-    if (strpos($url, '&amp;') === FALSE) {
+    if (!str_contains($url, '&amp;')) {
       return htmlspecialchars($url);
     }
 
@@ -912,6 +912,7 @@ ORDER BY weight";
             'label' => ts('CiviCRM Home'),
             'name' => 'CiviCRM Home',
             'url' => 'civicrm/dashboard?reset=1',
+            'icon' => 'crm-i fa-house-user',
             'weight' => 1,
           ],
         ];
@@ -921,6 +922,7 @@ ORDER BY weight";
               'label' => ts('Hide Menu'),
               'name' => 'Hide Menu',
               'url' => '#hidemenu',
+              'icon' => 'crm-i fa-minus',
               'weight' => 2,
             ],
           ];
@@ -931,6 +933,7 @@ ORDER BY weight";
               'label' => ts('Change Password'),
               'name' => 'Change Password',
               'url' => 'civicrm/admin/user/password',
+              'icon' => 'crm-i fa-keyboard',
               'weight' => 2,
             ],
           ];
@@ -940,6 +943,7 @@ ORDER BY weight";
             'label' => ts('Log out'),
             'name' => 'Log out',
             'url' => 'civicrm/logout?reset=1',
+            'icon' => 'crm-i fa-person-walking-arrow-right',
             'weight' => 3,
           ],
         ];

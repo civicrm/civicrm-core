@@ -662,7 +662,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
       $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
 
       // CRM-16905 - Sort by count cannot be done with sql
-      if (strpos($params['sort'], 'count') === 0) {
+      if (str_starts_with($params['sort'], 'count')) {
         $orderBy = $limit = '';
       }
     }
@@ -836,7 +836,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
     }
 
     // CRM-16905 - Sort by count cannot be done with sql
-    if (!empty($params['sort']) && strpos($params['sort'], 'count') === 0) {
+    if (!empty($params['sort']) && str_starts_with($params['sort'], 'count')) {
       usort($values, function($a, $b) {
         if ($a['count'] === 'unknown') {
           return -1;
@@ -1017,7 +1017,7 @@ WHERE {$whereClause}";
     $title = $params['title'] ?? NULL;
     if ($title) {
       $clauses[] = "`groups`.title LIKE %1";
-      if (strpos($title, '%') !== FALSE) {
+      if (str_contains($title, '%')) {
         $params[1] = [$title, 'String', FALSE];
       }
       else {
@@ -1083,7 +1083,7 @@ WHERE {$whereClause}";
     $createdBy = $params['created_by'] ?? NULL;
     if ($createdBy) {
       $clauses[] = "createdBy.sort_name LIKE %6";
-      if (strpos($createdBy, '%') !== FALSE) {
+      if (str_contains($createdBy, '%')) {
         $params[6] = [$createdBy, 'String', FALSE];
       }
       else {

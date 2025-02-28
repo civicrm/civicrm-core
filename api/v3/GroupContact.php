@@ -149,7 +149,7 @@ function civicrm_api3_group_contact_delete($params) {
   if ($groupContact['count'] == 0 && $groupContact2['count'] == 0) {
     throw new CRM_Core_Exception('Cannot Delete GroupContact');
   }
-  $params['status'] = CRM_Utils_Array::value('status', $params, empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
+  $params['status'] ??= (empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
   // "Deleted" isn't a real option so skip the api wrapper to avoid pseudoconstant validation
   return civicrm_api3_group_contact_create($params);
 }

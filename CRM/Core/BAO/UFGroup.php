@@ -1156,7 +1156,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
           }
         }
       }
-      elseif (strpos($name, '-') !== FALSE) {
+      elseif (str_contains($name, '-')) {
         [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $name, 3);
 
         if (!in_array($fieldName, $multipleFields)) {
@@ -1631,7 +1631,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     // add permissioning for profiles only if not registration
     if (!$skipPermission) {
       $permissionClause = CRM_Core_Permission::ufGroupClause($op, 'civicrm_uf_group.');
-      if (strpos($queryString, 'WHERE') !== FALSE) {
+      if (str_contains($queryString, 'WHERE')) {
         $queryString .= " AND $permissionClause ";
       }
       else {
@@ -2341,12 +2341,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                         $defaults[$fldName] = $value[$fieldName];
                       }
                     }
-                    elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
+                    elseif (str_starts_with($fieldName, 'address_custom') && !empty($value[substr($fieldName, 8)])) {
                       $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
                     }
                   }
                 }
-                elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
+                elseif (str_starts_with($fieldName, 'address_custom') && !empty($value[substr($fieldName, 8)])) {
                   $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
                 }
               }
@@ -2355,7 +2355,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           else {
             if (is_array($details)) {
               if ($fieldName === 'url'
-                && !empty($details['website'])
                 && !empty($details['website'][$locTypeId])
               ) {
                 $defaults[$fldName] = $details['website'][$locTypeId]['url'] ?? NULL;
@@ -2485,7 +2484,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $fields = array_keys($profileFields);
       foreach ($fields as $val) {
         foreach ($required as $key => $field) {
-          if (strpos($val, $field) === 0) {
+          if (str_starts_with($val, $field)) {
             unset($required[$key]);
           }
         }
@@ -3183,7 +3182,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     //check if contact email exist.
     $hasEmails = FALSE;
     foreach ($params as $name => $value) {
-      if (strpos($name, 'email-') !== FALSE) {
+      if (str_contains($name, 'email-')) {
         $hasEmails = TRUE;
         break;
       }

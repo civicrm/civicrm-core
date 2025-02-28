@@ -834,7 +834,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           if (isset($params[$key . '-provider_id'])) {
             $data['im'][$loc]['provider_id'] = $params[$key . '-provider_id'];
           }
-          if (strpos($key, '-provider_id') !== FALSE) {
+          if (str_contains($key, '-provider_id')) {
             $data['im'][$loc]['provider_id'] = $params[$key];
           }
           else {
@@ -1311,18 +1311,21 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * Get the location data from a location array, filtering out metadata.
+   * Get the location data from a location array, filtering out metadata and empty fields.
+   *
+   * The function is intended to allow us to find out if address/email etc records have any
+   * 'real' data like address information or an email address. If not they are not merge candidates.
    *
    * This returns data like street_address but not metadata like is_primary, on_hold etc.
    *
    * @param array $location
    *
-   * @return mixed
+   * @return array
    */
-  public static function getLocationDataFields($location) {
+  public static function getLocationDataFields(array $location): array {
     $keysToIgnore = array_merge(self::ignoredFields(), ['display', 'location_type_id']);
     foreach ($location as $field => $value) {
-      if (in_array($field, $keysToIgnore, TRUE)) {
+      if (!$value || in_array($field, $keysToIgnore, TRUE)) {
         unset($location[$field]);
       }
     }
@@ -1340,37 +1343,42 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'address' => [
         'label' => 'Address',
         'displayField' => 'display',
-        'sortString' => 'location_type_id',
+        'order_by' => ['location_type_id' => 'ASC'],
         'hasLocation' => TRUE,
         'hasType' => FALSE,
+        'entity' => 'Address',
       ],
       'email' => [
         'label' => 'Email',
         'displayField' => 'display',
-        'sortString' => 'location_type_id',
+        'order_by' => ['location_type_id' => 'ASC'],
         'hasLocation' => TRUE,
         'hasType' => FALSE,
+        'entity' => 'Email',
       ],
       'im' => [
         'label' => 'IM',
         'displayField' => 'name',
-        'sortString' => 'location_type_id,provider_id',
+        'order_by' => ['location_type_id' => 'ASC', 'provider_id' => 'ASC'],
         'hasLocation' => TRUE,
         'hasType' => 'provider_id',
+        'entity' => 'IM',
       ],
       'phone' => [
         'label' => 'Phone',
         'displayField' => 'phone',
-        'sortString' => 'location_type_id,phone_type_id',
+        'order_by' => ['location_type_id' => 'ASC', 'phone_type_id' => 'ASC'],
         'hasLocation' => TRUE,
         'hasType' => 'phone_type_id',
+        'entity' => 'Phone',
       ],
       'website' => [
         'label' => 'Website',
         'displayField' => 'url',
-        'sortString' => 'website_type_id',
+        'order_by' => ['website_type_id' => 'ASC'],
         'hasLocation' => FALSE,
         'hasType' => 'website_type_id',
+        'entity' => 'Website',
       ],
     ];
   }
@@ -1689,7 +1697,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     foreach ($submitted as $key => $value) {
-      if (strpos($key, 'custom_') === 0) {
+      if (str_starts_with($key, 'custom_')) {
         $fieldID = (int) substr($key, 7);
         $fieldMetadata = CRM_Core_BAO_CustomField::getField($fieldID);
         if ($fieldMetadata) {
@@ -2184,7 +2192,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
       elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) ||
-          strpos($key, 'move_custom_') === 0
+          str_starts_with($key, 'move_custom_')
         ) and $val !== NULL
       ) {
         // Rule: If both main-contact, and other-contact have a field with a
@@ -2296,7 +2304,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       elseif ($mode === 'aggressive') {
         unset($conflicts[$key]);
-        if (strpos($key, 'move_location_') !== 0) {
+        if (!str_starts_with($key, 'move_location_')) {
           // @todo - just handling plain contact fields for now because I think I need a bigger refactor
           // of the below to handle locations & will do as a follow up.
           $resolved['contact'][substr($key, 5)] = $migrationInfo[$key]['main'];
@@ -2465,28 +2473,27 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param int $cid
    * @param array $blockInfo
-   * @param string $blockName
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  private static function buildLocationBlockForContact($cid, $blockInfo, $blockName): array {
+  private static function buildLocationBlockForContact(int $cid, array $blockInfo): array {
     $searchParams = [
-      'contact_id' => $cid,
+      'where' => [['contact_id', '=', $cid]],
       // CRM-17556 Order by field-specific criteria
-      'options' => [
-        'sort' => $blockInfo['sortString'],
-      ],
+      'orderBy' => $blockInfo['order_by'],
+      'checkPermissions' => FALSE,
+      'select' => ['*', 'custom.*'],
     ];
     $locationBlock = [];
-    $values = civicrm_api3($blockName, 'get', $searchParams);
-    if ($values['count']) {
+    $values = civicrm_api4($blockInfo['entity'], 'get', $searchParams);
+    if (count($values)) {
       $cnt = 0;
-      foreach ($values['values'] as $value) {
+      foreach ($values as $value) {
         $locationBlock[$cnt] = $value;
         // Fix address display
-        if ($blockName == 'address') {
+        if ($blockInfo['entity'] == 'Address') {
           // For performance avoid geocoding while merging https://issues.civicrm.org/jira/browse/CRM-21786
           // we can expect existing geocode values to be retained.
           $value['skip_geocode'] = TRUE;
@@ -2495,7 +2502,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $locationBlock[$cnt]['display'] = CRM_Utils_Address::format($value);
         }
         // Fix email display
-        elseif ($blockName == 'email') {
+        elseif ($blockInfo['entity'] == 'Email') {
           $locationBlock[$cnt]['display'] = CRM_Utils_Mail::format($value);
         }
 
@@ -2573,12 +2580,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   protected static function addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, array $locations, array $rows, array $elements, array $migrationInfo): array {
     // Collect existing fields from both 'main' and 'other' contacts first
     // This allows us to match up location/types when building the table rows
-    $locations['main'][$blockName] = self::buildLocationBlockForContact($mainId, $blockInfo, $blockName);
-    $locations['other'][$blockName] = self::buildLocationBlockForContact($otherId, $blockInfo, $blockName);
+    $locations['main'][$blockName] = self::buildLocationBlockForContact($mainId, $blockInfo);
+    $locations['other'][$blockName] = self::buildLocationBlockForContact($otherId, $blockInfo);
 
     // Now, build the table rows appropriately, based off the information on
     // the 'other' contact
-    if (!empty($locations['other']) && !empty($locations['other'][$blockName])) {
+    if (!empty($locations['other'][$blockName])) {
       foreach ($locations['other'][$blockName] as $count => $value) {
 
         $displayValue = $value[$blockInfo['displayField']];
@@ -2697,7 +2704,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // Put this field's location type at the top of the list
           $tmpIdList = $typeOptions['values'];
-          $defaultTypeId = [$thisTypeId => CRM_Utils_Array::value($thisTypeId, $tmpIdList)];
+          $defaultTypeId = [$thisTypeId => $tmpIdList[$thisTypeId] ?? NULL];
           unset($tmpIdList[$thisTypeId]);
 
           // Add the element

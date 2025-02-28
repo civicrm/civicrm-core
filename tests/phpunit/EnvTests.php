@@ -22,7 +22,7 @@ class EnvTests extends \PHPUnit\Framework\TestSuite {
     $suite = new EnvTests();
     $tests = getenv('PHPUNIT_TESTS');
     foreach (explode(' ', $tests) as $test) {
-      if (strpos($test, '::') !== FALSE) {
+      if (str_contains($test, '::')) {
         list ($class, $method) = explode('::', $test);
         $clazz = new \ReflectionClass($class);
         $suite->addTestMethod($clazz, $clazz->getMethod($method));

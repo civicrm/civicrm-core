@@ -478,7 +478,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     foreach ($fields as $field => $defaultVal) {
-      $val = CRM_Utils_Array::value($field, $params, $defaultVal);
+      $val = $params[$field] ?? $defaultVal;
       if (in_array($field, $resetFields)) {
         $val = $defaultVal;
       }
@@ -771,12 +771,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
             foreach ($pledgeBlock as $key) {
               $pledgeBlockParams[$key] = $params[$key] ?? NULL;
             }
-            $pledgeBlockParams['is_pledge_interval'] = CRM_Utils_Array::value('is_pledge_interval',
-              $params, FALSE
-            );
-            $pledgeBlockParams['pledge_start_date'] = CRM_Utils_Array::value('pledge_start_date',
-              $params, FALSE
-            );
+            $pledgeBlockParams['is_pledge_interval'] = $params['is_pledge_interval'] ?? FALSE;
+            $pledgeBlockParams['pledge_start_date'] = $params['pledge_start_date'] ?? FALSE;
             // create pledge block.
             CRM_Pledge_BAO_PledgeBlock::create($pledgeBlockParams);
           }

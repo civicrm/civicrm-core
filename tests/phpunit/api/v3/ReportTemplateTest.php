@@ -137,7 +137,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
     $found = FALSE;
     foreach ($result['metadata']['sql'] as $sql) {
-      if (strpos($sql, " =  'Organization' ") !== FALSE) {
+      if (str_contains($sql, " =  'Organization' ")) {
         $found = TRUE;
       }
     }
@@ -255,7 +255,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $reportID
    */
   public function testReportTemplateGetRowsAllReports(string $reportID): void {
-    if (strpos($reportID, 'logging') === 0) {
+    if (str_starts_with($reportID, 'logging')) {
       Civi::settings()->set('logging', 1);
     }
 
@@ -301,7 +301,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param $reportID
    */
   public function testReportTemplateGetRowsAllReportsACL($reportID): void {
-    if (strpos($reportID, 'logging') === 0) {
+    if (str_starts_with($reportID, 'logging')) {
       Civi::settings()->set('logging', 1);
     }
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookNoResults']);
@@ -322,7 +322,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if (in_array($reportID, ['contribute/softcredit', 'contribute/bookkeeping'])) {
       $this->markTestIncomplete($reportID . ' has non e-notices when calling statistics fn');
     }
-    if (strpos($reportID, 'logging') === 0) {
+    if (str_starts_with($reportID, 'logging')) {
       Civi::settings()->set('logging', 1);
     }
     if ($reportID === 'contribute/summary') {

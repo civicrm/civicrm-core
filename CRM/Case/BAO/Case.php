@@ -1143,7 +1143,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $caseActivities[$caseActivityId]['target_contact_name'] = $targetContact;
       }
       else {
-        if (strpos($caseActivities[$caseActivityId]['target_contact_name'], $targetContact) === FALSE) {
+        if (!str_contains($caseActivities[$caseActivityId]['target_contact_name'], $targetContact)) {
           $caseActivities[$caseActivityId]['target_contact_name'] .= '; ' . $targetContact;
         }
       }
@@ -1158,7 +1158,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $caseActivities[$caseActivityId]['assignee_contact_name'] = $assigneeContact;
       }
       else {
-        if (strpos($caseActivities[$caseActivityId]['assignee_contact_name'], $assigneeContact) === FALSE) {
+        if (!str_contains($caseActivities[$caseActivityId]['assignee_contact_name'], $assigneeContact)) {
           $caseActivities[$caseActivityId]['assignee_contact_name'] .= '; ' . $assigneeContact;
         }
       }
@@ -2175,17 +2175,11 @@ SELECT  id
         $mainActivity->copyValues($mainActVals);
         $mainActivity->id = NULL;
         $mainActivity->activity_date_time = $otherActivity->activity_date_time;
-        $mainActivity->source_record_id = CRM_Utils_Array::value($mainActivity->source_record_id,
-          $activityMappingIds
-        );
+        $mainActivity->source_record_id = $activityMappingIds[$mainActivity->source_record_id] ?? NULL;
 
-        $mainActivity->original_id = CRM_Utils_Array::value($mainActivity->original_id,
-          $activityMappingIds
-        );
+        $mainActivity->original_id = $activityMappingIds[$mainActivity->original_id] ?? NULL;
 
-        $mainActivity->parent_id = CRM_Utils_Array::value($mainActivity->parent_id,
-          $activityMappingIds
-        );
+        $mainActivity->parent_id = $activityMappingIds[$mainActivity->parent_id] ?? NULL;
         $mainActivity->save();
         $mainActivityId = $mainActivity->id;
         if (!$mainActivityId) {

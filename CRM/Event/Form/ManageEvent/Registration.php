@@ -475,12 +475,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
       //check that the selected profiles have either firstname+lastname or email required
       $profileIds = [
-        CRM_Utils_Array::value('custom_pre_id', $values),
-        CRM_Utils_Array::value('custom_post_id', $values),
+        $values['custom_pre_id'] ?? NULL,
+        $values['custom_post_id'] ?? NULL,
       ];
       $additionalProfileIds = [
-        CRM_Utils_Array::value('additional_custom_pre_id', $values),
-        CRM_Utils_Array::value('additional_custom_post_id', $values),
+        $values['additional_custom_pre_id'] ?? NULL,
+        $values['additional_custom_post_id'] ?? NULL,
       ];
       //additional profile fields default to main if not set
       if (!is_numeric($additionalProfileIds[0])) {
@@ -722,7 +722,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
           // check each of the fields in the index against the profile field
           foreach ($index as $ifield => $icombos) {
-            if (strpos($field['name'], $ifield) !== FALSE) {
+            if (str_contains($field['name'], $ifield)) {
 
               // we found the field in the profile, now record it in the index
               foreach ($icombos as $icombo => $dontcare) {
@@ -905,12 +905,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     // get the profiles to evaluate what they collect
     $profileIds = [
-      CRM_Utils_Array::value('custom_pre_id', $params),
-      CRM_Utils_Array::value('custom_post_id', $params),
+      $params['custom_pre_id'] ?? NULL,
+      $params['custom_post_id'] ?? NULL,
     ];
     $additionalProfileIds = [
-      CRM_Utils_Array::value('additional_custom_pre_id', $params),
-      CRM_Utils_Array::value('additional_custom_post_id', $params),
+      $params['additional_custom_pre_id'] ?? NULL,
+      $params['additional_custom_post_id'] ?? NULL,
     ];
     // additional profile fields default to main if not set
     if (!is_numeric($additionalProfileIds[0])) {

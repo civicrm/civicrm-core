@@ -213,7 +213,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         ->execute()->first();
       $addressValues = ['address_name' => $event['loc_block_id.address_id.name']];
       foreach ($event as $key => $value) {
-        if (strpos($key, 'loc_block_id.address_id.') === 0) {
+        if (str_starts_with($key, 'loc_block_id.address_id.')) {
           $addressValues[str_replace('loc_block_id.address_id.', '', $key)] = $value;
         }
       }

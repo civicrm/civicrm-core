@@ -458,7 +458,7 @@ class CRM_Utils_File {
    * @return string
    */
   public static function makeFileName($name, bool $unicode = FALSE) {
-    $uniqID = md5(uniqid(rand(), TRUE));
+    $uniqID = bin2hex(random_bytes(16));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
       0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
@@ -509,7 +509,7 @@ class CRM_Utils_File {
    */
   public static function duplicate($filePath) {
     $oldName = pathinfo($filePath, PATHINFO_FILENAME);
-    $uniqID = md5(uniqid(rand(), TRUE));
+    $uniqID = bin2hex(random_bytes(16));
     $newName = preg_replace('/(_[\w]{32})$/', '', $oldName) . '_' . $uniqID;
     $newPath = str_replace($oldName, $newName, $filePath);
     copy($filePath, $newPath);
@@ -730,9 +730,6 @@ HTACCESS;
    * @see tempnam
    */
   public static function tempnam($prefix = 'tmp-') {
-    // $config = CRM_Core_Config::singleton();
-    // $nonce = md5(uniqid() . $config->dsn . $config->userFrameworkResourceURL);
-    // $fileName = "{$config->configAndLogDir}" . $prefix . $nonce . $suffix;
     $fileName = tempnam(sys_get_temp_dir(), $prefix);
     return $fileName;
   }
@@ -987,11 +984,7 @@ HTACCESS;
       'jpg' => 'jpeg',
       'svg' => 'svg+xml',
     ];
-    $mimeType = 'image/' . CRM_Utils_Array::value(
-      $fileExtension,
-      $translateMimeTypes,
-      $fileExtension
-    );
+    $mimeType = 'image/' . ($translateMimeTypes[$fileExtension] ?? $fileExtension);
 
     return self::getFileURL($path, $mimeType, $url);
   }
@@ -1101,7 +1094,7 @@ HTACCESS;
     }
     $iconClasses = Civi::$statics[__CLASS__]['mimeIcons'];
     foreach ($iconClasses as $text => $icon) {
-      if (strpos(($mimeType ?? ''), $text) === 0) {
+      if (str_starts_with(($mimeType ?? ''), $text)) {
         return $icon;
       }
     }
@@ -1177,7 +1170,7 @@ HTACCESS;
     set_error_handler(function($errno, $errstr) {
       // If this is open_basedir-related, convert it to an exception so we
       // can catch it.
-      if (strpos($errstr, 'open_basedir restriction in effect') !== FALSE) {
+      if (str_contains($errstr, 'open_basedir restriction in effect')) {
         throw new \ErrorException($errstr, $errno);
       }
       // Continue with normal error handling so other errors still happen.

@@ -149,38 +149,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   }
 
   /**
-   * Add the saved mapping fields to the form.
-   *
-   * @param int|null $savedMappingID
-   *
-   * @deprecated - working to remove this in favour of `addSavedMappingFields`
-   * @throws \CRM_Core_Exception
-   */
-  protected function buildSavedMappingFields($savedMappingID) {
-    CRM_Core_Error::deprecatedFunctionWarning('addSavedMappingFields');
-    //to save the current mappings
-    if (!$savedMappingID) {
-      $saveDetailsName = ts('Save this field mapping');
-      $this->applyFilter('saveMappingName', 'trim');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    else {
-      // @todo we should stop doing this - the passed in value should be fine, confirmed OK in contact import.
-      $savedMapping = $this->get('savedMapping');
-      $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
-      $this->add('hidden', 'mappingId', $savedMapping);
-
-      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
-      $saveDetailsName = ts('Save as a new field mapping');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    $this->assign('savedMappingName', $mappingName ?? NULL);
-    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
-  }
-
-  /**
    * Validate that sufficient fields have been supplied to match to a contact.
    *
    * @param string $contactType
@@ -556,6 +524,66 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       CRM_Core_Session::setStatus(ts('Unable to load saved mapping. Please ensure all fields are correctly mapped'));
     }
     return $defaults;
+  }
+
+  /**
+   * Validate the the mapped fields contain enough to meet the dedupe rule lookup requirements.
+   *
+   * @internal this function may change without notice.
+   *
+   * @param array $rule
+   * @param array $mapper Mapper array as submitted
+   * @param array $contactIdentifierFields Array of fields which in themselves uniquely identify a contact.
+   *   This array will likely have an import specific prefix.
+   *
+   * @return string|null
+   *   Error string if insufficient.
+   */
+  protected function validateDedupeFieldsSufficientInMapping(array $rule, array $mapper, array $contactIdentifierFields): ?string {
+    $threshold = $rule['threshold'];
+    $ruleFields = $rule['fields'];
+    $weightSum = 0;
+    foreach ($mapper as $mapping) {
+      // Because api v4 style fields have a . and QuickForm multiselect js does
+      // not cope with a . the quick form layer will use a double underscore
+      // as a stand in (the angular layer will not)
+      $fieldName = str_replace('__', '.', $mapping[0]);
+      if (str_contains($fieldName, '.')) {
+        // If the field name contains a . - eg. address_primary.street_address
+        // we just want the part after the .
+        $fieldName = substr($fieldName, strpos($fieldName, '.') + 1);
+      }
+      if (in_array($fieldName, $contactIdentifierFields)) {
+        // It is enough to have external identifier or contact ID mapped..
+        $weightSum = $threshold;
+        break;
+      }
+      if (array_key_exists($fieldName, $ruleFields)) {
+        $weightSum += $ruleFields[$fieldName];
+      }
+    }
+    if ($weightSum < $threshold) {
+      return $rule['rule_message'];
+    }
+    return NULL;
+  }
+
+  /**
+   * @param array $rule
+   * @param array $mapper
+   * @param array $contactIdentifierFields
+   *
+   * @return array
+   */
+  protected function validateContactFields(array $rule, array $mapper, array $contactIdentifierFields): array {
+    $mapperError = [];
+    if (!$this->isUpdateExisting()) {
+      $missingDedupeFields = $this->validateDedupeFieldsSufficientInMapping($rule, $mapper, $contactIdentifierFields);
+      if ($missingDedupeFields) {
+        $mapperError[] = $missingDedupeFields;
+      }
+    }
+    return $mapperError;
   }
 
 }

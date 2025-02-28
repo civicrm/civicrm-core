@@ -1350,7 +1350,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function prePostRedirect() {
     // Get User Agent string.
-    $rawUserAgent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+    $rawUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $userAgent = mb_convert_encoding($rawUserAgent, 'UTF-8');
 
     // Bail early if User Agent does not support `SameSite=None`.

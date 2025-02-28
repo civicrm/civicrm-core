@@ -107,7 +107,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     // Handle absolute urls
     // compares $url (which is some unknown/untrusted value from a third-party dev) to the CMS's base url (which is independent of civi's url)
     // to see if the url is within our drupal dir, if it is we are able to treated it as an internal url
-    if (strpos($url_path, $base_url) === 0) {
+    if (str_starts_with($url_path, $base_url)) {
       $file = trim(str_replace($base_url, '', $url_path), '/');
       // CRM-18130: Custom CSS URL not working if aliased or rewritten
       if (file_exists(DRUPAL_ROOT . '/' . $file)) {
@@ -116,7 +116,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
     // Handle relative urls that are within the CiviCRM module directory
-    elseif (strpos($url_path, $base) === 0) {
+    elseif (str_starts_with($url_path, $base)) {
       $internal = TRUE;
       $url = $this->appendCoreDirectoryToResourceBase(dirname(drupal_get_path('module', 'civicrm')) . '/') . trim(substr($url_path, strlen($base)), '/');
     }
@@ -619,10 +619,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function parseDrupalSiteNameFromRoot($civicrm_root) {
     $siteName = NULL;
-    if (strpos($civicrm_root,
-        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
-      ) === FALSE
-    ) {
+    if (!str_contains($civicrm_root, DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules')) {
       $startPos = strpos($civicrm_root,
         DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
       );

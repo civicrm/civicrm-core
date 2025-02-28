@@ -24,6 +24,7 @@
         </div>
     {/foreach}
     <div class="action-link">
+        {* dev/core#4808 profile listings are being phased out, but extensions can still set this *}
         {if $listingURL}
             <a href="{$listingURL}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Listings{/ts}</a>&nbsp;&nbsp;&nbsp;&nbsp;
         {/if}

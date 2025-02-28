@@ -40,14 +40,12 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
       if ($fields['mailerJobSize'] < 1000) {
         $errors['mailerJobSize'] = ts('The job size must be at least 1000 or set to 0 (unlimited).');
       }
-      elseif ($fields['mailerJobSize'] <
-        CRM_Utils_Array::value('mailerBatchLimit', $fields)
-      ) {
+      elseif ($fields['mailerJobSize'] < ($fields['mailerBatchLimit'] ?? 0)) {
         $errors['mailerJobSize'] = ts('A job size smaller than the batch limit will negate the effect of the batch limit.');
       }
     }
     // dev/core#1768 Check the civimail_sync_interval setting.
-    if (CRM_Utils_Array::value('civimail_sync_interval', $fields) < 1) {
+    if (($fields['civimail_sync_interval'] ?? 0) < 1) {
       $errors['civimail_sync_interval'] = ts('Error - the synchronization interval must be at least 1');
     }
     return empty($errors) ? TRUE : $errors;

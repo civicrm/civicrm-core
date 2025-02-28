@@ -55,7 +55,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     parent::setUp();
     //  Create Group For Individual  Contact Type
     $groupIndividual = [
-      'title' => 'TestGroup For Individual' . substr(sha1(rand()), 0, 5),
+      'title' => 'TestGroup For Individual' . bin2hex(random_bytes(3)),
       'extends' => ['Individual'],
       'style' => 'Inline',
       'is_active' => 1,
@@ -68,7 +68,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     //  Create Group For Individual-Student  Contact Sub  Type
     $groupIndividualStudent = [
-      'title' => 'Student Test' . substr(sha1(rand()), 0, 5),
+      'title' => 'Student Test' . bin2hex(random_bytes(3)),
       'extends' => ['Individual', ['Student']],
       'style' => 'Inline',
       'is_active' => 1,

@@ -219,7 +219,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
-      if (strpos($fields['html_message'], $token) !== FALSE) {
+      if (str_contains($fields['html_message'], $token)) {
         $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
       }
     }
@@ -295,7 +295,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
-    elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
+    elseif (($formValues['template'] ?? 0) > 0) {
       if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = {$formValues['format_id']} WHERE id = {$formValues['template']}";
       }

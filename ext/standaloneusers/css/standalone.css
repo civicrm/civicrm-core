@@ -14,23 +14,17 @@ html.crm-standalone  nav.breadcrumb>ol {
   height: 100vh;
 }
 .standalone-auth-box {
-  --crm-standalone-auth-box-bg: #fff;
-  --crm-standalone-auth-box-text: #000;
-  --crm-standalone-auth-box-link: #444;
-  --crm-standalone-auth-box-link-hover: #136388;
   /* box sizing */
   grid-row: 2;
   box-sizing: border-box;
   width: clamp(280px, 68vw, 45rem);
   margin: 0;
-  /* force colors here because the box has an inset civicrm logo, which only looks good on certain background */
-  background-color: var(--crm-standalone-auth-box-bg);
-  color: var(--crm-standalone-auth-box-text);
   border: none;
   border-radius: 3px;
   padding: clamp(1rem, 3vw, 2rem);
+  background-color: var(--crm-standalone-auth-box-bg, #fff);
 }
-.standalone-auth-form img.crm-logo {
+.standalone-auth-form .crm-logo {
   width: 100%;
   max-width: 400px;
   margin: 0 auto 2rem;
@@ -50,8 +44,6 @@ div.crm-container .standalone-auth-form input {
   width: 100%;
   height: 2rem;
   padding: 0.5rem;
-  background-color: var(--crm-standalone-auth-box-bg);
-  color: var(--crm-standalone-auth-box-text);
 }
 .standalone-auth-form .login-or-forgot {
   display: grid;
@@ -60,11 +52,6 @@ div.crm-container .standalone-auth-form input {
 }
 .standalone-auth-form .login-or-forgot>a {
   grid-column: 1;
-  /* fixed on white background */
-  color: var(--crm-standalone-auth-box-link);
-}
-.standalone-auth-form .login-or-forgot>a:hover {
-  color: var(--crm-standalone-auth-box-link-hover)
 }
 .standalone-auth-form .login-or-forgot>button {
   grid-column: 2;

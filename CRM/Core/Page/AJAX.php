@@ -261,13 +261,13 @@ class CRM_Core_Page_AJAX {
     $params = [];
 
     foreach ($requiredParams as $param => $type) {
-      $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);
+      $params[$param] = CRM_Utils_Type::validate($_GET[$param] ?? NULL, $type);
     }
 
     foreach ($optionalParams as $param => $type) {
       if (!empty($_GET[$param])) {
         if (!is_array($_GET[$param])) {
-          $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);
+          $params[$param] = CRM_Utils_Type::validate($_GET[$param], $type);
         }
         else {
           foreach ($_GET[$param] as $index => $value) {
