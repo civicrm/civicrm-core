@@ -146,19 +146,29 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     try {
       $params = $this->getMappedRow($values);
-      $formatted = [];
+      $metadataBlocks = ['phone', 'im', 'openid', 'email', 'address'];
+      foreach ($metadataBlocks as $block) {
+        foreach ($params[$block] ?? [] as $blockKey => $blockValues) {
+          if ($blockValues['location_type_id'] === 'Primary') {
+            $this->fillPrimary($params[$block][$blockKey], $blockValues, $block, $formatted['id'] ?? NULL);
+          }
+        }
+      }
       foreach ($params as $key => $value) {
-        if ($value !== '') {
-          $formatted[$key] = $value;
+        if ($value === '') {
+          unset($params[$key]);
         }
       }
 
-      $formatted['id'] = $params['id'] = $this->processContact($params, TRUE);
-
+      $params['id'] = $this->processContact($params, TRUE);
+      $formatted = $params;
       //format common data, CRM-4062
       $this->formatCommonData($params, $formatted);
+      if ($params !== $formatted) {
+        throw new CRM_Core_Exception('what changed');
+      }
 
-      $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
+      $newContact = $this->createContact($params, $params['id'] ?? NULL);
       $contactID = $newContact->id;
 
       if ($contactID) {
@@ -176,9 +186,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       //relationship contact insert
       foreach ($this->getRelatedContactsParams($params) as $key => $field) {
         $field['id'] = $this->processContact($field, FALSE);
+        $metadataBlocks = ['phone', 'im', 'openid', 'email', 'address'];
+        foreach ($metadataBlocks as $block) {
+          foreach ($field[$block] ?? [] as $blockKey => $blockValues) {
+            if ($blockValues['location_type_id'] === 'Primary') {
+              $this->fillPrimary($field[$block][$blockKey], $blockValues, $block, $formatted['id'] ?? NULL);
+            }
+          }
+        }
         $formatting = $field;
         //format common data, CRM-4062
+
         $this->formatCommonData($field, $formatting);
+        if ($field !== $formatting) {
+          throw new CRM_Core_Exception('what changed');
+        }
         $isUpdate = empty($formatting['id']) ? 'new' : 'updated';
         if (empty($formatting['id']) || $this->isUpdateExisting()) {
           $relatedNewContact = $this->createContact($formatting, $formatting['id']);
@@ -316,13 +338,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     $metadataBlocks = ['phone', 'im', 'openid', 'email', 'address'];
-    foreach ($metadataBlocks as $block) {
-      foreach ($formatted[$block] ?? [] as $blockKey => $blockValues) {
-        if ($blockValues['location_type_id'] === 'Primary') {
-          $this->fillPrimary($formatted[$block][$blockKey], $blockValues, $block, $formatted['id'] ?? NULL);
-        }
-      }
-    }
     //now format custom data.
     foreach ($params as $key => $field) {
       if (in_array($key, $metadataBlocks, TRUE)) {
