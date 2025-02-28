@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\CustomValue;
+
 /**
  * Class CRM_Custom_Import_Parser_Api
  */
@@ -37,9 +39,11 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
     try {
       $params = $this->getMappedRow($values);
       $params['skipRecentView'] = TRUE;
-      $params['check_permissions'] = TRUE;
       $params['entity_id'] = $params['contact_id'];
-      civicrm_api3('CustomValue', 'create', $params);
+      $group = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->getCustomGroupID()]);
+      CustomValue::create($group['name'])
+        ->setValues($params)
+        ->execute();
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $params['contact_id']);
     }
     catch (CRM_Core_Exception $e) {
@@ -88,10 +92,9 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
         continue;
       }
       /* generate the key for the fields array */
-      $key = 'custom_' . $values['id'];
       $regexp = preg_replace('/[.,;:!?]/', '', $values['label']);
-      $importableFields[$key] = array_merge($values, [
-        'name' => $key,
+      $importableFields[$values['name']] = array_merge($values, [
+        'name' => $values['name'],
         'title' => $values['label'] ?? NULL,
         'headerPattern' => '/' . preg_quote($regexp, '/') . '/i',
         'import' => 1,
