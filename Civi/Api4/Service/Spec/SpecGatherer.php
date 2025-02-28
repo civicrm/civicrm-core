@@ -46,6 +46,8 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
   public function onClearMetadata(): void {
     $this->entityActionValues = [];
     $this->fieldCache = [];
+    // Also clear static used by `entityFields()`
+    \Civi::$statics['Api4EntityFields'] = [];
   }
 
   /**
