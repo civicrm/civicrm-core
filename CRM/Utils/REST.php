@@ -397,10 +397,6 @@ class CRM_Utils_REST {
       $smarty->assign('tplFile', $tpl);
       $config = CRM_Core_Config::singleton();
       $content = $smarty->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
-
-      if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-        CRM_Utils_System::addHTMLHead($region->render(''));
-      }
       CRM_Utils_System::appendTPLFile($tpl, $content);
 
       return CRM_Utils_System::theme($content);
