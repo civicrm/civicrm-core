@@ -127,4 +127,42 @@ class Schema {
     return $this;
   }
 
+  /**
+   * This sets the AUTO_INCREMENT to flush out tests that muddle
+   * ids of test entities but pass because the ids are all low
+   * starting at 1
+   *
+   * @return Schema
+   */
+  public function setAutoIncrement() {
+    $autoIncrement = 1;  //
+    $separation = 100;    // Might want to tweak this
+    $dbName = \Civi\Test::dsn('database');
+
+    $pdo = \Civi\Test::pdo();
+    $query = sprintf(
+      "SELECT table_name FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_SCHEMA = %s AND TABLE_TYPE = 'BASE TABLE' AND AUTO_INCREMENT = 1",
+      $pdo->quote($dbName)
+    );
+    $tables = $pdo->query($query);
+    $queries = [
+      "USE {$dbName};",
+    ];
+    if (!empty($tables)) {
+      foreach ($tables as $table) {
+        $autoIncrement += $separation;
+        $table_name = $table['TABLE_NAME'] ?? $table['table_name'];
+        $queries[] = "ALTER TABLE $table_name AUTO_INCREMENT=$autoIncrement;";
+      }
+    }
+    foreach ($queries as $query) {
+      if (\Civi\Test::execute($query) === FALSE) {
+        throw new RuntimeException("Query failed: $query");
+      }
+    }
+    return $this;
+  }
+
+
 }
