@@ -374,7 +374,7 @@ WHERE ceft.entity_id = %1";
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $entityId, 'contribution_id', 'participant_id');
     }
     elseif ($entityName == 'membership') {
-      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $entityId, 'contribution_id', 'membership_id');
+      $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($entityId);
     }
     else {
       $contributionId = $entityId;
