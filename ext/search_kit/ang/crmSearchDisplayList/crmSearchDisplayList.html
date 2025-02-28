@@ -1,11 +1,21 @@
-<div class="crm-search-display crm-search-display-list">
+<div class="crm-search-display crm-search-display-list {{:: $ctrl.settings.classes.join(' ') }}">
   <div class="alert alert-info crm-search-display-description" ng-if="$ctrl.settings.description">{{:: $ctrl.settings.description }}</div>
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
     <span ng-if="$ctrl.settings.headerCount" ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
     <div class="form-group pull-right" ng-include="'~/crmSearchDisplay/toolbar.html'" ng-if="$ctrl.toolbar"></div>
   </div>
-  <ol ng-if=":: $ctrl.settings.style === 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ol>
-  <ul ng-if=":: $ctrl.settings.style !== 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ul>
+  <ol
+    class="crm-search-display-list-container"
+    ng-if=":: $ctrl.settings.style === 'ol'"
+    ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'"
+    ng-style="{'list-style': $ctrl.settings.symbol}"
+    ></ol>
+  <ul
+    class="crm-search-display-list-container"
+    ng-if=":: $ctrl.settings.style !== 'ol'"
+    ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'"
+    ng-style="{'list-style': $ctrl.settings.symbol}"
+    ></ul>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>
