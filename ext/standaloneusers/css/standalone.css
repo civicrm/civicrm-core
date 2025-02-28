@@ -51,7 +51,6 @@ div.crm-container .standalone-auth-form input {
   height: 2rem;
   padding: 0.5rem;
   background-color: var(--crm-standalone-auth-box-bg);
-  color: var(--crm-standalone-auth-box-text);
 }
 .standalone-auth-form .login-or-forgot {
   display: grid;
