@@ -6009,10 +6009,11 @@ AND   displayRelType.is_active = 1
           // and we can use the metadata to figure it out.
           // ideally this bit of IF will absorb & replace all the rest in time as we move to
           // more metadata based choices.
+          $labels[$value['idCol']] ??= $value['bao']::buildOptions($value['idCol']);
           if (str_contains($val, CRM_Core_DAO::VALUE_SEPARATOR)) {
             $dbValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
             foreach ($dbValues as $pseudoValue) {
-              $convertedValues[] = CRM_Core_PseudoConstant::getLabel($value['bao'], $value['idCol'], $pseudoValue);
+              $convertedValues[] = $labels[$value['idCol']][$pseudoValue];
             }
 
             $dao->$key = ($usedForAPI) ? $convertedValues : implode(', ', $convertedValues);
@@ -6027,9 +6028,7 @@ AND   displayRelType.is_active = 1
 
           }
           else {
-            // This is basically the same as the default but since we have the bao we can use
-            // a cached function.
-            $dao->$key = CRM_Core_PseudoConstant::getLabel($value['bao'], $value['idCol'], $val);
+            $dao->$key = $labels[$value['idCol']][$val];
           }
         }
         elseif ($baoName) {
