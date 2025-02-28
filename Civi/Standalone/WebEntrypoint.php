@@ -15,6 +15,7 @@ class WebEntrypoint {
    * @see self::checkCiviInstalled
    */
   public static function index(): void {
+    define('CIVICRM_UF_HEAD', TRUE);
     if (self::checkCiviInstalled()) {
       ErrorHandler::setHandler();
       self::invoke();
