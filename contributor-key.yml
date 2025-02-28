@@ -317,6 +317,8 @@
   name        : Christopher Yu
   organization: Giant Rabbit
 
+- github      : chumkui
+
 - github      : clarkac1
   name        : Andy Clark
 
@@ -421,6 +423,9 @@
 
 - github      : devappsoftware
   organization: DevApp
+
+- gitub       : dev-allinappli
+  name        : dev ALL IN APPLI
 
 - github      : devarun
   name        : Arun Singh
@@ -618,6 +623,8 @@
 - github      : giovannidalmas1967
   name        : Giovanni Dalmas
 
+- github      : gitressa
+
 - github      : jmcheung
   name        : Jon-Man Cheung
   organization: GMCVO Databases
@@ -652,6 +659,9 @@
 
 - github      : hosseinamin
   name        : Hossein Amin
+
+- github      : IamDrowsy
+  name        : Albrecht Schmidt
 
 - github      : in2part
 
@@ -1257,6 +1267,8 @@
 - github      : otetard
   name        : Olivier Tétard
 
+- github      : ozhamlet
+
 - github      : nowszy
   name        : Pawel Nowak
 
@@ -1518,6 +1530,9 @@
 - github      : shitijg
   name        : Shitij Gugnani
   organization: CompuCorp
+
+- github      : Sjord
+  name        : Sjoerd Langkemper
 
 - name        : James van der Hoven
 
