@@ -295,26 +295,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   Array of formatted data.
    */
   private function formatCommonData($params, &$formatted) {
-    // @todo - remove just about everything in this function. See docblock.
-    $customFields = CRM_Core_BAO_CustomField::getFields($formatted['contact_type'], FALSE, FALSE, $formatted['contact_sub_type'] ?? NULL);
-
-    $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
-    $customFields = $customFields + $addressCustomFields;
-
-    foreach ($params as $key => $val) {
-      $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
-      if ($customFieldID &&
-        !array_key_exists($customFieldID, $addressCustomFields)
-      ) {
-        // @todo - this can probably go....
-        if ($customFields[$customFieldID]['data_type'] === 'Boolean') {
-          if (empty($val) && !is_numeric($val) && $this->isFillDuplicates()) {
-            //retain earlier value when Import mode is `Fill`
-            unset($params[$key]);
-          }
-        }
-      }
-    }
     $metadataBlocks = ['phone', 'im', 'openid', 'email', 'address'];
     foreach ($metadataBlocks as $block) {
       foreach ($formatted[$block] ?? [] as $blockKey => $blockValues) {
@@ -329,84 +309,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         // This location block is already fully handled at this point.
         continue;
       }
-      if (is_array($field)) {
-        $isAddressCustomField = FALSE;
-
-        foreach ($field as $value) {
-          if (is_array($value)) {
-            foreach ($value as $name => $testForEmpty) {
-              if (CRM_Core_BAO_CustomField::getKeyID($name)) {
-                $isAddressCustomField = TRUE;
-                break;
-              }
-
-              if (($testForEmpty === '' || $testForEmpty == NULL)) {
-                break;
-              }
-            }
-          }
-
-        }
-        if (!$isAddressCustomField) {
-          continue;
-        }
-      }
-
-      $formatValues = [
-        $key => $field,
-      ];
 
       if ($key == 'id' && isset($field)) {
         $formatted[$key] = $field;
       }
-      $this->formatContactParameters($formatValues, $formatted);
 
-      //Handling Custom Data
-      // note: Address custom fields will be handled separately inside formatContactParameters
-      if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) &&
-        array_key_exists($customFieldID, $customFields) &&
-        !array_key_exists($customFieldID, $addressCustomFields)
-      ) {
-
-        $extends = $customFields[$customFieldID]['extends'] ?? NULL;
-        $htmlType = $customFields[$customFieldID]['html_type'] ?? NULL;
-        $dataType = $customFields[$customFieldID]['data_type'] ?? NULL;
-        $serialized = CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]);
-
-        if (!$serialized && in_array($htmlType, ['Select', 'Radio', 'Autocomplete-Select']) && in_array($dataType, ['String', 'Int'])) {
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          foreach ($customOption as $customValue) {
-            $val = $customValue['value'] ?? NULL;
-            $label = strtolower($customValue['label'] ?? '');
-            $value = strtolower(trim($formatted[$key] ?? ''));
-            if (($value == $label) || ($value == strtolower($val))) {
-              $params[$key] = $formatted[$key] = $val;
-            }
-          }
-        }
-        elseif ($serialized && !empty($formatted[$key]) && !empty($params[$key])) {
-          $mulValues = explode(',', $formatted[$key]);
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $formatted[$key] = [];
-          $params[$key] = [];
-          foreach ($mulValues as $v1) {
-            foreach ($customOption as $v2) {
-              if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
-                (strtolower($v2['value']) == strtolower(trim($v1)))
-              ) {
-                $params[$key][] = $formatted[$key][] = $v2['value'];
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (!empty($key) && ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) && array_key_exists($customFieldID, $customFields) &&
-      !array_key_exists($customFieldID, $addressCustomFields)
-    ) {
-      // @todo calling api functions directly is not supported
-      _civicrm_api3_custom_format_params($params, $formatted, $extends);
     }
 
     // parse street address, CRM-5450
