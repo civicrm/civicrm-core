@@ -116,7 +116,17 @@
     {{:: ts('Post help text') }}
   </a>
 </li>
-
+<li>
+  <a href ng-click="toggleClassName(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('CSS class name') }}">
+    <i class="crm-i fa-{{ $ctrl.hasClassName? 'check-' : '' }}square-o"></i>
+    {{:: ts('CSS class name') }}
+  </a>
+</li>
+<li ng-if="$ctrl.hasClassName">
+  <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+    <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('class_name')" ng-model-options="{getterSetter: true}" >
+  </form>
+</li>
 <li role="separator" class="divider" ng-if="$ctrl.canBeRange() || $ctrl.canBeMultiple()"></li>
 <li ng-if="$ctrl.canBeMultiple()" ng-click="$event.stopPropagation()">
   <a href ng-click="toggleMultiple()" title="{{:: ts('Search multiple values') }}">

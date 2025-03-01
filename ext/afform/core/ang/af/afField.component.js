@@ -34,6 +34,10 @@
           $element.addClass('af-field-type-multiple');
         }
 
+        if (this.defn.class_name) {
+          $element.addClass(this.defn.class_name);
+        }
+
         if (this.defn.name !== this.fieldName) {
           if (!this.defn.name) {
             console.error('Missing field definition for: ' + this.fieldName);
