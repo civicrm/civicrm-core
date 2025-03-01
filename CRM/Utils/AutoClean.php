@@ -116,6 +116,15 @@ class CRM_Utils_AutoClean {
     });
   }
 
+  public static function swapMaxExecutionTime(int $newTime): CRM_Utils_AutoClean {
+    $originalTimeLimit = CRM_Core_DAO::setMaxExecutionTime($newTime);
+    $ac = new CRM_Utils_AutoClean();
+    $ac->args = [$originalTimeLimit];
+    $ac->callback = ['CRM_Core_DAO', 'setMaxExecutionTime'];
+    CRM_Core_DAO::setMaxExecutionTime($newTime);
+    return $ac;
+  }
+
   /**
    * Temporarily swap values using callback functions, and cleanup
    * when the current context shuts down.
