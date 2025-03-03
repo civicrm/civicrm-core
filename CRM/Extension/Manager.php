@@ -149,9 +149,11 @@ class CRM_Extension_Manager {
    *
    * @param string $tmpCodeDir
    *   Path to a local directory containing a copy of the new (inert) code.
+   * @return string
+   *   The final path where the extension has been loaded.
    * @throws CRM_Extension_Exception
    */
-  public function replace($tmpCodeDir) {
+  public function replace($tmpCodeDir): string {
     if (!$this->defaultContainer) {
       throw new CRM_Extension_Exception("Default extension container is not configured");
     }
@@ -229,6 +231,8 @@ class CRM_Extension_Manager {
     // \Civi::reset();
     // \CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+
+    return $tgtPath;
   }
 
   /**
