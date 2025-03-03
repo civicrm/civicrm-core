@@ -124,7 +124,7 @@
 </li>
 <li ng-if="$ctrl.hasClassName">
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
-    <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('class_name')" ng-model-options="{getterSetter: true}" >
+    <input class="form-control" type="text" ng-model="getSet('class_name')" >
   </form>
 </li>
 <li role="separator" class="divider" ng-if="$ctrl.canBeRange() || $ctrl.canBeMultiple()"></li>
