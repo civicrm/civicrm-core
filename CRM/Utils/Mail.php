@@ -344,13 +344,6 @@ class CRM_Utils_Mail {
       $headers['Auto-Submitted'] = "Auto-Generated";
     }
 
-    // make sure we has to have space, CRM-6977
-    foreach (['From', 'To', 'Cc', 'Bcc', 'Reply-To', 'Return-Path'] as $fld) {
-      if (isset($headers[$fld])) {
-        $headers[$fld] = str_replace('"<', '" <', $headers[$fld]);
-      }
-    }
-
     // quote FROM, if comma is detected AND is not already quoted. CRM-7053
     if (str_contains($headers['From'], ',')) {
       $from = explode(' <', $headers['From']);
@@ -367,6 +360,13 @@ class CRM_Utils_Mail {
 
     if (!empty($replyTo)) {
       $headers['Reply-To'] = $replyTo;
+    }
+
+    // make sure we has to have space, CRM-6977
+    foreach (['From', 'To', 'Cc', 'Bcc', 'Reply-To', 'Return-Path'] as $fld) {
+      if (isset($headers[$fld])) {
+        $headers[$fld] = str_replace('"<', '" <', $headers[$fld]);
+      }
     }
 
     require_once 'Mail/mime.php';
