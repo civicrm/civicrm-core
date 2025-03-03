@@ -536,7 +536,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $ctype = NULL
   ) {
 
-    $data = $contactDetails = [];
+    $data = $contactDetails = ['contact_type' => $ctype];
 
     // get the contact details (hier)
     if ($contactID) {
@@ -546,39 +546,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
       $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
     }
-    else {
-      //we should get contact type only if contact
-      if ($ctype) {
-        $data['contact_type'] = $ctype;
-      }
-      else {
-        $data['contact_type'] = 'Individual';
-      }
-    }
 
     //fix contact sub type CRM-5125
     if (array_key_exists('contact_sub_type', $params) &&
       !empty($params['contact_sub_type'])
     ) {
       $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
-    }
-    elseif (array_key_exists('contact_sub_type_hidden', $params) &&
-      !empty($params['contact_sub_type_hidden'])
-    ) {
-      // if profile was used, and had any subtype, we obtain it from there
-      //CRM-13596 - add to existing contact types, rather than overwriting
-      if (empty($data['contact_sub_type'])) {
-        // If we don't have a contact ID the $data['contact_sub_type'] will not be defined...
-        $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
-      }
-      else {
-        $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-        if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
-          //CRM-20517 - make sure contact_sub_type gets the correct delimiters
-          $data['contact_sub_type'] = trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR);
-          $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
-        }
-      }
     }
 
     if ($ctype == 'Organization') {
@@ -605,7 +578,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $multiplFields = ['url'];
 
-    $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
       [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
 
@@ -702,10 +674,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $data[$key] = $value;
       }
 
-    }
-
-    if (!isset($data['contact_type'])) {
-      $data['contact_type'] = 'Individual';
     }
 
     //set the values for checkboxes (do_not_email, do_not_mail, do_not_trade, do_not_phone)
@@ -1114,8 +1082,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param string $prefixString
    *
    * @return array
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
    */
   protected function getInvalidValuesForContact($value, string $prefixString): array {
     $errors = [];
