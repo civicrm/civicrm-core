@@ -10,6 +10,11 @@
  */
 
 /**
+ * If a site still has 'hotfix_extup' installed, ignore it.
+ */
+define('CIVICRM_EXTUP_OBSOLETE', TRUE);
+
+/**
  * This class glues together the various parts of the extension
  * system.
  *
