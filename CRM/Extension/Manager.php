@@ -203,10 +203,6 @@ class CRM_Extension_Manager {
 
       case self::STATUS_INSTALLED_MISSING:
       case self::STATUS_DISABLED_MISSING:
-        // the extension does not exist in any container; we're free to put it anywhere
-        $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-        break;
-
       case self::STATUS_UNKNOWN:
         // the extension does not exist in any container; we're free to put it anywhere
         $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
