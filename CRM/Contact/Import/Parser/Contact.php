@@ -31,24 +31,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   private $externalIdentifiers = [];
 
   /**
-   * Array of successfully imported contact id's
-   *
-   * @var array
-   */
-  protected $_newContacts = [];
-
-  protected $_tableName;
-
-  /**
-   * Total number of lines in file
-   *
-   * @var int
-   */
-  protected $_rowCount;
-
-  protected $fieldMetadata = [];
-
-  /**
    * Relationship labels.
    *
    * Temporary cache of labels to reduce queries in getRelationshipLabels.
@@ -280,9 +262,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *  1) calls fillPrimary
    *  2) possibly the street address parsing.
    *
-   * The other hundred lines do stuff that is done elsewhere. Custom fields
-   * should already be formatted by getTransformedValue and we don't need to
-   * re-rewrite them to a BAO style array since we call the api which does that.
+   * The other hundred lines do stuff that is done elsewhere.
    *
    * The call to formatLocationBlock just does the address custom fields which,
    * are already formatted by this point.
@@ -337,28 +317,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $address = array_merge($address, $parsedFields);
         }
       }
-    }
-  }
-
-  /**
-   * Build error-message containing error-fields
-   *
-   * Once upon a time there was a dev who hadn't heard of implode. That dev wrote this function.
-   *
-   * @todo just say no!
-   *
-   * @param string $errorName
-   *   A string containing error-field name.
-   * @param string $errorMessage
-   *   A string containing all the error-fields, where the new errorName is concatenated.
-   *
-   */
-  public static function addToErrorMsg($errorName, &$errorMessage) {
-    if ($errorMessage) {
-      $errorMessage .= "; $errorName";
-    }
-    else {
-      $errorMessage = $errorName;
     }
   }
 
@@ -857,7 +815,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   private function getSuccessMessage(): string {
     if (!empty($this->_unparsedStreetAddressContacts)) {
       $errorMessage = ts('Record imported successfully but unable to parse the street address: ');
-      foreach ($this->_unparsedStreetAddressContacts as $contactInfo => $contactValue) {
+      foreach ($this->_unparsedStreetAddressContacts as $contactValue) {
         $contactUrl = CRM_Utils_System::url('civicrm/contact/add', 'reset=1&action=update&cid=' . $contactValue['id'], TRUE, NULL, FALSE);
         $errorMessage .= "\n Contact ID:" . $contactValue['id'] . " <a href=\"$contactUrl\"> " . $contactValue['streetAddress'] . '</a>';
       }
@@ -911,46 +869,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Format contact parameters.
-   *
-   * @todo this function needs re-writing & re-merging into the main function.
-   *
-   * Here be dragons.
-   *
-   * @param array $values
-   * @param array $params
-   *
-   * @return bool
-   */
-  protected function formatContactParameters(&$values, &$params) {
-    // Crawl through the possible classes:
-    // Contact
-    //      Individual
-    //      Household
-    //      Organization
-    //          Location
-    //              Address
-    //              Email
-    //              IM
-    //      Note
-    //      Custom
-
-    // first add core contact values since for other Civi modules they are not added
-    $contactFields = CRM_Contact_DAO_Contact::fields();
-    _civicrm_api3_store_values($contactFields, $values, $params);
-
-    if (isset($values['contact_type'])) {
-      // we're an individual/household/org property
-
-      $fields[$values['contact_type']] = CRM_Contact_DAO_Contact::fields();
-
-      _civicrm_api3_store_values($fields[$values['contact_type']], $values, $params);
-      return TRUE;
-    }
-    return TRUE;
-  }
-
-  /**
    * Get metadata for contact importable fields.
    *
    * @internal this function will be made private in the near future. It is
@@ -970,7 +888,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     //CRM-5125
     //supporting import for contact subtypes
-    $csType = NULL;
     if ($this->getContactSubType()) {
       //custom fields for sub type
       $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($this->getContactSubType());
@@ -1000,21 +917,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     Civi::cache('fields')->set($cacheKey, $fields);
     return $fields;
-  }
-
-  /**
-   * Get the field metadata for the relevant entity.
-   *
-   * @param string $entity
-   *
-   * @return array
-   */
-  protected function getMetadataForEntity($entity) {
-    if (!isset($this->fieldMetadata[$entity])) {
-      $className = "CRM_Core_DAO_$entity";
-      $this->fieldMetadata[$entity] = $className::fields();
-    }
-    return $this->fieldMetadata[$entity];
   }
 
   /**
@@ -1289,21 +1191,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return NULL;
     }
     $relationshipField = 'contact_sub_type_' . substr($relationshipDirection, -1);
-    return $this->getRelationshipType($relationshipTypeID)[$relationshipField];
-  }
-
-  /**
-   * Get the related contact type.
-   *
-   * @param int|null $relationshipTypeID
-   * @param int|string $relationshipDirection
-   *
-   * @return null|string
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getRelatedContactLabel($relationshipTypeID, $relationshipDirection): ?string {
-    $relationshipField = 'label_' . $relationshipDirection;
     return $this->getRelationshipType($relationshipTypeID)[$relationshipField];
   }
 
