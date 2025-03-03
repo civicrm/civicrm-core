@@ -125,11 +125,14 @@ class CRM_Extension_Downloader {
    *   The name of the extension being installed.
    * @param string $downloadUrl
    *   URL of a .zip file.
-   * @return bool
-   *   TRUE for success
+   * @param bool $deploy
+   *   Whether to reset statuses and caches, rebuild menus, etc.
+   * @return bool|string
+   *   FALSE for failure
+   *   Otherwise, a string indicating the file-path with the extracted content.
    * @throws CRM_Extension_Exception
    */
-  public function download($key, $downloadUrl) {
+  public function download($key, $downloadUrl, bool $deploy = TRUE) {
     $filename = $this->tmpDir . DIRECTORY_SEPARATOR . $key . '.zip';
 
     if (!$downloadUrl) {
@@ -149,9 +152,7 @@ class CRM_Extension_Downloader {
       return FALSE;
     }
 
-    $this->manager->replace($extractedZipPath);
-
-    return TRUE;
+    return $deploy ? $this->manager->replace($extractedZipPath) : $extractedZipPath;
   }
 
   /**
