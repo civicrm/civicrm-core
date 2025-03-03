@@ -9,7 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Contact;
 use Civi\Api4\County;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\StateProvince;
@@ -272,18 +271,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $this->fillPrimary($formatted[$block][$blockKey], $blockValues, $block, $formatted['id'] ?? NULL);
         }
       }
-    }
-    //now format custom data.
-    foreach ($params as $key => $field) {
-      if (in_array($key, $metadataBlocks, TRUE)) {
-        // This location block is already fully handled at this point.
-        continue;
-      }
-
-      if ($key == 'id' && isset($field)) {
-        $formatted[$key] = $field;
-      }
-
     }
 
     // parse street address, CRM-5450
