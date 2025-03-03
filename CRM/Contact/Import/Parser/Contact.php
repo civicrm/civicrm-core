@@ -142,16 +142,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
       $contactID = $newContact->id;
 
-      if ($contactID) {
-        // call import hook
-        $currentImportID = end($values);
-        $hookParams = [
-          'contactID' => $contactID,
-          'importID' => $currentImportID,
-        ];
-        CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
-      }
-
       $primaryContactId = $newContact->id;
 
       //relationship contact insert
@@ -185,6 +175,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $extraFields['related_contact_matched']++;
       }
     }
+    $this->callLegacyHook($contactID ?? NULL, $values);
     $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields, array_merge(array_keys($relatedContacts), [$contactID]));
   }
 
@@ -337,6 +328,24 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     asort($relations);
     Civi::cache('fields')->set($cacheKey, $relations);
     return $relations;
+  }
+
+  /**
+   * Call legacy, strongly discouraged, hook.
+   *
+   * @param int|string|null $contactID
+   * @param array $values
+   */
+  private function callLegacyHook(int|string|null $contactID, array $values): void {
+    if ($contactID) {
+      // call import hook
+      $currentImportID = end($values);
+      $hookParams = [
+        'contactID' => $contactID,
+        'importID' => $currentImportID,
+      ];
+      CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
+    }
   }
 
   /**
