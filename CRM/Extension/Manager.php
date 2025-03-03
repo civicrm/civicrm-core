@@ -161,14 +161,34 @@ class CRM_Extension_Manager {
     $newInfo = CRM_Extension_Info::loadFromFile($tmpCodeDir . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME);
     $oldStatus = $this->getStatus($newInfo->key);
 
-    // find $tgtPath, $oldInfo, $typeManager
+    // Find $oldInfo, $typeManager
+    switch ($oldStatus) {
+      case self::STATUS_UNINSTALLED:
+      case self::STATUS_INSTALLED:
+      case self::STATUS_DISABLED:
+        [$oldInfo, $typeManager] = $this->_getInfoTypeHandler($newInfo->key);
+        break;
+
+      case self::STATUS_INSTALLED_MISSING:
+      case self::STATUS_DISABLED_MISSING:
+        [$oldInfo, $typeManager] = $this->_getMissingInfoTypeHandler($newInfo->key);
+        break;
+
+      case self::STATUS_UNKNOWN:
+        $oldInfo = $typeManager = NULL;
+        break;
+
+      default:
+        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
+    }
+
+    // find $tgtPath
     switch ($oldStatus) {
       case self::STATUS_UNINSTALLED:
       case self::STATUS_INSTALLED:
       case self::STATUS_DISABLED:
         // There is an old copy of the extension. Try to install in the same place -- but it must go somewhere in the default-container
         // throws Exception
-        list ($oldInfo, $typeManager) = $this->_getInfoTypeHandler($newInfo->key);
         $tgtPath = $this->fullContainer->getPath($newInfo->key);
         if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
           // force installation in the default-container
@@ -185,14 +205,11 @@ class CRM_Extension_Manager {
       case self::STATUS_DISABLED_MISSING:
         // the extension does not exist in any container; we're free to put it anywhere
         $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-        // throws Exception
-        list ($oldInfo, $typeManager) = $this->_getMissingInfoTypeHandler($newInfo->key);
         break;
 
       case self::STATUS_UNKNOWN:
         // the extension does not exist in any container; we're free to put it anywhere
         $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-        $oldInfo = $typeManager = NULL;
         break;
 
       default:
