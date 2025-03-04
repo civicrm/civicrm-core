@@ -40,25 +40,18 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
   /**
    * @param int $fileID
-   * @param int $entityID
    *
    * @return array
    */
-  public static function path($fileID, $entityID) {
-    $entityFileDAO = new CRM_Core_DAO_EntityFile();
-    $entityFileDAO->entity_id = $entityID;
-    $entityFileDAO->file_id = $fileID;
+  public static function path($fileID): array {
+    $fileDAO = new CRM_Core_DAO_File();
+    $fileDAO->id = $fileID;
+    if ($fileDAO->find(TRUE)) {
+      $config = CRM_Core_Config::singleton();
+      $path = $config->customFileUploadDir . $fileDAO->uri;
 
-    if ($entityFileDAO->find(TRUE)) {
-      $fileDAO = new CRM_Core_DAO_File();
-      $fileDAO->id = $fileID;
-      if ($fileDAO->find(TRUE)) {
-        $config = CRM_Core_Config::singleton();
-        $path = $config->customFileUploadDir . $fileDAO->uri;
-
-        if (file_exists($path) && is_readable($path)) {
-          return [$path, $fileDAO->mime_type];
-        }
+      if (file_exists($path) && is_readable($path)) {
+        return [$path, $fileDAO->mime_type];
       }
     }
 
@@ -741,58 +734,50 @@ HEREDOC;
     return NULL;
   }
 
+  public static function getFileUrl(int $fileId, string $cmsEnd = 'current', ?string $flags = NULL): \Civi\Core\Url {
+    $fileHash = self::generateFileHash(NULL, $fileId);
+    return Civi::url("$cmsEnd://civicrm/file?reset=1&id=$fileId&fcs=$fileHash", $flags);
+  }
+
   /**
    * Generates an access-token for downloading a specific file.
    *
-   * @param int $entityId entity id the file is attached to
+   * @param null $entityId deprecated unused param
    * @param int $fileId file ID
    * @param int $genTs
    * @param int $life
    * @return string
    */
   public static function generateFileHash($entityId = NULL, $fileId = NULL, $genTs = NULL, $life = NULL) {
-    // Use multiple (but stable) inputs for hash information.
-    $siteKey = CRM_Utils_Constant::value('CIVICRM_SITE_KEY');
-    if (!$siteKey) {
-      throw new \CRM_Core_Exception("Cannot generate file access token. Please set CIVICRM_SITE_KEY.");
-    }
-
     if (!$genTs) {
-      $genTs = time();
+      $genTs = CRM_Utils_Time::time();
     }
     if (!$life) {
       $days = Civi::settings()->get('checksum_timeout');
       $life = 24 * $days;
     }
-    // Trim 8 chars off the string, make it slightly easier to find
-    // but reveals less information from the hash.
-    $cs = hash_hmac('sha256', "entity={$entityId}&file={$fileId}&life={$life}", $siteKey);
-    return "{$cs}_{$genTs}_{$life}";
+    return Civi::service('crypto.jwt')->encode([
+      'exp' => $genTs + ($life * 60 * 60),
+      'civi.file' => $fileId,
+    ], ['SIGN', 'WEAK_SIGN']);
   }
 
   /**
    * Validate a file access token.
    *
    * @param string $hash
-   * @param int $entityId Entity Id the file is attached to
+   * @param null $entityId deprecated unused param
    * @param int $fileId File Id
    * @return bool
    */
   public static function validateFileHash($hash, $entityId, $fileId) {
-    $input = CRM_Utils_System::explode('_', $hash, 3);
-    $inputTs = $input[1] ?? NULL;
-    $inputLF = $input[2] ?? NULL;
-    $testHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId, $inputTs, $inputLF);
-    if (hash_equals($testHash, $hash)) {
-      $now = time();
-      if ($inputTs + ($inputLF * 60 * 60) >= $now) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
+    try {
+      $payload = Civi::service('crypto.jwt')->decode($hash, ['SIGN', 'WEAK_SIGN']);
+      return $payload && $payload['civi.file'] == $fileId;
     }
-    return FALSE;
+    catch (\Civi\Crypto\Exception\CryptoException $e) {
+      return FALSE;
+    }
   }
 
   /**
