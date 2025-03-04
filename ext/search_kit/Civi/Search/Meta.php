@@ -29,7 +29,7 @@ class Meta {
    * @return array
    */
   public static function getCalcFields($apiEntity, $apiParams): array {
-    $api = \Civi\API\Request::create($apiEntity, 'get', $apiParams);
+    $api = \Civi\API\Request::create($apiEntity, 'get', $apiParams + ['checkPermissions' => FALSE]);
     if (!is_a($api, '\Civi\Api4\Generic\DAOGetAction')) {
       return [];
     }
