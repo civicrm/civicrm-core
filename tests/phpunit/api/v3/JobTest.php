@@ -2536,4 +2536,27 @@ ENDSQLUPDATE;
     ]);
   }
 
+  /**
+   * Test that Job.execute is disabled when in Maintenance Mode
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMaintenanceModeGate(): void {
+    $settings = \Civi::settings();
+
+    // stash the starting value of setting
+    $startMode = $settings->get('core_maintenance_mode');
+
+    $settings->set('core_maintenance_mode', TRUE);
+    $result = $this->callAPISuccess('Job', 'execute');
+    $this->assertEquals($result['skipped'] ?? NULL, 'maintenance_mode');
+
+    $settings->set('core_maintenance_mode', FALSE);
+    $result = $this->callAPISuccess('Job', 'execute');
+    $this->assertEquals($result['skipped'] ?? FALSE, FALSE);
+
+    // revert
+    $settings->set('core_maintenance_mode', $startMode);
+  }
+
 }
