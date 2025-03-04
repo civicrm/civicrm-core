@@ -28,6 +28,8 @@ class CRM_Dedupe_FinderQueryOptimizer {
 
   private array $queries = [];
 
+  private array $optimizedQueries = [];
+
   /**
    * Threshold weight for merge.
    *
@@ -253,6 +255,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
     $tableQueryFormat = [];
     foreach ($queries as $query) {
       $tableQueryFormat[$query['key']] = $query['query'];
+      $this->optimizedQueries[$query['key']] = $query;
     }
     return $tableQueryFormat;
   }
@@ -338,6 +341,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
     $tableQueryFormat = [];
     foreach ($queries as $query) {
       $tableQueryFormat[$query['key']] = $query['query'];
+      $this->optimizedQueries[$query['key']] = $query;
     }
     return $tableQueryFormat;
   }
@@ -610,6 +614,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
   private function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = []) {
     $input = [];
     foreach ($tableQueries as $key => $query) {
+      $optimizedQuery = $this->optimizedQueries[$key];
       $input[] = substr($key, strrpos($key, '.') + 1);
     }
 
