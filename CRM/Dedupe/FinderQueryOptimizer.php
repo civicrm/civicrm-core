@@ -521,9 +521,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
-    // @todo move all this to the FinderQueryOptimizer - there used to be a
-    // hook which meant we had to keep this 'after' the hook - but the
-    // hook is now only in the legacydedupefinder so we can clean that up now
     while (!empty($tableQueries)) {
       [$isInclusive, $isDie] = $this->isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum);
 
