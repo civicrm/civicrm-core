@@ -2,7 +2,7 @@
   "use strict";
 
   // Trait shared by any search display controllers which allow sorting
-  angular.module('crmSearchDisplay').factory('searchDisplayEditableTrait', function(crmApi4, crmStatus) {
+  angular.module('crmSearchDisplay').factory('searchDisplayEditableTrait', function(crmApi4, crmStatus, $timeout) {
 
     // Trait properties get mixed into display controller using angular.extend()
     return {
@@ -14,11 +14,15 @@
       }],
 
       startEditing: function(row, colIndex) {
+        const ctrl = this;
         if (this.editing === false && row.columns[colIndex].edit) {
           this.editValues = {};
           this.editing = row.key;
           row.columns.forEach((col, index) => {
             col.editing = (index === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
+          });
+          $timeout(function() {
+            $('crm-search-display-editable :input', ctrl.$element).first().focus();
           });
         }
       },
