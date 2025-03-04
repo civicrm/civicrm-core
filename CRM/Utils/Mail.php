@@ -336,26 +336,12 @@ class CRM_Utils_Mail {
     $headers['Content-Transfer-Encoding'] = '8bit';
     $headers['Return-Path'] = $params['returnPath'] ?? $defaultReturnPath;
 
-    // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
-    // dev/core#5301: Allow Reply-To to be set directly.
-    $replyTo = $params['Reply-To'] ?? ($params['replyTo'] ?? ($params['from'] ?? NULL));
-
-    if (!empty($replyTo)) {
-      $headers['Reply-To'] = $replyTo;
-    }
     $headers['Date'] = date('r');
     if ($includeMessageId) {
       $headers['Message-ID'] = $params['messageId'] ?? '<' . uniqid('civicrm_', TRUE) . "@$emailDomain>";
     }
     if (!empty($params['autoSubmitted'])) {
       $headers['Auto-Submitted'] = "Auto-Generated";
-    }
-
-    // make sure we has to have space, CRM-6977
-    foreach (['From', 'To', 'Cc', 'Bcc', 'Reply-To', 'Return-Path'] as $fld) {
-      if (isset($headers[$fld])) {
-        $headers[$fld] = str_replace('"<', '" <', $headers[$fld]);
-      }
     }
 
     // quote FROM, if comma is detected AND is not already quoted. CRM-7053
@@ -366,6 +352,21 @@ class CRM_Utils_Mail {
         substr(trim($from[1]), 0, -1),
         TRUE
       );
+    }
+
+    // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
+    // dev/core#5301: Allow Reply-To to be set directly.
+    $replyTo = $params['Reply-To'] ?? ($params['replyTo'] ?? ($headers['From'] ?? NULL));
+
+    if (!empty($replyTo)) {
+      $headers['Reply-To'] = $replyTo;
+    }
+
+    // make sure we has to have space, CRM-6977
+    foreach (['From', 'To', 'Cc', 'Bcc', 'Reply-To', 'Return-Path'] as $fld) {
+      if (isset($headers[$fld])) {
+        $headers[$fld] = str_replace('"<', '" <', $headers[$fld]);
+      }
     }
 
     require_once 'Mail/mime.php';
