@@ -149,11 +149,15 @@ class CRM_Extension_Manager {
    *
    * @param string $tmpCodeDir
    *   Path to a local directory containing a copy of the new (inert) code.
+   * @param string|null $backupCodeDir
+   *   Optionally move the old code to $backupCodeDir
+   * @param bool $refresh
+   *   Whether to immediately rebuild system caches
    * @return string
    *   The final path where the extension has been loaded.
    * @throws CRM_Extension_Exception
    */
-  public function replace($tmpCodeDir): string {
+  public function replace($tmpCodeDir, ?string $backupCodeDir = NULL, bool $refresh = TRUE): string {
     if (!$this->defaultContainer) {
       throw new CRM_Extension_Exception("Default extension container is not configured");
     }
@@ -212,6 +216,12 @@ class CRM_Extension_Manager {
         throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
+    if ($backupCodeDir && is_dir($tgtPath)) {
+      if (!rename($tgtPath, $backupCodeDir)) {
+        throw new CRM_Extension_Exception("Failed to move $tgtPath to backup $backupCodeDir");
+      }
+    }
+
     // move the code!
     switch ($oldStatus) {
       case self::STATUS_UNINSTALLED:
@@ -239,11 +249,13 @@ class CRM_Extension_Manager {
         throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
-    $this->refresh();
-    // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
-    // \Civi::reset();
-    // \CRM_Core_Config::singleton(TRUE, TRUE);
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    if ($refresh) {
+      $this->refresh();
+      // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
+      // \Civi::reset();
+      // \CRM_Core_Config::singleton(TRUE, TRUE);
+      CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    }
 
     return $tgtPath;
   }
