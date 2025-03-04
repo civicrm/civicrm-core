@@ -163,7 +163,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       return;
     }
 
-    $dedupeTable = $ruleGroup->runTablesQuery([], $tableQueries, $threshold);
+    $dedupeTable = $ruleGroup->runTablesQuery($optimizer, $tableQueries, $threshold);
     if (!$dedupeTable) {
       return;
     }
@@ -214,7 +214,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       return;
     }
 
-    $dedupeTable = $ruleGroup->runTablesQuery($event->dedupeParams['match_params'], $tableQueries, $threshold);
+    $dedupeTable = $ruleGroup->runTablesQuery($optimizer, $tableQueries, $threshold);
 
     $aclFrom = '';
     $aclWhere = '';
@@ -423,17 +423,19 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
   }
 
   /**
-   * @internal this query is part of a refactoring process.
-   *
-   * @param array $params
+   * @param \CRM_Dedupe_FinderQueryOptimizer $optimizer
    * @param array $tableQueries
    * @param int $threshold
    *
    * @return string
    * @throws \Civi\Core\Exception\DBQueryException
+   * @internal this query is part of a refactoring process.
+   *
+   * Ideally it will be worked back into the FinderQueryOptimizer now.
+   *
    */
-  private function runTablesQuery(array $params, array $tableQueries, int $threshold): string {
-    if ($params) {
+  private function runTablesQuery(CRM_Dedupe_FinderQueryOptimizer $optimizer, array $tableQueries, int $threshold): string {
+    if ($optimizer->isLookupMode()) {
       $dedupeTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
@@ -457,7 +459,9 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
-
+    // @todo move all this to the FinderQueryOptimizer - there used to be a
+    // hook which meant we had to keep this 'after' the hook - but the
+    // hook is now only in the legacydedupefinder so we can clean that up now
     while (!empty($tableQueries)) {
       [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum);
 
