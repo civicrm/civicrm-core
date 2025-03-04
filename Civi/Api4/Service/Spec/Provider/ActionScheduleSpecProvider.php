@@ -29,8 +29,7 @@ class ActionScheduleSpecProvider extends \Civi\Core\Service\AutoService implemen
       $spec->getFieldByName('name')->setRequired(FALSE);
       // Repeat events do not require mapping_id or start_action_unit (or seemingly start_action_condition)- although
       // we don't have that level of nuance available so we make them optional for all events.
-      $spec->getFieldByName('mapping_id')->setRequiredIf('empty($values.used_for) || $values.used_for !== "civicrm_event"');
-      $spec->getFieldByName('start_action_unit')->setRequiredIf('empty($values.absolute_date) && (empty($values.used_for) || $values.used_for !== "civicrm_event")');
+      $spec->getFieldByName('mapping_id')->setRequiredIf('empty($values.used_for)');
       $spec->getFieldByName('start_action_condition')->setRequiredIf('empty($values.absolute_date) && (empty($values.used_for) || $values.used_for !== "civicrm_event")');
       $spec->getFieldByName('entity_value')->setRequired(TRUE);
       $spec->getFieldByName('start_action_offset')->setRequiredIf('empty($values.absolute_date)');
