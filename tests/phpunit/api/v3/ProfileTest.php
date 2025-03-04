@@ -47,6 +47,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'civicrm_phone',
       'civicrm_address',
       'civicrm_uf_match',
+      'civicrm_im',
+      'civicrm_website',
+      'civicrm_email',
     ], TRUE);
     CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_uf_group WHERE id = $this->_profileID OR name = 'test_contact_activity_profile'");
     parent::tearDown();
