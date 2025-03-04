@@ -782,7 +782,7 @@ class CRM_Extension_Manager {
    *
    * @param array $keys
    *   List of extensions to install.
-   * @param \CRM_Extension_Info $info
+   * @param \CRM_Extension_Info|CRM_Extension_Info[]|null $newInfos
    *   An extension info object that we should use instead of our local versions (eg. when checking for upgradeability).
    *
    * @return array
@@ -791,10 +791,12 @@ class CRM_Extension_Manager {
    * @throws \MJS\TopSort\CircularDependencyException
    * @throws \MJS\TopSort\ElementNotFoundException
    */
-  public function findInstallRequirements($keys, $info = NULL) {
-    // Use our passed in info, or get the local versions
-    if ($info) {
-      $infos[$info->key] = $info;
+  public function findInstallRequirements($keys, $newInfos = NULL) {
+    if (is_object($newInfos)) {
+      $infos[$newInfos->key] = $newInfos;
+    }
+    elseif (is_array($newInfos)) {
+      $infos = $newInfos;
     }
     else {
       $infos = $this->mapper->getAllInfos();
