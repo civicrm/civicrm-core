@@ -828,6 +828,23 @@ class CRM_Extension_Manager {
     return $sorter->sort();
   }
 
+  public function checkInstallRequirements(array $installKeys, $newInfos = NULL): array {
+    $errors = [];
+    $requiredExtensions = $this->findInstallRequirements($installKeys, $newInfos);
+    $installKeysSummary = implode(',', $requiredExtensions);
+    foreach ($requiredExtensions as $extension) {
+      if ($this->getStatus($extension) !== CRM_Extension_Manager::STATUS_INSTALLED && !in_array($extension, $installKeys)) {
+        $requiredExtensionInfo = CRM_Extension_System::singleton()->getBrowser()->getExtension($extension);
+        $requiredExtensionInfoName = empty($requiredExtensionInfo->name) ? $extension : $requiredExtensionInfo->name;
+        $errors[] = [
+          'title' => ts('Missing Requirement: %1', [1 => $extension]),
+          'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $installKeysSummary, 2 => $requiredExtensionInfoName]),
+        ];
+      }
+    }
+    return $errors;
+  }
+
   /**
    * Build a list of extensions to remove, in an order that will satisfy dependencies.
    *
