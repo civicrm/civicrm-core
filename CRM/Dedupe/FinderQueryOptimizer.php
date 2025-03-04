@@ -28,6 +28,8 @@ class CRM_Dedupe_FinderQueryOptimizer {
 
   private array $queries = [];
 
+  private array $optimizedQueries = [];
+
   /**
    * Threshold weight for merge.
    *
@@ -253,6 +255,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
     $tableQueryFormat = [];
     foreach ($queries as $query) {
       $tableQueryFormat[$query['key']] = $query['query'];
+      $this->optimizedQueries[$query['key']] = $query;
     }
     return $tableQueryFormat;
   }
@@ -338,6 +341,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
     $tableQueryFormat = [];
     foreach ($queries as $query) {
       $tableQueryFormat[$query['key']] = $query['query'];
+      $this->optimizedQueries[$query['key']] = $query;
     }
     return $tableQueryFormat;
   }
@@ -521,11 +525,8 @@ class CRM_Dedupe_FinderQueryOptimizer {
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
-    // @todo move all this to the FinderQueryOptimizer - there used to be a
-    // hook which meant we had to keep this 'after' the hook - but the
-    // hook is now only in the legacydedupefinder so we can clean that up now
     while (!empty($tableQueries)) {
-      [$isInclusive, $isDie] = $this->isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum);
+      [$isInclusive, $isDie] = $this->isQuerySetInclusive($threshold, $exclWeightSum);
 
       if ($isInclusive) {
         // order queries by table count
@@ -535,10 +536,12 @@ class CRM_Dedupe_FinderQueryOptimizer {
         $searchWithinDupes = !empty($exclWeightSum) ? 1 : 0;
 
         while (!empty($tableQueries)) {
-          // extract the next query ( and weight ) to be executed
-          $fieldWeight = array_keys($tableQueries);
-          $fieldWeight = $fieldWeight[0];
-          $query = array_shift($tableQueries);
+          // extract the next query to be executed
+          $queryKey = array_key_first($tableQueries);
+          $optimizedQuery = $this->optimizedQueries[$queryKey];
+          // since queries are already sorted by weights, we can continue as is
+          unset($tableQueries[$queryKey]);
+          $query = $optimizedQuery['query'];
 
           if ($searchWithinDupes) {
             // drop dedupe_copy table just in case if its already there.
@@ -570,27 +573,28 @@ class CRM_Dedupe_FinderQueryOptimizer {
 
           // FIXME: we need to be more accurate with affected rows, especially for insert vs duplicate insert.
           // And that will help optimize further.
-          $affectedRows = $dao->affectedRows();
+          $this->optimizedQueries['found_rows'] = $dao->affectedRows();
 
           // In an inclusive situation, failure of any query means no further processing -
-          if ($affectedRows == 0) {
+          if ($this->optimizedQueries['found_rows'] == 0) {
             // reset to make sure no further execution is done.
             $tableQueries = [];
             break;
           }
-          $weightSum = substr($fieldWeight, strrpos($fieldWeight, '.') + 1) + $weightSum;
+          $weightSum = $optimizedQuery['weight'] + $weightSum;
         }
         // An exclusive situation -
       }
       elseif (!$isDie) {
+        $queryKey = array_key_first($tableQueries);
+        $optimizedQuery = $this->optimizedQueries[$queryKey];
         // since queries are already sorted by weights, we can continue as is
-        $fieldWeight = array_keys($tableQueries);
-        $fieldWeight = $fieldWeight[0];
-        $query = array_shift($tableQueries);
-        $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
+        unset($tableQueries[$queryKey]);
+        $query = "{$insertClause} {$optimizedQuery['query']} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
         $dao = CRM_Core_DAO::executeQuery($query);
-        if ($dao->affectedRows() >= 1) {
-          $exclWeightSum[] = substr($fieldWeight, strrpos($fieldWeight, '.') + 1);
+        $this->optimizedQueries[$queryKey]['found_rows'] = $dao->affectedRows();
+        if ($this->optimizedQueries[$queryKey]['found_rows'] >= 1) {
+          $exclWeightSum[] = $optimizedQuery['weight'];
         }
       }
       else {
@@ -610,10 +614,10 @@ class CRM_Dedupe_FinderQueryOptimizer {
    *
    * @return array
    */
-  private function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = []) {
+  private function isQuerySetInclusive($threshold, $exclWeightSum = []) {
     $input = [];
-    foreach ($tableQueries as $key => $query) {
-      $input[] = substr($key, strrpos($key, '.') + 1);
+    foreach ($this->getRemainingQueries() as $query) {
+      $input[] = $query['weight'];
     }
 
     if (!empty($exclWeightSum)) {
@@ -640,6 +644,16 @@ class CRM_Dedupe_FinderQueryOptimizer {
       }
     }
     return [$totalCombinations == 1, $totalCombinations <= 0];
+  }
+
+  protected function getRemainingQueries(): array {
+    $remaining = [];
+    foreach ($this->optimizedQueries as $key => $query) {
+      if (!isset($query['found_rows'])) {
+        $remaining[$key] = $query;
+      }
+    }
+    return $remaining;
   }
 
   /**
