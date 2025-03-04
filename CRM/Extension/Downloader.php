@@ -181,11 +181,14 @@ class CRM_Extension_Downloader {
    *   The name of the extension being installed; this usually matches the basedir in the .zip.
    * @param string $zipFile
    *   The local path to a .zip file.
+   * @param string|null $extractTo
+   *   Where to extract the zip file. (If omitted, use $this->tmpDir).
    * @return string|FALSE
    *   zip file path
    */
-  public function extractFiles($key, $zipFile) {
+  public function extractFiles($key, $zipFile, ?string $extractTo = NULL) {
     $config = CRM_Core_Config::singleton();
+    $extractTo = $extractTo ?: $this->tmpDir;
 
     $zip = new ZipArchive();
     $res = $zip->open($zipFile);
@@ -196,7 +199,7 @@ class CRM_Extension_Downloader {
         CRM_Core_Session::setStatus(ts('Unable to extract the extension: bad directory structure'), '', 'error');
         return FALSE;
       }
-      $extractedZipPath = $this->tmpDir . DIRECTORY_SEPARATOR . $zipSubDir;
+      $extractedZipPath = $extractTo . DIRECTORY_SEPARATOR . $zipSubDir;
       if (is_dir($extractedZipPath)) {
         if (!CRM_Utils_File::cleanDir($extractedZipPath, TRUE, FALSE)) {
           \Civi::log()->error('Unable to extract the extension {extension}: {path} cannot be cleared', [
@@ -207,9 +210,9 @@ class CRM_Extension_Downloader {
           return FALSE;
         }
       }
-      if (!$zip->extractTo($this->tmpDir)) {
-        \Civi::log()->error('Unable to extract the extension to {path}.', ['path' => $this->tmpDir]);
-        CRM_Core_Session::setStatus(ts('Unable to extract the extension to %1.', [1 => $this->tmpDir]), ts('Installation Error'), 'error');
+      if (!$zip->extractTo($extractTo)) {
+        \Civi::log()->error('Unable to extract the extension to {path}.', ['path' => $extractTo]);
+        CRM_Core_Session::setStatus(ts('Unable to extract the extension to %1.', [1 => $extractTo]), ts('Installation Error'), 'error');
         return FALSE;
       }
       $zip->close();
