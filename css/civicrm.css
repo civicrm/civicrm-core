@@ -6,6 +6,15 @@
  * All styles should start with .crm-container unless they are specific to the main div only
  */
 
+/**
+ * CiviCRM themes do not generally have dark mode, so this declares we expect light mode
+ * for system components (and our responsive svg logo).
+ * In Riverlea, this is overridden depending on the dark mode setting.
+ */
+.crm-container {
+  color-scheme: only light;
+}
+
 /* Use this class to hide text that should only be there for screen readers */
 .sr-only {
   border: 0;
