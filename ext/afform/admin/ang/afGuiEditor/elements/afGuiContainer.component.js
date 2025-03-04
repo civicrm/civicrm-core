@@ -45,6 +45,8 @@
             genericElements.push(element.directive);
           }
         });
+        ctrl.hasClassName = !!$scope.getSetClassName();
+
       };
 
       this.sortableOptions = {
@@ -180,6 +182,34 @@
           }
         }
         return ctrl.node.max ? parseInt(ctrl.node.max, 10) : null;
+      };
+
+      $scope.getSetClassName = function(value) {
+        if (arguments.length) {
+          // Build a list of classes to add (as given, then prefixed).
+          var customClasses = [];
+          if (typeof value != 'undefined') {
+            _.each(afGui.splitClass(value), function(valueClass){
+              customClasses.push('af-container-class-' + valueClass);
+            });
+          }
+          // Build a list of classes to remove (any prefixed classes in node.class).
+          var oldCustomClasses = _.filter(afGui.splitClass(ctrl.node['class']), function(className){
+            return className.startsWith('af-container-class-');
+          });
+          // Add and remove those classes.
+          afGui.modifyClasses(ctrl.node, oldCustomClasses, customClasses);
+        }
+        // Get a list of all prefixed clases in node.class.
+        var currentCustomClasses = _.filter(afGui.splitClass(ctrl.node['class']), function(className){
+          return className.startsWith('af-container-class');
+        });
+        // Build a list of prefix-stripped base class names, and return them as a string.
+        var classBaseNames = [];
+        _.each(currentCustomClasses, function(className) {
+          classBaseNames.push(className.replace(/^af-container-class-/, ''));
+        });
+        return classBaseNames.join(' ');
       };
 
       // Returns the maximum number of repeats allowed if this is a joined entity with a limit
@@ -344,6 +374,15 @@
             setBlockDirective(block.directive_name);
             initializeBlockContainer();
           });
+      };
+
+      $scope.toggleClassName = function() {
+        if (ctrl.hasClassName) {
+          $scope.getSetClassName(undefined);
+          ctrl.hasClassName = false;
+        } else {
+          ctrl.hasClassName = true;
+        }
       };
 
       this.node = ctrl.node;
