@@ -1321,12 +1321,12 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function permissions() {
+  public static function permissions($fieldName = NULL, $params = []) {
     $perms = $options = [];
     \CRM_Utils_Hook::permissionList($perms);
 
     foreach ($perms as $machineName => $details) {
-      if (!empty($details['is_active'])) {
+      if (!empty($details['is_active']) || !empty($params['include_disabled'])) {
         $options[$machineName] = $details['title'];
       }
     }
