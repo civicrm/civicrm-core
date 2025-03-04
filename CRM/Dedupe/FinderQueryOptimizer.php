@@ -536,10 +536,12 @@ class CRM_Dedupe_FinderQueryOptimizer {
         $searchWithinDupes = !empty($exclWeightSum) ? 1 : 0;
 
         while (!empty($tableQueries)) {
-          // extract the next query ( and weight ) to be executed
-          $fieldWeight = array_keys($tableQueries);
-          $fieldWeight = $fieldWeight[0];
-          $query = array_shift($tableQueries);
+          // extract the next query to be executed
+          $queryKey = array_key_first($tableQueries);
+          $optimizedQuery = $this->optimizedQueries[$queryKey];
+          // since queries are already sorted by weights, we can continue as is
+          unset($tableQueries[$queryKey]);
+          $query = $optimizedQuery['query'];
 
           if ($searchWithinDupes) {
             // drop dedupe_copy table just in case if its already there.
@@ -571,27 +573,28 @@ class CRM_Dedupe_FinderQueryOptimizer {
 
           // FIXME: we need to be more accurate with affected rows, especially for insert vs duplicate insert.
           // And that will help optimize further.
-          $affectedRows = $dao->affectedRows();
+          $this->optimizedQueries['found_rows'] = $dao->affectedRows();
 
           // In an inclusive situation, failure of any query means no further processing -
-          if ($affectedRows == 0) {
+          if ($this->optimizedQueries['found_rows'] == 0) {
             // reset to make sure no further execution is done.
             $tableQueries = [];
             break;
           }
-          $weightSum = substr($fieldWeight, strrpos($fieldWeight, '.') + 1) + $weightSum;
+          $weightSum = $optimizedQuery['weight'] + $weightSum;
         }
         // An exclusive situation -
       }
       elseif (!$isDie) {
+        $queryKey = array_key_first($tableQueries);
+        $optimizedQuery = $this->optimizedQueries[$queryKey];
         // since queries are already sorted by weights, we can continue as is
-        $fieldWeight = array_keys($tableQueries);
-        $fieldWeight = $fieldWeight[0];
-        $query = array_shift($tableQueries);
-        $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
+        unset($tableQueries[$queryKey]);
+        $query = "{$insertClause} {$optimizedQuery['query']} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
         $dao = CRM_Core_DAO::executeQuery($query);
-        if ($dao->affectedRows() >= 1) {
-          $exclWeightSum[] = substr($fieldWeight, strrpos($fieldWeight, '.') + 1);
+        $this->optimizedQueries[$queryKey]['found_rows'] = $dao->affectedRows();
+        if ($this->optimizedQueries[$queryKey]['found_rows'] >= 1) {
+          $exclWeightSum[] = $optimizedQuery['weight'];
         }
       }
       else {
@@ -615,7 +618,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
     $input = [];
     foreach ($tableQueries as $key => $query) {
       $optimizedQuery = $this->optimizedQueries[$key];
-      $input[] = substr($key, strrpos($key, '.') + 1);
+      $input[] = $optimizedQuery['weight'];
     }
 
     if (!empty($exclWeightSum)) {
