@@ -1097,6 +1097,31 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  public function checkObsoleteHotfix() {
+    $messages = [];
+    $obsolete = ['key' => 'hotfix_extup', 'title' => 'Hotfix: Extension Upgrader'];
+    if (CRM_Extension_System::singleton()->getMapper()->isActiveModule($obsolete['key'])) {
+      $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The extension "%1" (%2) is obsolete. It should be disabled, uninstalled, and deleted.', [1 => $obsolete['title'], '2' => $obsolete['key']]),
+        ts('Obsolete: "%1"', [1 => $obsolete['title']]),
+        LogLevel::WARNING,
+        'fa-server',
+      );
+      $message->addAction(ts('Manage Extensions'), NULL, 'href',
+        ['path' => 'civicrm/admin/extensions', 'query' => ['reset' => 1, 'action' => 'browse']],
+        // Want to improve this? Make an action to disable+uninstall+delete!
+        // However, that's easier said than done, and we have other fish to fry.
+        // Note that this does NOT link to `civicrm/admin/extensions?action=disable&id=hotfix_extup&key=hotfix_extup`
+        // because it would be easily misunderstood. That page -sounds- like it does the needful, but it's -only- the first step.
+        // Within current limitations, it's better to force the user to engage/read/comprehend.
+      );
+
+      $messages[] = $message;
+    }
+    return $messages;
+  }
+
   public function checkPHPIntlExists(): array {
     $messages = [];
     if (!extension_loaded('intl')) {
