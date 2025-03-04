@@ -30,6 +30,7 @@ use Civi\UserJob\UserJobInterface;
  * supported.
  */
 abstract class CRM_Import_Parser implements UserJobInterface {
+  use \Civi\API\EntityLookupTrait;
 
   /**
    * Return codes
@@ -184,6 +185,29 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   public function isComplete() :bool {
     return $this->getDataSourceObject()->isCompleted();
+  }
+
+  /**
+   * @param int $contactID
+   * @param string $value
+   *
+   * @return int|string|bool|null|array
+   * @throws \CRM_Core_Exception
+   */
+  public function getExistingContactValue(int $contactID, string $value): mixed {
+    $identifier = 'Contact' . $contactID;
+    if (!$this->isDefined($identifier)) {
+      $existingContact = Contact::get(FALSE)
+        ->addWhere('id', '=', $contactID)
+        // Don't auto-filter deleted - people use import to undelete.
+        ->addWhere('is_deleted', 'IN', [0, 1])
+        ->execute()->first();
+      if (empty($existingContact['id'])) {
+        throw new CRM_Core_Exception('No contact found for this contact ID:' . $contactID, CRM_Import_Parser::NO_MATCH);
+      }
+      $this->define('Contact', $identifier, $existingContact);
+    }
+    return $this->lookup($identifier, $value);
   }
 
   /**
@@ -587,15 +611,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception
    */
   protected function validateContactID(int $contactID, ?string $contactType): void {
-    $existingContact = Contact::get(FALSE)
-      ->addWhere('id', '=', $contactID)
-      // Don't auto-filter deleted - people use import to undelete.
-      ->addWhere('is_deleted', 'IN', [0, 1])
-      ->addSelect('contact_type')->execute()->first();
-    if (empty($existingContact['id'])) {
-      throw new CRM_Core_Exception('No contact found for this contact ID:' . $contactID, CRM_Import_Parser::NO_MATCH);
-    }
-    if ($contactType && $existingContact['contact_type'] !== $contactType) {
+    if ($contactType && $this->getExistingContactValue($contactID, 'contact_type') !== $contactType) {
       throw new CRM_Core_Exception('Mismatched contact Types', CRM_Import_Parser::NO_MATCH);
     }
   }
