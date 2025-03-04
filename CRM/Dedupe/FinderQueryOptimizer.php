@@ -69,7 +69,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
           'key' => $key,
           'order' => $index + 1,
         ];
-        $this->queries[$key]['query'] = $this->getQuery($this->queries[$key]);
+        $this->addQuery($key);
       }
       $this->threshold = $rule['dedupe_rule_group_id.threshold'];
     }
@@ -79,18 +79,14 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
-   * @param array $rule
-   *
-   * @return string
-   *   SQL query performing the search
-   *   or NULL if params is present and doesn't have and for a field.
+   * @param string $key
    *
    * @throws \CRM_Core_Exception
    * @internal do not call from outside tested core code. No universe uses Feb 2024.
    *
    */
-  public function getQuery(array $rule): ?string {
-
+  private function addQuery(string $key) {
+    $rule = $this->queries[$key];
     $filter = $this->getRuleTableFilter($rule['table']);
     $contactIDFieldName = $this->getContactIDFieldName($rule['table']);
 
@@ -98,7 +94,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
     // based on whether the rule is about substrings or not
     if ($this->lookupParameters) {
       $select = "t1.$contactIDFieldName id1, {$rule['weight']} weight";
-      $subSelect = 'id1, weight';
       $where = $filter ? ['t1.' . $filter] : [];
       $from = "{$rule['table']} t1";
       $str = 'NULL';
@@ -112,6 +107,10 @@ class CRM_Dedupe_FinderQueryOptimizer {
       else {
         $where[] = "t1.{$rule['field']} = '$str'";
       }
+      $this->queries[$key]['where'] = $where;
+      $this->queries[$key]['contact_id_field'] = $contactIDFieldName;
+      $this->queries[$key]['query'] = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
+      return;
     }
     else {
       $select = "t1.$contactIDFieldName id1, t2.$contactIDFieldName id2, {$rule['weight']} weight";
@@ -134,7 +133,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
       // thing in a subquery.
       $sql = "SELECT $subSelect FROM ($sql) subunion";
     }
-    return $sql;
+    $this->queries[$key]['query'] = $sql;
   }
 
   /**
@@ -220,12 +219,42 @@ class CRM_Dedupe_FinderQueryOptimizer {
    *
    * @return array
    */
-  public function getRuleQueries(): array {
-    $queries = [];
-    foreach ($this->queries as $rule) {
-      $queries[$rule['key']] = $rule['query'];
+  public function getFindQueries(): array {
+    $queries = $this->queries;
+    // We want to combine cross-tables but looking to do that as a follow on since that will require some
+    // more work to figure out. For single table regex does get us there.
+    foreach ($this->getCombinableQueriesByTable() as $queryCombinations) {
+      foreach ($queryCombinations as $queryDetails) {
+        if (count($queryDetails) < 2) {
+          // We can't yet combine across tables so skip this one for now.
+          continue;
+        }
+        $comboQueries = ['field' => [], 'criteria' => [], 'weight' => 0, 'table' => '', 'query' => ''];
+        foreach ($queryDetails as $queryDetail) {
+          $comboQueries['table'] = $queryDetail['table'];
+          $comboQueries['weight'] += $queryDetail['weight'];
+          $comboQueries['field'][] = $queryDetail['field'];
+          $comboQueries['query'] = $queryDetail['query'];
+          $comboQueries['table_alias'] = 't1';
+          $comboQueries['contact_id_field'] = $queryDetail['contact_id_field'];
+          $comboQueries['criteria'][] = implode(' AND ', $queryDetail['where']);
+          unset($queries[$queryDetail['key']]);
+        }
+        $combinedKey = $comboQueries['table'] . '.' . implode('_', $comboQueries['field']) . '.' . $comboQueries['weight'];
+        $combinedQuery['query'] = 'SELECT t1.' . $comboQueries['contact_id_field'] . ' id1, '
+          . $comboQueries['weight'] . ' weight FROM ' . $comboQueries['table'] . ' ' . $comboQueries['table_alias']
+          . ' WHERE ' . implode(' AND ', $comboQueries['criteria']);
+        $combinedQuery['weight'] = $comboQueries['weight'];
+        $combinedQuery['key'] = $combinedKey;
+        $queries[$combinedKey] = $combinedQuery;
+      }
     }
-    return $queries;
+    uasort($queries, [$this, 'sortWeightDescending']);
+    $tableQueryFormat = [];
+    foreach ($queries as $query) {
+      $tableQueryFormat[$query['key']] = $query['query'];
+    }
+    return $tableQueryFormat;
   }
 
   /**

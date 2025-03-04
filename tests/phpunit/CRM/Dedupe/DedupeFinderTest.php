@@ -11,6 +11,11 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->callAPISuccess('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+  }
+
   /**
    * Clean up after the test.
    */
@@ -125,6 +130,34 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // always both required. Even though we can also combine first+last
     // this should not be returned as it is a subset.
     $this->assertCount(1, $optimizer->getCombinableQueries());
+  }
+
+  /**
+   * Test the ability of the Dedupe Query Optimizer to join queries appropriately.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function testFinderQueryOptimizerLookup(): void {
+    $this->createRuleGroup(['threshold' => 16]);
+    // Note that in this format the number at the end is the weight.
+    $queries = [
+      ['civicrm_email', 'email', 16],
+      ['civicrm_contact', 'first_name', 7],
+      ['civicrm_phone', 'phone', 5],
+      ['civicrm_contact', 'nick_name', 5],
+      ['civicrm_address', 'street_address', 4],
+      ['civicrm_address', 'city', 3],
+    ];
+    $this->createRules($queries);
+    $this->individualCreate(['first_name' => 'Robert', 'nick_name' => 'Bob', 'address_primary.street_address' => 'sesame street', 'version' => 4]);
+    $result = \CRM_Contact_BAO_Contact::findDuplicates([
+      'civicrm_contact' => ['first_name' => 'Robert', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
+      'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
+      'contact_type' => 'Individual',
+    ]);
+    $this->assertEquals([$this->ids['Contact']['individual_0']], $result);
   }
 
   /**
