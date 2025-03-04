@@ -476,8 +476,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $formatted['updateBlankLocInfo'] = FALSE;
     }
 
-    $contactFields = CRM_Contact_DAO_Contact::import();
-    $data = $this->formatProfileContactParams($formatted, $contactFields, $contactId, $formatted['contact_type']);
+    $data = $this->formatProfileContactParams($formatted, $contactId, $formatted['contact_type']);
 
     $contact = civicrm_api3('Contact', 'create', $data);
     $cid = $contact['id'];
@@ -512,43 +511,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * nothing but copied here to star unravelling that...
    *
    * @param array $params
-   * @param array $fields
    * @param int|null $contactID
    * @param string|null $ctype
    *
    * @return array
    */
   private function formatProfileContactParams(
-    &$params,
-    $fields,
+    $params,
     $contactID = NULL,
     $ctype = NULL
   ) {
 
-    $data = $contactDetails = ['contact_type' => $ctype];
-
-    // get the contact details (hier)
-    if ($contactID) {
-      $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, $fields);
-
-      $contactDetails = $details[$contactID];
-      $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
-      $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
-    }
-
-    //fix contact sub type CRM-5125
-    if (array_key_exists('contact_sub_type', $params) &&
-      !empty($params['contact_sub_type'])
-    ) {
-      $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
-    }
-
-    if ($ctype == 'Organization') {
-      $data['organization_name'] = $contactDetails['organization_name'] ?? NULL;
-    }
-    elseif ($ctype == 'Household') {
-      $data['household_name'] = $contactDetails['household_name'] ?? NULL;
-    }
+    $data = ['contact_type' => $ctype];
 
     $locationType = [];
     $count = 1;
@@ -653,33 +627,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
         }
       }
-      // Why only these fields...?
-      if ($value === '' && in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'], TRUE)
-        ) {
-        // CRM-10128: if $value is blank, do not fill $data with empty value
-        continue;
-      }
-      else {
-        $data[$key] = $value;
-      }
-
-    }
-
-    //set the values for checkboxes (do_not_email, do_not_mail, do_not_trade, do_not_phone)
-    $privacy = CRM_Core_SelectValues::privacy();
-    foreach ($privacy as $key => $value) {
-      if (array_key_exists($key, $fields)) {
-        // do not reset values for existing contacts, if fields are added to a profile
-        if (array_key_exists($key, $params)) {
-          $data[$key] = $params[$key];
-          if (empty($params[$key])) {
-            $data[$key] = 0;
-          }
-        }
-        elseif (!$contactID) {
-          $data[$key] = 0;
-        }
-      }
+      $data[$key] = $value;
     }
 
     return $data;
