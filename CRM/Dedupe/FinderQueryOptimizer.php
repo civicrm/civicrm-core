@@ -445,4 +445,15 @@ class CRM_Dedupe_FinderQueryOptimizer {
     return $combinations;
   }
 
+  /**
+   * It the optimizer being used to lookup existing contacts based on input parameters.
+   *
+   * @internal
+   *
+   * @return bool
+   */
+  public function isLookupMode(): bool {
+    return !empty($this->lookupParameters);
+  }
+
 }
