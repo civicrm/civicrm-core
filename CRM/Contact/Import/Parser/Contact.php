@@ -9,13 +9,10 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Contact;
 use Civi\Api4\County;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\StateProvince;
 use Civi\Api4\DedupeRuleGroup;
-
-require_once 'api/v3/utils.php';
 
 /**
  *
@@ -128,6 +125,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     try {
       $params = $this->getMappedRow($values);
+      $params['id'] = $this->processContact($params, TRUE);
       $formatted = [];
       foreach ($params as $key => $value) {
         if ($value !== '') {
@@ -135,23 +133,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
-      $formatted['id'] = $params['id'] = $this->processContact($params, TRUE);
-
       //format common data, CRM-4062
       $this->formatCommonData($params, $formatted);
 
       $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
       $contactID = $newContact->id;
-
-      if ($contactID) {
-        // call import hook
-        $currentImportID = end($values);
-        $hookParams = [
-          'contactID' => $contactID,
-          'importID' => $currentImportID,
-        ];
-        CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
-      }
 
       $primaryContactId = $newContact->id;
 
@@ -186,6 +172,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $extraFields['related_contact_matched']++;
       }
     }
+    $this->callLegacyHook($contactID ?? NULL, $values);
     $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields, array_merge(array_keys($relatedContacts), [$contactID]));
   }
 
@@ -283,18 +270,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-    //now format custom data.
-    foreach ($params as $key => $field) {
-      if (in_array($key, $metadataBlocks, TRUE)) {
-        // This location block is already fully handled at this point.
-        continue;
-      }
-
-      if ($key == 'id' && isset($field)) {
-        $formatted[$key] = $field;
-      }
-
-    }
 
     // parse street address, CRM-5450
     if ($this->isParseStreetAddress()) {
@@ -338,6 +313,24 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     asort($relations);
     Civi::cache('fields')->set($cacheKey, $relations);
     return $relations;
+  }
+
+  /**
+   * Call legacy, strongly discouraged, hook.
+   *
+   * @param int|string|null $contactID
+   * @param array $values
+   */
+  private function callLegacyHook(int|string|null $contactID, array $values): void {
+    if ($contactID) {
+      // call import hook
+      $currentImportID = end($values);
+      $hookParams = [
+        'contactID' => $contactID,
+        'importID' => $currentImportID,
+      ];
+      CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
+    }
   }
 
   /**
@@ -450,11 +443,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return \CRM_Contact_BAO_Contact
    *   If a duplicate is found an array is returned, otherwise CRM_Contact_BAO_Contact
+   * @throws \CRM_Core_Exception
    */
   public function createContact(&$formatted, $contactId = NULL) {
 
     if ($contactId) {
       $this->formatParams($formatted, (int) $contactId);
+      // manage is_opt_out
+      $existingOptOut = $this->getExistingContactValue($contactId, 'is_opt_out');
+      if (array_key_exists('is_opt_out', $formatted) && $existingOptOut !== (bool) $formatted['is_opt_out']
+      ) {
+        // on change, create new civicrm_subscription_history entry
+        CRM_Contact_BAO_SubscriptionHistory::writeRecord([
+          'contact_id' => $contactId,
+          'status' => $formatted['is_opt_out'] ? 'Removed' : 'Added',
+          'method' => 'Import',
+        ]);
+      }
     }
 
     // Resetting and rebuilding cache could be expensive.
@@ -472,23 +477,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $contactFields = CRM_Contact_DAO_Contact::import();
-    [$data, $contactDetails] = $this->formatProfileContactParams($formatted, $contactFields, $contactId, $formatted['contact_type']);
-
-    // manage is_opt_out
-    if (array_key_exists('is_opt_out', $contactFields) && array_key_exists('is_opt_out', $formatted)) {
-      $wasOptOut = $contactDetails['is_opt_out'] ?? FALSE;
-      $isOptOut = $formatted['is_opt_out'];
-      $data['is_opt_out'] = $isOptOut;
-      // on change, create new civicrm_subscription_history entry
-      if (($wasOptOut != $isOptOut) && !empty($contactDetails['contact_id'])) {
-        $shParams = [
-          'contact_id' => $contactDetails['contact_id'],
-          'status' => $isOptOut ? 'Removed' : 'Added',
-          'method' => 'Web',
-        ];
-        CRM_Contact_BAO_SubscriptionHistory::create($shParams);
-      }
-    }
+    $data = $this->formatProfileContactParams($formatted, $contactFields, $contactId, $formatted['contact_type']);
 
     $contact = civicrm_api3('Contact', 'create', $data);
     $cid = $contact['id'];
@@ -693,7 +682,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
 
-    return [$data, $contactDetails];
+    return $data;
   }
 
   /**
@@ -1313,11 +1302,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected function processContact(array $params, bool $isMainContact): ?int {
     $contactID = $this->lookupContactID($params, $isMainContact);
     if ($contactID && !empty($params['contact_sub_type'])) {
-      $contactSubType = Contact::get(FALSE)
-        ->addWhere('id', '=', $contactID)
-        ->addSelect('contact_sub_type')
-        ->execute()
-        ->first()['contact_sub_type'];
+      $contactSubType = $this->getExistingContactValue($contactID, 'contact_sub_type');
       if (!empty($contactSubType) && $contactSubType[0] !== $params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isAllowEdit($contactID, $contactSubType[0])) {
         throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
       }
