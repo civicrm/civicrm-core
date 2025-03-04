@@ -186,33 +186,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if (!empty($data[$key])) {
           $item = $this->getSelectExpression($key);
           if ($item['expr'] instanceof SqlField && isset($item['fields'][$key]) && $item['fields'][$key]['fk_entity'] === 'File') {
-            return $this->generateFileUrl($data[$key]);
+            return (string) \CRM_Core_BAO_File::getFileUrl($data[$key]);
           }
         }
         return $data[$key] ?? NULL;
     }
-  }
-
-  /**
-   * Convert file id to a readable url
-   *
-   * @param $fileID
-   * @return string
-   * @throws \CRM_Core_Exception
-   */
-  private function generateFileUrl($fileID) {
-    $entityId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile',
-      $fileID,
-      'entity_id',
-      'file_id'
-    );
-    $fileHash = \CRM_Core_BAO_File::generateFileHash($entityId, $fileID);
-    return $this->getUrl('civicrm/file', [
-      'reset' => 1,
-      'id' => $fileID,
-      'eid' => $entityId,
-      'fcs' => $fileHash,
-    ]);
   }
 
   /**
