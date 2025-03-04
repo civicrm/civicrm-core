@@ -220,6 +220,72 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Set the sql maximum execution time value.
+   *
+   * Note the preferred way to access this is via
+   * `$autoClean = CRM_Utils_AutoClean::swapMaxExecutionTime(800);`
+   *
+   * It can then be reverted with
+   * `$autoClean->cleanup()`
+   * Note that the auto clean will do the clean up itself on `__destruct`
+   * but formally doing it makes it clear that it is being done and, importantly,
+   * avoids the situation where someone just calls
+   * `CRM_Utils_AutoClean::swapMaxExecutionTime(800);`
+   * without assigning it to a variable (because `__destruct` is implicitly called)
+   *
+   * https://mariadb.com/kb/en/aborting-statements/
+   */
+  public static function setMaxExecutionTime(int $time): int {
+    $version = CRM_Utils_SQL::getDatabaseVersion();
+    $originalTimeLimit = self::getMaxExecutionTime();
+    if (stripos($version, 'mariadb') !== FALSE) {
+      // MariaDB variable has a certain name, and value is in seconds.
+      $sql = "SET SESSION MAX_STATEMENT_TIME={$time}";
+    }
+    else {
+      // MySQL variable has a different name, and value is in milliseconds.
+      $sql = "SET SESSION MAX_EXECUTION_TIME=" . ($time * 1000);
+    }
+    try {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+    catch (CRM_Core_Exception $e) {
+      \Civi::log()->warning('failed to adjust maximum query execution time {sql}', [
+        'sql' => $sql,
+        'exception' => $e,
+      ]);
+    }
+    finally {
+      return $originalTimeLimit;
+    }
+  }
+
+  /**
+   * Get the mysql / mariaDB maximum execution time variable.
+   *
+   * https://mariadb.com/kb/en/aborting-statements/
+   *
+   * @return int
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function getMaxExecutionTime(): int {
+    $version = CRM_Utils_SQL::getDatabaseVersion();
+    if (stripos($version, 'mariadb') !== FALSE) {
+      $originalSql = 'SHOW VARIABLES LIKE "MAX_STATEMENT_TIME"';
+      $variableDao = CRM_Core_DAO::executeQuery($originalSql);
+      $variableDao->fetch();
+      return (int) $variableDao->Value;
+    }
+    else {
+      $originalSql = 'SHOW VARIABLES LIKE "MAX_EXECUTION_TIME"';
+      $variableDao = CRM_Core_DAO::executeQuery($originalSql);
+      $variableDao->fetch();
+      return ((int) $variableDao->Value) / 1000;
+    }
+
+  }
+
+  /**
    * Returns the list of fields that can be imported
    *
    * @param bool $prefix
