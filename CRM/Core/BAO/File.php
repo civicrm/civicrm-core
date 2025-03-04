@@ -749,23 +749,17 @@ HEREDOC;
    * @return string
    */
   public static function generateFileHash($entityId = NULL, $fileId = NULL, $genTs = NULL, $life = NULL) {
-    // Use multiple (but stable) inputs for hash information.
-    $siteKey = CRM_Utils_Constant::value('CIVICRM_SITE_KEY');
-    if (!$siteKey) {
-      throw new \CRM_Core_Exception("Cannot generate file access token. Please set CIVICRM_SITE_KEY.");
-    }
-
     if (!$genTs) {
-      $genTs = time();
+      $genTs = CRM_Utils_Time::time();
     }
     if (!$life) {
       $days = Civi::settings()->get('checksum_timeout');
       $life = 24 * $days;
     }
-    // Trim 8 chars off the string, make it slightly easier to find
-    // but reveals less information from the hash.
-    $cs = hash_hmac('sha256', "file={$fileId}&life={$life}", $siteKey);
-    return "{$cs}_{$genTs}_{$life}";
+    return Civi::service('crypto.jwt')->encode([
+      'exp' => $genTs + ($life * 60 * 60),
+      'civi.file' => $fileId,
+    ], ['SIGN', 'WEAK_SIGN']);
   }
 
   /**
@@ -777,20 +771,13 @@ HEREDOC;
    * @return bool
    */
   public static function validateFileHash($hash, $entityId, $fileId) {
-    $input = CRM_Utils_System::explode('_', $hash, 3);
-    $inputTs = $input[1] ?? NULL;
-    $inputLF = $input[2] ?? NULL;
-    $testHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileId, $inputTs, $inputLF);
-    if (hash_equals($testHash, $hash)) {
-      $now = time();
-      if ($inputTs + ($inputLF * 60 * 60) >= $now) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
+    try {
+      $payload = Civi::service('crypto.jwt')->decode($hash, ['SIGN', 'WEAK_SIGN']);
+      return $payload && $payload['civi.file'] == $fileId;
     }
-    return FALSE;
+    catch (\Civi\Crypto\Exception\CryptoException $e) {
+      return FALSE;
+    }
   }
 
   /**

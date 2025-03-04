@@ -38,7 +38,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     }
 
     if (empty($fileName)) {
-      $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
+      $hash = CRM_Utils_Request::retrieve('fcs', 'String', $this);
       if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId)) {
         CRM_Core_Error::statusBounce(ts('URL for file is not valid'));
       }

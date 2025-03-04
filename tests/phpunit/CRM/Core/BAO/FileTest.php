@@ -148,4 +148,60 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
     return $activity;
   }
 
+  /**
+   * Data provider for testing `generateFileHash` and `validateFileHash`.
+   *
+   * @return array
+   */
+  public function fileHashProvider() {
+    $currentTimestamp = time();
+
+    return [
+      // Test case 1: Valid token with a specific fileId
+      'valid_file_hash' => [
+        'fileId' => 123,
+        'genTs' => $currentTimestamp,
+        'life' => 1,
+        'expectedResult' => TRUE,
+      ],
+
+      // Test case 2: Expired token
+      'expired_file_hash' => [
+        'fileId' => 123,
+        // Token generated 2 hours ago
+        'genTs' => $currentTimestamp - (2 * 60 * 60),
+        'life' => 1,
+        'expectedResult' => FALSE,
+      ],
+
+      // Test case 3: Invalid fileId
+      'invalid_file_id' => [
+        'fileId' => 123,
+        'invalidFileId' => 999,
+        'genTs' => $currentTimestamp,
+        'life' => 1,
+        'expectedResult' => FALSE,
+      ],
+    ];
+  }
+
+  /**
+   * Test `generateFileHash` and `validateFileHash` using a data provider.
+   *
+   * @dataProvider fileHashProvider
+   */
+  public function testFileHash($fileId, $genTs, $life, $expectedResult, $invalidFileId = NULL) {
+    // Generate token
+    $token = CRM_Core_BAO_File::generateFileHash(NULL, $fileId, $genTs, $life);
+
+    // Validate token (valid or invalid fileId depending on the scenario)
+    $result = CRM_Core_BAO_File::validateFileHash(
+      $token,
+      NULL,
+      $invalidFileId ?: $fileId
+    );
+
+    $this->assertEquals($expectedResult, $result);
+  }
+
 }
