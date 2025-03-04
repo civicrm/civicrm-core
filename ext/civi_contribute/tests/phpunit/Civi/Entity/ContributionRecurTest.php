@@ -55,16 +55,17 @@ class ContributionRecurTest extends TestCase implements HeadlessInterface, HookI
       'trxn_id' => 'abc',
       'amount' => 20,
     ];
-    ContributionRecur::create(FALSE)
+    $recur = ContributionRecur::create(FALSE)
       ->setValues($values)
-      ->execute();
+      ->execute()
+      ->first();
     try {
       ContributionRecur::create(FALSE)
         ->setValues($values)
         ->execute();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Found matching recurring contribution(s): 1', $e->getMessage());
+      $this->assertEquals('Found matching recurring contribution(s): ' . $recur['id'], $e->getMessage());
       return;
     }
     $this->fail('We should have had an exception');

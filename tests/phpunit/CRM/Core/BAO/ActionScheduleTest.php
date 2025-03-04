@@ -1352,7 +1352,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       [
         'name' => 'new_smart_group',
         'title' => 'New Smart Group',
-        'parents' => [$groupID => 1],
+        'parents' => [$groupID],
       ]
     );
 
