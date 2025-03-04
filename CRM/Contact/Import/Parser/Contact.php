@@ -14,8 +14,6 @@ use Civi\Api4\RelationshipType;
 use Civi\Api4\StateProvince;
 use Civi\Api4\DedupeRuleGroup;
 
-require_once 'api/v3/utils.php';
-
 /**
  *
  * @package CRM
