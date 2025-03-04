@@ -199,16 +199,18 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $result = civicrm_api('Extension', 'download', [
-        'version' => 3,
-        'key' => $this->_key,
+      $downloads = CRM_Extension_System::singleton()->getBrowser()->findDownloads([$this->_key]);
+
+      $qd = new CRM_Extension_QueueDownloader();
+      // FIXME: It would be nice to accept a list of exts and/or use transitive dependencies (Manager::findInstallRequirements()).
+      $runner = new CRM_Queue_Runner([
+        'title' => $qd->getTitle(),
+        'queue' => $qd->fillQueue($qd->createQueue(), $downloads),
+        'onEnd' => [static::class, 'onFinishDownload'],
+        'onEndUrl' => (string) Civi::url('backend://civicrm/admin/extensions?reset=1&action=browse'),
+        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       ]);
-      if (empty($result['is_error'])) {
-        CRM_Core_Session::setStatus("", ts('Extension Upgraded'), "success");
-      }
-      else {
-        CRM_Core_Session::setStatus($result['error_message'], ts('Extension Upgrade Failed'), "error");
-      }
+      $runner->runAllViaWeb();
     }
 
     CRM_Utils_System::redirect(
@@ -217,6 +219,12 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         'reset=1&action=browse'
       )
     );
+  }
+
+  public static function onFinishDownload(CRM_Queue_TaskContext $ctx): void {
+    // This message is shown for both "Extensions > $X > Upgrade to $V"
+    // and "Extensions > Add New > $X > Install".
+    CRM_Core_Session::setStatus('', ts('Extension Installed'), "success");
   }
 
 }
