@@ -476,8 +476,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $formatted['updateBlankLocInfo'] = FALSE;
     }
 
-    $contactFields = CRM_Contact_DAO_Contact::import();
-    $data = $this->formatProfileContactParams($formatted, $contactFields, $contactId, $formatted['contact_type']);
+    $data = $this->formatProfileContactParams($formatted, $contactId, $formatted['contact_type']);
 
     $contact = civicrm_api3('Contact', 'create', $data);
     $cid = $contact['id'];
@@ -512,36 +511,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * nothing but copied here to star unravelling that...
    *
    * @param array $params
-   * @param array $fields
    * @param int|null $contactID
    * @param string|null $ctype
    *
    * @return array
    */
   private function formatProfileContactParams(
-    &$params,
-    $fields,
+    $params,
     $contactID = NULL,
     $ctype = NULL
   ) {
 
-    $data = $contactDetails = ['contact_type' => $ctype];
-
-    // get the contact details (hier)
-    if ($contactID) {
-      $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, $fields);
-
-      $contactDetails = $details[$contactID];
-      $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
-      $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
-    }
-
-    //fix contact sub type CRM-5125
-    if (array_key_exists('contact_sub_type', $params) &&
-      !empty($params['contact_sub_type'])
-    ) {
-      $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
-    }
+    $data = ['contact_type' => $ctype];
 
     $locationType = [];
     $count = 1;
