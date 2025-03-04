@@ -526,7 +526,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
     while (!empty($tableQueries)) {
-      [$isInclusive, $isDie] = $this->isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum);
+      [$isInclusive, $isDie] = $this->isQuerySetInclusive($threshold, $exclWeightSum);
 
       if ($isInclusive) {
         // order queries by table count
@@ -614,11 +614,10 @@ class CRM_Dedupe_FinderQueryOptimizer {
    *
    * @return array
    */
-  private function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = []) {
+  private function isQuerySetInclusive($threshold, $exclWeightSum = []) {
     $input = [];
-    foreach ($tableQueries as $key => $query) {
-      $optimizedQuery = $this->optimizedQueries[$key];
-      $input[] = $optimizedQuery['weight'];
+    foreach ($this->getRemainingQueries() as $query) {
+      $input[] = $query['weight'];
     }
 
     if (!empty($exclWeightSum)) {
@@ -645,6 +644,16 @@ class CRM_Dedupe_FinderQueryOptimizer {
       }
     }
     return [$totalCombinations == 1, $totalCombinations <= 0];
+  }
+
+  protected function getRemainingQueries(): array {
+    $remaining = [];
+    foreach ($this->optimizedQueries as $key => $query) {
+      if (!isset($query['found_rows'])) {
+        $remaining[$key] = $query;
+      }
+    }
+    return $remaining;
   }
 
   /**
