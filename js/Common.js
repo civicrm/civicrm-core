@@ -641,6 +641,7 @@ if (!CRM.vars) CRM.vars = {};
             var params = $.extend({}, getApiParams(), {ids: idsNeeded});
             CRM.api4(entityName, 'autocomplete', params).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
+              $el.trigger('initSelectionComplete');
             });
           }
         },

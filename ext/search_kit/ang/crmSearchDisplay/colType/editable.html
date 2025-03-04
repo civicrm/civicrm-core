@@ -3,6 +3,7 @@
   display="$ctrl"
   is-full-row-mode="$ctrl.settings.editableRow.full"
   col-key="$ctrl.settings.columns[colIndex].key"
+  col-data="colData"
   ng-if="!colData.loading && $ctrl.editing === row.key && colData.editing"
 ></crm-search-display-editable>
 <span
