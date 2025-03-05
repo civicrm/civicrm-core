@@ -153,7 +153,10 @@ class CRM_Core_Invoke {
     $ids = new CRM_Core_IDS();
     $ids->check($item);
 
-    PharLoader::register();
+    if (!PharLoader::isWrapperInstantiated()) {
+      // Up to now, we're not guaranteed to have the wrapper. But we prefer to have it.
+      PharLoader::register();
+    }
 
     $config = CRM_Core_Config::singleton();
 

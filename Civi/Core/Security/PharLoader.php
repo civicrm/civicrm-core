@@ -17,6 +17,22 @@ namespace Civi\Core\Security;
  */
 class PharLoader {
 
+  public static function isWrapperInstantiated(): bool {
+    try {
+      \TYPO3\PharStreamWrapper\Manager::instance();
+      return TRUE;
+    }
+    catch (\LogicException $e) {
+      if ($e->getCode() === 1535189872) {
+        return FALSE;
+      }
+      else {
+        // this is not an exception we can handle
+        throw $e;
+      }
+    }
+  }
+
   /**
    * Register an alternative phar:// stream wrapper to filter out insecure Phars
    *
@@ -35,27 +51,16 @@ class PharLoader {
    * the vulnerability.
    */
   public static function register() {
-    try {
-      // try to get the existing stream wrapper, registered e.g. by Drupal
-      \TYPO3\PharStreamWrapper\Manager::instance();
-    }
-    catch (\LogicException $e) {
-      if ($e->getCode() === 1535189872) {
-        // no phar stream wrapper was registered by \TYPO3\PharStreamWrapper\Manager.
-        // This means we're probably not on Drupal and need to register our own.
-        \TYPO3\PharStreamWrapper\Manager::initialize(
-          (new \TYPO3\PharStreamWrapper\Behavior())
-            ->withAssertion(new \Civi\Core\Security\PharExtensionInterceptor())
-        );
-        if (in_array('phar', stream_get_wrappers())) {
-          stream_wrapper_unregister('phar');
-          stream_wrapper_register('phar', \TYPO3\PharStreamWrapper\PharStreamWrapper::class);
-        }
-      }
-      else {
-        // this is not an exception we can handle
-        throw $e;
-      }
+    \TYPO3\PharStreamWrapper\Manager::initialize(
+      (new \TYPO3\PharStreamWrapper\Behavior())
+        ->withAssertion(new \Civi\Core\Security\PharExtensionInterceptor())
+    );
+
+    // The default phar:// handler may be live (as on Standalone/WordPress), or it may
+    // have been removed preemptively (as on Backdrop). Either way, we want to replace it.
+    if (in_array('phar', stream_get_wrappers())) {
+      stream_wrapper_unregister('phar');
+      stream_wrapper_register('phar', \TYPO3\PharStreamWrapper\PharStreamWrapper::class);
     }
   }
 
