@@ -2647,6 +2647,14 @@ WHERE      f.id IN ($ids)";
     return is_object($field) ? !empty($field->serialize) : !empty($field['serialize']);
   }
 
+  public static function getFkEntity(array $field): ?string {
+    $dataTypeToFK = [
+      'ContactReference' => 'Contact',
+      'File' => 'File',
+    ];
+    return $field['fk_entity'] ?? $dataTypeToFK[$field['data_type']] ?? NULL;
+  }
+
   public static function getFkEntityOnDeleteOptions(): array {
     return [
       'set_null' => ts('Delete reference'),
