@@ -1,5 +1,5 @@
 <?php
-use CRM_BobBase_ExtensionUtil as E;
+use CRM_Standaloneusers_ExtensionUtil as E;
 
 return [
   [
@@ -11,7 +11,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'My_account',
-        'label' => E::ts('My account'),
+        'label' => E::ts('My User Account'),
         'api_entity' => 'UFMatch',
         'api_params' => [
           'version' => 4,
@@ -56,7 +56,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'My_account',
-        'label' => E::ts('My account'),
+        'label' => E::ts('My User Account'),
         'saved_search_id.name' => 'My_account',
         'type' => 'grid',
         'settings' => [
@@ -69,7 +69,7 @@ return [
               'type' => 'field',
               'key' => 'contact_id.display_name',
               'dataType' => 'String',
-              'label' => E::ts('Donor'),
+              'label' => E::ts('Contact'),
               'link' => [
                 'path' => '',
                 'entity' => 'Contact',
@@ -77,7 +77,7 @@ return [
                 'join' => 'contact_id',
                 'target' => '',
               ],
-              'title' => E::ts('View Donor'),
+              'title' => E::ts('View Contact'),
               'break' => TRUE,
             ],
             [
@@ -93,7 +93,7 @@ return [
                 [
                   'path' => '/civicrm/user/edit#?User1=[uf_id]',
                   'icon' => 'fa-key',
-                  'text' => E::ts('Update account'),
+                  'text' => E::ts('Update user account'),
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
