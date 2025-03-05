@@ -74,4 +74,27 @@ return [
     'global_name' => 'CIVICRM_DOMAIN_ID',
     'add' => '5.80',
   ],
+  // NOTE: consumers should probably not check the value of this setting directly
+  // instead please use CRM_Utils_System::isMaintenanceMode()
+  'core_maintenance_mode' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'core_maintenance_mode',
+    'type' => 'String',
+    'default' => 'inherit',
+    'options' => [
+      '0' => 'Off',
+      '1' => 'On',
+      'inherit' => 'Inherit from CMS',
+    ],
+    'title' => ts('CiviCRM Maintenance Mode'),
+    'description' => ts('Enabling Maintenance Mode will restrict certain functionality such as scheduled job runs and REST api calls. If not set, CiviCRM will attempt to check whether the CMS is in maintenance mode.'),
+    'help_text' => NULL,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'is_constant' => FALSE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_MAINTENANCE_MODE',
+    'add' => '6.0',
+  ],
 ];
