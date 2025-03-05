@@ -34,6 +34,18 @@ class PharLoader {
   }
 
   /**
+   * Does the system have any kind of support for reading phar://?
+   * Or has it been completely disabled?
+   *
+   * - This will return TRUE in a vanilla PHP process (with default handler).
+   * - It will also return TRUE if someone (such as Drupal, Joomla, or CiviCRM) has registered a wrapper.
+   * - However, it can return FALSE if someone (such as Backdrop Web) has disabled support.
+   */
+  public static function isPharLoadingEnabled(): bool {
+    return in_array('phar', stream_get_wrappers());
+  }
+
+  /**
    * Register an alternative phar:// stream wrapper to filter out insecure Phars
    *
    * PHP makes it possible to trigger Object Injection vulnerabilities by using
@@ -58,10 +70,10 @@ class PharLoader {
 
     // The default phar:// handler may be live (as on Standalone/WordPress), or it may
     // have been removed preemptively (as on Backdrop). Either way, we want to replace it.
-    if (in_array('phar', stream_get_wrappers())) {
+    if (static::isPharLoadingEnabled()) {
       stream_wrapper_unregister('phar');
-      stream_wrapper_register('phar', \TYPO3\PharStreamWrapper\PharStreamWrapper::class);
     }
+    stream_wrapper_register('phar', \TYPO3\PharStreamWrapper\PharStreamWrapper::class);
   }
 
 }
