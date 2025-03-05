@@ -163,7 +163,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       return;
     }
 
-    $dedupeTable = $optimizer->runTablesQuery($tableQueries, $threshold);
+    $dedupeTable = $optimizer->runTablesQuery();
     if (!$dedupeTable) {
       return;
     }
@@ -214,7 +214,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       return;
     }
 
-    $dedupeTable = $optimizer->runTablesQuery($tableQueries, $threshold);
+    $dedupeTable = $optimizer->runTablesQuery();
 
     $aclFrom = '';
     $aclWhere = '';

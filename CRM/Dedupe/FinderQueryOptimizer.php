@@ -248,16 +248,16 @@ class CRM_Dedupe_FinderQueryOptimizer {
           . ' WHERE ' . implode(' AND ', $comboQueries['criteria']);
         $combinedQuery['weight'] = $comboQueries['weight'];
         $combinedQuery['key'] = $combinedKey;
+        $combinedQuery['contact_id_field'] = $comboQueries['contact_id_field'];
+        $combinedQuery['table'] = $comboQueries['table'];
         $queries[$combinedKey] = $combinedQuery;
       }
     }
     uasort($queries, [$this, 'sortWeightDescending']);
-    $tableQueryFormat = [];
     foreach ($queries as $query) {
-      $tableQueryFormat[$query['key']] = $query['query'];
       $this->optimizedQueries[$query['key']] = $query;
     }
-    return $tableQueryFormat;
+    return $this->optimizedQueries;
   }
 
   /**
@@ -334,16 +334,16 @@ class CRM_Dedupe_FinderQueryOptimizer {
         $combinedQuery['query'] = preg_replace('/( \d+ weight )/m', ' ' . $comboQueries['weight'] . ' weight ', $combinedQuery['query']);
         $combinedQuery['weight'] = $comboQueries['weight'];
         $combinedQuery['key'] = $combinedKey;
+        $combinedQuery['table'] = $comboQueries['table'];
         $queries[$combinedKey] = $combinedQuery;
       }
     }
     uasort($queries, [$this, 'sortWeightDescending']);
-    $tableQueryFormat = [];
+
     foreach ($queries as $query) {
-      $tableQueryFormat[$query['key']] = $query['query'];
       $this->optimizedQueries[$query['key']] = $query;
     }
-    return $tableQueryFormat;
+    return $this->optimizedQueries;
   }
 
   /**
@@ -374,7 +374,17 @@ class CRM_Dedupe_FinderQueryOptimizer {
     return $singleTableCombinableQueries;
   }
 
-  private function sortWeightDescending($a, $b) {
+  /**
+   * @param int $affectedRows
+   * @param string $queryKey
+   *
+   * @return void
+   */
+  public function setQueryResult(int $affectedRows, string $queryKey): void {
+    $this->optimizedQueries[$queryKey]['found_rows'] = $affectedRows;
+  }
+
+  private function sortWeightDescending($a, $b): int {
     return ($a['weight'] > $b['weight']) ? -1 : 1;
   }
 
@@ -490,8 +500,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
   }
 
   /**
-   * @param array $tableQueries
-   * @param int $threshold
+   * Run the queries to build the duplicates table.
    *
    * @return string
    * @throws \Civi\Core\Exception\DBQueryException
@@ -500,7 +509,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * Ideally it will be worked back into the FinderQueryOptimizer now.
    *
    */
-  public function runTablesQuery(array $tableQueries, int $threshold): string {
+  public function runTablesQuery(): string {
     if ($this->isLookupMode()) {
       $dedupeTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
@@ -525,6 +534,8 @@ class CRM_Dedupe_FinderQueryOptimizer {
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
+    $tableQueries = $this->getRemainingQueries();
+    $threshold = $this->threshold;
     while (!empty($tableQueries)) {
       [$isInclusive, $isDie] = $this->isQuerySetInclusive($threshold, $exclWeightSum);
 
@@ -573,10 +584,11 @@ class CRM_Dedupe_FinderQueryOptimizer {
 
           // FIXME: we need to be more accurate with affected rows, especially for insert vs duplicate insert.
           // And that will help optimize further.
-          $this->optimizedQueries['found_rows'] = $dao->affectedRows();
+          $affectedRows = $dao->affectedRows();
+          $this->setQueryResult($affectedRows, $queryKey);
 
           // In an inclusive situation, failure of any query means no further processing -
-          if ($this->optimizedQueries['found_rows'] == 0) {
+          if ($this->optimizedQueries[$queryKey]['found_rows'] == 0) {
             // reset to make sure no further execution is done.
             $tableQueries = [];
             break;
@@ -592,7 +604,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
         unset($tableQueries[$queryKey]);
         $query = "{$insertClause} {$optimizedQuery['query']} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
         $dao = CRM_Core_DAO::executeQuery($query);
-        $this->optimizedQueries[$queryKey]['found_rows'] = $dao->affectedRows();
+        $this->setQueryResult($dao->affectedRows(), $queryKey);
         if ($this->optimizedQueries[$queryKey]['found_rows'] >= 1) {
           $exclWeightSum[] = $optimizedQuery['weight'];
         }
@@ -662,26 +674,33 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @param array $tableQueries
    */
   public static function orderByTableCount(array &$tableQueries): void {
-    uksort($tableQueries, [__CLASS__, 'isTableBigger']);
+    uasort($tableQueries, [__CLASS__, 'isTableBigger']);
   }
 
   /**
    * Is the table extracted from the first string larger than the second string.
    *
-   * @param string $a
+   * @param array $a
    *   e.g civicrm_contact.first_name
-   * @param string $b
+   * @param array $b
    *   e.g civicrm_address.street_address
    *
    * @return int
    */
-  private static function isTableBigger(string $a, string $b): int {
-    $tableA = explode('.', $a)[0];
-    $tableB = explode('.', $b)[0];
+  private static function isTableBigger(array $a, array $b): int {
+    $tableA = $a['table'];
+    $tableB = $b['table'];
     if ($tableA === $tableB) {
       return 0;
     }
     return CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableA) <=> CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableB);
+  }
+
+  /**
+   * Store the queries run into a static - this is purely for unit tests to validate.
+   */
+  public function __destruct() {
+    \Civi::$statics[__CLASS__]['queries'] = $this->optimizedQueries;
   }
 
 }
