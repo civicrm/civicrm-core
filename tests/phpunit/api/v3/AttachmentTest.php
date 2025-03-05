@@ -690,11 +690,11 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   protected function cleanupFiles(): void {
     $config = CRM_Core_Config::singleton();
     $dirs = [
-      sys_get_temp_dir(),
+      sys_get_temp_dir() . DIRECTORY_SEPARATOR,
       $config->customFileUploadDir,
     ];
     foreach ($dirs as $dir) {
-      $files = (array) glob($dir . '/' . self::getFilePrefix() . '*');
+      $files = (array) glob($dir . self::getFilePrefix() . '*');
       foreach ($files as $file) {
         unlink($file);
       }
