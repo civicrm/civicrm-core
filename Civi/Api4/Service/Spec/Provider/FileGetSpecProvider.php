@@ -40,7 +40,6 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
       ->setColumnName('id')
       ->setDescription(ts('Url at which this file can be downloaded'))
       ->setType('Extra')
-      ->setSqlRenderer([__CLASS__, 'renderFileUrl'])
       ->addOutputFormatter([__CLASS__, 'formatFileUrl']);
     $spec->addFieldSpec($field);
 
@@ -83,46 +82,14 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
     return "REGEX_REPLACE({$field['sql_name']}, $pattern, '.')";
   }
 
-  public static function renderFileUrl(array $idField, Api4SelectQuery $query): string {
-    // Getting a link to the file requires the `entity_id` from the `civicrm_entity_file` table
-    // If the file was implicitly joined, the joined-from-entity has the id we want
-    if ($idField['implicit_join']) {
-      $joinField = $query->getField($idField['implicit_join']);
-      $entityIdField = $query->getFieldSibling($joinField, 'id');
-    }
-    // If it's explicitly joined FROM another entity, get the id of the parent
-    elseif ($idField['explicit_join']) {
-      $parent = $query->getJoinParent($idField['explicit_join']);
-      $joinPrefix = $parent ? "$parent." : '';
-      $entityIdField = $query->getField($joinPrefix . 'id');
-    }
-    // If it's explicitly joined TO another entity, use the id of the other
-    if (!isset($entityIdField)) {
-      foreach ($query->getExplicitJoins() as $join) {
-        if ($join['bridge'] === 'EntityFile') {
-          $entityIdField = $query->getField($join['alias'] . '.id');
-        }
-      }
-    }
-    if (isset($entityIdField)) {
-      return "CONCAT('civicrm/file?reset=1&id=', {$idField['sql_name']}, '&eid=', {$entityIdField['sql_name']})";
-    }
-    // Couldn't find an `entity_id` in the query so add a subquery instead.
-    return "CONCAT('civicrm/file?reset=1&id=', {$idField['sql_name']}, '&eid=', (SELECT `entity_id` FROM `civicrm_entity_file` WHERE `file_id` = {$idField['sql_name']} LIMIT 1))";
-  }
-
   public static function renderFileIsImage(array $mimeTypeField, Api4SelectQuery $query): string {
     $uriField = $query->getFieldSibling($mimeTypeField, 'uri');
     return "IF(($mimeTypeField[sql_name] LIKE 'image/%') AND ($uriField[sql_name] NOT LIKE '%.unknown'), 1, 0)";
   }
 
   public static function formatFileUrl(&$value) {
-    $args = [];
-    // renderFileUrl() will have formatted the output in-sql to `civicrm/file?reset=1&id=id&eid=entity_id`
-    if (is_string($value) && str_contains($value, '?')) {
-      parse_str(explode('?', $value)[1], $args);
-      $value .= '&fcs=' . \CRM_Core_BAO_File::generateFileHash($args['eid'], $args['id']);
-      $value = (string) \Civi::url('frontend://' . $value, 'a');
+    if ($value && is_numeric($value)) {
+      $value = (string) \CRM_Core_BAO_File::getFileUrl($value);
     }
   }
 

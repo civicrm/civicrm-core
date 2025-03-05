@@ -95,8 +95,8 @@ class EntityFileTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertCount(2, $allowedNotes);
     $this->assertEquals('file_for_' . $note[2] . '.txt', $allowedNotes[$note[2]]['file.file_name']);
     $this->assertEquals('file_for_' . $note[3] . '.txt', $allowedNotes[$note[3]]['file.file_name']);
-    $this->assertStringContainsString("id=$file[2]&eid=$note[2]&fcs=", $allowedNotes[$note[2]]['file.url']);
-    $this->assertStringContainsString("id=$file[3]&eid=$note[3]&fcs=", $allowedNotes[$note[3]]['file.url']);
+    $this->assertStringContainsString("id=$file[2]&fcs=", $allowedNotes[$note[2]]['file.url']);
+    $this->assertStringContainsString("id=$file[3]&fcs=", $allowedNotes[$note[3]]['file.url']);
   }
 
   public function testGetAggregateFileFields() {
