@@ -172,6 +172,56 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the Dedupe Query Optimizer when there are 2 tables to join and the second has more than one criteria.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function testFinderQueryOptimizerCombineSecondTable(): void {
+    $this->createRuleGroup(['threshold' => 16]);
+    // Note that in this format the number at the end is the weight.
+    //
+    $queries = [
+      ['civicrm_email', 'email', 16],
+      ['civicrm_contact', 'first_name', 1],
+      ['civicrm_phone', 'phone', 1],
+      ['civicrm_contact', 'nick_name', 7],
+      ['civicrm_address', 'street_address', 5],
+      ['civicrm_address', 'city', 3],
+    ];
+    $this->createRules($queries);
+    $this->individualCreate([
+      'first_name' => 'Robert',
+      'nick_name' => 'Bob',
+      'phone_primary.phone' => 123,
+      'address_primary.street_address' => 'sesame street',
+      'address_primary.city' => 'Bobville',
+      'version' => 4,
+    ]);
+    // One the first name fails to match ALL the others must match.
+    $result = \CRM_Contact_BAO_Contact::findDuplicates([
+      'civicrm_contact' => ['first_name' => 'Bob', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
+      'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
+      'civicrm_phone' => ['phone' => 123],
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
+      'contact_type' => 'Individual',
+    ]);
+    $this->assertEquals([$this->ids['Contact']['individual_0']], $result);
+    $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
+    // One combined query & the after we have the first_name & the phone query.
+    $this->assertCount(3, $queries);
+    $query = reset($queries);
+    $this->assertEquals(15, $query['weight']);
+    $this->assertEquals(1, $query['found_rows']);
+    $this->assertLike("SELECT civicrm_address .contact_id id1,  15 weight  FROM civicrm_contact t1
+          INNER JOIN civicrm_address
+          ON t1.id = civicrm_address.contact_id
+          AND civicrm_address.street_address = 'sesame street'
+          AND civicrm_address.city = 'Bobville'
+          WHERE t1.contact_type = 'Individual' AND t1.nick_name = 'Bob'", $query['query']);
+  }
+
+  /**
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \CRM_Core_Exception
    */

@@ -432,7 +432,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
         $combinedQuery['from'] .= "
           INNER JOIN {$query['table']}
           ON t1.{$combinedQuery['base_contact_id_field']} = {$query['table']}.{$query['contact_id_field']}
-          AND " . str_replace('t1.', $query['table'] . '.', implode(',', $query['criteria']));
+          AND " . str_replace('t1.', $query['table'] . '.', implode(' AND ', $query['criteria']));
 
         $combinedQuery['query'] = $query['select'] . ' ' . $combinedQuery['weight'] . ' weight '
           . $combinedQuery['from']
