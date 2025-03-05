@@ -255,7 +255,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
         // Delete file only if there are no longer any entities using this file.
         if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $fileID, 'id', 'file_id')) {
           self::deleteRecord(['id' => $fileID]);
-          unlink($config->customFileUploadDir . DIRECTORY_SEPARATOR . $fUri);
+          unlink($config->customFileUploadDir . $fUri);
         }
       }
       $isDeleted = TRUE;
@@ -292,7 +292,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $result['fileName'] = $dao->uri;
       $result['description'] = $dao->description;
       $result['cleanName'] = CRM_Utils_File::cleanFileName($dao->uri);
-      $result['fullPath'] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
+      $result['fullPath'] = $config->customFileUploadDir . $dao->uri;
       $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}&fcs={$fileHash}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
