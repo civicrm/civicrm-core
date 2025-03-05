@@ -67,7 +67,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_user_job', 'civicrm_queue', 'civicrm_queue_item'], TRUE);
+    $this->quickCleanup(['civicrm_user_job', 'civicrm_queue', 'civicrm_queue_item', 'civicrm_campaign'], TRUE);
     OptionValue::delete()->addWhere('name', '=', 'random')->execute();
     DedupeRule::delete()
       ->addWhere('rule_table', '!=', 'civicrm_email')

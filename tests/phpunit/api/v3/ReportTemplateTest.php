@@ -40,7 +40,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public function tearDown(): void {
     Civi::settings()->set('logging', 0);
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
+    $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group', 'civicrm_campaign'], TRUE);
     (new CRM_Logging_Schema())->dropAllLogTables();
     CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();

@@ -833,6 +833,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'civicrm_action_schedule',
       'civicrm_action_log',
       'civicrm_email',
+      'civicrm_campaign',
     ], TRUE);
     parent::tearDown();
   }
