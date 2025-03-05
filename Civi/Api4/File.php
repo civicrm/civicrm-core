@@ -46,4 +46,13 @@ class File extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\File\Delete
+   */
+  public static function delete($checkPermissions = TRUE) {
+    return (new Action\File\Delete(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }
