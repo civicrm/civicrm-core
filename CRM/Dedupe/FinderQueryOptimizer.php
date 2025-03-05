@@ -222,41 +222,17 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @return array
    */
   public function getFindQueries(): array {
-    $queries = $this->getUsableQueries();
-    // We want to combine cross-tables but looking to do that as a follow on since that will require some
-    // more work to figure out. For single table regex does get us there.
-    foreach ($this->getCombinableQueriesByTable() as $queryCombinations) {
-      foreach ($queryCombinations as $queryDetails) {
-        if (count($queryDetails) < 2) {
-          // We can't yet combine across tables so skip this one for now.
-          continue;
-        }
-        $comboQueries = ['field' => [], 'criteria' => [], 'weight' => 0, 'table' => '', 'query' => ''];
-        foreach ($queryDetails as $queryDetail) {
-          $comboQueries['table'] = $queryDetail['table'];
-          $comboQueries['weight'] += $queryDetail['weight'];
-          $comboQueries['field'][] = $queryDetail['field'];
-          $comboQueries['query'] = $queryDetail['query'];
-          $comboQueries['table_alias'] = 't1';
-          $comboQueries['contact_id_field'] = $queryDetail['contact_id_field'];
-          $comboQueries['criteria'][] = implode(' AND ', $queryDetail['where']);
-          unset($queries[$queryDetail['key']]);
-        }
-        $combinedKey = $comboQueries['table'] . '.' . implode('_', $comboQueries['field']) . '.' . $comboQueries['weight'];
-        $combinedQuery['query'] = 'SELECT t1.' . $comboQueries['contact_id_field'] . ' id1, '
-          . $comboQueries['weight'] . ' weight FROM ' . $comboQueries['table'] . ' ' . $comboQueries['table_alias']
-          . ' WHERE ' . implode(' AND ', $comboQueries['criteria']);
-        $combinedQuery['weight'] = $comboQueries['weight'];
-        $combinedQuery['key'] = $combinedKey;
-        $combinedQuery['contact_id_field'] = $comboQueries['contact_id_field'];
-        $combinedQuery['table'] = $comboQueries['table'];
-        $queries[$combinedKey] = $combinedQuery;
+    $this->optimizedQueries = $this->getUsableQueries();
+    foreach ($this->getCombinableQueries() as $queryCombinations) {
+      $queries = [];
+      foreach ($queryCombinations as $query) {
+        $queryDetail = $this->optimizedQueries[$query];
+        $queries[$queryDetail['table']][$query] = $queryDetail;
+        unset($this->optimizedQueries[$query]);
       }
+      $this->optimizedQueries += $this->getCombinedQuery($queries);
     }
-    uasort($queries, [$this, 'sortWeightDescending']);
-    foreach ($queries as $query) {
-      $this->optimizedQueries[$query['key']] = $query;
-    }
+    uasort($this->optimizedQueries, [$this, 'sortWeightDescending']);
     return $this->optimizedQueries;
   }
 
@@ -341,7 +317,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
     uasort($queries, [$this, 'sortWeightDescending']);
 
     foreach ($queries as $query) {
-      $isUsable = $this->isQueryUsable($query);
       $this->optimizedQueries[$query['key']] = $query;
     }
     return $this->optimizedQueries;
@@ -422,6 +397,78 @@ class CRM_Dedupe_FinderQueryOptimizer {
       }
     }
     return $queries;
+  }
+
+  /**
+   * @param array $queries
+   *
+   * @return array
+   */
+  public function getCombinedQuery(array $queries): array {
+    $tables = isset($queries['civicrm_contact']) ? ['civicrm_contact' => ['alias' => 't1', 'query' => []]] : [array_key_first($queries) => ['alias' => 't1', 'query' => []]];
+    foreach ($queries as $table => $tableQueries) {
+      if (!isset($tables[$table])) {
+        $tables[$table] = ['alias' => $table, 'query' => []];
+      }
+      $alias = $tables[$table]['alias'];
+      $tables[$table]['query'] += $this->getSingleTableCombinedQuery($tableQueries, $alias);
+    }
+    if (count($tables) === 1) {
+      return $tables[array_key_first($tables)]['query'];
+    }
+    $combinedQuery = [];
+    $combinedKey = implode('_', array_keys($tables));
+    foreach ($tables as $table) {
+      $query = reset($table['query']);
+      $combinedKey .= '.' . $query['key'];
+      if (empty($combinedQuery)) {
+        $query['from'] = " FROM {$query['table']} {$query['table_alias']}";
+        $query['base_contact_id_field'] = $query['contact_id_field'];
+        $query['base_where'] = ' WHERE ' . implode(' AND ', $query['criteria']);
+        $combinedQuery = $query;
+      }
+      else {
+        $combinedQuery['weight'] += $query['weight'];
+        $combinedQuery['from'] .= "
+          INNER JOIN {$query['table']}
+          ON t1.{$combinedQuery['base_contact_id_field']} = {$query['table']}.{$query['contact_id_field']}
+          AND " . str_replace('t1.', $query['table'] . '.', implode(',', $query['criteria']));
+
+        $combinedQuery['query'] = $query['select'] . ' ' . $combinedQuery['weight'] . ' weight '
+          . $combinedQuery['from']
+          . $combinedQuery['base_where'];
+      }
+    }
+    $combinedQuery['key'] = $combinedKey;
+    return [$combinedKey => $combinedQuery];
+  }
+
+  /**
+   * @param array $tableQueries
+   * @param string $tableAlias
+   *
+   * @return array
+   */
+  public function getSingleTableCombinedQuery(array $tableQueries, string $tableAlias): array {
+    $combinedQuery = ['field' => [], 'criteria' => [], 'weight' => 0];
+    foreach ($tableQueries as $queryDetail) {
+      $combinedQuery['table'] = $queryDetail['table'];
+      $combinedQuery['table_alias'] = $tableAlias;
+      $combinedQuery['weight'] += $queryDetail['weight'];
+      $combinedQuery['field'][] = $queryDetail['field'];
+      $combinedQuery['contact_id_field'] = $queryDetail['contact_id_field'];
+      $combinedQuery['criteria'][] = implode(' AND ', $queryDetail['where']);
+    }
+    $combinedKey = $combinedQuery['table'] . '.' . implode('_', $combinedQuery['field']) . '.' . $combinedQuery['weight'];
+    $combinedQuery['key'] = $combinedKey;
+    $combinedQuery['select'] = "SELECT {$tableAlias} .{$combinedQuery['contact_id_field']} id1, ";
+    $combinedQuery['query'] =
+      $combinedQuery['select']
+      . $combinedQuery['weight'] . ' weight'
+      . ' FROM ' . $combinedQuery['table'] . ' ' . $tableAlias
+      . ' WHERE ' . implode(' AND ', $combinedQuery['criteria']);
+
+    return [$combinedKey => $combinedQuery];
   }
 
   private function sortWeightDescending($a, $b): int {

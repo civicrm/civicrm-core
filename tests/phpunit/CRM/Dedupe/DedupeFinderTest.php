@@ -160,7 +160,15 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->assertEquals([$this->ids['Contact']['individual_0']], $result);
     $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
     // Check that the city query was eliminated - it has data but it's weight of 3 cannot influence the match outcome.
-    $this->assertEquals(['civicrm_contact.first_name_nick_name.12', 'civicrm_address.street_address.4'], array_keys($queries));
+    // The other queries are combined.
+    $this->assertCount(1, $queries);
+    $query = reset($queries);
+    $this->assertEquals(16, $query['weight']);
+    $this->assertEquals(1, $query['found_rows']);
+    $this->assertLike("SELECT civicrm_address .contact_id id1,  16 weight  FROM civicrm_contact t1
+          INNER JOIN civicrm_address
+          ON t1.id = civicrm_address.contact_id
+          AND civicrm_address.street_address = 'sesame street' WHERE t1.contact_type = 'Individual' AND t1.first_name = 'Robert' AND t1.contact_type = 'Individual' AND t1.nick_name = 'Bob'", $query['query']);
   }
 
   /**
