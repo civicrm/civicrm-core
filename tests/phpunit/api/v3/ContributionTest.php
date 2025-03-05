@@ -2830,8 +2830,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionUpdatedCampaign(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $campaignID = $this->campaignCreate();
-    $campaignID2 = $this->campaignCreate();
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+    $campaignID2 = $this->campaignCreate([], 'second');
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $this->individualID,
       'installments' => '12',
       'frequency_interval' => '1',

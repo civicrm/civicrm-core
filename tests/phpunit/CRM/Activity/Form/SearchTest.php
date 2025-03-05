@@ -33,6 +33,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
       'civicrm_activity_contact',
     ];
     $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
 
@@ -96,7 +97,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
   /**
    * Get criteria for activity testing.
    */
-  public function getSearchCriteria() {
+  public function getSearchCriteria(): array {
     $format = \Civi::settings()->get('dateformatDatetime');
     $dates['ending_60.day'] = CRM_Utils_Date::getFromTo('ending_60.day', NULL, NULL);
     $dates['earlier.year'] = CRM_Utils_Date::getFromTo('earlier.year', NULL, NULL);
