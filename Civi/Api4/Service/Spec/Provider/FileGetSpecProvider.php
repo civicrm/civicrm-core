@@ -40,6 +40,7 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
       ->setColumnName('id')
       ->setDescription(ts('Url at which this file can be downloaded'))
       ->setType('Extra')
+      ->setReadonly(TRUE)
       ->addOutputFormatter([__CLASS__, 'formatFileUrl']);
     $spec->addFieldSpec($field);
 
@@ -48,6 +49,7 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
       ->setTitle(ts('Filetype Icon'))
       ->setColumnName('mime_type')
       ->setDescription(ts('Icon associated with this filetype'))
+      ->setReadonly(TRUE)
       ->setType('Extra')
       ->addOutputFormatter([__CLASS__, 'formatFileIcon']);
     $spec->addFieldSpec($field);
@@ -56,10 +58,31 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
     $field->setLabel(ts('Is Image'))
       ->setTitle(ts('File is Image'))
       ->setColumnName('mime_type')
+      ->setReadonly(TRUE)
       ->setDescription(ts('Is this a recognized image type file'))
       ->setType('Extra')
       ->setSqlRenderer([__CLASS__, 'renderFileIsImage']);
     $spec->addFieldSpec($field);
+
+    $field = new FieldSpec('content', $spec->getEntity(), 'String');
+    $field->setLabel(ts('Content'))
+      ->setTitle(ts('Content'))
+      ->setColumnName('uri')
+      ->setDescription(ts('Contents of file'))
+      ->setType('Extra')
+      ->addOutputFormatter([__CLASS__, 'formatFileContent']);
+    $spec->addFieldSpec($field);
+
+    if ($spec->getAction() === 'create') {
+      $spec->getFieldByName('mime_type')->setRequired(TRUE);
+
+      $field = new FieldSpec('move_file', $spec->getEntity(), 'String');
+      $field->setLabel(ts('Move File'))
+        ->setTitle(ts('Move File'))
+        ->setDescription(ts('Name of temporary uploaded file'))
+        ->setType('Extra');
+      $spec->addFieldSpec($field);
+    }
   }
 
   public static function formatFileName(&$uri) {
@@ -70,6 +93,18 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
     if ($uri && is_string($uri)) {
       $uri = \CRM_Utils_File::cleanFileName($uri);
     }
+  }
+
+  public static function formatFileContent(&$uri) {
+    if ($uri && is_string($uri)) {
+      $dir = \CRM_Core_Config::singleton()->customFileUploadDir;
+      $path = $dir . DIRECTORY_SEPARATOR . $uri;
+      if (file_exists($path)) {
+        $uri = file_get_contents($path);
+        return;
+      }
+    }
+    $uri = NULL;
   }
 
   /**
@@ -100,7 +135,7 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
   }
 
   public function applies($entity, $action): bool {
-    return $entity === 'File' && $action === 'get';
+    return $entity === 'File';
   }
 
 }

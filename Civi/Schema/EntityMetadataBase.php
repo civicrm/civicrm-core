@@ -294,10 +294,11 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           $field['pseudoconstant'] = $addressField['pseudoconstant'];
         }
         // Set FK for EntityRef, ContactRef & File fields
-        if ($customField['fk_entity'] || $customField['data_type'] === 'ContactReference' || $customField['data_type'] === 'File') {
+        $fkEntity = \CRM_Core_BAO_CustomField::getFkEntity($customField);
+        if ($fkEntity) {
           $onDelete = empty($customField['fk_entity_on_delete']) ? 'SET NULL' : strtoupper(str_replace('_', ' ', $customField['fk_entity_on_delete']));
           $field['entity_reference'] = [
-            'entity' => $customField['fk_entity'] ?? str_replace('Reference', '', $customField['data_type']),
+            'entity' => $fkEntity,
             'key' => 'id',
             'on_delete' => $onDelete,
           ];
