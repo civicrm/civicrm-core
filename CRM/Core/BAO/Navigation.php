@@ -930,9 +930,9 @@ ORDER BY weight";
         else {
           $item['child'][] = [
             'attributes' => [
-              'label' => ts('My Account'),
-              'name' => 'My Account',
-              'url' => 'civicrm/my-account',
+              'label' => ts('My User Account'),
+              'name' => 'My User Account',
+              'url' => 'civicrm/user/me',
               'icon' => 'crm-i fa-user',
               'weight' => 2,
             ],
