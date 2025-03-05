@@ -60,6 +60,19 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $entityReferenceFields = [];
 
   /**
+   * Are we restricting ourselves to a single contact
+   *
+   * @var bool
+   */
+  protected bool $_single = FALSE;
+
+  /**
+   * How many records should we return
+   * @var int|null
+   */
+  protected ?int $_limit = NULL;
+
+  /**
    * Builds the list of tasks or actions that a searcher can perform on a result set.
    *
    * To modify the task list, child classes should alter $this->_taskList,
