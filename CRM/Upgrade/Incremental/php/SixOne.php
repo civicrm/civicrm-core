@@ -180,29 +180,37 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       // as only the email rule can be selected. However, keeping the 'set'
       // together (from Contribution convert in FiveFiftyFour) feels like
       // it has merit
+      $contactPrefix = '';
+      if ($importType === 'Import Membership') {
+        $contactPrefix = 'contact.';
+      }
+      if ($importType === 'Import Activity') {
+        $contactPrefix = 'target_contact.';
+      }
       $fieldsToConvert = [
-        'email' => 'email_primary.email',
-        'phone' => 'phone_primary.phone',
-        'street_address' => 'address_primary.street_address',
-        'supplemental_address_1' => 'address_primary.supplemental_address_1',
-        'supplemental_address_2' => 'address_primary.supplemental_address_2',
-        'supplemental_address_3' => 'address_primary.supplemental_address_3',
-        'city' => 'address_primary.city',
-        'county_id' => 'address_primary.county_id',
-        'state_province_id' => 'address_primary.state_province_id',
-        'country_id' => 'address_primary.country_id',
-        'membership_id' => 'membership.id',
-        'membership_contact_id' => 'membership.contact_id',
-        'membership_start_date' => 'membership.start_date',
-        'membership_type_id' => 'membership.membership_type_id',
-        'membership_join_date' => 'membership.join_date',
-        'membership_end_date' => 'membership.end_date',
-        'membership_source' => 'membership.source',
-        'member_is_override' => 'membership.is_override',
-        'status_override_end_date' => 'membership.status_override_end_date',
-        'member_is_test' => 'membership.is_test',
-        'member_is_pay_later' => 'membership.is_pay_later',
-        'member_campaign_id' => 'membership.campaign_id',
+        'email' => $contactPrefix . 'email_primary.email',
+        'phone' => $contactPrefix . 'phone_primary.phone',
+        'street_address' => $contactPrefix . 'address_primary.street_address',
+        'supplemental_address_1' => $contactPrefix . 'address_primary.supplemental_address_1',
+        'supplemental_address_2' => $contactPrefix . 'address_primary.supplemental_address_2',
+        'supplemental_address_3' => $contactPrefix . 'address_primary.supplemental_address_3',
+        'city' => $contactPrefix . 'address_primary.city',
+        'county_id' => $contactPrefix . 'address_primary.county_id',
+        'state_province_id' => $contactPrefix . 'address_primary.state_province_id',
+        'country_id' => $contactPrefix . 'address_primary.country_id',
+        'external_identifier' => $contactPrefix . 'external_identifier',
+        'membership_id' => 'id',
+        'membership_contact_id' => 'contact.id',
+        'membership_start_date' => 'start_date',
+        'membership_type_id' => 'membership_type_id',
+        'membership_join_date' => 'join_date',
+        'membership_end_date' => 'end_date',
+        'membership_source' => 'source',
+        'member_is_override' => 'is_override',
+        'status_override_end_date' => 'status_override_end_date',
+        'member_is_test' => 'is_test',
+        'member_is_pay_later' => 'is_pay_later',
+        'member_campaign_id' => 'campaign_id',
         'source_contact_id' => 'source_contact.id',
         'target_contact_id' => 'target_contact.id',
         'source_contact_external_identifier' => 'source_contact.external_identifier',
@@ -222,13 +230,6 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
         'activity_engagement_level' => 'engagement_level',
         'activity_is_star' => 'is_star',
       ];
-      if ($importType === 'Import Activity') {
-        $fieldsToConvert['email'] = 'target_contact.email_primary.email';
-        $fieldsToConvert['external_identifier'] = 'target_contact.external_identifier';
-      }
-      if ($importType === 'Import Membership') {
-        $fieldsToConvert['status_id'] = 'membership.status_id';
-      }
 
       $customFields = CRM_Core_DAO::executeQuery('
       SELECT custom_field.id, custom_field.name, custom_group.name as custom_group_name, custom_group.extends
@@ -237,7 +238,8 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       WHERE extends IN ("Contact", "Individual", "Organization", "Household", "Participant", "Membership", "Activity")
     ');
       while ($customFields->fetch()) {
-        $fieldsToConvert['custom_' . $customFields->id] = $customFields->custom_group_name . '.' . $customFields->name;
+        $prefix = in_array($customFields->extends, ['Contact', 'Individual', 'Household', 'Organization']) ? $contactPrefix : '';
+        $fieldsToConvert['custom_' . $customFields->id] = $prefix . $customFields->custom_group_name . '.' . $customFields->name;
       }
       while ($mappingFields->fetch()) {
         // Convert the field.

@@ -21,15 +21,6 @@ use Civi\Api4\Activity;
  */
 class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
 
-  /**
-   * Has this parser been fixed to expect `getMappedRow` to break it up
-   * by entity yet? This is a transitional property to allow the classes
-   * to be fixed up individually.
-   *
-   * @var bool
-   */
-  protected $isUpdatedForEntityRowParsing = TRUE;
-
   protected string $baseEntity = 'Activity';
 
   /**
@@ -102,6 +93,19 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    */
   protected function getRequiredFields(): array {
     return [['activity_type_id', 'activity_date_time']];
+  }
+
+  /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   */
+  public function getImportEntities() : array {
+    return [
+      'Activity' => ['text' => ts('Activity Fields'), 'is_contact' => FALSE, 'entity_field_prefix' => ''],
+      'TargetContact' => ['text' => ts('Target Contact Fields'), 'is_contact' => TRUE, 'entity_field_prefix' => 'target_contact.'],
+      'SourceContact' => ['text' => ts('Source Contact Fields'), 'is_contact' => TRUE, 'entity_field_prefix' => 'source_contact.'],
+    ];
   }
 
   /**

@@ -21,6 +21,21 @@
 class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
+   * Does the form layer convert field names to support QuickForm widgets.
+   *
+   * (e.g) if 'yes' we swap
+   * `soft_credit.external_identifier` to `soft_credit__external_identifier`
+   * because the contribution form would break on the . as it would treat it as
+   * javascript.
+   *
+   * In the case of the membership import the array is flatter and there
+   * is no hierarchical select so we do not need to do this.
+   *
+   * @var bool
+   */
+  protected bool $supportsDoubleUnderscoreFields = FALSE;
+
+  /**
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
@@ -38,9 +53,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
           if (empty($contactField['match_rule'])) {
             unset($option['children'][$index]);
           }
-          if ($contactField['id'] === 'contact_id') {
-            $option['children'][$index]['id'] = 'membership__contact_id';
-          }
         }
       }
       else {
@@ -51,9 +63,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
           // which is indistinguishable to convert back - ie ___ could be _. or ._.
           // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
           $name = $membershipField['id'];
-          $name = str_replace('_.', '~~', $name);
-          $name = str_replace('.', '__', $name);
-          $name = 'membership__' . $name;
           $option['children'][$index]['id'] = $name;
         }
       }
@@ -86,16 +95,16 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $parser = $self->getParser();
     $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-    $errors = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'membership.contact_id', 'contact_id']);
+    $errors = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'contact_id', 'contact_id']);
 
-    if (!in_array('membership.id', $fields['mapper']) && !in_array('membership__id', $fields['mapper'])) {
+    if (!in_array('id', $fields['mapper']) && !in_array('membership__id', $fields['mapper'])) {
       // FIXME: should use the schema titles, not redeclare them
       $requiredFields = [
-        'membership.membership_type_id' => ts('Membership Type'),
-        'membership.start_date' => ts('Membership Start Date'),
+        'membership_type_id' => ts('Membership Type'),
+        'start_date' => ts('Membership Start Date'),
       ];
       foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $fields['mapper']) && !in_array(str_replace('membership.', 'membership__', $field), $fields['mapper'])) {
+        if (!in_array($field, $fields['mapper'])) {
           if (!isset($errors['_qf_default'])) {
             $errors['_qf_default'] = '';
           }

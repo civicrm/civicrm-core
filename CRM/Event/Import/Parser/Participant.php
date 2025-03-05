@@ -21,15 +21,6 @@ use Civi\Api4\Participant;
  */
 class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
-  /**
-   * Has this parser been fixed to expect `getMappedRow` to break it up
-   * by entity yet? This is a transitional property to allow the classes
-   * to be fixed up individually.
-   *
-   * @var bool
-   */
-  protected $isUpdatedForEntityRowParsing = TRUE;
-
   protected string $baseEntity = 'Participant';
 
   /**

@@ -764,12 +764,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
         // but is now loaded in the Parser for the LexIM variant.
         continue;
       }
-      // Swap out dots for double underscores so as not to break the quick form js.
-      // We swap this back on postProcess.
-      // Arg - we need to swap out _. first as it seems some groups end in a trailing underscore.
-      // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
-      $name = str_replace('_.', '~~', $name);
-      $name = str_replace('.', '__', $name);
+      if (isset($this->supportsDoubleUnderscoreFields) && !empty($this->supportsDoubleUnderscoreFields)) {
+        // Swap out dots for double underscores so as not to break the quick form js.
+        // We swap this back on postProcess.
+        // Arg - we need to swap out _. first as it seems some groups end in a trailing underscore.
+        // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
+        $name = str_replace('_.', '~~', $name);
+        $name = str_replace('.', '__', $name);
+      }
       $return[$name] = $field['title'];
     }
     return $return;
