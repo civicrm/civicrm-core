@@ -158,6 +158,9 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ]);
     $this->assertEquals([$this->ids['Contact']['individual_0']], $result);
+    $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
+    // Check that the city query was eliminated - it has data but it's weight of 3 cannot influence the match outcome.
+    $this->assertEquals(['civicrm_contact.first_name_nick_name.12', 'civicrm_address.street_address.4'], array_keys($queries));
   }
 
   /**
@@ -211,7 +214,10 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->individualCreate(['first_name' => 'Bob', 'last_name' => 'Smith', 'street_address' => '123 Main St']);
     $this->individualCreate(['first_name' => 'Bob', 'email' => 'bob@example.org']);
     $this->individualCreate(['first_name' => 'Bob', 'email' => 'bob@example.org']);
-    $this->callAPISuccess('Job', 'process_batch_merge', ['rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general']]);
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general']])['values'];
+    $this->assertCount(2, $result['merged']);
+    $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
+    $this->assertEquals(['civicrm_email.email.8', 'civicrm_address.street_address.5', 'civicrm_contact.first_name.3'], array_keys($queries));
   }
 
   /**

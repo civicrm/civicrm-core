@@ -222,7 +222,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @return array
    */
   public function getFindQueries(): array {
-    $queries = $this->queries;
+    $queries = $this->getUsableQueries();
     // We want to combine cross-tables but looking to do that as a follow on since that will require some
     // more work to figure out. For single table regex does get us there.
     foreach ($this->getCombinableQueriesByTable() as $queryCombinations) {
@@ -307,7 +307,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * use one query that includes both.
    */
   public function getOptimizedQueries(): array {
-    $queries = $this->queries;
+    $queries = $this->getUsableQueries();
     // We want to combine cross-tables but looking to do that as a follow on since that will require some
     // more work to figure out. For single table regex does get us there.
     foreach ($this->getCombinableQueriesByTable() as $queryCombinations) {
@@ -341,9 +341,31 @@ class CRM_Dedupe_FinderQueryOptimizer {
     uasort($queries, [$this, 'sortWeightDescending']);
 
     foreach ($queries as $query) {
+      $isUsable = $this->isQueryUsable($query);
       $this->optimizedQueries[$query['key']] = $query;
     }
     return $this->optimizedQueries;
+  }
+
+  /**
+   * Is the query usable.
+   *
+   * This would return false when a poorly constructed rule group includes a rule that can
+   * never contribute to reaching the threshold - e.g if the rule requires a threshold of 8
+   * and has 3 fields with weights 1, 3, and 5 the field with a weight of 1 is unusable as
+   * it will never make a difference to the outcome.
+   *
+   * @param array $query
+   *
+   * @return bool
+   */
+  private function isQueryUsable(array $query): bool {
+    foreach ($this->getValidCombinations() as $validCombination) {
+      if (!empty($validCombination[$query['key']])) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -382,6 +404,24 @@ class CRM_Dedupe_FinderQueryOptimizer {
    */
   public function setQueryResult(int $affectedRows, string $queryKey): void {
     $this->optimizedQueries[$queryKey]['found_rows'] = $affectedRows;
+  }
+
+  /**
+   * Get usable queries.
+   *
+   * A query is usable when it could contribute to making a match - e.g if the threshold is 8
+   * and there are 3 queries with weights of 5, 3, and 1 the first 2 are usable.
+   *
+   * @return array
+   */
+  public function getUsableQueries(): array {
+    $queries = $this->queries;
+    foreach ($queries as $key => $query) {
+      if (!$this->isQueryUsable($query)) {
+        unset($queries[$key]);
+      }
+    }
+    return $queries;
   }
 
   private function sortWeightDescending($a, $b): int {
