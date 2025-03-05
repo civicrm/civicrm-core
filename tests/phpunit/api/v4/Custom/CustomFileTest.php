@@ -105,11 +105,18 @@ class CustomFileTest extends Api4TestBase {
       'data_type' => 'File',
     ]);
 
+    $tmpFile = $this->createTmpFile('Hello World 12345');
+    $this->assertFileExists($tmpFile);
+
     $file = $this->createTestRecord('File', [
       'mime_type' => 'text/plain',
       'file_name' => 'test456.txt',
-      'move_file' => $this->createTmpFile('Hello World 12345'),
+      'move_file' => $tmpFile,
     ]);
+
+    $this->assertFileDoesNotExist($tmpFile);
+    $newFile = \CRM_Core_Config::singleton()->customFileUploadDir . $file['uri'];
+    $this->assertFileExists($newFile);
 
     $activity = $this->createTestRecord('Activity', [
       $fieldName => $file['id'],
@@ -124,6 +131,15 @@ class CustomFileTest extends Api4TestBase {
     $this->assertEquals('test456.txt', $result["$fieldName.file_name"]);
     $this->assertEquals('Hello World 12345', $result["$fieldName.content"]);
     $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
+
+    \Civi\Api4\EntityFile::delete(FALSE)
+      ->addWhere('file_id', '=', $file['id'])
+      ->execute();
+
+    File::delete(FALSE)
+      ->addWhere('id', '=', $file['id'])
+      ->execute();
+    $this->assertFileDoesNotExist($newFile);
   }
 
   protected function createTmpFile(string $content): string {
