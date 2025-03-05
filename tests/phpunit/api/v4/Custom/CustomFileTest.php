@@ -70,7 +70,7 @@ class CustomFileTest extends Api4TestBase {
       ->execute()->single();
 
     $this->assertEquals('test123.txt', $file['file_name']);
-    $this->assertStringContainsString("id={$file['id']}&eid={$contact['id']}&fcs=", $file['url']);
+    $this->assertStringContainsString("id={$file['id']}&fcs=", $file['url']);
   }
 
 }
