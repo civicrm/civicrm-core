@@ -1,5 +1,5 @@
-<ul role="tablist" class="nav nav-tabs af-tablist">
-  <li ng-repeat="(tabIndex, tab) in $ctrl.tabs" role="tab" class="af-tab" ng-class="{active: tab.tabSelected}">
+<ul role="tablist" class="nav nav-tabs crm-tab-list">
+  <li ng-repeat="(tabIndex, tab) in $ctrl.tabs" role="tab" class="crm-tab-button" ng-class="{active: tab.tabSelected}">
     <a href ng-click="$ctrl.selectTab(tabIndex)">
       <i ng-if="tab.icon" class="crm-i {{ tab.icon }}" aria-hidden="true"></i>
       {{ tab.title }}
@@ -7,4 +7,4 @@
     </a>
   </li>
 </ul>
-<div class="af-tabpanel" ng-transclude></div>
+<div class="crm-tab-panel" ng-transclude></div>

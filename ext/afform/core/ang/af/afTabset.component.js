@@ -7,6 +7,10 @@
     controller: function($scope, $element) {
       this.tabs = [];
 
+      this.$onInit = function() {
+        $element.addClass('crm-tabset');
+      };
+
       this.addTab = function(tab) {
         tab.tabSelected = !this.tabs.length;
         this.tabs.push(tab);
