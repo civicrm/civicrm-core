@@ -149,9 +149,15 @@ class CRM_Extension_Manager {
    *
    * @param string $tmpCodeDir
    *   Path to a local directory containing a copy of the new (inert) code.
+   * @param string|null $backupCodeDir
+   *   Optionally move the old code to $backupCodeDir
+   * @param bool $refresh
+   *   Whether to immediately rebuild system caches
+   * @return string
+   *   The final path where the extension has been loaded.
    * @throws CRM_Extension_Exception
    */
-  public function replace($tmpCodeDir) {
+  public function replace($tmpCodeDir, ?string $backupCodeDir = NULL, bool $refresh = TRUE): string {
     if (!$this->defaultContainer) {
       throw new CRM_Extension_Exception("Default extension container is not configured");
     }
@@ -159,14 +165,34 @@ class CRM_Extension_Manager {
     $newInfo = CRM_Extension_Info::loadFromFile($tmpCodeDir . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME);
     $oldStatus = $this->getStatus($newInfo->key);
 
-    // find $tgtPath, $oldInfo, $typeManager
+    // Find $oldInfo, $typeManager
+    switch ($oldStatus) {
+      case self::STATUS_UNINSTALLED:
+      case self::STATUS_INSTALLED:
+      case self::STATUS_DISABLED:
+        [$oldInfo, $typeManager] = $this->_getInfoTypeHandler($newInfo->key);
+        break;
+
+      case self::STATUS_INSTALLED_MISSING:
+      case self::STATUS_DISABLED_MISSING:
+        [$oldInfo, $typeManager] = $this->_getMissingInfoTypeHandler($newInfo->key);
+        break;
+
+      case self::STATUS_UNKNOWN:
+        $oldInfo = $typeManager = NULL;
+        break;
+
+      default:
+        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
+    }
+
+    // find $tgtPath
     switch ($oldStatus) {
       case self::STATUS_UNINSTALLED:
       case self::STATUS_INSTALLED:
       case self::STATUS_DISABLED:
         // There is an old copy of the extension. Try to install in the same place -- but it must go somewhere in the default-container
         // throws Exception
-        list ($oldInfo, $typeManager) = $this->_getInfoTypeHandler($newInfo->key);
         $tgtPath = $this->fullContainer->getPath($newInfo->key);
         if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
           // force installation in the default-container
@@ -181,20 +207,19 @@ class CRM_Extension_Manager {
 
       case self::STATUS_INSTALLED_MISSING:
       case self::STATUS_DISABLED_MISSING:
-        // the extension does not exist in any container; we're free to put it anywhere
-        $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-        // throws Exception
-        list ($oldInfo, $typeManager) = $this->_getMissingInfoTypeHandler($newInfo->key);
-        break;
-
       case self::STATUS_UNKNOWN:
         // the extension does not exist in any container; we're free to put it anywhere
         $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-        $oldInfo = $typeManager = NULL;
         break;
 
       default:
         throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
+    }
+
+    if ($backupCodeDir && is_dir($tgtPath)) {
+      if (!rename($tgtPath, $backupCodeDir)) {
+        throw new CRM_Extension_Exception("Failed to move $tgtPath to backup $backupCodeDir");
+      }
     }
 
     // move the code!
@@ -224,11 +249,15 @@ class CRM_Extension_Manager {
         throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
-    $this->refresh();
-    // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
-    // \Civi::reset();
-    // \CRM_Core_Config::singleton(TRUE, TRUE);
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    if ($refresh) {
+      $this->refresh();
+      // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
+      // \Civi::reset();
+      // \CRM_Core_Config::singleton(TRUE, TRUE);
+      CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    }
+
+    return $tgtPath;
   }
 
   /**
@@ -765,7 +794,7 @@ class CRM_Extension_Manager {
    *
    * @param array $keys
    *   List of extensions to install.
-   * @param \CRM_Extension_Info $info
+   * @param \CRM_Extension_Info|CRM_Extension_Info[]|null $newInfos
    *   An extension info object that we should use instead of our local versions (eg. when checking for upgradeability).
    *
    * @return array
@@ -774,10 +803,12 @@ class CRM_Extension_Manager {
    * @throws \MJS\TopSort\CircularDependencyException
    * @throws \MJS\TopSort\ElementNotFoundException
    */
-  public function findInstallRequirements($keys, $info = NULL) {
-    // Use our passed in info, or get the local versions
-    if ($info) {
-      $infos[$info->key] = $info;
+  public function findInstallRequirements($keys, $newInfos = NULL) {
+    if (is_object($newInfos)) {
+      $infos[$newInfos->key] = $newInfos;
+    }
+    elseif (is_array($newInfos)) {
+      $infos = $newInfos;
     }
     else {
       $infos = $this->mapper->getAllInfos();
@@ -807,6 +838,23 @@ class CRM_Extension_Manager {
       }
     }
     return $sorter->sort();
+  }
+
+  public function checkInstallRequirements(array $installKeys, $newInfos = NULL): array {
+    $errors = [];
+    $requiredExtensions = $this->findInstallRequirements($installKeys, $newInfos);
+    $installKeysSummary = implode(',', $requiredExtensions);
+    foreach ($requiredExtensions as $extension) {
+      if ($this->getStatus($extension) !== CRM_Extension_Manager::STATUS_INSTALLED && !in_array($extension, $installKeys)) {
+        $requiredExtensionInfo = CRM_Extension_System::singleton()->getBrowser()->getExtension($extension);
+        $requiredExtensionInfoName = empty($requiredExtensionInfo->name) ? $extension : $requiredExtensionInfo->name;
+        $errors[] = [
+          'title' => ts('Missing Requirement: %1', [1 => $extension]),
+          'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $installKeysSummary, 2 => $requiredExtensionInfoName]),
+        ];
+      }
+    }
+    return $errors;
   }
 
   /**
