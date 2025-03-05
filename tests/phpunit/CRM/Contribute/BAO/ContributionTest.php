@@ -31,6 +31,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->disableFinancialACLs();
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_campaign']);
     parent::tearDown();
   }
 
