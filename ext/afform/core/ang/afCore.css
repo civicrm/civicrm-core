@@ -84,7 +84,7 @@ af-form {
 }
 
 /* Tabs */
-#bootstrap-theme .af-tabpanel {
+#bootstrap-theme .crm-tabset {
   display: block;
   padding: 10px;
 }
