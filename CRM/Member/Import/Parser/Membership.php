@@ -26,7 +26,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    *
    * @var array
    */
-  protected $fieldMetadata = [];
+  protected array $fieldMetadata = [];
 
   protected string $baseEntity = 'Membership';
 
@@ -38,19 +38,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    * @var bool
    */
   protected $isUpdatedForEntityRowParsing = TRUE;
-
-  /**
-   * Array of successfully imported membership id's
-   *
-   * @var array
-   */
-  protected $_newMemberships;
-
-  /**
-   * Separator being used
-   * @var string
-   */
-  protected $_separator;
 
   /**
    * Get information about the provided job.
@@ -82,8 +69,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    */
   public function getImportEntities() : array {
     return [
-      'Membership' => ['text' => ts('Membership Fields'), 'is_contact' => FALSE],
-      'Contact' => ['text' => ts('Contact Fields'), 'is_contact' => TRUE],
+      'Membership' => ['text' => ts('Membership Fields'), 'is_contact' => FALSE, 'entity_field_prefix' => ''],
+      'Contact' => ['text' => ts('Contact Fields'), 'is_contact' => TRUE, 'entity_field_prefix' => 'contact.'],
     ];
   }
 

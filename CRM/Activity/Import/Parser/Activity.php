@@ -105,6 +105,19 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
   }
 
   /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   */
+  public function getImportEntities() : array {
+    return [
+      'Activity' => ['text' => ts('Activity Fields'), 'is_contact' => FALSE, 'entity_field_prefix' => ''],
+      'TargetContact' => ['text' => ts('Target Contact Fields'), 'is_contact' => TRUE, 'entity_field_prefix' => 'target_contact.'],
+      'SourceContact' => ['text' => ts('Source Contact Fields'), 'is_contact' => TRUE, 'entity_field_prefix' => 'source_contact.'],
+    ];
+  }
+
+  /**
    * Ensure metadata is loaded.
    *
    * @throws \CRM_Core_Exception

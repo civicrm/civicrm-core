@@ -25,6 +25,18 @@ use Civi\Api4\MappingField;
 abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
 
   /**
+   * Does the form layer convert field names to support QuickForm widgets.
+   *
+   * (e.g) if 'yes' we swap
+   * `soft_credit.external_identifier` to `soft_credit__external_identifier`
+   * because the contribution form would break on the . as it would treat it as
+   * javascript.
+   *
+   * @var bool
+   */
+  protected bool $supportsDoubleUnderscoreFields = TRUE;
+
+  /**
    * Mapper fields
    *
    * @var array

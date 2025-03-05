@@ -18,7 +18,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
   use CRMTraits_Import_ParserTrait;
 
-  protected $entity = 'Participant';
+  protected string $entity = 'Participant';
 
   /**
    * @var int

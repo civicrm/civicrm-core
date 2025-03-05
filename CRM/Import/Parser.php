@@ -1062,7 +1062,16 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     // See https://lab.civicrm.org/dev/core/-/issues/4317#note_91322 - a further hack for quickform not
     // handling dots in field names. One day we will get rid of the Quick form screen...
     $fieldMapName = str_replace('~~', '_.', $fieldMapName);
+    foreach ($this->getImportEntities() as $entity) {
+      if (empty($this->getImportableFieldsMetadata()[$fieldMapName]) && $entity['entity_field_prefix'] && str_starts_with($fieldMapName, $entity['entity_field_prefix'])) {
+        // e.g if the field name is 'contact.external_identifier' then it is just a case of looking
+        // for external_identifier.
+        $fieldMapName = substr($fieldMapName, strlen($entity['entity_field_prefix']));
+        break;
+      }
+    }
     if (isset($this->baseEntity) && str_starts_with($fieldMapName, strtolower($this->baseEntity) . '.')) {
+      // @todo - remove this again - we are switching to NOT namespacing the base entity & using the getImportEntities above.
       $fieldMapName = str_replace(strtolower($this->baseEntity) . '.', '', $fieldMapName);
     }
     // This whole business of only loading metadata for one type when we actually need it for all is ... dubious.
@@ -1196,8 +1205,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception
    */
   protected function validateParams(array $params): void {
-    if (empty($params['id'])) {
-      $this->validateRequiredFields($this->getRequiredFields(), $params);
+    if (empty($params['id']) && empty($params[$this->baseEntity]['id'])) {
+      $this->validateRequiredFields($this->getRequiredFields(), $params[$this->baseEntity] ?? $params);
     }
     $errors = [];
     foreach ($params as $key => $value) {
@@ -1351,7 +1360,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   public function getImportEntities() : array {
     return [
-      'Contact' => ['text' => ts('Contact Fields'), 'is_contact' => TRUE],
+      'Contact' => ['text' => ts('Contact Fields'), 'is_contact' => TRUE, 'entity_field_prefix' => ''],
     ];
   }
 
