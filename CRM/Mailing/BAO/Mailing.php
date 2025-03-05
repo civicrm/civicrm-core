@@ -1353,6 +1353,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if (isset($mailing->group_id)) {
         $row['id'] = $mailing->group_id;
         $row['name'] = $mailing->group_title;
+        $row['mailing'] = FALSE;
         $row['link'] = CRM_Utils_System::url('civicrm/group/search',
           "reset=1&force=1&context=smog&gid={$row['id']}"
         );
