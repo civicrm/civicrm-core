@@ -20,6 +20,7 @@ namespace api\v4\Custom;
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Api4\EntityFile;
 use Civi\Api4\File;
 
 /**
@@ -30,6 +31,9 @@ class CustomFileTest extends Api4TestBase {
   /**
    */
   public function testCustomFileContent(): void {
+    // Baseline count for civicrm_entity_file which should not change during this test
+    $entityFileCount = EntityFile::get(FALSE)->selectRowCount()->execute()->count();
+
     $fieldName = 'ContactFileFields.TestMyFile';
     [$customGroup, $customField] = explode('.', $fieldName);
 
@@ -60,8 +64,9 @@ class CustomFileTest extends Api4TestBase {
       ->addWhere('id', '=', $contact['id'])
       ->addValue($fieldName, $file['id'])
       ->execute();
-    // Register hidden entityFile record for cleanup
-    $this->registerTestRecord('EntityFile', [['file_id', '=', $file['id']]]);
+
+    // No EntityFile records should have been created
+    $this->assertSame($entityFileCount, EntityFile::get(FALSE)->selectRowCount()->execute()->count());
 
     $result = File::get(FALSE)
       ->addSelect('uri', 'file_name', 'url', 'content')
@@ -131,10 +136,6 @@ class CustomFileTest extends Api4TestBase {
     $this->assertEquals('test456.txt', $result["$fieldName.file_name"]);
     $this->assertEquals('Hello World 12345', $result["$fieldName.content"]);
     $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
-
-    \Civi\Api4\EntityFile::delete(FALSE)
-      ->addWhere('file_id', '=', $file['id'])
-      ->execute();
 
     File::delete(FALSE)
       ->addWhere('id', '=', $file['id'])
