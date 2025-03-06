@@ -18,6 +18,8 @@
 namespace api\v4\Custom;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Activity;
+use Civi\Api4\Contact;
 use Civi\Api4\File;
 
 /**
@@ -27,50 +29,125 @@ class CustomFileTest extends Api4TestBase {
 
   /**
    */
-  public function testCustomFileField(): void {
-    $group = $this->createTestRecord('CustomGroup', [
-      'title' => 'FileFields',
+  public function testCustomFileContent(): void {
+    $fieldName = 'ContactFileFields.TestMyFile';
+    [$customGroup, $customField] = explode('.', $fieldName);
+
+    $this->createTestRecord('CustomGroup', [
+      'title' => $customGroup,
       'extends' => 'Individual',
     ]);
     $this->createTestRecord('CustomField', [
-      'label' => 'TestMyFile',
-      'custom_group_id.name' => 'FileFields',
+      'label' => $customField,
+      'custom_group_id.name' => $customGroup,
       'html_type' => 'File',
       'data_type' => 'File',
     ]);
 
-    $fieldName = 'FileFields.TestMyFile';
+    $getFields = Contact::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertEquals('File', $getFields[$fieldName]['fk_entity']);
 
     $contact = $this->createTestRecord('Individual');
 
-    // FIXME: Use Api4 when available
-    $file = civicrm_api3('Attachment', 'create', [
-      // The mismatch between entity id and entity table feels very wrong but that's how core does it for now
-      'entity_id' => $contact['id'],
-      'entity_table' => $group['table_name'],
+    $file = $this->createTestRecord('File', [
       'mime_type' => 'text/plain',
-      'name' => 'test123.txt',
+      'file_name' => 'test123.txt',
       'content' => 'Hello World 123',
     ]);
-    // FIXME: Autocleanup would happen if using Api4 + $this->createTestRecord
-    $this->registerTestRecord('File', $file['id']);
+
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue($fieldName, $file['id'])
+      ->execute();
+    // Register hidden entityFile record for cleanup
     $this->registerTestRecord('EntityFile', [['file_id', '=', $file['id']]]);
 
-    civicrm_api4('Individual', 'update', [
-      'values' => [
-        'id' => $contact['id'],
-        $fieldName => $file['id'],
-      ],
-      'checkPermissions' => FALSE,
-    ]);
-
-    $file = File::get(FALSE)
-      ->addSelect('id', 'file_name', 'url')
+    $result = File::get(FALSE)
+      ->addSelect('uri', 'file_name', 'url', 'content')
       ->addWhere('id', '=', $file['id'])
       ->execute()->single();
+    $this->assertEquals($file['uri'], $result['uri']);
+    $this->assertEquals('test123.txt', $result['file_name']);
+    $this->assertEquals('Hello World 123', $result['content']);
+    $this->assertStringContainsString("id={$file['id']}&fcs=", $result['url']);
 
-    $this->assertEquals('test123.txt', $file['file_name']);
-    $this->assertStringContainsString("id={$file['id']}&fcs=", $file['url']);
+    // Update file contents
+    File::update(FALSE)
+      ->addWhere('id', '=', $file['id'])
+      ->addValue('content', 'Hello World 456')
+      ->execute();
+
+    // This time use a join to fetch the file
+    $result = Contact::get(FALSE)
+      ->addSelect('id', "$fieldName.uri", "$fieldName.file_name", "$fieldName.url", "$fieldName.content")
+      ->addWhere('id', '=', $contact['id'])
+      ->execute()->single();
+
+    $this->assertEquals($file['uri'], $result["$fieldName.uri"]);
+    $this->assertEquals('test123.txt', $result["$fieldName.file_name"]);
+    $this->assertEquals('Hello World 456', $result["$fieldName.content"]);
+    $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
+  }
+
+  public function testMoveFile(): void {
+    $fieldName = 'ActFileFields.TestMyFile';
+    [$customGroup, $customField] = explode('.', $fieldName);
+
+    $this->createTestRecord('CustomGroup', [
+      'title' => $customGroup,
+      'extends' => 'Activity',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'label' => $customField,
+      'custom_group_id.name' => $customGroup,
+      'html_type' => 'File',
+      'data_type' => 'File',
+    ]);
+
+    $tmpFile = $this->createTmpFile('Hello World 12345');
+    $this->assertFileExists($tmpFile);
+
+    $file = $this->createTestRecord('File', [
+      'mime_type' => 'text/plain',
+      'file_name' => 'test456.txt',
+      'move_file' => $tmpFile,
+    ]);
+
+    $this->assertFileDoesNotExist($tmpFile);
+    $newFile = \CRM_Core_Config::singleton()->customFileUploadDir . $file['uri'];
+    $this->assertFileExists($newFile);
+
+    $activity = $this->createTestRecord('Activity', [
+      $fieldName => $file['id'],
+    ]);
+
+    $result = Activity::get(FALSE)
+      ->addSelect('id', "$fieldName.uri", "$fieldName.file_name", "$fieldName.url", "$fieldName.content")
+      ->addWhere('id', '=', $activity['id'])
+      ->execute()->single();
+
+    $this->assertEquals($file['uri'], $result["$fieldName.uri"]);
+    $this->assertEquals('test456.txt', $result["$fieldName.file_name"]);
+    $this->assertEquals('Hello World 12345', $result["$fieldName.content"]);
+    $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
+
+    \Civi\Api4\EntityFile::delete(FALSE)
+      ->addWhere('file_id', '=', $file['id'])
+      ->execute();
+
+    File::delete(FALSE)
+      ->addWhere('id', '=', $file['id'])
+      ->execute();
+    $this->assertFileDoesNotExist($newFile);
+  }
+
+  protected function createTmpFile(string $content): string {
+    $tmpDir = sys_get_temp_dir();
+    $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
+    $path = tempnam(sys_get_temp_dir(), 'Test');
+    file_put_contents($path, $content);
+    return $path;
   }
 
 }
