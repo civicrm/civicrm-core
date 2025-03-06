@@ -16,6 +16,7 @@
         submissionResponse,
         saveDraftButtons = [],
         draftStatus = 'unsaved',
+        cancelDraftWatcher,
         ts = CRM.ts('org.civicrm.afform'),
         ctrl = this;
 
@@ -173,7 +174,7 @@
         // If autosave enabled, save every ten seconds if changes have been made
         const saveEveryTenSeconds = autoSaveEnabled ? _.debounce(ctrl.submitDraft, 10000) : _.noop;
 
-        $scope.$watch(() => data, function (newVal, oldVal) {
+        cancelDraftWatcher = $scope.$watch(() => data, function (newVal, oldVal) {
             if (oldVal) {
               setDraftStatus('unsaved');
               saveEveryTenSeconds(newVal);
@@ -354,6 +355,9 @@
         }
         status = CRM.status({});
         $element.block();
+        if (cancelDraftWatcher) {
+          cancelDraftWatcher();
+        }
 
         crmApi4('Afform', 'submit', {
           name: ctrl.getFormMeta().name,

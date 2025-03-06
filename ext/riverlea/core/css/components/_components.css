@@ -375,10 +375,11 @@ table.advmultiselect {
   text-align: center;
   font-size: var(--crm-m2);
 }
+/* Outputs stream + version number
 #civicrm-footer::after {
   content: var(--crm-version);
   float: right;
-}
+}*/
 .crm-container #civicrm-footer .status {
   border-radius: var(--crm-roundness);
   padding: var(--crm-btn-small-padding);
