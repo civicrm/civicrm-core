@@ -1,0 +1,22 @@
+<li>
+  <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+    <input class="form-control" ng-model="tab['title']" required title="{{:: ts('Tab title') }}" placeholder="{{:: ts('Tab title') }}">
+  </form>
+</li>
+<li>
+  <a href ng-click="$ctrl.pickIcon(tab)">
+    <i class="crm-i fa-icons"></i> {{:: ts('Choose icon') }}
+  </a>
+</li>
+<li ng-if="$ctrl.searchDisplays[tabIndex].length">
+<form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+  <label for="af-gui-tab-count">{{:: ts('Count:') }}</label>
+  <select id="af-gui-tab-count" class="form-control" ng-model="$ctrl.getSetCount(tabIndex)" ng-model-options="{getterSetter: true}">
+    <option ng-value="-1">{{:: ts('None') }}</option>
+    <option ng-value="$index" ng-repeat="disp in $ctrl.searchDisplays[tabIndex]">{{:: disp.defn.label }}</option>
+  </select>
+</form>
+</li>
+
+<li role="separator" class="divider"></li>
+<li><a href ng-click="$ctrl.deleteTab(tabIndex)"><span class="text-danger"><i class="crm-i fa-trash"></i> {{:: ts('Delete tab') }}</span></a></li>

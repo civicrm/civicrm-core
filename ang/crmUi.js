@@ -863,7 +863,6 @@
         template: '<div ng-transclude></div>',
         transclude: true,
         link: function (scope, element, attrs, crmUiTabSetCtrl) {
-          element.attr('role', 'tabpanel');
           crmUiTabSetCtrl.add(scope);
         }
       };
