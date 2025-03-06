@@ -18,10 +18,6 @@ abstract class MixinTestCase extends \PHPUnit\Framework\TestCase implements \Civ
 
   abstract protected function getMixinTests(): array;
 
-  public static function setUpBeforeClass(): void {
-    civicrm_api3('Extension', 'refresh', ['local' => TRUE, 'remote' => FALSE]);
-  }
-
   protected function setUp(): void {
     $this->assertNotEquals('UnitTests', getenv('CIVICRM_UF'), 'This is an end-to-end test involving CLI and HTTP. CIVICRM_UF should not be set to UnitTests.');
     parent::setUp();
@@ -39,6 +35,7 @@ abstract class MixinTestCase extends \PHPUnit\Framework\TestCase implements \Civ
     $this->runMethods('testPreConditions', $cv);
 
     // Clear out anything from previous runs.
+    $cv->api3('Extension', 'refresh', ['local' => TRUE, 'remote' => FALSE]);
     $cv->api3('Extension', 'disable', ['key' => 'shimmy']);
     $cv->api3('Extension', 'uninstall', ['key' => 'shimmy']);
 
