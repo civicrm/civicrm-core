@@ -2158,13 +2158,15 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'cg_extend_objects', 'id', 'name');
     $ogValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
     foreach ($ogValues as $ogValue) {
-      $options[] = [
-        'id' => $ogValue['value'],
-        'label' => $ogValue['label'],
-        'grouping' => $ogValue['grouping'] ?? NULL,
-        'table_name' => $ogValue['name'],
-        'allow_is_multiple' => !empty($ogValue['filter']),
-      ];
+      if ($ogValue['is_active']) {
+        $options[] = [
+          'id' => $ogValue['value'],
+          'label' => $ogValue['label'],
+          'grouping' => $ogValue['grouping'] ?? NULL,
+          'table_name' => $ogValue['name'],
+          'allow_is_multiple' => !empty($ogValue['filter']),
+        ];
+      }
     }
     foreach ($options as &$option) {
       $option['icon'] ??= \Civi\Api4\Utils\CoreUtil::getInfoItem($option['id'], 'icon');
