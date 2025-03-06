@@ -2731,14 +2731,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     ])->column('id');
 
     foreach (['text/plain' => 'txt', 'image/png' => 'png', 'image/foo' => 'foo'] as $mimeType => $ext) {
-      // FIXME: Use api4 when available
-      civicrm_api3('Attachment', 'create', [
-        'entity_table' => 'civicrm_note',
-        'entity_id' => $notes[0],
-        'name' => 'test_file.' . $ext,
+      $file = $this->createTestRecord('File', [
+        'file_name' => 'test_file.' . $ext,
         'mime_type' => $mimeType,
         'content' => 'hello',
-      ])['id'];
+      ]);
+      $this->createTestRecord('EntityFile', [
+        'file_id' => $file['id'],
+        'entity_table' => 'civicrm_note',
+        'entity_id' => $notes[0],
+      ]);
     }
 
     $params = [
