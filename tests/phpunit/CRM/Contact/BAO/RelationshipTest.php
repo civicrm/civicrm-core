@@ -27,6 +27,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   protected function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup([
       'civicrm_relationship_type',
       'civicrm_relationship',

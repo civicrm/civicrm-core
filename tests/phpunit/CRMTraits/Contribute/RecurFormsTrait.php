@@ -14,17 +14,8 @@
  */
 trait CRMTraits_Contribute_RecurFormsTrait {
 
-  /**
-   * @var int
-   */
-  protected $paymentProcessorId;
-
   public function tearDown(): void {
-    if ($this->paymentProcessorId) {
-      \Civi\Api4\PaymentProcessor::delete(FALSE)
-        ->addWhere('id', '=', $this->paymentProcessorId)
-        ->execute();
-    }
+    $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
 
@@ -44,7 +35,7 @@ trait CRMTraits_Contribute_RecurFormsTrait {
    *
    */
   public function addContribution(): void {
-    $this->paymentProcessorId = $this->processorCreate();
+    $this->processorCreate();
     $order = $this->callAPISuccess('Order', 'create', [
       'contact_id' => $this->getContactID(),
       'contribution_recur_id' => $this->getContributionRecurID(),
@@ -55,7 +46,7 @@ trait CRMTraits_Contribute_RecurFormsTrait {
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $order['id'],
       'total_amount' => 10,
-      'payment_processor_id' => $this->paymentProcessorId,
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'is_send_contribution_notification' => FALSE,
     ]);
     $this->callAPISuccess('Contribution', 'create', [
@@ -81,7 +72,7 @@ trait CRMTraits_Contribute_RecurFormsTrait {
         'installments' => 12,
         'frequency_interval' => 1,
         'frequency_unit' => 'month',
-        'payment_processor_id' => $this->paymentProcessorId,
+        'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       ])['id'];
     }
     return $this->ids['ContributionRecur'][0];
