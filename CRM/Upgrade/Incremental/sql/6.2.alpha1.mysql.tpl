@@ -10,3 +10,8 @@ WHERE extends IS NULL;
 
 UPDATE civicrm_custom_group SET style = 'Inline'
 WHERE style IS NULL OR style NOT IN ('Tab', 'Inline', 'Tab with table');
+
+{* Snapshot before deleting non-attachment rows from civicrm_entity_file *}
+{crmUpgradeSnapshot name='entity_file'}
+  SELECT id, entity_table, entity_id, file_id FROM civicrm_entity_file WHERE entity_table LIKE "civicrm_value_%";
+{/crmUpgradeSnapshot}

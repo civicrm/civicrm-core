@@ -46,6 +46,14 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'default' => 'CURRENT_TIMESTAMP',
       'description' => ts('Date and time that this attachment was uploaded or written to server.'),
     ]);
+
+    // Delete non-attachment rows in batches of 5000
+    $fileCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_entity_file WHERE entity_table LIKE "civicrm_value_%"');
+    $iterations = ceil($fileCount / self::BATCH_SIZE);
+    for ($i = 1; $i <= $iterations; $i++) {
+      $this->addTask('Delete non-attachment rows from civicrm_entity_file', 'deleteNonAttachmentFiles', $i);
+    }
+
     $this->addTask('CustomGroup: Make "name" required', 'alterSchemaField', 'CustomGroup', 'name', [
       'title' => ts('Custom Group Name'),
       'sql_type' => 'varchar(64)',
@@ -87,6 +95,11 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'default' => 1,
     ]);
     $this->addTask('Fix Unique index on acl cache table with domain id', 'fixAclUniqueIndex');
+  }
+
+  public static function deleteNonAttachmentFiles(): bool {
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_file WHERE entity_table LIKE "civicrm_value_%" LIMIT ' . self::BATCH_SIZE);
+    return TRUE;
   }
 
   public static function setFileUploadDate(): bool {
