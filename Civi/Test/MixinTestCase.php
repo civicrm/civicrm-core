@@ -146,9 +146,11 @@ abstract class MixinTestCase extends \PHPUnit\Framework\TestCase implements \Civ
         if (getenv('DEBUG')) {
           fprintf(STDERR, "#$# ");
           if (!empty($pipeData)) {
-            fprintf(STDERR, "echo %s | ", escapeshellarg($pipeData));
+            fprintf(STDERR, "echo %s | (%s)\n", escapeshellarg($pipeData), $cmd);
           }
-          fprintf(STDERR, "%s\n", $cmd);
+          else {
+            fprintf(STDERR, "%s\n", $cmd);
+          }
         }
         $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);
         putenv("CV_OUTPUT=$oldOutput");
