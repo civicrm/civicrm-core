@@ -48,15 +48,18 @@ class EntityFileTest extends Api4TestBase implements TransactionalInterface, Hoo
 
     $file = [];
 
-    // FIXME: Use api4 when available
     foreach ($note as $nid) {
-      $file[] = civicrm_api3('Attachment', 'create', [
-        'entity_table' => 'civicrm_note',
-        'entity_id' => $nid,
-        'name' => 'file_for_' . $nid . '.txt',
+      $fileId = $this->createTestRecord('File', [
+        'file_name' => 'file_for_' . $nid . '.txt',
         'mime_type' => 'text/plain',
         'content' => 'hello',
       ])['id'];
+      $file[] = $fileId;
+      $this->createTestRecord('EntityFile', [
+        'file_id' => $fileId,
+        'entity_table' => 'civicrm_note',
+        'entity_id' => $nid,
+      ]);
     }
 
     // Grant access to contact 2 & 3, deny to 0 & 1
@@ -103,14 +106,16 @@ class EntityFileTest extends Api4TestBase implements TransactionalInterface, Hoo
     $activity = $this->createTestRecord('Activity');
 
     foreach (['text/plain' => 'txt', 'image/png' => 'png', 'image/jpg' => 'jpg'] as $mimeType => $ext) {
-      // FIXME: Use api4 when available
-      civicrm_api3('Attachment', 'create', [
-        'entity_table' => 'civicrm_activity',
-        'entity_id' => $activity['id'],
-        'name' => 'test_file.' . $ext,
+      $file = $this->createTestRecord('File', [
+        'file_name' => 'test_file.' . $ext,
         'mime_type' => $mimeType,
         'content' => 'hello',
-      ])['id'];
+      ]);
+      $this->createTestRecord('EntityFile', [
+        'file_id' => $file['id'],
+        'entity_table' => 'civicrm_activity',
+        'entity_id' => $activity['id'],
+      ]);
     }
 
     $get = Activity::get(FALSE)
