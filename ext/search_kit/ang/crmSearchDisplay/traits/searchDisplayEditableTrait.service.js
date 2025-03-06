@@ -19,6 +19,7 @@
           this.editing = row.key;
           row.columns.forEach((col, index) => {
             col.editing = (index === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
+            col.focused = index === colIndex;
           });
         }
       },
