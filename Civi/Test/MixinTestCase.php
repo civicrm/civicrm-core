@@ -167,7 +167,7 @@ abstract class MixinTestCase extends \PHPUnit\Framework\TestCase implements \Civ
         }
 
         if ($exitCode !== 0) {
-          throw new RuntimeException("Command failed ($cmd):\n$result");
+          throw new \RuntimeException("Command failed ($cmd):\n$result");
         }
         switch ($decode) {
           case 'raw':
@@ -184,7 +184,7 @@ abstract class MixinTestCase extends \PHPUnit\Framework\TestCase implements \Civ
             return json_decode($result, 1);
 
           default:
-            throw new RuntimeException("Bad decoder format ($decode)");
+            throw new \RuntimeException("Bad decoder format ($decode)");
         }
       }
 
