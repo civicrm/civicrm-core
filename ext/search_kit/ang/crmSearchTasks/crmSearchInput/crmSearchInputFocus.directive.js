@@ -37,7 +37,6 @@
         }
 
         function focusOn() {
-          scope.manualFocus = true;
           let [jQueryObject, type] = getFocusableInput();
 
           if (type === 'default') {
@@ -76,17 +75,9 @@
           }
         }
 
-        function removeFocus() {
-          getFocusableInput().trigger('blur');
-        }
-
-        function endManualFocus() {
-          scope.manualFocus = false;
-        }
-
         scope.$watch(attrs.crmSearchInputFocus, function(flag) {
           if(flag === true) {
-            $timeout(focusOn).then(endManualFocus);
+            $timeout(focusOn);
           }
         });
       }
