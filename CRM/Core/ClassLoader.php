@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Security\PharLoader;
+
 /**
  *
  *
@@ -138,6 +140,11 @@ class CRM_Core_ClassLoader {
     set_include_path($include_paths . PATH_SEPARATOR . get_include_path());
     // @todo Why do we need to load this again?
     $this->requireComposerAutoload();
+
+    if (!PharLoader::isPharLoadingEnabled()) {
+      // Ex: In Backdrop with CMS-first boot, the loader is missing.
+      PharLoader::register();
+    }
 
     $mixinLib = dirname(__DIR__, 2) . '/mixin/lib';
     ($GLOBALS['_PathLoad'][0] ?? require "$mixinLib/pathload-0.php");
