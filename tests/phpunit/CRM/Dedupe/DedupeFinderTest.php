@@ -222,6 +222,56 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the Dedupe Query Optimizer when it decides that later queries are 'inclusive'.
+   *
+   * This currently tests that the 'inclusive' code flow does not break. The 'inclusive'
+   * code flow is a legacy flow that decides that if all remaining queries are needed to
+   * reach the threshold they go through a process of building a shared table. The goal
+   * is to dismantle this code in favour of recombining the queries based on the results of
+   * earlier queries. However, the goal of this test is just to ensure there is a test
+   * passing through this logic. When the logic changes the test can check the more efficient
+   * queries are generated.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function testFinderQueryOptimizerFirstRuleChangesLaterQueries(): void {
+    $this->createRuleGroup(['threshold' => 15]);
+    // Note that in this format the number at the end is the weight.
+    $queries = [
+      ['civicrm_contact', 'first_name', 10],
+      ['civicrm_contact', 'last_name', 9],
+      ['civicrm_contact', 'nick_name', 3],
+      ['civicrm_address', 'city', 3],
+    ];
+    $this->createRules($queries);
+    $this->individualCreate([
+      'first_name' => 'Robert',
+      'nick_name' => 'Bob',
+      'last_name' => 'Smith',
+      'phone_primary.phone' => 123,
+      'address_primary.street_address' => 'sesame street',
+      'address_primary.city' => 'Bobville',
+      'version' => 4,
+    ]);
+    // One the first name fails to match ALL the others must match.
+    $result = \CRM_Contact_BAO_Contact::findDuplicates([
+      'civicrm_contact' => ['first_name' => 'Bob', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
+      'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
+      'civicrm_phone' => ['phone' => 123],
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
+      'contact_type' => 'Individual',
+    ]);
+    $this->assertEquals([$this->ids['Contact']['individual_0']], $result);
+    $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
+
+    $this->assertCount(3, $queries);
+    $query = reset($queries);
+    $this->assertEquals(10, $query['weight']);
+    $this->assertEquals(0, $query['found_rows']);
+  }
+
+  /**
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \CRM_Core_Exception
    */
