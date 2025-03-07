@@ -39,7 +39,7 @@ class Download extends AbstractRunAction {
    *
    * @var bool
    */
-  protected $downloadAsFile = true;
+  protected $downloadAsFile = TRUE;
 
   private $formats = [
     'xlsx' => [
@@ -128,14 +128,14 @@ class Download extends AbstractRunAction {
 
       default:
         // Only send headers when downloading as a file.
-        if ($this->downloadAsFile){
+        if ($this->downloadAsFile) {
           $this->sendHeaders($fileName);
         }
         $this->outputSpreadsheet($rows, $columns);
     }
 
     // Only need to exit when downloading file.
-    if ($this->downloadAsFile){
+    if ($this->downloadAsFile) {
       \CRM_Utils_System::civiExit();
     }
   }
