@@ -258,9 +258,6 @@ class SettingsBag {
    * @return SettingsBag
    */
   public function set($key, $value) {
-    if ($this->updateVirtual($key, $value)) {
-      return $this;
-    }
     $this->setDb($key, $value);
     return $this;
   }
@@ -284,10 +281,6 @@ class SettingsBag {
   public function importValues(array $newValues): void {
     $currentValues = $this->exportValues();
 
-    foreach ($this->getVirtualKeys() as $key) {
-      unset($newValues[$key], $currentValues[$key]);
-    }
-
     $revertKeys = array_diff(array_keys($currentValues), array_keys($newValues));
     foreach ($revertKeys as $key) {
       $this->revert($key);
@@ -298,39 +291,13 @@ class SettingsBag {
     }
   }
 
-  private function getVirtualKeys(): array {
-    return ['contribution_invoice_settings'];
-  }
-
   /**
-   * Update a virtualized/deprecated setting.
-   *
-   * Temporary handling for phasing out contribution_invoice_settings.
-   *
-   * Until we have transitioned we need to handle setting & retrieving
-   * contribution_invoice_settings.
-   *
-   * Once removed from core we will add deprecation notices & then remove this.
-   *
-   * https://lab.civicrm.org/dev/core/issues/1558
-   *
-   * @param string $key
-   * @param array $value
-   * @return bool
-   *   TRUE if $key is a virtualized setting. FALSE if it is a normal setting.
+   * Deprecated and does nothing
+   * Will be removed sometime after June 2027
+   * @deprecated
    */
-  public function updateVirtual($key, $value) {
-    if ($key === 'contribution_invoice_settings') {
-      \CRM_Core_Error::deprecatedWarning('Invoicing settings should be directly accessed - eg Civi::setting()->set("invoicing")');
-      foreach (SettingsBag::getContributionInvoiceSettingKeys() as $possibleKeyName => $settingName) {
-        $keyValue = $value[$possibleKeyName] ?? '';
-        if ($possibleKeyName === 'invoicing' && is_array($keyValue)) {
-          $keyValue = $keyValue['invoicing'];
-        }
-        $this->set($settingName, $keyValue);
-      }
-      return TRUE;
-    }
+  public function updateVirtual() {
+    \CRM_Core_Error::deprecatedWarning('Invoicing settings should be directly accessed - eg Civi::setting()->set("invoicing")');
     return FALSE;
   }
 
@@ -340,20 +307,7 @@ class SettingsBag {
    * @return array
    */
   public function computeVirtual() {
-    $contributionSettings = [];
-    foreach (SettingsBag::getContributionInvoiceSettingKeys() as $keyName => $settingName) {
-      switch ($keyName) {
-        case 'invoicing':
-          $contributionSettings[$keyName] = $this->get($settingName) ? [$keyName => 1] : 0;
-          break;
-
-        default:
-          $contributionSettings[$keyName] = $this->get($settingName);
-          break;
-      }
-    }
     return array_merge(
-        ['contribution_invoice_settings' => $contributionSettings],
         $this->interpolateDsnSettings('civicrm'),
         // TODO: provide equivalent component settings for CIVICRM_UF_DSN
         // $this->interpolateDsnSettings('civicrm_uf')
@@ -519,10 +473,12 @@ class SettingsBag {
   }
 
   /**
+   * @deprecated Will be removed sometime after June 2027
    * @return array
    */
   public static function getContributionInvoiceSettingKeys(): array {
-    $convertedKeys = [
+    \CRM_Core_Error::deprecatedWarning('Invoicing settings should be directly accessed - eg Civi::setting()->set("invoicing")');
+    return [
       'credit_notes_prefix' => 'credit_notes_prefix',
       'invoice_prefix' => 'invoice_prefix',
       'due_date' => 'invoice_due_date',
@@ -533,7 +489,6 @@ class SettingsBag {
       'tax_display_settings' => 'tax_display_settings',
       'invoicing' => 'invoicing',
     ];
-    return $convertedKeys;
   }
 
   /**
