@@ -82,7 +82,6 @@ trait CRMTraits_PCP_PCPTestTrait {
    *
    * @return int
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function createPCPBlock(array $params):int {
     $blockParams = $this->pcpBlockParams();
