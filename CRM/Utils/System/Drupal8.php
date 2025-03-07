@@ -1020,7 +1020,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function isMaintenanceMode(): bool {
     try {
-      return \Drupal::state()->get('system.maintenance_mode');
+      return \Drupal::state()->get('system.maintenance_mode') ?: FALSE;
     }
     catch (\Exception $e) {
       // catch in case Drupal isn't fully booted and can't answer
