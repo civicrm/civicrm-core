@@ -19,15 +19,17 @@ namespace Civi\Api4\Action\SearchDisplay;
 class SaveFile extends AbstractRunAction {
   /**
    * The name of the file for the report output that is saved to the file system.
-   * @required
+   *
    * @var string
+   * @required
    */
   protected $fileName;
 
   /**
    * The name of the report for the document being created.
-   * @required
+   *
    * @var string
+   * @required
    */
   protected $reportName;
 
