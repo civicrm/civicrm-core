@@ -122,7 +122,6 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
       'file_type_id' => NULL,
       'mime_type' => 'image/png',
       'uri' => 'fake_file.png',
-      'document' => NULL,
       'description' => 'Fake file',
       'upload_date' => '2023-05-10 15:00:00',
       'created_id' => $contactId,
