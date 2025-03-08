@@ -18,7 +18,7 @@
 /**
  * BAO object for crm_log table
  */
-class CRM_Core_BAO_File extends CRM_Core_DAO_File {
+class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInterface {
 
   public static $_signableFields = ['entityTable', 'entityID', 'fileID'];
 
@@ -36,6 +36,18 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    */
   public static function create($params) {
     return self::writeRecord($params);
+  }
+
+  /**
+   * Event fired before an action is taken on a File record.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create') {
+      if (empty($event->params['created_id'])) {
+        $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
+      }
+    }
   }
 
   /**
