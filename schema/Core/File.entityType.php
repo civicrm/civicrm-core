@@ -50,8 +50,9 @@ return [
       'title' => ts('File Contents'),
       'sql_type' => 'mediumblob',
       'input_type' => NULL,
-      'description' => ts('contents of the document'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '1.5',
+      'deprecated' => TRUE,
     ],
     'description' => [
       'title' => ts('File Description'),
