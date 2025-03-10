@@ -13,7 +13,7 @@ namespace Civi\Api4;
 /**
  * EntityFile Bridge.
  *
- * @searchable bridge
+ * @searchable secondary
  * @since 5.67
  * @package Civi\Api4
  */
