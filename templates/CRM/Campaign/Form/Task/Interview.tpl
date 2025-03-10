@@ -278,7 +278,9 @@ function registerInterview( voterId ) {
     if (fldId.indexOf('_custom_') == -1 &&
       fldId.indexOf('_result') == -1  &&
       fldId.indexOf('_note') == -1 ) {
-      data[fldId] = CRM.$(this).val( );
+      data[fldId] = CRM.$(this).prop('type') == 'checkbox' ?
+        (CRM.$(this).is(':checked') ? '1' : '0') :
+        CRM.$(this).val();
     }
   });
 
