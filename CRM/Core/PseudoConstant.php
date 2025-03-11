@@ -320,13 +320,22 @@ class CRM_Core_PseudoConstant {
       if (!$daoName) {
         return NULL;
       }
-      // We don't have good mapping so have to do a bit of guesswork from the menu
-      [, $parent, , $child] = explode('_', $daoName);
-      $sql = "SELECT path FROM civicrm_menu
+
+      $dao = new $daoName();
+      $path = $dao::getEntityPaths()['browse'] ?? NULL;
+
+      if (!$path) {
+        // We don't have good mapping so have to do a bit of guesswork from the menu
+        // @todo Get rid of this! It's unreliable and doesn't work if the path is replaced by
+        // an afform one because the callback changes to CRM_Afform_Page_AfformBase
+        [, $parent, , $child] = explode('_', $daoName);
+        $sql = "SELECT path FROM civicrm_menu
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
         LIMIT 1";
-      return CRM_Core_DAO::singleValueQuery($sql);
+        $path = CRM_Core_DAO::singleValueQuery($sql);
+      }
+      return $path;
     }
     return NULL;
   }
