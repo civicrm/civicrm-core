@@ -29,6 +29,13 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_2_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add column "civicrm_managed.checksum"', 'alterSchemaField', 'Managed', 'checksum', [
+      'title' => ts('Checksum'),
+      'sql_type' => 'varchar(45)',
+      'input_type' => 'Text',
+      'required' => FALSE,
+      'description' => ts('Configuration of the managed-entity when last stored'),
+    ]);
     $this->addTask('Set upload_date in file table', 'setFileUploadDate');
     $this->addTask('Set default for upload_date in file table', 'alterSchemaField', 'File', 'upload_date', [
       'title' => ts('File Upload Date'),
