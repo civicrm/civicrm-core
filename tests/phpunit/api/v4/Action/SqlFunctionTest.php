@@ -277,7 +277,20 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       $origin = new \DateTimeImmutable($result[$aid]['created_date']);
       $target = new \DateTimeImmutable($result[$aid]['activity_date_time']);
       $diffInSeconds = $target->getTimestamp() - $origin->getTimestamp();
-      $this->assertEquals($diffInSeconds, $result[$aid]['time_diff']);
+
+      // The behaviors of TIMESTAMPDIFF() and DateTimeImmutable->getTimestamp() are
+      // fundamentally misaligned because
+      // (1) the input columns created_date (TIMESTAMP) and activity_date_time (DATETIME) have different TZ handling, and
+      // (2) https://lab.civicrm.org/dev/core/-/issues/3121 means that MySQL cannot identify appropriate DST offsets.
+      // If your organization's jurisdiction does not observe DST, then maybe you don't care.
+      // Similarly, if you're only interested in high-level differences (days/months/years), then DST is a rounding error.
+      // But in general, until the timezone situation is better, you have to expect TIMESTAMPDIFF() to give flaky outputs.
+
+      // $this->assertEquals($diffInSeconds, $result[$aid]['time_diff']);
+      $this->assertTrue(
+        in_array($result[$aid]['time_diff'], [$diffInSeconds, $diffInSeconds + 3600, $diffInSeconds - 3600])
+      );
+
     }
   }
 
