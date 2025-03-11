@@ -1800,7 +1800,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function getSelfServiceEligibility(int $participantId, string $url, bool $isBackOffice) : array {
     $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
     $query = "
-      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id, ce.start_date, ce.title, cp.event_id, ce.allow_selfcancelxfer
+      SELECT cpst.name as status, cpst.label as statuslabel, cov.name as role, cov.label as rolelabel, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id, ce.start_date, ce.title, cp.event_id, ce.allow_selfcancelxfer
       FROM civicrm_participant cp
       LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
       LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
@@ -1813,6 +1813,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $details['role'] = $dao->role;
       $details['fee_level'] = $dao->fee_level ? implode('<br>', CRM_Core_DAO::unSerializeField($dao->fee_level, CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND)) : NULL;
       $details['fee_amount'] = $dao->fee_amount;
+      $details['rolelabel'] = $dao->rolelabel;
+      $details['statuslabel'] = $dao->statuslabel;
       $details['register_date'] = $dao->register_date;
       $details['event_start_date'] = $dao->start_date;
       $details['allow_selfcancelxfer'] = $dao->allow_selfcancelxfer;
