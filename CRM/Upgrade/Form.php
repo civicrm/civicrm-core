@@ -758,9 +758,7 @@ SET    version = '$version'
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  public static function doCoreFinish(): bool {
-    $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
-
+  public static function doCoreFinish(CRM_Queue_TaskContext $ctx): bool {
     $upgrade = new CRM_Upgrade_Form();
     [$ignore, $latestVer] = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
@@ -768,7 +766,19 @@ SET    version = '$version'
     // Going forward, any new tasks will run in `upgrade.finish` mode.
     // @see \CRM_Upgrade_DispatchPolicy::pick()
 
-    $config = CRM_Core_Config::singleton();
+    // (1) For web-upgrade (multi-process), we should resume as another step. It implicitly switches to 'upgrade.finish' on new requests.
+    $ctx->queue->createItem(
+      new CRM_Queue_Task([static::CLASS, 'doRebuild'], [], ts('Rebuild')),
+      ['weight' => -1]
+    );
+
+    // (2) For CLI-upgrade (single-process), we must force-switch to 'upgrade.finish' policy.
+    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
+    return TRUE;
+  }
+
+  public static function doRebuild(CRM_Queue_TaskContext $ctx): bool {
+    $config = CRM_Core_Config::singleton(TRUE, TRUE);
     $config->userSystem->flush();
 
     CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
