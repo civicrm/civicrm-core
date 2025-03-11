@@ -885,6 +885,7 @@ $100.00
     $this->assertStringContainsString('Beverley Hills
 90210
 California
+CA
 United States', $tokenProcessor->getRow(0)->render('message'));
   }
 
@@ -950,6 +951,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.city}' => 'Domain (Organization) City',
       '{domain.postal_code}' => 'Domain (Organization) Postal Code',
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
+      '{domain.state_province_id:abbr}' => 'Domain (Organization) State Abbreviation',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
       '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
       '{site.message_header}' => 'Message Header',
