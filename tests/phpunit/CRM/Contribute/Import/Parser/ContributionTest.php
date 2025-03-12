@@ -110,7 +110,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'total_amount'],
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
-      ['name' => 'external_identifier'],
+      ['name' => 'contact.external_identifier'],
       ['name' => 'soft_credit.contact.external_identifier', 'soft_credit_type_id' => 1],
       ['name' => 'note'],
     ];
@@ -178,7 +178,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'financial_type_id'],
       ['name' => ''],
       ['name' => ''],
-      ['name' => 'email_primary.email'],
+      ['name' => 'contact.email_primary.email'],
       ['name' => 'soft_credit.contact.email_primary.email', 'soft_credit_type_id' => 1],
     ];
     $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
@@ -270,7 +270,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       // Note that default_value is supported via the parser and the angular form
       // but there is no way to enter it on the quick form.
       ['name' => 'financial_type_id', 'default_value' => 'Donation'],
-      ['name' => 'source'],
+      ['name' => 'contact.source'],
       ['name' => 'receive_date'],
       ['name' => 'external_identifier'],
       ['name' => 'soft_credit.contact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
@@ -634,7 +634,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => ''],
       ['name' => ''],
-      ['name' => 'contribution_source'],
+      ['name' => 'source'],
       ['name' => 'trxn_id'],
       ['name' => 'campaign_id'],
     ];
@@ -660,7 +660,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
-      ['name' => 'email_primary.email'],
+      ['name' => 'contact.email_primary.email'],
       ['name' => ''],
       ['name' => ''],
       ['name' => 'trxn_id'],
@@ -852,7 +852,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'total_amount'],
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
-      ['name' => 'source'],
+      ['name' => 'contact.source'],
       ['name' => ''],
     ];
     $this->importCSV('contributions_update.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
@@ -934,12 +934,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   private function importContributionsDotCSV(array $submittedValues = []): CRM_Import_DataSource_CSV {
     $this->importCSV('contributions.csv', [
-      ['name' => 'first_name'],
+      ['name' => 'contact.first_name'],
       ['name' => 'total_amount'],
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
-      ['name' => 'email_primary.email'],
-      ['name' => 'contribution_source'],
+      ['name' => 'contact.email_primary.email'],
+      ['name' => 'source'],
       ['name' => 'note'],
       ['name' => 'trxn_id'],
     ], $submittedValues);

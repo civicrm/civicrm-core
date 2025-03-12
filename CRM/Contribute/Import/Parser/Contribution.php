@@ -245,12 +245,20 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $tmpFields[$realField] = $tmpFields[$uniqueField];
         unset($tmpFields[$uniqueField]);
       }
-      $tmpContactField = $this->getContactFields($this->getContactType());
       // I haven't un-done this unique field yet cos it's more complex.
       $tmpFields['contribution_contact_id']['title'] = $tmpFields['contribution_contact_id']['html']['label'] = $tmpFields['contribution_contact_id']['title'] . ' ' . ts('(match to contact)');
       $tmpFields['contribution_contact_id']['contact_type'] = ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'];
       $tmpFields['contribution_contact_id']['match_rule'] = '*';
-      $fields = array_merge($fields, $tmpContactField);
+      $tmpContactField = $this->getContactFields($this->getContactType());
+      foreach ($tmpContactField as $contactField) {
+        $fields['contact.' . $contactField['name']] = array_merge($contactField, [
+          'title' => ts('Contact') . ' ' . $contactField['title'],
+          'softCredit' => FALSE,
+          'entity' => 'Contact',
+          'entity_instance' => 'Contact',
+          'entity_prefix' => 'contact.',
+        ]);
+      }
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, $note);
       $apiv4 = Contribution::getFields(TRUE)->addWhere('custom_field_id', '>', 0)->execute();
@@ -351,7 +359,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           'contact_type' => $this->getSubmittedValue('contactType'),
           'dedupe_rule' => $this->getDedupeRule($this->getContactType())['name'],
         ],
-        'entity_field_prefix' => '',
+        'entity_field_prefix' => 'contact.',
         'default_action' => 'select',
         'entity_name' => 'Contact',
         'entity_title' => ts('Contribution Contact'),
@@ -746,7 +754,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @return string[]
    */
   protected function getOddlyMappedMetadataFields(): array {
-    $uniqueNames = ['contribution_id', 'contribution_contact_id', 'contribution_source'];
+    $uniqueNames = ['contribution_id', 'contribution_contact_id'];
     $fields = [];
     foreach ($uniqueNames as $name) {
       $fields[$this->importableFieldsMetadata[$name]['name']] = $name;
