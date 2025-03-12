@@ -4,39 +4,55 @@ require_once 'riverlea.civix.php';
 use CRM_riverlea_ExtensionUtil as E;
 
 /**
- * Supports multiple theme variations/streams.
+ * Supply available streams to the theme hook
+ *
+ * Note: if this looks labour intensive, don't worry - the output
+ * is cached in \Civi\Core\Themes
  */
 function riverlea_civicrm_themes(&$themes) {
-  $themes['minetta'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Minetta (RiverLea ~Greenwich)',
-    'prefix' => 'streams/minetta/',
-    'search_order' => array('minetta', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['walbrook'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Walbrook (RiverLea ~Shoreditch/Island)',
-    'prefix' => 'streams/walbrook/',
-    'search_order' => array('walbrook', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['hackneybrook'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Hackney Brook (RiverLea ~Finsbury Park)',
-    'prefix' => 'streams/hackneybrook/',
-    'search_order' => array('hackneybrook', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['thames'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Thames (RiverLea ~Aah)',
-    'prefix' => 'streams/thames/',
-    'search_order' => array('thames', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['_riverlea_core_'] = array(
+  // always add (hidden) Riverlea base theme
+  $themes['_riverlea_core_'] = [
     'ext' => 'riverlea',
     'title' => 'Riverlea: base theme',
     'prefix' => 'core/',
-    'search_order' => array('_riverlea_core_', '_fallback_'),
-  );
+    'search_order' => ['_riverlea_core_', '_fallback_'],
+  ];
+
+  try {
+    $streams = \Civi::service('riverlea.dynamic_css')->getAvailableStreamMeta();
+  }
+  catch (\CRM_Core_Exception $e) {
+    // dont crash the whole hook if Riverlea is broken
+    \CRM_Core_Session::setStatus('Error occured making Riverlea streams available to the theme engine: ' . $e->getMessage());
+    return;
+  }
+
+  $streamsById = array_column($streams, NULL, 'id');
+
+  foreach ($streams as $name => $stream) {
+    $themeMeta = [
+      'title' => $stream['label'],
+      'search_order' => [],
+    ];
+
+    $extension = $stream['extension'];
+
+    // we only add the stream itself to the search order if
+    // it has an extension (which indicates it may have its own
+    // file overrides)
+    if ($extension) {
+      $themeMeta['search_order'][] = $name;
+
+      // used to resolve files from this stream
+      $themeMeta['ext'] = $extension;
+      $themeMeta['prefix'] = $stream['file_prefix'] ?? '';
+    }
+
+    $themeMeta['search_order'][] = '_riverlea_core_';
+    $themeMeta['search_order'][] = '_fallback_';
+
+    $themes[$name] = $themeMeta;
+  }
 }
 
 /**
@@ -44,9 +60,9 @@ function riverlea_civicrm_themes(&$themes) {
  * @return bool
  */
 function _riverlea_is_active() {
-  $themeKey = Civi::service('themes')->getActiveThemeKey();
-  $themeExt = Civi::service('themes')->get($themeKey)['ext'];
-  return ($themeExt === 'riverlea');
+  $themeKey = \Civi::service('themes')->getActiveThemeKey();
+  $themeSearchOrder = \Civi::service('themes')->get($themeKey)['search_order'] ?? [];
+  return in_array('_riverlea_core_', $themeSearchOrder);
 }
 
 function riverlea_civicrm_config(&$config) {
