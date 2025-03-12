@@ -147,7 +147,7 @@ class CRM_Queue_Runner {
   }
 
   /**
-   * [EXPERIMENTAL] Run all tasks interactively. Redirect to a screen which presents the progress.
+   * Run all tasks interactively. Redirect to a screen which presents the progress.
    *
    * The exact mechanism and pageflow may be determined by the system configuration --
    * environments which support multiprocessing (background queue-workers) can use those;
