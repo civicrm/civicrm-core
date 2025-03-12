@@ -50,7 +50,7 @@
         </tr>
         <tr>
           <td>
-            <label>{ts}Contact Type(s){/ts}</label>
+            <label>{ts}Contact Type{/ts}</label>
           </td>
           <td>
             {$form.contact_type.html}
