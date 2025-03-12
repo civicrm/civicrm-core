@@ -95,7 +95,7 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
   border-right: var(--crm-table-column-border);
 }
 .crm-container table td:has(.btn-slide),
-.crm-container table td:not(.crm-case-date):has(.action-item) {
+.crm-container table:not(.crm-info-panel) td:not(.crm-case-date):has(.action-item) {
   text-align: right;
 }
 .crm-container table.crm-mailing-ab-table td:has(.action-item) {

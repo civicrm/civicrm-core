@@ -1,3 +1,8 @@
+1.4.0-6.2alpha
+ - FIXED - right-align of event participant contact details removed (https://lab.civicrm.org/extensions/riverlea/-/issues/119).
+ - FIXED - FormBuilder left tabs squash and become illegible when too many items (https://lab.civicrm.org/extensions/riverlea/-/issues/116)
+ - CHANGED - only bottom align delete button when there are a limited number of custom activities (default list plus up to three more custom activities), otherwise keep inline (https://lab.civicrm.org/extensions/riverlea/-/issues/117#note_178676)
+
 1.3.8-6.0alpha
  - FIXED - solves various issues around the naming of crm-text-light and crm-text-dark (https://github.com/civicrm/civicrm-core/pull/31994);
  - FIXED - Bootstrap Time input fields limit width, not 100%.

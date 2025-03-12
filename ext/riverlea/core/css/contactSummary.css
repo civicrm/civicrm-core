@@ -285,7 +285,7 @@ div.crm-inline-edit-form div.crm-clear {
 #crm-contact-actions-list ul a {
   display: block;
 }
-.crm-contact-crm-contact-delete {
+.crm-contact-actions-list-inner:not(:has(.crm-activity-type_6)) .crm-contact-crm-contact-delete {
   margin-top: auto;
 }
 #crm-contact-actions-list .crm-contact_activities-list select {
