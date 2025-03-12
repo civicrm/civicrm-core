@@ -10,10 +10,81 @@
  */
 
 /**
- * APIv3 for mailing groups.
+ * APIv3 functions for registering/processing mailing group events.
  *
+ * @deprecated
  * @package CiviCRM_APIv3
  */
+
+/**
+ * Declare deprecated functions.
+ *
+ * @deprecated api notice
+ * @return string
+ *   to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_mailing_group_deprecation() {
+  $message = 'This action is deprecated. Use the mailing_event API instead.';
+  return [
+    'event_unsubscribe' => $message,
+    'event_domain_unsubscribe' => $message,
+    'event_resubscribe' => $message,
+    'event_subscribe' => $message,
+  ];
+}
+
+/**
+ * Handle an unsubscribe event.
+ *
+ * @deprecated
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_group_event_unsubscribe($params) {
+  return civicrm_api('mailing_event_unsubscribe', 'create', $params);
+}
+
+/**
+ * Handle a site-level unsubscribe event.
+ *
+ * @deprecated
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_group_event_domain_unsubscribe($params) {
+  $params['org_unsubscribe'] = 1;
+  return civicrm_api('mailing_event_unsubscribe', 'create', $params);
+}
+
+/**
+ * Handle a re-subscription event.
+ *
+ * @deprecated
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_group_event_resubscribe($params) {
+  return civicrm_api('mailing_event_resubscribe', 'create', $params);
+}
+
+/**
+ * Handle a subscription event.
+ *
+ * @deprecated
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_group_event_subscribe($params) {
+  return civicrm_api('mailing_event_subscribe', 'create', $params);
+}
 
 /**
  * Create mailing group.
