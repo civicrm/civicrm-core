@@ -401,7 +401,7 @@ class CRM_Mailing_BAO_Query {
     $mailings = CRM_Mailing_BAO_Mailing::getMailingsList();
 
     if (!empty($mailings)) {
-      $form->add('select', 'mailing_id', ts('Mailing Name(s)'), $mailings, FALSE,
+      $form->add('select', 'mailing_id', ts('Mailing Name'), $mailings, FALSE,
         ['id' => 'mailing_id', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
