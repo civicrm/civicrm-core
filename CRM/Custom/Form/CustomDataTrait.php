@@ -86,6 +86,21 @@ trait CRM_Custom_Form_CustomDataTrait {
 
     $formValues = [];
     foreach ($fields as $field) {
+      // Filter for fields in "Inline" style custom groups only, as others are not added to forms via Ajax. Not removing
+      // them here would register them in the QuickForm but not have POST values for them, which might result in data
+      // loss (most notably radio fields, for which no POST value will be interpreted as a reset).
+      // See https://lab.civicrm.org/dev/core/-/issues/5613
+      if (!isset(Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']])) {
+        Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']] = \Civi\Api4\CustomGroup::get(FALSE)
+          ->addSelect('style')
+          ->addWhere('name', '=', $field['custom_group'])
+          ->execute()
+          ->single();
+      }
+      if ('Inline' !== Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']]['style']) {
+        continue;
+      }
+
       // Here we add the custom fields to the form
       // based on whether they have been 'POSTed'
       foreach ($this->getInstancesOfField($field['custom_field_id']) as $elementName) {
