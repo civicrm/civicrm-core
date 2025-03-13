@@ -682,7 +682,7 @@ input.crm-form-checkbox) + label {
   gap: var(--crm-xs);
 }
 .crm-form-date-wrapper {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   flex-flow: wrap;
   gap: var(--crm-flex-gap);
