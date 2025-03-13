@@ -1,5 +1,5 @@
 <form name="crmSearchDisplayEditableForm">
-  <crm-search-input class="form-inline" field="$ctrl.field" ng-model="$ctrl.display.editValues[$ctrl.colKey]"></crm-search-input>
+  <crm-search-input class="form-inline" field="$ctrl.field" ng-model="$ctrl.display.editValues[$ctrl.colKey]" crm-search-input-focus="{{:: $ctrl.colData.focused }}"></crm-search-input>
   <div class="form-inline crm-search-display-editable-buttons" ng-if="!$ctrl.isFullRowMode">
     <button type="submit" ng-disabled="!crmSearchDisplayEditableForm.$valid" ng-click="$ctrl.save()" class="btn btn-xs btn-success">
       <span class="sr-only">{{:: ts('Save') }}</span>
