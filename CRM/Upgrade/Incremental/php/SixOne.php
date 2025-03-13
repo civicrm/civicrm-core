@@ -111,6 +111,8 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       $fieldsToConvert['source'] = 'contact.source';
       $fieldsToConvert['id'] = 'contact.id';
       $fieldsToConvert['contribution_source'] = 'source';
+      $fieldsToConvert['contribution_id'] = 'id';
+      $fieldsToConvert['contribution_contact_id'] = 'contact_id';
     }
 
     $customFields = CRM_Core_DAO::executeQuery('
