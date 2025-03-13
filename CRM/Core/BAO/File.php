@@ -255,13 +255,6 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
 
     if (!empty($cfIDs)) {
       foreach ($cfIDs as $fileID => $fUri) {
-        $tagParams = [
-          'entity_table' => 'civicrm_file',
-          'entity_id' => $fileID,
-        ];
-        // Delete tags from entity tag table.
-        CRM_Core_BAO_EntityTag::del($tagParams);
-
         // sequentially deletes EntityFile entry and then deletes File record
         CRM_Core_DAO_EntityFile::deleteRecord(['id' => $cefIDs[$fileID]]);
         // Delete file only if there are no longer any entities using this file.

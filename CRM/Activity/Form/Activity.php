@@ -877,14 +877,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $deleteParams = ['id' => $activityId];
         $moveToTrash = CRM_Case_BAO_Case::isCaseActivity($activityId);
         CRM_Activity_BAO_Activity::deleteActivity($deleteParams, $moveToTrash);
-
-        // delete tags for the entity
-        $tagParams = [
-          'entity_table' => 'civicrm_activity',
-          'entity_id' => $activityId,
-        ];
-
-        CRM_Core_BAO_EntityTag::del($tagParams);
       }
 
       CRM_Core_Session::setStatus(

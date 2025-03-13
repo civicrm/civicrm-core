@@ -364,12 +364,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $statusMsg = ts("Selected Activity cannot be deleted.");
       }
 
-      $tagParams = [
-        'entity_table' => 'civicrm_activity',
-        'entity_id' => $this->_activityId,
-      ];
-      CRM_Core_BAO_EntityTag::del($tagParams);
-
       CRM_Core_Session::setStatus('', $statusMsg, 'info');
       return;
     }
