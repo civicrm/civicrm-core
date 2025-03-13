@@ -84,6 +84,19 @@ NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
   }
 
   /**
+   * Test rendering an alternate location.
+   */
+  public function testMailingLabelOtherLocation(): void {
+    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {contact.phone}');
+    $this->createTestAddresses();
+    $rows = $this->submitForm([
+      'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Work'),
+    ]);
+    // Check that the non-primary phone has been appended - ie the one with 0 for non-primary at the end.
+    $this->assertEquals($this->getExpectedAddress('souza', FALSE) . ' 1230', $rows[$this->ids['Contact']['souza']][0]);
+  }
+
+  /**
    * Test the mailing label rows contain the primary addresses when
    * location_type_id = none (as primary) is chosen in form.
    *
@@ -111,19 +124,20 @@ NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
    * Get the default address we expect for our test contact with the default string.
    *
    * @param string $identifier
+   * @param bool $isPrimary
    *
    * @return string
    */
-  protected function getExpectedAddress(string $identifier): string {
+  protected function getExpectedAddress(string $identifier, bool $isPrimary = TRUE): string {
     if ($identifier === 'souza') {
       return 'Mr. Antonia J. D`souza II
-Main Street 231
+Main Street 23' . (int) $isPrimary . '
 Brummen, 6971 BN
 NETHERLANDS';
     }
     if ($identifier === 'collins') {
       return 'Mr. Anthony J. Collins II
-Main Street 231
+Main Street 23' . (int) $isPrimary . '
 Brummen, 6971 BN
 NETHERLANDS';
     }
@@ -161,6 +175,16 @@ NETHERLANDS';
           'postal_code' => '6971 BN',
           'country_id' => '1152',
           'city' => 'Brummen',
+          // Give them different location types, the actual types are random.
+          'location_type_id:name' => $isPrimary ? 'Main' : 'Work',
+          // this doesn't affect for non-primary address so we need to call the Address.update API again, see below at L57
+          'is_primary' => $isPrimary,
+          'contact_id' => $contactID,
+        ]);
+        $this->createTestEntity('Phone', [
+          'phone' => '123' . (int) $isPrimary,
+          // Give them different location types, the actual types are random.
+          'location_type_id:name' => $isPrimary ? 'Main' : 'Work',
           // this doesn't affect for non-primary address so we need to call the Address.update API again, see below at L57
           'is_primary' => $isPrimary,
           'contact_id' => $contactID,
