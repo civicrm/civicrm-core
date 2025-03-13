@@ -17,17 +17,7 @@ UPDATE civicrm_group SET `name` = `id` WHERE name IS NULL;
 UPDATE `civicrm_job` SET `api_entity` = CONCAT(UPPER(SUBSTRING(`api_entity`, 1 ,1)), SUBSTRING(`api_entity`, 2));
 
 -- Add name field, make frontend_title required (in conjunction with php function)
-{if $multilingual}
-    {foreach from=$locales item=locale}
-      UPDATE `civicrm_group`
-      SET `frontend_title_{$locale}` = `title_{$locale}`
-      WHERE `frontend_title_{$locale}` IS NULL OR `frontend_title_{$locale}` = '';
-
-      UPDATE `civicrm_group`
-      SET `frontend_description_{$locale}` = `description`
-      WHERE (`frontend_description_{$locale}` IS NULL OR `frontend_description_{$locale}` = '') AND `description` <> '';
-    {/foreach}
-{else}
+{localize field='title,frontend_title,frontend_description'}
   UPDATE `civicrm_group`
   SET `frontend_title` = `title`
   WHERE `frontend_title` IS NULL OR `frontend_title` = '';
@@ -35,7 +25,7 @@ UPDATE `civicrm_job` SET `api_entity` = CONCAT(UPPER(SUBSTRING(`api_entity`, 1 ,
   UPDATE `civicrm_group`
   SET `frontend_description` = `description`
   WHERE (`frontend_description` IS NULL OR `frontend_description` = '') AND description <> '';
-{/if}
+{/localize}
 
 {crmUpgradeSnapshot name=schedule}
   SELECT id, limit_to FROM civicrm_action_schedule
