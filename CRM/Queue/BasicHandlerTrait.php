@@ -118,7 +118,7 @@ trait CRM_Queue_BasicHandlerTrait {
         $this->runItem($item, $queue);
         $outcome = 'ok';
       }
-      catch (\Exception $e) {
+      catch (Throwable $e) {
         $outcome = $queue->getSpec('error');
         $exception = $e;
       }
