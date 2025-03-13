@@ -20,6 +20,12 @@ return [
       'unique' => TRUE,
       'add' => '3.1',
     ],
+    'Index_domain_id' => [
+      'fields' => [
+        'domain_id' => TRUE,
+      ],
+      'add' => '6.2',
+    ],
   ],
   'getFields' => fn() => [
     'id' => [
@@ -60,6 +66,15 @@ return [
       'pseudoconstant' => [
         'callback' => ['CRM_ACL_BAO_ACL', 'operation'],
       ],
+    ],
+    'domain_id' => [
+      'title'  => ts('Domain'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'description' => ts('Implicit FK to civicrm_domain'),
+      'add' => '6.2',
+      'required' => TRUE,
+      'default' => 1,
     ],
   ],
 ];

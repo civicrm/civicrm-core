@@ -78,6 +78,14 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
         'callback' => ['CRM_Core_SelectValues', 'customGroupStyle'],
       ],
     ]);
+    $this->addTask('Add in domain_id column to the civicrm_acl_contact_cache_table', 'alterSchemaField', 'ACLContactCache', 'domain_id', [
+      'title'  => ts('Domain'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'description' => ts('Implicit FK to civicrm_domain'),
+      'required' => TRUE,
+      'default' => 1,
+    ]);
   }
 
   public static function setFileUploadDate(): bool {
