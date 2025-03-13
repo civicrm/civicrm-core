@@ -41,7 +41,7 @@
         </a>
         <ul class="dropdown-menu" ng-if="menu.open">
           <li ng-class="{disabled: !editor.searchOptions || !editor.searchOptions.length}">
-            <input ng-if="editor.searchOptions && editor.searchOptions.length" type="search" class="form-control" placeholder="&#xf002" ng-model="searchDisplayListFilter.label">
+            <input ng-if="editor.searchOptions && editor.searchOptions.length" type="search" class="form-control" placeholder="&#x1f50d;" ng-model="searchDisplayListFilter.label">
             <a href ng-if="!editor.searchOptions"><i class="crm-i fa-spinner fa-spin"></i></a>
             <a href ng-if="editor.searchOptions && !editor.searchOptions.length">{{:: ts('None Found') }}</a>
           </li>
