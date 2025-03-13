@@ -46,6 +46,38 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'default' => 'CURRENT_TIMESTAMP',
       'description' => ts('Date and time that this attachment was uploaded or written to server.'),
     ]);
+    $this->addTask('CustomGroup: Make "name" required', 'alterSchemaField', 'CustomGroup', 'name', [
+      'title' => ts('Custom Group Name'),
+      'sql_type' => 'varchar(64)',
+      'input_type' => 'Text',
+      'description' => ts('Variable name/programmatic handle for this group.'),
+      'required' => TRUE,
+      'add' => '1.1',
+    ]);
+    $this->addTask('CustomGroup: Make "extends" required', 'alterSchemaField', 'CustomGroup', 'extends', [
+      'title' => ts('Custom Group Extends'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Select',
+      'description' => ts('Type of object this group extends (can add other options later e.g. contact_address, etc.).'),
+      'add' => '1.1',
+      'default' => 'Contact',
+      'required' => TRUE,
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_BAO_CustomGroup', 'getCustomGroupExtendsOptions'],
+      ],
+    ]);
+    $this->addTask('CustomGroup: Make "style" required', 'alterSchemaField', 'CustomGroup', 'style', [
+      'title' => ts('Custom Group Style'),
+      'sql_type' => 'varchar(15)',
+      'input_type' => 'Select',
+      'description' => ts('Visual relationship between this form and its parent.'),
+      'add' => '1.1',
+      'required' => TRUE,
+      'default' => 'Inline',
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_SelectValues', 'customGroupStyle'],
+      ],
+    ]);
   }
 
   public static function setFileUploadDate(): bool {
