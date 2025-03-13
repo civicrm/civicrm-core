@@ -5,7 +5,7 @@
   <div class="crm-accordion-body">
     <table class="form-layout-compressed">
       <tr class="crm-{$type}activity-form-block-followup_activity_type_id">
-	<td class="label">{ts}Schedule Follow-up Activity{/ts}</td>
+      <td class="label">{ts}Schedule Follow-up Activity{/ts}</td>
         <td>
           {$form.followup_activity_type_id.html}&nbsp;&nbsp;
           {ts}on{/ts} {$form.followup_date.html}
