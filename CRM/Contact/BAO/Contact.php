@@ -838,6 +838,20 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
+   * Get the CMS user id
+   *
+   * @param int $contactId
+   * @return int
+   */
+  private static function getUFId(int $contactId): int {
+    // Note: we're not using CRM_Core_BAO_UFMatch::getUFId() because that's cached.
+    $ufmatch = new CRM_Core_DAO_UFMatch();
+    $ufmatch->contact_id = $contactId;
+    $ufmatch->domain_id = CRM_Core_Config::domainID();
+    return $ufmatch->find(TRUE) ? $ufmatch->uf_id : 0;
+  }
+
+  /**
    * Delete a contact and all its associated records.
    *
    * @param int $id
@@ -890,15 +904,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       return FALSE;
     }
 
-    // Note: we're not using CRM_Core_BAO_UFMatch::getUFId() because that's cached.
-    $ufmatch = new CRM_Core_DAO_UFMatch();
-    $ufmatch->contact_id = $id;
-    $ufmatch->domain_id = CRM_Core_Config::domainID();
-    if ($ufmatch->find(TRUE)) {
-      // Do not permit a contact to be deleted if it is linked to a site user.
-      return FALSE;
-    }
-
     $contactType = $contact->contact_type;
     if ($restore) {
       // @todo deprecate calling contactDelete with the intention to restore.
@@ -914,8 +919,19 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $transaction = new CRM_Core_Transaction();
 
     if ($skipUndelete) {
-      $hookParams = ['check_permissions' => $checkPermissions];
+      $hookParams = [
+        'check_permissions' => $checkPermissions,
+        'uf_id' => self::getUFId($id),
+      ];
+
+      // Hook might delete the CMS user
       CRM_Utils_Hook::pre('delete', $contactType, $id, $hookParams);
+
+      // Do not permit a contact to be deleted if it is (still) linked to a site user.
+      if ($hookParams['uf_id'] && self::getUFId($id)) {
+        $transaction->rollback();
+        return FALSE;
+      }
 
       //delete billing address if exists.
       CRM_Contribute_BAO_Contribution::deleteAddress(NULL, $id);
@@ -953,6 +969,9 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $contact->delete();
     }
     else {
+      if (self::getUFId($id)) {
+        return FALSE;
+      }
       self::contactTrash($contact);
     }
     // currently we only clear employer cache.
