@@ -12,7 +12,7 @@
 
   <div class="form-inline">
     <label for="afform-list-filter">{{:: ts('Filter:') }}</label>
-    <input class="form-control" type="search" id="afform-list-filter" ng-model="$ctrl.searchAfformList" placeholder="&#xf002">
+    <input class="form-control" type="search" id="afform-list-filter" ng-model="$ctrl.searchAfformList" placeholder="&#x1f50d;">
     <div class="btn-group pull-right" ng-if="types[$ctrl.tab].options !== false" af-gui-menu>
       <a ng-if="types[$ctrl.tab].default" ng-href="{{ types[$ctrl.tab].default }}" class="btn btn-primary">
         {{ ts('New %1', {1: types[$ctrl.tab].label }) }}
@@ -23,7 +23,7 @@
       </button>
       <ul class="dropdown-menu" ng-if="menu.open">
         <li ng-class="{disabled: !types[$ctrl.tab].options || !types[$ctrl.tab].options.length}">
-          <input ng-if="types[$ctrl.tab].options && types[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#xf002" ng-model="searchCreateLinks.label">
+          <input ng-if="types[$ctrl.tab].options && types[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#x1f50d;" ng-model="searchCreateLinks.label">
           <a href ng-if="!types[$ctrl.tab].options"><i class="crm-i fa-spinner fa-spin"></i></a>
           <a href ng-if="types[$ctrl.tab].options && !types[$ctrl.tab].options.length">{{:: ts('None Found') }}</a>
         </li>
