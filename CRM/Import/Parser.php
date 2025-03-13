@@ -31,6 +31,7 @@ use Civi\UserJob\UserJobInterface;
  */
 abstract class CRM_Import_Parser implements UserJobInterface {
   use \Civi\API\EntityLookupTrait;
+  use \Civi\UserJob\UserJobTrait;
 
   /**
    * Return codes
@@ -41,23 +42,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * Codes for duplicate record handling
    */
   const DUPLICATE_SKIP = 1, DUPLICATE_UPDATE = 4, DUPLICATE_FILL = 8, DUPLICATE_NOCHECK = 16;
-
-  /**
-   * User job id.
-   *
-   * This is the primary key of the civicrm_user_job table which is used to
-   * track the import.
-   *
-   * @var int
-   */
-  protected $userJobID;
-
-  /**
-   * The user job in use.
-   *
-   * @var array
-   */
-  protected $userJob;
 
   /**
    * Potentially ambiguous options.
@@ -81,30 +65,11 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected $siteDefaultCountry = NULL;
 
   /**
-   * @return int|null
-   */
-  public function getUserJobID(): ?int {
-    return $this->userJobID;
-  }
-
-  /**
    * Ids of contacts created this iteration.
    *
    * @var array
    */
   protected $createdContacts = [];
-
-  /**
-   * Set user job ID.
-   *
-   * @param int $userJobID
-   *
-   * @return self
-   */
-  public function setUserJobID(int $userJobID): self {
-    $this->userJobID = $userJobID;
-    return $this;
-  }
 
   /**
    * Countries that the site is restricted to
@@ -119,25 +84,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   public function getTrackingFields(): array {
     return [];
-  }
-
-  /**
-   * Get User Job.
-   *
-   * API call to retrieve the userJob row.
-   *
-   * @return array
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getUserJob(): array {
-    if (empty($this->userJob)) {
-      $this->userJob = UserJob::get()
-        ->addWhere('id', '=', $this->getUserJobID())
-        ->execute()
-        ->first();
-    }
-    return $this->userJob;
   }
 
   /**
