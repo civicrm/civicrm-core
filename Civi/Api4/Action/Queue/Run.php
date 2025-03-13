@@ -101,6 +101,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
       catch (\Throwable $t) {
         $errors++;
         $message = sprintf('Queue-item raised unhandled exception (%s: %s)', get_class($t), $t->getMessage());
+        \Civi::log('queue')->alert($message, ['subject' => 'Queue-item raised unhandled exception (' . get_class($t)]);
         break;
       }
 
