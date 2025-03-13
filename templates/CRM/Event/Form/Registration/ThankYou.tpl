@@ -41,8 +41,7 @@
              </p>
         {elseif $isRequireApproval}
             <p>
-                <span class="bold">{ts}Your registration has been submitted.{/ts}
-                {ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</span>
+                <span class="bold">{ts}Your registration has been submitted.{/ts}</span>
             </p>
         {elseif $is_pay_later and $paidEvent and !$isAmountzero}
             <div class="bold">{$pay_later_receipt}</div>
