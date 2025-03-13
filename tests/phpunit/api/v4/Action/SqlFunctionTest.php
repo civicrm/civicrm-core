@@ -231,6 +231,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('GREATEST(duration, 0200) AS greatest_of_duration_or_200')
       ->addSelect('LEAST(duration, 300) AS least_of_duration_and_300')
       ->addSelect('ISNULL(duration) AS duration_isnull')
+      ->addSelect('ISNOTNULL(duration) AS duration_isnotnull')
       ->addSelect('IFNULL(duration, 2) AS ifnull_duration_2')
       ->addSelect('created_date')
       ->addSelect('activity_date_time')
@@ -266,6 +267,10 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(FALSE, $result[$aids[0]]['duration_isnull']);
     $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
+
+    $this->assertEquals(TRUE, $result[$aids[0]]['duration_isnotnull']);
+    $this->assertEquals(FALSE, $result[$aids[1]]['duration_isnotnull']);
+    $this->assertEquals(TRUE, $result[$aids[2]]['duration_isnotnull']);
 
     $this->assertEquals(123, $result[$aids[0]]['ifnull_duration_2']);
     $this->assertEquals(2, $result[$aids[1]]['ifnull_duration_2']);
