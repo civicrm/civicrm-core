@@ -567,9 +567,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   background: transparent;
   padding: 0;
 }
-.crm-case-activity-form-block-followup_activity_type_id .crm-form-date-wrapper {
-  display: inline-block;
-}
 .crm-case-activity-form-block table.form-layout-compressed {
   width: 100%;
 }

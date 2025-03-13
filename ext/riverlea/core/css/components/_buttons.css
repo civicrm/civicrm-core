@@ -297,9 +297,11 @@
 
 /* BS3 Button groups and dropdowns  */
 
-#bootstrap-theme td.text-right:has(.btn + .btn) {
+#bootstrap-theme td.text-right:has(.btn + .btn),
+.crm-container .crm-buttons {
   display: flex;
   gap: var(--crm-s);
+  flex-wrap: wrap;
 }
 #bootstrap-theme td.text-right:has(.btn + .btn) {
   justify-content: end;
