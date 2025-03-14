@@ -13,6 +13,7 @@ return [
   'getIndices' => fn() => [
     'UI_user_contact_operation' => [
       'fields' => [
+        'domain_id' => TRUE,
         'user_id' => TRUE,
         'contact_id' => TRUE,
         'operation' => TRUE,
@@ -60,6 +61,15 @@ return [
       'pseudoconstant' => [
         'callback' => ['CRM_ACL_BAO_ACL', 'operation'],
       ],
+    ],
+    'domain_id' => [
+      'title'  => ts('Domain'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'description' => ts('Implicit FK to civicrm_domain'),
+      'add' => '6.2',
+      'required' => TRUE,
+      'default' => 1,
     ],
   ],
 ];
