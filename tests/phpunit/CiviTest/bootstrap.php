@@ -26,6 +26,9 @@ function civitest_civicrm_scanClasses(array &$classes): void {
 # Crank up the memory
 ini_set('memory_limit', '2G');
 define('CIVICRM_TEST', 1);
+if (getenv('CIVICRM_UPGRADE_EVIL')) {
+  define('CIVICRM_BOOTSTRAP_FORBIDDEN', TRUE);
+}
 // phpcs:disable
 eval(cv('php:boot --level=settings', 'phpcode'));
 // phpcs:enable
