@@ -286,11 +286,11 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
 
     $config = CRM_Core_Config::singleton();
 
-    [$sql, $params] = self::sql($entityTable, $entityID, NULL);
+    [$sql, $params] = self::sql($entityTable, $entityID);
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     $results = [];
     while ($dao->fetch()) {
-      $fileHash = self::generateFileHash($dao->entity_id, $dao->cfID);
+      $fileHash = self::generateFileHash(NULL, $dao->cfID);
       $result['fileID'] = $dao->cfID;
       $result['entityID'] = $dao->cefID;
       $result['mime_type'] = $dao->mime_type;
@@ -298,7 +298,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
       $result['description'] = $dao->description;
       $result['cleanName'] = CRM_Utils_File::cleanFileName($dao->uri);
       $result['fullPath'] = $config->customFileUploadDir . $dao->uri;
-      $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}&fcs={$fileHash}");
+      $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&fcs={$fileHash}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
       $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type ?? '');
@@ -630,8 +630,8 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * @param $entityTable
-   * @param int $entityID
+   * @param string|null $entityTable
+   * @param int|null $entityID
    * @param int $fileID
    *
    * @return string
@@ -652,8 +652,8 @@ AND       CEF.entity_id    = %2";
    */
   public static function deleteAttachment() {
     $params = [];
-    $params['entityTable'] = CRM_Utils_Request::retrieve('entityTable', 'String', CRM_Core_DAO::$_nullObject, TRUE);
-    $params['entityID'] = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $params['entityTable'] = CRM_Utils_Request::retrieve('entityTable', 'String', CRM_Core_DAO::$_nullObject, FALSE);
+    $params['entityID'] = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
     $params['fileID'] = CRM_Utils_Request::retrieve('fileID', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
 
     $signature = CRM_Utils_Request::retrieve('_sgn', 'String', CRM_Core_DAO::$_nullObject, TRUE);
@@ -663,7 +663,16 @@ AND       CEF.entity_id    = %2";
       throw new CRM_Core_Exception('Request signature is invalid');
     }
 
-    self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
+    // Attachment - need to delete entityFile record
+    if ($params['entityTable'] && $params['entityID']) {
+      self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
+    }
+    // Just a file field
+    else {
+      \Civi\Api4\File::delete(FALSE)
+        ->addWhere('id', '=', $params['fileID'])
+        ->execute();
+    }
   }
 
   /**
@@ -810,17 +819,9 @@ HEREDOC;
   }
 
   /**
-   * FIXME: Incomplete pseudoconstant for EntityFile.entity_table
+   * List of entities that can have file attachments.
    *
-   * The `EntityFile` table serves 2 purposes:
-   * 1. As a many-to-many bridge table for entities that support multiple attachments
-   * 2. As a redundant copy of the value of custom fields of type File
-   *
-   * The 2nd use isn't really a bridge entity, and doesn't even make much sense
-   * (what purpose does it serve other than as a dummy value to use in file download links).
-   * Including the 2nd in this function would blow up the possible values for `entity_table`
-   * and make ACL clauses quite slow. So until someone comes up with a better idea,
-   * this only returns values relevant to the 1st.
+   * TODO: Make this extensible.
    *
    * @return array
    */
