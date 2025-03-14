@@ -306,9 +306,10 @@ AND domain_id = %2
     // the permission clause.
     if ($userID && (CRM_Core_Permission::check('edit my contact') ||
       ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')))) {
+      $queryParams[3] = [$operation, 'String'];
       if (!CRM_Core_DAO::singleValueQuery("
-        SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}' AND domain_id = '{$currentDomainID}' LIMIT 1", $queryParams)) {
-        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation, domain_id ) VALUES(%1, %1, '{$operation}', '{$currentDomainID}')", $queryParams);
+        SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = %3 AND domain_id = %2 LIMIT 1", $queryParams)) {
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation, domain_id ) VALUES(%1, %1, %3, %2)", $queryParams);
       }
     }
     Civi::$statics[__CLASS__]['processed'][$currentDomainID][$type][$userID] = 1;

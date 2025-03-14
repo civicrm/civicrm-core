@@ -13,18 +13,13 @@ return [
   'getIndices' => fn() => [
     'UI_user_contact_operation' => [
       'fields' => [
+        'domain_id' => TRUE,
         'user_id' => TRUE,
         'contact_id' => TRUE,
         'operation' => TRUE,
       ],
       'unique' => TRUE,
       'add' => '3.1',
-    ],
-    'Index_domain_id' => [
-      'fields' => [
-        'domain_id' => TRUE,
-      ],
-      'add' => '6.2',
     ],
   ],
   'getFields' => fn() => [
