@@ -593,7 +593,6 @@
     "Civi/Api4/Service/Spec/Provider/ContributionCreationSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/ContributionGetSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/ContributionRecurCreationSpecProvider.php",
-    "Civi/Api4/Service/Spec/Provider/CustomGroupCreationSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/CustomGroupSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/EventCreationSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/FinancialItemCreationSpecProvider.php",
