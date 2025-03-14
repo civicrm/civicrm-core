@@ -63,9 +63,9 @@ IFRAME Example Page:  https://example.org/iframe.php/civicrm/contribute/transact
 
 * Whenever you edit your template in `Civi/Iframe/EntryPoint/`, the status-check will complain that `iframe.php` is out-of-date and prompt you to re-deploy it.
 
-    (The quickest way to republish is to run `cv api4 Iframe.installScript`)
+    (The quickest way to republish is to run `cv api4 Iframe.installScript` or `cv api4 -I Iframe.RenderScript > /path/to/iframe.php`)
 
-* The D10 template is ore involved. It needs some helper classes. These are in `lib/`.
+* The D10 template is more involved. It needs some helper classes. These are in `lib/`.
 
 * Does this absolutely need to be a separate PHP file in the web-root?  Maybe not; it depends.
     * It has some benefits.  It can use the regular UF bootstrap methods.  The URL is easy to predict and interpret.  It gets high privileges in manipulating the app (e.g.  to configure session options).
