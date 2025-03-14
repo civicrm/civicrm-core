@@ -17,6 +17,7 @@ Overwriting CSS variables for the front is straightforward (they can be nested w
 
 ## [Changelog](CHANGELOG.md)
 
+- 1.4.x-6.2.alpha - ongoing fixes/changes against 6.2
 - 1.3.x-6.0.alpha - Contrast ratios, responsive and Front-end changes, including new variables, plus fixes (see changelog)
 - 1.2.x-5.81 - Regression fixes against 5.81 RC
 - 1.1 (5.80) - Release for packaging with CiviCRM core, v5.80

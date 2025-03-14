@@ -93,6 +93,7 @@
 #afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
   white-space: nowrap;
   overflow: hidden;
+  max-width: unset !important; /* vs inline max-width set by Form Builder UI */
 }
 #afGuiEditor .panel-heading .form-inline.pull-right button {
   max-height: 32px;
