@@ -630,8 +630,8 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * @param $entityTable
-   * @param int $entityID
+   * @param string|null $entityTable
+   * @param int|null $entityID
    * @param int $fileID
    *
    * @return string
@@ -652,8 +652,8 @@ AND       CEF.entity_id    = %2";
    */
   public static function deleteAttachment() {
     $params = [];
-    $params['entityTable'] = CRM_Utils_Request::retrieve('entityTable', 'String', CRM_Core_DAO::$_nullObject, TRUE);
-    $params['entityID'] = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $params['entityTable'] = CRM_Utils_Request::retrieve('entityTable', 'String', CRM_Core_DAO::$_nullObject, FALSE);
+    $params['entityID'] = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
     $params['fileID'] = CRM_Utils_Request::retrieve('fileID', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
 
     $signature = CRM_Utils_Request::retrieve('_sgn', 'String', CRM_Core_DAO::$_nullObject, TRUE);
@@ -663,7 +663,16 @@ AND       CEF.entity_id    = %2";
       throw new CRM_Core_Exception('Request signature is invalid');
     }
 
-    self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
+    // Attachment - need to delete entityFile record
+    if ($params['entityTable'] && $params['entityID']) {
+      self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
+    }
+    // Just a file field
+    else {
+      \Civi\Api4\File::delete(FALSE)
+        ->addWhere('id', '=', $params['fileID'])
+        ->execute();
+    }
   }
 
   /**
