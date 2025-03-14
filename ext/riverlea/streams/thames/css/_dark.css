@@ -11,6 +11,7 @@
   --crm-c-code-background: var(--crm-c-dkblue-04);
   --crm-dashlet-bg: var(--crm-c-dkblue-02);
   --crm-c-green: #335417;
+  --crm-c-green-light: var(--crm-c-green);
   --crm-c-link: var(--crm-c-dkblue-08);
   --crm-c-link-hover: color-mix(in srgb, white, var(--crm-c-dkblue-08) 70%);
   --crm-dash-header-col: var(--crm-c-blue-light);
