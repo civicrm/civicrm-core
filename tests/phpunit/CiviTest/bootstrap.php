@@ -85,7 +85,7 @@ function cv($cmd, $decode = 'json') {
   $oldOutput = getenv('CV_OUTPUT');
   putenv("CV_OUTPUT=json");
   $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);
-  putenv("CV_OUTPUT=$oldOutput");
+  putenv($oldOutput === FALSE ? "CV_OUTPUT" : "CV_OUTPUT=$oldOutput");
   fclose($pipes[0]);
   $result = stream_get_contents($pipes[1]);
   fclose($pipes[1]);
