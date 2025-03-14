@@ -541,7 +541,6 @@ class CRM_Core_SelectValues {
       '{action.resubscribeUrl}' => ts('Resubscribe via web page'),
       '{action.optOut}' => ts('Opt out via email'),
       '{action.optOutUrl}' => ts('Opt out via web page'),
-      '{action.forward}' => ts('Forward this email (link)'),
       '{action.reply}' => ts('Reply to this email (link)'),
       '{action.subscribeUrl}' => ts('Subscribe via web page'),
       '{mailing.key}' => ts('Mailing key'),

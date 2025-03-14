@@ -25,7 +25,6 @@ class CRM_Utils_Token {
 
   public static $_tokens = [
     'action' => [
-      'forward',
       'optOut',
       'optOutUrl',
       'reply',
@@ -493,7 +492,7 @@ class CRM_Utils_Token {
 
       if ($value && $html) {
         // fix for CRM-2318
-        if ((substr($token, -3) != 'Url') && ($token != 'forward')) {
+        if (substr($token, -3) != 'Url') {
           $value = "mailto:$value";
         }
       }
