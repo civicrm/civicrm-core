@@ -2179,20 +2179,19 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *
    * @param string $dataType
    * @param mixed $fieldData
-   * @param int|null $entityIDFieldValue
+   * @param int|null $entityIDFieldValue unused param
    * @param int|null $id
    *   ID of the record in the relevant custom data table.
    *   Oddly this can be NULL - it rather feels like we should not
    *   call this function if so - perhaps we can iterate on that.
    * @param int $fieldID
-   * @param string $table
    *
    * @return array
    * @throws \CRM_Core_Exception
    * @internal do not call this from outside core code - the signature is expected to change multiple times.
    *
    */
-  private static function getCustomDisplayValue(string $dataType, $fieldData, ?int $entityIDFieldValue, ?int $id, int $fieldID, string $table): array {
+  private static function getCustomDisplayValue(string $dataType, $fieldData, ?int $entityIDFieldValue, ?int $id, int $fieldID): array {
     $customValue = [];
     if ($dataType === 'File') {
       if ($fieldData) {
@@ -2222,7 +2221,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             CRM_Core_Action::DELETE,
             [
               'id' => $fileDAO->id,
-              'eid' => $entityIDFieldValue,
               'fid' => $fieldID,
               'fcs' => $fileHash,
             ],
@@ -2232,7 +2230,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             'File',
             $fileDAO->id
           );
-          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $entityIDFieldValue, $fileDAO->id);
+          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs(NULL, NULL, $fileDAO->id);
           $customValue['fileName'] = CRM_Utils_File::cleanFileName(basename($fileDAO->uri));
           if ($fileDAO->mime_type === "image/jpeg" ||
             $fileDAO->mime_type === "image/pjpeg" ||
