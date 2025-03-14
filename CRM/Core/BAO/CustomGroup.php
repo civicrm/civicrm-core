@@ -2222,7 +2222,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             CRM_Core_Action::DELETE,
             [
               'id' => $fileDAO->id,
-              'eid' => $entityIDFieldValue,
               'fid' => $fieldID,
               'fcs' => $fileHash,
             ],
@@ -2232,7 +2231,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             'File',
             $fileDAO->id
           );
-          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $entityIDFieldValue, $fileDAO->id);
+          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $entityIDFieldValue, $fileDAO->id, $fieldID);
           $customValue['fileName'] = CRM_Utils_File::cleanFileName(basename($fileDAO->uri));
           if ($fileDAO->mime_type === "image/jpeg" ||
             $fileDAO->mime_type === "image/pjpeg" ||
