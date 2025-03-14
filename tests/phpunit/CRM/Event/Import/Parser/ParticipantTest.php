@@ -118,8 +118,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   protected function getMapperFromFieldMappings(array $mappings): array {
     $mapper = [];
     foreach ($mappings as $mapping) {
-      $fieldInput = [$mapping['name']];
-      $mapper[] = $fieldInput;
+      $mapper[] = $mapping['name'];
     }
     return $mapper;
   }
@@ -135,7 +134,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'external_identifier'],
+      ['name' => 'contact.external_identifier'],
       ['name' => 'fee_amount'],
       ['name' => 'fee_currency'],
       ['name' => 'fee_level'],
@@ -228,7 +227,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'external_identifier'],
+      ['name' => 'contact.external_identifier'],
       ['name' => 'fee_amount'],
       ['name' => 'fee_currency'],
       ['name' => 'fee_level'],
@@ -274,7 +273,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'external_identifier'],
+      ['name' => 'contact.external_identifier'],
       ['name' => 'fee_amount'],
       ['name' => 'fee_currency'],
       ['name' => 'fee_level'],
@@ -319,7 +318,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'external_identifier'],
+      ['name' => 'contact.external_identifier'],
       ['name' => 'fee_amount'],
       ['name' => 'fee_currency'],
       ['name' => 'fee_level'],
@@ -365,9 +364,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->individualCreate([$this->getCustomFieldName() => 'secret code', 'first_name' => 'Bob', 'last_name' => 'Smith'], 'bob');
     $this->importCSV('participant_with_dedupe_match.csv', [
       ['name' => 'event_id'],
-      ['name' => 'first_name'],
-      ['name' => 'last_name'],
-      ['name' => $this->getCustomFieldName('text', 4)],
+      ['name' => 'contact.first_name'],
+      ['name' => 'contact.last_name'],
+      ['name' => 'contact.' . $this->getCustomFieldName('text', 4)],
       ['name' => 'role_id'],
       ['name' => 'status_id'],
       ['name' => 'register_date'],
@@ -393,8 +392,8 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'event_id'],
       ['name' => 'participant_id'],
       ['name' => 'contact_id'],
-      ['name' => 'external_identifier'],
-      ['name' => 'email_primary.email'],
+      ['name' => 'contact.external_identifier'],
+      ['name' => 'contact.email_primary.email'],
       ['name' => 'status_id'],
     ];
     foreach ($mapper as $index => $field) {
@@ -412,8 +411,8 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   public function requiredFields(): array {
     return [
       'contact_id' => [['contact_id', 'status_id', 'event_id']],
-      'external_identifier' => [['external_identifier', 'status_id', 'event_id']],
-      'email' => [['email_primary.email', 'status_id', 'event_id']],
+      'external_identifier' => [['contact.external_identifier', 'status_id', 'event_id']],
+      'email' => [['contact.email_primary.email', 'status_id', 'event_id']],
     ];
   }
 

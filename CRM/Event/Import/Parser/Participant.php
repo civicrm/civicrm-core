@@ -142,9 +142,9 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         ],
         $allParticipantFields
       );
-      $contactFields = $this->getContactFields($this->getContactType());
-      $fields['contact_id'] = $contactFields['id'];
-      unset($contactFields['id']);
+      $contactFields = $this->getContactFields($this->getContactType(), 'contact');
+      $fields['contact_id'] = $contactFields['contact.id'];
+      unset($contactFields['contact.id']);
       $fields['contact_id']['title'] .= ' ' . ts('(match to contact)');
       $fields['contact_id']['html']['label'] = $fields['contact_id']['title'];
       $fields += $contactFields;

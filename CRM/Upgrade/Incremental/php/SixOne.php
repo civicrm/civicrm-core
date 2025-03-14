@@ -57,7 +57,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     // together (from Contribution convert in FiveFiftyFour) feels like
     // it has merit
     $contactPrefix = '';
-    if ($importType === 'Import Membership' || $importType === 'Import Contribution') {
+    if ($importType === 'Import Membership' || $importType === 'Import Contribution' || $importType === 'Import Participant') {
       $contactPrefix = 'contact.';
     }
     if ($importType === 'Import Activity') {

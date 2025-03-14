@@ -315,23 +315,14 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     $formName = 'document.forms.' . $this->_name;
 
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
-      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
-      $jsSet = FALSE;
       if ($this->getSubmittedValue('savedMapping')) {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if (isset($fieldMappings[$i])) {
           if ($fieldMapping['name'] !== ts('do_not_import')) {
-            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
             $defaults["mapper[$i]"] = [$fieldMapping['name']];
-            $jsSet = TRUE;
           }
           else {
             $defaults["mapper[$i]"] = [];
-          }
-          if (!$jsSet) {
-            for ($k = 1; $k < 4; $k++) {
-              $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
-            }
           }
         }
         else {
@@ -345,7 +336,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         //end of load mapping
       }
       else {
-        $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
         if ($hasHeaders) {
           // Infer the default from the skipped headers if we have them
           $defaults["mapper[$i]"] = [
@@ -357,10 +347,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
           ];
         }
       }
-      $sel->setOptions([$sel1]);
+      $sel = &$this->addElement('select', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), $sel1);
+
     }
-    $js .= "</script>\n";
-    $this->assign('initHideBoxes', $js);
     $this->setDefaults($defaults);
     return [$sel, $headerPatterns];
   }
