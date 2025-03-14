@@ -1362,6 +1362,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (!$this->getContactID()) {
       CRM_Core_Error::statusBounce(ts('Returning since there is no contact attached to this contribution id.'));
     }
+    if ($this->getContributionValue('contribution_status_id:name') === 'Cancelled') {
+      throw new CRM_Core_Exception(ts('Sorry, this contribution has been cancelled.'));
+    }
 
     $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);
     //bounce if the contribution is not pending.
