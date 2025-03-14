@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * BAO object for crm_log table
  */
@@ -258,7 +260,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
         // sequentially deletes EntityFile entry and then deletes File record
         CRM_Core_DAO_EntityFile::deleteRecord(['id' => $cefIDs[$fileID]]);
         // Delete file only if there are no longer any entities using this file.
-        if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $fileID, 'id', 'file_id')) {
+        if (!CoreUtil::getRefCountTotal('File', $fileID)) {
           self::deleteRecord(['id' => $fileID]);
           unlink($config->customFileUploadDir . $fUri);
         }
@@ -630,16 +632,18 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * @param $entityTable
+   * @param string $entityTable
    * @param int $entityID
    * @param int $fileID
+   * @param int|null $customField
    *
    * @return string
    */
-  public static function deleteURLArgs($entityTable, $entityID, $fileID) {
+  public static function deleteURLArgs($entityTable, $entityID, $fileID, $customField = NULL) {
     $params['entityTable'] = $entityTable;
     $params['entityID'] = $entityID;
     $params['fileID'] = $fileID;
+    $params['customField'] = $customField;
 
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$_signableFields);
     $params['_sgn'] = $signer->sign($params);
@@ -652,18 +656,51 @@ AND       CEF.entity_id    = %2";
    */
   public static function deleteAttachment() {
     $params = [];
-    $params['entityTable'] = CRM_Utils_Request::retrieve('entityTable', 'String', CRM_Core_DAO::$_nullObject, TRUE);
-    $params['entityID'] = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
-    $params['fileID'] = CRM_Utils_Request::retrieve('fileID', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $params['entityTable'] = CRM_Utils_Request::retrieve('entityTable', 'String', NULL, TRUE);
+    $params['entityID'] = CRM_Utils_Request::retrieve('entityID', 'Positive', NULL, TRUE);
+    $params['fileID'] = CRM_Utils_Request::retrieve('fileID', 'Positive', NULL, TRUE);
+    $params['customField'] = CRM_Utils_Request::retrieve('customField', 'Positive');
 
-    $signature = CRM_Utils_Request::retrieve('_sgn', 'String', CRM_Core_DAO::$_nullObject, TRUE);
+    $signature = CRM_Utils_Request::retrieve('_sgn', 'String', NULL, TRUE);
 
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$_signableFields);
     if (!$signer->validate($signature, $params)) {
       throw new CRM_Core_Exception('Request signature is invalid');
     }
 
-    self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
+    // Attachment - need to delete entityFile record
+    if (!$params['customField']) {
+      self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
+      return;
+    }
+    $refCount = 0;
+    // Custom file field - set the custom value to NULL
+    $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['table_name' => $params['entityTable']]);
+    $customField = $customGroup['fields'][$params['customField']] ?? NULL;
+    if ($customField) {
+      // *SIGH* Api4 has a bug which cannot update file custom fields to NULL :(
+      //   $entityName = $customGroup['extends'] ?? NULL;
+      //   $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName('custom_' . $params['customField']);
+      //   civicrm_api4($entityName, 'update', [
+      //     'values' => [$fieldName => NULL, 'id' => $params['entityID']],
+      //     'where' => [
+      //       ['id', '=', $params['entityID']],
+      //       [$fieldName, '=', $params['fileID']],
+      //     ],
+      //   ]);
+      // TEMP HACK
+      CRM_Core_DAO::executeQuery("UPDATE `{$customGroup['table_name']}` SET {$customField['column_name']} = NULL WHERE entity_id = %1 AND {$customField['column_name']} = %2", [
+        1 => [$params['entityID'], 'Integer'],
+        2 => [$params['fileID'], 'Integer'],
+      ]);
+      $refCount = CoreUtil::getRefCountTotal('File', $params['fileID']);
+    }
+    // Delete file if there are no other references
+    if ($refCount === 0) {
+      \Civi\Api4\File::delete(FALSE)
+        ->addWhere('id', '=', $params['fileID'])
+        ->execute();
+    }
   }
 
   /**
