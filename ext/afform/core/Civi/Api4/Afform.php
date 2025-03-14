@@ -298,6 +298,16 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Timestamp',
           'readonly' => TRUE,
         ],
+        [
+          'name' => 'confirmation_type',
+          'pseudoconstant' => ['optionGroupName' => 'afform_confirmation_type'],
+          'default_value' => 'redirect_to_url',
+        ],
+        [
+          'name' => 'confirmation_message',
+          'title' => E::ts('Confirmation Message'),
+          'input_type' => 'Text',
+        ],
       ];
       // Calculated fields returned by get action
       if ($self->getAction() === 'get') {
