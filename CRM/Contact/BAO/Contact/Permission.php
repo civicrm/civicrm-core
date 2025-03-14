@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Event\AclContactCacheFilledEvent;
+
 /**
  *
  * @package CRM
@@ -227,9 +229,14 @@ WHERE contact_a.id = %1 AND $permission
     }
     $queryParams = [1 => [$userID, 'Integer']];
 
-    if (!$force) {
+    $cacheProcessed = !empty(Civi::$statics[__CLASS__]['processed'][$type][$userID]);
+
+    $event = new AclContactCacheFilledEvent($cacheProcessed, $force, $userID);
+    Civi::dispatcher()->dispatch('civi.user.aclcacheprocessed', $event);
+
+    if (!$event->force) {
       // skip if already calculated
-      if (!empty(Civi::$statics[__CLASS__]['processed'][$type][$userID])) {
+      if ($event->aclCacheProcessed) {
         // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called. Operation: $operation; UserID: $userID");
         return;
       }
@@ -247,14 +254,14 @@ WHERE contact_a.id = %1 AND $permission
       return;
     }
 
-    if (!$force) {
+    if (!$event->force) {
       // Check if the cache has already been built for this userID
       // The lock guards against simultaneous building of the cache but we don't clear individual userIDs from the cache,
       //   instead we truncate the whole table before calling cache() which may then be called multiple times.
       // The only way we get to this point with the cache already filled is if two processes call cache() almost simultaneously
       //   and the lock completes before the next process reaches the "get lock" call.
       $sql = "
-SELECT count(*)
+SELECT count(contact_id)
 FROM   civicrm_acl_contact_cache
 WHERE  user_id = %1
 AND    $operationClause
