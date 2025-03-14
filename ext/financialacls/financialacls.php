@@ -283,7 +283,14 @@ function financialacls_civicrm_permission(&$permissions) {
       'description' => E::ts('%1 contributions of all types', [1 => $action_ts]),
     ];
   }
-  $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, label FROM civicrm_financial_type')->fetchAll();
+  try {
+    $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, label FROM civicrm_financial_type')->fetchAll();
+  }
+  catch (\Civi\Core\Exception\DBQueryException $e) {
+    // dev/core#5794: While upgrade is pending, the 'label' column may not yet exist. We just need a 'label' that's good enough to get to upgrader.
+    $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, name AS label FROM civicrm_financial_type')->fetchAll();
+    // N.B. That's the most likely problem+fix. If there's some other SQL problem, then the fallback query will also throw an exception.
+  }
   foreach ($financialTypes as $type) {
     foreach ($actions as $action => $action_ts) {
       $permissions[$action . ' contributions of type ' . $type['name']] = [
