@@ -39,13 +39,14 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * @param \CRM_Queue_TaskContext|null $context
    * @param string $importType
    *
-   * @return void
+   * @return true
    * @throws \CRM_Core_Exception
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function upgradeImportMappingFields(string $importType): void {
+  public static function upgradeImportMappingFields($context, string $importType): bool {
     $mappingFields = CRM_Core_DAO::executeQuery('
       SELECT field.id, field.name FROM civicrm_mapping_field field
         INNER JOIN civicrm_mapping mapping
@@ -56,7 +57,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     // together (from Contribution convert in FiveFiftyFour) feels like
     // it has merit
     $contactPrefix = '';
-    if ($importType === 'Import Membership') {
+    if ($importType === 'Import Membership' || $importType === 'Import Contribution' || $importType === 'Import Participant') {
       $contactPrefix = 'contact.';
     }
     if ($importType === 'Import Activity') {
@@ -106,6 +107,14 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       'activity_is_star' => 'is_star',
     ];
 
+    if ($importType === 'Import Contribution') {
+      $fieldsToConvert['source'] = 'contact.source';
+      $fieldsToConvert['id'] = 'contact.id';
+      $fieldsToConvert['contribution_source'] = 'source';
+      $fieldsToConvert['contribution_id'] = 'id';
+      $fieldsToConvert['contribution_contact_id'] = 'contact_id';
+    }
+
     $customFields = CRM_Core_DAO::executeQuery('
       SELECT custom_field.id, custom_field.name, custom_group.name as custom_group_name, custom_group.extends
       FROM civicrm_custom_field custom_field INNER JOIN civicrm_custom_group custom_group
@@ -125,6 +134,23 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
         ]);
       }
     }
+    if ($importType === 'Import Contribution') {
+      $userJob = new \CRM_Core_DAO_UserJob();
+      $userJob->job_type = 'contribution_import';
+      $userJob->find();
+      while ($userJob->fetch()) {
+        $metadata = json_decode($userJob->metadata, TRUE);
+        foreach ($metadata['import_mappings'] as &$mapping) {
+          if (isset($fieldsToConvert[$mapping['name']])) {
+            $mapping['name'] = $fieldsToConvert[$mapping['name']];
+          }
+          $userJob->metadata = json_encode($metadata);
+          $userJob->save();
+        }
+
+      }
+    }
+    return TRUE;
   }
 
   /**
@@ -139,6 +165,16 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     $this->addTask('Update import mappings', 'updateFieldMappingsForImport');
     $this->addTask('Replace Clear Caches & Reset Paths with Clear Caches in Nav Menu', 'updateUpdateConfigBackendNavItem');
     $this->addTask('Install ImportTemplateField entity', 'createEntityTable', '6.1.alpha1.ImportTemplateField.entityType.php');
+  }
+
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_1_beta1(string $rev): void {
+    $this->addTask('Update import mappings', 'upgradeImportMappingFields', 'Import Contribution');
   }
 
   /**
@@ -261,7 +297,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
   public static function updateFieldMappingsForImport(): bool {
     $importTypes = ['Import Participant', 'Import Membership', 'Import Activity'];
     foreach ($importTypes as $importType) {
-      self::upgradeImportMappingFields($importType);
+      self::upgradeImportMappingFields(NULL, $importType);
     }
     return TRUE;
   }
