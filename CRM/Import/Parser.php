@@ -260,11 +260,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
   /**
    * @param string $contactType
+   * @param string|null $prefix
    *
    * @return array[]
    * @throws \CRM_Core_Exception
    */
-  protected function getContactFields(string $contactType): array {
+  protected function getContactFields(string $contactType, ?string $prefix = ''): array {
     $contactFields = $this->getAllContactFields('');
     $dedupeFields = $this->getDedupeFields($contactType);
 
@@ -278,6 +279,16 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $contactFields['external_identifier']['title'] .= (' ' . ts('(match to contact)'));
     $contactFields['external_identifier']['match_rule'] = '*';
+    if ($prefix) {
+      $prefixedFields = [];
+      foreach ($contactFields as $name => $contactField) {
+        $contactField['entity_prefix'] = $prefix . '.';
+        $contactField['entity'] = 'Contact';
+        $contactField['entity_instance'] = ucfirst($prefix);
+        $prefixedFields[$prefix . '.' . $name] = $contactField;
+      }
+      return $prefixedFields;
+    }
     return $contactFields;
   }
 

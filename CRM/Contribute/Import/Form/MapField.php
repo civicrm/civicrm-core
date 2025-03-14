@@ -97,10 +97,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         // Duplicates are being skipped so id matching is not available.
         continue;
       }
-      if ($this->isUpdateExisting() && in_array($name, ['contribution_contact_id', 'email', 'first_name', 'last_name', 'external_identifier', 'email_primary.email'], TRUE)) {
+      if ($this->isUpdateExisting() && in_array($name, ['contact_id', 'email', 'contact.first_name', 'contact.last_name', 'external_identifier', 'email_primary.email'], TRUE)) {
         continue;
       }
-      if ($this->isUpdateExisting() && in_array($name, ['contribution_id', 'invoice_id', 'trxn_id'], TRUE)) {
+      if ($this->isUpdateExisting() && in_array($name, ['id', 'invoice_id', 'trxn_id'], TRUE)) {
         $field['title'] .= (' ' . ts('(match to contribution record)'));
       }
       // Swap out dots for double underscores so as not to break the quick form js.
@@ -234,13 +234,13 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     //invoice id or trxn id or contribution id is required.
     if ($this->isUpdateExisting()) {
       //modify field title only for update mode. CRM-3245
-      foreach (['contribution_id', 'invoice_id', 'trxn_id'] as $key) {
+      foreach (['id', 'invoice_id', 'trxn_id'] as $key) {
         $highlightedFields[] = $key;
       }
     }
     elseif ($this->isSkipExisting()) {
       $highlightedFieldsArray = [
-        'contribution_contact_id',
+        'contact_id',
         'email',
         'first_name',
         'last_name',

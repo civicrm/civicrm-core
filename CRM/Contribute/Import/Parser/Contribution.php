@@ -117,7 +117,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @return array
    */
   public function getRequiredFieldsForMatch(): array {
-    return [['contribution_id'], ['invoice_id'], ['trxn_id']];
+    return [['id'], ['invoice_id'], ['trxn_id']];
   }
 
   /**
@@ -237,20 +237,31 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       $fields = ['' => ['title' => ts('- do not import -')]];
 
       $note = CRM_Core_DAO_Note::import();
+      // @todo - replace this with (array) Contribution::getFields()
+      //      ->addWhere('readonly', '=', FALSE)
+      //      ->addWhere('usage', 'CONTAINS', 'import')
       $tmpFields = CRM_Contribute_DAO_Contribution::import();
       // Unravel the unique fields - once more metadata work is done on apiv4 we
       // will use that instead to get them.
-      foreach (['contribution_cancel_date', 'contribution_check_number', 'contribution_campaign_id'] as $uniqueField) {
+      foreach (['contribution_cancel_date', 'contribution_check_number', 'contribution_campaign_id', 'contribution_id', 'contribution_contact_id', 'contribution_source'] as $uniqueField) {
         $realField = substr($uniqueField, 13);
         $tmpFields[$realField] = $tmpFields[$uniqueField];
         unset($tmpFields[$uniqueField]);
       }
-      $tmpContactField = $this->getContactFields($this->getContactType());
       // I haven't un-done this unique field yet cos it's more complex.
-      $tmpFields['contribution_contact_id']['title'] = $tmpFields['contribution_contact_id']['html']['label'] = $tmpFields['contribution_contact_id']['title'] . ' ' . ts('(match to contact)');
-      $tmpFields['contribution_contact_id']['contact_type'] = ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'];
-      $tmpFields['contribution_contact_id']['match_rule'] = '*';
-      $fields = array_merge($fields, $tmpContactField);
+      $tmpFields['contact_id']['title'] = $tmpFields['contact_id']['html']['label'] = $tmpFields['contact_id']['title'] . ' ' . ts('(match to contact)');
+      $tmpFields['contact_id']['contact_type'] = ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'];
+      $tmpFields['contact_id']['match_rule'] = '*';
+      $tmpContactField = $this->getContactFields($this->getContactType());
+      foreach ($tmpContactField as $contactField) {
+        $fields['contact.' . $contactField['name']] = array_merge($contactField, [
+          'title' => ts('Contact') . ' ' . $contactField['title'],
+          'softCredit' => FALSE,
+          'entity' => 'Contact',
+          'entity_instance' => 'Contact',
+          'entity_prefix' => 'contact.',
+        ]);
+      }
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, $note);
       $apiv4 = Contribution::getFields(TRUE)->addWhere('custom_field_id', '>', 0)->execute();
@@ -351,7 +362,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           'contact_type' => $this->getSubmittedValue('contactType'),
           'dedupe_rule' => $this->getDedupeRule($this->getContactType())['name'],
         ],
-        'entity_field_prefix' => '',
+        'entity_field_prefix' => 'contact.',
         'default_action' => 'select',
         'entity_name' => 'Contact',
         'entity_title' => ts('Contribution Contact'),
@@ -738,21 +749,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
 
     return implode(' - ', $title);
-  }
-
-  /**
-   * Get the metadata field for which importable fields does not key the actual field name.
-   *
-   * @return string[]
-   */
-  protected function getOddlyMappedMetadataFields(): array {
-    $uniqueNames = ['contribution_id', 'contribution_contact_id', 'contribution_source'];
-    $fields = [];
-    foreach ($uniqueNames as $name) {
-      $fields[$this->importableFieldsMetadata[$name]['name']] = $name;
-    }
-    // Include the parent fields as they could be present if required for matching ...in theory.
-    return array_merge($fields, parent::getOddlyMappedMetadataFields());
   }
 
   /**
