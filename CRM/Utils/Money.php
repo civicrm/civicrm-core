@@ -284,7 +284,7 @@ class CRM_Utils_Money {
    * Format money for display with rounding to the supplied precision but without padding.
    *
    * If the string is shorter than the precision trailing zeros are not added to reach the precision
-   * beyond the 2 required for normally currency formatting.
+   * beyond the 2 required for normal currency formatting.
    *
    * This handles both rounding & replacement of the currency separators for the locale.
    *
@@ -296,6 +296,11 @@ class CRM_Utils_Money {
    */
   public static function formatLocaleNumericRoundedByOptionalPrecision($amount, $precision) {
     $decimalPlaces = self::getDecimalPlacesForAmount((string) $amount);
+    $defaultDecimals = self::getCurrencyPrecision(CRM_Core_Config::singleton()->defaultCurrency);
+    if ($decimalPlaces < $defaultDecimals) {
+      $decimalPlaces = $defaultDecimals;
+    }
+
     $amount = self::formatUSLocaleNumericRounded($amount, $precision > $decimalPlaces ? $decimalPlaces : $precision);
     return self::replaceCurrencySeparators($amount);
   }
@@ -368,6 +373,14 @@ class CRM_Utils_Money {
    * @return int
    */
   protected static function getDecimalPlacesForAmount(string $amount): int {
+    if (!str_contains($amount, '.')) {
+      return 0;
+    }
+
+    if (is_string($amount) && str_contains($amount, '.')) {
+      $amount = rtrim($amount, '0');
+    }
+
     $decimalPlaces = strlen(substr($amount, strpos($amount, '.') + 1));
     return $decimalPlaces;
   }
