@@ -28,6 +28,7 @@
 
       this.$onInit = function() {
         ctrl.hasDefaultValue = !!getSet('afform_default');
+        ctrl.hasClassName = !!getSet('class_name');
         setFieldDefn();
         ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputTypes), function(inputTypes, type) {
           if (inputTypeCanBe(type.name)) {
@@ -290,6 +291,15 @@
           ctrl.hasDefaultValue = false;
         } else {
           ctrl.hasDefaultValue = true;
+        }
+      };
+
+      $scope.toggleClassName = function() {
+        if (ctrl.hasClassName) {
+          getSet('class_name', undefined);
+          ctrl.hasClassName = false;
+        } else {
+          ctrl.hasClassName = true;
         }
       };
 
