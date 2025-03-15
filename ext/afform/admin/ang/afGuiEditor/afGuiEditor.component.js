@@ -144,6 +144,7 @@
         }
 
         editor.afform.permission_operator = editor.afform.permission_operator || 'AND';
+        editor.afform.confirmation_type = editor.afform.confirmation_type || 1 ;
 
         // Initialize undo history
         undoAction = 'initialLoad';

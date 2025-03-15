@@ -4,6 +4,8 @@
 
     .controller('AfformStandalonePageCtrl', function($scope) {
       $scope.afformTitle = '';
+      $scope.afformDisplayForm = true;
+      $scope.afformConfirmationMessage = '';
     });
 
 })(angular, CRM.$, CRM._);

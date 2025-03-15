@@ -302,7 +302,12 @@
           dialog.dialog('close');
         }
 
-        else if (metaData.redirect) {
+        else if (metaData.confirmation_type == 2) {
+          $scope.$parent.$parent.$parent.afformConfirmationMessage = metaData.confirmation_message;
+          $scope.$parent.$parent.$parent.afformDisplayForm = false;
+        }
+
+        else if (metaData.confirmation_type == 1 && metaData.redirect) {
           var url = replaceTokens(metaData.redirect, submissionResponse[0]);
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
