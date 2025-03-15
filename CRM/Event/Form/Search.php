@@ -447,7 +447,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       elseif (is_array($status) && !array_key_exists('IN', $status)) {
         $statusTypes = array_keys($status);
       }
-      $this->_defaults['participant_status_id'] = is_array($statusTypes) ? array_keys($statusTypes) : $statusTypes;
+      $this->_defaults['participant_status_id'] = $statusTypes;
     }
     return $this->_defaults;
   }
