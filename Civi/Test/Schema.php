@@ -1,4 +1,5 @@
 <?php
+
 namespace Civi\Test;
 
 use RuntimeException;
@@ -125,6 +126,54 @@ class Schema {
     \Civi\Test::schema()->setStrict(TRUE);
 
     return $this;
+  }
+
+  /**
+   * Load a snapshot into CiviCRM's database.
+   *
+   * @param string $file
+   *   Ex: '/path/to/civicrm-4.5.6-foobar.sql.bz2' or '/path/to/civicrm-4.5.6-foobar.mysql.gz'
+   * @return Schema
+   */
+  public function loadSnapshot(string $file) {
+    $dsn = \Civi\Test::dsn();
+    $defaultsFile = $this->createMysqlDefaultsFile($dsn);
+    if (preg_match(';sql.bz2$;', $file)) {
+      $cmd = sprintf('bzip2 -d -c %s | mysql --defaults-file=%s %s', escapeshellarg($file), escapeshellarg($defaultsFile), escapeshellarg($dsn['database']));
+    }
+    elseif (preg_match(';sql.gz$;', $file)) {
+      $cmd = sprintf('gzip -d -c %s | mysql --defaults-file=%s %s', escapeshellarg($file), escapeshellarg($defaultsFile), escapeshellarg($dsn['database']));
+    }
+    else {
+      $cmd = sprintf('cat %s | mysql --defaults-file=%s %s', escapeshellarg($file), escapeshellarg($defaultsFile), escapeshellarg($dsn['database']));
+    }
+    ProcessHelper::runOk($cmd);
+    return $this;
+  }
+
+  /**
+   * When calling "mysql" subprocess, it helps to put DB credentials into "my.cnf"-style file.
+   *
+   * @param array $dsn
+   * @return string
+   *   Path to the new "my.cnf" file.
+   */
+  protected function createMysqlDefaultsFile(array $dsn): string {
+    $data = "[client]\n";
+    $data .= "host={$dsn['hostspec']}\n";
+    $data .= "user={$dsn['username']}\n";
+    $data .= "password={$dsn['password']}\n";
+    if (!empty($dsn['port'])) {
+      $data .= "port={$dsn['port']}\n";
+    }
+
+    $file = sys_get_temp_dir() . '/my.cnf-' . hash('sha256', __FILE__ . stat(__FILE__)['mtime'] . $data);
+    if (!file_exists($file)) {
+      if (!file_put_contents($file, $data)) {
+        throw new \RuntimeException("Failed to create temporary my.cnf connection file.");
+      }
+    }
+    return $file;
   }
 
 }

@@ -692,6 +692,9 @@ class Container {
     $bootServices['lockManager'] = self::createLockManager();
 
     if ($loadFromDB && $runtime->dsn) {
+      if (defined('CIVICRM_BOOTSTRAP_FORBIDDEN')) {
+        throw new \LogicException("This process should not bootstrap CiviCRM. (CIVICRM_BOOTSTRAP_FORBIDDEN)");
+      }
       \CRM_Core_DAO::init($runtime->dsn);
       $bootServices['settings_manager']->dbAvailable();
       \CRM_Utils_Hook::singleton(TRUE);
