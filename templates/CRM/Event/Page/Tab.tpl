@@ -12,7 +12,8 @@
 {elseif $action eq 4}
     {include file="CRM/Event/Form/ParticipantView.tpl"}
 {else}
-    {if $permission EQ 'edit'}{capture assign=newEventURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant"}{/capture}
+    {if $permission EQ 'edit'}
+      {capture assign=newEventURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant"}{/capture}
     {/if}
 
     <div class="help">
@@ -38,15 +39,12 @@
 
     {if $rows}
       {include file="CRM/common/pager.tpl" location="top"}
-        {include file="CRM/Event/Form/Selector.tpl"}
-  {include file="CRM/common/pager.tpl" location="bottom"}
+      {include file="CRM/Event/Form/Selector.tpl"}
+      {include file="CRM/common/pager.tpl" location="bottom"}
     {else}
        <div class="messages status no-popup">
-           <table class="form-layout">
-             <tr>{icon icon="fa-info-circle"}{/icon}
-                   {ts}No event registrations have been recorded for this contact.{/ts}
-             </tr>
-           </table>
+          {icon icon="fa-info-circle"}{/icon}
+          {ts}No event registrations have been recorded for this contact.{/ts}
        </div>
     {/if}
 {/if}
