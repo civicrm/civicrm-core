@@ -311,7 +311,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     }
     $sel1 = $this->_mapperFields;
 
-    $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $this->_name;
 
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
@@ -326,9 +325,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
           }
         }
         else {
-          // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-          $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
-
           if ($hasHeaders) {
             $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
           }
