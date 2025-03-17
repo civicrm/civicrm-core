@@ -4,6 +4,7 @@
  * File for the CRM_Contribute_Import_Parser_ContributionTest class.
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\DedupeRule;
@@ -242,6 +243,26 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 3], 1);
 
+  }
+
+  /**
+   * Test that when a contribution is merged to a deleted contact the kept contact is used.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportToMergedContact(): void {
+    $contactID = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    Contact::mergeDuplicates()
+      ->setContactId($contactID2)
+      ->setDuplicateId($contactID)
+      ->execute();
+    $values = ['contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', 'payment_instrument_id' => 'Check', 'contribution_status_id' => 'Pending'];
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $contribution = Contribution::get()
+      ->addWhere('contact_id', '=', $contactID2)
+      ->execute();
+    $this->assertCount(1, $contribution);
   }
 
   /**
