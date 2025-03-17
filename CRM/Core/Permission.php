@@ -1084,6 +1084,9 @@ class CRM_Core_Permission {
       ],
       // managed by query object
       'get' => [],
+      'getMergedTo' => [],
+      'getMergedFrom' => [],
+
       // managed by _civicrm_api3_check_edit_permissions
       'update' => [],
       'duplicatecheck' => [
