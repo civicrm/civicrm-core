@@ -260,13 +260,13 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
           ->addOrderBy('title')
           ->execute()->indexBy('name');
 
-      $contactFields = $this->getContactFields($this->getContactType());
-      $fields['contact_id'] = $contactFields['id'];
+      $contactFields = $this->getContactFields($this->getContactType(), 'contact');
+      $fields['contact_id'] = $contactFields['contact.id'];
       $fields['contact_id']['match_rule'] = '*';
       $fields['contact_id']['entity'] = 'Contact';
       $fields['contact_id']['html']['label'] = $fields['contact_id']['title'];
       $fields['contact_id']['title'] .= ' ' . ts('(match to contact)');
-      unset($contactFields['id']);
+      unset($contactFields['contact.id']);
       $fields += $contactFields;
       Civi::cache('fields')->set('membership_importable_fields' . $contactType, $fields);
     }

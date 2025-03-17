@@ -52,6 +52,19 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param array $mappings
+   *
+   * @return array
+   */
+  protected function getMapperFromFieldMappings(array $mappings): array {
+    $mapper = [];
+    foreach ($mappings as $mapping) {
+      $mapper[] = $mapping['name'];
+    }
+    return $mapper;
+  }
+
+  /**
    * Get the import's datasource form.
    *
    * Defaults to contribution - other classes should override.
