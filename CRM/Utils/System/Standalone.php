@@ -332,6 +332,22 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    if ($maintenance) {
+      // if maintenance, we need to wrap in a minimal header
+      $headerContent = CRM_Core_Region::instance('html-header', FALSE)->render('');
+
+      $content = <<<HTML
+        <html>
+          <head>
+            {$headerContent}
+          </head>
+          <body>
+            {$content}
+          </body>
+        </html>
+      HTML;
+    }
+
     print $content;
     return NULL;
   }
