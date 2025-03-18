@@ -10,13 +10,11 @@
  */
 
 use Civi\Api4\Address;
-use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\DedupeRule;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
-use Civi\Api4\Event;
 use Civi\Api4\Phone;
 use Civi\Api4\UserJob;
 use Civi\UserJob\UserJobInterface;
@@ -998,19 +996,29 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
       return $resolvedValue;
     }
-    // @todo - make this generic - for fields where getOptions doesn't fetch
-    // getOptions does not retrieve these fields with high potential results
+    // @todo - it would be faster in most cases to retrieve and cache all potential results.
+    // @todo - Programmatically determine which core fields don't already have options loaded.
+    $fkEntity = NULL;
     if ($fieldName === 'event_id') {
-      if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
-        $event = Event::get()->addClause('OR', ['title', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
-        Civi::$statics[__CLASS__][$fieldName][$importedValue] = $event['id'] ?? FALSE;
-      }
-      return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
+      $fkEntity = 'Event';
     }
-    if ($fieldMetadata['name'] === 'campaign_id') {
+    if ($fieldName === 'campaign_id') {
+      $fkEntity = 'Campaign';
+    }
+    if (isset($fieldMetadata['fk_entity'])) {
+      $fkEntity = $fieldMetadata['fk_entity'];
+    }
+    if ($fkEntity) {
       if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
-        $campaign = Campaign::get()->addClause('OR', ['title', '=', $importedValue], ['name', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
-        Civi::$statics[__CLASS__][$fieldName][$importedValue] = $campaign['id'] ?? FALSE;
+        // handle if the imported value is already an integer. Can't just return the integer because it might be invalid.
+        $returnKey = CRM_Utils_Rule::positiveInteger($importedValue) ? 'id' : 'label';
+        // Do an autocomplete lookup and cache the result.
+        $autocompleteName = $this->getAutocompleteFieldName($fieldMetadata);
+        $autocompleteResult = civicrm_api4($fkEntity, 'Autocomplete', [
+          'fieldName' => $autocompleteName,
+          'input' => $importedValue,
+        ])->column('id', $returnKey);
+        Civi::$statics[__CLASS__][$fieldName][$importedValue] = $autocompleteResult[$importedValue] ?? FALSE;
       }
       return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?: 'invalid_import_value';
     }
@@ -1019,6 +1027,14 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       return CRM_Utils_Rule::numeric($importedValue) ? (int) $importedValue : 'invalid_import_value';
     }
     return $importedValue;
+  }
+
+  protected function getAutocompleteFieldName(array $fieldMetadata) : string {
+    $fieldName = $fieldMetadata['name'];
+    if (isset($fieldMetadata['fk_entity']) && isset($fieldMetaData['extends'])) {
+      return $fieldMetadata['extends'] . '.' . CRM_Core_BAO_CustomField::getLongNameFromShortName($fieldName);
+    }
+    return $fieldMetadata['entity'] . '.' . $fieldName;
   }
 
   /**

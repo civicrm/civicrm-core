@@ -512,6 +512,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 0,
+        'fk_entity' => NULL,
         'pseudoconstant' => [
           'table' => 'civicrm_country',
           'keyColumn' => 'id',
@@ -551,6 +552,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 1,
+        'fk_entity' => NULL,
         'pseudoconstant' => [
           'table' => 'civicrm_country',
           'keyColumn' => 'id',
@@ -590,6 +592,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 0,
+        'fk_entity' => NULL,
       ],
       $this->getCustomFieldName('text') => [
         'name' => $this->getCustomFieldName('text'),
@@ -624,6 +627,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'search_table' => 'contact_a',
         'maxlength' => 300,
         'serialize' => 0,
+        'fk_entity' => NULL,
       ],
       $this->getCustomFieldName('select_string') => [
         'name' => $this->getCustomFieldName('select_string'),
@@ -657,6 +661,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 0,
+        'fk_entity' => NULL,
         'pseudoconstant' => [
           'optionGroupName' => $this->callAPISuccessGetValue('CustomField', ['id' => $this->getCustomFieldID('select_string'), 'return' => 'option_group_id.name']),
           'optionEditPath' => 'civicrm/admin/options/' . $this->callAPISuccessGetValue('CustomField', ['id' => $this->getCustomFieldID('select_string'), 'return' => 'option_group_id.name']),
@@ -694,6 +699,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 0,
+        'fk_entity' => NULL,
       ],
       $this->getCustomFieldName('link') => [
         'name' => $this->getCustomFieldName('link'),
@@ -727,6 +733,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 0,
+        'fk_entity' => NULL,
       ],
       $this->getCustomFieldName('int') => [
         'name' => $this->getCustomFieldName('int'),
@@ -760,6 +767,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 0,
+        'fk_entity' => NULL,
       ],
       $this->getCustomFieldName('contact_reference') => [
         'name' => $this->getCustomFieldName('contact_reference'),
@@ -793,6 +801,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 0,
+        'fk_entity' => NULL,
       ],
       $this->getCustomFieldName('state') => [
         'name' => $this->getCustomFieldName('state'),
@@ -819,6 +828,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 0,
+        'fk_entity' => NULL,
         'pseudoconstant' => [
           'table' => 'civicrm_state_province',
           'keyColumn' => 'id',
@@ -856,6 +866,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
         'serialize' => 1,
+        'fk_entity' => NULL,
         'pseudoconstant' => [
           'table' => 'civicrm_state_province',
           'keyColumn' => 'id',
@@ -902,6 +913,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'options_per_line' => NULL,
         'is_search_range' => '0',
         'serialize' => 0,
+        'fk_entity' => NULL,
         'pseudoconstant' => [
           'callback' => 'CRM_Core_SelectValues::boolean',
         ],
@@ -938,6 +950,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'options_per_line' => NULL,
         'is_search_range' => '0',
         'serialize' => '1',
+        'fk_entity' => NULL,
         'pseudoconstant' => [
           'optionGroupName' => $this->getOptionGroupName('checkbox'),
           'optionEditPath' => 'civicrm/admin/options/' . $this->getOptionGroupName('checkbox'),

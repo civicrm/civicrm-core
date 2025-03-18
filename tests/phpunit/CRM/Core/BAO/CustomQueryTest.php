@@ -86,8 +86,9 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       'where' => 'civicrm_value_testsearchcus_' . $ids['custom_group_id'] . '.date_field_' . $dateCustomField['id'],
       'import' => 1,
       'serialize' => 0,
+      'fk_entity' => NULL,
     ], $queryObj->getFieldSpec('custom_' . $dateCustomField['id']));
-
+$temp = 1;
   }
 
   /**
