@@ -213,7 +213,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Missing required fields: Participant ID OR Event ID', $row['_status_message']);
+    $this->assertEquals('Invalid value for field(s) : Event', $row['_status_message']);
   }
 
   /**
