@@ -33,7 +33,7 @@
   --crm-c-gray-300: #e1dfdf;
   --crm-c-gray-200: #bdbdbd;
   --crm-c-divider: 1px solid var(--crm-c-gray-500);
-  --crm-checkbox-list-col: #665800;
+  --crm-checkbox-list-bg: #665800;
   --crm-checkbox-list-bg2: #525209;
   --crm-checkbox-list-col: var(--crm-c-text-light);
   /* And others */
