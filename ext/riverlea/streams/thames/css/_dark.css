@@ -125,7 +125,7 @@
 .crm-container .status-past,
 .crm-contact-deceased,
 .crm-container .status-warning {
-  --crm-c-alert: var(--crm-c-red);
+  --crm-c-danger: var(--crm-c-red);
 }
 #civicrm-footer a,
 nav.breadcrumb a {
