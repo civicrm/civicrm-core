@@ -37,9 +37,10 @@ class EventAutocompleteProvider extends \Civi\Core\Service\AutoService implement
     $apiRequest = $event->getApiRequest();
     if (is_object($apiRequest) && is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {
       [$entityName, $fieldName] = array_pad(explode('.', (string) $apiRequest->getFieldName(), 2), 2, '');
-
-      if ($entityName === 'Event' && $fieldName === 'template_id') {
-        $apiRequest->addFilter('is_template', TRUE);
+      $entityName = !empty($entityName) ? $entityName : $apiRequest->getEntityName();
+      if (($entityName === 'Event' && $fieldName === 'id') || $fieldName === 'event_id') {
+        $showTemplates = $fieldName === 'template_id';
+        $apiRequest->addFilter('is_template', $showTemplates);
       }
     }
   }

@@ -452,6 +452,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
         $fields[$id]['column_name'] = $customField['column_name'];
         $fields[$id]['serialize'] = $customField['serialize'];
         $fields[$id]['where'] = $customGroup['table_name'] . '.' . $customField['column_name'];
+        $fields[$id]['fk_entity'] = $customField['fk_entity'];
         // Probably we should use a different fn to get the extends tables but this is a refactor so not changing that now.
         $fields[$id]['extends_table'] = array_key_exists($customGroup['extends'], CRM_Core_BAO_CustomQuery::$extendsMap) ? CRM_Core_BAO_CustomQuery::$extendsMap[$customGroup['extends']] : '';
         if ($extendsSubtypes) {
