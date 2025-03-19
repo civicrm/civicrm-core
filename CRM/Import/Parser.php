@@ -1691,6 +1691,20 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         throw new CRM_Core_Exception(ts('No matching %1 found', [$entity, 'String']));
       }
     }
+    if ($contactID && !isset($contactParams['is_deleted']) && $this->getExistingContactValue($contactID, 'is_deleted')) {
+      // The contact may have been merged since the contact ID was determined (common in cases where
+      // a list of contacts is exported and the some time later imported with augmented data.
+      // As long as is_deleted is not set (ie the importer is not trying to undelete the contact) we can
+      // use the merged to contact instead, if exists.
+      // Note using checkPermissions = FALSE as currently this requires administer CiviCRM
+      // but potentially reviewing that.
+      $result = Contact::getMergedTo(FALSE)
+        ->setContactId($contactID)
+        ->execute()->first();
+      if ($result) {
+        $contactID = $result['id'];
+      }
+    }
     return $contactID;
   }
 
