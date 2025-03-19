@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Entity Batch'),
     'title_plural' => ts('Entity Batches'),
-    'description' => ts('Batch entities (Contributions, Participants, Contacts) to a batch.'),
+    'description' => ts('Batch of Entities typically used for batch data entry (ex: Contribution, Participants, Contacts)'),
     'add' => '3.3',
   ],
   'getIndices' => fn() => [
