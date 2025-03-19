@@ -1,3 +1,6 @@
+1.4.2-6-2alpha
+ - CHANGED - emphasis colours in dark mode to resolve multiple colour contrast issues (https://lab.civicrm.org/extensions/riverlea/-/issues/123)
+
 1.4.1-6.2alpha
  - FIXED - start/end date appears inline (https://lab.civicrm.org/extensions/riverlea/-/issues/120)
  - FIXED - float of prev/next on contact dashboard on WordPress in some contexts (https://lab.civicrm.org/extensions/riverlea/-/issues/118).
