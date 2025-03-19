@@ -100,11 +100,11 @@
   min-height: 500px;
 }
 .crm-designer-duplicate .crm-designer-row {
-  background: var(--crm-c-alert);
+  background: var(--crm-c-danger);
 }
 .crm-designer-duplicate .field-location_type_id,
 .crm-designer-duplicate .field-phone_type_id {
-  color: var(--crm-c-alert-text);
+  color: var(--crm-c-danger-text);
 }
 .crm-designer-row .crm-designer-buttons {
   right: 5px;
@@ -153,8 +153,8 @@ button#crm-designer-add-custom-set {
   text-decoration: none;
 }
 .crm-designer-row .crm-designer-buttons a.crm-designer-action-remove:hover {
-  background-color: var(--crm-c-alert);
-  color: var(--crm-c-alert-text);
+  background-color: var(--crm-c-danger);
+  color: var(--crm-c-danger-text);
   text-decoration: none;
 }
 .crm-designer-row,

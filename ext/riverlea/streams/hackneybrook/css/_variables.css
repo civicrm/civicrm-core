@@ -47,8 +47,8 @@
   --crm-btn-warning-text: var(--crm-c-text);
   --crm-btn-success-bg: var(--crm-c-primary);
   --crm-btn-success-text: var(--crm-c-text);
-  --crm-btn-alert-bg: var(--crm-c-primary);
-  --crm-btn-alert-text: var(--crm-c-text);
+  --crm-btn-danger-bg: var(--crm-c-primary);
+  --crm-btn-danger-text: var(--crm-c-text);
   --crm-btn-icon-bg: rgba(256,256,256,0.25);
   --crm-btn-icon-border: var(--crm-btn-border);
   --crm-btn-icon-padding: 0px;
@@ -132,7 +132,7 @@
   --crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: 0;
   /* Icons */
-  --crm-icon-alert-color: var(--crm-c-alert);
+  --crm-icon-danger-color: var(--crm-c-danger);
   --crm-icon-success-color: var(--crm-c-success);
   --crm-icon-warning-color: var(--crm-c-warning);
   --crm-icon-info-color: var(--crm-c-info);
