@@ -34,6 +34,13 @@
  *   the help html to be inserted
  */
 function smarty_function_help($params, $smarty) {
+  if (isset($params['values']) && is_array($params['values'])) {
+    // Passing in values is way easier at the smarty level as it likely already
+    // has a field spec. Use/ prefer values.
+    $params = array_merge($params, $params['values']);
+    unset($params['values']);
+  }
+
   if (!isset($params['id']) || !isset($smarty->getTemplateVars()['config'])) {
     return NULL;
   }
