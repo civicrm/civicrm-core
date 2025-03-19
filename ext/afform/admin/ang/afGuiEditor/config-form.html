@@ -179,24 +179,19 @@
         </div>
       </div>
 
-
       <div class="form-group">
         <label>
           {{:: ts('Confirmation type') }}
         </label>
         <p class="form-inline">
-          <label class="radio">
-            <input class="crm-form-radio" type="radio" name="confirmation_type" ng-model="editor.afform.confirmation_type" ng-value="1">
-            {{:: ts('Redirect to a URL') }}
-          </label>
-          <label class="radio">
-            <input class="crm-form-radio" type="radio" name="confirmation_type" ng-model="editor.afform.confirmation_type" ng-value="2">
-            {{:: ts('Show confirmation message') }}
+          <label class="radio" ng-repeat="ctype in editor.meta.confirmation_types">
+            <input class="crm-form-radio" type="radio" name="confirmation_type" ng-model="editor.afform.confirmation_type" ng-value="ctype.value">
+            {{:: ctype.label }}
           </label>
         </p>
       </div>
 
-      <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}" ng-if="editor.afform.confirmation_type == 1">
+      <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}" ng-if="editor.afform.confirmation_type === 'redirect_to_url'">
         <label for="af_config_redirect">
           {{:: ts('Post-Submit Page') }}
         </label>
@@ -208,8 +203,7 @@
       </div>
     </div>
 
-
-    <div class="form-group" ng-if="editor.afform.confirmation_type == 2">
+    <div class="form-group" ng-if="editor.afform.confirmation_type === 'show_confirmation_message'">
       <label for="af_config_confirmation_message">
         {{:: ts('Confirmation message') }}
       </label>

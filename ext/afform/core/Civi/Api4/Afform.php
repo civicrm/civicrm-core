@@ -300,7 +300,8 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'confirmation_type',
-          'data_type' => 'Integer',
+          'pseudoconstant' => ['optionGroupName' => 'afform_confirmation_type'],
+          'default_value' => 'redirect_to_url',
         ],
         [
           'name' => 'confirmation_message',
