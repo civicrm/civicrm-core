@@ -616,7 +616,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           foreach ($joinValues as $index => $vals) {
             // $vals could be NULL when a join is in a repeating group.
             // Then $joinValues[0] = null and $joinValues[1] = array
-            if ($vals === null) {
+            if ($vals === NULL) {
               unset($joinValues[$index]);
               continue;
             }
