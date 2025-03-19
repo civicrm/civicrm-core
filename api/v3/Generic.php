@@ -442,7 +442,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
     }
     $options = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
   }
-  if ($options === FALSE) {
+  if (empty($options)) {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
   }
   // Support 'sequential' output as a non-associative array
