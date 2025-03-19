@@ -137,7 +137,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     try {
       $parser = $self->getParser();
       $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-      $mapperError = $self->validateContactFields($rule, $fields['mapper'], ['external_identifier', 'contribution_contact_id', 'contact__id']);
+      $mapperError = $self->validateContactFields($rule, $fields['mapper'], ['contact_id', 'external_identifier']);
       $parser->validateMapping($fields['mapper']);
     }
     catch (CRM_Core_Exception $e) {
