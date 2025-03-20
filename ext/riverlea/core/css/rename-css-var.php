@@ -8,7 +8,7 @@ if (PHP_SAPI !== 'cli') {
 // Run with: php fix.php from within the css/ dir.
 $names = explode("\n", <<<TXT
 --crm-alert             --crm-c-alert
---crm-alert-text        --crm-c-alert-text
+--crm-alert-text        --crm-c-alert-contrast
 --crm-amber             --crm-c-amber
 --crm-background        --crm-c-background
 --crm-background2       --crm-c-background2
@@ -41,7 +41,7 @@ $names = explode("\n", <<<TXT
 --crm-green-light       --crm-c-green-light
 --crm-inactive          --crm-c-inactive
 --crm-info              --crm-c-info
---crm-info-text         --crm-c-info-text
+--crm-info-text         --crm-c-info-contrast
 --crm-light-text        --crm-c-text-light
 --crm-link              --crm-c-link
 --crm-link-hover        --crm-c-link-hover
@@ -58,11 +58,11 @@ $names = explode("\n", <<<TXT
 --crm-secondary-hover   --crm-c-secondary-hover
 --crm-secondary-text    --crm-c-secondary-text
 --crm-success           --crm-c-success
---crm-success-text      --crm-c-success-text
+--crm-success-text      --crm-c-success-contrast
 --crm-teal              --crm-c-teal
 --crm-text              --crm-c-text
 --crm-warning           --crm-c-warning
---crm-warning-text      --crm-c-warning-text
+--crm-warning-text      --crm-c-warning-contrast
 --crm-yellow            --crm-c-yellow
 --crm-yellow-less-light --crm-c-yellow-less-light
 --crm-yellow-light      --crm-c-yellow-light
