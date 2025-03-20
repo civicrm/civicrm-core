@@ -76,6 +76,25 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
     ]);
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_0_3($rev): void {
+    $this->addTask('Increase site email display name length', 'alterSchemaField', 'SiteEmailAddress', 'display_name', [
+      'title' => ts('Display Name'),
+      'sql_type' => 'varchar(254)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'description' => ts('Full name of the sender'),
+      'add' => '6.0',
+    ]);
+    // There is no sql file for 6.0.3
+    // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
   public static function migrateFromEmailAddressValues($rev): bool {
     $select = <<<SQL
 SELECT
