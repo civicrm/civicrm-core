@@ -492,7 +492,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if (isset($fieldMappings[$i])) {
           if (($fieldMapping['name'] === 'do_not_import')) {
-            $defaults["mapper[$i]"] = NULL;
+            $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
           }
           elseif (array_key_exists($fieldMapping['name'], $this->getAvailableFields())) {
             $defaults["mapper[$i]"] = $fieldMapping['name'];
@@ -509,12 +509,15 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
             // (but perhaps not disabled or acl-restricted) but we should also
             // handle it here rather than rely on our other efforts.
             $mappingFailures[] = $columnHeader;
-            $defaults["mapper[$i]"] = NULL;
+            $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
           }
         }
       }
       if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
         $defaults["mapper[$i]"] = $this->defaultFromHeader($columnHeader, $headerPatterns);
+      }
+      else {
+        $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
       }
     }
     if (!$this->isSubmitted() && $mappingFailures) {
