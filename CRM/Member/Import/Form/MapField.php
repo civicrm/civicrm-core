@@ -90,21 +90,29 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public static function formRule($fields, $files, $self) {
     $importKeys = [];
+    $mappedFields = [];
     foreach ($fields['mapper'] as $field) {
-      $importKeys[] = [$field];
+      if (is_array($field)) {
+        $importKeys[] = $field;
+        $mappedFields[] = $field[0];
+      }
+      else {
+        $importKeys[] = [$field];
+        $mappedFields[] = $field;
+      }
     }
     $parser = $self->getParser();
     $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
     $errors = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'contact_id', 'contact_id']);
 
-    if (!in_array('id', $fields['mapper']) && !in_array('membership__id', $fields['mapper'])) {
+    if (!in_array('id', $mappedFields)) {
       // FIXME: should use the schema titles, not redeclare them
       $requiredFields = [
         'membership_type_id' => ts('Membership Type'),
         'start_date' => ts('Membership Start Date'),
       ];
       foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $fields['mapper'])) {
+        if (!in_array($field, $mappedFields)) {
           if (!isset($errors['_qf_default'])) {
             $errors['_qf_default'] = '';
           }
