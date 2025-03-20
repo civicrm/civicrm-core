@@ -952,12 +952,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
    * @inheritdoc
+   * @todo use Drupal "maintenance page" template and theme during installation
    */
-  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
-    // @todo use Drupal "maintenance page" template and theme during installation
-    // or upgrade.
-    print $content;
-    return NULL;
+  public function renderMaintenanceMessage(string $content): string {
+    return $content;
   }
 
   /**

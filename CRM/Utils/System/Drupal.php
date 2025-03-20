@@ -890,16 +890,14 @@ AND    u.status = 1
    * @inheritdoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    if ($maintenance) {
+      \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_Base::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
+    }
     $ret = FALSE;
 
     if (!$print) {
       if ($maintenance) {
-        drupal_set_breadcrumb('');
-        drupal_maintenance_theme();
-        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
-          $this->addHTMLHead($region->render(''));
-        }
-        print theme('maintenance_page', ['content' => $content]);
+        print $this->renderMaintenanceMessage($content);
         exit();
       }
       $ret = TRUE;
@@ -913,6 +911,18 @@ AND    u.status = 1
       print $out;
       return NULL;
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function renderMaintenanceMode(string $content): string {
+    drupal_set_breadcrumb('');
+    drupal_maintenance_theme();
+    if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+      $this->addHTMLHead($region->render(''));
+    }
+    return theme('maintenance_page', ['content' => $content]);
   }
 
   /**
