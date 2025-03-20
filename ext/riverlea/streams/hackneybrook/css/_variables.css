@@ -51,6 +51,10 @@
   --crm-btn-success-text: var(--crm-c-text);
   --crm-btn-alert-text: var(--crm-c-text);
   --crm-btn-icon-bg: rgba(256,256,256,0.25);
+  --crm-icon-alert-color: #ef415a;
+  --crm-icon-info-color: #39deff;
+  --crm-icon-success-color: #4dc447;
+  --crm-icon-warning-color: #fab488;
   /* Tables */
   --crm-table-outside-border: var(--crm-c-divider);
   /* Accordions */
@@ -128,11 +132,6 @@
   --crm-notify-padding: 10px 10px 15px 15px;
   --crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: 0;
-  /* Icons */
-  --crm-icon-alert-color: var(--crm-c-alert);
-  --crm-icon-success-color: var(--crm-c-success);
-  --crm-icon-warning-color: var(--crm-c-warning);
-  --crm-icon-info-color: var(--crm-c-info);
   /* Frontend */
   --crm-f-legend-align: unset;
   --crm-f-legend-size: var(--crm-r2);
