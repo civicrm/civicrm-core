@@ -157,7 +157,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('priceSetId', $_GET['priceSetId'] ?? NULL);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $contributionID = CRM_Member_BAO_Membership::getMembershipContributionId($this->_id);
+      $contributionID = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->_id);
       // check delete permission for contribution
       if ($this->_id && $contributionID && !CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
         CRM_Core_Error::statusBounce(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
@@ -1280,7 +1280,7 @@ DESC limit 1");
         // Test cover in `CRM_Member_Form_MembershipTest::testOverrideSubmit()`.
         $isPaymentPending = FALSE;
         if ($this->getMembershipID()) {
-          $contributionId = CRM_Member_BAO_Membership::getMembershipContributionId($this->getMembershipID());
+          $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
           if ($contributionId) {
             $isPaymentPending = \Civi\Api4\Contribution::get(FALSE)
               ->addSelect('contribution_status_id:name')
@@ -1339,7 +1339,7 @@ DESC limit 1");
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
-    $contributionId = $this->ids['Contribution'] ?? CRM_Member_BAO_Membership::getMembershipContributionId($this->getMembershipID());
+    $contributionId = $this->ids['Contribution'] ?? CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
     $membershipIds = $this->_membershipIDs;
     if ($this->getSubmittedValue('send_receipt') && $contributionId && !empty($membershipIds)) {
       $contributionStatus = \Civi\Api4\Contribution::get(FALSE)
