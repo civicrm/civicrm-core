@@ -296,16 +296,16 @@ div.crm-inline-edit-form div.crm-clear {
   margin-bottom: .25em;
 }
 #crm-contact-actions-list a.delete {
-  background: var(--crm-dropdown-danger-bg);
-  color: var(--crm-c-danger-text);
+  background: var(--crm-dropdown-alert-bg);
+  color: var(--crm-c-danger-contrast);
   border-radius: var(--crm-roundness);
 }
 #crm-contact-actions-list a.delete .crm-i.fa-trash::before {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
 }
 

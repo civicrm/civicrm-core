@@ -417,7 +417,7 @@
   background: var(--crm-dropdown-danger-bg);
 }
 #afGuiEditor  .af-gui-bar .dropdown-menu .text-danger {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 
 /* JsTree Dropdown - all of Vakata Context, from jstree/dist has to be overwritten with !important */

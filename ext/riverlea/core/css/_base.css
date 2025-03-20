@@ -309,23 +309,23 @@ dl dl {
   color: var(--crm-c-inactive);
 }
 .crm-container .text-primary {
-  color: var(--crm-c-primary-text);
+  color: var(--crm-c-primary-on-page-bg);
 }
 .crm-container a.text-primary:hover,
 .crm-container a.text-primary:focus {
   color: var(--crm-c-primary-hover);
 }
 .crm-container .text-success {
-  color: var(--crm-c-success-text);
+  color: var(--crm-c-success-on-page-bg);
 }
 .crm-container .text-info {
-  color: var(--crm-c-info-text);
+  color: var(--crm-c-info-on-page-bg);
 }
 .crm-container .text-warning {
-  color: var(--crm-c-warning-text);
+  color: var(--crm-c-warning-on-page-bg);
 }
 .crm-container .text-danger {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-on-page-bg);
 }
 .crm-container h1,
 .crm-container h2,

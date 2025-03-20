@@ -68,13 +68,13 @@
 --crm-c-secondary-text: var(--crm-c-text-light);
 --crm-c-secondary-hover-text: var(--crm-c-text-light);
 --crm-c-success: var(--crm-c-green-dark);
---crm-c-success-text: var(--crm-c-text-light);
+--crm-c-success-contrast: var(--crm-c-text-light);
 --crm-c-danger: var(--crm-c-red-dark);
---crm-c-danger-text: var(--crm-c-text-light);
+--crm-c-danger-contrast: var(--crm-c-text-light);
 --crm-c-warning: var(--crm-c-amber);
---crm-c-warning-text: var(--crm-c-text-light);
+--crm-c-warning-contrast: var(--crm-c-text-light);
 --crm-c-info: var(--crm-c-blue-dark);
---crm-c-info-text: var(--crm-c-text-light);
+--crm-c-info-contrast: var(--crm-c-text-light);
 --crm-c-focus: var(--crm-c-blue-dark);
 --crm-c-inactive: #696969;
 /* Shadows *
@@ -138,15 +138,15 @@
 --crm-btn-icon-spacing: var(--crm-s);
 --crm-btn-icon-size: auto;
 --crm-btn-cancel-bg: var(--crm-c-danger);
---crm-btn-cancel-text: var(--crm-c-danger-text);
+--crm-btn-cancel-text: var(--crm-c-danger-contrast);
 --crm-btn-info-bg: var(--crm-c-info);
---crm-btn-info-text: var(--crm-c-info-text);
+--crm-btn-info-text: var(--crm-c-info-contrast);
 --crm-btn-warning-bg: var(--crm-c-warning);
---crm-btn-warning-text: var(--crm-c-warning-text);
+--crm-btn-warning-text: var(--crm-c-warning-contrast);
 --crm-btn-success-bg: var(--crm-c-success);
---crm-btn-success-text: var(--crm-c-success-text);
---crm-btn-danger-bg: var(--crm-c-danger);
---crm-btn-danger-text: var(--crm-c-danger-text);
+--crm-btn-success-text: var(--crm-c-success-contrast);
+--crm-btn-alert-bg: var(--crm-c-danger);
+--crm-btn-alert-text: var(--crm-c-danger-contrast);
 --crm-btn-icon-bg: ; /* btn-icon-* supports distinct border/bg for icons. If applied, set btn-icon-padding to 0px to make the icon bg stretch to the button *
 --crm-btn-icon-border: ;
 --crm-btn-icon-padding: var(--crm-btn-padding-block);
@@ -276,7 +276,7 @@
 --crm-tab-col: var(--crm-c-text);
 --crm-tab-weight: normal;
 --crm-tab-font:;
---crm-tab-count-bg: var(--crm-c-info-text);
+--crm-tab-count-bg: var(--crm-c-info-contrast);
 --crm-tab-count-col: var(--crm-c-info);
 --crm-tab-roundness: var(--crm-roundness);
 --crm-tab-border: var(--crm-c-divider);

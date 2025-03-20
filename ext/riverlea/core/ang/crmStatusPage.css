@@ -19,23 +19,23 @@
 #crm-status-list .crm-severity-critical,
 #crm-status-list .crm-severity-error {
   background-color: var(--crm-c-danger);
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 /* Warning Severity */
 #crm-status-list .crm-severity-warning {
   background-color: var(--crm-c-warning);
-  color: var(--crm-c-warning-text);
+  color: var(--crm-c-warning-contrast);
 }
 /* Not Okay - Not Warning */
 #crm-status-list .crm-severity-notice {
   background-color: var(--crm-c-info);
-  color: var(--crm-c-info-text);
+  color: var(--crm-c-info-contrast);
 }
 /* All OK Severity */
 #crm-status-list .crm-severity-info,
 #crm-status-list .crm-severity-debug {
   background-color: var(--crm-c-success);
-  color: var(--crm-c-success-text);
+  color: var(--crm-c-success-contrast);
 }
 #crm-status-list .crm-status-message-body {
   margin: var(--crm-r) 0;

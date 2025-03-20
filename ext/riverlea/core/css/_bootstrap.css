@@ -1821,7 +1821,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 }
 #bootstrap-theme .has-warning .input-group-addon {
   color: var(--crm-c-warning);
-  background-color: var(--crm-c-warning-text);
+  background-color: var(--crm-c-warning-contrast);
   border-color: var(--crm-c-warning);
 }
 #bootstrap-theme .has-warning .form-control-feedback {
@@ -1836,7 +1836,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 }
 #bootstrap-theme .has-error .input-group-addon {
   color: var(--crm-c-danger);
-  background-color: var(--crm-c-danger-text);
+  background-color: var(--crm-c-danger-contrast);
   border-color: var(--crm-c-danger);
 }
 #bootstrap-theme .has-error .form-control-feedback {
@@ -2815,7 +2815,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-success.active,
 #bootstrap-theme button.list-group-item-success.active:hover,
 #bootstrap-theme button.list-group-item-success.active:focus {
-  color: var(--crm-c-success-text);
+  color: var(--crm-c-success-contrast);
   background-color: var(--crm-c-success);
   border-color: var(--crm-c-success);
 }
@@ -2844,7 +2844,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-info.active,
 #bootstrap-theme button.list-group-item-info.active:hover,
 #bootstrap-theme button.list-group-item-info.active:focus {
-  color: var(--crm-c-info-text);
+  color: var(--crm-c-info-contrast);
   background-color: var(--crm-c-info);
   border-color: var(--crm-c-info);
 }
@@ -2873,7 +2873,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-warning.active,
 #bootstrap-theme button.list-group-item-warning.active:hover,
 #bootstrap-theme button.list-group-item-warning.active:focus {
-  color: var(--crm-c-warning-text);
+  color: var(--crm-c-warning-contrast);
   background-color: var(--crm-c-warning);
   border-color: var(--crm-c-warning);
 }
@@ -2902,7 +2902,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-danger.active,
 #bootstrap-theme button.list-group-item-danger.active:hover,
 #bootstrap-theme button.list-group-item-danger.active:focus {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
   background-color: var(--crm-c-danger);
   border-color: var(--crm-c-danger);
 }
@@ -3422,7 +3422,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-success {
   background: var(--crm-c-success);
-  color: var(--crm-c-success-text);
+  color: var(--crm-c-success-contrast);
 }
 #bootstrap-theme .label-success[href]:hover,
 #bootstrap-theme .label-success[href]:focus {
@@ -3430,7 +3430,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-info {
   background: var(--crm-c-info);
-  color: var(--crm-c-info-text);
+  color: var(--crm-c-info-contrast);
 }
 #bootstrap-theme .label-info[href]:hover,
 #bootstrap-theme .label-info[href]:focus {
@@ -3438,7 +3438,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-warning {
   background: var(--crm-c-warning);
-  color: var(--crm-c-warning-text);
+  color: var(--crm-c-warning-contrast);
 }
 #bootstrap-theme .label-warning[href]:hover,
 #bootstrap-theme .label-warning[href]:focus {
@@ -3446,7 +3446,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-danger {
   background: var(--crm-c-danger);
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 #bootstrap-theme .label-danger[href]:hover,
 #bootstrap-theme .label-danger[href]:focus {

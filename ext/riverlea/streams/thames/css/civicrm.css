@@ -604,16 +604,16 @@ html.crm-standalone  nav.breadcrumb>ol {
 
 /* Override _dropdowns.css */
 #afGuiEditor .af-gui-bar .dropdown-menu {
-  --crm-c-danger-text: var(--crm-c-red-dark);
+  --crm-c-danger-contrast: var(--crm-c-red-dark);
 }
 /* Override contactSummary.css */
 #crm-contact-actions-list a.delete {
-  --crm-c-danger-text: var(--crm-c-red-dark);
+  --crm-c-danger-contrast: var(--crm-c-red-dark);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
   /* the hover state gives crm-c-red-dark to the background */
-  --crm-c-danger-text: var(--crm-c-red-light);
+  --crm-c-danger-contrast: var(--crm-c-red-light);
 }
 
 /* Fix Mosaico wizard */

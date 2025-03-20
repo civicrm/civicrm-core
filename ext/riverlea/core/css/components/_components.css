@@ -292,12 +292,12 @@ table.advmultiselect {
   color: var(--crm-alert-text-info);
 }
 .crm-container .panel-warning > .panel-heading {
-  color: var(--crm-c-warning-text);
+  color: var(--crm-c-warning-contrast);
   background-color: var(--crm-c-warning);
 }
 .crm-container .panel-warning > .panel-heading .badge,
 .crm-container .panel-warning > .panel-heading a {
-  color: var(--crm-c-warning-text);
+  color: var(--crm-c-warning-contrast);
 }
 .crm-container .panel-danger > .panel-heading {
   color: var(--crm-c-danger);
@@ -387,13 +387,13 @@ table.advmultiselect {
 }
 .crm-container #civicrm-footer .status.crm-error {
   background-color: var(--crm-c-danger);
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 #civicrm-footer .status a {
   color: inherit;
 }
 .crm-container #civicrm-footer .status.crm-error a {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 
 /* Upgrade screen (overwrites inline css) */
@@ -538,65 +538,65 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #bootstrap-theme .dropdown-menu a.bg-success,
 #bootstrap-theme .bg-success {
   background-color: var(--crm-c-success);
-  color: var(--crm-c-success-text);
+  color: var(--crm-c-success-contrast);
 }
 #bootstrap-theme a.bg-success:hover,
 #bootstrap-theme a.bg-success:focus,
 #bootstrap-theme .dropdown-menu a.bg-success:hover,
 #bootstrap-theme .dropdown-menu .bg-success a:hover {
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-success);
-  color: var(--crm-c-success-text);
+  color: var(--crm-c-success-contrast);
 }
 #bootstrap-theme .dropdown-menu .bg-info a,
 #bootstrap-theme .dropdown-menu a.bg-info,
 #bootstrap-theme .bg-info {
   background-color: var(--crm-c-info);
-  color: var(--crm-c-info-text);
+  color: var(--crm-c-info-contrast);
 }
 #bootstrap-theme a.bg-info:hover,
 #bootstrap-theme a.bg-info:focus,
 #bootstrap-theme .dropdown-menu .bg-info a:hover,
 #bootstrap-theme .dropdown-menu a.bg-info:hover {
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-info);
-  color: var(--crm-c-info-text);
+  color: var(--crm-c-info-contrast);
 }
 #bootstrap-theme .bg-warning,
 #bootstrap-theme .dropdown-menu .bg-warning a,
 #bootstrap-theme .dropdown-menu a.bg-warning {
   background-color: var(--crm-c-warning);
-  color: var(--crm-c-warning-text) !important /* FormBuilder vs .disabled */;
+  color: var(--crm-c-warning-contrast) !important /* FormBuilder vs .disabled */;
 }
 #bootstrap-theme a.bg-warning:hover,
 #bootstrap-theme a.bg-warning:focus,
 #bootstrap-theme .dropdown-menu .bg-warning a:hover,
 #bootstrap-theme .dropdown-menu a.bg-warning:hover {
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-warning);
-  color: var(--crm-c-warning-text);
+  color: var(--crm-c-warning-contrast);
 }
 #bootstrap-theme .bg-danger,
 #bootstrap-theme .dropdown-menu .bg-danger a,
 #bootstrap-theme .dropdown-menu a.bg-danger {
   background-color: var(--crm-c-danger);
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 #bootstrap-theme a.bg-danger:hover,
 #bootstrap-theme a.bg-danger:focus,
 #bootstrap-theme .dropdown-menu .bg-danger a:hover,
 #bootstrap-theme .dropdown-menu a.bg-danger:hover {
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 #bootstrap-theme .dropdown-menu .bg-danger .crm-i::before {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 #bootstrap-theme .dropdown-menu .bg-warning .crm-i::before {
-  color: var(--crm-c-warning-text);
+  color: var(--crm-c-warning-contrast);
 }
 #bootstrap-theme .dropdown-menu .bg-success .crm-i::before {
-  color: var(--crm-c-success-text);
+  color: var(--crm-c-success-contrast);
 }
 #bootstrap-theme .dropdown-menu .bg-info .crm-i::before {
-  color: var(--crm-c-info-text);
+  color: var(--crm-c-info-contrast);
 }
 
 /* CKEditor Config */

@@ -85,7 +85,8 @@
   --crm-c-inactive: #696969;
 /* should 'help' be blue in Thames? */
   --crm-c-success: var(--crm-c-info);
-  --crm-c-success-text: var(--crm-c-info-text);
+  --crm-c-success-contrast: var(--crm-c-info-contrast);
+  --crm-c-success-on-page-bg: var(--crm-c-info-on-page-bg);
 }
 :root {
 /* thames only radii */
@@ -287,7 +288,7 @@
   --crm-tab-col: var(--crm-c-text);
   --crm-tab-weight: normal;
   --crm-tab-font: unset;
-  --crm-tab-count-bg: var(--crm-c-info-text);
+  --crm-tab-count-bg: var(--crm-c-info-contrast);
   --crm-tab-count-col: var(--crm-c-info);
   --crm-tab-roundness: var(--crm-r-3) var(--crm-r-3) 0 0;
   --crm-tab-border: none;

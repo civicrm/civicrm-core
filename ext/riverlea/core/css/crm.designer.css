@@ -104,7 +104,7 @@
 }
 .crm-designer-duplicate .field-location_type_id,
 .crm-designer-duplicate .field-phone_type_id {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
 }
 .crm-designer-row .crm-designer-buttons {
   right: 5px;
@@ -149,12 +149,12 @@ button#crm-designer-add-custom-set {
 }
 .crm-designer-row .crm-designer-buttons a.crm-designer-action-settings:hover {
   background-color: var(--crm-c-success);
-  color: var(--crm-c-success-text);
+  color: var(--crm-c-success-contrast);
   text-decoration: none;
 }
 .crm-designer-row .crm-designer-buttons a.crm-designer-action-remove:hover {
   background-color: var(--crm-c-danger);
-  color: var(--crm-c-danger-text);
+  color: var(--crm-c-danger-contrast);
   text-decoration: none;
 }
 .crm-designer-row,
