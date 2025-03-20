@@ -1849,8 +1849,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
+   *
    * Retrieve the contribution id for the associated Membership id.
-   * @todo we should get this off the line item
    *
    * @param int $membershipId
    *   Membership id.
@@ -1859,10 +1859,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return int|int[]|null
    *   contribution id
-   * @todo we should get this off the line item
    *
+   * @deprecated
    */
   public static function getMembershipContributionId($membershipId, $all = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('use LineItems');
     $membershipPayment = new CRM_Member_DAO_MembershipPayment();
     $membershipPayment->membership_id = $membershipId;
     if ($all && $membershipPayment->find()) {
