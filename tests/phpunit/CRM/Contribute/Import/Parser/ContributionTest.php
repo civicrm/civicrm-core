@@ -535,20 +535,18 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test import parser will consider a rule valid including a custom field.
+   * Test import parser will pass MapField validation with rules including email and a custom field.
    *
    * @dataProvider validateData
    */
   public function testValidateMappingWithCustomDedupeRule($data): void {
     $this->addToDedupeRule();
-    // First we try to create without total_amount mapped.
-    // It will fail in create mode as total_amount is required for create.
     $mappings = [
       ['name' => 'financial_type_id'],
       ['name' => 'total_amount'],
     ];
     foreach ($data['fields'] as $field) {
-      $mappings[] = ['name' => $field === 'custom' ? ('contact.' . $this->getCustomFieldName('text', 4)) : $field];
+      $mappings[] = ['name' => 'contact.' . ($field === 'custom' ? $this->getCustomFieldName('text', 4) : $field)];
     }
     $this->submitDataSourceForm('contributions.csv', ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
     $form = $this->getMapFieldForm([
@@ -570,16 +568,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function validateData(): array {
     return [
-      'email_first_name_last_name' => [['fields' => ['email', 'first_name', 'last_name'], 'valid' => TRUE]],
-      'email_last_name' => [['fields' => ['email', 'last_name'], 'valid' => TRUE]],
-      'email_first_name' => [['fields' => ['email', 'first_name'], 'valid' => TRUE]],
+      'email_first_name_last_name' => [['fields' => ['email_primary.email', 'first_name', 'last_name'], 'valid' => TRUE]],
+      'email_last_name' => [['fields' => ['email_primary.email', 'last_name'], 'valid' => TRUE]],
+      'email_first_name' => [['fields' => ['email_primary.email', 'first_name'], 'valid' => TRUE]],
       'first_name_last_name' => [['fields' => ['first_name', 'last_name'], 'valid' => TRUE]],
-      'email' => [['fields' => ['email'], 'valid' => TRUE]],
+      'email' => [['fields' => ['email_primary.email'], 'valid' => TRUE]],
       'first_name' => [['fields' => ['first_name'], 'valid' => FALSE]],
       'last_name' => [['fields' => ['last_name'], 'valid' => FALSE]],
       'last_name_custom' => [['fields' => ['last_name', 'custom'], 'valid' => TRUE]],
       'first_name_custom' => [['fields' => ['first_name', 'custom'], 'valid' => TRUE]],
       'custom' => [['fields' => ['custom'], 'valid' => FALSE]],
+      'first_name_street_address' => [['fields' => ['address_primary.street_address', 'first_name'], 'valid' => TRUE]],
     ];
   }
 
