@@ -98,6 +98,17 @@
             <span class="description">{ts}Select Membership Organization and then Membership Type.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
           </td>
         </tr>
+        {if $isRecur && '{$form.update_recur.label}'}
+        <tr id="crm-membership-form-block-update-recurring">
+          <td class="label">{$form.update_recur.label}</td>
+          <td class="mem_recur_contribution">
+             <span class="UpdateRecur">{$form.update_recur.html}</span>
+             <span class="description">
+                {ts}Update Recurring Contribution to match the current membership pricing on this change.{/ts}
+              </span>
+          </td>
+        </tr>
+        {/if}
         <tr id="maxRelated" class="crm-membership-form-block-max_related">
           <td class="label">{$form.max_related.label}</td>
           <td>{$form.max_related.html}<br />
@@ -340,6 +351,9 @@
         cj('#membership_type_id_1-readonly').text(cj('#membership_type_id_1 option:selected').text());
         cj('#mem_type_id-readonly').show();
         cj('#mem_type_id-editable').hide();
+        {if '{$form.update_recur.label}'}
+          cj('#crm-membership-form-block-update-recurring').hide();
+        {/if}
       {else}
         cj('#mem_type_id-readonly').hide();
         cj('#mem_type_id-editable').show();
@@ -350,6 +364,9 @@
         e.preventDefault();
         cj('#mem_type_id-readonly').hide();
         cj('#mem_type_id-editable').show();
+        {if '{$form.update_recur.label}'}
+          cj('#crm-membership-form-block-update-recurring').show();
+        {/if}
       });
 
       // give option to override end-date for auto-renew memberships
