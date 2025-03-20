@@ -115,9 +115,6 @@ html.cms-standalone body {
   text-rendering: auto;
 }
 
-.crm-container .alert-success {
-  background-color: var(--crm-c-green);
-}
 .crm-container :is(.status,
 .alert-warning,
 .messages.warning) {

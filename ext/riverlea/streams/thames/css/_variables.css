@@ -81,16 +81,11 @@
   --crm-c-secondary-hover: #a1cef3; /* thames */
   --crm-c-secondary-text: var(--crm-c-blue-darker); /* thames */
   --crm-c-secondary-hover-text: var(--crm-c-text-light); /* thames todo */
-  --crm-c-success: var(--crm-c-green-dark);
-  --crm-c-success-text: var(--crm-c-text-light);
-  --crm-c-danger: var(--crm-c-red-dark); /* thames */
-  --crm-c-danger-text: var(--crm-c-text-light);
-  --crm-c-warning: var(--crm-c-amber); /* bg on .btn-warning, .label-warming but border on notification .alert */
-  --crm-c-warning-text: var(--crm-c-text);
-  --crm-c-info: var(--crm-c-blue-dark);
-  --crm-c-info-text: var(--crm-c-text-light);
   --crm-c-focus: var(--crm-c-blue-dark);
   --crm-c-inactive: #696969;
+/* should 'help' be blue in Thames? */
+  --crm-c-success: var(--crm-c-info);
+  --crm-c-success-text: var(--crm-c-info-text);
 }
 :root {
 /* thames only radii */
@@ -160,16 +155,8 @@
   --crm-btn-height: 1.825rem; /* thames */
   --crm-btn-icon-spacing: var(--crm-xs2); /* thames */
   --crm-btn-icon-size: auto;
-  --crm-btn-cancel-bg: var(--crm-c-red-light);
-  --crm-btn-cancel-text: var(--crm-c-red-dark);
-  --crm-btn-info-bg: var(--crm-c-secondary); /* thames */
-  --crm-btn-info-text: var(--crm-c-secondary-text); /* thames */
-  --crm-btn-warning-bg: var(--crm-c-warning);
-  --crm-btn-warning-text: var(--crm-c-warning-text);
-  --crm-btn-success-bg: var(--crm-c-info); /* thames */
-  --crm-btn-success-text: #fff; /* thames */
-  --crm-btn-danger-bg: var(--crm-c-red);
-  --crm-btn-danger-text: var(--crm-c-red-dark);
+  --crm-btn-success-bg: var(--crm-btn-info-bg); /* thames */
+  --crm-btn-success-text: var(--crm-btn-info-text); /* thames */
   --crm-btn-icon-bg: unset;
   --crm-btn-icon-border: unset;
   --crm-btn-margin: var(--crm-m) 0;
@@ -248,18 +235,11 @@
   --crm-alert-padding: var(--crm-r); /* thames */
   --crm-alert-margin: 0 0 var(--crm-m);
   --crm-alert-border-width: 0; /* thames */
-/* Note 'help' suffix here is for the 'success' boxes. */
-  --crm-alert-background-help: var(--crm-c-blue-light); /* thames */
+
   --crm-alert-border-help: unset; /* thames */
-  --crm-alert-text-help: unset; /* thames */
-  --crm-alert-text-warning: var(--crm-c-text);
   --crm-alert-border-warning: var(--crm-c-yellow);
-  --crm-alert-background-info: var(--crm-c-blue-light);
   --crm-alert-border-info: var(--crm-c-blue);
-  --crm-alert-text-info: var(--crm-c-blue-darker);
-  --crm-alert-background-danger: var(--crm-c-red-light);
   --crm-alert-border-danger: var(--crm-c-red);
-  --crm-alert-text-danger: var(--crm-c-red-dark);
 }
 :root {
 /* Form */
@@ -422,10 +402,6 @@
   --crm-notify-col: var(--crm-c-text); /* thames */
   --crm-notify-accent-border: 0.875rem 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */ /* thames */
   --crm-notify-radius: 4px; /* thames */
-  --crm-notify-danger: var(--crm-c-danger);
-  --crm-notify-warning: var(--crm-c-warning);
-  --crm-notify-success: var(--crm-c-success);
-  --crm-notify-info: var(--crm-c-info);
 }
 :root {
 /* Icons */

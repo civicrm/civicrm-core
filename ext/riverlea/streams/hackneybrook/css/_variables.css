@@ -29,8 +29,6 @@
   --crm-c-secondary-hover: var(--crm-c-gray-050);
   --crm-c-secondary-text: var(--crm-c-text);
   --crm-c-secondary-hover-text: var(--crm-c-text);
-  --crm-c-info: var(--crm-c-blue-darker);
-  --crm-c-warning-text: var(--crm-c-text);
   /* Type */
   --crm-heading-padding: var(--crm-s2) var(--crm-m2);
   /* Buttons */
@@ -39,19 +37,24 @@
   --crm-btn-height: 31px;
   --crm-btn-icon-spacing: var(--crm-m1);
   --crm-btn-icon-size: var(--crm-btn-height);
-  --crm-btn-cancel-bg: var(--crm-c-primary);
-  --crm-btn-cancel-text: var(--crm-c-text);
-  --crm-btn-info-bg: var(--crm-c-primary);
-  --crm-btn-info-text: var(--crm-c-text);
-  --crm-btn-warning-bg: var(--crm-c-primary);
-  --crm-btn-warning-text: var(--crm-c-text);
-  --crm-btn-success-bg: var(--crm-c-primary);
-  --crm-btn-success-text: var(--crm-c-text);
-  --crm-btn-danger-bg: var(--crm-c-primary);
-  --crm-btn-danger-text: var(--crm-c-text);
-  --crm-btn-icon-bg: rgba(256,256,256,0.25);
   --crm-btn-icon-border: var(--crm-btn-border);
   --crm-btn-icon-padding: 0px;
+  /* reset button colours - only icons are coloured */
+  --crm-btn-info-bg: var(--crm-c-primary);
+  --crm-btn-success-bg: var(--crm-c-primary);
+  --crm-btn-danger-bg: var(--crm-c-primary);
+  --crm-btn-cancel-bg: var(--crm-c-primary);
+  --crm-btn-warning-bg: var(--crm-c-primary);
+  --crm-btn-cancel-text: var(--crm-c-text);
+  --crm-btn-info-text: var(--crm-c-text);
+  --crm-btn-warning-text: var(--crm-c-text);
+  --crm-btn-success-text: var(--crm-c-text);
+  --crm-btn-danger-text: var(--crm-c-text);
+  --crm-btn-icon-bg: rgba(256,256,256,0.25);
+  --crm-icon-alert-color: #ef415a;
+  --crm-icon-info-color: #39deff;
+  --crm-icon-success-color: #4dc447;
+  --crm-icon-warning-color: #fab488;
   /* Tables */
   --crm-table-outside-border: var(--crm-c-divider);
   /* Accordions */
@@ -62,8 +65,6 @@
   --crm-expand-header-border: 0 solid transparent;
   /* Alerts */
   --crm-alert-padding: var(--crm-r);
-  --crm-alert-text-help: var(--crm-c-text);
-  --crm-alert-text-info: var(--crm-c-blue-darker);
   /* Form */
   --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: var(--crm-c-gray-300);
@@ -131,11 +132,6 @@
   --crm-notify-padding: 10px 10px 15px 15px;
   --crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: 0;
-  /* Icons */
-  --crm-icon-danger-color: var(--crm-c-danger);
-  --crm-icon-success-color: var(--crm-c-success);
-  --crm-icon-warning-color: var(--crm-c-warning);
-  --crm-icon-info-color: var(--crm-c-info);
   /* Frontend */
   --crm-f-legend-align: unset;
   --crm-f-legend-size: var(--crm-r2);
