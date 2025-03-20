@@ -51,10 +51,6 @@
   --crm-btn-success-text: var(--crm-c-text);
   --crm-btn-alert-text: var(--crm-c-text);
   --crm-btn-icon-bg: rgba(256,256,256,0.25);
-  --crm-c-alert-tint: #ef415a;
-  --crm-c-info-tint: #39deff;
-  --crm-c-success-tint: #4dc447;
-  --crm-c-warning-tint: #fab488;
   /* Tables */
   --crm-table-outside-border: var(--crm-c-divider);
   /* Accordions */
