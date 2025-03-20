@@ -1505,15 +1505,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
         $this->set('renewal_mode', $renewalMode);
 
-        if (!empty($membershipContribution)) {
-          // Next line is probably redundant. Checks prevent it happening twice.
-          $membershipPaymentParams = [
-            'membership_id' => $membership->id,
-            'membership_type_id' => $membership->membership_type_id,
-            'contribution_id' => $membershipContribution->id,
-          ];
-          civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
-        }
         if ($membership) {
           CRM_Core_BAO_CustomValueTable::postProcess($this->_params, 'civicrm_membership', $membership->id, 'Membership');
           $this->_params['createdMembershipIDs'][] = $membership->id;
