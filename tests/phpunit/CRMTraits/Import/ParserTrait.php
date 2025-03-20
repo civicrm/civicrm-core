@@ -169,6 +169,12 @@ trait CRMTraits_Import_ParserTrait {
       'rule_table' => 'civicrm_contact',
       'rule_field' => 'last_name',
     ]);
+    $this->createTestEntity('DedupeRule', [
+      'dedupe_rule_group_id' => $dedupeRuleGroupID,
+      'rule_weight' => 5,
+      'rule_table' => 'civicrm_address',
+      'rule_field' => 'street_address',
+    ]);
   }
 
 }
