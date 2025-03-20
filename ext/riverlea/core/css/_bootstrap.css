@@ -1821,7 +1821,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 }
 #bootstrap-theme .has-warning .input-group-addon {
   color: var(--crm-c-warning);
-  background-color: var(--crm-c-amber-light);
+  background-color: var(--crm-c-warning-text);
   border-color: var(--crm-c-warning);
 }
 #bootstrap-theme .has-warning .form-control-feedback {
@@ -1836,7 +1836,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 }
 #bootstrap-theme .has-error .input-group-addon {
   color: var(--crm-c-danger);
-  background-color: # var(--crm-c-red-light);
+  background-color: var(--crm-c-danger-text);
   border-color: var(--crm-c-danger);
 }
 #bootstrap-theme .has-error .form-control-feedback {

@@ -37,6 +37,7 @@
   --crm-c-red-light: #f9e6eb;
   --crm-c-red-dark: #91223c;
   --crm-c-amber: #dd5600;
+  --crm-c-amber-dark: #dd5600;
   --crm-c-amber-light: #fbf0e2;
   --crm-c-yellow: #fcfc5a;
   --crm-c-yellow-light: #ffffcc;
@@ -66,14 +67,14 @@
   --crm-c-secondary-hover: #3e485b;
   --crm-c-secondary-text: var(--crm-c-text-light);
   --crm-c-secondary-hover-text: var(--crm-c-text-light);
-  --crm-c-success: var(--crm-c-green-dark);
-  --crm-c-success-text: var(--crm-c-text-light);
-  --crm-c-danger: var(--crm-c-red-dark);
-  --crm-c-danger-text: var(--crm-c-text-light);
-  --crm-c-warning: var(--crm-c-amber);
-  --crm-c-warning-text: var(--crm-c-text-light);
-  --crm-c-info: var(--crm-c-blue-dark);
-  --crm-c-info-text: var(--crm-c-text-light);
+  --crm-c-success: var(--crm-c-green-light);
+  --crm-c-success-text: var(--crm-c-green-dark);
+  --crm-c-danger: var(--crm-c-red-light);
+  --crm-c-danger-text: var(--crm-c-red-dark);
+  --crm-c-warning: var(--crm-c-amber-light);
+  --crm-c-warning-text: var(--crm-c-amber-dark);
+  --crm-c-info: var(--crm-c-blue-light);
+  --crm-c-info-text: var(--crm-c-blue-dark);
   --crm-c-focus: var(--crm-c-blue-dark);
   --crm-c-inactive: #696969;
 /* Shadows */
@@ -220,18 +221,18 @@
   --crm-alert-padding: var(--crm-m) var(--crm-m2);
   --crm-alert-margin: 0 0 var(--crm-m);
   --crm-alert-border-width: 1px;
-  --crm-alert-background-help: var(--crm-c-green-light);
-  --crm-alert-border-help: var(--crm-c-green);
-  --crm-alert-text-help: var(--crm-c-green-dark);
-  --crm-alert-background-warning: var(--crm-c-yellow-light);
-  --crm-alert-border-warning: var(--crm-c-yellow);
-  --crm-alert-text-warning: var(--crm-c-text-dark);
-  --crm-alert-background-info: var(--crm-c-blue-light);
-  --crm-alert-border-info: var(--crm-c-blue);
-  --crm-alert-text-info: var(--crm-c-blue-dark);
-  --crm-alert-background-danger: var(--crm-c-red-light);
-  --crm-alert-border-danger: var(--crm-c-red);
-  --crm-alert-text-danger: var(--crm-c-red-dark);
+  --crm-alert-background-help: var(--crm-c-success);
+  --crm-alert-border-help: var(--crm-c-success-text);
+  --crm-alert-text-help: var(--crm-c-success-text);
+  --crm-alert-background-warning: var(--crm-c-warning);
+  --crm-alert-text-warning: var(--crm-c-warning-text);
+  --crm-alert-border-warning: var(--crm-c-warning-text);
+  --crm-alert-background-info: var(--crm-c-info);
+  --crm-alert-border-info: var(--crm-c-info-text);
+  --crm-alert-text-info: var(--crm-c-info-text);
+  --crm-alert-background-danger: var(--crm-c-alert);
+  --crm-alert-border-danger: var(--crm-c-alert-text);
+  --crm-alert-text-danger: var(--crm-c-alert-text);
 /* Form */
   --crm-form-block-box-shadow: var(--crm-block-shadow);
   --crm-form-block-background: var(--crm-c-background);
@@ -443,4 +444,18 @@
   --crm-f-form-error-bg: var(--crm-c-red);
   --crm-f-logo-height: 40px;
   --crm-f-logo-align: center; /* left, right or center */
+}
+
+/* emphasis colours - @todo move to core/_dark.css */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --crm-c-info: var(--crm-c-blue-dark);
+    --crm-c-info-text: var(--crm-c-blue-light);
+    --crm-c-success: var(--crm-c-green-dark);
+    --crm-c-success-text: var(--crm-c-green-light);
+    --crm-c-warning: var(--crm-c-amber-dark);
+    --crm-c-warning-text: var(--crm-c-amber-light);
+    --crm-c-alert: var(--crm-c-red-dark);
+    --crm-c-alert-text: var(--crm-c-red-light);
+  }
 }
