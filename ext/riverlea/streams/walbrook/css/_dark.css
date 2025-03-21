@@ -12,15 +12,22 @@
   --crm-c-background3: var(--crm-c-gray-800);
   --crm-c-background4: var(--crm-c-gray-700);
   --crm-alert-background-danger: var(--crm-c-red);
+  --crm-alert-background-help: var(--crm-c-green-dark);
   --crm-c-blue-dark: #043353;
-  --crm-c-green-light: #468847;
-  --crm-c-green: #376237;
-  --crm-c-green-dark: #dff0d8;
   --crm-c-gray-700: #353842;
   --crm-c-gray-600: #67676a;
   --crm-c-gray-500: #b3b3b3;
   --crm-c-gray-800: #222831;
   --crm-c-divider: 1px solid var(--crm-c-gray-500);
+  --crm-c-info: var(--crm-c-blue-light);
+  --crm-c-info-text: var(--crm-c-blue-dark);
+  --crm-c-warning: var(--crm-c-yellow-light);
+  --crm-c-warning-text: var(--crm-c-text-dark);
+  --crm-c-success: var(--crm-c-green-light);
+  --crm-c-success-text: var(--crm-c-text-dark);
+  --crm-c-danger: var(--crm-c-red-light);
+  --crm-c-alert: var(--crm-c-red-light);
+  --crm-c-alert-text: var(--crm-c-text-dark);
   /* And others */
   --crm-block-shadow: 0 3px 18px 0 rgb(0,0,0);
   --crm-popup-shadow: 0 3px 18px 0 rgb(0,0,0);
@@ -52,7 +59,6 @@
   --crm-table-odd-hover: var(--crm-alert-border-info);
   --crm-table-even-row: var(--crm-c-gray-800);
   --crm-table-even-hover: var(--crm-alert-border-info);
-  --crm-alert-text-help: var(--crm-c-text);
   --crm-alert-background-info: var(--crm-c-blue-dark);
   --crm-alert-text-info: var(--crm-c-blue-light);
   --crm-c-inactive: var(--crm-c-gray-400);
@@ -63,15 +69,18 @@
   --crm-dialog-body-bg: var(--crm-c-background2);
   --crm-notify-background: var(--crm-c-background);
   --crm-form-block-background: var(--crm-c-background2);
-  --crm-btn-cancel-bg: #9b3d4b;
-  --crm-btn-warning-bg: #7b4e14;
-  --crm-c-success-text: var(--crm-c-text-light);
-  --crm-c-warning-text: var(--crm-c-text-light);
-  --crm-c-alert: var(--crm-btn-cancel-bg);
+  /* --crm-btn-cancel-bg: #9b3d4b; */
+  /* --crm-btn-warning-bg: #7b4e14; */
+  /* --crm-c-success-text: var(--crm-c-text-light);
+  --crm-c-warning-text: var(--crm-c-text-light); */
+  /* --crm-c-alert: var(--crm-btn-cancel-bg);
   --crm-c-warning: var(--crm-btn-warning-bg);
-  --crm-btn-alert-bg: var(--crm-btn-cancel-bg);
+  --crm-btn-alert-bg: var(--crm-btn-cancel-bg); */
   --crm-wizard-active-bg: var(--crm-c-primary);
   --crm-wizard-active-col: var(--crm-c-primary-text);
   --crm-dash-edit-border: 1px solid var(--crm-c-link-hover);
   --crm-filter-bg: var(--crm-c-blue-dark);
+}
+.crm-container .text-primary {
+  color: var(--crm-c-text);
 }

@@ -55,6 +55,19 @@
   --crm-input-description: var(--crm-input-label-color);
   --crm-c-warning-text: black;
   --crm-filter-bg: var(--crm-c-dkblue-02);
+  --crm-c-info: var(--crm-c-secondary);
+  --crm-c-info-text: var(--crm-c-secondary-text);
+  --crm-c-warning: var(--crm-c-yellow-light);
+  --crm-c-warning-text: var(--crm-c-text-dark);
+  --crm-c-success: var(--crm-c-green-dark);
+  --crm-btn-success-text: var(--crm-c-secondary-text);
+  --crm-c-danger: var(--crm-c-red);
+  --crm-c-alert: var(--crm-c-red);
+  --crm-c-alert-text: var(--crm-c-red-dark);
+}
+
+.crm-container .text-primary {
+  color: var(--crm-c-text);
 }
 
 .crm-container div.crm-summary-row div.crm-label {
