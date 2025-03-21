@@ -568,7 +568,13 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function getTimeZoneString() {
     $userId = $this->getLoggedInUfID();
     if ($userId) {
-      $user = $this->getUserById($userId);
+      // if we are in multilingual this function might be called before we have set the dbLocale global variable and the APIv4 will try to boot some language options from the option value table which will fail.
+      if (CRM_Core_I18n::isMultilingual()) {
+        $user = $this->getPreBootUserById($userId);
+      }
+      else {
+        $user = $this->getUserById($userId);
+      }
       if ($user && !empty($user['timezone'])) {
         return $user['timezone'];
       }
@@ -582,6 +588,15 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     return $url;
+  }
+
+  private function getPreBootUserById(int $id) {
+    $userDAO = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_uf_match WHERE id = %1 AND is_active = 1", [1 => [$id, 'Positive']]);
+    $user = [];
+    while ($userDAO->fetch()) {
+      $user['timezone'] = $userDAO->timezone;
+    }
+    return empty($user) ? FALSE : $user;
   }
 
   /**
