@@ -1376,7 +1376,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   public function getMappedFieldLabel(array $mappedField): string {
     // doNotImport is on it's way out - skip fields will be '' once all is done.
-    if ($mappedField['name'] === 'doNotImport') {
+    if (empty($mappedField['name']) || $mappedField['name'] === 'doNotImport') {
       return '';
     }
     $this->setFieldMetadata();
@@ -1944,6 +1944,62 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
     }
     return $array;
+  }
+
+  /**
+   * Get the actions to display in the rich UI.
+   *
+   * Filter by the input actions - e.g ['update' 'select'] will only return those keys.
+   *
+   * @param array $actions
+   * @param string $entity
+   *
+   * @return array
+   */
+  protected function getActions(array $actions, $entity = 'Contact'): array {
+    $actionList['Contact'] = [
+      'ignore' => [
+        'id' => 'ignore',
+        'text' => ts('No action'),
+        'description' => ts('Contact not altered'),
+      ],
+      'select' => [
+        'id' => 'select',
+        'text' => ts('Match existing Contact'),
+        'description' => ts('Look up existing contact. Skip row if not found'),
+      ],
+      'update' => [
+        'id' => 'update',
+        'text' => ts('Update existing Contact.'),
+        'description' => ts('Update existing Contact. Skip row if not found'),
+      ],
+      'save' => [
+        'id' => 'save',
+        'text' => ts('Update existing Contact or Create'),
+        'description' => ts('Create new contact if not found'),
+      ],
+    ];
+    return array_values(array_intersect_key($actionList[$entity], array_fill_keys($actions, TRUE)));
+  }
+
+  /**
+   * Save the contact.
+   *
+   * @param string $entity
+   * @param array $contact
+   *
+   * @return int|null
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException|\CRM_Core_Exception
+   */
+  protected function saveContact(string $entity, array $contact): ?int {
+    if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])) {
+      return Contact::save()
+        ->setRecords([$contact])
+        ->execute()
+        ->first()['id'];
+    }
+    return NULL;
   }
 
 }
