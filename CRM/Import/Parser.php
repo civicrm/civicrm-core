@@ -1871,7 +1871,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         }
         elseif ($ruleField['rule_table'] === 'civicrm_address') {
           $fields[$ruleField['rule_field']] = $ruleField['rule_weight'];
-          $fields['address_primary' . $ruleField['rule_field']] = $ruleField['rule_weight'];
+          $fields['address_primary.' . $ruleField['rule_field']] = $ruleField['rule_weight'];
         }
         else {
           // At this point it must be a custom field.

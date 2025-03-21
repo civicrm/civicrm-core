@@ -140,7 +140,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       $contriPageInfo = CRM_Contribute_BAO_ContributionPage::getSectionInfo([$contribPageId]);
 
       foreach ($contriPageInfo[$contribPageId] as $section => $info) {
-        if (!$info) {
+        if (!$info && isset($tabs[$section])) {
           $tabs[$section]['valid'] = FALSE;
         }
       }

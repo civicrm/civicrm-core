@@ -175,6 +175,14 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_1_beta1(string $rev): void {
     $this->addTask('Update import mappings', 'upgradeImportMappingFields', 'Import Contribution');
+    $this->addTask('Increase site email display name length', 'alterSchemaField', 'SiteEmailAddress', 'display_name', [
+      'title' => ts('Display Name'),
+      'sql_type' => 'varchar(254)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'description' => ts('Full name of the sender'),
+      'add' => '6.0',
+    ]);
   }
 
   /**
