@@ -39,7 +39,24 @@ class AfformAdminMeta {
       'placement_filters' => self::getPlacementFilterOptions(),
       'afform_tags' => $afformTags,
       'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
+      'confirmation_types' => self::getConfirmationTypes(),
     ];
+  }
+
+  /**
+   * Get confirmation types
+   *
+   * @return array
+   */
+  public static function getConfirmationTypes(): array {
+    $confirmationTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('label', 'name', 'value')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('option_group_id:name', '=', 'afform_confirmation_type')
+      ->addOrderBy('weight', 'ASC')
+      ->execute();
+
+    return $confirmationTypes;
   }
 
   /**
