@@ -17,12 +17,12 @@
       this.getStatusClass = function() {
         let fraction = this.getLength() / (this.maxlength || 1);
         if (fraction > 0.9) {
-          return 'text-danger';
+          return 'label-danger';
         }
         if (fraction > 0.7) {
-          return 'text-warning';
+          return 'label-warning';
         }
-        return 'text-success';
+        return 'label-success';
       };
 
     }

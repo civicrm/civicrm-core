@@ -117,7 +117,7 @@ foreach ($roles as $roleName => $roleLabel) {
     ],
     'cssRules' => [
       [
-        'text-success',
+        'bg-success',
         'granted_' . $roleName,
         '=',
         TRUE,
