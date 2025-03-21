@@ -97,7 +97,7 @@ foreach ($roles as $roleName => $roleLabel) {
     'rewrite' => ' ',
     'icons' => [
       [
-        'icon' => 'fa-square-check',
+        'icon' => 'fa-circle-check fa-solid',
         'side' => 'left',
         'if' => [
           'granted_' . $roleName,
