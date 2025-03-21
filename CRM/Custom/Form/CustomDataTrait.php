@@ -188,11 +188,18 @@ trait CRM_Custom_Form_CustomDataTrait {
    *
    * @return array
    */
-  protected function getSubmittedCustomFields(): array {
+  protected function getSubmittedCustomFields($version = 3): array {
     $fields = [];
     foreach ($this->getSubmittedValues() as $label => $field) {
-      if (CRM_Core_BAO_CustomField::getKeyID($label)) {
-        $fields[$label] = $field;
+      if ($version === 3) {
+        if (CRM_Core_BAO_CustomField::getKeyID($label)) {
+          $fields[$label] = $field;
+        }
+      }
+      else {
+        if (str_starts_with($label, 'custom_')) {
+          $fields[CRM_Core_BAO_CustomField::getLongNameFromShortName($label)] = $field;
+        }
       }
     }
     return $fields;

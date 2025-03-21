@@ -1787,7 +1787,7 @@ DESC limit 1");
    * @throws \CRM_Core_Exception
    */
   protected function getFormMembershipParams(): array {
-    return [
+    $params = [
       'status_id' => $this->getSubmittedValue('status_id'),
       'source' => $this->getSubmittedValue('source') ?? $this->getContributionSource(),
       'contact_id' => $this->getMembershipContactID(),
@@ -1804,6 +1804,8 @@ DESC limit 1");
       'exclude_is_admin' => !$this->getSubmittedValue('is_override'),
       'contribution_recur_id' => $this->getContributionRecurID(),
     ];
+    $params += $this->getSubmittedCustomFields(4);
+    return $params;
   }
 
   /**
