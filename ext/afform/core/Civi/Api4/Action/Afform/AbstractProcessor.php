@@ -614,6 +614,12 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           // Enforce the limit set by join[max]
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
           foreach ($joinValues as $index => $vals) {
+            // $vals could be NULL when a join is in a repeating group.
+            // Then $joinValues[0] = null and $joinValues[1] = array
+            if ($vals === NULL) {
+              unset($joinValues[$index]);
+              continue;
+            }
             // As with the main entity, use default values from DisplayOnly fields + values from submittable fields
             $joinValues[$index] = $this->getForcedDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []);
             $joinValues[$index] += array_intersect_key($vals, $allowedFields);
