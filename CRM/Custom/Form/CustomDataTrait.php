@@ -86,18 +86,21 @@ trait CRM_Custom_Form_CustomDataTrait {
 
     $formValues = [];
     foreach ($fields as $field) {
-      // Filter for fields in "Inline" style custom groups only, as others are not added to forms via Ajax. Not removing
-      // them here would register them in the QuickForm but not have POST values for them, which might result in data
-      // loss (most notably radio fields, for which no POST value will be interpreted as a reset).
+      // Filter for fields in "Inline" style custom groups only
+      // hack alert hack alert hack alert
+      // per previous comments the above section was intended to be extended to non-contact
+      // entities rather than this section being messed with
+      // @todo remove the inline check below while
+      // walking the tightrope between not breaking core supported usage per
+      // https://lab.civicrm.org/dev/core/-/issues/5806
+      // and non-core implementations of non-inline custom groups.
       // See https://lab.civicrm.org/dev/core/-/issues/5613
-      if (!isset(Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']])) {
-        Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']] = \Civi\Api4\CustomGroup::get(FALSE)
-          ->addSelect('style')
-          ->addWhere('name', '=', $field['custom_group'])
-          ->execute()
-          ->single();
-      }
-      if ('Inline' !== Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']]['style']) {
+      $field += CRM_Core_BAO_CustomField::getField($field['custom_field_id']);
+      $inlineGroup = CRM_Core_BAO_CustomGroup::getGroup([
+        'id' => $field['custom_group_id'],
+        'style' => 'Inline',
+      ]);
+      if (!$inlineGroup) {
         continue;
       }
 
