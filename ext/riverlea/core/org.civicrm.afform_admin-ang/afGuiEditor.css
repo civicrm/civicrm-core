@@ -425,7 +425,7 @@ af-gui-container > .af-gui-bar,
 }
 #afGuiEditor .af-gui-field-required:after {
   content: '*';
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
   position: relative;
   left: -4px;
 }

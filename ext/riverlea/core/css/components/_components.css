@@ -300,12 +300,12 @@ table.advmultiselect {
   color: var(--crm-c-warning-text);
 }
 .crm-container .panel-danger > .panel-heading {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
   background-color: var(--crm-c-red-light);
 }
 .crm-container .panel-danger > .panel-heading .badge,
 .crm-container .panel-danger > .panel-heading a {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
 }
 .crm-container .panel:has(.nav.nav-tabs) {
   border: var(--crm-tabs-border);
@@ -386,14 +386,14 @@ table.advmultiselect {
   border-color: transparent;
 }
 .crm-container #civicrm-footer .status.crm-error {
-  background-color: var(--crm-c-alert);
-  color: var(--crm-c-alert-text);
+  background-color: var(--crm-c-danger);
+  color: var(--crm-c-danger-text);
 }
 #civicrm-footer .status a {
   color: inherit;
 }
 .crm-container #civicrm-footer .status.crm-error a {
-  color: var(--crm-c-alert-text);
+  color: var(--crm-c-danger-text);
 }
 
 /* Upgrade screen (overwrites inline css) */
@@ -507,7 +507,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   background: var(--crm-c-success);
 }
 .crm-status-box-outer.status-error .crm-status-box-inner {
-  background: var(--crm-c-alert);
+  background: var(--crm-c-danger);
 }
 
 /* Background regions */
@@ -576,18 +576,18 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #bootstrap-theme .bg-danger,
 #bootstrap-theme .dropdown-menu .bg-danger a,
 #bootstrap-theme .dropdown-menu a.bg-danger {
-  background-color: var(--crm-c-alert);
-  color: var(--crm-c-alert-text);
+  background-color: var(--crm-c-danger);
+  color: var(--crm-c-danger-text);
 }
 #bootstrap-theme a.bg-danger:hover,
 #bootstrap-theme a.bg-danger:focus,
 #bootstrap-theme .dropdown-menu .bg-danger a:hover,
 #bootstrap-theme .dropdown-menu a.bg-danger:hover {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
-  color: var(--crm-c-alert-text);
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
+  color: var(--crm-c-danger-text);
 }
 #bootstrap-theme .dropdown-menu .bg-danger .crm-i::before {
-  color: var(--crm-c-alert-text);
+  color: var(--crm-c-danger-text);
 }
 #bootstrap-theme .dropdown-menu .bg-warning .crm-i::before {
   color: var(--crm-c-warning-text);

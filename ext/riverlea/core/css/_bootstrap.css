@@ -1829,18 +1829,18 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 }
 #bootstrap-theme .has-error .form-control,
 #bootstrap-theme .has-error .form-control a.select2-default {
-  border-color: var(--crm-c-alert);
+  border-color: var(--crm-c-danger);
 }
 #bootstrap-theme .has-error .form-control:focus {
-  border-color: var(--crm-c-alert);
+  border-color: var(--crm-c-danger);
 }
 #bootstrap-theme .has-error .input-group-addon {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
   background-color: # var(--crm-c-red-light);
-  border-color: var(--crm-c-alert);
+  border-color: var(--crm-c-danger);
 }
 #bootstrap-theme .has-error .form-control-feedback {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
 }
 
 /* Nav */
@@ -2641,7 +2641,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
 }
 #bootstrap-theme .progress-bar-danger {
-  background-color: var(--crm-c-alert);
+  background-color: var(--crm-c-danger);
 }
 .progress-striped #bootstrap-theme .progress-bar-danger {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
@@ -2902,9 +2902,9 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-danger.active,
 #bootstrap-theme button.list-group-item-danger.active:hover,
 #bootstrap-theme button.list-group-item-danger.active:focus {
-  color: var(--crm-c-alert-text);
-  background-color: var(--crm-c-alert);
-  border-color: var(--crm-c-alert);
+  color: var(--crm-c-danger-text);
+  background-color: var(--crm-c-danger);
+  border-color: var(--crm-c-danger);
 }
 #bootstrap-theme .list-group-item-heading {
   margin-top: 0;
@@ -3445,12 +3445,12 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-warning);
 }
 #bootstrap-theme .label-danger {
-  background: var(--crm-c-alert);
-  color: var(--crm-c-alert-text);
+  background: var(--crm-c-danger);
+  color: var(--crm-c-danger-text);
 }
 #bootstrap-theme .label-danger[href]:hover,
 #bootstrap-theme .label-danger[href]:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
 }
 #bootstrap-theme .label i.crm-i {
   color: inherit; /* resets icons inside lables to use the label text colour */
