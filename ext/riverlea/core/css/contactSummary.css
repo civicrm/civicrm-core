@@ -297,15 +297,15 @@ div.crm-inline-edit-form div.crm-clear {
 }
 #crm-contact-actions-list a.delete {
   background: var(--crm-dropdown-alert-bg);
-  color: var(--crm-c-alert-text);
+  color: var(--crm-c-alert-contrast);
   border-radius: var(--crm-roundness);
 }
 #crm-contact-actions-list a.delete .crm-i.fa-trash::before {
-  color: var(--crm-c-alert-text);
+  color: var(--crm-c-alert-contrast);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
-  color: var(--crm-c-alert-text);
+  color: var(--crm-c-alert-contrast);
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
 }
 

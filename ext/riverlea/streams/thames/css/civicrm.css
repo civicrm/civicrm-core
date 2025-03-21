@@ -115,9 +115,6 @@ html.cms-standalone body {
   text-rendering: auto;
 }
 
-.crm-container .alert-success {
-  background-color: var(--crm-c-green);
-}
 .crm-container :is(.status,
 .alert-warning,
 .messages.warning) {
@@ -607,16 +604,16 @@ html.crm-standalone  nav.breadcrumb>ol {
 
 /* Override _dropdowns.css */
 #afGuiEditor .af-gui-bar .dropdown-menu {
-  --crm-c-alert-text: var(--crm-c-red-dark);
+  --crm-c-alert-contrast: var(--crm-c-red-dark);
 }
 /* Override contactSummary.css */
 #crm-contact-actions-list a.delete {
-  --crm-c-alert-text: var(--crm-c-red-dark);
+  --crm-c-alert-contrast: var(--crm-c-red-dark);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
   /* the hover state gives crm-c-red-dark to the background */
-  --crm-c-alert-text: var(--crm-c-red-light);
+  --crm-c-alert-contrast: var(--crm-c-red-light);
 }
 
 /* Fix Mosaico wizard */

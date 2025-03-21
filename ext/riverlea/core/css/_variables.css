@@ -37,6 +37,7 @@
   --crm-c-red-light: #f9e6eb;
   --crm-c-red-dark: #91223c;
   --crm-c-amber: #dd5600;
+  --crm-c-amber-dark: #dd5600;
   --crm-c-amber-light: #fbf0e2;
   --crm-c-yellow: #fcfc5a;
   --crm-c-yellow-light: #ffffcc;
@@ -66,14 +67,20 @@
   --crm-c-secondary-hover: #3e485b;
   --crm-c-secondary-text: var(--crm-c-text-light);
   --crm-c-secondary-hover-text: var(--crm-c-text-light);
-  --crm-c-success: var(--crm-c-green-dark);
-  --crm-c-success-text: var(--crm-c-text-light);
-  --crm-c-alert: var(--crm-c-red-dark);
-  --crm-c-alert-text: var(--crm-c-text-light);
-  --crm-c-warning: var(--crm-c-amber);
-  --crm-c-warning-text: var(--crm-c-text-light);
-  --crm-c-info: var(--crm-c-blue-dark);
-  --crm-c-info-text: var(--crm-c-text-light);
+  /* emphasis colors */
+  --crm-c-success: var(--crm-c-green-light);
+  --crm-c-success-contrast: var(--crm-c-text-dark);
+  --crm-c-success-tint: var(--crm-c-green-dark);
+  --crm-c-alert: var(--crm-c-red-light);
+  --crm-c-alert-contrast: var(--crm-c-text-dark);
+  --crm-c-alert-tint: var(--crm-c-red-dark);
+  --crm-c-warning: var(--crm-c-amber-light);
+  --crm-c-warning-contrast: var(--crm-c-text-dark);
+  --crm-c-warning-tint: var(--crm-c-amber-dark);
+  --crm-c-info: var(--crm-c-blue-light);
+  --crm-c-info-contrast: var(--crm-c-text-dark);
+  --crm-c-info-tint: var(--crm-c-blue-dark);
+
   --crm-c-focus: var(--crm-c-blue-dark);
   --crm-c-inactive: #696969;
 /* Shadows */
@@ -139,15 +146,15 @@
   --crm-btn-icon-spacing: var(--crm-s);
   --crm-btn-icon-size: auto;
   --crm-btn-cancel-bg: var(--crm-c-alert);
-  --crm-btn-cancel-text: var(--crm-c-alert-text);
+  --crm-btn-cancel-text: var(--crm-c-alert-contrast);
   --crm-btn-info-bg: var(--crm-c-info);
-  --crm-btn-info-text: var(--crm-c-info-text);
+  --crm-btn-info-text: var(--crm-c-info-contrast);
   --crm-btn-warning-bg: var(--crm-c-warning);
-  --crm-btn-warning-text: var(--crm-c-warning-text);
+  --crm-btn-warning-text: var(--crm-c-warning-contrast);
   --crm-btn-success-bg: var(--crm-c-success);
-  --crm-btn-success-text: var(--crm-c-success-text);
+  --crm-btn-success-text: var(--crm-c-success-contrast);
   --crm-btn-alert-bg: var(--crm-c-alert);
-  --crm-btn-alert-text: var(--crm-c-alert-text);
+  --crm-btn-alert-text: var(--crm-c-alert-contrast);
   --crm-btn-icon-bg: unset; /* btn-icon-* supports distinct border/bg for icons. If applied, set btn-icon-padding to 0px to make the icon bg stretch to the button */
   --crm-btn-icon-border: unset;
   --crm-btn-icon-padding: var(--crm-btn-padding-block);
@@ -220,18 +227,18 @@
   --crm-alert-padding: var(--crm-m) var(--crm-m2);
   --crm-alert-margin: 0 0 var(--crm-m);
   --crm-alert-border-width: 1px;
-  --crm-alert-background-help: var(--crm-c-green-light);
-  --crm-alert-border-help: var(--crm-c-green);
-  --crm-alert-text-help: var(--crm-c-green-dark);
-  --crm-alert-background-warning: var(--crm-c-yellow-light);
-  --crm-alert-border-warning: var(--crm-c-yellow);
-  --crm-alert-text-warning: var(--crm-c-text-dark);
-  --crm-alert-background-info: var(--crm-c-blue-light);
-  --crm-alert-border-info: var(--crm-c-blue);
-  --crm-alert-text-info: var(--crm-c-blue-dark);
-  --crm-alert-background-danger: var(--crm-c-red-light);
-  --crm-alert-border-danger: var(--crm-c-red);
-  --crm-alert-text-danger: var(--crm-c-red-dark);
+  --crm-alert-background-help: var(--crm-c-success);
+  --crm-alert-border-help: var(--crm-c-success-contrast);
+  --crm-alert-text-help: var(--crm-c-success-contrast);
+  --crm-alert-background-warning: var(--crm-c-warning);
+  --crm-alert-text-warning: var(--crm-c-warning-contrast);
+  --crm-alert-border-warning: var(--crm-c-warning-contrast);
+  --crm-alert-background-info: var(--crm-c-info);
+  --crm-alert-border-info: var(--crm-c-info-contrast);
+  --crm-alert-text-info: var(--crm-c-info-contrast);
+  --crm-alert-background-danger: var(--crm-c-alert);
+  --crm-alert-border-danger: var(--crm-c-alert-contrast);
+  --crm-alert-text-danger: var(--crm-c-alert-contrast);
 /* Form */
   --crm-form-block-box-shadow: var(--crm-block-shadow);
   --crm-form-block-background: var(--crm-c-background);
@@ -280,7 +287,7 @@
   --crm-tab-col: var(--crm-c-text);
   --crm-tab-weight: normal;
   --crm-tab-font: unset;
-  --crm-tab-count-bg: var(--crm-c-info-text);
+  --crm-tab-count-bg: var(--crm-c-info-contrast);
   --crm-tab-count-col: var(--crm-c-info);
   --crm-tab-roundness: var(--crm-roundness);
   --crm-tab-border: var(--crm-c-divider);
@@ -392,10 +399,10 @@
   --crm-icon-sort: "\f0dc";
   --crm-icon-sort-desc: "\f0dd";
   --crm-icon-sort-asc: "\f0de";
-  --crm-icon-alert-color: inherit;
-  --crm-icon-success-color: inherit;
-  --crm-icon-warning-color: inherit;
-  --crm-icon-info-color: inherit;
+  --crm-icon-alert-color: var(--crm-c-alert-tint);
+  --crm-icon-success-color: var(--crm-c-success-tint);
+  --crm-icon-warning-color: var(--crm-c-warning-tint);
+  --crm-icon-info-color: var(--crm-c-info-tint);
 /* Wizard */
   --crm-wizard-width: fit-content;
   --crm-wizard-margin: 0.5rem auto;
@@ -443,4 +450,22 @@
   --crm-f-form-error-bg: var(--crm-c-red);
   --crm-f-logo-height: 40px;
   --crm-f-logo-align: center; /* left, right or center */
+}
+
+/* emphasis colours - @todo move to core/_dark.css */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --crm-c-info: var(--crm-c-blue-dark);
+    --crm-c-info-contrast: var(--crm-c-text-light);
+    --crm-c-info-tint: var(--crm-c-blue-light);
+    --crm-c-success: var(--crm-c-green-dark);
+    --crm-c-success-contrast: var(--crm-c-text-light);
+    --crm-c-success-tint: var(--crm-c-green-light);
+    --crm-c-warning: var(--crm-c-amber-dark);
+    --crm-c-warning-contrast: var(--crm-c-text-light);
+    --crm-c-warning-tint: var(--crm-c-amber-light);
+    --crm-c-alert: var(--crm-c-red-dark);
+    --crm-c-alert-contrast: var(--crm-c-text-light);
+    --crm-c-alert-tint: var(--crm-c-red-light);
+  }
 }

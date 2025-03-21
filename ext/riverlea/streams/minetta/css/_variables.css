@@ -6,6 +6,9 @@
 
 :root {
   --crm-version: 'Minetta, v' var(--crm-release);
+  --crm-c-green-light: #dff0d8;
+  --crm-c-green: #55aa57;
+  --crm-c-green-dark: #366336;
 }
 .contactCardRight:has(#crm-contact-thumbnail) .float-left {
   width: calc(100% - var(--crm-flex-gap) - var(--crm-dash-image-size));
