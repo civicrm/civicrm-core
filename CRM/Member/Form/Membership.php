@@ -476,6 +476,10 @@ DESC limit 1");
       $this->add('number', 'num_terms', ts('Number of Terms'), ['size' => 6]);
     }
 
+    if (Civi::settings()->get('update_contribution_on_membership_type_change')) {
+      $this->addElement('checkbox', 'update_recur', ts('Update Recurring Contribution?'));
+    }
+
     $this->add('text', 'source', ts('Membership Source'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_Membership', 'source')
     );
@@ -1315,6 +1319,10 @@ DESC limit 1");
       }
     }
 
+    $params['update_recur'] = FALSE;
+    if ($this->getSubmittedValue('update_recur')) {
+      $params['update_recur'] = $formValues['update_recur'];
+    }
     $this->updateContributionOnMembershipTypeChange($params);
 
     if (($this->_action & CRM_Core_Action::UPDATE)) {
@@ -1388,7 +1396,7 @@ DESC limit 1");
     // if selected membership doesn't match with earlier membership
       !in_array($this->_memType, $this->_memTypeSelected)
     ) {
-      if ($this->isCreateRecurringContribution()) {
+      if ($this->isCreateRecurringContribution() && !$inputParams['update_recur']) {
         CRM_Core_Session::setStatus(ts('Associated recurring contribution cannot be updated on membership type change.'), ts('Error'), 'error');
         return;
       }
@@ -1418,6 +1426,23 @@ DESC limit 1");
         $this
       );
       CRM_Core_Session::setStatus(ts('Associated contribution is updated on membership type change.'), ts('Success'), 'success');
+
+      // Update Recurring Contribution
+      if ($inputParams['update_recur']) {
+        $contribution = \Civi\Api4\Contribution::get()
+          ->addWhere('id', '=', $contributionID)
+          ->execute()
+          ->first();
+
+        if (!empty($contribution['contribution_recur_id'])) {
+          ContributionRecur::update(FALSE)
+            ->addValue('amount', $contribution['total_amount'])
+            ->addValue('currency', $contribution['currency'])
+            ->addValue('modified_date', 'now')
+            ->addWhere('id', '=', $contribution['contribution_recur_id'])
+           ->execute();
+        }
+      }
     }
   }
 
