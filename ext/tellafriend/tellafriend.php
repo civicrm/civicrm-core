@@ -54,9 +54,13 @@ function tellafriend_civicrm_tabset($tabsetName, &$tabs, $context) {
       'template' => FALSE,
       'count' => FALSE,
       'icon' => FALSE,
-      'url' => $tabsetName === 'civicrm/event/manage' ? 'civicrm/event/manage/friend' : '',
+      'url' => '',
       'field' => 'friend',
     ];
+    $isFromBrowsePage = ($tabs['settings']['url'] ?? '') === 'civicrm/event/manage/settings' && empty($tabs['friend']);
+    if ($isFromBrowsePage) {
+      $default['url'] = 'civicrm/event/manage/friend';
+    }
     $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
   }
 }
