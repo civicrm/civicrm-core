@@ -35,15 +35,21 @@ trait CRM_Custom_Page_CustomDataTrait {
    *
    */
   protected function getCustomDataFieldsForEntityDisplay(string $entity, int $id): array {
-    $values = civicrm_api4($entity, 'get', [
-      'select' => [
-        'custom.*',
-      ],
-      'where' => [
-        ['id', '=', $id],
-      ],
-      'checkPermissions' => TRUE,
-    ])->single();
+    try {
+      $values = civicrm_api4($entity, 'get', [
+        'select' => [
+          'custom.*',
+        ],
+        'where' => [
+          ['id', '=', $id],
+        ],
+        'checkPermissions' => TRUE,
+      ])->single();
+    }
+    catch (CRM_Core_Exception $e) {
+      Civi::log()->warning('Tried loading Custom field data for Entity ' . $entity . ' id: ' . $id . ' and got the following message ' . $e->getMessage());
+      return [];
+    }
     $formValues = [];
     // We have api style field names not IDs so can't use the BAO function AFAIK.
     $fields = civicrm_api4($entity, 'getfields', [
