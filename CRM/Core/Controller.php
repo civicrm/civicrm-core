@@ -859,7 +859,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   public function invalidKeyCommon() {
     throw new CRM_Core_Exception(
-      ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, ts("Could not find a valid session key."));
+      ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, [ts("Could not find a valid session key.")]);
   }
 
   /**

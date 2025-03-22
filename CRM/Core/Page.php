@@ -567,7 +567,7 @@ class CRM_Core_Page {
   }
 
   public function invalidKey() {
-    throw new CRM_Core_Exception(ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, ts("Could not find a valid session key."));
+    throw new CRM_Core_Exception(ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, [ts("Could not find a valid session key.")]);
   }
 
 }
