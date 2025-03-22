@@ -373,7 +373,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
     if (!isset($params['net_amount'])) {
       if (!$contributionID) {
-        $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+        // It is unclear how total_amount could be null
+        // see https://lab.civicrm.org/dev/core/-/issues/5767
+        $params['net_amount'] = ($params['total_amount'] ?? 0) - $params['fee_amount'];
       }
       else {
         if (isset($params['fee_amount']) || isset($params['total_amount'])) {
