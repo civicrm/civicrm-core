@@ -605,7 +605,7 @@
   <item>
      <path>civicrm/admin/job</path>
      <title>Scheduled Jobs</title>
-     <desc>Managing periodially running tasks.</desc>
+     <desc>Managing periodically running tasks.</desc>
      <page_callback>CRM_Admin_Page_Job</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
      <adminGroup>System Settings</adminGroup>
@@ -614,14 +614,14 @@
   <item>
      <path>civicrm/admin/job/add</path>
      <title>Add Scheduled Job</title>
-     <desc>Add a periodially running task.</desc>
+     <desc>Add a periodically running task.</desc>
      <page_callback>CRM_Admin_Form_Job</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/job/edit</path>
      <title>Edit Scheduled Job</title>
-     <desc>Edit a periodially running task.</desc>
+     <desc>Edit a periodically running task.</desc>
      <page_callback>CRM_Admin_Page_Job</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
      <adminGroup>System Settings</adminGroup>
@@ -630,7 +630,7 @@
   <item>
      <path>civicrm/admin/joblog</path>
      <title>Scheduled Jobs Log</title>
-     <desc>Browsing the log of periodially running tasks.</desc>
+     <desc>Browsing the log of periodically running tasks.</desc>
      <page_callback>CRM_Admin_Page_JobLog</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
      <adminGroup>Manage</adminGroup>
