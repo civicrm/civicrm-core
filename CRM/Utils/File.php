@@ -508,7 +508,7 @@ class CRM_Utils_File {
    * @return mixed
    */
   public static function duplicate($filePath) {
-    $oldName = pathinfo($filePath, PATHINFO_FILENAME);
+    $oldName = pathinfo((string) $filePath, PATHINFO_FILENAME);
     $uniqID = bin2hex(random_bytes(16));
     $newName = preg_replace('/(_[\w]{32})$/', '', $oldName) . '_' . $uniqID;
     $newPath = str_replace($oldName, $newName, $filePath);
