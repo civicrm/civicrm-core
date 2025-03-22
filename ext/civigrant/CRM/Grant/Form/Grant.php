@@ -46,9 +46,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    */
   public function preProcess() {
 
-    $this->_grantType = NULL;
     if ($this->getGrantID()) {
-      $this->_grantType = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'grant_type_id');
       $this->_contactID = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'contact_id');
     }
     else {
@@ -170,7 +168,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     $this->addSelect('grant_type_id', ['placeholder' => ts('- select type -'), 'onChange' => "CRM.buildCustomData( 'Grant', this.value );"], TRUE);
 
     //need to assign custom data subtype to the template
-    $this->assign('customDataSubType', $this->_grantType);
+    $grantType = $this->getGrantID() ? CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'grant_type_id') : NULL;
+    $this->assign('customDataSubType', $grantType);
     $this->assign('entityID', $this->_id);
 
     $this->addSelect('status_id', ['placeholder' => ts('- select status -')], TRUE);
