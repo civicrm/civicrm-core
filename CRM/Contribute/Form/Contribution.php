@@ -2029,13 +2029,17 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $entityTable = 'participant';
         $entityID = $pId;
         $isRelatedId = FALSE;
-        $participantParams = [
-          'fee_amount' => $submittedValues['total_amount'],
-          'id' => $entityID,
-        ];
-        CRM_Event_BAO_Participant::add($participantParams);
-        if (empty($this->_lineItems)) {
-          $this->_lineItems[] = CRM_Price_BAO_LineItem::getLineItems($entityID, 'participant', TRUE);
+        $participantIds = CRM_Event_BAO_Participant::getParticipantIds($this->_id);
+        $fee = CRM_Utils_Money::format($submittedValues['total_amount'] / count($participantIds), NULL, NULL, TRUE);
+        foreach ($participantIds as $participantId) {
+          $participantParams = [
+            'fee_amount' => $fee,
+            'id'         => $participantId,
+          ];
+          CRM_Event_BAO_Participant::add($participantParams);
+          if (empty($this->_lineItems)) {
+            $this->_lineItems[] = CRM_Price_BAO_LineItem::getLineItems($participantId, 'participant', TRUE);
+          }
         }
       }
       else {

@@ -58,6 +58,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
 
     $this->individualCreate([], 0);
+    $this->individualCreate([], 1);
     $this->_params = [
       'contact_id' => $this->ids['Contact'][0],
       'receive_date' => '20120511',
@@ -2086,6 +2087,61 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
     $form = new CRM_Contribute_Form_Contribution();
     $this->assertEquals(['trxn_id' => "Transaction ID's must be unique. Transaction '1234' already exists in your database."], $form->formRule($fields, [], $form));
+  }
+
+  public function testParticipantFeeOnContributionEdit(): void {
+    $event = $this->eventCreatePaid(['is_email_confirm' => 1, 'email_confirm_text' => '']);
+    $firstParticipant = $this->callAPISuccess('Participant', 'create', [
+      'contact_id' => $this->ids['Contact'][0],
+      'event_id' => $event['id'],
+      'role_id' => 1,
+      'register_date' => 20070219,
+      'source' => 'Wimbledon',
+      'event_level' => 'Payment',
+      'debug' => 1,
+      'participant_fee_amount' => 1,
+    ]);
+    $secondParticipant = $this->callAPISuccess('Participant', 'create', [
+      'contact_id' => $this->ids['Contact'][1],
+      'event_id' => $event['id'],
+      'role_id' => 1,
+      'register_date' => 20070219,
+      'source' => 'Wimbledon',
+      'event_level' => 'Payment',
+      'debug' => 1,
+      'participant_fee_amount' => 1,
+    ]);
+    $firstParticipantDetailsBefore = $this->callAPISuccessGetSingle('Participant', ['id' => $firstParticipant['id']]);
+    $secondParticipantDetailsBefore = $this->callAPISuccessGetSingle('Participant', ['id' => $secondParticipant['id']]);
+    $contribution = $this->callAPISuccess('contribution', 'create', [
+      'contact_id' => $this->ids['Contact'][0],
+      'financial_type_id' => 4,
+      'receive_date' => date('Ymd'),
+      'total_amount' => 2,
+      'contribution_status_id' => 2,
+    ]);
+    $this->callAPISuccess('participant_payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'participant_id' => $firstParticipant['id'],
+    ]);
+    $this->callAPISuccess('participant_payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'participant_id' => $secondParticipant['id'],
+    ]);
+
+    $this->submitContributionForm([
+      'total_amount' => 2,
+      'financial_type_id' => 4,
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => 2,
+    ], $contribution['id']);
+
+    $firstParticipantDetailsAfter = $this->callAPISuccessGetSingle('Participant', ['id' => $firstParticipant['id']]);
+    $secondParticipantDetailsAfter = $this->callAPISuccessGetSingle('Participant', ['id' => $secondParticipant['id']]);
+
+    $this->assertEquals($firstParticipantDetailsBefore['participant_fee_amount'], $firstParticipantDetailsAfter['participant_fee_amount']);
+    $this->assertEquals($secondParticipantDetailsBefore['participant_fee_amount'], $secondParticipantDetailsAfter['participant_fee_amount']);
   }
 
   /**
