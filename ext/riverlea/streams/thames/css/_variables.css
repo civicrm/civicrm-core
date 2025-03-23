@@ -83,8 +83,8 @@
   --crm-c-secondary-hover-text: var(--crm-c-text-light); /* thames todo */
   --crm-c-success: var(--crm-c-green-dark);
   --crm-c-success-text: var(--crm-c-text-light);
-  --crm-c-alert: var(--crm-c-red-dark); /* thames */
-  --crm-c-alert-text: var(--crm-c-text-light);
+  --crm-c-danger: var(--crm-c-red-dark); /* thames */
+  --crm-c-danger-text: var(--crm-c-text-light);
   --crm-c-warning: var(--crm-c-amber); /* bg on .btn-warning, .label-warming but border on notification .alert */
   --crm-c-warning-text: var(--crm-c-text);
   --crm-c-info: var(--crm-c-blue-dark);
@@ -168,8 +168,8 @@
   --crm-btn-warning-text: var(--crm-c-warning-text);
   --crm-btn-success-bg: var(--crm-c-info); /* thames */
   --crm-btn-success-text: #fff; /* thames */
-  --crm-btn-alert-bg: var(--crm-c-red);
-  --crm-btn-alert-text: var(--crm-c-red-dark);
+  --crm-btn-danger-bg: var(--crm-c-red);
+  --crm-btn-danger-text: var(--crm-c-red-dark);
   --crm-btn-icon-bg: unset;
   --crm-btn-icon-border: unset;
   --crm-btn-margin: var(--crm-m) 0;
@@ -410,7 +410,7 @@
   --crm-dropdown-hover-bg: var(--crm-c-blue-light); /* thames */
   --crm-dropdown-border: 0;
   --crm-dropdown-width: 23ch; /* thames */
-  --crm-dropdown-alert-bg: transparent; /* thames */
+  --crm-dropdown-danger-bg: transparent; /* thames */
   --crm-dropdown-2-bg: var(--crm-c-secondary);
   --crm-dropdown-2-col: var(--crm-c-text);
   --crm-dropdown-2-padding: var(--crm-padding-small);
@@ -422,21 +422,21 @@
   --crm-notify-col: var(--crm-c-text); /* thames */
   --crm-notify-accent-border: 0.875rem 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */ /* thames */
   --crm-notify-radius: 4px; /* thames */
-  --crm-notify-alert: var(--crm-c-alert);
+  --crm-notify-danger: var(--crm-c-danger);
   --crm-notify-warning: var(--crm-c-warning);
   --crm-notify-success: var(--crm-c-success);
   --crm-notify-info: var(--crm-c-info);
 }
 :root {
 /* Icons */
-  --crm-icon-alert: "\f06a";
+  --crm-icon-danger: "\f06a";
   --crm-icon-success: "\f058";
   --crm-icon-info: "\f05a";
   --crm-icon-close: "\f00d";
   --crm-icon-sort: "\f0dc";
   --crm-icon-sort-desc: "\f0dd";
   --crm-icon-sort-asc: "\f0de";
-  --crm-icon-alert-color: inherit;
+  --crm-icon-danger-color: inherit;
   --crm-icon-success-color: inherit;
   --crm-icon-warning-color: inherit;
   --crm-icon-info-color: inherit;

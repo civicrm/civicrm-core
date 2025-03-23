@@ -39,8 +39,8 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container #crm-notification-container div.ui-notify-message.error h1::before,
 .crm-container span.batch-invalid::before {
-  content: var(--crm-icon-alert);
-  color: var(--crm-notify-alert);
+  content: var(--crm-icon-danger);
+  color: var(--crm-notify-danger);
 }
 .crm-container #crm-notification-container div.ui-notify-message.success h1::before,
 .crm-container span.batch-valid::before {
@@ -54,7 +54,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container #crm-notification-container div.ui-notify-message.alert h1::before,
 .crm-container #crm-notification-container div.ui-notify-message.warning h1::before {
-  content: var(--crm-icon-alert);
+  content: var(--crm-icon-danger);
   color: var(--crm-notify-warning);
 }
 .crm-container .messages.crm-empty-table > i.crm-i {
@@ -109,7 +109,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .crm-i.fa-times,
 .crm-container .btn-danger .crm-i,
 .crm-container button .fa-times {
-  color: var(--crm-icon-alert-color);
+  color: var(--crm-icon-danger-color);
 }
 .crm-container .crm-dashlet-header a.fa-times {
   color: var(--crm-dashlet-header-col);
@@ -219,11 +219,11 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .delete-icon::before,
 .crm-container .crm-i.fa-trash::before {
   content: "\f1f8";
-  color: var(--crm-icon-alert-color);
+  color: var(--crm-icon-danger-color);
 }
 .crm-container .delete-icon:hover::before,
 .crm-container .delete-icon:focus::before {
-  color: var(--crm-icon-alert-color);
+  color: var(--crm-icon-danger-color);
 }
 
 /* Jqueery UI icons (tags) */
@@ -265,7 +265,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   color: var(--crm-c-text);
 }
 .crm-container .jstree-default .jstree-search {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
   font-weight: normal;
 }
 .crm-container #navigation-tree li.jstree-node {

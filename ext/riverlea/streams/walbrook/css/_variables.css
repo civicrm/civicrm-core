@@ -49,7 +49,7 @@
   --crm-c-secondary-hover: var(--crm-c-purple-dark);
   --crm-c-success: var(--crm-c-green);
   --crm-c-success-text: var(--crm-c-text-dark);
-  --crm-c-alert: var(--crm-c-red);
+  --crm-c-danger: var(--crm-c-red);
   --crm-c-warning-text: var(--crm-c-text-dark);
   --crm-c-info-text: var(--crm-c-text-light);
 /* Shadows */
@@ -206,7 +206,7 @@
   --crm-notify-background: var(--crm-c-background);
   --crm-notify-col: var(--crm-c-text);
   --crm-notify-accent-border: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
-  --crm-notify-alert: #d02e2e;
+  --crm-notify-danger: #d02e2e;
   --crm-notify-warning: #c45008;
   --crm-notify-success: #5a803c;
   --crm-notify-info: #277fa5;

@@ -67,9 +67,9 @@
   --crm-btn-warning-bg: #7b4e14;
   --crm-c-success-text: var(--crm-c-text-light);
   --crm-c-warning-text: var(--crm-c-text-light);
-  --crm-c-alert: var(--crm-btn-cancel-bg);
+  --crm-c-danger: var(--crm-btn-cancel-bg);
   --crm-c-warning: var(--crm-btn-warning-bg);
-  --crm-btn-alert-bg: var(--crm-btn-cancel-bg);
+  --crm-btn-danger-bg: var(--crm-btn-cancel-bg);
   --crm-wizard-active-bg: var(--crm-c-primary);
   --crm-wizard-active-col: var(--crm-c-primary-text);
   --crm-dash-edit-border: 1px solid var(--crm-c-link-hover);

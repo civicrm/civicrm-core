@@ -63,8 +63,8 @@
   --crm-input-radio-color: #38c4b4;
   --crm-alert-text-help: var(--crm-c-text);
   --crm-btn-cancel-bg: #9b3d4b;
-  --crm-btn-alert-bg: var(--crm-btn-cancel-bg);
-  --crm-btn-alert-text: var(--crm-c-text);
+  --crm-btn-danger-bg: var(--crm-btn-cancel-bg);
+  --crm-btn-danger-text: var(--crm-c-text);
   --crm-dialog-header-border-col: transparent;
   --crm-dialog-header-bg: var(--crm-c-background2);
   --crm-dialog-body-bg: var(--crm-c-background2);
