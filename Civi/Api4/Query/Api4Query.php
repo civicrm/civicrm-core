@@ -77,7 +77,12 @@ abstract class Api4Query {
     $this->buildLimit();
     $this->buildGroupBy();
     $this->buildHavingClause();
-    return $this->query->toSQL();
+    $sql = $this->query->toSQL();
+
+    $event = GenericHookEvent::create(['sql' => &$sql]);
+    \Civi::dispatcher()->dispatch('civi.api4.generatedSql', $event);
+
+    return $sql;
   }
 
   public function getResults(): array {
