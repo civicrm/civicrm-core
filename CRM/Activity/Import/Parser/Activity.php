@@ -111,7 +111,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'text' => ts('Activity Fields'),
         'entity_title' => ts('Activity'),
         'is_contact' => FALSE,
-        'entity_field_prefix' => 'Activity.',
         'actions' => [
           ['id' => 'save', 'text' => ts('Create or Update using ID'), 'description' => ts('Skip if no match found')],
         ],
@@ -125,7 +124,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'text' => ts('Target Contact Fields'),
         'entity_title' => ts('Target Contact'),
         'is_contact' => TRUE,
-        'entity_field_prefix' => 'target_contact.',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => TRUE,
         'actions' => $this->getActions(['select', 'ignore', 'update']),
