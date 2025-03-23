@@ -251,5 +251,5 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
 }
 
 function civiimport_enabled_forms() {
-  return ['CRM_Contribute_Import_Form_MapField', 'CRM_Member_Import_Form_MapField'];
+  return ['CRM_Contribute_Import_Form_MapField', 'CRM_Member_Import_Form_MapField', 'CRM_Event_Import_Form_MapField'];
 }

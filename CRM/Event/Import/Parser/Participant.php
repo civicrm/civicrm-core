@@ -47,9 +47,53 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   /**
    * The initializer code, called before the processing.
    */
-  public function init() {
+  public function init(): void {
     unset($this->userJob);
     $this->setFieldMetadata();
+  }
+
+  /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   */
+  public function getImportEntities() : array {
+    return [
+      'Participant' => [
+        'text' => ts('Participant Fields'),
+        'is_contact' => FALSE,
+        'required_fields_update' => $this->getRequiredFieldsForMatch(),
+        'required_fields_create' => $this->getRequiredFieldsForCreate(),
+        'is_base_entity' => TRUE,
+        'supports_multiple' => FALSE,
+        'is_required' => TRUE,
+        // For now we stick with the action selected on the DataSource page.
+        'actions' => $this->isUpdateExisting() ?
+          [['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')]] :
+          [['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')]],
+        'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
+        'entity_name' => 'Participant',
+        'entity_title' => ts('Participant'),
+        'entity_field_prefix' => '',
+        'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
+      ],
+      'Contact' => [
+        'text' => ts('Contact Fields'),
+        'is_contact' => TRUE,
+        'entity_field_prefix' => 'contact.',
+        'unique_fields' => ['external_identifier', 'id'],
+        'supports_multiple' => FALSE,
+        'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
+        'selected' => [
+          'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
+          'contact_type' => $this->getSubmittedValue('contactType'),
+          'dedupe_rule' => $this->getDedupeRule($this->getContactType())['name'],
+        ],
+        'default_action' => 'select',
+        'entity_name' => 'Contact',
+        'entity_title' => ts('Participant Contact'),
+      ],
+    ];
   }
 
   /**
@@ -74,6 +118,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       }
 
       $participantParams['contact_id'] = $this->getContactID($contactParams, $participantParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      $participantParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $participantParams['contact_id'];
       // don't add to recent items, CRM-4399
       $participantParams['skipRecentView'] = TRUE;
 

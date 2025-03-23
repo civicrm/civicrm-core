@@ -98,30 +98,20 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @param $files
+   * @param array $files
    * @param self $self
    *
    * @return array|true
    *   list of errors to be posted back to the form
+   * @throws \CRM_Core_Exception
    */
   public static function formRule($fields, $files, $self) {
-    $requiredError = [];
-
-    if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = [];
-      $importKeys = [];
-      foreach ($fields['mapper'] as $field) {
-        $importKeys[] = [$field];
-      }
-      $parser = $self->getParser();
-      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-      $requiredError = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'contact_id']);
-
-      if (!in_array('id', $fields['mapper']) && !in_array('event_id', $fields['mapper'])) {
+    $mappedFields = $self->getMappedFields($fields['mapper']);
+    if (!in_array('id', $mappedFields)) {
+      $requiredError = $self->validateRequiredContactFields($fields['mapper']);
+      if (!in_array('event_id', $mappedFields)) {
         // ID is the only field we need, if present.
-        $requiredError[] = ts('Missing required field: Provide %1 or %2',
-            [1 => 'Event ID', 2 => 'Event Title']
-          ) . '<br />';
+        $requiredError[] = ts('Missing required field: %1', [1 => 'Event']) . '<br />';
       }
     }
 
@@ -151,7 +141,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       $highlightedFieldsArray = [
         'id',
         'event_id',
-        'event_title',
         'status_id',
       ];
       foreach ($highlightedFieldsArray as $name) {

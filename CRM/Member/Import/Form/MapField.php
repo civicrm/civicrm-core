@@ -89,23 +89,10 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $importKeys = [];
-    $mappedFields = [];
-    foreach ($fields['mapper'] as $field) {
-      if (is_array($field)) {
-        $importKeys[] = $field;
-        $mappedFields[] = $field[0];
-      }
-      else {
-        $importKeys[] = [$field];
-        $mappedFields[] = $field;
-      }
-    }
-    $parser = $self->getParser();
-    $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-    $errors = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'contact_id', 'contact_id']);
-
+    $errors = [];
+    $mappedFields = $self->getMappedFields($fields['mapper']);
     if (!in_array('id', $mappedFields)) {
+      $errors = $self->validateRequiredContactFields($fields['mapper']);
       // FIXME: should use the schema titles, not redeclare them
       $requiredFields = [
         'membership_type_id' => ts('Membership Type'),
