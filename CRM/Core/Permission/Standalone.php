@@ -66,7 +66,7 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
   /**
    * Determine whether the permission store allows us to store
    * a list of permissions generated dynamically (eg by
-   * hook_civicrm_permissions.)
+   * hook_civicrm_permission.)
    *
    * @return bool
    */
