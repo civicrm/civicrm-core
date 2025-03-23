@@ -757,7 +757,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if ($mappedField['relationship_type_id']) {
       $title[] = $this->getRelationshipLabel($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
     }
-    $title[] = $this->getFieldMetadata($mappedField['name'])['title'];
+    $title[] = $this->getFieldMetadata($mappedField['entity'] . '.' . $mappedField['name'])['title'];
     if ($mappedField['location_type_id']) {
       $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'location_type_id', $mappedField['location_type_id']);
     }

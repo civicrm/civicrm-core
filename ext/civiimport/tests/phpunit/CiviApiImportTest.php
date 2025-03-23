@@ -79,6 +79,15 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
       'job_type' => 'contribution_import',
     ];
     $userJobID = UserJob::create()->setValues($userJobParameters)->execute()->first()['id'];
+    \Civi\Api4\ImportTemplateField::save(FALSE)
+      ->setRecords([
+        ['entity' => 'Contact', 'name' => 'external_identifier'],
+        ['entity' => 'Contribution', 'name' => 'total_amount'],
+        ['entity' => 'Contribution', 'name' => 'receive_date'],
+        ['entity' => 'Contribution', 'name' => 'financial_type_id'],
+      ])
+      ->setDefaults(['user_job_id' => $userJobID])
+      ->execute();
     $importFields = Import::getFields($userJobID)->execute();
     $this->assertEquals('abc', $importFields[0]['table_name']);
     $this->assertEquals('_id', $importFields[0]['column_name']);

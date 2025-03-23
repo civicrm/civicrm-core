@@ -807,7 +807,8 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   public function getHeaderPatterns(): array {
     $headerPatterns = [];
-    foreach ($this->getFields() as $name => $field) {
+    $allFields = $this->getFields();
+    foreach ($allFields as $name => $field) {
       if (!empty($field['usage']['import']) && !empty($field['title'])) {
         $patterns = [
           $this->strToPattern($field['name']),
@@ -942,6 +943,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
     }
     elseif ($this->getMappingName()) {
       $this->createTemplateJob();
+    }
+    $templateFields = $this->getUserJob()['template_fields'] ?? NULL;
+    if ($templateFields !== NULL) {
+      \Civi\Api4\ImportTemplateField::replace(FALSE)
+        ->addWhere('user_job_id', '=', $this->getTemplateID())
+        ->setRecords($templateFields)
+        ->setDefaults()
+        ->execute();
     }
   }
 

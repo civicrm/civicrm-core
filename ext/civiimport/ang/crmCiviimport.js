@@ -111,7 +111,7 @@
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
               availableEntity = _.clone(entity);
-              availableEntity.children = filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_name + '.');
+              availableEntity.children = filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_name);
               fields.push(availableEntity);
             }
           });
@@ -126,9 +126,10 @@
          *
          * @type {(function(*=, *=, *=, *=): (*))|*}
          */
-        function filterEntityFields(isContact, fields, selection, entityFieldPrefix) {
+        function filterEntityFields(isContact, rawFields, selection, entityName) {
+          let fields = _.cloneDeep(rawFields);
           if (isContact) {
-            return filterContactFields(fields, selection, entityFieldPrefix);
+            fields = filterContactFields(fields, selection, entityName);
           }
           return fields;
         }
@@ -138,15 +139,13 @@
          *
          * @type {function(*=, *): *}
          */
-        function filterContactFields(fields, selection, entityFieldPrefix) {
+        function filterContactFields(fields, selection, entityName) {
           var contactType = selection.contact_type;
           var action = selection.action;
           var rules = $scope.data.dedupeRules;
           var dedupeRule = rules[selection.dedupe_rule];
-          fields = fields.filter((function (field) {
-            // Using replace here is safe ... for now... cos only soft credits have a prefix
-            // but if we add a prefix to contact this will need updating.
-            var fieldName = field.id.replace(entityFieldPrefix, '');
+          return fields.filter(function (field) {
+            let fieldName = field.id;
             if (action === 'select' && !Boolean(field.match_rule) &&
               (!Boolean(dedupeRule) || !Boolean(dedupeRule.fields[fieldName]))
             ) {
@@ -159,9 +158,7 @@
             }
             // No contact type specified, do not filter on it.
             return true;
-
-          }));
-          return fields;
+          });
         }
 
         /**
@@ -212,24 +209,6 @@
           return dedupeRules;
         };
 
-        /**
-         * Get the entity for the given field.
-         *
-         * @type {$scope.getEntityForField}
-         */
-        $scope.getEntityForField = (function (fieldName) {
-          var entityName = '';
-          _.each($scope.data.entityMetadata, function (fields) {
-            _.each(fields.children, function (field) {
-              if (field.id === fieldName) {
-                entityName = fields.entity_name;
-                return false;
-              }
-            });
-          });
-          return entityName;
-        });
-
         $scope.toggleMappingFields = (function (fieldName, extra) {
           if (fieldName === 'updateFieldMapping' && $scope.mappingSaving.updateFieldMapping === 0) {
             $scope.mappingSaving.newFieldMapping = 0;
@@ -267,7 +246,7 @@
          * the quickForm 'default_value' is supported.
          * - import mappings. e.g
          *   ['name' => 'financial_type_id', default_value' => 'Cash'],
-         *   ['name' => 'soft_credit.contact.external_identifier', 'default_value' => '', 'entity_data' => ['soft_credit' => ['soft_credit_type_id => 7]],
+         *   ['name' => 'soft_credit.contact.external_identifier', 'default_value' => '', 'data' => ['soft_credit' => ['soft_credit_type_id => 7]],
          *   ...
          * - entity_configuration
          *
@@ -275,14 +254,21 @@
          */
         $scope.save = (function ($event) {
           $event.preventDefault();
+          $('#MapField').block();
           $scope.userJob.metadata.entity_configuration = {};
-          $scope.userJob.template_fields = [];
-          _.each($scope.entitySelection, function (entity) {
+          const templateFields = [];
+          $scope.entitySelection.forEach(function (entity) {
             $scope.userJob.metadata.entity_configuration[entity.id] = entity.selected;
           });
-          _.each($scope.data.importMappings, function (importRow, index) {
-            selectedEntity = $scope.getEntityForField(importRow.selectedField);
-            var entityConfig = {};
+          $scope.data.importMappings.forEach(function (importRow, index) {
+            if (!importRow.selectedField) {
+              return;
+            }
+            let fieldPieces = importRow.selectedField.split('.');
+            let selectedEntity = fieldPieces[0];
+            // Join all pieces except for 0
+            let fieldName = fieldPieces.slice(1).join('.');
+            let entityConfig = {};
             if (selectedEntity === 'SoftCreditContact') {
               // For now we just hard-code this - mapping to soft_credit a bit undefined - but
               // we are mimicking getMappingFieldFromMapperInput on the php layer.
@@ -290,12 +276,12 @@
               entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity]};
             }
 
-            $scope.userJob.template_fields.push({
-              name: importRow.selectedField,
+            templateFields.push({
+              name: fieldName,
               default_value: importRow.defaultValue,
-              // At this stage column_number is thrown away but we store it here to have it for when we change that.
               column_number: index + 1,
-              entity_data: entityConfig
+              entity: selectedEntity,
+              data: entityConfig,
             });
           });
           crmApi4('UserJob', 'save', {
@@ -303,7 +289,7 @@
             chain: {
               template_fields: ['ImportTemplateField', 'replace', {
                 where: [['user_job_id', '=', '$id']],
-                records: $scope.userJob.template_fields,
+                records: templateFields,
               }],
             },
           })

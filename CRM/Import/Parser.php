@@ -410,7 +410,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       // specified dedupe rule (or the default Unsupervised if not specified).
       $requiredFields = $contactType === 'Individual' ? [[$requiredFields, 'external_identifier']] : [[$requiredFields, 'email', 'external_identifier']];
     }
-    $this->validateRequiredFields($requiredFields, $params, '', $prefixString);
+    $this->validateRequiredFields($requiredFields, $params, 'Contact', $prefixString);
   }
 
   /**
@@ -685,11 +685,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @throws \CRM_Core_Exception Exception thrown if field requirements are not met.
    */
-  protected function validateRequiredFields(array $requiredFields, array $params, string $entityName = '', string $prefixString = ''): void {
-    if ($entityName) {
-      // @todo - make entityName required once all fields are prefixed.
-      $params = CRM_Utils_Array::prefixKeys($params, "$entityName.");
-    }
+  protected function validateRequiredFields(array $requiredFields, array $params, $entityName, $prefixString = ''): void {
+    $params = CRM_Utils_Array::prefixKeys($params, "$entityName.");
     $missingFields = $this->getMissingFields($requiredFields, $params);
     if (empty($missingFields)) {
       return;
@@ -768,8 +765,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       // Select uses the same lookup as update.
       $action = 'update';
     }
-    if (isset($entityMetadata['required_fields_' . $action])) {
-      return $entityMetadata['required_fields_' . $action];
+    if (isset($entityMetadata["required_fields_$action"])) {
+      // Prefix field names with entity name
+      return array_map(fn($name) => "$entity.$name", $entityMetadata["required_fields_$action"]);
     }
     return [];
   }
