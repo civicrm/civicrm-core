@@ -122,6 +122,22 @@ WHERE       ps.name = '{$priceSetName}'
   }
 
   /**
+   * Calculate the default price set id
+   * assigned to the contribution/membership etc
+   *
+   * @param string $entity
+   *
+   * @return int
+   *   default price set ID
+   *
+   */
+  public static function getDefaultPriceSetID(string $entity = 'contribution'): int {
+    $priceSet = self::getDefaultPriceSet($entity);
+    $first = reset($priceSet);
+    return (int) $first['setID'];
+  }
+
+  /**
    * Get the price set title.
    *
    * @param int $id
