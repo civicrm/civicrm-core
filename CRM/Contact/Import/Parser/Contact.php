@@ -134,7 +134,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
 
       //format common data, CRM-4062
-      $this->formatCommonData($params, $formatted);
+      $this->augmentAddressData($formatted);
 
       $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
       $contactID = $newContact->id;
@@ -146,7 +146,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $field['id'] = $this->processContact($field, FALSE);
         $formatting = $field;
         //format common data, CRM-4062
-        $this->formatCommonData($field, $formatting);
+        $this->augmentAddressData($formatting);
         $isUpdate = empty($formatting['id']) ? 'new' : 'updated';
         if (empty($formatting['id']) || $this->isUpdateExisting()) {
           $relatedNewContact = $this->createContact($formatting, $formatting['id']);
@@ -254,14 +254,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * The call to formatLocationBlock just does the address custom fields which,
    * are already formatted by this point.
    *
-   * @deprecated
-   *
-   * @param array $params
-   *   Contain record values.
    * @param array $formatted
    *   Array of formatted data.
    */
-  private function formatCommonData($params, &$formatted) {
+  private function augmentAddressData(array &$formatted): void {
     $metadataBlocks = ['phone', 'im', 'openid', 'email', 'address'];
     foreach ($metadataBlocks as $block) {
       foreach ($formatted[$block] ?? [] as $blockKey => $blockValues) {
