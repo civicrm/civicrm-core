@@ -592,6 +592,7 @@ WHERE  id = %1";
    * don't specifically need it & find a better way where we do.
    */
   public static function processAmount($fields, &$params, &$lineItem = [], $priceSetID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('no non-core alternative');
     // using price set
     foreach ($fields as $id => $field) {
       if (empty($params["price_{$id}"]) ||
