@@ -586,4 +586,54 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     return $mapperError;
   }
 
+  /**
+   * @param $mapper
+   *
+   * @return array
+   */
+  protected function getImportKeys($mapper): array {
+    $importKeys = [];
+    foreach ($mapper as $field) {
+      if (is_array($field)) {
+        $importKeys[] = $field;
+      }
+      else {
+        $importKeys[] = [$field];
+      }
+    }
+    return $importKeys;
+  }
+
+  /**
+   * @param array $mapper
+   *
+   * @return array
+   */
+  protected static function getMappedFields(array $mapper): array {
+    $mappedFields = [];
+    foreach ($mapper as $field) {
+      if (is_array($field)) {
+        $mappedFields[] = $field[0];
+      }
+      else {
+        $mappedFields[] = $field;
+      }
+    }
+    return $mappedFields;
+  }
+
+  /**
+   * @param array $mapper
+   *
+   * @param string $entity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateRequiredContactFields(array $mapper, string $entity = 'Contact'): array {
+    $parser = $this->getParser();
+    $rule = $parser->getDedupeRule($this->getContactType(), $this->getUserJob()['metadata']['entity_configuration'][$entity]['dedupe_rule'] ?? NULL);
+    return $this->validateContactFields($rule, $this->getImportKeys($mapper), ['external_identifier', 'contact_id']);
+  }
+
 }
