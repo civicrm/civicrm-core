@@ -2310,6 +2310,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!Civi::settings()->get('invoicing')) {
       return;
     }
+    // @todo - all of the below is obsolete - it supports old templates that have tokens that
+    // have not been used in core since 2022-ish
     $taxRate = [];
     $getTaxDetails = FALSE;
 
