@@ -898,6 +898,24 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get line items that specifically relate to participants.
+   *
+   * return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getParticipantLineItems():array {
+    $lines = $this->getLineItems();
+    foreach ($lines as $index => $line) {
+      if ($line['entity_table'] !== 'civicrm_participant') {
+        unset($lines[$index]);
+        continue;
+      }
+    }
+    return $lines;
+  }
+
+  /**
    * Get an array of all membership types included in the order.
    *
    * @return array
