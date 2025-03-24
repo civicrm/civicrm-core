@@ -482,20 +482,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Set $newCredit variable in template to control whether link to credit card mode is included.
     $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
-    // Fix the display of the monetary value, CRM-4038.
-    if (isset($defaults['total_amount'])) {
-      $total_value = $defaults['total_amount'];
-      $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($total_value);
-      if (!empty($defaults['tax_amount'])) {
-        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
-          $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($total_value - $defaults['tax_amount']);
-        }
-      }
+    // We deduct tax amount for an editable field - as it should
+    // be edited exclusive, but if frozen (in edit mode) we display inclusive.
+    if (isset($defaults['total_amount']) && !$this->isElementFrozen('total_amount')) {
+      $defaults['total_amount'] -= ($defaults['tax_amount'] ?? 0);
     }
 
-    $amountFields = ['non_deductible_amount', 'fee_amount'];
-    foreach ($amountFields as $amt) {
+    foreach ($this->submittableMoneyFields as $amt) {
       if (isset($defaults[$amt])) {
         $defaults[$amt] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults[$amt]);
       }
