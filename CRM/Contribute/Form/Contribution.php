@@ -11,6 +11,7 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\FinancialType;
+use Civi\Api4\LineItem;
 use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
@@ -2006,7 +2007,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $pId = $this->_compId;
         }
         elseif ($this->_context === 'membership') {
-          $isRelatedId = TRUE;
         }
         else {
           $pId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'participant_id', 'contribution_id');
@@ -2014,10 +2014,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       else {
         $contributionDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (array_key_exists('membership', $contributionDetails)) {
-          $isRelatedId = TRUE;
-        }
-        elseif (array_key_exists('participant', $contributionDetails)) {
+        if (array_key_exists('participant', $contributionDetails)) {
           $pId = $contributionDetails['participant'];
         }
       }
@@ -2032,61 +2029,48 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // civicrm_api3('Contribution', 'completetransaction') should take care of
       // all associated updates rather than replicating them on the form layer.
       if ($pId) {
-        $entityTable = 'participant';
         $entityID = $pId;
-        $isRelatedId = FALSE;
         $participantParams = [
           'fee_amount' => $submittedValues['total_amount'],
           'id' => $entityID,
         ];
         CRM_Event_BAO_Participant::add($participantParams);
-        if (empty($this->_lineItems)) {
-          $this->_lineItems[] = CRM_Price_BAO_LineItem::getLineItems($entityID, 'participant', TRUE);
+      }
+
+      $lineItems = $this->getExistingContributionLineItems();
+      foreach ($lineItems as &$item) {
+        $itemId = $item['id'];
+        if (!empty($item['price_field_id'])) {
+          $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $item['price_field_id'], 'price_set_id');
         }
-      }
-      else {
-        $entityTable = 'contribution';
-        $entityID = $this->_id;
-      }
 
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entityTable, FALSE, TRUE, $isRelatedId);
-      foreach (array_keys($lineItems) as $id) {
-        $lineItems[$id]['id'] = $id;
-      }
-      $itemId = key($lineItems);
-      if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
-        $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
-      }
+        // @todo see above - new functionality has been inappropriately added to the quick config concept
+        // and new functionality has been added onto the form layer rather than the BAO :-(
+        if ($this->isQuickConfig()) {
+          //CRM-16833: Ensure tax is applied only once for membership conribution, when status changed.(e.g Pending to Completed).
+          $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+          if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
+            if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
+              $item['unit_price'] = $item['line_total'] = $this->getSubmittedValue('total_amount');
+            }
+          }
 
-      // @todo see above - new functionality has been inappropriately added to the quick config concept
-      // and new functionality has been added onto the form layer rather than the BAO :-(
-      if ($this->isQuickConfig()) {
-        //CRM-16833: Ensure tax is applied only once for membership conribution, when status changed.(e.g Pending to Completed).
-        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
-          if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
-            $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = $this->getSubmittedValue('total_amount');
+          // Update line total and total amount with tax on edit.
+          $financialItemsId = CRM_Core_PseudoConstant::getTaxRates();
+          if (array_key_exists($submittedValues['financial_type_id'], $financialItemsId)) {
+            $item['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
+          }
+          else {
+            $item['tax_rate'] = $item['tax_amount'] = '';
+            $submittedValues['tax_amount'] = 0;
+          }
+          if ($item['tax_rate']) {
+            $item['tax_amount'] = ($item['tax_rate'] / 100) * $item['line_total'];
+            $submittedValues['total_amount'] = $item['line_total'] + $item['tax_amount'];
+            $submittedValues['tax_amount'] = $item['tax_amount'];
           }
         }
-
-        // Update line total and total amount with tax on edit.
-        $financialItemsId = CRM_Core_PseudoConstant::getTaxRates();
-        if (array_key_exists($submittedValues['financial_type_id'], $financialItemsId)) {
-          $lineItems[$itemId]['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
-        }
-        else {
-          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = '';
-          $submittedValues['tax_amount'] = 0;
-        }
-        if ($lineItems[$itemId]['tax_rate']) {
-          $lineItems[$itemId]['tax_amount'] = ($lineItems[$itemId]['tax_rate'] / 100) * $lineItems[$itemId]['line_total'];
-          $submittedValues['total_amount'] = $lineItems[$itemId]['line_total'] + $lineItems[$itemId]['tax_amount'];
-          $submittedValues['tax_amount'] = $lineItems[$itemId]['tax_amount'];
-        }
-      }
-      // CRM-10117 update the line items for participants.
-      if (!empty($lineItems[$itemId]['price_field_id'])) {
-        $lineItem[$this->_priceSetId] = $lineItems;
+        $lineItem[$this->_priceSetId][$itemId] = $item;
       }
     }
 
@@ -2726,9 +2710,28 @@ WHERE  contribution_id = {$id}
       return [];
     }
     if (!isset($this->existingContributionLineItems)) {
-      $order = new CRM_Financial_BAO_Order();
-      $order->setTemplateContributionID($this->getContributionID());
-      $this->existingContributionLineItems = $order->getLineItems();
+      $this->existingContributionLineItems = (array) LineItem::get(FALSE)
+        ->addWhere('contribution_id', '=', $this->getContributionID())
+        ->setSelect([
+          'id',
+          'contribution_id',
+          'entity_id',
+          'entity_table',
+          'price_field_id',
+          'price_field_id.label',
+          'price_field_id.price_set_id',
+          'price_field_value_id',
+          'financial_type_id',
+          'label',
+          'qty',
+          'unit_price',
+          'line_total',
+          'tax_amount',
+          'non_deductible_amount',
+          'participant_count',
+          'membership_num_terms',
+        ])
+        ->execute();
     }
     return $this->existingContributionLineItems;
   }
