@@ -956,11 +956,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function initializeOrder(): void {
     $this->order = new CRM_Financial_BAO_Order();
     $this->order->setPriceSetID($this->getPriceSetID());
-    if ($this->getSubmittedValue('financial_type_id') && $this->isQuickConfig()) {
+    if ($this->getSubmittedValue('financial_type_id')) {
       $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
     }
     if ($this->getSubmittedValue('total_amount')) {
-      $this->order->setOverrideTotalAmount((float) $this->getSubmittedValue('total_amount'));
+      $this->order->setOverrideTotalAmountTaxExclusive($this->getSubmittedValue('total_amount'));
     }
     $this->order->setForm($this);
     foreach ($this->order->getPriceFieldsMetaData() as $priceField) {
@@ -1982,28 +1982,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->isQuickConfig() && !$this->_id) {
       $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
       $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-      $fieldID = key($this->_priceSet['fields']);
-      $fieldValueId = key($this->_priceSet['fields'][$fieldID]['options']);
-      $this->_priceSet['fields'][$fieldID]['options'][$fieldValueId]['amount'] = $submittedValues['total_amount'];
-      $submittedValues['price_' . $fieldID] = 1;
     }
-
-    // Every contribution has a price-set - the only reason it shouldn't be set is if we are dealing with
-    // quick config (very very arguably) & yet we see that this could still be quick config so this should be understood
-    // as a point of fragility rather than a logical 'if' clause.
-    if ($priceSetId) {
-      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $submittedValues, $lineItem[$priceSetId], $priceSetId);
-      // Unset tax amount for offline 'is_quick_config' contribution.
-      // @todo WHY  - quick config was conceived as a quick way to configure contribution forms.
-      // this is an example of 'other' functionality being hung off it.
-      if ($this->_priceSet['is_quick_config'] &&
-        !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
-      ) {
-        unset($submittedValues['tax_amount']);
-      }
-      $submittedValues['total_amount'] = $submittedValues['amount'] ?? NULL;
-    }
+    $lineItem = [$this->getPriceSetID() => $this->getOrder()->getLineItems()];
+    $submittedValues['total_amount'] = $this->getOrder()->getTotalAmount();
+    // @todo - ideally do not set tax_level - it is not required lower down
+    // if line items are provide appropriately.
+    $submittedValues['tax_amount'] = $this->getOrder()->getTotalTaxAmount();
+    $submittedValues['amount_level'] = $this->getOrder()->getAmountLevel();
 
     if ($this->_id) {
       if ($this->_compId) {
@@ -2042,6 +2027,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           if (!$this->hasExistingMembershipLines() && !$this->hasExistingParticipantLines()) {
             if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
               $item['unit_price'] = $item['line_total'] = $this->getSubmittedValue('total_amount');
+              $item['qty'] = 1;
             }
           }
 
@@ -2595,7 +2581,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $priceSetID;
     }
     $lines = $this->getExistingContributionLineItems();
-    if ($lines) {
+    if ($lines && !$this->getSubmittedValue('total_amount')) {
       $line = reset($lines);
       return $line['price_field_id.price_set_id'];
     }
