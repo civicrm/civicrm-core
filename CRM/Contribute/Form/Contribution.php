@@ -803,15 +803,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           'id',
           'contribution_id'
         );
-        if ($pledgePaymentId) {
+        if ($pledgePaymentId || $this->getOrder()->getParticipantLineItems()) {
           $buildPriceSet = FALSE;
-        }
-        $participantID = $componentDetails['participant'] ?? NULL;
-        if ($participantID) {
-          $participantLI = CRM_Price_BAO_LineItem::getLineItems($participantID);
-          if (!CRM_Utils_System::isNull($participantLI)) {
-            $buildPriceSet = FALSE;
-          }
         }
       }
 
@@ -948,7 +941,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   protected function initializeOrder(): void {
     $this->order = new CRM_Financial_BAO_Order();
-    $this->order->setPriceSetID($this->getPriceSetID());
+    if ($this->getContributionID()) {
+      $this->order->setTemplateContributionID($this->getContributionID());
+    }
+    if ($this->getPriceSetID()) {
+      $this->order->setPriceSetID($this->getPriceSetID());
+    }
     $this->order->setForm($this);
     $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
   }
