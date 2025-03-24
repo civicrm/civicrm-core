@@ -10,6 +10,8 @@
  */
 
 use Civi\Api4\MembershipBlock;
+use Civi\Api4\Order;
+use Civi\Api4\Participant;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\FormTrait;
@@ -89,6 +91,39 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
     parent::tearDown();
+  }
+
+  /**
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
+   */
+  public function testParticipantFeeOnContributionEdit(): void {
+    $orderParams = $this->getParticipantOrderParams();
+    $order = Order::create()
+      ->setContributionValues($orderParams['contribution_params']);
+    foreach ($orderParams['line_items'] as $lineItem) {
+      $order->addLineItem($lineItem);
+    }
+    $contribution = $order->execute()->first();
+    $participants = Participant::get()
+      ->addWhere('event_id', '=', $this->getEventID())
+      ->execute();
+    $firstParticipant = $participants->first();
+    $secondParticipant = $participants->last();
+
+    $this->submitContributionForm([
+      'total_amount' => 2,
+      'financial_type_id' => 4,
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => 2,
+    ], $contribution['id']);
+
+    $firstParticipantDetailsAfter = $this->callAPISuccessGetSingle('Participant', ['id' => $firstParticipant['id']]);
+    $secondParticipantDetailsAfter = $this->callAPISuccessGetSingle('Participant', ['id' => $secondParticipant['id']]);
+
+    $this->assertEquals($firstParticipant['fee_amount'], $firstParticipantDetailsAfter['participant_fee_amount']);
+    $this->assertEquals($secondParticipant['fee_amount'], $secondParticipantDetailsAfter['participant_fee_amount']);
   }
 
   /**
