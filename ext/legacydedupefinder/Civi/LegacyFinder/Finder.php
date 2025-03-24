@@ -27,6 +27,7 @@ class Finder extends AutoSubscriber {
     $contactIDs = [];
     if ($event->tableName) {
       $contactIDs = explode(',', \CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
+      $contactIDs = array_filter($contactIDs);
     }
     $ruleGroup->contactIds = $contactIDs;
     $tempTable = self::fillTable($ruleGroup, $ruleGroup->id, $contactIDs, []);
