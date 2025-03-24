@@ -377,7 +377,7 @@ class CRM_Financial_BAO_Order {
   /**
    * Form object - if present the buildAmount hook will be called.
    *
-   * @var \CRM_Member_Form_Membership|\CRM_Member_Form_MembershipRenewal
+   * @var \CRM_Member_Form_Membership|\CRM_Member_Form_MembershipRenewal|\CRM_Contribute_Form_Contribution
    */
   protected $form;
 
