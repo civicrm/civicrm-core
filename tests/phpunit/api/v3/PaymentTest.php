@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\EntityFinancialTrxn;
+use Civi\Api4\Order;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -416,7 +417,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @return array
    */
   protected function createPendingParticipantOrder(): array {
-    return $this->callAPISuccess('Order', 'create', $this->getParticipantOrderParams());
+    $orderParams = $this->getParticipantOrderParams();
+    $order = Order::create()
+      ->setContributionValues($orderParams['contribution_params']);
+    foreach ($orderParams['line_items'] as $lineItem) {
+      $order->addLineItem($lineItem);
+    }
+    return $order->execute()->first();
   }
 
   /**
