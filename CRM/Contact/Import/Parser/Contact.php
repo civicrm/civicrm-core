@@ -465,17 +465,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // Resetting and rebuilding cache could be expensive.
     CRM_Core_Config::setPermitCacheFlushMode(FALSE);
 
-    // If a user has logged in, or accessed via a checksum
-    // Then deliberately 'blanking' a value in the profile should remove it from their record
-    // @todo this should either be TRUE or FALSE in the context of import - once
-    // we figure out which we can remove all the rest.
-    // Also note the meaning of this parameter is less than it used to
-    // be following block cleanup.
-    $formatted['updateBlankLocInfo'] = TRUE;
-    if ((CRM_Core_Session::singleton()->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
-      $formatted['updateBlankLocInfo'] = FALSE;
-    }
-
     $data = $this->formatProfileContactParams($formatted, $contactId, $formatted['contact_type']);
 
     $contact = civicrm_api3('Contact', 'create', $data);
