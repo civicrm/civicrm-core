@@ -63,15 +63,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_feeBlock;
 
   /**
-   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields).
-   *
-   * This is rendered via billingBlock.tpl.
-   *
-   * @var array
-   */
-  public $_paymentFields = [];
-
-  /**
    * Is this submission incurring no costs.
    *
    * @param array $fields
