@@ -33,9 +33,9 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $item['search_name'] = $item['entity_name'] . '_Search';
 
     // get Active + Display In Table fields for this group to include as columns
+    $groupFields = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']])['fields'];
     // note: `in_selector` is the field key for "display in table"
-    $activeFields = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']])['fields'];
-    $item['fields'] = array_filter($activeFields, fn ($field) => $field['in_selector']);
+    $item['fields'] = array_filter($groupFields, fn ($field) => $field['in_selector'] && $field['is_active']);
 
     $managed = [];
 
@@ -58,7 +58,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $searchLabel = E::ts('%1 Search', [1 => $group['title']]);
 
     // select all fields by name
-    $select = array_map(fn ($field) => $field['name'], $group['fields']);
+    $select = array_column($group['fields'], 'name');
     // add id and entity_id - always useful
     $select[] = 'id';
     $select[] = 'entity_id';
