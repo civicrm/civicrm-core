@@ -1,3 +1,9 @@
+1.4.2-6.2alpha
+ - FIXED - today's date background on date-picker (https://lab.civicrm.org/dev/core/-/issues/5807).
+ - FIXED - restore .nowrap class (https://lab.civicrm.org/extensions/riverlea/-/issues/125).
+ - FIXED - inconsistent padding around 'add address' block on contact dashboard (https://lab.civicrm.org/extensions/riverlea/-/issues/122).
+ - FIXED - stange alignment on summary modals (https://lab.civicrm.org/extensions/riverlea/-/issues/121).
+
 1.4.1-6.2alpha
  - FIXED - start/end date appears inline (https://lab.civicrm.org/extensions/riverlea/-/issues/120)
  - FIXED - float of prev/next on contact dashboard on WordPress in some contexts (https://lab.civicrm.org/extensions/riverlea/-/issues/118).

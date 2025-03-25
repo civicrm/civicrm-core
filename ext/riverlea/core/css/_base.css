@@ -436,6 +436,9 @@ dl dl {
 .crm-container .element-right {
   float: right;
 }
+.crm-container .nowrap {
+  white-space: nowrap
+}
 /* Responsive  */
 
 @media (max-width: 991px) {
