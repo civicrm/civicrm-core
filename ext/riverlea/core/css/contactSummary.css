@@ -223,12 +223,6 @@ div.crm-inline-edit-form div.crm-clear {
   border-bottom: var(--crm-c-divider);
   border-width: 2px;
 }
-.crm-container div.contact_panel .crm-address-block {
-  margin-bottom: 6px;
-}
-.crm-container .crm-add-address-wrapper {
-  height: 25px;
-}
 .crm-container .crm-summary-row:after {
   clear: both;
   content: ".";
