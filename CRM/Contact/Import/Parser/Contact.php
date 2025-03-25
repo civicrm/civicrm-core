@@ -560,6 +560,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
         }
         if (count($params[$key]) == 0) {
+          CRM_Core_Error::deprecatedFunctionWarning('confirm this is unreachable - we have enough test cover');
           unset($params[$key]);
         }
       }
