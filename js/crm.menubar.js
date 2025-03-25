@@ -9,7 +9,7 @@
     settings: {collapsibleBehavior: 'accordion'},
     position: 'over-cms-menu',
     toggleButton: (CRM.config.userFramework != 'Standalone'),
-    attachTo: (CRM.menubar && CRM.menubar.position === 'above-crm-container') ? '#crm-container' : 'body',
+    attachTo: (CRM.menubar && CRM.menubar.position === 'above-crm-container') ? '.crm-container' : 'body',
     initialize: function() {
       var cache = CRM.cache.get('menubar');
       if (cache && cache.code === CRM.menubar.cacheCode && cache.locale === CRM.config.locale && cache.cid === CRM.config.cid && localStorage.civiMenubar) {

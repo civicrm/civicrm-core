@@ -165,7 +165,7 @@
         $('table.crm-group-selector').DataTable().draw();
       });
     });
-    $('#crm-container')
+    $('.crm-container')
       .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
       .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
           // Refresh datatable when form completes

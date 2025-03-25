@@ -143,7 +143,7 @@
     {literal}
     CRM.$(function($) {
       // Handle delete of multi-record custom data
-      $('#crm-container')
+      $('.crm-container')
         .off('.customValueDel')
         .on('click.customValueDel', '.crm-custom-value-del', function(e) {
           e.preventDefault();
