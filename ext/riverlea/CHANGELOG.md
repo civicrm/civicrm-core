@@ -1,3 +1,6 @@
+1.4.2-6.2alpha
+ - FIXED - today's date background on date-picker (https://lab.civicrm.org/dev/core/-/issues/5807)
+
 1.4.1-6.2alpha
  - FIXED - start/end date appears inline (https://lab.civicrm.org/extensions/riverlea/-/issues/120)
  - FIXED - float of prev/next on contact dashboard on WordPress in some contexts (https://lab.civicrm.org/extensions/riverlea/-/issues/118).
