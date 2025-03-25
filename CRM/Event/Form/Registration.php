@@ -556,16 +556,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
-    if ($this->getSubmittedValue('credit_card_number')) {
-      if (isset($params['credit_card_exp_date'])) {
-        $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
-        $date = CRM_Utils_Date::mysqlToIso($date);
-      }
-      $this->assign('credit_card_exp_date', $date ?? NULL);
-      $this->assign('credit_card_number',
-        CRM_Utils_System::mungeCreditCard($params['credit_card_number'] ?? NULL)
-      );
+    $this->assign('credit_card_type', $this->getSubmittedValue('credit_card_type'));
+    if ($this->getSubmittedValue('credit_card_exp_date')) {
+      $date = CRM_Utils_Date::format($this->getSubmittedValue('credit_card_exp_date'));
+      $date = CRM_Utils_Date::mysqlToIso($date);
     }
+    $this->assign('credit_card_exp_date', $date ?? NULL);
+    $this->assign('credit_card_number',
+      CRM_Utils_System::mungeCreditCard($this->getSubmittedValue('credit_card_number') ?? '')
+    );
 
     $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm'] ?? NULL);
     // assign pay later stuff
