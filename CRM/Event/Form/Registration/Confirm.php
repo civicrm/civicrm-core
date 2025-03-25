@@ -252,6 +252,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->assign('pay_later_receipt', '');
         // @fixme These functions all seem to do similar things but take one away and the house of cards falls down..
         $this->assignPaymentProcessor($this->_values['event']['is_pay_later']);
+        // This is required only after the form is submitted to repopulate form fields so that eg. credit card fields
+        //   can be retrieved via getSubmittedValue() from the ThankYou page. Otherwise they are lost.
+        $this->preProcessPaymentOptions();
         CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
         $this->addPaymentProcessorFieldsToForm();
       }
