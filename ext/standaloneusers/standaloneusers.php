@@ -18,22 +18,6 @@ function standaloneusers_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) 
 }
 
 /**
- * Hide the inherit CMS language on the Settings - Localization form.
- *
- * Implements hook_civicrm_buildForm().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm/
- */
-function standaloneusers_civicrm_buildForm($formName, CRM_Core_Form $form) {
-  // Administer / Localization / Languages, Currency, Locations
-  if ($formName == 'CRM_Admin_Form_Setting_Localization') {
-    if ($inheritLocaleElement = $form->getElement('inheritLocale')) {
-      $inheritLocaleElement->freeze();
-    }
-  }
-}
-
-/**
  * Implements hook_civicrm_config().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
@@ -129,4 +113,16 @@ function standaloneusers_civicrm_searchKitTasks(array &$tasks, bool $checkPermis
       'errorMsg' => E::ts('An error occurred while attempting to send password reset email(s).'),
     ],
   ];
+}
+
+/**
+ * Alter settings meta where the Standalone meaning is different from CMS meaning
+ *
+ * @todo more settings that could use this. Also some settings that might be best removed?
+ *
+ * Implements hook_civicrm_alterSettingsMetaData.
+ */
+function standaloneusers_civicrm_alterSettingsMetaData(&$settings) {
+  $settings['inheritLocale']['title'] = E::ts('Use User Language');
+  $settings['inheritLocale']['description'] = E::ts('If Yes, the system will use the Language set on the logged-in user\'s record. This can be changed later if using the CiviCRM language switcher.');
 }
