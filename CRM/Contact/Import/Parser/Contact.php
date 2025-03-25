@@ -444,6 +444,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public function createContact(&$formatted, $contactId = NULL) {
 
     if ($contactId) {
+      $formatted['id'] = $contactId;
       $this->formatParams($formatted, (int) $contactId);
       // manage is_opt_out
       $existingOptOut = $this->getExistingContactValue($contactId, 'is_opt_out');
@@ -460,10 +461,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     // Resetting and rebuilding cache could be expensive.
     CRM_Core_Config::setPermitCacheFlushMode(FALSE);
-
-    $data = $this->formatProfileContactParams($formatted, $contactId, $formatted['contact_type']);
-
-    $contact = civicrm_api3('Contact', 'create', $data);
+    $contact = civicrm_api3('Contact', 'create', $formatted);
     $cid = $contact['id'];
 
     CRM_Core_Config::setPermitCacheFlushMode(TRUE);
@@ -487,135 +485,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     return $newContact;
-  }
-
-  /**
-   * Legacy format profile contact parameters.
-   *
-   * This is a formerly shared function - most of the stuff in it probably does
-   * nothing but copied here to star unravelling that...
-   *
-   * @param array $params
-   * @param int|null $contactID
-   * @param string|null $ctype
-   *
-   * @return array
-   */
-  private function formatProfileContactParams(
-    $params,
-    $contactID = NULL,
-    $ctype = NULL
-  ) {
-
-    $data = ['contact_type' => $ctype];
-
-    $locationType = [];
-    $count = 1;
-
-    if ($contactID) {
-      //add contact id
-      $data['contact_id'] = $contactID;
-      $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
-    }
-    else {
-      $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
-      $defaultLocationId = $defaultLocation->id;
-    }
-
-    $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
-
-    $multiplFields = ['url'];
-
-    foreach ($params as $key => $value) {
-      [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
-
-      if ($locTypeId == 'Primary') {
-        if ($contactID) {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
-          $primaryLocationType = $locTypeId;
-        }
-        else {
-          $locTypeId = $defaultLocationId;
-        }
-      }
-
-      if (is_numeric($locTypeId) &&
-        !in_array($fieldName, $multiplFields) &&
-        substr($fieldName, 0, 7) !== 'custom_'
-      ) {
-        $index = $locTypeId;
-
-        if (is_numeric($typeId)) {
-          $index .= '-' . $typeId;
-        }
-        if (!in_array($index, $locationType)) {
-          $locationType[$count] = $index;
-          $count++;
-        }
-
-        $loc = CRM_Utils_Array::key($index, $locationType);
-
-        $blockName = strtolower($this->getFieldEntity($fieldName));
-
-        $data[$blockName][$loc]['location_type_id'] = $locTypeId;
-
-        //set is_billing true, for location type "Billing"
-        if ($locTypeId == $billingLocationTypeId) {
-          $data[$blockName][$loc]['is_billing'] = 1;
-        }
-
-        if ($contactID) {
-          //get the primary location type
-          if ($locTypeId == $primaryLocationType) {
-            $data[$blockName][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($locTypeId == $defaultLocationId) {
-          $data[$blockName][$loc]['is_primary'] = 1;
-        }
-
-        if ($fieldName === 'state_province') {
-          // CRM-3393
-          if (is_numeric($value) && ((int ) $value) >= 1000) {
-            $data['address'][$loc]['state_province_id'] = $value;
-          }
-          elseif (empty($value)) {
-            $data['address'][$loc]['state_province_id'] = '';
-          }
-          else {
-            $data['address'][$loc]['state_province'] = $value;
-          }
-        }
-        elseif ($fieldName === 'country_id') {
-          $data['address'][$loc]['country_id'] = $value;
-        }
-        elseif ($fieldName === 'county') {
-          $data['address'][$loc]['county_id'] = $value;
-        }
-        elseif ($fieldName == 'address_name') {
-          $data['address'][$loc]['name'] = $value;
-        }
-        elseif (substr($fieldName, 0, 14) === 'address_custom') {
-          $data['address'][$loc][substr($fieldName, 8)] = $value;
-        }
-        else {
-          $data[$blockName][$loc][$fieldName] = $value;
-        }
-      }
-
-      if ($key === 'location') {
-        foreach ($value as $locationTypeId => $field) {
-          foreach ($field as $block => $val) {
-            if ($block === 'address' && array_key_exists('address_name', $val)) {
-              $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-            }
-          }
-        }
-      }
-      $data[$key] = $value;
-    }
-
-    return $data;
   }
 
   /**
