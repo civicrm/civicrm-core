@@ -49,6 +49,9 @@
 .crm-container .crm-summary-group .crm-section .label {
   width: 40%;
 }
+.crm-container .crm-summary-group .crm-section .content {
+  margin-left: 40%;
+}
 .crm-container .radio-inline label,
 .crm-container .checkbox-inline label {
   font-family: inherit;
