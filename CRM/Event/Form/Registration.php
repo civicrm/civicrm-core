@@ -36,6 +36,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   private array $optionsCount;
 
+  /**
+   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields).
+   *
+   * This is rendered via billingBlock.tpl.
+   *
+   * @var array
+   */
+  public $_paymentFields = [];
+
   protected function getOrder(): CRM_Financial_BAO_Order {
     if (!isset($this->order)) {
       $this->initializeOrder();
