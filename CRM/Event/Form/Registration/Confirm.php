@@ -453,13 +453,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
       if ($this->isShowPaymentOnConfirm()) {
-        // "is_pay_later" may have been set by the registration page. Reset it here.
-        $params[$participantNum]['is_pay_later'] = 0;
-        // Again, here we have to use getSubmitValue because getSubmittedValue is not set.
-        if ($this->getSubmitValue('hidden_processor') === NULL || $this->getSubmitValue('payment_processor_id') == 0) {
-          // If we submitted with no payment processor then we must be pay later - set it here.
-          $params[$participantNum]['is_pay_later'] = 1;
-        }
+        // If payment_processor_id is 0 or unset we are pay later.
+        // Otherwise we are using a payment processor
+        $params[$participantNum]['is_pay_later'] = $this->_values['event']['is_pay_later'] = empty($this->getSubmittedValue('payment_processor_id'));
       }
     }
     $taxAmount = $totalTaxAmount;
