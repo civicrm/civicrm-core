@@ -774,7 +774,6 @@ input.crm-form-checkbox) + label {
 }
 .ui-datepicker-calendar [data-handler],
 .ui-datepicker-calendar .ui-state-disabled {
-  background-color: var(--crm-gray-50) !important;
   border: 0;
   font-size: var(--crm-small-font-size);
   opacity: 1;
@@ -796,6 +795,10 @@ input.crm-form-checkbox) + label {
   padding: var(--crm-s);
   text-align: center;
   color: var(--crm-c-text);
+}
+.ui-datepicker-today a {
+  background: var(--crm-c-gray-100) !important /* vs other bg */;
+  border-radius: var(--crm-roundness);
 }
 
 /* JQ spinner */
