@@ -501,66 +501,52 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return;
     }
 
-    $contactParams = [
-      'contact_id' => $cid,
-      // core#4269 - Don't check relationships for values.
-      'noRelationships' => TRUE,
+    $contactObj = new CRM_Contact_DAO_Contact();
+    $contactObj->id = $cid;
+    $contactObj->find(TRUE);
+    $blocks = [
+      'email' => CRM_Core_BAO_Email::getValues(['contact_id' => $cid]),
+      'phone' => CRM_Core_BAO_Phone::getValues(['contact_id' => $cid]),
+      'address' => CRM_Core_BAO_Address::getValues(['contact_id' => $cid]),
     ];
-
-    $defaults = [];
-    $contactObj = CRM_Contact_BAO_Contact::retrieve($contactParams, $defaults);
-
     $modeFill = $this->isFillDuplicates();
-
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($params['contact_type'], NULL, $cid, 0, NULL);
-    CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);
-
-    $contact = get_object_vars($contactObj);
 
     foreach ($params as $key => $value) {
       if (in_array($key, ['id', 'contact_type'])) {
         continue;
       }
-      // These values must be handled differently because we need to account for location type.
-      $checkLocationType = in_array($key, ['address', 'phone', 'email']);
 
-      if (!$checkLocationType) {
-        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
-          $custom_params = ['id' => $contact['id'], 'return' => $key];
-          $getValue = civicrm_api3('Contact', 'getvalue', $custom_params);
-          if (empty($getValue)) {
-            unset($getValue);
+      if (!isset($blocks[$key])) {
+        if ($this->isFillDuplicates()) {
+          if (CRM_Core_BAO_CustomField::getKeyID($key)) {
+            $getValue = civicrm_api3('Contact', 'getvalue', ['id' => $cid, 'return' => $key]);
+            if (!empty($getValue)) {
+              // Value exists. Do not overwrite in fill mode.
+              // It is unclear, but historical that we check empty here & NULL below.
+              unset($params[$key]);
+            }
           }
-        }
-        else {
-          $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
-        }
-
-        if ($modeFill && isset($getValue)) {
-          unset($params[$key]);
-          if ($customFieldId) {
-            // Extra values must be unset to ensure the values are not
-            // imported.
-            unset($params['custom'][$customFieldId]);
+          else {
+            if (($contactObj->$key ?? NULL) !== NULL) {
+              // Value exists. Do not overwrite in fill mode.
+              unset($params[$key]);
+            }
           }
         }
       }
       else {
-
+        // These values must be handled differently because we need to account for location type.
         foreach ($value as $innerKey => $locationValues) {
           if ($modeFill) {
-            $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
-            if (isset($getValue)) {
-              foreach ($getValue as $cnt => $values) {
-                if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$key][$innerKey]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$key][$innerKey]['location_type_id']) {
-                  unset($params[$key][$innerKey]);
+            foreach ($blocks[$key] ?? [] as $cnt => $values) {
+              if ((!empty($values['location_type_id']) && !empty($params[$key][$innerKey]['location_type_id'])) && $values['location_type_id'] == $params[$key][$innerKey]['location_type_id']) {
+                unset($params[$key][$innerKey]);
+                if (empty($params[$key])) {
+                  unset($params[$key]);
                 }
               }
             }
           }
-        }
-        if (count($params[$key]) == 0) {
-          unset($params[$key]);
         }
       }
     }
