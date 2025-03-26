@@ -50,59 +50,36 @@ trait CRM_Custom_Form_CustomDataTrait {
    * @throws \CRM_Core_Exception
    */
   protected function addCustomDataFieldsToForm(string $entity, array $filters = []): void {
-    $fields = (array) civicrm_api4($entity, 'getFields', [
-      'action' => 'create',
-      'values' => $filters,
-      'where' => [
-        ['type', '=', 'Custom'],
-        ['readonly', '=', FALSE],
-      ],
-      'checkPermissions' => TRUE,
-    ])->indexBy('custom_field_id');
-    $fieldFilters = ['style' => 'Inline'];
+    // Reuse the same spec-gatherer from Api4.getFields
+    $spec = new \Civi\Api4\Service\Spec\RequestSpec($entity, 'create', $filters);
+    $fieldFilters = Civi::service('spec_gatherer')->getCustomGroupFilters($spec);
+    if ($fieldFilters === NULL) {
+      return;
+    }
+    // Api4 normally filters out multivalued groups but forms include them
+    // TODO: For now only support multivalued groups for Contact forms.
+    // FIXME: This condition should be removed after verifying it does work for other entity forms (`unset` should be called unconditionally).
     if ($entity === 'Contact') {
-      // Ideally this would not be contact specific but the function being
-      // called here does not handle the filters as received.
-      $fieldFilters += [
-        'extends' => [$entity, $filters['contact_type']],
-        'is_multiple' => TRUE,
-      ];
-      if (!empty($filters['contact_sub_type'])) {
-        $fieldFilters['extends_entity_column_value'] = [NULL, $filters['contact_sub_type']];
-      }
+      unset($fieldFilters['is_multiple']);
+    }
+    // Only inline groups belong on the form: dev/core#5613
+    $fieldFilters['style'] = 'Inline';
 
-      $multipleCustomGroups = CRM_Core_BAO_CustomGroup::getAll($fieldFilters);
-      foreach ($multipleCustomGroups as $multipleCustomGroup) {
-        foreach ($multipleCustomGroup['fields'] as $groupField) {
-          $groupField['custom_group_id.is_multiple'] = TRUE;
-          $groupField['table_name'] = $multipleCustomGroup['table_name'];
-          $groupField['custom_field_id'] = $groupField['id'];
-          $groupField['required'] = $groupField['is_required'];
-          $groupField['input_type'] = $groupField['html_type'];
-          $fields[$groupField['id']] = $groupField;
-        }
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($fieldFilters, CRM_Core_Permission::EDIT);
+    $fields = [];
+    foreach ($customGroups as $customGroup) {
+      foreach ($customGroup['fields'] as $groupField) {
+        $groupField['custom_group_id.is_multiple'] = $customGroup['is_multiple'];
+        $groupField['table_name'] = $customGroup['table_name'];
+        $groupField['custom_field_id'] = $groupField['id'];
+        $groupField['required'] = $groupField['is_required'];
+        $groupField['input_type'] = $groupField['html_type'];
+        $fields[$groupField['id']] = $groupField;
       }
     }
 
     $formValues = [];
     foreach ($fields as $field) {
-      // Filter for fields in "Inline" style custom groups only, as others are not added to forms via Ajax. Not removing
-      // them here would register them in the QuickForm but not have POST values for them, which might result in data
-      // loss (most notably radio fields, for which no POST value will be interpreted as a reset).
-      // See https://lab.civicrm.org/dev/core/-/issues/5613
-      if (isset($field['custom_group'])) {
-        if (!isset(Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']])) {
-          Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']] = \Civi\Api4\CustomGroup::get(FALSE)
-            ->addSelect('style')
-            ->addWhere('name', '=', $field['custom_group'])
-            ->execute()
-            ->single();
-        }
-        if ('Inline' !== Civi::$statics[__CLASS__]['customGroups'][$field['custom_group']]['style']) {
-          continue;
-        }
-      }
-
       // Here we add the custom fields to the form
       // based on whether they have been 'POSTed'
       foreach ($this->getInstancesOfField($field['custom_field_id']) as $elementName) {
