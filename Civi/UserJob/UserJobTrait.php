@@ -11,6 +11,7 @@
 
 namespace Civi\UserJob;
 
+use Civi\Api4\ImportTemplateField;
 use Civi\Api4\UserJob;
 
 trait UserJobTrait {
@@ -71,6 +72,10 @@ trait UserJobTrait {
     if (empty($this->userJob)) {
       $this->userJob = UserJob::get()
         ->addWhere('id', '=', $this->getUserJobID())
+        ->addChain('template_fields', ImportTemplateField::get()
+          ->addWhere('user_job_id', '=', $this->getUserJobID())
+          ->addOrderBy('column_number')
+        )
         ->execute()
         ->single();
     }

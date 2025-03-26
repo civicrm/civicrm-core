@@ -507,7 +507,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getColumnHeaders(): array {
     $headers = $this->getDataSourceObject()->getColumnHeaders();
-    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    $mappedFields = $this->getUserJob()['template_fields'] ?? [];
     if (!empty($mappedFields) && count($mappedFields) > count($headers)) {
       // The user has mapped one or more non-database fields, add those in.
       $userMappedFields = array_diff_key($mappedFields, $headers);
@@ -549,7 +549,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $statuses = (array) $statuses;
     $rows = $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
     $headers = $this->getColumnHeaders();
-    $mappings = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    $mappings = $this->getUserJob()['template_fields'] ?? [];
     foreach ($rows as &$row) {
       foreach ($headers as $index => $header) {
         if (!$header) {
@@ -774,7 +774,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected function getMappedFieldLabels(): array {
     $mapper = [];
     $parser = $this->getParser();
-    $importMappings = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    $importMappings = $this->getUserJob()['template_fields'] ?? [];
     if (empty($importMappings)) {
       foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mapping) {
         $importMappings[] = $parser->getMappingFieldFromMapperInput((array) $mapping, 0, $columnNumber);

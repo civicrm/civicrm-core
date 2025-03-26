@@ -73,7 +73,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   protected function getFieldMappings(): array {
-    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    $mappedFields = $this->getUserJob()['template_fields'] ?? [];
     if (empty($mappedFields)) {
       foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
         $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
