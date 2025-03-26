@@ -407,7 +407,11 @@
             offset *= 365;
         }
         let newDate = new Date(baseDate.getTime() + offset * 24 * 60 * 60 * 1000);
-        let defaultDate = newDate.toISOString().split('T')[0];
+        let localYear = newDate.getFullYear();
+        let localMonth = String(newDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        let localDay = String(newDate.getDate()).padStart(2, '0');
+        let defaultDate = `${localYear}-${localMonth}-${localDay}`; // Format YYYY-MM-DD
+
         if (includeTime) {
           defaultDate += ' ' + newDate.toTimeString().slice(0,8);
         }
