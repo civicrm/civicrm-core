@@ -68,7 +68,7 @@
 
           function buildImportMappings() {
             $scope.data.importMappings = [];
-            var importMappings = $scope.userJob.metadata.import_mappings;
+            var importMappings = $scope.userJob.template_fields;
             _.each($scope.data.columnHeaders, function (header, index) {
               var fieldName = $scope.data.defaults['mapper[' + index + ']'][0];
               if (Boolean(fieldName)) {
@@ -276,7 +276,7 @@
         $scope.save = (function ($event) {
           $event.preventDefault();
           $scope.userJob.metadata.entity_configuration = {};
-          $scope.userJob.metadata.import_mappings = [];
+          $scope.userJob.template_fields = [];
           _.each($scope.entitySelection, function (entity) {
             $scope.userJob.metadata.entity_configuration[entity.id] = entity.selected;
           });
@@ -290,15 +290,23 @@
               entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity]};
             }
 
-            $scope.userJob.metadata.import_mappings.push({
+            $scope.userJob.template_fields.push({
               name: importRow.selectedField,
               default_value: importRow.defaultValue,
               // At this stage column_number is thrown away but we store it here to have it for when we change that.
-              column_number: index,
+              column_number: index + 1,
               entity_data: entityConfig
             });
           });
-          crmApi4('UserJob', 'save', {records: [$scope.userJob]})
+          crmApi4('UserJob', 'save', {
+            records: [$scope.userJob],
+            chain: {
+              template_fields: ['ImportTemplateField', 'replace', {
+                where: [['user_job_id', '=', '$id']],
+                records: $scope.userJob.template_fields,
+              }],
+            },
+          })
             .then(function(result) {
               // Only post the form if the save succeeds.
               document.getElementById("MapField").submit();
