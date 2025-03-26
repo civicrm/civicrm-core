@@ -17,8 +17,8 @@
 
 /* Class for successful upgrade */
 .crm-container .upgrade-success {
-  background-color: var(--crm-alert-background-help);
-  color: var(--crm-alert-text-help);
+  background-color: var(--crm-alert-success-bg);
+  color: var(--crm-alert-success-text);
 }
 
 /* Extension management */
@@ -66,11 +66,11 @@
   color: var(--crm-c-warning);
 }
 .crm-container .crm-extensions-upgrade {
-  background: var(--crm-alert-background-warning);
-  border: 1px solid var(--crm-alert-border-warning);
+  background: var(--crm-alert-warning-bg);
+  border: 1px solid var(--crm-alert-warning-border);
   padding: var(--crm-padding-small);
   border-radius: var(--crm-roundness);
-  color: var(--crm-alert-text-warning);
+  color: var(--crm-alert-warning-text);
 }
 .crm-container .crm-extensions-version {
   white-space: nowrap;
@@ -80,11 +80,11 @@
 }
 .crm-container .crm-extensions-stage.fa-flask,
 .crm-container .crm-extensions-stage.fa-warning {
-  color: var(--crm-c-warning);
+  color: var(--crm-notify-warning);
 }
 .crm-container .crm-extensions-stage.fa-check-circle,
 .crm-container .crm-extensions-stage.fa-trophy {
-  color: var(--crm-c-success);
+  color: var(--crm-notify-success);
 }
 
 /* Navigation Menu Editor */

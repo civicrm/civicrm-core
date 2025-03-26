@@ -73,6 +73,9 @@
   --crm-c-background5: var(--crm-c-gray-700);
   --crm-c-drag-background: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
   --crm-c-code-background: var(--crm-c-blue-overlay2); /* background for code regions */
+  --crm-c-focus: var(--crm-c-blue-dark);
+  --crm-c-inactive: #696969;
+  /* Emphasis colours */
   --crm-c-primary: var(--crm-c-blue-dark); /* primary button bgs */ /* thames */
   --crm-c-primary-hover: var(--crm-c-blue-darker); /* thames */
   --crm-c-primary-text: var(--crm-c-text-light);
@@ -81,6 +84,7 @@
   --crm-c-secondary-hover: #a1cef3; /* thames */
   --crm-c-secondary-text: var(--crm-c-blue-darker); /* thames */
   --crm-c-secondary-hover-text: var(--crm-c-text-light); /* thames todo */
+  --crm-c-secondary-on-light: var(--crm-c-blue-darker);
   --crm-c-success: var(--crm-c-green-dark);
   --crm-c-success-text: var(--crm-c-text-light);
   --crm-c-danger: var(--crm-c-red-dark); /* thames */
@@ -89,8 +93,6 @@
   --crm-c-warning-text: var(--crm-c-text);
   --crm-c-info: var(--crm-c-blue-dark);
   --crm-c-info-text: var(--crm-c-text-light);
-  --crm-c-focus: var(--crm-c-blue-dark);
-  --crm-c-inactive: #696969;
 }
 :root {
 /* thames only radii */
@@ -249,17 +251,17 @@
   --crm-alert-margin: 0 0 var(--crm-m);
   --crm-alert-border-width: 0; /* thames */
 /* Note 'help' suffix here is for the 'success' boxes. */
-  --crm-alert-background-help: var(--crm-c-blue-light); /* thames */
-  --crm-alert-border-help: unset; /* thames */
-  --crm-alert-text-help: unset; /* thames */
-  --crm-alert-text-warning: var(--crm-c-text);
-  --crm-alert-border-warning: var(--crm-c-yellow);
-  --crm-alert-background-info: var(--crm-c-blue-light);
-  --crm-alert-border-info: var(--crm-c-blue);
-  --crm-alert-text-info: var(--crm-c-blue-darker);
-  --crm-alert-background-danger: var(--crm-c-red-light);
-  --crm-alert-border-danger: var(--crm-c-red);
-  --crm-alert-text-danger: var(--crm-c-red-dark);
+  --crm-alert-success-bg: var(--crm-c-blue-light); /* thames */
+  --crm-alert-success-border: unset; /* thames */
+  --crm-alert-success-text: unset; /* thames */
+  --crm-alert-warning-text: var(--crm-c-text);
+  --crm-alert-warning-border: var(--crm-c-yellow);
+  --crm-alert-info-bg: var(--crm-c-blue-light);
+  --crm-alert-info-border: var(--crm-c-blue);
+  --crm-alert-info-text: var(--crm-c-blue-darker);
+  --crm-alert-danger-bg: var(--crm-c-red-light);
+  --crm-alert-danger-border: var(--crm-c-red);
+  --crm-alert-danger-text: var(--crm-c-red-dark);
 }
 :root {
 /* Form */

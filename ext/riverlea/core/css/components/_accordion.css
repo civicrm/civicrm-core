@@ -28,9 +28,9 @@
 }
 .crm-container details:has(input.crm-inline-error) summary,
 .crm-container details:has(input.crm-inline-error) summary.active {
-  background-color: var(--crm-alert-background-danger);
-  color: var(--crm-alert-text-danger);
-  border-color: var(--crm-alert-border-danger);
+  background-color: var(--crm-alert-danger-bg);
+  color: var(--crm-alert-danger-text);
+  border-color: var(--crm-alert-danger-border);
 }
 
 /* Expand/collapse icons */

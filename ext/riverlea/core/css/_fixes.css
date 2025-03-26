@@ -185,8 +185,8 @@ a.crm-expand-row:focus {
   color: var(--crm-c-danger);
 }
 .crm-container .alert.alert-info.font-red { /* for when an info alert wants to be a danger alert! */
-  background-color: var(--crm-alert-background-danger);
-  border-color: var(--crm-alert-border-danger);
+  background-color: var(--crm-alert-danger-bg);
+  border-color: var(--crm-alert-danger-border);
 }
 
 /******************

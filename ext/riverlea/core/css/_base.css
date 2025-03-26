@@ -316,16 +316,22 @@ dl dl {
   color: var(--crm-c-primary-hover);
 }
 .crm-container .text-success {
-  color: var(--crm-c-success);
+  color: var(--crm-c-success-on-light);
 }
 .crm-container .text-info {
-  color: var(--crm-c-info);
+  color: var(--crm-c-info-on-light);
 }
 .crm-container .text-warning {
-  color: var(--crm-c-warning);
+  color: var(--crm-c-warning-on-light);
 }
 .crm-container .text-danger {
-  color: var(--crm-c-danger);
+  color: var(--crm-c-danger-on-light);
+}
+.crm-container .text-primary {
+  color: var(--crm-c-primary-on-light);
+}
+.crm-container .text-secondary {
+  color: var(--crm-c-secondary-on-light);
 }
 .crm-container h1,
 .crm-container h2,
