@@ -1786,6 +1786,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * Returns all contribution related object ids.
    *
+   * @deprecated since 6.2 will be removed when core callers fully removed.
+   *
    * @param $contributionId
    *
    * @return array
