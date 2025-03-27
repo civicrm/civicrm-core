@@ -904,18 +904,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // if contribution is related to membership or participant freeze Financial Type, Amount
     if ($this->_id) {
-      $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       $isCancelledStatus = ($this->_values['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'));
 
-      if (!empty($componentDetails['membership']) ||
-        !empty($componentDetails['participant']) ||
+      if ($this->hasExistingMembershipLines() ||
+        $this->hasExistingParticipantLines() ||
         // if status is Cancelled freeze Amount, Payment Instrument, Check #, Financial Type,
         // Net and Fee Amounts are frozen in AdditionalInfo::buildAdditionalDetail
         $isCancelledStatus
       ) {
         if ($totalAmount) {
-          $totalAmount->freeze();
+          $this->getElement('total_amount')->freeze();
           $this->getElement('currency')->freeze();
+          if ($this->elementExists('price_set_id')) {
+            $this->getElement('price_set_id')->freeze();
+          }
+          $this->assign('hasPriceSets', FALSE);
         }
         if ($isCancelledStatus) {
           $paymentInstrument->freeze();
@@ -953,11 +956,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function initializeOrder(): void {
     $this->order = new CRM_Financial_BAO_Order();
     $this->order->setPriceSetID($this->getPriceSetID());
-    if ($this->getSubmittedValue('financial_type_id') && $this->isQuickConfig()) {
+    if ($this->getSubmittedValue('financial_type_id')) {
       $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
     }
     if ($this->getSubmittedValue('total_amount')) {
-      $this->order->setOverrideTotalAmount((float) $this->getSubmittedValue('total_amount'));
+      $this->order->setOverrideTotalAmountTaxExclusive($this->getSubmittedValue('total_amount'));
     }
     $this->order->setForm($this);
     foreach ($this->order->getPriceFieldsMetaData() as $priceField) {
@@ -1979,28 +1982,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->isQuickConfig() && !$this->_id) {
       $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
       $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-      $fieldID = key($this->_priceSet['fields']);
-      $fieldValueId = key($this->_priceSet['fields'][$fieldID]['options']);
-      $this->_priceSet['fields'][$fieldID]['options'][$fieldValueId]['amount'] = $submittedValues['total_amount'];
-      $submittedValues['price_' . $fieldID] = 1;
     }
-
-    // Every contribution has a price-set - the only reason it shouldn't be set is if we are dealing with
-    // quick config (very very arguably) & yet we see that this could still be quick config so this should be understood
-    // as a point of fragility rather than a logical 'if' clause.
-    if ($priceSetId) {
-      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $submittedValues, $lineItem[$priceSetId], $priceSetId);
-      // Unset tax amount for offline 'is_quick_config' contribution.
-      // @todo WHY  - quick config was conceived as a quick way to configure contribution forms.
-      // this is an example of 'other' functionality being hung off it.
-      if ($this->_priceSet['is_quick_config'] &&
-        !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
-      ) {
-        unset($submittedValues['tax_amount']);
-      }
-      $submittedValues['total_amount'] = $submittedValues['amount'] ?? NULL;
-    }
+    $lineItem = [$this->getPriceSetID() => $this->getOrder()->getLineItems()];
+    $submittedValues['total_amount'] = $this->getOrder()->getTotalAmount();
+    // @todo - ideally do not set tax_level - it is not required lower down
+    // if line items are provide appropriately.
+    $submittedValues['tax_amount'] = $this->getOrder()->getTotalTaxAmount();
+    $submittedValues['amount_level'] = $this->getOrder()->getAmountLevel();
 
     if ($this->_id) {
       if ($this->_compId) {
@@ -2036,10 +2024,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         // and new functionality has been added onto the form layer rather than the BAO :-(
         if ($this->isQuickConfig()) {
           //CRM-16833: Ensure tax is applied only once for membership conribution, when status changed.(e.g Pending to Completed).
-          $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-          if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
+          if (!$this->hasExistingMembershipLines() && !$this->hasExistingParticipantLines()) {
             if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
               $item['unit_price'] = $item['line_total'] = $this->getSubmittedValue('total_amount');
+              $item['qty'] = 1;
             }
           }
 
@@ -2223,6 +2211,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
           'check_number' => $this->getSubmittedValue('check_number'),
         ]);
+      }
+      if ($this->isAmountFrozen()) {
+        // If the user has no opportunity to edit these then don't update them.
+        unset($params['line_item'], $params['total_amount'], $params['net_amount'], $params['tax_amount'], $params['non_deductible_amount']);
       }
       $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
@@ -2589,7 +2581,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $priceSetID;
     }
     $lines = $this->getExistingContributionLineItems();
-    if ($lines) {
+    if ($lines && !$this->getSubmittedValue('total_amount')) {
       $line = reset($lines);
       return $line['price_field_id.price_set_id'];
     }
@@ -2733,6 +2725,35 @@ WHERE  contribution_id = {$id}
         ->execute();
     }
     return $this->existingContributionLineItems;
+  }
+
+  private function hasExistingParticipantLines(): bool {
+    foreach ($this->getExistingContributionLineItems() as $lineItem) {
+      if ($lineItem['entity_table'] === 'civicrm_participant') {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  private function hasExistingMembershipLines(): bool {
+    foreach ($this->getExistingContributionLineItems() as $lineItem) {
+      if ($lineItem['entity_table'] === 'civicrm_membership') {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  private function isAmountFrozen(): bool {
+    if (!$this->getContributionID()) {
+      return FALSE;
+    }
+    if ((!$this->elementExists('total_amount') || $this->isElementFrozen('total_amount'))
+      && (!$this->elementExists('price_set_id')|| $this->isElementFrozen('total_amount'))) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
