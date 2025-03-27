@@ -144,6 +144,10 @@
         }
 
         editor.afform.permission_operator = editor.afform.permission_operator || 'AND';
+        // set redirect to url as default if not set
+        if (!editor.afform.confirmation_type && editor.meta.confirmation_types.length > 0) {
+          editor.afform.confirmation_type = editor.meta.confirmation_types[0].value;
+        }
 
         // Initialize undo history
         undoAction = 'initialLoad';
