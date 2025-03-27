@@ -71,10 +71,10 @@
   --crm-c-secondary-text: var(--crm-c-text-light);
   --crm-c-secondary-hover-text: var(--crm-c-text-light);
   --crm-c-secondary-on-light: var(--crm-c-secondary-hover);
-  --crm-c-success: var(--crm-c-green-dark);
-  --crm-c-success-text: var(--crm-c-text-light);
-  --crm-c-success-light: var(--crm-c-green-light);
-  --crm-c-success-on-light: var(--crm-c-success);
+  --crm-c-success: var(--crm-c-green-dark); /* Main colour for emphasis */
+  --crm-c-success-text: var(--crm-c-text-light); /* Text colour on top of that, usually text-light or text-dark */
+  --crm-c-success-light: var(--crm-c-green-light); /* Light version of emphasis col, for alert bgs, and emphasis on dark bgs */
+  --crm-c-success-on-light: var(--crm-c-success); /* Text colour on top of light, usually text-light or text-dark but could be a tint */
   --crm-c-warning: var(--crm-c-amber);
   --crm-c-warning-text: var(--crm-c-text-light);
   --crm-c-warning-light: var(--crm-c-yellow-light);
@@ -392,9 +392,9 @@
   --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: var(--crm-roundness);
   --crm-notify-danger: hsl(from var(--crm-c-danger) h s calc(l + 20));
-  --crm-notify-warning:  hsl(from var(--crm-c-warning) h s calc(l + 20));
+  --crm-notify-warning: hsl(from var(--crm-c-warning) h s calc(l + 20));
   --crm-notify-success: hsl(from var(--crm-c-success) h s calc(l + 30));
-  --crm-notify-info:  hsl(from var(--crm-c-info) h s calc(l + 30));
+  --crm-notify-info: hsl(from var(--crm-c-info) h s calc(l + 30));
 /* Icons */
   --crm-icon-danger: "\f071";
   --crm-icon-success: "\f058";

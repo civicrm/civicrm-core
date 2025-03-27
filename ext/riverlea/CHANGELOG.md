@@ -3,6 +3,7 @@ This release makes a series of changes to how emphasis colours (ie primary/succe
  - ADDED - alert border colours are auto-generated using `hsl(from var(--crm-alert-background-X) h s calc(l - Y))`
  - ADDED - notification icon colours are auto-generated using `hsl(from var(--crm-c-X) h s calc(l + Y))`
  - ADDED auto primary/secondary hover darken cols via HSL.
+ - CHANGED - 'crm-c-alert' to 'crm-c-danger' (https://github.com/civicrm/civicrm-core/pull/32409)
  - CHANGED - Walbrook info alert made consistent with other stream and emphasis alerts (no more inverse bg colour)
  - CHANGED - names of alert emphasis variables made consistent with other names (help becomes 'success', background becomes bg, and the variable targe goes at the end not middle)
  - CHANGED - made heading bg colours match info colour scheme to simplify dark-mode flip.
@@ -21,8 +22,8 @@ This release makes a series of changes to how emphasis colours (ie primary/succe
     --crm-c-danger-on-light - new value for 'text-danger'
     --crm-c-success-light - lighter shade of success from --crm-alert-success-bg
     --crm-c-success-on-light - new value for 'text-success'
-    --crm-c-primary-on-light - new value for 'text-primary'
-    --crm-c-secondary-on-light - new value for 'text-secondary'
+    --crm-c-primary-on-light - new value for 'text-primary' - SearchKit outputs this
+    --crm-c-secondary-on-light - new value for 'text-secondary' - SearchKit outputs this
 
 1.4.2-6.2alpha
  - FIXED - today's date background on date-picker (https://lab.civicrm.org/dev/core/-/issues/5807).
