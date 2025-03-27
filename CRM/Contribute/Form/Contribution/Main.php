@@ -990,23 +990,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $errors['_qf_default'] = ts('Please select at least one membership option.');
         }
       }
-      // @todo - processAmount is to be deprectated - can we use getTotalAmount or
-      // a function of self->order here?
-      CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'],
-        $fields
-      );
 
+      $amount = $self->getOrder()->getTotalAmount();
       $minAmt = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $fields['priceSetId'], 'min_amount');
-      if ($fields['amount'] < 0) {
+      if ($amount < 0) {
         $errors['_qf_default'] = ts('Contribution can not be less than zero. Please select the options accordingly');
       }
-      elseif (!empty($minAmt) && $fields['amount'] < $minAmt) {
+      elseif (!empty($minAmt) && $amount < $minAmt) {
         $errors['_qf_default'] = ts('A minimum amount of %1 should be selected from Contribution(s).', [
           1 => CRM_Utils_Money::format($minAmt),
         ]);
       }
-
-      $amount = $fields['amount'];
     }
 
     if (isset($fields['selectProduct']) &&
