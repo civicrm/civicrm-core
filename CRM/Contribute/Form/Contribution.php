@@ -904,18 +904,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // if contribution is related to membership or participant freeze Financial Type, Amount
     if ($this->_id) {
-      $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       $isCancelledStatus = ($this->_values['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'));
 
-      if (!empty($componentDetails['membership']) ||
-        !empty($componentDetails['participant']) ||
+      if ($this->hasExistingMembershipLines() ||
+        $this->hasExistingParticipantLines() ||
         // if status is Cancelled freeze Amount, Payment Instrument, Check #, Financial Type,
         // Net and Fee Amounts are frozen in AdditionalInfo::buildAdditionalDetail
         $isCancelledStatus
       ) {
         if ($totalAmount) {
-          $totalAmount->freeze();
+          $this->getElement('total_amount')->freeze();
           $this->getElement('currency')->freeze();
+          if ($this->elementExists('price_set_id')) {
+            $this->getElement('price_set_id')->freeze();
+          }
+          $this->assign('hasPriceSets', FALSE);
         }
         if ($isCancelledStatus) {
           $paymentInstrument->freeze();
@@ -2036,8 +2039,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         // and new functionality has been added onto the form layer rather than the BAO :-(
         if ($this->isQuickConfig()) {
           //CRM-16833: Ensure tax is applied only once for membership conribution, when status changed.(e.g Pending to Completed).
-          $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-          if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
+          if (!$this->hasExistingMembershipLines() && !$this->hasExistingParticipantLines()) {
             if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
               $item['unit_price'] = $item['line_total'] = $this->getSubmittedValue('total_amount');
             }
@@ -2223,6 +2225,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
           'check_number' => $this->getSubmittedValue('check_number'),
         ]);
+      }
+      if ($this->isAmountFrozen()) {
+        // If the user has no opportunity to edit these then don't update them.
+        unset($params['line_item'], $params['total_amount'], $params['net_amount'], $params['tax_amount'], $params['non_deductible_amount']);
       }
       $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
@@ -2733,6 +2739,35 @@ WHERE  contribution_id = {$id}
         ->execute();
     }
     return $this->existingContributionLineItems;
+  }
+
+  private function hasExistingParticipantLines(): bool {
+    foreach ($this->getExistingContributionLineItems() as $lineItem) {
+      if ($lineItem['entity_table'] === 'civicrm_participant') {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  private function hasExistingMembershipLines(): bool {
+    foreach ($this->getExistingContributionLineItems() as $lineItem) {
+      if ($lineItem['entity_table'] === 'civicrm_membership') {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  private function isAmountFrozen(): bool {
+    if (!$this->getContributionID()) {
+      return FALSE;
+    }
+    if ((!$this->elementExists('total_amount') || $this->isElementFrozen('total_amount'))
+      && (!$this->elementExists('price_set_id')|| $this->isElementFrozen('total_amount'))) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
