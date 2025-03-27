@@ -833,7 +833,7 @@ SET    version = '$version'
    */
   public static function doFinish(): bool {
     $session = CRM_Core_Session::singleton();
-    $session->reset(2);
+    $session->reset('partial');
     return TRUE;
   }
 
