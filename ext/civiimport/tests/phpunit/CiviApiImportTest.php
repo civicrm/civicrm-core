@@ -68,7 +68,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ],
         'import_mappings' => [
-          ['name' => 'external_identifier'],
+          ['name' => 'contact.external_identifier'],
           ['name' => 'total_amount'],
           ['name' => 'receive_date'],
           ['name' => 'financial_type_id'],
