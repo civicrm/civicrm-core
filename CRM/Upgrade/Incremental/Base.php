@@ -492,6 +492,22 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Do any relevant message template updates.
+   *
+   * @param CRM_Queue_TaskContext|null $ctx
+   * @param string $version
+   * @param array $jobs
+   *
+   * @return true
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function updateUserJob(?CRM_Queue_TaskContext $ctx, string $version, array $jobs): bool {
+    $jobObject = new CRM_Upgrade_Incremental_UserJob($version, $jobs);
+    $jobObject->updateFieldMappingsForImport();
+    return TRUE;
+  }
+
+  /**
    * Updated a message token within a template.
    *
    * @param CRM_Queue_TaskContext $ctx
