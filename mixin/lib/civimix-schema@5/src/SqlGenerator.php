@@ -157,7 +157,7 @@ return new class() {
     return $constraints;
   }
 
-  public static function generateFieldSql(array $field) {
+  public static function generateFieldSql(array $field): string {
     $fieldSql = $field['sql_type'];
     if (!empty($field['collate'])) {
       $fieldSql .= " COLLATE {$field['collate']}";
