@@ -91,6 +91,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
     $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Activity');
     $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Membership');
     $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Contribution');
+    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Participant');
   }
 
   public static function setFileUploadDate(): bool {

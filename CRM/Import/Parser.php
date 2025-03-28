@@ -964,7 +964,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
     // @todo - make this generic - for fields where getOptions doesn't fetch
     // getOptions does not retrieve these fields with high potential results
-    if ($fieldName === 'event_id') {
+    if ($fieldMetadata['name'] === 'event_id' && $fieldMetadata['fk_entity'] === 'Event') {
       if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
         $event = Event::get()->addClause('OR', ['title', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
         Civi::$statics[__CLASS__][$fieldName][$importedValue] = $event['id'] ?? FALSE;
