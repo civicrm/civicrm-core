@@ -42,14 +42,26 @@ return new class() implements SchemaHelperInterface {
     return file_exists($this->getExtensionDir() . '/schema');
   }
 
-  public function arrayToSql(array $entityDefn): string {
+  /**
+   * Converts an entity or field definition to SQL statement.
+   *
+   * @param array $defn
+   *   The definition array, which can either represent
+   *   an entity with fields or a single database column.
+   * @return string
+   *   The generated SQL statement, which is either an SQL command
+   *   for creating a table with constraints or for defining a single column.
+   */
+  public function arrayToSql(array $defn): string {
     $generator = $this->getSqlGenerator();
-    return $generator->generateCreateTableWithConstraintSql($entityDefn);
-  }
-
-  public function generateFieldSql(array $fieldSpec): string {
-    $generator = $this->getSqlGenerator();
-    return $generator->generateFieldSql($fieldSpec);
+    // Entity array: generate entire table
+    if (isset($defn['getFields'])) {
+      return $generator->generateCreateTableWithConstraintSql($defn);
+    }
+    // Field array: generate single column
+    else {
+      return $generator->generateFieldSql($defn);
+    }
   }
 
   // FIXME: You can add more utility methods here

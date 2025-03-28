@@ -17,8 +17,7 @@ namespace CiviMix\Schema;
  *
  * @method string generateInstallSql()
  * @method string generateUninstallSql()
- * @method string arrayToSql(array $entityDefn)
- * @method string generateFieldSql(array $fieldSpec)
+ * @method string arrayToSql(array $defn) Converts an entity or field definition to SQL statement.
  *
  * TODO: void addTables(string[] $tables)
  * TODO: void addColumn(string $table, string $column)
