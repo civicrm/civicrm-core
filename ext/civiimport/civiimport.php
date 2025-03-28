@@ -138,9 +138,6 @@ function _civiimport_civicrm_get_import_tables(): array {
  * @throws \CRM_Core_Exception
  */
 function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templateFile): void {
-  if (in_array($formName, civiimport_enabled_forms())) {
-    $templateFile = 'CRM/Import/MapField.tpl';
-  }
   if ($formName === 'CRM_Queue_Page_Monitor') {
     $jobName = CRM_Utils_Request::retrieveValue('name', 'String');
     if (str_starts_with($jobName, 'user_job_')) {
