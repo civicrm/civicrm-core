@@ -79,9 +79,9 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         $activityParams['source_contact_id'] = $this->getContactID($sourceContactParams, empty($sourceContactParams['id']) ? NULL : (int) $sourceContactParams['id'], 'SourceContact', $this->getDedupeRulesForEntity('SourceContact'));
       }
       catch (CRM_Core_Exception $e) {
-        if (empty($activityParams['id'])) {
-          $activityParams['source_contact_id'] = CRM_Core_Session::getLoggedInContactID();
-        }
+      }
+      if (empty($activityParams['id']) && empty($activityParams['source_contact_id'])) {
+        $activityParams['source_contact_id'] = CRM_Core_Session::getLoggedInContactID();
       }
       $newActivity = Activity::save()
         ->addRecord($activityParams)
@@ -130,7 +130,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'actions' => $this->getActions(['select', 'ignore', 'update']),
         'selected' => [
           'action' => 'select',
-          'contact_type' => 'Individual',
+          'contact_type' => NULL,
           'dedupe_rule' => $this->getDefaultDedupeRule(),
         ],
         'default_action' => 'select',
@@ -142,10 +142,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'is_contact' => TRUE,
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,
-        'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore']) : $this->getActions(['select', 'update', 'save']),
+        'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore']) : $this->getActions(['ignore', 'select', 'update', 'save']),
         'selected' => [
-          'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
-          'dedupe_rule' => $this->getDefaultDedupeRule(),
+          'action' => 'ignore',
+          'contact_type' => 'Individual',
         ],
         'default_action' => 'select',
         'entity_name' => 'SourceContact',
@@ -159,6 +159,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'actions' => $this->getActions(['select', 'ignore']),
         'selected' => [
           'action' => 'ignore',
+          'contact_type' => 'Individual',
         ],
         'default_action' => 'ignore',
         'entity_name' => 'AssigneeContact',

@@ -342,7 +342,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
-          'contact_type' => $this->getSubmittedValue('contactType'),
+          'contact_type' => 'Individual',
           'dedupe_rule' => $this->getDefaultDedupeRule(),
         ],
         'default_action' => 'select',
