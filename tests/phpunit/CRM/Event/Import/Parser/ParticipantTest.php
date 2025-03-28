@@ -132,17 +132,17 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
     $this->individualCreate(['external_identifier' => 'ref-77', 'is_deleted' => TRUE]);
     $this->importCSV('participant_with_ext_id.csv', [
-      ['name' => 'event_id'],
+      ['name' => 'Participant.event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'contact.external_identifier'],
-      ['name' => 'fee_amount'],
-      ['name' => 'fee_currency'],
-      ['name' => 'fee_level'],
-      ['name' => 'is_pay_later'],
-      ['name' => 'role_id'],
-      ['name' => 'source'],
-      ['name' => 'status_id'],
-      ['name' => 'register_date'],
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'Participant.fee_amount'],
+      ['name' => 'Participant.fee_currency'],
+      ['name' => 'Participant.fee_level'],
+      ['name' => 'Participant.is_pay_later'],
+      ['name' => 'Participant.role_id'],
+      ['name' => 'Participant.source'],
+      ['name' => 'Participant.status_id'],
+      ['name' => 'Participant.register_date'],
       ['name' => 'do_not_import'],
       ['name' => 'do_not_import'],
     ]);
@@ -168,9 +168,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'role_id:name' => ['Attendee'],
     ]);
     $this->importCSV('cancel_participant.csv', [
-      ['name' => 'id'],
-      ['name' => 'status_id'],
-      ['name' => $this->getCustomFieldName('radio', 4)],
+      ['name' => 'Participant.id'],
+      ['name' => 'Participant.status_id'],
+      ['name' => 'Participant.' . $this->getCustomFieldName('radio', 4)],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -195,17 +195,17 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(1, $this->eventCreatePaid(['is_template' => TRUE])['id']);
     $this->assertEquals(3, $this->individualCreate());
     $this->importCSV('participant_with_event_id.csv', [
-      ['name' => 'event_id'],
+      ['name' => 'Participant.event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'contact_id'],
-      ['name' => 'fee_amount'],
+      ['name' => 'Participant.contact_id'],
+      ['name' => 'Participant.fee_amount'],
       ['name' => 'do_not_import'],
-      ['name' => 'fee_level'],
-      ['name' => 'is_pay_later'],
-      ['name' => 'role_id'],
-      ['name' => 'source'],
-      ['name' => 'status_id'],
-      ['name' => 'register_date'],
+      ['name' => 'Participant.fee_level'],
+      ['name' => 'Participant.is_pay_later'],
+      ['name' => 'Participant.role_id'],
+      ['name' => 'Participant.source'],
+      ['name' => 'Participant.status_id'],
+      ['name' => 'Participant.register_date'],
       ['name' => 'do_not_import'],
       ['name' => 'do_not_import'],
     ]);
@@ -223,21 +223,21 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   public function testImportParticipant() :void {
     $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
     $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'checkbox');
-    $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
+    $this->individualCreate(['external_identifier' => 'ref-77']);
     $this->importCSV('participant_with_ext_id.csv', [
-      ['name' => 'event_id'],
+      ['name' => 'Participant.event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'contact.external_identifier'],
-      ['name' => 'fee_amount'],
-      ['name' => 'fee_currency'],
-      ['name' => 'fee_level'],
-      ['name' => 'is_pay_later'],
-      ['name' => 'role_id'],
-      ['name' => 'source'],
-      ['name' => 'status_id'],
-      ['name' => 'register_date'],
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'Participant.fee_amount'],
+      ['name' => 'Participant.fee_currency'],
+      ['name' => 'Participant.fee_level'],
+      ['name' => 'Participant.is_pay_later'],
+      ['name' => 'Participant.role_id'],
+      ['name' => 'Participant.source'],
+      ['name' => 'Participant.status_id'],
+      ['name' => 'Participant.register_date'],
       ['name' => 'do_not_import'],
-      ['name' => $this->getCustomFieldName('checkbox', 4)],
+      ['name' => 'Participant.' . $this->getCustomFieldName('checkbox', 4)],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -271,23 +271,23 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
     ]);
     $this->importCSV('participant_with_ext_id.csv', [
-      ['name' => 'event_id'],
+      ['name' => 'Participant.event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'contact.external_identifier'],
-      ['name' => 'fee_amount'],
-      ['name' => 'fee_currency'],
-      ['name' => 'fee_level'],
-      ['name' => 'is_pay_later'],
-      ['name' => 'role_id'],
-      ['name' => 'source'],
-      ['name' => 'status_id'],
-      ['name' => 'register_date'],
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'Participant.fee_amount'],
+      ['name' => 'Participant.fee_currency'],
+      ['name' => 'Participant.fee_level'],
+      ['name' => 'Participant.is_pay_later'],
+      ['name' => 'Participant.role_id'],
+      ['name' => 'Participant.source'],
+      ['name' => 'Participant.status_id'],
+      ['name' => 'Participant.register_date'],
       ['name' => 'do_not_import'],
       ['name' => 'do_not_import'],
     ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('DUPLICATE', $row['_status']);
+    $this->assertEquals('DUPLICATE', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status']);
     $participants = Participant::get()
@@ -316,23 +316,23 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
     ]);
     $this->importCSV('participant_with_ext_id.csv', [
-      ['name' => 'event_id'],
+      ['name' => 'Participant.event_id'],
       ['name' => 'do_not_import'],
-      ['name' => 'contact.external_identifier'],
-      ['name' => 'fee_amount'],
-      ['name' => 'fee_currency'],
-      ['name' => 'fee_level'],
-      ['name' => 'is_pay_later'],
-      ['name' => 'role_id'],
-      ['name' => 'source'],
-      ['name' => 'status_id'],
-      ['name' => 'register_date'],
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'Participant.fee_amount'],
+      ['name' => 'Participant.fee_currency'],
+      ['name' => 'Participant.fee_level'],
+      ['name' => 'Participant.is_pay_later'],
+      ['name' => 'Participant.role_id'],
+      ['name' => 'Participant.source'],
+      ['name' => 'Participant.status_id'],
+      ['name' => 'Participant.register_date'],
       ['name' => 'do_not_import'],
       ['name' => 'do_not_import'],
     ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status']);
     $participant = Participant::get()
@@ -363,13 +363,13 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
     $this->individualCreate([$this->getCustomFieldName() => 'secret code', 'first_name' => 'Bob', 'last_name' => 'Smith'], 'bob');
     $this->importCSV('participant_with_dedupe_match.csv', [
-      ['name' => 'event_id'],
-      ['name' => 'contact.first_name'],
-      ['name' => 'contact.last_name'],
-      ['name' => 'contact.' . $this->getCustomFieldName('text', 4)],
-      ['name' => 'role_id'],
-      ['name' => 'status_id'],
-      ['name' => 'register_date'],
+      ['name' => 'Participant.event_id'],
+      ['name' => 'Contact.first_name'],
+      ['name' => 'Contact.last_name'],
+      ['name' => 'Contact.' . $this->getCustomFieldName('text', 4)],
+      ['name' => 'Participant.role_id'],
+      ['name' => 'Participant.status_id'],
+      ['name' => 'Participant.register_date'],
     ]);
     $participant = Participant::get(FALSE)
       ->addWhere('contact_id', '=', $this->ids['Contact']['bob'])
@@ -389,12 +389,12 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->eventCreateUnpaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
     $this->individualCreate(['external_identifier' => 'abc', 'email' => 'jenny@example.com']);
     $mapper = [
-      ['name' => 'event_id'],
-      ['name' => 'participant_id'],
-      ['name' => 'contact_id'],
-      ['name' => 'contact.external_identifier'],
-      ['name' => 'contact.email_primary.email'],
-      ['name' => 'status_id'],
+      ['name' => 'Participant.event_id'],
+      ['name' => 'Participant.id'],
+      ['name' => 'Participant.contact_id'],
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'Contact.email_primary.email'],
+      ['name' => 'Participant.status_id'],
     ];
     foreach ($mapper as $index => $field) {
       if (!in_array($field['name'], $dataProvider)) {
@@ -410,9 +410,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   public function requiredFields(): array {
     return [
-      'contact_id' => [['contact_id', 'status_id', 'event_id']],
-      'external_identifier' => [['contact.external_identifier', 'status_id', 'event_id']],
-      'email' => [['contact.email_primary.email', 'status_id', 'event_id']],
+      'contact_id' => [['Participant.contact_id', 'Participant.status_id', 'Participant.event_id']],
+      'external_identifier' => [['Contact.external_identifier', 'Participant.status_id', 'Participant.event_id']],
+      'email' => [['Contact.email_primary.email', 'Participant.status_id', 'Participant.event_id']],
     ];
   }
 

@@ -92,10 +92,9 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public static function formRule($fields, $files, $self) {
     $mappedFields = $self->getMappedFields($fields['mapper']);
-    if (!in_array('id', $mappedFields)) {
+    if (!in_array('Participant.id', $mappedFields)) {
       $requiredError = $self->validateRequiredContactFields($fields['mapper']);
-      if (!in_array('event_id', $mappedFields)) {
-        // ID is the only field we need, if present.
+      if (!in_array('Participant.event_id', $mappedFields)) {
         $requiredError[] = ts('Missing required field: %1', [1 => 'Event']) . '<br />';
       }
     }

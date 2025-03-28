@@ -583,7 +583,6 @@ return [
       'add' => '5.20',
       'default' => FALSE,
       'usage' => [
-        'import',
         'export',
         'duplicate_matching',
       ],
