@@ -236,10 +236,7 @@ dl dl {
 #bootstrap-theme .has-error.checkbox label,
 #bootstrap-theme .has-error.radio-inline label,
 #bootstrap-theme .has-error.checkbox-inline label {
-  color: var(--crm-c-danger);
-}
-.crm-container .font-red {
-  color: var(--crm-c-red-dark);
+  color: var(--crm-c-danger-on-page-bg);
 }
 .crm-container td.tasklist a:visited,
 #bootstrap-theme .has-success .help-block,
@@ -252,7 +249,7 @@ dl dl {
 #bootstrap-theme .has-success.checkbox label,
 #bootstrap-theme .has-success.radio-inline label,
 #bootstrap-theme .has-success.checkbox-inline label {
-  color: var(--crm-c-success);
+  color: var(--crm-c-success-on-page-bg);
 }
 #bootstrap-theme .has-warning .help-block,
 #bootstrap-theme .has-warning .control-label,
@@ -264,7 +261,7 @@ dl dl {
 #bootstrap-theme .has-warning.checkbox label,
 #bootstrap-theme .has-warning.radio-inline label,
 #bootstrap-theme .has-warning.checkbox-inline label {
-  color: var(--crm-c-warning);
+  color: var(--crm-c-warning-on-page-bg);
 }
 .crm-container .disabled,
 .crm-container .crm-disabled,
@@ -316,16 +313,22 @@ dl dl {
   color: var(--crm-c-primary-hover);
 }
 .crm-container .text-success {
-  color: var(--crm-c-success);
+  color: var(--crm-c-success-on-page-bg);
 }
 .crm-container .text-info {
-  color: var(--crm-c-info);
+  color: var(--crm-c-info-on-page-bg);
 }
 .crm-container .text-warning {
-  color: var(--crm-c-warning);
+  color: var(--crm-c-warning-on-page-bg);
 }
 .crm-container .text-danger {
-  color: var(--crm-c-danger);
+  color: var(--crm-c-danger-on-page-bg);
+}
+.crm-container .text-primary {
+  color: var(--crm-c-primary-on-page-bg);
+}
+.crm-container .text-secondary {
+  color: var(--crm-c-secondary-on-page-bg);
 }
 .crm-container h1,
 .crm-container h2,
