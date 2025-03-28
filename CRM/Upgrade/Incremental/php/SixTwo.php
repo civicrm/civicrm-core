@@ -36,6 +36,14 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'required' => FALSE,
       'description' => ts('Configuration of the managed-entity when last stored'),
     ]);
+    $this->addTask('Add in domain_id column to the civicrm_acl_contact_cache_table', 'alterSchemaField', 'ACLContactCache', 'domain_id', [
+      'title'  => ts('Domain'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'description' => ts('Implicit FK to civicrm_domain'),
+      'required' => TRUE,
+      'default' => 1,
+    ]);
     $this->addTask('Set upload_date in file table', 'setFileUploadDate');
     $this->addTask('Set default for upload_date in file table', 'alterSchemaField', 'File', 'upload_date', [
       'title' => ts('File Upload Date'),
@@ -78,14 +86,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
         'callback' => ['CRM_Core_SelectValues', 'customGroupStyle'],
       ],
     ]);
-    $this->addTask('Add in domain_id column to the civicrm_acl_contact_cache_table', 'alterSchemaField', 'ACLContactCache', 'domain_id', [
-      'title'  => ts('Domain'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
-      'description' => ts('Implicit FK to civicrm_domain'),
-      'required' => TRUE,
-      'default' => 1,
-    ]);
+    $this->addExtensionTask('Enable CiviImport extension', ['civiimport']);
     $this->addTask('Fix Unique index on acl cache table with domain id', 'fixAclUniqueIndex');
   }
 
