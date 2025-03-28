@@ -409,7 +409,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       // specified dedupe rule (or the default Unsupervised if not specified).
       $requiredFields = $contactType === 'Individual' ? [[$requiredFields, 'external_identifier']] : [[$requiredFields, 'email', 'external_identifier']];
     }
-    $this->validateRequiredFields($requiredFields, $params, $prefixString);
+    $this->validateRequiredFields($requiredFields, $params, '', $prefixString);
   }
 
   /**
@@ -677,11 +677,18 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *     ['first_name', 'last_name']
    *   ]
    *   Means 'email' OR 'first_name AND 'last_name'.
+   * @param string $entityName
+   *   Entity name, if the entity is prefixed in the `getAvailableFields()` array
+   *   - we are working towards this being required.
    * @param string $prefixString
    *
    * @throws \CRM_Core_Exception Exception thrown if field requirements are not met.
    */
-  protected function validateRequiredFields(array $requiredFields, array $params, $prefixString = ''): void {
+  protected function validateRequiredFields(array $requiredFields, array $params, string $entityName = '', string $prefixString = ''): void {
+    if ($entityName) {
+      // @todo - make entityName required once all fields are prefixed.
+      $params = CRM_Utils_Array::prefixKeys($params, "$entityName.");
+    }
     $missingFields = $this->getMissingFields($requiredFields, $params);
     if (empty($missingFields)) {
       return;
@@ -1154,7 +1161,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   protected function validateParams(array $params): void {
     if (empty($params['id']) && empty($params[$this->baseEntity]['id'])) {
-      $this->validateRequiredFields($this->getRequiredFields(), $params[$this->baseEntity] ?? $params);
+      $this->validateRequiredFields($this->getRequiredFields(), $params[$this->baseEntity] ?? $params, $this->getImportEntities()[$this->baseEntity]['entity_field_prefix']);
     }
     $errors = [];
     foreach ($params as $key => $value) {
