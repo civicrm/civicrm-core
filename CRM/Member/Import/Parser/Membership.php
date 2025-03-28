@@ -75,7 +75,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
         'entity_name' => 'Membership',
         'entity_title' => ts('Membership'),
-        'entity_field_prefix' => '',
+        'entity_field_prefix' => 'Membership.',
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
       ],
       'Contact' => [
@@ -285,16 +285,21 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected function getImportableFields(string $contactType = 'Individual'): array {
     $fields = Civi::cache('fields')->get('membership_importable_fields' . $contactType);
     if (!$fields) {
-      $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']]
-        + (array) Membership::getFields()
-          ->addWhere('readonly', '=', FALSE)
-          ->addWhere('usage', 'CONTAINS', 'import')
-          ->setAction('save')
-          ->addOrderBy('title')
-          ->execute()->indexBy('name');
+      $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']];
+      $membershipFields = (array) Membership::getFields()
+        ->addWhere('readonly', '=', FALSE)
+        ->addWhere('usage', 'CONTAINS', 'import')
+        ->setAction('save')
+        ->addOrderBy('title')
+        ->execute()->indexBy('name');
+      foreach ($membershipFields as $fieldName => $field) {
+        $field['entity_instance'] = 'Membership';
+        $field['entity_prefix'] = 'Membership.';
+        $fields['Membership.' . $fieldName] = $field;
+      }
 
-      $contactFields = $this->getContactFields($this->getContactType(), 'contact');
-      $fields['contact_id'] = $contactFields['contact.id'];
+      $contactFields = $this->getContactFields($this->getContactType(), 'Contact');
+      $fields['contact_id'] = $contactFields['Contact.id'];
       $fields['contact_id']['match_rule'] = '*';
       $fields['contact_id']['entity'] = 'Contact';
       $fields['contact_id']['html']['label'] = $fields['contact_id']['title'];
