@@ -57,9 +57,9 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   protected function validateRequiredFields(array $importKeys): ?array {
     $errors = [];
     $requiredFields = [
-      'activity_date_time' => ts('Activity Date'),
-      'subject' => ts('Activity Subject'),
-      'activity_type_id' => ts('Activity Type ID'),
+      'Activity.activity_date_time' => ts('Activity Date'),
+      'Activity.subject' => ts('Activity Subject'),
+      'Activity.activity_type_id' => ts('Activity Type ID'),
     ];
 
     foreach ($requiredFields as $field => $title) {
@@ -94,8 +94,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
-   *
-   * @throws \CRM_Core_Exception
    */
   protected function getAvailableFields(): array {
     $return = [];
@@ -105,14 +103,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
         // but is now loaded in the Parser for the LexIM variant.
         continue;
       }
-      $prefix = '';
-      $entityInstance = $field['entity_instance'] ?? '';
-      if ($entityInstance === 'TargetContact' && !str_starts_with($name, 'target_contact.')) {
-        $prefix = 'target_contact.';
-      }
-      if ($entityInstance === 'SourceContact' && !str_starts_with($name, 'source_contact.')) {
-        $prefix = 'source_contact.';
-      }
+      $prefix = empty($field['entity_name']) ? '' : $field['entity_name'] . '.';
       $return[$prefix . $name] = $field['title'];
     }
     return $return;

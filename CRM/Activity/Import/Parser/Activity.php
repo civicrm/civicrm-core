@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 use Civi\Api4\Activity;
+use Civi\Api4\Contact;
 
 /**
  * Class to parse activity csv files.
@@ -66,8 +67,12 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
       $activityParams = $params['Activity'];
       $targetContactParams = $params['TargetContact'] ?? [];
       $sourceContactParams = $params['SourceContact'] ?? [];
-
+      $assigneeContactParams = $params['AssigneeContact'] ?? [];
+      if (array_keys($targetContactParams) === ['email_primary.email']) {
+        $targetContactParams['contact_type'] = 'Individual';
+      }
       $activityParams['target_contact_id'] = $this->getContactID($targetContactParams, empty($targetContactParams['id']) ? NULL : (int) $targetContactParams['id'], 'TargetContact', $this->getDedupeRulesForEntity('TargetContact'));
+      $activityParams['assignee_contact_id'] = $this->getContactID($assigneeContactParams, empty($assigneeContactParams['id']) ? NULL : (int) $assigneeContactParams['id'], 'AssigneeContact', $this->getDedupeRulesForEntity('AssigneeContact'));
 
       try {
         $activityParams['source_contact_id'] = $this->getContactID($sourceContactParams, empty($sourceContactParams['id']) ? NULL : (int) $sourceContactParams['id'], 'SourceContact', $this->getDedupeRulesForEntity('SourceContact'));
@@ -92,7 +97,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    * @return array
    */
   protected function getRequiredFields(): array {
-    return [['activity_type_id', 'activity_date_time']];
+    return [['Activity.activity_type_id', 'Activity.activity_date_time']];
   }
 
   /**
@@ -102,9 +107,63 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    */
   public function getImportEntities() : array {
     return [
-      'Activity' => ['text' => ts('Activity Fields'), 'is_contact' => FALSE, 'entity_field_prefix' => ''],
-      'TargetContact' => ['text' => ts('Target Contact Fields'), 'is_contact' => TRUE, 'entity_field_prefix' => 'target_contact.'],
-      'SourceContact' => ['text' => ts('Source Contact Fields'), 'is_contact' => TRUE, 'entity_field_prefix' => 'source_contact.'],
+      'Activity' => [
+        'text' => ts('Activity Fields'),
+        'entity_title' => ts('Activity'),
+        'is_contact' => FALSE,
+        'entity_field_prefix' => 'Activity.',
+        'actions' => [
+          ['id' => 'save', 'text' => ts('Create or Update using ID'), 'description' => ts('Skip if no match found')],
+        ],
+        'selected' => [
+          'action' => 'save',
+        ],
+        'default_action' => 'save',
+        'entity_name' => 'Activity',
+      ],
+      'TargetContact' => [
+        'text' => ts('Target Contact Fields'),
+        'entity_title' => ts('Target Contact'),
+        'is_contact' => TRUE,
+        'entity_field_prefix' => 'target_contact.',
+        'unique_fields' => ['external_identifier', 'id'],
+        'supports_multiple' => TRUE,
+        'actions' => $this->getActions(['select', 'ignore', 'update']),
+        'selected' => [
+          'action' => 'select',
+          'contact_type' => 'Individual',
+        ],
+        'default_action' => 'select',
+        'entity_name' => 'TargetContact',
+      ],
+      'SourceContact' => [
+        'text' => ts('Source Contact Fields'),
+        'entity_title' => ts('Source Contact'),
+        'is_contact' => TRUE,
+        'entity_field_prefix' => 'source_contact.',
+        'unique_fields' => ['external_identifier', 'id'],
+        'supports_multiple' => FALSE,
+        'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore']) : $this->getActions(['select', 'update', 'save']),
+        'selected' => [
+          'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
+        ],
+        'default_action' => 'select',
+        'entity_name' => 'SourceContact',
+      ],
+      'AssigneeContact' => [
+        'text' => ts('assignee Contact Fields'),
+        'entity_title' => ts('Assignee Contact'),
+        'is_contact' => TRUE,
+        'entity_field_prefix' => 'AssigneeContact.',
+        'unique_fields' => ['external_identifier', 'id'],
+        'supports_multiple' => TRUE,
+        'actions' => $this->getActions(['select', 'ignore']),
+        'selected' => [
+          'action' => 'ignore',
+        ],
+        'default_action' => 'ignore',
+        'entity_name' => 'AssigneeContact',
+      ],
     ];
   }
 
@@ -115,34 +174,35 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
-      $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']]
-        + (array) Activity::getFields()
-          ->addWhere('readonly', '=', FALSE)
-          ->addWhere('usage', 'CONTAINS', 'import')
-          ->setAction('save')
-          ->addOrderBy('title')
-          ->execute()->indexBy('name');
-      $contactFields = $this->getContactFields('Individual');
-      foreach ($contactFields as &$field) {
-        // At this stage all fields except those specifically marked are the target_contact.
-        $field['entity_instance'] = 'TargetContact';
+      $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']];
+      $activityFields = (array) Activity::getFields()
+        ->addWhere('readonly', '=', FALSE)
+        ->addWhere('usage', 'CONTAINS', 'import')
+        ->setAction('save')
+        ->addOrderBy('title')
+        ->execute()->indexBy('name');
+      foreach ($activityFields as $fieldName => $field) {
+        $field['entity_instance'] = 'Activity';
+        $field['entity_prefix'] = 'Activity.';
+        $fields['Activity.' . $fieldName] = $field;
       }
-      $fields['target_contact.id'] = $contactFields['id'];
-      $fields['target_contact.id']['entity'] = 'Contact';
-      $fields['target_contact.id']['match_rule'] = '*';
-      $fields['source_contact.id'] = $fields['target_contact.id'];
-      $fields['source_contact.id']['entity_instance'] = 'SourceContact';
-      $fields['source_contact.id']['title'] .= ' ' . ts('(match to source contact)');
-      $fields['target_contact.id']['title'] .= ' ' . ts('(match to target contact)');
-      unset($contactFields['id']);
+      $idSchema = Contact::getFields(FALSE)
+        ->addWhere('name', '=', 'id')
+        ->execute()->single();
+      // For other entities contact_id is part of the main entity - that doesn't work here so
+      // hacking the ID in since the function won't add it.
+      $contactFields = [];
+      foreach (['SourceContact', 'TargetContact', 'AssigneeContact'] as $activityContactType) {
+        $matchText = ' ' . ts('(match to %1)', [1 => $activityContactType]);
+        $contactFields[$activityContactType . '.id'] = $idSchema;
+        $contactFields[$activityContactType . '.id']['title'] .= $matchText;
+        $contactFields[$activityContactType . '.id']['match_rule'] = '*';
+        $contactFields[$activityContactType . '.id']['entity_instance'] = $activityContactType;
+        $contactFields[$activityContactType . '.id']['contact_type'] = ['Individual', 'Organization', 'Household'];
+        $contactFields += $this->getContactFields('Individual', $activityContactType);
+      }
 
       $fields += $contactFields;
-      $fields['target_contact.external_identifier'] = $contactFields['external_identifier'];
-      $fields['target_contact.external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' (target contact)';
-      $fields['source_contact.external_identifier'] = $contactFields['external_identifier'];
-      $fields['source_contact.external_identifier']['entity_instance'] = 'SourceContact';
-      $fields['source_contact.external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' (source contact)';
-      unset($fields['external_identifier']);
       $this->importableFieldsMetadata = $fields;
     }
   }

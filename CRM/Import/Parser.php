@@ -214,16 +214,16 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected function getContactFields(string $contactType, ?string $prefix = ''): array {
     $contactFields = $this->getAllContactFields('');
     $dedupeFields = $this->getDedupeFields($contactType);
-
+    $matchText = ' ' . ts('(match to %1)', [1 => $prefix]);
     foreach ($dedupeFields as $fieldName => $dedupeField) {
       if (!isset($contactFields[$fieldName])) {
         continue;
       }
-      $contactFields[$fieldName]['title'] . ' ' . ts('(match to contact)');
+      $contactFields[$fieldName]['title'] .= $matchText;
       $contactFields[$fieldName]['match_rule'] = $this->getDefaultRuleForContactType($contactType);
     }
 
-    $contactFields['external_identifier']['title'] .= (' ' . ts('(match to contact)'));
+    $contactFields['external_identifier']['title'] .= $matchText;
     $contactFields['external_identifier']['match_rule'] = '*';
     if ($prefix) {
       $prefixedFields = [];
@@ -1161,7 +1161,15 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   protected function validateParams(array $params): void {
     if (empty($params['id']) && empty($params[$this->baseEntity]['id'])) {
-      $this->validateRequiredFields($this->getRequiredFields(), $params[$this->baseEntity] ?? $params, $this->getImportEntities()[$this->baseEntity]['entity_field_prefix']);
+      $entityConfiguration = $this->getImportEntities()[$this->baseEntity];
+      $entity = '';
+      if (!empty($entityConfiguration['entity_field_prefix'])) {
+        // entity_field_prefix is our current way of showing if a table is prefixed
+        // it might change to only using entity_name based on thinking in
+        // https://github.com/civicrm/civicrm-core/pull/32317
+        $entity = $entityConfiguration['entity_name'];
+      }
+      $this->validateRequiredFields($this->getRequiredFields(), $params[$this->baseEntity] ?? $params, $entity);
     }
     $errors = [];
     foreach ($params as $key => $value) {
@@ -1198,6 +1206,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
     elseif (is_array($value)) {
       foreach ($value as $innerKey => $innerValue) {
+        if (!$prefixString && !isset($this->importableFieldsMetadata[$innerKey]) && isset($this->importableFieldsMetadata[$key . '.' . $innerKey])) {
+          $innerKey = $key . '.' . $innerKey;
+        }
         $result = $this->getInvalidValues($innerValue, $innerKey, $prefixString);
         if ($result === [TRUE]) {
           $metadata = $this->getFieldMetadata($key);
@@ -1348,12 +1359,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   public function getMappedRow(array $values): array {
     $params = [];
     foreach ($this->getFieldMappings() as $i => $mappedField) {
-      if ($mappedField['name'] === 'do_not_import') {
+      if (!isset($mappedField['name']) || $mappedField['name'] === 'do_not_import') {
         continue;
       }
       if ($mappedField['name']) {
         $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-        $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
+        $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity_name'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
         if ($entity) {
           // Split values into arrays by entity.
           // Apiv4 name is currently only set for contact, & only in cases where it would
@@ -1378,15 +1389,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return array
    */
   protected function getFieldMappings(): array {
-    $mappedFields = [];
-    $mapper = $this->getSubmittedValue('mapper');
-    foreach ($mapper as $i => $mapperRow) {
-      // Cast to an array as it will be a string for membership
-      // and any others we simplify away from using hierselect for a single option.
-      $mappedField = $this->getMappingFieldFromMapperInput((array) $mapperRow, 0, $i);
-      // Just for clarity since 0 is a pseudo-value
-      unset($mappedField['mapping_id']);
-      $mappedFields[] = $mappedField;
+    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    if (empty($mappedFields)) {
+      $mapper = $this->getSubmittedValue('mapper');
+      foreach ($mapper as $i => $mapperRow) {
+        // Cast to an array as it will be a string for membership
+        // and any others we simplify away from using hierselect for a single option.
+        $mappedField = $this->getMappingFieldFromMapperInput((array) $mapperRow, 0, $i);
+        // Just for clarity since 0 is a pseudo-value
+        unset($mappedField['mapping_id']);
+        $mappedFields[] = $mappedField;
+      }
     }
     return $mappedFields;
   }
