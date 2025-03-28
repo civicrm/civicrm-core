@@ -15,15 +15,15 @@ This release makes a series of changes to how emphasis colours (ie primary/succe
  - FIXED - contrast ratio of AAA added to multiple emphasis colour/text interactions - many were AA or worse (e.g. Minetta Warning/amber, Walbrook blue/primary/info, success, danger).
  - ADDED CSS VARIABLES
     --crm-c-info-light - lighter shade of info colour from --crm-alert-info-bg
-    --crm-c-info-on-light - new value for 'text-info'
+    --crm-c-info-on-page-bg - new value for 'text-info'
     --crm-c-warning-light - lighter shade of warning from --crm-alert-warning-bg
-    --crm-c-warning-on-light - new value for 'text-warning'
+    --crm-c-warning-on-page-bg - new value for 'text-warning'
     --crm-c-danger-light - lighter shade of danger from --crm-alert-danger-bg
-    --crm-c-danger-on-light - new value for 'text-danger'
+    --crm-c-danger-on-page-bg - new value for 'text-danger'
     --crm-c-success-light - lighter shade of success from --crm-alert-success-bg
-    --crm-c-success-on-light - new value for 'text-success'
-    --crm-c-primary-on-light - new value for 'text-primary' - SearchKit outputs this
-    --crm-c-secondary-on-light - new value for 'text-secondary' - SearchKit outputs this
+    --crm-c-success-on-page-bg - new value for 'text-success'
+    --crm-c-primary-on-page-bg - new value for 'text-primary' - SearchKit outputs this
+    --crm-c-secondary-on-page-bg - new value for 'text-secondary' - SearchKit outputs this
 
 1.4.2-6.2alpha
  - FIXED - today's date background on date-picker (https://lab.civicrm.org/dev/core/-/issues/5807).

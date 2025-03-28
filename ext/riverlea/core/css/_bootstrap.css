@@ -1809,7 +1809,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
   border-color: var(--crm-alert-success-border);
 }
 #bootstrap-theme .has-success .form-control-feedback {
-  color: var(--crm-c-success-on-light);
+  color: var(--crm-c-success-on-page-bg);
 }
 #bootstrap-theme .has-warning .form-control {
   border-color: var(--crm-c-warning);

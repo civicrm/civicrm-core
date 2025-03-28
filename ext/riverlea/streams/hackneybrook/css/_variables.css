@@ -24,11 +24,11 @@
   --crm-c-primary: var(--crm-c-gray-025);
   --crm-c-primary-text: var(--crm-c-text);
   --crm-c-primary-hover-text: var(--crm-c-text);
-  --crm-c-primary-on-light: var(--crm-c-gray-800);
+  --crm-c-primary-on-page-bg: var(--crm-c-gray-800);
   --crm-c-secondary: var(--crm-c-gray-025);
   --crm-c-secondary-text: var(--crm-c-text);
   --crm-c-secondary-hover-text: var(--crm-c-text);
-  --crm-c-secondary-on-light: var(--crm-c-gray-900);
+  --crm-c-secondary-on-page-bg: var(--crm-c-gray-900);
   --crm-c-info: var(--crm-c-blue-darker);
   /* Type */
   --crm-heading-padding: var(--crm-s2) var(--crm-m2);

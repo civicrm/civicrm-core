@@ -52,12 +52,12 @@
   --crm-input-description: var(--crm-input-label-color);
   --crm-filter-bg: var(--crm-c-dkblue-02);
   /* Emphasis colours */
-  --crm-c-info-on-light: var(--crm-c-secondary);
-  --crm-c-danger-on-light: var(--crm-btn-danger-bg);
-  --crm-c-warning-on-light: var(--crm-c-warning-light);
-  --crm-c-success-on-light: var(--crm-c-success-light);
-  --crm-c-primary-on-light: var(--crm-c-secondary);
-  --crm-c-secondary-on-light: var(--crm-c-secondary);
+  --crm-c-info-on-page-bg: var(--crm-c-secondary);
+  --crm-c-danger-on-page-bg: var(--crm-btn-danger-bg);
+  --crm-c-warning-on-page-bg: var(--crm-c-warning-light);
+  --crm-c-success-on-page-bg: var(--crm-c-success-light);
+  --crm-c-primary-on-page-bg: var(--crm-c-secondary);
+  --crm-c-secondary-on-page-bg: var(--crm-c-secondary);
   --crm-alert-danger-bg: var(--crm-c-danger);
   --crm-alert-danger-text: var(--crm-c-danger-text);
   --crm-alert-info-bg: var(--crm-c-blue-darker);

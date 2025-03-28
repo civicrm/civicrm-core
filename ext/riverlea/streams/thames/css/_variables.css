@@ -84,7 +84,7 @@
   --crm-c-secondary-hover: #a1cef3; /* thames */
   --crm-c-secondary-text: var(--crm-c-blue-darker); /* thames */
   --crm-c-secondary-hover-text: var(--crm-c-text-light); /* thames todo */
-  --crm-c-secondary-on-light: var(--crm-c-blue-darker);
+  --crm-c-secondary-on-page-bg: var(--crm-c-blue-darker);
   --crm-c-success: var(--crm-c-green-dark);
   --crm-c-success-text: var(--crm-c-text-light);
   --crm-c-danger: var(--crm-c-red-dark); /* thames */

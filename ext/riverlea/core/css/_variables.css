@@ -65,28 +65,28 @@
   --crm-c-primary-hover: hsl(from var(--crm-c-primary) h s calc(l - 10));
   --crm-c-primary-text: var(--crm-c-text-light);
   --crm-c-primary-hover-text: var(--crm-c-text-light);
-  --crm-c-primary-on-light: var(--crm-c-primary-hover);
+  --crm-c-primary-on-page-bg: var(--crm-c-primary-hover);
   --crm-c-secondary: #5d677b;
   --crm-c-secondary-hover: hsl(from var(--crm-c-secondary) h s calc(l - 10));
   --crm-c-secondary-text: var(--crm-c-text-light);
   --crm-c-secondary-hover-text: var(--crm-c-text-light);
-  --crm-c-secondary-on-light: var(--crm-c-secondary-hover);
+  --crm-c-secondary-on-page-bg: var(--crm-c-secondary-hover);
   --crm-c-success: var(--crm-c-green-dark); /* Main colour for emphasis */
   --crm-c-success-text: var(--crm-c-text-light); /* Text colour on top of that, usually text-light or text-dark */
   --crm-c-success-light: var(--crm-c-green-light); /* Light version of emphasis col, for alert bgs, and emphasis on dark bgs */
-  --crm-c-success-on-light: var(--crm-c-success); /* Text colour on top of light, usually text-light or text-dark but could be a tint */
+  --crm-c-success-on-page-bg: var(--crm-c-success); /* Text colour on top of light, usually text-light or text-dark but could be a tint */
   --crm-c-warning: var(--crm-c-amber);
   --crm-c-warning-text: var(--crm-c-text-light);
   --crm-c-warning-light: var(--crm-c-yellow-light);
-  --crm-c-warning-on-light: #a94303;
+  --crm-c-warning-on-page-bg: #a94303;
   --crm-c-danger: var(--crm-c-red-dark);
   --crm-c-danger-text: var(--crm-c-text-light);
   --crm-c-danger-light: var(--crm-c-red-light);
-  --crm-c-danger-on-light: var(--crm-c-danger);
+  --crm-c-danger-on-page-bg: var(--crm-c-danger);
   --crm-c-info: var(--crm-c-blue-dark);
   --crm-c-info-text: var(--crm-c-text-light);
   --crm-c-info-light: var(--crm-c-blue-light);
-  --crm-c-info-on-light: var(--crm-c-info);
+  --crm-c-info-on-page-bg: var(--crm-c-info);
 /* Shadows */
   --crm-block-shadow: unset;
   --crm-popup-shadow: 0 3px 18px 0 rgba(48,40,40,.25);

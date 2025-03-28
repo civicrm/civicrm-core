@@ -48,19 +48,19 @@
   --crm-c-success: var(--crm-c-green);
   --crm-c-success-text: var(--crm-c-text);
   --crm-c-success-light: var(--crm-c-green-light);
-  --crm-c-success-on-light: var(--crm-c-green-dark);
+  --crm-c-success-on-page-bg: var(--crm-c-green-dark);
   --crm-c-warning: var(--crm-c-amber);
   --crm-c-warning-text: var(--crm-c-text);
   --crm-c-warning-light: var(--crm-c-amber-light);
-  --crm-c-warning-on-light: #873502;
+  --crm-c-warning-on-page-bg: #873502;
   --crm-c-danger: var(--crm-c-red);
   --crm-c-danger-text: var(--crm-c-text-light);
   --crm-c-danger-light: var(--crm-c-red-light);
-  --crm-c-danger-on-light: var(--crm-c-danger);
+  --crm-c-danger-on-page-bg: var(--crm-c-danger);
   --crm-c-info: var(--crm-c-blue);
   --crm-c-info-text: var(--crm-c-text);
   --crm-c-info-light: var(--crm-c-blue-light);
-  --crm-c-info-on-light: var(--crm-c-blue-darker);
+  --crm-c-info-on-page-bg: var(--crm-c-blue-darker);
 /* Shadows */
   --crm-block-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
   --crm-popup-shadow: var(--crm-block-shadow);
@@ -123,9 +123,9 @@
   --crm-expand2-body-padding: 0;
 /* Alerts */
   --crm-alert-padding: var(--crm-r) var(--crm-r2);
-  --crm-alert-success-text: var(--crm-c-success-on-light);
+  --crm-alert-success-text: var(--crm-c-success-on-page-bg);
   --crm-alert-danger-text: var(--crm-c-text);
-  --crm-alert-info-text: var(--crm-c-info-on-light);
+  --crm-alert-info-text: var(--crm-c-info-on-page-bg);
 /* Form */
   --crm-form-block-padding: var(--crm-r);
   --crm-form-block-border-radius: 0;

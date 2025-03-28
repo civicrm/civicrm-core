@@ -300,7 +300,7 @@ table.advmultiselect {
   color: var(--crm-c-warning-text);
 }
 .crm-container .panel-danger > .panel-heading {
-  color: var(--crm-c-danger-on-light);
+  color: var(--crm-c-danger-on-page-bg);
   background-color: var(--crm-c-danger);
 }
 .crm-container .panel-danger > .panel-heading .badge,
