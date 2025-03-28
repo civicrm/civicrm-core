@@ -108,7 +108,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @return array
    */
   public function getRequiredFieldsForCreate(): array {
-    return ['financial_type_id', 'total_amount'];
+    return ['Contribution.financial_type_id', 'Contribution.total_amount'];
   }
 
   /**
@@ -117,7 +117,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @return array
    */
   public function getRequiredFieldsForMatch(): array {
-    return [['id'], ['invoice_id'], ['trxn_id']];
+    return [['Contribution.id'], ['Contribution.invoice_id'], ['Contribution.trxn_id']];
   }
 
   /**
@@ -207,12 +207,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   protected function validateParams(array $params): void {
 
     if (empty($params['Contribution']['id'])) {
-      $this->validateRequiredFields($this->getRequiredFields(), $params['Contribution']);
+      $this->validateRequiredFields($this->getRequiredFields(), $params['Contribution'], 'Contribution');
     }
     $errors = [];
     foreach ($params as $entity => $values) {
       foreach ($values as $key => $value) {
-        $errors = array_merge($this->getInvalidValues($value, $key), $errors);
+        $errors = array_merge($this->getInvalidValues($value, $key, $entity . ' '), $errors);
       }
     }
     if ($errors) {
@@ -234,48 +234,40 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
-      $fields = ['' => ['title' => ts('- do not import -')]];
-
       $note = CRM_Core_DAO_Note::import();
-      // @todo - replace this with (array) Contribution::getFields()
-      //      ->addWhere('readonly', '=', FALSE)
-      //      ->addWhere('usage', 'CONTAINS', 'import')
-      $tmpFields = CRM_Contribute_DAO_Contribution::import();
-      // Unravel the unique fields - once more metadata work is done on apiv4 we
-      // will use that instead to get them.
-      foreach (['contribution_cancel_date', 'contribution_check_number', 'contribution_campaign_id', 'contribution_id', 'contribution_contact_id', 'contribution_source'] as $uniqueField) {
-        $realField = substr($uniqueField, 13);
-        $tmpFields[$realField] = $tmpFields[$uniqueField];
-        unset($tmpFields[$uniqueField]);
-      }
-      // I haven't un-done this unique field yet cos it's more complex.
-      $tmpFields['contact_id']['title'] = $tmpFields['contact_id']['html']['label'] = $tmpFields['contact_id']['title'] . ' ' . ts('(match to contact)');
-      $tmpFields['contact_id']['contact_type'] = ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'];
-      $tmpFields['contact_id']['match_rule'] = '*';
-      $tmpContactField = $this->getContactFields($this->getContactType());
-      foreach ($tmpContactField as $contactField) {
-        $fields['contact.' . $contactField['name']] = array_merge($contactField, [
-          'title' => ts('Contact') . ' ' . $contactField['title'],
-          'softCredit' => FALSE,
-          'entity' => 'Contact',
-          'entity_instance' => 'Contact',
-          'entity_prefix' => 'contact.',
-        ]);
-      }
-      $fields = array_merge($fields, $tmpFields);
-      $fields = array_merge($fields, $note);
-      $apiv4 = Contribution::getFields(TRUE)->addWhere('custom_field_id', '>', 0)->execute();
-      $customFields = [];
-      foreach ($apiv4 as $apiv4Field) {
-        $customFields[$apiv4Field['name']] = $apiv4Field;
-      }
-      $fields = array_merge($fields, $customFields);
+      $fields = [
+        '' => [
 
-      $fields['soft_credit.contact.id'] = [
+          'title' => '- ' . ts('do not import') . ' -',
+        ],
+      ];
+      $contributionFields = (array) Contribution::getFields()
+        ->addWhere('usage', 'CONTAINS', 'import')
+        ->setAction('save')
+        ->addOrderBy('title')
+        ->execute()->indexBy('name');
+      foreach ($contributionFields + ['note' => $note['note']] as $fieldName => $field) {
+        $field['entity_instance'] = 'Contribution';
+        $field['entity_prefix'] = 'Contribution.';
+        $fields['Contribution.' . $fieldName] = $field;
+      }
+      $contactFields = $this->getContactFields($this->getContactType(), 'Contact');
+      $fields['Contribution.contact_id'] = $contactFields['Contact.id'];
+      $fields['Contribution.contact_id']['match_rule'] = '*';
+      $fields['Contribution.contact_id']['entity'] = 'Contribution';
+      $fields['Contribution.contact_id']['html']['label'] = $fields['Contribution.contact_id']['title'];
+      $fields['Contribution.contact_id']['title'] .= ' ' . ts('(match to contact)');
+      $fields['Contribution.contact_id']['name'] = 'contact_id';
+      $fields['Contribution.contact_id']['entity_instance'] = 'Contribution';
+      $fields['Contribution.contact_id']['contact_type'] = ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'];
+      unset($contactFields['Contact.id']);
+      $fields += $contactFields + $this->getContactFields($this->getContactType(), 'SoftCreditContact');
+
+      $fields['SoftCredit.contact.id'] = [
         'title' => ts('Soft Credit Contact ID'),
         'softCredit' => TRUE,
         'name' => 'id',
-        'entity' => 'Contact',
+        'entity'  => 'Contact',
         'entity_instance' => 'SoftCreditContact',
         'entity_prefix' => 'soft_credit.contact.',
         'options' => FALSE,
@@ -283,15 +275,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'contact_type' => ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'],
         'match_rule' => '*',
       ];
-      foreach ($tmpContactField as $contactField) {
-        $fields['soft_credit.contact.' . $contactField['name']] = array_merge($contactField, [
-          'title' => ts('Soft Credit Contact') . ' ' . $contactField['title'],
-          'softCredit' => TRUE,
-          'entity' => 'Contact',
-          'entity_instance' => 'SoftCreditContact',
-          'entity_prefix' => 'soft_credit.contact.',
-        ]);
-      }
 
       // add pledge fields only if its is enabled
       if (CRM_Core_Permission::access('CiviPledge')) {
@@ -348,7 +331,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
         'entity_name' => 'Contribution',
         'entity_title' => ts('Contribution'),
-        'entity_field_prefix' => '',
+        'entity_field_prefix' => 'Contribution.',
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
       ],
       'Contact' => [
@@ -362,7 +345,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           'contact_type' => $this->getSubmittedValue('contactType'),
           'dedupe_rule' => $this->getDedupeRule($this->getContactType())['name'],
         ],
-        'entity_field_prefix' => 'contact.',
+        'entity_field_prefix' => 'Contact.',
         'default_action' => 'select',
         'entity_name' => 'Contact',
         'entity_title' => ts('Contribution Contact'),
@@ -383,7 +366,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         ],
         'default_action' => 'ignore',
         'entity_name' => 'SoftCreditContact',
-        'entity_field_prefix' => 'soft_credit.contact.',
+        'entity_field_prefix' => 'SoftCreditContact.',
         'entity_title' => ts('Soft Credit Contact'),
         'entity_data' => [
           'soft_credit_type_id' => [
