@@ -403,7 +403,7 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function alterSchemaField($ctx, string $entityName, string $fieldName, array $fieldSpec): bool {
     $tableName = Civi::entity($entityName)->getMeta('table');
-    $fieldSql = Civi::schemaHelper()->generateFieldSql($fieldSpec);
+    $fieldSql = Civi::schemaHelper()->arrayToSql($fieldSpec);
     if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
       return self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
     }
