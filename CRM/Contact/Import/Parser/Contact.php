@@ -27,6 +27,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   private $externalIdentifiers = [];
 
+  protected $baseEntity = 'Contact';
+
   /**
    * Relationship labels.
    *
