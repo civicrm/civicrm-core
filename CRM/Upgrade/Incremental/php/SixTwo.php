@@ -87,6 +87,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'default' => 1,
     ]);
     $this->addTask('Fix Unique index on acl cache table with domain id', 'fixAclUniqueIndex');
+    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Activity');
   }
 
   public static function setFileUploadDate(): bool {
@@ -116,6 +117,144 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_acl_contact_cache', 'UI_user_contact_operation');
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl_contact_cache ADD UNIQUE INDEX `UI_user_contact_operation` (`domain_id`, `user_id`, `contact_id`, `operation`)");
     return TRUE;
+  }
+
+  /**
+   * @param string $importType
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public static function getMappingTypeID(string $importType): int {
+    $mappingTypeID = (int) CRM_Core_DAO::singleValueQuery("
+      SELECT option_value.value
+      FROM civicrm_option_value option_value
+        INNER JOIN civicrm_option_group option_group
+        ON option_group.id = option_value.option_group_id
+        AND option_group.name =  'mapping_type'
+      WHERE option_value.name = '{$importType}'");
+    return $mappingTypeID;
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext|null $context
+   * @param string $entity
+   *
+   * @return true
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function upgradeImportMappingFields($context, string $entity): bool {
+    $mappingFields = self::getMappingFields($entity);
+    $fieldsToConvert = [];
+    while ($mappingFields->fetch()) {
+      $fieldsToConvert[$mappingFields->name] = self::getConvertedName($mappingFields->name, $entity);
+      // Convert the field.
+      CRM_Core_DAO::executeQuery(' UPDATE civicrm_mapping_field SET name = %1 WHERE id = %2', [
+        1 => [$fieldsToConvert[$mappingFields->name], 'String'],
+        2 => [$mappingFields->id, 'Integer'],
+      ]);
+    }
+
+    $userJob = new \CRM_Core_DAO_UserJob();
+    $userJob->job_type = strtolower($entity) . '_import';
+    $userJob->find();
+    while ($userJob->fetch()) {
+      $metadata = json_decode($userJob->metadata, TRUE);
+      if (empty($metadata['import_mappings']) && !empty($metadata['Template']['mapping_id'])) {
+        $mappingByID = self::getImportMappings($entity, $metadata['Template']['mapping_id']);
+        $metadata['import_mappings'] = reset($mappingByID);
+      }
+      foreach ($metadata['import_mappings'] as &$mapping) {
+        if (!empty($mapping['name'])) {
+          $mapping['name'] = self::getConvertedName($mapping['name'], $entity);
+        }
+      }
+      $userJob->metadata = json_encode($metadata);
+      $userJob->save();
+    }
+    self::ensureTemplateJobsExist($entity);
+    return TRUE;
+  }
+
+  public static function ensureTemplateJobsExist(string $entity) {
+    $mappings = self::getImportMappings($entity);
+    foreach ($mappings as $mappingName => $mapping) {
+      if (!CRM_Core_DAO::singleValueQuery('
+       SELECT id FROM civicrm_user_job WHERE name = %1', [1 => ['import_' . $mappingName, 'String']])) {
+        // Create a User Job.
+        $userJob = new \CRM_Core_DAO_UserJob();
+        $userJob->name = 'import_' . $mappingName;
+        $userJob->is_template = TRUE;
+        $userJob->job_type = strtolower($entity) . '_import';
+        $userJob->status_id = 2;
+        $userJob->metadata = json_encode([
+          'import_mappings' => $mapping,
+        ]);
+        $userJob->save();
+      }
+    }
+  }
+
+  /**
+   * @param string $mappingFieldsName
+   * @param string $type
+   *
+   * @return string
+   */
+  public static function getConvertedName(string $mappingFieldsName, string $type): string {
+    $prefixMap = [
+      'target_contact' => 'TargetContact',
+      'source_contact' => 'SourceContact',
+    ];
+    if (empty($mappingFieldsName) || $mappingFieldsName === 'do_not_import') {
+      return $mappingFieldsName;
+    }
+    $parts = explode('.', $mappingFieldsName);
+    if (!isset($prefixMap[$parts[0]])) {
+      // This is a 'native' mapping, add a prefix.
+      return $type . '.' . $mappingFieldsName;
+    }
+    else {
+      return str_replace($parts[0], $prefixMap[$parts[0]], $mappingFieldsName);
+    }
+  }
+
+  /**
+   * @param string $entity
+   *
+   * @return \CRM_Core_DAO|object
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function getMappingFields(string $entity) {
+    $importType = 'Import ' . $entity;
+    $mappingFields = CRM_Core_DAO::executeQuery('
+      SELECT field.id, field.name, mapping.id as mapping_id, mapping.name as mapping_name FROM civicrm_mapping_field field
+        INNER JOIN civicrm_mapping mapping
+          ON field.mapping_id = mapping.id
+          AND mapping_type_id = ' . self::getMappingTypeID($importType));
+    return $mappingFields;
+  }
+
+  /**
+   * @param string $entity
+   * @param int|null $id
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function getImportMappings(string $entity, ?int $id = NULL): array {
+    $mappingFields = self::getMappingFields($entity);
+    $mappings = [];
+    while ($mappingFields->fetch()) {
+      if ($id && $mappingFields->mapping_id != $id) {
+        continue;
+      }
+      $mappings[$mappingFields->mapping_name][] = ['name' => ($mappingFields->name === 'do_not_import' ? '' : $mappingFields->name)];
+    }
+    return $mappings;
   }
 
 }
