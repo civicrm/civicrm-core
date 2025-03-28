@@ -26,6 +26,8 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
    * Create a contact with middle name "Donald". Use the custom form to change the middle
    * name to "Donny".
    *
+   * @group ornery
+   *
    * @return void
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    * @throws \CRM_Core_Exception
