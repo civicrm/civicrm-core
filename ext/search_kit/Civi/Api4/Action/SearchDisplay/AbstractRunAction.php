@@ -200,7 +200,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
    */
   private function formatColumn(array $column, array $data, array $settings) {
-    $column += ['rewrite' => NULL, 'label' => NULL, 'key' => ''];
+    $column += ['rewrite' => NULL, 'label' => NULL, 'key' => '', 'type' => NULL];
     $out = [];
     switch ($column['type']) {
       case 'field':
