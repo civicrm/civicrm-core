@@ -516,7 +516,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
         $defaults["mapper[$i]"] = $this->defaultFromHeader($columnHeader, $headerPatterns);
       }
-      else {
+      elseif (!isset($defaults["mapper[$i]"])) {
         $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
       }
     }
