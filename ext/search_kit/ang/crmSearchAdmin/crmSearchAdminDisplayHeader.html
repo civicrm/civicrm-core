@@ -3,10 +3,10 @@
     <label for="crm-search-admin-display-label">{{:: ts('Name') }} <span class="crm-marker">*</span></label>
     <input id="crm-search-admin-display-label" type="text" class="form-control" ng-model="$ctrl.display.label" required placeholder="{{:: ts('Untitled') }}"/>
     <div class="form-control" ng-class="{disabled: !$ctrl.parent.isSuperAdmin}" title="{{:: $ctrl.parent.aclBypassHelp }}">
-      <label>
+      <label ng-class="$ctrl.display.acl_bypass ? 'label-danger' : 'label-success'">
         <input type="checkbox" ng-if="$ctrl.parent.isSuperAdmin" ng-model="$ctrl.display.acl_bypass" style="display: none;">
-        <i class="crm-i fa-lock text-success" ng-if="!$ctrl.display.acl_bypass"></i>
-        <i class="crm-i fa-unlock text-danger" ng-if="$ctrl.display.acl_bypass"></i>
+        <i class="crm-i fa-lock" ng-if="!$ctrl.display.acl_bypass"></i>
+        <i class="crm-i fa-unlock" ng-if="$ctrl.display.acl_bypass"></i>
         <span>{{ $ctrl.display.acl_bypass ? ts('Bypass Permissions') : ts('Enforce Permissions') }}</span>
       </label>
     </div>

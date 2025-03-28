@@ -45,7 +45,7 @@
             </a>
           </li>
           <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab.match('txActive|original') && !$ctrl.hasDraft() && $ctrl.allowDraft()">
-            <a crm-icon="fa-plus" class="nav-link text-success" ng-click="$ctrl.createDraft($ctrl.records[$ctrl.tab])">
+            <a crm-icon="fa-plus" class="nav-link btn-success" ng-click="$ctrl.createDraft($ctrl.records[$ctrl.tab])">
               {{:: ts('Create draft') }}
             </a>
           </li>
@@ -60,7 +60,7 @@
             </a>
           </li>
           <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab === 'txDraft'">
-            <a crm-icon="fa-rocket" class="nav-link text-success" crm-confirm="{title: ts('Activate draft?'), message: ts('Are you sure you want to activate this draft?')}" on-yes="$ctrl.activateDraft()">
+            <a crm-icon="fa-rocket" class="nav-link btn-success" crm-confirm="{title: ts('Activate draft?'), message: ts('Are you sure you want to activate this draft?')}" on-yes="$ctrl.activateDraft()">
               {{:: ts('Activate draft') }}
             </a>
           </li>

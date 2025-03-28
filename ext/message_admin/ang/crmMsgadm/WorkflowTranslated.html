@@ -27,7 +27,7 @@
       <td>{{record.tx_language_label || ts('Standard')}}</td>
       <td>
         <span ng-if="!record.tx_language || !!record.tx_statuses.active">
-          <a class="text-success" crm-icon="fa-file-text" title="{{ts('Edit current revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}" ng-href="{{$ctrl.editUrl(record)}}">{{:: ts('Current') }}</a>
+          <a class="btn-success" crm-icon="fa-file-text" title="{{ts('Edit current revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}" ng-href="{{$ctrl.editUrl(record)}}">{{:: ts('Current') }}</a>
         </span>
         <span ng-if="!(!record.tx_language || !!record.tx_statuses.active)">
           <span class="text-danger" crm-icon="fa-file-text" title="{{ts('No current revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}">{{:: ts('Current') }}</span>
