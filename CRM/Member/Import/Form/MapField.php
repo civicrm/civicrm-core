@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Member_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Build the form object.
