@@ -76,12 +76,12 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
   public static function formRule($fields, $files, $self) {
     $errors = [];
     $mappedFields = $self->getMappedFields($fields['mapper']);
-    if (!in_array('id', $mappedFields)) {
+    if (!in_array('Membership.id', $mappedFields)) {
       $errors = $self->validateRequiredContactFields($fields['mapper']);
       // FIXME: should use the schema titles, not redeclare them
       $requiredFields = [
-        'membership_type_id' => ts('Membership Type'),
-        'start_date' => ts('Membership Start Date'),
+        'Membership.membership_type_id' => ts('Membership Type'),
+        'Membership.start_date' => ts('Membership Start Date'),
       ];
       foreach ($requiredFields as $field => $title) {
         if (!in_array($field, $mappedFields)) {
