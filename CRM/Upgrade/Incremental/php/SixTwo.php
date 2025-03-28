@@ -90,6 +90,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
     $this->addTask('Fix Unique index on acl cache table with domain id', 'fixAclUniqueIndex');
     $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Activity');
     $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Membership');
+    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Contribution');
   }
 
   public static function setFileUploadDate(): bool {
@@ -209,6 +210,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'target_contact' => 'TargetContact',
       'source_contact' => 'SourceContact',
       'contact' => 'Contact',
+      'soft_credit.contact' => 'SoftCreditContact',
     ];
     if (empty($mappingFieldsName) || $mappingFieldsName === 'do_not_import') {
       return $mappingFieldsName;

@@ -1192,6 +1192,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $errors = [];
     if ($value === 'invalid_import_value') {
       if (!is_numeric($key)) {
+        if (!isset($this->importableFieldsMetadata[$key]) && isset($this->importableFieldsMetadata[trim($prefixString) . '.' . $key])) {
+          $key = trim($prefixString) . '.' . $key;
+        }
         $metadata = $this->getFieldMetadata($key);
         $errors[] = $prefixString . ($metadata['label'] ?? $metadata['html']['label'] ?? $metadata['title']);
       }
