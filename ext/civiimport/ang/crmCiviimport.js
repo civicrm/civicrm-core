@@ -2,10 +2,6 @@
   // Declare a list of dependencies.
   angular.module('crmCiviimport', CRM.angRequires('crmCiviimport'));
 
-  // The controller uses *injection*. This default injects a few things:
-  //   $scope -- This is the set of variables shared between JS and HTML.
-  //   crmApi, crmStatus, crmUiHelp -- These are services provided by civicrm-core.
-  //   myContact -- The current contact, defined above in config().
   angular.module('crmCiviimport').component('crmImportUi', {
       templateUrl: '~/crmCiviimport/Import.html',
       controller: function($scope, crmApi4, crmStatus, crmUiHelp) {
