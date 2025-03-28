@@ -17,6 +17,8 @@ namespace CiviMix\Schema;
  *
  * @method string generateInstallSql()
  * @method string generateUninstallSql()
+ * @method string arrayToSql(array $entityDefn)
+ * @method string generateFieldSql(array $fieldSpec)
  *
  * TODO: void addTables(string[] $tables)
  * TODO: void addColumn(string $table, string $column)
