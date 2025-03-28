@@ -68,7 +68,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_user_job', 'civicrm_queue', 'civicrm_queue_item', 'civicrm_campaign'], TRUE);
+    $this->quickCleanup(['civicrm_user_job', 'civicrm_queue', 'civicrm_queue_item', 'civicrm_campaign', 'civicrm_note'], TRUE);
     OptionValue::delete()->addWhere('name', '=', 'random')->execute();
     DedupeRule::delete()
       ->addWhere('rule_table', '!=', 'civicrm_email')
@@ -130,27 +130,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
-
-    // Now try the import with the dots swapped to double underscores. The parser
-    // layer and api understand the dots - but QuickForm has to play switcheroo as the dots
-    // break the hierarchical multiselect js. QuickForm uses a double underscore as a stand in.;
-    $this->validateSoftCreditImport([
-      ['name' => 'total_amount'],
-      ['name' => 'receive_date'],
-      ['name' => 'financial_type_id'],
-      ['name' => 'contact__external_identifier'],
-      ['name' => 'soft_credit__contact__external_identifier', 'soft_credit_type_id' => 1],
-    ]);
-    $this->validateSoftCreditImport([
-      ['name' => 'total_amount'],
-      ['name' => 'receive_date'],
-      ['name' => 'financial_type_id'],
-      ['name' => 'external_identifier'],
-      [],
-      [],
-      [],
-      ['name' => 'soft_credit__contact__id', 'soft_credit_type_id' => 1],
-    ]);
   }
 
   /**
@@ -517,24 +496,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
     $this->assertEquals('Call him back', $note['note']);
 
-  }
-
-  /**
-   * Tests the form flow copes with QuickForm style dots.
-   *
-   * Because the QuickForm hierarchical select won't cope with dots
-   * we are using a double underscore on that form. The test checks that works.
-   */
-  public function testImportQuickFormEmailMatch() :void {
-    $this->individualCreate(['email' => 'jenny@example.com']);
-    $this->importCSV('checkboxes.csv', [
-      ['name' => 'total_amount'],
-      ['name' => 'receive_date'],
-      ['name' => 'financial_type_id'],
-      ['name' => ''],
-      ['name' => 'contact__email_primary__email'],
-      ['name' => ''],
-    ]);
   }
 
   /**

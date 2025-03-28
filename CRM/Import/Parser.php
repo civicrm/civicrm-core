@@ -1006,10 +1006,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $fieldMap = $this->getOddlyMappedMetadataFields();
     $fieldMapName = empty($fieldMap[$fieldName]) ? $fieldName : $fieldMap[$fieldName];
-    $fieldMapName = str_replace('__', '.', $fieldMapName);
-    // See https://lab.civicrm.org/dev/core/-/issues/4317#note_91322 - a further hack for quickform not
-    // handling dots in field names. One day we will get rid of the Quick form screen...
-    $fieldMapName = str_replace('~~', '_.', $fieldMapName);
     foreach ($this->getImportEntities() as $entity) {
       if (empty($this->getImportableFieldsMetadata()[$fieldMapName]) && $entity['entity_field_prefix'] && str_starts_with($fieldMapName, $entity['entity_field_prefix'])) {
         // e.g if the field name is 'contact.external_identifier' then it is just a case of looking

@@ -63,7 +63,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     ];
 
     foreach ($requiredFields as $field => $title) {
-      $field = str_replace('__', '.', $field);
       if (!in_array($field, $importKeys, TRUE)) {
         $errors[] = ts('Missing required field: %1', [1 => $title]) . '<br />';
       }
