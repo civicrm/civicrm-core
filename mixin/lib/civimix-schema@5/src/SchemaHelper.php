@@ -47,6 +47,11 @@ return new class() implements SchemaHelperInterface {
     return $generator->generateCreateTableWithConstraintSql($entityDefn);
   }
 
+  public function generateFieldSql(array $fieldSpec): string {
+    $generator = $this->getSqlGenerator();
+    return $generator->generateFieldSql($fieldSpec);
+  }
+
   // FIXME: You can add more utility methods here
 
   // public function addTables(array $names): void {
