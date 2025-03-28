@@ -7,6 +7,8 @@ This release makes a series of changes to how emphasis colours (ie primary/succe
  - CHANGED - Walbrook info alert made consistent with other stream and emphasis alerts (no more inverse bg colour)
  - CHANGED - names of alert emphasis variables made consistent with other names (help becomes 'success', background becomes bg, and the variable targe goes at the end not middle)
  - CHANGED - made heading bg colours match info colour scheme to simplify dark-mode flip.
+ - CHANGED - variable for danger/red/cancel colours to --crm-c-danger-on-page-bg, for better dark-mode contrast.
+ - CHANGED - variable for form 'required' marker from --crm-c-danger to --crm-notify-danger for a brighter red shade in light and dark mode.
  - REMOVED - many literal colours from core CSS (ie green/red/etc), particularly Bootstrap, swapping to pairs that should maintain contrast in dark-mode.
  - REMOVED - most literal colour names in dark modes that inverse, ie light green becomes dark. Instead emphasis variable points to a different colour (Bg cols still inverse, plus some blues).
  - FIXED - colour contrast issue for `text-X` in dark-mode on all streams.

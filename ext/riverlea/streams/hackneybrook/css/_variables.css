@@ -63,6 +63,7 @@
   --crm-alert-padding: var(--crm-r);
   --crm-alert-success-text: var(--crm-c-text);
   --crm-alert-info-text: var(--crm-c-blue-darker);
+  --crm-alert-danger-text: var(--crm-c-text);
   /* Form */
   --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: var(--crm-c-gray-300);

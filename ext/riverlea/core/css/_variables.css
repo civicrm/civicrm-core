@@ -34,7 +34,7 @@
   --crm-c-green-light: #dfefdc;
   --crm-c-green-dark: #2e562e;
   --crm-c-red: #eed3d7;
-  --crm-c-red-light: #f9e6eb;
+  --crm-c-red-light: #f9d9e1;
   --crm-c-red-dark: #91223c;
   --crm-c-amber: #983b01;
   --crm-c-amber-light: #fbf0e2;
@@ -82,7 +82,7 @@
   --crm-c-danger: var(--crm-c-red-dark);
   --crm-c-danger-text: var(--crm-c-text-light);
   --crm-c-danger-light: var(--crm-c-red-light);
-  --crm-c-danger-on-page-bg: var(--crm-c-danger);
+  --crm-c-danger-on-page-bg: #5d0d20;
   --crm-c-info: var(--crm-c-blue-dark);
   --crm-c-info-text: var(--crm-c-text-light);
   --crm-c-info-light: var(--crm-c-blue-light);
