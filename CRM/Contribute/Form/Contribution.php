@@ -956,11 +956,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function initializeOrder(): void {
     $this->order = new CRM_Financial_BAO_Order();
     $this->order->setPriceSetID($this->getPriceSetID());
-    if ($this->getSubmittedValue('financial_type_id') && $this->isQuickConfig()) {
+    if ($this->getSubmittedValue('financial_type_id')) {
       $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
     }
     if ($this->getSubmittedValue('total_amount')) {
-      $this->order->setOverrideTotalAmount((float) $this->getSubmittedValue('total_amount'));
+      $this->order->setOverrideTotalAmountTaxExclusive($this->getSubmittedValue('total_amount'));
     }
     $this->order->setForm($this);
     foreach ($this->order->getPriceFieldsMetaData() as $priceField) {
