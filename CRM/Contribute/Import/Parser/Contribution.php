@@ -73,9 +73,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   protected function getFieldMappings(): array {
-    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    $mappedFields = $this->getUserJob()['template_fields'] ?? [];
     if (empty($mappedFields)) {
-      foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
+      $importMappings = $this->getUserJob()['metadata']['import_mappings'];
+      foreach ($importMappings as $i => $mapperRow) {
         $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
         // Just for clarity since 0 is a pseudo-value
         unset($mappedField['mapping_id']);
@@ -143,7 +144,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if (empty($mappedField['name']) || $mappedField['name'] === 'do_not_import') {
         continue;
       }
-      $fieldSpec = $this->getFieldMetadata($mappedField['name']);
+      $fieldSpec = $this->getFieldMetadata($mappedField['entity'] . '.' . $mappedField['name']);
       $columnHeader = $this->getUserJob()['metadata']['DataSource']['column_headers'][$i] ?? '';
       // If there is no column header we are dealing with an added value mapping, do not use
       // the database value as it will be for (e.g.) `_status`
@@ -162,7 +163,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $entityInstance = (array) ($mappedField['entity_data']['soft_credit']);
           $entityInstance['Contact']['contact_type'] = $this->getContactTypeForEntity($entity);
         }
-        $entityInstance['Contact'] = array_merge($entityInstance['Contact'], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $fieldValue)]);
+        $entityInstance['Contact'] = array_merge($entityInstance['Contact'], [$this->getFieldMetadata($mappedField['entity'] . '.' . $mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $fieldValue)]);
         $params[$entity][$entityKey] = $entityInstance;
       }
       else {
@@ -170,7 +171,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $params[$entity] = [];
           $params[$entity]['contact_type'] = $this->getContactTypeForEntity($entity) ?: $this->getContactType();
         }
-        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
+        $params[$entity][$this->getFieldMetadata($mappedField['entity'] . '.' . $mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['entity'] . '.' . $mappedField['name'], $fieldValue);
       }
     }
     return $this->removeEmptyValues($params);
@@ -248,7 +249,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         ->execute()->indexBy('name');
       foreach ($contributionFields + ['note' => $note['note']] as $fieldName => $field) {
         $field['entity_instance'] = 'Contribution';
-        $field['entity_prefix'] = 'Contribution.';
         $fields['Contribution.' . $fieldName] = $field;
       }
       $contactFields = $this->getContactFields($this->getContactType(), 'Contact');
@@ -269,7 +269,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'name' => 'id',
         'entity'  => 'Contact',
         'entity_instance' => 'SoftCreditContact',
-        'entity_prefix' => 'soft_credit.contact.',
         'options' => FALSE,
         'type' => CRM_Utils_Type::T_STRING,
         'contact_type' => ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'],
@@ -331,7 +330,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
         'entity_name' => 'Contribution',
         'entity_title' => ts('Contribution'),
-        'entity_field_prefix' => 'Contribution.',
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
       ],
       'Contact' => [
@@ -345,7 +343,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           'contact_type' => $this->getSubmittedValue('contactType'),
           'dedupe_rule' => $this->getDedupeRule($this->getContactType())['name'],
         ],
-        'entity_field_prefix' => 'Contact.',
         'default_action' => 'select',
         'entity_name' => 'Contact',
         'entity_title' => ts('Contribution Contact'),
@@ -366,7 +363,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         ],
         'default_action' => 'ignore',
         'entity_name' => 'SoftCreditContact',
-        'entity_field_prefix' => 'SoftCreditContact.',
         'entity_title' => ts('Soft Credit Contact'),
         'entity_data' => [
           'soft_credit_type_id' => [
@@ -612,7 +608,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
     return [
-      'name' => $fieldMapping[0],
+      'name' => $fieldMapping['name'],
       'mapping_id' => $mappingID,
       'column_number' => $columnNumber,
       'entity_data' => !empty($fieldMapping[1]) ? ['soft_credit' => ['soft_credit_type_id' => $fieldMapping[1]]] : NULL,
@@ -705,7 +701,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       return '';
     }
     $title = [];
-    $title[] = $this->getFieldMetadata($mappedField['name'])['title'];
+    $title[] = $this->getFieldMetadata($mappedField['entity'] . '.' . $mappedField['name'])['title'];
     if (isset($mappedField['soft_credit'])) {
       $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $mappedField['soft_credit']['soft_credit_type_id']);
     }

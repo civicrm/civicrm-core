@@ -43,6 +43,10 @@ return [
       'add' => '6.1',
       'required' => TRUE,
       'description' => ts('Template field key'),
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_BAO_ImportTemplateField', 'getImportableFieldOptions'],
+        'suffixes' => ['name', 'label', 'description'],
+      ],
     ],
     'column_number' => [
       'title' => ts('Column Number to map to'),
@@ -59,6 +63,10 @@ return [
       'required' => TRUE,
       'description' => ts('Import entity'),
       'add' => '6.1',
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_BAO_ImportTemplateField', 'getImportableEntityOptions'],
+        'suffixes' => ['name', 'label', 'description'],
+      ],
     ],
     'default_value' => [
       'title' => ts('Default Value'),
