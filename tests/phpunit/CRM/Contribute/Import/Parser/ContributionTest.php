@@ -42,6 +42,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
+    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
     $this->enableBackgroundQueueOriginalValue = Civi::settings()->get('enableBackgroundQueue');
   }
 
@@ -905,19 +906,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.trxn_id'],
     ], $submittedValues);
     return new CRM_Import_DataSource_CSV($this->userJobID);
-  }
-
-  /**
-   * Test the Import api works from the extension when the extension is enabled
-   * after the import.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testEnableExtension(): void {
-    $this->importContributionsDotCSV();
-    $this->callAPISuccess('Extension', 'enable', ['key' => 'civiimport']);
-    $result = Import::get($this->userJobID)->execute();
-    $this->assertEquals('ERROR', $result->first()['_status']);
   }
 
   /**

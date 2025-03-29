@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload.
  */
-class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
