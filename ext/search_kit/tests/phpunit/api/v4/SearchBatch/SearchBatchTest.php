@@ -104,6 +104,15 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ->indexBy('name');
     // Check fields ignoring order
     $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($getFields));
+
+    civicrm_api4($apiName, 'create', [
+      'values' => [],
+    ]);
+
+    $row = civicrm_api4($apiName, 'get')->single();
+    $this->assertEquals(1, $row['_id']);
+    $this->assertEquals('NEW', $row['_status']);
+    $this->assertNULL($row['_entity_id']);
   }
 
 }
