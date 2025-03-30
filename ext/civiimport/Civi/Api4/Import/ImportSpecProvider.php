@@ -56,7 +56,6 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
     $field->setType('Field');
     $field->setInputType('Text');
     $field->setReadonly(TRUE);
-    $field->setRequired(TRUE);
     $field->setNullable(FALSE);
     $field->setColumnName('_status');
     $spec->addFieldSpec($field);
