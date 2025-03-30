@@ -47,7 +47,7 @@ class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    *
    * @return void
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
     unset($this->_mapperFields['participant_is_test']);
 
