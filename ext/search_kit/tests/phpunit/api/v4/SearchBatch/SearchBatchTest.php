@@ -13,6 +13,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   public function setUpHeadless() {
     return \Civi\Test::headless()
       ->installMe(__DIR__)
+      ->install('civiimport')
       ->apply();
   }
 
@@ -96,6 +97,13 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $indices = \CRM_Core_DAO::executeQuery('SHOW INDEX FROM ' . $tableName)->fetchAll();
     $indexNames = array_column($indices, 'Key_name');
     $this->assertEquals(['PRIMARY', '_id', '_status'], $indexNames);
+
+    // Check api getFields
+    $apiName = 'Import_' . $userJob['id'];
+    $getFields = (array) civicrm_api4($apiName, 'getFields')
+      ->indexBy('name');
+    // Check fields ignoring order
+    $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($getFields));
   }
 
 }
