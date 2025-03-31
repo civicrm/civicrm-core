@@ -16,6 +16,7 @@ use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\UserJob;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\BAO\Import;
 use Civi\Core\Service\AutoService;
 use CRM_Core_BAO_UserJob;
@@ -77,7 +78,7 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
         continue;
       }
       $field = new FieldSpec($column['name'], $spec->getEntity(), 'String');
-      $field->setTitle(ts('Import field') . ':' . $column['label']);
+      $field->setTitle(ts('Import field') . ': ' . $column['label']);
       $field->setLabel($column['label']);
       $field->setType('Field');
       $field->setDataType($column['data_type']);
@@ -87,7 +88,9 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
       if ($column['name'] === '_entity_id') {
         $field->setFkEntity($userJobType['entity']);
         $field->setInputType('EntityRef');
-        $field->setInputAttrs(['label' => $userJobType['entity']]);
+        $field->setInputAttrs([
+          'label' => CoreUtil::getInfoItem($userJobType['entity'], 'title'),
+        ]);
       }
       $spec->addFieldSpec($field);
     }

@@ -52,7 +52,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
           [
             'type' => 'field',
             'key' => 'first_name',
-            'label' => 'First Name',
+            'label' => 'Your Name',
           ],
           [
             'type' => 'field',
@@ -100,10 +100,19 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Check api getFields
     $apiName = 'Import_' . $userJob['id'];
-    $getFields = (array) civicrm_api4($apiName, 'getFields')
+    $getFields = (array) civicrm_api4($apiName, 'getFields', ['loadOptions' => TRUE])
       ->indexBy('name');
     // Check fields ignoring order
     $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($getFields));
+
+    $this->assertEquals('Your Name', $getFields['first_name']['label']);
+    $this->assertEquals('Import field: Your Name', $getFields['first_name']['title']);
+    $this->assertEquals('Integer', $getFields['gender_id']['data_type']);
+    $this->assertContains('Male', $getFields['gender_id']['options']);
+    $this->assertContains('Parent', $getFields['contact_sub_type']['options']);
+    $this->assertEquals('Date', $getFields['birth_date']['data_type']);
+    $this->assertEquals('Boolean', $getFields['is_deceased']['data_type']);
+    $this->assertEquals('Integer', $getFields['_id']['data_type']);
 
     // The table was initialized with one empty row. Now create another.
     $created = civicrm_api4($apiName, 'create')->single();
