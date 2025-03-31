@@ -128,7 +128,7 @@ class FormattingUtil {
 
     switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
-        $format = 'YmdHis';
+        $format = 'Y-m-d H:i:s';
         // Using `=` with a Y-m-d timestamp means we really want `BETWEEN` midnight and 11:59:59pm.
         if ($operator && is_string($value) && !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
           $isYmd = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value));
@@ -144,7 +144,7 @@ class FormattingUtil {
         break;
 
       case 'Date':
-        $value = self::formatDateValue('Ymd', $value, $operator, $index);
+        $value = self::formatDateValue('Y-m-d', $value, $operator, $index);
         break;
     }
 
