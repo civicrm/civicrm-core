@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\DedupeRuleGroup;
+use Civi\Api4\UserJob;
 
 /**
  * Trait ParserTrait
@@ -31,6 +32,8 @@ trait CRMTraits_Import_ParserTrait {
    * @param string $csv Name of csv file.
    * @param array $fieldMappings
    * @param array $submittedValues
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
     $submittedValues = array_merge([
@@ -45,9 +48,18 @@ trait CRMTraits_Import_ParserTrait {
       'groups' => [],
     ], $submittedValues);
     $this->submitDataSourceForm($csv, $submittedValues);
-
     $form = $this->getMapFieldForm($submittedValues);
     $form->setUserJobID($this->userJobID);
+    $userJobMetadata = UserJob::get()
+      ->addWhere('id', '=', $this->userJobID)
+      ->execute()->first()['metadata'];
+    $userJobMetadata['import_mappings'] = $fieldMappings;
+    UserJob::update()
+      ->addWhere('id', '=', $this->userJobID)
+      ->setValues([
+        'metadata' => $userJobMetadata,
+      ])
+      ->execute();
     $form->buildForm();
     $this->assertTrue($form->validate());
     $form->postProcess();
@@ -71,16 +83,20 @@ trait CRMTraits_Import_ParserTrait {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $queue = Civi::queue('user_job_' . $this->userJobID);
-      $this->assertEquals(1, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_queue_item'));
-      $item = $queue->claimItem(0);
-      $this->assertEquals(['contactId' => CRM_Core_Session::getLoggedInContactID(), 'domainId' => CRM_Core_Config::domainID()], $item->data->runAs);
-      $queue->releaseItem($item);
-      $runner = new CRM_Queue_Runner([
-        'queue' => $queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      ]);
-      $result = $runner->runAll();
-      $this->assertEquals(TRUE, $result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
+      if (CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_queue_item')) {
+        $item = $queue->claimItem(0);
+        $this->assertEquals(['contactId' => CRM_Core_Session::getLoggedInContactID(), 'domainId' => CRM_Core_Config::domainID()], $item->data->runAs);
+        $queue->releaseItem($item);
+        $runner = new CRM_Queue_Runner([
+          'queue' => $queue,
+          'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+        ]);
+        $result = $runner->runAll();
+        $this->assertEquals(TRUE, $result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
+      }
+      else {
+        throw new CRM_Core_Exception('nothing queued');
+      }
     }
   }
 

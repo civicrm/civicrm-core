@@ -58,61 +58,50 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Import the csv file values.
+   * Get the import's datasource form.
    *
-   * This function uses a flow that mimics the UI flow.
-   *
-   * @param string $csv Name of csv file.
-   * @param array $fieldMappings
    * @param array $submittedValues
+   *
+   * @return \CRM_Event_Import_Form_DataSource
+   * @throws \CRM_Core_Exception
    */
-  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
-    $submittedValues = array_merge([
-      'uploadFile' => ['name' => __DIR__ . '/data/' . $csv],
-      'skipColumnHeader' => TRUE,
-      'fieldSeparator' => ',',
-      'contactType' => 'Individual',
-      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
-      'dataSource' => 'CRM_Import_DataSource_CSV',
-      'file' => ['name' => $csv],
-      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
-      'groups' => [],
-      'saveMapping' => TRUE,
-      'saveMappingName' => 'my mapping',
-      'saveMappingDesc' => 'new mapping',
-    ], $submittedValues);
+  protected function getDataSourceForm(array $submittedValues): CRM_Event_Import_Form_DataSource {
     /** @var \CRM_Event_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_DataSource', $submittedValues);
-    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
-    $form->buildForm();
-    $form->postProcess();
-    // This gets reset in DataSource so re-do....
-    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
+    return $form;
+  }
 
-    $this->userJobID = $form->getUserJobID();
-    /** @var CRM_Event_Import_Form_MapField $form */
+  /**
+   * Get the import's mapField form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Event_Import_Form_MapField
+   * @noinspection PhpUnnecessaryLocalVariableInspection
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMapFieldForm(array $submittedValues): CRM_Event_Import_Form_MapField {
+    /** @var \CRM_Event_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_MapField', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertTrue($form->validate());
-    $form->postProcess();
+    return $form;
+  }
+
+  /**
+   * Get the import's preview form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Event_Import_Form_Preview
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPreviewForm(array $submittedValues): CRM_Event_Import_Form_Preview {
     /** @var CRM_Event_Import_Form_Preview $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_Preview', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertTrue($form->validate());
-    try {
-      $form->postProcess();
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $queue = Civi::queue('user_job_' . $this->userJobID);
-      $runner = new CRM_Queue_Runner([
-        'queue' => $queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      ]);
-      $runner->runAll();
-    }
+    return $form;
   }
 
   /**
@@ -176,7 +165,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'Participant.id'],
       ['name' => 'Participant.status_id'],
       ['name' => 'Participant.' . $this->getCustomFieldName('radio', 4)],
-    ]);
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
@@ -199,25 +188,31 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     // When setting up for the test make sure the IDs match those in the csv.
     $this->assertEquals(1, $this->eventCreatePaid(['is_template' => TRUE])['id']);
     $this->assertEquals(3, $this->individualCreate());
-    $this->importCSV('participant_with_event_id.csv', [
-      ['name' => 'Participant.event_id'],
-      ['name' => 'do_not_import'],
-      ['name' => 'Participant.contact_id'],
-      ['name' => 'Participant.fee_amount'],
-      ['name' => 'do_not_import'],
-      ['name' => 'Participant.fee_level'],
-      ['name' => 'Participant.is_pay_later'],
-      ['name' => 'Participant.role_id'],
-      ['name' => 'Participant.source'],
-      ['name' => 'Participant.status_id'],
-      ['name' => 'Participant.register_date'],
-      ['name' => 'do_not_import'],
-      ['name' => 'do_not_import'],
-    ]);
-    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Missing required fields: Participant ID OR Event ID', $row['_status_message']);
+    try {
+      $this->importCSV('participant_with_event_id.csv', [
+        ['name' => 'Participant.event_id'],
+        ['name' => 'do_not_import'],
+        ['name' => 'Participant.contact_id'],
+        ['name' => 'Participant.fee_amount'],
+        ['name' => 'do_not_import'],
+        ['name' => 'Participant.fee_level'],
+        ['name' => 'Participant.is_pay_later'],
+        ['name' => 'Participant.role_id'],
+        ['name' => 'Participant.source'],
+        ['name' => 'Participant.status_id'],
+        ['name' => 'Participant.register_date'],
+        ['name' => 'do_not_import'],
+        ['name' => 'do_not_import'],
+      ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    }
+    catch (CRM_Core_Exception $e) {
+      $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+      $row = $dataSource->getRow();
+      $this->assertEquals('ERROR', $row['_status']);
+      $this->assertEquals('Missing required fields: Participant ID OR Event ID', $row['_status_message']);
+      return;
+    }
+    $this->fail('exception expected');
   }
 
   /**

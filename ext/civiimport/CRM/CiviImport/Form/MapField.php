@@ -5,6 +5,7 @@ use Civi\Api4\Mapping;
 class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
 
   public function preProcess(): void {
+    parent::preProcess();
     // Add import-ui app
     Civi::service('angularjs.loader')->addModules('crmCiviimport');
     $this->assignCiviimportVariables();
@@ -17,6 +18,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     }
     Civi::resources()->addVars('crmImportUi', ['savedMapping' => $savedMapping]);
   }
+
   /**
    * Use the form name to create the tpl file name.
    *

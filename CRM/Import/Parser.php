@@ -225,6 +225,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $contactFields['external_identifier']['title'] .= $matchText;
     $contactFields['external_identifier']['match_rule'] = '*';
+    $contactFields['id']['match_rule'] = '*';
     if ($prefix) {
       $prefixedFields = [];
       foreach ($contactFields as $name => $contactField) {
