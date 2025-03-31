@@ -45,7 +45,7 @@ class CreateBatch extends AbstractAction {
       ->setCategory('searchbatch')
       ->setDurable();
     $tableName = $table->getName();
-    \CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
+    \CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS `$tableName`");
 
     $userJob = [
       'job_type' => 'search_batch_import',
@@ -55,6 +55,8 @@ class CreateBatch extends AbstractAction {
       'metadata' => [
         'DataSource' => [
           'table_name' => $tableName,
+          'saved_search' => $this->savedSearch['name'],
+          'search_display' => $this->display['name'],
           'column_headers' => [],
         ],
       ],
@@ -84,12 +86,16 @@ class CreateBatch extends AbstractAction {
     $table->createWithColumns($columnSql);
 
     // Add indices
-    $alterSql = "ALTER TABLE $tableName ADD INDEX(" . implode('), ADD INDEX(', \CRM_Import_DataSource::getStandardIndices()) . ')';
+    $alterSql = "ALTER TABLE `$tableName` ADD INDEX(" . implode('), ADD INDEX(', \CRM_Import_DataSource::getStandardIndices()) . ')';
     \CRM_Core_DAO::executeQuery($alterSql, [], TRUE, NULL, FALSE, FALSE);
 
     $result[] = UserJob::create(FALSE)
       ->setValues($userJob)
       ->execute()->single();
+
+    // Add an empty row to get the user started
+    $sql = "INSERT INTO `$tableName` () VALUES ()";
+    \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
   }
 
 }

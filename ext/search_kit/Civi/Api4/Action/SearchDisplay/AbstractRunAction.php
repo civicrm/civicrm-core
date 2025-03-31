@@ -135,7 +135,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * Transforms each row into an array of raw data and an array of formatted columns
    *
    * @param iterable $result
-   * @return array{data: array, columns: array}[]
+   * @return array{data: array, columns: array, key: int, cssClass: string}[]
    */
   protected function formatResult(iterable $result): array {
     $rows = [];
