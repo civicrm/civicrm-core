@@ -13,6 +13,9 @@
       <th>&nbsp;</th>
       <th ng-repeat="col in $ctrl.settings.columns">
         <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
+        <button type="button" ng-if="$ctrl.results.editable[col.key]" class="btn btn-xs" ng-click="$ctrl.copyCol($index)" title="{{:: ts('Copy value from first row to all rows') }}">
+          <i class="crm-i fa-arrows-down-to-line"></i>
+        </button>
       </th>
       <th>&nbsp;</th>
     </tr>
