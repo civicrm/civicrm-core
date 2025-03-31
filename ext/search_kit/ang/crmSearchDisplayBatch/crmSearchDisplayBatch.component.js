@@ -98,6 +98,13 @@
         });
       };
 
+      this.copyCol = function(index) {
+        const key = this.settings.columns[index].key;
+        const value = this.results[0].data[key];
+        this.results.forEach((row) => row.data[key] = value);
+        ctrl.unsavedChanges = true;
+      };
+
       // When inserting/deleting rows the ids will shift so cancel pending save & re-queue it
       function cancelSave() {
         if (ctrl.saving) {
