@@ -72,10 +72,7 @@ class RunBatch extends Run {
         $apiParams['limit'] = $limit ?? $settings['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
 
-        // Add metadata needed for inline-editing
-        if ($this->getActionName() === 'run') {
-          $this->addEditableInfo($result);
-        }
+        $this->addEditableInfo($result);
     }
 
     $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
@@ -89,6 +86,22 @@ class RunBatch extends Run {
     else {
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
+    }
+  }
+
+  /**
+   * Add editable information to the SearchDisplayRunResult object.
+   *
+   * @param \Civi\Api4\Result\SearchDisplayRunResult $result
+   *   The SearchDisplayRunResult object to add editable info to.
+   */
+  private function addEditableInfo(SearchDisplayRunResult $result): void {
+    $pseudoFields = array_column(AbstractRunAction::getPseudoFields(), 'name');
+    foreach ($this->display['settings']['columns'] as $column) {
+      if (!empty($column['key']) && !in_array($column['key'], $pseudoFields)) {
+        [$key] = explode(':', $column['key']);
+        $result->editable[$key] = $this->getEditableInfo($key);
+      }
     }
   }
 

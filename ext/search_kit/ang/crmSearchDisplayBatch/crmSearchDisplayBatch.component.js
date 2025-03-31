@@ -30,6 +30,8 @@
         this.userJobId = $location.search().batch;
         // Run search if a userJobId is given. Otherwise the "Start New Batch" button will be shown.
         if (this.userJobId) {
+          // Strip pseudoconstant suffixes from column keys
+          this.settings.columns.forEach((col) => col.key = col.key.split(':')[0]);
           this.runSearch();
           // Autosave every 10 seconds
           autoSaveTimer = $interval(function() {
@@ -64,6 +66,10 @@
       this.deleteRow = function(index) {
         this.results.splice(index, 1);
         cancelSave();
+      };
+
+      this.onChangeData = function() {
+        ctrl.unsavedChanges = true;
       };
 
       this.saveRows = function() {
