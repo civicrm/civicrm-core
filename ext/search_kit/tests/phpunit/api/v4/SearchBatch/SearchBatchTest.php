@@ -105,14 +105,22 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     // Check fields ignoring order
     $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($getFields));
 
-    civicrm_api4($apiName, 'create', [
-      'values' => [],
-    ]);
+    // The table was initialized with one empty row. Now create another.
+    $created = civicrm_api4($apiName, 'create')->single();
+    $this->assertEquals(2, $created['_id']);
 
-    $row = civicrm_api4($apiName, 'get')->single();
-    $this->assertEquals(1, $row['_id']);
-    $this->assertEquals('NEW', $row['_status']);
-    $this->assertNULL($row['_entity_id']);
+    $rows = civicrm_api4($apiName, 'get');
+    $this->assertEquals([1, 2], $rows->column('_id'));
+    $this->assertEquals(['NEW', 'NEW'], $rows->column('_status'));
+    $this->assertNULL($rows[0]['_entity_id']);
+
+    // Delete the first row
+    civicrm_api4($apiName, 'delete', [
+      'where' => [['_id', '=', 1]],
+    ]);
+    $rows = civicrm_api4($apiName, 'get');
+    $this->assertEquals([2], $rows->column('_id'));
+    $this->assertEquals(['NEW'], $rows->column('_status'));
   }
 
 }

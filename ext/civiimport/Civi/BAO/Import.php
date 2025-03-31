@@ -33,7 +33,7 @@ class Import extends CRM_Core_DAO {
    *
    * @var int
    */
-  protected $_id;
+  public $_id;
 
   /**
    * Primary key field.
@@ -126,6 +126,41 @@ class Import extends CRM_Core_DAO {
     }
 
     CRM_Utils_Hook::post($op, $entityName, $instance->_id, $instance);
+
+    return $instance;
+  }
+
+  /**
+   * Delete a record from supplied params.
+   *
+   * @param array $record
+   *   'id' is required.
+   * @return static
+   * @throws CRM_Core_Exception
+   */
+  public static function deleteRecord(array $record) {
+    $idField = static::$_primaryKey[0];
+    $userJobID = $record['_user_job_id'];
+    $entityName = 'Import_' . $userJobID;
+    if (empty($record[$idField])) {
+      throw new CRM_Core_Exception("Cannot delete {$entityName} with no $idField.");
+    }
+    CRM_Utils_Type::validate($record[$idField], 'Positive');
+    $checkPermissions = (bool) ($record['check_permissions'] ?? FALSE);
+
+    CRM_Utils_Hook::pre('delete', $entityName, $record[$idField], $record);
+    $instance = new self();
+    $instance->__table = self::getTableNameForUserJob($userJobID);
+    $instance->$idField = $record[$idField];
+    // Load complete object for the sake of hook_civicrm_post, below
+    $instance->find(TRUE);
+    if (!$instance || !$instance->delete()) {
+      throw new CRM_Core_Exception("Could not delete {$entityName} $idField {$record[$idField]}");
+    }
+    // For other operations this hook is passed an incomplete object and hook listeners can load if needed.
+    // But that's not possible with delete because it's gone from the database by the time this hook is called.
+    // So in this case the object has been pre-loaded so hook listeners have access to the complete record.
+    CRM_Utils_Hook::post('delete', $entityName, $record[$idField], $instance, $record);
 
     return $instance;
   }
