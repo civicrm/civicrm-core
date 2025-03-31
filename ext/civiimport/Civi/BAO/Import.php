@@ -186,7 +186,7 @@ class Import extends CRM_Core_DAO {
     }
     $columns = [];
     $userJob = UserJob::get(FALSE)
-      ->addWhere('metadata', 'LIKE', '%' . $tableName . '%')
+      ->addWhere('metadata', 'LIKE', '%"table_name":"' . $tableName . '"%')
       ->addSelect('metadata', 'job_type')->execute()->first();
     $headers = $userJob['metadata']['DataSource']['column_headers'] ?? [];
     $entity = \CRM_Core_BAO_UserJob::getType($userJob['job_type'])['entity'];
@@ -205,7 +205,7 @@ class Import extends CRM_Core_DAO {
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
       if (!str_starts_with($result->Field, '_')) {
-        $columns[$result->Field]['label'] = ts('Import field') . ':' . ($headers[$userFieldIndex] ?? $result->Field);
+        $columns[$result->Field]['label'] = ts('Import field') . ': ' . ($headers[$userFieldIndex] ?? $result->Field);
         $columns[$result->Field]['data_type'] = 'String';
         $userFieldIndex++;
       }
