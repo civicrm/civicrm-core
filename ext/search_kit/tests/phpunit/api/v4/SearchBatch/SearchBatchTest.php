@@ -123,6 +123,22 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals(['NEW', 'NEW'], $rows->column('_status'));
     $this->assertNULL($rows[0]['_entity_id']);
 
+    $run = civicrm_api4('SearchDisplay', 'runBatch', [
+      'savedSearch' => $name,
+      'display' => $name,
+      'userJobId' => $userJob['id'],
+    ]);
+    $this->assertCount(2, $run);
+    $editable = $run->editable;
+    $this->assertEquals('Text', $editable['first_name']['input_type']);
+    $this->assertEquals('Individual', $editable['first_name']['entity']);
+    $this->assertEquals('Select', $editable['gender_id']['input_type']);
+    $this->assertNotEmpty($editable['gender_id']['options']);
+    $this->assertIsArray($editable['gender_id']['options']);
+    $this->assertEquals('Select', $editable['contact_sub_type']['input_type']);
+    $this->assertEquals('Date', $editable['birth_date']['input_type']);
+    $this->assertEquals('CheckBox', $editable['is_deceased']['input_type']);
+
     // Delete the first row
     civicrm_api4($apiName, 'delete', [
       'where' => [['_id', '=', 1]],
