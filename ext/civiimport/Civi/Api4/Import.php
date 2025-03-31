@@ -16,6 +16,7 @@ use Civi\Api4\Generic\DAOGetAction;
 use Civi\Api4\Generic\DAOGetFieldsAction;
 use Civi\Api4\Action\GetActions;
 use Civi\Api4\Import\Create;
+use Civi\Api4\Import\Delete;
 use Civi\Api4\Import\Save;
 use Civi\Api4\Import\Update;
 use Civi\Api4\Import\Import as ImportAction;
@@ -92,6 +93,28 @@ class Import {
    */
   public static function update(int $userJobID, bool $checkPermissions = TRUE): Update {
     return (new Update('Import_' . $userJobID, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param int $userJobID
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Import\Delete
+   * @throws \CRM_Core_Exception
+   */
+  public static function delete(int $userJobID, bool $checkPermissions = TRUE): Delete {
+    return (new Delete('Import_' . $userJobID, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param string $userJobID
+   * @param bool $checkPermissions
+   * @return Generic\BasicReplaceAction
+   * @throws \CRM_Core_Exception
+   */
+  public static function replace($userJobID, $checkPermissions = TRUE) {
+    return (new Generic\BasicReplaceAction("Import_$userJobID", __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
