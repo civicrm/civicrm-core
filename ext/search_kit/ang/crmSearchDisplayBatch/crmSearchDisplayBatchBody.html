@@ -1,0 +1,12 @@
+<tr ng-repeat="(rowIndex, row) in $ctrl.results" data-entity-id="{{:: row.key }}" ng-if="!row.hidden">
+  <td>{{ rowIndex + 1 }}</td>
+  <td ng-repeat="col in $ctrl.settings.columns">
+    {{ row.data[col.key] }}
+  </td>
+  <td>
+    <button type="button" class="btn btn-primary btn-xs" ng-click="$ctrl.deleteRow($index)">
+      <i class="crm-i fa-trash"></i>
+      <span class="sr-only">{{:: ts('Remove Row') }}</span>
+    </button>
+  </td>
+</tr>

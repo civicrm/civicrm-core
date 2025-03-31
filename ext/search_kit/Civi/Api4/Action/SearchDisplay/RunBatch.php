@@ -34,7 +34,7 @@ class RunBatch extends Run {
 
     $entityName = "Import_{$this->userJobId}";
     $apiParams = [
-      'select' => '*',
+      'select' => ['*'],
       'orderBy' => ['_id' => 'ASC'],
     ];
     $settings = $this->display['settings'];
@@ -87,10 +87,25 @@ class RunBatch extends Run {
       $result->exchangeArray($apiResult->getArrayCopy());
     }
     else {
-      $result->toolbar = $this->formatToolbar();
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
     }
+  }
+
+  /**
+   * Override base method to skip row formatting
+   *
+   * @param iterable $result
+   * @return array{data: array}[]
+   */
+  protected function formatResult(iterable $result): array {
+    $rows = [];
+    foreach ($result as $record) {
+      $rows[] = [
+        'data' => $record,
+      ];
+    }
+    return $rows;
   }
 
 }
