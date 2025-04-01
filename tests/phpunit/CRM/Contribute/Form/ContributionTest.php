@@ -1261,6 +1261,47 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Changing FT on Quick Config Price Set
+   */
+  public function testSubmitFormChangeFTQuickConfig(): void {
+    $this->submitContributionForm([
+      'total_amount' => $this->formatMoneyInput(10000),
+      'financial_type_id' => $this->financialTypeID,
+      'receive_date' => '2015-04-21 00:00:00',
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => 1,
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      [
+        'contribution_id' => 1,
+      ],
+    );
+    $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Campaign Contribution', 'id', 'name');
+    $this->submitContributionForm([
+      'id' => $contribution['id'],
+      'total_amount' => $this->formatMoneyInput(10000),
+      'financial_type_id' => $financialTypeID,
+      'receive_date' => $contribution['receive_date'],
+      'payment_instrument_id' => $contribution['payment_instrument_id'],
+      'price_set_id' => 0,
+      'check_number' => 12345,
+      'contribution_status_id' => 1,
+      'is_email_receipt' => 1,
+      'from_email_address' => 'demo@example.com',
+    ], $contribution['id']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      [
+        'contribution_id' => 1,
+        'return' => ['tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'],
+      ]
+    );
+    $this->assertEquals($financialTypeID, $contribution['financial_type_id']);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
+    $this->assertEquals($financialTypeID, $lineItem['financial_type_id']);
+  }
+
+  /**
    * Do the first contributions, in preparation for an edit-submit.
    *
    * @return array
