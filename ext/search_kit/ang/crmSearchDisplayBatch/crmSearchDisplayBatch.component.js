@@ -27,7 +27,9 @@
       this.unsavedChanges = false;
 
       this.$onInit = function() {
-        this.userJobId = $location.search().batch;
+        // When previewing on the search admin screen
+        this.isPreviewMode = typeof this.search !== 'string';
+        this.userJobId = this.isPreviewMode ? null : $location.search().batch;
         // Run search if a userJobId is given. Otherwise the "Start New Batch" button will be shown.
         if (this.userJobId) {
           // Strip pseudoconstant suffixes from column keys
@@ -37,6 +39,10 @@
           autoSaveTimer = $interval(function() {
             ctrl.saveRows();
           }, 10000);
+        }
+        if (this.isPreviewMode) {
+          this.results = [{data: {}}];
+          this.loading = false;
         }
       };
 

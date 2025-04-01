@@ -1,11 +1,11 @@
-<div ng-if="!$ctrl.userJobId">
+<div ng-if="!$ctrl.userJobId && !$ctrl.isPreviewMode">
   <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
     <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
     <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
     {{:: ts('Start New Batch') }}
   </button>
 </div>
-<div ng-if="$ctrl.userJobId" class="crm-search-display crm-search-display-batch">
+<div ng-if="$ctrl.userJobId || $ctrl.isPreviewMode" class="crm-search-display crm-search-display-batch">
   <div class="alert alert-info crm-search-display-description" ng-if="$ctrl.settings.description">{{:: $ctrl.settings.description }}</div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>
@@ -38,7 +38,7 @@
         </li>
       </ul>
     </div>
-    <button type="button" class="btn btn-primary" ng-click="$ctrl.saveRows()" ng-disabled="!$ctrl.unsavedChanges || $ctrl.saving">
+    <button type="button" ng-if="$ctrl.userJobId" class="btn btn-primary" ng-click="$ctrl.saveRows()" ng-disabled="!$ctrl.unsavedChanges || $ctrl.saving">
       <i ng-if="$ctrl.unsavedChanges && !$ctrl.saving" class="crm-i fa-save"></i>
       <i ng-if="!$ctrl.unsavedChanges && !$ctrl.saving" class="crm-i fa-check"></i>
       <i ng-if="$ctrl.saving" class="crm-i fa-spin fa-spinner"></i>
