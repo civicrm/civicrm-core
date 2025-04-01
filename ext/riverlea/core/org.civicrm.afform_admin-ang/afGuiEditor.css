@@ -268,7 +268,6 @@
 #afGuiEditor .af-gui-node-title {
   position: absolute;
   top: 1px;
-  width: calc(100% - var(--crm-r4));
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
