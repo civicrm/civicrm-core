@@ -70,12 +70,10 @@
       this.toggleTally = function() {
         if (ctrl.display.settings.tally) {
           delete ctrl.display.settings.tally;
-          _.each(ctrl.display.settings.columns, function(col) {
-            delete col.tally;
-          });
+          ctrl.display.settings.columns.forEach((col) => delete col.tally);
         } else {
           ctrl.display.settings.tally = {label: ts('Total')};
-          _.each(ctrl.display.settings.columns, function(col) {
+          ctrl.display.settings.columns.forEach(function(col) {
             if (col.type === 'field') {
               col.tally = {
                 fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(ctrl.parent.getExprFromSelect(col.key)), ctrl.apiParams)
