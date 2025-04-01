@@ -8,6 +8,19 @@
   </div>
 </fieldset>
 
+<details>
+  <summary>{{:: ts('Style') }}</summary>
+  <div class="form-inline">
+    <label>{{:: ts('Table Style') }}</label>
+    <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.parent.tableClasses">
+      <label>
+        <input type="checkbox" ng-checked="$ctrl.includes($ctrl.display.settings.classes, style.name)" ng-click="$ctrl.parent.toggle($ctrl.display.settings.classes, style.name)">
+        <span>{{:: style.label }}</span>
+      </label>
+    </div>
+  </div>
+</details>
+
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
     {{:: ts('Columns') }}
