@@ -82,6 +82,7 @@ INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES
 (1228, "AE", "Armed Forces Europe"),
 (1228, "AA", "Armed Forces Americas"),
 (1228, "AP", "Armed Forces Pacific"),
+(1228, "MAGA", "Greenland"),
 (1039, "AB", "Alberta"),
 (1039, "BC", "British Columbia"),
 (1039, "MB", "Manitoba"),
