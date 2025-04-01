@@ -167,6 +167,9 @@ class Admin {
           }
           $entity['fields'][] = $field;
         }
+        if (empty($entity['fields'])) {
+          continue;
+        }
         $entity['default_columns'] = self::getDefaultColumns($entity, $getFields);
         $params = $entity['get'][0];
         // Entity must support at least these params or it is too weird for search kit
