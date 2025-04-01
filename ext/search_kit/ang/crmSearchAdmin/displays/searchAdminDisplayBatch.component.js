@@ -28,12 +28,39 @@
       };
 
       this.$onInit = function () {
-        if (!ctrl.display.settings) {
+        const isNew = !ctrl.display.settings;
+        if (isNew) {
           ctrl.display.settings = {
             classes: ['table', 'table-striped', 'table-bordered', 'crm-sticky-header'],
           };
         }
         ctrl.parent.initColumns({label: true});
+        if (isNew) {
+          this.toggleTally();
+        }
+      };
+
+      this.toggleTally = function() {
+        if (ctrl.display.settings.tally) {
+          delete ctrl.display.settings.tally;
+          ctrl.display.settings.columns.forEach((col) => delete col.tally);
+        } else {
+          ctrl.display.settings.tally = {};
+          ctrl.display.settings.columns.forEach(function(col) {
+            if (col.key) {
+              const arg = searchMeta.parseExpr(col.key).args[0];
+              if (!arg || !arg.field || arg.field.fk_entity || arg.field.options) {
+                return;
+              }
+              if (arg.field.data_type === 'Integer' || arg.field.data_type === 'Float' || arg.field.data_type === 'Money') {
+                col.tally = {fn: 'SUM'};
+              }
+              if (arg.field.data_type === 'Boolean') {
+                col.tally = {fn: 'COUNT'};
+              }
+            }
+          });
+        }
       };
 
     }

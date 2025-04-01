@@ -105,6 +105,27 @@
         ctrl.unsavedChanges = true;
       };
 
+      this.getTally = function(col) {
+        const fn = col.tally.fn;
+        let tally = 0;
+        this.results.forEach(function(row) {
+          if (row.data[col.key]) {
+            if (fn === 'COUNT') {
+              tally++;
+            } else {
+              const colVal = Number(row.data[col.key]);
+              if (!isNaN(colVal)) {
+                tally += colVal;
+              }
+            }
+          }
+        });
+        if (fn === 'AVG' && this.results.length) {
+          return tally / this.results.length;
+        }
+        return tally;
+      };
+
       // When inserting/deleting rows the ids will shift so cancel pending save & re-queue it
       function cancelSave() {
         if (ctrl.saving) {

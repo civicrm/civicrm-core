@@ -22,6 +22,7 @@
     </thead>
     <tbody ng-if="$ctrl.loading" ng-include="'~/crmSearchDisplayBatch/crmSearchDisplayBatchLoading.html'"></tbody>
     <tbody ng-if="!$ctrl.loading" ng-include="'~/crmSearchDisplayBatch/crmSearchDisplayBatchBody.html'"></tbody>
+    <tfoot ng-if="!$ctrl.loading && $ctrl.settings.tally" ng-include="'~/crmSearchDisplayBatch/crmSearchDisplayBatchTally.html'"></tfoot>
   </table>
   <div>
     <div class="btn-group" ng-if="!$ctrl.loading">

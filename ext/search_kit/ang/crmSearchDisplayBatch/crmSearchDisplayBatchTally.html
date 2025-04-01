@@ -1,0 +1,7 @@
+<tr>
+  <td><i class="crm-i fa-calculator"></i></td>
+  <td ng-repeat="col in $ctrl.settings.columns">
+    <label ng-if="col.tally.label">{{:: col.tally.label }}</label>
+    <span ng-if="col.tally.fn">{{ $ctrl.getTally(col) }}</span>
+  </td>
+</tr>
