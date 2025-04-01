@@ -1202,13 +1202,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   protected function processCreditCard($submittedValues, $lineItem, $contactID) {
     $isTest = ($this->_mode === 'test') ? 1 : 0;
-    // CRM-12680 set $_lineItem if its not set
-    // @todo - I don't believe this would ever BE set. I can't find anywhere in the code.
-    // It would be better to pass line item out to functions than $this->_lineItem as
-    // we don't know what is being changed where.
-    if (empty($this->_lineItem) && !empty($lineItem)) {
-      $this->_lineItem = $lineItem;
-    }
 
     $paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
     $this->_paymentProcessor = $paymentObject->getPaymentProcessor();
@@ -1266,11 +1259,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];
     $financialType->find(TRUE);
-
-    // Add some financial type details to the params list
-    // if folks need to use it.
-    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $financialType->name;
-    $paymentParams['contributionPageID'] = NULL;
 
     if (!empty($this->_params['is_email_receipt'])) {
       $paymentParams['email'] = $this->getContactValue('email_primary.email');
@@ -1962,7 +1950,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function submit($submittedValues, $action, $pledgePaymentID) {
-    $pId = $contribution = $isRelatedId = FALSE;
+    $pId = FALSE;
     $this->_params = $submittedValues;
     $this->beginPostProcess();
     // reassign submitted form values if the any information is formatted via beginPostProcess
@@ -1976,34 +1964,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    // Process price set and get total amount and line items.
-    $lineItem = [];
+    // Process price set and get total amount and line items - @todo the following lines should be obsolete.
     $priceSetId = $submittedValues['price_set_id'] ?? NULL;
     if ($this->isQuickConfig() && !$this->_id) {
+      // @todo - probably these lines are not required.
       $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
       $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-      $fieldID = key($this->_priceSet['fields']);
-      $fieldValueId = key($this->_priceSet['fields'][$fieldID]['options']);
-      $this->_priceSet['fields'][$fieldID]['options'][$fieldValueId]['amount'] = $submittedValues['total_amount'];
-      $submittedValues['price_' . $fieldID] = 1;
     }
-
-    // Every contribution has a price-set - the only reason it shouldn't be set is if we are dealing with
-    // quick config (very very arguably) & yet we see that this could still be quick config so this should be understood
-    // as a point of fragility rather than a logical 'if' clause.
-    if ($priceSetId) {
-      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $submittedValues, $lineItem[$priceSetId], $priceSetId);
-      // Unset tax amount for offline 'is_quick_config' contribution.
-      // @todo WHY  - quick config was conceived as a quick way to configure contribution forms.
-      // this is an example of 'other' functionality being hung off it.
-      if ($this->_priceSet['is_quick_config'] &&
-        !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
-      ) {
-        unset($submittedValues['tax_amount']);
-      }
-      $submittedValues['total_amount'] = $submittedValues['amount'] ?? NULL;
-    }
+    $submittedValues['total_amount'] = $this->getOrder()->getTotalAmount();
+    $lineItem = [$this->getPriceSetID() => $this->getOrder()->getLineItems()];
+    // @todo - ideally do not set tax_level - it is not required lower down
+    // if line items are provide appropriately. The BAO prefers to self-calculate tax.
+    $submittedValues['tax_amount'] = $this->getOrder()->getTotalTaxAmount();
+    $submittedValues['amount_level'] = $this->getOrder()->getAmountLevel();
 
     if ($this->_id) {
       if ($this->_compId) {
@@ -2017,9 +1990,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
       else {
-        $contributionDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (array_key_exists('participant', $contributionDetails)) {
-          $pId = $contributionDetails['participant'];
+        if ($this->hasExistingParticipantLines()) {
+          foreach ($this->getExistingContributionLineItems() as $item) {
+            if ($item['entity_table'] === 'civicrm_participant') {
+              $pId = $item['entity_id'];
+            }
+          }
         }
       }
       if (!empty($this->_payNow)) {
@@ -2074,28 +2050,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
     }
-
-    //CRM-11529 for quick config back office transactions
-    //when financial_type_id is passed in form, update the
-    //line items with the financial type selected in form
-    // NOTE that this IS still a legitimate use of 'quick-config' for contributions under the current DB but
-    // we should look at having a price field per contribution type & then there would be little reason
-    // for the back-office contribution form postProcess to know if it is a quick-config form.
-    if ($this->isQuickConfig() && !empty($submittedValues['financial_type_id']) && !empty($lineItem[$this->getPriceSetID()])
-    ) {
-      foreach ($lineItem[$this->_priceSetId] as &$values) {
-        $values['financial_type_id'] = $submittedValues['financial_type_id'];
-      }
-    }
-
-    if (!isset($submittedValues['total_amount'])) {
-      $submittedValues['total_amount'] = $this->_values['total_amount'] ?? NULL;
-      // Avoid tax amount deduction on edit form and keep it original, because this will lead to error described in CRM-20676
-      if (!$this->_id) {
-        $submittedValues['total_amount'] -= $this->_values['tax_amount'] ?? 0;
-      }
-    }
-    $this->assign('lineItem', !empty($lineItem) && !$this->isQuickConfig() ? $lineItem : FALSE);
 
     $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id'] ?? []));
     if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
@@ -2595,7 +2549,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $priceSetID;
     }
     $lines = $this->getExistingContributionLineItems();
-    if ($lines) {
+    if ($lines && !$this->getSubmittedValue('total_amount')) {
       $line = reset($lines);
       return $line['price_field_id.price_set_id'];
     }
@@ -2763,8 +2717,9 @@ WHERE  contribution_id = {$id}
     if (!$this->getContributionID()) {
       return FALSE;
     }
-    if ((!$this->elementExists('total_amount') || $this->isElementFrozen('total_amount'))
-      && (!$this->elementExists('price_set_id')|| $this->isElementFrozen('total_amount'))) {
+    if ((!$this->elementExists('total_amount') || $this->isElementFrozen('total_amount')
+        || !is_numeric($this->getSubmittedValue('total_amount')))
+      && (!$this->elementExists('price_set_id') || $this->isElementFrozen('total_amount') || $this->getSubmittedValue('price_set_id'))) {
       return TRUE;
     }
     return FALSE;

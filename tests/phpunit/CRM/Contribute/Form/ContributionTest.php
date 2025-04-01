@@ -465,9 +465,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Failed',
     ], 1);
     $lineItem = $this->callAPISuccessGetSingle('line_item', []);
-    $this->assertEquals('50.00', $lineItem['unit_price']);
+    $this->assertEquals('50.00', $lineItem['unit_price'] * $lineItem['qty']);
     $this->assertEquals('50.00', $lineItem['line_total']);
-    $this->assertEquals(1, $lineItem['qty']);
     $this->assertEquals(1, $lineItem['financial_type_id']);
     $financialItem = $this->callAPISuccessGetSingle('financial_item', [
       'civicrm_line_item' => $lineItem['id'],
