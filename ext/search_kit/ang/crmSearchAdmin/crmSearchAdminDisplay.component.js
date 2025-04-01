@@ -431,6 +431,22 @@
         }
       };
 
+      // Add or remove an item from an array
+      this.toggle = function(collection, item) {
+        if (_.includes(collection, item)) {
+          _.pull(collection, item);
+        } else {
+          collection.push(item);
+        }
+      };
+
+      this.tableClasses = [
+        {name: 'table', label: ts('Row Borders')},
+        {name: 'table-bordered', label: ts('Column Borders')},
+        {name: 'table-striped', label: ts('Even/Odd Stripes')},
+        {name: 'crm-sticky-header', label: ts('Sticky Header')}
+      ];
+
       $scope.$watch('$ctrl.display.settings', function() {
         ctrl.stale = true;
       }, true);

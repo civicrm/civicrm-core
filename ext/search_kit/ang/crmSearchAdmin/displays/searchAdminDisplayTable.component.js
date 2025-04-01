@@ -16,24 +16,9 @@
         ctrl = this;
       $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Display'});
 
-      this.tableClasses = [
-        {name: 'table', label: ts('Row Borders')},
-        {name: 'table-bordered', label: ts('Column Borders')},
-        {name: 'table-striped', label: ts('Even/Odd Stripes')},
-        {name: 'crm-sticky-header', label: ts('Sticky Header')}
-      ];
 
       // Check if array contains item
       this.includes = _.includes;
-
-      // Add or remove an item from an array
-      this.toggle = function(collection, item) {
-        if (_.includes(collection, item)) {
-          _.pull(collection, item);
-        } else {
-          collection.push(item);
-        }
-      };
 
       this.getColTypes = function() {
         return ctrl.parent.colTypes;
