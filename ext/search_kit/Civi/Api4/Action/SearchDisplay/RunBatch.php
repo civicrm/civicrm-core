@@ -4,7 +4,6 @@ namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\Api4\Result\SearchDisplayRunResult;
 use Civi\Api4\UserJob;
-use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Specialized run action for batch displays
@@ -62,10 +61,9 @@ class RunBatch extends Run {
    *   The SearchDisplayRunResult object to add editable info to.
    */
   private function addEditableInfo(SearchDisplayRunResult $result): void {
-    $pseudoFields = array_column(AbstractRunAction::getPseudoFields(), 'name');
     foreach ($this->display['settings']['columns'] as $column) {
-      if (!empty($column['key']) && !in_array($column['key'], $pseudoFields)) {
-        [$key] = explode(':', $column['key']);
+      if (!empty($column['key'])) {
+        $key = $column['key'];
         $result->editable[$key] = $this->getEditableInfo($key);
       }
     }

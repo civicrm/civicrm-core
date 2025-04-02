@@ -33,8 +33,6 @@
         this.userJobId = this.isPreviewMode ? null : $location.search().batch;
         // Run search if a userJobId is given. Otherwise the "Start New Batch" button will be shown.
         if (this.userJobId) {
-          // Strip pseudoconstant suffixes from column keys
-          this.settings.columns.forEach((col) => col.key = col.key.split(':')[0]);
           this.runSearch();
           // Autosave every 10 seconds
           autoSaveTimer = $interval(function() {
@@ -135,21 +133,24 @@
       };
 
       this.copyCol = function(index) {
-        const key = this.settings.columns[index].key;
-        const value = this.results[0].data[key];
-        this.results.forEach((row) => row.data[key] = value);
+        const fieldName = this.settings.columns[index].spec.name;
+        const value = this.results[0].data[fieldName];
+        this.results.forEach((row) => row.data[fieldName] = value);
         ctrl.unsavedChanges = true;
       };
 
       this.getTally = function(col) {
+        if (this.isPreviewMode) {
+          return 0;
+        }
         const fn = col.tally.fn;
         let tally = 0;
         this.results.forEach(function(row) {
-          if (row.data[col.key]) {
+          if (row.data[col.spec.name]) {
             if (fn === 'COUNT') {
               tally++;
             } else {
-              const colVal = Number(row.data[col.key]);
+              const colVal = Number(row.data[col.spec.name]);
               if (!isNaN(colVal)) {
                 tally += colVal;
               }
