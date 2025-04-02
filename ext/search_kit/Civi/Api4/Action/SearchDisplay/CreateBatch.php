@@ -5,7 +5,6 @@ namespace Civi\Api4\Action\SearchDisplay;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\UserJob;
-use Civi\Search\Meta;
 
 /**
  * Creates an UserJob instance for a batch data entry display
@@ -64,22 +63,16 @@ class CreateBatch extends AbstractAction {
       ],
     ];
 
-    $pseudoFields = array_column(AbstractRunAction::getPseudoFields(), 'name');
-
     $tableColumns = [];
 
-    foreach ($this->display['settings']['columns'] as $i => $column) {
-      if (empty($column['key']) || in_array($column['key'], $pseudoFields)) {
+    foreach ($this->display['settings']['columns'] as $column) {
+      if (empty($column['spec'])) {
         continue;
       }
-      $expr = $this->getSelectExpression($column['key']);
-      $fieldSpec = Meta::formatFieldSpec($column, $expr);
-      if (in_array($fieldSpec['name'], $tableColumns)) {
-        $fieldSpec['name'] .= $i;
-      }
+      $fieldSpec = $column['spec'];
       $tableColumns[] = $fieldSpec['name'];
       $fieldSpec['label'] = $column['label'];
-      $userJob['metadata']['DataSource']['column_headers'][] = $fieldSpec['label'];
+      $userJob['metadata']['DataSource']['column_headers'][] = $column['label'];
       $userJob['metadata']['DataSource']['column_specs'][$fieldSpec['name']] = $fieldSpec;
     }
 

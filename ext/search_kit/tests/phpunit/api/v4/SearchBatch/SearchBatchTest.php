@@ -132,10 +132,10 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $editable = $run->editable;
     $this->assertEquals('Text', $editable['first_name']['input_type']);
     $this->assertEquals('Individual', $editable['first_name']['entity']);
-    $this->assertEquals('Select', $editable['gender_id']['input_type']);
-    $this->assertNotEmpty($editable['gender_id']['options']);
-    $this->assertIsArray($editable['gender_id']['options']);
-    $this->assertEquals('Select', $editable['contact_sub_type']['input_type']);
+    $this->assertEquals('Select', $editable['gender_id:label']['input_type']);
+    $this->assertNotEmpty($editable['gender_id:label']['options']);
+    $this->assertIsArray($editable['gender_id:label']['options']);
+    $this->assertEquals('Select', $editable['contact_sub_type:label']['input_type']);
     $this->assertEquals('Date', $editable['birth_date']['input_type']);
     $this->assertEquals('CheckBox', $editable['is_deceased']['input_type']);
 
