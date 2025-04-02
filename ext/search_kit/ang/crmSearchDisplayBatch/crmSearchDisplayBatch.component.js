@@ -27,7 +27,8 @@
       this.unsavedChanges = false;
 
       this.$onInit = function() {
-        // When previewing on the search admin screen
+        this.limit = this.settings.limit || 0;
+        // When previewing on the search admin screen, the display will be limited
         this.isPreviewMode = typeof this.search !== 'string';
         this.userJobId = this.isPreviewMode ? null : $location.search().batch;
         // Run search if a userJobId is given. Otherwise the "Start New Batch" button will be shown.
@@ -52,6 +53,34 @@
         }
       };
 
+      // Override function in base class: this sets the current page of results
+      this.getResultsPronto = function() {
+        if (this.limit) {
+          const start = (this.page - 1) * this.limit;
+          this.resultsPage = this.results.slice(start, start + this.limit);
+        } else {
+          this.resultsPage = this.results;
+        }
+      };
+
+      $scope.$watch('$ctrl.results.length', function() {
+        if (ctrl.results) {
+          ctrl.rowCount = ctrl.results.length;
+          // If no more items on this page, go to the previous page
+          if (ctrl.limit && ctrl.page > 1 && Math.ceil(ctrl.results.length / ctrl.limit) < ctrl.page) {
+            ctrl.page--;
+          }
+          ctrl.getResultsPronto();
+        }
+      });
+
+      $scope.$watch('$ctrl.limit', function() {
+        if (ctrl.results) {
+          ctrl.page = 1;
+          ctrl.getResultsPronto();
+        }
+      });
+
       this.createNewBatch = function() {
         this.creatingBatch = true;
         crmApi4('SearchDisplay', 'createBatch', {
@@ -70,7 +99,8 @@
       };
 
       this.deleteRow = function(index) {
-        this.results.splice(index, 1);
+        const start = (this.page - 1) * this.limit;
+        this.results.splice(start + index, 1);
         cancelSave();
       };
 
