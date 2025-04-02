@@ -53,6 +53,13 @@
         <label for="crm-search-admin-edit-col-{{:: $index }}">{{:: ts('Header') }}</label>
         <input id="crm-search-admin-edit-col-{{:: $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
       </div>
+      <div class="form-inline" ng-if="col.type === 'field'">
+        <label>
+          <input type="checkbox" ng-click="$ctrl.toggleDefault(col)" ng-checked="$ctrl.hasDefault(col)" >
+          {{:: ts('Default Value') }}
+        </label>
+        <crm-search-input ng-model="col.default" ng-if="$ctrl.hasDefault(col)" field="$ctrl.getField(col.key)"></crm-search-input>
+      </div>
       <div class="form-inline" ng-if="col.type === 'field' && $ctrl.display.settings.tally">
         <label for="crm-search-admin-edit-col-footer-label-{{:: $index }}">{{:: ts('Footer') }}</label>
         <input class="form-control" id="crm-search-admin-edit-col-footer-label-{{:: $index }}" ng-model="col.tally.label" placeholder="{{:: ts('No label') }}" title="{{:: ts('Footer label') }}">
