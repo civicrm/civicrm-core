@@ -74,13 +74,11 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
         'entity_name' => 'Participant',
         'entity_title' => ts('Participant'),
-        'entity_field_prefix' => 'Participant.',
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
         'is_contact' => TRUE,
-        'entity_field_prefix' => 'Contact.',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),

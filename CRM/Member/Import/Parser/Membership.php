@@ -75,13 +75,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
         'entity_name' => 'Membership',
         'entity_title' => ts('Membership'),
-        'entity_field_prefix' => 'Membership.',
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
         'is_contact' => TRUE,
-        'entity_field_prefix' => 'contact.',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
