@@ -21,6 +21,9 @@ class RunBatch extends Run {
   protected $userJobId;
 
   /**
+   * Unlike the base Run action, this does not support pager, count, or tally
+   * as those are all handled client-side.
+   *
    * @param \Civi\Api4\Result\SearchDisplayRunResult $result
    * @throws \CRM_Core_Exception
    */
@@ -36,57 +39,20 @@ class RunBatch extends Run {
     $apiParams = [
       'select' => ['*'],
       'orderBy' => ['_id' => 'ASC'],
+      'debug' => $this->debug,
     ];
-    $settings = $this->display['settings'];
-    $page = $index = NULL;
-    $key = $this->return;
 
     $this->applyFilters();
 
-    switch ($this->return) {
-      case 'id':
-        $key = CoreUtil::getIdFieldName($entityName);
-        $index = [$key];
-      case 'row_count':
-        if (empty($apiParams['having'])) {
-          $apiParams['select'] = [];
-        }
-        if (!in_array($key, $apiParams['select'], TRUE)) {
-          $apiParams['select'][] = $key;
-        }
-        unset($apiParams['orderBy'], $apiParams['limit']);
-        break;
+    $this->addEditableInfo($result);
 
-      case 'tally':
-        $result[] = $this->getTally();
-        return;
-
-      default:
-        // Pager mode: `page:n`
-        // Or NULL for unlimited results
-        if (($settings['pager'] ?? FALSE) !== FALSE && $key && preg_match('/^page:\d+$/', $key)) {
-          [$pagerMode, $page] = explode(':', $key);
-          $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
-        }
-        $apiParams['debug'] = $this->debug;
-        $apiParams['limit'] = $limit ?? $settings['limit'] ?? NULL;
-        $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
-
-        $this->addEditableInfo($result);
-    }
-
-    $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
+    $apiResult = civicrm_api4($entityName, 'get', $apiParams);
     // Copy over meta properties to this result
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
 
-    if ($this->return === 'row_count' || $this->return === 'id') {
-      $result->exchangeArray($apiResult->getArrayCopy());
-    }
-    else {
-      $result->exchangeArray($this->formatResult($apiResult));
-      $result->labels = $this->filterLabels;
-    }
+    $result->exchangeArray($this->formatResult($apiResult));
+    $result->labels = $this->filterLabels;
   }
 
   /**

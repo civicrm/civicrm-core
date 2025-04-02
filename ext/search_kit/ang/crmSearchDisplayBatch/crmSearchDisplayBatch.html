@@ -24,6 +24,7 @@
     <tbody ng-if="!$ctrl.loading" ng-include="'~/crmSearchDisplayBatch/crmSearchDisplayBatchBody.html'"></tbody>
     <tfoot ng-if="!$ctrl.loading && $ctrl.settings.tally" ng-include="'~/crmSearchDisplayBatch/crmSearchDisplayBatchTally.html'"></tfoot>
   </table>
+  <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
   <div>
     <div class="btn-group" ng-if="!$ctrl.loading">
       <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

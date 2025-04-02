@@ -32,6 +32,8 @@
         if (isNew) {
           ctrl.display.settings = {
             classes: ['table', 'table-striped', 'table-bordered', 'crm-sticky-header'],
+            limit: CRM.crmSearchAdmin.defaultPagerSize,
+            pager: {hide_single: true}
           };
         }
         ctrl.parent.initColumns({label: true});
