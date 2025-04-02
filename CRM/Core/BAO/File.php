@@ -156,12 +156,12 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     //save static tags
     if (!empty($fileParams['tag'])) {
-      CRM_Core_BAO_EntityTag::create($fileParams['tag'], 'civicrm_file', $entityFileDAO->id);
+      CRM_Core_BAO_EntityTag::create($fileParams['tag'], 'civicrm_file', $fileDAO->id);
     }
 
     //save free tags
     if (isset($fileParams['attachment_taglist']) && !empty($fileParams['attachment_taglist'])) {
-      CRM_Core_Form_Tag::postProcess($fileParams['attachment_taglist'], $entityFileDAO->id, 'civicrm_file');
+      CRM_Core_Form_Tag::postProcess($fileParams['attachment_taglist'], $fileDAO->id, 'civicrm_file');
     }
 
     // lets call the post hook here so attachments code can do the right stuff
