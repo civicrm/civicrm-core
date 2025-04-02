@@ -91,7 +91,13 @@
 
       this.addRows = function(rowCount) {
         for (let i = 0; i < rowCount; i++) {
-          this.results.push({data: {}});
+          let data = this.settings.columns.reduce(function (defaults, col) {
+            if ('default' in col) {
+              defaults[col.spec.name] = col.default;
+            }
+            return defaults;
+          }, {});
+          this.results.push({data: data});
         }
         cancelSave();
       };

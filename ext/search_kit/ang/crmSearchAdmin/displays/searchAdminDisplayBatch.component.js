@@ -13,6 +13,7 @@
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayBatch.html',
     controller: function($scope, searchMeta, crmUiHelp) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
+      const fieldSpecs = {};
       const ctrl = this;
       $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Display'});
 
@@ -42,6 +43,18 @@
         }
       };
 
+      this.hasDefault = function(col) {
+        return 'default' in col;
+      };
+
+      this.toggleDefault = function(col) {
+        if ('default' in col) {
+          delete col.default;
+        } else {
+          col.default = null;
+        }
+      };
+
       this.toggleTally = function() {
         if (ctrl.display.settings.tally) {
           delete ctrl.display.settings.tally;
@@ -63,6 +76,13 @@
             }
           });
         }
+      };
+
+      this.getField = function(key) {
+        if (key in fieldSpecs) {
+          return fieldSpecs[key];
+        }
+        return (fieldSpecs[key] = searchMeta.getField(key));
       };
 
     }
