@@ -95,12 +95,11 @@ class CRM_Core_BAO_CustomValueTable {
               // need to add/update civicrm_entity_file
               $entityFileDAO = new CRM_Core_DAO_EntityFile();
               $entityFileDAO->file_id = $field['file_id'];
-              $entityFileDAO->find(TRUE);
-
               $entityFileDAO->entity_table = $field['table_name'];
               $entityFileDAO->entity_id = $field['entity_id'];
-              $entityFileDAO->file_id = $field['file_id'];
-              $entityFileDAO->save();
+              if (!$entityFileDAO->find(TRUE)) {
+                $entityFileDAO->save();
+              }
               $value = $field['file_id'];
               $type = 'String';
               break;

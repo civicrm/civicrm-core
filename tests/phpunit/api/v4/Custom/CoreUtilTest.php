@@ -143,6 +143,10 @@ class CoreUtilTest extends Api4TestBase {
     $this->createTestRecord('Activity', [
       'TestActivityFields.TestFileField' => $fileId,
     ]);
+    // For now, ensure extra EntityFile was created for the custom field
+    $this->assertEquals('1', \CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_entity_file WHERE entity_table = '{$customGroup['table_name']}'"));
+    // For now, ensure extra EntityFile record gets cleaned up, because that's not handled by the custom field business logic
+    $this->registerTestRecord('EntityFile', [['file_id', '=', $fileId]]);
 
     // File should exist in the custom value table
     $idCheck = \CRM_Core_DAO::singleValueQuery("SELECT {$customField['column_name']} FROM {$customGroup['table_name']}");
