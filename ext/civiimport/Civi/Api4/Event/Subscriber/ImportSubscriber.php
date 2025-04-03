@@ -176,6 +176,10 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       if (!UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->selectRowCount()->execute()->count()) {
         throw new UnauthorizedException('Import access not permitted');
       }
+      if ($event->getActionName() === 'get') {
+        // User can access UserJob::get so authorize them to access the imports as well
+        $event->authorize();
+      }
     }
   }
 

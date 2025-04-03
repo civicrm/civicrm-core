@@ -25,18 +25,6 @@ use Civi\Api4\MappingField;
 abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
 
   /**
-   * Does the form layer convert field names to support QuickForm widgets.
-   *
-   * (e.g) if 'yes' we swap
-   * `soft_credit.external_identifier` to `soft_credit__external_identifier`
-   * because the contribution form would break on the . as it would treat it as
-   * javascript.
-   *
-   * @var bool
-   */
-  protected bool $supportsDoubleUnderscoreFields = TRUE;
-
-  /**
    * Mapper fields
    *
    * @var array
@@ -492,7 +480,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if (isset($fieldMappings[$i])) {
           if (($fieldMapping['name'] === 'do_not_import')) {
-            $defaults["mapper[$i]"] = NULL;
+            $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
           }
           elseif (array_key_exists($fieldMapping['name'], $this->getAvailableFields())) {
             $defaults["mapper[$i]"] = $fieldMapping['name'];
@@ -509,12 +497,15 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
             // (but perhaps not disabled or acl-restricted) but we should also
             // handle it here rather than rely on our other efforts.
             $mappingFailures[] = $columnHeader;
-            $defaults["mapper[$i]"] = NULL;
+            $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
           }
         }
       }
       if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
         $defaults["mapper[$i]"] = $this->defaultFromHeader($columnHeader, $headerPatterns);
+      }
+      elseif (!isset($defaults["mapper[$i]"])) {
+        $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
       }
     }
     if (!$this->isSubmitted() && $mappingFailures) {
@@ -544,7 +535,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       // Because api v4 style fields have a . and QuickForm multiselect js does
       // not cope with a . the quick form layer will use a double underscore
       // as a stand in (the angular layer will not)
-      $fieldName = str_replace('__', '.', $mapping[0]);
+      $fieldName = $mapping[0];
       if (str_contains($fieldName, '.')) {
         // If the field name contains a . - eg. address_primary.street_address
         // we just want the part after the .
@@ -581,6 +572,56 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       }
     }
     return $mapperError;
+  }
+
+  /**
+   * @param $mapper
+   *
+   * @return array
+   */
+  protected function getImportKeys($mapper): array {
+    $importKeys = [];
+    foreach ($mapper as $field) {
+      if (is_array($field)) {
+        $importKeys[] = $field;
+      }
+      else {
+        $importKeys[] = [$field];
+      }
+    }
+    return $importKeys;
+  }
+
+  /**
+   * @param array $mapper
+   *
+   * @return array
+   */
+  protected static function getMappedFields(array $mapper): array {
+    $mappedFields = [];
+    foreach ($mapper as $field) {
+      if (is_array($field)) {
+        $mappedFields[] = $field[0];
+      }
+      else {
+        $mappedFields[] = $field;
+      }
+    }
+    return $mappedFields;
+  }
+
+  /**
+   * @param array $mapper
+   *
+   * @param string $entity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateRequiredContactFields(array $mapper, string $entity = 'Contact'): array {
+    $parser = $this->getParser();
+    $rule = $parser->getDedupeRule($this->getContactType(), $this->getUserJob()['metadata']['entity_configuration'][$entity]['dedupe_rule'] ?? NULL);
+    return $this->validateContactFields($rule, $this->getImportKeys($mapper), ['external_identifier', 'contact_id']);
   }
 
 }

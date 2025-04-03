@@ -136,6 +136,22 @@ class CoreUtil {
   }
 
   /**
+   * Get sql for table, including database prefix if needed
+   *
+   * @param string $entityName
+   *
+   * @return string|null
+   */
+  public static function getTableExpr(string $entityName): ?string {
+    $tableName = self::getInfoItem($entityName, 'table_name');
+    $databaseName = self::getInfoItem($entityName, 'database_name');
+    if ($databaseName) {
+      return "`$databaseName`.`$tableName`";
+    }
+    return "`$tableName`";
+  }
+
+  /**
    * Given a sql table name, return the name of the api entity.
    *
    * @param string $tableName

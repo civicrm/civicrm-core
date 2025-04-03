@@ -1081,6 +1081,8 @@
   name        : Matthew Wire
   organization: MJW Consulting
 
+- github      : Matt5K
+
 - github      : marcineqpol
   name        : Marcin Lewandowski
 
@@ -1747,7 +1749,7 @@
   name        : Vinu Varshith Sekar
   organization: CompuCorp
 
-- github      : vinay-osseed
+- github      : vinugawade
   name        : Vinay Gawade
   organization: OSSeed Technologies LLP
 
@@ -1893,3 +1895,7 @@
 - github      : peetcreative
   name        : Peter Klausing
   organization: 5Knoten
+
+- github      : pzukowicz
+  name        : Patryk Żukowicz
+  organization: TechSoup

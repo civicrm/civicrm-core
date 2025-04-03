@@ -2544,7 +2544,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @throws \CRM_Core_Exception
    */
   protected function createPartiallyPaidParticipantOrder(): array {
-    $orderParams = $this->getParticipantOrderParams();
+    $orderParams = $this->getParticipantOrderParams(3);
     $orderParams['api.Payment.create'] = ['total_amount' => 150];
     return $this->callAPISuccess('Order', 'create', $orderParams);
   }
@@ -3431,9 +3431,42 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  protected function getParticipantOrderParams(): array {
+  protected function getParticipantOrderParams($version = 4): array {
     $this->eventCreatePaid();
     $contactID = $this->individualCreate();
+    if ($version === 4) {
+      return [
+        'contribution_params' => [
+          'total_amount' => 300,
+          'currency' => 'USD',
+          'contact_id' => $contactID,
+          'financial_type_id' => 4,
+        ],
+        'line_items' => [
+          [
+            'price_field_id' => $this->ids['PriceField']['PaidEvent'],
+            'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+            'entity_table' => 'civicrm_participant',
+            'entity_id.event_id' => $this->getEventID('PaidEvent'),
+            'entity_id.role_id' => 1,
+            'entity_id.status_id' => 14,
+            'entity_id.fee_currency' => 'USD',
+            'entity_id.contact_id' => $this->individualCreate(),
+          ],
+          [
+            'price_field_id' => $this->ids['PriceField']['PaidEvent'],
+            'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_plus'],
+            'qty' => 1,
+            'entity_table' => 'civicrm_participant',
+            'entity_id.event_id' => $this->getEventID('PaidEvent'),
+            'entity_id.role_id' => 1,
+            'entity_id.status_id' => 14,
+            'entity_id.fee_currency' => 'USD',
+            'entity_id.contact_id' => $contactID,
+          ],
+        ],
+      ];
+    }
     return [
       'total_amount' => 300,
       'currency' => 'USD',

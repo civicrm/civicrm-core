@@ -95,9 +95,10 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
         $display[$fieldExpr] = $display[$fieldName];
       }
     }
+    $displays = [$display];
     // Replace pseudoconstants e.g. type:icon
-    FormattingUtil::formatOutputValues($display, $fields);
-    $result->exchangeArray($this->selectArray([$display]));
+    FormattingUtil::formatOutputValues($displays, $fields);
+    $result->exchangeArray($this->selectArray($displays));
   }
 
   /**

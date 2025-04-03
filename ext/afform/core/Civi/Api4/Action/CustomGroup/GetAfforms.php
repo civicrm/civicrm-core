@@ -56,12 +56,8 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     $forms = [];
 
     // get field names once, for use across all the generate actions
-    $item['field_names'] = \Civi\Api4\CustomField::get(FALSE)
-      ->addSelect('name')
-      ->addWhere('custom_group_id', '=', $item['id'])
-      ->addWhere('is_active', '=', TRUE)
-      ->execute()
-      ->column('name');
+    $fields = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']])['fields'];
+    $item['field_names'] = array_column($fields, 'name');
 
     // Custom group has no enabled fields; nothing to generate.
     if (!$item['field_names']) {

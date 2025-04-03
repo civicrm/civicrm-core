@@ -199,7 +199,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $session = CRM_Core_Session::singleton();
       $userID = $session->get('userID');
 
-      $this->_isPermissionedChecksum = $allowPermission = FALSE;
+      $isPermissionedChecksum = $allowPermission = FALSE;
       $permissionType = CRM_Core_Permission::VIEW;
       if (CRM_Core_Permission::check('cms:administer users') || CRM_Core_Permission::check('view all contacts') || CRM_Contact_BAO_Contact_Permission::allow($this->_id)) {
         $allowPermission = TRUE;
@@ -207,18 +207,18 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       if ($this->_id != $userID) {
         // do not allow edit for anon users in joomla frontend, CRM-4668, unless u have checksum CRM-5228
         if ($config->userFrameworkFrontend) {
-          $this->_isPermissionedChecksum = CRM_Contact_BAO_Contact_Permission::validateOnlyChecksum($this->_id, $this, FALSE);
-          if (!$this->_isPermissionedChecksum) {
-            $this->_isPermissionedChecksum = $allowPermission;
+          $isPermissionedChecksum = CRM_Contact_BAO_Contact_Permission::validateOnlyChecksum($this->_id, $this, FALSE);
+          if (!$isPermissionedChecksum) {
+            $isPermissionedChecksum = $allowPermission;
           }
         }
         else {
-          $this->_isPermissionedChecksum = CRM_Contact_BAO_Contact_Permission::validateChecksumContact($this->_id, $this, FALSE);
+          $isPermissionedChecksum = CRM_Contact_BAO_Contact_Permission::validateChecksumContact($this->_id, $this, FALSE);
         }
       }
       // CRM-10853
       // Users with create or edit permission should be allowed to view their own profile
-      if ($this->_id == $userID || $this->_isPermissionedChecksum) {
+      if ($this->_id == $userID || $isPermissionedChecksum) {
         if (!CRM_Core_Permission::check('profile view')) {
           if (CRM_Core_Permission::check('profile create') || CRM_Core_Permission::check('profile edit')) {
             $this->_skipPermission = TRUE;
@@ -230,7 +230,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $admin = FALSE;
       if ((!$config->userFrameworkFrontend && $allowPermission) ||
         $this->_id == $userID ||
-        $this->_isPermissionedChecksum
+        $isPermissionedChecksum
       ) {
         $admin = TRUE;
       }

@@ -223,12 +223,6 @@ div.crm-inline-edit-form div.crm-clear {
   border-bottom: var(--crm-c-divider);
   border-width: 2px;
 }
-.crm-container div.contact_panel .crm-address-block {
-  margin-bottom: 6px;
-}
-.crm-container .crm-add-address-wrapper {
-  height: 25px;
-}
 .crm-container .crm-summary-row:after {
   clear: both;
   content: ".";
@@ -296,17 +290,17 @@ div.crm-inline-edit-form div.crm-clear {
   margin-bottom: .25em;
 }
 #crm-contact-actions-list a.delete {
-  background: var(--crm-dropdown-alert-bg);
-  color: var(--crm-c-alert-text);
+  background: var(--crm-dropdown-danger-bg);
+  color: var(--crm-c-danger-text);
   border-radius: var(--crm-roundness);
 }
 #crm-contact-actions-list a.delete .crm-i.fa-trash::before {
-  color: var(--crm-c-alert-text);
+  color: var(--crm-c-danger-text);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
-  color: var(--crm-c-alert-text);
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
+  color: var(--crm-c-danger-text);
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
 }
 
 /* Tags */

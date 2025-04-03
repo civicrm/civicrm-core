@@ -144,6 +144,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     }
     $this->setTitle($title);
 
+    $findParticipants = ['statusCounted' => '', 'statusNotCounted' => ''];
     if (CRM_Core_Permission::check('view event participants') &&
       CRM_Core_Permission::check('view all contacts')
     ) {
@@ -151,8 +152,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
       $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
       $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
-      $this->assign('findParticipants', $findParticipants);
     }
+    $this->assign('findParticipants', $findParticipants);
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
 

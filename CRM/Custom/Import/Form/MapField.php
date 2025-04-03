@@ -5,22 +5,6 @@
  */
 class CRM_Custom_Import_Form_MapField extends CRM_Import_Form_MapField {
 
-
-  /**
-   * Does the form layer convert field names to support QuickForm widgets.
-   *
-   * (e.g) if 'yes' we swap
-   * `soft_credit.external_identifier` to `soft_credit__external_identifier`
-   * because the contribution form would break on the . as it would treat it as
-   * javascript.
-   *
-   * In the case of the custom field import the array is flatter and there
-   * is no hierarchical select so we do not need to do this.
-   *
-   * @var bool
-   */
-  protected bool $supportsDoubleUnderscoreFields = FALSE;
-
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
    *

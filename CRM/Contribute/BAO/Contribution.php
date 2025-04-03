@@ -21,6 +21,7 @@ use Civi\Api4\MembershipLog;
 use Civi\Api4\PaymentProcessor;
 use Civi\Api4\UFJoin;
 use Civi\Core\Event\PostEvent;
+use Civi\Order\Event\OrderCompleteEvent;
 
 /**
  *
@@ -373,7 +374,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
     if (!isset($params['net_amount'])) {
       if (!$contributionID) {
-        $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+        // It is unclear how total_amount could be null
+        // see https://lab.civicrm.org/dev/core/-/issues/5767
+        $params['net_amount'] = ($params['total_amount'] ?? 0) - $params['fee_amount'];
       }
       else {
         if (isset($params['fee_amount']) || isset($params['total_amount'])) {
@@ -945,8 +948,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    *
    * @return array
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   protected static function getRelatedMemberships(int $contributionID): array {
+    CRM_Core_Error::deprecatedWarning('getRelatedMemberships is only used by updateMembershipBasedOnCompletionOfContribution which has been moved to \Civi\Membership\OrderCompleteSubscriber and will be removed from CRM_Contribute_BAO_Contribution');
+
     $membershipIDs = array_keys((array) LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionID)
       ->addWhere('entity_table', '=', 'civicrm_membership')
@@ -1778,6 +1785,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
   /**
    * Returns all contribution related object ids.
+   *
+   * @deprecated since 6.2 will be removed when core callers fully removed.
    *
    * @param $contributionId
    *
@@ -3658,10 +3667,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID && !$disableActionsOnCompleteOrder) {
-      self::updateMembershipBasedOnCompletionOfContribution(
-        $contributionID,
-        $input['trxn_date'] ?? date('YmdHis')
-      );
+      $orderCompleteEventParams = [
+        'effective_date' => $input['trxn_date'] ?? date('YmdHis'),
+      ];
+      \Civi::dispatcher()->dispatch('civi.order.complete', new OrderCompleteEvent($contributionID, $orderCompleteEventParams));
     }
 
     $participantPayments = civicrm_api3('ParticipantPayment', 'get', ['contribution_id' => $contributionID, 'return' => 'participant_id', 'sequential' => 1])['values'];
@@ -3991,8 +4000,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   If provided, specify an alternative date to use as "today" calculation of membership dates
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function updateMembershipBasedOnCompletionOfContribution($contributionID, $changeDate) {
+    CRM_Core_Error::deprecatedWarning('updateMembershipBasedOnCompletionOfContribution has been moved to \Civi\Membership\OrderCompleteSubscriber and will be removed from CRM_Contribute_BAO_Contribution');
+
     $memberships = self::getRelatedMemberships((int) $contributionID);
     foreach ($memberships as $membership) {
       $membershipParams = [

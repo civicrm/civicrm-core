@@ -36,6 +36,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   private array $optionsCount;
 
+  /**
+   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields).
+   *
+   * This is rendered via billingBlock.tpl.
+   *
+   * @var array
+   */
+  public $_paymentFields = [];
+
   protected function getOrder(): CRM_Financial_BAO_Order {
     if (!isset($this->order)) {
       $this->initializeOrder();
@@ -547,23 +556,22 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
-    if ($this->getSubmittedValue('credit_card_number')) {
-      if (isset($params['credit_card_exp_date'])) {
-        $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
-        $date = CRM_Utils_Date::mysqlToIso($date);
-      }
-      $this->assign('credit_card_exp_date', $date ?? NULL);
-      $this->assign('credit_card_number',
-        CRM_Utils_System::mungeCreditCard($params['credit_card_number'] ?? NULL)
-      );
+    $this->assign('credit_card_type', $this->getSubmittedValue('credit_card_type'));
+    if ($this->getSubmittedValue('credit_card_exp_date')) {
+      $date = CRM_Utils_Date::format($this->getSubmittedValue('credit_card_exp_date'));
+      $date = CRM_Utils_Date::mysqlToIso($date);
     }
+    $this->assign('credit_card_exp_date', $date ?? NULL);
+    $this->assign('credit_card_number',
+      CRM_Utils_System::mungeCreditCard($this->getSubmittedValue('credit_card_number') ?? '')
+    );
 
     $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm'] ?? NULL);
     // assign pay later stuff
-    $params['is_pay_later'] ??= FALSE;
-    $this->assign('is_pay_later', $params['is_pay_later']);
-    $this->assign('pay_later_text', $params['is_pay_later'] ? $this->getPayLaterLabel() : FALSE);
-    $this->assign('pay_later_receipt', $params['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
+    $isPayLater = empty($this->getSubmittedValue('payment_processor_id'));
+    $this->assign('is_pay_later', $isPayLater);
+    $this->assign('pay_later_text', $isPayLater ? $this->getPayLaterLabel() : FALSE);
+    $this->assign('pay_later_receipt', $isPayLater ? $this->_values['event']['pay_later_receipt'] : NULL);
 
     // also assign all participantIDs to the template
     // useful in generating confirmation numbers if needed
@@ -1598,15 +1606,17 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return mixed|null
    */
   public function getSubmittedValue(string $fieldName) {
-    $value = parent::getSubmittedValue($fieldName);
-    // Check for value as well in case the field has been added to the Confirm form
-    // I don't quite know how that works but something Matt has worked on.
-    if ($value || !in_array($this->getName(), ['Confirm', 'ThankYou'], TRUE)) {
-      return $value;
+    if ($this->isShowPaymentOnConfirm() && in_array($this->getName(), ['Confirm', 'ThankYou'], TRUE)) {
+      $value = $this->controller->exportValue('Confirm', $fieldName);
     }
-    // If we are on the Confirm or ThankYou page then the submitted values
-    // were on the Register Page so we return them
-    $value = $this->controller->exportValue('Register', $fieldName);
+    else {
+      // If we are on the Confirm or ThankYou page then the submitted values
+      // were on the Register Page so we return them
+      $value = $this->controller->exportValue('Register', $fieldName);
+    }
+    if (!isset($value)) {
+      $value = parent::getSubmittedValue($fieldName);
+    }
     if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
       return CRM_Utils_Rule::cleanMoney($value);
     }

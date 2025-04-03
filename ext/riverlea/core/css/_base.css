@@ -236,7 +236,7 @@ dl dl {
 #bootstrap-theme .has-error.checkbox label,
 #bootstrap-theme .has-error.radio-inline label,
 #bootstrap-theme .has-error.checkbox-inline label {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
 }
 .crm-container .font-red {
   color: var(--crm-c-red-dark);
@@ -325,7 +325,7 @@ dl dl {
   color: var(--crm-c-warning);
 }
 .crm-container .text-danger {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
 }
 .crm-container h1,
 .crm-container h2,
@@ -435,6 +435,9 @@ dl dl {
 .crm-container .pull-right,
 .crm-container .element-right {
   float: right;
+}
+.crm-container .nowrap {
+  white-space: nowrap
 }
 /* Responsive  */
 

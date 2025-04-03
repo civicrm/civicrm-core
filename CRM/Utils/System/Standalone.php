@@ -696,13 +696,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * Standalone's session cannot be initialized until CiviCRM is booted,
    * since it is defined in an extension,
    *
-   * This is also when we set timezone
+   * This used to be when we set timezone, but this is moved to
+   * standaloneusers_civicrm_config hook to avoid crashing multilingual sites`
    */
   public function postContainerBoot(): void {
     $sess = \CRM_Core_Session::singleton();
     $sess->initialize();
-
-    $this->setTimeZone();
   }
 
 }

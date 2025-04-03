@@ -18,22 +18,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
-
-  /**
-   * Does the form layer convert field names to support QuickForm widgets.
-   *
-   * (e.g) if 'yes' we swap
-   * `soft_credit.external_identifier` to `soft_credit__external_identifier`
-   * because the contribution form would break on the . as it would treat it as
-   * javascript.
-   *
-   * In the case of the participant import the array is flatter and there
-   * is no hierarchical select so we do not need to do this.
-   *
-   * @var bool
-   */
-  protected bool $supportsDoubleUnderscoreFields = FALSE;
+class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
@@ -98,30 +83,19 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @param $files
+   * @param array $files
    * @param self $self
    *
    * @return array|true
    *   list of errors to be posted back to the form
+   * @throws \CRM_Core_Exception
    */
   public static function formRule($fields, $files, $self) {
-    $requiredError = [];
-
-    if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = [];
-      $importKeys = [];
-      foreach ($fields['mapper'] as $field) {
-        $importKeys[] = [$field];
-      }
-      $parser = $self->getParser();
-      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-      $requiredError = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'contact_id']);
-
-      if (!in_array('id', $fields['mapper']) && !in_array('event_id', $fields['mapper'])) {
-        // ID is the only field we need, if present.
-        $requiredError[] = ts('Missing required field: Provide %1 or %2',
-            [1 => 'Event ID', 2 => 'Event Title']
-          ) . '<br />';
+    $mappedFields = $self->getMappedFields($fields['mapper']);
+    if (!in_array('Participant.id', $mappedFields)) {
+      $requiredError = $self->validateRequiredContactFields($fields['mapper']);
+      if (!in_array('Participant.event_id', $mappedFields)) {
+        $requiredError[] = ts('Missing required field: %1', [1 => 'Event']) . '<br />';
       }
     }
 
@@ -151,7 +125,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       $highlightedFieldsArray = [
         'id',
         'event_id',
-        'event_title',
         'status_id',
       ];
       foreach ($highlightedFieldsArray as $name) {

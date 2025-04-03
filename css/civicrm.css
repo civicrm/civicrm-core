@@ -1828,10 +1828,6 @@ input.crm-form-entityref {
   vertical-align: top;
 }
 
-#crm-container table.report-layout tr {
-  font-size: 0.95em;
-}
-
 #crm-container .report-label {
   text-align: right;
   font-weight: bold;

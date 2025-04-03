@@ -602,6 +602,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    */
   public static function getLongNameFromShortName(string $shortName): ?string {
     [, $id] = explode('_', $shortName);
+    $id = (int) $id;
     foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
       if (isset($customGroup['fields'][$id])) {
         return $customGroup['name'] . '.' . $customGroup['fields'][$id]['name'];
@@ -618,12 +619,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     if (empty($groupName) || empty($fieldName)) {
       return NULL;
     }
-    foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
-      if ($customGroup['name'] === $groupName) {
-        foreach ($customGroup['fields'] as $id => $field) {
-          if ($field['name'] === $fieldName) {
-            return "custom_$id";
-          }
+    $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['name' => $groupName]);
+    if ($customGroup) {
+      foreach ($customGroup['fields'] as $id => $field) {
+        if ($field['name'] === $fieldName) {
+          return "custom_$id";
         }
       }
     }

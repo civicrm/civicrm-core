@@ -77,8 +77,8 @@ class Api4SelectQuery extends Api4Query {
       $this->addSpecField($field['name'], $field);
     }
 
-    $tableName = CoreUtil::getTableName($this->getEntity());
-    $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
+    $tableExpr = CoreUtil::getTableExpr($this->getEntity());
+    $this->query = \CRM_Utils_SQL_Select::from($tableExpr . ' ' . self::MAIN_TABLE_ALIAS);
 
     $this->fillEntityValues();
 
@@ -104,9 +104,7 @@ class Api4SelectQuery extends Api4Query {
    */
   public function run(): array {
     $results = $this->getResults();
-    foreach ($results as &$result) {
-      FormattingUtil::formatOutputValues($result, $this->apiFieldSpec, 'get', $this->selectAliases);
-    }
+    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases);
     return $results;
   }
 
@@ -488,7 +486,8 @@ class Api4SelectQuery extends Api4Query {
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
       $tableName = CoreUtil::getTableName($entity);
-      $this->startNewJoin($tableName, $alias);
+      $tableExpr = CoreUtil::getTableExpr($entity);
+      $this->startNewJoin($tableExpr, $alias);
       // Save join info to be retrieved by $this->getExplicitJoin()
       $joinOn = array_filter(array_filter($join, 'is_array'));
       $this->explicitJoins[$alias] = [
@@ -603,8 +602,9 @@ class Api4SelectQuery extends Api4Query {
 
     $bridgeAlias = $alias . '_via_' . strtolower($bridgeEntity);
 
-    $joinTable = CoreUtil::getTableName($joinEntity);
-    [$bridgeTable, $baseRef, $joinRef] = $this->getBridgeRefs($bridgeEntity, $joinEntity);
+    $joinTableExpr = CoreUtil::getTableExpr($joinEntity);
+    $bridgeTableExpr = CoreUtil::getTableExpr($bridgeEntity);
+    [$baseRef, $joinRef] = $this->getBridgeRefs($bridgeEntity, $joinEntity);
 
     $this->registerBridgeJoinFields($bridgeEntity, $joinRef, $baseRef, $alias, $bridgeAlias);
 
@@ -632,12 +632,12 @@ class Api4SelectQuery extends Api4Query {
     // Info needed for joining custom fields extending the bridge entity
     $this->explicitJoins[$alias]['bridge_table_alias'] = $bridgeAlias;
     // Invert the join so all nested joins will link to the bridge entity
-    $this->openJoin['table'] = $bridgeTable;
+    $this->openJoin['table'] = $bridgeTableExpr;
     $this->openJoin['alias'] = $bridgeAlias;
 
     // Add main table as inner join
     $innerConditions = array_merge($linkConditions, $acls);
-    $this->addJoin('INNER', $joinTable, $alias, $bridgeAlias, $innerConditions);
+    $this->addJoin('INNER', $joinTableExpr, $alias, $bridgeAlias, $innerConditions);
     return array_merge($outerConditions, $bridgeConditions);
   }
 
@@ -654,7 +654,6 @@ class Api4SelectQuery extends Api4Query {
     /** @var \CRM_Core_DAO $bridgeDAO */
     $bridgeDAO = CoreUtil::getInfoItem($bridgeEntity, 'dao');
     $bridgeEntityFields = \Civi\API\Request::create($bridgeEntity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()])->entityFields();
-    $bridgeTable = $bridgeDAO::getTableName();
 
     // Get the 2 bridge reference columns as CRM_Core_Reference_* objects
     $referenceColumns = $bridgeDAO::getReferenceColumns();
@@ -666,7 +665,7 @@ class Api4SelectQuery extends Api4Query {
         }
         foreach ($bridgeDAO::getReferenceColumns() as $baseRef) {
           if ($baseRef->getReferenceKey() === $bridges[$refKey]['to']) {
-            return [$bridgeTable, $baseRef, $joinRef];
+            return [$baseRef, $joinRef];
           }
         }
       }
@@ -889,9 +888,9 @@ class Api4SelectQuery extends Api4Query {
   /**
    * Begins a new join; as long as it's "open" then additional joins will nest inside it.
    */
-  private function startNewJoin(string $tableName, string $joinAlias): void {
+  private function startNewJoin(string $tableExpr, string $joinAlias): void {
     $this->openJoin = [
-      'table' => $tableName,
+      'table' => $tableExpr,
       'alias' => $joinAlias,
       'subjoins' => [],
     ];
@@ -899,33 +898,33 @@ class Api4SelectQuery extends Api4Query {
 
   private function finishJoin(string $side, $conditions): void {
     $tableAlias = $this->openJoin['alias'];
-    $tableName = $this->openJoin['table'];
+    $tableExpr = $this->openJoin['table'];
     $subjoinClause = '';
     foreach ($this->openJoin['subjoins'] as $subjoin) {
-      $subjoinClause .= " INNER JOIN `{$subjoin['table']}` `{$subjoin['alias']}` ON (" . implode(' AND ', $subjoin['conditions']) . ")";
+      $subjoinClause .= " INNER JOIN {$subjoin['table']} `{$subjoin['alias']}` ON (" . implode(' AND ', $subjoin['conditions']) . ")";
     }
-    $this->query->join($tableAlias, "$side JOIN (`$tableName` `$tableAlias`$subjoinClause) ON " . implode(' AND ', $conditions));
+    $this->query->join($tableAlias, "$side JOIN ($tableExpr `$tableAlias`$subjoinClause) ON " . implode(' AND ', $conditions));
     $this->openJoin = NULL;
   }
 
   /**
    * @param string $side
-   * @param string $tableName
+   * @param string $tableExpr
    * @param string $tableAlias
    * @param string $baseTableAlias
    * @param array $conditions
    */
-  private function addJoin(string $side, string $tableName, string $tableAlias, string $baseTableAlias, array $conditions): void {
+  private function addJoin(string $side, string $tableExpr, string $tableAlias, string $baseTableAlias, array $conditions): void {
     // If this join is based off the current open join, incorporate it
     if ($baseTableAlias === ($this->openJoin['alias'] ?? NULL)) {
       $this->openJoin['subjoins'][] = [
-        'table' => $tableName,
+        'table' => $tableExpr,
         'alias' => $tableAlias,
         'conditions' => $conditions,
       ];
     }
     else {
-      $this->query->join($tableAlias, "$side JOIN `$tableName` `$tableAlias` ON " . implode(' AND ', $conditions));
+      $this->query->join($tableAlias, "$side JOIN $tableExpr `$tableAlias` ON " . implode(' AND ', $conditions));
     }
   }
 

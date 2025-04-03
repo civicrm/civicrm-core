@@ -18,22 +18,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
-
-  /**
-   * Does the form layer convert field names to support QuickForm widgets.
-   *
-   * (e.g) if 'yes' we swap
-   * `soft_credit.external_identifier` to `soft_credit__external_identifier`
-   * because the contribution form would break on the . as it would treat it as
-   * javascript.
-   *
-   * In the case of the membership import the array is flatter and there
-   * is no hierarchical select so we do not need to do this.
-   *
-   * @var bool
-   */
-  protected bool $supportsDoubleUnderscoreFields = FALSE;
+class CRM_Member_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Build the form object.
@@ -89,22 +74,17 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $importKeys = [];
-    foreach ($fields['mapper'] as $field) {
-      $importKeys[] = [$field];
-    }
-    $parser = $self->getParser();
-    $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-    $errors = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'contact_id', 'contact_id']);
-
-    if (!in_array('id', $fields['mapper']) && !in_array('membership__id', $fields['mapper'])) {
+    $errors = [];
+    $mappedFields = $self->getMappedFields($fields['mapper']);
+    if (!in_array('Membership.id', $mappedFields)) {
+      $errors = $self->validateRequiredContactFields($fields['mapper']);
       // FIXME: should use the schema titles, not redeclare them
       $requiredFields = [
-        'membership_type_id' => ts('Membership Type'),
-        'start_date' => ts('Membership Start Date'),
+        'Membership.membership_type_id' => ts('Membership Type'),
+        'Membership.start_date' => ts('Membership Start Date'),
       ];
       foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $fields['mapper'])) {
+        if (!in_array($field, $mappedFields)) {
           if (!isset($errors['_qf_default'])) {
             $errors['_qf_default'] = '';
           }

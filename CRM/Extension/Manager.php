@@ -166,54 +166,36 @@ class CRM_Extension_Manager {
     $oldStatus = $this->getStatus($newInfo->key);
 
     // Find $oldInfo, $typeManager
-    switch ($oldStatus) {
-      case self::STATUS_UNINSTALLED:
-      case self::STATUS_INSTALLED:
-      case self::STATUS_DISABLED:
-        [$oldInfo, $typeManager] = $this->_getInfoTypeHandler($newInfo->key);
-        break;
-
-      case self::STATUS_INSTALLED_MISSING:
-      case self::STATUS_DISABLED_MISSING:
+    try {
+      [$oldInfo, $typeManager] = $this->_getInfoTypeHandler($newInfo->key);
+    }
+    catch (CRM_Extension_Exception_MissingException $e) {
+      if ($oldStatus === self::STATUS_INSTALLED_MISSING || $oldStatus === self::STATUS_DISABLED_MISSING) {
         [$oldInfo, $typeManager] = $this->_getMissingInfoTypeHandler($newInfo->key);
-        break;
-
-      case self::STATUS_UNKNOWN:
-        $oldInfo = $typeManager = NULL;
-        break;
-
-      default:
-        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
+      }
+      else {
+        $oldInfo = NULL;
+        $typeManager = $this->typeManagers[$newInfo->type];
+      }
     }
 
     // find $tgtPath
-    switch ($oldStatus) {
-      case self::STATUS_UNINSTALLED:
-      case self::STATUS_INSTALLED:
-      case self::STATUS_DISABLED:
-        // There is an old copy of the extension. Try to install in the same place -- but it must go somewhere in the default-container
-        // throws Exception
-        $tgtPath = $this->fullContainer->getPath($newInfo->key);
-        if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
-          // force installation in the default-container
-          $oldPath = $tgtPath;
-          $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-          CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
-            1 => $newInfo->key,
-            2 => $oldPath,
-          ]), '', 'alert', ['expires' => 0]);
-        }
-        break;
-
-      case self::STATUS_INSTALLED_MISSING:
-      case self::STATUS_DISABLED_MISSING:
-      case self::STATUS_UNKNOWN:
-        // the extension does not exist in any container; we're free to put it anywhere
-        $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-        break;
-
-      default:
-        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
+    try {
+      // We prefer to put the extension in the same place (where it already exists).
+      $tgtPath = $this->fullContainer->getPath($newInfo->key);
+    }
+    catch (CRM_Extension_Exception_MissingException $e) {
+      // the extension does not exist in any container; we're free to put it anywhere
+      $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
+    }
+    if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
+      // But if we don't control the folder, then force installation in the default-container
+      $oldPath = $tgtPath;
+      $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
+      CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
+        1 => $newInfo->key,
+        2 => $oldPath,
+      ]), '', 'alert', ['expires' => 0]);
     }
 
     if ($backupCodeDir && is_dir($tgtPath)) {

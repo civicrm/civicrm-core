@@ -1688,6 +1688,8 @@ class CRM_Utils_Token {
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
           'receipt_text_renewal' => 'receipt_text',
+          '$totalTaxAmount' => 'contribution.tax_amount',
+          '$getTaxDetails' => ts('no longer available / relevant'),
           '$isAmountZero' => ts('no longer available / relevant'),
           '$dataArray' => ts('see default template for how to show this'),
           '$mem_start_date' => 'membership.start_date',
@@ -1713,8 +1715,13 @@ class CRM_Utils_Token {
           '$receive_date' => 'contribution.receive_date',
           '$currency' => 'contribution.currency',
         ],
+        'contribution_offline_receipt' => [
+          '$totalTaxAmount' => 'contribution.tax_amount',
+          '$getTaxDetails' => ts('no longer available / relevant'),
+        ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
+          '$getTaxDetails' => ts('no longer available / relevant'),
           '$isAmountZero' => ts('no longer available / relevant'),
           '$dataArray' => ts('see default template for how to show this'),
           '$paidBy' => 'contribution.payment_instrument_id:label',

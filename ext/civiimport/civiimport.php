@@ -138,9 +138,6 @@ function _civiimport_civicrm_get_import_tables(): array {
  * @throws \CRM_Core_Exception
  */
 function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templateFile): void {
-  if ($formName === 'CRM_Contribute_Import_Form_MapField') {
-    $templateFile = 'CRM/Import/MapField.tpl';
-  }
   if ($formName === 'CRM_Queue_Page_Monitor') {
     $jobName = CRM_Utils_Request::retrieveValue('name', 'String');
     if (str_starts_with($jobName, 'user_job_')) {
@@ -213,7 +210,7 @@ function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions
  * @throws \CRM_Core_Exception
  */
 function civiimport_civicrm_buildForm(string $formName, $form) {
-  if ($formName === 'CRM_Contribute_Import_Form_MapField') {
+  if (in_array($formName, civiimport_enabled_forms())) {
     // Add import-ui app
     Civi::service('angularjs.loader')->addModules('crmCiviimport');
     $form->assignCiviimportVariables();
@@ -241,10 +238,15 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
   //@todo - do for all Preview forms - just need to fix each Preview.tpl to
   // not open in new tab as they are not yet consolidated into one file.
   // (Or consolidate them now).
-  if ($formName === 'CRM_Contact_Import_Form_Summary' || $formName === 'CRM_Contribute_Import_Form_Preview') {
+  if ($formName === 'CRM_Contact_Import_Form_Summary'
+    || $formName === 'CRM_Contribute_Import_Form_Preview') {
     $form->assign('isOpenResultsInNewTab', TRUE);
     $form->assign('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR', FALSE));
     $form->assign('allRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID(), FALSE));
     $form->assign('importedRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=IMPORTED', FALSE));
   }
+}
+
+function civiimport_enabled_forms() {
+  return ['CRM_Contribute_Import_Form_MapField', 'CRM_Member_Import_Form_MapField', 'CRM_Event_Import_Form_MapField'];
 }

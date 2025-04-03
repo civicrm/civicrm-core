@@ -27,6 +27,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   private $externalIdentifiers = [];
 
+  protected $baseEntity = 'Contact';
+
   /**
    * Relationship labels.
    *
@@ -134,7 +136,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
 
       //format common data, CRM-4062
-      $this->formatCommonData($params, $formatted);
+      $this->augmentAddressData($formatted);
 
       $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
       $contactID = $newContact->id;
@@ -146,7 +148,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $field['id'] = $this->processContact($field, FALSE);
         $formatting = $field;
         //format common data, CRM-4062
-        $this->formatCommonData($field, $formatting);
+        $this->augmentAddressData($formatting);
         $isUpdate = empty($formatting['id']) ? 'new' : 'updated';
         if (empty($formatting['id']) || $this->isUpdateExisting()) {
           $relatedNewContact = $this->createContact($formatting, $formatting['id']);
@@ -254,14 +256,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * The call to formatLocationBlock just does the address custom fields which,
    * are already formatted by this point.
    *
-   * @deprecated
-   *
-   * @param array $params
-   *   Contain record values.
    * @param array $formatted
    *   Array of formatted data.
    */
-  private function formatCommonData($params, &$formatted) {
+  private function augmentAddressData(array &$formatted): void {
     $metadataBlocks = ['phone', 'im', 'openid', 'email', 'address'];
     foreach ($metadataBlocks as $block) {
       foreach ($formatted[$block] ?? [] as $blockKey => $blockValues) {
@@ -448,6 +446,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public function createContact(&$formatted, $contactId = NULL) {
 
     if ($contactId) {
+      $formatted['id'] = $contactId;
       $this->formatParams($formatted, (int) $contactId);
       // manage is_opt_out
       $existingOptOut = $this->getExistingContactValue($contactId, 'is_opt_out');
@@ -464,21 +463,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     // Resetting and rebuilding cache could be expensive.
     CRM_Core_Config::setPermitCacheFlushMode(FALSE);
-
-    // If a user has logged in, or accessed via a checksum
-    // Then deliberately 'blanking' a value in the profile should remove it from their record
-    // @todo this should either be TRUE or FALSE in the context of import - once
-    // we figure out which we can remove all the rest.
-    // Also note the meaning of this parameter is less than it used to
-    // be following block cleanup.
-    $formatted['updateBlankLocInfo'] = TRUE;
-    if ((CRM_Core_Session::singleton()->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
-      $formatted['updateBlankLocInfo'] = FALSE;
-    }
-
-    $data = $this->formatProfileContactParams($formatted, $contactId, $formatted['contact_type']);
-
-    $contact = civicrm_api3('Contact', 'create', $data);
+    $contact = civicrm_api3('Contact', 'create', $formatted);
     $cid = $contact['id'];
 
     CRM_Core_Config::setPermitCacheFlushMode(TRUE);
@@ -505,135 +490,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Legacy format profile contact parameters.
-   *
-   * This is a formerly shared function - most of the stuff in it probably does
-   * nothing but copied here to star unravelling that...
-   *
-   * @param array $params
-   * @param int|null $contactID
-   * @param string|null $ctype
-   *
-   * @return array
-   */
-  private function formatProfileContactParams(
-    $params,
-    $contactID = NULL,
-    $ctype = NULL
-  ) {
-
-    $data = ['contact_type' => $ctype];
-
-    $locationType = [];
-    $count = 1;
-
-    if ($contactID) {
-      //add contact id
-      $data['contact_id'] = $contactID;
-      $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
-    }
-    else {
-      $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
-      $defaultLocationId = $defaultLocation->id;
-    }
-
-    $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
-
-    $multiplFields = ['url'];
-
-    foreach ($params as $key => $value) {
-      [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
-
-      if ($locTypeId == 'Primary') {
-        if ($contactID) {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
-          $primaryLocationType = $locTypeId;
-        }
-        else {
-          $locTypeId = $defaultLocationId;
-        }
-      }
-
-      if (is_numeric($locTypeId) &&
-        !in_array($fieldName, $multiplFields) &&
-        substr($fieldName, 0, 7) !== 'custom_'
-      ) {
-        $index = $locTypeId;
-
-        if (is_numeric($typeId)) {
-          $index .= '-' . $typeId;
-        }
-        if (!in_array($index, $locationType)) {
-          $locationType[$count] = $index;
-          $count++;
-        }
-
-        $loc = CRM_Utils_Array::key($index, $locationType);
-
-        $blockName = strtolower($this->getFieldEntity($fieldName));
-
-        $data[$blockName][$loc]['location_type_id'] = $locTypeId;
-
-        //set is_billing true, for location type "Billing"
-        if ($locTypeId == $billingLocationTypeId) {
-          $data[$blockName][$loc]['is_billing'] = 1;
-        }
-
-        if ($contactID) {
-          //get the primary location type
-          if ($locTypeId == $primaryLocationType) {
-            $data[$blockName][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($locTypeId == $defaultLocationId) {
-          $data[$blockName][$loc]['is_primary'] = 1;
-        }
-
-        if ($fieldName === 'state_province') {
-          // CRM-3393
-          if (is_numeric($value) && ((int ) $value) >= 1000) {
-            $data['address'][$loc]['state_province_id'] = $value;
-          }
-          elseif (empty($value)) {
-            $data['address'][$loc]['state_province_id'] = '';
-          }
-          else {
-            $data['address'][$loc]['state_province'] = $value;
-          }
-        }
-        elseif ($fieldName === 'country_id') {
-          $data['address'][$loc]['country_id'] = $value;
-        }
-        elseif ($fieldName === 'county') {
-          $data['address'][$loc]['county_id'] = $value;
-        }
-        elseif ($fieldName == 'address_name') {
-          $data['address'][$loc]['name'] = $value;
-        }
-        elseif (substr($fieldName, 0, 14) === 'address_custom') {
-          $data['address'][$loc][substr($fieldName, 8)] = $value;
-        }
-        else {
-          $data[$blockName][$loc][$fieldName] = $value;
-        }
-      }
-
-      if ($key === 'location') {
-        foreach ($value as $locationTypeId => $field) {
-          foreach ($field as $block => $val) {
-            if ($block === 'address' && array_key_exists('address_name', $val)) {
-              $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-            }
-          }
-        }
-      }
-      $data[$key] = $value;
-    }
-
-    return $data;
-  }
-
-  /**
    * Format params for update and fill mode.
    *
    * @param array $params
@@ -647,66 +503,52 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return;
     }
 
-    $contactParams = [
-      'contact_id' => $cid,
-      // core#4269 - Don't check relationships for values.
-      'noRelationships' => TRUE,
+    $contactObj = new CRM_Contact_DAO_Contact();
+    $contactObj->id = $cid;
+    $contactObj->find(TRUE);
+    $blocks = [
+      'email' => CRM_Core_BAO_Email::getValues(['contact_id' => $cid]),
+      'phone' => CRM_Core_BAO_Phone::getValues(['contact_id' => $cid]),
+      'address' => CRM_Core_BAO_Address::getValues(['contact_id' => $cid]),
     ];
-
-    $defaults = [];
-    $contactObj = CRM_Contact_BAO_Contact::retrieve($contactParams, $defaults);
-
     $modeFill = $this->isFillDuplicates();
-
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($params['contact_type'], NULL, $cid, 0, NULL);
-    CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);
-
-    $contact = get_object_vars($contactObj);
 
     foreach ($params as $key => $value) {
       if (in_array($key, ['id', 'contact_type'])) {
         continue;
       }
-      // These values must be handled differently because we need to account for location type.
-      $checkLocationType = in_array($key, ['address', 'phone', 'email']);
 
-      if (!$checkLocationType) {
-        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
-          $custom_params = ['id' => $contact['id'], 'return' => $key];
-          $getValue = civicrm_api3('Contact', 'getvalue', $custom_params);
-          if (empty($getValue)) {
-            unset($getValue);
+      if (!isset($blocks[$key])) {
+        if ($this->isFillDuplicates()) {
+          if (CRM_Core_BAO_CustomField::getKeyID($key)) {
+            $getValue = civicrm_api3('Contact', 'getvalue', ['id' => $cid, 'return' => $key]);
+            if (!empty($getValue)) {
+              // Value exists. Do not overwrite in fill mode.
+              // It is unclear, but historical that we check empty here & NULL below.
+              unset($params[$key]);
+            }
           }
-        }
-        else {
-          $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
-        }
-
-        if ($modeFill && isset($getValue)) {
-          unset($params[$key]);
-          if ($customFieldId) {
-            // Extra values must be unset to ensure the values are not
-            // imported.
-            unset($params['custom'][$customFieldId]);
+          else {
+            if (($contactObj->$key ?? NULL) !== NULL) {
+              // Value exists. Do not overwrite in fill mode.
+              unset($params[$key]);
+            }
           }
         }
       }
       else {
-
+        // These values must be handled differently because we need to account for location type.
         foreach ($value as $innerKey => $locationValues) {
           if ($modeFill) {
-            $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
-            if (isset($getValue)) {
-              foreach ($getValue as $cnt => $values) {
-                if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$key][$innerKey]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$key][$innerKey]['location_type_id']) {
-                  unset($params[$key][$innerKey]);
+            foreach ($blocks[$key] ?? [] as $cnt => $values) {
+              if ((!empty($values['location_type_id']) && !empty($params[$key][$innerKey]['location_type_id'])) && $values['location_type_id'] == $params[$key][$innerKey]['location_type_id']) {
+                unset($params[$key][$innerKey]);
+                if (empty($params[$key])) {
+                  unset($params[$key]);
                 }
               }
             }
           }
-        }
-        if (count($params[$key]) == 0) {
-          unset($params[$key]);
         }
       }
     }

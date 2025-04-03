@@ -40,6 +40,10 @@ function standaloneusers_civicrm_buildForm($formName, CRM_Core_Form $form) {
  */
 function standaloneusers_civicrm_config(&$config) {
   _standaloneusers_civix_civicrm_config($config);
+
+  // set system timezone based on logged in user
+  \CRM_Utils_System::setTimeZone();
+
   $sess = CRM_Core_Session::singleton();
 
   if (!empty($sess->get('ufID'))) {

@@ -208,23 +208,16 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
     }
   }
 
-  /**
-   * Get custom fields that extend this entity
-   *
-   * @param string $entityName
-   * @param \Civi\Api4\Service\Spec\RequestSpec $spec
-   * @throws \CRM_Core_Exception
-   * @see \CRM_Core_SelectValues::customGroupExtends
-   */
-  private function addCustomFields(string $entityName, RequestSpec $spec) {
+  public function getCustomGroupFilters(RequestSpec $spec): ?array {
+    $entityName = $spec->getEntity();
     // If contact type is given, treat it as the api entity
     if ($entityName === 'Contact' && $spec->getValue('contact_type')) {
       $entityName = $spec->getValue('contact_type');
     }
 
-    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entityName);
+    $customInfo = CoreUtil::getCustomGroupExtends($entityName);
     if (!$customInfo) {
-      return;
+      return NULL;
     }
     $grouping = $customInfo['grouping'];
     if (CoreUtil::isContact($entityName)) {
@@ -257,6 +250,22 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
         }
         $filters['id'] = $ids;
       }
+    }
+    return $filters;
+  }
+
+  /**
+   * Get custom fields that extend this entity
+   *
+   * @param string $entityName
+   * @param \Civi\Api4\Service\Spec\RequestSpec $spec
+   * @throws \CRM_Core_Exception
+   * @see \CRM_Core_SelectValues::customGroupExtends
+   */
+  private function addCustomFields(string $entityName, RequestSpec $spec) {
+    $filters = $this->getCustomGroupFilters($spec);
+    if ($filters === NULL) {
+      return;
     }
     $entity = \Civi::entity(CoreUtil::isContact($entityName) ? 'Contact' : $entityName);
     $customFields = $entity->getCustomFields($filters);

@@ -160,9 +160,9 @@
             {ts}Credit Card Information{/ts}
           </div>
           <div class="crm-section no-label credit_card_details-section">
-            <div class="content">{$credit_card_type}</div>
-            <div class="content">{$credit_card_number}</div>
-            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
+            <div class="content credit_card_type">{$credit_card_type}</div>
+            <div class="content credit_card_number">{$credit_card_number}</div>
+            <div class="content credit_card_exp_date">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         </div>

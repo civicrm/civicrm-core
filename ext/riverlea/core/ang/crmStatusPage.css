@@ -18,8 +18,8 @@
 #crm-status-list .crm-severity-alert,
 #crm-status-list .crm-severity-critical,
 #crm-status-list .crm-severity-error {
-  background-color: var(--crm-c-alert);
-  color: var(--crm-c-alert-text);
+  background-color: var(--crm-c-danger);
+  color: var(--crm-c-danger-text);
 }
 /* Warning Severity */
 #crm-status-list .crm-severity-warning {

@@ -62,7 +62,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     $this->processForm('CRM_Contribute_Import_Form_MapField', [
       'savedMapping' => $mapping['id'],
       'contactType' => 'Organization',
-      'mapper' => [['id'], ['source']],
+      'mapper' => [['Contribution.id'], ['Contribution.source']],
     ]);
 
     // Now we want to submit this form without updating the mapping used & make sure the mapping_id
@@ -122,7 +122,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
       'dataSource' => 'CRM_Import_DataSource_SQL',
       'sqlQuery' => 'SELECT id, source FROM civicrm_contact',
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
-      'mapper' => [['id'], ['source']],
+      'mapper' => [['Contribution.id'], ['Contribution.source']],
     ];
   }
 

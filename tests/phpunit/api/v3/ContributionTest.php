@@ -2707,7 +2707,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * original contribution where there is more than one line item.
    */
   public function testRepeatTransactionPassedInFinancialTypeTwoLineItems(): void {
-    $this->_params = $this->getParticipantOrderParams();
+    $this->_params = $this->getParticipantOrderParams(3);
     $originalContribution = $this->setUpRecurringContribution();
 
     $this->callAPISuccess('Contribution', 'repeattransaction', [

@@ -47,8 +47,14 @@
             formatted.forEach((v, i) => formatted[i] = formatDataType(v));
             return formatted;
           }
-          if (ctrl.field.data_type === 'Integer' || ctrl.field.data_type === 'Float') {
-            return Number(val);
+          if (['Integer', 'Float'].includes(ctrl.field ? ctrl.field.data_type : null)) {
+            let newVal = Number(val);
+            // FK Entities can use a mix of numeric & string values (see "static" options)
+            // Also see afGuiFieldValue.convertDataType
+            if ((ctrl.field.name === 'id' || ctrl.field.fk_entity) && ('' + newVal) !== val) {
+              return val;
+            }
+            return newVal;
           }
           return val;
         }

@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload.
  */
-class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
@@ -103,13 +103,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       if ($this->isUpdateExisting() && in_array($name, ['id', 'invoice_id', 'trxn_id'], TRUE)) {
         $field['title'] .= (' ' . ts('(match to contribution record)'));
       }
-      // Swap out dots for double underscores so as not to break the quick form js.
-      // We swap this back on postProcess.
-      // Arg - we need to swap out _. first as it seems some groups end in a trailing underscore,
-      // which is indistinguishable to convert back - ie ___ could be _. or ._.
-      // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
-      $name = str_replace('_.', '~~', $name);
-      $name = str_replace('.', '__', $name);
       if (($field['entity'] ?? '') === 'Contact' && $this->isFilterContactFields() && empty($field['match_rule'])) {
         // Filter out metadata that is intended for create & update - this is not available in the quick-form
         // but is now loaded in the Parser for the LexIM variant.
@@ -219,7 +212,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         if (!empty($entityData)) {
           $softCreditTypeID = (int) $entityData['soft_credit']['soft_credit_type_id'];
         }
-        $fieldName = $this->isQuickFormMode ? str_replace('.', '__', $fieldMapping['name']) : $fieldMapping['name'];
+        $fieldName = $fieldMapping['name'];
         $defaults["mapper[$rowNumber]"] = [$fieldName, $softCreditTypeID];
       }
     }
