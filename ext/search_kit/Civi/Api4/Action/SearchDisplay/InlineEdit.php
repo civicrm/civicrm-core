@@ -120,7 +120,7 @@ class InlineEdit extends Run {
       throw new \CRM_Core_Exception('Inline edit failed.');
     }
 
-    $checkPermissions = empty($this->display['settings']['acl_bypass']);
+    $checkPermissions = empty($this->display['acl_bypass']);
     // Run create/update tasks
     foreach ($tasks as $editableEntity => $editableItems) {
       foreach ($editableItems as $editableItem) {
@@ -175,7 +175,7 @@ class InlineEdit extends Run {
       throw new \CRM_Core_Exception('Not enough data to create new row');
     }
 
-    $checkPermissions = empty($this->display['settings']['acl_bypass']);
+    $checkPermissions = empty($this->display['acl_bypass']);
     $saved = [];
 
     foreach ($tasks as $joinName => $editableItem) {
@@ -247,7 +247,7 @@ class InlineEdit extends Run {
       $values[$parentField] = $this->values[$parentField];
     }
     civicrm_api4($entityName, 'update', [
-      'checkPermissions' => empty($this->display['settings']['acl_bypass']),
+      'checkPermissions' => empty($this->display['acl_bypass']),
       'where' => [
         [$keyName, '=', $this->rowKey],
       ],
