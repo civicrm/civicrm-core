@@ -199,6 +199,7 @@ div.crm-inline-edit-form div.crm-clear {
 .crm-container div.contactCardLeft,
 .crm-container div.contactCardRight {
   width: 100%;
+  overflow: auto;
 }
 .crm-container div.contact_panel table {
   margin-bottom: 0;
@@ -244,6 +245,11 @@ div.crm-inline-edit-form div.crm-clear {
   padding: var(--crm-m);
   min-width: var(--crm-input-label-width);
   text-align: left;
+}
+/* Prevent wide content over-spilling page */
+.crm-container div.crm-summary-row div.crm-label {
+  max-width: calc(100% - var(--crm-input-label-width));
+  overflow: auto;
 }
 .crm-container div.crm-summary-row div.crm-content {
   padding: var(--crm-m);
