@@ -56,4 +56,12 @@ class Drupal implements AuthxInterface {
     return $user && $user->uid ? $user->uid : NULL;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getUserIsBlocked($userId) {
+    // ToDo
+    return FALSE;
+  }
+
 }
