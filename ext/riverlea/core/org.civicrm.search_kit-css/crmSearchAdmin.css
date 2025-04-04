@@ -131,6 +131,7 @@
   border-top: var(--crm-c-divider);
   margin-block: var(--crm-s);
   border-radius: var(--crm-roundness);
+  position: relative;
 }
 .crm-search fieldset fieldset {
   padding-top: 0;
