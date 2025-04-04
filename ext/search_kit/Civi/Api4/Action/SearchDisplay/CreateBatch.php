@@ -70,14 +70,16 @@ class CreateBatch extends AbstractAction {
         continue;
       }
       $fieldSpec = $column['spec'];
-      $tableColumns[] = $fieldSpec['name'];
+      $tableColumns[$fieldSpec['name']] = $this->getSqlType($fieldSpec);
       $fieldSpec['label'] = $column['label'];
       $userJob['metadata']['DataSource']['column_headers'][] = $column['label'];
       $userJob['metadata']['DataSource']['column_specs'][$fieldSpec['name']] = $fieldSpec;
     }
 
     $columnSql = implode(",\n", \CRM_Import_DataSource::getStandardTrackingFields());
-    $columnSql .= ",\n`" . implode("` text,\n`", $tableColumns) . "` text";
+    foreach ($tableColumns as $name => $type) {
+      $columnSql .= ",\n`$name` $type";
+    }
 
     $table->createWithColumns($columnSql);
 
@@ -92,6 +94,20 @@ class CreateBatch extends AbstractAction {
     // Add an empty row to get the user started
     $sql = "INSERT INTO `$tableName` () VALUES ()";
     \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+  }
+
+  private function getSqlType(array $fieldSpec) {
+    if (empty($fieldSpec['data_type']) || !empty($fieldSpec['serialize']) || !empty($fieldSpec['options'])) {
+      return 'text';
+    }
+    $map = [
+      'Boolean' => 'boolean',
+      'Date' => 'date',
+      'Float' => 'double',
+      'Timestamp' => 'datetime',
+      'Money' => 'decimal(20,2)',
+    ];
+    return $map[$fieldSpec['data_type']] ?? 'text';
   }
 
 }

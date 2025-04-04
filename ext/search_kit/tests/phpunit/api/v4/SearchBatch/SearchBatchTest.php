@@ -89,9 +89,15 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Query the database schema to ensure the table has all columns defined
     $schema = \CRM_Core_DAO::executeQuery('DESCRIBE ' . $tableName)->fetchAll();
-    $fieldNames = array_column($schema, 'Field');
+    $fields = array_column($schema, NULL, 'Field');
     // Check fields ignoring order
-    $this->assertEqualsCanonicalizing($expectedFieldNames, $fieldNames);
+    $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($fields));
+    $this->assertEquals('text', $fields['first_name']['Type']);
+    // Fields with options are also text
+    $this->assertEquals('text', $fields['gender_id']['Type']);
+    $this->assertEquals('date', $fields['birth_date']['Type']);
+    // Different sql databases report this type differently but they're all acceptable
+    $this->assertContains($fields['is_deceased']['Type'], ['tinyint', 'boolean', 'tinyint(1)']);
 
     // Check the table has indices _id and _status
     $indices = \CRM_Core_DAO::executeQuery('SHOW INDEX FROM ' . $tableName)->fetchAll();
@@ -118,9 +124,19 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $created = civicrm_api4($apiName, 'create')->single();
     $this->assertEquals(2, $created['_id']);
 
+    // And another
+    civicrm_api4($apiName, 'create', [
+      'values' => [
+        'first_name' => 'Test',
+        'gender_id' => 1,
+        'birth_date' => '2019-01-01',
+        'is_deceased' => FALSE,
+      ],
+    ]);
+
     $rows = civicrm_api4($apiName, 'get');
-    $this->assertEquals([1, 2], $rows->column('_id'));
-    $this->assertEquals(['NEW', 'NEW'], $rows->column('_status'));
+    $this->assertEquals([1, 2, 3], $rows->column('_id'));
+    $this->assertEquals(['NEW', 'NEW', 'NEW'], $rows->column('_status'));
     $this->assertNULL($rows[0]['_entity_id']);
 
     $run = civicrm_api4('SearchDisplay', 'runBatch', [
@@ -128,7 +144,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'display' => $name,
       'userJobId' => $userJob['id'],
     ]);
-    $this->assertCount(2, $run);
+    $this->assertCount(3, $run);
     $editable = $run->editable;
     $this->assertEquals('Text', $editable['first_name']['input_type']);
     $this->assertEquals('Individual', $editable['first_name']['entity']);
@@ -139,13 +155,18 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals('Date', $editable['birth_date']['input_type']);
     $this->assertEquals('CheckBox', $editable['is_deceased']['input_type']);
 
+    $this->assertSame('Test', $run[2]['data']['first_name']);
+    $this->assertSame(1, $run[2]['data']['gender_id']);
+    $this->assertSame('2019-01-01', $run[2]['data']['birth_date']);
+    $this->assertSame(FALSE, $run[2]['data']['is_deceased']);
+
     // Delete the first row
     civicrm_api4($apiName, 'delete', [
       'where' => [['_id', '=', 1]],
     ]);
     $rows = civicrm_api4($apiName, 'get');
-    $this->assertEquals([2], $rows->column('_id'));
-    $this->assertEquals(['NEW'], $rows->column('_status'));
+    $this->assertEquals([2, 3], $rows->column('_id'));
+    $this->assertEquals(['NEW', 'NEW'], $rows->column('_status'));
   }
 
 }

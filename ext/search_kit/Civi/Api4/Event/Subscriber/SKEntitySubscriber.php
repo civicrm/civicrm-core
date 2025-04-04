@@ -173,7 +173,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'Timestamp' => 'datetime',
         'Money' => 'decimal(20,2)',
       ];
-      $type = $map[$expr['dataType']] ?? $type;
+      $type = $map[$expr['dataType']] ?? 'text';
     }
     $defn = [
       'name' => $column['spec']['name'],
