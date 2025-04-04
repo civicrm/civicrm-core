@@ -1047,7 +1047,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     // Ensure either the display uses acl_bypass or the current user has access
     if ($editable['record']) {
-      if (!empty($this->display['settings']['acl_bypass'])) {
+      if (!empty($this->display['acl_bypass'])) {
         $access = TRUE;
       }
       else {
@@ -1113,7 +1113,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Reload field with correct action because `$this->getField()` uses 'get' as the action
       $createModeField = civicrm_api4($getModeField['entity'], 'getFields', [
         'where' => [['name', '=', $getModeField['name']]],
-        'checkPermissions' => empty($this->display['settings']['acl_bypass']),
+        'checkPermissions' => empty($this->display['acl_bypass']),
         'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
         'action' => 'create',
       ])->first() ?? [];
