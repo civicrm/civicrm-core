@@ -56,10 +56,6 @@ class SqlEntityStorage implements EntityStorageInterface {
     if ($daoClass) {
       $dao = new $daoClass();
       $dao->copyValues($record);
-      // TODO: Switch components to use same hook as everyone else
-      foreach (\CRM_Core_Component::getEnabledComponents() as $component) {
-        $counts = array_merge($counts, $component->getReferenceCounts($dao));
-      }
       // TODO: Fix hook to work with non-dao entities
       // (probably need to add 2 params for $entityName and $record and deprecate the $dao param)
       \CRM_Utils_Hook::referenceCounts($dao, $counts);
