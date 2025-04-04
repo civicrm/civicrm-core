@@ -930,11 +930,20 @@ ORDER BY weight";
         else {
           $item['child'][] = [
             'attributes' => [
+              'label' => ts('My User Account'),
+              'name' => 'My User Account',
+              'url' => 'civicrm/user/me',
+              'icon' => 'crm-i fa-user',
+              'weight' => 2,
+            ],
+          ];
+          $item['child'][] = [
+            'attributes' => [
               'label' => ts('Change Password'),
               'name' => 'Change Password',
               'url' => 'civicrm/admin/user/password',
               'icon' => 'crm-i fa-keyboard',
-              'weight' => 2,
+              'weight' => 3,
             ],
           ];
         }
@@ -944,7 +953,7 @@ ORDER BY weight";
             'name' => 'Log out',
             'url' => 'civicrm/logout?reset=1',
             'icon' => 'crm-i fa-person-walking-arrow-right',
-            'weight' => 3,
+            'weight' => 4,
           ],
         ];
         return;
