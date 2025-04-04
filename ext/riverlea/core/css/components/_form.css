@@ -88,7 +88,7 @@
   margin-bottom: var(--crm-flex-gap);
 }
 .crm-container .crm-marker {
-  color: var(--crm-c-danger);
+  color: var(--crm-notify-danger);
 }
 .crm-container .form-inline {
   padding: var(--crm-s) 0;

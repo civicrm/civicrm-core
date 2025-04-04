@@ -18,12 +18,7 @@
   --crm-c-red: #b3001b;
   --crm-c-red-dark: #a11b1f;
   --crm-c-red-light: #f1b6bd;
-  --crm-c-blue-light: #195e80;
   --crm-c-teal: #a3ebe6;
-  --crm-c-green-light: #1d3d1d;
-  --crm-c-green: #236225;
-  --crm-c-green-dark: #dff0d8;
-  --crm-c-success: var(--crm-c-green-light);
   --crm-c-gray-900: #2a2a2a;
   --crm-c-gray-800: #3b3b3b;
   --crm-c-gray-700: #535252;
@@ -35,7 +30,25 @@
   --crm-checkbox-list-bg: #665800;
   --crm-checkbox-list-bg2: #525209;
   --crm-checkbox-list-col: var(--crm-c-text-light);
-  /* And others */
+/* Emphasis colours */
+  --crm-alert-success-bg: var(--crm-c-success);
+  --crm-alert-success-text: var(--crm-c-success-text);
+  --crm-alert-success-border: hsl(from var(--crm-alert-success-bg) h s calc(l + 10));
+  --crm-c-success-on-page-bg: var(--crm-c-success-light);
+  --crm-alert-warning-bg: var(--crm-c-warning);
+  --crm-alert-warning-border: hsl(from var(--crm-alert-warning-bg) h s calc(l + 10));
+  --crm-c-warning-on-page-bg: var(--crm-c-warning-light);
+  --crm-alert-danger-bg: var(--crm-c-danger);
+  --crm-alert-danger-text: var(--crm-c-danger-text);
+  --crm-alert-danger-border: hsl(from var(--crm-alert-danger-bg) h s calc(l + 10));
+  --crm-c-danger-on-page-bg: var(--crm-c-danger-light);
+  --crm-alert-info-bg: var(--crm-c-info);
+  --crm-alert-info-text: var(--crm-c-success-text);
+  --crm-alert-info-border: hsl(from var(--crm-alert-info-bg) h s calc(l + 10));
+  --crm-c-info-on-page-bg: var(--crm-c-info-light);
+  --crm-c-primary-on-page-bg: var(--crm-c-gray-300);
+  --crm-c-secondary-on-page-bg: #cdcdcd;
+/* And others */
   --crm-c-focus: #00a3a5;
   --crm-btn-icon-bg: var(--crm-c-gray-700);
   --crm-block-shadow: 0;
@@ -65,11 +78,6 @@
   --crm-table-odd-hover: var(--crm-c-gray-700);
   --crm-table-even-row: var(--crm-c-gray-700);
   --crm-table-even-hover: var(--crm-c-gray-600);
-  --crm-alert-text-help: var(--crm-c-text-light);
-  --crm-alert-text-warning: var(--crm-c-text-light);
-  --crm-alert-text-info: var(--crm-c-text-light);
-  --crm-alert-background-info: var(--crm-c-blue-dark);
-  --crm-alert-background-danger: #fcf3f5;
   --crm-input-color: var(--crm-c-text);
   --crm-input-description: var(--crm-c-gray-300);
   --crm-dialog-header-border-col: transparent;
@@ -81,8 +89,7 @@
   --crm-form-block-background: var(--crm-c-background2);
   --crm-c-code-background: var(--crm-c-background2);
   --crm-filter-item-background: var(--crm-c-background2);
-  --crm-icon-danger-color: #ef415a;
-  --crm-icon-info-color: #39deff;
-  --crm-icon-success-color: #4dc447;
-  --crm-icon-warning-color: #fab488;
+  --crm-icon-danger-color: var(--crm-notify-danger);
+  --crm-icon-success-color: var(--crm-notify-success);
+  --crm-icon-warning-color: var(--crm-notify-warning);
 }
