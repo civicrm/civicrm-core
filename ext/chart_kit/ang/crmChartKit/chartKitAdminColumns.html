@@ -11,71 +11,55 @@
           {{:: ts('Field') }} <span class="crm-marker">*</span>
         </label>
 
-        <select
-           name="chart-kit-field-column-{{:: col.index }}"
-           required crm-ui-select class="form-control huge"
-           ng-model="$ctrl.display.settings.columns[col.index].key"
-           ng-change="$ctrl.onColumnSearchColumnChange(col.index)"
-           >
-           <option
-               ng-repeat="colOption in $ctrl.getColumnConfigOptionDetails(col, 'searchColumn')"
-               value="{{:: colOption.key}}"
-                >
-             {{:: colOption.label }}
-           </option>
-         </select>
+        <select name="chart-kit-field-column-{{:: col.index }}" required crm-ui-select class="form-control huge"
+          ng-model="$ctrl.display.settings.columns[col.index].key"
+          ng-change="$ctrl.onColumnSearchColumnChange(col.index)">
+          <option ng-repeat="colOption in $ctrl.getColumnConfigOptionDetails(col, 'searchColumn')"
+            value="{{:: colOption.key}}">
+            {{:: colOption.label }}
+          </option>
+        </select>
       </div>
       <div class="form-inline crm-chart-kit-column-label">
         <label>
-            {{:: ts('Label') }}
+          {{:: ts('Label') }}
         </label>
-        <input
-            ng-model="$ctrl.display.settings.columns[col.index].label"
-            />
+        <input ng-model="$ctrl.display.settings.columns[col.index].label" />
       </div>
       <div ng-if="axis.colorType" class="form-inline crm-chart-kit-column-color">
         <label>
-            {{:: ts('Color') }}
+          {{:: ts('Color') }}
         </label>
         <input ng-if="axis.colorType === 'one-per-column'" type="color"
-            ng-model="$ctrl.display.settings.columns[col.index].color"
-            class="form-control"
-            />
+          ng-model="$ctrl.display.settings.columns[col.index].color" class="form-control" />
       </div>
-      <div class="form-inline crm-chart-kit-column-series-type" ng-if="$ctrl.getColumnConfigOptionDetails(col, 'seriesType').length > 1">
+      <div class="form-inline crm-chart-kit-column-series-type"
+        ng-if="$ctrl.getColumnConfigOptionDetails(col, 'seriesType').length > 1">
         <label>
           {{:: ts('Series type')}}
         </label>
-        <select
-            class="form-control"
-            ng-model="$ctrl.display.settings.columns[col.index].seriesType"
-            >
-            <option
-                ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'seriesType')"
-                value="{{:: option.key }}"
-                >
-                {{:: option.label }}
-            </option>
+        <select class="form-control" ng-model="$ctrl.display.settings.columns[col.index].seriesType">
+          <option ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'seriesType')"
+            value="{{:: option.key }}">
+            {{:: option.label }}
+          </option>
         </select>
       </div>
-      <div class="form-inline crm-chart-kit-column-value-label" ng-if="$ctrl.getColumnConfigOptionDetails(col, 'dataLabelType').length > 1">
+      <div class="form-inline crm-chart-kit-column-value-label"
+        ng-if="$ctrl.getColumnConfigOptionDetails(col, 'dataLabelType').length > 1">
         <label>
           {{:: ts('Value labels')}}
         </label>
-        <select
-            class="form-control"
-            ng-model="$ctrl.display.settings.columns[col.index].dataLabelType"
-            >
-            <option
-                ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'dataLabelType')"
-                value="{{:: option.key}}"
-                >
-                {{:: option.label }}
-            </option>
+        <select class="form-control" ng-model="$ctrl.display.settings.columns[col.index].dataLabelType">
+          <option ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'dataLabelType')"
+            value="{{:: option.key}}">
+            {{:: option.label }}
+          </option>
         </select>
         <div class="form-inline" ng-if="col.dataLabelType && (col.dataLabelType != 'none')">
           <label>{{:: ts('Include column label') }}</label>
-          <input type="checkbox" class="form-control" ng-model="$ctrl.display.settings.columns[col.index].dataLabelColumnPrefix">
+          <input type="checkbox" class="form-control"
+            ng-model="$ctrl.display.settings.columns[col.index].dataLabelColumnPrefix">
         </div>
       </div>
       </details>
@@ -84,109 +68,87 @@
 
         <div class="form-inline crm-chart-kit-axis-source-data-type" ng-if="col.sourceDataType">
           <label>
-              {{:: ts('Source Data Type')}}
+            {{:: ts('Source Data Type')}}
           </label>
           <span>{{ col.sourceDataType }}</span>
         </div>
-        <div class="form-inline crm-chart-kit-axis-data-type" ng-if="$ctrl.getColumnConfigOptionDetails(col, 'scaleType').length > 1">
+        <div class="form-inline crm-chart-kit-axis-data-type"
+          ng-if="$ctrl.getColumnConfigOptionDetails(col, 'scaleType').length > 1">
           <label>
-              {{:: ts('Scale type')}}
+            {{:: ts('Scale type')}}
           </label>
-          <select
-              class="form-control"
-              ng-model="$ctrl.display.settings.columns[col.index].scaleType"
-              >
-              <option
-                  ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'scaleType')"
-                  value="{{:: option.key}}"
-                  >
-                  {{:: option.label }}
-              </option>
+          <select class="form-control" ng-model="$ctrl.display.settings.columns[col.index].scaleType">
+            <option ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'scaleType')"
+              value="{{:: option.key}}">
+              {{:: option.label }}
+            </option>
           </select>
         </div>
-        <div class="form-inline crm-chart-kit-axis-data-type" ng-if="$ctrl.getColumnConfigOptionDetails(col, 'datePrecision').length > 1">
+        <div class="form-inline crm-chart-kit-axis-data-type"
+          ng-if="$ctrl.getColumnConfigOptionDetails(col, 'datePrecision').length > 1">
           <label>
-              {{:: ts('Date precision')}}
+            {{:: ts('Date precision')}}
           </label>
-          <select
-              class="form-control"
-              ng-model="$ctrl.display.settings.columns[col.index].datePrecision"
-              >
-              <option
-                  ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'datePrecision')"
-                  value="{{:: option.key}}"
-                  >
-                  {{:: option.label }}
-              </option>
+          <select class="form-control" ng-model="$ctrl.display.settings.columns[col.index].datePrecision">
+            <option ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'datePrecision')"
+              value="{{:: option.key}}">
+              {{:: option.label }}
+            </option>
           </select>
         </div>
-        <div class="form-inline crm-chart-kit- axis-reduce-type" ng-if="$ctrl.getColumnConfigOptionDetails(col, 'reduceType').length > 1">
+        <div class="form-inline crm-chart-kit- axis-reduce-type"
+          ng-if="$ctrl.getColumnConfigOptionDetails(col, 'reduceType').length > 1">
           <label>
-              {{:: ts('Stat Type')}}
+            {{:: ts('Stat Type')}}
           </label>
-          <select
-              class="form-control"
-              ng-model="$ctrl.display.settings.columns[col.index].reduceType"
-              >
-              <option
-                  ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'reduceType')"
-                  value="{{:: option.key}}"
-                  >
-                  {{:: option.label }}
-              </option>
+          <select class="form-control" ng-model="$ctrl.display.settings.columns[col.index].reduceType">
+            <option ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'reduceType')"
+              value="{{:: option.key}}">
+              {{:: option.label }}
+            </option>
           </select>
         </div>
-        <div class="form-inline crm-chart-kit-col-label-formatter" ng-if="$ctrl.getColumnConfigOptionDetails(col, 'dataLabelFormatter').length > 1">
+        <div class="form-inline crm-chart-kit-col-label-formatter"
+          ng-if="$ctrl.getColumnConfigOptionDetails(col, 'dataLabelFormatter').length > 1">
           <label>
-              {{:: ts('Label formatter')}}
+            {{:: ts('Label formatter')}}
           </label>
-          <select
-              class="form-control"
-              ng-model="$ctrl.display.settings.columns[col.index].dataLabelFormatter"
-              >
-              <option
-                  ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'dataLabelFormatter')"
-                  value="{{:: option.key}}"
-                  >
-                  {{:: option.label }}
-              </option>
+          <select class="form-control" ng-model="$ctrl.display.settings.columns[col.index].dataLabelFormatter">
+            <option ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'dataLabelFormatter')"
+              value="{{:: option.key}}">
+              {{:: option.label }}
+            </option>
           </select>
         </div>
         <div class="form-inline" ng-if="col.dataLabelFormatter === 'round'">
           <label>
             {{:: ts('Decimal places') }}
           </label>
-          <input
-              type="number"
-              ng-model="$ctrl.display.settings.columns[col.index].dataLabelDecimalPlaces"
-              />
+          <input type="number" ng-model="$ctrl.display.settings.columns[col.index].dataLabelDecimalPlaces" />
         </div>
         <div class="form-inline" ng-if="col.dataLabelFormatter === 'formatMoney'">
           <label>
             {{:: ts('Money format string') }}
           </label>
-          <input
-              placeholder="{{:: ts('e.g. £1,234.56 or €1.234,56') }}"
-              ng-model="$ctrl.display.settings.columns[col.index].dataLabelMoneyFormatString"
-              />
+          <input placeholder="{{:: ts('e.g. £1,234.56 or €1.234,56') }}"
+            ng-model="$ctrl.display.settings.columns[col.index].dataLabelMoneyFormatString" />
         </div>
-        <div class="form-inline crm-chart-kit-col-use-right-axis" ng-if="axisKey === 'y' && ($ctrl.display.settings.chartType === 'composite')">
+        <div class="form-inline crm-chart-kit-col-use-right-axis"
+          ng-if="axisKey === 'y' && ($ctrl.display.settings.chartType === 'composite')">
           <label>
             {{:: ts('Use right axis?')}}
           </label>
-          <input
-            type="checkbox"
-            ng-model="col.useRightAxis"
-            />
+          <input type="checkbox" ng-model="col.useRightAxis" />
         </div>
       </details>
-      <button class="btn btn-sm btn-secondary-outline" ng-if="axis.multiColumn"  ng-click="$ctrl.removeColumn(col.index)">
+      <button class="btn btn-sm btn-secondary-outline" ng-if="axis.multiColumn"
+        ng-click="$ctrl.removeColumn(col.index)">
         <i class="crm-i fa-minus" />
         {{:: ts('Remove field') }}
       </button>
     </fieldset>
 
-    <button class="btn btn-default" ng-if="axis.multiColumn"  ng-click="$ctrl.initColumn(axisKey)">
+    <button class="btn btn-default" ng-if="axis.multiColumn" ng-click="$ctrl.initColumn(axisKey)">
       <i class="crm-i fa-plus" />
       {{:: ts('Add field') }}
     </button>
