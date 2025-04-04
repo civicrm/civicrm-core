@@ -155,10 +155,10 @@ class CRM_Core_Session {
    * @param int|string $mode
    *   1: Default mode. Deletes the `CiviCRM` data from $_SESSION.
    *   2: More invasive version of that. (somehow)
-   *   'partial': Less invasive. Preserve basic data (eg current user ID) from this session. Reset everything else.
+   *   'keep_login': Less invasive. Preserve basic data (current user ID) from this session. Reset everything else.
    */
   public function reset($mode = 1) {
-    if ($mode === 'partial') {
+    if ($mode === 'keep_login') {
       if (!empty($this->_session[$this->_key])) {
         $this->_session[$this->_key] = CRM_Utils_Array::subset(
           $this->_session[$this->_key],
