@@ -196,33 +196,29 @@
       };
 
       this.buildChart = () => {
-        // use override from chart type if defined - otherwise use a default
-        // based on chartType.getChartConstructor
+        if (!this.chartType.buildChart && !this.chartType.getChartConstructor) {
+          throw new Error('Chart type should implement buildChart or getChartConstructor');
+        }
+
         if (this.chartType.buildChart) {
           this.chartType.buildChart(this);
           return;
         }
 
-        if (this.chartType.getChartConstructor) {
-          this.chart = this.chartType.getChartConstructor(this)(this.chartContainer);
+        this.chart = this.chartType.getChartConstructor(this)(this.chartContainer);
 
-          if (this.chartType.hasCoordinateGrid()) {
-            this.buildCoordinateGrid();
-          }
-
-          // load in cap if implemented by chart type
-          if (this.chart.cap) {
-            this.chart.cap(this.settings.maxSegments ? this.settings.maxSegments : null);
-          }
-          // load in ordering if implement by chart type
-          if (this.chart.ordering) {
-            this.chart.ordering(this.getOrderAccessor());
-          }
-
-          return;
+        if (this.chartType.hasCoordinateGrid()) {
+          this.buildCoordinateGrid();
         }
 
-        throw new Error('Chart type should implement buildChart or getChartConstructor');
+        // load in cap if implemented by chart type
+        if (this.chart.cap) {
+          this.chart.cap(this.settings.maxSegments ? this.settings.maxSegments : null);
+        }
+        // load in ordering if implement by chart type
+        if (this.chart.ordering) {
+          this.chart.ordering(this.getOrderAccessor());
+        }
       };
 
       this.buildCoordinateGrid = () => {
