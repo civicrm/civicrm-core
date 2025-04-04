@@ -1,4 +1,4 @@
-<label ng-repeat="opt in getOptions() track by opt.id" for="{{ fieldId + opt.id }}">
+<label ng-repeat="opt in getOptions() track by opt.id" for="{{ fieldId + opt.id }}" class="radio-inline">
   <input class="crm-form-radio" id="{{ fieldId + opt.id }}" name="{{:: fieldId }}" type="radio" ng-model="getSetValue" ng-required="$ctrl.defn.required" ng-model-options="{getterSetter: true}" ng-value="opt.id"  aria-label="{{opt.label}}" />
   {{:: opt.label }}
 </label>

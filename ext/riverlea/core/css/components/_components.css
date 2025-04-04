@@ -264,8 +264,8 @@ table.advmultiselect {
   border: var(--crm-c-divider);
 }
 .crm-container .panel-default > .panel-heading .badge {
-  color: var(--crm-text-light);
-  background-color: var(--crm-c-gray-500);
+  color: var(--crm-c-secondary-text);
+  background-color: var(--crm-c-secondary);
 }
 .crm-container .panel-primary > .panel-heading {
   color: var(--crm-c-primary-text);
@@ -276,20 +276,20 @@ table.advmultiselect {
   color: var(--crm-c-primary-text);
 }
 .crm-container .panel-success > .panel-heading {
-  color: var(--crm-c-success);
-  background-color: var(--crm-c-green-light);
+  color: var(--crm-alert-success-text);
+  background-color: var(--crm-alert-success-bg);
 }
 .crm-container .panel-success > .panel-heading .badge,
 .crm-container .panel-success > .panel-heading a {
-  color: var(--crm-c-success);
+  color: var(--crm-alert-success-text);
 }
 .crm-container .panel-info > .panel-heading {
-  color: var(--crm-alert-text-info);
-  background-color: var(--crm-alert-background-info);
+  color: var(--crm-alert-info-text);
+  background-color: var(--crm-alert-info-bg);
 }
 .crm-container .panel-info > .panel-heading .badge,
 .crm-container .panel-info > .panel-heading a {
-  color: var(--crm-alert-text-info);
+  color: var(--crm-alert-info-text);
 }
 .crm-container .panel-warning > .panel-heading {
   color: var(--crm-c-warning-text);
@@ -300,8 +300,8 @@ table.advmultiselect {
   color: var(--crm-c-warning-text);
 }
 .crm-container .panel-danger > .panel-heading {
-  color: var(--crm-c-danger);
-  background-color: var(--crm-c-red-light);
+  color: var(--crm-c-danger-on-page-bg);
+  background-color: var(--crm-c-danger);
 }
 .crm-container .panel-danger > .panel-heading .badge,
 .crm-container .panel-danger > .panel-heading a {
@@ -404,8 +404,8 @@ table.advmultiselect {
 }
 .crm-upgrade-box-outer.crm-upgrade-success {
   margin: var(--crm-page-padding);
-  background: var(--crm-alert-background-help) !important; /* vs inline css */
-  border: var(--crm-alert-border-width) solid var(--crm-alert-border-help) !important; /* vs inline css */
+  background: var(--crm-alert-success-bg) !important; /* vs inline css */
+  border: var(--crm-alert-border-width) solid var(--crm-alert-success-border) !important; /* vs inline css */
 }
 .crm-upgrade-box-inner {
   padding: 1rem;
@@ -416,14 +416,14 @@ table.advmultiselect {
 }
 p.crm-upgrade-large-text {
   grid-column: 2;
-  color: var(--crm-alert-text-help);
+  color: var(--crm-alert-success-text);
 }
 .crm-upgrade-box-inner a {
   color: var(--crm-c-link) !important  /* vs inline */;
 }
 p.crm-upgrade-large-text:first-of-type {
   font-size: var(--crm-r1);
-  color: var(--crm-alert-text-help);
+  color: var(--crm-alert-success-text);
   font-family: var(--crm-font-bold);
   font-weight: bold;
 }
@@ -432,7 +432,7 @@ p.crm-upgrade-large-text:first-of-type {
   padding: 0 2rem 0 0 !important /* vs inline */;
   font-size: var(--crm-l);
   line-height: 1.35;
-  color: var(--crm-alert-text-help);
+  color: var(--crm-alert-success-text);
   grid-column: 1;
   grid-row: 1 / span 3;
 }
@@ -470,13 +470,13 @@ p.crm-upgrade-large-text:first-of-type {
 /* Community message */
 
 div.civicrm-community-messages {
-  border: 2px solid var(--crm-alert-border-help);
-  background: var(--crm-alert-background-help);
+  border: 2px solid var(--crm-alert-success-border);
+  background: var(--crm-alert-success-bg);
   padding: var(--crm-padding-inset);
 }
 div.civicrm-community-messages .crm-collapsible .collapsible-title,
 div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
-  color: var(--crm-alert-text-help) !important /* vs inline */;
+  color: var(--crm-alert-success-text) !important /* vs inline */;
 }
 
 /* Status box (for mailsending) */

@@ -17,4 +17,8 @@ interface EntityStorageInterface {
 
   public function deleteRecords(array $records): array;
 
+  public function findReferences(array $record): array;
+
+  public function getReferenceCounts(array $record): array;
+
 }
