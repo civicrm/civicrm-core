@@ -73,7 +73,8 @@ WHERE  mailing_id = %1
       ->select('r.phone_id')
       ->merge($criteria)
       ->where('r.mailing_id = #mailingID')
-      ->param('#mailingID', $mailingID);
+      ->param('#mailingID', $mailingID)
+      ->orderBy('r.id ASC');
     if ($limitString) {
       $sqlObject->limit($limit, $offset);
     }
