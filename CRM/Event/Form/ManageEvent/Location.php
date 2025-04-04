@@ -13,6 +13,7 @@ use Civi\Api4\Event;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Email;
 use Civi\Api4\Phone;
+use \Civi\Api4\Generic\Result;
 
 /**
  *
@@ -26,8 +27,10 @@ use Civi\Api4\Phone;
  * civicrm_event_page.
  */
 class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
 
   /**
+   * @deprecated use `getLocationBlockValue()
    * @var \Civi\Api4\Generic\Result
    */
   protected $locationBlock;
@@ -63,10 +66,19 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     if ($this->_id && empty($this->_values)) {
       //get location values.
       $params = [
-        'entity_id' => $this->_id,
+        'entity_id' => $this->getEventID(),
         'entity_table' => 'civicrm_event',
       ];
-      $this->_values = CRM_Core_BAO_Location::getValues($params);
+      $this->_values = [
+        'im' => CRM_Core_BAO_IM::getValues($params),
+        'openid' => CRM_Core_BAO_OpenID::getValues($params),
+        'phone' => CRM_Core_BAO_Phone::getValues($params),
+        'address' => CRM_Core_BAO_Address::getValues($params),
+      ];
+      // Get all the existing email addresses, The array historically starts
+      // with 1 not 0 so we do something nasty to continue that.
+      $this->_values['email'] = array_merge([0 => 1], (array) $this->getExistingEmails());
+      unset($this->existingEmails[0]);
 
       //get event values.
       $params = ['id' => $this->_id];
@@ -134,8 +146,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    */
   public function buildQuickForm() {
     CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 2);
+    $this->addEmailBlockNonContactFields(1);
+    $this->addEmailBlockNonContactFields(2);
     CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
     CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 2);
 
@@ -144,13 +156,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     //fix for CRM-1971
     $this->assign('action', $this->_action);
 
-    if ($this->_id) {
-      $this->locationBlock = Event::get()
-        ->addWhere('id', '=', $this->_id)
-        ->setSelect(['loc_block_id.*', 'loc_block_id'])
-        ->execute()->first();
-      $this->_oldLocBlockId = $this->locationBlock['loc_block_id'];
-    }
+    $this->_oldLocBlockId = $this->getLocationBlockID();
 
     // get the list of location blocks being used by other events
 
@@ -185,6 +191,31 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     }
     $this->addElement('advcheckbox', 'is_show_location', ts('Show Location?'));
     parent::buildQuickForm();
+  }
+
+  /**
+   * Get the ID of the location block associated with the event.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   * @api supported for external use. Will not change in minor versions of
+   *   CiviCRM.
+   *
+   */
+  public function getLocationBlockID(): ?int {
+    if (!$this->isDefined('LocationBlock')) {
+      if ($this->getEventID()) {
+        $this->locationBlock = Event::get()
+          ->addWhere('id', '=', $this->getEventID())
+          ->setSelect(['loc_block_id.*', 'loc_block_id'])
+          ->execute()->first();
+        $this->define('LocBlock', 'LocationBlock', ['id' => $this->locationBlock['loc_block_id']]);
+      }
+      else {
+        $this->locationBlock = [];
+      }
+    }
+    return $this->locationBlock['loc_block_id'] ?? NULL;
   }
 
   /**
