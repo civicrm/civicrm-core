@@ -5,12 +5,14 @@
     adminTemplate: '~/crmChartKit/chartTypes/chartKitRowAdmin.html',
 
     getAxes: () => ({
-      'x': {
+      'w': {
         label: ts('Category'),
-        reduceTypes: [],
+        reduceTypes: ['list'],
         scaleTypes: ['categorical'],
         // label is default to show what things are
         dataLabelTypes: ['label', 'title', 'none'],
+        multiColumn: true,
+        isDimension: true,
       },
       'y': {
         label: ts('Values'),

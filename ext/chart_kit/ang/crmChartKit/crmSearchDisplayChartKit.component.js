@@ -35,7 +35,7 @@
             //  it's not going to be able to render the chart anyway
             return;
           }
-          this.alwaysSortByXAscending();
+          this.alwaysSortByDimensionCols();
         });
         this.onPostRun.push(() => {
           this.renderChart();
@@ -60,19 +60,35 @@
         return true;
       };
 
-      this.alwaysSortByXAscending = () => {
-        this._currentSortKey = this.getFirstColumnForAxis('x').key;
-        // always sort the query by X axis - we can handle differently when we pass to d3
-        // but this is the only way to get magic that the server knows about the order
-        // (like option groups / month order etc)
-        this.sort = this.settings.sort = [[this._currentSortKey, 'ASC']];
+      this.getDimensionColumns = () => {
+        const axes = this.chartType.getAxes();
+        const dimensionAxisKeys = Object.keys(axes).filter((key) => axes[key].isDimension);
+        const dimensionColumns = dimensionAxisKeys.map((axis) => this.getColumnsForAxis(axis));
+        return dimensionColumns.flat();
+      };
+
+      this.getSortKeys = () => this.getDimensionColumns().map((col) => col.key);
+
+        /**
+         * we want to always sort the server query by dimension columns -
+         * we can handle differently when we pass to d3
+         * but this is the only way to get magic that the server knows about the order
+         * of e.g. OptionValue fields, months of the year
+         */
+      this.alwaysSortByDimensionCols = () => {
+        const sortKeys = this.getSortKeys();
+
+        // stash a serialised string for quick checking in onSettingsChange
+        this._currentSortKeys = sortKeys.join(',');
+        this.settings.sort = sortKeys.map((key) => [key, 'ASC']);
       };
 
       this.onSettingsChange = (newSettings, oldSettings) => {
-        // if X column key changes, we need to re-run the search to get new ordering
+        // if sort keys have changed, we need to re-run the search to get new ordering
         // from the server
-        if (newSettings.columns.find((col) => col.axis === 'x').key !== this._currentSortKey) {
-          this.getResultsPronto();
+        const newSortKeysSerialised = this.getSortKeys().join(',');
+        if (this._currentSortKeys !== newSortKeysSerialised) {
+          this.getResultsSoon();
         } else {
           // just rerender on the front end
           this.renderChart();
@@ -186,10 +202,19 @@
           return;
         }
 
-        // 99 times out of 100 the x axis will be column 0, but let's be sure
-        // (assume there's only one x axis column)
-        const xColumnIndex = this.getFirstColumnForAxis('x').index;
-        this.dimension = this.ndx.dimension((d) => d[xColumnIndex]);
+        const colIndexes = this.getDimensionColumns().map((col) => col.index);
+
+        if (colIndexes.length > 1) {
+          // dimension is multi-column, create an array key
+          this.dimension = this.ndx.dimension((d) => colIndexes.map((i) => d[i]));
+        }
+        else {
+          // if there is only one dimension axis we use the actual value
+          // rather than a single item array in order to benefit
+          // from default ordering in the chart library
+          const colIndex = colIndexes[0];
+          this.dimension = this.ndx.dimension((d) => d[colIndex]);
+        }
       };
 
       this.buildGroup = () => {
@@ -246,6 +271,7 @@
 
       this.buildCoordinateGrid = () => {
         const xCol = this.getFirstColumnForAxis('x');
+
         const xDomainValues = this.columnTotals[xCol.index];
         const min = Math.min(...xDomainValues);
         const max = Math.max(...xDomainValues);
@@ -317,20 +343,17 @@
 
 
       this.formatCoordinateGrid = () => {
-        // format x axis
-        // add our label formatter to the tick values
-        // EXCEPT for dates, where DC is much cleverer
-        // than we are at adapting the date precision
-        const xCols = this.getColumnsForAxis('x');
+        const xCol = this.getFirstColumnForAxis('x');
 
-        if (xCols.length === 1) {
-
-          if (xCols[0].scaleType !== 'date') {
-            this.chart.xAxis().tickFormat((v) => this.renderDataValue(v, xCols[0]));
-          }
+        // add ticks if not a date (dc is better at handling ticks for us for dates)
+        if (xCol.scaleType !== 'date') {
+          this.chart.xAxis().tickFormat((v) => this.renderDataValue(v, xCol));
         }
+
         this.chart.xAxisLabel(
-          this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCols.map((col) => col.label).join(' - ')
+          this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCol.label
+          // TODO: could we have multi-x?
+          //this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCols.map((col) => col.label).join(' - ')
         );
 
         // for Y axis, we need to work out whether this is split left and right
