@@ -206,6 +206,43 @@ abstract class Api4Query {
         return 'NOT (' . $this->treeWalkClauses($clause[1], $type, $depth + 1) . ')';
 
       default:
+        if ($clause[1] === 'CONTAINS' || $clause[1] === 'NOT CONTAINS' || $clause[1] === 'CONTAINS ONE OF' || $clause[1] === 'NOT CONTAINS ONE OF') {
+          if ($clause[1] === 'CONTAINS ONE OF') {
+            $clause[1] = 'CONTAINS';
+            $binding = ' OR ';
+          }
+          elseif ($clause[1] === 'NOT CONTAINS ONE OF') {
+            $clause[1] = 'NOT CONTAINS';
+            $binding = ' OR ';
+          }
+          else {
+            $binding = ' AND ';
+          }
+
+          if (is_array($clause[2])) {
+            $queryString = '';
+
+            foreach ($clause[2] as $value) {
+              $subclauses = $clause;
+              $subclauses[2] = $value;
+
+              if ($queryString !== '') {
+                $queryString .= $binding;
+              }
+
+              try {
+                $queryString .= $this->composeClause($subclauses, $type, $depth);
+              }
+              // Silently ignore fields the user lacks permission to see
+              catch (UnauthorizedException $e) {
+                return '';
+              }
+            }
+
+            return $queryString;
+          }
+        }
+
         try {
           return $this->composeClause($clause, $type, $depth);
         }

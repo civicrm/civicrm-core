@@ -318,6 +318,108 @@ class PseudoconstantTest extends Api4TestBase {
       ->execute()->indexBy('id');
 
     $this->assertArrayNotHasKey($participant['id'], (array) $search2);
+
+    //CONTINAS
+    $contact2 = $this->createTestRecord('Contact');
+    $this->createTestRecord('Participant', [
+      'contact_id' => $contact2['id'],
+      'event_id' => $event['id'],
+      'role_id:label' => ['Volunteer'],
+    ]);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS', 'Volunteer')
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS', ['Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS', ['Attendee'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(1, $search1);
+
+    //NOT CONTAINS
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'NOT CONTAINS', ['Attendee'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(1, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'NOT CONTAINS', ['Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(0, $search1);
+
+    //CONTAINS ONE OF
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS ONE OF', 'Volunteer')
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS ONE OF', ['Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS ONE OF', ['Attendee'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(1, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS ONE OF', ['Attendee', 'Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    //NOT CONTAINS ONE OF
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'NOT CONTAINS ONE OF', ['Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(0, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'NOT CONTAINS ONE OF', ['Attendee'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(1, $search1);
   }
 
   public function testPreloadFalse(): void {
