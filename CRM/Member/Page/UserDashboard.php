@@ -76,11 +76,21 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
 
   /**
    * Helper function to build appropriate Member links
+   *
+   * @array &members
+   * bool isActiveMembers
    */
-  public function buildMemberLinks(&$members) {
+  public function buildMemberLinks(&$members, $isActiveMembers = FALSE) {
     if (!empty($members)) {
+      $statuses = ($isActiveMembers) ? ['Current', 'New', 'Cancelled', 'Deceased', 'Pending'] : ['Expired'];
       foreach ($members as $id => &$member) {
+
+        // Is this recurring membership?
         if (empty($member['contribution_recur_id'])) {
+          // Build Renewal Link if appropriate
+          if (($isActiveMembers && !in_array($member['status'], $statuses)) || (!$isActiveMembers && !empty($member['renewPageId']) && in_array($member['status'], $statuses))) {
+            $member['renewMembershipLink'] = CRM_Utils_System::url('civicrm/contribute/transact', "reset=1&id={$member['renewPageId']}&mid={$member['id']}", TRUE, NULL, FALSE, TRUE);
+          }
           continue;
         }
 
