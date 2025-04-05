@@ -568,7 +568,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     if (!$this->isUpdateExisting()) {
       $missingDedupeFields = $this->validateDedupeFieldsSufficientInMapping($rule, $mapper, $contactIdentifierFields);
       if ($missingDedupeFields) {
-        $mapperError[] = $missingDedupeFields;
+        $mapperError['_qf_default'] = $missingDedupeFields;
       }
     }
     return $mapperError;
@@ -611,17 +611,22 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   }
 
   /**
-   * @param array $mapper
-   *
    * @param string $entity
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function validateRequiredContactFields(array $mapper, string $entity = 'Contact'): array {
+  protected function validateRequiredContactFields(string $entity = 'Contact'): array {
+    $mapper = [];
+    $fields = $this->getUserJob()['metadata']['import_mappings'];
+    foreach ($fields as $field) {
+      if (str_starts_with($field['name'], $entity . '.') || str_starts_with($field['name'], $this->getBaseEntity() . '.')) {
+        $mapper[] = [$field['name']];
+      }
+    }
     $parser = $this->getParser();
     $rule = $parser->getDedupeRule($this->getContactType(), $this->getUserJob()['metadata']['entity_configuration'][$entity]['dedupe_rule'] ?? NULL);
-    return $this->validateContactFields($rule, $this->getImportKeys($mapper), ['external_identifier', 'contact_id']);
+    return $this->validateContactFields($rule, $this->getImportKeys($mapper), ['external_identifier', 'contact_id', 'id']);
   }
 
 }

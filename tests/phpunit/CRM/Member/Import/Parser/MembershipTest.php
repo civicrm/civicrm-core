@@ -34,6 +34,7 @@ use Civi\Api4\UserJob;
  */
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
+  use CRMTraits_Import_ParserTrait;
 
   const MEMBERSHIP_TYPE_NAME = 'Mickey Mouse Club Member';
 
@@ -425,17 +426,23 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * Test the full form-flow import.
    */
   public function testImportCSV() :void {
-    $this->importCSV('memberships_invalid.csv', [
-      ['name' => 'Membership.contact_id'],
-      ['name' => 'Membership.source'],
-      ['name' => 'Membership.membership_type_id'],
-      ['name' => 'Membership.start_date'],
-      ['name' => 'do_not_import'],
-    ]);
-    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Invalid value for field(s) : Membership Type', $row['_status_message']);
+    try {
+      $this->importCSV('memberships_invalid.csv', [
+        ['name' => 'Membership.contact_id'],
+        ['name' => 'Membership.source'],
+        ['name' => 'Membership.membership_type_id'],
+        ['name' => 'Membership.start_date'],
+        ['name' => 'do_not_import'],
+      ]);
+    }
+    catch (CRM_Core_Exception $e) {
+      $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+      $row = $dataSource->getRow();
+      $this->assertEquals('ERROR', $row['_status']);
+      $this->assertEquals('Invalid value for field(s) : Membership Type', $row['_status_message']);
+      return;
+    }
+    $this->fail('should have thrown an exception');
   }
 
   /**
@@ -532,61 +539,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Import the csv file values.
-   *
-   * This function uses a flow that mimics the UI flow.
-   *
-   * @param string $csv Name of csv file.
-   * @param array $fieldMappings
-   * @param array $submittedValues
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
-    $submittedValues = array_merge([
-      'uploadFile' => ['name' => __DIR__ . '/data/' . $csv],
-      'skipColumnHeader' => TRUE,
-      'fieldSeparator' => ',',
-      'contactType' => 'Individual',
-      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
-      'dataSource' => 'CRM_Import_DataSource_CSV',
-      'file' => ['name' => $csv],
-      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
-      'groups' => [],
-    ], $submittedValues);
-    /* @var CRM_Member_Import_Form_DataSource $form */
-    $form = $this->getFormObject('CRM_Member_Import_Form_DataSource', $submittedValues);
-    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
-    $form->buildForm();
-    $form->postProcess();
-    // This gets reset in DataSource so re-do....
-    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
-
-    $this->userJobID = $form->getUserJobID();
-    $form = $this->getFormObject('CRM_Member_Import_Form_MapField', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertTrue($form->validate());
-    $form->postProcess();
-    /** @var CRM_Member_Import_Form_MapField $form */
-    $form = $this->getFormObject('CRM_Member_Import_Form_Preview', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    try {
-      $form->postProcess();
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $queue = Civi::queue('user_job_' . $this->userJobID);
-      $runner = new CRM_Queue_Runner([
-        'queue' => $queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      ]);
-      $runner->runAll();
-    }
-  }
-
-  /**
    * @param array $mappings
    *
    * @return array
@@ -597,6 +549,51 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       $mapper[] = $mapping['name'];
     }
     return $mapper;
+  }
+
+  /**
+   * Get the import's datasource form.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Member_Import_Form_DataSource
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDataSourceForm(array $submittedValues): CRM_Member_Import_Form_DataSource {
+    /** @var \CRM_Member_Import_Form_DataSource $form */
+    $form = $this->getFormObject('CRM_Member_Import_Form_DataSource', $submittedValues);
+    return $form;
+  }
+
+  /**
+   * Get the import's mapField form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Member_Import_Form_MapField
+   * @noinspection PhpUnnecessaryLocalVariableInspection
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMapFieldForm(array $submittedValues): CRM_Member_Import_Form_MapField {
+    /** @var \CRM_Member_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Member_Import_Form_MapField', $submittedValues);
+    return $form;
+  }
+
+  /**
+   * Get the import's preview form.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Member_Import_Form_Preview
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPreviewForm(array $submittedValues): CRM_Member_Import_Form_Preview {
+    /** @var CRM_Member_Import_Form_Preview $form */
+    $form = $this->getFormObject('CRM_Member_Import_Form_Preview', $submittedValues);
+    return $form;
   }
 
 }

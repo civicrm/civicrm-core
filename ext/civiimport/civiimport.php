@@ -1,7 +1,6 @@
 <?php
 
 use Civi\API\Exception\UnauthorizedException;
-use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
 use Civi\BAO\Import;
 
@@ -210,18 +209,6 @@ function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions
  * @throws \CRM_Core_Exception
  */
 function civiimport_civicrm_buildForm(string $formName, $form) {
-  if (in_array($formName, civiimport_enabled_forms())) {
-    // Add import-ui app
-    Civi::service('angularjs.loader')->addModules('crmCiviimport');
-    $form->assignCiviimportVariables();
-    $savedMappingID = (int) $form->getSavedMappingID();
-    $savedMapping = [];
-    if ($savedMappingID) {
-      $savedMapping = Mapping::get()->addWhere('id', '=', $savedMappingID)->addSelect('id', 'name', 'description')->execute()->first();
-    }
-    Civi::resources()->addVars('crmImportUi', ['savedMapping' => $savedMapping]);
-  }
-
   if ($formName === 'CRM_Contribute_Import_Form_DataSource') {
     // If we have already configured contact type on the import screen
     // we remove it from the DataSource screen.
@@ -245,8 +232,4 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
     $form->assign('allRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID(), FALSE));
     $form->assign('importedRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=IMPORTED', FALSE));
   }
-}
-
-function civiimport_enabled_forms() {
-  return ['CRM_Contribute_Import_Form_MapField', 'CRM_Member_Import_Form_MapField', 'CRM_Event_Import_Form_MapField'];
 }

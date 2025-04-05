@@ -27,7 +27,7 @@ class CRM_Member_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    */
   public function buildQuickForm(): void {
     $this->addSavedMappingFields();
-    $this->addFormRule(['CRM_Member_Import_Form_MapField', 'formRule'], $this);
+    $this->addFormRule([__CLASS__, 'formRule'], $this);
 
     $options = $this->getFieldOptions();
     // Suppress non-match contact fields at the QuickForm layer as
@@ -77,7 +77,7 @@ class CRM_Member_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
     $errors = [];
     $mappedFields = $self->getMappedFields($fields['mapper']);
     if (!in_array('Membership.id', $mappedFields)) {
-      $errors = $self->validateRequiredContactFields($fields['mapper']);
+      $errors = $self->validateRequiredContactFields();
       // FIXME: should use the schema titles, not redeclare them
       $requiredFields = [
         'Membership.membership_type_id' => ts('Membership Type'),

@@ -47,7 +47,7 @@ class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    *
    * @return void
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
     unset($this->_mapperFields['participant_is_test']);
 
@@ -93,7 +93,7 @@ class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   public static function formRule($fields, $files, $self) {
     $mappedFields = $self->getMappedFields($fields['mapper']);
     if (!in_array('Participant.id', $mappedFields)) {
-      $requiredError = $self->validateRequiredContactFields($fields['mapper']);
+      $requiredError = $self->validateRequiredContactFields();
       if (!in_array('Participant.event_id', $mappedFields)) {
         $requiredError[] = ts('Missing required field: %1', [1 => 'Event']) . '<br />';
       }

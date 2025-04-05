@@ -93,7 +93,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.receive_date'],
       ['name' => 'Contribution.financial_type_id'],
       ['name' => 'Contact.external_identifier'],
-      ['name' => 'SoftCreditContact.external_identifier', 'soft_credit_type_id' => 1],
+      ['name' => 'SoftCreditContact.external_identifier', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 1]]],
       ['name' => 'note'],
     ];
     $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
@@ -140,7 +140,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => ''],
       ['name' => 'Contact.email_primary.email'],
-      ['name' => 'SoftCreditContact.email_primary.email', 'soft_credit_type_id' => 1],
+      ['name' => 'SoftCreditContact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 1]]],
     ];
     $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
