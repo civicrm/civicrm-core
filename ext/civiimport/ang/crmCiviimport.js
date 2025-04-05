@@ -111,7 +111,7 @@
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
               availableEntity = _.clone(entity);
-              availableEntity.children = filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_field_prefix);
+              availableEntity.children = filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_name + '.');
               fields.push(availableEntity);
             }
           });
