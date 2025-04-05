@@ -4,6 +4,7 @@
   angular.module('crmSearchAdmin').component('searchAdminPagerConfig', {
     bindings: {
       display: '<',
+      noLimit: '<',
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminPagerConfig.html',
     controller: function($scope) {
@@ -35,7 +36,10 @@
       };
 
       this.toggleLimit = function() {
-        if (ctrl.display.settings.limit) {
+        if (ctrl.noLimit) {
+          delete ctrl.display.settings.limit;
+        }
+        else if (ctrl.display.settings.limit) {
           ctrl.display.settings.limit = 0;
         } else {
           ctrl.display.settings.limit = CRM.crmSearchAdmin.defaultPagerSize;

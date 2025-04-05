@@ -37,9 +37,9 @@
     </div>
     <div class="form-inline">
       <label>{{:: ts('Table Style') }}</label>
-      <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.tableClasses">
+      <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.parent.tableClasses">
         <label>
-          <input type="checkbox" ng-checked="$ctrl.includes($ctrl.display.settings.classes, style.name)" ng-click="$ctrl.toggle($ctrl.display.settings.classes, style.name)">
+          <input type="checkbox" ng-checked="$ctrl.includes($ctrl.display.settings.classes, style.name)" ng-click="$ctrl.parent.toggle($ctrl.display.settings.classes, style.name)">
           <span>{{:: style.label }}</span>
         </label>
       </div>
@@ -117,8 +117,8 @@
       <details>
         <summary>{{ $ctrl.parent.getColLabel(col) }}</summary>
         <div class="form-inline crm-search-admin-flex-row">
-          <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Header') }}</label>
-          <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
+          <label for="crm-search-admin-edit-header-{{ $index }}">{{:: ts('Header') }}</label>
+          <input id="crm-search-admin-edit-header-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
         </div>
         <div class="form-inline">
           <label>{{:: ts('Alignment') }}</label>
@@ -136,15 +136,15 @@
         </div>
         <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
         <div class="form-inline" ng-if="col.type === 'field' && $ctrl.display.settings.tally">
-          <label>{{:: ts('Footer Label') }}</label>
-          <input class="form-control" ng-model="col.tally.label" placeholder="{{:: ts('None') }}">
-          <label>{{:: ts('Footer Aggregate') }}</label>
-          <input class="form-control" ng-model="col.tally.fn" crm-ui-select="{data: $ctrl.getTallyFunctions, placeholder: ts('None'), allowClear: true}">
+          <label for="crm-search-admin-edit-footer-label-{{:: $index }}">{{:: ts('Footer') }}</label>
+          <input class="form-control" id="crm-search-admin-edit-footer-label-{{:: $index }}" ng-model="col.tally.label" placeholder="{{:: ts('No label') }}" title="{{:: ts('Footer label') }}">
+          <label for="crm-search-admin-edit-footer-agg-{{:: $index }}">{{:: ts('Aggregate') }}</label>
+          <input id="crm-search-admin-edit-footer-agg-{{:: $index }}" class="form-control" ng-model="col.tally.fn" crm-ui-select="{data: $ctrl.getTallyFunctions, placeholder: ts('None'), allowClear: true}" title="{{:: ts('Footer aggregate function') }}">
           <label>
             <input type="checkbox" ng-click="$ctrl.toggleTallyRewrite(col)" ng-checked="!!col.tally.rewrite">
             {{:: ts('Footer Rewrite') }}
           </label>
-          <input class="form-control" ng-if="col.tally.rewrite" ng-model="col.tally.rewrite" placeholder="{{:: ts('None') }}" title="{{:: ts('Footer Rewrite') }}" ng-model-options="{updateOn: 'blur'}">
+          <input class="form-control" ng-if="col.tally.rewrite" ng-model="col.tally.rewrite" placeholder="{{:: ts('None') }}" title="{{:: ts('Footer rewrite with tokens') }}" ng-model-options="{updateOn: 'blur'}">
           <crm-search-admin-token-select ng-if="col.tally.rewrite" model="col.tally" field="rewrite" only-select="true"></crm-search-admin-token-select>
         </div>
       </details>
