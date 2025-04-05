@@ -28,7 +28,15 @@
         this.chartContainer = $('.crm-chart-kit-chart-container', $element)[0];
 
         // add our trait functions to the pre and post search hooks
-        this.onPreRun.push(() => this.alwaysSortByXAscending());
+        this.onPreRun.push(() => {
+          const init = this.initChartType();
+          if (!init) {
+            // TODO: it might be nice to abort the whole search here, because
+            //  it's not going to be able to render the chart anyway
+            return;
+          }
+          this.alwaysSortByXAscending();
+        });
         this.onPostRun.push(() => {
           this.renderChart();
           // trigger re-rendering as you edit settings
@@ -36,6 +44,20 @@
           // TODO: get debounce to work?
           $scope.$watch('$ctrl.settings', this.onSettingsChange, true);
         });
+      };
+
+      this.initChartType = () => {
+        if (!this.settings.chartType) {
+          this.chartContainer.innerText = ts('No chart type selected.');
+          return false;
+        }
+        const type = chartKitChartTypes.find((type) => type.key === this.settings.chartType);
+        if (!type || !type.service) {
+          this.chartContainer.innerText = ts('No chart type selected.');
+          return false;
+        }
+        this.chartType = type.service;
+        return true;
       };
 
       this.alwaysSortByXAscending = () => {
@@ -60,16 +82,19 @@
       // this provides the common render steps - which chart types can then hook
       // into at different points
       this.renderChart = () => {
-        if (!this.settings.chartType) {
-          this.chartContainer.innerText = ts('No chart type selected.');
+        const init = this.initChartType();
+        if (!init) {
           return;
         }
+
         if (this.results.length === 0) {
           // show a no results type thing
           this.chartContainer.innerText = ts('Search returned no results.');
           return;
         }
-        this.initChartType();
+
+        // add a loading spinner
+        this.chartContainer.innerHTML = '<div class="crm-loading-element"></div>';
 
         // loads search results data into crossfilter
         this.buildCrossfilter();
@@ -89,13 +114,11 @@
         // apply formattting
         this.formatChart();
 
-        // run the dc render
-        this.chart.render();
-      };
+        // clear the loading spinner
+        this.chartContainer.innerHTML = '';
 
-      this.initChartType = () => {
-        const type = chartKitChartTypes.find((type) => type.key === this.settings.chartType);
-        this.chartType = type.service;
+        // run the dc render to draw the chart
+        this.chart.render();
       };
 
       this.buildCrossfilter = () => {
