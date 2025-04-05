@@ -50,7 +50,7 @@ class CRM_Mailing_BAO_MailingTrackableURL extends CRM_Mailing_DAO_MailingTrackab
     // let's not replace possible image URLs, CiviMail URLs or internal anchor URLs
     if (preg_match('/\.(png|jpg|jpeg|gif|css)[\'"]?$/i', $url)
       or substr_count($url, 'civicrm/extern/')
-      or substr_count($url, 'civicrm/mailing/')
+      or substr_count($url, 'civicrm/mailing/url')
       or ($url[0] === '#')
     ) {
       // let's not cache these, so they don't get &qid= appended to them
