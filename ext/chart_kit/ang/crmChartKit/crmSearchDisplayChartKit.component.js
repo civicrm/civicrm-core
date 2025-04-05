@@ -47,11 +47,14 @@
       };
 
       this.initChartType = () => {
+        // run initial settings through our legacy adaptor
+        this.settings = chartKitChartTypes.legacySettingsAdaptor(this.settings);
+
         if (!this.settings.chartType) {
           this.chartContainer.innerText = ts('No chart type selected.');
           return false;
         }
-        const type = chartKitChartTypes.find((type) => type.key === this.settings.chartType);
+        const type = chartKitChartTypes.types.find((type) => type.key === this.settings.chartType);
         if (!type || !type.service) {
           this.chartContainer.innerText = ts('No chart type selected.');
           return false;

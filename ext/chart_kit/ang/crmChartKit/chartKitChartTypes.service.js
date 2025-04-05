@@ -12,7 +12,33 @@
 
     const ts = CRM.ts('chart_kit');
 
-    return [
+    const legacySettingsAdaptor = (settings) => {
+      let updated = false;
+      // for pie/row charts, x axis was moved to w. if pie/row chart has x
+      // columns but no y columns, then transfer them
+      if (settings.chartType === 'pie' || settings.chartType === 'row') {
+        // if no cols for w axis
+        if (!settings.columns.find((col) => col.axis === 'w')) {
+
+          // update any x cols to w
+          settings.columns.forEach((col, i) => {
+            if (col.axis === 'x') {
+              settings.columns[i].axis = 'w';
+              updated = true;
+            }
+          });
+        }
+      }
+
+
+      if (updated) {
+        CRM.alert(ts("Please resave charts in SearchKit to avoid this message"), ts("Deprecated chart settings detected"));
+      }
+      return settings;
+    };
+
+
+    const types = [
       {
         key: 'pie',
         label: ts('Pie'),
@@ -56,5 +82,10 @@
         service: chartKitComposite
       },
     ];
+
+    return {
+      types: types,
+      legacySettingsAdaptor: legacySettingsAdaptor,
+    };
   });
 })(angular, CRM.$, CRM._);
