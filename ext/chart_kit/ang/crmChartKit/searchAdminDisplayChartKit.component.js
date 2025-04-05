@@ -162,7 +162,7 @@
         return this.getAxis(axisKey).sourceDataTypes;
       };
 
-      this.getAxisscaleTypeOptions = (axisKey) => {
+      this.getAxisScaleTypeOptions = (axisKey) => {
         return this.getAxis(axisKey).scaleTypes;
       };
 
@@ -223,8 +223,8 @@
         return dataType && ['Date', 'Time', 'Timestamp'].includes(dataType);
       };
 
-      this.getColumnscaleTypeOptions = (col) => {
-        let options = this.getAxisscaleTypeOptions(col.axis);
+      this.getColumnScaleTypeOptions = (col) => {
+        let options = this.getAxisScaleTypeOptions(col.axis);
 
         // date is only valid if the column type is date
         if (this.getColumnSourceDataTypeIsDate(col)) {
@@ -346,7 +346,7 @@
 
       this.getColumnConfigOptionGetters = () => ({
         searchColumn: this.getColumnSearchColumnOptions,
-        scaleType: this.getColumnscaleTypeOptions,
+        scaleType: this.getColumnScaleTypeOptions,
         datePrecision: this.getColumnDatePrecisionOptions,
         reduceType: this.getColumnReduceTypeOptions,
         seriesType: this.getColumnSeriesTypeOptions,

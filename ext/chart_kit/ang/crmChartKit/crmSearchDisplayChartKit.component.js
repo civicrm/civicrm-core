@@ -39,7 +39,7 @@
       };
 
       this.alwaysSortByXAscending = () => {
-        this._currentSortKey = this.getXColumn().key;
+        this._currentSortKey = this.getFirstColumnForAxis('x').key;
         // always sort the query by X axis - we can handle differently when we pass to d3
         // but this is the only way to get magic that the server knows about the order
         // (like option groups / month order etc)
@@ -165,7 +165,7 @@
 
         // 99 times out of 100 the x axis will be column 0, but let's be sure
         // (assume there's only one x axis column)
-        const xColumnIndex = this.getXColumn().index;
+        const xColumnIndex = this.getFirstColumnForAxis('x').index;
         this.dimension = this.ndx.dimension((d) => d[xColumnIndex]);
       };
 
@@ -196,41 +196,33 @@
       };
 
       this.buildChart = () => {
-        // use override from chart type if defined - otherwise use a default
-        // based on chartType.getChartConstructor
+        if (!this.chartType.buildChart && !this.chartType.getChartConstructor) {
+          throw new Error('Chart type should implement buildChart or getChartConstructor');
+        }
+
         if (this.chartType.buildChart) {
           this.chartType.buildChart(this);
           return;
         }
 
-        if (this.chartType.getChartConstructor) {
-          this.chart = this.chartType.getChartConstructor(this)(this.chartContainer);
+        this.chart = this.chartType.getChartConstructor(this)(this.chartContainer);
 
-          if (this.chartType.hasCoordinateGrid()) {
-            this.buildCoordinateGrid();
-          }
-
-          // load in cap if implemented by chart type
-          if (this.chart.cap) {
-            this.chart.cap(this.settings.maxSegments ? this.settings.maxSegments : null);
-          }
-          // load in ordering if implement by chart type
-          if (this.chart.ordering) {
-            this.chart.ordering(this.getOrderAccessor());
-          }
-
-          return;
+        if (this.chartType.hasCoordinateGrid()) {
+          this.buildCoordinateGrid();
         }
 
-        throw new Error('Chart type should implement buildChart or getChartConstructor');
+        // load in cap if implemented by chart type
+        if (this.chart.cap) {
+          this.chart.cap(this.settings.maxSegments ? this.settings.maxSegments : null);
+        }
+        // load in ordering if implement by chart type
+        if (this.chart.ordering) {
+          this.chart.ordering(this.getOrderAccessor());
+        }
       };
 
       this.buildCoordinateGrid = () => {
-        this.buildXAxis();
-      };
-
-      this.buildXAxis = () => {
-        const xCol = this.getXColumn();
+        const xCol = this.getFirstColumnForAxis('x');
         const xDomainValues = this.columnTotals[xCol.index];
         const min = Math.min(...xDomainValues);
         const max = Math.max(...xDomainValues);
@@ -269,7 +261,7 @@
             .dimension(this.dimension)
             .group(this.group)
             // default value is just the first y co-ordinate
-            .valueAccessor(this.getValueAccessor(this.getColumnsForAxis('y')[0]));
+            .valueAccessor(this.getValueAccessor(this.getFirstColumnForAxis('y')));
         }
       };
 
@@ -389,6 +381,8 @@
 
       this.getColumnsForAxis = (axisKey) => this.getColumns().filter((col) => col.axis === axisKey);
 
+      this.getFirstColumnForAxis = (axisKey) => this.getColumns().find((col) => col.axis === axisKey);
+
       /**
        * Get the reducer for a column, based on its reduceType key
        * ( defaults to returning the "list" reducer if reduceType isn't set )
@@ -404,8 +398,6 @@
         col.reducer = this.getReducerForColumn(col);
         return col;
       });
-
-      this.getXColumn = () => this.getColumnsForAxis('x')[0];
 
       this.getOrderColumn = () => this.getColumns()[parseInt(this.settings.chartOrderColIndex ? this.settings.chartOrderColIndex : 0)];
 
