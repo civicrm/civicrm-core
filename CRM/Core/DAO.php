@@ -2659,23 +2659,6 @@ SELECT contact_id
   }
 
   /**
-   * @param null $message
-   * @param bool $printDAO
-   */
-  public static function debugPrint($message = NULL, $printDAO = TRUE) {
-    CRM_Utils_System::xMemory("{$message}: ");
-
-    if ($printDAO) {
-      global $_DB_DATAOBJECT;
-      $q = [];
-      foreach (array_keys($_DB_DATAOBJECT['RESULTS']) as $id) {
-        $q[] = $_DB_DATAOBJECT['RESULTS'][$id]->query;
-      }
-      CRM_Core_Error::debug('_DB_DATAOBJECT', $q);
-    }
-  }
-
-  /**
    * Build a list of triggers via hook and add them to (err, reconcile them
    * with) the database.
    *
