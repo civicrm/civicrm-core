@@ -141,9 +141,9 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
         $parser = $self->getParser();
         $rule = $parser->getDedupeRule('Individual', $self->getUserJob()['metadata']['entity_configuration']['TargetContact']['dedupe_rule'] ?? NULL);
-        $errors = $self->validateContactFields($rule, $importKeys, ['target_contact.external_identifier', 'target_contact.id']);
+        $missingFields = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'id']);
 
-        $missingFields = $self->validateRequiredFields($fields['mapper']);
+        $missingFields += $self->validateRequiredFields($fields['mapper']);
         if ($missingFields) {
           $errors['_qf_default'] = implode(',', $missingFields);
         }
