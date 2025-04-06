@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload.
  */
-class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Activity_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Should contact fields be filtered which determining fields to show.
@@ -97,11 +97,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   protected function getAvailableFields(): array {
     $return = [];
     foreach ($this->getFields() as $name => $field) {
-      if (($field['entity'] ?? '') === 'Contact' && $this->isFilterContactFields() && empty($field['match_rule'])) {
-        // Filter out metadata that is intended for create & update - this is not available in the quick-form
-        // but is now loaded in the Parser for the LexIM variant.
-        continue;
-      }
       $prefix = empty($field['entity_name']) ? '' : $field['entity_name'] . '.';
       $return[$prefix . $name] = $field['title'];
     }
@@ -127,13 +122,13 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       if (!in_array('id', $fields['mapper'], TRUE)) {
         $importKeys = [];
         foreach ($fields['mapper'] as $field) {
-          $importKeys[] = [$field];
+          $importKeys[] = $field[0];
         }
         $parser = $self->getParser();
         $rule = $parser->getDedupeRule('Individual', $self->getUserJob()['metadata']['entity_configuration']['TargetContact']['dedupe_rule'] ?? NULL);
-        $errors = $self->validateContactFields($rule, $importKeys, ['target_contact.external_identifier', 'target_contact.id']);
+        $errors = $self->validateContactFields($rule, $fields['mapper'], ['external_identifier', 'id']);
 
-        $missingFields = $self->validateRequiredFields($fields['mapper']);
+        $missingFields = $self->validateRequiredFields($importKeys);
         if ($missingFields) {
           $errors['_qf_default'] = implode(',', $missingFields);
         }
