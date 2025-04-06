@@ -236,7 +236,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           !empty($field['is_required'])
         ) {
 
-          $fieldsName = CRM_Utils_Array::value(1, explode('_', $tableName));
+          $fieldsName = explode('_', $tableName)[1] ?? '';
           if ($fieldsName && property_exists($this, "_$fieldsName" . 'Field')) {
             $this->{"_$fieldsName" . 'Field'} = TRUE;
           }
