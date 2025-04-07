@@ -276,11 +276,11 @@
         this.chart
           .width(() => (this.settings.format.width))
           .height(() => (this.settings.format.height))
-          .on('pretransition', chart => {
-            chart.selectAll('text').attr('fill', this.settings.format.labelColor);
+          .on('pretransition', () => {
+            this.chart.selectAll('text').style('fill', this.settings.format.labelColor);
             // we need to add the background here as well as to the containing div
             // in order for inclusion in exports
-            chart.svg().style('background', this.settings.format.backgroundColor);
+            this.chart.svg().style('background', this.settings.format.backgroundColor);
           });
 
         if (this.chartType.hasCoordinateGrid()) {
