@@ -276,7 +276,7 @@
         this.chart
           .width(() => (this.settings.format.width))
           .height(() => (this.settings.format.height))
-          .on('pretransition', () => {
+          .on('pretransition.canvasColors', () => {
             this.chart.selectAll('text').style('fill', this.settings.format.labelColor);
             // we need to add the background here as well as to the containing div
             // in order for inclusion in exports
@@ -365,8 +365,8 @@
 
         // Correct vertical alignment of legend labels on Chrome
         // Should be fixed upstream and therefore unnecessary in DCv5
-        this.chart.on('pretransition', (chart) =>
-          chart.selectAll('.dc-legend-item text')
+        this.chart.on('pretransition.legendTextCorrect', () =>
+          this.chart.selectAll('.dc-legend-item text')
             .attr('y', legend.itemHeight() - 2)
         );
       };
