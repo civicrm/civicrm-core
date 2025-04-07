@@ -29,6 +29,26 @@ class CRM_Upgrade_Incremental_php_SixThree extends CRM_Upgrade_Incremental_Base 
    */
   public function upgrade_6_3_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    // Running this twice could end up matching on entity_file.id that belongs
+    // to something else and then insert the wrong file_id. Also, the snapshot
+    // will overwrite the old data with newly updated data so we lose the
+    // backup we wanted. So leave a flag that we've already run this.
+    if (!Civi::settings()->get('upgrade_6_3_entitytag_done')) {
+      $this->addSnapshotTask('entity_tag_file', CRM_Utils_SQL_Select::from('civicrm_entity_tag')->where("entity_table = 'civicrm_file'"));
+      $this->addTask('Harmonify entity tag file ids', 'harmonifyEntityTag');
+      Civi::settings()->set('upgrade_6_3_entitytag_done', TRUE);
+    }
+  }
+
+  /**
+   * The UI is currently expecting entity_tag.entity_id to point to a file id.
+   * It's currently pointing to entity_file's id.
+   */
+  public static function harmonifyEntityTag(CRM_Queue_TaskContext $ctx): bool {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_entity_tag et
+      INNER JOIN civicrm_entity_file ef ON (et.entity_id=ef.id AND et.entity_table='civicrm_file')
+      SET et.entity_id=ef.file_id");
+    return TRUE;
   }
 
 }
