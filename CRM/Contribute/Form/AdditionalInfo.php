@@ -426,6 +426,9 @@ class CRM_Contribute_Form_AdditionalInfo {
     [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'contribution_offline_receipt',
+        // @todo - IDs are being passed in multiple ways - the non-deprecated
+        // one is `modelProps`
+        // The others are probably redundant after merging https://github.com/civicrm/civicrm-core/pull/32036
         'contactId' => $params['contact_id'],
         'contributionId' => $params['contribution_id'],
         'tokenContext' => ['contributionId' => (int) $params['contribution_id'], 'contactId' => $params['contact_id']],
@@ -434,6 +437,10 @@ class CRM_Contribute_Form_AdditionalInfo {
         'toEmail' => $contributorEmail,
         'isTest' => $form->_mode === 'test',
         'PDFFilename' => ts('receipt') . '.pdf',
+        'modelProps' => [
+          'contributionID' => $params['contribution_id'],
+          'contactID' => $params['contact_id'],
+        ],
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
       ]
     );
