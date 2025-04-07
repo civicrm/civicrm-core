@@ -150,7 +150,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
-      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG)
+      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG && !defined('CIVICRM_MAIL_LOG_AND_SEND'))
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK)
     ) {
