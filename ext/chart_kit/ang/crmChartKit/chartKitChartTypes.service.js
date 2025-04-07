@@ -7,7 +7,8 @@
     chartKitRow,
     chartKitStack,
     chartKitComposite,
-    chartKitSeries
+    chartKitSeries,
+    chartKitHeatMap
   ) => {
 
     const ts = CRM.ts('chart_kit');
@@ -80,6 +81,12 @@
         label: ts('Combined'),
         icon: 'fa-layer-group',
         service: chartKitComposite
+      },
+      {
+        key: 'heatmap',
+        label: ts('Heat Map'),
+        icon: 'fa-table-cells-large',
+        service: chartKitHeatMap
       },
     ];
 
