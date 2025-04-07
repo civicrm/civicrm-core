@@ -114,6 +114,7 @@ class CRM_Queue_Runner {
    *   - onEndUrl: string, the URL to which one redirects.
    *   - pathPrefix: string, prepended to URLs for the web-runner;
    *     default: 'civicrm/queue'.
+   *   - buttons
    */
   public function __construct($runnerSpec) {
     $this->title = $runnerSpec['title'] ?? ts('Queue Runner');
@@ -123,7 +124,7 @@ class CRM_Queue_Runner {
     $this->onEnd = $runnerSpec['onEnd'] ?? NULL;
     $this->onEndUrl = $runnerSpec['onEndUrl'] ?? NULL;
     $this->pathPrefix = $runnerSpec['pathPrefix'] ?? 'civicrm/queue';
-    $this->buttons = CRM_Utils_Array::value('buttons', $runnerSpec, ['retry' => TRUE, 'skip' => TRUE]);
+    $this->buttons = $runnerSpec['buttons'] ?? ['retry' => TRUE, 'skip' => TRUE];
     // perhaps this value should be randomized?
     $this->qrid = $this->queue->getName();
   }
