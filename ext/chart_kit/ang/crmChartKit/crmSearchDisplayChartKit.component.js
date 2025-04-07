@@ -538,6 +538,9 @@
 
       this.getCanvasStyle = () => {
         const formatSettings = this.settings.format;
+        if (!formatSettings) {
+          return {};
+        }
         return {
           backgroundColor: formatSettings.backgroundColor,
           padding: formatSettings.padding.outer,
@@ -547,6 +550,9 @@
 
       this.getContainerStyle = () => {
         const formatSettings = this.settings.format;
+        if (!formatSettings) {
+          return {};
+        }
         return {
           height: formatSettings.height,
           width: formatSettings.width,
