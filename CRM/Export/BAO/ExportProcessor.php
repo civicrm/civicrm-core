@@ -1448,7 +1448,7 @@ class CRM_Export_BAO_ExportProcessor {
       switch ($type) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($fieldSpec['data_type'] ?? NULL, ['Country', 'StateProvince', 'ContactReference'])) {
+          if (in_array($fieldSpec['data_type'] ?? NULL, ['Country', 'StateProvince', 'ContactReference', 'EntityReference'])) {
             return "`$fieldName` text";
           }
           // some of those will be exported as a (localisable) string
