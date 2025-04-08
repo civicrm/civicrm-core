@@ -194,7 +194,7 @@ class CRM_Extension_Manager {
         // There is an old copy of the extension. Try to install in the same place -- but it must go somewhere in the default-container
         // throws Exception
         $tgtPath = $this->fullContainer->getPath($newInfo->key);
-        if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
+        if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath, FALSE)) {
           // force installation in the default-container
           $oldPath = $tgtPath;
           $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
