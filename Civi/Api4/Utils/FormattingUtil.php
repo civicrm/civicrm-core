@@ -239,8 +239,8 @@ class FormattingUtil {
         }
       }
       foreach ($result as $key => $value) {
-        // Skip null values or values that have already been unset by `formatOutputValue` functions
-        if (!isset($result[$key])) {
+        // Skip values that have already been unset by `formatOutputValue` functions
+        if (!array_key_exists($key, $result)) {
           continue;
         }
         // Use ??= to only convert each column once

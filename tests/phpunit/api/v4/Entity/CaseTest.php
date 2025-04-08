@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
 use Civi\Api4\CaseActivity;
+use Civi\Api4\CaseType;
 use Civi\Api4\CiviCase;
 use Civi\Api4\Relationship;
 
@@ -112,6 +113,24 @@ class CaseTest extends Api4TestBase {
     $options = array_column($field['options'], 'name');
 
     $this->assertEquals(['Closed', 'Testing'], $options);
+  }
+
+  public function testCaseTypeDefinition(): void {
+    $caseType = $this->createTestRecord('CaseType', [
+      'title' => 'Test Case Type',
+      'name' => 'test_case_type3',
+      'definition' => [
+        'statuses' => ['Testing', 'Closed'],
+      ],
+    ]);
+
+    $caseTypeToTest = CaseType::get(FALSE)
+      ->addSelect('definition')
+      ->addWhere('name', '=', 'test_case_type3')
+      ->execute()
+      ->first();
+    $this->assertArrayHasKey('definition', $caseTypeToTest);
+    $this->assertNotNull($caseTypeToTest['definition']);
   }
 
   public function testCaseActivity(): void {
