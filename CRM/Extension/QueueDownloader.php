@@ -16,7 +16,6 @@
  *
  *   $dl = new CRM_Extension_QueueDownloader();
  *   $queue = $dl->fillQueue(
- *     $dl->createQueue(),
  *     ['ext-1' => 'https://example.com/ext-1/releases/1.2.3./zip']
  *   );
  *   $runner = new CRM_Queue_Runner(...$queue...);
@@ -41,12 +40,24 @@ class CRM_Extension_QueueDownloader {
    */
   protected string $upId;
 
+  protected bool $autoApply;
+
+  protected CRM_Queue_Queue $queue;
+
+  protected bool $cleanup;
+
   /**
-   * @param string|null $upId
-   *   Ex: 20250607_abcd1234abcd1234
+   * @param bool $autoApply
+   *   TRUE if the downloader should also execute the installation/upgrade routines
+   * @param bool $cleanup
+   *    Whether to delete temporary files and backup files at the end.
+   * @param CRM_Queue_Queue|null $queue
    */
-  public function __construct(?string $upId = NULL) {
-    $this->upId = $upId ?: (CRM_Utils_Time::date('Y-m-d') . '-' . CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC));
+  public function __construct(bool $autoApply = TRUE, bool $cleanup = TRUE, ?CRM_Queue_Queue $queue = NULL) {
+    $this->upId = (CRM_Utils_Time::date('Y-m-d') . '-' . CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC));
+    $this->autoApply = $autoApply;
+    $this->cleanup = $cleanup;
+    $this->queue = $queue ?: $this->createQueue();
   }
 
   public function createQueue(): CRM_Queue_Queue {
@@ -81,16 +92,12 @@ class CRM_Extension_QueueDownloader {
   }
 
   /**
-   * @param CRM_Queue_Queue $queue
    * @param array $downloads
    *   Ex: ['ext1' => 'https://example.com/ext1/releases/1.0.zip']
-   * @param bool $autoApply
-   * *   TRUE if the downloader should also execute the installation/upgrade routines
-   * @param bool $cleanup
-   *   Whether to delete temporary files and backup files at the end.
    * @return \CRM_Queue_Queue
    */
-  public function fillQueue(CRM_Queue_Queue $queue, array $downloads, bool $autoApply = TRUE, bool $cleanup = TRUE): CRM_Queue_Queue {
+  public function fillQueue(array $downloads): CRM_Queue_Queue {
+    $queue = $this->queue;
     if (empty($downloads)) {
       throw new CRM_Core_Exception("Cannot build download queue. No downloads requested!");
     }
@@ -134,7 +141,7 @@ class CRM_Extension_QueueDownloader {
       ['weight' => 300]
     );
 
-    if ($autoApply) {
+    if ($this->autoApply) {
       // We need to figure out the mix of activation-steps (enable/upgrade).
       // If you have multiple (e.g. enable $X and also upgrade $Y), then... which runs first?
       // In theory, there is no simple rule of ordering that will work for all imaginable scenarios.
@@ -197,7 +204,7 @@ class CRM_Extension_QueueDownloader {
       }
     }
 
-    if ($cleanup) {
+    if ($this->cleanup) {
       $queue->createItem(
         static::task(ts('Cleanup workspace'), 'cleanup'),
         ['weight' => 2000]
