@@ -84,24 +84,26 @@ class CRM_Extension_QueueDownloader {
    * @param CRM_Queue_Queue $queue
    * @param array $downloads
    *   Ex: ['ext1' => 'https://example.com/ext1/releases/1.0.zip']
-   * @param bool $upgradeDb
-   *   Whether to run database updates
+   * @param bool $autoApply
+   * *   TRUE if the downloader should also execute the installation/upgrade routines
    * @param bool $cleanup
    *   Whether to delete temporary files and backup files at the end.
    * @return \CRM_Queue_Queue
    */
-  public function fillQueue(CRM_Queue_Queue $queue, array $downloads, bool $upgradeDb = TRUE, bool $cleanup = TRUE): CRM_Queue_Queue {
+  public function fillQueue(CRM_Queue_Queue $queue, array $downloads, bool $autoApply = TRUE, bool $cleanup = TRUE): CRM_Queue_Queue {
     if (empty($downloads)) {
       throw new CRM_Core_Exception("Cannot build download queue. No downloads requested!");
     }
 
     // Store some metadata about what's going on. This may help with debugging.
     $this->mkdir($this->getStagingPath());
+    $details = $this->getStagingPath('details.json');
     file_put_contents($this->getStagingPath('details.json'), json_encode([
       'startTime' => CRM_Utils_Time::date('c'),
       'upId' => $this->upId,
       'queue' => $queue->getName(),
       'downloads' => $downloads,
+      'statuses' => CRM_Extension_System::singleton()->getManager()->getStatuses(),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
     // Download and extract zip files. This is I/O dependent (error-prone), so we do each as a separate (retriable) step.
@@ -133,11 +135,67 @@ class CRM_Extension_QueueDownloader {
       ['weight' => 300]
     );
 
-    if ($upgradeDb) {
-      $queue->createItem(
-        static::subtask(ts('Upgrade database'), 'upgradeDb'),
-        ['weight' => 400]
-      );
+    if ($autoApply) {
+      // We need to figure out the mix of activation-steps (enable/upgrade).
+      // If you have multiple (e.g. enable $X and also upgrade $Y), then... which runs first?
+      // In theory, there is no simple rule of ordering that will work for all imaginable scenarios.
+      // The main mitigating factor is that actual usage will be biased toward simple-cases.
+      // (Ex: The web UI only lets you add one extension at a time. The CLI allows multiple -- but user must explicitly choose each.)
+      // This implementation defers to the user -- applying extensions in the order requested.
+
+      $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
+      $todos = [];
+      foreach (array_keys($downloads) as $key) {
+        switch ($statuses[$key] ?? CRM_Extension_Manager::STATUS_UNINSTALLED) {
+          case CRM_Extension_Manager::STATUS_UNINSTALLED:
+            $todos[] = ['enable', $key];
+            break;
+
+          case CRM_Extension_Manager::STATUS_DISABLED:
+          case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
+            $todos[] = ['enable', $key];
+            $todos[] = ['upgrade', $key];
+            break;
+
+          case CRM_Extension_Manager::STATUS_INSTALLED:
+          case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
+            $todos[] = ['upgrade', $key];
+            break;
+
+          default:
+            throw new \CRM_Extension_Exception('Unknown status: ' . $statuses[$key]);
+        }
+      }
+
+      // Optimization: Combine any adjacent todos of the same type (e.g. "enable A + enable B ==> enable A+B").
+      $nextType = fn() => $todos[0][0];
+      $nextKey = fn() => $todos[0][1];
+      while (!empty($todos)) {
+        $targetType = $nextType();
+
+        $contiguousSegment = [];
+        while (!empty($todos) && $nextType() === $targetType) {
+          $contiguousSegment[] = $nextKey();
+          array_shift($todos);
+        }
+
+        switch ($targetType) {
+          case 'enable':
+            $queue->createItem(
+              static::subtask(ts('Enable %1', [1 => '"' . implode('", "', $contiguousSegment) . '"']), 'enable', [$contiguousSegment]),
+              ['weight' => 400]
+            );
+
+            break;
+
+          case 'upgrade':
+            $queue->createItem(
+              static::subtask(ts('Upgrade database'), 'upgradeDb'),
+              ['weight' => 400]
+            );
+            break;
+        }
+      }
     }
 
     if ($cleanup) {
@@ -265,6 +323,13 @@ class CRM_Extension_QueueDownloader {
   public function subtaskRebuild(CRM_Queue_TaskContext $ctx): void {
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE, FALSE);
     // FIXME: For 6.1+:, use: Civi::rebuild(['*' => TRUE, 'sessions' => FALSE]);
+  }
+
+  /**
+   * Scan the downloaded extensions and verify that their requirements are satisfied.
+   */
+  public function subtaskEnable(CRM_Queue_TaskContext $ctx, array $keys): void {
+    CRM_Extension_System::singleton()->getManager()->enable($keys);
   }
 
   public function subtaskUpgradeDb(CRM_Queue_TaskContext $ctx): void {
