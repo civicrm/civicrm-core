@@ -96,7 +96,7 @@ class CRM_Extension_QueueDownloader {
     }
 
     // Store some metadata about what's going on. This may help with debugging.
-    $this->mkdir($this->getStagingPath());
+    CRM_Utils_File::createDir($this->getStagingPath(), 'exception');
     file_put_contents($this->getStagingPath('details.json'), json_encode([
       'startTime' => CRM_Utils_Time::date('c'),
       'upId' => $this->upId,
@@ -238,7 +238,10 @@ class CRM_Extension_QueueDownloader {
     $tmpDir = $this->getStagingPath('tmp');
     $zipFile = $this->getStagingPath('fetch', $key . '.zip');
     $stageDir = $this->getStagingPath('new', $key);
-    $this->mkdir([$tmpDir, dirname($zipFile), dirname($stageDir)]);
+
+    CRM_Utils_File::createDir($tmpDir, 'exception');
+    CRM_Utils_File::createDir(dirname($zipFile), 'exception');
+    CRM_Utils_File::createDir(dirname($stageDir), 'exception');
 
     if (file_exists($stageDir)) {
       // In case we're retrying from a prior failure.
@@ -296,7 +299,7 @@ class CRM_Extension_QueueDownloader {
    * Delete the container-cache
    */
   public function subtaskSwap(CRM_Queue_TaskContext $ctx, array $keys): void {
-    $this->mkdir($this->getStagingPath('old'));
+    CRM_Utils_File::createDir($this->getStagingPath('old'), 'exception');
     try {
       foreach ($keys as $key) {
         $tmpCodeDir = $this->getStagingPath('new', $key);
@@ -339,17 +342,6 @@ class CRM_Extension_QueueDownloader {
 
   public function subtaskCleanup(): void {
     CRM_Utils_File::cleanDir($this->getStagingPath(), TRUE, FALSE);
-  }
-
-  private function mkdir($paths): void {
-    $paths = (array) $paths;
-    foreach ($paths as $path) {
-      if (!is_dir($path)) {
-        if (!mkdir($path, 0777, TRUE)) {
-          throw new CRM_Core_Exception("Failed to create directory: $path");
-        }
-      }
-    }
   }
 
 }
