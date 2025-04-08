@@ -217,23 +217,18 @@ class CRM_Extension_QueueDownloader {
    * @return \CRM_Queue_Task
    */
   protected function subtask(string $title, string $method, array $args = []): CRM_Queue_Task {
+    $realMethod = 'subtask' . ucfirst($method);
     return new CRM_Queue_Task(
-      [static::class, 'runSubtask'],
-      [$this->upId, $method, [$this->getStagingPath(), ...$args]],
+      [static::class, $realMethod],
+      [$this->getStagingPath(), ...$args],
       $title
     );
-  }
-
-  public static function runSubtask(CRM_Queue_TaskContext $ctx, string $upId, string $name, array $args = []): bool {
-    $method = 'subtask' . ucfirst($name);
-    static::{$method}($ctx, ...$args);
-    return TRUE;
   }
 
   /**
    * Download extension ($key) from $url and store it in {$stagingPath}/new/{$key}.
    */
-  public static function subtaskFetch(CRM_Queue_TaskContext $ctx, string $stagingPath, string $key, string $url): void {
+  public static function subtaskFetch(CRM_Queue_TaskContext $ctx, string $stagingPath, string $key, string $url): bool {
     $tmpDir = "$stagingPath/tmp";
     $zipFile = "$stagingPath/fetch/$key.zip";
     $stageDir = "$stagingPath/new/$key";
@@ -265,12 +260,14 @@ class CRM_Extension_QueueDownloader {
     if (!rename($extractedZipPath, $stageDir)) {
       throw new CRM_Extension_Exception("Failed to rename $extractedZipPath to $stageDir");
     }
+
+    return TRUE;
   }
 
   /**
    * Scan the downloaded extensions and verify that their requirements are satisfied.
    */
-  public static function subtaskVerify(CRM_Queue_TaskContext $ctx, string $stagingPath, array $keys): void {
+  public static function subtaskVerify(CRM_Queue_TaskContext $ctx, string $stagingPath, array $keys): bool {
     $infos = CRM_Extension_System::singleton()->getMapper()->getAllInfos();
     foreach ($keys as $key) {
       $infos[$key] = CRM_Extension_Info::loadFromFile("$stagingPath/new/$key/" . CRM_Extension_Info::FILENAME);
@@ -289,6 +286,8 @@ class CRM_Extension_QueueDownloader {
         "Consult CiviCRM log for details.",
       ]));
     }
+
+    return TRUE;
   }
 
   /**
@@ -296,7 +295,7 @@ class CRM_Extension_QueueDownloader {
    * Move any old code to the backup (`stagingDir/old/{key}`).
    * Delete the container-cache
    */
-  public static function subtaskSwap(CRM_Queue_TaskContext $ctx, string $stagingPath, array $keys): void {
+  public static function subtaskSwap(CRM_Queue_TaskContext $ctx, string $stagingPath, array $keys): bool {
     CRM_Utils_File::createDir("$stagingPath/old", 'exception');
     try {
       foreach ($keys as $key) {
@@ -318,28 +317,34 @@ class CRM_Extension_QueueDownloader {
       // $config->cleanup(1);
       $config->cleanupCaches(FALSE);
     }
+
+    return TRUE;
   }
 
-  public static function subtaskRebuild(CRM_Queue_TaskContext $ctx): void {
+  public static function subtaskRebuild(CRM_Queue_TaskContext $ctx): bool {
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE, FALSE);
     // FIXME: For 6.1+:, use: Civi::rebuild(['*' => TRUE, 'sessions' => FALSE]);
+    return TRUE;
   }
 
   /**
    * Scan the downloaded extensions and verify that their requirements are satisfied.
    */
-  public static function subtaskEnable(CRM_Queue_TaskContext $ctx, string $stagingPath, array $keys): void {
+  public static function subtaskEnable(CRM_Queue_TaskContext $ctx, string $stagingPath, array $keys): bool {
     CRM_Extension_System::singleton()->getManager()->enable($keys);
+    return TRUE;
   }
 
-  public static function subtaskUpgradeDb(CRM_Queue_TaskContext $ctx): void {
+  public static function subtaskUpgradeDb(CRM_Queue_TaskContext $ctx): bool {
     if (CRM_Extension_Upgrades::hasPending()) {
       CRM_Extension_Upgrades::fillQueue($ctx->queue);
     }
+    return TRUE;
   }
 
-  public static function subtaskCleanup(CRM_Queue_TaskContext $ctx, string $stagingPath): void {
+  public static function subtaskCleanup(CRM_Queue_TaskContext $ctx, string $stagingPath): bool {
     CRM_Utils_File::cleanDir($stagingPath, TRUE, FALSE);
+    return TRUE;
   }
 
 }
