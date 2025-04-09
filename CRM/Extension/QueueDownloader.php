@@ -15,16 +15,45 @@
  * The general idea is:
  *
  *   $dl = new CRM_Extension_QueueDownloader();
- *   $queue = $dl->fillQueue(
- *     $dl->createQueue(),
+ *   $dl->addDownloads(
  *     ['ext-1' => 'https://example.com/ext-1/releases/1.2.3./zip']
  *   );
- *   $runner = new CRM_Queue_Runner(...$queue...);
+ *   $runner = new CRM_Queue_Runner([
+ *     'queue' => $dl->fillQueue(), ...
+ *   ]);
  *   $runner->runAllViaWeb();
  *
- * NOTE: When upgrading extensions, you MUST have a chance to reset the PHP process (loading new PHP files).
+ * == NOTE: Using subprocesses
+ *
+ * When upgrading extensions, you MUST provide a chance to reset the PHP process (loading new PHP files).
+ *
  * We will assume that every task runs in a new PHP process. This is compatible with runAllViaWeb() not but runAll().
- * Headless clients (like `cv`) will need to use a different implementation that spawns new subprocesses.
+ *
+ * Headless clients (like `cv`) will need to use a suitable runner that spawns new subprocesses.
+ *
+ * == NOTE: Sequencing
+ *
+ * When you have multiple extensions to download/enable (and each may come with different start-state
+ * and version; and each may have differing versioned-dependencies)... then there is an interesting
+ * question about how to sequence/group the operations.
+ *
+ * Some operations target multiple ext's concurrently (like "rebuild" or "hook_upgrade" or "enable(keys=>A,B,C)").
+ * It's nice to lean into this style ("fetch A+B+C" then "rebuild system" then "upgrade A+B+C")
+ * because it's a good facsimile of the behavior in SCM (git/gzr/svn)-based workflows.
+ *
+ * However, it's not perfect, and there may still be edge-cases where that doesn't work. I'm pessimistic
+ * that this class will be able to automatically form perfect+universal plans based only on a declared
+ * list of downloads.
+ *
+ * So if a problematic edge-case comes up, how could you resolve it? The caller can decide sequencing/batching.
+ * Compare:
+ *
+ * ## Ex 1: Download 'a' and 'b' in the same batch. They will be fetched, swapped, and rebuilt in tandem.
+ *   $dl->addDownloads(['a' => ..., 'b' => ...]);
+ *
+ * ## Ex 2: Download 'a' and 'b' as separate batches. 'a' will be fully handled before 'b'.
+ *   $dl->addDownloads(['a' => ...]);
+ *   $dl->addDownloads(['b' => ...]);
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -41,12 +70,26 @@ class CRM_Extension_QueueDownloader {
    */
   protected string $upId;
 
+  protected CRM_Queue_Queue $queue;
+
+  protected bool $cleanup;
+
   /**
-   * @param string|null $upId
-   *   Ex: 20250607_abcd1234abcd1234
+   * @var array
+   *   Ex: [0 => ['type' => 'download', 'urls' => ['my.extension' => 'https://example/my.extension-1.0.zip']]]
+   *   Ex: [0 => ['type' => 'enable', 'keys' => ['my.extension']]]
    */
-  public function __construct(?string $upId = NULL) {
-    $this->upId = $upId ?: (CRM_Utils_Time::date('Y-m-d') . '-' . CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC));
+  protected array $batches = [];
+
+  /**
+   * @param bool $cleanup
+   *    Whether to delete temporary files and backup files at the end.
+   * @param CRM_Queue_Queue|null $queue
+   */
+  public function __construct(bool $cleanup = TRUE, ?CRM_Queue_Queue $queue = NULL) {
+    $this->upId = (CRM_Utils_Time::date('Y-m-d') . '-' . CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC));
+    $this->cleanup = $cleanup;
+    $this->queue = $queue ?: $this->createQueue();
   }
 
   public function createQueue(): CRM_Queue_Queue {
@@ -81,73 +124,109 @@ class CRM_Extension_QueueDownloader {
   }
 
   /**
-   * @param CRM_Queue_Queue $queue
+   * Add a set of extensions to download and enable.
+   *
    * @param array $downloads
    *   Ex: ['ext1' => 'https://example.com/ext1/releases/1.0.zip']
-   * @param bool $upgradeDb
-   *   Whether to run database updates
-   * @param bool $cleanup
-   *   Whether to delete temporary files and backup files at the end.
-   * @return \CRM_Queue_Queue
+   * @param bool $autoApply
+   *   TRUE if the downloader should execute the installation/upgrade routines
+   *   FALSE if the downloader should only get the files and put them in place
+   * @return $this
    */
-  public function fillQueue(CRM_Queue_Queue $queue, array $downloads, bool $upgradeDb = TRUE, bool $cleanup = TRUE): CRM_Queue_Queue {
-    if (empty($downloads)) {
-      throw new CRM_Core_Exception("Cannot build download queue. No downloads requested!");
-    }
+  public function addDownloads(array $downloads, bool $autoApply = TRUE) {
+    $this->batches[] = ['type' => 'download', 'urls' => $downloads, 'autoApply' => $autoApply];
+    return $this;
+  }
+
+  /**
+   * Add a set of keys which should be enabled. (Use this if you -only- want to enable. If you are actually downloading, then use addDownloads().)
+   *
+   * @param array $keys
+   *   Ex: ['my.ext1', 'my.ext2']
+   * @return $this
+   */
+  public function addEnable(array $keys) {
+    $this->batches[] = ['type' => 'enable', 'keys' => $keys];
+    return $this;
+  }
+
+  /**
+   * Take the list of pending updates (from addDownload, addEnable)
+   */
+  public function fillQueue(): CRM_Queue_Queue {
+    $queue = $this->queue;
 
     // Store some metadata about what's going on. This may help with debugging.
-    $this->mkdir($this->getStagingPath());
+    CRM_Utils_File::createDir($this->getStagingPath(), 'exception');
     file_put_contents($this->getStagingPath('details.json'), json_encode([
       'startTime' => CRM_Utils_Time::date('c'),
       'upId' => $this->upId,
       'queue' => $queue->getName(),
-      'downloads' => $downloads,
+      'batches' => $this->batches,
+      'statuses' => CRM_Extension_System::singleton()->getManager()->getStatuses(),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-    // Download and extract zip files. This is I/O dependent (error-prone), so we do each as a separate (retriable) step.
-    foreach ($downloads as $ext => $url) {
-      $queue->createItem(
-        static::subtask(ts('Fetch "%1" from "%2"', [1 => $ext, 2 => $url]), 'fetch', [$ext, $url]),
-        ['weight' => 100]
-      );
+    foreach ($this->batches as $batch) {
+      switch ($batch['type']) {
+        case 'enable':
+          $queue->createItem(static::task(ts('Enable %1', [1 => $this->quotedList($batch['keys'])]), 'enable', [$batch['keys']]));
+          break;
+
+        case 'download':
+          $downloads = $batch['urls'];
+
+          // Download and extract zip files. This is I/O dependent (error-prone), so we do each as a separate (retriable) step.
+          foreach ($downloads as $ext => $url) {
+            $queue->createItem(static::task(ts('Fetch "%1" from "%2"', [1 => $ext, 2 => $url]), 'fetch', [$ext, $url]));
+          }
+
+          // Verify all requirements with a single operation -- _before_ loading the new code.
+          // We won't be sensitive to (re)ordering of fetch-tasks, because we only care if the final set is coherent.
+          $queue->createItem(static::task(ts('Verify requirements'), 'preverify', [array_keys($downloads)]));
+
+          // Swap-in new folders with a single operation. This should be similar to more sophisticated site-builder
+          // workflows. (f you manage a site in git, then "git pull" swaps all code at the same time.) This
+          // can't guarantee that all combinations of $downloads work, but at least they'll behave consistently.
+          $queue->createItem(static::task(ts('Swap folders'), 'swap', [array_keys($downloads)]));
+
+          // The "swap" and "rebuild" must happen in separate steps.
+          if ($batch['autoApply']) {
+            $queue->createItem(static::task(ts('Rebuild system'), 'rebuild'));
+          }
+
+          $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
+          $findByStatus = fn(array $matchStatuses) => array_filter(
+            array_keys($downloads),
+            fn($key) => in_array($statuses[$key] ?? CRM_Extension_Manager::STATUS_UNINSTALLED, $matchStatuses, TRUE)
+          );
+          $needEnable = $findByStatus([CRM_Extension_Manager::STATUS_UNINSTALLED, CRM_Extension_Manager::STATUS_DISABLED, CRM_Extension_Manager::STATUS_DISABLED_MISSING]);
+          $needUpgrade = $findByStatus([CRM_Extension_Manager::STATUS_INSTALLED, CRM_Extension_Manager::STATUS_DISABLED, CRM_Extension_Manager::STATUS_DISABLED_MISSING]);
+          if ($batch['autoApply'] && $needEnable) {
+            $queue->createItem(static::task(ts('Enable %1', [1 => $this->quotedList($needEnable)]), 'enable', [$needEnable]));
+          }
+          if ($batch['autoApply'] && $needUpgrade) {
+            $queue->createItem(static::task(ts('Upgrade database'), 'upgradeDb'));
+          }
+
+          break;
+
+      }
     }
 
-    // Verify all requirements with a single operation.
-    // We won't be sensitive to (re)ordering of fetch-tasks, because we only care if the final set is coherent.
-    $queue->createItem(
-      static::subtask(ts('Verify requirements'), 'verify', [array_keys($downloads)]),
-      ['weight' => 200]
-    );
-
-    // Swap-in new folders with a single operation. This should be similar to more sophisticated site-builder
-    // workflows. (f you manage a site in git, then "git pull" swaps all code at the same time.) This
-    // can't guarantee that all combinations of $downloads work, but at least they'll behave consistently.
-    $queue->createItem(
-      static::subtask(ts('Swap folders'), 'swap', [array_keys($downloads)]),
-      ['weight' => 200]
-    );
-
-    // The "swap" and "rebuild" must happen in separate steps.
-    $queue->createItem(
-      static::subtask(ts('Rebuild system'), 'rebuild'),
-      ['weight' => 300]
-    );
-
-    if ($upgradeDb) {
+    if ($this->cleanup) {
       $queue->createItem(
-        static::subtask(ts('Upgrade database'), 'upgradeDb'),
-        ['weight' => 400]
-      );
-    }
-
-    if ($cleanup) {
-      $queue->createItem(
-        static::subtask(ts('Cleanup workspace'), 'cleanup'),
+        static::task(ts('Cleanup workspace'), 'cleanup'),
         ['weight' => 2000]
       );
     }
 
     return $queue;
+  }
+
+  private function quotedList(array $items) {
+    // This can at least adapt to quotes and guillemets... we should probably have some more general helpers for lists and conjunctions...
+    $template = ts('"%1"');
+    return implode(', ', array_map(fn($item) => str_replace('%1', $item, $template), $items));
   }
 
   /**
@@ -159,133 +238,12 @@ class CRM_Extension_QueueDownloader {
    *
    * @return \CRM_Queue_Task
    */
-  protected function subtask(string $title, string $method, array $args = []): CRM_Queue_Task {
+  protected function task(string $title, string $method, array $args = []): CRM_Queue_Task {
     return new CRM_Queue_Task(
-      [static::class, 'runSubtask'],
-      [$this->upId, $method, $args],
+      [CRM_Extension_QueueTasks::class, $method],
+      [$this->getStagingPath(), ...$args],
       $title
     );
-  }
-
-  public static function runSubtask(CRM_Queue_TaskContext $ctx, string $upId, string $name, array $args = []): bool {
-    $instance = new static($upId);
-    $method = 'subtask' . ucfirst($name);
-    $instance->{$method}($ctx, ...$args);
-    return TRUE;
-  }
-
-  /**
-   * Download extension ($key) from $url and store it in {$stagingPath}/new/{$key}.
-   */
-  public function subtaskFetch(CRM_Queue_TaskContext $ctx, string $key, string $url): void {
-    $tmpDir = $this->getStagingPath('tmp');
-    $zipFile = $this->getStagingPath('fetch', $key . '.zip');
-    $stageDir = $this->getStagingPath('new', $key);
-    $this->mkdir([$tmpDir, dirname($zipFile), dirname($stageDir)]);
-
-    if (file_exists($stageDir)) {
-      // In case we're retrying from a prior failure.
-      CRM_Utils_File::cleanDir($stageDir, TRUE, FALSE);
-    }
-
-    $downloader = CRM_Extension_System::singleton()->getDownloader();
-    if (!$downloader->fetch($url, $zipFile)) {
-      throw new CRM_Extension_Exception("Failed to download: $url");
-    }
-
-    $extractedZipPath = $downloader->extractFiles($key, $zipFile, $tmpDir);
-    if (!$extractedZipPath) {
-      throw new CRM_Extension_Exception("Failed to extract: $zipFile");
-    }
-
-    if (!$downloader->validateFiles($key, $extractedZipPath)) {
-      throw new CRM_Extension_Exception("Failed to validate $extractedZipPath. Consult CiviCRM log for details.");
-      // FIXME: Might be nice to show errors immediately, but we've got bigger fish to fry right now.
-    }
-
-    if (!rename($extractedZipPath, $stageDir)) {
-      throw new CRM_Extension_Exception("Failed to rename $extractedZipPath to $stageDir");
-    }
-  }
-
-  /**
-   * Scan the downloaded extensions and verify that their requirements are satisfied.
-   */
-  public function subtaskVerify(CRM_Queue_TaskContext $ctx, array $keys): void {
-    $infos = CRM_Extension_System::singleton()->getMapper()->getAllInfos();
-    foreach ($keys as $key) {
-      $infos[$key] = CRM_Extension_Info::loadFromFile($this->getStagingPath('new', $key, CRM_Extension_Info::FILENAME));
-    }
-
-    $errors = CRM_Extension_System::singleton()->getManager()->checkInstallRequirements($keys, $infos);
-    if (!empty($errors)) {
-      $path = $this->getStagingPath();
-      Civi::log()->error('Failed to verify requirements for new downloads in {path}', [
-        'path' => $path,
-        'installKeys' => $keys,
-        'errors' => $errors,
-      ]);
-      throw new CRM_Extension_Exception(implode("\n", [
-        "Failed to verify requirements for new downloads in {$path}.",
-        ...array_column($errors, 'title'),
-        "Consult CiviCRM log for details.",
-      ]));
-    }
-  }
-
-  /**
-   * Take the extracted code (`stagingDir/new/{key}`) and put it into its final place.
-   * Move any old code to the backup (`stagingDir/old/{key}`).
-   * Delete the container-cache
-   */
-  public function subtaskSwap(CRM_Queue_TaskContext $ctx, array $keys): void {
-    $this->mkdir($this->getStagingPath('old'));
-    try {
-      foreach ($keys as $key) {
-        $tmpCodeDir = $this->getStagingPath('new', $key);
-        $backupCodeDir = $this->getStagingPath('old', $key);
-
-        CRM_Extension_System::singleton()->getManager()->replace($tmpCodeDir, $backupCodeDir, FALSE);
-        // What happens when you call replace(.., refresh: false)? Varies by type:
-        // - For report/search/payment-extensions, it runs the uninstallation/reinstallation routines.
-        // - For module-extensions, it swaps the folders and clears the class-index.
-
-        // Arguably, for DownloadQueue, we should only clear class-index after all code is swapped,
-        // but it's messier to write that patch, and it's not clear if it's needed.
-      }
-    }
-    finally {
-      // Delete `CachedCiviContainer.*.php`, `CachedExtLoader.*.php`, and similar.
-      $config = CRM_Core_Config::singleton();
-      // $config->cleanup(1);
-      $config->cleanupCaches(FALSE);
-    }
-  }
-
-  public function subtaskRebuild(CRM_Queue_TaskContext $ctx): void {
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE, FALSE);
-    // FIXME: For 6.1+:, use: Civi::rebuild(['*' => TRUE, 'sessions' => FALSE]);
-  }
-
-  public function subtaskUpgradeDb(CRM_Queue_TaskContext $ctx): void {
-    if (CRM_Extension_Upgrades::hasPending()) {
-      CRM_Extension_Upgrades::fillQueue($ctx->queue);
-    }
-  }
-
-  public function subtaskCleanup(): void {
-    CRM_Utils_File::cleanDir($this->getStagingPath(), TRUE, FALSE);
-  }
-
-  private function mkdir($paths): void {
-    $paths = (array) $paths;
-    foreach ($paths as $path) {
-      if (!is_dir($path)) {
-        if (!mkdir($path, 0777, TRUE)) {
-          throw new CRM_Core_Exception("Failed to create directory: $path");
-        }
-      }
-    }
   }
 
 }
