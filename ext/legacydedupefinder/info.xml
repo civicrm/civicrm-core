@@ -20,10 +20,7 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
-  <comments>This adds backwards compatibility for dedupe hooks. If you do not need them you can improve dedupe performance by disabling this</comments>
+  <comments>Adds backwards compatibility for dedupe hooks. If you do not need them, you can improve dedupe performance by disabling this extension.</comments>
   <mixins>
     <mixin>scan-classes@1.0.0</mixin>
   </mixins>
