@@ -116,17 +116,9 @@ class CaseTest extends Api4TestBase {
   }
 
   public function testCaseTypeDefinition(): void {
-    $caseType = $this->createTestRecord('CaseType', [
-      'title' => 'Test Case Type',
-      'name' => 'test_case_type3',
-      'definition' => [
-        'statuses' => ['Testing', 'Closed'],
-      ],
-    ]);
-
     $caseTypeToTest = CaseType::get(FALSE)
       ->addSelect('definition')
-      ->addWhere('name', '=', 'test_case_type3')
+      ->addWhere('name', '=', 'housing_support')
       ->execute()
       ->first();
     $this->assertArrayHasKey('definition', $caseTypeToTest);
