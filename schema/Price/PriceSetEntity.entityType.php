@@ -35,10 +35,13 @@ return [
     'entity_table' => [
       'title' => ts('Entity Table'),
       'sql_type' => 'varchar(64)',
-      'input_type' => 'Text',
+      'input_type' => 'Select',
       'required' => TRUE,
       'description' => ts('Table which uses this price set'),
       'add' => '1.8',
+      'pseudoconstant' => [
+        'callback' => ['CRM_Price_BAO_PriceSet', 'entityTables'],
+      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),
