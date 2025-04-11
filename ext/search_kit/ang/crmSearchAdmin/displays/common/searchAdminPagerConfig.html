@@ -5,7 +5,7 @@
       <span>{{:: ts('Use Pager') }}</span>
     </label>
   </div>
-  <div class="checkbox-inline form-control" ng-if="!$ctrl.display.settings.pager">
+  <div class="checkbox-inline form-control" ng-if="!$ctrl.display.settings.pager && !$ctrl.noLimit">
     <label>
       <input type="checkbox" ng-checked="$ctrl.display.settings.limit" ng-click="$ctrl.toggleLimit()">
       <span>{{:: ts('Limit Results') }}</span>
