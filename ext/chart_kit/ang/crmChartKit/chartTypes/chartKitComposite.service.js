@@ -14,7 +14,8 @@
         label: ts('X-Axis'),
         // prefer date/categorical
         scaleTypes: ['date', 'numeric', 'categorical'],
-        reduceTypes: []
+        reduceTypes: [],
+        isDimension: true,
       },
       'y': {
         key: 'y',

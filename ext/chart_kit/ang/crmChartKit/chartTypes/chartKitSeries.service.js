@@ -16,11 +16,13 @@
         label: ts('X-Axis'),
         scaleTypes: ['date', 'numeric', 'categorical'],
         reduceTypes: [],
+        isDimension: true,
       },
       'w': {
         label: ts('Grouping'),
         scaleTypes: ['categorical'],
         reduceTypes: [],
+        isDimension: true,
       },
       'y': {
         label: ts('Value'),
@@ -43,20 +45,6 @@
 
     // fallback to a line chart if we dont have a grouping column yet
     getChartConstructor: (displayCtrl) => displayCtrl.getColumnsForAxis('w') ? dc.seriesChart : dc.lineChart,
-
-    buildDimension: (displayCtrl) => {
-      // we need to add the series values in the dimension or they will get
-      // aggregated
-      displayCtrl.dimension = displayCtrl.ndx.dimension((d) => {
-        const xValue = d[displayCtrl.getFirstColumnForAxis('x').index];
-        const seriesCol = displayCtrl.getFirstColumnForAxis('w');
-        const seriesVal = seriesCol ? d[seriesCol.index] : null;
-
-        // we use a string separator rather than array to
-        // not corrupt ordering on xValue
-        return [xValue, seriesVal];
-      });
-    },
 
     loadChartData: (displayCtrl) => {
       displayCtrl.chart.chart((displayCtrl.settings.seriesDisplayType === 'bar') ? dc.barChart : dc.lineChart);

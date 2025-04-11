@@ -28,7 +28,7 @@
         return this.getColumns().filter((col) => col.axis === axisKey);
       };
 
-      this.getChartTypeOptions = () => chartKitChartTypes.map((type) => ({ key: type.key, label: type.label, icon: type.icon }));
+      this.getChartTypeOptions = () => chartKitChartTypes.types.map((type) => ({ key: type.key, label: type.label, icon: type.icon }));
 
       this.getInitialDisplaySettings = () => ({
         columns: [],
@@ -57,13 +57,17 @@
       this.$onInit = () => {
         this.searchColumns = this.apiParams.select.map((col) => searchMeta.fieldToColumn(col, { label: true }));
 
-        this.chartTypeOptions = this.getChartTypeOptions();
-
         if (!this.display.settings) {
           this.display.settings = {
             chartType: null
           };
         }
+        else {
+          // run initial settings through our legacy adaptor
+          this.display.settings = chartKitChartTypes.legacySettingsAdaptor(this.display.settings);
+        }
+
+        this.chartTypeOptions = this.getChartTypeOptions();
 
         $scope.$watch('$ctrl.display.settings.chartType', () => this.onSetChartType(), true);
       };
@@ -81,7 +85,7 @@
       };
 
       this.initChartType = () => {
-        const type = chartKitChartTypes.find((type) => type.key === this.display.settings.chartType);
+        const type = chartKitChartTypes.types.find((type) => type.key === this.display.settings.chartType);
         this.chartType = type.service;
       };
 

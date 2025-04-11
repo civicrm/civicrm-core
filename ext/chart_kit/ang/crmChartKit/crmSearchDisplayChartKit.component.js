@@ -28,7 +28,15 @@
         this.chartContainer = $('.crm-chart-kit-chart-container', $element)[0];
 
         // add our trait functions to the pre and post search hooks
-        this.onPreRun.push(() => this.alwaysSortByXAscending());
+        this.onPreRun.push(() => {
+          const init = this.initChartType();
+          if (!init) {
+            // TODO: it might be nice to abort the whole search here, because
+            //  it's not going to be able to render the chart anyway
+            return;
+          }
+          this.alwaysSortByDimensionCols();
+        });
         this.onPostRun.push(() => {
           this.renderChart();
           // trigger re-rendering as you edit settings
@@ -38,19 +46,52 @@
         });
       };
 
-      this.alwaysSortByXAscending = () => {
-        this._currentSortKey = this.getFirstColumnForAxis('x').key;
-        // always sort the query by X axis - we can handle differently when we pass to d3
-        // but this is the only way to get magic that the server knows about the order
-        // (like option groups / month order etc)
-        this.sort = this.settings.sort = [[this._currentSortKey, 'ASC']];
+      this.initChartType = () => {
+        // run initial settings through our legacy adaptor
+        this.settings = chartKitChartTypes.legacySettingsAdaptor(this.settings);
+
+        if (!this.settings.chartType) {
+          this.chartContainer.innerText = ts('No chart type selected.');
+          return false;
+        }
+        const type = chartKitChartTypes.types.find((type) => type.key === this.settings.chartType);
+        if (!type || !type.service) {
+          this.chartContainer.innerText = ts('No chart type selected.');
+          return false;
+        }
+        this.chartType = type.service;
+        return true;
+      };
+
+      this.getDimensionColumns = () => {
+        const axes = this.chartType.getAxes();
+        const dimensionAxisKeys = Object.keys(axes).filter((key) => axes[key].isDimension);
+        const dimensionColumns = dimensionAxisKeys.map((axis) => this.getColumnsForAxis(axis));
+        return dimensionColumns.flat();
+      };
+
+      this.getSortKeys = () => this.getDimensionColumns().map((col) => col.key);
+
+        /**
+         * we want to always sort the server query by dimension columns -
+         * we can handle differently when we pass to d3
+         * but this is the only way to get magic that the server knows about the order
+         * of e.g. OptionValue fields, months of the year
+         */
+      this.alwaysSortByDimensionCols = () => {
+        const sortKeys = this.getSortKeys();
+
+        // stash a serialised string for quick checking in onSettingsChange
+        this._currentSortKeys = sortKeys.join(',');
+        this.settings.sort = sortKeys.map((key) => [key, 'ASC']);
       };
 
       this.onSettingsChange = (newSettings, oldSettings) => {
-        // if X column key changes, we need to re-run the search to get new ordering
+        // if sort keys have changed, we need to re-run the search to get new ordering
         // from the server
-        if (newSettings.columns.find((col) => col.axis === 'x').key !== this._currentSortKey) {
-          this.getResultsPronto();
+        const newSortKeysSerialised = this.getSortKeys().join(',');
+        if (this._currentSortKeys !== newSortKeysSerialised) {
+          this.getResultsSoon();
         } else {
           // just rerender on the front end
           this.renderChart();
@@ -60,16 +101,19 @@
       // this provides the common render steps - which chart types can then hook
       // into at different points
       this.renderChart = () => {
-        if (!this.settings.chartType) {
-          this.chartContainer.innerText = ts('No chart type selected.');
+        const init = this.initChartType();
+        if (!init) {
           return;
         }
+
         if (this.results.length === 0) {
           // show a no results type thing
           this.chartContainer.innerText = ts('Search returned no results.');
           return;
         }
-        this.initChartType();
+
+        // add a loading spinner
+        this.chartContainer.innerHTML = '<div class="crm-loading-element"></div>';
 
         // loads search results data into crossfilter
         this.buildCrossfilter();
@@ -89,13 +133,11 @@
         // apply formattting
         this.formatChart();
 
-        // run the dc render
-        this.chart.render();
-      };
+        // clear the loading spinner
+        this.chartContainer.innerHTML = '';
 
-      this.initChartType = () => {
-        const type = chartKitChartTypes.find((type) => type.key === this.settings.chartType);
-        this.chartType = type.service;
+        // run the dc render to draw the chart
+        this.chart.render();
       };
 
       this.buildCrossfilter = () => {
@@ -163,10 +205,19 @@
           return;
         }
 
-        // 99 times out of 100 the x axis will be column 0, but let's be sure
-        // (assume there's only one x axis column)
-        const xColumnIndex = this.getFirstColumnForAxis('x').index;
-        this.dimension = this.ndx.dimension((d) => d[xColumnIndex]);
+        const colIndexes = this.getDimensionColumns().map((col) => col.index);
+
+        if (colIndexes.length > 1) {
+          // dimension is multi-column, create an array key
+          this.dimension = this.ndx.dimension((d) => colIndexes.map((i) => d[i]));
+        }
+        else {
+          // if there is only one dimension axis we use the actual value
+          // rather than a single item array in order to benefit
+          // from default ordering in the chart library
+          const colIndex = colIndexes[0];
+          this.dimension = this.ndx.dimension((d) => d[colIndex]);
+        }
       };
 
       this.buildGroup = () => {
@@ -223,6 +274,7 @@
 
       this.buildCoordinateGrid = () => {
         const xCol = this.getFirstColumnForAxis('x');
+
         const xDomainValues = this.columnTotals[xCol.index];
         const min = Math.min(...xDomainValues);
         const max = Math.max(...xDomainValues);
@@ -287,27 +339,24 @@
           this.formatCoordinateGrid();
         }
 
-        if (this.chartType.showLegend(this)) {
+        if (this.chartType.showLegend && this.chartType.showLegend(this)) {
           this.addLegend();
         }
       };
 
 
       this.formatCoordinateGrid = () => {
-        // format x axis
-        // add our label formatter to the tick values
-        // EXCEPT for dates, where DC is much cleverer
-        // than we are at adapting the date precision
-        const xCols = this.getColumnsForAxis('x');
+        const xCol = this.getFirstColumnForAxis('x');
 
-        if (xCols.length === 1) {
-
-          if (xCols[0].scaleType !== 'date') {
-            this.chart.xAxis().tickFormat((v) => this.renderDataValue(v, xCols[0]));
-          }
+        // add ticks if not a date (dc is better at handling ticks for us for dates)
+        if (xCol.scaleType !== 'date') {
+          this.chart.xAxis().tickFormat((v) => this.renderDataValue(v, xCol));
         }
+
         this.chart.xAxisLabel(
-          this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCols.map((col) => col.label).join(' - ')
+          this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCol.label
+          // TODO: could we have multi-x?
+          //this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCols.map((col) => col.label).join(' - ')
         );
 
         // for Y axis, we need to work out whether this is split left and right
