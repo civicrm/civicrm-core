@@ -80,15 +80,14 @@ class SubmitFile extends AbstractProcessor {
       throw new \CRM_Core_Exception('Entity not found');
     }
 
-    $file = civicrm_api3('Attachment', 'create', [
-      'entity_id' => $entityId,
-      'entity_table' => CoreUtil::getTableName($apiEntity),
-      'mime_type' => $_FILES['file']['type'],
-      'name' => $_FILES['file']['name'],
-      'options' => [
-        'move-file' => $_FILES['file']['tmp_name'],
+    $file = civicrm_api4('File', 'create', [
+      'values' => [
+        'mime_type' => $_FILES['file']['type'],
+        'file_name' => $_FILES['file']['name'],
+        'move_file' => $_FILES['file']['tmp_name'],
       ],
-    ]);
+      'checkPermissions' => FALSE,
+    ])->single();
 
     civicrm_api4($apiEntity, 'update', [
       'values' => [
