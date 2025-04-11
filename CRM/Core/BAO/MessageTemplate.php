@@ -417,7 +417,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    */
   public static function sendTemplate(array $params): array {
     // Handle isEmailPdf here as the unit test on that function deems it 'non-conforming'.
-    $isAttachPDFInvoice = !empty($params['isEmailPdf']) && !empty($params['contributionId']);
+    $contributionID = $params['modelProps']['contributionID'] ?? NULL;
+    if (!empty($params['contributionId']) && !$contributionID) {
+      CRM_Core_Error::deprecatedWarning('contribution ID should be set in modelProps rather than params');
+      $contributionID = $params['contributionId'];
+    }
+    $isAttachPDFInvoice = !empty($params['isEmailPdf']) && $contributionID;
     unset($params['isEmailPdf']);
     [$mailContent, $params] = self::renderTemplateRaw($params);
 
@@ -433,7 +438,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       $config = CRM_Core_Config::singleton();
       if ($isAttachPDFInvoice) {
         // FIXME: $params['contributionId'] is not modeled in the parameter list. When is it supplied? Should probably move to tokenContext.contributionId.
-        $pdfHtml = CRM_Contribute_BAO_ContributionPage::addInvoicePdfToEmail($params['contributionId'], $params['contactId']);
+        $pdfHtml = CRM_Contribute_BAO_ContributionPage::addInvoicePdfToEmail($contributionID, $params['contactId']);
         if (empty($params['attachments'])) {
           $params['attachments'] = [];
         }
