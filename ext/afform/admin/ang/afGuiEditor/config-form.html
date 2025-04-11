@@ -179,7 +179,19 @@
         </div>
       </div>
 
-      <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}">
+      <div class="form-group">
+        <label>
+          {{:: ts('Confirmation type') }}
+        </label>
+        <p class="form-inline">
+          <label class="radio" ng-repeat="ctype in editor.meta.confirmation_types">
+            <input class="crm-form-radio" type="radio" name="confirmation_type" ng-model="editor.afform.confirmation_type" ng-value="ctype.value">
+            {{:: ctype.label }}
+          </label>
+        </p>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}" ng-if="editor.afform.confirmation_type === 'redirect_to_url'">
         <label for="af_config_redirect">
           {{:: ts('Post-Submit Page') }}
         </label>
@@ -190,5 +202,14 @@
         <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
       </div>
     </div>
+
+    <div class="form-group" ng-if="editor.afform.confirmation_type === 'show_confirmation_message'">
+      <label for="af_config_confirmation_message">
+        {{:: ts('Confirmation message') }}
+      </label>
+      <textarea ng-model="editor.afform.confirmation_message" class="form-control" id="af_config_confirmation_message" ng-model-options="editor.debounceMode"></textarea>
+      <p class="help-block">{{:: ts("This message wil be displayed when the form is submitted.") }}</p>
+    </div>
+
   </fieldset>
 </ng-form>

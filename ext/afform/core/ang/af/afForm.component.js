@@ -302,7 +302,14 @@
           dialog.dialog('close');
         }
 
-        else if (metaData.redirect) {
+        else if (metaData.confirmation_type && metaData.confirmation_type === 'show_confirmation_message') {
+          $element.hide();
+          const $confirmation = $('<div class="afform-confirmation" />');
+          $confirmation.text(metaData.confirmation_message);
+          $confirmation.insertAfter($element);
+        }
+
+        else if ((!metaData.confirmation_type && metaData.redirect ) || (metaData.confirmation_type && metaData.confirmation_type === 'redirect_to_url' && metaData.redirect)) {
           var url = replaceTokens(metaData.redirect, submissionResponse[0]);
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
