@@ -3,6 +3,12 @@
 require_once 'civi_case.civix.php';
 use CRM_Case_ExtensionUtil as E;
 
+function civi_case_civicrm_scanClasses(array &$classes) {
+  $extMap = CRM_Extension_System::singleton()->getMapper();
+  $excludeRegex = $extMap->isActiveModule('afform') ? NULL : '/Afform/';
+  \Civi\Core\ClassScanner::scanFolders($classes, __DIR__ . '/', 'Civi', '\\', $excludeRegex);
+}
+
 /**
  * Implements hook_civicrm_managed().
  */
