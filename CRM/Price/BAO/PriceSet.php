@@ -1513,4 +1513,16 @@ WHERE     ct.id = cp.financial_type_id AND
     }
   }
 
+  /**
+   * Whitelist of possible values for the entity_table field in PriceSetEntity
+   *
+   * @return array
+   */
+  public static function entityTables(): array {
+    return [
+      'civicrm_contribution_page' => ts('Contribution Page'),
+      'civicrm_event' => ts('Event'),
+    ];
+  }
+
 }
