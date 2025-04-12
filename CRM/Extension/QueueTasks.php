@@ -134,6 +134,11 @@ class CRM_Extension_QueueTasks {
 
   public static function cleanup(CRM_Queue_TaskContext $ctx, string $stagingPath): bool {
     CRM_Utils_File::cleanDir($stagingPath, TRUE, FALSE);
+    $parent = dirname($stagingPath);
+    $siblings = preg_grep('/^\.\.?$/', scandir($parent), PREG_GREP_INVERT);
+    if (empty($siblings)) {
+      rmdir($parent);
+    }
     return TRUE;
   }
 
