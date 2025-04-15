@@ -59,30 +59,30 @@ if (!defined('CIVI_SETUP')) {
           $e->addError('system', 'l10nWritable', sprintf('Unable to create l10n directory "%s"', $e->getModel()->paths['civicrm.l10n']['path']));
         }
       }
-    }
-  }, \Civi\Setup::PRIORITY_MAIN);
 
-\Civi\Setup::dispatcher()
-  ->addListener('civi.setup.installFiles', function (\Civi\Setup\Event\InstallFilesEvent $e) {
-    $lang = \Civi\Setup::instance()->getModel()->lang;
-    if ($lang && $lang != 'en_US') {
       $downloadDir = $e->getModel()->paths['civicrm.l10n']['path'] . DIRECTORY_SEPARATOR . $lang . DIRECTORY_SEPARATOR . 'LC_MESSAGES';
       if (!is_dir($downloadDir)) {
         \Civi\Setup::log()->info("Creating directory: " . $downloadDir);
         if (!mkdir($downloadDir, 0777, TRUE)) {
           $e->addError('system', 'l10nWritable', sprintf('Unable to create language directory "%s"', $downloadDir));
         }
+      }
 
-        foreach ($e->getModel()->moFiles as $moFile => $url) {
-          $l10DownloadFile = str_replace('[locale]', $lang, $url);
+      foreach ($e->getModel()->moFiles as $moFile => $url) {
+        $l10DownloadFile = str_replace('[locale]', $lang, $url);
+        $destFile = $downloadDir . DIRECTORY_SEPARATOR . $moFile;
+        if (!file_exists($destFile)) {
           \Civi\Setup::log()
             ->info("Download translation '$moFile' from " . $l10DownloadFile . ' into ' . $downloadDir);
           $client = new \GuzzleHttp\Client();
           $response = $client->get($l10DownloadFile);
           if ($response->getStatusCode() == 200) {
-            $success = file_put_contents($downloadDir . DIRECTORY_SEPARATOR . $moFile, $response->getBody());
-            if (!$success) {
-              $e->addError('l10n', 'download', 'Unable to download translation file');
+            $success = file_put_contents($destFile, $response->getBody());
+            if ($success) {
+              $e->isReloadRequired(TRUE);
+            }
+            else {
+              $e->addError('l10n', 'download', 'Unable to download translation file' . $destFile);
             }
           }
         }

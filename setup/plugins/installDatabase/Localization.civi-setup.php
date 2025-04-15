@@ -1,48 +1,30 @@
 <?php
-/*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
- */
-
-namespace Civi\Core;
-
-use Civi\Core\Event\SystemInstallEvent;
 
 /**
- * Class LocalizationInitializer
- * @package Civi\Core
+ * @file
+ *
+ * Default settings depending on the locale.
  */
-class LocalizationInitializer {
 
-  /**
-   * Load the locale settings based on the installation language
-   *
-   * @param \Civi\Core\Event\SystemInstallEvent $event
-   * @throws \CRM_Core_Exception
-   */
-  public static function initialize(SystemInstallEvent $event) {
+if (!defined('CIVI_SETUP')) {
+  exit("Installation plugins must only be loaded by the installer.\n");
+}
 
-    // get the current installation language
-    global $tsLocale;
-    $seedLanguage = $tsLocale;
-    if (!$seedLanguage) {
+\Civi\Setup::dispatcher()
+  ->addListener('civi.setup.installDatabase', function (\Civi\Setup\Event\InstallDatabaseEvent $e) {
+    // Get the current installation language
+    $seedLanguage = $e->getModel()->lang;
+    \Civi\Setup::log()->info(sprintf('[%s] Setup localization %s', basename(__FILE__), $seedLanguage));
+
+    if (!$seedLanguage || $seedLanguage == 'en_US') {
       return;
     }
 
-    // get the corresponding settings file if any
-    $localeDir = \CRM_Core_I18n::getResourceDir();
-    $fileName = $localeDir . $seedLanguage . DIRECTORY_SEPARATOR . 'settings.default.json';
-
-    // initalization
+    // Get the corresponding settings file if any
+    $fileName = \Civi::paths()->getPath("[civicrm.root]/settings/l10n/$seedLanguage/settings.default.json");
     $settingsParams = [];
 
     if (file_exists($fileName)) {
-
       // load the file and parse it
       $json = file_get_contents($fileName);
       $settings = json_decode($json, TRUE);
@@ -56,7 +38,6 @@ class LocalizationInitializer {
           if (in_array($setting, $validSettings)) {
             $settingsParams[$setting] = $value;
           }
-
         }
 
         // ensure we don't mess with multilingual
@@ -71,9 +52,10 @@ class LocalizationInitializer {
         if (isset($settings['defaultCurrency'])) {
           \CRM_Admin_Form_Setting_Localization::updateEnabledCurrencies([$settings['defaultCurrency']], $settings['defaultCurrency']);
         }
-
       }
-
+    }
+    else {
+      \Civi\Setup::log()->info(sprintf('[%s] No defaults settings found for %s (you can send a PR to add them to settings/l10n)', basename(__FILE__), $seedLanguage));
     }
 
     // in any case, enforce the seedLanguage as the default language
@@ -81,7 +63,4 @@ class LocalizationInitializer {
 
     // apply the config
     civicrm_api3('Setting', 'create', $settingsParams);
-
-  }
-
-}
+  }, \Civi\Setup::PRIORITY_LATE - 60);
