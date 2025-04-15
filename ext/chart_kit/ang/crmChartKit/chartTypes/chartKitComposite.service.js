@@ -101,7 +101,8 @@
       const barCount = yAxisBars.length;
 
       if (barCount > 1) {
-        displayCtrl.chart.on('renderlet', (chart) => {
+        displayCtrl.chart.on('renderlet.groupedBars', () => {
+          const chart = displayCtrl.chart;
           const tickCount = chart.xUnitCount();
           const xAxisLength = chart.xAxisLength();
 
