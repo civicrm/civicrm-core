@@ -2155,11 +2155,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'icon' => $contactInfo['icon'],
       ];
     }
+    // Index by id to allow `cg_extend_objects` in the database to override this hardcoded list
+    $options = array_column($options, NULL, 'id');
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'cg_extend_objects', 'id', 'name');
     $ogValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
     foreach ($ogValues as $ogValue) {
       if ($ogValue['is_active']) {
-        $options[] = [
+        $options[$ogValue['value']] = [
           'id' => $ogValue['value'],
           'label' => $ogValue['label'],
           'grouping' => $ogValue['grouping'] ?? NULL,
@@ -2171,7 +2173,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     foreach ($options as &$option) {
       $option['icon'] ??= CoreUtil::getInfoItem($option['id'], 'icon');
     }
-    return $options;
+    return array_values($options);
   }
 
   /**
