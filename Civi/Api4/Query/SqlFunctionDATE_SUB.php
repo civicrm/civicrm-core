@@ -21,13 +21,14 @@ class SqlFunctionDATE_SUB extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'label' => ts('The value of the time/date interval to subtract.'),
         'optional' => FALSE,
-        'must_be' => ['SqlNumber'],
+        'must_be' => ['SqlField'],
       ],
       [
-        'label' => ts('The type of interval to subtract.'),
-        'flag_before' => [
+        'label' => ts('The value of the time/date interval to subtract.'),
+        'must_be' => ['SqlNumber'],
+        'flag_before' => ['INTERVAL'],
+        'flag_after' => [
           'SECOND' => ts('Seconds'),
           'MINUTE' => ts('Minutes'),
           'HOUR' => ts('Hours'),
@@ -44,7 +45,6 @@ class SqlFunctionDATE_SUB extends SqlFunction {
           'DAY_HOUR' => ts('Days Hours'),
           'YEAR_MONTH' => ts('Years-Months'),
         ],
-        'max_expr' => 0,
         'optional' => FALSE,
       ],
     ];
