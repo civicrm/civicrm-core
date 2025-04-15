@@ -60,7 +60,7 @@ abstract class SqlFunction extends SqlExpression {
     $this->setSuffix($matches[2] ?? NULL);
     // Parse function arguments string, match to declared function params
     foreach ($this->getParams() as $idx => $param) {
-      $prefix = NULL;
+      $prefixes = [];
       $name = $param['name'] ?: ($idx + 1);
       // If this isn't the first param it needs to start with something;
       // either the name (e.g. "ORDER BY") if it has one, or a comma separating it from the previous param.
@@ -79,16 +79,22 @@ abstract class SqlFunction extends SqlExpression {
         if (!$prefix && !$param['optional']) {
           throw new \CRM_Core_Exception("Missing param $name for SQL function " . static::getName());
         }
+        if ($prefix) {
+          $prefixes[] = $prefix;
+        }
       }
-      elseif ($param['flag_before']) {
+      if ($param['flag_before']) {
         $prefix = $this->captureKeyword(array_keys($param['flag_before']), $arg);
+        if ($prefix) {
+          $prefixes[] = $prefix;
+        }
       }
       $this->args[$idx] = [
-        'prefix' => (array) $prefix,
+        'prefix' => $prefixes,
         'expr' => [],
         'suffix' => [],
       ];
-      if ($param['max_expr'] && (!$param['name'] || $param['name'] === $prefix)) {
+      if ($param['max_expr'] && (!$param['name'] || $param['name'] === ($prefix ?? ''))) {
         $exprs = $this->captureExpressions($arg, $param['must_be'], $param['max_expr']);
         if (
           count($exprs) < $param['min_expr'] &&
