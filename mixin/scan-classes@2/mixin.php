@@ -56,17 +56,21 @@ return function ($mixInfo, $bootCache) {
       $all = [];
       ClassScanner::scanFolders($all, $baseDir, 'CRM', '_');
 
-      /** @var CRM_Extension_Mapper $extMap */
+      /**
+       * @var CRM_Extension_Mapper $extMap
+       */
       $extMap = CRM_Extension_System::singleton()->getMapper();
-      /** @var CRM_Extension_Info $info */
+      /**
+       * @var CRM_Extension_Info $info
+       */
       $info = $extMap->keyToInfo($mixInfo->longName);
       if (!empty($info->classloader)) {
         foreach ($info->classloader as $mapping) {
-          $requiredExtensionsAreInstalled = true;
+          $requiredExtensionsAreInstalled = TRUE;
           if (!empty($mapping['requires-ext'])) {
             foreach ($mapping['requires-ext'] as $requireExtension) {
               if (!$extMap->isActiveModule($requireExtension)) {
-                $requiredExtensionsAreInstalled = false;
+                $requiredExtensionsAreInstalled = FALSE;
                 break;
               }
             }
