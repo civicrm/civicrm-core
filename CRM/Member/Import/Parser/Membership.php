@@ -109,7 +109,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     foreach ($params as $key => $value) {
       $errors = array_merge($this->getInvalidValues($value, $key), $errors);
     }
-    $this->validateRequiredFields($this->getRequiredFields(), $params['Membership']);
+    $this->validateRequiredFields($this->getRequiredFields(), $params['Membership'], 'Membership');
 
     //To check whether start date or join date is provided
     if (empty($params['Membership']['id']) && empty($params['Membership']['start_date']) && empty($params['Membership']['join_date'])) {
