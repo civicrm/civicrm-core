@@ -329,6 +329,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   private function buildRecurringContributionsArray($recurContributions) {
     $liveRecurringContributionCount = 0;
     foreach ($recurContributions as $recurId => $recurDetail) {
+      $recurId = (int) $recurId;
+      $recurContributions[$recurId]['recurId'] = $recurId;
       // API3 does not return "installments" if it is not set. But we need it set to avoid PHP notices on ContributionRecurSelector.tpl
       $recurContributions[$recurId]['installments'] = $recurDetail['installments'] ?? NULL;
       $recurContributions[$recurId]['next_sched_contribution_date'] = $recurDetail['next_sched_contribution_date'] ?? NULL;
