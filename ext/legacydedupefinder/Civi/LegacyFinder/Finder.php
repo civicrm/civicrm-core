@@ -327,4 +327,23 @@ class Finder extends AutoSubscriber {
     uksort($tableQueries, [__CLASS__, 'isTableBigger']);
   }
 
+  /**
+   * Is the table extracted from the first string larger than the second string.
+   *
+   * @param array $a
+   *   e.g civicrm_contact.first_name
+   * @param array $b
+   *   e.g civicrm_address.street_address
+   *
+   * @return int
+   */
+  public static function isTableBigger(array $a, array $b): int {
+    $tableA = $a['table'];
+    $tableB = $b['table'];
+    if ($tableA === $tableB) {
+      return 0;
+    }
+    return \CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableA) <=> \CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableB);
+  }
+
 }
