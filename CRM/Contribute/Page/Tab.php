@@ -322,11 +322,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * @param $recurContributions
+   * @param array $recurContributions
    *
    * @return array
    */
-  private function buildRecurringContributionsArray($recurContributions) {
+  private function buildRecurringContributionsArray(array $recurContributions): array {
     $liveRecurringContributionCount = 0;
     foreach ($recurContributions as $recurId => $recurDetail) {
       $recurId = (int) $recurId;
@@ -350,13 +350,10 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       }
 
       // Get the name of the payment processor
-      if (!empty($recurDetail['payment_processor_id'])) {
-        $recurContributions[$recurId]['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName($recurDetail['payment_processor_id']);
-      }
+      $recurContributions[$recurId]['payment_processor'] = empty($recurDetail['payment_processor_id']) ? '' : CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName($recurDetail['payment_processor_id']);
+
       // Get the label for the contribution status
-      if (!empty($recurDetail['contribution_status_id'])) {
-        $recurContributions[$recurId]['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recurDetail['contribution_status_id']);
-      }
+      $recurContributions[$recurId]['contribution_status'] = empty($recurDetail['contribution_status_id']) ? '' : CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recurDetail['contribution_status_id']);
 
       $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks((int) $recurId), $actionMask,
         [
