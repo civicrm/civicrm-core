@@ -27,7 +27,7 @@ class SqlFunctionDATE_SUB extends SqlFunction {
       [
         'label' => ts('The value of the time/date interval to subtract.'),
         'must_be' => ['SqlNumber'],
-        'flag_before' => ['INTERVAL'],
+        'flag_before' => ['INTERVAL' => ts('Interval')],
         'flag_after' => [
           'SECOND' => ts('Seconds'),
           'MINUTE' => ts('Minutes'),
