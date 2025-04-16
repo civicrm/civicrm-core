@@ -36,6 +36,10 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
    * Log out.
    */
   public static function logout() {
+    if (!self::isUserLoggedIn()) {
+      throw new \CRM_Core_Exception(ts('You cannot log out because you are not logged in.'));
+    }
+
     _authx_uf()->logoutSession();
 
     // Dump them back on the log-IN page.
