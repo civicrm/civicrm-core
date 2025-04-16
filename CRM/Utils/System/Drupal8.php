@@ -384,14 +384,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * In previous versions, this function was the controller for logging out. In Drupal 8, we rewrite the route
-   * to hand off logout to the standard Drupal logout controller. This function should therefore never be called.
-   */
-  public function logout() {
-    // Pass
-  }
-
-  /**
    * Load drupal bootstrap.
    *
    * @param array $params

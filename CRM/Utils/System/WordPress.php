@@ -612,13 +612,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function logout() {
-    // destroy session
-    if (session_id()) {
-      session_destroy();
-    }
-    wp_logout();
-    wp_redirect(wp_login_url());
+  public function postLogoutUrl(): string {
+    return wp_login_url();
   }
 
   /**
