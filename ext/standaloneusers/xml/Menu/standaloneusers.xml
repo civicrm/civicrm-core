@@ -7,11 +7,6 @@
     <access_arguments>*always allow*</access_arguments>
   </item>
   <item>
-    <path>civicrm/logout</path>
-    <page_callback>CRM_Standaloneusers_Page_Login::logout</page_callback>
-    <access_arguments>*always allow*</access_arguments>
-  </item>
-  <item>
     <path>civicrm/admin/user/password</path>
     <page_callback>CRM_Standaloneusers_Page_ChangePassword</page_callback>
     <title>Change Password</title>
