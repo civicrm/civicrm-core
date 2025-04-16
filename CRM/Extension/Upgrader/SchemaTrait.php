@@ -87,48 +87,4 @@ trait CRM_Extension_Upgrader_SchemaTrait {
     return TRUE;
   }
 
-  /**
-   * Create table (if not exists) from a given php schema file.
-   *
-   * The original entityType.php file should be copied to a directory (e.g. `my_extension/upgrade/schema`)
-   * and prefixed with the version-added.
-   *
-   * @param string $filePath
-   *   Relative path to copied schema file (relative to extension directory).
-   * @return bool
-   * @throws CRM_Core_Exception
-   */
-  public function createEntityTable(string $filePath): bool {
-    $absolutePath = $this->getExtensionDir() . DIRECTORY_SEPARATOR . $filePath;
-    $entityDefn = include $absolutePath;
-    $schemaHelper = Civi::schemaHelper($this->getExtensionKey());
-    $sql = $schemaHelper->arrayToSql($entityDefn);
-    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
-    return TRUE;
-  }
-
-  /**
-   * Task to add or change a column definition, based on the php schema spec.
-   *
-   * @param string $entityName
-   * @param string $fieldName
-   * @param array $fieldSpec
-   *   As definied in the .entityType.php file for $entityName
-   * @return bool
-   * @throws CRM_Core_Exception
-   */
-  public function alterSchemaField(string $entityName, string $fieldName, array $fieldSpec): bool {
-    $tableName = Civi::entity($entityName)->getMeta('table');
-    $schemaHelper = Civi::schemaHelper($this->getExtensionKey());
-    $fieldSql = $schemaHelper->arrayToSql($fieldSpec);
-    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
-      $query = "ALTER TABLE `$tableName` CHANGE `$fieldName` `$fieldName` $fieldSql";
-      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
-      return TRUE;
-    }
-    else {
-      return self::addColumn($tableName, $fieldName, $fieldSql);
-    }
-  }
-
 }
