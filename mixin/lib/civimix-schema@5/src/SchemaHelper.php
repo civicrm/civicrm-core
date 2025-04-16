@@ -94,7 +94,9 @@ return new class() implements SchemaHelperInterface {
    * @throws \CRM_Core_Exception
    */
   public function alterSchemaField(string $entityName, string $fieldName, array $fieldSpec): bool {
-    $tableName = \Civi::entity($entityName)->getMeta('table');
+    $tableName = method_exists('Civi', 'entity')
+      ? \Civi::entity($entityName)->getMeta('table')
+      : \CRM_Core_DAO_AllCoreTables::getTableForEntityName($entityName);
     $fieldSql = $this->arrayToSql($fieldSpec);
     if (\CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
       $query = "ALTER TABLE `$tableName` CHANGE `$fieldName` `$fieldName` $fieldSql";
