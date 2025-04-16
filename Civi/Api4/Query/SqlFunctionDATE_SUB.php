@@ -18,6 +18,8 @@ class SqlFunctionDATE_SUB extends SqlFunction {
 
   protected static $category = self::CATEGORY_DATE;
 
+  protected static $dataType = 'Date';
+
   protected static function params(): array {
     return [
       [
@@ -25,9 +27,9 @@ class SqlFunctionDATE_SUB extends SqlFunction {
         'must_be' => ['SqlField'],
       ],
       [
-        'label' => ts('The value of the time/date interval to subtract.'),
+        'label' => ts('Interval to subtract'),
         'must_be' => ['SqlNumber'],
-        'flag_before' => ['INTERVAL' => ts('Interval')],
+        'flag_before' => ['INTERVAL' => ts('Minus')],
         'flag_after' => [
           'SECOND' => ts('Seconds'),
           'MINUTE' => ts('Minutes'),
@@ -54,7 +56,7 @@ class SqlFunctionDATE_SUB extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Subtracts a time/date interval');
+    return ts('Date Subtraction');
   }
 
   /**
