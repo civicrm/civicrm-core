@@ -32,7 +32,7 @@ use Civi\Test\Api3TestTrait;
 use Civi\Test\ContactTestTrait;
 use Civi\Test\EventTestTrait;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use PHPUnit\Framework\TestCase;
 

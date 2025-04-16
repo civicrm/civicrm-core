@@ -28,7 +28,7 @@ use Civi\Api4\SavedSearch;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use CRM_Core_ManagedEntities;
 use CRM_Core_Module;

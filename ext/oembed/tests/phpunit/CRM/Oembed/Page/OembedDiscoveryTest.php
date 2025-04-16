@@ -3,7 +3,7 @@
 use CRM_Oembed_ExtensionUtil as E;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Test\LocalHttpClient;
 use GuzzleHttp\Psr7\Request;
