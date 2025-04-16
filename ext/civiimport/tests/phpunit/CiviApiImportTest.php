@@ -3,7 +3,7 @@
 use Civi\Api4\Import;
 use Civi\Api4\UserJob;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\CiviEnvBuilder;
 use PHPUnit\Framework\TestCase;
 

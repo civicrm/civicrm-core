@@ -24,7 +24,7 @@ use Civi\Api4\MockBasicEntity;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\CiviEnvBuilder;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\Invasive;
 use Civi\Test\TransactionalInterface;
 

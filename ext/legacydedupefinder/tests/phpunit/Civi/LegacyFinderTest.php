@@ -7,7 +7,7 @@ use Civi\Api4\Group;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\EntityTrait;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 
 /**
  * FIXME - Add test description.

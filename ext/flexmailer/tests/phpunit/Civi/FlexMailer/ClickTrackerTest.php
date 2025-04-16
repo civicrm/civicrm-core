@@ -2,7 +2,7 @@
 namespace Civi\FlexMailer;
 
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
 use Civi\FlexMailer\ClickTracker\TextClickTracker;
