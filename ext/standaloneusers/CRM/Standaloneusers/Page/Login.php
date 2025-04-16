@@ -36,9 +36,10 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
    * Log out.
    */
   public static function logout() {
-    CRM_Core_Config::singleton()->userSystem->logout();
+    _authx_uf()->logoutSession();
+
     // Dump them back on the log-IN page.
-    CRM_Utils_System::redirect('/civicrm/login?justLoggedOut');
+    \CRM_Utils_System::redirect('/civicrm/login?justLoggedOut');
   }
 
 }
