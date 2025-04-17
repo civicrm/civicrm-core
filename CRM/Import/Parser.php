@@ -1076,6 +1076,11 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       // @todo - remove this again - we are switching to NOT namespacing the base entity & using the getImportEntities above.
       $fieldMapName = str_replace(strtolower($this->baseEntity) . '.', '', $fieldMapName);
     }
+    if (!isset($this->importableFieldsMetadata[$fieldMapName]) && isset($this->importableFieldsMetadata['contact.' . $fieldMapName])) {
+      // Our metadata is a bit in flux in the early 6.x versions but this should catch the mapping in 6.1
+      // and has cover in testImportFromUserJobConfigurationInvalidCountry.
+      $fieldMapName = 'contact.' . $fieldMapName;
+    }
     // This whole business of only loading metadata for one type when we actually need it for all is ... dubious.
     if (empty($this->getImportableFieldsMetadata()[$fieldMapName])) {
       if ($loadOptions || !$limitToContactType) {

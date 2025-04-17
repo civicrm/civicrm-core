@@ -196,31 +196,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
-   * Override parent to cope with params being separated by entity already.
-   *
-   * @todo - make this the parent method...
-   *
-   * @param array $params
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function validateParams(array $params): void {
-
-    if (empty($params['Contribution']['id'])) {
-      $this->validateRequiredFields($this->getRequiredFields(), $params['Contribution']);
-    }
-    $errors = [];
-    foreach ($params as $entity => $values) {
-      foreach ($values as $key => $value) {
-        $errors = array_merge($this->getInvalidValues($value, $key), $errors);
-      }
-    }
-    if ($errors) {
-      throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
-    }
-  }
-
-  /**
    * The initializer code, called before the processing
    */
   public function init() {
