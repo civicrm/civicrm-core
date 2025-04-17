@@ -259,6 +259,25 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'SoftCreditContact.last_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
       [],
     ];
+    $submittedValues = $this->doUserJobImport($importMappings);
+    $row = $this->getDataSource()->getRow();
+    // a valid status here means it has been able to incorporate the default_value.
+    $this->assertEquals('VALID', $row['_status']);
+
+    $this->submitPreviewForm($submittedValues);
+    $row = $this->getDataSource()->getRow();
+    // a valid status here means it has been able to incorporate the default_value.
+    $this->assertEquals('soft_credit_imported', $row['_status']);
+  }
+
+  /**
+   * @param array $importMappings
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function doUserJobImport(array $importMappings): array {
     $submittedValues = [
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
@@ -296,14 +315,47 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $form->buildForm();
     $this->assertTrue($form->validate());
     $form->postProcess();
-    $row = $this->getDataSource()->getRow();
-    // a valid status here means it has been able to incorporate the default_value.
-    $this->assertEquals('VALID', $row['_status']);
+    return $submittedValues;
+  }
 
-    $this->submitPreviewForm($submittedValues);
+  /**
+   * Test the an import can be done based on saved configuration in the UserJob.
+   *
+   * This also demonstrates some advanced import handling that the quickForm
+   * layer does not support but if you can get the config INTO the user_job
+   * table it runs... (ie via the angular form).
+   *
+   * These features are
+   *  - default_value for each field.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isBackGroundProcessing
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportFromUserJobConfigurationInvalidCountry(bool $isBackGroundProcessing): void {
+    Civi::settings()->set('enableBackgroundQueue', $isBackGroundProcessing);
+    $this->createLoggedInUser();
+    $importMappings = [
+      ['name' => 'Contact.organization_name'],
+      ['name' => 'Contact.legal_name'],
+      ['name' => 'Contribution.total_amount'],
+      // Note that default_value is supported via the parser and the angular form
+      // but there is no way to enter it on the quick form.
+      ['name' => 'Contribution.financial_type_id', 'default_value' => 'Donation'],
+      ['name' => 'Contact.source'],
+      ['name' => 'Contribution.receive_date'],
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'SoftCreditContact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      ['name' => 'SoftCreditContact.first_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      ['name' => 'SoftCreditContact.last_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      ['name' => 'Contact.address_primary.country_id', 'default_value' => 'Naha'],
+    ];
+    $this->doUserJobImport($importMappings);
     $row = $this->getDataSource()->getRow();
-    // a valid status here means it has been able to incorporate the default_value.
-    $this->assertEquals('soft_credit_imported', $row['_status']);
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Invalid value for field(s) : Contact Country', $row['_status_message']);
   }
 
   /**
