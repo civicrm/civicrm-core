@@ -53,6 +53,54 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   protected $toggleExtensions = ['civiimport'];
 
+  /**
+   * @param array $importMappings
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function doUserJobImport(array $importMappings): array {
+    $submittedValues = [
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'contactType' => 'Organization',
+      'mapper' => $this->getMapperFromFieldMappings($importMappings),
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+    ];
+    $this->submitDataSourceForm('soft_credit_extended.csv', $submittedValues);
+    $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)->addSelect('metadata')->execute()->first()['metadata'];
+    $metadata['import_mappings'] = $importMappings;
+    $metadata['entity_configuration'] = [
+      'Contribution' => ['action' => 'create'],
+      'Contact' => [
+        'action' => 'create',
+        'contact_type' => 'Organization',
+        'dedupe_rule' => 'OrganizationUnsupervised',
+      ],
+      'SoftCreditContact' => [
+        'contact_type' => 'Individual',
+        'action' => 'create',
+        'dedupe_rule' => 'IndividualSupervised',
+        'entity_data' => [
+          'soft_credit' => [
+            'soft_credit_type_id' => 1,
+          ],
+        ],
+      ],
+    ];
+    UserJob::update()->addWhere('id', '=', $this->userJobID)
+      ->setValues(['metadata' => $metadata])->execute();
+    $form = $this->getMapFieldForm($submittedValues);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $this->assertTrue($form->validate());
+    $form->postProcess();
+    return $submittedValues;
+  }
+
   protected function setUp(): void {
     parent::setUp();
     $originalExtensions = array_column(CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'fullName');
@@ -278,43 +326,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'soft_credit.contact.last_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
       [],
     ];
-    $submittedValues = [
-      'skipColumnHeader' => TRUE,
-      'fieldSeparator' => ',',
-      'contactType' => 'Organization',
-      'mapper' => $this->getMapperFromFieldMappings($importMappings),
-      'dataSource' => 'CRM_Import_DataSource_CSV',
-      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-    ];
-    $this->submitDataSourceForm('soft_credit_extended.csv', $submittedValues);
-    $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)->addSelect('metadata')->execute()->first()['metadata'];
-    $metadata['import_mappings'] = $importMappings;
-    $metadata['entity_configuration'] = [
-      'Contribution' => ['action' => 'create'],
-      'Contact' => [
-        'action' => 'create',
-        'contact_type' => 'Organization',
-        'dedupe_rule' => 'OrganizationUnsupervised',
-      ],
-      'SoftCreditContact' => [
-        'contact_type' => 'Individual',
-        'action' => 'create',
-        'dedupe_rule' => 'IndividualSupervised',
-        'entity_data' => [
-          'soft_credit' => [
-            'soft_credit_type_id' => 1,
-          ],
-        ],
-      ],
-    ];
-    UserJob::update()->addWhere('id', '=', $this->userJobID)
-      ->setValues(['metadata' => $metadata])->execute();
-    $form = $this->getMapFieldForm($submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertTrue($form->validate());
-    $form->postProcess();
+    $submittedValues = $this->doUserJobImport($importMappings);
     $row = $this->getDataSource()->getRow();
     // a valid status here means it has been able to incorporate the default_value.
     $this->assertEquals('VALID', $row['_status']);
@@ -323,6 +335,46 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $row = $this->getDataSource()->getRow();
     // a valid status here means it has been able to incorporate the default_value.
     $this->assertEquals('soft_credit_imported', $row['_status']);
+  }
+
+  /**
+   * Test the an import can be done based on saved configuration in the UserJob.
+   *
+   * This also demonstrates some advanced import handling that the quickForm
+   * layer does not support but if you can get the config INTO the user_job
+   * table it runs... (ie via the angular form).
+   *
+   * These features are
+   *  - default_value for each field.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isBackGroundProcessing
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportFromUserJobConfigurationInvalidCountry(bool $isBackGroundProcessing): void {
+    Civi::settings()->set('enableBackgroundQueue', $isBackGroundProcessing);
+    $this->createLoggedInUser();
+    $importMappings = [
+      ['name' => 'organization_name'],
+      ['name' => 'legal_name'],
+      ['name' => 'total_amount'],
+      // Note that default_value is supported via the parser and the angular form
+      // but there is no way to enter it on the quick form.
+      ['name' => 'financial_type_id', 'default_value' => 'Donation'],
+      ['name' => 'contact.source'],
+      ['name' => 'receive_date'],
+      ['name' => 'external_identifier'],
+      ['name' => 'soft_credit.contact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      ['name' => 'soft_credit.contact.first_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      ['name' => 'soft_credit.contact.last_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      ['name' => 'contact.address_primary.country_id', 'default_value' => 'Naha'],
+    ];
+    $this->doUserJobImport($importMappings);
+    $row = $this->getDataSource()->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Invalid value for field(s) : Country', $row['_status_message']);
   }
 
   /**
