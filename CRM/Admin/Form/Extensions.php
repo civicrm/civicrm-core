@@ -205,7 +205,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
       // FIXME: It would be nice to accept a list of exts and/or use transitive dependencies (Manager::findInstallRequirements()).
       $runner = new CRM_Queue_Runner([
         'title' => $qd->getTitle(),
-        'queue' => $qd->fillQueue($qd->createQueue(), $downloads),
+        'queue' => $qd->addDownloads($downloads)->fillQueue(),
         'onEnd' => [static::class, 'onFinishDownload'],
         'onEndUrl' => (string) Civi::url('backend://civicrm/admin/extensions?reset=1&action=browse'),
         'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
