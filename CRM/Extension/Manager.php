@@ -188,7 +188,7 @@ class CRM_Extension_Manager {
       // the extension does not exist in any container; we're free to put it anywhere
       $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
     }
-    if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
+    if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath, FALSE)) {
       // But if we don't control the folder, then force installation in the default-container
       $oldPath = $tgtPath;
       $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
