@@ -1,0 +1,21 @@
+{
+  "address_format": "{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}",
+  "mailing_format": "{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}",
+  "display_name_format": "{contact.first_name}{ }{contact.last_name}",
+  "sort_name_format": "{contact.last_name}{, }{contact.first_name}",
+  "defaultCurrency": "CAD",
+  "defaultContactCountry": "1039",
+  "defaultContactStateProvince": "1110",
+  "dateformatDatetime": "%Y-%m-%d %H:%M",
+  "dateformatFull": "%Y-%m-%d",
+  "dateformatPartial": "%Y-%m",
+  "dateformatTime": "%H:%M",
+  "dateformatYear": "%Y",
+  "dateformatFinancialBatch": "%Y-%m-%d",
+  "dateInputFormat": "yy-mm-dd",
+  "languagesOption": ["fr_CA"],
+  "lcMessages": "fr_CA",
+  "timezone": "America/Toronto",
+  "timeInputFormat": "1",
+  "weekBegins": "1"
+}
