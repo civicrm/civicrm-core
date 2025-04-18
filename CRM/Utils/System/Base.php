@@ -302,10 +302,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Immediately stop script execution, log out the user and redirect to the home page.
-   *
-   * @deprecated
-   *   This function should be removed in favor of linking to the CMS's logout page
+   * Log the user out however the UF does that
    */
   public function logout() {
   }

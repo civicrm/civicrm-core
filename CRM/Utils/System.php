@@ -1966,4 +1966,17 @@ class CRM_Utils_System {
     }
   }
 
+  /**
+   * Check user is logged in, then use the UF specific
+   * logout function
+   */
+  public static function logout() {
+    if (!self::isUserLoggedIn()) {
+      throw new \CRM_Core_Exception(ts('You cannot log out because you are not logged in.'));
+    }
+
+    // now use the userSystem specific function
+    CRM_Core_Config::singleton()->userSystem->logout();
+  }
+
 }

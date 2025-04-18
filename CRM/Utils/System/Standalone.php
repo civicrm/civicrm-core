@@ -303,13 +303,13 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Immediately stop script execution and log out the user
+   * @inheritdoc
    */
   public function logout() {
     _authx_uf()->logoutSession();
-    // redirect to the home page?
-    // breaks tests in standaloneusers-e2e
-    // \CRM_Utils_System::redirect('/civicrm/login');
+
+    // Dump them back on the log-IN page.
+    CRM_Utils_System::redirect('/civicrm/login?justLoggedOut');
   }
 
   /**
