@@ -3,6 +3,8 @@
 namespace Civi\ext\legacydedupefinder\tests\phpunit\Civi;
 
 use Civi\Api4\Contact;
+use Civi\Api4\DedupeRule;
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Group;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\EntityTrait;
@@ -60,6 +62,16 @@ class LegacyFinderTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       Group::delete(FALSE)->addWhere('id', 'IN', $this->ids['Group'])
         ->execute();
     }
+    if (!empty($this->ids['DedupeRuleGroup'])) {
+      DedupeRule::delete(FALSE)->addWhere('dedupe_rule_group_id', 'IN', $this->ids['DedupeRuleGroup'])
+        ->execute();
+      DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])
+        ->execute();
+    }
+    DedupeRuleGroup::update(FALSE)
+      ->setValues(['used' => 'Supervised'])
+      ->addWhere('name', '=', 'IndividualSupervised')
+      ->execute();
     parent::tearDown();
   }
 
@@ -118,6 +130,66 @@ class LegacyFinderTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ])
       ->execute();
     $this->assertCount(1, $matches);
+  }
+
+  public function testFindDuplicateNonReservedRule(): void {
+    $this->createTestEntity('Contact', [
+      'last_name' => 'bob@example.org',
+      'first_name' => 'Bob',
+      'contact_type' => 'Individual',
+    ]);
+    $this->createTestEntity('DedupeRuleGroup', [
+      'contact_type' => 'Individual',
+      'threshold' => 5,
+      'used' => 'Supervised',
+      'name' => 'test-rule',
+    ]);
+    $this->createTestEntity('DedupeRule', [
+      'dedupe_rule_group_id.name' => 'test-rule',
+      'rule_table' => 'civicrm_contact',
+      'rule_field' => 'first_name',
+      'rule_weight' => 3,
+    ]);
+    $this->createTestEntity('DedupeRule', [
+      'dedupe_rule_group_id.name' => 'test-rule',
+      'rule_table' => 'civicrm_contact',
+      'rule_field' => 'last_name',
+      'rule_weight' => 2,
+    ]);
+    DedupeRuleGroup::update(FALSE)
+      ->setValues(['used' => 'General'])
+      ->addWhere('name', '=', 'IndividualSupervised')
+      ->execute();
+
+    // Test finding the match on apiv3 & 4.
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('test-rule')
+      ->setValues([
+        'last_name' => 'bob@example.org',
+        'first_name' => 'Bob',
+      ])
+      ->execute();
+    $this->assertCount(1, $matches);
+    $matches = \civicrm_api3('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+        'first_name' => 'Bob',
+        'last_name' => 'bob@example.org',
+      ],
+    ]);
+    $this->assertEquals(1, $matches['count']);
+
+    // Test again on a non-matched one - apiv3 & 4 again.
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('test-rule')
+      ->setValues([
+        'last_name' => 'bob@example.org',
+        'first_name' => 'Bobby',
+      ])
+      ->execute();
+    $this->assertCount(0, $matches);
   }
 
 }
