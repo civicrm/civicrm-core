@@ -34,6 +34,10 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
+    // undo what tcpdf does since it seems needed in these tests
+    if (!in_array('phar', stream_get_wrappers(), TRUE)) {
+      stream_wrapper_restore('phar');
+    }
     list($this->basedir, $this->container) = $this->createContainer();
     $this->mapper = new CRM_Extension_Mapper($this->container);
   }
