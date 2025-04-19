@@ -12,12 +12,12 @@ if (!defined('CIVI_SETUP')) {
      */
     $ctrl = $e->getCtrl();
 
-    $ctrl->blocks['sample-data'] = array(
+    $ctrl->blocks['sample-data'] = [
       'is_active' => TRUE,
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'sample-data.tpl.php',
       'class' => 'if-no-errors',
-      'weight' => 40,
-    );
+      'weight' => 50,
+    ];
 
     if ($e->getMethod() === 'POST') {
       $e->getModel()->loadGenerated = !empty($e->getField('loadGenerated'));
