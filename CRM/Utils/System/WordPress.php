@@ -122,7 +122,17 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         elseif ($oldExists && $newExists) {
           // situation ambiguous. encourage admin to set value explicitly.
           if (!isset($GLOBALS['civicrm_paths']['civicrm.files'])) {
-            \Civi::log()->warning("The system has data from both old+new conventions. Please use civicrm.settings.php to set civicrm.files explicitly.");
+            // Let's ensure these are different paths before issuing a warning.
+            // Because WordPress uses __DIR__ to calculate paths, symlinks get
+            // resolved with the new path, but not the old path. Replace
+            // backslash with forward slash (in case we are on Windows) and
+            // remove trailing slashes to normalize each path.
+            $oldNormalizedPath = rtrim(str_replace('\\', '/', realpath($old['path'])), '/');
+            $newNormalizedPath = rtrim(str_replace('\\', '/', $new['path']), '/');
+            if ($oldNormalizedPath != $newNormalizedPath) {
+              // If these paths really are different, display a warning.
+              \Civi::log()->warning("The system has data from both old+new conventions. Please use civicrm.settings.php to set civicrm.files explicitly.");
+            }
           }
           return $new;
         }
