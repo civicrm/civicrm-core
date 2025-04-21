@@ -1,5 +1,6 @@
 <?php
 declare(strict_types = 1);
+use Civi\Api4\Contact;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\DedupeRule;
 
@@ -21,6 +22,16 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_contact', 'civicrm_group_contact', 'civicrm_group'], TRUE);
+    if (!empty($this->ids['DedupeRuleGroup'])) {
+      DedupeRule::delete(FALSE)->addWhere('dedupe_rule_group_id', 'IN', $this->ids['DedupeRuleGroup'])
+        ->execute();
+      DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])
+        ->execute();
+    }
+    DedupeRuleGroup::update(FALSE)
+      ->setValues(['used' => 'Supervised'])
+      ->addWhere('name', '=', 'IndividualSupervised')
+      ->execute();
     parent::tearDown();
   }
 
@@ -776,6 +787,120 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $fields = array_merge($fields, $params);
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, $ruleGroup['id'], ['event_id' => 1]);
     $this->assertCount(2, $ids);
+  }
+
+  public function testFindDuplicateNonReservedRule(): void {
+    $this->createTestEntity('Contact', [
+      'last_name' => 'bob@example.org',
+      'first_name' => 'Bob',
+      'contact_type' => 'Individual',
+    ]);
+    $this->createTestEntity('Contact', [
+      'last_name' => '',
+      'first_name' => 'Bob',
+      'contact_type' => 'Individual',
+    ]);
+    $this->createTestEntity('DedupeRuleGroup', [
+      'contact_type' => 'Individual',
+      'threshold' => 5,
+      'used' => 'Supervised',
+      'name' => 'test-rule',
+    ]);
+    $this->createTestEntity('DedupeRule', [
+      'dedupe_rule_group_id.name' => 'test-rule',
+      'rule_table' => 'civicrm_contact',
+      'rule_field' => 'first_name',
+      'rule_weight' => 3,
+    ]);
+    $this->createTestEntity('DedupeRule', [
+      'dedupe_rule_group_id.name' => 'test-rule',
+      'rule_table' => 'civicrm_contact',
+      'rule_field' => 'last_name',
+      'rule_weight' => 2,
+    ]);
+    DedupeRuleGroup::update(FALSE)
+      ->setValues(['used' => 'General'])
+      ->addWhere('name', '=', 'IndividualSupervised')
+      ->execute();
+
+    // Test finding the match on apiv3 & 4.
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('test-rule')
+      ->setValues([
+        'last_name' => 'bob@example.org',
+        'first_name' => 'Bob',
+      ])
+      ->execute();
+    $this->assertCount(1, $matches);
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+        'first_name' => 'Bob',
+        'last_name' => 'bob@example.org',
+      ],
+    ]);
+    $this->assertEquals(1, $matches['count']);
+
+    // Test again on a non-matched one - apiv3 & 4 again.
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('test-rule')
+      ->setValues([
+        'last_name' => 'bob@example.org',
+        'first_name' => 'Bobby',
+      ])
+      ->execute();
+    $this->assertCount(0, $matches);
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+      ],
+    ]);
+    $this->assertEquals(0, $matches['count']);
+
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+        'first_name' => 'Bob',
+      ],
+    ]);
+    $this->assertEquals(0, $matches['count']);
+
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+        'first_name' => 'Bob',
+        'last_name' => '',
+      ],
+    ]);
+    $this->assertEquals(0, $matches['count']);
+
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('test-rule')
+      ->setValues([
+        'last_name' => '',
+        'first_name' => 'Bob',
+      ])
+      ->execute();
+    $this->assertCount(0, $matches);
+  }
+
+  public function testDedupeApiCallLackingData(): void {
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'contact_type' => 'Individual',
+      'match' => [
+        'contact_type' => 'Individual',
+      ],
+    ]);
+    $this->assertEquals(0, $matches['count']);
   }
 
 }

@@ -198,7 +198,8 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
   }
 
   public static function hook_civicrm_findDuplicates(GenericHookEvent $event): void {
-    if (!empty($event->dedupeResults['handled'])) {
+    $lookupParameters = $event->dedupeParams['match_params'];
+    if (!$lookupParameters || !empty($event->dedupeResults['handled'])) {
       // @todo - in time we can deprecate this & expect them to use stopPropagation().
       return;
     }
@@ -207,7 +208,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     $ruleGroup->find(TRUE);
     $contactType = $ruleGroup->contact_type;
     $threshold = $ruleGroup->threshold;
-    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, [], $event->dedupeParams['match_params']);
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, [], $lookupParameters);
     $tableQueries = $optimizer->getFindQueries();
     if (empty($tableQueries)) {
       $event->dedupeResults['ids'] = [];
