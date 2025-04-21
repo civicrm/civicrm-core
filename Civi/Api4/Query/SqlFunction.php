@@ -314,6 +314,31 @@ abstract class SqlFunction extends SqlExpression {
   }
 
   /**
+   * Function to get the date intervals for date functions
+   *
+   * @return array date intervals
+   */
+  protected static function getDateIntervals() :array {
+    return [
+      'SECOND' => ts('Seconds'),
+      'MINUTE' => ts('Minutes'),
+      'HOUR' => ts('Hours'),
+      'DAY' => ts('Days'),
+      'WEEK' => ts('Weeks'),
+      'MONTH' => ts('Months'),
+      'QUARTER' => ts('Quarters'),
+      'YEAR' => ts('Years'),
+      'MINUTE_SECOND' => ts('Minutes:Seconds'),
+      'HOUR_SECOND' => ts('Hours:Minutes:Seconds'),
+      'HOUR_MINUTE' => ts('Hours:Minutes'),
+      'DAY_SECOND' => ts('Days Hours:Minutes:Seconds'),
+      'DAY_MINUTE' => ts('Days Hours:Minutes'),
+      'DAY_HOUR' => ts('Days Hours'),
+      'YEAR_MONTH' => ts('Years-Months'),
+    ];
+  }
+
+  /**
    * @return string
    */
   abstract public static function getDescription(): string;
