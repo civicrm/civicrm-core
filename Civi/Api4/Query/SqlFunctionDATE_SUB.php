@@ -14,21 +14,24 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionEXTRACT extends SqlFunction {
+class SqlFunctionDATE_SUB extends SqlFunction {
 
   protected static $category = self::CATEGORY_DATE;
+
+  protected static $dataType = 'Date';
 
   protected static function params(): array {
     return [
       [
-        'label' => ts('Unit'),
-        'flag_before' => self::getDateIntervals(),
-        'max_expr' => 0,
         'optional' => FALSE,
+        'must_be' => ['SqlField'],
       ],
       [
-        'name' => 'FROM',
-        'must_be' => ['SqlField'],
+        'label' => ts('Interval to subtract'),
+        'must_be' => ['SqlNumber'],
+        'flag_before' => ['INTERVAL' => ts('Minus')],
+        'flag_after' => self::getDateIntervals(),
+        'optional' => FALSE,
       ],
     ];
   }
@@ -37,14 +40,14 @@ class SqlFunctionEXTRACT extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Partial Date');
+    return ts('Date Subtraction');
   }
 
   /**
    * @return string
    */
   public static function getDescription(): string {
-    return ts('Extract part(s) of a date (e.g. the day, year, etc.)');
+    return ts('Subtracts a time/date interval from a date.');
   }
 
 }

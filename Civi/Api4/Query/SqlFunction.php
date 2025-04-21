@@ -60,7 +60,7 @@ abstract class SqlFunction extends SqlExpression {
     $this->setSuffix($matches[2] ?? NULL);
     // Parse function arguments string, match to declared function params
     foreach ($this->getParams() as $idx => $param) {
-      $prefix = NULL;
+      $prefixes = [];
       $name = $param['name'] ?: ($idx + 1);
       // If this isn't the first param it needs to start with something;
       // either the name (e.g. "ORDER BY") if it has one, or a comma separating it from the previous param.
@@ -79,16 +79,22 @@ abstract class SqlFunction extends SqlExpression {
         if (!$prefix && !$param['optional']) {
           throw new \CRM_Core_Exception("Missing param $name for SQL function " . static::getName());
         }
+        if ($prefix) {
+          $prefixes[] = $prefix;
+        }
       }
-      elseif ($param['flag_before']) {
+      if ($param['flag_before']) {
         $prefix = $this->captureKeyword(array_keys($param['flag_before']), $arg);
+        if ($prefix) {
+          $prefixes[] = $prefix;
+        }
       }
       $this->args[$idx] = [
-        'prefix' => (array) $prefix,
+        'prefix' => $prefixes,
         'expr' => [],
         'suffix' => [],
       ];
-      if ($param['max_expr'] && (!$param['name'] || $param['name'] === $prefix)) {
+      if ($param['max_expr'] && (!$param['name'] || $param['name'] === ($prefix ?? ''))) {
         $exprs = $this->captureExpressions($arg, $param['must_be'], $param['max_expr']);
         if (
           count($exprs) < $param['min_expr'] &&
@@ -305,6 +311,31 @@ abstract class SqlFunction extends SqlExpression {
     $this->suffix = $suffix ?
       str_replace(':', '', $suffix) :
       NULL;
+  }
+
+  /**
+   * Function to get the date intervals for date functions
+   *
+   * @return array date intervals
+   */
+  protected static function getDateIntervals() :array {
+    return [
+      'SECOND' => ts('Seconds'),
+      'MINUTE' => ts('Minutes'),
+      'HOUR' => ts('Hours'),
+      'DAY' => ts('Days'),
+      'WEEK' => ts('Weeks'),
+      'MONTH' => ts('Months'),
+      'QUARTER' => ts('Quarters'),
+      'YEAR' => ts('Years'),
+      'MINUTE_SECOND' => ts('Minutes:Seconds'),
+      'HOUR_SECOND' => ts('Hours:Minutes:Seconds'),
+      'HOUR_MINUTE' => ts('Hours:Minutes'),
+      'DAY_SECOND' => ts('Days Hours:Minutes:Seconds'),
+      'DAY_MINUTE' => ts('Days Hours:Minutes'),
+      'DAY_HOUR' => ts('Days Hours'),
+      'YEAR_MONTH' => ts('Years-Months'),
+    ];
   }
 
   /**
