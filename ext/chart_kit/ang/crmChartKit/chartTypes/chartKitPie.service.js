@@ -33,7 +33,7 @@
     // for pie chart the legend is showing column values, which benefit from rendering
     legendTextAccessor: (displayCtrl) => ((d) =>
       (d.name === 'Others') ?
-        'Others' :
+        ts('Others') :
         displayCtrl.getColumnsForAxis('w').map((col) => displayCtrl.renderColumnValue(d.data, col)).join(' - ')
     ),
 
