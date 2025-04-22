@@ -42,7 +42,6 @@ J4PACK=0
 J5PACKBC=0
 WPPACK=0
 PATCHPACK=0
-SKPACK=0
 STANDALONEPACK=0
 L10NPACK=0
 REPOREPORT=0
@@ -64,7 +63,6 @@ display_usage()
   echo "  Joomla5bc|j5bc    - generate Joomla 5 module requiring the Back Compatibility plugin"
   echo "  WordPress|wp      - generate Wordpress module"
   echo "  patchset          - generate a tarball with patch files"
-  echo "  sk                - generate Drupal StarterKit module"
   echo "  standalone        - generate CiviCRM Standalone"
   echo
   echo "You also need to have distmaker.conf file in place."
@@ -175,8 +173,7 @@ case $1 in
 
   # DRUPAL7 StarterKit package
   sk)
-  dm_note "Enable CiviCRM-Drupal 7 (StarterKit version)"
-  SKPACK=1
+  dm_note "Skip CiviCRM-Drupal 7 (StarterKit no longer provided)"
   ;;
 
   # JOOMLA4
@@ -224,7 +221,6 @@ case $1 in
   J5BCPACK=1
   WPPACK=1
   PATCHPACK=1
-  SKPACK=1
   STANDALONEPACK=1
   L10NPACK=1
   REPOREPORT=1
@@ -292,12 +288,6 @@ if [ "$D7DIR" = 1 ]; then
   bash $P/dists/drupal7_dir.sh
 fi
 
-if [ "$SKPACK" = 1 ]; then
-  dm_title "Build CiviCRM-Drupal 7 (StarterKit version)"
-  dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
-  bash $P/dists/drupal7_sk.sh
-fi
-
 if [ "$J4PACK" = 1 ]; then
   dm_title "Build CiviCRM-Joomla 4"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
@@ -333,7 +323,6 @@ if [ "$REPOREPORT" = 1 ]; then
     BPACK="$BPACK" \
     D7PACK="$D7PACK" \
     D7DIR="$D7DIR" \
-    SKPACK="$SKPACK" \
     J4PACK="$J4PACK" \
     J5BCPACK="$J5BCPACK" \
     WPPACK="$WPPACK" \
