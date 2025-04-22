@@ -64,6 +64,6 @@
   </div>
 {else}
   <div class="messages status no-popup">
-    <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>&nbsp; {ts 1=$newReport}There are no option values entered. You can <a href="%1">add one</a>.{/ts}
+    <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>&nbsp; {ts 1=$newReport}There are no option values entered. You can <a href="%1">add one</a>.{/ts}
   </div>
 {/if}

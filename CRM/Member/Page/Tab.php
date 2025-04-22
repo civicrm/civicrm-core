@@ -52,8 +52,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
     $membershipTypes = \Civi\Api4\MembershipType::get(TRUE)
       ->execute()
-      ->indexBy('id')
-      ->column('name');
+      ->column('name', 'id');
     $addWhere = "membership_type_id IN (0)";
     if (!empty($membershipTypes)) {
       $addWhere = "membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
@@ -245,13 +244,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId);
-      // Refresh other tabs with related data
-      $this->ajaxResponse['updateTabs'] = [
-        '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
-      ];
-      if (CRM_Core_Permission::access('CiviContribute')) {
-        $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
-      }
     }
   }
 

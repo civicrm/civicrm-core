@@ -84,7 +84,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
             $countRow = 0;
             foreach ($options as $optionId => $optionValue) {
               $countRow++;
-              $defaults['value'][$countRow] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($optionValue['amount']);
+              $defaults['value'][$countRow] = isset($optionValue['amount']) ? CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($optionValue['amount'], 9) : '';
               $defaults['label'][$countRow] = $optionValue['label'];
               $defaults['name'][$countRow] = $optionValue['name'];
               $defaults['weight'][$countRow] = $optionValue['weight'];
@@ -124,7 +124,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
         foreach ($discountFields['options'] as $discountFieldsval) {
           $defaults['discounted_label'][$discountFieldsval['weight']] = $discountFieldsval['label'];
-          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($discountFieldsval['amount']);
+          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = isset($discountFieldsval['amount']) ? CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($discountFieldsval['amount'], 9) : '';
           $defaults['discount_option_id'][$rowCount][$discountFieldsval['weight']] = $discountFieldsval['id'];
           if (!empty($discountFieldsval['is_default'])) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];
@@ -177,7 +177,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $maxKey = count($totalLables) - 1;
       if (isset($maxKey) && !empty($totalLables[$maxKey]['value'])) {
         foreach ($totalLables[$maxKey]['value'] as $i => $v) {
-          if ($totalLables[$maxKey]['amount_id'][$i] == CRM_Utils_Array::value('default_discount_fee_id', $defaults)) {
+          if ($totalLables[$maxKey]['amount_id'][$i] == ($defaults['default_discount_fee_id'] ?? NULL)) {
             $defaults['discounted_default'] = $i;
             break;
           }
@@ -236,7 +236,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     //add currency element.
     $this->addCurrency('currency', ts('Currency'), FALSE);
 
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
+    $paymentProcessor = CRM_Contribute_BAO_ContributionRecur::buildOptions('payment_processor_id', 'create');
 
     $this->assign('paymentProcessor', $paymentProcessor);
     $this->addCheckBox('payment_processor', ts('Payment Processor'),
@@ -632,7 +632,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                 $fieldParams['option_id'] = $params['price_field_value'];
 
                 $priceSet = new CRM_Price_BAO_PriceSet();
-                $priceSet->id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $params), 'price_set_id');
+                $priceSet->id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'] ?? NULL, 'price_set_id');
 
                 if ($this->_defaultValues['financial_type_id'] != $params['financial_type_id']) {
                   CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $priceSet->id, 'financial_type_id', $params['financial_type_id']);
@@ -731,7 +731,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   if (!empty($value['is_default'])) {
                     $fieldParams['default_option'] = $value['weight'];
                   }
-                  if (!empty($discountFieldIDs[$j]) && !empty($discountFieldIDs[$j][$value['weight']])) {
+                  if (!empty($discountFieldIDs[$j][$value['weight']])) {
                     $fieldParams['option_id'][$value['weight']] = $discountFieldIDs[$j][$value['weight']];
                     unset($discountFieldIDs[$j][$value['weight']]);
                   }

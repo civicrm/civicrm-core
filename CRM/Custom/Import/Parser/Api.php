@@ -1,9 +1,13 @@
 <?php
 
+use Civi\Api4\CustomValue;
+
 /**
  * Class CRM_Custom_Import_Parser_Api
  */
 class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
+
+  protected string $baseEntity = 'Contact';
 
   /**
    * Get information about the provided job.
@@ -27,6 +31,48 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
   }
 
   /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   */
+  public function getImportEntities() : array {
+    return [
+      $this->getGroupName() => [
+        'text' => ts('Custom Fields'),
+        'is_contact' => FALSE,
+        'required_fields_update' => [],
+        'required_fields_create' => [],
+        'is_base_entity' => TRUE,
+        'supports_multiple' => FALSE,
+        'is_required' => TRUE,
+        // For now we stick with the action selected on the DataSource page.
+        'actions' => [['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')]],
+        'default_action' => 'create',
+        'entity_name' => $this->getGroupName(),
+        'entity_title' => $this->getGroupTitle(),
+        'entity_field_prefix' => '',
+        'selected' => ['action' => 'create'],
+      ],
+      'Contact' => [
+        'text' => ts('Contact Fields'),
+        'is_contact' => TRUE,
+        'entity_field_prefix' => 'Contact.',
+        'unique_fields' => ['external_identifier', 'id'],
+        'supports_multiple' => FALSE,
+        'actions' => $this->getActions(['select', 'update', 'save']),
+        'selected' => [
+          'action' => 'select',
+          'contact_type' => $this->getSubmittedValue('contactType'),
+          'dedupe_rule' => $this->getDedupeRule($this->getContactType())['name'],
+        ],
+        'default_action' => 'select',
+        'entity_name' => 'Contact',
+        'entity_title' => ts('Contact'),
+      ],
+    ];
+  }
+
+  /**
    * Main import function.
    *
    * @param array $values
@@ -36,11 +82,16 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
     $rowNumber = (int) $values[array_key_last($values)];
     try {
       $params = $this->getMappedRow($values);
+      $contactParams = $params['Contact'];
+      $groupName = $this->getGroupName();
+      $params = $params[$groupName];
       $params['skipRecentView'] = TRUE;
-      $params['check_permissions'] = TRUE;
-      $params['entity_id'] = $params['contact_id'];
-      civicrm_api3('CustomValue', 'create', $params);
-      $this->setImportStatus($rowNumber, 'IMPORTED', '', $params['contact_id']);
+      $params['entity_id'] = $this->getContactID($contactParams, $contactParams['id'] ?? NULL, 'Contact');
+
+      CustomValue::create($groupName)
+        ->setValues($params)
+        ->execute();
+      $this->setImportStatus($rowNumber, 'IMPORTED', '', $params['entity_id']);
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage(), $params['contact_id'] ?? NULL);
@@ -53,12 +104,9 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
   public function setFieldMetadata(): void {
     if (!$this->importableFieldsMetadata) {
       $customGroupID = $this->getCustomGroupID();
-      $importableFields = $this->getGroupFieldsForImport($customGroupID);
-      $this->importableFieldsMetadata = array_merge([
-        'do_not_import' => ['title' => ts('- do not import -')],
-        'contact_id' => ['title' => ts('Contact ID'), 'name' => 'contact_id', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE, 'headerPattern' => '/contact?|id$/i'],
-        'external_identifier' => ['title' => ts('External Identifier'), 'name' => 'external_identifier', 'type' => CRM_Utils_Type::T_STRING, 'options' => FALSE, 'headerPattern' => '/external\s?id/i'],
-      ], $importableFields);
+      $fields = ['' => ['title' => ts('- do not import -')]];
+      $importableFields = CRM_Utils_Array::prefixKeys($this->getGroupFieldsForImport($customGroupID), $this->getGroupName() . '.');
+      $this->importableFieldsMetadata = $fields + $importableFields + $this->getContactFields($this->getContactType(), 'Contact', TRUE);
     }
   }
 
@@ -88,10 +136,9 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
         continue;
       }
       /* generate the key for the fields array */
-      $key = 'custom_' . $values['id'];
       $regexp = preg_replace('/[.,;:!?]/', '', $values['label']);
-      $importableFields[$key] = array_merge($values, [
-        'name' => $key,
+      $importableFields[$values['name']] = array_merge($values, [
+        'name' => $values['name'],
         'title' => $values['label'] ?? NULL,
         'headerPattern' => '/' . preg_quote($regexp, '/') . '/i',
         'import' => 1,
@@ -100,6 +147,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
         'extends' => $customGroup['extends'],
         'custom_group_id.name' => $customGroup['name'],
         'is_multiple' => $customGroup['is_multiple'],
+        'entity' => $customGroup['name'],
       ]);
     }
     return $importableFields;
@@ -110,6 +158,20 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
    */
   private function getCustomGroupID(): int {
     return (int) $this->getSubmittedValue('multipleCustomData');
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getGroupName(): mixed {
+    return CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->getCustomGroupID()])['name'];
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getGroupTitle(): mixed {
+    return CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->getCustomGroupID()])['title'];
   }
 
 }

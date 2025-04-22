@@ -648,7 +648,7 @@ abstract class CRM_Utils_Hook {
    * @param array $conditions
    *   Values from WHERE or ON clause
    */
-  public static function selectWhereClause($entity, array &$clauses, int $userId = NULL, array $conditions = []): void {
+  public static function selectWhereClause($entity, array &$clauses, ?int $userId = NULL, array $conditions = []): void {
     $entityName = is_object($entity) ? CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($entity)) : $entity;
     $null = NULL;
     $userId ??= (int) CRM_Core_Session::getLoggedInContactID();
@@ -935,10 +935,21 @@ abstract class CRM_Utils_Hook {
    * @param array $tokens
    *   The list of tokens that can be used for the contact.
    *
+   * @param bool $squashDeprecation
+   *    Suppress the deprecation message - this should ONLY EVER BE CALLED
+   *    from the backward compatibilty adapter in `evaluateLegacyHookTokens`.
+   *    We are deprecating both this function, and the implementation of the hook
+   *    but for now we ensure that the hook is still rendered for
+   *    sites that implement it, via the TokenProcessor methodology
+   *    https://docs.civicrm.org/dev/en/latest/framework/token/#compose-batch
+   *
    * @return null
    */
-  public static function tokens(&$tokens) {
+  public static function tokens(&$tokens, bool $squashDeprecation = FALSE) {
     $null = NULL;
+    if (!$squashDeprecation) {
+      CRM_Core_Error::deprecatedFunctionWarning('call the token processor');
+    }
     return self::singleton()->invoke(['tokens'], $tokens,
       $null, $null, $null, $null, $null, 'civicrm_tokens'
     );
@@ -968,25 +979,36 @@ abstract class CRM_Utils_Hook {
    *   The array to store the token values indexed by contactIDs.
    * @param array $contactIDs
    *   An array of contactIDs.
-   * @param int $jobID
+   * @param null $jobID
    *   The jobID if this is associated with a CiviMail mailing.
    * @param array $tokens
    *   The list of tokens associated with the content.
-   * @param string $className
+   * @param null $className
    *   The top level className from where the hook is invoked.
-   *
-   * @deprecated since 5.71 will be removed sometime after all core uses are fully removed.
+   * @param bool $squashDeprecation
+   *   Suppress the deprecation message - this should ONLY EVER BE CALLED
+   *   from the backward compatibilty adapter in `evaluateLegacyHookTokens`.
+   *   We are deprecating both this function, and the implementation of the hook
+   *   but for now we ensure that the hook is still rendered for
+   *   sites that implement it, via the TokenProcessor methodology
+   *   https://docs.civicrm.org/dev/en/latest/framework/token/#compose-batch
    *
    * @return null
+   * @deprecated since 5.71 will be removed sometime after all core uses are fully removed.
+   *
    */
   public static function tokenValues(
     &$details,
     $contactIDs,
     $jobID = NULL,
     $tokens = [],
-    $className = NULL
+    $className = NULL,
+    $squashDeprecation = FALSE
   ) {
     $null = NULL;
+    if (!$squashDeprecation) {
+      CRM_Core_Error::deprecatedFunctionWarning('call the token processor');
+    }
     return self::singleton()
       ->invoke(['details', 'contactIDs', 'jobID', 'tokens', 'className'], $details, $contactIDs, $jobID, $tokens, $className, $null, 'civicrm_tokenValues');
   }
@@ -1023,7 +1045,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function copy($objectName, &$object, $original_id = NULL) {
     $null = NULL;
-    return self::singleton()->invoke(['objectName', 'object'], $objectName, $object, $original_id,
+    return self::singleton()->invoke(['objectName', 'object', 'original_id'], $objectName, $object, $original_id,
       $null, $null, $null,
       'civicrm_copy'
     );
@@ -1051,32 +1073,6 @@ abstract class CRM_Utils_Hook {
     $null = NULL;
     return self::singleton()
       ->invoke(['op', 'mailingId', 'contactId', 'groups', 'baseGroups'], $op, $mailingId, $contactId, $groups, $baseGroups, $null, 'civicrm_unsubscribeGroups');
-  }
-
-  /**
-   * This hook is called when CiviCRM needs to edit/display a custom field with options
-   *
-   * @deprecated in favor of hook_civicrm_fieldOptions
-   *
-   * @param int $customFieldID
-   *   The custom field ID.
-   * @param array $options
-   *   The current set of options for that custom field.
-   *   You can add/remove existing options.
-   *   Important: This array may contain meta-data about the field that is needed elsewhere, so it is important
-   *              to be careful to not overwrite the array.
-   *   Only add/edit/remove the specific field options you intend to affect.
-   * @param bool $detailedFormat
-   *   If true, the options are in an ID => array ( 'id' => ID, 'label' => label, 'value' => value ) format
-   *
-   * @return mixed
-   */
-  public static function customFieldOptions($customFieldID, &$options, $detailedFormat = FALSE) {
-    $null = NULL;
-    return self::singleton()->invoke(['customFieldID', 'options', 'detailedFormat'], $customFieldID, $options, $detailedFormat,
-      $null, $null, $null,
-      'civicrm_customFieldOptions'
-    );
   }
 
   /**
@@ -1665,6 +1661,34 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Check for existing duplicates in the database.
+   *
+   * This hook is called when
+   *
+   * @param array $duplicates
+   *   Array of duplicate pairs found using the rule, with the weight.
+   *   ['entity_id_1' => 5, 'entity_id_2' => 6, 'weight' => 7] where 5 & 6 are contact IDs and 7 is the weight of the match.
+   * @param int[] $ruleGroupIDs
+   *   Array of rule group IDs.
+   * @param string|null $tableName
+   *   Name of a table holding ids to restrict the query to. If there is no ID restriction
+   *   The table will be NULL.
+   * @param bool $checkPermissions
+   * @todo the existing implementation looks for situations where ONE of the contacts
+   *   is consistent with the where clause criteria. Potentially we might
+   *   implement a mode where both/all contacts must be consistent with the clause criteria.
+   *   There is a use case for both scenarios - although core code currently only implements
+   *   one.
+   *
+   * @return mixed
+   */
+  public static function findExistingDuplicates(array &$duplicates, array $ruleGroupIDs, ?string $tableName, bool $checkPermissions) {
+    $null = NULL;
+    return self::singleton()
+      ->invoke(['duplicates', 'ruleGroupIDs', 'tableName', 'checkPermissions'], $duplicates, $ruleGroupIDs, $tableName, $checkPermissions, $null, $null, 'civicrm_findExistingDuplicates');
+  }
+
+  /**
    * This hook is called AFTER EACH email has been processed by the script bin/EmailProcessor.php
    *
    * @param string $type
@@ -1675,13 +1699,15 @@ abstract class CRM_Utils_Hook {
    * @param array &$result the result returned by the api call
    * @param string $action
    *   (optional ) the requested action to be performed if the types was 'mailing'.
+   * @param int|null $mailSettingId
+   *   The MailSetting ID the email relates to
    *
    * @return mixed
    */
-  public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL) {
+  public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL, ?int $mailSettingId = NULL) {
     $null = NULL;
     return self::singleton()
-      ->invoke(['type', 'params', 'mail', 'result', 'action'], $type, $params, $mail, $result, $action, $null, 'civicrm_emailProcessor');
+      ->invoke(['type', 'params', 'mail', 'result', 'action', 'mailSettingId'], $type, $params, $mail, $result, $action, $mailSettingId, 'civicrm_emailProcessor');
   }
 
   /**
@@ -1691,10 +1717,9 @@ abstract class CRM_Utils_Hook {
    * @deprecated
    *
    * @param string $object
-   *   Object being imported (for now Contact only, later Contribution, Activity,.
-   *                               Participant and Member)
+   *   Object being imported (Contact only)
    * @param string $usage
-   *   Hook usage/location (for now process only, later mapping and others).
+   *   Hook usage/location (for now process only).
    * @param string $objectRef
    *   Import record object.
    * @param array $params
@@ -2194,7 +2219,7 @@ abstract class CRM_Utils_Hook {
    *   TRUE, if $op is 'check' and upgrades are pending.
    *   FALSE, if $op is 'check' and upgrades are not pending.
    */
-  public static function upgrade($op, CRM_Queue_Queue $queue = NULL) {
+  public static function upgrade($op, ?CRM_Queue_Queue $queue = NULL) {
     $null = NULL;
     return self::singleton()->invoke(['op', 'queue'], $op, $queue,
       $null, $null, $null, $null,
@@ -2338,7 +2363,7 @@ abstract class CRM_Utils_Hook {
    *     - description: string (ex: "Register for events online")
    *     - is_synthetic: bool (TRUE for synthetic permissions with a bespoke evaluation. FALSE for concrete permissions that registered+granted in the UF user-management layer.
    *        Default TRUE iff name begins with '@')
-   *     - is_active: bool (TRUE if this permission is defined by. Default: TRUE)
+   *     - is_active: bool (FALSE for permissions belonging to disabled components, TRUE otherwise)
    *
    * @return null
    *   The return value is ignored
@@ -2426,18 +2451,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called for declaring managed entities via API.
+   * This hook is called for declaring entities.
    *
    * Note: This is a pre-boot hook. It will dispatch via the extension/module
    * subsystem but *not* the Symfony EventDispatcher.
    *
    * @param array[] $entityTypes
-   *   List of entity types; each entity-type is an array with keys:
-   *   - name: string, a unique short name (e.g. "ReportInstance")
-   *   - class: string, a PHP DAO class (e.g. "CRM_Report_DAO_Instance")
-   *   - table: string, a SQL table name (e.g. "civicrm_report_instance")
-   *   - fields_callback: array, list of callables which manipulates field list
-   *   - links_callback: array, list of callables which manipulates fk list
+   *   List of entity definitions; each item is keyed by entity name.
+   *   Each entity-type is an array with values:
+   *   - `name`: string, a unique short name (e.g. "ReportInstance")
+   *   - `module`: string, full_name of extension declaring the entity (e.g. "search_kit")
+   *   - `class`: string|null, a PHP DAO class (e.g. "CRM_Report_DAO_Instance")
+   *   - `table`: string|null, a SQL table name (e.g. "civicrm_report_instance")
+   *
+   * Other possible values in the entity definition array are documented here:
+   * @see https://docs.civicrm.org/dev/en/latest/framework/entities/
    *
    * @return null
    *   The return value is ignored

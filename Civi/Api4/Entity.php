@@ -66,6 +66,10 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'Name of sql table, if applicable',
     ],
     [
+      'name' => 'database_name',
+      'description' => 'Name of sql database, if different from CiviCRM',
+    ],
+    [
       'name' => 'primary_key',
       'data_type' => 'Array',
       'description' => 'Name of unique identifier field(s) (e.g. [id])',
@@ -87,6 +91,10 @@ class Entity extends Generic\AbstractEntity {
     [
       'name' => 'order_by',
       'description' => 'Default column to sort results',
+    ],
+    [
+      'name' => 'parent_field',
+      'description' => 'Field linking a hierarchical entity to its parent',
     ],
     [
       'name' => 'searchable',

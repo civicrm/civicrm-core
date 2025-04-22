@@ -47,7 +47,7 @@ function smarty_block_crmButton($params, $text, &$smarty, &$repeat) {
       $icon = $params['icon'] ?? 'fa-pencil';
       // Assume for now that all icons are Font Awesome v4.x but handle if it's
       // specified
-      if (strpos($icon, 'fa-') !== 0) {
+      if (!str_starts_with($icon, 'fa-')) {
         $icon = "fa-$icon";
       }
       $iconMarkup = "<i class='crm-i $icon' aria-hidden=\"true\"></i> ";

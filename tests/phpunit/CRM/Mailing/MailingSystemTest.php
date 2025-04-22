@@ -83,7 +83,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
 
     $params = $this->_params;
     /** @noinspection HttpUrlsUsage */
-    $params['body_html'] = '<a href="http://{action.forward}">Forward this email written in ckeditor</a>';
+    $params['body_html'] = '<a href="http://{action.unsubscribeUrl}">Unsubscribe written in ckeditor</a>';
     $params['api.Mailing.preview'] = [
       'id' => '$value.id',
       'contact_id' => $contactID,
@@ -92,8 +92,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
 
     $result = $this->callAPISuccess('mailing', 'create', $params);
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertMatchesRegularExpression('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
-    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!>Unsubscribe written in ckeditor</a>!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/unsubscribe&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
@@ -154,7 +154,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * Test the auto-respond email, including token presence.
    */
   public function testMailingReplyAutoRespond(): void {
     // Because our parent class marks the _groupID as private, we can't use that :-(

@@ -14,7 +14,7 @@
       <th>{ts}Amount{/ts}</th>
       <th>{ts}Type{/ts}</th>
       <th>{ts}Payment Method{/ts}</th>
-      <th>{ts}Contribution Date{/ts}</th>
+      <th>{ts}Date{/ts}</th>
       <th>{ts}Transaction ID{/ts}</th>
       <th>{ts}Status{/ts}</th>
       <th></th>

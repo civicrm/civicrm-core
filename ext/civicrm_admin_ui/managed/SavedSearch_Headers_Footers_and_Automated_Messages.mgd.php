@@ -172,6 +172,7 @@ return [
           'classes' => [
             'table-striped',
             'table',
+            'crm-sticky-header',
           ],
           'toolbar' => [
             [

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Security\PharLoader;
+
 /**
  *
  * Given an argument list, invoke the appropriate CRM function
@@ -58,32 +60,18 @@ class CRM_Core_Invoke {
     if (($args[1] ?? NULL) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
+    // Guard against CSRF for ajax snippets
+    $ajaxModes = [CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON];
+    if (in_array($_REQUEST['snippet'] ?? NULL, $ajaxModes)) {
+      CRM_Core_Page_AJAX::validateAjaxRequestMethod();
+    }
 
-    if (!defined('CIVICRM_SYMFONY_PATH')) {
-      // Traditional Civi invocation path
-      // may exit
-      self::hackMenuRebuild($args);
-      self::init($args);
-      Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
-      $item = self::getItem($args);
-      return self::runItem($item);
-    }
-    else {
-      // Symfony-based invocation path
-      require_once CIVICRM_SYMFONY_PATH . '/app/bootstrap.php.cache';
-      require_once CIVICRM_SYMFONY_PATH . '/app/AppKernel.php';
-      $kernel = new AppKernel('dev', TRUE);
-      $kernel->loadClassCache();
-      $response = $kernel->handle(Symfony\Component\HttpFoundation\Request::createFromGlobals());
-      if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
-        // let the CMS handle the trappings
-        return $response->getContent();
-      }
-      else {
-        $response->send();
-        exit();
-      }
-    }
+    self::hackMenuRebuild($args);
+    self::init($args);
+    Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
+    $item = self::getItem($args);
+    return self::runItem($item);
+    // NOTE: runItem() may return HTML, or it may call print+exit.
   }
 
   /**
@@ -153,48 +141,6 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * Register an alternative phar:// stream wrapper to filter out insecure Phars
-   *
-   * PHP makes it possible to trigger Object Injection vulnerabilities by using
-   * a side-effect of the phar:// stream wrapper that unserializes Phar
-   * metadata. To mitigate this vulnerability, projects such as TYPO3 and Drupal
-   * have implemented an alternative Phar stream wrapper that disallows
-   * inclusion of phar files based on certain parameters.
-   *
-   * This code attempts to register the TYPO3 Phar stream wrapper using the
-   * interceptor defined in \Civi\Core\Security\PharExtensionInterceptor. In an
-   * environment where the stream wrapper was already registered via
-   * \TYPO3\PharStreamWrapper\Manager (i.e. Drupal), this code does not do
-   * anything. In other environments (e.g. WordPress, at the time of this
-   * writing), the TYPO3 library is used to register the interceptor to mitigate
-   * the vulnerability.
-   */
-  private static function registerPharHandler() {
-    try {
-      // try to get the existing stream wrapper, registered e.g. by Drupal
-      \TYPO3\PharStreamWrapper\Manager::instance();
-    }
-    catch (\LogicException $e) {
-      if ($e->getCode() === 1535189872) {
-        // no phar stream wrapper was registered by \TYPO3\PharStreamWrapper\Manager.
-        // This means we're probably not on Drupal and need to register our own.
-        \TYPO3\PharStreamWrapper\Manager::initialize(
-          (new \TYPO3\PharStreamWrapper\Behavior())
-            ->withAssertion(new \Civi\Core\Security\PharExtensionInterceptor())
-        );
-        if (in_array('phar', stream_get_wrappers())) {
-          stream_wrapper_unregister('phar');
-          stream_wrapper_register('phar', \TYPO3\PharStreamWrapper\PharStreamWrapper::class);
-        }
-      }
-      else {
-        // this is not an exception we can handle
-        throw $e;
-      }
-    }
-  }
-
-  /**
    * Given a menu item, call the appropriate controller and return the response
    *
    * @param array $item
@@ -207,7 +153,10 @@ class CRM_Core_Invoke {
     $ids = new CRM_Core_IDS();
     $ids->check($item);
 
-    self::registerPharHandler();
+    if (!PharLoader::isWrapperInstantiated()) {
+      // Up to now, we're not guaranteed to have the wrapper. But we prefer to have it.
+      PharLoader::register();
+    }
 
     $config = CRM_Core_Config::singleton();
 
@@ -276,11 +225,7 @@ class CRM_Core_Invoke {
 
       if (isset($item['return_url'])) {
         $session = CRM_Core_Session::singleton();
-        $args = CRM_Utils_Array::value(
-          'return_url_args',
-          $item,
-          'reset=1'
-        );
+        $args = $item['return_url_args'] ?? 'reset=1';
         $session->pushUserContext(CRM_Utils_System::url($item['return_url'], $args));
       }
 
@@ -291,7 +236,7 @@ class CRM_Core_Invoke {
       if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
         $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']));
       }
-      elseif (strpos($item['page_callback'], '_Form') !== FALSE) {
+      elseif (str_contains($item['page_callback'], '_Form')) {
         $wrapper = new CRM_Utils_Wrapper();
         $result = $wrapper->run(
           $item['page_callback'] ?? NULL,
@@ -371,6 +316,8 @@ class CRM_Core_Invoke {
   /**
    * Show status in the footer (admin only)
    *
+   * If in Maintenance Mode, display a message to user
+   *
    * @param CRM_Core_Smarty $template
    */
   public static function statusCheck($template) {
@@ -381,6 +328,14 @@ class CRM_Core_Invoke {
     $status = Civi::cache('checks')->get('systemStatusCheckResult');
     $template->assign('footer_status_severity', $status);
     $template->assign('footer_status_message', CRM_Utils_Check::toStatusLabel($status));
+
+    // show user a warning if CiviCRM is in explicit maintenance mode
+    // NOTE: if maintenance mode is inherited from the CMS, we expect the CMS
+    // to issue its own warning
+    $coreMaintenanceMode = \Civi::settings()->get('core_maintenance_mode');
+    if ($coreMaintenanceMode && ($coreMaintenanceMode !== 'inherit')) {
+      \CRM_Core_Session::setStatus(ts('CiviCRM is currently in maintenance mode. To deactivate, update the <code>core_maintenance_mode</code> setting.'), ts('Maintenance Mode'), 'warning');
+    }
   }
 
   /**
@@ -388,47 +343,32 @@ class CRM_Core_Invoke {
    * @param bool $sessionReset
    *
    * @throws Exception
+   * @deprecated
+   *   Deprecated Feb 2025 in favor of Civi::rebuild().
+   *   Reassess after Jun 2026.
+   *   For an extension bridging before+after, suggest guard like:
+   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild(...)->execute()
+   *     else CRM_Core_Invoke::rebuildMenuAndCaches();
+   *   Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
   public static function rebuildMenuAndCaches(bool $triggerRebuild = FALSE, bool $sessionReset = FALSE): void {
-    $config = CRM_Core_Config::singleton();
-    $config->clearModuleList();
+    Civi::rebuild([
+      'ext' => TRUE,
+      'files' => TRUE,
+      'tables' => TRUE,
+      'sessions' => $sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+      'metadata' => TRUE,
+      'system' => TRUE,
+      'userjob' => TRUE,
+      'menu' => TRUE,
+      'perms' => TRUE,
+      'strings' => TRUE,
+      'settings' => TRUE,
+      'cases' => TRUE,
+      'triggers' => $triggerRebuild || CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+      'entities' => TRUE,
+    ])->execute();
 
-    // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
-    CRM_Extension_System::singleton()->getClassLoader()->refresh();
-    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
-
-    // also cleanup all caches
-    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
-
-    CRM_Core_Menu::store();
-
-    // also reset navigation
-    CRM_Core_BAO_Navigation::resetNavigation();
-
-    // also cleanup module permissions
-    $config->cleanupPermissions();
-
-    // rebuild word replacement cache - pass false to prevent operations redundant with this fn
-    CRM_Core_BAO_WordReplacement::rebuild(FALSE);
-
-    Civi::service('settings_manager')->flush();
-    // Clear js caches
-    CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
-    CRM_Case_XMLRepository::singleton(TRUE);
-
-    // also rebuild triggers if requested explicitly
-    if (
-      $triggerRebuild ||
-      CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET')
-    ) {
-      Civi::service('sql_triggers')->rebuild();
-      // Rebuild Drupal 8/9/10 route cache only if "triggerRebuild" is set to TRUE as it's
-      // computationally very expensive and only needs to be done when routes change on the Civi-side.
-      // For example - when uninstalling an extension. We already set "triggerRebuild" to true for these operations.
-      $config->userSystem->invalidateRouteCache();
-    }
-
-    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 
 }

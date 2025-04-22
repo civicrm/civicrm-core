@@ -81,7 +81,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   /**
    * @inheritDoc
    */
-  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
+  public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     return static::getEntityInfo()['icon'] ?? NULL;
   }
 
@@ -113,7 +113,11 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   }
 
   private static function getSchemaFields(): array {
-    return (Civi::$statics[static::class]['fields'] ??= static::loadSchemaFields());
+    if (!isset(Civi::$statics[static::class]['fields'])) {
+      Civi::$statics[static::class]['fields'] = static::loadSchemaFields();
+      CRM_Core_DAO_AllCoreTables::invoke(static::class, 'fields_callback', Civi::$statics[static::class]['fields']);
+    }
+    return Civi::$statics[static::class]['fields'];
   }
 
   private static function loadSchemaFields(): array {
@@ -132,7 +136,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
         $field['required'] = TRUE;
       }
       if (str_starts_with($fieldSpec['sql_type'], 'decimal(')) {
-        $precision = self::getFieldLength($fieldSpec['sql_type']);
+        $precision = CRM_Core_BAO_SchemaHandler::getFieldLength($fieldSpec['sql_type']);
         $field['precision'] = array_map('intval', explode(',', $precision));
       }
       foreach (['maxlength', 'size', 'rows', 'cols'] as $attr) {
@@ -141,9 +145,14 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
           unset($fieldSpec['input_attrs'][$attr]);
         }
       }
-      if (!isset($field['size']) && str_contains($fieldSpec['sql_type'], 'char')) {
-        $length = self::getFieldLength($fieldSpec['sql_type']);
-        $field['size'] = constant(CRM_Utils_Schema::getDefaultSize($length));
+      if (str_contains($fieldSpec['sql_type'], 'char(')) {
+        $length = CRM_Core_BAO_SchemaHandler::getFieldLength($fieldSpec['sql_type']);
+        if (!isset($field['size'])) {
+          $field['size'] = constant(CRM_Utils_Schema::getDefaultSize($length));
+        }
+        if (!isset($field['maxlength'])) {
+          $field['maxlength'] = $length;
+        }
       }
       $usage = $fieldSpec['usage'] ?? [];
       $field['usage'] = [
@@ -220,16 +229,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
       $field['add'] = $fieldSpec['add'] ?? NULL;
       $fields[$fieldName] = $field;
     }
-    CRM_Core_DAO_AllCoreTables::invoke(static::class, 'fields_callback', $fields);
     return $fields;
-  }
-
-  private static function getFieldLength($sqlType): ?string {
-    $open = strpos($sqlType, '(');
-    if ($open) {
-      return substr($sqlType, $open + 1, -1);
-    }
-    return NULL;
   }
 
   /**

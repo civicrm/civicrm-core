@@ -60,6 +60,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'pager' => [
             'show_count' => TRUE,
@@ -148,9 +149,9 @@ return [
                   'icon' => 'fa-list-ol',
                   'text' => E::ts('Multiple Choice Options'),
                   'style' => 'default',
-                  'path' => 'civicrm/admin/custom/group/field/option?reset=1&action=browse&gid=[custom_group_id]&fid=[id]',
+                  'path' => 'civicrm/admin/custom/group/field/options#?option_group_id=[option_group_id]',
                   'condition' => [
-                    'option_group_id:label',
+                    'option_group_id:name',
                     'IS NOT EMPTY',
                   ],
                 ],

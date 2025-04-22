@@ -174,7 +174,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclGroup', [$this, 'hook_civicrm_aclGroup']);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit groups'];
     // Create dummy group and assign 2 contacts
-    $name = 'Test static group ' . substr(sha1(rand()), 0, 7);
+    $name = 'Test static group ' . bin2hex(random_bytes(4));
     $groupID = $this->groupCreate([
       'name' => $name,
       'title' => $name,

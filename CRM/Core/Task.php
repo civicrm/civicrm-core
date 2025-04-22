@@ -224,7 +224,7 @@ abstract class CRM_Core_Task {
       if ((!empty($value['url']) || $task == self::TASK_EXPORT)
           && ((is_array($value['class']) && in_array($className, $value['class']))
           || ($value['class'] == $className))) {
-        return [$task, CRM_Utils_Array::value('title', $value)];
+        return [$task, $value['title'] ?? NULL];
       }
     }
     return [];

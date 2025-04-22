@@ -19,23 +19,21 @@ class CRM_Core_OptionGroup {
   public static $_cache = [];
 
   /**
-   * $_domainIDGroups array maintains the list of option groups for whom
-   * domainID is to be considered.
+   * Deprecated flag for domain-specific optionValues. The `is_domain` column is no longer used.
+   * Any set of options that needs domain specificity should be stored in its own table.
    *
-   * FIXME: Hardcoded list = bad. It would be better to make this a column in the civicrm_option_group table
    * @var array
+   * @deprecated
    */
-  public static $_domainIDGroups = [
-    'from_email_address',
-    'grant_type',
-  ];
+  public static $_domainIDGroups = [];
 
   /**
+   * @deprecated - going forward the optionValue table will not support domain-specific options
    * @param $groupName
    * @return bool
    */
   public static function isDomainOptionGroup($groupName) {
-    return in_array($groupName, self::$_domainIDGroups, TRUE);
+    return FALSE;
   }
 
   /**
@@ -116,8 +114,10 @@ class CRM_Core_OptionGroup {
     $orderBy = 'weight'
   ) {
 
-    if (self::isDomainOptionGroup($name)) {
-      $cacheKey = self::createCacheKey($name, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy, CRM_Core_Config::domainID());
+    // Legacy shim for option group that's been moved to its own table
+    if ($name === 'from_email_address') {
+      $options = self::getLegacyFromEmailAddressValues((bool) $onlyActive, $condition, $labelColumnName, $keyColumnName);
+      return $options;
     }
     else {
       $cacheKey = self::createCacheKey($name, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
@@ -151,9 +151,6 @@ WHERE  v.option_group_id = g.id
         $componentClause .= " OR v.component_id IN (SELECT id FROM civicrm_component WHERE name IN ($enabledComponents)) ";
       }
       $query .= " AND ($componentClause) ";
-    }
-    if (self::isDomainOptionGroup($name)) {
-      $query .= ' AND v.domain_id = ' . CRM_Core_Config::domainID();
     }
 
     if ($condition) {
@@ -346,22 +343,8 @@ WHERE  v.option_group_id = g.id
     if (empty($groupName)) {
       return NULL;
     }
-    $query = "
-SELECT v.value
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-  AND  g.name            = %1
-  AND  v.is_active       = 1
-  AND  g.is_active       = 1
-  AND  v.is_default      = 1
-";
-    if (self::isDomainOptionGroup($groupName)) {
-      $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();
-    }
-
-    $p = [1 => [$groupName, 'String']];
-    return CRM_Core_DAO::singleValueQuery($query, $p);
+    $options = self::values($groupName, FALSE, FALSE, FALSE, ' AND is_default = 1', 'value');
+    return CRM_Utils_Array::first($options);
   }
 
   /**
@@ -609,6 +592,37 @@ WHERE  v.option_group_id = g.id
     self::$_values = [];
     self::$_cache = [];
     CRM_Utils_Cache::singleton()->flush();
+  }
+
+  /**
+   * Uses api adapter to fetch `from_email_address` options as if it were still an option group
+   *
+   * @see SiteEmailLegacyOptionValueAdapter
+   * @throws CRM_Core_Exception
+   */
+  private static function getLegacyFromEmailAddressValues(bool $onlyActive, $condition, string $labelColumnName, string $keyColumnName): array {
+    $where = [
+      ['option_group_id:name', '=', 'from_email_address'],
+      ['domain_id', '=', 'current_domain'],
+    ];
+    if ($onlyActive) {
+      $where[] = ['is_active', '=', TRUE];
+    }
+    if ($condition && is_string($condition)) {
+      // Use regex to extract the field_name and the value from the condition.
+      if (preg_match("/`?(\w+)`?\s*=\s*(\d+)$/", $condition, $matches)) {
+        $where[] = [$matches[1], '=', $matches[2]];
+      }
+      else {
+        throw new CRM_Core_Exception("Invalid condition: $condition");
+      }
+    }
+    // This api call will get converted by SiteEmailLegacyOptionValueAdapter
+    // Because of the telltale `'option_group_id:name', '=', 'from_email_address'`
+    return civicrm_api4('OptionValue', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => $where,
+    ])->column($labelColumnName, $keyColumnName);
   }
 
 }

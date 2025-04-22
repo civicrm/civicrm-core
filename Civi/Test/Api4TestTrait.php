@@ -4,6 +4,7 @@ namespace Civi\Test;
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\UFMatch;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -48,6 +49,25 @@ trait Api4TestTrait {
   }
 
   /**
+   * @param string $entityName
+   * @param array|string|int $idOrFilters
+   *   Either the entity id or filters like ['name' => 'foo']
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getTestRecord(string $entityName, $idOrFilters): array {
+    if (!is_array($idOrFilters)) {
+      $idField = CoreUtil::getIdFieldName($entityName);
+      $idOrFilters = [$idField => $idOrFilters];
+    }
+    $where = [];
+    foreach ($idOrFilters as $key => $value) {
+      $where[] = [$key, '=', $value];
+    }
+    return civicrm_api4($entityName, 'get', ['where' => $where])->single();
+  }
+
+  /**
    * Saves one or more test records, supplying default values.
    *
    * Test records will be deleted when the `deleteTestRecords` function is
@@ -83,9 +103,23 @@ trait Api4TestTrait {
     }
     $saved = civicrm_api4($entityName, 'save', $saveParams);
     foreach ($saved as $item) {
-      $this->testRecords[] = [$entityName, [[$idField, '=', $item[$idField]]]];
+      $this->registerTestRecord($entityName, [[$idField, '=', $item[$idField]]]);
     }
     return $saved;
+  }
+
+  /**
+   * Register a record to be automatically cleaned up during tearDown
+   * @param string $entityName
+   * @param string|int|array $where
+   *   Where clause (or for short, just the ID)
+   */
+  public function registerTestRecord(string $entityName, $where): void {
+    if (!is_array($where)) {
+      $idField = CoreUtil::getIdFieldName($entityName);
+      $where = [[$idField, '=', $where]];
+    }
+    $this->testRecords[] = [$entityName, $where];
   }
 
   /**
@@ -130,7 +164,7 @@ trait Api4TestTrait {
     $extraValues = [];
     foreach ($requiredFields as $fieldName => $field) {
       if (
-        !isset($values[$fieldName]) &&
+        self::isMissingValue($values, $fieldName) &&
         ($field['required'] || AbstractAction::evaluateCondition($field['required_if'], ['values' => $values + $extraValues]))
       ) {
         $extraValues[$fieldName] = $this->getRequiredValue($field);
@@ -215,6 +249,19 @@ trait Api4TestTrait {
 
     $values += $extraValues;
     return $values;
+  }
+
+  private static function isMissingValue(array $values, string $fieldName): bool {
+    // Check if field value is set
+    if (isset($values[$fieldName])) {
+      return FALSE;
+    }
+    // Also check unique-field joins like :name or .name
+    if (isset($values["$fieldName:name"]) || isset($values["$fieldName.name"])) {
+      return FALSE;
+    }
+    // A few other unique-field joins are possible, but not important for unit tests
+    return TRUE;
   }
 
   /**
@@ -321,6 +368,17 @@ trait Api4TestTrait {
     }
   }
 
+  protected function conditionallyDeleteTestRecords(): void {
+    $implements = class_implements($this);
+    // If not created in a transaction, test records must be deleted
+    $needsCleanup = !in_array('Civi\Test\TransactionalInterface', $implements, TRUE) ||
+      // Creating custom groups or custom fields breaks transactions & requires cleanup
+      array_intersect(['CustomField', 'CustomGroup'], array_column($this->testRecords, 0));
+    if ($needsCleanup) {
+      $this->deleteTestRecords();
+    }
+  }
+
   /**
    * Get an ID for the appropriate entity.
    *
@@ -379,6 +437,40 @@ trait Api4TestTrait {
     }
 
     return NULL;
+  }
+
+  /**
+   * Emulate a logged in user since certain functions use that.
+   * value to store a record in the DB (like activity)
+   *
+   * @see https://issues.civicrm.org/jira/browse/CRM-8180
+   *
+   * @return int
+   *   Contact ID of the created user.
+   * @throws \CRM_Core_Exception
+   */
+  public function createLoggedInUser(): int {
+    $contactID = $this->createTestRecord('Individual', [
+      'first_name' => 'Logged In',
+      'last_name' => 'User ' . mt_rand(),
+    ])['id'];
+    UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
+    $this->createTestRecord('UFMatch', [
+      'contact_id' => $contactID,
+      'uf_name' => 'superman',
+      'uf_id' => 6,
+    ]);
+
+    $session = \CRM_Core_Session::singleton();
+    $session->set('userID', $contactID);
+    return $contactID;
+  }
+
+  public function userLogout() {
+    \CRM_Core_Session::singleton()->reset();
+    UFMatch::delete(FALSE)
+      ->addWhere('uf_name', '=', 'superman')
+      ->execute();
   }
 
 }

@@ -7,6 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{* Deprecation notice - this file is slated for remove and has not been used from
+  core for some years - replaced by datepicker. eg at the php layer ....
+  $this->add('datepicker', 'start_date', ts('Campaign Start Date'), [], FALSE, ['time' => FALSE]);
+*}
 {if $batchUpdate}
     {assign var='elementId'   value=$form.field.$elementIndex.$elementName.id}
     {assign var="tElement" value=$elementName|cat:"_time"}
@@ -48,7 +52,7 @@
 {/if}
 
 
- <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+ <a href="#" class="crm-hover-button crm-clear-link" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
 
 <script type="text/javascript">
     {literal}

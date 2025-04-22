@@ -217,7 +217,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   public static function checkProfileComplete($fields, &$errors): ?int {
     $email = '';
     foreach ($fields as $fieldname => $fieldvalue) {
-      if (strpos($fieldname, 'email') === 0 && $fieldvalue) {
+      if (str_starts_with($fieldname, 'email') && $fieldvalue) {
         $email = $fieldvalue;
       }
     }
@@ -363,8 +363,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $toEmail = $contactDetails['email'] ?? NULL;
     if ($toEmail) {
       //take a receipt from as event else domain.
-      $receiptFrom = CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE);
-      $receiptFrom = reset($receiptFrom);
+      $receiptFrom = CRM_Core_BAO_Domain::getFromEmail();
       if (!empty($eventDetails['confirm_from_name']) && !empty($eventDetails['confirm_from_email'])) {
         $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
       }

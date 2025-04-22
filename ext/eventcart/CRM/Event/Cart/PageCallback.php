@@ -28,14 +28,21 @@ class CRM_Event_Cart_PageCallback {
 
     $event->page->assign('registerText', $registerText);
     $event->page->assign('registerURL', $url);
-    $event->page->assign('eventCartEnabled', TRUE);
+
+    // For the "View Cart" and "Checkout" buttons
+    $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
+    $cart->load_associations();
+    $events = $cart->get_main_events_in_carts();
+    $event->page->assign('eventcart_has_events', !empty($events));
+
+    CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')
+      ->add(['template' => 'CRM/Event/Cart/eventinfo.tpl']);
   }
 
   public static function alterEventList($event) {
-    if ((bool) Civi::settings()->get('enable_cart')) {
-      CRM_Core_Region::instance('crm-event-list-pre')
-        ->add(['template' => 'CRM/Event/Cart/eventlistpre.tpl']);
-    }
+    CRM_Core_Region::instance('crm-event-list-pre')
+      ->add(['template' => 'CRM/Event/Cart/eventlistpre.tpl']);
+
   }
 
 }

@@ -47,7 +47,6 @@ return [
       'add' => '1.1',
       'input_attrs' => [
         'label' => ts('Reference Type'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'option_group_name' => 'note_used_for',
@@ -105,6 +104,7 @@ return [
       'input_type' => 'Select Date',
       'description' => ts('Date attached to the note'),
       'add' => '5.36',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP',
       'input_attrs' => [
         'format_type' => 'activityDateTime',
@@ -130,6 +130,7 @@ return [
       'readonly' => TRUE,
       'description' => ts('When was this note last modified/edited'),
       'add' => '1.1',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'input_attrs' => [
         'label' => ts('Modified Date'),
@@ -144,7 +145,6 @@ return [
       'add' => '1.5',
       'input_attrs' => [
         'size' => '60',
-        'maxlength' => 255,
       ],
     ],
     'privacy' => [
@@ -155,9 +155,6 @@ return [
       'description' => ts('Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)'),
       'add' => '3.3',
       'default' => '0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'note_privacy',
       ],

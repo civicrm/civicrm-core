@@ -85,29 +85,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkPhpMysqli() {
-    $messages = [];
-
-    if (!extension_loaded('mysqli')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Future versions of CiviCRM may require the PHP extension "%2". To ensure that your system will be compatible, please install it in advance. For more explanation, see <a href="%1">the announcement</a>.',
-          [
-            1 => 'https://civicrm.org/blog/totten/psa-please-verify-php-extension-mysqli',
-            2 => 'mysqli',
-          ]),
-          ts('Forward Compatibility: Enable "mysqli"'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-server'
-      );
-    }
-
-    return $messages;
-  }
-
-  /**
    * Check that the MySQL time settings match the PHP time settings.
    *
    * @return CRM_Utils_Check_Message[]
@@ -173,7 +150,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
-      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG)
+      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG && !defined('CIVICRM_MAIL_LOG_AND_SEND'))
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK)
     ) {
@@ -206,12 +183,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
     $domainName    = $domain->name;
-    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/from_email_address", "&reset=1");
+    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/site_email_address");
     $fixDomainName = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1");
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       if (!$domainName || $domainName == 'Default Domain Name') {
-        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default FROM Email Address </a> (for system-generated emails).",
+        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default Site Email Address </a> (for system-generated emails).",
           [
             1 => $fixDomainName,
             2 => $fixEmailUrl,
@@ -219,7 +196,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         );
       }
       else {
-        $msg = ts('Please enter a <a href="%1">default FROM Email Address</a> (for system-generated emails).',
+        $msg = ts('Please enter a <a href="%1">default Site Email Address</a> (for system-generated emails).',
           [1 => $fixEmailUrl]);
       }
     }
@@ -594,8 +571,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $e->getMessage(),
-        ts('Extension download error'),
-        \Psr\Log\LogLevel::ERROR,
+        ts('Unable to get updates to extensions'),
+        \Psr\Log\LogLevel::WARNING,
         'fa-plug'
       );
       return $messages;
@@ -773,7 +750,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       ->addWhere('key', 'LIKE', 'civi_%')
       ->addWhere('status', '=', 'installed')
       ->execute()
-      ->indexBy('key')->column('status');
+      ->column('status', 'key');
     if (empty($setting) || empty($exts)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
@@ -807,7 +784,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'job_id' => $job['id'],
         'options' => ['sort' => "id desc", 'limit' => 1],
       ])['values'][0]['description'] ?? NULL;
-      if (!empty($lastExecutionMessage) && strpos($lastExecutionMessage, 'Failure') !== FALSE) {
+      if (!empty($lastExecutionMessage) && str_contains($lastExecutionMessage, 'Failure')) {
         $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
         $html .= '<tr>
           <td>' . $job['name'] . ' </td>
@@ -1068,7 +1045,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     // Ensure that the MySQL driver supports utf8mb4 encoding.
     $version = mysqli_get_client_info();
-    if (strpos($version, 'mysqlnd') !== FALSE) {
+    if (str_contains($version, 'mysqlnd')) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {

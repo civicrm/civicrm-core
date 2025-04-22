@@ -14,13 +14,16 @@
     <url desc="Support">http://civicrm.org</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-05-02</releaseDate>
-  <version>5.75.alpha1</version>
-  <develStage>alpha</develStage>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>stable</develStage>
+  <tags>
+    <tag>mgmt:required</tag>
+  </tags>
   <compatibility>
-    <ver>5.75</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
-  <comments>This extension contains import functionality which was previously in CiviCRM Core. If you use the import functionality it is recommended to enable this extension.</comments>
+  <comments>CiviCRM import functionality</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
     <ext>org.civicrm.search_kit</ext>
@@ -31,7 +34,7 @@
   </classloader>
   <civix>
     <namespace>CRM/Civiimport</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
     <angularModule>crmCiviimport</angularModule>
   </civix>
   <mixins>
@@ -39,6 +42,6 @@
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>ang-php@1.0.0</mixin>
-    <mixin>smarty@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
   </mixins>
 </extension>

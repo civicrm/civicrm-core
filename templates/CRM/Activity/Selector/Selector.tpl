@@ -24,7 +24,7 @@
           </td>
           {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" hideRelativeLabel=false}
           <td class="crm-contact-form-block-activity_status_filter_id crm-inline-edit-field">
-            <label>{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
+            <label for="status_id">{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
           </td>
         </tr>
       </table>

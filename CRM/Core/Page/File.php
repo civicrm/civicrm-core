@@ -20,6 +20,8 @@ class CRM_Core_Page_File extends CRM_Core_Page {
    * Run page.
    */
   public function run() {
+    CRM_Utils_Hook::pageRun($this);
+
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
     $disposition = $download == 0 ? 'inline' : 'download';
@@ -31,17 +33,17 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     // File ID
     $fileId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
     $fileName = CRM_Utils_Request::retrieve('filename', 'String', $this, FALSE);
-    if (empty($fileName) && (empty($entityId) || empty($fileId))) {
-      CRM_Core_Error::statusBounce("Cannot access file: Must pass either \"Filename\" or the combination of \"Entity ID\" + \"File ID\"");
+    if (empty($fileName) && empty($fileId)) {
+      CRM_Core_Error::statusBounce('Cannot access file: Must pass either "Filename" or the combination of "File ID" + "Hash"');
     }
 
     if (empty($fileName)) {
-      $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
-      if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId)) {
+      $hash = CRM_Utils_Request::retrieve('fcs', 'String', $this);
+      if (!CRM_Core_BAO_File::validateFileHash($hash, NULL, $fileId)) {
         CRM_Core_Error::statusBounce(ts('URL for file is not valid'));
       }
 
-      [$path, $mimeType] = CRM_Core_BAO_File::path($fileId, $entityId);
+      [$path, $mimeType] = CRM_Core_BAO_File::path($fileId);
     }
     else {
       if (!CRM_Utils_File::isValidFileName($fileName)) {
@@ -74,8 +76,9 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       CRM_Core_Error::statusBounce(ts('The file is either empty or you do not have permission to retrieve the file'));
     }
 
+    // FIXME: Yikes! Deleting records via GET request??
     if ($action & CRM_Core_Action::DELETE) {
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
+      if ($entityId && $fileId && CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
         CRM_Core_BAO_File::deleteFileReferences($fileId, $entityId, $fieldId);
         CRM_Core_Session::setStatus(ts('The attached file has been deleted.'), ts('Complete'), 'success');
 

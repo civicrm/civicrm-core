@@ -38,6 +38,9 @@
  * @property string $modified_date
  * @property int|string|null $scheduled_id
  * @property string $scheduled_date
+ * @property string $start_date
+ * @property string $end_date
+ * @property string status
  * @property int|string|null $approver_id
  * @property string $approval_date
  * @property int|string|null $approval_status_id

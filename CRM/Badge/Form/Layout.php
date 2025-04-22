@@ -148,7 +148,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     }
 
     // its ok if there is no element called is_active
-    $defaults['is_active'] = ($this->_id) ? CRM_Utils_Array::value('is_active', $defaults) : 1;
+    $defaults['is_active'] = ($this->_id) ? ($defaults['is_active'] ?? NULL) : 1;
 
     return $defaults;
   }

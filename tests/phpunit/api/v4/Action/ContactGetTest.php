@@ -318,6 +318,13 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayHasKey($meg['id'], (array) $result);
     $this->assertArrayHasKey($jess['id'], (array) $result);
     $this->assertArrayHasKey($amy['id'], (array) $result);
+
+    // Check that punctuation in REGEXP isn't munged away.
+    $findByIDs = '^(' . $jane['id'] . '|' . $meg['id'] . '|' . $jess['id'] . '|' . $amy['id'] . ')$';
+    $result = Contact::get(FALSE)
+      ->addWhere('id', 'REGEXP', $findByIDs)
+      ->execute();
+    $this->assertCount(4, $result);
   }
 
   public function testGetRelatedWithSubType(): void {
@@ -426,7 +433,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $result = Individual::get(FALSE)
       ->addWhere('first_name', '=', 'Hi 😁')
       ->addHaving('first_name', '=', 'last_name', TRUE)
-      ->execute()->indexBy('id')->column('first_name');
+      ->execute()->column('first_name', 'id');
     $this->assertEquals('Hi 😁', $result[$same['id']]);
     $this->assertArrayNotHasKey($diff['id'], $result);
   }

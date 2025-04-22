@@ -114,16 +114,17 @@ class CRM_Queue_Runner {
    *   - onEndUrl: string, the URL to which one redirects.
    *   - pathPrefix: string, prepended to URLs for the web-runner;
    *     default: 'civicrm/queue'.
+   *   - buttons
    */
   public function __construct($runnerSpec) {
-    $this->title = CRM_Utils_Array::value('title', $runnerSpec, ts('Queue Runner'));
+    $this->title = $runnerSpec['title'] ?? ts('Queue Runner');
     $this->queue = $runnerSpec['queue'];
-    $this->errorMode = CRM_Utils_Array::value('errorMode', $runnerSpec, $this->pickErrorMode($this->queue));
+    $this->errorMode = $runnerSpec['errorMode'] ?? $this->pickErrorMode($this->queue);
     $this->isMinimal = $runnerSpec['isMinimal'] ?? FALSE;
     $this->onEnd = $runnerSpec['onEnd'] ?? NULL;
     $this->onEndUrl = $runnerSpec['onEndUrl'] ?? NULL;
-    $this->pathPrefix = CRM_Utils_Array::value('pathPrefix', $runnerSpec, 'civicrm/queue');
-    $this->buttons = CRM_Utils_Array::value('buttons', $runnerSpec, ['retry' => TRUE, 'skip' => TRUE]);
+    $this->pathPrefix = $runnerSpec['pathPrefix'] ?? 'civicrm/queue';
+    $this->buttons = $runnerSpec['buttons'] ?? ['retry' => TRUE, 'skip' => TRUE];
     // perhaps this value should be randomized?
     $this->qrid = $this->queue->getName();
   }
@@ -147,7 +148,7 @@ class CRM_Queue_Runner {
   }
 
   /**
-   * [EXPERIMENTAL] Run all tasks interactively. Redirect to a screen which presents the progress.
+   * Run all tasks interactively. Redirect to a screen which presents the progress.
    *
    * The exact mechanism and pageflow may be determined by the system configuration --
    * environments which support multiprocessing (background queue-workers) can use those;

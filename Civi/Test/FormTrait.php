@@ -148,6 +148,10 @@ trait FormTrait {
     }
   }
 
+  protected function assertTemplateVariable($name, $expected): void {
+    $this->assertEquals($expected, $this->form->getTemplateVariable($name));
+  }
+
   /**
    * Retrieve a deprecated property, ensuring a deprecation notice is thrown.
    *

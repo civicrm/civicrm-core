@@ -153,4 +153,8 @@ interface MappingInterface extends SpecProviderInterface {
    */
   public function sendToAdditional($entityId): bool;
 
+  public function getBccRecipients(\CRM_Core_DAO_ActionSchedule $schedule): ?array;
+
+  public function getAlternateRecipients(\CRM_Core_DAO_ActionSchedule $schedule): ?array;
+
 }

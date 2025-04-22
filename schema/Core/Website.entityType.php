@@ -48,7 +48,7 @@ return [
     ],
     'url' => [
       'title' => ts('Website'),
-      'sql_type' => 'varchar(255)',
+      'sql_type' => 'varchar(2048)',
       'input_type' => 'Text',
       'description' => ts('Website'),
       'add' => '3.2',
@@ -59,7 +59,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '45',
-        'maxlength' => 255,
       ],
     ],
     'website_type_id' => [

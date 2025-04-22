@@ -62,9 +62,6 @@ return [
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Security hash'),
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'time_stamp' => [
       'title' => ts('Mailing Subscribe Timestamp'),

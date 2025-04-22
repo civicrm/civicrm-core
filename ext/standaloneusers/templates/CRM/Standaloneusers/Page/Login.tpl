@@ -1,71 +1,60 @@
+{crmScope extensionKey="standaloneusers"}
 <div class="standalone-auth-form">
   <div class="standalone-auth-box">
-    <form>
-      <img class="crm-logo" src="{$logoUrl}" alt="logo for CiviCRM, with an intersecting blue and green triangle">
-      {if $justLoggedOut}<div class="help message info">{ts}You have been logged out.{/ts}</div>{/if}
-      {if $anonAccessDenied}<div class="help message warning">{ts}You do not have permission to access that, you may
-        need to login.{/ts}</div>{/if}
+    <form id=login-form>
+      {include file='CRM/common/logo.tpl'}
       <div class="input-wrapper">
-        <label for="usernameInput" name=username class="form-label">Username</label>
-        <input type="text" class="form-control" id="usernameInput">
+        <label for="usernameInput" name=username class="form-label">{ts}Username{/ts}</label>
+        <input type="text" class="form-control crm-form-text" id="usernameInput" >
       </div>
       <div class="input-wrapper">
-        <label for="passwordInput" class="form-label">Password</label>
-        <input type="password" class="form-control" id="passwordInput">
+        <label for="passwordInput" class="form-label">{ts}Password{/ts}</label>
+        <input type="password" class="form-control crm-form-text" id="passwordInput">
       </div>
-      <div id="error" style="display:none;" class="form-alert">Your username and password do not match</div>
       <div class="login-or-forgot">
-        <a href="{$forgottenPasswordURL}">Forgotten password?</a>
-        <button id="loginSubmit" type="submit" class="btn btn-secondary crm-button">Submit</button>
+        <a href="{$forgottenPasswordURL}">{ts}Forgotten password?{/ts}</a>
+        <button id="loginSubmit" type="submit" class="btn btn-primary crm-button">{ts}Log In{/ts}</button>
       </div>
     </form>
   </div>
 </div>
 
+{* The notification template is not loaded when the user is logged out. And we need this for CRM.alert *}
+{include file="CRM/common/notifications.tpl"}
+
 {literal}
 <script>
   document.addEventListener('DOMContentLoaded', () => {
 
-    const submitBtn = document.getElementById('loginSubmit'),
+    const form = document.getElementById('login-form'),
       username = document.getElementById('usernameInput'),
       password = document.getElementById('passwordInput');
 
-    submitBtn.addEventListener('click', async e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
 
-      const response = await fetch(CRM.url("civicrm/authx/login"), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        //body: '_authx=Basic ' + btoa(encodeURIComponent(`${username.value}:${password.value}`))
-        body: '_authx=Basic ' + encodeURIComponent(btoa(`${username.value}:${password.value}`))
-      });
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-        let msg = 'Unexpected error';
-        if (!contentType || !contentType.includes("application/json")) {
-          // Non-JSON response; an error.
-          msg = await response.text();
-          // Example error string: 'HTTP 401 Invalid credential'
-          msg = msg.replace(/^HTTP \d{3} /, '');
+      let errorMsg = '{/literal}{ts escape="js"}Unexpected error{/ts}{literal}';
+      try {
+        let originalUrl = location.href;
+        // Remove the current status popup messages.
+        CRM.$('#crm-notification-container .ui-notify-message').remove();
+        const response = await CRM.api4('User', 'login', {
+          username: username.value,
+          password: password.value,
+          originalUrl
+        });
+        if (response.url) {
+          window.location = response.url;
+          return;
         }
-        else {
-          let responseObj = await response.json();
-          console.log("responseObj with error", responseObj);
-        }
-        alert(`Sorry, that didn‘t work. ${msg}`);
+        errorMsg = response.publicError || "{/literal}{ts escape="js"}Unexpected error{/ts}{literal}";
       }
-      else {
-        // OK response (it includes contact_id and user_id in JSON, but we don't need those)
-
-        // reload the page
-        // if we were trying to access a specific url, we will be taken to it
-        // if we reload the /civicrm/login we will be redirected to the home page
-        // (or an alternative url if we make that configurable)
-        location.reload();
+      catch (e) {
+        console.error('caught', e);
       }
+      CRM.alert('', errorMsg, 'error', {'expires': 10000});
     });
   });
 </script>
 {/literal}
+{/crmScope}

@@ -40,7 +40,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public function tearDown(): void {
     Civi::settings()->set('logging', 0);
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
+    $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group', 'civicrm_campaign'], TRUE);
     (new CRM_Logging_Schema())->dropAllLogTables();
     CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
@@ -137,7 +137,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
     $found = FALSE;
     foreach ($result['metadata']['sql'] as $sql) {
-      if (strpos($sql, " =  'Organization' ") !== FALSE) {
+      if (str_contains($sql, " =  'Organization' ")) {
         $found = TRUE;
       }
     }
@@ -255,7 +255,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $reportID
    */
   public function testReportTemplateGetRowsAllReports(string $reportID): void {
-    if (strpos($reportID, 'logging') === 0) {
+    if (str_starts_with($reportID, 'logging')) {
       Civi::settings()->set('logging', 1);
     }
 
@@ -301,7 +301,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param $reportID
    */
   public function testReportTemplateGetRowsAllReportsACL($reportID): void {
-    if (strpos($reportID, 'logging') === 0) {
+    if (str_starts_with($reportID, 'logging')) {
       Civi::settings()->set('logging', 1);
     }
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookNoResults']);
@@ -322,7 +322,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if (in_array($reportID, ['contribute/softcredit', 'contribute/bookkeeping'])) {
       $this->markTestIncomplete($reportID . ' has non e-notices when calling statistics fn');
     }
-    if (strpos($reportID, 'logging') === 0) {
+    if (str_starts_with($reportID, 'logging')) {
       Civi::settings()->set('logging', 1);
     }
     if ($reportID === 'contribute/summary') {
@@ -1037,14 +1037,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       [
         'contact_id' => $this->ids['Contact']['first'],
         'receive_date' => '2016-10-01',
-        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+3 month')),
+        'revenue_recognition_date' => (new DateTime('+3 month'))->format('Y-m-t'),
         'financial_type_id' => 2,
       ]
     );
     $this->contributionCreate(
       [
         'contact_id' => $this->ids['Contact']['first'],
-        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+22 month')),
+        'revenue_recognition_date' => (new DateTime('+22 month'))->format('Y-m-t'),
         'financial_type_id' => 4,
         'trxn_id' => NULL,
         'invoice_id' => NULL,
@@ -1053,7 +1053,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->contributionCreate(
       [
         'contact_id' => $this->ids['Contact']['second'],
-        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+1 month')),
+        'revenue_recognition_date' => (new DateTime('+1 month'))->format('Y-m-t'),
         'financial_type_id' => 4,
         'trxn_id' => NULL,
         'invoice_id' => NULL,
@@ -1063,7 +1063,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       [
         'contact_id' => $this->ids['Contact']['second'],
         'receive_date' => '2016-03-01',
-        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+4 month')),
+        'revenue_recognition_date' => (new DateTime('+4 month'))->format('Y-m-t'),
         'financial_type_id' => 2,
         'trxn_id' => NULL,
         'invoice_id' => NULL,

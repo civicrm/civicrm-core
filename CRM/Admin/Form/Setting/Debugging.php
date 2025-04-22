@@ -28,31 +28,21 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
    * @deprecated - do not add new settings here - the page to display
    * settings on should be defined in the setting metadata.
    */
-  protected $_settings = [
-    // @todo remove these, define any not yet defined in the setting metadata.
-    'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-    'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-    'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-    'assetCache' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-    'esm_loader' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-    'environment' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-  ];
+  protected $_settings = [];
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->setTitle(ts(' Settings - Debugging and Error Handling '));
-    if (CRM_Core_Config::singleton()->userSystem->supports_UF_Logging == '1') {
-      $this->_settings['userFrameworkLogging'] = CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME;
-    }
+    $this->setTitle(ts('Settings - Debugging and Error Handling'));
 
     parent::buildQuickForm();
-    if (Civi::settings()->getMandatory('environment') !== NULL) {
-      $element = $this->getElement('environment');
-      $element->freeze();
-      CRM_Core_Session::setStatus(ts('The environment settings have been disabled because it has been overridden in the settings file.'), ts('Environment settings'), 'info');
+
+    $settingMetaData = $this->getSettingsMetaData();
+    if (!CRM_Core_Config::singleton()->userSystem->supportsUfLogging()) {
+      unset($settingMetaData['userFrameworkLogging']);
     }
+    $this->assign('settings_fields', $settingMetaData);
   }
 
 }

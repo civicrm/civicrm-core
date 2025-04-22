@@ -103,7 +103,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
 
-    $showBestResult = CRM_Utils_Request::retrieve('sbr', 'Positive', CRM_Core_DAO::$_nullArray);
+    $showBestResult = CRM_Utils_Request::retrieve('sbr', 'Positive');
     if ($showBestResult) {
       $this->assign('showBestResult', $showBestResult);
     }
@@ -207,7 +207,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         $defaults['field_type'],
         ($defaults['field_type'] == "Formatting" ? "" : $defaults['field_name']),
         ($defaults['field_name'] == "url") ? $defaults['website_type_id'] : $defaults['location_type_id'],
-        CRM_Utils_Array::value('phone_type_id', $defaults),
+        $defaults['phone_type_id'] ?? NULL,
       ];
       $this->_gid = $defaults['uf_group_id'];
     }
@@ -266,9 +266,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     $this->assign('noSearchable', $noSearchable);
 
-    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $this->_location_types = CRM_Core_DAO_Address::buildOptions('location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    $this->_website_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $this->_website_types = CRM_Core_DAO_Website::buildOptions('website_type_id');
 
     /**
      * FIXME: dirty hack to make the default option show up first.  This
@@ -323,7 +323,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
     $sel3[''] = NULL;
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
     ksort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {
@@ -512,7 +512,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     // If field_name is missing, it's formatting
-    $fieldName = CRM_Utils_Array::value(1, $params['field_name'], 'formatting');
+    $fieldName = $params['field_name'][1] ?? 'formatting';
 
     //check for duplicate fields
     $apiFormattedParams = $params;
@@ -548,7 +548,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         CRM_Core_BAO_UFField::resetInSelectorANDSearchable($this->_gid);
       }
 
-      $this->setMessageIfCountryNotAboveState($fieldName, CRM_Utils_Array::value('location_type_id', $apiFormattedParams), $apiFormattedParams['weight'], $apiFormattedParams['uf_group_id']);
+      $this->setMessageIfCountryNotAboveState($fieldName, $apiFormattedParams['location_type_id'] ?? NULL, $apiFormattedParams['weight'], $apiFormattedParams['uf_group_id']);
 
     }
     $buttonName = $this->controller->getButtonName();
@@ -804,7 +804,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $fieldType = $fields['field_name'][0];
 
     //get the group type.
-    $groupType = CRM_Core_BAO_UFGroup::calculateGroupType($self->_gid, FALSE, CRM_Utils_Array::value('field_id', $fields));
+    $groupType = CRM_Core_BAO_UFGroup::calculateGroupType($self->_gid, FALSE, $fields['field_id'] ?? NULL);
 
     switch ($fieldType) {
       case 'Contact':

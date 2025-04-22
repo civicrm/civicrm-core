@@ -9,6 +9,16 @@ use Civi\Core\Service\AutoService;
  */
 class Router extends AutoService {
 
+  /**
+   * @param array $params
+   *    Some mix of:
+   *    - route: string, eg "civicrm/event/info"
+   *    - printPage: function(string), Print an exact web page response
+   *    - drupalKernel: The HTTP kernel handling the iframe request in D8/9/10/11
+   *    - drupalRequest: The HTTP object representing the iframe request in D8/9/10/11
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
   public function invoke(array $params) {
     if (!$this->isAllowedRoute($params['route'])) {
       throw new \CRM_Core_Exception("Route not available for embedding.");
@@ -17,7 +27,7 @@ class Router extends AutoService {
     $config = \CRM_Core_Config::singleton();
     $_GET[$config->userFrameworkURLVar] = $params['route'];
 
-    $handler = $this->getHandler();
+    $handler = [$this, 'invoke' . ucfirst($this->getLayout())];
     $handler($params);
   }
 
@@ -46,12 +56,16 @@ class Router extends AutoService {
     return FALSE;
   }
 
-  protected function getHandler(): callable {
+  /**
+   * @return string
+   *   'basic' or 'raw' or 'cms'
+   */
+  public function getLayout(): string {
     $setting = \Civi::settings()->get('iframe_layout');
     if ($setting === 'auto') {
       $setting = 'basic';
     }
-    return [$this, 'invoke' . ucfirst($setting)];
+    return $setting;
   }
 
   protected function invokeRaw(array $params): void {
@@ -64,7 +78,9 @@ class Router extends AutoService {
     if (empty($pageContent) && !empty($printedContent)) {
       $pageContent = $printedContent;
     }
-    echo $pageContent;
+
+    $printPage = $params['printPage'] ?? 'print';
+    $printPage($pageContent);
   }
 
   /**
@@ -90,12 +106,15 @@ class Router extends AutoService {
     $htmlHeader = \CRM_Core_Region::instance('html-header')->render('');
     $locale = \CRM_Core_I18n::getLocale();
 
-    echo \CRM_Core_Smarty::singleton()->fetchWith('iframe-basic-page.tpl', [
+    $fullPage = \CRM_Core_Smarty::singleton()->fetchWith('iframe-basic-page.tpl', [
       'lang' => substr($locale, 0, 2),
       'dir' => \CRM_Core_I18n::isLanguageRTL($locale) ? 'rtl' : 'ltr',
       'head' => $htmlHeader,
       'body' => $pageContent,
     ]);
+
+    $printPage = $params['printPage'] ?? 'print';
+    $printPage($fullPage);
   }
 
   protected function invokeCms(array $params):void {
@@ -117,6 +136,11 @@ class Router extends AutoService {
         $response->send();
         $kernel->terminate($request, $response);
         break;
+
+      case 'WordPress':
+        // N.B. There are sufficient events in WP API to enforce IFRAME invariants.
+        // @see \CiviCRM_For_WordPress::activate_iframe()
+        throw new \LogicException("In Civi-WP, IFRAMEs with CMS page-chrome should use standard invoker.");
 
       default:
         throw new \CRM_Core_Exception("Unimplemented: invokeCms(" . CIVICRM_UF . ")");

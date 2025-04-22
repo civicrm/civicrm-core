@@ -77,11 +77,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('How the (un)subscription was triggered'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getSubscriptionHistoryMethods',
+        'callback' => ['CRM_Core_SelectValues', 'getSubscriptionHistoryMethods'],
       ],
     ],
     'status' => [
@@ -90,11 +87,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('The state of the contact within the group'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::groupContactStatus',
+        'callback' => ['CRM_Core_SelectValues', 'groupContactStatus'],
       ],
     ],
     'tracking' => [
@@ -103,9 +97,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('IP address or other tracking info'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
   ],
 ];

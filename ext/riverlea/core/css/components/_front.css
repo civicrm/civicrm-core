@@ -1,0 +1,241 @@
+/* Front-end specific */
+
+/* General */
+
+.crm-container.crm-public {
+  --crm-font: inherit;
+  --crm-font-bold: inherit;
+  --crm-font-italic: inherit;
+  --crm-font-bold-italic: inherit;
+}
+.crm-container.crm-public #crm-main-content-wrapper {
+  margin-inline: auto;
+  width: clamp(calc(var(--crm-f-form-width) / 2),100%,var(--crm-f-form-width));
+}
+.crm-container.crm-public fieldset:not(.collapsed,
+.crm-inactive-dashlet-fieldset,
+.af-container-style-pane),
+.crm-container.crm-public .crm-event-info-form-block,
+.crm-container.crm-public #crm-profile-block,
+.crm-container.crm-public .crm-container.crm-public .af-container:not(.af-container-style-pane),
+.crm-container.crm-public .email-5-section {
+  background-color: var(--crm-f-fieldset-bg);
+  margin: var(--crm-f-fieldset-margin);
+  padding: var(--crm-f-fieldset-padding);
+  border: var(--crm-f-fieldset-border);
+  box-shadow: var(--crm-f-fieldset-box-shadow);
+}
+.crm-container.crm-public fieldset legend {
+  padding: var(--crm-f-legend-padding);
+  font-size: var(--crm-f-legend-size);
+  text-align: var(--crm-f-legend-align);
+  float: var(--crm-f-legend-position);
+}
+.crm-container.crm-public fieldset legend + * {
+  clear: both;
+}
+af-form > fieldset > legend {
+  position: relative;
+  top: calc(2 * var(--crm-f-fieldset-padding));
+  margin-bottom: var(--crm-f-fieldset-padding);
+  width: 100%;
+  float: none;
+}
+.crm-container.crm-public .header-dark {
+  background: var(--crm-c-secondary);
+  color: var(--crm-c-text-light);
+  padding: var(--crm-m1) var(--crm-f-fieldset-padding);
+  font-family: var(--crm-font-bold);
+  font-weight: bold;
+  font-size: var(--crm-r1);
+  border-radius: var(--crm-roundness);
+}
+.crm-contribution-confirm-form-block fieldset legend:has(~ .header-dark) {
+  display: none; /* fix for duplication on confirmation screen of legend text with Header Dark text */
+}
+.crm-container.crm-public .crm-section:not(.alert) {
+  padding: 0;
+}
+.crm-container.crm-public fieldset > fieldset,
+.crm-container.crm-public fieldset:has(> fieldset) {
+  padding-top: 0;
+}
+.crm-container.crm-public .af-container:not(.af-container-style-pane) .af-container:not(.af-container-style-pane),
+.crm-container.crm-public fieldset .crm-form-block {
+  box-shadow: none !important; /* vs _page.css */
+}
+.crm-container.crm-public h3 {
+  background: transparent;
+  padding: 0;
+}
+.crm-container.crm-public .form-layout-compressed {
+  display: block;
+}
+.crm-container.crm-public table.form-layout-compressed {
+  display: table;
+}
+.crm-container.crm-public span#msgbox {
+  border-radius: var(--crm-roundness);
+  padding: var(--crm-padding-small);
+}
+.crm-container.crm-public #civicrm-footer::after {
+  display: none;
+}
+/* Input */
+.crm-container.crm-public .crm-section:has( > .label):not(.crm-public-form-item) {
+  margin: 0 calc(-1 * var(--crm-f-form-padding));
+}
+.crm-container.crm-public .crm-section:has( > .label) {
+  display: var(--crm-f-form-layout);
+  grid-template-columns: var(--crm-f-label-width) 1fr 0;
+  padding: var(--crm-f-form-padding);
+}
+.crm-container.crm-public .crm-section:has( > .content input:focus),
+.crm-container.crm-public .crm-section:has( > .content select:focus),
+.crm-container.crm-public .crm-section:has( > .content textarea:focus) {
+  background-color: var(--crm-f-form-focus-bg);
+}
+.crm-container.crm-public .crm-section:has( > .content input.error),
+.crm-container.crm-public .crm-section:has( > .content textarea.error),
+.crm-container.crm-public .crm-section:has( > .content select.error),
+.crm-container.crm-public .crm-section:has( > .content input.crm-inline-error),
+.crm-container.crm-public .crm-section:has( > .content textarea.crm-inline-error),
+.crm-container.crm-public .crm-section:has( > .content select.crm-inline-error) {
+  background-color: var(--crm-f-form-error-bg);
+}
+.crm-container.crm-public input[type="text"],
+.crm-container.crm-public input[type="password"],
+.crm-container.crm-public input[type="email"],
+.crm-container.crm-public input,
+.crm-container.crm-public select,
+.crm-container.crm-public textarea,
+.crm-container.crm-public .select2-container .select2-choice {
+  border-radius: var(--crm-f-input-radius);
+  padding: var(--crm-f-input-padding);
+  font-size: var(--crm-f-input-font-size);
+  min-width: var(--crm-f-input-width);
+}
+.crm-container.crm-public select.crm-form-select {
+  min-width: auto;
+  padding-block: 0;
+}
+.crm-container.crm-public .content:has(> select) { /* to handle select-list with inline label */
+  display: flex;
+  align-items: center;
+  gap: var(--crm-flex-gap);
+}
+.crm-container.crm-public .select2-search input[type="text"] {
+  min-width: unset;
+}
+.crm-container.crm-public input[type="radio"] {
+  margin: var(--crm-s2) var(--crm-s3) 0 0;
+  min-width: auto;
+}
+.crm-container.crm-public input[type="checkbox"] {
+  margin: var(--crm-s2) var(--crm-s3) 0 0;
+  min-width: auto;
+}
+.crm-container.crm-public .crm-checkbox-list input[type="checkbox"] {
+  margin: inherit; /* resets margin in checkbox list grids */
+}
+.crm-container.crm-public .big {
+  width: var(--crm-f-input-width);
+}
+.crm-container.crm-public .select2-search input,
+.crm-container.crm-public .select2-results select,
+.crm-container.crm-public .select2-results input {
+  padding: var(--crm-s) var(--crm-r1) var(--crm-s);
+}
+.crm-container.crm-public .select2-dropdown-open .select2-choice,
+.crm-container.crm-public .select2-dropdown-open .select2-choices {
+  border-radius: var(--crm-f-input-radius) var(--crm-f-input-radius) 0 0;
+}
+.crm-container.crm-public .crm-submit-buttons {
+  padding-inline: 0;
+}
+/* Afform */
+.crm-container.crm-public af-field {
+  padding-block: var(--crm-f-form-padding);
+  display: block;
+}
+.crm-container.crm-public .af-container.af-layout-inline,
+.crm-container.crm-public .af-container.af-layout-cols {
+  padding: var(--crm-f-form-padding);
+}
+/* Contribution pages */
+.crm-container.crm-public .other_amount-section {
+  padding-top: 0;
+}
+.crm-container.crm-public table#membership-listings {
+  border: 0;
+}
+.crm-container.crm-public .amount_display-group .display-block,
+.crm-container.crm-public .event_fees-group > .crm-section {
+  padding: var(--crm-f-form-padding);
+}
+.crm-container.crm-public #attachments table.form-layout-compressed {
+  margin-block: var(--crm-m) 0;
+}
+.crm-container.crm-public #attachments table.form-layout-compressed tr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--crm-s);
+}
+.crm-container.crm-public #attachments table.form-layout-compressed td {
+  width: 100%;
+  padding: 0;
+  text-align: var(--crm-f-label-align);
+}
+.crm-container.crm-public .crm-profile-view-title {
+  padding-inline: var(--crm-f-form-padding);
+  font-size: var(--crm-r1);
+}
+/* Empowered by logo */
+
+.crm-public-footer {
+  display: flex;
+  align-items: center;
+  justify-content: var(--crm-f-logo-align);
+  gap: var(--crm-s);
+  width: var(--crm-f-form-width);
+  margin: 0 auto;
+}
+.crm-container a.empowered-by-link {
+  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 229.76 59.78'%3E%3Cdefs%3E%3Cstyle%3E .cls-1 %7B fill: %23086287; %7D .cls-2 %7B fill: %2381c459; %7D %3C/style%3E%3C/defs%3E%3Cg%3E%3Cpath class='cls-1' d='m191.47,59.78h0c-3.77-.07-5.2-4.43-5.35-4.92l-12.85-42.11c-.76-2.47-.58-4.46.51-5.92.71-.94,2.12-2.04,4.83-1.99.99.02,1.77.19,1.85.21l42.78,9.97c2.75.64,4.44,1.94,5.02,3.85.93,3.04-1.65,5.92-1.95,6.24l-29.94,32.12c-1.59,1.72-3.25,2.58-4.9,2.55Zm-13.07-50.53c-.77,0-1.02.19-1.06.26-.22.31-.26.44.19,1.93l12.85,42.11c.29.9.76,1.74,1.18,1.77h0s.52,0,1.57-1.13l29.94-32.12c.55-.61,1.06-1.6.95-1.9-.08-.22-.43-.5-1.77-.81l-42.78-9.97h0s-.56-.13-1.07-.14Z'/%3E%3Cpath class='cls-2' d='m186.66,56.35c-1.38.51-2.83.61-3.96.24h0c-3.57-1.17-3.68-5.74-3.68-6.26V9.33l4.21.94.02,40.15c0,.94.25,1.84.83,1.94h0s.3.09,1.15-.3l1.43,4.29Zm2.57-6.52l34.62-20.03c.7-.42,1.53-1.04,1.46-1.54,0-.07-.17-.52-.92-1.05l2.9-3.3c1.64,1.25,2.47,2.71,2.47,4.35,0,3.17-3.3,5.17-3.68,5.39l-35.51,20.4-1.34-4.22Zm31.12-24.89l-34.02-19.79s-.85-.54-1.34-.7c-.73-.24-1.08,0-1.15.05-.2.14-.27.24-.35,1.24l-4.38-.82c.24-1.82.95-3.17,2.12-4.03.95-.69,2.62-1.33,5.19-.5.94.31,1.63.7,1.71.74l35.39,20.42-3.17,3.39Z'/%3E%3C/g%3E%3Cpath class='cls-1' d='m158.23,22.34c-.48-.28-.86-.67-1.15-1.15-.28-.48-.42-1-.42-1.57s.14-1.09.42-1.57.66-.86,1.15-1.15,1-.42,1.57-.42,1.09.14,1.57.42.86.66,1.15,1.15.42,1,.42,1.57-.14,1.09-.42,1.57-.66.86-1.15,1.15-1,.42-1.57.42-1.09-.14-1.57-.42Zm2.91-.4c.41-.24.74-.57.98-.98.24-.41.36-.86.36-1.35s-.12-.93-.36-1.34-.57-.73-.98-.98c-.41-.24-.86-.36-1.35-.36s-.93.12-1.34.36-.73.57-.98.98c-.24.41-.36.85-.36,1.34s.12.94.36,1.35c.24.41.57.74.98.98s.85.36,1.34.36c.49.01.94-.12,1.35-.36Zm-2.56-.62c-.06-.05-.08-.12-.08-.21v-2.83c0-.11.04-.21.11-.28s.17-.12.28-.12h1.05c.46,0,.8.1,1.03.29s.34.45.34.76c0,.21-.06.39-.18.53s-.28.25-.46.32c.16.06.3.18.42.35.12.18.18.42.18.74v.24c0,.08-.03.15-.09.21s-.13.09-.21.09-.15-.03-.21-.09c-.06-.06-.09-.13-.09-.21v-.16c0-.25-.04-.46-.11-.63s-.25-.26-.53-.26h-.95v1.06c0,.08-.03.15-.09.21s-.13.08-.21.08c-.08,0-.15-.03-.2-.09Zm1.33-1.78c.25,0,.45-.05.6-.15.15-.1.22-.25.22-.44,0-.18-.06-.32-.19-.42s-.34-.14-.65-.14h-.81v1.15h.83Z'/%3E%3Cg%3E%3Cpath class='cls-1' d='m6.93,44.07c-2.15-1.18-3.85-2.87-5.08-5.08s-1.85-4.79-1.85-7.74.62-5.53,1.85-7.74,2.93-3.9,5.08-5.08,4.58-1.77,7.29-1.77c1.84,0,3.49.22,4.94.65,1.45.43,2.89,1.06,4.33,1.87.6.32.89.84.89,1.54,0,.41-.15.77-.45,1.08-.3.31-.69.47-1.18.47-.27,0-.51-.05-.73-.16-1.19-.62-2.36-1.1-3.49-1.42-1.14-.32-2.45-.49-3.94-.49-2.33,0-4.31.48-5.95,1.44s-2.87,2.28-3.7,3.94c-.83,1.67-1.24,3.55-1.24,5.67s.41,4,1.24,5.67,2.06,2.98,3.7,3.94c1.64.96,3.62,1.44,5.95,1.44,1.49,0,2.8-.16,3.94-.49,1.14-.32,2.3-.8,3.49-1.42.22-.11.46-.16.73-.16.49,0,.88.15,1.18.45.3.3.45.66.45,1.1,0,.7-.3,1.22-.89,1.54-1.44.81-2.88,1.44-4.33,1.87s-3.09.65-4.94.65c-2.71,0-5.14-.59-7.29-1.77Z'/%3E%3Cpath class='cls-1' d='m28.68,19.87c-.41-.41-.61-.89-.61-1.46v-.16c0-.57.2-1.06.61-1.46.41-.41.89-.61,1.46-.61h.24c.57,0,1.06.2,1.46.61s.61.89.61,1.46v.16c0,.57-.2,1.06-.61,1.46-.41.41-.89.61-1.46.61h-.24c-.56,0-1.05-.2-1.46-.61Zm.25,25.23c-.35-.35-.53-.79-.53-1.3v-17.42c0-.51.18-.96.53-1.32.35-.37.79-.55,1.3-.55.54,0,.99.18,1.34.53s.53.8.53,1.34v17.43c0,.51-.18.95-.55,1.3-.37.35-.81.53-1.32.53-.52,0-.95-.18-1.3-.54Z'/%3E%3Cpath class='cls-1' d='m43.71,45.21c-.41-.28-.7-.64-.89-1.08l-7.07-16.9c-.14-.32-.2-.61-.2-.85,0-.51.18-.96.53-1.32.35-.37.79-.55,1.3-.55.35,0,.68.1,1,.3.31.2.53.45.67.75l6.22,15.76,6.22-15.76c.14-.3.36-.55.67-.75s.64-.3,1-.3c.51,0,.95.18,1.3.55.35.37.53.81.53,1.32,0,.24-.07.53-.2.85l-7.07,16.9c-.19.43-.49.79-.89,1.08s-.85.43-1.34.43h-.41c-.51-.01-.96-.15-1.37-.43Z'/%3E%3Cpath class='cls-1' d='m58.71,19.87c-.41-.41-.61-.89-.61-1.46v-.16c0-.57.2-1.06.61-1.46.41-.41.89-.61,1.46-.61h.24c.57,0,1.06.2,1.46.61s.61.89.61,1.46v.16c0,.57-.2,1.06-.61,1.46-.41.41-.89.61-1.46.61h-.24c-.57,0-1.06-.2-1.46-.61Zm.24,25.23c-.35-.35-.53-.79-.53-1.3v-17.42c0-.51.18-.96.53-1.32.35-.37.79-.55,1.3-.55.54,0,.99.18,1.34.53s.53.8.53,1.34v17.43c0,.51-.18.95-.55,1.3-.37.35-.81.53-1.32.53-.51,0-.95-.18-1.3-.54Z'/%3E%3Cpath class='cls-1' d='m72.86,44.07c-2.15-1.18-3.85-2.87-5.08-5.08s-1.85-4.79-1.85-7.74.62-5.53,1.85-7.74c1.23-2.21,2.93-3.9,5.08-5.08s4.58-1.77,7.29-1.77c1.84,0,3.49.22,4.94.65,1.45.43,2.89,1.06,4.33,1.87.6.32.89.84.89,1.54,0,.41-.15.77-.45,1.08-.3.31-.69.47-1.18.47-.27,0-.51-.05-.73-.16-1.19-.62-2.36-1.1-3.49-1.42-1.14-.32-2.45-.49-3.94-.49-2.33,0-4.31.48-5.95,1.44s-2.87,2.28-3.7,3.94c-.83,1.67-1.24,3.55-1.24,5.67s.41,4,1.24,5.67c.83,1.67,2.06,2.98,3.7,3.94s3.62,1.44,5.95,1.44c1.49,0,2.8-.16,3.94-.49,1.14-.32,2.3-.8,3.49-1.42.22-.11.46-.16.73-.16.49,0,.88.15,1.18.45.3.3.45.66.45,1.1,0,.7-.3,1.22-.89,1.54-1.44.81-2.88,1.44-4.33,1.87-1.45.43-3.09.65-4.94.65-2.7,0-5.13-.59-7.29-1.77Z'/%3E%3Cpath class='cls-1' d='m95.11,45.1c-.35-.35-.53-.79-.53-1.3v-24.86c0-.51.18-.96.53-1.32s.79-.55,1.3-.55h9.47c3.68,0,6.45.76,8.29,2.28s2.76,3.51,2.76,5.97c0,1.62-.45,3.11-1.36,4.45s-2.23,2.31-3.96,2.9c1.95.51,3.28,1.73,4,3.64.72,1.91,1.08,3.79,1.08,5.63v1.87c0,.51-.18.95-.53,1.3-.35.35-.79.53-1.3.53-.57,0-1.02-.17-1.36-.51-.34-.34-.51-.78-.51-1.32v-1.22c0-1.35-.12-2.61-.37-3.76s-.83-2.18-1.75-3.09c-.92-.91-2.32-1.36-4.18-1.36h-8.41v9.43c0,.51-.18.95-.55,1.3s-.81.53-1.32.53c-.52,0-.95-.18-1.3-.54Zm10.52-14.21c2.33,0,4.18-.46,5.55-1.38,1.37-.92,2.05-2.22,2.05-3.9s-.59-2.87-1.77-3.74c-1.18-.87-3.19-1.3-6.03-1.3h-7.15v10.32h7.35Z'/%3E%3Cpath class='cls-1' d='m121.92,45.1c-.35-.35-.53-.79-.53-1.3v-24.25c0-.73.26-1.36.77-1.89.51-.53,1.14-.79,1.87-.79h1.34c.54,0,1.04.16,1.48.49.45.33.78.73,1,1.22l9.22,22.99,9.22-22.99c.22-.49.55-.89,1-1.22.45-.32.94-.49,1.48-.49h1.34c.73,0,1.35.26,1.87.79.51.53.77,1.16.77,1.89v24.25c0,.51-.18.95-.53,1.3-.35.35-.79.53-1.3.53s-.96-.18-1.32-.53c-.37-.35-.55-.79-.55-1.3v-23.07l-9.38,23.2c-.22.51-.56.93-1.04,1.24-.47.31-1,.47-1.56.47s-1.09-.16-1.56-.47-.82-.72-1.04-1.24l-9.38-23.2v23.08c0,.51-.18.95-.55,1.3s-.81.53-1.32.53c-.51-.01-.95-.18-1.3-.54Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  display: inline-block;
+  height: var(--crm-f-logo-height);
+  width: calc(var(--crm-f-logo-height) * 3.5);
+}
+.crm-container div.empowered-by-logo span {
+  visibility: hidden;
+}
+.crm-container.crm-public .crm-section .label {
+  font-weight: var(--crm-f-label-weight);
+  margin-block: var(--crm-f-label-margin);
+  margin-right: var(--crm-f-label-gap);
+  color: var(--crm-f-label-color);
+}
+@media (min-width: 480px) {
+  .crm-container.crm-public {
+    --crm-page-padding: var(--crm-f-form-padding);
+  }
+  .crm-container.crm-public .crm-section .label {
+    float: var(--crm-f-label-position);
+    width: var(--crm-f-label-width);
+    text-align: var(--crm-f-label-align);
+  }
+  .crm-container.crm-public .crm-section .content {
+    margin-left: calc(var(--crm-f-label-width) + var(--crm-f-label-gap));
+  }
+}
+@media (max-width: 479px) {
+  .crm-container.crm-public {
+    --crm-f-input-width: 100%;
+    --crm-page-padding: 0;
+    width: 100%;
+  }
+  .crm-container af-field {
+    width: 100%;
+  }
+}

@@ -59,7 +59,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
     $this->assign('linkTextUrl', $linkTextUrl ?? NULL);
     $this->assign('linkText', $linkText);
-    $this->setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
+    $this->setTitle($this->_values['thankyou_title'] ?? NULL);
     // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
     $this->assign('isShare', $this->_values['is_share']);
@@ -211,7 +211,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('trxn_id', $this->_trxnId);
 
     $this->assign('receive_date',
-      CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $this->_params))
+      CRM_Utils_Date::mysqlToIso($this->_params['receive_date'] ?? NULL)
     );
 
     $defaults = [];
@@ -245,45 +245,46 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
 
     $this->_submitValues = array_merge($this->_submitValues, $defaults);
-
     $this->setDefaults($defaults);
 
     $values['entity_id'] = $this->_id;
     $values['entity_table'] = 'civicrm_contribution_page';
 
-    CRM_Friend_BAO_Friend::retrieve($values, $data);
     $tellAFriend = FALSE;
-    if ($this->_pcpId) {
-      if ($this->_pcpBlock['is_tellfriend_enabled']) {
-        $this->assign('friendText', ts('Tell a Friend'));
-        $subUrl = "eid={$this->_pcpId}&blockId={$this->_pcpBlock['id']}&pcomponent=pcp";
+    $friendURL = NULL;
+    $friendText = NULL;
+
+    if (function_exists('tellafriend_civicrm_config')) {
+      CRM_Friend_BAO_Friend::retrieve($values, $data);
+      if ($this->_pcpId) {
+        if ($this->_pcpBlock['is_tellfriend_enabled']) {
+          $friendText = ts('Tell a Friend');
+          $subUrl = "eid={$this->_pcpId}&blockId={$this->_pcpBlock['id']}&pcomponent=pcp";
+          $tellAFriend = TRUE;
+        }
+      }
+      elseif (!empty($data['is_active'])) {
+        $friendText = $data['title'];
+        $subUrl = "eid={$this->_id}&pcomponent=contribute";
         $tellAFriend = TRUE;
       }
-    }
-    elseif (!empty($data['is_active'])) {
-      $friendText = $data['title'];
-      $this->assign('friendText', $friendText);
-      $subUrl = "eid={$this->_id}&pcomponent=contribute";
-      $tellAFriend = TRUE;
-    }
-    else {
-      $this->assign('friendText');
     }
 
     if ($tellAFriend) {
       if ($this->_action & CRM_Core_Action::PREVIEW) {
-        $url = CRM_Utils_System::url('civicrm/friend',
+        $friendURL = CRM_Utils_System::url('civicrm/friend',
           "reset=1&action=preview&{$subUrl}"
         );
       }
       else {
-        $url = CRM_Utils_System::url('civicrm/friend',
+        $friendURL = CRM_Utils_System::url('civicrm/friend',
           "reset=1&{$subUrl}"
         );
       }
-      $this->assign('friendURL', $url);
     }
 
+    $this->assign('friendText', $friendText);
+    $this->assign('friendURL', $friendURL);
     $this->assign('isPendingOutcome', $this->isPendingOutcome($params));
     $this->assign('paymentProcessorName', $this->getPaymentProcessorValue('frontend_title'));
     $this->freeze();

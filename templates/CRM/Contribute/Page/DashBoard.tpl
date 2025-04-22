@@ -14,7 +14,7 @@
 <tr class="columnheader-dark">
     <th scope="col">{ts}Period{/ts}</th>
     <th scope="col">{ts}Total Amount{/ts}</th>
-    <th scope="col" title="{ts}Contribution Count{/ts}"><strong>#</strong></th><th></th></tr>
+    <th scope="col" title="{ts escape='htmlattribute'}Contribution Count{/ts}"><strong>#</strong></th><th></th></tr>
 <tr>
     <td><strong>{ts}Current Month-To-Date{/ts}</strong></td>
     <td class="label">{if NOT $monthToDate.Valid.amount}{ts}(n/a){/ts}{else}{$monthToDate.Valid.amount}{/if}</td>
@@ -44,10 +44,10 @@
 {crmRegion name="contribute-dashboard-summary"}
   <h3>{ts}Contribution Summary{/ts} {help id="id-contribute-intro"}</h3>
       <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
-        <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-           <li id="chart_view"   class="crm-tab-button ui-state-active ui-corner-top ui-corner-bottom ui-tabs-selected" >
+        <ul role="tablist" class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+           <li role="tab" id="chart_view"   class="crm-tab-button ui-state-active ui-corner-top ui-corner-bottom ui-tabs-selected" >
              <a href="#chart_layout"><span>&nbsp;</span>&nbsp;{ts}Chart Layout{/ts}&nbsp;</a> </li>&nbsp;
-           <li id ="table_view"  class="crm-tab-button ui-corner-top ui-corner-bottom ui-state-default" >
+           <li role="tab" id ="table_view"  class="crm-tab-button ui-corner-top ui-corner-bottom ui-state-default" >
              <a href="#table_layout"><span>&nbsp;</span>&nbsp;{ts}Table Layout{/ts}&nbsp;</a>
            </li>
 {if $isAdmin}

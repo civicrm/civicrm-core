@@ -3,11 +3,7 @@ namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
-use Civi\Api4\Group;
-use Civi\Api4\GroupContact;
-use Civi\Api4\SavedSearch;
+use Civi\Api4\OptionValue;
 
 /**
  * Test case for Afform with autocomplete.
@@ -22,7 +18,7 @@ class AfformAutocompleteUsageTest extends AfformUsageTestCase {
   public function testAutocompleteWithSavedSearchFilter(): void {
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="id" defn="{saved_search: 'the_unit_test_search', input_attrs: {}}" />
@@ -38,22 +34,20 @@ EOHTML;
     ]);
 
     // Saved search for filtering
-    SavedSearch::create(FALSE)
-      ->setValues([
-        'name' => 'the_unit_test_search',
-        'label' => 'the_unit_test_search',
-        'api_entity' => 'Contact',
-        'api_params' => [
-          'version' => 4,
-          'select' => ['id', 'display_name'],
-          'orderBy' => [],
-          'where' => [
-            ['contact_type:name', '=', 'Individual'],
-            ['source', '=', 'Yes'],
-          ],
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'the_unit_test_search',
+      'label' => 'the_unit_test_search',
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id', 'display_name'],
+        'orderBy' => [],
+        'where' => [
+          ['contact_type:name', '=', 'Individual'],
+          ['source', '=', 'Yes'],
         ],
-      ])
-      ->execute();
+      ],
+    ]);
 
     $lastName = uniqid(__FUNCTION__);
 
@@ -62,10 +56,10 @@ EOHTML;
       ['source' => 'Yes', 'first_name' => 'A'],
       ['source' => 'No', 'first_name' => 'C'],
     ];
-    $contacts = Contact::save(FALSE)
-      ->setRecords($sampleContacts)
-      ->addDefault('last_name', $lastName)
-      ->execute()->indexBy('first_name')->column('id');
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => $sampleContacts,
+      'defaults' => ['last_name' => $lastName],
+    ])->column('id', 'first_name');
 
     $result = Contact::autocomplete()
       ->setFormName('afform:' . $this->formName)
@@ -127,32 +121,45 @@ EOHTML;
       ['last_name' => $lastName, 'first_name' => 'C'],
     ];
 
-    $contacts = Contact::save(FALSE)
-      ->setRecords($sampleData)
-      ->execute()->indexBy('first_name')->column('id');
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => $sampleData,
+    ])->column('id', 'first_name');
 
+    $group = $this->createTestRecord('Group', [
+      'name' => $lastName,
+      'title' => $lastName,
+    ]);
     // Place contacts A & B in the group, but not contact C
-    $group = Group::create(FALSE)
-      ->addValue('name', $lastName)
-      ->addValue('title', $lastName)
-      ->addChain('A', GroupContact::create()->addValue('group_id', '$id')->addValue('contact_id', $contacts['A']))
-      ->addChain('B', GroupContact::create()->addValue('group_id', '$id')->addValue('contact_id', $contacts['B']))
-      ->execute()->single();
+    $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contacts['A'],
+    ]);
+    $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contacts['B'],
+    ]);
 
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'test_af_fields')
-      ->addValue('extends', 'Contact')
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete', 'filter' => 'action=get&group=' . $group['id']],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Contact',
+      'title' => 'test_af_fields',
+    ]);
+    $this->saveTestRecords('CustomField', [
+      'defaults' => [
+        'custom_group_id.name' => 'test_af_fields',
+      ],
+      'records' => [
+        [
+          'html_type' => 'Autocomplete-Select',
+          'data_type' => 'ContactReference',
+          'label' => 'contact_ref',
+          'filter' => 'action=get&group=' . $group['id'],
+        ],
+      ],
+    ]);
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="first_name" />
@@ -226,24 +233,32 @@ EOHTML;
       ['last_name' => $lastName, 'first_name' => 'C', 'source' => 'in'],
     ];
 
-    $contacts = Contact::save(FALSE)
-      ->setRecords($sampleData)
-      ->execute()->indexBy('first_name')->column('id');
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => $sampleData,
+    ])->column('id', 'first_name');
 
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'test_address_fields')
-      ->addValue('extends', 'Address')
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete', 'filter' => 'action=get&source=in'],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Address',
+      'title' => 'test_address_fields',
+    ]);
+
+    $this->saveTestRecords('CustomField', [
+      'defaults' => [
+        'custom_group_id.name' => 'test_address_fields',
+      ],
+      'records' => [
+        [
+          'html_type' => 'Autocomplete-Select',
+          'data_type' => 'ContactReference',
+          'label' => 'contact_ref',
+          'filter' => 'action=get&source=in',
+        ],
+      ],
+    ]);
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="first_name" />
@@ -310,6 +325,115 @@ EOHTML;
       ->addWhere('address_primary.test_address_fields.contact_ref', '=', $contacts['A'])
       ->selectRowCount()->execute();
     $this->assertCount(1, $check);
+  }
+
+  /**
+   * Tests autocomplete fields used as savedSearch filters
+   *
+   * @return void
+   */
+  public function testAutocompleteWithSearchJoin(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Individual',
+      'name' => 'test_af_autocomplete_search',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_af_autocomplete_search',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'String',
+      'label' => 'select_auto',
+      'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue', 'y' => 'Yellow'],
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'test_activity_search',
+      'api_entity' => 'Activity',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'activity_type_id:label',
+          'Activity_ActivityContact_Contact_01.sort_name',
+          'Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto:label',
+        ],
+        'orderBy' => [],
+        'where' => [],
+        'groupBy' => [],
+        'join' => [
+          [
+            'Contact AS Activity_ActivityContact_Contact_01',
+            'LEFT',
+            'ActivityContact',
+            [
+              'id',
+              '=',
+              'Activity_ActivityContact_Contact_01.activity_id',
+            ],
+            [
+              'Activity_ActivityContact_Contact_01.record_type_id:name',
+              '=',
+              '"Activity Targets"',
+            ],
+          ],
+        ],
+        'having' => [],
+      ],
+    ]);
+
+    $this->createTestRecord('SearchDisplay', [
+      'name' => 'test_activity_search_display',
+      'saved_search_id.name' => 'test_activity_search',
+      'type' => 'table',
+      'settings' => [
+        'description' => NULL,
+        'sort' => [],
+        'limit' => 50,
+        'pager' => [],
+        'placeholder' => 5,
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'activity_type_id:label',
+            'dataType' => 'Integer',
+            'sortable' => TRUE,
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Activity_ActivityContact_Contact_01.sort_name',
+            'dataType' => 'String',
+            'sortable' => TRUE,
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto:label',
+            'dataType' => 'String',
+            'sortable' => TRUE,
+          ],
+        ],
+      ],
+    ]);
+
+    $layout = <<<EOHTML
+<div af-fieldset="">
+  <af-field name="Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto" defn="{input_attrs: {multiple: true}}" />
+  <crm-search-display-table search-name="test_activity_search" display-name="test_activity_search_display"></crm-search-display-table>
+</div>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Autocompleting with the letter "l" will give 2 matches: Blue & Yellow
+    $result = OptionValue::autocomplete()
+      ->setFormName('afform:' . $this->formName)
+      ->setFieldName('test_activity_search_display:Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto')
+      ->setInput('l')
+      ->execute();
+
+    $this->assertCount(2, $result);
+    $this->assertEquals('Blue', $result[0]['label']);
+    $this->assertEquals('Yellow', $result[1]['label']);
   }
 
 }

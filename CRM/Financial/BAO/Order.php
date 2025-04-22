@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+use Civi\Api4\Generic\Result;
 use Civi\Api4\LineItem;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
@@ -79,6 +81,8 @@ class CRM_Financial_BAO_Order {
   protected $overridableFinancialTypeID;
 
   private $isExcludeExpiredFields = FALSE;
+
+  private array $contributionValues;
 
   /**
    * @param bool $isExcludeExpiredFields
@@ -214,6 +218,18 @@ class CRM_Financial_BAO_Order {
    * @var float
    */
   protected $overrideTotalAmount;
+
+  /**
+   * Override for the total amount of the order exclusive of tax.
+   *
+   * We set this when that is what is known by the form, in order to 'prefer'
+   * the raw form when it comes to forwards / backwards calculations.
+   *
+   * When there is a single line item the order total may be overriden.
+   *
+   * @var float|null
+   */
+  protected ?float $overrideTotalAmountTaxExclusive = NULL;
 
   /**
    * Line items in the order.
@@ -355,6 +371,7 @@ class CRM_Financial_BAO_Order {
       'OverrideTotalAmount' => $this->getOverrideTotalAmount(),
       'OverrideFinancialType' => $this->getOverrideFinancialTypeID(),
       'PriceSelection' => $this->getPriceSelection(),
+      'OverrideTotalAmountTaxExclusive' => $this->getOverrideTotalAmountTaxExclusive(),
     ];
   }
 
@@ -373,7 +390,7 @@ class CRM_Financial_BAO_Order {
   /**
    * Form object - if present the buildAmount hook will be called.
    *
-   * @var \CRM_Member_Form_Membership|\CRM_Member_Form_MembershipRenewal
+   * @var \CRM_Member_Form_Membership|\CRM_Member_Form_MembershipRenewal|\CRM_Contribute_Form_Contribution
    */
   protected $form;
 
@@ -425,6 +442,18 @@ class CRM_Financial_BAO_Order {
    */
   public function setOverrideTotalAmount(?float $overrideTotalAmount): void {
     $this->overrideTotalAmount = $overrideTotalAmount;
+  }
+
+  public function setOverrideTotalAmountTaxExclusive(float $overrideTotalAmountTaxExclusive): void {
+    $this->overrideTotalAmountTaxExclusive = $overrideTotalAmountTaxExclusive;
+    if ($this->getOverrideFinancialTypeID()) {
+      $taxRate = $this->getTaxRate($this->getOverrideFinancialTypeID());
+      $this->setOverrideTotalAmount($overrideTotalAmountTaxExclusive + ($overrideTotalAmountTaxExclusive * $taxRate));
+    }
+  }
+
+  public function getOverrideTotalAmountTaxExclusive(): ?float {
+    return $this->overrideTotalAmountTaxExclusive;
   }
 
   /**
@@ -762,7 +791,7 @@ class CRM_Financial_BAO_Order {
    */
   public function setPriceSelectionFromUnfilteredInput(array $input): void {
     foreach ($input as $fieldName => $value) {
-      if (strpos($fieldName, 'price_') === 0) {
+      if (str_starts_with($fieldName, 'price_')) {
         $fieldID = substr($fieldName, 6);
         if (is_numeric($fieldID)) {
           $this->priceSelection[$fieldName] = $value;
@@ -888,6 +917,24 @@ class CRM_Financial_BAO_Order {
       }
       if (empty($line['membership_num_terms'])) {
         $lines[$index]['membership_num_terms'] = 1;
+      }
+    }
+    return $lines;
+  }
+
+  /**
+   * Get line items that specifically relate to participants.
+   *
+   * return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getParticipantLineItems():array {
+    $lines = $this->getLineItems();
+    foreach ($lines as $index => $line) {
+      if ($line['entity_table'] !== 'civicrm_participant') {
+        unset($lines[$index]);
+        continue;
       }
     }
     return $lines;
@@ -1149,10 +1196,24 @@ class CRM_Financial_BAO_Order {
       }
     }
     if (!isset($lineItem['financial_type_id'])) {
-      $lineItem['financial_type_id'] = $this->getDefaultFinancialTypeID();
+      if (!empty($lineItem['price_field_value_id'])
+        && $lineItem['price_field_value_id'] !== $this->getDefaultPriceFieldValueID()) {
+        // We have a price field value ID and this value is not the default one used for
+        // 'generic' line items, so we can load the financial type ID from it.
+        $lineItem['financial_type_id'] = $this->getPriceFieldValueSpec($lineItem['price_field_value_id'])['financial_type_id'];
+      }
+      else {
+        $lineItem['financial_type_id'] = $this->getDefaultFinancialTypeID();
+      }
     }
-    if (!is_numeric($lineItem['financial_type_id'])) {
-      $lineItem['financial_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $lineItem['financial_type_id']);
+    if (!isset($lineItem['membership_type_id']) && !empty($lineItem['price_field_value_id'])) {
+      $lineItem['membership_type_id'] = $this->getPriceFieldValueSpec($lineItem['price_field_value_id'])['membership_type_id'];
+    }
+    if (!isset($lineItem['membership_num_terms']) && !empty($lineItem['price_field_value_id'])) {
+      $lineItem['membership_num_terms'] = $this->getPriceFieldValueSpec($lineItem['price_field_value_id'])['membership_num_terms'];
+    }
+    if (!empty($lineItem['membership_type_id']) && !isset($lineItem['membership_num_terms'])) {
+      $lineItem['membership_num_terms'] = 1;
     }
     if ($this->getOverrideTotalAmount()) {
       $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
@@ -1291,11 +1352,21 @@ class CRM_Financial_BAO_Order {
     $lineItem['tax_rate'] = $taxRate = $this->getTaxRate($financialTypeID);
     if ($taxRate) {
       // Total is tax inclusive.
-      $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
-      $lineItem['line_total'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
+      $taxExclusiveAmount = $this->getOverrideTotalAmountTaxExclusive();
+      if ($taxExclusiveAmount) {
+        $lineItem['line_total'] = $taxExclusiveAmount;
+        $lineItem['tax_amount'] = ($taxRate / 100) * $taxExclusiveAmount;
+        // Set to 1 for consistency with historical behaviour on the only form that calls this section.
+        // There may be a case to set unit_price to 1 & qty to x
+        $lineItem['qty'] = 1;
+      }
+      else {
+        $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
+        $lineItem['line_total'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
+      }
     }
     else {
-      $lineItem['line_total'] = $this->getOverrideTotalAmount();
+      $lineItem['line_total'] = $this->getOverrideTotalAmountTaxExclusive() ?: $this->getOverrideTotalAmount();
       $lineItem['tax_amount'] = 0.0;
       $lineItem['line_total_inclusive'] = $lineItem['line_total'];
     }
@@ -1432,6 +1503,78 @@ class CRM_Financial_BAO_Order {
       }
     }
     return $lineItemTitle ?? '';
+  }
+
+  /**
+   * @param array $contributionValues
+   *
+   * @return \Civi\Api4\Generic\Result
+   *
+   * @internal Access through apiv4 Order api only. Signature subject to change.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function save(array $contributionValues): Result {
+    $this->contributionValues = $contributionValues;
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      // Save entities first, so we can get the Entity ID.
+      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
+        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
+      }
+    }
+    $contributionValues['total_amount'] = $this->getTotalAmount();
+    $contributionValues['tax_amount'] = $this->getTotalTaxAmount();
+    $contributionValues['amount_level'] = $this->getAmountLevel();
+    $contributionValues['contribution_status_id:name'] = 'Pending';
+    $contributionValues['line_item'] = [$this->getLineItems()];
+    return Contribution::create()
+      ->setValues($contributionValues)->execute();
+  }
+
+  /**
+   * Save the entity related to a given line item.
+   *
+   * @param array $lineItem
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  private function saveLineItemEntity(array $lineItem): int {
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($lineItem['entity_table']);
+    $entityValues = empty($lineItem['entity_id']) ? [] : ['id' => $lineItem['entity_id']];
+    foreach ($lineItem as $fieldName => $fieldValue) {
+      if (str_starts_with($fieldName, 'entity_id.')) {
+        $entityValues[substr($fieldName, 10)] = $fieldValue;
+      }
+      if ($fieldName === 'membership_type_id' && $entity === 'Membership') {
+        $entityValues['membership_type_id'] = $fieldValue;
+      }
+    }
+    if (empty($entityValues['id'])) {
+      // Not an update, include any relevant values (e.g. contact_id) from the contribution
+      // entity values if not present already in EntityFields.
+      $fields = (array) civicrm_api4($entity, 'getfields')->indexBy('name');
+      $carryOverFields = array_intersect_key($this->contributionValues, $fields);
+      $entityValues += $carryOverFields;
+      if ($entity === 'Membership' && empty($entityValues['status_id'])) {
+        if (empty($entityValues['join_date'])) {
+          $entityValues['join_date'] = $this->contributionValues['receive_date'];
+        }
+        $entityValues['status_id'] = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
+          $entityValues['start_date'] ?? NULL,
+            $entityValues['end_date'] ?? NULL,
+            $entityValues['join_date'] ?? NULL,
+          $this->contributionValues['receive_date'],
+          TRUE,
+          $entityValues['membership_type_id']
+        )['id'];
+      }
+    }
+    if (array_keys($entityValues) === ['id']) {
+      // Nothing to save.
+      return $entityValues['id'];
+    }
+    return civicrm_api4($entity, 'save', ['records' => [$entityValues]])->first()['id'];
   }
 
 }

@@ -19,7 +19,7 @@
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
     @import url({$config->resourceBase}css/crm-i.css);
-    @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
+    @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
   </style>
 </head>
 <body>
@@ -29,11 +29,10 @@
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
     @import url({$config->resourceBase}css/crm-i.css);
-    @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
+    @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
   </style>
 {/if}
 <div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
- <span class="status-fatal">{ts}Sorry, due to an error, we are unable to fulfill your request at the moment. You may want to contact your administrator or service provider with more details about what action you were performing when this occurred.{/ts}</span>
     <div class="crm-section crm-error-message">{$message|escape}</div>
     {if !empty($error.message) && $message != $error.message}
         <hr style="solid 1px" />
@@ -57,7 +56,7 @@
          </div>
         </details>
     {/if}
-    <p><a href="{$config->userFrameworkBaseURL}" title="{ts}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>
+    <p><a href="{$config->userFrameworkBaseURL}" title="{ts escape='htmlattribute'}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>
 </div>
 </div> {* end crm-container div *}
 {if $config->userFramework != 'WordPress'}

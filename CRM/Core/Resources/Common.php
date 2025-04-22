@@ -189,7 +189,11 @@ class CRM_Core_Resources_Common {
       "packages/jquery/plugins/jquery.mousewheel.min.js",
       "bower_components/select2/select2.min.js",
       "bower_components/select2/select2.min.css",
-      "bower_components/font-awesome/css/font-awesome.min.css",
+      "bower_components/font-awesome/css/all.min.css",
+      // shims for fontawesome 4 - webfonts are loaded from the package
+      "bower_components/font-awesome/css/v4-font-face.min.css",
+      // we load our own version of the shim with crm-i namespace
+      "css/crm-i-v4-shims.css",
       "packages/jquery/plugins/jquery.form.min.js",
       "packages/jquery/plugins/jquery.timeentry.min.js",
       "packages/jquery/plugins/jquery.blockUI.min.js",
@@ -197,7 +201,6 @@ class CRM_Core_Resources_Common {
       "bower_components/datatables/media/css/jquery.dataTables.min.css",
       "bower_components/jquery-validation/dist/jquery.validate.min.js",
       "bower_components/jquery-validation/dist/additional-methods.min.js",
-      "packages/jquery/plugins/jquery.ui.datepicker.validation.min.js",
       "js/Common.js",
       "js/crm.datepicker.js",
       "js/crm.ajax.js",

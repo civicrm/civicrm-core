@@ -47,7 +47,8 @@ class Cosession extends AutoService implements EventSubscriberInterface {
   protected ?string $sessionId = NULL;
 
   public function findCreateSessionId(): ?string {
-    if (!defined('CIVICRM_IFRAME')) {
+    // We only want to execute this code if CIVICRM_IFRAME is both defined and is truthy (ie. true/1)
+    if (!(defined('CIVICRM_IFRAME') && CIVICRM_IFRAME)) {
       return NULL;
     }
 

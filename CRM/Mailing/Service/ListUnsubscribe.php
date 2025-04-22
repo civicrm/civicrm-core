@@ -50,7 +50,8 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
     $sep = preg_quote(Civi::settings()->get('verpSeparator'), ';');
     $regex = ";^<mailto:[^>]*u{$sep}(\d+){$sep}(\d+){$sep}(\w*)@(.+)>$;";
     if (!preg_match($regex, $params['List-Unsubscribe'], $m)) {
-      \Civi::log()->warning('Failed to set final value of List-Unsubscribe');
+      // This can happen when generating a preview of a mailing or bots
+      // crawling public mailings with invalid checkums
       return;
     }
 

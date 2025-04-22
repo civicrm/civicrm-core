@@ -201,32 +201,32 @@
   <div class="api4-explorer-row crm-flex-box">
     <div class="panel panel-info explorer-code-panel">
       <div class="panel-heading">
-        <ul class="nav nav-tabs">
-          <li role="presentation" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
+        <ul role="tablist" class="nav nav-tabs">
+          <li role="tab" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
             <a href ng-click="selectLang(lang)">
               {{:: lang }}
             </a>
           </li>
         </ul>
       </div>
-      <div class="panel-body">
+      <div role="tabpanel" class="panel-body">
         <div class="alert alert-danger" ng-if="selectedTab.code === 'rest' && !$ctrl.authxEnabled">
           <p>
             {{:: ts('To enable REST authentication, the AuthX extension must be installed.') }}
             <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/extensions') }}">
-              <i class="crm-i fa-gear"> {{:: ts('Manage Extensions') }}</i>
+              <i class="crm-i fa-gear"></i> {{:: ts('Manage Extensions') }}
             </a>
           </p>
         </div>
         <div class="alert alert-warning" ng-if="selectedTab.code === 'rest' && $ctrl.authxEnabled">
           <p>
             <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/setting/authx', {reset: 1}) }}">
-              <i class="crm-i fa-gear"> {{:: ts('Configure REST Authentication') }}</i>
+              <i class="crm-i fa-gear"></i> {{:: ts('Configure REST Authentication') }}
             </a>
           </p>
           <p>
             <a target="_blank" href="https://docs.civicrm.org/dev/en/latest/api/v4/rest/">
-              <i class="crm-i fa-external-link"> {{:: ts('REST Documentation') }}</i>
+              <i class="crm-i fa-external-link"></i> {{:: ts('REST Documentation') }}
             </a>
           </p>
         </div>
@@ -253,8 +253,8 @@
             </option>
           </select>
         </div>
-        <ul class="nav nav-tabs">
-          <li role="presentation" ng-class="{active: selectedTab.result === 'result'}">
+        <ul role="tablist" class="nav nav-tabs">
+          <li role="tab" ng-class="{active: selectedTab.result === 'result'}">
             <a href ng-click="selectedTab.result = 'result'">
               <span ng-switch="status">
                 <i class="fa fa-fw fa-circle-o" ng-switch-when="default"></i>
@@ -266,7 +266,7 @@
               <span>{{:: ts('Result') }}</span>
             </a>
           </li>
-          <li role="presentation" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
+          <li role="tab" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
             <a href ng-click="selectedTab.result = 'debug'">
               <i class="fa fa-fw fa-{{ debug ? (status === 'warning' || status === 'danger' ? 'warning' : 'bug') : 'circle-o' }}"></i>
               <span>{{:: ts('Debug') }}</span>
@@ -275,7 +275,7 @@
         </ul>
       </div>
       <div class="panel-body">
-        <div ng-show="selectedTab.result === 'result'">
+        <div ng-show="selectedTab.result === 'result'" role="tabpanel">
           <div ng-repeat="code in result">
             <div class="clearfix">
               <button ng-if="$index" class="btn btn-xs btn-default pull-right" ng-click="$ctrl.copyCode('api4-result-' + $index)">
@@ -286,7 +286,7 @@
             <pre class="prettyprint" id="api4-result-{{ $index }}" ng-bind-html="code"></pre>
           </div>
         </div>
-        <div ng-if="::perm.viewDebugOutput" ng-show="selectedTab.result === 'debug'">
+        <div ng-if="::perm.viewDebugOutput" ng-show="selectedTab.result === 'debug'" role="tabpanel">
           <pre ng-if="debug" class="prettyprint" ng-bind-html="debug"></pre>
           <div ng-if="!debug">
             <p>

@@ -56,6 +56,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['body_html', 'html_message'];
+  }
+
+  /**
    * Because `CRM_Mailing_BAO_Mailing::commonCompose` uses different fieldNames than `CRM_Core_DAO_ActionSchedule`.
    * @var array
    */
@@ -323,10 +330,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     // Absolute or relative date
     if ($values['absolute_or_relative_date'] === 'absolute') {
-      $values['start_action_offset'] = $values['start_action_unit'] = $values['start_action_condition'] = $values['start_action_date'] = NULL;
+      $values['start_action_offset'] = $values['start_action_unit'] = $values['start_action_condition'] = $values['start_action_date'] = '';
     }
     else {
-      $values['absolute_date'] = NULL;
+      $values['absolute_date'] = '';
     }
 
     // Convert values for the fields added by CRM_Mailing_BAO_Mailing::commonCompose

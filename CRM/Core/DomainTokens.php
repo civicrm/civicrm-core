@@ -50,6 +50,7 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       'city' => ts('Domain (Organization) City'),
       'postal_code' => ts('Domain (Organization) Postal Code'),
       'state_province_id:label' => ts('Domain (Organization) State'),
+      'state_province_id:abbr' => ts('Domain (Organization) State Abbreviation'),
       'country_id:label' => ts('Domain (Organization) Country'),
       'phone' => ts('Domain (Organization) Phone'),
       'email' => ts('Domain (Organization) Email'),
@@ -123,6 +124,7 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       $tokens['city'] = $loc['address'][1]['city'] ?? '';
       $tokens['postal_code'] = $loc['address'][1]['postal_code'] ?? '';
       $tokens['state_province_id:label'] = $loc['address'][1]['state_province'] ?? '';
+      $tokens['state_province_id:abbr'] = $loc['address'][1]['state_province_abbreviation'] ?? '';
       $tokens['country_id:label'] = $loc['address'][1]['country'] ?? '';
       $phone = reset($loc['phone']);
       $email = reset($loc['email']);

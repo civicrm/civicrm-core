@@ -84,7 +84,8 @@ class CRM_Utils_Type {
         break;
 
       case 3:
-        $string = 'Enum';
+        CRM_Core_Error::deprecatedFunctionWarning("Enum data type not supported.");
+        $string = 'String';
         break;
 
       case 4:
@@ -145,7 +146,6 @@ class CRM_Utils_Type {
     return [
       'Int' => self::T_INT,
       'String' => self::T_STRING,
-      'Enum' => self::T_ENUM,
       'Date' => self::T_DATE,
       'Time' => self::T_TIME,
       'Boolean' => self::T_BOOLEAN,
@@ -248,7 +248,7 @@ class CRM_Utils_Type {
       case 'Country':
       case 'StateProvince':
         // Handle multivalued data in delimited or array format
-        if (is_array($data) || (strpos($data, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE)) {
+        if (is_array($data) || (str_contains($data, CRM_Core_DAO::VALUE_SEPARATOR))) {
           $valid = TRUE;
           foreach (CRM_Utils_Array::explodePadded($data) as $item) {
             if (!CRM_Utils_Rule::positiveInteger($item)) {

@@ -190,7 +190,7 @@ function showBindFormatChkBox()
         document.getElementById("bindFormat").style.display = "block";
     } else if ( formatExists && document.getElementById("saveTemplate") != null && document.getElementById("saveTemplate").checked ) {
         document.getElementById("bindFormat").style.display = "block";
-        var yes = confirm( '{/literal}{$useThisPageFormat}{literal}' );
+        var yes = confirm( "{/literal}{$useThisPageFormat}{literal}" );
         if ( yes ) {
             document.getElementById("bind_format").checked = true;
         }
@@ -305,6 +305,9 @@ function convertMetric( value, from, to ) {
 }
 
 function showSaveDetails(chkbox)  {
+    if (chkbox === undefined) {
+      return;
+    }
     var formatSelected = ( document.getElementById('format_id').value > 0 );
     var templateSelected = ( document.getElementById('template') != null && document.getElementById('template').value > 0 );
     if (chkbox.checked) {
@@ -312,7 +315,7 @@ function showSaveDetails(chkbox)  {
         document.getElementById("saveTemplateName").disabled = false;
         if ( formatSelected && ! templateSelected ) {
             document.getElementById("bindFormat").style.display = "block";
-            var yes = confirm( '{/literal}{$useSelectedPageFormat}{literal}' );
+            var yes = confirm( "{/literal}{$useSelectedPageFormat}{literal}" );
             if ( yes ) {
                 document.getElementById("bind_format").checked = true;
             }

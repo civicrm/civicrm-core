@@ -34,8 +34,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Status code of various types of errors.
    */
   const FATAL_ERROR = 2;
+
+  /**
+   * @deprecated
+   */
   const DUPLICATE_CONTACT = 8001;
   const DUPLICATE_CONTRIBUTION = 8002;
+
+  /**
+   * @deprecated
+   */
   const DUPLICATE_PARTICIPANT = 8003;
 
   /**
@@ -123,7 +131,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function displaySessionError(&$error, $separator = '<br />') {
     $message = self::getMessages($error, $separator);
     if ($message) {
-      $status = ts("Payment Processor Error message") . "{$separator} $message";
+      $status = ts('Payment Processor Error message') . "{$separator} $message";
       $session = CRM_Core_Session::singleton();
       $session->setStatus($status);
     }
@@ -501,12 +509,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     if ($log) {
       // Log the output to error_log with a unique reference.
-      $unique = substr(md5(random_bytes(32)), 0, 12);
+      $unique = bin2hex(random_bytes(6));
       error_log("errorID:$unique\n$out");
 
       if (!$checkPermission) {
         // Permission system inactive, only emit a reference to content in logfile
-        echo "Critical error. Please see server logs for errorID:$unique";
+        echo "Critical error. Please see server logs for errorID:$unique" . (PHP_SAPI !== 'cli' ? '<br/>' : '') . "\n";
       }
       else {
         if (CRM_Core_Permission::check('view debug output')) {
@@ -659,11 +667,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function createDebugLogger($prefix = '') {
     self::generateLogFileName($prefix);
     $log = Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '', [
-      'timeFormat' => '%Y-%m-%d %H:%M:%S%z',
+      'timeFormat' => 'Y-m-d H:i:sO',
+      'mode' => CRM_Utils_Constant::value('CIVICRM_LOG_FILE_PERMISSIONS', '0664'),
+      'dirmode' => CRM_Utils_Constant::value('CIVICRM_LOG_FILE_DIR_PERMISSIONS', '0775'),
     ]);
-    if (is_callable([$log, 'setLocale'])) {
-      $log->setLocale(CRM_Core_I18n::getLocale());
-    }
     return $log;
   }
 
@@ -696,8 +703,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * the file exists.
    *
    * @param string $prefix
+   * @return string The full path to the file.
    */
-  protected static function generateLogFileName($prefix) {
+  public static function generateLogFileName($prefix): string {
     if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $prefix])) {
       $config = CRM_Core_Config::singleton();
 
@@ -731,6 +739,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
       \Civi::$statics[__CLASS__]['logger_file' . $prefix] = $fileName;
     }
+    return \Civi::$statics[__CLASS__]['logger_file' . $prefix];
   }
 
   /**
@@ -837,8 +846,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       $ret[] = sprintf(
         "%s(%s): %s%s(%s)",
-        CRM_Utils_Array::value('file', $trace, '[internal function]'),
-        CRM_Utils_Array::value('line', $trace, ''),
+        $trace['file'] ?? '[internal function]',
+        $trace['line'] ?? '',
         $className,
         $fnName,
         implode(", ", $args)
@@ -917,6 +926,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * @deprecated since 6.1 will be removed around 6.13
+   *
    * @param $message
    * @param int $code
    * @param string $level
@@ -925,6 +936,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @return object
    */
   public static function createError($message, $code = 8000, $level = 'Fatal', $params = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('something that is less silly');
     $error = CRM_Core_Error::singleton();
     $error->push($code, $level, [$params], $message);
     return $error;

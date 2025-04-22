@@ -10,6 +10,10 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+/**
+ * class \Civi\FlexMailer\Listener\IsActiveTrait
+ * @todo: Replace this with \Civi\Core\Service\IsActiveTrait
+ */
 trait IsActiveTrait {
 
   /**

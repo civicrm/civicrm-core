@@ -21,17 +21,17 @@
           $el.addClass('afform-directive');
 
           // Afforms do not use routing, but some forms get input from search params
-          var dialog = $el.closest('.ui-dialog-content');
+          const dialog = $el.closest('.ui-dialog-content');
           if (!dialog.length) {
-            // Full-screen mode
+            // Full-screen mode: watch search params in url
             $scope.$watch(function() {return $location.search();}, function(params) {
               $scope.routeParams = params;
             });
           } else {
-            // Use urlHash embedded in popup dialog
+            // Popup dialog mode: use urlHash (injected by civi.crmSnippet::refresh() function)
             $scope.routeParams = {};
-            if (dialog.data('urlHash')) {
-              var searchParams = new URLSearchParams(dialog.data('urlHash'));
+            if (typeof dialog.data('urlHash') === 'string' && dialog.data('urlHash').includes('?')) {
+              const searchParams = new URLSearchParams(dialog.data('urlHash').split('?')[1]);
               searchParams.forEach(function(value, key) {
                 $scope.routeParams[key] = value;
               });

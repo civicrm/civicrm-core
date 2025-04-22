@@ -12,11 +12,11 @@
     <url desc="Documentation">https://lab.civicrm.org/dev/core/-/issues/3912</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-05-02</releaseDate>
-  <version>5.75.alpha1</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.75</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <comments>Key CiviCRM interfaces are being rewritten as configurable Search Display Forms. This extension lets you try these updates now, before the screens are permanently replaced in core.</comments>
   <classloader>
@@ -26,10 +26,11 @@
   <civix>
     <namespace>CRM/CivicrmAdminUi</namespace>
     <angularModule>crmCivicrmAdminUi</angularModule>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
   </civix>
   <mixins>
     <mixin>mgd-php@1.0.0</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
   </mixins>
-  <upgrader>CRM_CivicrmAdminUi_Upgrader</upgrader>
+  <upgrader>CiviMix\Schema\CivicrmAdminUi\AutomaticUpgrader</upgrader>
 </extension>

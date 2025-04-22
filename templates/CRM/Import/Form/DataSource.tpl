@@ -70,13 +70,13 @@
       {if array_key_exists('onDuplicate', $form)}
         <tr class="crm-import-uploadfile-from-block-onDuplicate">
           <td class="label">{$form.onDuplicate.label}</td>
-          <td>{$form.onDuplicate.html} {help id="dupes"}</td>
+          <td>{$form.onDuplicate.html} {help id="dupes" file="CRM/Contact/Import/Form/DataSource.hlp"}</td>
         </tr>
       {/if}
       {if array_key_exists('dedupe_rule_id', $form)}
         <tr class="crm-import-datasource-form-block-dedupe">
           <td class="label">{$form.dedupe_rule_id.label}</td>
-          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule'}</td>
+          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule' file="CRM/Contact/Import/Form/DataSource.hlp"}</td>
         </tr>
       {/if}
       {if array_key_exists('multipleCustomData', $form)}
@@ -145,9 +145,15 @@
 
     function buildSubTypes( )
     {
-      element = cj('input[name="contactType"]:checked').val( );
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0}"{literal};
-      var param = 'parentId='+ element;
+      const element = cj('input[name="contactType"]:checked');
+      if (!element.length) {
+        // There are no contact fields on some import forms (e.g. import of activities)
+        return;
+      }
+
+      const elementVal = element.val( );
+      const postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0}"{literal};
+      const param = 'parentId='+ elementVal;
       cj.ajax({ type: "POST", url: postUrl, data: param, async: false, dataType: 'json',
         success: function(subtype)
         {

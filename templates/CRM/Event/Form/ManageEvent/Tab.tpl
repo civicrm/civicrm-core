@@ -81,4 +81,6 @@ CRM.$(function($) {
 });
 </script>
 {/literal}
+{crmRegion name="event-manageevent-confirmrepeatmode"}
 {include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$id entityTable="civicrm_event"}
+{/crmRegion}

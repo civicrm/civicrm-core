@@ -15,6 +15,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Membership;
+use Civi\Api4\OptionValue;
+
 /**
  * This class generates form components for Membership Renewal
  */
@@ -180,11 +183,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['receive_date'] = $now . ' ' . CRM_Utils_Time::date('H:i:s');
 
     if ($defaults['id']) {
-      $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
-        $defaults['id'],
-        'contribution_id',
-        'membership_id'
-      );
+      $defaults['record_contribution'] = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($defaults['id']);
     }
 
     $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
@@ -204,8 +203,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['send_receipt'] = 0;
 
     //set Soft Credit Type to Gift by default
-    $scTypes = CRM_Core_OptionGroup::values('soft_credit_type');
-    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+    $defaults['soft_credit_type_id'] = OptionValue::get(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'soft_credit_type')
+      ->addWhere('name', '=', 'gift')
+      ->execute()
+      ->first()['value'] ?? NULL;
 
     $this->assign('renewalDate', $defaults['renewal_date']);
     $this->assign('member_is_test', $defaults['member_is_test'] ?? NULL);
@@ -274,7 +277,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $totalAmount = $values['minimum_fee'] ?? 0;
         // @todo - feels a bug - we use taxRate from the form default rather than from the specified type?!?
         if ($this->getTaxRateForFinancialType($values['financial_type_id'])) {
-          $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
+          $taxAmount = ($taxRate / 100) * ($values['minimum_fee'] ?? 0);
           $totalAmount = $totalAmount + $taxAmount;
         }
 
@@ -326,7 +329,14 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->applyFilter('__ALL__', 'trim');
 
-    $this->add('datepicker', 'renewal_date', ts('Date Renewal Entered'), [], FALSE, ['time' => FALSE]);
+    // Only add renewal date if membership is not current
+    if (!Membership::get(FALSE)
+      ->addSelect('status_id.is_current_member')
+      ->addWhere('id', '=', $this->getMembershipID())
+      ->execute()
+      ->first()['status_id.is_current_member']) {
+      $this->add('datepicker', 'renewal_date', ts('Renewal Date'), [], FALSE, ['time' => FALSE]);
+    }
 
     $this->add('select', 'financial_type_id', ts('Financial Type'),
       ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::financialType()
@@ -423,7 +433,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // CRM-20571: Check if the renewal date is not before Join Date, if it is then add to 'errors' array
     // The fields in Renewal form come into this routine in $params array. 'renewal_date' is in the form
     // We process both the dates before comparison using CRM utils so that they are in same date format
-    if (isset($params['renewal_date'])) {
+    // If renewal date is empty we renew based on existing membership end date and 'num_terms'.
+    // If renewal date is specified it will always renew from that date.
+    if (!empty($params['renewal_date'])) {
       if ($params['renewal_date'] < $joinDate) {
         $errors['renewal_date'] = ts('Renewal date must be the same or later than Member Since.');
       }
@@ -480,10 +492,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->assign('receive_date', $this->_params['receive_date'] ?? CRM_Utils_Time::date('Y-m-d H:i:s'));
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
-
-    $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
-      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
-    );
+    $this->_params['total_amount'] = $this->_params['total_amount'] ?? CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee');
     $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
       $this->getMembershipID(),
       'Membership'
@@ -547,6 +556,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $payment = $this->_paymentProcessor['object'];
       $paymentParams['currency'] = $this->getCurrency();
+      $payment->setBackOffice(TRUE);
       $result = $payment->doPayment($paymentParams);
       $this->_params = array_merge($this->_params, $result);
 
@@ -563,33 +573,43 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $numRenewTerms = $this->_params['num_terms'];
     }
 
-    //if contribution status is pending then set pay later
-    $this->_params['is_pay_later'] = FALSE;
-    if ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'))) {
-      $this->_params['is_pay_later'] = 1;
-    }
-
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
+
+    // if contribution status is pending then set pay later
+    $this->_params['is_pay_later'] = $pending;
 
     $membershipParams = [
       'id' => $this->getMembershipID(),
       'membership_type_id' => $this->_params['membership_type_id'][1],
       'modified_id' => $this->_contactID,
       'custom' => $customFieldsFormatted,
-      'membership_activity_status' => ($pending || $this->_params['is_pay_later']) ? 'Scheduled' : 'Completed',
+      'membership_activity_status' => $pending ? 'Scheduled' : 'Completed',
       // Since we are renewing, make status override false.
       'is_override' => FALSE,
     ];
     if ($contributionRecurID) {
       $membershipParams['contribution_recur_id'] = $contributionRecurID;
     }
-    $membership = $this->processMembership($membershipParams, $this->getSubmittedValue('renewal_date'), $numRenewTerms, $pending);
+    // Only pass through "changeToday" for non-current memberships as it's not used otherwise
+    $changeToday = NULL;
+    $membership = Membership::get(FALSE)
+      ->addSelect('status_id.is_current_member', 'end_date')
+      ->addWhere('id', '=', $membershipParams['id'])
+      ->execute()
+      ->first();
+    if (!$membership['status_id.is_current_member']) {
+      $changeToday = !empty($this->getSubmittedValue('renewal_date'))
+        ? $this->getSubmittedValue('renewal_date')
+        : date('Ymd', strtotime($membership['end_date'] . '+1 day'));
+    }
+    $this->processMembership($membershipParams, $changeToday, $numRenewTerms, $pending);
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
       [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
-      $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membership->membership_type_id,
+      $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipParams['membership_type_id'],
         'name');
+      $userName = htmlentities($userName);
       $this->_params['contribution_source'] = "{$this->membershipTypeName} Membership: Offline membership renewal (by {$userName})";
 
       //create line items
@@ -613,7 +633,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // temporary variable to avoid e-notice & to make it clear to future refactorer that
       // this function is NOT reliant on that var being set
       $temporaryParams = array_merge($this->_params, [
-        'membership_id' => $membership->id,
+        'membership_id' => $membershipParams['id'],
         'contribution_recur_id' => $contributionRecurID,
       ]);
       $this->setContributionID(CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams)->id);
@@ -661,9 +681,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('customValues', $customValues);
 
     if ($this->_mode) {
-      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-        $this->_params,
-      ));
+      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
@@ -704,26 +722,23 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param $numRenewTerms
    * @param bool $pending
    *
-   * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
    */
   public function processMembership($memParams, $changeToday, $numRenewTerms, $pending) {
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $ids = [];
-    $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $memParams['id']]);
+    $currentMembership = Membership::get(FALSE)
+      ->addSelect('id', 'join_date', 'membership_type_id', 'start_date', 'status_id:name', 'status_id.is_current_member')
+      ->addWhere('id', '=', $memParams['id'])
+      ->execute()
+      ->first();
 
     // Do NOT do anything.
     //1. membership with status : PENDING/CANCELLED (CRM-2395)
     //2. Paylater/IPN renew. CRM-4556.
-    if ($pending || in_array($currentMembership['status_id'], [
-      array_search('Pending', $allStatus),
-      // CRM-15475
-      array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
-    ])) {
+    if ($pending || in_array($currentMembership['status_id:name'], ['Pending', 'Cancelled'])) {
       return CRM_Member_BAO_Membership::create($memParams);
     }
     $memParams['join_date'] = date('Ymd', CRM_Utils_Time::strtotime($currentMembership['join_date']));
-    $isMembershipCurrent = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $currentMembership['status_id'], 'is_current_member');
 
     // CRM-7297 Membership Upsell - calculate dates based on new membership type
     $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
@@ -733,26 +748,19 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     );
     $memParams = array_merge($memParams, [
       'end_date' => $dates['end_date'] ?? NULL,
-      'start_date' => $isMembershipCurrent ? $currentMembership['start_date'] : ($dates['start_date'] ?? NULL),
+      'start_date' => $currentMembership['status_id.is_current_member'] ? $currentMembership['start_date'] : ($dates['start_date'] ?? NULL),
       'log_start_date' => $dates['log_start_date'],
     ]);
 
     // Now Renew the membership
-    if ($isMembershipCurrent) {
+    if ($currentMembership['status_id.is_current_member']) {
       // CURRENT Membership
       if (!empty($currentMembership['id'])) {
         $ids['membership'] = $currentMembership['id'];
       }
     }
 
-    // @todo stop passing $ids (membership and userId may be set by this point)
-    $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
-
-    // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
-    // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
-    $membership->find(TRUE);
-
-    return $membership;
+    CRM_Member_BAO_Membership::create($memParams);
   }
 
 }

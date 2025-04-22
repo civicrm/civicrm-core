@@ -26,13 +26,13 @@
     <td>{$form.website.$blockId.url.html|crmAddClass:url}&nbsp;</td>
     <td>{$form.website.$blockId.website_type_id.html}</td>
     {if $blockId gt 1}
-      <td colspan="3"><a href="#" title="{ts}Delete Website Block{/ts}" onClick="removeBlock('Website','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
+      <td colspan="3"><a href="#" title="{ts escape='htmlattribute'}Delete Website Block{/ts}" onClick="removeBlock('Website','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
     {/if}
 </tr>
 {if !$addBlock}
 <tr>
 <td colspan="4">
-&nbsp;&nbsp;<a href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'Website', '{$className}');return false;">{ts}Add another website{/ts}</a>
+&nbsp;&nbsp;<a href="#" title="{ts escape='htmlattribute'}Add{/ts}" onClick="buildAdditionalBlocks( 'Website', '{$className}');return false;">{ts}Add another website{/ts}</a>
 </td>
 </tr>
 {/if}

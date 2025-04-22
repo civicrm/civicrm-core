@@ -256,7 +256,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $honor = [];
-    while ($dao->fetch()) {
+    while ($dao->find()) {
       $honor[$dao->id]['nickname'] = ucwords($dao->pcp_roll_nickname);
       $honor[$dao->id]['total_amount'] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
       $honor[$dao->id]['personal_note'] = $dao->pcp_personal_note;
@@ -504,7 +504,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
       return FALSE;
     }
 
-    $pcpStatus = CRM_Core_PseudoConstant::get('CRM_PCP_BAO_PCP', 'status_id');
+    $pcpStatus = CRM_PCP_BAO_PCP::buildOptions('status_id');
     $approvedId = array_search('Approved', $pcpStatus);
 
     $params = ['id' => $pcpId];
@@ -673,8 +673,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-      $fixUrl = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'reset=1');
-      throw new CRM_Core_Exception(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+      $fixUrl = CRM_Utils_System::url('civicrm/admin/options/site_email_address');
+      throw new CRM_Core_Exception(ts('The site administrator needs to enter a valid "Site Email Address" in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
     }
 
     $receiptFrom = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';

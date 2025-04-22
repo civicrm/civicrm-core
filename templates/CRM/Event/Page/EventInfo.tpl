@@ -16,14 +16,15 @@
      &nbsp;{ts}Registration is closed for this event{/ts}
   </div>
 {/if}
-{if call_user_func(array('CRM_Core_Permission','check'), 'access CiviEvent')}
+{crmPermission has='access CiviEvent'}
 <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">
   <ul id="actions">
-{if call_user_func(array('CRM_Core_Permission','check'), 'edit all events') && !empty($manageEventLinks)}
+{crmPermission has='edit all events'}
+{if !empty($manageEventLinks)}
   <li>
     <div id="crm-event-links-wrapper">
       <span id="crm-event-configure-link" class="crm-hover-button">
-        <span title="{ts}Configure this event.{/ts}" class="crm-i fa-wrench" aria-hidden="true"></span>
+        <span title="{ts escape='htmlattribute'}Configure this event.{/ts}" class="crm-i fa-wrench" aria-hidden="true"></span>
       </span>
       <div class="ac_results" id="crm-event-links-list" style="margin-left: -25px;">
         <div class="crm-event-links-list-inner">
@@ -44,10 +45,11 @@
     </div>
   </li>
 {/if}
+{/crmPermission}
   <li>
     <div id="crm-participant-wrapper">
       <span id="crm-participant-links" class="crm-hover-button">
-        <span title="{ts}Participant listing links.{/ts}" class="crm-i fa-search" aria-hidden="true"></span>
+        <span title="{ts escape='htmlattribute'}Participant listing links.{/ts}" class="crm-i fa-search" aria-hidden="true"></span>
       </span>
       <div class="ac_results" id="crm-participant-list" style="margin-left: -25px;">
         <div class="crm-participant-list-inner">
@@ -71,7 +73,7 @@
   </ul>
   <div class="clear"></div>
 </div>
-{/if}
+{/crmPermission}
 <div class="vevent crm-event-id-{$event.id} crm-block crm-event-info-form-block">
   <div class="event-info">
   {* Display top buttons only if the page is long enough to merit duplicate buttons *}
@@ -135,13 +137,12 @@
         {/if}
 
       {if ($event.is_map && $config->mapProvider &&
-          array_key_exists('address', $location)  && (is_numeric($location.address.1.geo_code_1) ||
-          ($location.address.1.city AND $location.address.1.state_province)))}
+          array_key_exists('address', $location)  && (is_numeric($location.address.1.geo_code_1)))}
           <div class="crm-section event_map-section">
               <div class="content">
                     {assign var=showDirectly value="1"}
-                    {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly}
-                    <a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
+                    {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly profileGID=false}
+                    <a href="{$mapURL}" title="{ts escape='htmlattribute'}Show large map{/ts}">{ts}Show large map{/ts}</a>
               </div>
               <div class="clear"></div>
           </div>

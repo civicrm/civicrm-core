@@ -2,7 +2,7 @@
 <extension key="financialacls" type="module">
   <file>financialacls</file>
   <name>Financial ACLs</name>
-  <description>Implements financial ACLS - may not be disabled without risk of site breakage while in progress</description>
+  <description>Implements financial ACLS</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM</author>
@@ -14,16 +14,13 @@
     <url desc="Support">http://FIXME</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-05-02</releaseDate>
-  <version>5.75.alpha1</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.75</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
-  <comments>Financial acls - working towards moving this code to the extension from core</comments>
+  <comments>This code was previously in core and the extension can now be disabled if you do not use ACLs for contributions</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -36,6 +33,6 @@
   </requires>
   <civix>
     <namespace>CRM/Financialacls</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
   </civix>
 </extension>

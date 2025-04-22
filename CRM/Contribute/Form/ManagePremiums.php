@@ -21,6 +21,7 @@ use Civi\Api4\Product;
  * This class generates form components for Premiums.
  */
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Classes extending CRM_Core_Form should implement this method.
@@ -37,7 +38,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_id) {
-      $tempDefaults = Product::get()->addWhere('id', '=', $this->_id)->execute()->first();
+      $tempDefaults = Product::get()->addSelect('*', 'custom.*')->addWhere('id', '=', $this->_id)->execute()->first();
       if (isset($tempDefaults['image']) && isset($tempDefaults['thumbnail'])) {
         $defaults['imageUrl'] = $tempDefaults['image'];
         $defaults['thumbnailUrl'] = $tempDefaults['thumbnail'];
@@ -55,9 +56,38 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       if (isset($tempDefaults['period_type'])) {
         $this->assign('showSubscriptions', TRUE);
       }
+
+      // Convert api3 field names to custom_xx format
+      foreach ($tempDefaults as $name => $value) {
+        $short = CRM_Core_BAO_CustomField::getShortNameFromLongName($name);
+        if ($short) {
+          $tempDefaults[$short . '_' . $this->_id] = $value;
+          unset($tempDefaults[$name]);
+        }
+      }
     }
 
     return $defaults;
+  }
+
+  /**
+   * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function preProcess() {
+    parent::preProcess();
+
+    // when custom data is included in this page
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Product', array_filter([
+        'id' => $this->_id,
+      ]));
+    }
   }
 
   /**
@@ -103,7 +133,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->addElement('text', 'imageUrl', ts('Image URL'));
     $this->addElement('text', 'thumbnailUrl', ts('Thumbnail URL'));
 
-    $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'select_option();']);
+    $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'CRM.$("input[name=imageOption][value=image]").prop("checked", true);']);
 
     $this->add('text', 'price', ts('Market Value'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'price'), TRUE);
     $this->addRule('price', ts('Please enter the Market Value for this product.'), 'money');
@@ -287,6 +317,15 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     }
 
     $this->_processImages($params);
+
+    $params += $this->getSubmittedCustomFieldsForApi4();
+
+    if (is_string($params['options'])) {
+      // In setDefaultValues(), we loaded the serialized `options` string to present
+      // it as one editable string. Now we pass to APIv4 save() -- but it doesn't want
+      // the serialized string. It wants the array...
+      $params['options'] = CRM_Utils_CommaKV::unserialize($params['options']);
+    }
 
     // Save the premium product to database
     $premium = Product::save()->addRecord($params)->execute()->first();

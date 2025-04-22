@@ -19,13 +19,13 @@
 
 namespace api\v4\Action;
 
-use api\v4\Custom\CustomTestBase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 
 /**
  * @group headless
  */
-class ContactDuplicatesTest extends CustomTestBase {
+class ContactDuplicatesTest extends Api4TestBase {
 
   public function testGetDuplicatesUnsupervised(): void {
     $email = uniqid('test@');
@@ -177,6 +177,58 @@ class ContactDuplicatesTest extends CustomTestBase {
       ->execute();
     $this->assertCount(1, $check);
     $this->assertEquals('Jo', $check[0]['first_name']);
+  }
+
+  public function testGetMergedToFrom(): void {
+    $email = uniqid('test@');
+
+    $testContacts = $this->saveTestRecords('Contact', [
+      'records' => [['first_name' => 'MergeDown'], ['first_name' => 'MergeDown']],
+      'defaults' => ['email_primary.email' => $email],
+    ])->column('id');
+
+    // Test merge "down" to lower ID
+    // which is the usual way merges are conducted
+    $result = Contact::mergeDuplicates(FALSE)
+      ->setContactId($testContacts[0])
+      ->setDuplicateId($testContacts[1])
+      ->execute();
+
+    $mergedToID = Contact::getMergedTo(FALSE)
+      ->setContactId($testContacts[1])
+      ->execute()
+      ->first()['id'];
+    $this->assertEquals($testContacts[0], $mergedToID);
+
+    $mergedFromID = Contact::getMergedFrom(FALSE)
+      ->setContactId($testContacts[0])
+      ->execute()
+      ->first()['id'];
+    $this->assertEquals($testContacts[1], $mergedFromID);
+
+    // Set up new test contacts
+    $testContacts = $this->saveTestRecords('Contact', [
+      'records' => [['first_name' => 'MergeUp'], ['first_name' => 'MergeUp']],
+      'defaults' => ['email_primary.email' => $email],
+    ])->column('id');
+
+    // Test merge "up" to higher ID
+    $result = Contact::mergeDuplicates(FALSE)
+      ->setContactId($testContacts[1])
+      ->setDuplicateId($testContacts[0])
+      ->execute();
+
+    $mergedToID = Contact::getMergedTo(FALSE)
+      ->setContactId($testContacts[0])
+      ->execute()
+      ->first()['id'];
+    $this->assertEquals($testContacts[1], $mergedToID);
+
+    $mergedFromID = Contact::getMergedFrom(FALSE)
+      ->setContactId($testContacts[1])
+      ->execute()
+      ->first()['id'];
+    $this->assertEquals($testContacts[0], $mergedFromID);
   }
 
 }

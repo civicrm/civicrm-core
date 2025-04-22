@@ -118,6 +118,9 @@ trait DAOActionTrait {
 
     foreach ($items as &$item) {
       $entityId = $item[$idField] ?? NULL;
+      if (CoreUtil::isContact($this->getEntityName())) {
+        $entityId = FormattingUtil::resolveContactID($idField, $entityId);
+      }
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
 
@@ -145,9 +148,7 @@ trait DAOActionTrait {
     }
 
     \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    foreach ($result as &$row) {
-      FormattingUtil::formatOutputValues($row, $this->entityFields());
-    }
+    FormattingUtil::formatOutputValues($result, $this->entityFields());
     return $result;
   }
 
@@ -189,7 +190,7 @@ trait DAOActionTrait {
    *
    * @param array $record
    */
-  private function resolveFKValues(array &$record): void {
+  protected function resolveFKValues(array &$record): void {
     // Resolve domain id first
     uksort($record, function($a, $b) {
       return substr($a, 0, 9) == 'domain_id' ? -1 : 1;
@@ -264,13 +265,8 @@ trait DAOActionTrait {
 
       // Match contact id to strings like "user_contact_id"
       // FIXME handle arrays for multi-value contact reference fields, etc.
-      if (in_array($field['data_type'], ['ContactReference', 'EntityReference']) && is_string($value) && !is_numeric($value)) {
-        // FIXME decouple from v3 API
-        require_once 'api/v3/utils.php';
-        $value = \_civicrm_api3_resolve_contactID($value);
-        if ('unknown-user' === $value) {
-          throw new \CRM_Core_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
-        }
+      if (in_array($field['data_type'], ['ContactReference', 'EntityReference']) && is_string($value)) {
+        $value = FormattingUtil::resolveContactID($field['name'], $value);
       }
 
       \CRM_Core_BAO_CustomField::formatCustomField(
@@ -337,17 +333,34 @@ trait DAOActionTrait {
       return;
     }
     $newWeight = $record[$weightField] ?? NULL;
-    $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
 
     $filters = [];
     foreach ($grouping ?? [] as $filter) {
-      $filters[$filter] = $record[$filter] ?? (empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $filter));
+      if (array_key_exists($filter, $record)) {
+        $filters[$filter] = $record[$filter];
+      }
+      elseif (!empty($record[$idField])) {
+        $filters[$filter] = $daoName::getDbVal($filter, $record[$idField]);
+      }
     }
     // Supply default weight for new record
     if (!isset($record[$weightField]) && empty($record[$idField])) {
-      $record[$weightField] = $this->getMaxWeight($daoName, $filters, $weightField);
+      $max = $this->getMaxWeight($daoName, $filters, $weightField);
+      $record[$weightField] = $max;
     }
     else {
+      $oldWeight = NULL;
+      // Look up the old weight using filters (it's only relevant if this record is still within the same filter grouping)
+      if (!empty($record[$idField])) {
+        $where = [[$idField, '=', $record[$idField]]];
+        foreach ($filters as $filter => $value) {
+          $where[] = [$filter, '=', $value];
+        }
+        $oldWeight = civicrm_api4($this->getEntityName(), 'get', [
+          'select' => [$weightField],
+          'where' => $where,
+        ])[0][$weightField] ?? NULL;
+      }
       $record[$weightField] = \CRM_Utils_Weight::updateOtherWeights($daoName, $oldWeight, $newWeight, $filters, $weightField);
     }
   }
@@ -363,6 +376,7 @@ trait DAOActionTrait {
    * @return int|mixed
    */
   private function getMaxWeight($daoName, $filters, $weightField) {
+    ksort($filters);
     $key = $daoName . json_encode($filters);
     if (!isset($this->_maxWeights[$key])) {
       $this->_maxWeights[$key] = \CRM_Utils_Weight::getMax($daoName, $filters, $weightField) + 1;

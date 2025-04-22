@@ -92,7 +92,7 @@ class CRM_Utils_SQL_TempTable {
   public static function build() {
     $t = new CRM_Utils_SQL_TempTable();
     $t->category = NULL;
-    $t->id = md5(uniqid('', TRUE));
+    $t->id = bin2hex(random_bytes(16));
     // The constant CIVICRM_TEMP_FORCE_DURABLE is for local debugging.
     $t->durable = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_DURABLE', FALSE);
     $t->utf8 = TRUE;
@@ -317,6 +317,9 @@ class CRM_Utils_SQL_TempTable {
    * @return $this
    */
   public function setMemory($value = TRUE) {
+    if (\Civi::settings()->get('disable_sql_memory_engine')) {
+      $value = FALSE;
+    }
     $this->memory = $value;
     return $this;
   }

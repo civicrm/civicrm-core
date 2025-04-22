@@ -140,6 +140,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    */
   public function run() {
     $this->assign('isIncludeInvoiceLinks', $this->isIncludeInvoiceLinks());
+    $this->assign('canViewMyInvoicesOrAccessCiviContribute', CRM_Core_Permission::check([['view my invoices', 'access CiviContribute']]));
     parent::preProcess();
     $this->listContribution();
   }

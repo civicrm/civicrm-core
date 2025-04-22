@@ -14,11 +14,11 @@
     <url desc="Support">https://github.com/civicrm/civicrm-core/</url>
     <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-05-02</releaseDate>
-  <version>5.75.alpha1</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.75</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <comments>This is the version of CKEditor that originally shipped with CiviCRM core</comments>
   <classloader>
@@ -27,11 +27,11 @@
   </classloader>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
-    <mixin>smarty@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Ckeditor4</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
   </civix>
-  <upgrader>CRM_Ckeditor4_Upgrader</upgrader>
+  <upgrader>CiviMix\Schema\Ckeditor4\AutomaticUpgrader</upgrader>
 </extension>

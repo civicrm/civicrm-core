@@ -30,7 +30,6 @@ return [
     'api4',
     'ui.bootstrap',
   ],
-  'settings' => [],
   'basePages' => [],
   'permissions' => [
     'edit message templates',

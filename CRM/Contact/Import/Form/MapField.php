@@ -106,9 +106,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $sel1 = $this->_mapperFields;
     $sel2[''] = NULL;
 
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
+    $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
 
     foreach ($this->getLocationTypes() as $key => $value) {
       $sel3['phone'][$key] = &$phoneTypes;
@@ -330,7 +330,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function submit(array $params): void {
     // store mapping Id to display it in the preview page
-    $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
+    $this->set('loadMappingId', $params['mappingId'] ?? NULL);
 
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
@@ -389,13 +389,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $highlightedFields = $entityFields[$this->getContactType()];
     $highlightedFields[] = 'email';
     $highlightedFields[] = 'external_identifier';
-    if (!$this->isSkipDuplicates()) {
-      $highlightedFields[] = 'id';
-    }
-    $customFields = CRM_Core_BAO_CustomField::getFields($this->getContactType());
-    foreach ($customFields as $key => $attr) {
-      if (!empty($attr['is_required'])) {
-        $highlightedFields[] = "custom_$key";
+    $highlightedFields[] = 'id';
+    foreach ($this->getFields() as $key => $details) {
+      if (!empty($details['custom_field_id']) && !empty($details['is_required'])) {
+        $highlightedFields[] = $key;
       }
     }
     return $highlightedFields;
@@ -432,7 +429,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return array
    */
   protected function getLocationTypes(): array {
-    return ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    return ['Primary' => ts('Primary')] + CRM_Core_DAO_Address::buildOptions('location_type_id');
   }
 
   /**

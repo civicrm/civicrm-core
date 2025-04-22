@@ -47,6 +47,7 @@ class Admin {
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
       'modules' => \CRM_Core_BAO_Managed::getBaseModules(),
       'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
+      'optionAttributes' => \CRM_Core_SelectValues::optionAttributes(),
       'jobFrequency' => \Civi\Api4\Job::getFields()
         ->addWhere('name', '=', 'run_frequency')
         ->setLoadOptions(['id', 'label'])
@@ -56,6 +57,7 @@ class Admin {
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
         ->execute(),
       'myName' => \CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
+      'dateFormats' => self::getDateFormats(),
     ];
     $perms = \Civi\Api4\Permission::get()
       ->addWhere('group', 'IN', ['civicrm', 'cms'])
@@ -130,7 +132,7 @@ class Admin {
   public static function getSchema(): array {
     $schema = [];
     $entities = Entity::get()
-      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
+      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'parent_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
       ->setChain([
@@ -165,6 +167,9 @@ class Admin {
           }
           $entity['fields'][] = $field;
         }
+        if (empty($entity['fields'])) {
+          continue;
+        }
         $entity['default_columns'] = self::getDefaultColumns($entity, $getFields);
         $params = $entity['get'][0];
         // Entity must support at least these params or it is too weird for search kit
@@ -188,7 +193,7 @@ class Admin {
   private static function getDefaultColumns(array $entity, iterable $getFields): array {
     // Start with id & label
     $defaultColumns = array_merge(
-      $entity['primary_key'],
+      $entity['primary_key'] ?? [],
       $entity['search_fields'] ?? []
     );
     $possibleColumns = [];
@@ -278,10 +283,14 @@ class Admin {
   public static function getJoins(array $allowedEntities):array {
     $joins = [];
     foreach ($allowedEntities as $entity) {
-      $isMultiValueCustomEntity = in_array('CustomValue', $entity['type'], TRUE);
+      $isVirtualEntity = (bool) array_intersect(['CustomValue', 'SavedSearch'], $entity['type']);
 
-      // Normal DAO entities (excludes multi-value custom field entities)
-      if (!empty($entity['dao']) && !$isMultiValueCustomEntity) {
+      // Normal DAO entities (excludes virtual entities)
+      // FIXME: At this point DAO entities have enough metadata that using getReferenceColumns()
+      // is no longer necessary and they could be handled the same as virtual entities.
+      // So this entire block could, in theory, be removed in favor of the foreach loop below.
+      // Just need a solid before/after comparison to ensure the output stays stable.
+      if (!empty($entity['dao']) && !$isVirtualEntity) {
         /** @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
@@ -321,7 +330,8 @@ class Admin {
                   'description' => '',
                   'entity' => $targetEntityName,
                   'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $dynamicValue, $dynamicCol),
-                  'defaults' => self::getJoinDefaults($alias, $targetEntity),
+                  // No default conditions for straight joins as they ought to be direct 1-1
+                  'defaults' => [],
                   'alias' => $alias,
                   'multi' => FALSE,
                 ];
@@ -391,15 +401,23 @@ class Admin {
         }
       }
 
-      // Custom EntityRef joins
+      // This handles joins for custom fields and virtual entities which don't have a DAO.
       foreach ($entity['fields'] as $field) {
-        if (($field['type'] === 'Custom' || $isMultiValueCustomEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
+        // FIXME: See comment above: this loop should be able to handle every entity.
+        // Above block could be removed and the first part of this conditional
+        // `($field['type'] === 'Custom' || $isVirtualEntity)` can be removed.
+        if (($field['type'] === 'Custom' || $isVirtualEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
           $entityRefJoins = self::getEntityRefJoins($entity, $field);
           foreach ($entityRefJoins as $joinEntity => $joinInfo) {
             $joins[$joinEntity][] = $joinInfo;
           }
         }
       }
+    }
+    // Add contact joins to the contactType pseudo-entities
+    foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+      $joins += [$contactType => []];
+      $joins[$contactType] = array_merge($joins[$contactType], $joins['Contact']);
     }
     return $joins;
   }
@@ -428,7 +446,7 @@ class Admin {
       $alias = "{$field['fk_entity']}_{$entity['name']}_$bareFieldName";
       $joins[$field['fk_entity']] = [
         'label' => $entity['title_plural'],
-        'description' => $entity['description'],
+        'description' => $entity['description'] ?? '',
         'entity' => $entity['name'],
         'conditions' => self::getJoinConditions('id', "$alias.{$field['name']}"),
         'defaults' => [],
@@ -463,7 +481,7 @@ class Admin {
    * @param string|null $dynamicCol
    * @return array[]
    */
-  private static function getJoinConditions(string $nearCol, string $farCol, string $dynamicValue = NULL, string $dynamicCol = NULL):array {
+  private static function getJoinConditions(string $nearCol, string $farCol, ?string $dynamicValue = NULL, ?string $dynamicCol = NULL):array {
     $conditions = [
       [
         $nearCol,
@@ -492,28 +510,30 @@ class Admin {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  private static function getJoinDefaults(string $alias, ...$entities):array {
+  private static function getJoinDefaults(string $alias, ...$entities): array {
     $conditions = [];
     foreach ($entities as $entity) {
-      foreach ($entity['ui_join_filters'] ?? [] as $fieldName) {
-        $field = civicrm_api4($entity['name'], 'getFields', [
-          'select' => ['options', 'data_type'],
-          'where' => [['name', '=', $fieldName]],
+      if (!empty($entity['ui_join_filters'])) {
+        $filterFields = civicrm_api4($entity['name'], 'getFields', [
+          'select' => ['name', 'options', 'data_type'],
+          'where' => [['name', 'IN', $entity['ui_join_filters']]],
           'loadOptions' => ['name'],
-        ])->first();
-        $value = '';
-        if ($field['data_type'] === 'Boolean') {
-          $value = TRUE;
+        ])->indexBy('name');
+        foreach ($filterFields as $fieldName => $field) {
+          $value = '';
+          if ($field['data_type'] === 'Boolean') {
+            $value = TRUE;
+          }
+          elseif (isset($field['options'][0])) {
+            $fieldName .= ':name';
+            $value = json_encode($field['options'][0]['name']);
+          }
+          $conditions[] = [
+            $alias . '.' . $fieldName,
+            '=',
+            $value,
+          ];
         }
-        elseif (isset($field['options'][0])) {
-          $fieldName .= ':name';
-          $value = json_encode($field['options'][0]['name']);
-        }
-        $conditions[] = [
-          $alias . '.' . $fieldName,
-          '=',
-          $value,
-        ];
       }
     }
     return $conditions;
@@ -568,6 +588,14 @@ class Admin {
       return $a['title'] <=> $b['title'];
     });
     return $functions;
+  }
+
+  private static function getDateFormats(): array {
+    return \Civi\Api4\Setting::getFields(FALSE)
+      ->addWhere('name', 'LIKE', 'dateformat%')
+      ->execute()
+      ->indexBy('name')
+      ->column('title');
   }
 
 }

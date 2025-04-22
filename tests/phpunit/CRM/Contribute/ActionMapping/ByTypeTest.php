@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\AbstractMappingTest;
+use Civi\ActionSchedule\AbstractMappingTestCase;
 use Civi\Api4\Contribution;
 use Civi\Token\TokenProcessor;
 
@@ -21,10 +21,10 @@ use Civi\Token\TokenProcessor;
  * reminders for *contribution types*. It follows a design/pattern described in
  * AbstractMappingTest.
  *
- * @see \Civi\ActionSchedule\AbstractMappingTest
+ * @see \Civi\ActionSchedule\AbstractMappingTestCase
  * @group headless
  */
-class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
+class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
 
   /**
    * Generate a list of test cases, where each is a distinct combination of
@@ -39,7 +39,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
    *        - recipients: array of emails
    *        - subject: regex
    */
-  public function createTestCases(): array {
+  public static function createTestCases(): array {
     $cs = [];
 
     $cs[] = [
@@ -193,7 +193,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
    * Create a contribution record for Alice with type "Member Dues".
    */
   public function addAliceDues(): void {
-    $campaignID = $this->campaignCreate([
+    $campaignID = $this->ids['Campaign']['big'] = $this->campaignCreate([
       'title' => 'Campaign',
       'name' => 'big_campaign',
     ]);
@@ -346,7 +346,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
       campaign_id = {contribution.campaign_id}
       campaign name = {contribution.campaign_id:name}
       campaign label = {contribution.campaign_id:label}
-      receipt text = {contribution.contribution_page_id.receipt_text}';
+      receipt text = {contribution.contribution_page_id.receipt_text}
+      message_header = {site.message_header}';
 
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
@@ -372,10 +373,11 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
       'fee_amount = €5.00',
       'paid_amount = €100.00',
       'balance_amount = €0.00',
-      'campaign_id = 1',
+      'campaign_id = ' . $this->ids['Campaign']['big'],
       'campaign name = big_campaign',
       'campaign label = Campaign',
       'receipt text = Thank you!',
+      'header = <div><!-- This content comes from the site message header token--></div>',
     ];
     $this->mut->checkMailLog($expected);
 
@@ -412,7 +414,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
     ]);
     $comparison = [];
     foreach ($tokenProcessor->listTokens() as $token => $label) {
-      if (strpos($token, '{domain.') === 0) {
+      if (str_starts_with($token, '{domain.')) {
         // domain token - ignore.
         continue;
       }
@@ -463,6 +465,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
         'contribution_recur_id.cancel_date' => 'Cancel Date',
         'contribution_recur_id.cancel_reason' => 'Cancellation Reason',
         'contribution_recur_id.end_date' => 'Recurring Contribution End Date',
+        'contribution_recur_id.next_sched_contribution_date' => 'Next Scheduled Contribution Date',
+        'contribution_recur_id.failure_count' => 'Number of Failures',
+        'contribution_recur_id.failure_retry_date' => 'Retry Failed Attempt Date',
         'contribution_recur_id.financial_type_id' => 'Financial Type ID',
         'contribution_recur_id.campaign_id' => 'Campaign ID',
         'contribution_page_id.frontend_title' => 'Public Title',
@@ -472,6 +477,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
         'address_id.id' => 'Address ID',
         'address_id.name' => 'Billing Address Name',
         'address_id.display' => 'Billing Address',
+        'header' => 'Message Header',
       ], $comparison);
   }
 

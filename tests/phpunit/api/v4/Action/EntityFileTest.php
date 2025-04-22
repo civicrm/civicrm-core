@@ -22,6 +22,8 @@ namespace api\v4\Action;
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\EntityFile;
+use Civi\Api4\EntityTag;
+use Civi\Api4\File;
 use Civi\Api4\Note;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -48,15 +50,18 @@ class EntityFileTest extends Api4TestBase implements TransactionalInterface, Hoo
 
     $file = [];
 
-    // FIXME: Use api4 when available
     foreach ($note as $nid) {
-      $file[] = civicrm_api3('Attachment', 'create', [
-        'entity_table' => 'civicrm_note',
-        'entity_id' => $nid,
-        'name' => 'file_for_' . $nid . '.txt',
+      $fileId = $this->createTestRecord('File', [
+        'file_name' => 'file_for_' . $nid . '.txt',
         'mime_type' => 'text/plain',
         'content' => 'hello',
       ])['id'];
+      $file[] = $fileId;
+      $this->createTestRecord('EntityFile', [
+        'file_id' => $fileId,
+        'entity_table' => 'civicrm_note',
+        'entity_id' => $nid,
+      ]);
     }
 
     // Grant access to contact 2 & 3, deny to 0 & 1
@@ -95,22 +100,24 @@ class EntityFileTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertCount(2, $allowedNotes);
     $this->assertEquals('file_for_' . $note[2] . '.txt', $allowedNotes[$note[2]]['file.file_name']);
     $this->assertEquals('file_for_' . $note[3] . '.txt', $allowedNotes[$note[3]]['file.file_name']);
-    $this->assertStringContainsString("id=$file[2]&eid=$note[2]&fcs=", $allowedNotes[$note[2]]['file.url']);
-    $this->assertStringContainsString("id=$file[3]&eid=$note[3]&fcs=", $allowedNotes[$note[3]]['file.url']);
+    $this->assertStringContainsString("id=$file[2]&fcs=", $allowedNotes[$note[2]]['file.url']);
+    $this->assertStringContainsString("id=$file[3]&fcs=", $allowedNotes[$note[3]]['file.url']);
   }
 
   public function testGetAggregateFileFields() {
     $activity = $this->createTestRecord('Activity');
 
     foreach (['text/plain' => 'txt', 'image/png' => 'png', 'image/jpg' => 'jpg'] as $mimeType => $ext) {
-      // FIXME: Use api4 when available
-      civicrm_api3('Attachment', 'create', [
-        'entity_table' => 'civicrm_activity',
-        'entity_id' => $activity['id'],
-        'name' => 'test_file.' . $ext,
+      $file = $this->createTestRecord('File', [
+        'file_name' => 'test_file.' . $ext,
         'mime_type' => $mimeType,
         'content' => 'hello',
-      ])['id'];
+      ]);
+      $this->createTestRecord('EntityFile', [
+        'file_id' => $file['id'],
+        'entity_table' => 'civicrm_activity',
+        'entity_id' => $activity['id'],
+      ]);
     }
 
     $get = Activity::get(FALSE)
@@ -126,6 +133,59 @@ class EntityFileTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertCount(3, $get['aggregate_icon']);
     $this->assertEquals(['test_file.txt', 'test_file.png', 'test_file.jpg'], $get['aggregate_file_name']);
     $this->assertEquals(['fa-file-text-o', 'fa-file-image-o', 'fa-file-image-o'], $get['aggregate_icon']);
+  }
+
+  public function testDeleteTaggedAttachments(): void {
+    $activity = $this->createTestRecord('Activity');
+
+    $fileTag = $this->createTestRecord('Tag', [
+      'used_for' => 'civicrm_file',
+      'title' => uniqid(),
+    ]);
+    $activityTag = $this->createTestRecord('Tag', [
+      'used_for' => 'civicrm_activity',
+      'title' => uniqid(),
+    ]);
+
+    $activityEntityTag = $this->createTestRecord('EntityTag', [
+      'entity_id' => $activity['id'],
+      'entity_table' => 'civicrm_activity',
+      'tag_id' => $activityTag['id'],
+    ]);
+
+    $file = $this->createTestRecord('File', [
+      'file_name' => 'test_file.txt',
+      'mime_type' => 'text/plain',
+      'content' => 'hello',
+    ]);
+
+    $entityFile = $this->createTestRecord('EntityFile', [
+      'file_id' => $file['id'],
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $activity['id'],
+    ]);
+
+    $fileEntityTag = $this->createTestRecord('EntityTag', [
+      'entity_id' => $file['id'],
+      'entity_table' => 'civicrm_file',
+      'tag_id' => $fileTag['id'],
+    ]);
+
+    EntityFile::delete(FALSE)
+      ->addWhere('id', '=', $entityFile['id'])
+      ->execute();
+
+    File::delete(FALSE)
+      ->addWhere('id', '=', $file['id'])
+      ->execute();
+
+    Activity::delete(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->execute();
+
+    $this->assertCount(0, EntityTag::get(FALSE)
+      ->addWhere('id', 'IN', [$activityEntityTag['id'], $fileEntityTag['id']])
+      ->execute());
   }
 
 }

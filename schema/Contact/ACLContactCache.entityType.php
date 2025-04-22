@@ -13,6 +13,7 @@ return [
   'getIndices' => fn() => [
     'UI_user_contact_operation' => [
       'fields' => [
+        'domain_id' => TRUE,
         'user_id' => TRUE,
         'contact_id' => TRUE,
         'operation' => TRUE,
@@ -57,12 +58,18 @@ return [
       'required' => TRUE,
       'description' => ts('What operation does this user have permission on?'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::operation',
+        'callback' => ['CRM_ACL_BAO_ACL', 'operation'],
       ],
+    ],
+    'domain_id' => [
+      'title'  => ts('Domain'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'description' => ts('Implicit FK to civicrm_domain'),
+      'add' => '6.2',
+      'required' => TRUE,
+      'default' => 1,
     ],
   ],
 ];

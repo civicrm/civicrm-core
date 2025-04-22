@@ -24,9 +24,23 @@ class SqlEntityMetadata extends EntityMetadataBase {
         }
         return $keys;
 
+      case 'primary_key':
+        foreach ($this->getFields() as $name => $field) {
+          if (!empty($field['primary_key'])) {
+            return $name;
+          }
+        }
+        return NULL;
+
       case 'paths':
         if (isset($this->getEntity()['getPaths'])) {
           return $this->getEntity()['getPaths']();
+        }
+        return [];
+
+      case 'indices':
+        if (isset($this->getEntity()['getIndices'])) {
+          return $this->getEntity()['getIndices']();
         }
         return [];
 
@@ -38,10 +52,6 @@ class SqlEntityMetadata extends EntityMetadataBase {
 
   public function getFields(): array {
     return $this->getEntity()['getFields']();
-  }
-
-  public function getOptions(string $fieldName, array $values = NULL): ?array {
-    // TODO: Implement getOptions() method.
   }
 
 }

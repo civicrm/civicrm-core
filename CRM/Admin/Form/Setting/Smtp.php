@@ -60,11 +60,11 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     $this->setTitle(ts('Settings - Outbound Mail'));
     $this->add('text', 'sendmail_path', ts('Sendmail Path'));
     $this->add('text', 'sendmail_args', ts('Sendmail Argument'));
-    $this->add('text', 'smtpServer', ts('SMTP Server'), CRM_Utils_Array::value('smtpServer', $props));
-    $this->add('text', 'smtpPort', ts('SMTP Port'), CRM_Utils_Array::value('smtpPort', $props));
-    $this->addYesNo('smtpAuth', ts('Authentication?'), CRM_Utils_Array::value('smtpAuth', $props));
-    $this->addElement('text', 'smtpUsername', ts('SMTP Username'), CRM_Utils_Array::value('smtpUsername', $props));
-    $this->addElement('password', 'smtpPassword', ts('SMTP Password'), CRM_Utils_Array::value('smtpPassword', $props));
+    $this->add('text', 'smtpServer', ts('SMTP Server'), $props['smtpServer'] ?? NULL);
+    $this->add('text', 'smtpPort', ts('SMTP Port'), $props['smtpPort'] ?? NULL);
+    $this->addYesNo('smtpAuth', ts('Authentication?'), $props['smtpAuth'] ?? NULL);
+    $this->addElement('text', 'smtpUsername', ts('SMTP Username'), $props['smtpUsername'] ?? NULL);
+    $this->addElement('password', 'smtpPassword', ts('SMTP Password'), $props['smtpPassword'] ?? NULL);
 
     $this->_testButtonName = $this->getButtonName('refresh', 'test');
 
@@ -117,8 +117,8 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
         if (!$domainEmailAddress || $domainEmailAddress === 'info@EXAMPLE.ORG') {
-          $fixUrl = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'action=update&reset=1');
-          CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; System Settings &raquo; Option Groups &raquo; From Email Address</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+          $fixUrl = CRM_Utils_System::url('civicrm/admin/options/site_email_address');
+          CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid "Site Email Address" in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
         }
         if (!$toEmail) {
           CRM_Core_Error::statusBounce(ts('Cannot send a test email because your user record does not have a valid email address.'));

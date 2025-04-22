@@ -26,12 +26,17 @@ use Civi\Api4\Email;
 use Civi\Api4\Individual;
 use Civi\Api4\Navigation;
 use Civi\Api4\Organization;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
 class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
+
+  public function testMetadata(): void {
+    $this->assertEquals('parent_id', CoreUtil::getInfoItem('ContactType', 'parent_field'));
+  }
 
   public function testMenuItemWillBeCreatedAndDeleted(): void {
     ContactType::create(FALSE)
@@ -198,6 +203,37 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals('Household', $household['contact_type']);
     $this->assertTrue(empty($household['organization_name']));
+  }
+
+  public function testDepth(): void {
+    ContactType::delete(FALSE)
+      ->addWhere('parent_id', 'IS NOT NULL')
+      ->execute();
+
+    $this->saveTestRecords('ContactType', [
+      'records' => [
+        ['parent_id.name' => 'Organization', 'name' => 'ZOrg'],
+        ['parent_id.name' => 'Individual', 'name' => '1Ind'],
+        ['parent_id.name' => 'Organization', 'name' => '1Org'],
+        ['parent_id.name' => 'Individual', 'name' => '2Ind'],
+      ],
+    ]);
+
+    $result = ContactType::get(FALSE)
+      ->addSelect('name', '_depth')
+      ->addOrderBy('name', 'ASC')
+      ->setLimit(5)
+      ->setOffset(1)
+      ->execute()->column('_depth', 'name');
+
+    $expected = [
+      'Individual' => 0,
+      '1Ind' => 1,
+      '2Ind' => 1,
+      'Organization' => 0,
+      '1Org' => 1,
+    ];
+    $this->assertEquals($expected, $result);
   }
 
 }

@@ -11,15 +11,14 @@
 {capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
 {capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
-  <table id="crm-membership_receipt"
-         style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
-
     <!-- BEGIN HEADER -->
-    <!-- You can add table row(s) here with logo or other header elements -->
+      {* To modify content in this section, you can edit the Custom Token named "Message Header". See also: https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates *}
+      {site.message_header}
     <!-- END HEADER -->
 
     <!-- BEGIN CONTENT -->
 
+    <table id="crm-membership_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
     <tr>
       <td>
         {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
@@ -73,17 +72,6 @@
                   {ts}Membership Fee{/ts}
                 </th>
               </tr>
-              {if {contribution.financial_type_id|boolean}}
-                <tr>
-                  <td {$labelStyle}>
-                    {ts}Financial Type{/ts}
-                  </td>
-                  <td {$valueStyle}>
-                    {contribution.financial_type_id:label}
-                  </td>
-                </tr>
-              {/if}
-
               {if $isShowLineItems}
                   <tr>
                     <td colspan="2" {$valueStyle}>
@@ -216,7 +204,7 @@
             {if !empty($billingName)}
               <tr>
                 <th {$headerStyle}>
-                  {ts}Billing Name and Address{/ts}
+                  {ts}Billing Address{/ts}
                 </th>
               </tr>
               <tr>

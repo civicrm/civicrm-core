@@ -1,11 +1,11 @@
 <nav class="bg-info">
-  <ul class="nav nav-tabs">
-    <li role="presentation"
+  <ul role="tablist" class="nav nav-tabs">
+    <li role="tab"
         ng-class="{active: location.path() === '/user'}"
         ng-if="checkPerm('edit message templates') || checkPerm('edit user-driven message templates')">
       <a ng-href="#/user">{{:: ts('User-Driven Messages') }}</a>
     </li>
-    <li role="presentation"
+    <li role="tab"
         ng-class="{active: location.path() === '/workflow'}"
         ng-if="checkPerm('edit message templates') || checkPerm('edit system workflow message templates')">
       <a ng-href="#/workflow">{{:: ts('System Workflow Messages' )}}</a>
@@ -15,12 +15,12 @@
 
 <div class="help">
 
-  <div ng-if="location.path() === '/user'">
+  <div role="tabpanel" ng-if="location.path() === '/user'">
     <span ng-bind-html="ts('Message templates allow you to easily create similar emails or letters on a recurring basis. Messages used for membership renewal reminders, as well as event and activity related reminders should be created via <a href=\'%1\'>Schedule Reminders</a>.', {1: crmUrl('civicrm/admin/scheduleReminders', 'reset=1')})"></span>
     <span ng-if="checkPerm('access CiviMail')" ng-bind-html="ts('You can also use message templates for CiviMail (bulk email) content. However, subscribe, unsubscribe and opt-out messages are configured at <a href=\'%1\'>Administer > CiviMail > Headers, Footers and Automated Messages</a>.', {1: crmUrl('civicrm/admin/component', 'reset=1')})"></span>
     <a crm-ui-help="hs({title:ts('User-Driven Messages'), id:'id-intro', file:'CRM/Admin/Page/MessageTemplates'})"></a>
   </div>
-  <div ng-if="location.path() === '/workflow'">
+  <div role="tabpanel" ng-if="location.path() === '/workflow'">
     {{ts('System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.')}}
     <a crm-ui-help="hs({title:ts('System Workflow Messages'), id:'id-system-workflow', file:'CRM/Admin/Page/MessageTemplates'})"></a>
   </div>

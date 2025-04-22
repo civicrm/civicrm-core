@@ -43,9 +43,6 @@ return [
       'required' => TRUE,
       'description' => ts('The name of the table this rule is about'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'rule_field' => [
       'title' => ts('Rule Field'),
@@ -54,9 +51,6 @@ return [
       'required' => TRUE,
       'description' => ts('The name of the field of the table referenced in rule_table'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'rule_length' => [
       'title' => ts('Rule Length'),

@@ -326,7 +326,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $params['id'] = ['!=' => $exclude];
     }
     $allTags = [];
-    foreach (CRM_Utils_Array::value('values', civicrm_api3('Tag', 'get', $params)) as $id => $tag) {
+    foreach (civicrm_api3('Tag', 'get', $params)['values'] as $id => $tag) {
       $allTags[$id] = [
         'text' => $tag['label'],
         'id' => $id,
@@ -412,11 +412,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $params['color'] = '';
     }
 
-    // save creator id and time
-    if (!$id) {
-      $params['created_id'] ??= CRM_Core_Session::getLoggedInContactID();
-    }
-
     $tag = self::writeRecord($params);
 
     // if we modify parent tag, then we need to update all children
@@ -431,6 +426,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
 
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
 
     return $tag;
   }

@@ -79,7 +79,7 @@ return [
         'saved_search_id.name' => 'Contact_Summary_Memberships',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts('Active Memberships'),
+          'description' => '',
           'sort' => [
             [
               'id',
@@ -285,8 +285,8 @@ return [
               'action' => '',
               'entity' => '',
               'text' => E::ts('Add Membership'),
-              'icon' => 'fa-external-link',
-              'style' => 'default',
+              'icon' => 'fa-plus-circle',
+              'style' => 'primary',
               'target' => 'crm-popup',
               'join' => '',
               'path' => 'civicrm/contact/view/membership?reset=1&action=add&cid=[contact_id]&context=membership',

@@ -66,21 +66,16 @@ return [
       'required' => TRUE,
       'description' => ts('Internal name of Group.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'title' => [
       'title' => ts('Group Title'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['frontend_title', 'name'],
       'localizable' => TRUE,
       'description' => ts('Name of Group.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Group Description'),
@@ -99,9 +94,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Module or process which created this group.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'saved_search_id' => [
       'title' => ts('Saved Search ID'),
@@ -137,11 +129,8 @@ return [
       'description' => ts('In what context(s) is this field visible.'),
       'add' => '1.2',
       'default' => 'User and User Admin Only',
-      'input_attrs' => [
-        'maxlength' => 24,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::groupVisibility',
+        'callback' => ['CRM_Core_SelectValues', 'groupVisibility'],
       ],
     ],
     'where_clause' => [
@@ -180,9 +169,6 @@ return [
       'description' => ts('FK to group type'),
       'add' => '1.9',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'group_type',
       ],
@@ -272,6 +258,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to contact table.'),
       'add' => '4.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -288,6 +275,7 @@ return [
       'readonly' => TRUE,
       'description' => ts('FK to contact table.'),
       'add' => '4.5',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Modified By'),
       ],
@@ -302,12 +290,10 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['title'],
       'localizable' => TRUE,
       'description' => ts('Alternative public title for this Group.'),
       'add' => '5.31',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'frontend_description' => [
       'title' => ts('Public Group Description'),

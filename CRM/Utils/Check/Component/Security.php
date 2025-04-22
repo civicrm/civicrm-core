@@ -59,8 +59,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
     $config = CRM_Core_Config::singleton();
 
-    $log = CRM_Core_Error::createDebugLogger();
-    $log_filename = str_replace('\\', '/', $log->_filename);
+    CRM_Core_Error::createDebugLogger();
+    $log_filename = str_replace('\\', '/', CRM_Core_Error::generateLogFileName(''));
 
     $filePathMarker = $this->getFilePathMarker();
 
@@ -316,36 +316,6 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           [1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1')]
         ),
         ts('Remote Profiles Enabled'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-lock'
-      );
-    }
-
-    return $messages;
-  }
-
-  /**
-   * Check that the sysadmin has not modified the Cxn security setup.
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkCxnOverrides() {
-    $list = [];
-    if (defined('CIVICRM_CXN_CA') && CIVICRM_CXN_CA !== 'CiviRootCA') {
-      $list[] = 'CIVICRM_CXN_CA';
-    }
-    if (defined('CIVICRM_CXN_APPS_URL') && CIVICRM_CXN_APPS_URL !== \Civi\Cxn\Rpc\Constants::OFFICIAL_APPMETAS_URL) {
-      $list[] = 'CIVICRM_CXN_APPS_URL';
-    }
-
-    $messages = [];
-
-    if (!empty($list)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The system administrator has disabled security settings (%1). Connections to remote applications are insecure.', [
-          1 => implode(', ', $list),
-        ]),
-        ts('Security Warning'),
         \Psr\Log\LogLevel::WARNING,
         'fa-lock'
       );

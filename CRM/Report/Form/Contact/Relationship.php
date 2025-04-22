@@ -509,7 +509,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
               }
               else {
                 if ($fieldName == 'is_valid') {
-                  $clause = $this->buildValidityQuery(CRM_Utils_Array::value("{$fieldName}_value", $this->_params));
+                  $clause = $this->buildValidityQuery($this->_params["{$fieldName}_value"] ?? NULL);
                 }
                 else {
                   $clause = $this->whereClause($field,
@@ -772,8 +772,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
   /**
    * Convert values to permissioned relationship descriptions
-   * @param  [int] $key
-   * @return [string]
+   * @param int[] $key
+   * @return string[]
    */
   public static function permissionedRelationship($key) {
     static $lookup;

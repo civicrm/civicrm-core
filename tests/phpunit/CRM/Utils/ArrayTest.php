@@ -528,4 +528,30 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals(NULL, CRM_Utils_Array::value('c', $list, 'fruit'));
   }
 
+  public function testDeepSort() {
+    $unsorted = [
+      '1-bbb' => '1-BBB',
+      '1-aaa' => '1-AAA',
+      '1-ddd' => [
+        '2-bbb' => '2-BBB',
+        '2-ccc' => '2-ccc',
+        '2-aaa' => '2-AAA',
+      ],
+      '1-ccc' => '1-CCC',
+    ];
+    $expected = [
+      '1-aaa' => '1-AAA',
+      '1-bbb' => '1-BBB',
+      '1-ccc' => '1-CCC',
+      '1-ddd' => [
+        '2-aaa' => '2-AAA',
+        '2-bbb' => '2-BBB',
+        '2-ccc' => '2-ccc',
+      ],
+    ];
+    $sorted = $unsorted;
+    CRM_Utils_Array::deepSort($sorted, fn(array &$a) => ksort($a));
+    $this->assertEquals($expected, $sorted);
+  }
+
 }

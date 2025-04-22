@@ -110,6 +110,13 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
 
     $participantBAO->save();
 
+    // add custom field values
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participantBAO->id);
+    }
+
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if (!empty($params['id'])) {
@@ -191,13 +198,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
       $id = $params['contact_id'] ?? NULL;
     }
 
-    // add custom field values
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participant->id);
-    }
-
     //process note, CRM-7634
     $noteId = NULL;
     if (!empty($params['id'])) {
@@ -219,13 +219,9 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
           'entity_table' => 'civicrm_participant',
           'note' => $noteValue,
           'entity_id' => $participant->id,
-          'contact_id' => $id,
+          'id' => $noteId,
         ];
-        $noteIDs = [];
-        if ($noteId) {
-          $noteIDs['id'] = $noteId;
-        }
-        CRM_Core_BAO_Note::add($noteParams, $noteIDs);
+        CRM_Core_BAO_Note::add($noteParams);
       }
       elseif ($noteId && $hasNoteField) {
         CRM_Core_BAO_Note::deleteRecord(['id' => $noteId]);
@@ -1013,7 +1009,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
    *   $displayName => $viewUrl
    */
   public static function getAdditionalParticipants($primaryParticipantID) {
-    $additionalParticipantIDs = [];
+    $additionalParticipants = [];
     $additionalParticipantIDs = self::getAdditionalParticipantIds($primaryParticipantID);
     if (!empty($additionalParticipantIDs)) {
       foreach ($additionalParticipantIDs as $additionalParticipantID) {
@@ -1747,35 +1743,23 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
+   * Pseudoconstant condition_provider for role_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = ['condition' => []];
+  public static function alterRole(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['filter'])) {
+      $conditions->where('filter = #filter', ['filter' => (int) $params['values']['filter']]);
+    }
+  }
 
-    if ($fieldName === 'status_id' && $context !== 'validate') {
-      // Get rid of cart-related option if disabled
-      // FIXME: Why does this option even exist if cart is disabled?
-      if (!Civi::settings()->get('enable_cart')) {
-        $params['condition'][] = "name <> 'Pending in cart'";
-      }
+  /**
+   * Pseudoconstant condition_provider for status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStatus(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['is_counted'])) {
+      $conditions->where('is_counted = #counted', ['counted' => (int) $params['values']['is_counted']]);
     }
-    if ($fieldName === 'status_id' && isset($props['is_counted'])) {
-      $params['condition'][] = 'is_counted = ' . $props['is_counted'];
-    }
-    if ($fieldName === 'role_id' && isset($props['filter'])) {
-      $params['condition'][] = 'filter = ' . $props['filter'];
-    }
-
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
   /**
@@ -1816,7 +1800,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function getSelfServiceEligibility(int $participantId, string $url, bool $isBackOffice) : array {
     $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
     $query = "
-      SELECT cpst.name as status, cov.name as role, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id, ce.start_date, ce.title, cp.event_id, ce.allow_selfcancelxfer
+      SELECT cpst.name as status, cpst.label as statuslabel, cov.name as role, cov.label as rolelabel, cp.fee_level, cp.fee_amount, cp.register_date, cp.status_id, ce.start_date, ce.title, cp.event_id, ce.allow_selfcancelxfer
       FROM civicrm_participant cp
       LEFT JOIN civicrm_participant_status_type cpst ON cpst.id = cp.status_id
       LEFT JOIN civicrm_option_value cov ON cov.value = cp.role_id and cov.option_group_id = {$optionGroupId}
@@ -1829,6 +1813,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $details['role'] = $dao->role;
       $details['fee_level'] = $dao->fee_level ? implode('<br>', CRM_Core_DAO::unSerializeField($dao->fee_level, CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND)) : NULL;
       $details['fee_amount'] = $dao->fee_amount;
+      $details['rolelabel'] = $dao->rolelabel;
+      $details['statuslabel'] = $dao->statuslabel;
       $details['register_date'] = $dao->register_date;
       $details['event_start_date'] = $dao->start_date;
       $details['allow_selfcancelxfer'] = $dao->allow_selfcancelxfer;

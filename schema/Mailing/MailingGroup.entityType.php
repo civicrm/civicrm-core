@@ -38,11 +38,8 @@ return [
       'sql_type' => 'varchar(8)',
       'input_type' => 'Select',
       'description' => ts('Are the members of the group included or excluded?.'),
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getMailingGroupTypes',
+        'callback' => ['CRM_Core_SelectValues', 'getMailingGroupTypes'],
       ],
     ],
     'entity_table' => [
@@ -51,11 +48,8 @@ return [
       'input_type' => 'Select',
       'required' => TRUE,
       'description' => ts('Name of table where item being referenced is stored.'),
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_BAO_Mailing::mailingGroupEntityTables',
+        'callback' => ['CRM_Mailing_BAO_Mailing', 'mailingGroupEntityTables'],
       ],
     ],
     'entity_id' => [

@@ -18,7 +18,7 @@
 /**
  * BAO object for crm_log table
  */
-class CRM_Core_BAO_File extends CRM_Core_DAO_File {
+class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInterface {
 
   public static $_signableFields = ['entityTable', 'entityID', 'fileID'];
 
@@ -30,54 +30,40 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   const DEFAULT_MAX_ATTACHMENTS_BACKEND = 100;
 
   /**
-   * Takes an associative array and creates a File object.
-   *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
+   * @deprecated
    * @return CRM_Core_BAO_File
    */
   public static function create($params) {
-    $fileDAO = new CRM_Core_DAO_File();
+    return self::writeRecord($params);
+  }
 
-    $op = empty($params['id']) ? 'create' : 'edit';
-
-    CRM_Utils_Hook::pre($op, 'File', $params['id'] ?? NULL, $params);
-
-    $fileDAO->copyValues($params);
-
-    if (empty($params['id']) && empty($params['created_id'])) {
-      $fileDAO->created_id = CRM_Core_Session::getLoggedInContactID();
+  /**
+   * Event fired before an action is taken on a File record.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create') {
+      if (empty($event->params['created_id'])) {
+        $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
+      }
     }
-
-    $fileDAO->save();
-
-    CRM_Utils_Hook::post($op, 'File', $fileDAO->id, $fileDAO);
-
-    return $fileDAO;
   }
 
   /**
    * @param int $fileID
-   * @param int $entityID
    *
    * @return array
    */
-  public static function path($fileID, $entityID) {
-    $entityFileDAO = new CRM_Core_DAO_EntityFile();
-    $entityFileDAO->entity_id = $entityID;
-    $entityFileDAO->file_id = $fileID;
+  public static function path($fileID): array {
+    $fileDAO = new CRM_Core_DAO_File();
+    $fileDAO->id = $fileID;
+    if ($fileDAO->find(TRUE)) {
+      $config = CRM_Core_Config::singleton();
+      $path = $config->customFileUploadDir . $fileDAO->uri;
 
-    if ($entityFileDAO->find(TRUE)) {
-      $fileDAO = new CRM_Core_DAO_File();
-      $fileDAO->id = $fileID;
-      if ($fileDAO->find(TRUE)) {
-        $config = CRM_Core_Config::singleton();
-        $path = $config->customFileUploadDir . $fileDAO->uri;
-
-        if (file_exists($path) && is_readable($path)) {
-          return [$path, $fileDAO->mime_type];
-        }
+      if (file_exists($path) && is_readable($path)) {
+        return [$path, $fileDAO->mime_type];
       }
     }
 
@@ -175,12 +161,12 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     //save static tags
     if (!empty($fileParams['tag'])) {
-      CRM_Core_BAO_EntityTag::create($fileParams['tag'], 'civicrm_file', $entityFileDAO->id);
+      CRM_Core_BAO_EntityTag::create($fileParams['tag'], 'civicrm_file', $fileDAO->id);
     }
 
     //save free tags
     if (isset($fileParams['attachment_taglist']) && !empty($fileParams['attachment_taglist'])) {
-      CRM_Core_Form_Tag::postProcess($fileParams['attachment_taglist'], $entityFileDAO->id, 'civicrm_file');
+      CRM_Core_Form_Tag::postProcess($fileParams['attachment_taglist'], $fileDAO->id, 'civicrm_file');
     }
 
     // lets call the post hook here so attachments code can do the right stuff
@@ -269,19 +255,12 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     if (!empty($cfIDs)) {
       foreach ($cfIDs as $fileID => $fUri) {
-        $tagParams = [
-          'entity_table' => 'civicrm_file',
-          'entity_id' => $fileID,
-        ];
-        // Delete tags from entity tag table.
-        CRM_Core_BAO_EntityTag::del($tagParams);
-
         // sequentially deletes EntityFile entry and then deletes File record
         CRM_Core_DAO_EntityFile::deleteRecord(['id' => $cefIDs[$fileID]]);
         // Delete file only if there are no longer any entities using this file.
         if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $fileID, 'id', 'file_id')) {
           self::deleteRecord(['id' => $fileID]);
-          unlink($config->customFileUploadDir . DIRECTORY_SEPARATOR . $fUri);
+          unlink($config->customFileUploadDir . $fUri);
         }
       }
       $isDeleted = TRUE;
@@ -318,7 +297,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $result['fileName'] = $dao->uri;
       $result['description'] = $dao->description;
       $result['cleanName'] = CRM_Utils_File::cleanFileName($dao->uri);
-      $result['fullPath'] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
+      $result['fullPath'] = $config->customFileUploadDir . $dao->uri;
       $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}&fcs={$fileHash}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
@@ -330,7 +309,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     }
 
     //fix tag names
-    $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
 
     foreach ($results as &$values) {
       if (!empty($values['tag'])) {
@@ -760,58 +739,50 @@ HEREDOC;
     return NULL;
   }
 
+  public static function getFileUrl(int $fileId, string $cmsEnd = 'current', ?string $flags = NULL): \Civi\Core\Url {
+    $fileHash = self::generateFileHash(NULL, $fileId);
+    return Civi::url("$cmsEnd://civicrm/file?reset=1&id=$fileId&fcs=$fileHash", $flags);
+  }
+
   /**
    * Generates an access-token for downloading a specific file.
    *
-   * @param int $entityId entity id the file is attached to
+   * @param null $entityId deprecated unused param
    * @param int $fileId file ID
    * @param int $genTs
    * @param int $life
    * @return string
    */
   public static function generateFileHash($entityId = NULL, $fileId = NULL, $genTs = NULL, $life = NULL) {
-    // Use multiple (but stable) inputs for hash information.
-    $siteKey = CRM_Utils_Constant::value('CIVICRM_SITE_KEY');
-    if (!$siteKey) {
-      throw new \CRM_Core_Exception("Cannot generate file access token. Please set CIVICRM_SITE_KEY.");
-    }
-
     if (!$genTs) {
-      $genTs = time();
+      $genTs = CRM_Utils_Time::time();
     }
     if (!$life) {
       $days = Civi::settings()->get('checksum_timeout');
       $life = 24 * $days;
     }
-    // Trim 8 chars off the string, make it slightly easier to find
-    // but reveals less information from the hash.
-    $cs = hash_hmac('sha256', "entity={$entityId}&file={$fileId}&life={$life}", $siteKey);
-    return "{$cs}_{$genTs}_{$life}";
+    return Civi::service('crypto.jwt')->encode([
+      'exp' => $genTs + ($life * 60 * 60),
+      'civi.file' => $fileId,
+    ], ['SIGN', 'WEAK_SIGN']);
   }
 
   /**
    * Validate a file access token.
    *
    * @param string $hash
-   * @param int $entityId Entity Id the file is attached to
+   * @param null $entityId deprecated unused param
    * @param int $fileId File Id
    * @return bool
    */
   public static function validateFileHash($hash, $entityId, $fileId) {
-    $input = CRM_Utils_System::explode('_', $hash, 3);
-    $inputTs = $input[1] ?? NULL;
-    $inputLF = $input[2] ?? NULL;
-    $testHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId, $inputTs, $inputLF);
-    if (hash_equals($testHash, $hash)) {
-      $now = time();
-      if ($inputTs + ($inputLF * 60 * 60) >= $now) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
+    try {
+      $payload = Civi::service('crypto.jwt')->decode($hash, ['SIGN', 'WEAK_SIGN']);
+      return $payload && $payload['civi.file'] == $fileId;
     }
-    return FALSE;
+    catch (\Civi\Crypto\Exception\CryptoException $e) {
+      return FALSE;
+    }
   }
 
   /**
@@ -820,7 +791,7 @@ HEREDOC;
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     // TODO: This seemded like a good idea... piggybacking off the ACL clause of EntityFile
     // however that's too restrictive because entityFile ACLs are limited to just attachments,
     // so this would prevent access to other file fields (e.g. custom fields)

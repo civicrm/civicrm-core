@@ -8,6 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Displays alphabetic filter bar for search results. If one more records in resultset starts w/ that letter, item is a link. *}
+{if $aToZ}
 <div id="alpha-filter">
     <ul>
     {foreach from=$aToZ item=letter}
@@ -15,3 +16,4 @@
     {/foreach}
     </ul>
 </div>
+{/if}

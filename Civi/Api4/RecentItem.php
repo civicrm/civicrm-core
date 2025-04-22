@@ -19,12 +19,11 @@ namespace Civi\Api4;
  * The number of items stored is determined by the setting `recentItemsMaxCount`.
  *
  * @searchable secondary
+ * @primaryKey entity_id,entity_type
  * @since 5.49
  * @package Civi\Api4
  */
 class RecentItem extends Generic\BasicEntity {
-
-  protected static $idField = ['entity_id', 'entity_type'];
 
   protected static $getter = ['CRM_Utils_Recent', 'get'];
   protected static $setter = ['CRM_Utils_Recent', 'create'];

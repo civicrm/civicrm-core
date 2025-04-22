@@ -83,7 +83,10 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_location_type',
         'key_column' => 'id',
+        'name_column' => 'name',
+        'description_column' => 'description',
         'label_column' => 'display_name',
+        'abbr_column' => 'vcard_name',
       ],
     ],
     'is_primary' => [
@@ -121,11 +124,9 @@ return [
       'usage' => [
         'import',
         'export',
-        'duplicate_matching',
       ],
       'input_attrs' => [
         'label' => ts('Phone'),
-        'maxlength' => 32,
       ],
     ],
     'phone_ext' => [
@@ -141,7 +142,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '4',
-        'maxlength' => 16,
       ],
     ],
     'phone_numeric' => [
@@ -151,9 +151,11 @@ return [
       'readonly' => TRUE,
       'description' => ts('Phone number stripped of all whitespace, letters, and punctuation.'),
       'add' => '4.3',
+      'usage' => [
+        'duplicate_matching',
+      ],
       'input_attrs' => [
-        'label' => ts('Numeric'),
-        'maxlength' => 32,
+        'label' => ts('Phone (Numbers only)'),
       ],
     ],
     'phone_type_id' => [

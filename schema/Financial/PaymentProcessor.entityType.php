@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Payment Processor'),
     'title_plural' => ts('Payment Processors'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing list of defined payment processors'),
     'add' => '1.8',
     'label_field' => 'title',
   ],
@@ -67,8 +67,7 @@ return [
       'description' => ts('Payment Processor Name.'),
       'add' => '1.8',
       'input_attrs' => [
-        'label' => ts('Machine Name'),
-        'maxlength' => 64,
+        'label' => ts('Machine name'),
       ],
     ],
     'title' => [
@@ -76,12 +75,12 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['frontend_title', 'name'],
       'localizable' => TRUE,
       'description' => ts('Name of processor when shown to CiviCRM administrators.'),
       'add' => '5.13',
       'input_attrs' => [
         'label' => ts('Backend Title'),
-        'maxlength' => 255,
       ],
     ],
     'frontend_title' => [
@@ -89,12 +88,12 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['title', 'name'],
       'localizable' => TRUE,
       'description' => ts('Name of processor when shown to users making a payment.'),
       'add' => '5.61',
       'input_attrs' => [
         'label' => ts('Frontend Title'),
-        'maxlength' => 255,
       ],
     ],
     'description' => [
@@ -105,7 +104,6 @@ return [
       'add' => '1.8',
       'input_attrs' => [
         'label' => ts('Description'),
-        'maxlength' => 255,
       ],
     ],
     'payment_processor_type_id' => [
@@ -165,18 +163,12 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'password' => [
       'title' => ts('Password'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Password',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'signature' => [
       'title' => ts('Signature'),
@@ -193,54 +185,36 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_api' => [
       'title' => ts('API URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_recur' => [
       'title' => ts('Recurring Payments URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_button' => [
       'title' => ts('Button URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'subject' => [
       'title' => ts('Subject'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'class_name' => [
       'title' => ts('Suffix for PHP class name implementation'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'billing_mode' => [
       'title' => ts('Processor Billing Mode'),

@@ -322,6 +322,11 @@ class CRM_Core_Permission_Base {
         'description' => ts('Administer user accounts. (Synthetic permission - adapts to local CMS)'),
         'is_synthetic' => TRUE,
       ],
+      'cms:bypass maintenance mode' => [
+        'label' => ts('CMS') . ': ' . ts('Bypass maintenance mode'),
+        'description' => ts('Allow to bypass maintenance mode checks - e.g. when using AJAX API'),
+        'is_synthetic' => TRUE,
+      ],
     ];
   }
 
@@ -352,7 +357,7 @@ class CRM_Core_Permission_Base {
   /**
    * Determine whether the permission store allows us to store
    * a list of permissions generated dynamically (eg by
-   * hook_civicrm_permissions.)
+   * hook_civicrm_permission.)
    *
    * @return bool
    */

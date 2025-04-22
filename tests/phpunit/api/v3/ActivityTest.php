@@ -754,7 +754,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   public function testJoinOnTags(): void {
     $tagName = 'act_tag_nm_' . mt_rand();
     $tagDescription = 'act_tag_ds_' . mt_rand();
-    $tagColor = '#' . substr(md5(mt_rand()), 0, 6);
+    $tagColor = '#' . bin2hex(random_bytes(3));
     $tag = $this->callAPISuccess('Tag', 'create', ['name' => $tagName, 'color' => $tagColor, 'description' => $tagDescription, 'used_for' => 'Activities']);
     $activity = $this->callAPISuccess('Activity', 'Create', $this->_params);
     $this->callAPISuccess('EntityTag', 'create', ['entity_table' => 'civicrm_activity', 'tag_id' => $tag['id'], 'entity_id' => $activity['id']]);
@@ -1267,45 +1267,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($this->test_activity_type_value, $result['values'][$activity['id']]['activity_type_id']);
     $this->assertEquals('Test activity type', $result['values'][$activity['id']]['activity_name']);
     $this->assertEquals('Test activity type', $result['values'][$activity2['id']]['activity_name']);
-  }
-
-  /**
-   * Test chained Activity format.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testChainedActivityGet(): void {
-
-    $activity = $this->callAPISuccess('Contact', 'Create', [
-      'display_name' => 'bob brown',
-      'contact_type' => 'Individual',
-      'api.activity_type.create' => [
-        'weight' => '2',
-        'label' => 'send out letters',
-        'filter' => 0,
-        'is_active' => 1,
-        'is_optgroup' => 1,
-        'is_default' => 0,
-      ],
-      'api.activity.create' => [
-        'subject' => 'send letter',
-        'activity_type_id' => '$value.api.activity_type.create.values.0.value',
-      ],
-    ]);
-
-    $this->callAPISuccess('Activity', 'Get', [
-      'id' => $activity['id'],
-      'return.assignee_contact_id' => 1,
-      'api.contact.get' => ['api.pledge.get' => 1],
-    ]);
-  }
-
-  /**
-   * Test civicrm_activity_contact_get() with invalid Contact ID.
-   */
-  public function testActivitiesContactGetWithInvalidContactId(): void {
-    $params = ['contact_id' => 'contact'];
-    $this->callAPIFailure('activity', 'get', $params);
   }
 
   /**

@@ -113,7 +113,7 @@ class Civi {
    *
    * @param string $name
    *   The name of a persistent/registered queue (stored in `civicrm_queue`)
-   * @param array{type: string, is_autorun: bool, reset: bool, is_persistent: bool} $params
+   * @param array{type: string, is_autorun: bool, reset: bool, is_persistent: bool, runner: string, error: string, retry_limit: int, retry_interval: int} $params
    *   Specification for a queue.
    *   This is not required for accessing an existing queue.
    *   Specify this if you wish to auto-create the queue or to include advanced options (eg `reset`).
@@ -182,6 +182,43 @@ class Civi {
   public static function reset() {
     self::$statics = [];
     Civi\Core\Container::singleton();
+  }
+
+  /**
+   * Rebuild the system.
+   *
+   * This is more expansive than Civi::reset(). Where Civi::reset() targets ephemeral state within the current process,
+   * the rebuild targets shared data-structures used by all processes.
+   *
+   * Ex: Rebuild everything
+   *   Civi::rebuild('*')->execute();
+   * Ex: Rebuild the temp SQL data and the system-caches (and nothing else))
+   *   Civi::rebuild(['tables' => TRUE, 'system' => TRUE])->execute();
+   * Ex: Rebuild everything except the menu
+   *   Civi::rebuild(['*' => TRUE, 'menu' => FALSE])->execute();
+   *
+   * @param string|array{ext:bool,files:bool,tables:bool,sessions:bool,metadata:bool,system:bool,userjob:bool,menu:bool,perms:bool,strings:bool,settings:bool,cases:bool,triggers:bool,entities:bool}|null $targets
+   *   The special key '*' indicates that all flags should start as TRUE (but you may opt-out of specific ones).
+   *   Keys:
+   *     - ext: Rebuild list of extensions, their hooks/mixins, etc.
+   *     - files: Reset any temporary files. Recreate any mandatory flag-files.
+   *     - tables: Truncate and drop any SQL tables with expendable data (e.g. ACL caches and import-temp-tables).
+   *     - sessions: Reset any form-state stored in user-sessions
+   *     - metadata: Rebuild metadata about the available entities and fields
+   *     - system: Reset any cache-services defined by the system.
+   *     - userjob: Delete any expired UserJob records.
+   *     - menu: Rebuild the routing-table and nav-bars.
+   *     - perms: Republish the list of available permissions. (Some CMS's need to be notified.)
+   *     - strings: Reset caches involving visible strings (WordReplacements, JS ts()).
+   *     - settings: Rebuild the index of available settings and their values.
+   *     - cases: Somethingsomething.
+   *     - triggers: Rebuild the SQL triggers.
+   *     - entities: Reconcile the managed-entities.
+   *
+   * @return Civi\Core\Rebuilder
+   */
+  public static function rebuild($targets): Civi\Core\Rebuilder {
+    return new Civi\Core\Rebuilder($targets);
   }
 
   /**
@@ -310,6 +347,17 @@ class Civi {
    * @return \Civi\Schema\EntityProvider
    */
   public static function entity(string $entityName): \Civi\Schema\EntityProvider {
+    return new \Civi\Schema\EntityProvider($entityName);
+  }
+
+  /**
+   * Get the canonical entityProvider for a given entity table.
+   *
+   * @param string $tableName
+   * @return \Civi\Schema\EntityProvider
+   */
+  public static function table(string $tableName): \Civi\Schema\EntityProvider {
+    $entityName = \Civi\Schema\EntityRepository::getTableIndex()[$tableName];
     return new \Civi\Schema\EntityProvider($entityName);
   }
 

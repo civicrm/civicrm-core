@@ -9,7 +9,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
     <table id="extensions" class="display">
       <thead>
         <tr>
-          <th>{ts}Name{/ts}</th>
+          <th>{ts}Extension{/ts}</th>
           <th>{ts}Status{/ts}</th>
           <th>{ts}Version{/ts}</th>
           <th></th>
@@ -30,7 +30,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
             </details>
           </td>
           <td class="crm-extensions-status">{$row.statusLabel} </td>
-          <td class="crm-extensions-version">{$row.version|escape}
+          <td class="crm-extensions-version right">{$row.version|escape}
             {if !$row.is_stable}
               {icon icon="fa-flask crm-extensions-stage"}{ts}This is a pre-release version. For more details, see the expanded description.{/ts}{/icon}
             {else}

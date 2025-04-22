@@ -212,6 +212,22 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Add a task to uninstall an extension. It will use the full, uninstallation process
+   * (invoking `hook_uninstall`, `hook_disable`, and so on).
+   *
+   * @param string $title
+   * @param string[] $keys
+   *   List of extensions to uninstall.
+   * @param int $weight
+   */
+  protected function addUninstallTask(string $title, array $keys, int $weight = 1000): void {
+    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+      new CRM_Queue_Task([static::CLASS, 'uninstallExtension'], [$keys], $title),
+      ['weight' => $weight]
+    );
+  }
+
+  /**
    * Add a task to activate an extension. It will use a simple (low-tech) installation process
    * (skipping events like `hook_install`; instead, it merely updates `civicrm_extension` and
    * `CRM_Extension_ClassLoader`). The extension should not now (or in the future) use
@@ -324,6 +340,26 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string[] $extensionKeys
+   *   List of extensions to enable.
+   * @return bool
+   */
+  public static function uninstallExtension(CRM_Queue_TaskContext $ctx, array $extensionKeys): bool {
+    // Assert this task was run with sufficient weight to use high-level services.
+    CRM_Upgrade_DispatchPolicy::assertActive('upgrade.finish');
+
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $manager->disable($extensionKeys);
+    $manager->uninstall($extensionKeys);
+
+    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
+
+    return TRUE;
+  }
+
+  /**
    * Remove a payment processor if not in use
    *
    * @param CRM_Queue_TaskContext $ctx
@@ -352,6 +388,28 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function checkFKExists($table_name, $constraint_name) {
     return CRM_Core_BAO_SchemaHandler::checkFKExists($table_name, $constraint_name);
+  }
+
+  /**
+   * Task to add or change a column definition, based on the php schema spec.
+   *
+   * @param $ctx
+   * @param string $entityName
+   * @param string $fieldName
+   * @param array $fieldSpec
+   *   As definied in the .entityType.php file for $entityName
+   * @return bool
+   * @throws CRM_Core_Exception
+   */
+  public static function alterSchemaField($ctx, string $entityName, string $fieldName, array $fieldSpec): bool {
+    $tableName = Civi::entity($entityName)->getMeta('table');
+    $fieldSql = Civi::schemaHelper()->arrayToSql($fieldSpec);
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
+      return self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+    }
+    else {
+      return self::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+    }
   }
 
   /**
@@ -391,7 +449,7 @@ class CRM_Upgrade_Incremental_Base {
       }
       $schema = new CRM_Logging_Schema();
       if ($schema->isEnabled()) {
-        $schema->fixSchemaDifferencesFor($table);
+        $schema->fixSchemaDifferencesFor($table, [], TRUE);
       }
     }
     if ($locales && $triggerRebuild) {
@@ -613,7 +671,7 @@ class CRM_Upgrade_Incremental_Base {
     }
     $schema = new CRM_Logging_Schema();
     if ($schema->isEnabled()) {
-      $schema->fixSchemaDifferencesFor($table);
+      $schema->fixSchemaDifferencesFor($table, [], TRUE);
     }
     $locales = CRM_Core_I18n::getMultilingual();
     if ($locales) {
@@ -720,11 +778,30 @@ class CRM_Upgrade_Incremental_Base {
     }
     $schema = new CRM_Logging_Schema();
     if ($schema->isEnabled()) {
-      $schema->fixSchemaDifferencesFor($table);
+      $schema->fixSchemaDifferencesFor($table, [], TRUE);
     }
     if ($locales) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
     }
+    return TRUE;
+  }
+
+  /**
+   * Installs a newly-added core entity.
+   *
+   * The entityType.php file should be copied into CRM/Upgrade/Incremental/schema
+   * and prefixed with the version-added.
+   *
+   * @param $ctx
+   * @param string $fileName
+   * @return bool
+   * @throws DBQueryException
+   */
+  public static function createEntityTable($ctx, string $fileName): bool {
+    $filePath = __DIR__ . "/schema/$fileName";
+    $entityDefn = include $filePath;
+    $sql = Civi::schemaHelper()->arrayToSql($entityDefn);
+    CRM_Core_DAO::executeQuery($sql);
     return TRUE;
   }
 

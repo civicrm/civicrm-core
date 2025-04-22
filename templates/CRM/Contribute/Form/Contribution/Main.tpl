@@ -48,18 +48,18 @@
     {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
   {/if}
 
-  {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+  {crmPermission has='administer CiviCRM'}
     {capture assign="buttonTitle"}{ts}Configure Contribution Page{/ts}{/capture}
     {crmButton target="_blank" p="civicrm/admin/contribute/settings" q="reset=1&action=update&id=`$contributionPageID`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
     <div class='clear'></div>
-  {/if}
+  {/crmPermission}
 
   <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block" data-page-id="{$contributionPageID}" data-page-template="main">
 
     {crmRegion name='contribution-main-not-you-block'}
     {if $contact_id && !$isPaymentOnExistingContribution}
       <div class="messages status no-popup crm-not-you-message">
-        {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
+        {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts escape='htmlattribute'}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
       </div>
     {/if}
     {/crmRegion}

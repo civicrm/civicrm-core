@@ -472,8 +472,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
     }
 
     // Handle mapping for 'related contact' fields
-    if (count(explode('_', CRM_Utils_Array::value('1', $v))) > 2) {
-      [$id, $first, $second] = explode('_', CRM_Utils_Array::value('1', $v));
+    if (count(explode('_', $v['1'] ?? '')) > 2) {
+      [$id, $first, $second] = explode('_', $v['1']);
       if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
 
         if (!empty($v['2'])) {
@@ -767,8 +767,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
   /**
    * Remove references to a specific field from save Mappings
    * @param string $fieldName
+   * @deprecated
    */
   public static function removeFieldFromMapping($fieldName): void {
+    CRM_Core_Error::deprecatedFunctionWarning('Api');
     $mappingField = new CRM_Core_DAO_MappingField();
     $mappingField->name = $fieldName;
     $mappingField->delete();
@@ -784,6 +786,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
       // CRM-3323 - Delete mappingField records when deleting relationship type
       \Civi\Api4\MappingField::delete(FALSE)
         ->addWhere('relationship_type_id', '=', $event->id)
+        ->execute();
+    }
+    if ($event->action === 'delete' && $event->entity === 'CustomField') {
+      // Delete mappingField records when deleting custom field
+      \Civi\Api4\MappingField::delete(FALSE)
+        ->addWhere('name', '=', 'custom_' . $event->id)
         ->execute();
     }
     if ($event->action === 'create' && $event->entity === 'Mapping') {

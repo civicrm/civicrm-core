@@ -59,7 +59,7 @@ class CRM_Extension_MixinScanner {
    *   Enabling this may slow-down scanning a bit, and it has no benefit when for on-demand loaders.
    *   However, if the loader is cached, then it may make for smaller, more portable cache-file.
    */
-  public function __construct(?\CRM_Extension_Mapper $mapper = NULL, \CRM_Extension_Manager $manager = NULL, $relativize = TRUE) {
+  public function __construct(?\CRM_Extension_Mapper $mapper = NULL, ?\CRM_Extension_Manager $manager = NULL, $relativize = TRUE) {
     $this->mapper = $mapper ?: CRM_Extension_System::singleton()->getMapper();
     $this->manager = $manager ?: CRM_Extension_System::singleton()->getManager();
     if ($relativize) {

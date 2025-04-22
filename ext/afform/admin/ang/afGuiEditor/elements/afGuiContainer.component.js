@@ -111,13 +111,17 @@
         return 'layout' in block;
       };
 
+      this.isJoin = function() {
+        return !!ctrl.join;
+      };
+
       $scope.getSetChildren = function(val) {
         var collection = block.layout || (ctrl.node && ctrl.node['#children']);
         return arguments.length ? (collection = val) : collection;
       };
 
       $scope.isRepeatable = function() {
-        return ctrl.join ||
+        return (ctrl.join && $scope.getRepeatMax() !== 1) ||
           (block.directive && afGui.meta.blocks[block.directive].repeat) ||
           (ctrl.node['af-fieldset'] && ctrl.editor.getEntityDefn(ctrl.editor.getEntity(ctrl.node['af-fieldset'])) !== false);
       };
@@ -255,7 +259,17 @@
         }
       };
 
+      this.onChangeUpdateAction = function() {
+        if (!ctrl.node.actions.update) {
+          ctrl.node.actions.delete = false;
+        }
+      };
+
       function initializeBlockContainer() {
+        // Set defaults for 'actions'
+        if (!('actions' in ctrl.node)) {
+          ctrl.node.actions = {update: true, delete: true};
+        }
 
         // Cancel the below $watch expressions if already set
         _.each(block.listeners, function(deregister) {
@@ -349,6 +363,9 @@
         }
         if (node['af-join']) {
           return 'join';
+        }
+        if (node['#tag'] === 'af-tabset') {
+          return 'tabset';
         }
         if (node['#tag'] && node['#tag'] in afGui.meta.blocks) {
           return 'container';

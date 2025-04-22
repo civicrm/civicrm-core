@@ -165,7 +165,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $_REQUEST['mode'] = 'live';
     // Add someone to the waitlist.
     $waitlistContactID = $this->individualCreate();
-    $waitlistParticipantID = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactID, 'status_id' => 'On waitlist']);
+    $waitlistParticipantID = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactID, 'status_id.name' => 'On waitlist']);
 
     $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantID, 'return' => ['participant_status']]);
     $this->assertEquals('On waitlist', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: On waitlist');
@@ -260,8 +260,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
     $this->assertStringContainsString('Dear Participant1', $mailSent[2]);
     $this->assertStringContainsString('job_title	oracle', $mailSent[2]);
-    // Note the delayed version does not add the additional participant profiles
-    // This could be fixed at some point so no assertions added.
+    $this->assertStringContainsString('job_title	wizard', $mailSent[2]);
+    $this->assertStringContainsString('job_title	seer', $mailSent[2]);
+    $this->assertStringNotContainsString('Participant 4', $mailSent[2]);
 
     $this->assertStringContainsString('Dear Participant2', $mailSent[0]);
     $this->assertStringNotContainsString('job_title	oracle', $mailSent[0]);
@@ -328,11 +329,37 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Test stock template for multiple participant.
    *
-   * The goal is to ensure no leakage.
+   * The goal is to ensure the profile details for all are
+   * on the first contact and the relevant contact are
+   * on the other 2.
    *
    * @throws \CRM_Core_Exception
    */
   public function testMailMultipleParticipant(): void {
+    $this->createScenarioMultipleParticipantPendingFreeEvent();
+    $mailSent = $this->sentMail;
+    // The second and 3rd emails have the job title for their participant,
+    // but not the others
+    $this->assertStringContainsString('job_title	wizard', $mailSent[1]['body']);
+    $this->assertStringContainsString('job_title	seer', $mailSent[2]['body']);
+    $this->assertStringNotContainsString('job_title	oracle', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('job_title	oracle', $mailSent[2]['body']);
+
+    // The first participant, has the title for all 3.
+    $this->assertStringContainsString('job_title	oracle', $mailSent[0]['body']);
+    $this->assertStringContainsString('job_title	seer', $mailSent[0]['body']);
+    $this->assertStringContainsString('job_title	wizard', $mailSent[0]['body']);
+
+  }
+
+  /**
+   * Test stock template for multiple participant.
+   *
+   * The goal is to ensure no leakage.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailParticipant(): void {
     $this->createScenarioMultipleParticipantPendingWithTax();
     $mailSent = $this->sentMail;
     // amounts paid = [300, 100, 200];
@@ -445,8 +472,16 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ], $this->getEventID());
     $form->processForm();
     $form->checkTemplateVariable('primaryParticipantProfile', [
-      'CustomPre' => ['Comment' => $note, 'job_title' => 'Magician'],
-      'CustomPreGroupTitle' => 'Public Event Post Post Profile',
+      'CustomPre' => ['email' => 'demo@example.com'],
+      'CustomPreGroupTitle' => 'Public Event Pre Profile',
+      'CustomPost' => [
+        $this->ids['UFGroup']['event_post_event'] => ['first_name' => NULL, 'last_name' => NULL],
+        $this->ids['UFGroup']['event_post_post_event'] => ['Comment' => $note, 'job_title' => 'Magician'],
+      ],
+      'CustomPostGroupTitle' => [
+        $this->ids['UFGroup']['event_post_event'] => ['groupTitle' => 'Public Event Post Profile'],
+        $this->ids['UFGroup']['event_post_post_event'] => ['groupTitle' => 'Public Event Post Post Profile'],
+      ],
     ]);
   }
 
@@ -481,7 +516,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * email reflects the submitted value
    *
    * @throws \CRM_Core_Exception
-   * @throws \Exception
    */
   public function testNoteSubmission(): void {
     // Create an event with an attached profile containing a note
@@ -512,43 +546,13 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   public function testSubmitNonPrimaryEmail(): void {
     $event = $this->eventCreateUnpaid();
-    $mut = new CiviMailUtils($this, TRUE);
-    $this->submitFormLegacy($event['id'], [
-      [
-        'first_name' => 'k',
-        'last_name' => 'p',
-        'email-Other' => 'nonprimaryemail@example.com',
-        'hidden_processor' => '1',
-        'credit_card_number' => '4111111111111111',
-        'cvv2' => '123',
-        'credit_card_exp_date' => [
-          'M' => '1',
-          'Y' => '2019',
-        ],
-        'credit_card_type' => 'Visa',
-        'billing_first_name' => 'p',
-        'billing_middle_name' => '',
-        'billing_last_name' => 'p',
-        'billing_street_address-5' => 'p',
-        'billing_city-5' => 'p',
-        'billing_state_province_id-5' => '1061',
-        'billing_postal_code-5' => '7',
-        'billing_country_id-5' => '1228',
-        'priceSetId' => '6',
-        'price_7' => [
-          13 => 1,
-        ],
-        'payment_processor_id' => '1',
-        'year' => '2019',
-        'month' => '1',
-        'button' => '_qf_Register_upload',
-        'billing_state_province-5' => 'AP',
-        'billing_country-5' => 'US',
-      ],
+    $this->submitForm($event['id'], [
+      'first_name' => 'Kim',
+      'last_name' => 'Price',
+      'email-Other' => 'nonprimaryemail@example.com',
+      'email-Primary' => 'demo@example.com',
     ]);
-    $mut->checkMailLog(['nonprimaryemail@example.com']);
-    $mut->stop();
-    $mut->clearMessages();
+    $this->assertMailSentContainingHeaderString('nonprimaryemail@example.com');
   }
 
   /**

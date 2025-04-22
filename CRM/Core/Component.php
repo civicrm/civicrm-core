@@ -415,6 +415,10 @@ class CRM_Core_Component {
     return in_array($component, Civi::settings()->get('enable_components'), TRUE);
   }
 
+  public static function isIdEnabled(int $id): bool {
+    return self::isEnabled(self::getComponentName($id));
+  }
+
   /**
    * Callback for the "enable_components" setting (pre change)
    *
@@ -446,7 +450,9 @@ class CRM_Core_Component {
       if ($status === CRM_Extension_Manager::STATUS_INSTALLED) {
         $info = $manager->mapper->keyToInfo($extension);
         if (array_intersect($info->requires, $disabledExtensions)) {
-          $manager->disable($extension);
+          static::protectTestEnv(
+            fn() => $manager->disable($extension)
+          );
         }
       }
     }
@@ -482,10 +488,39 @@ class CRM_Core_Component {
       }
     }
     if ($toEnable) {
-      CRM_Extension_System::singleton()->getManager()->install($toEnable);
+      static::protectTestEnv(
+        fn() => CRM_Extension_System::singleton()->getManager()->install($toEnable)
+      );
     }
     if ($toDisable) {
-      CRM_Extension_System::singleton()->getManager()->disable($toDisable);
+      static::protectTestEnv(
+        fn() => CRM_Extension_System::singleton()->getManager()->disable($toDisable)
+      );
+    }
+  }
+
+  private static function protectTestEnv(callable $function): void {
+    // Blerg. Consider a headless test like this (inspired by flakiness in CRM_Activity_BAO_ActivityTest):
+    //
+    // function testFoo() {
+    //   CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM'];
+    //   CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    //   $this->assertTrue(CRM_Core_Permission::check('administer CiviCRM'));
+    // }
+    //
+    // The `enableComponent()` might be a nullop... or it might toggle the `civi_case` extension.
+    // Toggling an extension triggers a general reset of many caches/data-structures... including temp perms...
+
+    if (CIVICRM_UF === 'UnitTests') {
+      $activePerms = CRM_Core_Config::singleton()->userPermissionClass->permissions;
+    }
+    try {
+      $function();
+    }
+    finally {
+      if (CIVICRM_UF === 'UnitTests') {
+        CRM_Core_Config::singleton()->userPermissionClass->permissions = $activePerms;
+      }
     }
   }
 

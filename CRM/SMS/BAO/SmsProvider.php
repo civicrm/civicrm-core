@@ -85,10 +85,10 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
       $provider->find(TRUE);
     }
     if ($id) {
-      $provider->domain_id = CRM_Utils_Array::value('domain_id', $params, $provider->domain_id);
+      $provider->domain_id = $params['domain_id'] ?? $provider->domain_id;
     }
     else {
-      $provider->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+      $provider->domain_id = $params['domain_id'] ?? CRM_Core_Config::domainID();
     }
     $provider->copyValues($params);
     $result = $provider->save();
@@ -166,12 +166,12 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
         // Replace the api_type ID with the string value
         $apiTypes = CRM_Core_OptionGroup::values('sms_api_type');
         $apiTypeId = $providerInfo[$providerID]['api_type'];
-        $providerInfo[$providerID]['api_type'] = CRM_Utils_Array::value($apiTypeId, $apiTypes, $apiTypeId);
+        $providerInfo[$providerID]['api_type'] = $apiTypes[$apiTypeId] ?? $apiTypeId;
       }
     }
 
     if ($returnParam) {
-      return CRM_Utils_Array::value($returnParam, $providerInfo[$providerID], $returnDefaultString);
+      return $providerInfo[$providerID][$returnParam] ?? $returnDefaultString;
     }
     return $providerInfo[$providerID];
   }

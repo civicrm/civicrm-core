@@ -1241,8 +1241,11 @@ abstract class CRM_Core_Payment {
     }
 
     if ($this->_component == 'event') {
-      $eventID = Participant::get(FALSE)->addWhere('id', '=', $participantID)
-        ->addSelect('event_id')->execute()->single()['event_id'];
+      $eventID = NULL;
+      if ($participantID) {
+        $eventID = Participant::get(FALSE)->addWhere('id', '=', $participantID)
+          ->addSelect('event_id')->execute()->single()['event_id'];
+      }
       return CRM_Utils_System::url($this->getBaseReturnUrl(), [
         'reset' => 1,
         'cc' => 'fail',
@@ -1906,6 +1909,19 @@ abstract class CRM_Core_Payment {
   public function supportsNoReturn(): bool {
     $billingMode = (int) $this->_paymentProcessor['billing_mode'];
     return $billingMode === self::BILLING_MODE_NOTIFY || $billingMode === self::BILLING_MODE_BUTTON;
+  }
+
+  /**
+   * Checks if payment processor supports not returning to the form processing on recurring.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturnForRecurring(): bool {
+    return $this->supportsNoReturn();
   }
 
   /**

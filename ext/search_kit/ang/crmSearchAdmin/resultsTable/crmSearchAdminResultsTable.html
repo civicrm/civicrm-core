@@ -1,7 +1,7 @@
 <div class="crm-search-display crm-search-display-table">
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'"></div>
-    <crm-search-tasks-menu ids="$ctrl.selectedRows" task-manager="$ctrl.taskManager"></crm-search-tasks-menu>
+    <crm-search-tasks-menu ids="$ctrl.selectedRows" task-manager="$ctrl.taskManager" display-mode="'menu'"></crm-search-tasks-menu>
     <span ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
   </div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
@@ -11,7 +11,7 @@
         </th>
         <th ng-repeat="item in $ctrl.search.api_params.select" ng-click="$ctrl.setSort($ctrl.settings.columns[$index], $event)" title="{{$index || !$ctrl.crmSearchAdmin.groupExists ? ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).') : ts('Column reserved for smart group.')}}">
           <i ng-if=":: $ctrl.isSortable($ctrl.settings.columns[$index])" class="crm-i {{ $ctrl.getSort($ctrl.settings.columns[$index]) }}"></i>
-          <span ng-class="{'crm-draggable': $index || !$ctrl.crmSearchAdmin.groupExists}">{{ $ctrl.settings.columns[$index].label }}</span>
+          <span ng-class="{'crm-draggable': $index || !$ctrl.crmSearchAdmin.groupExists}">{{ getColumnLabel($index) }}</span>
           <span ng-switch="$index || !$ctrl.crmSearchAdmin.groupExists ? 'sortable' : 'locked'">
             <i ng-switch-when="locked" class="crm-i fa-lock" aria-hidden="true"></i>
             <a href ng-switch-default class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="removeColumn($index); $event.stopPropagation();"><i class="crm-i fa-times" aria-hidden="true"></i></a>

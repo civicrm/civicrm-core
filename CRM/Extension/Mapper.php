@@ -73,13 +73,13 @@ class CRM_Extension_Mapper {
   protected $upgraders = [];
 
   /**
-   * @param CRM_Extension_Container_Interface $container
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Extension_Container_Interface|null $container
+   * @param CRM_Utils_Cache_Interface|null $cache
    * @param null $cacheKey
    * @param null $civicrmPath
    * @param null $civicrmUrl
    */
-  public function __construct(CRM_Extension_Container_Interface $container, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $civicrmPath = NULL, $civicrmUrl = NULL) {
+  public function __construct(CRM_Extension_Container_Interface $container, ?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $civicrmPath = NULL, $civicrmUrl = NULL) {
     $this->container = $container;
     $this->cache = $cache;
     $this->cacheKey = $cacheKey;
@@ -140,7 +140,7 @@ class CRM_Extension_Mapper {
    */
   public function isExtensionKey($key) {
     // check if the string is an extension name or the class
-    return (strpos($key, '.') !== FALSE) ? TRUE : FALSE;
+    return (str_contains($key, '.')) ? TRUE : FALSE;
   }
 
   /**
@@ -443,6 +443,7 @@ class CRM_Extension_Mapper {
   /**
    * @return CRM_Extension_Info[]
    *   Ex: $result['org.civicrm.foobar'] = new CRM_Extension_Info(...).
+   *   Note: This only returns well-formed/available info's.
    * @throws \CRM_Extension_Exception
    * @throws \Exception
    */
@@ -457,6 +458,12 @@ class CRM_Extension_Mapper {
           2 => $e->getMessage(),
         ]), '', 'error');
         CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
+        continue;
+      }
+      catch (CRM_Extension_Exception_MissingException $e) {
+        // If we're in here, it suggests that someone has deleted an extension that was previously stored in the index.
+        // In particular, the extension was probably inactive and deleted. (If it was active+deleted, then errors would arise elsewhere.)
+        // getAllInfos() is for inspecting available exts. If it's not there, then it's not there. 🙈🙊
         continue;
       }
     }

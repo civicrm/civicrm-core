@@ -7,9 +7,10 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Financial Account'),
     'title_plural' => ts('Financial Accounts'),
-    'description' => ts('FIXME'),
+    'description' => ts('Financial Accounts'),
     'log' => TRUE,
     'add' => '3.2',
+    'label_field' => 'label',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/financial/financialAccount/edit?action=add&reset=1',
@@ -42,10 +43,21 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['label'],
       'description' => ts('Financial Account Name.'),
       'add' => '3.2',
+    ],
+    'label' => [
+      'title' => ts('Financial Account Label'),
+      'sql_type' => 'varchar(64)',
+      'input_type' => 'Text',
+      'description' => ts('User-facing financial account label'),
+      'required' => TRUE,
+      'default_fallback' => ['name'],
+      'localizable' => TRUE,
+      'add' => '5.79',
       'input_attrs' => [
-        'maxlength' => 255,
+        'label' => ts('Financial Account'),
       ],
     ],
     'contact_id' => [
@@ -85,9 +97,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'account_type_code' => [
       'title' => ts('Account Type Code'),
@@ -98,9 +107,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Financial Account Description'),
@@ -108,9 +114,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Financial Type Description.'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'parent_id' => [
       'title' => ts('Parent ID'),

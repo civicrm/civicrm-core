@@ -62,7 +62,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
     }
 
     foreach ($this->_checkboxes as $name => $title) {
-      $this->{$name} = CRM_Utils_Array::value($name, $this->_formValues, FALSE);
+      $this->{$name} = $this->_formValues[$name] ?? FALSE;
     }
 
     foreach ($this->_dates as $name => $title) {

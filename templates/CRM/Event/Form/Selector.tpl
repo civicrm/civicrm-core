@@ -16,7 +16,7 @@
 <thead class="sticky">
   <tr>
     {if ! $single and $context eq 'Search'}
-      <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
+      <th scope="col" title="{ts escape='htmlattribute'}Select rows{/ts}">{$form.toggleSelect.html}</th>
     {/if}
     {foreach from=$columnHeaders item=header}
         <th scope="col">
@@ -40,15 +40,15 @@
         <td>{$form.$cbName.html}</td>
       {/if}
       <td class="crm-participant-contact_type">{$row.contact_type}</td>
-      <td class="crm-participant-sort_name"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}" title="{ts}View contact record{/ts}">{$row.sort_name|smarty:nodefaults|purify}</a></td>
+      <td class="crm-participant-sort_name"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}" title="{ts escape='htmlattribute'}View contact record{/ts}">{$row.sort_name|smarty:nodefaults|purify}</a></td>
     {/if}
 
-    <td class="crm-participant-event_title"><a href="{crmURL p='civicrm/event/info' q="id=`$row.event_id`&reset=1"}" title="{ts}View event info page{/ts}">{$row.event_title|smarty:nodefaults|purify}</a>
-      {if !empty($contactId)}<br /><a href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$row.event_id`"}" title="{ts}List participants for this event (all statuses){/ts}">({ts}participants{/ts})</a>{/if}
+    <td class="crm-participant-event_title"><a href="{crmURL p='civicrm/event/info' q="id=`$row.event_id`&reset=1"}" title="{ts escape='htmlattribute'}View event info page{/ts}">{$row.event_title|smarty:nodefaults|purify}</a>
+      {if !empty($contactId)}<br /><a href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$row.event_id`"}" title="{ts escape='htmlattribute'}List participants for this event (all statuses){/ts}">({ts}participants{/ts})</a>{/if}
     </td>
     <td class="crm-participant-participant_fee_level">
       {assign var="participant_id" value=$row.participant_id}
-      {if $lineItems.$participant_id}
+      {if array_key_exists($participant_id, $lineItems)}
         {foreach from=$lineItems.$participant_id item=line name=lineItemsIter}
           {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if}: {$line.qty}
           {if ! $smarty.foreach.lineItemsIter.last}<br />{/if}

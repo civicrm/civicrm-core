@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Address Format'),
     'title_plural' => ts('Address Formats'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of different address formats'),
     'add' => '3.2',
   ],
   'getFields' => fn() => [

@@ -1,6 +1,5 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
-use Civi\Api4\MessageTemplate;
 use Civi\Api4\Navigation;
 
 /**
@@ -17,16 +16,16 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public function onInstall() {
+  public function preInstall() {
     $config = \CRM_Core_Config::singleton();
     // We generally only want to run on standalone. In theory, we might also run headless tests.
-    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_Headless'])) {
+    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_UnitTests'])) {
       throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
     }
-    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_Headless'])) {
+    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_UnitTests'])) {
       throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
     }
-    parent::onInstall();
+    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_uf_match');
   }
 
   /**
@@ -52,44 +51,9 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
       ['pass']
     )));
 
-    $this->createPasswordResetMessageTemplate();
-
     // `standaloneusers` is installed as part of the overall install process for `Standalone`.
     // A subsequent step will configure some default users (*depending on local options*).
     // See also: `StandaloneUsers.civi-setup.php`
-  }
-
-  protected function createPasswordResetMessageTemplate() {
-
-    $baseTpl = [
-      'workflow_name' => 'password_reset',
-      'msg_title' => 'Password reset',
-      'msg_subject' => '{ts}Password reset link for{/ts} {domain.name}',
-      'msg_text' => <<<TXT
-        {ts}A password reset link was requested for this account.  If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}
-
-        {\$resetUrlPlaintext}
-
-        {domain.name}
-        TXT,
-      'msg_html' => <<<HTML
-        <p>{ts}A password reset link was requested for this account.&nbsp; If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}</p>
-
-        <p><a href="{\$resetUrlHtml}">{\$resetUrlHtml}</a></p>
-
-        <p>{domain.name}</p>
-        HTML,
-    ];
-
-    // Create a "reserved" template. This is a pristine copy provided for reference.
-    MessageTemplate::save(FALSE)
-      ->setDefaults($baseTpl)
-      ->setRecords([
-        ['is_reserved' => TRUE, 'is_default' => FALSE],
-        ['is_reserved' => FALSE, 'is_default' => TRUE],
-      ])
-      ->execute();
-
   }
 
   /**
@@ -121,6 +85,21 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
       ->addWhere('url', '=', 'civicrm/admin/synchUser?reset=1')
       ->addValue('is_active', TRUE)
       ->execute();
+  }
+
+  public function upgrade_5692(): bool {
+    CRM_Core_DAO::executeQuery(<<<SQL
+      CREATE TABLE IF NOT EXISTS `civicrm_totp` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique TOTP ID',
+        `user_id` int(10) unsigned NOT NULL COMMENT 'Reference to User (UFMatch) ID',
+        `seed` varchar(512) NOT NULL,
+        `hash` varchar(20) NOT NULL DEFAULT '\"sha1\"',
+        `period` INT(1) UNSIGNED NOT NULL DEFAULT '30',
+        `length` INT(1) UNSIGNED NOT NULL DEFAULT '6',
+        PRIMARY KEY (`id`)
+      )
+      SQL);
+    return TRUE;
   }
 
   /**

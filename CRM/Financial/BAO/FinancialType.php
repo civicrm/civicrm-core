@@ -138,6 +138,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   }
 
   /**
+   * Pseudoconstant condition_provider for financial_type_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterIncomeFinancialTypes(string $fieldName, CRM_Utils_SQL_Select $conditions, $params): void {
+    $allowedTypes = self::getIncomeFinancialType($params['check_permissions']);
+    $allowedTypes = array_keys($allowedTypes) ?: 0;
+    $conditions->where('id IN (#financialTypeId)', ['financialTypeId' => $allowedTypes]);
+  }
+
+  /**
    * Fetch financial types having relationship as Income Account is.
    *
    * @return array
@@ -146,6 +156,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @throws \CRM_Core_Exception
    */
   public static function getIncomeFinancialType($checkPermissions = TRUE): array {
+    if (!CRM_Core_Component::isEnabled('CiviContribute')) {
+      return [];
+    }
     // Realistically tests are the only place where logged in contact can
     // change during the session at this stage.
     $key = 'income_type' . (int) $checkPermissions;
@@ -223,20 +236,28 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    *   (reference ) an array of financial types
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
-   * @param bool $resetCache
-   *   load values from static cache
+   * @param bool $unused
+   *   unused param but we can't get rid of it because of param order
    * @param bool $includeDisabled
    *   Whether we should load in disabled FinancialTypes or Not
    *
    * @return array
    */
-  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE, $includeDisabled = FALSE) {
-    if (empty($financialTypes)) {
-      $financialTypes = CRM_Contribute_PseudoConstant::financialType(NULL, $includeDisabled);
+  public static function getAvailableFinancialTypes(&$financialTypes = [], $action = CRM_Core_Action::VIEW, $unused = FALSE, $includeDisabled = FALSE) {
+    $query = 'SELECT id, `name`, label FROM civicrm_financial_type';
+    if (!$includeDisabled) {
+      $query .= ' WHERE is_active = 1';
+    }
+    $financialTypeOptions = CRM_Core_DAO::executeQuery($query)->fetchAll();
+    if (!empty($financialTypes)) {
+      $financialTypeOptions = array_column($financialTypeOptions, NULL, 'id');
+      $financialTypeOptions = array_intersect_key($financialTypeOptions, $financialTypes);
     }
     if (!self::isACLFinancialTypeStatus()) {
+      $financialTypes = array_column($financialTypeOptions, 'label', 'id');
       return $financialTypes;
     }
+
     $actions = [
       CRM_Core_Action::VIEW => 'view',
       CRM_Core_Action::UPDATE => 'edit',
@@ -245,14 +266,20 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
     ];
 
     if (!isset(\Civi::$statics[__CLASS__]['available_types_' . $action])) {
-      foreach ($financialTypes as $finTypeId => $type) {
-        if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
-          unset($financialTypes[$finTypeId]);
+      foreach ($financialTypeOptions as $type) {
+        if (CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type['name'])) {
+          $financialTypes[$type['id']] = $type['label'];
+        }
+        elseif (isset($financialTypes[$type['id']])) {
+          unset($financialTypes[$type['id']]);
         }
       }
       \Civi::$statics[__CLASS__]['available_types_' . $action] = $financialTypes;
     }
-    $financialTypes = \Civi::$statics[__CLASS__]['available_types_' . $action];
+    else {
+      $financialTypes = \Civi::$statics[__CLASS__]['available_types_' . $action];
+    }
+
     return \Civi::$statics[__CLASS__]['available_types_' . $action];
   }
 
@@ -394,12 +421,24 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   /**
    * Check if FT-ACL is turned on or off.
    *
-   * @todo rename this function e.g isFinancialTypeACLsEnabled.
+   * @deprecated since 5.75 will be removed around 5.90
+   * Generally you should call hooks & allow the extension to engage but if you need to
+   * then check the extension status directly - do not use a helper.
    *
    * @return bool
    */
   public static function isACLFinancialTypeStatus() {
-    return Civi::settings()->get('acl_financial_type');
+    return self::isFinancialTypeAclExtensionInstalled();
+  }
+
+  /**
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @internal transitional function.
+   */
+  public static function isFinancialTypeAclExtensionInstalled(): bool {
+    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'financialacls', 'sequential' => 1])['values'];
+    return !empty($financialAclExtension) && $financialAclExtension[0]['status'] === 'installed';
   }
 
 }

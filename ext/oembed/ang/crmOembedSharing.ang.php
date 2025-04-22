@@ -14,7 +14,6 @@ return [
     'ang/crmOembedSharing',
   ],
   'requires' => ['crmUi', 'crmUtil'],
-  'settings' => [],
   'basePages' => [],
   'bundles' => ['bootstrap3'],
   'exports' => [

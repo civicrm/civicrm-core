@@ -28,9 +28,10 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
   public static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
-      $tabs = self::process($form);
+      $tabs = self::process($form) ?? [];
       $form->set('tabHeader', $tabs);
     }
+    $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
     $form->assign('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
@@ -76,9 +77,6 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       ] + $default,
       'thankyou' => [
         'title' => ts('Receipt'),
-      ] + $default,
-      'friend' => [
-        'title' => ts('Tell a Friend'),
       ] + $default,
       'custom' => [
         'title' => ts('Profiles'),
@@ -142,7 +140,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       $contriPageInfo = CRM_Contribute_BAO_ContributionPage::getSectionInfo([$contribPageId]);
 
       foreach ($contriPageInfo[$contribPageId] as $section => $info) {
-        if (!$info) {
+        if (!$info && isset($tabs[$section])) {
           $tabs[$section]['valid'] = FALSE;
         }
       }

@@ -13,7 +13,7 @@
       {$form.address.$blockId.street_address.label} {help id="id-street-address" file="CRM/Contact/Form/Contact.hlp"}<br />
       {$form.address.$blockId.street_address.html}
       {if $parseStreetAddress eq 1 && ($action eq 1 || $action eq 2)}
-          &nbsp;&nbsp;<a href="#" title="{ts}Edit Address Elements{/ts}" onClick="processAddressFields( 'addressElements' , '{$blockId}', 1 );return false;">{ts}Edit Address Elements{/ts}</a>
+          &nbsp;&nbsp;<a href="#" title="{ts escape='htmlattribute'}Edit Address Elements{/ts}" onClick="processAddressFields( 'addressElements' , '{$blockId}', 1 );return false;">{ts}Edit Address Elements{/ts}</a>
           {help id="id-edit-street-elements" file="CRM/Contact/Form/Contact.hlp"}
       {/if}
     </td>
@@ -34,7 +34,7 @@
       <td colspan="2">
         {$form.address.$blockId.street_unit.label}<br />
         {$form.address.$blockId.street_unit.html}
-        <a href="#" title="{ts}Edit Street Address{/ts}" onClick="processAddressFields( 'streetAddress', '{$blockId}', 1 );return false;">{ts}Edit Complete Street Address{/ts}</a>
+        <a href="#" title="{ts escape='htmlattribute'}Edit Street Address{/ts}" onClick="processAddressFields( 'streetAddress', '{$blockId}', 1 );return false;">{ts}Edit Complete Street Address{/ts}</a>
         {help id="id-edit-complete-street" file="CRM/Contact/Form/Contact.hlp"}
       </td>
     </tr>

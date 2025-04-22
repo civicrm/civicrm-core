@@ -21,7 +21,7 @@ class CRM_Core_BAO_Query {
    * @param array $extends
    */
   public static function addCustomFormFields(&$form, $extends) {
-    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => $extends]);
+    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => $extends, 'is_active' => TRUE]);
     if ($groupDetails) {
       foreach ($groupDetails as $group) {
         if (empty($group['fields'])) {

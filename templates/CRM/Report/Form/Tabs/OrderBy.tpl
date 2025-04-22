@@ -9,7 +9,7 @@
 *}
 
 
-  <div id="report-tab-order-by-elements" class="civireport-criteria">
+  <div id="report-tab-order-by-elements" role="tabpanel" class="civireport-criteria">
     <table id="optionField">
       <tr>
         <th>&nbsp;</th>

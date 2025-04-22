@@ -132,15 +132,15 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
       if ($defaults['data_type'] == 'ContactReference' && !empty($defaults['filter'])) {
         $contactRefFilter = 'Advance';
-        if (strpos($defaults['filter'], 'action=lookup') !== FALSE &&
-          strpos($defaults['filter'], 'group=') !== FALSE
+        if (str_contains($defaults['filter'], 'action=lookup') &&
+          str_contains($defaults['filter'], 'group=')
         ) {
           $filterParts = explode('&', $defaults['filter']);
 
           if (count($filterParts) == 2) {
             $contactRefFilter = 'Group';
             foreach ($filterParts as $part) {
-              if (strpos($part, 'group=') === FALSE) {
+              if (!str_contains($part, 'group=')) {
                 continue;
               }
               $groups = substr($part, strpos($part, '=') + 1);
@@ -219,7 +219,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->addField('html_type', ['class' => 'twenty', 'options' => $htmlOptions], TRUE);
 
     if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
-      $this->add('checkbox', 'in_selector', ts('Display in Table?'));
+      $this->add('advcheckbox', 'in_selector', ts('Display in Table?'));
     }
 
     $optionGroupParams = [
@@ -229,7 +229,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'return' => ['title'],
     ];
 
-    $this->add('checkbox', 'serialize', ts('Multi-Select'));
+    $this->add('advcheckbox', 'serialize', ts('Multi-Select'));
 
     $this->addAutocomplete('fk_entity', ts('Entity'), [
       'class' => 'twenty',
@@ -601,10 +601,10 @@ SELECT count(*)
 
         case 'ContactReference':
           if ($fields['filter_selected'] == 'Advance' && !empty($fields['filter'])) {
-            if (strpos($fields['filter'], 'entity=') !== FALSE) {
+            if (str_contains($fields['filter'], 'entity=')) {
               $errors['filter'] = ts("Please do not include entity parameter (entity is always 'contact')");
             }
-            elseif (strpos($fields['filter'], 'action=get') === FALSE) {
+            elseif (!str_contains($fields['filter'], 'action=get')) {
               $errors['filter'] = ts("Only 'get' action is supported.");
             }
           }
@@ -878,6 +878,10 @@ AND    option_group_id = %2";
     // are different label, help text and default value than for other type fields
     if ($params['data_type'] == "Memo") {
       $params['text_length'] = $params['note_length'];
+    }
+    // Urls can be up to 2047 characters according to https://www.sitemaps.org/protocol.html#locdef
+    if ($params['data_type'] == 'Link') {
+      $params['text_length'] = 2047;
     }
 
     // need the FKEY - custom group id

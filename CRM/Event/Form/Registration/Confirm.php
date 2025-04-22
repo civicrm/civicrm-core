@@ -84,7 +84,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->assign('confirm_text', $this->getEventValue('confirm_text'));
     CRM_Utils_Hook::eventDiscount($this, $this->_params);
 
-    if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
+    if (!empty($this->_params[0]['discount']['applied'])) {
       $this->set('hookDiscount', $this->_params[0]['discount']);
     }
     $this->assign('hookDiscount', $this->_params[0]['discount'] ?? '');
@@ -243,13 +243,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('amounts', $amountArray);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
-      $showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
-      $this->assign('showPaymentOnConfirm', $showPaymentOnConfirm);
-      if ($showPaymentOnConfirm) {
-        $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
-        $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
+
+      $this->assign('showPaymentOnConfirm', $this->isShowPaymentOnConfirm());
+      if ($this->isShowPaymentOnConfirm()) {
+        // Setup and load the payment elements on the form
         $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['event']['payment_processor'] ?? NULL);
-        $this->assignPaymentProcessor($isPayLater);
+        $this->setPayLaterLabel('');
+        $this->assign('pay_later_receipt', '');
+        // @fixme These functions all seem to do similar things but take one away and the house of cards falls down..
+        $this->assignPaymentProcessor($this->_values['event']['is_pay_later']);
+        // This is required only after the form is submitted to repopulate form fields so that eg. credit card fields
+        //   can be retrieved via getSubmittedValue() from the ThankYou page. Otherwise they are lost.
+        $this->preProcessPaymentOptions();
         CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
         $this->addPaymentProcessorFieldsToForm();
       }
@@ -316,8 +321,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $this->setDefaults($defaults);
-    $showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
-    if (!$showPaymentOnConfirm) {
+    if (!$this->isShowPaymentOnConfirm()) {
       $this->freeze();
     }
 
@@ -402,7 +406,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // if a discount has been applied, lets now deduct it from the amount
     // and fix the fee level
-    if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
+    if (!empty($this->_params[0]['discount']['applied'])) {
       foreach ($this->_params as $k => $v) {
         if (($this->_params[$k]['amount'] ?? NULL) > 0 && !empty($this->_params[$k]['discountAmount'])) {
           $this->_params[$k]['amount'] -= $this->_params[$k]['discountAmount'];
@@ -423,6 +427,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
     $participantCount = [];
     $totalTaxAmount = 0;
+
+    if ($this->isShowPaymentOnConfirm()) {
+      // Set the payment processor so that we can submit the payment
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'));
+    }
 
     //unset the skip participant from params.
     //build the $participantCount array.
@@ -445,6 +454,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if ($additionalId && $key = array_search($additionalId, $cancelledIds)) {
           unset($cancelledIds[$key]);
         }
+      }
+      if ($this->isShowPaymentOnConfirm()) {
+        // If payment_processor_id is 0 or unset we are pay later.
+        // Otherwise we are using a payment processor
+        $params[$participantNum]['is_pay_later'] = $this->_values['event']['is_pay_later'] = empty($this->getSubmittedValue('payment_processor_id'));
       }
     }
     $taxAmount = $totalTaxAmount;
@@ -647,7 +661,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $allParticipantIds = array_merge([$registerByID], $this->_additionalParticipantIds);
       }
 
-      $entityTable = 'civicrm_participant';
       $totalTaxAmount = 0;
       foreach ($this->_lineItem as $key => $value) {
         if ($value == 'skip') {
@@ -656,10 +669,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if ($entityId = $allParticipantIds[$key] ?? NULL) {
           // do cleanup line  items if participant re-walking wizard.
           if ($this->_allowConfirmation) {
-            CRM_Price_BAO_LineItem::deleteLineItems($entityId, $entityTable);
+            CRM_Price_BAO_LineItem::deleteLineItems($entityId, 'civicrm_participant');
           }
           $lineItem[$this->_priceSetId] = $value;
-          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
+          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
         }
         if (\Civi::settings()->get('invoicing')) {
           foreach ($value as $line) {
@@ -978,7 +991,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @param array $params
    * @param array $fields
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_Registration|CRM_Event_Form_Registration_Confirm $form
    */
   public static function fixLocationFields(&$params, &$fields, &$form) {
     if (!empty($form->_fields)) {
@@ -1013,7 +1026,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $fields['email-Primary'] = 1;
 
     //if its pay later or additional participant set email address as primary.
-    if ((!empty($params['is_pay_later']) || empty($params['is_primary']) ||
+    // Note that it seems this function may have been broken and then
+    // accidentally started working - causing https://lab.civicrm.org/dev/core/-/issues/5330 was
+    // I can't see what changed...
+    if (empty($params['email-Primary']) && (!empty($params['is_pay_later']) || empty($params['is_primary']) ||
         !$form->_values['event']['is_monetary'] ||
         $form->_allowWaitlist ||
         $form->_requireApproval
@@ -1029,7 +1045,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param int $contactID
    * @param array $params
    * @param array $fields
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_Registration|CRM_Event_Form_Registration_Confirm $form
    *
    * @return int
    */

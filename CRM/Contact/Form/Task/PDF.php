@@ -105,6 +105,17 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      'details',
+      'activity_details',
+      'html_message',
+    ];
+  }
+
+  /**
    * Build the form object.
    *
    * @throws \CRM_Core_Exception

@@ -139,7 +139,7 @@ function civicrm_api3_attachment_create($params) {
   $entityFileDao->file_id = $fileDao->id;
   $entityFileDao->save();
 
-  $path = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $fileDao->uri;
+  $path = $config->customFileUploadDir . $fileDao->uri;
   if (is_string($content)) {
     file_put_contents($path, $content);
   }
@@ -238,7 +238,7 @@ function civicrm_api3_attachment_delete($params) {
   $filePaths = [];
   $fileIds = [];
   while ($dao->fetch()) {
-    $filePaths[] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
+    $filePaths[] = $config->customFileUploadDir . $dao->uri;
     $fileIds[] = $dao->id;
   }
 
@@ -410,7 +410,7 @@ function _civicrm_api3_attachment_parse_params($params) {
  */
 function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $returnContent, $isTrusted) {
   $config = CRM_Core_Config::singleton();
-  $path = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $fileDao->uri;
+  $path = $config->customFileUploadDir . $fileDao->uri;
 
   $result = [
     'id' => $fileDao->id,

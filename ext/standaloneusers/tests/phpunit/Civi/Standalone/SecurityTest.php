@@ -4,9 +4,11 @@ namespace Civi\Standalone;
 use Civi\Test\EndToEndInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\User;
+use Civi\Api4\Action\User\PasswordReset;
+use Civi\Api4\Action\User\SendPasswordResetEmail;
 
 /**
- * FIXME - Add test description.
+ * Test Security flows in Standalone
  *
  * Tips:
  *  - With HookInterface, you may implement CiviCRM hooks directly in the test class.
@@ -52,7 +54,6 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   protected function loginUser($userID) {
-    $security = Security::singleton();
     $user = \Civi\Api4\User::get(FALSE)
       ->addWhere('id', '=', $userID)
       ->execute()->first();
@@ -63,8 +64,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       'uf_id' => $user['id'],
     ])['values'][0]['contact_id'] ?? NULL;
     $this->assertNotNull($contactID);
-    /** @var \Civi\Standalone\Security $security */
-    $security->loginAuthenticatedUserRecord($user, FALSE);
+
+    \CRM_Core_Config::singleton()->userSystem->loadUser($user['username']);
   }
 
   public function testCheckPassword():void {
@@ -75,8 +76,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->execute()->single();
 
     // Test that the password can be checked ok.
-    $this->assertTrue($security->checkPassword('secret1', $user['hashed_password']));
-    $this->assertFalse($security->checkPassword('some other password', $user['hashed_password']));
+    $this->assertTrue((bool) $security->checkPassword($user['username'], 'secret1'));
+    $this->assertFalse((bool) $security->checkPassword($user['username'], 'some other password'));
   }
 
   public function testPerms() {
@@ -172,7 +173,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $token = \Civi::service('crypto.jwt')->encode([
       'exp' => $expires,
       'sub' => "uid:$userID",
-      'scope' => Security::PASSWORD_RESET_SCOPE,
+      'scope' => PasswordReset::PASSWORD_RESET_SCOPE,
     ]);
     User::update(FALSE)
       ->addValue('password_reset_token', $token)
@@ -188,18 +189,18 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     // Create token.
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    $token = PasswordReset::updateToken($userID);
     $decodedToken = \Civi::service('crypto.jwt')->decode($token);
     $this->assertEquals('uid:' . $userID, $decodedToken['sub']);
-    $this->assertEquals(Security::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
+    $this->assertEquals(PasswordReset::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
 
     // Check it works, but only once.
-    $extractedUserID = $security->checkPasswordResetToken($token);
+    $extractedUserID = PasswordReset::checkPasswordResetToken($token);
     $this->assertEquals($userID, $extractedUserID);
-    $this->assertNull($security->checkPasswordResetToken($token));
+    $this->assertNull(PasswordReset::checkPasswordResetToken($token));
 
     // OK, let's change that password.
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    $token = PasswordReset::updateToken($userID);
 
     // Attempt to change the user's password using this token to authenticate.
     $result = User::passwordReset(TRUE)
@@ -209,7 +210,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     $this->assertEquals(1, $result['success']);
     $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single();
-    $this->assertTrue($security->checkPassword('fingersCrossed', $user['hashed_password']));
+    $this->assertTrue((bool) $security->checkPassword($user['username'], 'fingersCrossed'));
 
     // Should not work a 2nd time with same token.
     try {
@@ -224,24 +225,18 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
 
     // Check the message template generation
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
-    $workflow = $security->preparePasswordResetWorkflow($user, $token);
+    $token = PasswordReset::updateToken($userID);
+    $workflow = SendPasswordResetEmail::preparePasswordResetWorkflow($user, $token, 60);
     $this->assertNotNull($workflow);
     $result = $workflow->renderTemplate();
 
-    $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['text']);
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['html']);
     $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
+    $this->assertStringContainsString('This link expires 60 minutes after the date of this email.', $result['html']);
 
     // Fake an expired token
     $token = $this->storeFakePasswordResetToken($userID, time() - 1);
-    $this->assertNull($security->checkPasswordResetToken($token));
-  }
-
-  public function testGetUserIDFromUsername() {
-    [$contactID, $adminUserID, $security] = $this->createFixtureContactAndUser();
-    $this->assertEquals($adminUserID, $security->getUserIDFromUsername('user_one'), 'Should return admin user ID');
-    $this->assertNull($security->getUserIDFromUsername('user_unknown'), 'Should return NULL for non-existent user');
+    $this->assertNull(PasswordReset::checkPasswordResetToken($token));
   }
 
   protected function deleteStuffWeMade() {

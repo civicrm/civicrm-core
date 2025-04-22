@@ -55,8 +55,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_params = [
       'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}.\nhttps://civicrm.org\n{domain.address}{action.optOutUrl}",
-      // 'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
-      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"{action.forward}\">Forward this email</a></p><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      // 'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
       'header_id' => '',
@@ -83,7 +83,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * @dataProvider versionThreeAndFour
    */
   public function testMailerCreateSuccess(): void {
-    $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
+    $this->campaignCreate(['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign']);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
@@ -296,8 +296,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
     $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertMatchesRegularExpression('!>Forward this email</a>!', $previewResult['values']['body_html']);
-    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!civicrm/mailing/optout&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
@@ -752,15 +751,15 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $jobId, 'hash', 'job_id');
     $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $jobId, 'id', 'job_id');
     // This gets the list of groups to unsubscribe but does NOT actually unsubcribe from groups (because return=TRUE)
-    $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queueId, $hash, TRUE);
     // Assert that there are two groups in the unsubscribe list.
     $this->assertCount(2, $beforeUnsubscribeGroups);
     $this->assertArrayHasKey($groupID3, $beforeUnsubscribeGroups);
     $this->assertArrayHasKey($groupID4, $beforeUnsubscribeGroups);
     // Do the actual unsubscribe
-    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, FALSE);
+    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queueId, $hash, FALSE);
     // Assert that there are now no groups in the unsubscribe list.
-    $afterUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    $afterUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queueId, $hash, TRUE);
     $this->assertCount(0, $afterUnsubscribeGroups);
   }
 

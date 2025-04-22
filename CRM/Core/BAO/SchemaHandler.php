@@ -42,6 +42,14 @@ class CRM_Core_BAO_SchemaHandler {
   const DEFAULT_COLLATION = 'utf8mb4_unicode_ci';
 
   /**
+   * MySql allows a maximum of 3072 bytes per index.
+   * With the `utf8mb4` character set, each character can occupy up to 4 bytes,
+   * so the absolute limit would be 3072 / 4 = 768.
+   * This keeps a bit under that for extra safety.
+   */
+  const MAX_INDEX_LENGTH = 512;
+
+  /**
    * Create a CiviCRM-table
    *
    * @param array $params
@@ -97,8 +105,28 @@ class CRM_Core_BAO_SchemaHandler {
         $sql .= self::buildForeignKeySQL($field, $separator, '', $params['name']);
       }
     }
+    $params['attributes'] ??= '';
+    if (!str_contains(strtoupper($params['attributes']), 'COLLATE')) {
+      $params['attributes'] .= self::defaultAttributes();
+    }
     $sql .= "\n) {$params['attributes']};";
     return $sql;
+  }
+
+  public static function defaultAttributes(): string {
+    $collation = self::getInUseCollation();
+    $characterSet = 'utf8';
+    if (stripos($collation, 'utf8mb4') !== FALSE) {
+      $characterSet = 'utf8mb4';
+    }
+    $attributes = " ENGINE=InnoDB DEFAULT CHARACTER SET {$characterSet} COLLATE {$collation}";
+
+    // If on MySQL 5.6 include ROW_FORMAT=DYNAMIC to fix unit tests
+    $databaseVersion = CRM_Utils_SQL::getDatabaseVersion();
+    if (version_compare($databaseVersion, '5.7', '<') && version_compare($databaseVersion, '5.6', '>=')) {
+      $attributes .= ' ROW_FORMAT=DYNAMIC';
+    }
+    return $attributes;
   }
 
   /**
@@ -115,9 +143,10 @@ class CRM_Core_BAO_SchemaHandler {
     $sql .= $prefix;
     $sql .= "`{$params['name']}` {$params['type']}";
 
-    if (!empty($params['required'])) {
-      $sql .= " NOT NULL";
-    }
+    // explicitly set NULL attribute for non-required fields to work around
+    // MySQL's special handling of timestamp columns
+    // see https://dev.mysql.com/doc/refman/8.4/en/timestamp-initialization.html
+    $sql .= empty($params['required']) ? ' NULL' : ' NOT NULL';
 
     if (!empty($params['attributes'])) {
       $sql .= " {$params['attributes']}";
@@ -177,10 +206,14 @@ class CRM_Core_BAO_SchemaHandler {
     // Add index if field is searchable if it does not reference a foreign key
     // (skip indexing FK fields because it would be redundant to have 2 indexes)
     if (!empty($params['searchable']) && empty($params['fk_table_name']) && !$searchIndexExists) {
+      $indexName = $params['name'];
+      if (self::getFieldLength($params['type']) > self::MAX_INDEX_LENGTH) {
+        $indexName .= '(' . self::MAX_INDEX_LENGTH . ')';
+      }
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
-      $sql .= "index_{$params['name']} ( {$params['name']} )";
+      $sql .= "index_{$params['name']} ( $indexName )";
     }
     // Drop search index if field is no longer searchable
     elseif (empty($params['searchable']) && $searchIndexExists) {
@@ -320,31 +353,35 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
   /**
    * Create indexes.
    *
-   * @param $tables
+   * @param array $tables
    *   Tables to create index for in the format:
    *     ['civicrm_entity_table' => ['entity_id']]
    *     OR
-   *     array['civicrm_entity_table' => array['entity_id', 'entity_table']]
+   *     array['civicrm_entity_table' => [['entity_id', 'entity_table']]
    *   The latter will create a combined index on the 2 keys (in order).
    *
-   *  Side note - when creating combined indexes the one with the most variation
+   *  Side note - when creating combined indexes the one with the most
+   *   variation
    *  goes first  - so entity_table always goes after entity_id.
    *
-   *  It probably makes sense to consider more sophisticated options at some point
-   *  but at the moment this is only being as enhanced as fast as the test is.
-   *
-   * @todo add support for length & multilingual on combined keys.
+   *  It probably makes sense to consider more sophisticated options at some
+   *   point but at the moment this is only being as enhanced as fast as the
+   *   test is.
    *
    * @param string $createIndexPrefix
    * @param array $substrLengths
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @todo add support for length & multilingual on combined keys.
+   *
    */
-  public static function createIndexes($tables, $createIndexPrefix = 'index', $substrLengths = []) {
+  public static function createIndexes(array $tables, string $createIndexPrefix = 'index', array $substrLengths = []): void {
     $queries = [];
     $locales = CRM_Core_I18n::getMultilingual();
 
-    // if we're multilingual, cache the information on internationalised fields
+    // If we're multilingual, cache the information on internationalised fields.
     static $columns = NULL;
-    if (!CRM_Utils_System::isNull($locales) and $columns === NULL) {
+    if ($columns === NULL && !CRM_Utils_System::isNull($locales)) {
       $columns = CRM_Core_I18n_SchemaStructure::columns();
     }
 
@@ -838,11 +875,11 @@ MODIFY      {$columnName} varchar( $length )
         if (!$dao->Collation || $dao->Collation === $newCollation || $dao->Collation === $newBinaryCollation) {
           continue;
         }
-        if (strpos($dao->Collation, 'utf8') !== 0) {
+        if (!str_starts_with($dao->Collation, 'utf8')) {
           continue;
         }
 
-        if (strpos($dao->Collation, '_bin') !== FALSE) {
+        if (str_contains($dao->Collation, '_bin')) {
           $tableCollation = $newBinaryCollation;
         }
         else {
@@ -973,6 +1010,34 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function getDBCharset() {
     return CRM_Core_DAO::singleValueQuery('SELECT @@character_set_database');
+  }
+
+  /**
+   * @param string $table
+   * @return string|null
+   *   Ex: 'BASE TABLE' or 'VIEW'
+   */
+  public static function getTableType(string $table): ?string {
+    return \CRM_Core_DAO::singleValueQuery(
+      'SELECT TABLE_TYPE  FROM information_schema.tables  WHERE TABLE_SCHEMA=database() AND TABLE_NAME LIKE %1',
+      [1 => [$table, 'String']]);
+  }
+
+  /**
+   * Extracts the length or size parameter from an SQL type definition if it exists.
+   *
+   * @param string $sqlType
+   *   E.g. "varchar(255)" or "decimal(20,2)" or "int".
+   *
+   * @return string|null
+   *   E.g. "255" or "20,2" or NULL
+   */
+  public static function getFieldLength($sqlType): ?string {
+    $open = strpos($sqlType, '(');
+    if ($open) {
+      return substr($sqlType, $open + 1, -1);
+    }
+    return NULL;
   }
 
 }

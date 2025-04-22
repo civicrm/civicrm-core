@@ -94,7 +94,7 @@ class PermissionCheck implements EventSubscriberInterface {
     switch ($apiRequest['entity']) {
       case 'UFGroup':
       case 'UFField':
-        $ufGroups = \CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+        $ufGroups = \CRM_Core_DAO_UFField::buildOptions('uf_group_id');
         $aclCreate = \CRM_ACL_API::group(\CRM_Core_Permission::CREATE, NULL, 'civicrm_uf_group', $ufGroups);
         $aclEdit = \CRM_ACL_API::group(\CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
         $ufGroupId = $apiRequest['entity'] == 'UFGroup' ? $apiRequest['params']['id'] : $apiRequest['params']['uf_group_id'];

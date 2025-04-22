@@ -133,7 +133,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
@@ -183,6 +183,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'payment_instrument',
+        'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterPaymentInstrument'],
       ],
     ],
     'receive_date' => [
@@ -270,9 +271,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'invoice_id' => [
       'title' => ts('Invoice Reference'),
@@ -286,9 +284,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'invoice_number' => [
       'title' => ts('Invoice Number'),
@@ -300,9 +295,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'currency' => [
@@ -319,7 +311,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Currency'),
-        'maxlength' => 3,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
@@ -327,6 +318,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'cancel_date' => [
@@ -402,9 +394,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'amount_level' => [
       'title' => ts('Amount Label'),
@@ -477,6 +466,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'contribution_status',
+        'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterStatus'],
       ],
     ],
     'address_id' => [
@@ -511,7 +501,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '6',
-        'maxlength' => 255,
       ],
     ],
     'campaign_id' => [
@@ -552,9 +541,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'tax_amount' => [
@@ -597,7 +583,6 @@ return [
       'add' => '5.20',
       'default' => FALSE,
       'usage' => [
-        'import',
         'export',
         'duplicate_matching',
       ],

@@ -2,6 +2,7 @@
 
 namespace Civi\AfformAdmin;
 
+use Civi\Afform\Placement\PlacementUtils;
 use Civi\Api4\Entity;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
@@ -12,13 +13,9 @@ class AfformAdminMeta {
   /**
    * @return array
    */
-  public static function getAdminSettings() {
-    $afformPlacement = \CRM_Utils_Array::formatForSelect2((array) \Civi\Api4\OptionValue::get(FALSE)
-      ->addSelect('value', 'label', 'icon', 'description')
-      ->addWhere('is_active', '=', TRUE)
-      ->addWhere('option_group_id:name', '=', 'afform_placement')
-      ->addOrderBy('weight')
-      ->execute(), 'label', 'value');
+  public static function getAdminSettings(): array {
+    $afformPlacement = \CRM_Utils_Array::formatForSelect2(PlacementUtils::getPlacements(), 'label', 'value');
+    $afformTags = \CRM_Utils_Array::formatForSelect2((array) \Civi\Api4\Utils\AfformTags::getTagOptions());
     $afformTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
       ->addSelect('name', 'label', 'icon')
       ->addWhere('is_active', '=', TRUE)
@@ -38,8 +35,28 @@ class AfformAdminMeta {
     return [
       'afform_type' => $afformTypes,
       'afform_placement' => $afformPlacement,
+      'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
+      'placement_filters' => self::getPlacementFilterOptions(),
+      'afform_tags' => $afformTags,
       'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
+      'confirmation_types' => self::getConfirmationTypes(),
     ];
+  }
+
+  /**
+   * Get confirmation types
+   *
+   * @return array
+   */
+  public static function getConfirmationTypes(): array {
+    $confirmationTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('label', 'name', 'value')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('option_group_id:name', '=', 'afform_confirmation_type')
+      ->addOrderBy('weight', 'ASC')
+      ->execute();
+
+    return $confirmationTypes;
   }
 
   /**
@@ -99,6 +116,13 @@ class AfformAdminMeta {
       }
       $params['values']['state_province_id'] = \Civi::settings()->get('defaultContactStateProvince');
     }
+    // Exclude LocBlock fields that will be replaced by joins (see below)
+    if ($params['action'] === 'create' && $entityName === 'LocBlock') {
+      $joinParams = $params;
+      // Omit the fk fields (email_id, email_2_id, phone_id, etc)
+      // As we'll add their joined fields below
+      $params['where'][] = ['fk_entity', 'IS NULL'];
+    }
     $fields = (array) civicrm_api4($entityName, 'getFields', $params);
     // Add implicit joins to search fields
     if ($params['action'] === 'get') {
@@ -117,11 +141,35 @@ class AfformAdminMeta {
         }
       }
     }
+    // Add LocBlock joins (e.g. `email_id.email`, `address_id.street_address`)
+    if ($params['action'] === 'create' && $entityName === 'LocBlock') {
+      // Exclude fields that don't apply to locBlocks
+      $joinParams['where'][] = ['name', 'NOT IN', ['id', 'is_primary', 'is_billing', 'location_type_id', 'contact_id']];
+      foreach (['Address', 'Email', 'Phone', 'IM'] as $joinEntity) {
+        $joinEntityFields = (array) civicrm_api4($joinEntity, 'getFields', $joinParams);
+        $joinEntityLabel = CoreUtil::getInfoItem($joinEntity, 'title');
+        // LocBlock entity includes every join twice (e.g. `email_2_id.email`, `address_2_id.street_address`)
+        foreach ([1 => '', 2 => '_2'] as $number => $suffix) {
+          $joinField = strtolower($joinEntity) . $suffix . '_id';
+          foreach ($joinEntityFields as $joinEntityField) {
+            if (strtolower($joinEntity) === $joinEntityField['name']) {
+              $joinEntityField['label'] .= " $number";
+            }
+            else {
+              $joinEntityField['label'] = "$joinEntityLabel $number {$joinEntityField['label']}";
+            }
+            $joinEntityField['name'] = "$joinField." . $joinEntityField['name'];
+            $fields[] = $joinEntityField;
+          }
+        }
+      }
+    }
     // Index by name
     $fields = array_column($fields, NULL, 'name');
     $idField = CoreUtil::getIdFieldName($entityName);
     // Convert ID field to existing entity field
-    if (isset($fields[$idField])) {
+    // Unless it already references another entity (e.g. GroupSubscription)
+    if (isset($fields[$idField]) && empty($fields[$idField]['fk_entity'])) {
       $fields[$idField]['readonly'] = FALSE;
       $fields[$idField]['input_type'] = 'EntityRef';
       // Afform-only (so far) metadata tells the form to update an existing entity autofilled from this value
@@ -221,6 +269,16 @@ class AfformAdminMeta {
             '#markup' => FALSE,
           ],
         ],
+        'tabset' => [
+          'title' => E::ts('Tab Set'),
+          'element' => [
+            '#tag' => 'af-tabset',
+            '#children' => [
+              ['#tag' => 'af-tab', 'title' => E::ts('Tab 1'), '#children' => []],
+              ['#tag' => 'af-tab', 'title' => E::ts('Tab 2'), '#children' => []],
+            ],
+          ],
+        ],
         'submit' => [
           'title' => E::ts('Submit Button'),
           'afform_type' => ['form'],
@@ -232,6 +290,20 @@ class AfformAdminMeta {
             'ng-if' => 'afform.showSubmitButton',
             '#children' => [
               ['#text' => E::ts('Submit')],
+            ],
+          ],
+        ],
+        'save_draft' => [
+          'title' => E::ts('Save Draft Button'),
+          'afform_type' => ['form'],
+          'element' => [
+            '#tag' => 'button',
+            'class' => 'af-button btn btn-primary',
+            'crm-icon' => 'fa-floppy-disk',
+            'ng-click' => 'afform.submitDraft()',
+            'ng-if' => 'afform.showSubmitButton',
+            '#children' => [
+              ['#text' => E::ts('Save Draft')],
             ],
           ],
         ],
@@ -303,6 +375,24 @@ class AfformAdminMeta {
     }
 
     return $data;
+  }
+
+  private static function getPlacementFilterOptions(): array {
+    $entities = $entityFilterOptions = [];
+    foreach (PlacementUtils::getPlacements() as $placement) {
+      $entities += $placement['entities'];
+    }
+    foreach ($entities as $entityName) {
+      $filterOptions = PlacementUtils::getEntityTypeFilterOptions($entityName);
+      if ($filterOptions) {
+        $entityFilterOptions[$entityName] = [
+          'name' => PlacementUtils::getEntityTypeFilterName($entityName),
+          'label' => PlacementUtils::getEntityTypeFilterLabel($entityName),
+          'options' => $filterOptions,
+        ];
+      }
+    }
+    return $entityFilterOptions;
   }
 
 }

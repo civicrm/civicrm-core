@@ -22,6 +22,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    */
   public function tearDown():void {
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email', 'civicrm_translation'], TRUE);
+    $this->quickCleanUpFinancialEntities();
     parent::tearDown();
     Civi::cache('metadata')->clear();
     unset($GLOBALS['tsLocale'], $GLOBALS['dbLocale'], $GLOBALS['civicrmLocale']);
@@ -959,6 +960,7 @@ emo
       '{contact.checksum}' => 'Checksum',
       '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
+      '{site.message_header}' => 'Message Header',
     ];
   }
 
@@ -1336,6 +1338,7 @@ custom_3 |01/20/2021 12:00AM
 checksum |cs=' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
+sage_header |<div><!-- This content comes from the site message header token--></div>
 ';
   }
 

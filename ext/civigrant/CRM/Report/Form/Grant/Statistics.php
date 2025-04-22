@@ -83,14 +83,14 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id'),
+            'options' => CRM_Grant_DAO_Grant::buildOptions('grant_type_id'),
           ],
           'status_id' => [
             'name' => 'status_id',
             'title' => ts('Grant Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id'),
+            'options' => CRM_Grant_DAO_Grant::buildOptions('status_id'),
           ],
           'amount_requested' => [
             'name' => 'amount_requested',
@@ -134,7 +134,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
             'name' => 'gender_id',
             'title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+            'options' => CRM_Contact_DAO_Contact::buildOptions('gender_id'),
           ],
           'contact_type' => [
             'name' => 'contact_type',
@@ -238,7 +238,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
         foreach ($table['filters'] as $fieldName => $field) {
 
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? NULL) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -250,8 +250,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
           else {
             $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if (($fieldName == 'grant_report_received') &&
-              (CRM_Utils_Array::value("{$fieldName}_value", $this->_params) ===
-                0)
+              (($this->_params["{$fieldName}_value"] ?? NULL) === 0)
             ) {
               $op = 'nll';
               $this->_params["{$fieldName}_value"] = NULL;
@@ -259,9 +258,9 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }
@@ -297,6 +296,10 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     if (!empty($groupBy)) {
       $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
+  }
+
+  public function preProcess() {
+    \Civi::resources()->addBundle('visual');
   }
 
   public function postProcess() {
@@ -335,9 +338,9 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     $awardedGrantsAmount = $grantsReceived = $totalAmount = $awardedGrants = $grantReportsReceived = 0;
     $grantStatistics = [];
 
-    $grantTypes = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
+    $grantTypes = CRM_Grant_DAO_Grant::buildOptions('grant_type_id');
     $countries = CRM_Core_PseudoConstant::country();
-    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+    $gender = CRM_Contact_DAO_Contact::buildOptions('gender_id');
 
     $grantAmountTotal = "
 SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
@@ -514,8 +517,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       return;
     }
 
-    $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency', ['labelColumn' => 'name']);
-    $currency = $currencies[$values['civicrm_grant_currency']];
+    $currency = CRM_Core_PseudoConstant::getName('CRM_Grant_DAO_Grant', 'currency', $values['civicrm_grant_currency']);
 
     if (!$customData) {
       if (!isset($grantStatistics['value'][$fieldValue]['currency'][$currency])

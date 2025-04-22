@@ -82,12 +82,13 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
       $this->tx->rollback()->commit();
       $this->tx = NULL;
     }
-    if ($test instanceof \Civi\Test\HookInterface) {
+    if ($test instanceof \Civi\Core\HookInterface) {
       \CRM_Utils_Hook::singleton()->reset();
     }
     \CRM_Utils_Time::resetTime();
     if ($this->isCiviTest($test)) {
       unset($GLOBALS['CIVICRM_TEST_CASE']);
+      unset($_SERVER['HTTP_X_REQUESTED_WITH']); /* Several tests neglect to clean this up... */
       error_reporting(E_ALL & ~E_NOTICE);
       $this->errorScope = NULL;
     }
@@ -128,7 +129,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    * @return bool
    */
   protected function isCiviTest(\PHPUnit_Framework_Test $test) {
-    return $test instanceof \Civi\Test\HookInterface || $test instanceof \Civi\Test\HeadlessInterface;
+    return $test instanceof \Civi\Core\HookInterface || $test instanceof \Civi\Test\HeadlessInterface;
   }
 
   /**
@@ -255,7 +256,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
       if (strpos($docComment, "@group headless\n") === FALSE) {
         echo "WARNING: Class $className implements HeadlessInterface. It should declare \"@group headless\".\n";
       }
-      if (strpos($docComment, "@group e2e\n") !== FALSE) {
+      if (str_contains($docComment, "@group e2e\n")) {
         echo "WARNING: Class $className implements HeadlessInterface. It should not declare \"@group e2e\".\n";
       }
     }
@@ -265,7 +266,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
       if (strpos($docComment, "@group e2e\n") === FALSE) {
         echo "WARNING: Class $className implements EndToEndInterface. It should declare \"@group e2e\".\n";
       }
-      if (strpos($docComment, "@group headless\n") !== FALSE) {
+      if (str_contains($docComment, "@group headless\n")) {
         echo "WARNING: Class $className implements EndToEndInterface. It should not declare \"@group headless\".\n";
       }
     }

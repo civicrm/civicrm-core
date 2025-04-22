@@ -26,11 +26,18 @@ function make_font_cache() {
 php -r "echo json_encode(array (
   'sans-serif' =>
   array (
-    'normal' => 'Helvetica',
-    'bold' => 'Helvetica-Bold',
-    'italic' => 'Helvetica-Oblique',
-    'bold_italic' => 'Helvetica-BoldOblique',
+    'normal' => 'DejaVuSans',
+    'bold' => 'DejaVuSans-Bold',
+    'italic' => 'DejaVuSans-Oblique',
+    'bold_italic' => 'DejaVuSans-BoldOblique',
   ),
+  'DejaVu Sans' =>
+    array (
+      'normal' => 'DejaVuSans',
+      'bold' => 'DejaVuSans-Bold',
+      'italic' => 'DejaVuSans-Oblique',
+      'bold_italic' => 'DejaVuSans-BoldOblique',
+    ),
   'times' =>
   array (
     'normal' => 'Times-Roman',
@@ -75,17 +82,17 @@ php -r "echo json_encode(array (
   ),
   'serif' =>
   array (
-    'normal' => 'Times-Roman',
-    'bold' => 'Times-Bold',
-    'italic' => 'Times-Italic',
-    'bold_italic' => 'Times-BoldItalic',
+    'normal' => 'DejaVuSerif',
+    'bold' => 'DejaVuSerif-Bold',
+    'italic' => 'DejaVuSerif-Italic',
+    'bold_italic' => 'DejaVuSerif-BoldItalic',
   ),
   'monospace' =>
   array (
-    'normal' => 'Courier',
-    'bold' => 'Courier-Bold',
-    'italic' => 'Courier-Oblique',
-    'bold_italic' => 'Courier-BoldOblique',
+    'normal' => 'DejaVuMono',
+    'bold' => 'DejaVuMono-Bold',
+    'italic' => 'DejaVuMono-Oblique',
+    'bold_italic' => 'DejaVuMono-BoldOblique',
   ),
   'fixed' =>
   array (
@@ -95,16 +102,6 @@ php -r "echo json_encode(array (
     'bold_italic' => 'Courier-BoldOblique',
   ),
 ), JSON_PRETTY_PRINT);"
-}
-
-function make_font_readme() {
-cat <<EOREADME
-To save space in the final distribution we have not included the DejaVu family of fonts. You can get these fonts from:
-
-http://code.google.com/p/dompdf/
-
-Download the latest version and copy the font files from the lib/fonts directories to this directory.
-EOREADME
 }
 
 ## usage: simple_replace <filename> <old-string> <new-string>
@@ -120,7 +117,4 @@ safe_delete vendor/dompdf/dompdf/load_font.php
 safe_delete vendor/dompdf/dompdf/www
 safe_delete vendor/phenx/php-font-lib/www
 
-# Remove DejaVu fonts. They add 12mb.
-safe_delete vendor/dompdf/dompdf/lib/fonts/DejaVu*
 make_font_cache > vendor/dompdf/dompdf/lib/fonts/installed-fonts.dist.json
-make_font_readme > vendor/dompdf/dompdf/lib/fonts/README.DejaVuFonts.txt

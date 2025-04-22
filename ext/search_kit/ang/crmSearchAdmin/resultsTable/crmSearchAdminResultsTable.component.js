@@ -74,6 +74,10 @@
         ctrl.crmSearchAdmin.clearParam('select', index);
       };
 
+      $scope.getColumnLabel = function(index) {
+        return searchMeta.getDefaultLabel(ctrl.search.api_params.select[index], ctrl.search);
+      };
+
     }
   });
 

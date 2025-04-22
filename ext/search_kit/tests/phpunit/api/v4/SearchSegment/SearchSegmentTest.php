@@ -330,7 +330,7 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertEquals('Adult', $result[2]['columns'][0]['val']);
     $this->assertEquals(2, $result[2]['data']['COUNT_id']);
 
-    $this->assertNull($result[3]['columns'][0]['val']);
+    $this->assertEquals('', $result[3]['columns'][0]['val']);
     $this->assertEquals(1, $result[3]['data']['COUNT_id']);
   }
 

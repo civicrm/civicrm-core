@@ -35,7 +35,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
       $decimal = CRM_Utils_Number::createRandomDecimal($precision);
       // print "Assert $decimal between $expectedMinInclusive and $expectedMaxExclusive\n";
       $this->assertTrue(($expectedMinInclusive <= $decimal) && ($decimal < $expectedMaxExclusive), "Assert $decimal between $expectedMinInclusive and $expectedMaxExclusive");
-      if (strpos($decimal, '.') === FALSE) {
+      if (!str_contains($decimal, '.')) {
         $decimal .= '.';
       }
       list ($before, $after) = explode('.', $decimal);

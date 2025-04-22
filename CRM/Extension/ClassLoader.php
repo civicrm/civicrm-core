@@ -65,6 +65,10 @@ class CRM_Extension_ClassLoader {
     $this->unregister();
   }
 
+  public function isRegistered(): bool {
+    return ($this->loader !== NULL);
+  }
+
   /**
    * Registers this instance as an autoloader.
    * @return CRM_Extension_ClassLoader

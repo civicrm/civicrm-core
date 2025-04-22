@@ -28,21 +28,19 @@ class CRM_Upgrade_Incremental_General {
    * The point release will be dropped in recommendations unless it's .1 or
    * higher.
    */
-  const RECOMMENDED_PHP_VER = '8.1.0';
+  const RECOMMENDED_PHP_VER = '8.3.0';
 
   /**
    * The minimum recommended PHP version.
    *
    * A site running an earlier version will be told to upgrade.
    */
-  const MIN_RECOMMENDED_PHP_VER = '8.0.0';
+  const MIN_RECOMMENDED_PHP_VER = '8.1.0';
 
   /**
    * The minimum PHP version required to install Civi.
-   *
-   * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '7.4.0';
+  const MIN_INSTALL_PHP_VER = '8.0.0';
 
   /**
    * The minimum recommended MySQL version.
@@ -53,8 +51,6 @@ class CRM_Upgrade_Incremental_General {
 
   /**
    * The minimum MySQL version required to install Civi.
-   *
-   * @see install/index.php
    */
   const MIN_INSTALL_MYSQL_VER = '5.7';
 
@@ -133,14 +129,6 @@ class CRM_Upgrade_Incremental_General {
       // after the upgrade.  But that's speculative.  For now, we'll leave this
       // advanced feature in the hands of the sysadmin.
       $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => Customize Data and Screens => Search Preferences".');
-    }
-
-    $ftAclSetting = Civi::settings()->get('acl_financial_type');
-    if ($ftAclSetting && !self::isExtensionInstalled('biz.jmaconsulting.financialaclreport')) {
-      $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', [
-        1 => 'biz.jmaconsulting.financialaclreport',
-        2 => 'https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport',
-      ]);
     }
 
     $snapshotIssues = CRM_Upgrade_Snapshot::getActivationIssues();

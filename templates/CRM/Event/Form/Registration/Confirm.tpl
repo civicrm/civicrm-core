@@ -18,7 +18,7 @@
         {ts}Please verify your information.{/ts} <strong>{ts}If space becomes available you will receive an email with a link to complete your registration.{/ts}</strong>
         {ts 1=$register}Click <strong>%1</strong> to be added to the WAIT LIST for this event.{/ts}
     {elseif $isRequireApproval}
-        {ts}Please verify your information.{/ts} <strong>{ts}Once approved, you will receive an email with a link to complete the registration process.{/ts}</strong>
+        {ts}Please verify your information.{/ts}
         {ts 1=$register}Click <strong>%1</strong> to submit your registration for approval.{/ts}
     {else}
         {ts}Please verify your information.{/ts}
@@ -92,7 +92,9 @@
         </div>
       </fieldset>
     {/if}
-        {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {if $totalAmount > 0}
+      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {/if}
     {literal}<script>function calculateTotalFee() { return {/literal}{$totalAmount}{literal} }</script>{/literal}
     </div>
     {/if}
@@ -117,20 +119,6 @@
           <br />
         </div>
     </div>
-    {/if}
-
-    {if $event.participant_role neq 'Attendee' and $defaultRole}
-        <div class="crm-group participant_role-group">
-            <div class="header-dark">
-                {ts}Participant Role{/ts}
-            </div>
-            <div class="crm-section no-label participant_role-section">
-                <div class="content">
-                    {$event.participant_role}
-                </div>
-              <div class="clear"></div>
-            </div>
-        </div>
     {/if}
 
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}

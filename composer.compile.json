@@ -1,0 +1,9 @@
+{
+  "compile": [
+    {
+      "title": "Optimize Monaco",
+      "run": ["@php-method \\Civi\\ComposerTasks::stripSourceMap"],
+      "src-path": "bower_components/monaco-editor"
+    }
+  ]
+}

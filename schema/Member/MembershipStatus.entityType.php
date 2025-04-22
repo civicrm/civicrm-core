@@ -41,9 +41,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'label' => [
       'title' => ts('Label'),
@@ -52,9 +49,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Label for Membership Status'),
       'add' => '3.2',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'start_event' => [
       'title' => ts('Start Event'),
@@ -64,10 +58,9 @@ return [
       'add' => '1.5',
       'input_attrs' => [
         'label' => ts('Start Event'),
-        'maxlength' => 12,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::eventDate',
+        'callback' => ['CRM_Core_SelectValues', 'eventDate'],
       ],
     ],
     'start_event_adjust_unit' => [
@@ -78,10 +71,9 @@ return [
       'add' => '1.5',
       'input_attrs' => [
         'label' => ts('Start Event Adjust Unit'),
-        'maxlength' => 8,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::unitList',
+        'callback' => ['CRM_Core_SelectValues', 'unitList'],
       ],
     ],
     'start_event_adjust_interval' => [
@@ -102,10 +94,9 @@ return [
       'add' => '1.5',
       'input_attrs' => [
         'label' => ts('End Event'),
-        'maxlength' => 12,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::eventDate',
+        'callback' => ['CRM_Core_SelectValues', 'eventDate'],
       ],
     ],
     'end_event_adjust_unit' => [
@@ -116,10 +107,9 @@ return [
       'add' => '1.5',
       'input_attrs' => [
         'label' => ts('End Event Adjust Unit'),
-        'maxlength' => 8,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::unitList',
+        'callback' => ['CRM_Core_SelectValues', 'unitList'],
       ],
     ],
     'end_event_adjust_interval' => [

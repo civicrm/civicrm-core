@@ -19,7 +19,6 @@
 
 namespace api\v4;
 
-use Civi\Api4\UFMatch;
 use Civi\Test;
 use Civi\Test\Api4TestTrait;
 use Civi\Test\CiviEnvBuilder;
@@ -53,11 +52,10 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
    * Post test cleanup.
    */
   public function tearDown(): void {
-    $implements = class_implements($this);
-    // If not created in a transaction, test records must be deleted
-    if (!in_array('Civi\Test\TransactionalInterface', $implements, TRUE)) {
-      $this->deleteTestRecords();
-    }
+    $this->conditionallyDeleteTestRecords();
+    \CRM_Utils_Time::resetTime();
+    \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+    parent::tearDown();
   }
 
   /**
@@ -76,37 +74,6 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
       \CRM_Core_DAO::executeQuery($sql);
     }
     \CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
-  }
-
-  /**
-   * Emulate a logged in user since certain functions use that.
-   * value to store a record in the DB (like activity)
-   *
-   * @see https://issues.civicrm.org/jira/browse/CRM-8180
-   *
-   * @return int
-   *   Contact ID of the created user.
-   * @throws \CRM_Core_Exception
-   */
-  public function createLoggedInUser(): int {
-    $contactID = $this->createTestRecord('Individual')['id'];
-    UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
-    $this->createTestRecord('UFMatch', [
-      'contact_id' => $contactID,
-      'uf_name' => 'superman',
-      'uf_id' => 6,
-    ]);
-
-    $session = \CRM_Core_Session::singleton();
-    $session->set('userID', $contactID);
-    return $contactID;
-  }
-
-  public function userLogout() {
-    \CRM_Core_Session::singleton()->reset();
-    UFMatch::delete(FALSE)
-      ->addWhere('uf_name', '=', 'superman')
-      ->execute();
   }
 
 }

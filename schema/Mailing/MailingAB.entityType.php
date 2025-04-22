@@ -24,9 +24,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Name of the A/B test'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'status' => [
       'title' => ts('Status'),
@@ -34,11 +31,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('Status'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 32,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_PseudoConstant::abStatus',
+        'callback' => ['CRM_Mailing_PseudoConstant', 'abStatus'],
       ],
     ],
     'mailing_id_a' => [
@@ -75,11 +69,8 @@ return [
       'sql_type' => 'varchar(32)',
       'input_type' => 'Select',
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 32,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_PseudoConstant::abTestCriteria',
+        'callback' => ['CRM_Mailing_PseudoConstant', 'abTestCriteria'],
       ],
     ],
     'winner_criteria' => [
@@ -87,11 +78,8 @@ return [
       'sql_type' => 'varchar(32)',
       'input_type' => 'Select',
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 32,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_PseudoConstant::abWinnerCriteria',
+        'callback' => ['CRM_Mailing_PseudoConstant', 'abWinnerCriteria'],
       ],
     ],
     'specific_url' => [
@@ -100,9 +88,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('What specific url to track'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'declare_winning_time' => [
       'title' => ts('Declaration Time'),

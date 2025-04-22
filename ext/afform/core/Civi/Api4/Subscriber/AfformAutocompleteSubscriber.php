@@ -11,6 +11,7 @@
 
 namespace Civi\Api4\Subscriber;
 
+use Civi\Api4\SavedSearch;
 use Civi\Core\Service\AutoService;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Afform;
@@ -77,18 +78,28 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     $formDataModel = new FormDataModel($afform['layout']);
     [$entityName, $joinEntity] = array_pad(explode('+', $entityName), 2, NULL);
     $entity = $formDataModel->getEntity($entityName);
+    $isId = FALSE;
 
     // If no model entity, it's a search display
     if (!$entity) {
       $searchDisplay = $formDataModel->getSearchDisplay($entityName);
-      $apiEntity = civicrm_api4('SavedSearch', 'get', ['where' => [['name', '=', $searchDisplay['searchName']]]])
-        ->first()['api_entity'] ?? NULL;
+      $savedSearch = SavedSearch::get(FALSE)
+        ->addWhere('name', '=', $searchDisplay['searchName'])
+        ->addSelect('api_entity', 'api_params')
+        ->execute()
+        ->single();
+      $searchEntities = FormDataModel::getSearchEntities($savedSearch);
+      $fieldEntities = FormDataModel::getSearchFieldEntityType($fieldName, $searchEntities);
+      // If getSearchFieldEntityType returns > 1 entity we only need to consider the first, as the 2nd would be from a bridge join
+      [$apiEntity, $explicitJoin] = array_pad(explode(' AS ', $fieldEntities[0]), 2, '');
       $formField = $searchDisplay['fields'][$fieldName]['defn'] ?? [];
+      if (str_starts_with($fieldName, "$explicitJoin.")) {
+        $fieldName = substr($fieldName, strlen($explicitJoin) + 1);
+      }
     }
     // If using a join (e.g. Contact -> Email)
     elseif ($joinEntity) {
       $apiEntity = $joinEntity;
-      $isId = FALSE;
       $formField = $entity['joins'][$joinEntity]['fields'][$fieldName]['defn'] ?? [];
     }
     else {
@@ -137,7 +148,14 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     }
     switch ($fieldName) {
       case 'autocompleteSavedSearch':
-        $apiRequest->addFilter('api_entity', $apiRequest->getFilters()['api_entity']);
+        if (CoreUtil::isContact($apiRequest->getFilters()['api_entity'])) {
+          $filter = ['Contact', $apiRequest->getFilters()['api_entity']];
+          $apiRequest->addFilter('api_entity', $filter);
+        }
+        else {
+          $apiRequest->addFilter('api_entity', $apiRequest->getFilters()['api_entity']);
+        }
+        $apiRequest->addFilter('is_template', FALSE);
         return;
 
       case 'autocompleteDisplay':

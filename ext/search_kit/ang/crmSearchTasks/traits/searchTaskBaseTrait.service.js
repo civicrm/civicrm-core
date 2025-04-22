@@ -24,8 +24,8 @@
         dialogService.cancel('crmSearchTask');
       },
 
-      close: function() {
-        dialogService.close('crmSearchTask');
+      close: function(result) {
+        dialogService.close('crmSearchTask', result);
       }
 
     };

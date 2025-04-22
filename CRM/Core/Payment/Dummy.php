@@ -370,4 +370,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     return $string . '_' . $trxn_id . '_' . uniqid();
   }
 
+  public function updateSubscriptionBillingInfo(&$message = '', $params = []) {
+    $message = ts('Recurring Contribution Updated');
+    return TRUE;
+  }
+
 }

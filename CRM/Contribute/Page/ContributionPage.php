@@ -64,7 +64,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
         CRM_Core_Action::COPY => [
           'name' => ts('Make a Copy'),
           'url' => CRM_Utils_System::currentPath(),
-          'qs' => 'action=copy&gid=%%id%%',
+          'qs' => 'action=copy&gid=%%id%%&qfKey=%%key%%',
           'title' => ts('Make a Copy of CiviCRM Contribution Page'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
@@ -139,14 +139,6 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'qs' => $urlParams,
           'uniqueName' => 'thankyou',
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EXPORT),
-        ],
-        CRM_Core_Action::BASIC => [
-          'name' => ts('Tell a Friend'),
-          'title' => ts('Tell a Friend'),
-          'url' => $urlString . 'friend',
-          'qs' => $urlParams,
-          'uniqueName' => 'friend',
-          'weight' => 10,
         ],
         CRM_Core_Action::PROFILE => [
           'name' => ts('Include Profiles'),
@@ -326,12 +318,13 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       $this->assign('CiviMember', CRM_Core_Component::isEnabled('CiviMember'));
     }
     elseif ($action & CRM_Core_Action::COPY) {
-      // @todo Unused local variable can be safely removed.
-      // But are there any side effects of CRM_Core_Session::singleton() that we
-      // need to preserve?
-      $session = CRM_Core_Session::singleton();
-      CRM_Core_Session::setStatus(ts('A copy of the contribution page has been created'), ts('Successfully Copied'), 'success');
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
+      }
       $this->copy();
+      CRM_Core_Session::setStatus(ts('A copy of the contribution page has been created'), ts('Successfully Copied'), 'success');
     }
     elseif ($action & CRM_Core_Action::DELETE) {
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -502,7 +495,7 @@ ORDER BY is_active desc, title asc
       }
 
       //build the configure links.
-      $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, []);
+      $sectionsInfo = $contriPageSectionInfo[$dao->id] ?? [];
       $contributions[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
         $action,
         ['id' => $dao->id],
@@ -538,7 +531,7 @@ ORDER BY is_active desc, title asc
       //build the normal action links.
       $contributions[$dao->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(),
         $action,
-        ['id' => $dao->id],
+        ['id' => $dao->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('more'),
         TRUE,
         'contributionpage.action.links',
@@ -590,7 +583,7 @@ ORDER BY is_active desc, title asc
 
     if ($title) {
       $clauses[] = "title LIKE %1";
-      if (strpos($title, '%') !== FALSE) {
+      if (str_contains($title, '%')) {
         $params[1] = [trim($title), 'String', FALSE];
       }
       else {

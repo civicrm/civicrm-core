@@ -91,7 +91,7 @@ class GetActions extends BasicGetAction {
             if ($method) {
               $methodDocs = ReflectionUtils::getCodeDocs($method, 'Method', $vars);
               // Allow method doc to inherit class doc
-              if (strpos($method->getDocComment(), '@inheritDoc') !== FALSE && !empty($methodDocs['comment']) && !empty($actionDocs['comment'])) {
+              if (str_contains($method->getDocComment(), '@inheritDoc') && !empty($methodDocs['comment']) && !empty($actionDocs['comment'])) {
                 $methodDocs['comment'] .= "\n\n" . $actionDocs['comment'];
               }
               $actionDocs = array_filter($methodDocs) + $actionDocs + ['deprecated' => FALSE];

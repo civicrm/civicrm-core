@@ -40,7 +40,7 @@
   </div>
 
   <div class="action-link">
-    <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid|escape}, {$other_cid|escape}, 'dupe-nondupe', 'merge-contact', '{$browseUrl}' );return false;">
+    <a href="#" class="action-item crm-hover-button crm-notDuplicate" title="{ts escape='htmlattribute'}Mark this pair as not a duplicate.{/ts}" onClick="processDupes( {$main_cid|escape}, {$other_cid|escape}, 'dupe-nondupe', 'merge-contact', '{$browseUrl}' );return false;">
       <i class="crm-i fa-times-circle" aria-hidden="true"></i>
       {ts}Mark this pair as not a duplicate.{/ts}
     </a>

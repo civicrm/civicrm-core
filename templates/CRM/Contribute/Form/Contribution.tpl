@@ -10,7 +10,7 @@
 {* this template is used for adding/editing/deleting contributions and pledge payments *}
 
 {if $priceSetId}
-  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution" hideTotal=false}
+  {include file="CRM/Price/Form/PriceSet.tpl" extends="Contribution" hideTotal=false isShowAdminVisibilityFields=true}
 {elseif !empty($showAdditionalInfo) and !empty($formType)}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
@@ -59,7 +59,7 @@
       <table class="form-layout-compressed">
         <tr class="crm-contribution-form-block-contact_id">
           <td class="label">{$form.contact_id.label}</td>
-          <td>{$form.contact_id.html}</td>
+          <td>{$form.contact_id.html nofilter}</td>
         </tr>
         <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
           <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;

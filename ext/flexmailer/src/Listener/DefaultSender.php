@@ -165,13 +165,21 @@ class DefaultSender extends AutoService {
     // SMTP response code is buried in the message.
     $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
 
-    if (strpos($message, 'Failed to write to socket') !== FALSE) {
+    if (str_contains($message, 'Failed to write to socket')) {
       return TRUE;
     }
 
     // Register 5xx SMTP response code (permanent failure) as bounce.
     if (isset($code[0]) && $code[0] === '5') {
       return FALSE;
+    }
+
+    // Consider SMTP Erorr 450, class 4.1.2 "Domain not found", as permanent failures if the corresponding setting is enabled
+    if ($code === '450' && \Civi::settings()->get('smtp_450_is_permanent')) {
+      $class = preg_match('/ \(code: (.+), response: ([0-9\.]+) /', $message, $matches) ? $matches[2] : '';
+      if ($class === '4.1.2') {
+        return FALSE;
+      }
     }
 
     if (str_contains($message, 'Failed to set sender')) {

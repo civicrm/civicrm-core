@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Friend'),
     'title_plural' => ts('Friends'),
-    'description' => ts('FIXME'),
+    'description' => ts('Tell a Friend (deprecated - moved to extension)'),
     'add' => '2.0',
     'label_field' => 'title',
   ],
@@ -29,9 +29,6 @@ return [
       'required' => TRUE,
       'description' => ts('Name of table where item being referenced is stored.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),
@@ -51,9 +48,6 @@ return [
       'input_type' => 'Text',
       'localizable' => TRUE,
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'intro' => [
       'title' => ts('Intro'),
@@ -82,9 +76,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'thankyou_title' => [
       'title' => ts('Thank You Title'),
@@ -93,9 +84,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Text for Tell a Friend thank you page header and HTML title.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'thankyou_text' => [
       'title' => ts('Thank You Text'),

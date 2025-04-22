@@ -37,9 +37,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('physical tablename for entity being joined to discount, e.g. civicrm_event'),
       'add' => '3.4',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id1' => [
       'title' => ts('Prev Next Entity ID 1'),
@@ -62,9 +59,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Unique path name for cache element of the searched item'),
       'add' => '3.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'data' => [
       'title' => ts('Prev Next Data'),

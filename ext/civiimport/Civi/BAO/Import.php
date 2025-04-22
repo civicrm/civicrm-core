@@ -62,54 +62,6 @@ class Import extends CRM_Core_DAO {
   }
 
   /**
-   * Returns fields generic to all imports, indexed by name.
-   *
-   * This function could arguably go, leaving it to the `ImportSpecProvider`
-   * which adds all the other fields. But it does have the nice side effect of
-   * putting these three fields first in a natural sort.
-   *
-   * @param bool $checkPermissions
-   *   Filter by field permissions.
-   * @return array
-   */
-  public static function getSupportedFields($checkPermissions = FALSE): array {
-    return [
-      '_id' => [
-        'type' => 'Field',
-        'required' => FALSE,
-        'nullable' => FALSE,
-        'readonly' => TRUE,
-        'name' => '_id',
-        'title' => E::ts('Import row ID'),
-        'data_type' => 'Integer',
-        'input_type' => 'Number',
-        'column_name' => '_id',
-      ],
-      '_status' => [
-        'type' => 'Field',
-        'required' => TRUE,
-        // We should add a requeue action or just define an option group but for now..
-        'readonly' => TRUE,
-        'nullable' => FALSE,
-        'name' => '_status',
-        'title' => E::ts('Row status'),
-        'data_type' => 'String',
-        'column_name' => '_status_message',
-      ],
-      '_status_message' => [
-        'type' => 'Field',
-        'nullable' => TRUE,
-        'readonly' => TRUE,
-        'name' => '_status_message',
-        'title' => E::ts('Row import message'),
-        'description' => '',
-        'data_type' => 'String',
-        'column_name' => '_status_message',
-      ],
-    ];
-  }
-
-  /**
    * Over-ride the parent to prevent a NULL return.
    *
    * Metadata otherwise handled in `table()`, `writeRecord` and `ImportSpecProvider`
@@ -155,9 +107,9 @@ class Import extends CRM_Core_DAO {
     $op = empty($record['_id']) ? 'create' : 'edit';
     $userJobID = $record['_user_job_id'];
     $entityName = 'Import_' . $userJobID;
-    $userJob = UserJob::get($record['check_permissions'])->addWhere('id', '=', $userJobID)->addSelect('metadata', 'job_type', 'created_id')->execute()->first();
+    $checkPermissions = (bool) ($record['check_permissions'] ?? FALSE);
 
-    $tableName = $userJob['metadata']['DataSource']['table_name'];
+    $tableName = self::getTableNameForUserJob($userJobID, $checkPermissions);
     CRM_Utils_Hook::pre($op, $entityName, $record['_id'] ?? NULL, $record);
     $fields = self::getAllFields($tableName);
     $instance = new self();
@@ -217,7 +169,7 @@ class Import extends CRM_Core_DAO {
     $userFieldIndex = 0;
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
-      if (strpos($result->Field, '_') !== 0) {
+      if (!str_starts_with($result->Field, '_')) {
         $columns[$result->Field]['label'] = ts('Import field') . ':' . ($headers[$userFieldIndex] ?? $result->Field);
         $columns[$result->Field]['data_type'] = 'String';
         $userFieldIndex++;
@@ -225,7 +177,7 @@ class Import extends CRM_Core_DAO {
       else {
         $columns[$result->Field]['label'] = ($result->Field === '_entity_id') ? E::ts('Row Imported to %1 ID', [1 => $entity]) : $result->Field;
         $columns[$result->Field]['fk_entity'] = ($result->Field === '_entity_id') ? $entity : NULL;
-        $columns[$result->Field]['data_type'] = strpos($result->Type, 'int') === 0 ? 'Integer' : 'String';
+        $columns[$result->Field]['data_type'] = str_starts_with($result->Type, 'int') ? 'Integer' : 'String';
       }
     }
     \Civi::cache('metadata')->set($cacheKey, $columns);
@@ -246,11 +198,7 @@ class Import extends CRM_Core_DAO {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getFieldsForUserJobID(int $userJobID, bool $checkPermissions = TRUE): array {
-    $userJob = UserJob::get($checkPermissions)
-      ->addWhere('id', '=', $userJobID)
-      ->addSelect('created_id.display_name', 'created_id', 'metadata')
-      ->execute()->first();
-    $tableName = $userJob['metadata']['DataSource']['table_name'];
+    $tableName = self::getTableNameForUserJob($userJobID, $checkPermissions);
     return self::getAllFields($tableName);
   }
 
@@ -264,6 +212,27 @@ class Import extends CRM_Core_DAO {
    */
   public static function tableHasBeenAdded(): bool {
     return TRUE;
+  }
+
+  public static function getTableNameForUserJob(int $userJobID, bool $checkPermissions = FALSE): string {
+    $perm = (int) $checkPermissions;
+    if (isset(\Civi::$statics[__METHOD__][$perm][$userJobID])) {
+      return \Civi::$statics[__METHOD__][$perm][$userJobID];
+    }
+    $userJob = UserJob::get($checkPermissions)
+      ->addWhere('id', '=', $userJobID)
+      ->addSelect('metadata')
+      ->execute()->first();
+    if (!$userJob && $checkPermissions) {
+      throw new \Civi\API\Exception\UnauthorizedException('User does not have access to this import');
+    }
+    $tableName = $userJob['metadata']['DataSource']['table_name'] ?? NULL;
+    if (!$tableName) {
+      throw new \CRM_Core_Exception('Import table not found');
+    }
+    \Civi::$statics[__METHOD__][$perm][$userJobID] = $tableName;
+    \Civi::$statics[__METHOD__][0][$userJobID] = $tableName;
+    return $tableName;
   }
 
   /**

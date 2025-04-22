@@ -52,6 +52,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_processor_type_id' => [
         'name' => 'payment_processor_type_id',
         'required' => TRUE,
+        // This is being double added - perhaps we can fix but for now....
+        // dev/core#5266
+        'not-auto-addable' => TRUE,
       ],
       'title' => [
         'name' => 'title',
@@ -184,7 +187,13 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     // Financial Account of account type asset CRM-11515
     $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
-    $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
+    $financialAccount = \Civi\Api4\FinancialAccount::get()
+      ->addSelect('id', 'label')
+      ->addWhere('financial_account_type_id', '=', key($accountType))
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('label')
+      ->execute()
+      ->column('label', 'id');
     if ($fcount = count($financialAccount)) {
       $this->assign('financialAccount', $fcount);
     }
@@ -330,7 +339,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $cards = json_decode(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
           $this->_id,
           'accepted_credit_cards'
-        ), TRUE);
+         ) ?? '', TRUE);
     $acceptedCards = [];
     if (!empty($cards)) {
       foreach ($cards as $card => $val) {
@@ -413,7 +422,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   public function updatePaymentProcessor($values, $domainID, $test) {
     if ($test) {
       foreach (['user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject'] as $field) {
-        $values[$field] = empty($values["test_{$field}"]) ? CRM_Utils_Array::value($field, $values) : $values["test_{$field}"];
+        $values[$field] = empty($values["test_{$field}"]) ? ($values[$field] ?? NULL) : $values["test_{$field}"];
       }
     }
     if (!empty($values['accept_credit_cards'])) {
@@ -464,11 +473,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $this->set('pp', $this->_paymentProcessorType);
     }
     else {
-      $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', [
-        'labelColumn' => 'name',
-        'flip' => 1,
-      ]);
-      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, $paymentProcessorTypes['PayPal']);
+      $payPal = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', 'PayPal');
+      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, $payPal);
     }
   }
 

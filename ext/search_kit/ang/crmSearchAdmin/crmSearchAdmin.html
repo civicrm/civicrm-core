@@ -1,5 +1,5 @@
 <div id="bootstrap-theme" class="crm-search">
-  <h1 crm-page-title>{{ $ctrl.entityTitle + ': ' + $ctrl.savedSearch.label }}</h1>
+  <h1 crm-page-title>{{ ($ctrl.savedSearch.is_template ? ts('Search Template') : ts('Saved Search')) + ': ' + $ctrl.savedSearch.label }}</h1>
   <div crm-ui-debug="$ctrl.savedSearch"></div>
 
   <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
@@ -14,11 +14,11 @@
   <form>
     <div class="crm-flex-box crm-search-admin-outer">
       <div class="crm-flex-1">
-        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}" ng-model-options="$ctrl.debounceMode">
+        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}" ng-model-options="$ctrl.debounceMode" title="{{:: ts('Saved Search label')}}">
       </div>
       <div class="crm-flex-1 form-inline">
         <div class="btn-group">
-          <button type="button" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" ng-click="$ctrl.save()">
+          <button type="button" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" crm-confirm="$ctrl.confirmSave()" on-yes="$ctrl.save()">
             <i class="crm-i" ng-class="{'fa-check': status !== 'saving', 'fa-spin fa-spinner': status === 'saving'}"></i>
             <span ng-if="status === 'saved'">{{:: ts('Saved') }}</span>
             <span ng-if="status === 'unsaved'">{{:: ts('Save') }}</span>
@@ -28,7 +28,7 @@
 
         <div class="form-group pull-right">
 
-          <div class="btn-group" ng-if="$ctrl.afformEnabled && $ctrl.savedSearch.id">
+          <div class="btn-group" ng-if="$ctrl.afformEnabled && $ctrl.savedSearch.id && !$ctrl.savedSearch.is_template">
             <button type="button" ng-click="$ctrl.openAfformMenu = true;" class="btn dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="crm-i fa-list-alt"></i>
               {{ ($ctrl.afformCount !== undefined) ? ($ctrl.afformCount === 1 ? ts('1 Form') : ts('%1 Forms', {1: $ctrl.afformCount})) : ts('Forms...') }}
@@ -68,6 +68,7 @@
             </a>
             <button type="button" ng-click="$ctrl.openDisplayMenu = true;" class="btn btn-primary-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
+              <span class="sr-only">{{:: ts('View results using display')}}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openDisplayMenu">
               <li title="{{:: ts('View search results table') }}">

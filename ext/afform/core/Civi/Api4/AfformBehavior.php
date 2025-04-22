@@ -68,6 +68,11 @@ class AfformBehavior extends Generic\AbstractEntity {
           'data_type' => 'Array',
           'description' => 'Nested array of supported behavior modes, keyed by entity name',
         ],
+        [
+          'name' => 'default_mode',
+          'data_type' => 'String',
+          'description' => 'If set then mode will not be de-selectable',
+        ],
       ];
     }))->setCheckPermissions(TRUE);
   }

@@ -70,8 +70,8 @@ class EntityRepository {
     // Extensions should be online when we're called.
     \CRM_Utils_Hook::entityTypes($entityTypes);
     self::$entities = array_column($entityTypes, NULL, 'name');
-    self::$tableIndex = array_column($entityTypes, 'name', 'table');
-    self::$classIndex = array_column($entityTypes, 'name', 'class');
+    self::$tableIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['table'])), 'name', 'table');
+    self::$classIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['class'])), 'name', 'class');
   }
 
   private static function loadCoreEntities(): array {

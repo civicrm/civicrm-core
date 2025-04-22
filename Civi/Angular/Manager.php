@@ -38,7 +38,7 @@ class Manager {
    *   The resource manager.
    * @param $cache
    */
-  public function __construct($res, \CRM_Utils_Cache_Interface $cache = NULL) {
+  public function __construct($res, ?\CRM_Utils_Cache_Interface $cache = NULL) {
     $this->res = $res;
     $this->cache = $cache ?: new \CRM_Utils_Cache_ArrayCache([]);
   }
@@ -360,6 +360,10 @@ class Manager {
 
             case 'cacheUrl':
               $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
+              break;
+
+            case 'relUrl':
+              $result[] = ['ext' => $module['ext'], 'file' => $file];
               break;
 
             case 'path-assetBuilder':

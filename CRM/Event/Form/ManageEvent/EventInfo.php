@@ -124,8 +124,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
         ->addWhere('is_template', '=', TRUE)
         ->addWhere('is_active', '=', TRUE)
         ->execute()
-        ->indexBy('id')
-        ->column('template_title');
+        ->column('template_title', 'id');
       if (CRM_Utils_System::isNull($eventTemplates) && !$this->_isTemplate) {
         $url = CRM_Utils_System::url('civicrm/admin/eventTemplate', ['reset' => 1]);
         CRM_Core_Session::setStatus(ts('If you find that you are creating multiple events with similar settings, you may want to use the <a href="%1">Event Templates</a> feature to streamline your workflow.', [1 => $url]), ts('Tip'), 'info');
@@ -158,10 +157,10 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
     $this->add('wysiwyg', 'description', ts('Complete Description'), $attributes['event_description'] + ['preset' => 'civievent']);
-    $this->addElement('checkbox', 'is_public', ts('Public Event'));
-    $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
-    $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
-    $this->addElement('checkbox', 'is_show_calendar_links', ts('Show Calendar Links'));
+    $this->addElement('checkbox', 'is_public', ts('Display the event in public listings'));
+    $this->addElement('checkbox', 'is_share', ts('Social media sharing links'));
+    $this->addElement('checkbox', 'is_map', ts('Map to the event location'));
+    $this->addElement('checkbox', 'is_show_calendar_links', ts('Calendar links'));
 
     $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
@@ -182,7 +181,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'event_full_text', ts('Message if Event Is Full'), $attributes['event_full_text']);
 
-    $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
+    $this->addElement('checkbox', 'is_active', ts('Event is active'));
 
     $this->addFormRule(['CRM_Event_Form_ManageEvent_EventInfo', 'formRule']);
     if ($this->isSubmitted()) {

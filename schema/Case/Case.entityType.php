@@ -83,9 +83,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'start_date' => [
       'title' => ts('Case Start Date'),
@@ -148,6 +145,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'case_status',
+        'condition_provider' => ['CRM_Case_BAO_Case', 'alterStatusOptions'],
       ],
     ],
     'is_deleted' => [

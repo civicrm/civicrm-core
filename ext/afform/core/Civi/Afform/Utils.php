@@ -40,7 +40,7 @@ class Utils {
       foreach ($entityValues[$entityName] as $record) {
         foreach ($record['fields'] as $fieldName => $fieldValue) {
           foreach ((array) $fieldValue as $value) {
-            if (array_key_exists($value, $formEntities) && $value !== $entityName) {
+            if (!is_bool($value) && array_key_exists($value, $formEntities) && $value !== $entityName) {
               $references[$value] = $value;
             }
           }
@@ -101,12 +101,21 @@ class Utils {
       (!empty($updatedAfform['server_route']) && $isChanged('title'));
   }
 
-  public static function formatViewValue(string $fieldName, array $fieldInfo, array $values): string {
+  public static function formatViewValue(string $fieldName, array $fieldInfo, array $values, ?string $entityName = NULL, ?string $formName = NULL): string {
     $value = $values[$fieldName] ?? NULL;
-    if (isset($value)) {
+    if (isset($value) && $value !== '') {
       $dataType = $fieldInfo['data_type'] ?? NULL;
       if (!empty($fieldInfo['options'])) {
         $value = FormattingUtil::replacePseudoconstant(array_column($fieldInfo['options'], 'label', 'id'), $value);
+      }
+      elseif (!empty($fieldInfo['fk_entity']) && $formName) {
+        $autocomplete = civicrm_api4($fieldInfo['fk_entity'], 'autocomplete', [
+          'checkPermissions' => FALSE,
+          'formName' => "afform:$formName",
+          'fieldName' => "$entityName:$fieldName",
+          'ids' => (array) $value,
+        ]);
+        $value = $autocomplete->column('label');
       }
       elseif ($dataType === 'Boolean') {
         $value = $value ? ts('Yes') : ts('No');

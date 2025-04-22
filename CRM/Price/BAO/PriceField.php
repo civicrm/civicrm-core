@@ -152,10 +152,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           throw new CRM_Core_Exception($e->getMessage());
         }
       }
-      elseif (!empty($optionsIds) && !empty($optionsIds['id'])) {
+      elseif (!empty($optionsIds['id'])) {
         $optionsLoad = civicrm_api3('price_field_value', 'get', ['id' => $optionsIds['id']]);
         $options = $optionsLoad['values'][$optionsIds['id']];
-        $options['is_active'] = CRM_Utils_Array::value('is_active', $params, 1);
+        $options['is_active'] = $params['is_active'] ?? 1;
         try {
           CRM_Price_BAO_PriceFieldValue::create($options, $optionsIds);
         }
@@ -167,7 +167,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
 
     $transaction->commit();
-    Civi::cache('metadata')->flush();
+    Civi::cache('metadata')->clear();
     return $priceField;
   }
 
@@ -298,10 +298,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     switch ($field->html_type) {
       case 'Text':
         $optionKey = key($customOption);
-        $count = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
-        $max_value = CRM_Utils_Array::value('max_value', $customOption[$optionKey], '');
+        $count = $customOption[$optionKey]['count'] ?? '';
+        $max_value = $customOption[$optionKey]['max_value'] ?? '';
         $taxAmount = $customOption[$optionKey]['tax_amount'] ?? NULL;
-        if (isset($taxAmount) && $displayOpt && $invoicing) {
+        if (isset($taxAmount) && $taxAmount && $displayOpt && $invoicing) {
           $qf->assign('displayOpt', $displayOpt);
           $qf->assign('taxTerm', $taxTerm);
           $qf->assign('invoicing', $invoicing);
@@ -496,7 +496,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $check = [];
         foreach ($customOption as $opId => $opt) {
           $priceOptionText = self::buildPriceOptionText($opt, $field->is_display_amounts, $valueFieldName);
-          $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $priceOptionText['label'],
+          $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, CRM_Utils_String::purifyHTML($priceOptionText['label']),
             [
               'price' => json_encode([$opt['id'], $priceOptionText['priceVal']]),
               'data-amount' => $opt[$valueFieldName],

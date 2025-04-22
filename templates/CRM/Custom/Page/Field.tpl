@@ -24,7 +24,7 @@
             <th>{ts}Req?{/ts}</th>
             <th>{ts}Searchable?{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
-            <th></th>
+            <th><span class="sr-only">{ts}Actions{/ts}</span></th>
         </tr>
         </thead>
         <tbody>
@@ -49,7 +49,7 @@
 
     {else}
         <div class="messages status no-popup crm-empty-table">
-          <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+          <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
           {ts}None found.{/ts}
         </div>
     {/if}

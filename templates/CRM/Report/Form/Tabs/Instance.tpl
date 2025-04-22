@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div id="report-tab-format" class="civireport-criteria">
+<div id="report-tab-format" class="civireport-criteria" role="tabpanel">
   <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-title">
       <td class="report-label" width="20%">{$form.title.label} {help id="id-report_title" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
@@ -28,7 +28,7 @@
   </table>
 </div>
 
-<div id="report-tab-email" class="civireport-criteria">
+<div id="report-tab-email" class="civireport-criteria" role="tabpanel">
   <h3 class="email-delivery-settings-title">{ts}Email Delivery Settings{/ts} {help id="id-email_settings" file="CRM/Report/Form/Tabs/Settings.hlp"}</h3>
   <table class="form-layout email-delivery-settings-fields">
     <tr class="crm-report-instanceForm-form-block-email_subject">
@@ -46,7 +46,7 @@
   </table>
 </div>
 
-<div id="report-tab-access" class="civireport-criteria">
+<div id="report-tab-access" class="civireport-criteria" role="tabpanel">
   <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-is_navigation">
       <td class="report-label">{$form.is_navigation.label}</td>

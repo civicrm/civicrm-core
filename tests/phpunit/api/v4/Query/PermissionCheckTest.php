@@ -39,7 +39,7 @@ class PermissionCheckTest extends Api4TestBase implements TransactionalInterface
   public function tearDown(): void {
     \CRM_Utils_Hook::singleton()->reset();
     $config = \CRM_Core_Config::singleton();
-    unset($config->userPermissionClass->permissions);
+    $config->userPermissionClass->permissions = NULL;
     parent::tearDown();
   }
 

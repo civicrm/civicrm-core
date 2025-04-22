@@ -9,7 +9,7 @@
 *}
 {* template for building OpenID block*}
 <div id="crm-openid-content" {if $permission EQ 'edit'} class="crm-inline-edit" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_OpenID"{rdelim}'{/if}>
-  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Add or edit OpenID{/ts}"{/if}>
+  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts escape='htmlattribute'}Add or edit OpenID{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
         <span class="crm-i fa-pencil" aria-hidden="true"></span> {if empty($openid)}{ts}Add OpenID{/ts}{else}{ts}Add or edit OpenID{/ts}{/if}

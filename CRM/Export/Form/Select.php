@@ -53,6 +53,24 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
   public $_componentTable;
 
   /**
+   * @var bool
+   * @internal
+   */
+  public $_selectAll;
+
+  /**
+   * @var bool
+   * @internal
+   */
+  public $_matchingContacts;
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $_greetingOptions;
+
+  /**
    * Use the form name to create the tpl file name.
    *
    * @return string
@@ -187,11 +205,6 @@ FROM   {$this->_componentTable}
     if ($this->_exportMode == self::CONTACT_EXPORT) {
       $this->addRadio('mergeOption', ts('Merge Options'), $mergeOptions, [], '<br/>', FALSE, $mergeOptionsJS);
       $this->addGroup($postalMailing, 'postal_mailing_export', ts('Postal Mailing Export'), '<br/>');
-
-      $this->addElement('select', 'additional_group', ts('Additional Group for Export'),
-        ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup(),
-        ['class' => 'crm-select2 huge']
-      );
     }
 
     $this->buildMapping();

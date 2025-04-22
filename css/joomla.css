@@ -45,13 +45,13 @@ body.admin.com_civicrm.layout-default .crm-dashlet {
 body.admin.com_civicrm .crm-container.ui-dialog {
   z-index: 100000;
 }
-body.admin.com_civicrm.layout-default .ui-widget-overlay {
+body.admin.com_civicrm .ui-widget-overlay {
   z-index: 100001;
 }
-body.admin.com_civicrm.layout-default .select2-drop {
+body.admin.com_civicrm .select2-drop {
   z-index: 100002;
 }
-body.admin.com_civicrm.layout-default .modal-dialog {
+body.admin.com_civicrm .modal-dialog {
   max-width: inherit;
   margin: 0;
   padding: 0;

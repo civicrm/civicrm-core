@@ -4,6 +4,7 @@ return [
   'name' => 'Address',
   'table' => 'civicrm_address',
   'class' => 'CRM_Core_DAO_Address',
+  'metaProvider' => '\Civi\Schema\Entity\AddressMetadata',
   'getInfo' => fn() => [
     'title' => ts('Address'),
     'title_plural' => ts('Addresses'),
@@ -89,7 +90,10 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_location_type',
         'key_column' => 'id',
+        'name_column' => 'name',
+        'description_column' => 'description',
         'label_column' => 'display_name',
+        'abbr_column' => 'vcard_name',
       ],
     ],
     'is_primary' => [
@@ -121,9 +125,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 96,
-      ],
     ],
     'street_number' => [
       'title' => ts('Street Number'),
@@ -144,9 +145,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'street_number_predirectional' => [
       'title' => ts('Street Direction Prefix'),
@@ -154,9 +152,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Directional prefix, e.g. SE Main St, SE is the prefix.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'street_name' => [
       'title' => ts('Street Name'),
@@ -167,9 +162,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'street_type' => [
       'title' => ts('Street Type'),
@@ -177,9 +169,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('St, Rd, Dr, etc.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'street_number_postdirectional' => [
       'title' => ts('Street Direction Suffix'),
@@ -187,9 +176,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Directional prefix, e.g. Main St S, S is the suffix.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'street_unit' => [
       'title' => ts('Street Unit'),
@@ -199,9 +185,6 @@ return [
       'add' => '1.1',
       'usage' => [
         'export',
-      ],
-      'input_attrs' => [
-        'maxlength' => 16,
       ],
     ],
     'supplemental_address_1' => [
@@ -215,9 +198,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 96,
-      ],
     ],
     'supplemental_address_2' => [
       'title' => ts('Supplemental Address 2'),
@@ -229,9 +209,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 96,
       ],
     ],
     'supplemental_address_3' => [
@@ -245,9 +222,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 96,
-      ],
     ],
     'city' => [
       'title' => ts('City'),
@@ -260,9 +234,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'county_id' => [
       'title' => ts('County ID'),
@@ -270,6 +241,10 @@ return [
       'input_type' => 'ChainSelect',
       'description' => ts('Which County does this address belong to.'),
       'add' => '1.1',
+      'usage' => [
+        'import',
+        'duplicate_matching',
+      ],
       'input_attrs' => [
         'control_field' => 'state_province_id',
         'label' => ts('County'),
@@ -279,6 +254,7 @@ return [
         'key_column' => 'id',
         'label_column' => 'name',
         'abbr_column' => 'abbreviation',
+        'condition_provider' => ['CRM_Core_BAO_Address', 'alterCounty'],
         'suffixes' => [
           'label',
           'abbr',
@@ -296,6 +272,10 @@ return [
       'input_type' => 'ChainSelect',
       'description' => ts('Which State_Province does this address belong to.'),
       'add' => '1.1',
+      'usage' => [
+        'import',
+        'duplicate_matching',
+      ],
       'localize_context' => 'province',
       'input_attrs' => [
         'control_field' => 'country_id',
@@ -306,6 +286,7 @@ return [
         'key_column' => 'id',
         'label_column' => 'name',
         'abbr_column' => 'abbreviation',
+        'condition_provider' => ['CRM_Core_BAO_Address', 'alterStateProvince'],
         'suffixes' => [
           'label',
           'abbr',
@@ -330,7 +311,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '3',
-        'maxlength' => 12,
       ],
     ],
     'postal_code' => [
@@ -346,7 +326,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '6',
-        'maxlength' => 64,
       ],
     ],
     'usps_adc' => [
@@ -356,9 +335,6 @@ return [
       'deprecated' => TRUE,
       'description' => ts('USPS Bulk mailing code.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 32,
-      ],
     ],
     'country_id' => [
       'title' => ts('Country ID'),
@@ -366,6 +342,10 @@ return [
       'input_type' => 'Select',
       'description' => ts('Which Country does this address belong to.'),
       'add' => '1.1',
+      'usage' => [
+        'import',
+        'duplicate_matching',
+      ],
       'localize_context' => 'country',
       'input_attrs' => [
         'label' => ts('Country'),
@@ -376,6 +356,7 @@ return [
         'label_column' => 'name',
         'name_column' => 'iso_code',
         'abbr_column' => 'iso_code',
+        'condition_provider' => ['CRM_Core_BAO_Address', 'alterCountry'],
         'suffixes' => [
           'label',
           'abbr',
@@ -435,9 +416,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Timezone expressed as a UTC offset - e.g. United States CST would be written as "UTC-6".'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'name' => [
       'title' => ts('Address Name'),
@@ -449,9 +427,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'master_id' => [

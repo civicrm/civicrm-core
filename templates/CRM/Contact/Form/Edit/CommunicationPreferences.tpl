@@ -41,7 +41,7 @@
                 <td>
                     <span id="email_greeting" {if !empty($email_greeting_display) and $action eq 2} class="hiddenElement"{/if}>{$form.email_greeting_id.html|crmAddClass:big}</span>
                     {if !empty($email_greeting_display) and $action eq 2}
-                      <div data-id="email_greeting" class="replace-plain" title="{ts}Click to edit{/ts}">
+                      <div data-id="email_greeting" class="replace-plain" title="{ts escape='htmlattribute'}Click to edit{/ts}">
                         {$email_greeting_display}
                       </div>
                     {/if}
@@ -51,7 +51,7 @@
                 <td>
                     <span id="postal_greeting" {if !empty($postal_greeting_display) and $action eq 2} class="hiddenElement"{/if}>{$form.postal_greeting_id.html|crmAddClass:big}</span>
                     {if !empty($postal_greeting_display) and $action eq 2}
-                      <div data-id="postal_greeting" class="replace-plain" title="{ts}Click to edit{/ts}">
+                      <div data-id="postal_greeting" class="replace-plain" title="{ts escape='htmlattribute'}Click to edit{/ts}">
                         {$postal_greeting_display}
                       </div>
                     {/if}
@@ -61,7 +61,7 @@
                 <td>
                     <span id="addressee" {if !empty($addressee_display) and $action eq 2} class="hiddenElement"{/if}>{$form.addressee_id.html|crmAddClass:big}</span>
                     {if !empty($addressee_display) and $action eq 2}
-                      <div data-id="addressee" class="replace-plain" title="{ts}Click to edit{/ts}">
+                      <div data-id="addressee" class="replace-plain" title="{ts escape='htmlattribute'}Click to edit{/ts}">
                         {$addressee_display}
                       </div>
                     {/if}
@@ -103,7 +103,7 @@
           </td>
         </tr>
         <tr>
-          <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}</td>
+          <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" title=$form.is_opt_out.label file="CRM/Contact/Form/Contact.hlp"}</td>
         </tr>
     </table>
  </div>

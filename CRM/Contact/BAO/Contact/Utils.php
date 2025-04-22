@@ -88,7 +88,7 @@ class CRM_Contact_BAO_Contact_Utils {
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
-      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo['image'] . '</a>';
+      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link" aria-labelledby="crm-contactname-content">' . $imageInfo['image'] . '</a>';
     }
     else {
       $imageInfo['summary-link'] = $imageInfo['image'];
@@ -161,10 +161,15 @@ WHERE  id IN ( $idString )
     }
 
     if (!$hash) {
-      $hash = md5(uniqid(rand(), TRUE));
-      if ($hashSize) {
-        $hash = substr($hash, 0, $hashSize);
-      }
+      // Ensure we cannot generate numeric hashes
+      // to avoid breaking things elsewhere
+      // See lab issue #5541
+      do {
+        $hash = bin2hex(random_bytes(16));
+        if ($hashSize) {
+          $hash = substr($hash, 0, $hashSize);
+        }
+      } while (is_numeric($hash));
 
       if ($entityType == 'contact') {
         CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact',
@@ -494,7 +499,7 @@ WHERE id={$contactId}; ";
       default:
         // individual
         $form->addElement('select', 'prefix_id', ts('Prefix'),
-          ['' => ts('- prefix -')] + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
+          ['' => ts('- prefix -')] + CRM_Contact_DAO_Contact::buildOptions('prefix_id')
         );
         $form->addElement('text', 'first_name', ts('First Name'),
           $attributes['first_name']
@@ -506,7 +511,7 @@ WHERE id={$contactId}; ";
           $attributes['last_name']
         );
         $form->addElement('select', 'suffix_id', ts('Suffix'),
-          ['' => ts('- suffix -')] + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
+          ['' => ts('- suffix -')] + CRM_Contact_DAO_Contact::buildOptions('suffix_id')
         );
     }
 
@@ -863,7 +868,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    * @return array
    *   associated array of contact names
    */
-  public static function getAddressShareContactNames(&$addresses) {
+  public static function getAddressShareContactNames($addresses) {
     $contactNames = [];
     // get the list of master id's for address
     $masterAddressIds = [];

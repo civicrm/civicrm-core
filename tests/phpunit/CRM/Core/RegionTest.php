@@ -9,6 +9,11 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
 
   use CRM_Core_Resources_CollectionTestTrait;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * @return \CRM_Core_Resources_CollectionInterface
    */

@@ -1,5 +1,5 @@
 .standalone-page-padding {
-  padding: 1px 3vw 1rem;
+  padding: 1px max(10px, 1vw) 1rem;
 }
 
 html.crm-standalone  nav.breadcrumb>ol {
@@ -8,20 +8,23 @@ html.crm-standalone  nav.breadcrumb>ol {
 
 .standalone-auth-form {
   display: grid;
-  place-content: center;
+  grid-template-rows: 1fr auto 3fr;
+  justify-content: center;
   width: 100%;
   height: 100vh;
 }
 .standalone-auth-box {
+  /* box sizing */
+  grid-row: 2;
   box-sizing: border-box;
   width: clamp(280px, 68vw, 45rem);
   margin: 0;
-  background-color: white;
   border: none;
   border-radius: 3px;
-  padding: 1rem 3vw;;
+  padding: clamp(1rem, 3vw, 2rem);
+  background-color: var(--crm-standalone-auth-box-bg, #fff);
 }
-.standalone-auth-form img.crm-logo {
+.standalone-auth-form .crm-logo {
   width: 100%;
   max-width: 400px;
   margin: 0 auto 2rem;
@@ -30,12 +33,17 @@ html.crm-standalone  nav.breadcrumb>ol {
 .standalone-auth-form .input-wrapper {
   margin-bottom: 1rem;
 }
-.standalone-auth-form label {
+/* the div.crm-container is to beat the specificity of civicrm.css under Greenwich */
+div.crm-container .standalone-auth-form label {
   display: block;
+  margin-bottom: 0.25rem;
 }
-.standalone-auth-form input {
+/* the div.crm-container is to beat the specificity of civicrm.css under Greenwich */
+div.crm-container .standalone-auth-form input {
   box-sizing: border-box;
   width: 100%;
+  height: 2rem;
+  padding: 0.5rem;
 }
 .standalone-auth-form .login-or-forgot {
   display: grid;

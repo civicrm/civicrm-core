@@ -115,13 +115,11 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Get the ids the user has selected or FALSE if selection has not been used.
+   * Get the ids the user has selected or an empty array if selection has not been used.
    *
    * @param array $values
-   *
-   * @return array|bool
    */
-  public function getSelectedIDs(array $values) {
+  public function getSelectedIDs(array $values): array {
     if ($values['radio_ts'] === 'ts_sel') {
       $ids = [];
       foreach ($values as $name => $value) {
@@ -131,7 +129,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
       }
       return $ids;
     }
-    return FALSE;
+    return [];
   }
 
   /**

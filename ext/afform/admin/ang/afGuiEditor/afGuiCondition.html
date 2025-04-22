@@ -1,2 +1,6 @@
-<select class="form-control api4-operator" ng-model="$ctrl.getSetOperator" ng-if="$ctrl.getOperators().length > 1" ng-model-options="{getterSetter: true}" ng-options="o.key as o.value for o in $ctrl.getOperators()" ng-change="$ctrl.changeClauseOperator()" ></select>
-<input af-gui-field-value="$ctrl.field" ng-model="$ctrl.getSetValue" ng-model-options="{getterSetter: true}" class="form-control"></input>
+<select class="form-control api4-operator" ng-model="$ctrl.clause[$ctrl.offset]" ng-change="$ctrl.changeClauseOperator()" >
+  <option ng-repeat="(name, label) in $ctrl.getOperators()" value="{{:: name }}">{{:: label }}</option>
+</select>
+<div class="form-group" ng-if="$ctrl.operatorTakesInput()">
+  <input af-gui-field-value="$ctrl.field" ng-model="$ctrl.getSetValue" op="$ctrl.clause[$ctrl.offset]" ng-model-options="{getterSetter: true}" class="form-control">
+</div>

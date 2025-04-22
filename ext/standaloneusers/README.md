@@ -59,3 +59,4 @@ to check if a given password is known to have been compromised. This is controll
 
     // Disable haveibeenpwned checking.
     define('CIVICRM_HIBP_URL', '');
+

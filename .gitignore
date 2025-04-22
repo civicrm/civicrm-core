@@ -9,6 +9,8 @@
 !/ext/civigrant
 !/ext/civicrm_admin_ui
 !/ext/civicrm_search_ui
+!/ext/chart_kit
+/ext/chart_kit/packages
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
 !/ext/eventcart
@@ -20,6 +22,7 @@
 !/ext/message_admin
 !/ext/oauth-client
 !/ext/search_kit
+!/ext/search_kit_reports
 !/ext/financialacls
 !/ext/contributioncancelactions
 !/ext/recaptcha
@@ -28,6 +31,7 @@
 !/ext/payflowpro
 !/ext/ckeditor4
 !/ext/legacycustomsearches
+!/ext/legacydedupefinder
 !/ext/civiimport
 !/ext/civi_campaign
 !/ext/civi_case
@@ -39,6 +43,8 @@
 !/ext/civi_report
 !/ext/scheduled_communications
 !/ext/user_dashboard
+!/ext/tellafriend
+!/ext/riverlea
 backdrop/
 bower_components
 CRM/Case/xml/configuration
@@ -70,6 +76,7 @@ packages/
 tests/output
 tests/phpunit/CiviTest/civicrm.settings.local.php
 tests/phpunit/CiviTest/truncate.xml
+tests/**/*.rtf.php
 tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html

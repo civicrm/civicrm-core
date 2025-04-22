@@ -2,7 +2,7 @@
 
 use CRM_PayflowPro_ExtensionUtil as E;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 
 /**
  * FIXME - Add test description.

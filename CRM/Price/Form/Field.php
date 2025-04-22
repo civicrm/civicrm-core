@@ -149,11 +149,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $defaults['options_per_line'] = 1;
       $defaults['is_display_amounts'] = 1;
     }
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
-    $eventComponentId = NULL;
-    if (array_key_exists('CiviEvent', $enabledComponents)) {
-      $eventComponentId = CRM_Core_Component::getComponentID('CiviEvent');
-    }
 
     if (isset($this->_sid) && $this->_action == CRM_Core_Action::ADD) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'financial_type_id');
@@ -194,15 +189,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $visibilityType = CRM_Core_PseudoConstant::visibility();
     $this->assign('visibilityType', $visibilityType);
 
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
-    $eventComponentId = $memberComponentId = NULL;
-    if (array_key_exists('CiviEvent', $enabledComponents)) {
-      $eventComponentId = CRM_Core_Component::getComponentID('CiviEvent');
-    }
-    if (array_key_exists('CiviMember', $enabledComponents)) {
-      $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
-    }
-
     $attributes = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
 
     $this->add('select', 'financial_type_id',
@@ -211,7 +197,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     );
 
     $this->assign('useForMember', FALSE);
-    if (in_array($eventComponentId, $this->_extendComponentId)) {
+    if ($this->extendsEvent()) {
       $this->add('text', 'count', ts('Participant Count'), $attributes['count']);
 
       $this->addRule('count', ts('Participant Count should be a positive number'), 'positiveInteger');
@@ -222,19 +208,19 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $this->assign('useForEvent', TRUE);
     }
     else {
-      if (in_array($memberComponentId, $this->_extendComponentId)) {
+      if ($this->extendsMembership()) {
         $this->_useForMember = 1;
         $this->assign('useForMember', $this->_useForMember);
       }
       $this->assign('useForEvent', FALSE);
     }
 
-    $sel = $this->add('select', 'html_type', ts('Input Field Type'),
+    $sel = $this->add('select', 'html_type', ts('Field Type'),
       $htmlTypes, TRUE, $javascript
     );
 
     // price (for text inputs)
-    $this->add('text', 'price', ts('Price'));
+    $this->add('text', 'price', ts('Unit Price'));
     $this->registerRule('price', 'callback', 'money', 'CRM_Utils_Rule');
     $this->addRule('price', ts('must be a monetary value'), 'money');
 
@@ -277,7 +263,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         ts('Financial Type'),
         ['' => ts('- select -')] + $financialTypes
       );
-      if (in_array($eventComponentId, $this->_extendComponentId)) {
+      if ($this->extendsEvent()) {
         // count
         $this->add('text', 'option_count[' . $i . ']', ts('Participant Count'), $attributes['count']);
         $this->addRule('option_count[' . $i . ']', ts('Please enter a valid Participants Count.'), 'positiveInteger');
@@ -289,14 +275,14 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         // description
         //$this->add('textArea', 'option_description['.$i.']', ts('Description'), array('rows' => 1, 'cols' => 40 ));
       }
-      elseif (in_array($memberComponentId, $this->_extendComponentId)) {
+      if ($this->extendsMembership()) {
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         $js = ['onchange' => "calculateRowValues( $i );"];
 
         $this->add('select', 'membership_type_id[' . $i . ']', ts('Membership Type'),
           ['' => ' '] + $membershipTypes, FALSE, $js
         );
-        $this->add('text', 'membership_num_terms[' . $i . ']', ts('Number of Terms'), CRM_Utils_Array::value('membership_num_terms', $attributes));
+        $this->add('text', 'membership_num_terms[' . $i . ']', ts('Number of Terms'), $attributes['membership_num_terms'] ?? NULL);
       }
 
       // weight
@@ -633,7 +619,9 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
     $params['id'] = $this->getEntityId();
-    $this->submit($params);
+    $submitResult = $this->submit($params);
+    // Update _fid property to match the saved id especially important in add mode so extensions can reliably call getEntityID()
+    $this->_fid = $submitResult->id;
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
@@ -691,9 +679,44 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_visibility_id'] = [1 => $params['visibility_id'] ?? NULL];
     }
 
-    $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
+    $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? $params['membership_num_terms'] ?? 1 : NULL;
 
     return CRM_Price_BAO_PriceField::create($params);
+  }
+
+  /**
+   * Does the price Set extend memberships.
+   *
+   * @return bool
+   */
+  protected function extendsMembership(): bool {
+    if (!CRM_Core_Component::isEnabled('CiviMember')) {
+      return FALSE;
+    }
+    return in_array(CRM_Core_Component::getComponentID('CiviMember'), array_filter($this->_extendComponentId));
+  }
+
+  /**
+   * Does the price Set extend events.
+   *
+   * @return bool
+   */
+  protected function extendsEvent(): bool {
+    if (!CRM_Core_Component::isEnabled('CiviEvent')) {
+      return FALSE;
+    }
+    return in_array(CRM_Core_Component::getComponentID('CiviEvent'), array_filter($this->_extendComponentId));
+  }
+
+  /**
+   * Get id of Price Field being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getPriceFieldID(): ?int {
+    return $this->_fid;
   }
 
 }

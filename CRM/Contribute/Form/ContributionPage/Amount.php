@@ -259,17 +259,17 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
         // CRM-4038: fix value display
         foreach ($defaults['value'] as & $amount) {
-          $amount = trim(CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($amount));
+          $amount = trim(CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($amount, 9));
         }
       }
     }
 
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['min_amount'])) {
-      $defaults['min_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['min_amount']);
+      $defaults['min_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($defaults['min_amount'], 9);
     }
     if (isset($defaults['max_amount'])) {
-      $defaults['max_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['max_amount']);
+      $defaults['max_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($defaults['max_amount'], 9);
     }
 
     if (!empty($defaults['payment_processor'])) {
@@ -478,7 +478,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     foreach ($fields as $field => $defaultVal) {
-      $val = CRM_Utils_Array::value($field, $params, $defaultVal);
+      $val = $params[$field] ?? $defaultVal;
       if (in_array($field, $resetFields)) {
         $val = $defaultVal;
       }
@@ -539,7 +539,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $params['payment_processor'] = 'null';
     }
 
-    $contributionPage = CRM_Contribute_BAO_ContributionPage::create($params);
+    $contributionPage = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
     $contributionPageID = $contributionPage->id;
 
     // prepare for data cleanup.
@@ -771,12 +771,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
             foreach ($pledgeBlock as $key) {
               $pledgeBlockParams[$key] = $params[$key] ?? NULL;
             }
-            $pledgeBlockParams['is_pledge_interval'] = CRM_Utils_Array::value('is_pledge_interval',
-              $params, FALSE
-            );
-            $pledgeBlockParams['pledge_start_date'] = CRM_Utils_Array::value('pledge_start_date',
-              $params, FALSE
-            );
+            $pledgeBlockParams['is_pledge_interval'] = $params['is_pledge_interval'] ?? FALSE;
+            $pledgeBlockParams['pledge_start_date'] = $params['pledge_start_date'] ?? FALSE;
             // create pledge block.
             CRM_Pledge_BAO_PledgeBlock::create($pledgeBlockParams);
           }

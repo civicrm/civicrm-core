@@ -96,7 +96,7 @@ class SessionHandler implements SessionHandlerInterface, SessionIdInterface, Ses
    * @return bool
    */
   public function open($path, $name): bool {
-    $this->db = DB::connect(\CRM_Core_Config::singleton()->dsn);
+    $this->db = \CRM_Utils_SQL::connect(\CRM_Core_Config::singleton()->dsn);
     $this->db->autoCommit(FALSE);
 
     return TRUE;
@@ -145,7 +145,7 @@ class SessionHandler implements SessionHandlerInterface, SessionIdInterface, Ses
     $this->data = $session['data'];
     $maxLifetime = \Civi::settings()->get('standaloneusers_session_max_lifetime');
 
-    return strtotime($session['last_accessed']) >= strtotime("-$maxLifetime seconds");
+    return strtotime($session['last_accessed']) >= strtotime("-$maxLifetime minutes");
   }
 
   /**

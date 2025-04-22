@@ -121,9 +121,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional verbose description for the relationship.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_permission_a_b' => [
       'title' => ts('Contact A has Permission Over Contact B'),
@@ -134,7 +131,7 @@ return [
       'add' => '2.1',
       'default' => 0,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getPermissionedRelationshipOptions',
+        'callback' => ['CRM_Core_SelectValues', 'getPermissionedRelationshipOptions'],
         'suffixes' => [
           'name',
           'label',
@@ -151,7 +148,7 @@ return [
       'add' => '2.1',
       'default' => 0,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getPermissionedRelationshipOptions',
+        'callback' => ['CRM_Core_SelectValues', 'getPermissionedRelationshipOptions'],
         'suffixes' => [
           'name',
           'label',

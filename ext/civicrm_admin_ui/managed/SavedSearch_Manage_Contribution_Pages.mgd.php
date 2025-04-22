@@ -61,6 +61,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'pager' => [
             'show_count' => TRUE,
@@ -206,6 +207,7 @@ return [
                 ],
                 [
                   'path' => 'civicrm/admin/contribute/manage?action=copy&gid=[id]',
+                  'csrf' => 'qfKey',
                   'icon' => 'fa-clone',
                   'text' => E::ts('Clone'),
                   'style' => 'secondary',

@@ -39,6 +39,7 @@ class CRM_Core_Permission_List {
         'description' => $corePerm['description'] ?? NULL,
         'is_active' => empty($corePerm['disabled']),
         'implies' => $corePerm['implies'] ?? NULL,
+        'parent' => $corePerm['parent'] ?? NULL,
       ];
     }
   }
@@ -84,6 +85,11 @@ class CRM_Core_Permission_List {
       // This line is here more as a bit of documentation (so it will show in `Civi\Api4\Permission::get()`).
       // The functionality that actually handles this pseudo-permission is in `CRM_Core_Permission_*::check()`
       'implies' => ['*'],
+    ];
+    $e->permissions[\CRM_Core_Permission::ANY_AUTHENTICATED_CONTACT] = [
+      'group' => 'const',
+      'title' => ts('Generic: Allow any authenticated contact'),
+      'is_synthetic' => TRUE,
     ];
   }
 

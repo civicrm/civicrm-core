@@ -17,10 +17,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-
-    $this->loadAllFixtures();
-
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
   }
 
@@ -255,7 +251,8 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Campaign_DAO_Survey' => [
         [
           'fieldName' => 'activity_type_id',
-          'sample' => 'Phone Call',
+          'sample' => 'Survey',
+          'exclude' => 'Phone Call',
           'max' => 100,
         ],
       ],
@@ -639,7 +636,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Core_DAO_Website' => [
         [
           'fieldName' => 'website_type_id',
-          'sample' => 'Facebook',
+          'sample' => 'Social',
         ],
       ],
       'CRM_Core_DAO_WordReplacement' => [
@@ -655,7 +652,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Core_DAO_MappingField' => [
         [
           'fieldName' => 'website_type_id',
-          'sample' => 'Facebook',
+          'sample' => 'Social',
         ],
         [
           'fieldName' => 'im_provider_id',
@@ -926,16 +923,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'max' => 200,
         ],
       ],
-      'CRM_Case_DAO_Case' => [
-        [
-          'fieldName' => 'status_id',
-          'sample' => 'Ongoing',
-        ],
-        [
-          'fieldName' => 'case_type_id',
-          'sample' => 'Housing Support',
-        ],
-      ],
       'CRM_Report_DAO_ReportInstance' => [
         [
           'fieldName' => 'domain_id',
@@ -946,31 +933,37 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
     foreach ($fields as $daoName => $daoFields) {
       foreach ($daoFields as $field) {
-        $message = "DAO name: '{$daoName}', field: '{$field['fieldName']}'";
+        // Test both the new `buildOptions` method with goes through `Civi::entity()`
+        // and the old deprecated `CRM_Core_Pseudoconstant::get()`
+        $methods = [
+          "$daoName::buildOptions({$field['fieldName']})" => $daoName::buildOptions($field['fieldName']),
+          "CRM_Core_Pseudoconstant::get($daoName, {$field['fieldName']})" => CRM_Core_Pseudoconstant::get($daoName, $field['fieldName']),
+        ];
+        foreach ($methods as $message => $optionValues) {
+          $this->assertNotEmpty($optionValues, $message);
 
-        $optionValues = $daoName::buildOptions($field['fieldName']);
-        $this->assertNotEmpty($optionValues, $message);
-
-        // Ensure sample value is contained in the returned optionValues.
-        if (!is_array($field['sample'])) {
-          $this->assertContains($field['sample'], $optionValues, $message);
-        }
-        // If sample is an array, we check keys and values
-        else {
-          foreach ($field['sample'] as $key => $value) {
-            $this->assertArrayHasKey($key, $optionValues, $message);
-            $this->assertEquals($optionValues[$key], $value, $message);
+          // Ensure sample value is contained in the returned optionValues.
+          if (!is_array($field['sample'])) {
+            $this->assertContains($field['sample'], $optionValues, $message);
           }
-        }
+          // If sample is an array, we check keys and values
+          else {
+            foreach ($field['sample'] as $key => $value) {
+              $this->assertArrayHasKey($key, $optionValues, $message);
+              $this->assertEquals($optionValues[$key], $value, $message);
+            }
+          }
 
-        // Ensure exclude value is not contained in the optionValues
-        if (!empty($field['exclude'])) {
-          $this->assertNotContains($field['exclude'], $optionValues, $message);
-        }
+          // Ensure exclude value is not contained in the optionValues
+          // Skip this check for the legacy `CRM_Core_Pseudoconstant::get()` which doesn't evaluate `condition_provider`
+          if (!empty($field['exclude']) && !str_starts_with($message, 'CRM_Core_Pseudoconstant')) {
+            $this->assertNotContains($field['exclude'], $optionValues, $message);
+          }
 
-        // Ensure count of optionValues is not extraordinarily high.
-        $max = $field['max'] ?? 20;
-        $this->assertLessThanOrEqual($max, count($optionValues), $message);
+          // Ensure count of optionValues is not extraordinarily high.
+          $max = $field['max'] ?? 20;
+          $this->assertLessThanOrEqual($max, count($optionValues), $message);
+        }
       }
     }
   }

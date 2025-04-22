@@ -5,6 +5,7 @@
   </button>
   <button type="button" class="btn btn-secondary-outline dropdown-toggle" ng-click="$ctrl.selectAllMenuOpen = true;" ng-disabled="$ctrl.loading || !$ctrl.results.length" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     <span class="caret"></span>
+    <span class="sr-only">{{ ts('Select All rows or this pages rows')}}</span>
   </button>
   <ul class="dropdown-menu" ng-if="$ctrl.selectAllMenuOpen">
     <li ng-if="$ctrl.rowCount > $ctrl.results.length">

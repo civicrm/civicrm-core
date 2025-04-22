@@ -6,7 +6,7 @@ use Civi\Test\Api3TestTrait;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\FormTrait;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\Contact;
 use Civi\Api4\MembershipType;
@@ -216,7 +216,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   }
 
   /**
-   * Test that a cancel from paypal pro results in an order being cancelled.
+   * Test that a cancel from PayPal pro results in an order being cancelled.
    *
    * @throws \CRM_Core_Exception
    */
@@ -256,8 +256,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    */
   public function testCancelOrderWithParticipantCancelled(): void {
     $this->markTestIncomplete('For unknown reasons this failed if run after the cancelled variation of this test');
-    $status = 'Cancelled';
-    $this->createAndUpdateContribution($status);
+    $this->createAndUpdateContribution('Cancelled');
   }
 
   /**

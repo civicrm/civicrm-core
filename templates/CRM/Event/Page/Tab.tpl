@@ -12,13 +12,14 @@
 {elseif $action eq 4}
     {include file="CRM/Event/Form/ParticipantView.tpl"}
 {else}
-    {if $permission EQ 'edit'}{capture assign=newEventURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant"}{/capture}
+    {if $permission EQ 'edit'}
+      {capture assign=newEventURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant"}{/capture}
     {/if}
 
     <div class="help">
         <p>{ts 1=$displayName}This page lists all event registrations for %1 since inception.{/ts}
-        {capture assign="link"}class="action-item" href="{$newEventURL|smarty:nodefaults}"{/capture}
-        {if $permission EQ 'edit'}{ts 1=$link|smarty:nodefaults}Click <a %1>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
+        {capture assign="link"}class="action-item" href="{$newEventURL nofilter}"{/capture}
+        {if $permission EQ 'edit'}{ts 1=$link}Click <a %1>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
         {if $accessContribution and $newCredit}
             {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant&mode=live"}{/capture}
             {capture assign="link"}class="action-item" href="{$newCreditURL|smarty:nodefaults}"{/capture}
@@ -38,15 +39,12 @@
 
     {if $rows}
       {include file="CRM/common/pager.tpl" location="top"}
-        {include file="CRM/Event/Form/Selector.tpl"}
-  {include file="CRM/common/pager.tpl" location="bottom"}
+      {include file="CRM/Event/Form/Selector.tpl"}
+      {include file="CRM/common/pager.tpl" location="bottom"}
     {else}
        <div class="messages status no-popup">
-           <table class="form-layout">
-             <tr>{icon icon="fa-info-circle"}{/icon}
-                   {ts}No event registrations have been recorded for this contact.{/ts}
-             </tr>
-           </table>
+          {icon icon="fa-info-circle"}{/icon}
+          {ts}No event registrations have been recorded for this contact.{/ts}
        </div>
     {/if}
 {/if}

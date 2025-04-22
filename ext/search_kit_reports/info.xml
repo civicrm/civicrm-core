@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<extension key="search_kit_reports" type="module">
+  <file>search_kit_reports</file>
+  <name>Search Kit Reports</name>
+  <description>SearchKit-based Reports UI</description>
+  <license>AGPL-3.0</license>
+  <authors>
+    <author>
+      <name>Ben</name>
+      <email>ben@civicrm.org</email>
+      <role>Maintainer</role>
+    </author>
+  </authors>
+  <urls>
+    <url desc="Documentation">https://docs.civicrm.org/user/en/latest/searching/searchkit/what-is-searchkit/</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/search-improvements</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/report/-/issues</url>
+    <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <comments>SearchKit-based reporting UI</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/SearchKitReports</namespace>
+    <format>25.01.1</format>
+    <angularModule>crmSearchKitReports</angularModule>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
+    <mixin>ang-php@1.0.0</mixin>
+  </mixins>
+</extension>

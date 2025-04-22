@@ -36,16 +36,50 @@ final class EntityProvider {
     return $this->getMetaProvider()->getProperty($property);
   }
 
+  /**
+   * @return array
+   *   List of field descriptors, keyed by name.
+   *   Fields may or may not be defined in the underlying data-store, depending on the status of upgrade.
+   *
+   *   Ex: ['field_1' => ['title' => ..., 'sqlType' => ...]]
+   */
   public function getFields(): array {
     return $this->getMetaProvider()->getFields();
   }
 
-  public function getField(string $fieldName): ?array {
-    return $this->getFields()[$fieldName] ?? NULL;
+  public function getCustomFields(array $customGroupFilters = []): array {
+    return $this->getMetaProvider()->getCustomFields($customGroupFilters);
   }
 
-  public function getOptions(string $fieldName, array $values = NULL): ?array {
-    return $this->getMetaProvider()->getOptions($fieldName, $values);
+  /**
+   * @return array
+   *   List of field descriptors, keyed by name.
+   *   Only include fields that are currently expected to be active/supported.
+   *
+   *   Ex: ['field_1' => ['title' => ..., 'sqlType' => ...]]
+   */
+  public function getSupportedFields(): array {
+    $fields = $this->getMetaProvider()->getFields();
+    if ($this->getMeta('module') === 'civicrm') {
+      // Exclude fields yet not added by pending upgrades
+      $dbVer = \CRM_Core_BAO_Domain::version();
+      $fields = array_filter($fields, function($field) use ($dbVer) {
+        $add = $field['add'] ?? '1.0.0';
+        if (substr_count($add, '.') < 2) {
+          $add .= '.alpha1';
+        }
+        return version_compare($dbVer, $add, '>=');
+      });
+    }
+    return $fields;
+  }
+
+  public function getField(string $fieldName): ?array {
+    return $this->getMetaProvider()->getField($fieldName);
+  }
+
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+    return $this->getMetaProvider()->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
   }
 
   public function writeRecords(array $records): array {
@@ -54,6 +88,10 @@ final class EntityProvider {
 
   public function deleteRecords(array $records): array {
     return $this->getStorageProvider()->deleteRecords($records);
+  }
+
+  public function getReferenceCounts (array $record): array {
+    return $this->getStorageProvider()->getReferenceCounts($record);
   }
 
   private function getMetaProvider(): EntityMetadataInterface {

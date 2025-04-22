@@ -88,7 +88,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
     $formValues = $form->controller->exportValues($form->getName());
     [$formValues, $html_message] = $this->processMessageTemplate($formValues);
     $html = $this->generateHTML($membershipIDs, $html_message);
-    $form->createActivities($html_message, $contactIDs, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
+    $form->createActivities($html_message, $contactIDs, $formValues['subject'], $formValues['campaign_id'] ?? NULL);
     CRM_Utils_PDF_Utils::html2pdf($html, $this->getFileName() . '.pdf', FALSE, $formValues);
 
     $form->postProcessHook();

@@ -51,10 +51,6 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
     ]);
 
     if ($runner->isMinimal) {
-      // Render page header
-      if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-        CRM_Utils_System::addHTMLHead($region->render(''));
-      }
       $smarty = CRM_Core_Smarty::singleton();
       $content = $smarty->fetch('CRM/Queue/Page/Runner.tpl');
       echo CRM_Utils_System::theme($content, $this->_print, TRUE);

@@ -218,8 +218,6 @@ class CRM_Core_Page {
     $pageTemplateFile = $this->getHookedTemplateFileName();
     self::$_template->assign('tplFile', $pageTemplateFile);
 
-    self::$_template->addExpectedTabHeaderKeys();
-
     // invoke the pagRun hook, CRM-3906
     CRM_Utils_Hook::pageRun($this);
 
@@ -271,11 +269,6 @@ class CRM_Core_Page {
     }
 
     $content = self::$_template->fetch(CRM_Utils_System::getContentTemplate());
-
-    // Render page header
-    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-      CRM_Utils_System::addHTMLHead($region->render(''));
-    }
     CRM_Utils_System::appendTPLFile($pageTemplateFile, $content);
 
     //its time to call the hook.
@@ -571,6 +564,10 @@ class CRM_Core_Page {
       // Duplicates don't actually matter....
       $this->addExpectedSmartyVariable($elementName);
     }
+  }
+
+  public function invalidKey() {
+    throw new CRM_Core_Exception(ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, [ts("Could not find a valid session key.")]);
   }
 
 }

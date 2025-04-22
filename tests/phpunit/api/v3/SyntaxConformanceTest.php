@@ -88,11 +88,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     parent::setUp();
     $this->enableCiviCampaign();
     $this->toBeImplemented['get'] = [
-      // CxnApp.get exists but relies on remote data outside our control; QA w/UtilsTest::testBasicArrayGet
-      'CxnApp',
+      // Not apiv3.
+      'Afform',
       'Profile',
       'CustomValue',
-      'Constant',
       'CustomSearch',
       'Extension',
       'ReportTemplate',
@@ -103,9 +102,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ];
     $this->toBeImplemented['create'] = [
       'Afform',
-      'Cxn',
-      'CxnApp',
-      'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
       'UFMatch',
@@ -120,11 +116,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Logging',
     ];
     $this->toBeImplemented['delete'] = [
-      'Cxn',
-      'CxnApp',
       'MembershipPayment',
       'OptionGroup',
-      'SurveyRespondant',
       'UFJoin',
       'UFMatch',
       'Extension',
@@ -136,7 +129,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   public function getDeprecatedAPIs() : array {
-    return ['Location', 'ActivityType', 'SurveyRespondant'];
+    return [];
   }
 
   public function tearDown(): void {
@@ -162,11 +155,18 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     // crept into the system where civicrm_api('Entity','get') must be called as part of entities()
     // (even if its return value is ignored).
 
-    $tmp = civicrm_api('Entity', 'Get', ['version' => 3]);
     if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
       $tmp = [
         'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES')),
       ];
+    }
+    elseif (isset(\Civi\Test::$statics[__CLASS__]['entities'])) {
+      $tmp = \Civi\Test::$statics[__CLASS__]['entities'];
+    }
+    else {
+      \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply();
+      $tmp = civicrm_api('Entity', 'Get', ['version' => 3]);
+      \Civi\Test::$statics[__CLASS__]['entities'] = $tmp;
     }
 
     if (!is_array($skip)) {
@@ -284,7 +284,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_get($sequential = FALSE) {
     $entitiesWithoutGet = [
       'MailingEventResubscribe',
-      'Location',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -321,7 +320,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function toBeSkipped_create($sequential = FALSE) {
-    $entitiesWithoutCreate = ['Constant', 'Entity', 'Location', 'Profile', 'MailingRecipients'];
+    $entitiesWithoutCreate = ['Entity', 'Profile', 'MailingRecipients'];
     if ($sequential === TRUE) {
       return $entitiesWithoutCreate;
     }
@@ -345,9 +344,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingEventSubscribe',
       'MailingEventUnsubscribe',
       'MailingRecipients',
-      'Constant',
       'Entity',
-      'Location',
       'Domain',
       'Profile',
       'CustomValue',
@@ -396,14 +393,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Relationship',
 
       // ones that are not real entities hence not extendable.
-      'ActivityType',
       'Entity',
-      'Cxn',
-      'Constant',
       'Attachment',
       'CustomSearch',
       'CustomValue',
-      'CxnApp',
       'Extension',
       'MailingContact',
       'User',
@@ -412,7 +405,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'SystemLog',
       'ReportTemplate',
       'MailingRecipients',
-      'SurveyRespondant',
       'Profile',
       'Payment',
       'Order',
@@ -460,7 +452,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'EntityTag',
       'Participant',
       'Setting',
-      'SurveyRespondant',
       'MailingRecipients',
       'CustomSearch',
       'Extension',
@@ -493,9 +484,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Mailing',
       'MailingEventUnsubscribe',
       'MailingEventSubscribe',
-      'Constant',
       'Entity',
-      'Location',
       'Profile',
       'CustomValue',
       'UFJoin',
@@ -508,7 +497,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomField',
       'CustomGroup',
       'Contribution',
-      'ActivityType',
       'MailingEventConfirm',
       'Case',
       'CaseContact',
@@ -587,8 +575,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     // Re:^^^ => the failure was probably correct behavior, and test is now fixed, but yeah 5.5 is deprecated, and don't care enough to verify.
     // Test data providers should be able to run in pre-boot environment, so we connect directly to SQL server.
     require_once 'DB.php';
-    $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
-    $db = DB::connect($dsn);
+    $db = CRM_Utils_SQL::connect(CIVICRM_DSN);
     if ($db->connection instanceof mysqli && $db->connection->server_version < 50600) {
       $entitiesWithout[] = 'Dedupe';
     }
@@ -958,9 +945,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ) {
       return;
     }
-    if (in_array($Entity, ['ActivityType', 'SurveyRespondant'])) {
-      $this->markTestSkipped();
-    }
     $this->callAPISuccess($Entity, 'getlist', ['label_field' => 'id']);
   }
 
@@ -976,9 +960,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       || in_array($entity, $this->toBeSkippedGetByID())
     ) {
       return;
-    }
-    if (in_array($entity, ['ActivityType', 'SurveyRespondant'])) {
-      $this->markTestSkipped();
     }
     if ($entity === 'UFGroup') {
       $entity = 'ufgroup';
@@ -1261,7 +1242,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testInvalidSort_get($Entity) {
-    $invalidEntitys = ['ActivityType', 'Setting', 'System'];
+    $invalidEntitys = ['Setting', 'System'];
     if (in_array($Entity, $invalidEntitys)) {
       $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently sips invalid params');
     }
@@ -1276,7 +1257,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testValidSortSingleArrayById_get($Entity) {
-    $invalidEntitys = ['ActivityType', 'Setting', 'System'];
+    $invalidEntitys = ['Setting', 'System'];
     $tests = [
       'id' => '_id',
       'id desc' => '_id desc',
@@ -1799,7 +1780,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   protected function getOnlyIDNonZeroCount(): array {
     return [
-      'ActivityType',
       'Entity',
       'Domain',
       'Setting',

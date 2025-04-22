@@ -43,7 +43,10 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => [table => table_name, class => CRM_DAO_ClassName]][]
    */
   public static function getEntities(): array {
-    return EntityRepository::getEntities();
+    $allEntities = EntityRepository::getEntities();
+    // Filter out entities without a table or class
+
+    return array_filter($allEntities, fn($entity) => (!empty($entity['table']) && !empty($entity['class'])));
   }
 
   /**
@@ -88,6 +91,15 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function tables() {
     return array_column(self::getEntities(), 'class', 'table');
+  }
+
+  /**
+   * Get the declared token classes.
+   * @return string[]
+   *   [table_name => token class]
+   */
+  public static function tokenClasses() {
+    return array_column(self::getEntities(), 'token_class', 'name');
   }
 
   /**
@@ -157,7 +169,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => CRM_DAO_ClassName]
    */
   public static function daoToClass() {
-    return array_combine(array_keys(self::getEntities()), array_column(self::getEntities(), 'class'));
+    $entities = self::getEntities();
+    return array_combine(array_keys($entities), array_column($entities, 'class'));
   }
 
   /**
@@ -210,7 +223,7 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g membership_payment returns MembershipPayment
+   * e.g custom_field returns CustomField
    *
    * @param string $name
    * @param bool $legacyV3
@@ -231,7 +244,7 @@ class CRM_Core_DAO_AllCoreTables {
     foreach ($fragments as & $fragment) {
       $fragment = ucfirst($fragment);
       // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
-      if (strpos($fragment, 'Uf') === 0 && strlen($name) > 2) {
+      if (str_starts_with($fragment, 'Uf') && strlen($name) > 2) {
         $fragment = 'UF' . ucfirst(substr($fragment, 2));
       }
     }
@@ -345,10 +358,9 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * @deprecated in 5.72 will be removed in 5.96
+   * @deprecated in 5.72 will be removed in 5.102
    */
   public static function getBriefName($className): ?string {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::getEntityNameForClass');
     return self::getEntityNameForClass((string) $className);
   }
 
@@ -482,7 +494,7 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function invoke($className, $event, &$values) {
     $entityName = self::getEntityNameForClass($className);
-    $entityTypes = self::getEntities();
+    $entityTypes = EntityRepository::getEntities();
     if (isset($entityTypes[$entityName][$event])) {
       foreach ($entityTypes[$entityName][$event] as $filter) {
         $args = [$className, &$values];

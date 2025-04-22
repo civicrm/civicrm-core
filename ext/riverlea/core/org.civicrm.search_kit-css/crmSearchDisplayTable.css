@@ -1,0 +1,56 @@
+/* Style rules for SearchKit Admin
+   Forked on 19 July 24. Called on SearchKit Admin pages
+   Status: merged */
+
+table.crm-sticky-header > thead > tr {
+  position: sticky !important;
+  top: var(--crm-menubar-bottom, 0px);
+  z-index: 2;
+}
+.crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
+  padding-inline: 0;
+  text-transform: none;
+  color: initial;
+  min-width: 95px; /* Don't allow button to be split on 2 lines */
+}
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon + .crm-search-display-table-column-label {
+  margin-left: 0 !important;
+}
+.crm-search-display.crm-search-display-table tfoot > tr > td {
+  font-weight: bold;
+  font-family: var(--crm-font-bold);
+}
+
+/* Afform tables */
+.crm-container td.crm-search-col-type-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-s);
+}
+.crm-container td.crm-search-col-type-buttons:has(span:only-child),
+.crm-container td.crm-search-col-type-buttons:has(> .btn:only-child) {
+  /* when button column has only one button, turn cell back to table cell to vertically center */
+  display: table-cell;
+}
+td.crm-search-col-type-buttons.text-right {
+  flex-direction: row-reverse;
+}
+#bootstrap-theme th.crm-search-result-select button.btn {
+  background: transparent;
+  padding: var(--crm-xs1) var(--crm-m1);
+}
+#bootstrap-theme th.crm-search-result-select button.btn:hover,
+#bootstrap-theme th.crm-search-result-select button.btn:focus {
+  background: transparent;
+}
+#bootstrap-theme th.crm-search-result-select button.btn i.crm-i {
+  color: var(--crm-c-text);
+  min-width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.crm-search-display-table table {
+  border: var(--crm-table-outside-border);
+  box-shadow: var(--crm-block-shadow);
+}

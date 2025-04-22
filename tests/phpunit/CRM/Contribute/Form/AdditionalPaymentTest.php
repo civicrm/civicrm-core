@@ -139,7 +139,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       '$100.00',
       'This Payment Amount',
       '$70.00',
-      'Billing Name and Address',
+      'Billing Address',
       'Vancouver, British Columbia 1321312',
       'Visa',
       '***********1111',
@@ -223,7 +223,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'check-12345',
     ],
     [
-      'Billing Name and Address',
+      'Billing Address',
       'Visa',
     ]);
     $mut->stop();
@@ -252,7 +252,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'Paid By',
       'Credit Card',
       '***********1111',
-      'Billing Name and Address',
+      'Billing Address',
       'Vancouver, British Columbia 1321312',
     ]);
     $mut->stop();
@@ -353,7 +353,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function submitPayment(float $amount, string $mode = NULL, bool $isEmailReceipt = FALSE): void {
+  public function submitPayment(float $amount, ?string $mode = NULL, bool $isEmailReceipt = FALSE): void {
     $submitParams = [
       'contact_id' => $this->ids['Contact']['order'] ?? $this->_individualId,
       'total_amount' => $amount,

@@ -45,15 +45,17 @@
         return _.findWhere(mngr.tasks, {name: taskName});
       };
 
-      this.doTask = function(task, ids) {
+      this.doTask = function(task, ids, isLink) {
         var data = {
           ids: ids,
           entity: mngr.getEntityName(),
           search: displayCtrl.search,
           display: displayCtrl.display,
+          displayCtrl: displayCtrl,
           taskManager: mngr,
           entityInfo: mngr.entityInfo,
           taskTitle: task.title,
+          isLink: isLink,
           apiBatch: _.cloneDeep(task.apiBatch)
         };
         // If task uses a crmPopup form
@@ -61,7 +63,12 @@
           var path = $rootScope.$eval(task.crmPopup.path, data),
             query = task.crmPopup.query && $rootScope.$eval(task.crmPopup.query, data);
           CRM.loadForm(CRM.url(path, query, 'back'), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
-            .on('crmFormSuccess', mngr.refreshAfterTask);
+            .on('crmFormSuccess', (e) => {
+                // refreshAfterTask emits its own
+                // crmPopupFormSuccess event
+                e.stopPropagation();
+                mngr.refreshAfterTask();
+            });
         }
         else if (task.redirect) {
           var redirectPath = $rootScope.$eval(task.redirect.path, data),
@@ -77,18 +84,23 @@
           });
           dialogService.open('crmSearchTask', (task.uiDialog && task.uiDialog.templateUrl) || '~/crmSearchTasks/crmSearchTaskApiBatch.html', data, options)
             // Reload results on success, do nothing on cancel
-            .then(mngr.refreshAfterTask, _.noop);
+            .then((result) => mngr.refreshAfterTask(result, ids), _.noop);
         }
       };
 
-      this.refreshAfterTask = function() {
+      this.refreshAfterTask = function(result, ids) {
         displayCtrl.selectedRows = [];
         displayCtrl.allRowsSelected = false;
-        displayCtrl.rowCount = null;
-        displayCtrl.getResultsPronto();
-        // Trigger all other displays in the same form to update.
-        // This display won't update twice because of the debounce in getResultsPronto()
-        $element.trigger('crmPopupFormSuccess');
+        if (ids && result.action === 'inlineEdit' && ids.length === 1) {
+          displayCtrl.refreshAfterEditing(result, ids[0]);
+        }
+        else {
+          displayCtrl.rowCount = null;
+          displayCtrl.getResultsPronto();
+          // Trigger all other displays in the same form to update.
+          // This display won't update twice because of the debounce in getResultsPronto()
+          $element.trigger('crmPopupFormSuccess');
+        }
       };
     }
 
@@ -198,7 +210,7 @@
           const mngr = this.taskManager;
           event.preventDefault();
           mngr.getMetadata().then(function() {
-            mngr.doTask(_.extend({title: link.title}, mngr.getTaskInfo(link.task)), [id]);
+            mngr.doTask(_.extend({title: link.title}, mngr.getTaskInfo(link.task)), [id], true);
           });
         }
       },
@@ -229,6 +241,11 @@
         }
         else if (status === 'success' && !editedRow && apiResults.run && apiResults.run[0]) {
           const mngr = this.taskManager;
+          // If tasks are shown as buttons, they need to be loaded right away
+          if (this.settings.actions_display_mode === 'buttons') {
+            mngr.getMetadata();
+            return;
+          }
           // If results contain a link to a task, prefetch task info to prevent latency when clicking the link
           _.each(apiResults.run[0].columns, function(column) {
             if ((column.link && column.link.task) || _.find(column.links || [], 'task')) {

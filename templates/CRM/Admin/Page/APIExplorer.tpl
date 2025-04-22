@@ -225,16 +225,16 @@
 </div>
 <div class="crm-block crm-content-block">
 <div id="mainTabContainer">
-  <ul>
-    <li class="ui-corner-all" title="GUI to build and execute API calls">
+  <ul role="tablist">
+    <li role="tab" class="ui-corner-all" title="GUI to build and execute API calls">
       <a href="#explorer-tab"><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Explorer{/ts}</a>
     </li>
-    <li class="ui-corner-all" title="API source-code and code-level documentation">
+    <li role="tab" class="ui-corner-all" title="API source-code and code-level documentation">
       <a href="#docs-tab"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Code Docs{/ts}</a>
     </li>
   </ul>
 
-  <div id="explorer-tab">
+  <div id="explorer-tab" role="tabpanel">
     <div class="crm-block crm-form-block">
     <form id="api-explorer">
       <label for="api-entity">{ts}Entity{/ts}:</label>
@@ -252,12 +252,12 @@
       <input class="crm-form-text" id="api-action" name="action" value="get">
       &nbsp;&nbsp;
 
-      <label for="debug-checkbox" class="api-checkbox-label" title="{ts}Display debug output with results.{/ts}">
+      <label for="debug-checkbox" class="api-checkbox-label" title="{ts escape='htmlattribute'}Display debug output with results.{/ts}">
         <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="debug-checkbox" name="debug" value="1" >debug
       </label>
       &nbsp;|&nbsp;
 
-      <label for="sequential-checkbox" class="api-checkbox-label" title="{ts}Sequential is more compact format, well-suited for json and smarty.{/ts}">
+      <label for="sequential-checkbox" class="api-checkbox-label" title="{ts escape='htmlattribute'}Sequential is more compact format, well-suited for json and smarty.{/ts}">
         <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="sequential-checkbox" name="sequential" checked="checked" value="1">sequential
       </label>
 
@@ -300,7 +300,7 @@
         </table>
       </div>
       <div class="crm-submit-buttons">
-        <button type="submit" class="crm-button crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}">
+        <button type="submit" class="crm-button crm-form-submit" accesskey="S" title="{ts escape='htmlattribute'}Execute API call and display results{/ts}">
           <i class="crm-i fa-bolt" aria-hidden="true"></i> {ts}Execute{/ts}
         </button>
       </div>
@@ -312,7 +312,7 @@
   </div>
   </div>
 
-  <div id="docs-tab">
+  <div id="docs-tab" role="tabpanel">
     <div class="crm-block crm-form-block">
     <form id="api-docs">
       <label for="doc-entity">{ts}Entity{/ts}:</label>
@@ -355,13 +355,13 @@
   <tr class="api-param-row">
     <td>
       <i class="crm-i api-sort-handle fa-arrows" aria-hidden="true"></i>
-      <input style="width: 90%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts}Parameter{/ts}" />
+      <input style="width: 90%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts escape='htmlattribute'}Parameter{/ts}" />
       <div class="api-and-or"><span><span class="api-and">{ts}AND{/ts}</span> <i class="crm-i fa-toggle-on" aria-hidden="true"></i> <span class="api-or">{ts}OR{/ts}</span></span></div>
     </td>
     <td>
       {literal}
       <% if (noOps) { %>
-        <input class="crm-form-text api-param-op" value="=" readonly="true" title="{/literal}{ts}Other operators not available for this action.{/ts}{literal}" />
+        <input class="crm-form-text api-param-op" value="=" readonly="true" title="{/literal}{ts escape='htmlattribute'}Other operators not available for this action.{/ts}{literal}" />
       <% } else { %>
       {/literal}
         <select class="crm-form-select api-param-op">
@@ -374,7 +374,7 @@
       {/literal}
     </td>
     <td>
-      <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts}Value{/ts}"/>
+      <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts escape='htmlattribute'}Value{/ts}"/>
       <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
     </td>
   </tr>
@@ -399,10 +399,10 @@
       <label>{ts}Options{/ts}: &nbsp;</label>
     </td>
     <td>
-      <input class="crm-form-text api-option-name api-input" style="width: 12em;" placeholder="{ts}Option{/ts}"/>
+      <input class="crm-form-text api-option-name api-input" style="width: 12em;" placeholder="{ts escape='htmlattribute'}Option{/ts}"/>
     </td>
     <td>
-      <input style="width: 85%;" class="crm-form-text api-option-value api-input" placeholder="{ts}Value{/ts}"/>
+      <input style="width: 85%;" class="crm-form-text api-option-value api-input" placeholder="{ts escape='htmlattribute'}Value{/ts}"/>
       <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
     </td>
   </tr>
@@ -427,7 +427,7 @@
       </select>
     </td>
     <td>
-      <input style="width: 85%;" class="crm-form-text api-param-value api-input" value="{ldelim}{rdelim}" placeholder="{ts}API Params{/ts}"/>
+      <input style="width: 85%;" class="crm-form-text api-param-value api-input" value="{ldelim}{rdelim}" placeholder="{ts escape='htmlattribute'}API Params{/ts}"/>
       <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
     </td>
   </tr>

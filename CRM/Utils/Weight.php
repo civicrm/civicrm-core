@@ -105,24 +105,24 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * Updates the weight fields of other rows according to the new and old weight passed in.
-   * And returns the new weight be used. If old-weight not present, Creates a gap for a new row to be inserted
-   * at the specified new weight
+   * Makes space for a moved or inserted row by updating the weight of other rows as needed.
    *
    * @param string $daoName
-   *   Full name of the DAO.
-   * @param int $oldWeight
+   *   Full name of the DAO class.
+   * @param int|null $oldWeight
+   *   Previous weight if the row was moved within the same parent-grouping
+   *   Null if the item is new or being moved from a different grouping.
    * @param int $newWeight
+   *   The desired weight of the moved/inserted row
    * @param array $fieldValues
-   *   Field => value to be used in the WHERE.
+   *   Defines the group, e.g. [parent_id => 8, domain_id => 1]
    * @param string $weightField
-   *   Field which contains the weight value,.
-   *   defaults to 'weight'
+   *   Field which contains the weight value, defaults to 'weight'
    *
    * @return int
+   *   Adjusted new weight
    */
   public static function updateOtherWeights($daoName, $oldWeight, $newWeight, $fieldValues = NULL, $weightField = 'weight') {
-    $oldWeight = (int) $oldWeight;
     $newWeight = (int) $newWeight;
 
     // max weight is the highest current weight
@@ -138,7 +138,7 @@ class CRM_Utils_Weight {
       }
       $newWeight = $maxWeight;
 
-      if (!$oldWeight) {
+      if (!isset($oldWeight)) {
         return $newWeight + 1;
       }
     }
@@ -159,12 +159,13 @@ class CRM_Utils_Weight {
     }
 
     // if oldWeight not present, indicates new weight is to be added. So create a gap for a new row to be inserted.
-    if (!$oldWeight) {
+    if (!isset($oldWeight)) {
       $additionalWhere = "$weightField >= $newWeight";
       $update = "$weightField = ($weightField + 1)";
       CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
     }
     else {
+      $oldWeight = (int) $oldWeight;
       if ($newWeight > $oldWeight) {
         $additionalWhere = "$weightField > $oldWeight AND $weightField <= $newWeight";
         $update = "$weightField = ($weightField - 1)";

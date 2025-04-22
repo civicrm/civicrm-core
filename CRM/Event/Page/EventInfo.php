@@ -49,9 +49,6 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_id));
     $this->assign('isShowICalIconsInline', TRUE);
 
-    // Sometimes we want to suppress the Event Full msg
-    $noFullMsg = CRM_Utils_Request::retrieve('noFullMsg', 'String', $this, FALSE, 'false');
-
     //retrieve event information
     $params = ['id' => $this->_id];
     $values = ['event' => NULL];
@@ -63,7 +60,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     if (!$values['event']['is_public']) {
-      CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+      CRM_Utils_System::setNoRobotsFlag();
     }
 
     if (!empty($values['event']['is_template'])) {
@@ -72,11 +69,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     // Add Event Type to $values in case folks want to display it
-    $values['event']['event_type'] = CRM_Utils_Array::value($values['event']['event_type_id'], CRM_Event_PseudoConstant::eventType());
+    $values['event']['event_type'] = CRM_Event_PseudoConstant::eventType($values['event']['event_type_id']);
 
     $this->assign('isShowLocation', $values['event']['is_show_location'] ?? NULL);
 
-    $eventCurrency = CRM_Utils_Array::value('currency', $values['event'], $config->defaultCurrency);
+    $eventCurrency = $values['event']['currency'] ?? $config->defaultCurrency;
     $this->assign('eventCurrency', $eventCurrency);
 
     // show event fees.
@@ -152,7 +149,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     // fix phone type labels
     if (!empty($values['location']['phone'])) {
-      $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+      $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
       foreach ($values['location']['phone'] as &$val) {
         if (!empty($val['phone_type_id'])) {
           $val['phone_type_display'] = $phoneTypes[$val['phone_type_id']];
@@ -221,14 +218,14 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('skipLocationType', TRUE);
       $this->assign('mapURL', $mapURL);
     }
-
+    $findParticipants = ['statusCounted' => '', 'statusNotCounted' => ''];
     if (CRM_Core_Permission::check('view event participants')) {
       $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');
       $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
       $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
       $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
-      $this->assign('findParticipants', $findParticipants);
     }
+    $this->assign('findParticipants', $findParticipants);
 
     $participantListingID = $values['event']['participant_listing_id'] ?? NULL;
     if ($participantListingID) {
@@ -236,8 +233,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         "reset=1&id={$this->_id}",
         FALSE, NULL, TRUE, TRUE
       );
-      $this->assign('participantListingURL', $participantListingURL);
     }
+    $this->assign('participantListingURL', $participantListingURL ?? NULL);
 
     $hasWaitingList = $values['event']['has_waitlist'] ?? NULL;
     $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);
@@ -249,10 +246,16 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->getEventID(), 'register for events'
     );
     if ($hasPermission && $this->isAvailableForOnlineRegistration()) {
+      // Copy over the checksum, if one was present
+      $checksum_query = CRM_Utils_Request::retrieveValue('cs', 'String');
+      if ($checksum_query) {
+        $checksum_query = '&cs=' . $checksum_query . '&cid=' . CRM_Utils_Request::retrieveValue('cid', 'Positive');
+      }
+
       // we always generate urls for the front end in joomla
       $action_query = $action === CRM_Core_Action::PREVIEW ? "&action=$action" : '';
       $url = CRM_Utils_System::url('civicrm/event/register',
-        "id={$this->_id}&reset=1{$action_query}",
+        "id={$this->_id}&reset=1{$action_query}{$checksum_query}",
         FALSE, NULL, TRUE,
         TRUE
       );
@@ -271,17 +274,25 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration && CRM_Core_Permission::check('register for events'));
     $this->assign('allowRegistration', $allowRegistration);
 
-    $session = CRM_Core_Session::singleton();
-    $params = [
-      'contact_id' => $session->get('userID'),
-      'event_id' => $values['event']['id'] ?? NULL,
-      'role_id' => $values['event']['default_role_id'] ?? NULL,
-    ];
-
-    if (($this->isEventFull() && $noFullMsg === 'false') || CRM_Event_BAO_Event::checkRegistration($params)) {
-      $statusMessage = $this->getEventValue('event_full_text');
-      if (CRM_Event_BAO_Event::checkRegistration($params)) {
-        if ($noFullMsg == 'false') {
+    $isAlreadyRegistered = $this->isAlreadyRegistered();
+    // noFullMsg was originally passed in to suppress the message about the event being full. The intent
+    // was originally such that when you were sending the user back to the info page after registering
+    // they would not be told it was full. Along the way it got overloaded to encompass
+    // the scenario where the user is potentially trying to register another user & hence became very confusing.
+    // We could probably make this make more sense by
+    // 1) always passing cid in the url if the person is being redirected to register another person
+    // and using that rather than the logged in use to check for existing registrations
+    // 2) using a more positive 'you are registered' message rather than making it
+    // sound like a mistake.
+    // 3) using the normal button to pass cid=0 information rather than a link.
+    $noFullMsg = CRM_Utils_Request::retrieve('noFullMsg', 'String', $this, FALSE, 'false');
+    $isSuppressEventFullMessage = $noFullMsg !== 'false';
+    $statusMessage = ($this->isEventFull() && !$isSuppressEventFullMessage && !$isAlreadyRegistered) ? $this->getEventValue('event_full_text') : '';
+    if (($this->isEventFull() && $noFullMsg === 'false') || $isAlreadyRegistered) {
+      if ($isAlreadyRegistered) {
+        // @todo - this usage of `$isSuppressEventFullMessage` is where the historical mis-use makes it
+        // confusing - better use of cid in the url would help.
+        if (!$isSuppressEventFullMessage) {
           if ($values['event']['allow_same_participant_emails']) {
             $statusMessage = ts('It looks like you are already registered for this event.  You may proceed if you want to create an additional registration.');
           }
@@ -331,7 +342,12 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
    */
   public function getEventID(): int {
     if (!isset($this->_id)) {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      try {
+        $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Event ID'));
+      }
       $this->_id = $id;
     }
     return (int) $this->_id;
@@ -375,6 +391,21 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       return (int) CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->getEventID());
     }
     return NULL;
+  }
+
+  /**
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function isAlreadyRegistered(): bool {
+    $params = [
+      // @todo - instead of just checking logged in user check for cid=0 or an integer
+      // in the url. (For zero there should be no check).
+      'contact_id' => CRM_Core_Session::getLoggedInContactID(),
+      'event_id' => $this->getEventID(),
+      'role_id' => $this->getEventValue('default_role_id'),
+    ];
+    return CRM_Event_BAO_Event::checkRegistration($params);
   }
 
 }

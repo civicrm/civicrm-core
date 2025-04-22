@@ -9,9 +9,9 @@
 *}
 
 {htxt id='allow_mail_contact_email'}
-{capture assign=adminFromEmailURL}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
+{capture assign=adminFromEmailURL}{crmURL p="civicrm/admin/options/site_email_address" q="reset=1"}{/capture}
 {ts 1=$adminFromEmailURL}If this is enabled a logged in user can send email from their own email address as well as the configured
-  <a href="%1"><strong>FROM Email addresses</strong></a>.  This applies to actions such as send Email, Email invoice.. If this setting
-  is disabled then only the system configured FROM Email addresses will be available for selection.{/ts}
+  <a href="%1"><strong>Site Email Addresses</strong></a>.  This applies to actions such as "Send Email", "Email Invoice" and "Send Receipt". If this setting
+  is disabled then only the system configured Site Email addresses will be available for selection.{/ts}
 {/htxt}
 

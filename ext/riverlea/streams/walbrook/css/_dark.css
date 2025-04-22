@@ -1,0 +1,99 @@
+/* Walbrook dark mode settings */
+
+:root {
+  --crm-c-text: #fff;
+  --crm-c-link: var(--crm-c-amber);
+  --crm-c-link-hover: var(--crm-c-amber-light);
+  --crm-c-focus: var(--crm-c-link);
+  --crm-c-background: var(--crm-c-gray-900);
+  --crm-c-page-background: var(--crm-c-darkest);
+  --crm-c-code-background: var(--crm-c-background2);
+  --crm-c-background2: var(--crm-c-gray-900);
+  --crm-c-background3: var(--crm-c-gray-800);
+  --crm-c-background4: var(--crm-c-gray-700);
+  /* --crm-alert-danger-bg: var(--crm-c-red); *
+  --crm-c-blue-dark: #043353;
+  /* --crm-c-green-light: #468847;
+  --crm-c-green: #376237;
+  --crm-c-green-dark: #dff0d8; */
+  --crm-c-gray-700: #353842;
+  --crm-c-gray-600: #67676a;
+  --crm-c-gray-500: #b3b3b3;
+  --crm-c-gray-800: #222831;
+  --crm-c-divider: 1px solid var(--crm-c-gray-500);
+/* Emphasis colours */
+  --crm-c-success: var(--crm-c-green-dark);
+  --crm-alert-success-bg: var(--crm-c-success);
+  --crm-alert-success-text: var(--crm-c-success-text);
+  --crm-alert-success-border: hsl(from var(--crm-alert-success-bg) h s calc(l + 10));
+  --crm-c-success-on-page-bg: var(--crm-c-success-light);
+  --crm-c-warning-text: var(--crm-c-text-dark);
+  --crm-alert-warning-bg: var(--crm-c-warning);
+  --crm-alert-warning-text: var(--crm-c-text-dark);
+  --crm-alert-warning-border: hsl(from var(--crm-alert-warning-bg) h s calc(l + 10));
+  --crm-c-warning-on-page-bg: var(--crm-c-warning-light);
+  --crm-alert-danger-bg: var(--crm-c-danger);
+  --crm-alert-danger-text: var(--crm-c-danger-text);
+  --crm-alert-danger-border: hsl(from var(--crm-alert-danger-bg) h s calc(l + 10));
+  --crm-c-danger-on-page-bg: var(--crm-c-danger-light);
+  --crm-c-info: var(--crm-c-blue-dark);
+  --crm-alert-info-bg: var(--crm-c-info);
+  --crm-alert-info-text: var(--crm-c-success-text);
+  --crm-alert-info-border: hsl(from var(--crm-alert-info-bg) h s calc(l + 10));
+  --crm-c-info-on-page-bg: var(--crm-c-info-light);
+  --crm-c-primary-on-page-bg: var(--crm-c-gray-300);
+  --crm-c-secondary-on-page-bg: #cdcdcd;
+/* And others */
+  --crm-block-shadow: 0 3px 18px 0 rgb(0,0,0);
+  --crm-popup-shadow: 0 3px 18px 0 rgb(0,0,0);
+  --crm-heading-bg: var(--crm-c-secondary);
+  --crm-heading-col: var(--crm-c-text-light);
+  --crm-dashlet-bg: var(--crm-c-background2);
+  --crm-dashlet-header-bg: var(--crm-c-background3);
+  --crm-expand-header-bg: transparent;
+  --crm-expand-header-bg-active: var(--crm-c-secondary-hover);
+  --crm-expand2-header-bg: transparent;
+  --crm-expand2-header-bg-active: var(--crm-c-secondary-hover);
+  --crm-expand-body-bg: var(--crm-c-background3);
+  --crm-expand-body-border: 0;
+  --crm-dash-header-bg: var(--crm-c-background4);
+  --crm-dash-block-bg: var(--crm-c-background2);
+  --crm-dash-label-bg: transparent;
+  --crm-dash-tabs-bg: var(--crm-c-background3);
+  --crm-dash-panel-bg: var(--crm-c-background2);
+  --crm-dash-tab-bg-hover: var(--crm-c-background4);
+  --crm-dash-box-shadow: inset 0 5px 18px -5px rgba(0, 0, 0, 0.75);
+  --crm-dropdown-bg: var(--crm-c-background);
+  --crm-dropdown-2-bg: var(--crm-c-background);
+  --crm-tabs-bg: var(--crm-c-background3);
+  --crm-panel-border-col: var(--crm-c-gray-500);
+  --crm-panel-border: 1px;
+  --crm-panel-background: var(--crm-c-background);
+  --crm-input-border-color: var(--crm-c-gray-500);
+  --crm-table-odd-row: var(--crm-c-page-background);
+  --crm-table-odd-hover: var(--crm-alert-info-border);
+  --crm-table-even-row: var(--crm-c-gray-800);
+  --crm-table-even-hover: var(--crm-alert-info-border);
+  /* --crm-alert-success-text: var(--crm-c-text);
+  --crm-alert-info-bg: var(--crm-c-blue-dark);
+  --crm-alert-info-text: var(--crm-c-blue-light); */
+  --crm-c-inactive: var(--crm-c-gray-400);
+  --crm-input-color: var(--crm-c-text);
+  --crm-input-description: var(--crm-c-gray-300);
+  --crm-dialog-header-border-col: transparent;
+  --crm-dialog-header-bg: var(--crm-c-background2);
+  --crm-dialog-body-bg: var(--crm-c-background2);
+  --crm-notify-background: var(--crm-c-background);
+  --crm-form-block-background: var(--crm-c-background2);
+  /* --crm-btn-cancel-bg: #9b3d4b;
+  --crm-btn-warning-bg: #7b4e14;
+  --crm-c-success-text: var(--crm-c-text-light);
+  --crm-c-warning-text: var(--crm-c-text-light);
+  --crm-c-danger: var(--crm-btn-cancel-bg);
+  --crm-c-warning: var(--crm-btn-warning-bg);
+  --crm-btn-danger-bg: var(--crm-btn-cancel-bg); */
+  --crm-wizard-active-bg: var(--crm-c-primary);
+  --crm-wizard-active-col: var(--crm-c-primary-text);
+  --crm-dash-edit-border: 1px solid var(--crm-c-link-hover);
+  --crm-filter-bg: var(--crm-c-blue-dark);
+}

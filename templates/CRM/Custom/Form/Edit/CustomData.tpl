@@ -1,6 +1,6 @@
 {if !$isSingleRecordEdit && $cd_edit.is_multiple eq 1 and array_key_exists('table_id', $cd_edit) && $cd_edit.table_id and $contactId and !$skipTitle and $cd_edit.style eq 'Inline'}
   {assign var=tableID value=$cd_edit.table_id}
-  <a href="#" class="crm-hover-button crm-custom-value-del" title="{ts 1=$cd_edit.title}Delete %1{/ts}"
+  <a href="#" class="crm-hover-button crm-custom-value-del" title="{ts escape='htmlattribute' 1=$cd_edit.title}Delete %1{/ts}"
      data-post='{ldelim}"valueID": "{$tableID}", "groupID": "{$group_id}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'>
     <span class="icon delete-icon"></span> {ts}Delete{/ts}
   </a>

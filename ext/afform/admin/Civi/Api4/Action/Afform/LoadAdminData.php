@@ -173,7 +173,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
             ->setSavedSearch($displayTag['search-name']);
         }
         $display = $displayGet
-          ->addSelect('*', 'type:name', 'type:icon', 'saved_search_id.name', 'saved_search_id.label', 'saved_search_id.api_entity', 'saved_search_id.api_params')
+          ->addSelect('*', 'type:name', 'type:icon', 'saved_search_id.name', 'saved_search_id.label', 'saved_search_id.api_entity', 'saved_search_id.api_params', 'saved_search_id.form_values')
           ->execute()->first();
         if (!$display) {
           continue;
@@ -205,6 +205,9 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     foreach (array_diff($entities, $this->skipEntities) as $entity) {
       $info['entities'][$entity] = AfformAdminMeta::getApiEntity($entity);
       $info['fields'][$entity] = AfformAdminMeta::getFields($entity, ['action' => $getFieldsMode]);
+      foreach ($info['fields'][$entity] as $key => $field) {
+        $info['fields'][$entity][$key]['original_input_type'] = $field['input_type'];
+      }
       $behaviors = AfformBehavior::get(FALSE)
         ->addWhere('entities', 'CONTAINS', $entity)
         ->execute();

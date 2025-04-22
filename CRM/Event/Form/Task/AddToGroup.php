@@ -203,7 +203,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       }
       $groupParams['is_active'] = 1;
 
-      $createdGroup = CRM_Contact_BAO_Group::create($groupParams);
+      $createdGroup = CRM_Contact_BAO_Group::writeRecord($groupParams);
       $groupID = $createdGroup->id;
       $groupName = $groupParams['title'];
     }

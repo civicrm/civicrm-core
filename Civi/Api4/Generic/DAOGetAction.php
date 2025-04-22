@@ -114,16 +114,16 @@ class DAOGetAction extends AbstractGetAction {
           $result->setCountMatched(count($rows) + $this->getOffset());
           $getCount = FALSE;
         }
-        else {
-          // Set rowCount for backward compatibility.
-          $result->rowCount = count($rows) + $this->getOffset();
-        }
+        // Set rowCount for backward compatibility.
+        $result->rowCount = count($rows) + $this->getOffset();
       }
     }
 
     if ($getCount) {
       $query = new Api4SelectQuery($this);
       $result->setCountMatched($query->getCount());
+      // Set rowCount for backward compatibility.
+      $result->rowCount = $result->countMatched();
     }
   }
 

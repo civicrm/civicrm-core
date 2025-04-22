@@ -26,6 +26,7 @@ use Civi\Api4\Address;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionSoft;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
@@ -83,6 +84,14 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($fields['id']['default_value']);
 
     $this->assertEquals(['import', 'export', 'duplicate_matching'], $fields['id']['usage']);
+
+    $this->assertSame('contact_type', $fields['contact_sub_type']['input_attrs']['control_field']);
+    $this->assertTrue($fields['contact_sub_type']['input_attrs']['multiple']);
+
+    // Check date format
+    $this->assertTrue($fields['birth_date']['input_attrs']['date']);
+    $this->assertFalse($fields['birth_date']['input_attrs']['time']);
+    $this->assertArrayNotHasKey('format_type', $fields['birth_date']['input_attrs']);
   }
 
   public function testComponentFields(): void {
@@ -168,6 +177,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($actFields['phone_id']['deprecated']);
     $this->assertEquals('now', $actFields['created_date']['default_value']);
     $this->assertEquals('now', $actFields['activity_date_time']['default_value']);
+    $this->assertEquals('Date', $actFields['activity_date_time']['input_type']);
 
     $getFields = Activity::getFields(FALSE)
       ->setAction('get')
@@ -214,9 +224,19 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->setLoadOptions(['id', 'name', 'label', 'description', 'color'])
       ->execute()->single();
     $this->assertCount(1, $tagField['options']);
+    $this->assertIsInt($tagField['options'][0]['id']);
     $this->assertEquals('Act_Tag', $tagField['options'][0]['name']);
     $this->assertEquals('Test tag for activities', $tagField['options'][0]['description']);
     $this->assertEquals('#aaaaaa', $tagField['options'][0]['color']);
+  }
+
+  public function testIdIsInt(): void {
+    $field = ContributionSoft::getFields(FALSE)
+      ->addWhere('name', '=', 'soft_credit_type_id')
+      ->setLoadOptions(['id', 'name'])
+      ->execute()->single();
+
+    $this->assertIsInt($field['options'][0]['id']);
   }
 
   public function testGetSuffixes(): void {
@@ -246,6 +266,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
   public function testDynamicFks(): void {
     $tagFields = EntityTag::getFields(FALSE)
       ->execute()->indexBy('name');
+    $this->assertEquals('Tag', $tagFields['tag_id']['fk_entity']);
     $this->assertEmpty($tagFields['entity_id']['fk_entity']);
     $this->assertEquals('Activity', $tagFields['entity_id']['dfk_entities']['civicrm_activity']);
     $this->assertEquals('entity_table', $tagFields['entity_id']['input_attrs']['control_field']);

@@ -50,38 +50,31 @@ trait CRM_Custom_Form_CustomDataTrait {
    * @throws \CRM_Core_Exception
    */
   protected function addCustomDataFieldsToForm(string $entity, array $filters = []): void {
-    $fields = (array) civicrm_api4($entity, 'getFields', [
-      'action' => 'create',
-      'values' => $filters,
-      'where' => [
-        ['type', '=', 'Custom'],
-        ['readonly', '=', FALSE],
-      ],
-      'checkPermissions' => TRUE,
-    ])->indexBy('custom_field_id');
-
+    // Reuse the same spec-gatherer from Api4.getFields
+    $spec = new \Civi\Api4\Service\Spec\RequestSpec($entity, 'create', $filters);
+    $fieldFilters = Civi::service('spec_gatherer')->getCustomGroupFilters($spec);
+    if ($fieldFilters === NULL) {
+      return;
+    }
+    // Api4 normally filters out multivalued groups but forms include them
+    // TODO: For now only support multivalued groups for Contact forms.
+    // FIXME: This condition should be removed after verifying it does work for other entity forms (`unset` should be called unconditionally).
     if ($entity === 'Contact') {
-      // Ideally this would not be contact specific but the function being
-      // called here does not handle the filters as received.
-      $fieldFilters = [
-        'extends' => [$entity, $filters['contact_type']],
-        'is_multiple' => TRUE,
-        'style' => 'Inline',
-      ];
-      if (!empty($filters['contact_sub_type'])) {
-        $fieldFilters['extends_entity_column_value'] = [NULL, $filters['contact_sub_type']];
-      }
+      unset($fieldFilters['is_multiple']);
+    }
+    // Only inline groups belong on the form: dev/core#5613
+    $fieldFilters['style'] = 'Inline';
 
-      $multipleCustomGroups = CRM_Core_BAO_CustomGroup::getAll($fieldFilters);
-      foreach ($multipleCustomGroups as $multipleCustomGroup) {
-        foreach ($multipleCustomGroup['fields'] as $groupField) {
-          $groupField['custom_group_id.is_multiple'] = TRUE;
-          $groupField['table_name'] = $multipleCustomGroup['table_name'];
-          $groupField['custom_field_id'] = $groupField['id'];
-          $groupField['required'] = $groupField['is_required'];
-          $groupField['input_type'] = $groupField['html_type'];
-          $fields[$groupField['id']] = $groupField;
-        }
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($fieldFilters, CRM_Core_Permission::EDIT);
+    $fields = [];
+    foreach ($customGroups as $customGroup) {
+      foreach ($customGroup['fields'] as $groupField) {
+        $groupField['custom_group_id.is_multiple'] = $customGroup['is_multiple'];
+        $groupField['table_name'] = $customGroup['table_name'];
+        $groupField['custom_field_id'] = $groupField['id'];
+        $groupField['required'] = $groupField['is_required'];
+        $groupField['input_type'] = $groupField['html_type'];
+        $fields[$groupField['id']] = $groupField;
       }
     }
 
@@ -112,9 +105,26 @@ trait CRM_Custom_Form_CustomDataTrait {
    */
   private function getInstancesOfField($id): array {
     $instances = [];
+    $found = [];
     foreach (array_merge($_POST, ($_FILES ?? [])) as $key => $value) {
       if (preg_match('/^custom_' . $id . '_?(-?\d+)?$/', $key)) {
         $instances[] = $key;
+        $found[$id] = $key;
+      }
+    }
+    if (!isset($found[$id])) {
+      // I think the _POST check was mostly about multiple fields
+      // see https://github.com/civicrm/civicrm-core/pull/29708
+      // However per https://lab.civicrm.org/dev/core/-/issues/5322
+      // it turns out that radio fields do not show up in the form.
+      // We can handle those here - although is that enough to handle blanking on
+      // multiple field radios?
+      $field = CRM_Core_BAO_CustomField::getField($id);
+      if ($field['html_type'] === 'Radio' || $field['html_type'] === 'Select') {
+        $group = CRM_Core_BAO_CustomGroup::getGroup(['id' => $field['custom_group_id']]);
+        if (!$group['is_multiple']) {
+          $instances[] = 'custom_' . $id;
+        }
       }
     }
     return $instances;
@@ -147,6 +157,48 @@ trait CRM_Custom_Form_CustomDataTrait {
     // CustomDataByType form in it's setDefaultValues() function - otherwise it cannot reload the
     // values that were just entered if validation fails.
     return is_string($this->getSubmitValue($elementName)) ? CRM_Utils_String::purifyHTML($this->getSubmitValue($elementName)) : $this->getSubmitValue($elementName);
+  }
+
+  /**
+   * Get the submitted custom fields.
+   *
+   * This is returned apiv3 style.
+   * @see getSubmittedCustomFieldsForApi4()
+   *
+   * @return array
+   */
+  protected function getSubmittedCustomFields($version = 3): array {
+    $fields = [];
+    foreach ($this->getSubmittedValues() as $label => $field) {
+      if ($version === 3) {
+        if (CRM_Core_BAO_CustomField::getKeyID($label)) {
+          $fields[$label] = $field;
+        }
+      }
+      else {
+        if (str_starts_with($label, 'custom_')) {
+          $fields[CRM_Core_BAO_CustomField::getLongNameFromShortName($label)] = $field;
+        }
+      }
+    }
+    return $fields;
+  }
+
+  /**
+   * Get the submitted custom fields in Api4 format.
+   *
+   * @return array
+   */
+  protected function getSubmittedCustomFieldsForApi4(): array {
+    $fields = [];
+    foreach ($this->getSubmittedValues() as $label => $field) {
+      if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $label)) {
+        if ($new = CRM_Core_BAO_CustomField::getLongNameFromShortName($label)) {
+          $fields[$new] = $field;
+        }
+      }
+    }
+    return $fields;
   }
 
 }

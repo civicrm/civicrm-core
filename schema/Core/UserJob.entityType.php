@@ -40,9 +40,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Unique name for job.'),
       'add' => '5.50',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'created_id' => [
       'title' => ts('Created By Contact ID'),
@@ -50,6 +47,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to contact table.'),
       'add' => '5.50',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -113,7 +111,7 @@ return [
         'label' => ts('Job Status'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_UserJob::getStatuses',
+        'callback' => ['CRM_Core_BAO_UserJob', 'getStatuses'],
       ],
     ],
     'job_type' => [
@@ -125,10 +123,9 @@ return [
       'add' => '5.50',
       'input_attrs' => [
         'label' => ts('Job Type'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_UserJob::getTypes',
+        'callback' => ['CRM_Core_BAO_UserJob', 'getTypes'],
         'suffixes' => [
           'name',
           'label',

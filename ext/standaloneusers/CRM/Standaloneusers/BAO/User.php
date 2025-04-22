@@ -37,6 +37,9 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     elseif ($action === 'create') {
       $e->setAuthorized($mayAdminUsers);
     }
+    elseif ($action === 'sendPasswordResetEmail') {
+      $e->setAuthorized($mayAdminUsers);
+    }
     else {
       // Is there another write action we don't know about? If so, play it safe and say No.
       $e->setAuthorized(FALSE);
@@ -48,12 +51,24 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
    * @param \Civi\Core\Event\PreEvent $event
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    if (
-      in_array($event->action, ['create', 'edit'], TRUE) &&
-      empty($event->params['when_updated'])
-    ) {
-      // Track when_updated.
-      $event->params['when_updated'] = date('YmdHis');
+    if (in_array($event->action, ['create', 'edit'], TRUE)) {
+      if (empty($event->params['when_updated'])) {
+        // Track when_updated.
+        $event->params['when_updated'] = date('YmdHis');
+      }
+      if (empty($event->params['uf_name'])) {
+        // If no email is specified, fetch from contact
+        $contactId = $event->params['contact_id'] ?? NULL;
+
+        if ($contactId) {
+          $email = \Civi\Api4\Contact::get(FALSE)
+            ->addWhere('id', '=', $contactId)
+            ->addSelect('email_primary.email')
+            ->execute()->single()['email_primary.email'] ?? NULL;
+
+          $event->params['uf_name'] = $email;
+        }
+      }
     }
   }
 
@@ -104,7 +119,7 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     return $timeZones;
   }
 
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];
 
     // ↓ The following is copied from parent::addSelectWhereClause(). Is it needed? :shrug:

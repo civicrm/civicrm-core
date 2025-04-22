@@ -28,8 +28,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
       ->setSelect(['name', 'data'])
       ->addWhere('name', 'IN', ['workflow/case_activity_test/CaseAdhocExample', 'workflow/case_activity_test/CaseModelExample'])
       ->execute()
-      ->indexBy('name')
-      ->column('data');
+      ->column('data', 'name');
     $byAdhoc = WorkflowMessage::create('case_activity_test', $examples['workflow/case_activity_test/CaseAdhocExample']);
     $byClass = new CRM_Case_WorkflowMessage_CaseActivityTestWorkflow($examples['workflow/case_activity_test/CaseModelExample']);
     $this->assertSameWorkflowMessage($byClass, $byAdhoc, 'Compare byClass and byAdhoc: ');
@@ -41,7 +40,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
    * To see this, we take all the example data and use it with diff constructors.
    */
   public function testConstructorEquivalence(): void {
-    $examples = $this->findExamples()->execute()->indexBy('name')->column('data');
+    $examples = $this->findExamples()->execute()->column('data', 'name');
     $this->assertTrue(count($examples) >= 1, 'Must have at least one example data-set');
     foreach ($examples as $example) {
       $this->assertConstructorEquivalence($example);

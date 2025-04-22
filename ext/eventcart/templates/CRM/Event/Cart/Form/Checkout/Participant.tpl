@@ -27,5 +27,5 @@
           </div>
   </div>
     <!--if $form_participant->participant_index > 0-->
-    <a class="link-delete" href="#" onclick="delete_participant({$event_id}, {$participant_id}); return false;">{ts}Delete{/ts} {$form->name}</a>
+    <a class="link-delete" href="#" onclick="delete_participant({$event_id}, {$participant_id}); return false;">{ts}Delete{/ts}</a>
   </fieldset>

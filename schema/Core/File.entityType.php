@@ -38,26 +38,21 @@ return [
       'input_type' => 'Text',
       'description' => ts('mime type of the document'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'uri' => [
       'title' => ts('Path'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
-      'description' => ts('uri of the file on disk'),
+      'description' => ts('Location of file on disk relative to $config.customFileUploadDir'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'document' => [
       'title' => ts('File Contents'),
       'sql_type' => 'mediumblob',
       'input_type' => NULL,
-      'description' => ts('contents of the document'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '1.5',
+      'deprecated' => TRUE,
     ],
     'description' => [
       'title' => ts('File Description'),
@@ -65,14 +60,14 @@ return [
       'input_type' => 'Text',
       'description' => ts('Additional descriptive text regarding this attachment (optional).'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'upload_date' => [
       'title' => ts('File Upload Date'),
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP',
       'description' => ts('Date and time that this attachment was uploaded or written to server.'),
       'add' => '1.5',
     ],
@@ -82,6 +77,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who uploaded this file'),
       'add' => '5.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],

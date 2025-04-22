@@ -1,0 +1,11 @@
+<div class="form-group">
+  <label>
+    {{:: ts('Allowed Actions') }}
+  </label>
+  <div class="checkbox-inline">
+    <label><input type="checkbox" ng-model="$ctrl.entity.actions.create">{{:: ts('Subscribe') }}</label>
+  </div>
+  <div class="checkbox-inline">
+    <label><input type="checkbox" ng-model="$ctrl.entity.actions.update">{{:: ts('Unsubscribe') }}</label>
+  </div>
+</div>

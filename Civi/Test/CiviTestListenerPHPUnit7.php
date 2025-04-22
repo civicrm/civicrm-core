@@ -60,7 +60,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
       $this->tx = NULL;
     }
 
-    if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+    if ($this->isCiviTest($test)) {
       \Civi\Test::eventChecker()->start($test);
     }
   }
@@ -68,7 +68,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
   public function endTest(\PHPUnit\Framework\Test $test, float $time): void {
     $exception = NULL;
 
-    if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+    if ($this->isCiviTest($test)) {
       try {
         \Civi\Test::eventChecker()->stop($test);
       }
@@ -87,6 +87,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
     \CRM_Utils_Time::resetTime();
     if ($this->isCiviTest($test)) {
       unset($GLOBALS['CIVICRM_TEST_CASE']);
+      unset($_SERVER['HTTP_X_REQUESTED_WITH']); /* Several tests neglect to clean this up... */
       error_reporting(E_ALL & ~E_NOTICE);
       $this->errorScope = NULL;
     }
@@ -126,7 +127,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
    * @return bool
    */
   protected function isCiviTest(\PHPUnit\Framework\Test $test) {
-    return $test instanceof HookInterface || $test instanceof HeadlessInterface;
+    return $test instanceof HookInterface || $test instanceof HeadlessInterface || $test instanceof \CiviUnitTestCase;
   }
 
   /**
@@ -250,20 +251,20 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
     foreach ($byInterface['HeadlessInterface'] as $className => $nonce) {
       $clazz = new \ReflectionClass($className);
       $docComment = str_replace("\r\n", "\n", $clazz->getDocComment());
-      if (strpos($docComment, "@group headless\n") === FALSE) {
+      if (!str_contains($docComment, "@group headless\n")) {
         echo "WARNING: Class $className implements HeadlessInterface. It should declare \"@group headless\".\n";
       }
-      if (strpos($docComment, "@group e2e\n") !== FALSE) {
+      if (str_contains($docComment, "@group e2e\n")) {
         echo "WARNING: Class $className implements HeadlessInterface. It should not declare \"@group e2e\".\n";
       }
     }
     foreach ($byInterface['EndToEndInterface'] as $className => $nonce) {
       $clazz = new \ReflectionClass($className);
       $docComment = str_replace("\r\n", "\n", $clazz->getDocComment());
-      if (strpos($docComment, "@group e2e\n") === FALSE) {
+      if (!str_contains($docComment, "@group e2e\n")) {
         echo "WARNING: Class $className implements EndToEndInterface. It should declare \"@group e2e\".\n";
       }
-      if (strpos($docComment, "@group headless\n") !== FALSE) {
+      if (str_contains($docComment, "@group headless\n")) {
         echo "WARNING: Class $className implements EndToEndInterface. It should not declare \"@group headless\".\n";
       }
     }

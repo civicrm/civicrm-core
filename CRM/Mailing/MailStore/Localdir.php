@@ -108,7 +108,7 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
       $mail = $parser->parseMail($set);
 
       if (!$mail) {
-        return CRM_Core_Error::createAPIError(ts('%1 could not be parsed',
+        throw new CRM_Core_Exception(ts('%1 could not be parsed',
           [1 => $file]
         ));
       }

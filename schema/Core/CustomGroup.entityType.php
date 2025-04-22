@@ -52,10 +52,8 @@ return [
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
       'description' => ts('Variable name/programmatic handle for this group.'),
+      'required' => TRUE,
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'title' => [
       'title' => ts('Custom Group Title'),
@@ -65,9 +63,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Friendly Name.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'extends' => [
       'title' => ts('Custom Group Extends'),
@@ -76,11 +71,9 @@ return [
       'description' => ts('Type of object this group extends (can add other options later e.g. contact_address, etc.).'),
       'add' => '1.1',
       'default' => 'Contact',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
+      'required' => TRUE,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions',
+        'callback' => ['CRM_Core_BAO_CustomGroup', 'getCustomGroupExtendsOptions'],
         'suffixes' => [
           'name',
           'label',
@@ -100,7 +93,7 @@ return [
         'control_field' => 'extends',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions',
+        'callback' => ['CRM_Core_BAO_CustomGroup', 'getExtendsEntityColumnIdOptions'],
         'suffixes' => [
           'name',
           'label',
@@ -117,10 +110,9 @@ return [
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
       'input_attrs' => [
         'control_field' => 'extends_entity_column_id',
-        'maxlength' => 255,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions',
+        'callback' => ['CRM_Core_BAO_CustomGroup', 'getExtendsEntityColumnValueOptions'],
       ],
     ],
     'style' => [
@@ -129,11 +121,10 @@ return [
       'input_type' => 'Select',
       'description' => ts('Visual relationship between this form and its parent.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 15,
-      ],
+      'required' => TRUE,
+      'default' => 'Inline',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::customGroupStyle',
+        'callback' => ['CRM_Core_SelectValues', 'customGroupStyle'],
       ],
     ],
     'collapse_display' => [
@@ -199,7 +190,6 @@ return [
       'add' => '2.0',
       'input_attrs' => [
         'label' => ts('Table Name'),
-        'maxlength' => 255,
       ],
     ],
     'is_multiple' => [
@@ -281,9 +271,6 @@ return [
       'description' => ts('crm-i icon class'),
       'add' => '5.28',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
   ],
 ];

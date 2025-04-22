@@ -144,6 +144,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     }
     $this->setTitle($title);
 
+    $findParticipants = ['statusCounted' => '', 'statusNotCounted' => ''];
     if (CRM_Core_Permission::check('view event participants') &&
       CRM_Core_Permission::check('view all contacts')
     ) {
@@ -151,15 +152,15 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
       $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
       $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
-      $this->assign('findParticipants', $findParticipants);
     }
+    $this->assign('findParticipants', $findParticipants);
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
 
     $this->assign('isRepeatingEntity', $this->_isRepeatingEvent);
 
     // CRM-16776 - show edit/copy/create buttons for Profiles if user has required permission.
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
     $ufCreate = CRM_ACL_API::group(CRM_Core_Permission::CREATE, NULL, 'civicrm_uf_group', $ufGroups);
     $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
     $checkPermission = [
@@ -396,9 +397,10 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   private function build() {
     $tabs = $this->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
-      $tabs = $this->processTab();
+      $tabs = $this->processTab() ?? [];
       $this->set('tabHeader', $tabs);
     }
+    $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
     $this->assign('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
@@ -429,22 +431,21 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     ];
 
     $tabs = [];
-    $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage'] + $default;
-    $tabs['location'] = ['title' => ts('Event Location')] + $default;
+    $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage', 'icon' => 'crm-i fa-circle-info'] + $default;
+    $tabs['location'] = ['title' => ts('Event Location'), 'icon' => 'crm-i fa-map-marker'] + $default;
     // If CiviContribute is active, create the Fees tab.
     if (CRM_Core_Component::isEnabled('CiviContribute')) {
-      $tabs['fee'] = ['title' => ts('Fees')] + $default;
+      $tabs['fee'] = ['title' => ts('Fees'), 'icon' => 'crm-i fa-money'] + $default;
     }
-    $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
+    $tabs['registration'] = ['title' => ts('Online Registration'), 'icon' => 'crm-i fa-check'] + $default;
     // @fixme I don't understand the event permissions check here - can we just get rid of it?
     $permissions = CRM_Event_BAO_Event::getAllPermissions();
     if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
-      $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
+      $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage', 'icon' => 'crm-i fa-envelope'] + $default;
     }
 
-    $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
-    $tabs['pcp'] = ['title' => ts('Personal Campaigns')] + $default;
-    $tabs['repeat'] = ['title' => ts('Repeat')] + $default;
+    $tabs['pcp'] = ['title' => ts('Personal Campaigns'), 'icon' => 'crm-i fa-user'] + $default;
+    $tabs['repeat'] = ['title' => ts('Repeat'), 'icon' => 'crm-i fa-repeat'] + $default;
 
     // Repeat tab must refresh page when switching repeat mode so js & vars will get set-up
     if (!$this->_isRepeatingEvent) {
@@ -481,9 +482,6 @@ WHERE      e.id = %1
       }
       if (!$dao->is_monetary) {
         $tabs['fee']['valid'] = FALSE;
-      }
-      if (!$dao->is_active) {
-        $tabs['friend']['valid'] = FALSE;
       }
       if (!$dao->is_pcp) {
         $tabs['pcp']['valid'] = FALSE;
@@ -549,8 +547,7 @@ WHERE      e.id = %1
         $link = "civicrm/event/manage/{$key}";
         $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
 
-        $tabs[$key]['link'] = (isset($value['link']) ? $value['link'] :
-          CRM_Utils_System::url($link, $query));
+        $tabs[$key]['link'] = $value['link'] ?? CRM_Utils_System::url($link, $query);
       }
     }
 

@@ -60,6 +60,19 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $entityReferenceFields = [];
 
   /**
+   * Are we restricting ourselves to a single contact
+   *
+   * @var bool
+   */
+  protected bool $_single = FALSE;
+
+  /**
+   * How many records should we return
+   * @var int|null
+   */
+  protected ?int $_limit = NULL;
+
+  /**
    * Builds the list of tasks or actions that a searcher can perform on a result set.
    *
    * To modify the task list, child classes should alter $this->_taskList,
@@ -290,7 +303,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   protected function getEntityDefaults($entity) {
     $defaults = [];
-    foreach (CRM_Utils_Array::value($entity, $this->getSearchFieldMetadata(), []) as $fieldName => $fieldSpec) {
+    foreach (($this->getSearchFieldMetadata()[$entity] ?? []) as $fieldName => $fieldSpec) {
       if (empty($_POST[$fieldName])) {
         $value = CRM_Utils_Request::retrieveValue($fieldName, $this->getValidationTypeForField($entity, $fieldName), NULL, NULL, 'GET');
         if ($value !== NULL) {
@@ -465,7 +478,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->searchFieldMetadata['Contact']['contact_type'] = CRM_Contact_DAO_Contact::fields()['contact_type'];
 
     if (CRM_Core_Permission::check('access deleted contacts') && Civi::settings()->get('contact_undelete')) {
-      $this->addElement('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));
+      $this->addElement('checkbox', 'deleted_contacts', ts('Search Deleted Contacts'));
       $this->searchFieldMetadata['Contact']['deleted_contacts'] = ['name' => 'deleted_contacts', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'html' => ['type' => 'Checkbox']];
     }
 

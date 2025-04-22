@@ -11,7 +11,7 @@ use Civi\Api4\Product;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\ContactTestTrait;
 use Civi\Test\Api3TestTrait;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +80,6 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
       'edit contributions of type Donation',
       'view all contacts',
     ]);
-    \Civi::settings()->set('acl_financial_type', TRUE);
     $this->createLoggedInUser();
   }
 

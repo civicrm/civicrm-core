@@ -309,6 +309,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreate(string $testEntityClass, array $createParams, string $expectedContent): void {
+    $this->useFrozenTime();
     $entity = CRM_Core_DAO::createTestObject($testEntityClass);
     $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);
     $this->assertIsNumeric($entity->id);
@@ -333,14 +334,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $getResult['count']);
     foreach (['id', 'entity_table', 'entity_id', 'url'] as $field) {
-      if ($field === 'url') {
-        $this->assertEquals(substr($createResult['values'][$fileId][$field], 0, -15), substr($getResult['values'][$fileId][$field], 0, -15));
-        $this->assertEquals(substr($createResult['values'][$fileId][$field], -3), substr($getResult['values'][$fileId][$field], -3));
-        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult['values'][$fileId][$field], -14, 10), 2);
-      }
-      else {
-        $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
-      }
+      $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
     }
     $this->assertNotTrue(isset($getResult['values'][$fileId]['content']));
 
@@ -352,14 +346,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertEquals($expectedContent, $getResult2['values'][$fileId]['content']);
     // Do this again even though we just tested above to demonstrate that these fields should be returned even if you only ask to return 'content'.
     foreach (['id', 'entity_table', 'entity_id', 'url'] as $field) {
-      if ($field === 'url') {
-        $this->assertEquals(substr($createResult['values'][$fileId][$field], 0, -15), substr($getResult2['values'][$fileId][$field], 0, -15));
-        $this->assertEquals(substr($createResult['values'][$fileId][$field], -3), substr($getResult2['values'][$fileId][$field], -3));
-        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult2['values'][$fileId][$field], -14, 10), 2);
-      }
-      else {
-        $this->assertEquals($createResult['values'][$fileId][$field], $getResult2['values'][$fileId][$field], "Expect field $field to match");
-      }
+      $this->assertEquals($createResult['values'][$fileId][$field], $getResult2['values'][$fileId][$field], "Expect field $field to match");
     }
   }
 
@@ -532,7 +519,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       $queryResult = [];
       $parsedURl = parse_url($result['url']);
       parse_str($parsedURl['query'], $queryResult);
-      $this->assertTrue(CRM_Core_BAO_File::validateFileHash($queryResult['fcs'], $queryResult['eid'], $queryResult['id']));
+      $this->assertTrue(CRM_Core_BAO_File::validateFileHash($queryResult['fcs'], NULL, $queryResult['id']));
     }
 
     sort($actualNames);
@@ -703,11 +690,11 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   protected function cleanupFiles(): void {
     $config = CRM_Core_Config::singleton();
     $dirs = [
-      sys_get_temp_dir(),
+      sys_get_temp_dir() . DIRECTORY_SEPARATOR,
       $config->customFileUploadDir,
     ];
     foreach ($dirs as $dir) {
-      $files = (array) glob($dir . '/' . self::getFilePrefix() . '*');
+      $files = (array) glob($dir . self::getFilePrefix() . '*');
       foreach ($files as $file) {
         unlink($file);
       }

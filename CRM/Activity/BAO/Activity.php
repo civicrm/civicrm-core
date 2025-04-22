@@ -285,13 +285,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
     }
 
-    // Set priority to Normal for Auto-populated activities (for Cases)
-    if (!isset($params['priority_id']) &&
-      // if not set and not 0
-      empty($params['id'])
-    ) {
-      $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
-      $params['priority_id'] = array_search('Normal', $priority);
+    // Set the default priority for Auto-populated activities (for Cases)
+    if (!isset($params['priority_id']) && empty($params['id'])) {
+      $params['priority_id'] = CRM_Core_OptionGroup::getDefaultValue('priority');
     }
 
     if (!empty($params['target_contact_id']) && is_array($params['target_contact_id'])) {
@@ -723,12 +719,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           }
         }
       }
-      // if deleted, wrap in <del>
-      if (!empty($activity['source_contact_id']) &&
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $activity['source_contact_id'], 'is_deleted')
-      ) {
-        $activities[$id]['source_contact_name'] = sprintf("<del>%s<del>", $activity['source_contact_name']);
-      }
       $activities[$id]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getParentFor($id, 'civicrm_activity');
     }
 
@@ -804,7 +794,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     $permittedActivityTypeIDs = self::getPermittedActivityTypes();
     if (!empty($conditions['activity_type_id'])) {
@@ -1282,6 +1272,7 @@ WHERE entity_id =%1 AND entity_table = %2";
    * @param int $activityID
    *   The activity ID that tracks the message.
    * @param int $sourceContactID
+   * @param int|null $entityID
    *
    * @return bool true on success
    * @throws CRM_Core_Exception
@@ -1291,7 +1282,8 @@ WHERE entity_id =%1 AND entity_table = %2";
     &$tokenText,
     $smsProviderParams,
     $activityID,
-    $sourceContactID = NULL
+    $sourceContactID = NULL,
+    $entityID = NULL
   ) {
     $toPhoneNumber = NULL;
     if ($smsProviderParams['To']) {
@@ -1319,6 +1311,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     $recipient = $toPhoneNumber;
     $smsProviderParams['contact_id'] = $toID;
     $smsProviderParams['parent_activity_id'] = $activityID;
+    $smsProviderParams['entity_id'] = $entityID;
 
     $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $smsProviderParams['provider_id']]);
     $sendResult = $providerObj->send($recipient, $smsProviderParams, $tokenText, NULL, $sourceContactID);
@@ -2337,11 +2330,11 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
         $activity['DT_RowAttr']['data-entity'] = 'activity';
         $activity['DT_RowAttr']['data-id'] = $activityId;
 
-        $activity['activity_type'] = (!empty($activityIcons[$values['activity_type_id']]) ? '<span class="crm-i ' . $activityIcons[$values['activity_type_id']] . '" aria-hidden="true"></span> ' : '') . $values['activity_type'];
+        $activity['activity_type'] = (!empty($activityIcons[$values['activity_type_id']]) ? '<span class="crm-i ' . $activityIcons[$values['activity_type_id']] . '" aria-hidden="true"></span> ' : '') . htmlentities($values['activity_type']);
         $activity['subject'] = $values['subject'];
 
         if ($params['contact_id'] == $values['source_contact_id']) {
-          $activity['source_contact_name'] = $values['source_contact_name'];
+          $activity['source_contact_name'] = htmlentities($values['source_contact_name']);
         }
         elseif ($values['source_contact_id']) {
           $srcTypeImage = "";
@@ -2351,7 +2344,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
               FALSE,
               $values['source_contact_id']);
           }
-          $activity['source_contact_name'] = $srcTypeImage . CRM_Utils_System::href($values['source_contact_name'],
+          $activity['source_contact_name'] = $srcTypeImage . CRM_Utils_System::href(htmlentities($values['source_contact_name']),
               'civicrm/contact/view', "reset=1&cid={$values['source_contact_id']}");
         }
         else {
@@ -2373,7 +2366,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
 
           // The first target may not be accessable to the logged in user dev/core#1052
           if ($firstTargetName) {
-            $targetLink = CRM_Utils_System::href($firstTargetName, 'civicrm/contact/view', "reset=1&cid={$firstTargetContactID}");
+            $targetLink = CRM_Utils_System::href(htmlentities($firstTargetName), 'civicrm/contact/view', "reset=1&cid={$firstTargetContactID}");
             if ($showContactOverlay) {
               $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
                 CRM_Contact_BAO_Contact::getContactType($firstTargetContactID),
@@ -2407,7 +2400,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
           foreach ($values['assignee_contact_name'] as $acID => $acName) {
             if ($acID && $count < 5) {
               $assigneeTypeImage = "";
-              $assigneeLink = CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
+              $assigneeLink = CRM_Utils_System::href(htmlentities($acName), 'civicrm/contact/view', "reset=1&cid={$acID}");
               if ($showContactOverlay) {
                 $assigneeTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
                   CRM_Contact_BAO_Contact::getContactType($acID),
@@ -2728,7 +2721,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
    *   Id of the activity.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
+  public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     $default = parent::getEntityIcon($entityName);
     if (!$entityId) {
       return $default;

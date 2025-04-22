@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Token\TokenProcessor;
 
@@ -128,15 +129,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
       }
     }
 
-    if (isset($params['preferred_communication_method']) && is_array($params['preferred_communication_method'])) {
-      if (!empty($params['preferred_communication_method']) && empty($params['preferred_communication_method'][0])) {
-        CRM_Core_Error::deprecatedWarning(' Form layer formatting should never get to the BAO');
-        CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
-        $contact->preferred_communication_method = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
-        unset($params['preferred_communication_method']);
-      }
-    }
-
     $defaults = ['source' => $params['contact_source'] ?? NULL];
     if ($params['contact_type'] === 'Organization' && isset($params['organization_name'])) {
       $defaults['display_name'] = $params['organization_name'];
@@ -190,7 +182,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
     // Fixed in 1.5 by making hash optional, only do this in create mode, not update.
     if ((!isset($contact->hash) || !$contact->hash) && !$contact->id) {
       $allNull = FALSE;
-      $contact->hash = md5(uniqid(rand(), TRUE));
+      $contact->hash = bin2hex(random_bytes(16));
     }
 
     // Even if we don't need $employerId, it's important to call getFieldValue() before
@@ -837,6 +829,20 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
+   * Get the CMS user id
+   *
+   * @param int $contactId
+   * @return int
+   */
+  private static function getUFId(int $contactId): int {
+    // Note: we're not using CRM_Core_BAO_UFMatch::getUFId() because that's cached.
+    $ufmatch = new CRM_Core_DAO_UFMatch();
+    $ufmatch->contact_id = $contactId;
+    $ufmatch->domain_id = CRM_Core_Config::domainID();
+    return $ufmatch->find(TRUE) ? $ufmatch->uf_id : 0;
+  }
+
+  /**
    * Delete a contact and all its associated records.
    *
    * @param int $id
@@ -889,15 +895,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       return FALSE;
     }
 
-    // Note: we're not using CRM_Core_BAO_UFMatch::getUFId() because that's cached.
-    $ufmatch = new CRM_Core_DAO_UFMatch();
-    $ufmatch->contact_id = $id;
-    $ufmatch->domain_id = CRM_Core_Config::domainID();
-    if ($ufmatch->find(TRUE)) {
-      // Do not permit a contact to be deleted if it is linked to a site user.
-      return FALSE;
-    }
-
     $contactType = $contact->contact_type;
     if ($restore) {
       // @todo deprecate calling contactDelete with the intention to restore.
@@ -913,8 +910,19 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $transaction = new CRM_Core_Transaction();
 
     if ($skipUndelete) {
-      $hookParams = ['check_permissions' => $checkPermissions];
+      $hookParams = [
+        'check_permissions' => $checkPermissions,
+        'uf_id' => self::getUFId($id),
+      ];
+
+      // Hook might delete the CMS user
       CRM_Utils_Hook::pre('delete', $contactType, $id, $hookParams);
+
+      // Do not permit a contact to be deleted if it is (still) linked to a site user.
+      if ($hookParams['uf_id'] && self::getUFId($id)) {
+        $transaction->rollback();
+        return FALSE;
+      }
 
       //delete billing address if exists.
       CRM_Contribute_BAO_Contribution::deleteAddress(NULL, $id);
@@ -952,6 +960,9 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $contact->delete();
     }
     else {
+      if (self::getUFId($id)) {
+        return FALSE;
+      }
       self::contactTrash($contact);
     }
     // currently we only clear employer cache.
@@ -1660,7 +1671,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     $multipleFields = ['website' => 'url'];
     foreach ($fields as $name => $dontCare) {
-      if (strpos($name, '-') !== FALSE) {
+      if (str_contains($name, '-')) {
         [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $name, 3);
 
         if (!in_array($fieldName, $multipleFields)) {
@@ -2167,16 +2178,29 @@ ORDER BY civicrm_email.is_primary DESC";
           }
         }
         elseif ($fieldName == 'email') {
+          // This bit of code ensures is_primary is set.
+          // It probably dates back to when the BAO
+          // could not be relied upon to manage
+          // that at least one email had is_primary
+          // & would ideally be removed.
           $data['email'][$loc]['email'] = $value;
           if (empty($contactID)) {
-            $data['email'][$loc]['is_primary'] = 1;
+            $hasPrimary = FALSE;
+            foreach ($data['email'] ?? [] as $email) {
+              if (!empty($email['is_primary'])) {
+                $hasPrimary = TRUE;
+              }
+            }
+            if (!$hasPrimary) {
+              $data['email'][$loc]['is_primary'] = 1;
+            }
           }
         }
         elseif ($fieldName == 'im') {
           if (isset($params[$key . '-provider_id'])) {
             $data['im'][$loc]['provider_id'] = $params[$key . '-provider_id'];
           }
-          if (strpos($key, '-provider_id') !== FALSE) {
+          if (str_contains($key, '-provider_id')) {
             $data['im'][$loc]['provider_id'] = $params[$key];
           }
           else {
@@ -2689,6 +2713,9 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       'postal_greeting_display' => self::getTemplateForGreeting('postal_greeting', $contact),
       'addressee_display' => self::getTemplateForGreeting('addressee', $contact),
     ]);
+    if (empty($greetings)) {
+      return;
+    }
     // A DAO fetch here is more efficient than looking up
     // values in the token processor - this may be substantially improved by
     // https://github.com/civicrm/civicrm-core/pull/24294 and
@@ -2989,6 +3016,20 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       ];
     }
 
+    if (CRM_Core_Permission::check('delete contacts')) {
+      $menu['otherActions']['delete'] = [
+        'title' => ts('Delete'),
+        'description' => ts('Delete Contact'),
+        'weight' => 90,
+        'ref' => 'crm-contact-delete',
+        'key' => 'delete',
+        'tab' => 'delete',
+        'class' => 'delete',
+        'href' => CRM_Utils_System::url('civicrm/contact/view/delete', "reset=1&delete=1&id=$contactId"),
+        'icon' => 'crm-i fa-trash',
+      ];
+    }
+
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactId);
     if ($uid) {
       $menu['otherActions']['user-record'] = [
@@ -3046,9 +3087,9 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         if (in_array($values['ref'], ['view-contact', 'edit-contact'])) {
           $contextMenu['primaryActions'][$key] = [
             'title' => $values['title'],
-            'ref' => $values['ref'],
+            'ref' => $values['ref'] ?? $key,
             'class' => $values['class'] ?? NULL,
-            'key' => $values['key'],
+            'key' => $values['key'] ?? $key,
             'weight' => $values['weight'],
           ];
           continue;
@@ -3062,11 +3103,11 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         }
         $contextMenu['moreActions'][$values['weight']] = [
           'title' => $values['title'],
-          'ref' => $values['ref'],
+          'ref' => $values['ref'] ?? $key,
           'href' => $values['href'] ?? NULL,
           'tab' => $values['tab'] ?? NULL,
           'class' => $values['class'] ?? NULL,
-          'key' => $values['key'],
+          'key' => $values['key'] ?? $key,
           'weight' => $values['weight'],
         ];
       }
@@ -3085,12 +3126,12 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
           }
           $contextMenu['otherActions'][$value['weight']] = [
             'title' => $value['title'],
-            'ref' => $value['ref'],
+            'ref' => $value['ref'] ?? $key,
             'href' => $value['href'] ?? NULL,
             'tab' => $value['tab'] ?? NULL,
             'class' => $value['class'] ?? NULL,
             'icon' => $value['icon'] ?? NULL,
-            'key' => $value['key'],
+            'key' => $value['key'] ?? $key,
             'weight' => $value['weight'],
           ];
         }
@@ -3281,33 +3322,13 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   }
 
   /**
-   * Get options for a given contact field.
+   * Legacy option getter
    *
-   * @param string $fieldName
-   * @param string $context
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
-   * TODO: In context of chainselect, what to return if e.g. a country has no states?
-   *
-   * @see CRM_Core_DAO::buildOptionsContext
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
-      case 'contact_sub_type':
-        if (!empty($props['contact_type'])) {
-          $params['condition'] = CRM_Core_DAO::composeQuery('parent_id = (SELECT id FROM civicrm_contact_type WHERE name = %1)', [
-            1 => [$props['contact_type'], 'String'],
-          ]);
-        }
-        break;
-
       case 'contact_type':
         if ($context == 'search') {
           // CRM-15495 - EntityRef filters and basic search forms expect this format
@@ -3337,7 +3358,17 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
         return CRM_Core_BAO_Address::buildOptions($fieldName, 'get', $props);
 
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * Pseudoconstant condition_provider for contact_sub_type field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterContactSubType(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (!empty($params['values']['contact_type'])) {
+      $conditions->where('parent_id = (SELECT id FROM civicrm_contact_type WHERE name = @contactSubType)', ['contactSubType' => $params['values']['contact_type']]);
+    }
   }
 
   /**
@@ -3398,7 +3429,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     // We always return an array with these keys, even if they are empty,
     // because this tells the query builder that we have considered these fields for acls
     $clauses = [
@@ -3450,16 +3481,33 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       'ids' => [],
       'handled' => FALSE,
     ];
-    CRM_Utils_Hook::findDuplicates($dedupeParams, $dedupeResults, $contextParams);
-    if (!$dedupeResults['handled']) {
-      $dedupeParams += [
-        'contact_type' => NULL,
-        'rule' => NULL,
-        'rule_group_id' => NULL,
-        'excluded_contact_ids' => [],
-      ];
-      $dedupeResults['ids'] = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $dedupeParams['contact_type'], $dedupeParams['rule'], $dedupeParams['excluded_contact_ids'], $dedupeParams['rule_group_id']);
+    $checkPermission = $dedupeParams['check_permission'] ?? TRUE;
+    // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
+    $dedupeParams = array_filter($dedupeParams);
+    if (empty($dedupeParams)) {
+      // If $params is empty there is zero reason to proceed.
+      return [];
     }
+    if (empty($dedupeParams['rule_group_id'])) {
+      $dedupeParams['rule_group_id'] = DedupeRuleGroup::get(FALSE)
+        ->addWhere('contact_type', '=', $dedupeParams['contact_type'])
+        ->addWhere('used', '=', $dedupeParams['rule'])
+        ->addSelect('id')
+        ->execute()->first()['id'];
+    }
+    $nonMatchFields = ['contact_type', 'rule', 'excluded_contact_ids', 'rule_group_id', 'check_permission'];
+    $matchParams = $dedupeParams['match_params'] ?? array_diff_key($dedupeParams, array_fill_keys($nonMatchFields, TRUE));
+    // Although dedupe_params is a += that is not because it might have additional data but
+    // rather because the legacy array was less nested (ie everything in match_params was at the top level).
+    $dedupeParams += [
+      'contact_type' => NULL,
+      'rule' => NULL,
+      'excluded_contact_ids' => [],
+      'check_permission' => (bool) $checkPermission,
+      'match_params' => $matchParams,
+    ];
+    $dedupeParams += $dedupeParams['match_params'];
+    CRM_Utils_Hook::findDuplicates($dedupeParams, $dedupeResults, $contextParams);
     return $dedupeResults['ids'] ?? [];
   }
 
@@ -3619,11 +3667,11 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    *
    * @param string $entityName
    *   Always "Contact".
-   * @param int $entityId
+   * @param int|null $entityId
    *   Id of the contact.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
+  public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     $default = parent::getEntityIcon($entityName);
     if (!$entityId) {
       return $default;

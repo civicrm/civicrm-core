@@ -9,7 +9,6 @@ use Civi\Api4\Afform;
  * @group headless
  */
 class AfformPrefillUsageTest extends AfformUsageTestCase {
-  use \Civi\Test\Api4TestTrait;
 
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
@@ -22,6 +21,7 @@ class AfformPrefillUsageTest extends AfformUsageTestCase {
     <div class="af-container">
       <af-field name="id"></af-field>
       <af-field name="preferred_communication_method"></af-field>
+      <af-field name="sort_name"></af-field>
       <afblock-name-individual></afblock-name-individual>
     </div>
     <div af-join="Email" af-repeat="Add" af-copy="Copy" min="1">
@@ -60,6 +60,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');
@@ -67,9 +68,12 @@ EOHTML;
     // Form entity has `max="3"`
     $this->assertCount(3, $prefill['Individual1']['values']);
     $this->assertEquals('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('_A, A', $prefill['Individual1']['values'][0]['fields']['sort_name']);
     $this->assertEquals([1, 3], $prefill['Individual1']['values'][0]['fields']['preferred_communication_method']);
     $this->assertEquals('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertEquals('_B, B', $prefill['Individual1']['values'][1]['fields']['sort_name']);
     $this->assertEquals('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
+    $this->assertEquals('_C, C', $prefill['Individual1']['values'][2]['fields']['sort_name']);
 
     // One email should have been filled
     $this->assertCount(1, $prefill['Individual1']['values'][1]['joins']['Email']);
@@ -87,6 +91,7 @@ EOHTML;
     // Prefill a specific contact for the af-repeat entity
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => [1 => $cid[3]]])
       ->execute()
       ->indexBy('name');
@@ -99,9 +104,87 @@ EOHTML;
     // Form entity has `max="3"` so a forth contact (index 3) is out-of-bounds
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => [3 => $cid[0]]])
       ->execute();
     $this->assertTrue(empty($prefill['Individual1']['values']));
+  }
+
+  /**
+   * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
+   */
+  public function testPrefillByLocationType(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1" af-repeat="Add" min="1" max="3">
+    <div class="af-container">
+      <af-field name="id"></af-field>
+      <af-field name="preferred_communication_method"></af-field>
+      <afblock-name-individual></afblock-name-individual>
+    </div>
+    <div af-join="Email" data="{location_type_id: 1}">
+      <afblock-contact-email></afblock-contact-email>
+    </div>
+    <div af-join="Email" data="{location_type_id: 2}">
+      <afblock-contact-email></afblock-contact-email>
+    </div>
+  </fieldset>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $cid = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => '_A'],
+        ['first_name' => 'B', 'last_name' => '_B'],
+        ['first_name' => 'C', 'last_name' => '_C'],
+        ['first_name' => 'D', 'last_name' => '_D'],
+      ],
+    ])->column('id');
+
+    $this->saveTestRecords('email', [
+      'records' => [
+        ['contact_id' => $cid[0], 'email' => 'a2@test.com', 'location_type_id' => 2],
+        ['contact_id' => $cid[0], 'email' => 'a1@test.com', 'location_type_id' => 1],
+        // Wrong location type
+        ['contact_id' => $cid[1], 'email' => 'b3@test.com', 'location_type_id' => 3],
+        ['contact_id' => $cid[2], 'email' => 'c2@test.com', 'location_type_id' => 2],
+        // Wrong contact
+        ['contact_id' => $cid[3], 'email' => 'd1@test.com', 'location_type_id' => 1],
+      ],
+    ]);
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('entity')
+      ->setArgs(['Individual1' => $cid])
+      ->execute()
+      ->indexBy('name');
+
+    // Form entity has `max="3"`
+    $this->assertCount(3, $prefill['Individual1']['values']);
+    $this->assertEquals('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertEquals('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
+
+    // Emails should have been filled for A & C
+    $this->assertCount(2, $prefill['Individual1']['values'][0]['joins']['Email']);
+    $this->assertCount(2, $prefill['Individual1']['values'][1]['joins']['Email']);
+    $this->assertCount(2, $prefill['Individual1']['values'][2]['joins']['Email']);
+    // 2 Emails for contact 0
+    $this->assertEquals('a1@test.com', $prefill['Individual1']['values'][0]['joins']['Email'][0]['email']);
+    $this->assertEquals('a2@test.com', $prefill['Individual1']['values'][0]['joins']['Email'][1]['email']);
+    // 0 Emails for contact 1
+    $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Email'][0]);
+    $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Email'][1]);
+    // 1 Email for contact 2
+    $this->assertEmpty($prefill['Individual1']['values'][2]['joins']['Email'][0]);
+    $this->assertEquals('c2@test.com', $prefill['Individual1']['values'][2]['joins']['Email'][1]['email']);
   }
 
   public function testPrefillByRelationship(): void {
@@ -150,6 +233,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('form')
       ->execute()
       ->indexBy('name');
 
@@ -208,6 +292,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');

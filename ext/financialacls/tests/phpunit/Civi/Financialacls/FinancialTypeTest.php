@@ -2,7 +2,6 @@
 
 namespace Civi\Financialacls;
 
-use Civi;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -21,7 +20,6 @@ class FinancialTypeTest extends BaseTestClass {
    * financial type.
    */
   public function testChangeFinancialTypeName(): void {
-    Civi::settings()->set('acl_financial_type', TRUE);
     $type = $this->callAPISuccess('FinancialType', 'create', [
       'name' => 'my test',
     ]);
@@ -31,7 +29,7 @@ class FinancialTypeTest extends BaseTestClass {
     ]);
     $statusMessages = CRM_Core_Session::singleton()->getStatus(TRUE);
     $financialTypeMessages = array_filter($statusMessages, function ($msg) {
-        return strpos($msg['text'], 'Changing the name of a Financial Type') === 0;
+        return str_starts_with($msg['text'], 'Changing the name of a Financial Type');
     });
     $this->assertEquals(1, count($financialTypeMessages));
   }
@@ -40,7 +38,6 @@ class FinancialTypeTest extends BaseTestClass {
    * Check method testPermissionedFinancialTypes()
    */
   public function testPermissionedFinancialTypes(): void {
-    Civi::settings()->set('acl_financial_type', TRUE);
     $permissions = \CRM_Core_Permission::basicPermissions(FALSE, TRUE);
     $actions = [
       'add' => ts('add'),
@@ -49,7 +46,7 @@ class FinancialTypeTest extends BaseTestClass {
       'delete' => ts('delete'),
     ];
     $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate');
-    foreach ($financialTypes as $id => $type) {
+    foreach ($financialTypes as $type) {
       foreach ($actions as $action => $action_ts) {
         $this->assertEquals(
           [
@@ -58,6 +55,8 @@ class FinancialTypeTest extends BaseTestClass {
               2 => $type,
             ]),
             'description' => ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+            'implied_by' => [ts('%1 contributions of all types', [1 => $action_ts])],
+            'parent' => $action_ts . ' contributions of all types',
           ],
           $permissions[$action . ' contributions of type ' . $type]
         );
@@ -135,7 +134,6 @@ class FinancialTypeTest extends BaseTestClass {
     ];
 
     $contribution = $this->callAPISuccess('Order', 'create', $contributionParams);
-    Civi::settings()->set('acl_financial_type', TRUE);
 
     $this->setPermissions([
       'view contributions of type Member Dues',

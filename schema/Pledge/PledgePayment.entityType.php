@@ -107,15 +107,13 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'scheduled_date' => [
@@ -174,7 +172,8 @@ return [
         'duplicate_matching',
       ],
       'pseudoconstant' => [
-        'option_group_name' => 'contribution_status',
+        'option_group_name' => 'pledge_status',
+        'condition_provider' => ['CRM_Pledge_BAO_PledgePayment', 'alterStatus'],
       ],
     ],
   ],

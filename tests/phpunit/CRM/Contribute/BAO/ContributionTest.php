@@ -31,6 +31,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->disableFinancialACLs();
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_campaign']);
     parent::tearDown();
   }
 
@@ -228,7 +229,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
     $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
-    $this->assertStringContainsString('b.financial_type_id IN (' . $permittedFinancialType . ')', $sql);
+    $this->assertStringContainsString('`b`.`financial_type_id` IN (' . $permittedFinancialType . ')', $sql);
 
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
@@ -260,8 +261,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
     $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
-    $this->assertStringContainsString('WHERE b.id NOT IN (0)', $sql);
+    $this->assertStringContainsString('`b`.`id` NOT IN (0)', $sql);
     $this->assertStringNotContainsString('b.financial_type_id', $sql);
+    $this->assertStringNotContainsString('`b`.`financial_type_id`', $sql);
     CRM_Core_DAO::executeQuery($sql);
   }
 
@@ -275,7 +277,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     if ($entity !== 'Contribution') {
       return;
     }
-    $clauses['id'] = 'NOT IN (0)';
+    $clauses['id'] = ['NOT IN (0)'];
   }
 
   /**
@@ -334,7 +336,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'min_contribution' => 100,
       'is_active' => 1,
     ];
-    $premium = CRM_Contribute_BAO_Product::create($params);
+    $premium = CRM_Contribute_BAO_Product::writeRecord($params);
 
     $this->assertEquals('TEST Premium', $premium->name, 'Check for premium  name.');
 
@@ -968,15 +970,13 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $financialType = $this->createFinancialType();
     $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
     /** @var CRM_Contribute_Form_Contribution $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => $params['total_amount'],
       'financial_type_id' => $financialType['id'],
       'contact_id' => $contactId,
       'contribution_status_id' => $isCompleted ? 1 : 2,
       'price_set_id' => 0,
-    ]);
-    $form->buildForm();
-    $form->postProcess();
+    ])->processForm();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contact_id' => $contactId,
