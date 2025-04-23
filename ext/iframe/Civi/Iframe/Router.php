@@ -79,7 +79,7 @@ class Router extends AutoService {
       $pageContent = $printedContent;
     }
 
-    $printPage = $params['printPage'] ?? 'print';
+    $printPage = $params['printPage'] ?? '\Civi\Iframe\Router::print';
     $printPage($pageContent);
   }
 
@@ -113,7 +113,7 @@ class Router extends AutoService {
       'body' => $pageContent,
     ]);
 
-    $printPage = $params['printPage'] ?? 'print';
+    $printPage = $params['printPage'] ?? '\Civi\Iframe\Router::print';
     $printPage($fullPage);
   }
 
@@ -145,6 +145,14 @@ class Router extends AutoService {
       default:
         throw new \CRM_Core_Exception("Unimplemented: invokeCms(" . CIVICRM_UF . ")");
     }
+  }
+
+  /**
+   * Wrapper around print because we cannot call lagnuage constructs using a
+   * variable name
+   */
+  protected static function print(string $html):void {
+    echo $html;
   }
 
 }
