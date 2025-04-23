@@ -783,12 +783,25 @@ class CRM_Utils_Date {
   /**
    * Get the regex to extract the time portion.
    *
+   * This is accessed when importing date fields from CSV files.
+   *
+   * The time could be in ISO8601 or just hyphen separated (preceded by a space)
+   * - ie
+   *
+   * T13:15:30-01:00
+   * T13:15:30+01:00
+   * T13:15:30Z
+   *  13:15:30
+   *
+   *
+   * @see https://www.w3.org/TR/NOTE-datetime
+   *
    * @internal
    *
    * @return string
    */
   protected static function getTimeRegex(): string {
-    return "/(\s(([01]*\d)|[2][0-3])(:([0-5]\d)){1,2})$/";
+    return "/([T\s](([01]*\d)|[2][0-3])(:([0-5]\d)){1,2}([+|-]\d{2}:\d{2}|Z)?)$/";
   }
 
   /**
