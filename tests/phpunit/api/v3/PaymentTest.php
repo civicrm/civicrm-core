@@ -1355,4 +1355,34 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     Civi::settings()->set('always_post_to_accounts_receivable', 0);
   }
 
+  /**
+   * Payment.create with a fee_amount and 1 line item should create 2 financial_trxn records, one for the fee amount.
+   */
+  public function testFeeAmountTrxn(): void {
+    $this->_apiversion = 4;
+    $contributionID = $this->contributionCreate([
+      'contact_id'             => $this->individualCreate(),
+      'total_amount'           => 110,
+      'contribution_status_id' => 'Pending',
+      'receive_date'           => date('Y-m-d H:i:s'),
+      'fee_amount' => 0,
+      'financial_type_id' => 1,
+      'is_pay_later' => 1,
+    ]);
+    $trxnID = 'abcd121212';
+    $this->callAPISuccess('Payment', 'create', [
+      'total_amount' => 100,
+      'order_id'     => $contributionID,
+      'trxn_date'    => date('Y-m-d H:i:s'),
+      'trxn_id'      => $trxnID,
+      'fee_amount' => .2,
+    ]);
+    $trxns = \Civi\Api4\FinancialTrxn::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('trxn_id', '=', $trxnID)
+      ->execute();
+    $this->assertCount(2, $trxns);
+    Civi::settings()->set('always_post_to_accounts_receivable', 0);
+  }
+
 }
