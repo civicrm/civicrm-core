@@ -76,6 +76,13 @@ class CRM_Utils_Cache_CacheWrapper implements CRM_Utils_Cache_Interface {
     return $this->delegate->clear();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    return $this->delegate->garbageCollection();
+  }
+
   public function has($key) {
     return $this->delegate->has($key);
   }

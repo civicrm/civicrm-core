@@ -87,4 +87,11 @@ interface CRM_Utils_Cache_Interface extends \Psr\SimpleCache\CacheInterface {
    */
   public function has($key);
 
+  /**
+   * Performs garbage collection on a cache. Removing expired items.
+   *
+   * @return bool
+   */
+  public function garbageCollection();
+
 }

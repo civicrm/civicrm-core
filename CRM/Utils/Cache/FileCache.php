@@ -226,6 +226,28 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    $files = \CRM_Utils_File::findFiles($this->getCacheDir(), '*.txt', TRUE);
+    foreach ($files as $filename) {
+      $path = $this->getCacheDir() . '/' . $filename;
+      if (!is_file($path)) {
+        continue;
+      }
+      $cache = $this->getContents($path);
+      if (isset($cache)) {
+        $item = CRM_Core_BAO_Cache::decode($cache);
+        if ($item['expires'] < CRM_Utils_Time::time()) {
+          if (@unlink($path)) {
+            clearstatcache(FALSE, $path);
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Prefetch
    */
   public function prefetch() {

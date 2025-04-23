@@ -192,9 +192,14 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     }
 
     if ($expired) {
+      $cache = CRM_Utils_Cache::singleton();
+      $result = $cache->garbageCollection();
+
+      // The default cache driver is ArrayCache. The SqlGroup cache driver won't
+      // be instantiated so still need to check the db cache for expired items.
       $sql = "DELETE FROM civicrm_cache WHERE expired_date < %1";
       $params = [
-        1 => [date(CRM_Utils_Cache_SqlGroup::TS_FMT, CRM_Utils_Time::getTimeRaw()), 'String'],
+        1 => [date(CRM_Utils_Cache_SqlGroup::TS_FMT, CRM_Utils_Time::time()), 'String'],
       ];
       CRM_Core_DAO::executeQuery($sql, $params);
     }
