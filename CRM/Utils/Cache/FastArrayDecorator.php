@@ -118,7 +118,7 @@ class CRM_Utils_Cache_FastArrayDecorator implements CRM_Utils_Cache_Interface {
    * {@inheritdoc}
    */
   public function garbageCollection() {
-    return $this->clear();
+    return $this->delegate->garbageCollection();
   }
 
   public function has($key) {
