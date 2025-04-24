@@ -16,6 +16,15 @@ class Iframe extends AutoService implements EventSubscriberInterface {
   }
 
   /**
+   * Is there a driver that supports IFRAMEs for this environment?
+   *
+   * @return bool
+   */
+  public function isSupported(): bool {
+    return CIVICRM_UF === 'WordPress' || class_exists($this->getTemplate());
+  }
+
+  /**
    * Determine which template to use for the iframe entry-point.
    *
    * @return string
