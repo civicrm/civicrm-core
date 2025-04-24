@@ -22,7 +22,9 @@ class CRM_Iframe_IframeTest extends \PHPUnit\Framework\TestCase implements EndTo
       $this->markTestSkipped('iframe extension does not support activation in this environment');
     }
 
-    \Civi\Api4\Iframe::installScript()->setCheckPermissions(FALSE)->execute();
+    if (CIVICRM_UF !== 'WordPress') {
+      \Civi\Api4\Iframe::installScript()->setCheckPermissions(FALSE)->execute();
+    }
 
     $eventId = CRM_Core_DAO::singleValueQuery('SELECT min(id) FROM civicrm_event');
     $this->assertTrue(is_numeric($eventId), 'Database should have at least one event');
