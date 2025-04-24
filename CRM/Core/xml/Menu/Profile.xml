@@ -16,9 +16,4 @@
      <is_public>true</is_public>
      <weight>0</weight>
   </item>
-  <item>
-     <path>civicrm/profile/view</path>
-     <page_callback>CRM_Profile_Page_View</page_callback>
-     <is_public>true</is_public>
-  </item>
 </menu>

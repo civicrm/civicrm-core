@@ -275,7 +275,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $defaults['add_cancel_button'] = 1;
       $defaults['is_active'] = 1;
       $defaults['is_map'] = 0;
-      $defaults['is_update_dupe'] = 0;
+      $defaults['is_update_dupe'] = 2;
       $defaults['is_proximity_search'] = 0;
     }
     // Don't assign showHide elements to template in DELETE mode (fields to be shown and hidden don't exist)

@@ -46,7 +46,7 @@
 {/htxt}
 
 {htxt id="id-search-views-title"}
-{ts}Views For Display Contacts{/ts}
+{ts}Display Columns{/ts}
 {/htxt}
 {htxt id="id-search-views"}
     <p>{ts}If you are displaying the search results as contacts, you can modify the columns displayed by creating a Profile containing a different set of contact fields and then selecting that Profile here. For example you may want to include columns for Gender and Date of Birth, while eliminating Country.{/ts} {docURL page="user/organising-your-data/profiles"}</p>

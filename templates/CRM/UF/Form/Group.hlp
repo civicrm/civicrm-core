@@ -139,10 +139,13 @@
   {ts}Duplicate Matching{/ts}
 {/htxt}
 {htxt id='id-is_update_dupe'}
-  <p>{ts}If you are using the profile as a contact signup and editing form - this option controls what happens if the data matches an existing contact record. Using this option user can update the matching record or create a duplicate record or otherwise he will get a 'duplicate record' warning, and their input will not be saved. Contact matching is based on your configured 'Strict' rule for identifying duplicate contacts.{/ts} {docURL page="user/common-workflows/deduping-and-merging"}</p>
-  <p>{ts}This setting is ignored if the profile is embedded in an online contribution, membership signup or event registration form. In this case a contact match always results in the transaction being linked to the matching contact.</p>{/ts}
-  <p>{ts}In all cases, the check for an existing matching contact uses the default "Individual Strict Duplicate Matching Rule" (match on email address). If you are concerned with existing contact data being over-written by anonymous visitors, you can modify this rule to make matches less likely (or even impossible). For example, if you NEVER want anonymous input to match (i.e. always create a new contact record) - edit that rule and set the 'weight threshold' higher than 10. You will then need to run Find Duplicates periodically using a different rule, and merge any duplicate records with their associated memberships, contributions, etc.{/ts}</p>
-  <p>{ts}NOTE: If there are multiple matching contacts, the first matching record is used.{/ts}</p>
+  <p>{ts}If you are using the profile as a contact signup and editing form, this option controls what happens if the data matches an existing contact record.{/ts}</p>
+  <ul>
+    <li>{ts}<strong>No duplicate checking:</strong> saves the data as a new contact, without comparing them to existing contact records for possible duplicates.{/ts}</li>
+    <li>{ts}<strong>Update the matching contact:</strong> if a matching contact exists (using the default unsupervised rule), update the contact record.{/ts} {ts}Depending on which fields are in the profile, it can be somewhat safe to use, but it might also result in contact data being over-written by malicious visitors.{/ts} {ts}If there are multiple matching contacts, the first matching record is used.{/ts}</li>
+    <li>{ts}<strong>Issue warning and do not save:</strong> if a matching contact exists, display a warning and do not save anything.{/ts}</li>
+  </ul>
+  <p>{ts}This setting is ignored if the profile is part of an online contribution form, membership signup or event registration form. In this case a contact match always results in the transaction being linked to the matching contact using the default unsupervised rule.</p>{/ts}
 {/htxt}
 
 {htxt id='id-is_map-title'}
