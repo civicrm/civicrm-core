@@ -136,9 +136,9 @@ class CRM_Contact_Form_Search_Criteria {
 
     $form->add('select',
       'uf_group_id',
-      ts('Views For Display Contacts'),
+      ts('Display Columns'),
       [
-        '0' => ts('- default view -'),
+        '0' => ts('- default columns -'),
       ] + $searchProfiles,
       FALSE,
       ['class' => 'crm-select2']
