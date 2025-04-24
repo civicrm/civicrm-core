@@ -119,7 +119,7 @@ SELECT module,is_reserved
 
     //Remove need for Profile module type when using reserved profiles [CRM-14488]
     if (!$dao->N || (!$isProfile && !($dao->is_reserved && $canAdd))) {
-      CRM_Core_Error::statusBounce(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
+      CRM_Core_Error::statusBounce(ts("The requested Profile (gid=%1) is not configured to be used as a standalone form. Contact the site administrator if you need assistance.",
         [1 => $this->_gid]
       ));
     }

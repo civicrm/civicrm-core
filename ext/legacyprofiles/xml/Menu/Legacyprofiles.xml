@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+     <path>civicrm/profile/view</path>
+     <page_callback>CRM_Profile_Page_View</page_callback>
+     <is_public>true</is_public>
+  </item>
+</menu>
