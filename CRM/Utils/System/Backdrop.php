@@ -521,14 +521,6 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritDoc
-   */
-  public function logout() {
-    module_load_include('inc', 'user', 'user.pages');
-    user_logout();
-  }
-
-  /**
    * Get the default location for CiviCRM blocks.
    *
    * @return string

@@ -302,12 +302,22 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Immediately stop script execution, log out the user and redirect to the home page.
+   * Logout the current user session
    *
-   * @deprecated
-   *   This function should be removed in favor of linking to the CMS's logout page
+   * Alias for _authx_uf()->logoutSession
    */
   public function logout() {
+    _authx_uf()->logoutSession();
+  }
+
+  /**
+   * Url to redirect users to after logging out, in the context of an HTTP session
+   *
+   * @see CRM_Core_Page_Logout
+   * @return string
+   */
+  public function postLogoutUrl(): string {
+    return '/';
   }
 
   /**
