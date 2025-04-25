@@ -106,6 +106,8 @@ body {
 
 .civicrm-setup-body .advancedTip {
   border-collapse: collapse;
+  font-style: italic;
+  font-size: 0.9em;
 }
 
 .civicrm-setup-body .install-validate-ok {
