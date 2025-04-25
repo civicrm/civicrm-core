@@ -47,7 +47,7 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->add('text', 'label', ts('Label of combined tag'), TRUE);
+    $this->add('text', 'label', ts('Label of combined tag'), NULL, TRUE);
     $this->assign('tags', CRM_Utils_Array::collect('label', $this->_tags));
 
     $this->addButtons([
