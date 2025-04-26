@@ -30,7 +30,7 @@
           {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
             {*Contact ref id passed if user has sufficient permissions - so make a link.*}
             <div class="crm-content crm-custom-data crm-contact-reference">
-              {', '|implode:$element.contact_ref_links}
+              {$element.contact_ref_links|join:', '}
             </div>
           {else}
             <div class="crm-content crm-custom-data">{$element.field_value}</div>
