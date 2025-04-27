@@ -398,8 +398,9 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Allow sending email from the logged in contact\'s email address.'),
-    'help_text' => 'CiviCRM allows you to send email from the domain from email addresses and the logged in contact id addresses by default. Disable this if you only want to allow the domain from addresses to be used.',
+    'help_text' => ts('CiviCRM allows you to send email from the domain from email addresses and the logged in contact id addresses by default. Disable this if you only want to allow the domain from addresses to be used.'),
     'add' => '4.7.31',
+    'settings_pages' => ['smtp' => ['weight' => 10]],
   ],
   'url_tracking_default' => [
     'group_name' => 'Mailing Preferences',
