@@ -273,7 +273,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $return = [];
     foreach ($this->getImportableFieldsMetadata() as $name => $field) {
       if ($name === 'id' && $this->isSkipDuplicates()) {
-        // Duplicates are being skipped so id matching is not availble.
+        // Duplicates are being skipped so id matching is not available.
         continue;
       }
       $return[$name] = $field['html']['label'] ?? $field['title'];
