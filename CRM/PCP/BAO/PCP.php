@@ -256,7 +256,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $honor = [];
-    while ($dao->find()) {
+    while ($dao->fetch()) {
       $honor[$dao->id]['nickname'] = ucwords($dao->pcp_roll_nickname);
       $honor[$dao->id]['total_amount'] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
       $honor[$dao->id]['personal_note'] = $dao->pcp_personal_note;
