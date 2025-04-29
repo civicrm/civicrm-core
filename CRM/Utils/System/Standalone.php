@@ -592,36 +592,36 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * Respond that permission has been denied.
    *
-   * Note that there are a few subtle variations on this:
-   *
-   * - For authenticated users with a session/cookie, it uses "statusBounce()" to show popup (on prior page or dashboard page).
-   * - For authenticated users with stateless requests, it shows formatted error page.
-   * - For unauthenticated users, it shows login screen with an error blurb.
+   * There are a few variations:
+   * - For stateful requests where no one is logged in => redirect to login page
+   * - For stateful requests where user is logged in => redirect to home page with a message (unless caught in redirect loop)
+   * - Otherwise, show a "Permission Denied" page
    */
   public function permissionDenied() {
-    // If not logged in, they need to.
+    http_response_code(403);
+
     $session = CRM_Core_Session::singleton();
     $useSession = ($session->get('authx')['useSession'] ?? TRUE);
-    if ($this->isUserLoggedIn() && $useSession) {
-      // They are logged in; they're just not allowed this page.
-      CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
-      return;
-    }
-    elseif ($this->isUserLoggedIn() && !$useSession) {
-      return (new CRM_Standaloneusers_Page_PermissionDenied())->run();
-    }
-    else {
-      http_response_code(403);
 
-      // render a login page
-      if (class_exists('CRM_Standaloneusers_Page_Login')) {
-        $loginPage = new CRM_Standaloneusers_Page_Login();
-        CRM_Core_Session::setStatus(ts('You need to be logged in to access this page.'), ts('Please sign in.'));
-        return $loginPage->run();
+    if ($useSession && !$this->isUserLoggedIn()) {
+      // Stateful request, but no one is logged in => show log in prompt
+      $loginPage = new CRM_Standaloneusers_Page_Login();
+      CRM_Core_Session::setStatus(ts('You need to be logged in to access this page.'), ts('Please sign in.'));
+      return $loginPage->run();
+    }
+
+    if ($useSession && $this->isUserLoggedIn()) {
+      // Stateful login => redirect to home page with message (unless they are caught in a redirect loop)
+      if (!\CRM_Utils_Request::retrieve('permissionDeniedRedirect', 'Boolean')) {
+        CRM_Core_Error::statusBounce(ts("Access denied"), \Civi::url('current://civicrm/home')->setQuery([
+          'permissionDeniedRedirect' => 1,
+        ]));
+        return;
       }
-
-      throw new CRM_Core_Exception('Access denied. Standaloneusers login page not found');
     }
+
+    // show a stateless access denied page
+    return (new CRM_Standaloneusers_Page_PermissionDenied())->run();
   }
 
   /**
