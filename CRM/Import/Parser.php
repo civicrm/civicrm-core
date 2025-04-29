@@ -1426,8 +1426,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $dataSource->setLimit($limit);
 
     while ($row = $dataSource->getRow()) {
-      $values = array_values($row);
-      $parser->import($values);
+      $parser->import($row);
     }
     $parser->doPostImportActions();
     return TRUE;

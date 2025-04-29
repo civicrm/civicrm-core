@@ -161,6 +161,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    *   the result of this processing - which is ignored
    */
   public function import(array $values) {
+    $values = array_values($values);
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);

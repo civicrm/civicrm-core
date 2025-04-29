@@ -60,6 +60,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    *   The array of values belonging to this line.
    */
   public function import(array $values): void {
+    $values = array_values($values);
     $rowNumber = (int) ($values[array_key_last($values)]);
     // First make sure this is a valid line
     try {

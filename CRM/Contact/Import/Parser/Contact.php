@@ -112,6 +112,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   The array of values belonging to this line.
    */
   public function import(array $values): void {
+    $values = array_values($values);
     $rowNumber = (int) $values[array_key_last($values)];
 
     // Put this here for now since we're gettting run by a job and need to
