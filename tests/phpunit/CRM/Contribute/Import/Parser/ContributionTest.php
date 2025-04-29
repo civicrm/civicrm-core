@@ -504,6 +504,40 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that both the form flow & the api import trim spaces for csv files.
+   *
+   * In this case state_province_id is ' ' which has to be trimmed to '' or
+   * it will be picked up as an invalid state during import
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportSpaceForState() :void {
+    $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Bob', 'external_identifier' => 'bob']);
+    $this->importCSV('contributions_need_trim.csv', [
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'Contribution.total_amount'],
+      ['name' => 'Contribution.receive_date'],
+      ['name' => 'Contribution.financial_type_id'],
+      ['name' => 'Contact.email_primary.email'],
+      ['name' => 'Contact.address_primary.state_province_id'],
+      ['name' => 'Contribution.source'],
+      ['name' => 'note'],
+      [],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+
+    // Now update it to 'NEW' and try again using the api to import.
+    Import::update($this->userJobID)->setValues(['_status' => 'NEW', '_entity_id' => NULL])
+      ->addWhere('_status', '=', 'IMPORTED')->execute();
+    Import::import($this->userJobID)->execute();
+
+    $row = Import::get($this->userJobID)->execute()->first();
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+  }
+
+  /**
    * Test the full form-flow import.
    *
    * @throws \CRM_Core_Exception
