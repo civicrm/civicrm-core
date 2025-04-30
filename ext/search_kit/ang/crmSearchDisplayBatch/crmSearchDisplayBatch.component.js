@@ -15,7 +15,7 @@
       afFieldset: '?^^afFieldset'
     },
     templateUrl: '~/crmSearchDisplayBatch/crmSearchDisplayBatch.html',
-    controller: function($scope, $element, $location, $interval, crmApi4, searchDisplayBaseTrait, searchDisplayEditableTrait) {
+    controller: function($scope, $element, $location, $interval, $q, crmApi4, searchDisplayBaseTrait, searchDisplayEditableTrait) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
       // Mix in required traits
       const ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayEditableTrait));
@@ -113,13 +113,15 @@
       };
 
       this.saveRows = function() {
-        if (this.saving || !this.unsavedChanges) {
-          return;
+        if (this.saving) {
+          return this.saving;
         }
-        this.saving = true;
+        if (!this.unsavedChanges) {
+          return $q.resolve();
+        }
         this.unsavedChanges = false;
         const apiName = 'Import_' + this.userJobId;
-        crmApi4(apiName, 'replace', {
+        this.saving = crmApi4(apiName, 'replace', {
           // The api requires this clause, but we actually want every row in the table
           where: [['_id', '>', 0]],
           records: this.results.map((row) => row.data),
@@ -135,6 +137,20 @@
         }, function(error) {
           ctrl.saving = false;
           ctrl.unsavedChanges = true;
+        });
+        return this.saving;
+      };
+
+      this.doImport = function() {
+        $element.block();
+        this.saveRows().then(function() {
+          crmApi4('SearchDisplay', 'importBatch', {
+            savedSearch: ctrl.search,
+            display: ctrl.display,
+            userJobId: ctrl.userJobId,
+          }).then(function(result) {
+            window.location.href = result[0].url;
+          });
         });
       };
 

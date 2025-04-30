@@ -45,5 +45,9 @@
       <i ng-if="$ctrl.saving" class="crm-i fa-spin fa-spinner"></i>
       {{ $ctrl.unsavedChanges || $ctrl.saving ? ts('Save Changes') : ts('Changes Saved') }}
     </button>
+    <button type="button" ng-if="$ctrl.userJobId" class="btn btn-primary" ng-click="$ctrl.doImport()">
+      <i class="crm-i fa-download"></i>
+      {{:: ts('Run Import') }}
+    </button>
   </div>
 </div>

@@ -31,7 +31,7 @@ class Import extends DAOGetAction {
       if (!$parser->validateRow($row)) {
         continue;
       }
-      $parser->import(array_values($row));
+      $parser->import($row);
     }
     $parser->doPostImportActions();
 

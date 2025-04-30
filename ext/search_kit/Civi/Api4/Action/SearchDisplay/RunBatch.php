@@ -8,6 +8,8 @@ use Civi\Api4\UserJob;
 /**
  * Specialized run action for batch displays
  *
+ * @method $this setUserJobId(int $userJobId)
+ * @method int getUserJobId()
  * @package Civi\Api4\Action\SearchDisplay
  * @since 6.3
  */

@@ -170,4 +170,186 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals(['NEW', 'NEW'], $rows->column('_status'));
   }
 
+  public function testImportBatch() {
+    $name = uniqid();
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'name' => $name,
+      'label' => 'Contribution Batch Testing',
+      'api_entity' => 'Contribution',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'total_amount',
+          'financial_type_id:label',
+          'Contribution_Contact_contact_id_01.first_name',
+          'Contribution_Contact_contact_id_01.last_name',
+          'Contribution_Contact_contact_id_01.gender_id:label',
+          'Contribution_ContributionSoft_contribution_id_01.contact_id',
+          'Contribution_ContributionSoft_contribution_id_01.amount',
+        ],
+        'orderBy' => [],
+        'where' => [],
+        'groupBy' => [],
+        'join' => [
+          [
+            'Contact AS Contribution_Contact_contact_id_01',
+            'LEFT',
+            [
+              'contact_id',
+              '=',
+              'Contribution_Contact_contact_id_01.id',
+            ],
+          ],
+          [
+            'ContributionSoft AS Contribution_ContributionSoft_contribution_id_01',
+            'LEFT',
+            [
+              'id',
+              '=',
+              'Contribution_ContributionSoft_contribution_id_01.contribution_id',
+            ],
+            [
+              'Contribution_ContributionSoft_contribution_id_01.soft_credit_type_id:name',
+              '=',
+              '"in_honor_of"',
+            ],
+          ],
+        ],
+        'having' => [],
+      ],
+    ]);
+
+    $display = $this->createTestRecord('SearchDisplay', [
+      'name' => $name,
+      'label' => 'Contribution Batch Testing',
+      'saved_search_id.name' => $name,
+      'type' => 'batch',
+      'settings' => [
+        'classes' => [
+          'table',
+          'table-striped',
+          'table-bordered',
+          'crm-sticky-header',
+        ],
+        'limit' => 50,
+        'pager' => [
+          'hide_single' => TRUE,
+        ],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'total_amount',
+            'label' => 'Total Amount',
+            'tally' => [
+              'fn' => 'SUM',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'financial_type_id:label',
+            'label' => 'Financial Type',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Contribution_Contact_contact_id_01.first_name',
+            'label' => 'Contact First Name',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Contribution_Contact_contact_id_01.last_name',
+            'label' => 'Contact Last Name',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Contribution_Contact_contact_id_01.gender_id:label',
+            'label' => 'Contact Gender',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Contribution_ContributionSoft_contribution_id_01.contact_id',
+            'label' => 'Soft Credit Contact ID',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Contribution_ContributionSoft_contribution_id_01.amount',
+            'label' => 'Soft Credit Amount',
+          ],
+        ],
+        'tally' => [],
+      ],
+      'acl_bypass' => FALSE,
+    ]);
+
+    $userJob = SearchDisplay::createBatch(FALSE)
+      ->setSavedSearch($name)
+      ->setDisplay($name)
+      ->execute()->single();
+    $apiName = 'Import_' . $userJob['id'];
+
+    $fields = civicrm_api4($apiName, 'getFields', ['loadOptions' => TRUE])->indexBy('label');
+
+    $fieldKeys = $fields->column('name');
+
+    $this->assertContains('Female', $fields['Contact Gender']['options']);
+
+    $softCreditContactId = $this->createTestRecord('Contact', ['first_name' => 'Softie', 'last_name' => 'Credit'])['id'];
+
+    $lastName = uniqid(__FUNCTION__);
+
+    // Add rows of data to import
+    civicrm_api4($apiName, 'replace', [
+      'where' => [['_id', '>', 0]],
+      'records' => [
+        [
+          $fieldKeys['Total Amount'] => 100,
+          $fieldKeys['Financial Type'] => 1,
+          $fieldKeys['Contact First Name'] => 'Jane',
+          $fieldKeys['Contact Last Name'] => $lastName,
+          $fieldKeys['Contact Gender'] => 1,
+          $fieldKeys['Soft Credit Contact ID'] => $softCreditContactId,
+          $fieldKeys['Soft Credit Amount'] => 10,
+        ],
+        [
+          $fieldKeys['Total Amount'] => 200,
+          $fieldKeys['Financial Type'] => 2,
+          $fieldKeys['Contact First Name'] => 'John',
+          $fieldKeys['Contact Last Name'] => $lastName,
+          $fieldKeys['Contact Gender'] => 2,
+        ],
+      ],
+    ]);
+
+    $import = civicrm_api4($apiName, 'import');
+    $this->assertCount(2, $import);
+    $this->assertEquals('IMPORTED', $import[0]['_status']);
+    $this->assertEquals('IMPORTED', $import[1]['_status']);
+
+    $contributions = civicrm_api4('Contribution', 'get', [
+      'select' => ['id', 'financial_type_id', 'total_amount', 'contact_id.first_name', 'contact_id.gender_id'],
+      'where' => [['contact_id.last_name', '=', $lastName]],
+      'orderBy' => ['id' => 'ASC'],
+    ]);
+    $this->assertCount(2, $contributions);
+
+    $this->assertEquals($import[0]['_entity_id'], $contributions[0]['id']);
+    $this->assertEquals($import[1]['_entity_id'], $contributions[1]['id']);
+    $this->assertEquals(100, $contributions[0]['total_amount']);
+    $this->assertEquals(200, $contributions[1]['total_amount']);
+    $this->assertEquals(1, $contributions[0]['financial_type_id']);
+    $this->assertEquals(2, $contributions[1]['financial_type_id']);
+    $this->assertEquals('Jane', $contributions[0]['contact_id.first_name']);
+    $this->assertEquals('John', $contributions[1]['contact_id.first_name']);
+    $this->assertEquals(1, $contributions[0]['contact_id.gender_id']);
+    $this->assertEquals(2, $contributions[1]['contact_id.gender_id']);
+
+    $contributionSoft = civicrm_api4('ContributionSoft', 'get', [
+      'select' => ['contact_id', 'amount', 'soft_credit_type_id:name'],
+      'where' => [['contribution_id', '=', $contributions[0]['id']]],
+    ])->single();
+    $this->assertEquals($softCreditContactId, $contributionSoft['contact_id']);
+    $this->assertEquals(10, $contributionSoft['amount']);
+    // This value was set in the ON clause & should have carried through
+    $this->assertEquals('in_honor_of', $contributionSoft['soft_credit_type_id:name']);
+  }
+
 }
