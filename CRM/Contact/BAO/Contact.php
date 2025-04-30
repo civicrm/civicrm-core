@@ -1135,6 +1135,15 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     // retrieve contact id in case of Profile context
     $id = CRM_Utils_Request::retrieve('id', 'Positive');
     $formName = $pcp ? 'CRM_PCP_Form_PCPAccount' : ($cid ? 'CRM_Contact_Form_Contact' : 'CRM_Profile_Form_Edit');
+    if ($formName == 'CRM_Profile_Form_Edit') {
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      // If the call is initiated from the profile loaded from drupal, we
+      // need to change the form name. otherwise we will get : Error: Could
+      // not find a valid session key.
+      if (strpos($key, 'CRMProfileFormDynamic') !== FALSE) {
+        $formName = 'CRM_Profile_Form_Dynamic';
+      }
+    }
     $cid = $cid ?: $id;
     if ($action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
