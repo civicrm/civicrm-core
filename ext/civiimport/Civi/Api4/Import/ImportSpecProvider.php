@@ -70,7 +70,12 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
     $field->setColumnName('_status_message');
     $spec->addFieldSpec($field);
 
+    [, $userJobID] = explode('_', $spec->getEntity(), 2);
+
     $userJobType = $this->getJobType($spec);
+    $parser = new $userJobType['class']();
+    $parser->setUserJobID($userJobID);
+
     foreach ($columns as $column) {
       $isInternalField = str_starts_with($column['name'], '_');
       $exists = $isInternalField && $spec->getFieldByName($column['name']);
@@ -86,10 +91,10 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
       $field->setDescription(ts('Data being imported into the field.'));
       $field->setColumnName($column['name']);
       if ($column['name'] === '_entity_id') {
-        $field->setFkEntity($userJobType['entity']);
+        $field->setFkEntity($parser->getBaseEntity());
         $field->setInputType('EntityRef');
         $field->setInputAttrs([
-          'label' => CoreUtil::getInfoItem($userJobType['entity'], 'title'),
+          'label' => CoreUtil::getInfoItem($parser->getBaseEntity(), 'title'),
         ]);
       }
       $spec->addFieldSpec($field);

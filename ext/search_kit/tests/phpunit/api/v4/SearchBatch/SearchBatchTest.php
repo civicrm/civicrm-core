@@ -119,6 +119,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals('Date', $getFields['birth_date']['data_type']);
     $this->assertEquals('Boolean', $getFields['is_deceased']['data_type']);
     $this->assertEquals('Integer', $getFields['_id']['data_type']);
+    $this->assertEquals('Individual', $getFields['_entity_id']['fk_entity']);
 
     // The table was initialized with one empty row. Now create another.
     $created = civicrm_api4($apiName, 'create')->single();

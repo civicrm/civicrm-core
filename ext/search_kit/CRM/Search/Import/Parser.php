@@ -20,11 +20,15 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
         'id' => 'search_batch_import',
         'name' => 'search_batch_import',
         'label' => ts('Import data from Search Kit'),
-        // Not sure what to put here...
-        'entity' => 'SearchDisplay',
-        'url' => 'civicrm/import/search',
       ],
     ];
+  }
+
+  public function getBaseEntity(): string {
+    if (!isset($this->baseEntity)) {
+      $this->init();
+    }
+    return $this->baseEntity;
   }
 
 }

@@ -189,7 +189,10 @@ class Import extends CRM_Core_DAO {
       ->addWhere('metadata', 'LIKE', '%"table_name":"' . $tableName . '"%')
       ->addSelect('metadata', 'job_type')->execute()->first();
     $headers = $userJob['metadata']['DataSource']['column_headers'] ?? [];
-    $entity = \CRM_Core_BAO_UserJob::getType($userJob['job_type'])['entity'];
+    $parserClass = \CRM_Core_BAO_UserJob::getTypeValue($userJob['job_type'], 'class');
+    $parser = new $parserClass();
+    $parser->setUserJobID($userJob['id']);
+    $entity = $parser->getBaseEntity();
 
     try {
       $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
