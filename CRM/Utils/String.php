@@ -640,8 +640,6 @@ class CRM_Utils_String {
       $config = HTMLPurifier_Config::createDefault();
       $config->set('Core.Encoding', 'UTF-8');
       $config->set('Attr.AllowedFrameTargets', ['_blank', '_self', '_parent', '_top']);
-      // Disable the cache entirely
-      $config->set('Cache.DefinitionImpl', NULL);
       $config->set('HTML.DefinitionID', 'enduser-customize.html tutorial');
       $config->set('HTML.DefinitionRev', 1);
       $config->set('HTML.MaxImgLength', NULL);
