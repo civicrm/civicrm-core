@@ -29,6 +29,18 @@ class CRM_Upgrade_Incremental_php_SixThree extends CRM_Upgrade_Incremental_Base 
    */
   public function upgrade_6_3_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    // Delete non-attachment rows in batches of 5000
+    $fileCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_entity_file WHERE entity_table LIKE "civicrm_value_%"');
+    $iterations = ceil($fileCount / self::BATCH_SIZE);
+    for ($i = 1; $i <= $iterations; $i++) {
+      $this->addTask('Delete non-attachment rows from civicrm_entity_file', 'deleteNonAttachmentFiles', $i);
+    }
+  }
+
+  public static function deleteNonAttachmentFiles(): bool {
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_file WHERE entity_table LIKE "civicrm_value_%" LIMIT ' . self::BATCH_SIZE);
+    return TRUE;
   }
 
 }

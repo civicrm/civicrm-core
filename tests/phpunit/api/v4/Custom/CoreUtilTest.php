@@ -97,4 +97,67 @@ class CoreUtilTest extends Api4TestBase {
     $this->assertEquals($expected, CoreUtil::stripNamespace($input));
   }
 
+  public function testGetRefCountTotal(): void {
+    $fileId = $this->createTestRecord('File', [
+      'mime_type' => 'text/plain',
+      'file_name' => 'test123.txt',
+      'content' => 'Hello 123',
+    ])['id'];
+
+    $this->assertEquals(0, CoreUtil::getRefCountTotal('File', $fileId));
+
+    $activity = $this->createTestRecord('Activity');
+    $this->createTestRecord('EntityFile', [
+      'file_id' => $fileId,
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $activity['id'],
+    ]);
+
+    $this->assertEquals(1, CoreUtil::getRefCountTotal('File', $fileId));
+
+    $tagId = $this->createTestRecord('Tag', [
+      'used_for' => 'civicrm_file',
+      'name' => 'testFileTag',
+      'label' => 'testFileTag',
+    ])['id'];
+
+    $this->createTestRecord('EntityTag', [
+      'entity_table' => 'civicrm_file',
+      'entity_id' => $fileId,
+      'tag_id' => $tagId,
+    ]);
+
+    $this->assertEquals(2, CoreUtil::getRefCountTotal('File', $fileId));
+
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'TestActivityFields',
+    ]);
+    $customField = $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'TestActivityFields',
+      'label' => 'TestFileField',
+      'html_type' => 'File',
+      'data_type' => 'File',
+    ]);
+
+    $this->createTestRecord('Activity', [
+      'TestActivityFields.TestFileField' => $fileId,
+    ]);
+
+    // File should exist in the custom value table
+    $idCheck = \CRM_Core_DAO::singleValueQuery("SELECT {$customField['column_name']} FROM {$customGroup['table_name']}");
+    $this->assertEquals($fileId, $idCheck);
+
+    $this->assertEquals(3, CoreUtil::getRefCountTotal('File', $fileId));
+
+    $activity2 = $this->createTestRecord('Activity');
+    $this->createTestRecord('EntityFile', [
+      'file_id' => $fileId,
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $activity2['id'],
+    ]);
+
+    $this->assertEquals(4, CoreUtil::getRefCountTotal('File', $fileId));
+  }
+
 }

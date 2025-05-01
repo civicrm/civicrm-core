@@ -1370,15 +1370,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
           $fileType == 'image/x-png' ||
           $fileType == 'image/png'
         ) {
-          $entityId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile',
-            $fileID,
-            'entity_id',
-            'file_id'
-          );
-          [$path] = CRM_Core_BAO_File::path($fileID, $entityId);
-          $fileHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileID);
+          [$path] = CRM_Core_BAO_File::path($fileID);
+          $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileID);
           $url = CRM_Utils_System::url('civicrm/file',
-            "reset=1&id=$fileID&eid=$entityId&fcs=$fileHash",
+            "reset=1&id=$fileID&fcs=$fileHash",
             $absolute, NULL, TRUE, TRUE
           );
           $result['file_url'] = CRM_Utils_File::getFileURL($path, $fileType, $url);
@@ -1389,7 +1384,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
             $fileID,
             'uri'
           );
-          $fileHash = CRM_Core_BAO_File::generateFileHash($contactID, $fileID);
+          $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileID);
           $url = CRM_Utils_System::url('civicrm/file',
             "reset=1&id=$fileID&eid=$contactID&fcs=$fileHash",
             $absolute, NULL, TRUE, TRUE
