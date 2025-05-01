@@ -684,7 +684,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 }
 @keyframes loadingspin {
   0% {
-    transform: rotate(0deg)
+    transform: rotate(0deg);
   }
   100% {
     transform: rotate(360deg);
