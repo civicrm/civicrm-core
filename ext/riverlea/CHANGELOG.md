@@ -1,3 +1,7 @@
+1.4.4-6.3alpha
+ - FIXED inline checkbox regression (https://lab.civicrm.org/extensions/riverlea/-/merge_requests/51) ht @yashodha
+ - FIXED loading animation, re-using nav-bar spinning logo svg, set as a css variable. (ref https://lab.civicrm.org/dev/user-interface/-/issues/84)
+
 1.4.3-6.2alpha
 This release makes a series of changes to how emphasis colours (ie primary/success/info/etc) are handled across RiverLea. The main changes:
  - ADDED - alert border colours are auto-generated using `hsl(from var(--crm-alert-background-X) h s calc(l - Y))`
