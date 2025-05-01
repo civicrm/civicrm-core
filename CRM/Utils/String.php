@@ -647,6 +647,9 @@ class CRM_Utils_String {
       $config->set('HTML.MaxImgLength', NULL);
       $config->set('CSS.MaxImgLength', NULL);
       $def = $config->maybeGetRawHTMLDefinition();
+      $uri = $config->getDefinition('URI');
+      $uri->addFilter(new CRM_Utils_HTMLPurifier_URIFilter(), $config);
+
       if (!empty($def)) {
         $def->addElement('figcaption', 'Block', 'Flow', 'Common');
         $def->addElement('figure', 'Block', 'Optional: (figcaption, Flow) | (Flow, figcaption) | Flow', 'Common');
