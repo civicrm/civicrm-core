@@ -34,10 +34,7 @@
     "psr-4": {
       "Civi\\": [".", "Civi/", "setup/src/"]
     },
-    "files": [
-      "functions.php",
-      "guzzle_php81_shim.php"
-    ]
+    "files": ["functions.php", "guzzle_php81_shim.php"]
   },
   "include-path": ["vendor/tecnickcom"],
   "config": {
@@ -53,7 +50,7 @@
   "require": {
     "php": "~8.0",
     "composer-runtime-api": "~2.0",
-    "dompdf/dompdf" : "~2.0.4|| ~3.0",
+    "dompdf/dompdf": "~2.0.4|| ~3.0",
     "firebase/php-jwt": ">=3 <7",
     "rubobaquero/phpquery": "^0.9.15",
     "symfony/config": "~4.4 || ~5.4 || ~6.0 || ~7.0",
@@ -66,7 +63,7 @@
     "symfony/service-contracts": "~2.2 || ~3.1",
     "psr/log": "~1.0 || ~2.0 || ~3.0",
     "symfony/finder": "~4.4 || ~5.4 || ~6.0 || ~7.0",
-    "tecnickcom/tcpdf" : "6.*",
+    "tecnickcom/tcpdf": "6.*",
     "totten/ca-config": "~23.07",
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "~1.9.4",
