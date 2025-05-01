@@ -1,0 +1,12 @@
+--- Mail/mime.php	2020-06-27 18:35:27.000000000 +1000
++++ Mail/mime.php	2020-07-25 08:36:14.570334621 +1000
+@@ -1527,6 +1527,9 @@
+             $this->{$type} .= $data;
+         }
+ 
++        // wordwrap the txtbody to be 750 characters to comply with RFC 2821
++        // CRM-3133
++        $this->{$type} = wordwrap($this->{$type}, 750);
+         return true;
+     }
+ 
