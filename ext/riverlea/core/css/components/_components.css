@@ -683,6 +683,10 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   animation: loadingspin 1.5s linear infinite;
 }
 @keyframes loadingspin {
-  0%   {transform: rotate(0deg);}
-  100% {transform: rotate(360deg);}
+  0% {
+    transform: rotate(0deg)
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
