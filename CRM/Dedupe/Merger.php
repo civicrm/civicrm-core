@@ -96,7 +96,7 @@ class CRM_Dedupe_Merger {
         ],
         'rel_table_relationships' => [
           'title' => ts('Relationships'),
-          'tables' => ['civicrm_relationship'],
+          'tables' => ['civicrm_relationship', 'civicrm_relationship_cache'],
           'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=rel'),
         ],
         'rel_table_custom_groups' => [
