@@ -229,6 +229,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    * {@inheritdoc}
    */
   public function garbageCollection() {
+    $garbage_collected = FALSE;
     $files = \CRM_Utils_File::findFiles($this->getCacheDir(), '*.txt', TRUE);
     foreach ($files as $filename) {
       $path = $this->getCacheDir() . '/' . $filename;
@@ -241,10 +242,12 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
         if ($item['expires'] < CRM_Utils_Time::time()) {
           if (@unlink($path)) {
             clearstatcache(FALSE, $path);
+            $garbage_collected = TRUE;
           }
         }
       }
     }
+    return $garbage_collected;
   }
 
   /**
