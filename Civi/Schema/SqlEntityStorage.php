@@ -11,6 +11,8 @@
 
 namespace Civi\Schema;
 
+use Civi\Api4\Utils\CoreUtil;
+
 class SqlEntityStorage implements EntityStorageInterface {
 
   /**
@@ -23,7 +25,8 @@ class SqlEntityStorage implements EntityStorageInterface {
   }
 
   public function writeRecords(array $records): array {
-    // TODO: Implement writeRecords() method.
+    $entityDAO = CoreUtil::getBAOFromApiName($this->entityName);
+    return $entityDAO::writeRecords($records);
   }
 
   public function deleteRecords(array $records): array {
