@@ -30,7 +30,8 @@
 {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
 </fieldset>
-
+{capture assign=docUrlText}{ts}Mass SMS Mailing Documentation{/ts}{/capture}
+{capture assign=docLink}{docURL page="user/sms-text-messaging/everyday-tasks/#mass-sms-messaging" title=$docUrlText}{/capture}
    <fieldset id="upload_id"><legend>{ts}Upload Content{/ts}</legend>
     <table class="form-layout-compressed">
         <tr class="crm-mailing-upload-form-block-textFile">
