@@ -117,7 +117,7 @@ class CRM_Utils_Cache_ArrayDecorator implements CRM_Utils_Cache_Interface {
    */
   public function garbageCollection() {
     $this->expires = [];
-    return FALSE;
+    return TRUE;
   }
 
   public function has($key) {
