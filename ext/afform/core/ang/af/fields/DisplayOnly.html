@@ -9,5 +9,5 @@
   </span>
 </span>
 <span ng-if="!dataProvider.getFieldData()[$ctrl.fieldName].file_name">
-  {{ dataProvider.getFieldData()[$ctrl.fieldName] }}
+  {{ $ctrl.getDisplayValue(dataProvider.getFieldData()[$ctrl.fieldName]) }}
 </span>

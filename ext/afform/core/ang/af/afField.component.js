@@ -268,6 +268,28 @@
         return ctrl.defn.input_type === 'DisplayOnly';
       };
 
+      ctrl.getDisplayValue = function(value) {
+        if (value === undefined || value === null || value === '') {
+          return '';
+        }
+        if (fieldOptions) {
+          let keys = Array.isArray(value) ? value : [value];
+          let options = fieldOptions.filter((option) => keys.includes(option.id));
+          return options.map((option) => option.label).join(', ');
+        }
+        if (ctrl.defn.data_type === 'Date' || ctrl.defn.data_type === 'Timestamp') {
+          try {
+            return CRM.formatDate(value, null, ctrl.defn.data_type === 'Timestamp');
+          } catch (e) {
+            return '';
+          }
+        }
+        if (ctrl.defn.fk_entity) {
+          // TODO: EntityRef fields
+        }
+        return value;
+      };
+
       // ngChange callback from Existing entity field
       ctrl.onSelectEntity = function() {
         if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
