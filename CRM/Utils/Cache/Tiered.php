@@ -153,9 +153,7 @@ class CRM_Utils_Cache_Tiered implements CRM_Utils_Cache_Interface {
   public function garbageCollection() {
     foreach ($this->tiers as $tier) {
       /** @var CRM_Utils_Cache_Interface $tier */
-      if (!$tier->garbageCollection()) {
-        return FALSE;
-      }
+      $tier->garbageCollection();
     }
     return TRUE;
   }
