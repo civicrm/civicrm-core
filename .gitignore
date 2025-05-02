@@ -77,6 +77,7 @@ tests/output
 tests/phpunit/CiviTest/civicrm.settings.local.php
 tests/phpunit/CiviTest/truncate.xml
 tests/**/*.rtf.php
+tools/patches/dist
 tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html

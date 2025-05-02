@@ -2,12 +2,12 @@
 
 > _For more general discussion about CiviCRM dependencies, see https://docs.civicrm.org/dev/en/latest/core/dependencies/_
 
-CiviCRM dependencies may require patches to address compatibility or critical bugs. While we try
+CiviCRM dependencies may require patches to address compatibility or critical bugs. While we try to
 avoid these patches, they are sometimes necessary.
 
 The plugin `cweagans/composer-patches` provides a mechanism to apply these patches on all CiviCRM
 deployments. However, the plugin has several options, and they don't always work intuitively. Here,
-we provided a recommended workflow.
+we describe a recommended workflow.
 
 ## Usage: Prepare patches
 
@@ -92,11 +92,11 @@ However, there are some snags to be considered:
   pass on SA/D7/BD/WP -- it will always fail on D8/9/10/11.
 * (D) You could add some interface (web UI or chat command) to formalize a multistep workflow.
     1. Contributor proposes PR.
-    2. Maintainer gives tenative approval (with button on web-page or chat-command).
-    3. CI runs the full test suite
+    2. Maintainer gives tenative approval to publish the draft patch (with button on web-page or chat-command).
+    3. CI runs the full test suite.
     4. Maintainer gives final approval (merge).
 
-At time writing, my favorite is (B) auto-publish when the PR is opened/updated... but include some policy
+At time of writing, my favorite is (B)... auto-publish when the PR is opened/updated... but also include policy
 constraints. For example, you might add a guard which validates that:
 
 1. The checksum in the URL matches the actual content.
