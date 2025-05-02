@@ -267,7 +267,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    */
   public function mapConfigToSSL() {
     global $base_url;
-    $base_url = str_replace('http://', 'https://', $base_url);
+    $base_url = str_replace('http://', 'https://', (string) $base_url);
   }
 
   /**
