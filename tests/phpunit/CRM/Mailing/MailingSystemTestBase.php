@@ -186,7 +186,7 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
         ";" .
         // Default header
         "Sample Header for TEXT formatted content.\n" .
-        "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
+        "BEWARE children need regular infusions of toys. Santa knows your 15 Main St\nCollinsville, CT 6022\nUnited States\n. There is no http.*civicrm/mailing/optout.*\\.\n" .
         // Default footer
         "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
