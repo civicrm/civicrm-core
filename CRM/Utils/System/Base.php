@@ -69,25 +69,32 @@ abstract class CRM_Utils_System_Base {
    * @var int|string $print
    *   Should match a CRM_Core_Smarty::PRINT_* constant,
    *   or equal 0 if not in print mode.
+   *
+   * @todo when php7.4 is no more, switch the `switch` to a `match`
    */
   public static function getContentTemplate($print = 0): string {
-    if ($print === CRM_Core_Smarty::PRINT_JSON) {
-      return 'CRM/common/snippet.tpl';
-    }
+    // I fear some callers of this function may still pass FALSE
+    // let's make sure any falsey value is exactly 0
+    $print = $print ?: 0;
 
-    switch ($print) {
-      case 0:
+    // switch uses lazy type comparison
+    // on php < 8 this causes strange results when comparing
+    // string like 'json' with integer 0
+    // so we use this workaround
+    switch (TRUE) {
+      case ($print === 0):
         // Not a print context.
         // Despite what the template is called
         return 'CRM/common/CMSPrint.tpl';
 
-      case CRM_Core_Smarty::PRINT_PAGE:
+      case ($print === CRM_Core_Smarty::PRINT_PAGE):
         return 'CRM/common/print.tpl';
 
-      case 'xls':
-      case 'doc':
+      case ($print === 'xls'):
+      case ($print === 'doc'):
         return 'CRM/Contact/Form/Task/Excel.tpl';
 
+      case ($print === CRM_Core_Smarty::PRINT_JSON):
       default:
         return 'CRM/common/snippet.tpl';
     }
