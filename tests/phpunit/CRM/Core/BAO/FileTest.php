@@ -176,10 +176,10 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
       // Test case 3: Invalid fileId
       'invalid_file_id' => [
         'fileId' => 123,
-        'invalidFileId' => 999,
         'genTs' => $currentTimestamp,
         'life' => 1,
         'expectedResult' => FALSE,
+        'invalidFileId' => 999,
       ],
     ];
   }
