@@ -424,6 +424,54 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test pending membership's financial items.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPendingMembershipFinancialItems(): void {
+    $contactId = $this->individualCreate();
+    $membershipId = $this->contactMembershipCreate([
+      'contact_id' => $contactId,
+      'status_id' => 'Pending',
+    ]);
+
+    $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
+      $membershipId,
+      'id',
+      'membership_id',
+      'Database checked on membership log record.'
+    );
+
+    // this is a test and we dont want qfKey generation / validation
+    // easier to suppress it, than change core code
+    $config = CRM_Core_Config::singleton();
+    $config->keyDisable = TRUE;
+
+    CRM_Contribute_Form_Contribution_Confirm::unitTestAccessTolegacyProcessMembership(
+      $contactId,
+      $this->_membershipTypeID,
+      $membershipId
+    );
+
+    $lineItemId = $this->assertDBNotNull('CRM_Price_BAO_LineItem',
+      $membershipId,
+      'id',
+      'entity_id',
+      'Database checked on line item record.'
+    );
+
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', [
+      'sequential' => 1,
+      'entity_id' => $lineItemId,
+      'entity_table' => 'civicrm_line_item',
+    ])['values'];
+
+    // legacyProcessMembership should not create any financial item for an existing membership
+    $this->assertCount(0, $financialItems);
+
+  }
+
+  /**
    * Renew stale membership.
    *
    * @throws \CRM_Core_Exception
