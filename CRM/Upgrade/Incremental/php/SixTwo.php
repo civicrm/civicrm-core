@@ -89,9 +89,9 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
     $this->addExtensionTask('Enable CiviImport extension', ['civiimport']);
     $this->addTask('Fix Unique index on acl cache table with domain id', 'fixAclUniqueIndex');
     $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Activity');
-    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Membership');
-    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Contribution');
-    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Participant');
+    $this->addTask('Update Membership mappings', 'upgradeImportMappingFields', 'Membership');
+    $this->addTask('Update Contribution mappings', 'upgradeImportMappingFields', 'Contribution');
+    $this->addTask('Update Participant mappings', 'upgradeImportMappingFields', 'Participant');
   }
 
   public static function setFileUploadDate(): bool {
@@ -217,6 +217,37 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       return $mappingFieldsName;
     }
     $parts = explode('.', $mappingFieldsName);
+    // For contribution imports we may have failed to convert these fields in 6.1
+    // as they are not generally available for other imports.
+    $contactFields = [
+      'first_name',
+      'last_name',
+      'middle_name',
+      'email_primary.email',
+      'nick_name',
+      'do_not_trade',
+      'do_not_email',
+      'do_not_mail',
+      'do_not_sms',
+      'do_not_phone',
+      'is_opt_out',
+      'external_identifier',
+      'legal_identifier',
+      'legal_name',
+      'preferred_communication_method',
+      'preferred_language',
+      'gender_id',
+      'prefix_id',
+      'suffix_id',
+      'job_title',
+      'birth_date',
+      'deceased_date',
+      'household_name',
+    ];
+    if (in_array($mappingFieldsName, $contactFields)) {
+      // This would happen for Contribution fields that were not correctly updated in 6.1.
+      return 'Contact.' . $mappingFieldsName;
+    }
     if (!isset($prefixMap[$parts[0]])) {
       // This is a 'native' mapping, add a prefix.
       return $type . '.' . $mappingFieldsName;
