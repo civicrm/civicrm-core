@@ -115,6 +115,7 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
       'birth_date',
       'deceased_date',
       'household_name',
+      NULL,
     ];
     $importMappings = [];
     $expectedImportMappings = [];
@@ -125,6 +126,9 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
       $importMappings[] = ['name' => $field];
       if ($field === 'contact.first_name') {
         $expectedImportMappings[] = ['name' => 'Contact.first_name'];
+      }
+      elseif ($field === NULL) {
+        $expectedImportMappings[] = ['name' => ''];
       }
       else {
         $expectedImportMappings[] = ['name' => 'Contact.' . $field];

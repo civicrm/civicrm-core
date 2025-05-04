@@ -152,7 +152,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
     $mappingFields = self::getMappingFields($entity);
     $fieldsToConvert = [];
     while ($mappingFields->fetch()) {
-      $fieldsToConvert[$mappingFields->name] = self::getConvertedName($mappingFields->name, $entity);
+      $fieldsToConvert[$mappingFields->name] = self::getConvertedName((string) $mappingFields->name, $entity);
       // Convert the field.
       CRM_Core_DAO::executeQuery(' UPDATE civicrm_mapping_field SET name = %1 WHERE id = %2', [
         1 => [$fieldsToConvert[$mappingFields->name], 'String'],
@@ -171,7 +171,14 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       }
       foreach ($metadata['import_mappings'] as &$mapping) {
         if (!empty($mapping['name'])) {
-          $mapping['name'] = self::getConvertedName($mapping['name'], $entity);
+          $convertedName = self::getConvertedName($mapping['name'], $entity);
+          if ($convertedName === 'do_not_import') {
+            $convertedName = '';
+          }
+          $mapping['name'] = $convertedName;
+        }
+        else {
+          $mapping['name'] = '';
         }
       }
       $userJob->metadata = json_encode($metadata);
@@ -214,7 +221,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'soft_credit.contact' => 'SoftCreditContact',
     ];
     if (empty($mappingFieldsName) || $mappingFieldsName === 'do_not_import') {
-      return $mappingFieldsName;
+      return 'do_not_import';
     }
     $parts = explode('.', $mappingFieldsName);
     // For contribution imports we may have failed to convert these fields in 6.1
