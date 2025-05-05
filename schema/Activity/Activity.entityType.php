@@ -398,7 +398,7 @@ return [
     'is_star' => [
       'title' => ts('Is Starred'),
       'sql_type' => 'boolean',
-      'input_type' => 'Checkbox',
+      'input_type' => 'CheckBox',
       'required' => TRUE,
       'description' => ts('Activity marked as favorite.'),
       'add' => '4.7',
