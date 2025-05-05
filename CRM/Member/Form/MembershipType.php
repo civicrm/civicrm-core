@@ -126,7 +126,14 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {
-    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all membership records of this type.') . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ts('Do you want to continue?');
+    $this->deleteMessage = $this->deleteMessage = implode(
+      ' ',
+      [
+        ts('WARNING: Deleting this option will result in the loss of all membership records of this type.'),
+        ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.'),
+        ts('Do you want to continue?'),
+      ]
+    );
   }
 
   /**
