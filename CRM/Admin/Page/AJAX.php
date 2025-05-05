@@ -219,7 +219,7 @@ class CRM_Admin_Page_AJAX {
           break;
 
         case 'CRM_Core_BAO_MessageTemplate':
-          $ret['content'] = ts('Are you sure you want to disable this message tempate?');
+          $ret['content'] = ts('Are you sure you want to disable this message template?');
           break;
 
         case 'CRM_ACL_BAO_ACL':
