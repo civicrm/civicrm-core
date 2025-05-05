@@ -109,6 +109,7 @@
   background: var(--crm-tab-bg-active);
   padding: var(--crm-tab-padding);
   container-type: inline-size;
+  min-height: 12rem;
 }
 
 /* Dashboard */
