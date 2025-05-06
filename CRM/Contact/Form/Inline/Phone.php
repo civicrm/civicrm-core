@@ -20,6 +20,9 @@
  */
 class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
 
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_ContactFormTrait;
+
   /**
    * Phones of the contact that is been viewed
    * @var array
@@ -40,7 +43,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
 
     //get all the existing phones
     $phone = new CRM_Core_BAO_Phone();
-    $phone->contact_id = $this->_contactId;
+    $phone->contact_id = $this->getContactID();
 
     $this->_phones = CRM_Core_BAO_Block::retrieveBlock($phone);
   }
@@ -68,10 +71,8 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     $this->assign('actualBlockCount', $actualBlockCount);
     $this->assign('totalBlocks', $totalBlocks);
 
-    $this->applyFilter('__ALL__', 'trim');
-
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
-      CRM_Contact_Form_Edit_Phone::buildQuickForm($this, $blockId, TRUE);
+      $this->addPhoneBlockFields($blockId);
     }
 
     $this->addFormRule(['CRM_Contact_Form_Inline_Phone', 'formRule']);
