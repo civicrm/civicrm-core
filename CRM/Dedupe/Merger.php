@@ -735,25 +735,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     //add contact id
     $data['contact_id'] = $contactID;
-    $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
-
-    $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
 
     $blocks = ['email', 'phone', 'im', 'openid'];
 
-    $multiplFields = ['url'];
-    // prevent overwritten of formatted array, reset all block from
-    // params if it is not in valid format (since import pass valid format)
-    foreach ($blocks as $blk) {
-      if (array_key_exists($blk, $params) &&
-        !is_array($params[$blk])
-      ) {
-        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-        unset($params[$blk]);
-      }
-    }
-
-    $primaryPhoneLoc = NULL;
     $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
       [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
