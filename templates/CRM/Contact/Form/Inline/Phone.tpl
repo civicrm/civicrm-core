@@ -39,6 +39,7 @@
             <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
           {/if}
         </td>
+        {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=phone customFields=$custom_fields_phone blockId=$blockId actualBlockCount=$actualBlockCount}
     </tr>
     {/section}
 </table>

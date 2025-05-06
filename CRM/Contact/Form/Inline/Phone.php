@@ -40,12 +40,10 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    */
   public function preProcess(): void {
     parent::preProcess();
-
-    //get all the existing phones
-    $phone = new CRM_Core_BAO_Phone();
-    $phone->contact_id = $this->getContactID();
-
-    $this->_phones = CRM_Core_BAO_Block::retrieveBlock($phone);
+    // Get all the existing phones , The array historically starts
+    // with 1 not 0 so we do something nasty to continue that.
+    $this->_phones = array_merge([0 => 1], (array) $this->getExistingPhones());
+    unset($this->_phones[0]);
   }
 
   /**
@@ -141,18 +139,15 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * Process the form.
    */
   public function postProcess(): void {
-    $params = $this->exportValues();
+    $params = $this->getSubmittedValues();
 
     // Process / save phones
-    $params['contact_id'] = $this->_contactId;
-    $params['updateBlankLocInfo'] = TRUE;
-    $params['phone']['isIdSet'] = TRUE;
     foreach ($this->_phones as $count => $value) {
       if (!empty($value['id']) && isset($params['phone'][$count])) {
         $params['phone'][$count]['id'] = $value['id'];
       }
     }
-    CRM_Core_BAO_Block::create('phone', $params);
+    $this->savePhones($params['phone']);
 
     $this->log();
     $this->response();
