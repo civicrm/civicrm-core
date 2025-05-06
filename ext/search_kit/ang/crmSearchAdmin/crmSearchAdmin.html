@@ -77,7 +77,7 @@
                   {{:: ts('Search results table') }}
                 </a>
               </li>
-              <li ng-repeat="display in $ctrl.savedSearch.displays" ng-if="display.id" ng-class="{disabled: display.acl_bypass}" title="{{:: display.acl_bypass ? ts('Display has permissions disabled') : ts('View display') }}">
+              <li ng-repeat="display in $ctrl.savedSearch.displays" ng-if="$ctrl.displayIsViewable(display)" ng-class="{disabled: display.acl_bypass}" title="{{:: display.acl_bypass ? ts('Display has permissions disabled') : ts('View display') }}">
                 <a ng-href="{{ display.acl_bypass ? '' : $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name + '/' + display.name }}" target="_blank">
                   <i class="crm-i {{ display.acl_bypass ? 'fa-unlock' : $ctrl.displayTypes[display.type].icon }}"></i>
                   {{ display.label }}
