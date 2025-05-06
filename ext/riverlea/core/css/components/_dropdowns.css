@@ -275,7 +275,7 @@
   background-color: var(--crm-c-background3);
 }
 #bootstrap-theme .dropdown-menu li .form-inline,
-#bootstrap-theme .dropdown-menu li .form-inline a {
+#bootstrap-theme .dropdown-menu li .form-inline a:not(.select2-choice) {
   color: var(--crm-dropdown-col);
 }
 .crm-container .dropdown-menu > li {
