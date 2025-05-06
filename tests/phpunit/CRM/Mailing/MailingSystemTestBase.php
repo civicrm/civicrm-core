@@ -18,6 +18,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Address;
 use Civi\Api4\MailSettings;
 use GuzzleHttp\Psr7\Request;
 
@@ -52,6 +53,17 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
       'groups' => ['include' => [$this->_groupID]],
       'scheduled_date' => 'now',
     ];
+    $domainContactID = CRM_Core_BAO_Domain::getDomain()->contact_id;
+    if (!Address::get(FALSE)->addWhere('contact_id', '=', $domainContactID)->execute()->count()) {
+      Address::create(FALSE)->setValues([
+        'contact_id' => $domainContactID,
+        'street_address' => '15 Main Street',
+        'city' => 'Collinsville',
+        'state_province_id:abbr' => 'CT',
+        'postal_code' => '6022',
+        'country_id:abbr' => 'US',
+      ])->execute();
+    }
     $this->_mut = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('mail_settings', 'get',
       ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
@@ -186,7 +198,10 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
         ";" .
         // Default header
         "Sample Header for TEXT formatted content.\n" .
-        "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
+        "BEWARE children need regular infusions of toys. Santa knows your 15 Main Street
+Collinsville, CT 6022
+United States
+.*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
         // Default footer
         "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",

@@ -19,6 +19,7 @@
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
+use Civi\Api4\Address;
 
 /**
  * Class CRM_Mailing_MailingSystemTest.
@@ -155,6 +156,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
 
   /**
    * Test the auto-respond email, including token presence.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMailingReplyAutoRespond(): void {
     // Because our parent class marks the _groupID as private, we can't use that :-(
@@ -163,8 +166,19 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
       'title' => 'Test Group Mailing Reply',
     ]);
     $this->createContactsInGroup(1, $group_1);
-    $this->callAPISuccess('Address', 'create', ['street_address' => 'Sesame Street', 'contact_id' => 1]);
-
+    $domainAddress = Address::get(FALSE)
+      ->addWhere('contact_id', '=', CRM_Core_BAO_Domain::getDomain()->id)
+      ->addOrderBy('is_primary', 'DESC')
+      ->execute()->first();
+    if ($domainAddress) {
+      Address::update(FALSE)
+        ->setValues(['street_address' => 'Sesame Street'])
+        ->addWhere('id', '=', $domainAddress['id'])
+        ->execute();
+    }
+    else {
+      $this->callAPISuccess('Address', 'create', ['street_address' => 'Sesame Street', 'contact_id' => 1, 'version' => 4]);
+    }
     // Also _mut is private to the parent, so we have to make our own:
     $mut = new CiviMailUtils($this, TRUE);
 
