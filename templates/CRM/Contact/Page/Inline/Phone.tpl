@@ -37,6 +37,7 @@
             {$item.phone}{if !empty($item.phone_ext)}&nbsp;&nbsp;{ts}ext.{/ts} {$item.phone_ext}{/if}
           </div>
         </div>
+        {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='phone' customGroups=$item.custom identifier=$blockId}
       {/if}
     {/foreach}
    </div>
