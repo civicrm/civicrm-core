@@ -575,6 +575,21 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   */
+  public function getUFLocale(): ?string {
+    $userId = $this->getLoggedInUfID();
+    if ($userId) {
+      $user = $this->getUserById($userId);
+      if ($user && !empty($user['language'])) {
+        return $user['language'];
+      }
+    }
+
+    return NULL;
+  }
+
+  /**
+   * @inheritDoc
    * @todo implement language negotiation for Standalone?
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
