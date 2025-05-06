@@ -729,29 +729,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     ) {
       $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
     }
-
-    $locationType = [];
-    $count = 1;
-
     //add contact id
     $data['contact_id'] = $contactID;
 
-    $blocks = ['email', 'phone', 'im', 'openid'];
-
     $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
-      [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
-
-      if ($locTypeId == 'Primary') {
-        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-        if (in_array($fieldName, $blocks)) {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
-        }
-        else {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
-        }
-        $primaryLocationType = $locTypeId;
-      }
 
       if (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
         // for autocomplete transfer hidden value instead of label
