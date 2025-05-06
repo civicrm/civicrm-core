@@ -238,10 +238,17 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     // get contact tags
     $defaults['contactTag'] = CRM_Core_BAO_EntityTag::getContactTags($this->_contactId);
     if (!empty($defaults['contactTag'])) {
+      // @todo - this looks like it is just overwritten a few lines down in the assign.
       $defaults['allTags'] = CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', FALSE);
     }
+    // @todo - stop assigning defaults - assign variables individually
+    // rather than adding to defaults for transparency - this is some old
+    // copy & paste.
+    $this->assign($defaults);
+    $this->assign('allTabs', $this->getTabs($defaults));
+    unset($defaults);
 
-    $defaults['privacy_values'] = CRM_Core_SelectValues::privacy();
+    $this->assign('privacy_values', CRM_Core_SelectValues::privacy());
 
     //Show blocks only if they are visible in edit form
     $editOptions = CRM_Core_BAO_Setting::valueOptions(
@@ -268,10 +275,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
     $this->assign('sharedAddresses', $sharedAddresses);
-    // @todo - stop assigning defaults - assign variables individually
-    // rather than adding to defaults for transparency - this is some old
-    // copy & paste.
-    $this->assign($defaults);
 
     // FIXME: when we sort out TZ isssues with DATETIME/TIMESTAMP, we can skip next query
     // also assign the last modifed details
@@ -286,8 +289,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     $changeLog = $this->_viewOptions['log'];
     $this->assign('changeLog', $changeLog);
-
-    $this->assign('allTabs', $this->getTabs($defaults));
 
     // hook for contact summary
     // ignored but needed to prevent warnings
