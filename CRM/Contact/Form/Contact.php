@@ -1475,10 +1475,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       CRM_Contact_Form_Edit_Website::buildQuickForm($this, $instance);
       return;
     }
-    if ($name === 'IM') {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this, $instance);
-      return;
-    }
     if ($name === 'OpenID') {
       CRM_Contact_Form_Edit_OpenID::buildQuickForm($this, $instance);
       return;
