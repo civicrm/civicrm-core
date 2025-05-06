@@ -24,18 +24,18 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * Phones of the contact that is been viewed
    * @var array
    */
-  private $_phones = [];
+  private array $_phones = [];
 
   /**
    * No of phone blocks for inline edit
    * @var int
    */
-  private $_blockCount = 6;
+  private int $_blockCount = 6;
 
   /**
    * Call preprocess.
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
 
     //get all the existing phones
@@ -48,7 +48,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   /**
    * Build the form object elements for phone object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
 
     $totalBlocks = $this->_blockCount;
@@ -121,7 +121,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    *
    * @return array
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $defaults = [];
     if (!empty($this->_phones)) {
       foreach ($this->_phones as $id => $value) {
@@ -139,7 +139,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   /**
    * Process the form.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $params = $this->exportValues();
 
     // Process / save phones
