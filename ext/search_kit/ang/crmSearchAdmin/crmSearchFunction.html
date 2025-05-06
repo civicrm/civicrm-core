@@ -21,8 +21,8 @@
         </li>
       </ul>
     </div>
-    <input ng-if="arg.type === 'number'" class="form-control" type="number" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.writeExpr()" ng-required="!$ctrl.getParam($index).can_be_empty" ng-model-options="{updateOn: 'blur'}">
-    <input ng-if="arg.type === 'string'" class="form-control" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.writeExpr()" ng-trim="false" ng-required="!$ctrl.getParam($index).can_be_empty" ng-model-options="{updateOn: 'blur'}">
+    <input ng-if="arg.type === 'number'" class="form-control" type="number" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.writeExpr()" ng-required="!$ctrl.getParam($index).can_be_empty && !$ctrl.getParam($index).optional" ng-model-options="{updateOn: 'blur'}">
+    <input ng-if="arg.type === 'string'" class="form-control" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.writeExpr()" ng-trim="false" ng-required="!$ctrl.getParam($index).can_be_empty && !$ctrl.getParam($index).optional" ng-model-options="{updateOn: 'blur'}">
     <span ng-if="arg.type === 'field'">
       <input class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: $ctrl.getParam($index).label, allowClear: false}" required ng-change="$ctrl.writeExpr()">
     </span>
