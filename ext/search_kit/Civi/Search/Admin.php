@@ -41,7 +41,7 @@ class Admin {
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'permissions' => [],
       'functions' => self::getSqlFunctions(),
-      'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
+      'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon', 'grouping']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
       'defaultPagerSize' => (int) \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),

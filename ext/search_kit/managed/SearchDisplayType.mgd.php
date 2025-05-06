@@ -20,6 +20,7 @@ return [
           'label',
           'icon',
           'description',
+          'grouping',
         ],
       ],
       'match' => ['name'],
@@ -121,6 +122,8 @@ return [
         'icon' => 'fa-keyboard-o',
         'is_reserved' => TRUE,
         'is_active' => TRUE,
+        // This display type is not viewable
+        'grouping' => 'non-viewable',
       ],
       'match' => ['option_group_id', 'name'],
     ],
@@ -141,6 +144,8 @@ return [
         'icon' => 'fa-database',
         'is_reserved' => TRUE,
         'is_active' => TRUE,
+        // This display type is not viewable
+        'grouping' => 'non-viewable',
       ],
       'match' => ['option_group_id', 'name'],
     ],
