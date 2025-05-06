@@ -143,7 +143,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
 
     if ($info['definition']['type'] === 'block') {
       $blockEntity = $info['definition']['join_entity'] ?? $info['definition']['entity_type'] ?? NULL;
-      if ($blockEntity) {
+      if ($blockEntity && $blockEntity !== '*') {
         $entities[] = $blockEntity;
       }
       $scanBlocks($info['definition']['layout']);
