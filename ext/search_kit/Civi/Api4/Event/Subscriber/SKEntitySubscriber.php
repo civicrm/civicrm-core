@@ -62,7 +62,11 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'searchable' => 'secondary',
         'class' => SKEntity::class,
         'icon' => 'fa-search-plus',
+        'search_fields' => [],
       ];
+      foreach ($display['settings']['columns'] as $column) {
+        $event->entities[$display['entityName']]['search_fields'][] = $column['spec']['name'];
+      }
     }
   }
 
