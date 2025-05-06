@@ -2128,6 +2128,20 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'table_name' => 'civicrm_address',
         'allow_is_multiple' => FALSE,
       ],
+      [
+        'id' => 'Phone',
+        'label' => ts('Phones'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_phone',
+        'allow_is_multiple' => FALSE,
+      ],
+      [
+        'id' => 'Email',
+        'label' => ts('Emails'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_email',
+        'allow_is_multiple' => FALSE,
+      ],
       // TODO: Move to civi_campaign extension (example: OptionValue_cg_extends_objects_grant.mgd.php)
       [
         'id' => 'Campaign',
