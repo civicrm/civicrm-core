@@ -192,7 +192,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
     $this->assign('email', $emails);
     $defaults['openid'] = $this->getLocationValues($this->_contactId, 'OpenID');
-    $defaults['phone'] = $this->getLocationValues($this->_contactId, 'Phone');
+    $phones = $this->getLocationValues($this->_contactId, 'Phone');
+    foreach ($phones as $blockId => $phone) {
+      $phones[$blockId]['custom'] = $this->addBlockCustomData('Phone', $phone['id']);
+    }
+    $this->assign('phone', $phones);
     $defaults['website'] = $this->getLocationValues($this->_contactId, 'Website');
     // Copy employer fields to the current_employer keys.
     if (($defaults['contact_type'] === 'Individual') && !empty($defaults['employer_id']) && !empty($defaults['organization_name'])) {
