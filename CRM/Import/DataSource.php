@@ -196,10 +196,6 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
       return NULL;
     }
     $values = $this->queryResultObject->toArray();
-    /* trim whitespace around the values */
-    foreach ($values as $k => $v) {
-      $values[$k] = trim($v, " \t\r\n");
-    }
     $this->row = $values;
     return $values;
   }
