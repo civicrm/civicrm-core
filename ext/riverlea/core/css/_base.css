@@ -365,11 +365,20 @@ dl dl {
 }
 .crm-container pre.prettyprint {
   background: var(--crm-c-text-light); /* method to force light bg on prettyprint code as inverting is too complex */
-  white-space: normal;
+  white-space: pre;
+  text-wrap: auto;
 }
 .crm-container pre.linenums {
   background: var(--crm-c-text-light);
   color: var(--crm-c-text-dark);
+}
+.crm-container ol.linenums {
+  list-style-type: decimal;
+  margin-inline: 0;
+  padding-inline-start: 5ch;
+}
+.crm-container ol.linenums li:nth-of-type(5n) {
+  list-style: inherit !important; /* vs WordPress list-style reset */
 }
 .crm-container td > code {
   display: block;
