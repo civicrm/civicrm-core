@@ -29,6 +29,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   use CRM_Custom_Form_CustomDataTrait;
   use CRM_Contact_Form_Edit_OpenIDBlockTrait;
   use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_Edit_IMBlockTrait;
 
   /**
    * Is this the contact summary edit screen.
@@ -252,7 +253,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
         else {
           CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId, 'contact_id' => $this->_contactId], $this->_values);
-          $this->_values['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['im'] = $this->getExistingIMsReIndexed();
           $this->_values['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $this->_contactId]);
           $this->_values['openid'] = $this->getExistingOpenIDsReIndexed();
           $this->_values['phone'] = $this->getExistingPhonessReIndexed();
@@ -1478,7 +1479,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return;
     }
     if ($name === 'IM') {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this, $instance);
+      $this->addOpenIDBlockFields($instance);
       return;
     }
     if ($name === 'Website') {

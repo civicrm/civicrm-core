@@ -23,6 +23,13 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   use CRM_Contact_Form_ContactFormTrait;
 
   /**
+   * Is this the contact summary edit screen.
+   *
+   * @var bool
+   */
+  protected bool $isContactSummaryEdit = FALSE;
+
+  /**
    * Ims of the contact that is been viewed.
    * @var array
    */
@@ -41,8 +48,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
     parent::preProcess();
     // Get all the existing ims , The array historically starts
     // with 1 not 0 so we do something nasty to continue that.
-    $this->_ims = array_merge([0 => 1], (array) $this->getExistingIMs());
-    unset($this->_ims[0]);
+    $this->_ims = $this->getExistingIMsReIndexed();
   }
 
   /**
