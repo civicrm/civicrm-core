@@ -29,6 +29,7 @@ class CRM_Contact_Form_Edit_Email {
    *   Block number to build.
    * @param bool $blockEdit
    *   Is it block edit.
+   * @deprecated moving core usages to EmailBlockTrait
    */
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
