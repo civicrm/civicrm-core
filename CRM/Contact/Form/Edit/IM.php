@@ -32,6 +32,7 @@ class CRM_Contact_Form_Edit_IM {
    */
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     if (!$blockCount) {
+      CRM_Core_Error::deprecatedWarning('pass in blockCount');
       $blockId = ($form->get('IM_Block_Count')) ? $form->get('IM_Block_Count') : 1;
     }
     else {

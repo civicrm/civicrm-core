@@ -19,6 +19,9 @@
  * Dummy page for details for OpenID.
  */
 class CRM_Contact_Page_Inline_OpenID extends CRM_Core_Page {
+  use CRM_Custom_Page_CustomDataTrait;
+  use CRM_Contact_Form_Edit_OpenIDBlockTrait;
+  use CRM_Contact_Form_ContactFormTrait;
 
   /**
    * Run the page.
@@ -27,25 +30,20 @@ class CRM_Contact_Page_Inline_OpenID extends CRM_Core_Page {
    *
    * @throws \CRM_Core_Exception
    */
-  public function run() {
-    // get the emails for this contact
-    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
-
-    $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id');
-
-    $entityBlock = ['contact_id' => $contactId];
-    $openids = CRM_Core_BAO_OpenID::getValues($entityBlock);
+  public function run(): void {
+    $openids = (array) $this->getExistingOpenIDs();
     if (!empty($openids)) {
-      foreach ($openids as $key => & $value) {
-        $value['location_type'] = $locationTypes[$value['location_type_id']];
+      foreach ($openids as &$value) {
+        $value['location_type'] = $value['location_type_id:label'];
+        $value['custom'] = $this->getCustomDataFieldsForEntityDisplay('Openid', $value['id']);
       }
     }
 
-    $this->assign('contactId', $contactId);
+    $this->assign('contactId', $this->getContactID());
     $this->assign('openid', $openids);
 
     // check logged in user permission
-    CRM_Contact_Page_View::checkUserPermission($this, $contactId);
+    CRM_Contact_Page_View::checkUserPermission($this, $this->getContactID());
 
     // finally call parent
     parent::run();
