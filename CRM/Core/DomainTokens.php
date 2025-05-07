@@ -10,6 +10,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Address;
+use Civi\Api4\Email;
+use Civi\Api4\Phone;
 use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenRow;
 
@@ -73,8 +76,8 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       $row->format('text/html')->tokens($entity, $field, $nowObj);
       return;
     }
-    $row->format('text/html')->tokens($entity, $field, self::getDomainTokenValues()[$field]);
-    $row->format('text/plain')->tokens($entity, $field, self::getDomainTokenValues(NULL, FALSE)[$field]);
+    $row->format('text/html')->tokens($entity, $field, self::getDomainTokenValues()[$field] ?? '');
+    $row->format('text/plain')->tokens($entity, $field, self::getDomainTokenValues(NULL, FALSE)[$field] ?? '');
   }
 
   /**
@@ -109,27 +112,45 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
         'id' => $domain->id,
         'description' => $domain->description ?? '',
       ];
-      $loc = $domain->getLocationValues();
-
+      $addressFields = [
+        'street_address',
+        'supplemental_address_1',
+        'supplemental_address_2',
+        'supplemental_address_3',
+        'city',
+        'state_province_id:label',
+        'state_province_id:abbr',
+        'country_id:label',
+        'country_id:abbr',
+        'county_id:label',
+        'county_id:abbr',
+        'postal_code',
+        'postal_code_suffix',
+        'country_id.region_id:label',
+      ];
+      $address = Address::get(FALSE)
+        ->addWhere('contact_id', '=', $domain->contact_id)
+        ->setSelect($addressFields)
+        ->addOrderBy('is_primary', 'DESC')
+        ->execute()->first() ?? [];
+      unset($address['id']);
+      $tokens += $address;
       if ($html) {
-        $tokens['address'] = str_replace("\n", '<br />', ($loc['address'][1]['display'] ?? ''));
+        $tokens['address'] = str_replace("\n", '<br />', (CRM_Utils_Address::formatVCard($address)));
       }
       else {
-        $tokens['address'] = $loc['address'][1]['display_text'] ?? '';
+        $tokens['address'] = CRM_Utils_Address::format($address);
       }
-      $tokens['street_address'] = $loc['address'][1]['street_address'] ?? '';
-      $tokens['supplemental_address_1'] = $loc['address'][1]['supplemental_address_1'] ?? '';
-      $tokens['supplemental_address_2'] = $loc['address'][1]['supplemental_address_2'] ?? '';
-      $tokens['supplemental_address_3'] = $loc['address'][1]['supplemental_address_3'] ?? '';
-      $tokens['city'] = $loc['address'][1]['city'] ?? '';
-      $tokens['postal_code'] = $loc['address'][1]['postal_code'] ?? '';
-      $tokens['state_province_id:label'] = $loc['address'][1]['state_province'] ?? '';
-      $tokens['state_province_id:abbr'] = $loc['address'][1]['state_province_abbreviation'] ?? '';
-      $tokens['country_id:label'] = $loc['address'][1]['country'] ?? '';
-      $phone = reset($loc['phone']);
-      $email = reset($loc['email']);
-      $tokens['phone'] = $phone['phone'] ?? '';
-      $tokens['email'] = $email['email'] ?? '';
+
+      $tokens['phone'] = Phone::get(FALSE)
+        ->addWhere('contact_id', '=', $domain->contact_id)
+        ->addOrderBy('is_primary', 'DESC')
+        ->addSelect('phone')->execute()->first()['phone'] ?? '';
+      $tokens['email'] = Email::get(FALSE)
+        ->addWhere('contact_id', '=', $domain->contact_id)
+        ->addOrderBy('is_primary', 'DESC')
+        ->addSelect('email')->execute()->first()['email'] ?? '';
+      ;
       $tokens['base_url'] = Civi::paths()->getVariable('cms.root', 'url');
       $tokens['empowered_by_civicrm_image_url'] = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'i/civi99.png';
       $tokens['tax_term'] = (string) Civi::settings()->get('tax_term');
