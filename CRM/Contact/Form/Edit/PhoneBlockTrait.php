@@ -48,6 +48,21 @@ trait CRM_Contact_Form_Edit_PhoneBlockTrait {
   }
 
   /**
+   * Get the open ids indexed numerically from 1.
+   *
+   * This reflects historical form requirements.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function getExistingPhonessReIndexed() : array {
+    $result = array_merge([0 => 1], (array) $this->getExistingPhones());
+    unset($result[0]);
+    return $result;
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   protected function addPhoneBlockFields(int $blockNumber): void {
