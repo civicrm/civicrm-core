@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/riverlea/streams</path>
+    <page_callback>CRM_riverlea_Page_RiverleaStreams</page_callback>
+    <title>Riverlea Streams</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>
