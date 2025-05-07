@@ -27,16 +27,16 @@ use Civi\Api4\Generic\Result;
 trait CRM_Contact_Form_Edit_OpenIDBlockTrait {
   use CRM_Contact_Form_Edit_BlockCustomDataTrait;
 
-  protected bool $isContactSummaryEdit = FALSE;
-
   /**
    * @var \Civi\Api4\Generic\Result
    */
   private Result $existingOpenIDs;
 
   /**
+   *
    * @return \Civi\Api4\Generic\Result
-   * @throws CRM_Core_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getExistingOpenIDs() : Result {
     if (!isset($this->existingOpenIDs)) {
@@ -47,6 +47,21 @@ trait CRM_Contact_Form_Edit_OpenIDBlockTrait {
         ->execute();
     }
     return $this->existingOpenIDs;
+  }
+
+  /**
+   * Get the open ids indexed numerically from 1.
+   *
+   * This reflects historical form requirements.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function getExistingOpenIDsReIndexed() : array {
+    $result = array_merge([0 => 1], (array) $this->getExistingOpenIDs());
+    unset($result[0]);
+    return $result;
   }
 
   /**

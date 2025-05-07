@@ -27,6 +27,15 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Contact_Form_Edit_OpenIDBlockTrait;
+
+  /**
+   * Is this the contact summary edit screen.
+   *
+   * @var bool
+   */
+  protected bool $isContactSummaryEdit = TRUE;
+
 
   /**
    * The contact type of the form.
@@ -244,7 +253,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId, 'contact_id' => $this->_contactId], $this->_values);
           $this->_values['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $this->_contactId]);
           $this->_values['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['openid'] = $this->getExistingOpenIDsReIndexed();
           $this->_values['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $this->_contactId]);
           $this->_values['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
           CRM_Core_BAO_Website::getValues(['contact_id' => $this->_contactId], $this->_values);
@@ -1476,7 +1485,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return;
     }
     if ($name === 'OpenID') {
-      CRM_Contact_Form_Edit_OpenID::buildQuickForm($this, $instance);
+      $this->addOpenIDBlockFields($instance);
       return;
     }
     if ($name === 'Email') {
