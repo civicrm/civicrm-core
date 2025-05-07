@@ -56,7 +56,7 @@ trait CRM_Contact_Form_Edit_BlockCustomDataTrait {
       }
       $this->customFieldBlocks[$entity][$blockNumber][$field['name']] = $field;
     }
-    $this->assign('custom_fields_' . strtolower($entity), $this->customFieldBlocks[$entity]);
+    $this->assign('custom_fields_' . strtolower($entity), $this->customFieldBlocks[$entity] ?? []);
   }
 
 }
