@@ -55,6 +55,7 @@
           flag_after: _.filter(_.keys(param.flag_after))[0],
           name: param.name,
           value: '',
+          optional: optional,
         });
         this.writeExpr();
       };
@@ -212,6 +213,10 @@
             const flag = arg.flag_before ? arg.flag_before + ' ' : '';
             const suffix = arg.flag_after ? ' ' + arg.flag_after : '';
             let content = '';
+            // Skip empty optional args
+            if (arg.optional && value === '' && flag === '') {
+              return '';
+            }
             if (ctrl.getParam(index).max_expr) {
               content = (arg.type === 'string' || value === '' ? JSON.stringify(value) : value);
             }
