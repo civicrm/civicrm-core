@@ -60,7 +60,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $this->setSelectedChild('location');
 
     $this->_values = $this->get('values');
-    if ($this->_id && empty($this->_values)) {
+    if ($this->getEventID() && empty($this->_values)) {
       //get location values.
       $params = [
         'entity_id' => $this->_id,
@@ -212,7 +212,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
        * affects the selected LocBlock and not the previous one - whether or not
        * there is a previous LocBlock.
        */
-      CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $this->_id,
+      CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $this->getEventID(),
         'loc_block_id', $params['loc_event_id']
       );
 
@@ -353,7 +353,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $params['loc_block_id'] = LocBlock::save(FALSE)->setRecords([$record])->execute()->first()['id'];
 
     // Finally update Event params.
-    $params['id'] = $this->_id;
+    $params['id'] = $this->getEventID();
     Event::save(FALSE)->addRecord($params)->execute();
 
     // Update tab "disabled" CSS class.
