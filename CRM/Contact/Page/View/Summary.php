@@ -185,19 +185,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     ];
 
     CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId], $defaults);
-    $defaults['im'] = $this->getLocationValues($this->_contactId, 'IM');
-    $emails = $this->getLocationValues($this->_contactId, 'Email');
-    foreach ($emails as $blockId => $email) {
-      $emails[$blockId]['custom'] = $this->addBlockCustomData('Email', $email['id']);
-    }
-    $this->assign('email', $emails);
-    $defaults['openid'] = $this->getLocationValues($this->_contactId, 'OpenID');
-    $phones = $this->getLocationValues($this->_contactId, 'Phone');
-    foreach ($phones as $blockId => $phone) {
-      $phones[$blockId]['custom'] = $this->addBlockCustomData('Phone', $phone['id']);
-    }
-    $this->assign('phone', $phones);
-    $defaults['website'] = $this->getLocationValues($this->_contactId, 'Website');
+    $this->assign('im', $this->getLocationValues($this->_contactId, 'IM'));
+    $this->assign('email', $this->getLocationValues($this->_contactId, 'Email'));
+    $this->assign('openid', $this->getLocationValues($this->_contactId, 'OpenID'));
+    $this->assign('phone', $this->getLocationValues($this->_contactId, 'Phone'));
+    $this->assign('website', $this->getLocationValues($this->_contactId, 'Website'));
+
     // Copy employer fields to the current_employer keys.
     if (($defaults['contact_type'] === 'Individual') && !empty($defaults['employer_id']) && !empty($defaults['organization_name'])) {
       $defaults['current_employer'] = $defaults['organization_name'];
@@ -538,6 +531,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       foreach ($optionFields as $optionField) {
         $locationEntities[$index][$fieldMap[$optionField]] = $locationEntity[$optionField . ':label'];
       }
+      $locationEntities[$index]['custom'] = $this->addBlockCustomData($entity, $locationEntity['id']);
     }
     return $locationEntities;
   }

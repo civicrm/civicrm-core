@@ -29,6 +29,7 @@
           <a href="{$item.openid}">{$item.openid|mb_truncate:40}</a>
         </div>
       </div>
+        {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='openid' customGroups=$item.custom identifier=$blockId}
       {/if}
     {/foreach}
    </div>
