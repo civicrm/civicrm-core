@@ -257,7 +257,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           $this->_values['im'] = $this->getExistingIMsReIndexed();
           $this->_values['email'] = $this->getExistingEmailsReIndexed();
           $this->_values['openid'] = $this->getExistingOpenIDsReIndexed();
-          $this->_values['phone'] = $this->getExistingPhonessReIndexed();
+          $this->_values['phone'] = $this->getExistingPhonesReIndexed();
           $this->_values['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
           CRM_Core_BAO_Website::getValues(['contact_id' => $this->_contactId], $this->_values);
           $this->set('values', $this->_values);
