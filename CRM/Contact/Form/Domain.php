@@ -95,7 +95,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       unset($params['id']);
       $locParams = ['contact_id' => $domainDefaults['contact_id']];
       $this->_locationDefaults['address'] = $defaults['address'] = CRM_Core_BAO_Address::getValues($locParams);
-      $this->_locationDefaults['phone'] = $defaults['phone'] = $this->getExistingPhonessReIndexed();
+      $this->_locationDefaults['phone'] = $defaults['phone'] = $this->getExistingPhonesReIndexed();
       $this->_locationDefaults['email'] = $defaults['email'] = $this->getExistingEmailsReIndexed();
       $config = CRM_Core_Config::singleton();
       if (!isset($defaults['address'][1]['country_id'])) {
