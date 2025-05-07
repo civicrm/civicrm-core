@@ -14,9 +14,11 @@
         status,
         args,
         submissionResponse,
+        autoSave = _.noop,
         saveDraftButtons = [],
-        draftStatus = 'unsaved',
+        draftStatus = 'pristine',
         cancelDraftWatcher,
+        uploadingDraftFiles = false,
         ts = CRM.ts('org.civicrm.afform'),
         ctrl = this;
 
@@ -146,12 +148,37 @@
       this.fileUploader = new FileUploader({
         url: CRM.url('civicrm/ajax/api4/Afform/submitFile'),
         headers: headers,
-        onCompleteAll: postProcess,
+        onAfterAddingFile: function(item) {
+          setDraftStatus('unsaved');
+        },
+        onSuccessItem: onFileUploadSuccess,
+        onCompleteAll: onFileUploadsComplete,
         onBeforeUploadItem: function(item) {
           status.resolve();
           status = CRM.status({start: ts('Uploading %1', {1: item.file.name})});
         }
       });
+
+      function onFileUploadSuccess(item, response, status, headers) {
+        if (response.values && response.values[0] && response.values[0].id) {
+          var dataProvider = item.crmDataProvider;
+          dataProvider.getFieldData()[item.crmFieldName] = response.values[0];
+        }
+      }
+
+      function onFileUploadsComplete() {
+        if (uploadingDraftFiles) {
+          uploadingDraftFiles = false;
+          setDraftStatus('saved');
+          //
+          if (draftStatus === 'unsaved') {
+            autoSave();
+          }
+          status.resolve();
+        } else {
+          postProcess();
+        }
+      }
 
       // Set up background tasks for saving draft
       function setupDraftWatcher() {
@@ -172,12 +199,18 @@
         });
 
         // If autosave enabled, save every ten seconds if changes have been made
-        const saveEveryTenSeconds = autoSaveEnabled ? _.debounce(ctrl.submitDraft, 10000) : _.noop;
+        if (autoSaveEnabled) {
+          autoSave = _.debounce(ctrl.submitDraft, 10000);
+        }
 
         cancelDraftWatcher = $scope.$watch(() => data, function (newVal, oldVal) {
             if (oldVal) {
-              setDraftStatus('unsaved');
-              saveEveryTenSeconds(newVal);
+              if (draftStatus === 'pristine') {
+                setDraftStatus('saved');
+              } else {
+                setDraftStatus('unsaved');
+                autoSave(newVal);
+              }
             }
           },
           true
@@ -394,14 +427,30 @@
       };
 
       this.submitDraft = function() {
+        if (uploadingDraftFiles) {
+          return;
+        }
         setDraftStatus('saving');
+        status = CRM.status({start: ts('Saving Draft'), success: ts('Draft saved')});
         crmApi4('Afform', 'submitDraft', {
           name: ctrl.getFormMeta().name,
           args: args,
           values: data,
         }).then(function(response) {
-          setDraftStatus('saved');
-          crmStatus(ts('Draft saved'));
+          status.resolve();
+          if (ctrl.fileUploader.getNotUploadedItems().length) {
+            uploadingDraftFiles = true;
+            _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
+              file.formData.push({
+                params: JSON.stringify(_.extend({
+                  name: ctrl.getFormMeta().name
+                }, file.crmApiParams()))
+              });
+            });
+            ctrl.fileUploader.uploadAll();
+          } else {
+            setDraftStatus('saved');
+          }
         });
       };
 
@@ -410,8 +459,7 @@
       }
 
       function setDraftStatus(newStatus) {
-        const buttons = getDraftButtons();
-        if (draftStatus === newStatus || !buttons.length) {
+        if (draftStatus === newStatus) {
           return;
         }
         if (draftStatus === 'unsaved' && newStatus === 'saved') {
@@ -419,25 +467,35 @@
           return;
         }
         // Setting to 'unsaved' - restore buttons to initial state
-        if (newStatus === 'unsaved') {
-          $.each(buttons, function(index, button) {
-            const initialState = saveDraftButtons[index] || saveDraftButtons[0];
-            $(button).text(initialState.text).attr('disabled', false);
-            if (initialState.icon) {
-              $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" aria-hidden="true"></i> ');
-            }
-          });
+        if (newStatus === 'unsaved' && !uploadingDraftFiles) {
+          restoreDraftButtons();
         }
         // Change icon, text & disable button for 'saving' or 'saved' status
-        else {
+        else if (!uploadingDraftFiles) {
           const newText = newStatus === 'saving' ? ts('Saving Draft') : ts('Draft Saved');
           const newIcon = newStatus === 'saving' ? 'fa-spinner fa-spin' : 'fa-check';
-          $.each(buttons, function(index, button) {
-            $(button).text(newText).attr('disabled', true);
-            $(button).prepend('<i class="crm-i ' + newIcon + '" aria-hidden="true"></i> ');
-          });
+          disableDraftButtons(newText, newIcon);
         }
         draftStatus = newStatus;
+      }
+
+      function disableDraftButtons(text, icon) {
+        const buttons = getDraftButtons();
+        $.each(buttons, function(index, button) {
+          $(button).text(text).attr('disabled', true);
+          $(button).prepend('<i class="crm-i ' + icon + '" aria-hidden="true"></i> ');
+        });
+      }
+
+      function restoreDraftButtons() {
+        const buttons = getDraftButtons();
+        $.each(buttons, function(index, button) {
+          const initialState = saveDraftButtons[index] || saveDraftButtons[0];
+          $(button).text(initialState.text).attr('disabled', false);
+          if (initialState.icon) {
+            $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" aria-hidden="true"></i> ');
+          }
+        });
       }
 
     }
