@@ -56,7 +56,7 @@ trait CRM_Contact_Form_Edit_PhoneBlockTrait {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function getExistingPhonessReIndexed() : array {
+  public function getExistingPhonesReIndexed() : array {
     $result = array_merge([0 => 1], (array) $this->getExistingPhones());
     unset($result[0]);
     return $result;
