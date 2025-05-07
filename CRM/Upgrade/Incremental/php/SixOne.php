@@ -140,14 +140,15 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       $userJob->find();
       while ($userJob->fetch()) {
         $metadata = json_decode($userJob->metadata, TRUE);
-        foreach ($metadata['import_mappings'] as &$mapping) {
-          if (isset($fieldsToConvert[$mapping['name']])) {
-            $mapping['name'] = $fieldsToConvert[$mapping['name']];
+        if (!empty($metadata['import_mappings'])) {
+          foreach ($metadata['import_mappings'] as &$mapping) {
+            if (isset($fieldsToConvert[$mapping['name']])) {
+              $mapping['name'] = $fieldsToConvert[$mapping['name']];
+            }
+            $userJob->metadata = json_encode($metadata);
+            $userJob->save();
           }
-          $userJob->metadata = json_encode($metadata);
-          $userJob->save();
         }
-
       }
     }
     return TRUE;
