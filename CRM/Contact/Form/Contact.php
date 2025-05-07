@@ -1480,7 +1480,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return;
     }
     if ($name === 'IM') {
-      $this->addOpenIDBlockFields($instance);
+      $this->addIMBlockFields($instance);
       return;
     }
     if ($name === 'Website') {
