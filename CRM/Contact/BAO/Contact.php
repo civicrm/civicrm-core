@@ -1140,7 +1140,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       // If the call is initiated from the profile loaded from drupal, we
       // need to change the form name. otherwise we will get : Error: Could
       // not find a valid session key.
-      if (strpos($key, 'CRMProfileFormDynamic') !== FALSE) {
+      if (str_contains($key, 'CRMProfileFormDynamic')) {
         $formName = 'CRM_Profile_Form_Dynamic';
       }
     }
