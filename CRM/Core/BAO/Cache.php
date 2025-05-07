@@ -192,11 +192,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     }
 
     if ($expired) {
-      $sql = "DELETE FROM civicrm_cache WHERE expired_date < %1";
-      $params = [
-        1 => [date(CRM_Utils_Cache_SqlGroup::TS_FMT, CRM_Utils_Time::getTimeRaw()), 'String'],
-      ];
-      CRM_Core_DAO::executeQuery($sql, $params);
+      \Civi::cache('long')->garbageCollection();
     }
   }
 

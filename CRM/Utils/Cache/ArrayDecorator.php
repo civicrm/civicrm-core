@@ -112,9 +112,17 @@ class CRM_Utils_Cache_ArrayDecorator implements CRM_Utils_Cache_Interface {
     return $this->delegate->clear();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    $this->expires = [];
+    return TRUE;
+  }
+
   public function has($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    if (array_key_exists($key, $this->values) && $this->expires[$key] > CRM_Utils_Time::getTimeRaw()) {
+    if (array_key_exists($key, $this->values) && $this->expires[$key] > CRM_Utils_Time::time()) {
       return TRUE;
     }
     return $this->delegate->has($key);
