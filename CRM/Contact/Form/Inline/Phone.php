@@ -41,9 +41,8 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   public function preProcess(): void {
     parent::preProcess();
     // Get all the existing phones , The array historically starts
-    // with 1 not 0 so we do something nasty to continue that.
-    $this->_phones = array_merge([0 => 1], (array) $this->getExistingPhones());
-    unset($this->_phones[0]);
+    // with 1 not 0.
+    $this->_phones = $this->getExistingPhonessReIndexed();
   }
 
   /**

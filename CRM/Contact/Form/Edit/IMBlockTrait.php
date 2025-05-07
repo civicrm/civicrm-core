@@ -32,8 +32,6 @@ trait CRM_Contact_Form_Edit_IMBlockTrait {
    */
   private Result $existingIMs;
 
-  protected bool $isContactSummaryEdit = FALSE;
-
   /**
    * @return \Civi\Api4\Generic\Result
    * @throws CRM_Core_Exception
@@ -47,6 +45,21 @@ trait CRM_Contact_Form_Edit_IMBlockTrait {
         ->execute();
     }
     return $this->existingIMs;
+  }
+
+  /**
+   * Get the open ids indexed numerically from 1.
+   *
+   * This reflects historical form requirements.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function getExistingIMsReIndexed() : array {
+    $result = array_merge([0 => 1], (array) $this->getExistingIMs());
+    unset($result[0]);
+    return $result;
   }
 
   /**
