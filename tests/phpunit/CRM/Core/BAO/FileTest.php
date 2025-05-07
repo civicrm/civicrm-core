@@ -153,13 +153,11 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
    * @return array
    */
   public function fileHashProvider() {
-    $currentTimestamp = time();
-
     return [
       // Test case 1: Valid token with a specific fileId
       'valid_file_hash' => [
         'fileId' => 123,
-        'genTs' => $currentTimestamp,
+        'genTs' => 'now',
         'life' => 1,
         'expectedResult' => TRUE,
       ],
@@ -168,7 +166,7 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
       'expired_file_hash' => [
         'fileId' => 123,
         // Token generated 2 hours ago
-        'genTs' => $currentTimestamp - (2 * 60 * 60),
+        'genTs' => '2 hours ago',
         'life' => 1,
         'expectedResult' => FALSE,
       ],
@@ -176,7 +174,7 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
       // Test case 3: Invalid fileId
       'invalid_file_id' => [
         'fileId' => 123,
-        'genTs' => $currentTimestamp,
+        'genTs' => 'now',
         'life' => 1,
         'expectedResult' => FALSE,
         'invalidFileId' => 999,
@@ -190,6 +188,11 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
    * @dataProvider fileHashProvider
    */
   public function testFileHash($fileId, $genTs, $life, $expectedResult, $invalidFileId = NULL) {
+    // We generate it now from its word description because dataproviders run
+    // at the start of the suite, so could have expired already in a
+    // long-running suite.
+    $genTs = strtotime($genTs);
+
     // Generate token
     $token = CRM_Core_BAO_File::generateFileHash(NULL, $fileId, $genTs, $life);
 
