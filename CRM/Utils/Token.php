@@ -1742,12 +1742,40 @@ class CRM_Utils_Token {
           '$contributionTypeName' => 'contribution.financial_type_id:label',
           '$trxn_id' => 'contribution.trxn_id',
           '$participant_status_id' => 'participant.status_id',
-
+          '$participant.role' => 'participant.role_id:label',
         ],
         'event_online_receipt' => [
           '`$participant.id`' => 'participant.id',
           '$dataArray' => ts('see default template for how to show this'),
           '$individual' => ts('see default template for how to show this'),
+          '$location' => 'event.location',
+          '$participant.role' => 'participant.role_id:label',
+          '$event.participant_role' => 'participant.role_id:label',
+        ],
+        'participant_transferred' => [
+          '$location' => 'event.location',
+          '$participant.role' => 'participant.role_id:label',
+          '$event.participant_role' => 'participant.role_id:label',
+        ],
+        'participant_cancelled' => [
+          '$location' => 'event.location',
+          '$participant.role' => 'participant.role_id:label',
+          '$event.participant_role' => 'participant.role_id:label',
+        ],
+        'participant_expired' => [
+          '$location' => 'event.location',
+          '$participant.role' => 'participant.role_id:label',
+          '$event.participant_role' => 'participant.role_id:label',
+        ],
+        'participant_confirm' => [
+          '$location' => 'event.location',
+          '$participant.role' => 'participant.role_id:label',
+          '$event.participant_role' => 'participant.role_id:label',
+        ],
+        'payment_or_refund_notification' => [
+          '$location' => 'event.location',
+          '$participant.role' => 'participant.role_id:label',
+          '$event.participant_role' => 'participant.role_id:label',
         ],
         'pledge_acknowledgement' => [
           '$domain' => ts('no longer available / relevant'),
