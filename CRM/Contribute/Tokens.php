@@ -101,7 +101,7 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
       $address = Address::get(FALSE)
         ->addWhere('id', '=', $addressID)
         ->addSelect('*', 'state_province_id:label', 'country_id:label')
-        ->execute()->first();
+        ->execute()->first() ?? [];
       // We have name in the address_id.name token.
       unset($address['name']);
       return \CRM_Utils_Address::format($address);
