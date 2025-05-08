@@ -159,7 +159,7 @@ class CRM_Queue_Runner {
    *
    * @throws \CRM_Core_Exception
    */
-  public function runAllInteractive(): void {
+  public function runAllInteractive(bool $redirectImmediately = TRUE): ?string {
     $this->assertRequirementsWeb();
     $this->assertRequirementsBackground();
 
@@ -172,17 +172,19 @@ class CRM_Queue_Runner {
     UserJob::save(FALSE)->setRecords([$userJob])->execute();
 
     if (Civi::settings()->get('enableBackgroundQueue')) {
-      $this->runAllViaBackground();
-      return;
+      $url = $this->startBackgroundRun();
     }
-    $this->runAllViaWeb();
+    else {
+      $url = $this->startWebRun();
+    }
+    if ($redirectImmediately) {
+      CRM_Utils_System::redirect($url);
+    }
+    return $url;
   }
 
   protected function runAllViaBackground() {
-    $url = CRM_Utils_System::url('civicrm/queue/monitor', ['name' => $this->queue->getName()]);
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = "active" WHERE name = %1', [
-      1 => [$this->queue->getName(), 'String'],
-    ]);
+    $url = $this->startBackgroundRun();
     CRM_Utils_System::redirect($url);
   }
 
@@ -190,10 +192,31 @@ class CRM_Queue_Runner {
    * Redirect to the web-based queue-runner and evaluate all tasks in a queue.
    */
   public function runAllViaWeb() {
-    $_SESSION['queueRunners'][$this->qrid] = serialize($this);
-    $url = CRM_Utils_System::url($this->pathPrefix . '/runner', 'reset=1&qrid=' . urlencode($this->qrid));
-    $this->disableBackgroundExecution();
+    $url = $this->startWebRun();
     CRM_Utils_System::redirect($url);
+  }
+
+  /**
+   * Start background runner and return url
+   *
+   * @return string queue monitor url
+   */
+  public function startBackgroundRun(): string {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = "active" WHERE name = %1', [
+      1 => [$this->queue->getName(), 'String'],
+    ]);
+    return CRM_Utils_System::url('civicrm/queue/monitor', ['name' => $this->queue->getName()], FALSE, NULL, FALSE);
+  }
+
+  /**
+   * Start web-based queue-runner and return url.
+   *
+   * @return string queue runner url
+   */
+  public function startWebRun(): string {
+    $_SESSION['queueRunners'][$this->qrid] = serialize($this);
+    $this->disableBackgroundExecution();
+    return CRM_Utils_System::url($this->pathPrefix . '/runner', 'reset=1&qrid=' . urlencode($this->qrid), FALSE, NULL, FALSE);
   }
 
   /**

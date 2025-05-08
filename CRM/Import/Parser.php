@@ -86,6 +86,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     return [];
   }
 
+  public function getBaseEntity(): string {
+    return $this->baseEntity;
+  }
+
   /**
    * Get the relevant datasource object.
    *

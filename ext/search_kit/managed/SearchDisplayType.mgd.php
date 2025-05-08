@@ -150,4 +150,24 @@ return [
       'match' => ['option_group_id', 'name'],
     ],
   ],
+  [
+    'name' => 'SearchDisplayType:batch',
+    'entity' => 'OptionValue',
+    'cleanup' => 'always',
+    'update' => 'always',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'search_display_type',
+        'value' => 'batch',
+        'name' => 'crm-search-display-batch',
+        'label' => E::ts('Data Entry'),
+        'description' => E::ts('Creates a spreadsheet-like form for batch data entry.'),
+        'icon' => 'fa-pen-to-square',
+        'is_reserved' => TRUE,
+        'is_active' => TRUE,
+      ],
+      'match' => ['option_group_id', 'name'],
+    ],
+  ],
 ];

@@ -96,6 +96,25 @@
           }
         }
 
+        // Process toolbar after run
+        if (this.settings.toolbar) {
+          this.onPostRun.push(function (apiResults) {
+            if (apiResults.run.toolbar) {
+              ctrl.toolbar = apiResults.run.toolbar;
+              // If there are no results on initial load, open an "autoOpen" toolbar link
+              ctrl.toolbar.forEach((link) => {
+                if (link.autoOpen && requestId === 1 && !ctrl.results.length) {
+                  CRM.loadForm(link.url)
+                    .on('crmFormSuccess', (e, data) => {
+                      ctrl.rowCount = null;
+                      ctrl.getResultsPronto();
+                    });
+                }
+              });
+            }
+          });
+        }
+
         if (this.afFieldset) {
           // Add filter title to Afform
           this.onPostRun.push(function (apiResults) {
@@ -196,7 +215,7 @@
         _.each(ctrl.onPreRun, function(callback) {
           callback.call(ctrl, apiCalls);
         });
-        var apiRequest = crmApi4(apiCalls);
+        const apiRequest = crmApi4(apiCalls);
         apiRequest.then(function(apiResults) {
           if (requestId < ctrl._runCount) {
             return; // Another request started after this one
@@ -210,24 +229,10 @@
               ctrl.rowCount = ctrl.results.length;
             } else if (ctrl.settings.pager || ctrl.settings.headerCount) {
               var params = ctrl.getApiParams('row_count');
-              crmApi4('SearchDisplay', 'run', params).then(function(result) {
+              crmApi4('SearchDisplay', apiCalls.run[1], params).then(function(result) {
                 ctrl.rowCount = result.count;
               });
             }
-          }
-          // Process toolbar
-          if (apiResults.run.toolbar) {
-            ctrl.toolbar = apiResults.run.toolbar;
-            // If there are no results on initial load, open an "autoOpen" toolbar link
-            ctrl.toolbar.forEach((link) => {
-              if (link.autoOpen && requestId === 1 && !ctrl.results.length) {
-                CRM.loadForm(link.url)
-                  .on('crmFormSuccess', (e, data) => {
-                    ctrl.rowCount = null;
-                    ctrl.getResultsPronto();
-                  });
-              }
-            });
           }
           _.each(ctrl.onPostRun, function(callback) {
             callback.call(ctrl, apiResults, 'success', editedRow);

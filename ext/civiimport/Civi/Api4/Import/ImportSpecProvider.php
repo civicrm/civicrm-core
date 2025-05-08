@@ -16,6 +16,7 @@ use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\UserJob;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\BAO\Import;
 use Civi\Core\Service\AutoService;
 use CRM_Core_BAO_UserJob;
@@ -56,7 +57,6 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
     $field->setType('Field');
     $field->setInputType('Text');
     $field->setReadonly(TRUE);
-    $field->setRequired(TRUE);
     $field->setNullable(FALSE);
     $field->setColumnName('_status');
     $spec->addFieldSpec($field);
@@ -70,7 +70,12 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
     $field->setColumnName('_status_message');
     $spec->addFieldSpec($field);
 
+    [, $userJobID] = explode('_', $spec->getEntity(), 2);
+
     $userJobType = $this->getJobType($spec);
+    $parser = new $userJobType['class']();
+    $parser->setUserJobID($userJobID);
+
     foreach ($columns as $column) {
       $isInternalField = str_starts_with($column['name'], '_');
       $exists = $isInternalField && $spec->getFieldByName($column['name']);
@@ -78,7 +83,7 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
         continue;
       }
       $field = new FieldSpec($column['name'], $spec->getEntity(), 'String');
-      $field->setTitle(ts('Import field') . ':' . $column['label']);
+      $field->setTitle(ts('Import field') . ': ' . $column['label']);
       $field->setLabel($column['label']);
       $field->setType('Field');
       $field->setDataType($column['data_type']);
@@ -86,9 +91,11 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
       $field->setDescription(ts('Data being imported into the field.'));
       $field->setColumnName($column['name']);
       if ($column['name'] === '_entity_id') {
-        $field->setFkEntity($userJobType['entity']);
+        $field->setFkEntity($parser->getBaseEntity());
         $field->setInputType('EntityRef');
-        $field->setInputAttrs(['label' => $userJobType['entity']]);
+        $field->setInputAttrs([
+          'label' => CoreUtil::getInfoItem($parser->getBaseEntity(), 'title'),
+        ]);
       }
       $spec->addFieldSpec($field);
     }
