@@ -29,6 +29,34 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
     $this->assertTrue((bool) strstr($formatted_address, 'UNITED STATES'));
   }
 
+  public function testVcardFormat(): void {
+    $address = [
+      'street_address' => '1 Happy Place',
+      'city' => 'Miami',
+      'state_province_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'state_province_id', 'Florida'),
+      'country_id:label' => 'United States',
+      'postal_code' => 33101,
+      'contact_id' => 1,
+      'county_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'county_id', 'Alameda'),
+      'postal_code_suffix' => '12345',
+      'location_type_id' => 5,
+      'is_primary' => 1,
+      'name' => 'Big house',
+      'supplemental_address_1' => 'line 1',
+      'supplemental_address_2' => 'line 2',
+      'supplemental_address_3' => 'line 3',
+    ];
+    $result = CRM_Utils_Address::formatVcard($address);
+    $this->assertEquals('<div class="location vcard"><span class="adr"><span class="address-name">Big house</span>
+<span class="street-address">1 Happy Place</span>
+<span class="extended-address">line 1</span>
+line 2
+line 3
+<span class="locality">Miami</span>, <span class="region">FL</span> <span class="postal-code">33101-12345</span>
+<span class="country-name">United States</span></span></div>', $result);
+
+  }
+
   /**
    * Test state/province field's state_province_name token on getFormattedBillingAddressFieldsFromParameters
    * and test using alternate names for state_province field
