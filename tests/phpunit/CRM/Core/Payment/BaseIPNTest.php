@@ -120,7 +120,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('General', $msg['html']);
 
-    $this->ids['contact'] = $this->_contactId = $this->individualCreate(['prefix_id' => 'Dr.', 'first_name' => 'Donald', 'last_name' => 'Duck', 'email' => 'the-don@duckville.com']);
+    $this->ids['contact'] = $this->_contactId = $this->_contributionParams['contact_id'] = $this->individualCreate(['prefix_id' => 'Dr.', 'first_name' => 'Donald', 'last_name' => 'Duck', 'email' => 'the-don@duckville.com']);
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, ['invoice_id' => 'abc']));
     $this->_contributionId = $contribution['id'];
 
