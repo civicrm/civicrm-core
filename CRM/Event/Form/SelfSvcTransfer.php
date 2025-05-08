@@ -354,12 +354,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
 
     //get default participant role.
     $eventDetails['participant_role'] = $participantRoles[$eventDetails['default_role_id']] ?? NULL;
-    //get the location info
-    $locParams = [
-      'entity_id' => $participant->event_id,
-      'entity_table' => 'civicrm_event',
-    ];
-    $eventDetails['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
+
     $toEmail = $contactDetails['email'] ?? NULL;
     if ($toEmail) {
       //take a receipt from as event else domain.
