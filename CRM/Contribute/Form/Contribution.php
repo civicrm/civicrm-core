@@ -748,10 +748,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails, FALSE, ['class' => 'crm-select2 huge']);
 
-    $componentDetails = [];
-    if ($this->_id) {
-      $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-    }
     $status = $this->getAvailableContributionStatuses();
 
     // define the status IDs that show the cancellation info, see CRM-17589
