@@ -140,7 +140,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'This Payment Amount',
       '$70.00',
       'Billing Address',
-      'Vancouver, British Columbia 1321312',
+      'Vancouver, BC 1321312',
       'Visa',
       '***********1111',
     ]);
@@ -253,7 +253,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'Credit Card',
       '***********1111',
       'Billing Address',
-      'Vancouver, British Columbia 1321312',
+      'Vancouver, BC 1321312',
     ]);
     $mut->stop();
     $mut->clearMessages();
