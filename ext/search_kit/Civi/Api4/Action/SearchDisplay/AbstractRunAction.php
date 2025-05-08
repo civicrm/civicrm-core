@@ -1462,7 +1462,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string $select
    * @return string|null
    */
-  private function getCurrencyField(string $select): ?string {
+  protected function getCurrencyField(string $select): ?string {
     // This function is called one or more times per row so cache the results
     if (array_key_exists($select, $this->currencyFields)) {
       return $this->currencyFields[$select];
