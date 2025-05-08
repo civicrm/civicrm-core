@@ -772,11 +772,14 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
    * @param bool $microformat
-   *   For location in microformat.
+   *   Deprecated value
    *
    * @return CRM_Contact_BAO_Contact
    */
   public static function &retrieve(&$params, &$defaults = [], $microformat = FALSE) {
+    if ($microformat) {
+      CRM_Core_Error::deprecatedWarning('microformat is deprecated in CRM_Contact_BAO_Contact::retrieve');
+    }
     if (array_key_exists('contact_id', $params)) {
       $params['id'] = $params['contact_id'];
     }
