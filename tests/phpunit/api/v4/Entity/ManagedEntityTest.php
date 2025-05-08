@@ -57,7 +57,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
   public function tearDown(): void {
     \Civi::settings()->revert('debug_enabled');
     // Disable multisite
-    \Civi::settings()->revert('is_enabled');
+    \Civi::settings()->revert('multisite_is_enabled');
     parent::tearDown();
   }
 
@@ -685,7 +685,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertSame(['name'], $result[0]['params']['match']);
 
     // Enable multisite with multiple domains
-    \Civi::settings()->set('is_enabled', TRUE);
+    \Civi::settings()->set('multisite_is_enabled', TRUE);
     Domain::create(FALSE)
       ->addValue('name', 'Another domain')
       ->addValue('version', CRM_Utils_System::version())

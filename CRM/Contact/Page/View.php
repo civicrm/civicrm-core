@@ -361,7 +361,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   protected function getGroupOrganizationUrl(string $contactType): string {
     if ($contactType !== 'Organization' || !CRM_Core_Permission::check('administer Multiple Organizations')
       || !CRM_Contact_BAO_GroupOrganization::hasGroupAssociated($this->_contactId)
-      || !Civi::settings()->get('is_enabled')
+      || !Civi::settings()->get('multisite_is_enabled')
     ) {
       return '';
     }
