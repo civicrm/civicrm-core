@@ -617,7 +617,7 @@ if (!CRM.vars) CRM.vars = {};
           results: function(data) {
             return {
               results: data.values,
-              more: data.count > data.countFetched
+              more: data.countMatched > data.countFetched
             };
           },
         },
