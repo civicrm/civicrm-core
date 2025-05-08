@@ -29,10 +29,15 @@ class MultisiteManaged extends AutoService implements EventSubscriberInterface {
    * @param array $managedRecords
    */
   public function generateDomainEntities(array &$managedRecords): void {
-    $multisiteEnabled = Setting::get(FALSE)
-      ->addSelect('multisite_is_enabled')
-      ->execute()->first();
-    if (empty($multisiteEnabled['value'])) {
+    // If *any* of the domains are multisite-enabled, then we need to replicate the records.
+    $multisiteEnabled = FALSE;
+    foreach ($this->getDomains() as $domainId) {
+      if (\Civi::settings($domainId)->get('multisite_is_enabled')) {
+        $multisiteEnabled = TRUE;
+        break;
+      }
+    }
+    if (!$multisiteEnabled) {
       return;
     }
 
