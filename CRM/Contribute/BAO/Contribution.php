@@ -2761,12 +2761,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     if ($this->_component === 'event') {
       $template->assign('title', $values['event']['title']);
-      $participantRoles = CRM_Event_PseudoConstant::participantRole();
-      $viewRoles = [];
-      foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_relatedObjects['participant']->role_id) as $k => $v) {
-        $viewRoles[] = $participantRoles[$v];
-      }
-      $values['event']['participant_role'] = implode(', ', $viewRoles);
       $template->assign('event', $values['event']);
       $template->assign('participant', $values['participant']);
       $template->assign('location', $values['location']);
