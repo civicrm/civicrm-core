@@ -26,6 +26,8 @@ use Civi\Api4\Phone;
  * civicrm_event_page.
  */
 class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
 
   /**
    * @var \Civi\Api4\Generic\Result
@@ -134,10 +136,10 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    */
   public function buildQuickForm() {
     CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 2);
-    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 2);
+    $this->addEmailBlockNonContactFields(1);
+    $this->addEmailBlockNonContactFields(2);
+    $this->addPhoneBlockFields(1);
+    $this->addPhoneBlockFields(2);
 
     $this->applyFilter('__ALL__', 'trim');
 
