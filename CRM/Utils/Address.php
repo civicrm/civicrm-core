@@ -43,7 +43,7 @@ class CRM_Utils_Address {
    *
    */
   public static function format(
-    $fields,
+    array $fields,
     $format = NULL,
     $microformat = FALSE,
     $unused = FALSE,
