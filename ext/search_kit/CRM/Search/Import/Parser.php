@@ -25,6 +25,8 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
 
   private array $joinPrefixes = [];
 
+  private array $lineItemEntities = ['Membership', 'Participant'];
+
   /**
    * Get information about the provided job.
    *
@@ -53,34 +55,89 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
   public function import(array $values): void {
     $rowNumber = (int) $values['_id'];
     $mappedRow = $this->getMappedRow($values);
-    // Process entities in order
+    if (!$mappedRow[$this->baseEntity]) {
+      $this->setImportStatus($rowNumber, 'ERROR', ts('No data found for %1.', [1 => CoreUtil::getInfoItem($this->baseEntity, 'title')]));
+      return;
+    }
+    try {
+      $this->saveEntities($mappedRow);
+      $idField = CoreUtil::getIdFieldName($this->baseEntity);
+      $this->setImportStatus($rowNumber, 'IMPORTED', '', $mappedRow[$this->baseEntity][$idField]);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
+    }
+  }
+
+  private function saveFinancialEntities(array &$mappedRow): void {
+    $contributionValues = NULL;
+    $contributionKey = NULL;
     foreach ($this->getImportEntities() as $entityKey => $entity) {
-      if (!isset($mappedRow[$entityKey])) {
+      if ($entity['entity_name'] === 'Contribution' && isset($mappedRow[$entityKey])) {
+        $contributionKey = $entityKey;
+        $contributionValues = $this->getEntityValues($mappedRow, $entity);
+      }
+    }
+    if (!$contributionValues) {
+      return;
+    }
+    $lineItems = [];
+    foreach ($this->getImportEntities() as $entityKey => $entity) {
+      if ($entity['is_line_item'] && isset($mappedRow[$entityKey])) {
+        $lineItem = $this->getEntityValues($mappedRow, $entity);
+        $lineItems[] = CRM_Utils_Array::prefixKeys($lineItem, 'entity_id.');
+      }
+    }
+    if (!$lineItems && isset($contributionValues['total_amount'])) {
+      $lineItems[] = ['line_total' => $contributionValues['total_amount']];
+    }
+    try {
+      $contribution = \Civi\Api4\Order::create()
+        ->setContributionValues($contributionValues)
+        ->setLineItems($lineItems)
+        ->execute()->single();
+      $mappedRow[$contributionKey]['id'] = $contribution['id'];
+    }
+    catch (\CRM_Core_Exception $e) {
+      if ($contributionKey === $this->baseEntity) {
+        throw $e;
+      }
+    }
+  }
+
+  private function saveEntities(array &$mappedRow): void {
+    foreach ($this->getImportEntities() as $entityKey => $entity) {
+      if (!isset($mappedRow[$entityKey]) || $entity['is_line_item']) {
         continue;
       }
-      $entityValues = $mappedRow[$entityKey];
-      foreach ($entity['join_values'] as $field => $joinField) {
-        $joinEntity = $this->extractEntityFromFieldName($joinField);
-        if (isset($mappedRow[$joinEntity][$joinField])) {
-          $entityValues[$field] = $mappedRow[$joinEntity][$joinField];
-        }
-      }
       try {
+        if ($entity['entity_name'] === 'Contribution') {
+          $this->saveFinancialEntities($mappedRow);
+          continue;
+        }
+        $entityValues = $this->getEntityValues($mappedRow, $entity);
         $saved = civicrm_api4($entity['entity_name'], 'save', [
           'records' => [$entityValues],
-          'defaults' => $entity['static_values'],
         ])->single();
         $mappedRow[$entityKey] += $saved;
       }
       catch (\CRM_Core_Exception $e) {
         if ($entity['entity_name'] === $this->baseEntity) {
-          $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-          return;
+          throw $e;
         }
       }
     }
-    $idField = CoreUtil::getIdFieldName($this->baseEntity);
-    $this->setImportStatus($rowNumber, 'IMPORTED', '', $mappedRow[$this->baseEntity][$idField]);
+  }
+
+  private function getEntityValues(array $mappedRow, array $entity): array {
+    $entityValues = array_merge($mappedRow[$entity['key']], $entity['static_values']);
+    foreach ($entity['join_values'] as $field => $joinField) {
+      $joinEntity = $this->extractEntityFromFieldName($joinField);
+      if (isset($mappedRow[$joinEntity][$joinField])) {
+        $entityValues[$field] = $mappedRow[$joinEntity][$joinField];
+      }
+    }
+    return $entityValues;
   }
 
   /**
@@ -132,9 +189,11 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
     $entities = [
       $this->baseEntity => [
         'entity_name' => $this->baseEntity,
+        'key' => $this->baseEntity,
         'entity_field_prefix' => '',
         'static_values' => [],
         'join_values' => [],
+        'is_line_item' => FALSE,
       ],
     ];
     $this->joinPrefixes = [];
@@ -142,9 +201,11 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
       $this->joinPrefixes[$join['alias']] = $join['alias'] . '.';
       $entities[$join['alias']] = [
         'entity_name' => $join['entity'],
+        'key' => $join['alias'],
         'entity_field_prefix' => $join['alias'] . '.',
         'static_values' => [],
         'join_values' => [],
+        'is_line_item' => FALSE,
       ];
     }
     $entitySortOrder = [$this->baseEntity];
@@ -174,6 +235,13 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
             // Now we have entity 0 as the FK and entity 1 as the PK
             $entities[$entity[0]]['join_values'][$field[0]] = $prefixedField[1];
             $sort = $entity[1] === $join['alias'] ? 'before' : 'after';
+            // Mark any participant or memberships linked to contribution as financial
+            if ($entities[$entity[0]]['entity_name'] === 'Contribution' && in_array($entities[$entity[1]]['entity_name'], $this->lineItemEntities)) {
+              $entities[$entity[1]]['is_line_item'] = TRUE;
+            }
+            if ($entities[$entity[1]]['entity_name'] === 'Contribution' && in_array($entities[$entity[0]]['entity_name'], $this->lineItemEntities)) {
+              $entities[$entity[0]]['is_line_item'] = TRUE;
+            }
           }
         }
       }
