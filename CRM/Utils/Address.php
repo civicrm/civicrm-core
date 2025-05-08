@@ -32,9 +32,9 @@ class CRM_Utils_Address {
    *   The address fields.
    * @param string $format
    *   The desired address format.
-   * @param bool $microformat
-   *   If true indicates, the address to be built in hcard-microformat standard.
-   * @param bool $unused
+   * @param false $ignore
+   *   Should always be false.
+   * @param false $unused
    *   Should ALWAYS be false.
    * @param string[] $tokenFields
    *
@@ -45,14 +45,10 @@ class CRM_Utils_Address {
   public static function format(
     $fields,
     $format = NULL,
-    $microformat = FALSE,
+    $ignore = FALSE,
     $unused = FALSE,
     $tokenFields = NULL
   ) {
-    if ($microformat) {
-      CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Address::formatVCard (not recommended outside core - figure out a token way)');
-      self::formatVCard($fields);
-    }
     if ($format) {
       CRM_Core_Error::deprecatedWarning('passing format is deprecated, use the token processor directly');
     }
