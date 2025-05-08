@@ -30,7 +30,7 @@ class MultisiteManaged extends AutoService implements EventSubscriberInterface {
    */
   public function generateDomainEntities(array &$managedRecords): void {
     $multisiteEnabled = Setting::get(FALSE)
-      ->addSelect('is_enabled')
+      ->addSelect('multisite_is_enabled')
       ->execute()->first();
     if (empty($multisiteEnabled['value'])) {
       return;

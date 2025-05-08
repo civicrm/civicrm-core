@@ -20,11 +20,10 @@
  */
 
 return [
-  // FIXME: This is arguably the worst name for a setting ever
-  'is_enabled' => [
+  'multisite_is_enabled' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
-    'name' => 'is_enabled',
+    'name' => 'multisite_is_enabled',
     'title' => ts('Enable Multi Site Configuration'),
     'html_type' => 'checkbox',
     'type' => 'Boolean',
