@@ -43,7 +43,7 @@ return [
       'title' => ts('EntityBatch Table'),
       'sql_type' => 'varchar(64)',
       'input_type' => 'Select',
-      'description' => ts('physical tablename for entity being joined to file, e.g. civicrm_contact'),
+      'description' => ts('physical tablename for entity being joined to batch, e.g. civicrm_contact'),
       'add' => '3.3',
       'pseudoconstant' => [
         'option_group_name' => 'entity_batch_extends',
