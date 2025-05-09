@@ -1,9 +1,19 @@
-<div ng-if="!$ctrl.userJobId && !$ctrl.isPreviewMode">
-  <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
-    <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
-    <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
-    {{:: ts('Start New Batch') }}
-  </button>
+<div ng-if="!$ctrl.userJobId && !$ctrl.isPreviewMode" class="crm-search-display crm-search-display-batch">
+  <ul class="list-group">
+    <li class="list-group-item">
+      <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
+        <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
+        <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
+        {{:: ts('Start New Batch') }}
+      </button>
+    </li>
+    <li class="list-group-item" ng-repeat="link in $ctrl.reportLinks">
+      <a href ng-href="{{:: link.href }}">
+        <i class="crm-i {{:: link.icon }}"></i>
+        {{:: link.title }}
+      </a>
+    </li>
+  </ul>
 </div>
 <div ng-if="$ctrl.userJobId || $ctrl.isPreviewMode" class="crm-search-display crm-search-display-batch">
   <div class="alert alert-info crm-search-display-description" ng-if="$ctrl.settings.description">{{:: $ctrl.settings.description }}</div>
