@@ -24,6 +24,7 @@ use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\IM;
 use Civi\Api4\LocationType;
+use Civi\Api4\Membership;
 use Civi\Api4\OpenID;
 use Civi\Api4\Phone;
 use Civi\Api4\Queue;
@@ -80,7 +81,22 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->organizationCreate([
       'organization_name' => 'Agileware',
       'legal_name'        => 'Agileware',
-    ]);
+    ], 'employer');
+    // Create a membership that should be inherited.
+    $this->createTestEntity('MembershipType', [
+      'name' => 'Workplace',
+      'relationship_type_id' => 5,
+      'relationship_direction' => 'b_a',
+      'max_related' => 100,
+      'duration_unit' => 'year',
+      'period_type' => 'rolling',
+      'financial_type_id:name' => 'Donation',
+      'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
+    ], 'workplace');
+    $this->createTestEntity('Membership', [
+      'membership_type_id' => $this->ids['MembershipType']['workplace'],
+      'contact_id' => $this->ids['Contact']['employer'],
+    ], 'employer');
     $contactImportValues = [
       'first_name' => 'Alok',
       'last_name' => 'Patel',
@@ -102,11 +118,17 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     ]);
 
     $this->importValues($userJobID, $values, 'IMPORTED');
-    $this->callAPISuccessGetSingle('Contact', [
-      'first_name' => 'Alok',
-      'last_name' => 'Patel',
-      'organization_name' => 'Agileware',
-    ]);
+    $createdContact = Contact::get(FALSE)
+      ->addWhere('first_name', '=', 'Alok')
+      ->addWhere('last_name', '=', 'Patel')
+      ->addWhere('organization_name', '=', 'Agileware')
+      ->addSelect('employer_id', 'employer_id.display_name')
+      ->execute()->single();
+    $this->assertEquals($this->ids['Contact']['employer'], $createdContact['employer_id']);
+    // Check the inherited relationship was created.
+    Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $createdContact['id'])
+      ->execute()->single();
   }
 
   /**

@@ -180,72 +180,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Only called from import now... plus one place outside of core & tests.
-   *
-   * @todo - deprecate more aggressively - will involve copying to the import
-   * class, adding a deprecation notice here & removing from tests.
-   *
-   * Takes an associative array and creates a relationship object.
-   *
-   * @deprecated For single creates use the api instead (it's tested).
-   * For multiple a new variant of this function needs to be written and migrated to as this is a bit
-   * nasty
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   The array that holds all the db ids.
-   *   per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
-   *  "we are moving away from the $ids param "
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  private static function legacyCreateMultiple($params, $ids = []) {
-    // clarify that the only key ever pass in the ids array is 'contact'
-    // There is legacy handling for other keys but a universe search on
-    // calls to this function (not supported to be called from outside core)
-    // only returns 2 calls - one in CRM_Contact_Import_Parser_Contact
-    // and the other in jma grant applications (CRM_Grant_Form_Grant_Confirm)
-    // both only pass in contact as a key here.
-    $contactID = $ids['contact'];
-    unset($ids);
-    // There is only ever one value passed in from the 2 places above that call
-    // this - by clarifying here like this we can cleanup within this
-    // function without having to do more universe searches.
-    $relatedContactID = key($params['contact_check']);
-
-    // check if the relationship is valid between contacts.
-    // step 1: check if the relationship is valid if not valid skip and keep the count
-    // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-    // step 3: if valid relationship then add the relation and keep the count
-
-    // step 1
-    [$contactFields['relationship_type_id'], $firstLetter, $secondLetter] = explode('_', $params['relationship_type_id']);
-    $contactFields['contact_id_' . $firstLetter] = $contactID;
-    $contactFields['contact_id_' . $secondLetter] = $relatedContactID;
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
-      $contactFields['relationship_type_id'])) {
-      return [0, 0];
-    }
-
-    if (
-      CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
-        $contactFields,
-        (int) $contactID,
-        // step 2
-        (int) $relatedContactID
-      )
-    ) {
-      return [0, 1];
-    }
-
-    $singleInstanceParams = array_merge($params, $contactFields);
-    CRM_Contact_BAO_Relationship::add($singleInstanceParams);
-    return [1, 0];
-  }
-
-  /**
    * Format common params data to the format that was required a very long time ago.
    *
    * I think the only useful things this function does now are
@@ -374,64 +308,48 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * @param $key
-   * @param $relContactId
-   * @param $primaryContactId
+   * @param string $key
+   * @param int $relatedContactID
+   * @param int $primaryContactId
    *
    * @throws \CRM_Core_Exception
    */
-  protected function createRelationship($key, $relContactId, $primaryContactId): void {
-    //if more than one duplicate contact
-    //found, create relationship with first contact
-    // now create the relationship record
-    $relationParams = [
-      'relationship_type_id' => $key,
-      'contact_check' => [
-        $relContactId => 1,
-      ],
+  protected function createRelationship(string $key, int $relatedContactID, int $primaryContactId): void {
+    // check if the relationship is valid between contacts.
+    // step 1: check if the relationship is valid if not valid skip.
+    // step 2: check the if two contacts already have a relationship if yes skip.
+    // step 3: if valid relationship then add the relation.
+
+    [$contactFields['relationship_type_id'], $firstLetter, $secondLetter] = explode('_', $key);
+    $contactFields['contact_id_' . $firstLetter] = $primaryContactId;
+    $contactFields['contact_id_' . $secondLetter] = $relatedContactID;
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
+      $contactFields['relationship_type_id'])) {
+      return;
+    }
+
+    if (
+      CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
+        $contactFields,
+        (int) $primaryContactId,
+        // step 2
+        (int) $relatedContactID
+      )
+    ) {
+      return;
+    }
+
+    $singleInstanceParams = array_merge([
       'is_active' => 1,
       'skipRecentView' => TRUE,
-    ];
-
-    // we only handle related contact success, we ignore failures for now
-    // at some point wold be nice to have related counts as separate
-    $relationIds = [
-      'contact' => $primaryContactId,
-    ];
-
-    [$valid, $duplicate] = self::legacyCreateMultiple($relationParams, $relationIds);
-
-    if ($valid || $duplicate) {
-      $relationIds['contactTarget'] = $relContactId;
-      $action = ($duplicate) ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD;
-      CRM_Contact_BAO_Relationship::relatedMemberships($primaryContactId, $relationParams, $relationIds, $action);
-    }
-
-    //handle current employer, CRM-3532
-    if ($valid) {
-      $allRelationships = CRM_Core_PseudoConstant::relationshipType('name');
-      $relationshipTypeId = str_replace([
-        '_a_b',
-        '_b_a',
-      ], [
-        '',
-        '',
-      ], $key);
-      $relationshipType = str_replace($relationshipTypeId . '_', '', $key);
-      $orgId = $individualId = NULL;
-      if ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employee of') {
-        $orgId = $relContactId;
-        $individualId = $primaryContactId;
-      }
-      elseif ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employer of') {
-        $orgId = $primaryContactId;
-        $individualId = $relContactId;
-      }
-      if ($orgId && $individualId) {
-        $currentEmpParams[$individualId] = $orgId;
-        CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);
-      }
-    }
+    ], $contactFields);
+    // Setting is_current_employer means that IF the relationship is an employment one
+    // employee_id & organization_name will be updated on the individual.
+    // This happens in the BAO_Relationship::add function.
+    // If it were not for needing to pass this parameter we could use
+    // apiv4 here instead.
+    $singleInstanceParams['is_current_employer'] = TRUE;
+    CRM_Contact_BAO_Relationship::create($singleInstanceParams);
   }
 
   /**
