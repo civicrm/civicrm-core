@@ -267,7 +267,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function preProcess() {
     parent::preProcess();
-    $this->_ccid = $this->get('ccid');
+    $this->_ccid = $this->getExistingContributionID();
 
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
@@ -471,7 +471,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $params = $this->_params;
     // make sure we have values for it
-    if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id']) && empty($this->_ccid)) {
+    if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id']) && empty($this->getExistingContributionID())) {
       $honorName = NULL;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
@@ -520,7 +520,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     $this->assign('membershipBlock', FALSE);
-    if (CRM_Core_Component::isEnabled('CiviMember') && empty($this->_ccid)) {
+    if (CRM_Core_Component::isEnabled('CiviMember') && empty($this->getExistingContributionID())) {
       if (isset($params['selectMembership']) &&
         $params['selectMembership'] !== 'no_thanks'
       ) {
@@ -531,7 +531,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
 
-    if (empty($this->_ccid)) {
+    if (empty($this->getExistingContributionID())) {
       $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
       $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
     }
@@ -540,7 +540,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       !empty($params['onbehalf']) &&
       ($this->_values['is_for_organization'] == 2 ||
         !empty($params['is_for_organization'])
-      ) && empty($this->_ccid)
+      ) && empty($this->getExistingContributionID())
     ) {
       $fieldTypes = ['Contact', 'Organization'];
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
@@ -563,20 +563,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $this->assign('priceSetID', $this->_priceSetId);
     $contributionButtonText = $this->getPaymentProcessorObject()->getText('contributionPageButtonText', [
-      'is_payment_to_existing' => !empty($this->_ccid),
+      'is_payment_to_existing' => !empty($this->getExistingContributionID()),
       'amount' => $this->_amount,
     ]);
     $this->assign('button', $contributionButtonText);
 
     $this->assign('continueText',
       $this->getPaymentProcessorObject()->getText('contributionPageContinueText', [
-        'is_payment_to_existing' => !empty($this->_ccid),
+        'is_payment_to_existing' => !empty($this->getExistingContributionID()),
         'amount' => $this->_amount,
       ])
     );
     $this->assign('confirmText',
       $this->getPaymentProcessorObject()->getText('contributionPageConfirmText', [
-        'is_payment_to_existing' => !empty($this->_ccid),
+        'is_payment_to_existing' => !empty($this->getExistingContributionID()),
         'amount' => $this->_amount,
       ])
     );
@@ -2035,7 +2035,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // organization params in a separate variable, to make sure
     // normal behavior is continued. And use that variable to
     // process on-behalf-of functionality.
-    if (!empty($this->_values['onbehalf_profile_id']) && empty($this->_ccid)) {
+    if (!empty($this->_values['onbehalf_profile_id']) && empty($this->getExistingContributionID())) {
       $behalfOrganization = [];
       $orgFields = ['organization_name', 'organization_id', 'org_option'];
       foreach ($orgFields as $organizationField) {
