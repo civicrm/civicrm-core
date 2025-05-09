@@ -198,7 +198,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
    *  "we are moving away from the $ids param "
    *
-   * @return array
    * @throws \CRM_Core_Exception
    */
   private static function legacyCreateMultiple($params, $ids = []) {
@@ -226,7 +225,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $contactFields['contact_id_' . $secondLetter] = $relatedContactID;
     if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
       $contactFields['relationship_type_id'])) {
-      return [0, 0];
+      return;
     }
 
     if (
@@ -237,12 +236,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         (int) $relatedContactID
       )
     ) {
-      return [0, 1];
+      return;
     }
 
     $singleInstanceParams = array_merge($params, $contactFields);
-    CRM_Contact_BAO_Relationship::add($singleInstanceParams);
-    return [1, 0];
+    // Setting is_current_employer means that IF the relationship is an employment one
+    // employee_id & organization_name will be updated on the individual.
+    // This happens in the BAO_Relationship::add function.
+    // If it were not for needing to pass this parameter we could use
+    // apiv4 here instead.
+    $singleInstanceParams['is_current_employer'] = TRUE;
+    CRM_Contact_BAO_Relationship::create($singleInstanceParams);
+    return;
   }
 
   /**
@@ -399,39 +404,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       'contact' => $primaryContactId,
     ];
 
-    [$valid, $duplicate] = self::legacyCreateMultiple($relationParams, $relationIds);
-
-    if ($valid || $duplicate) {
-      $relationIds['contactTarget'] = $relContactId;
-      $action = ($duplicate) ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD;
-      CRM_Contact_BAO_Relationship::relatedMemberships($primaryContactId, $relationParams, $relationIds, $action);
-    }
-
-    //handle current employer, CRM-3532
-    if ($valid) {
-      $allRelationships = CRM_Core_PseudoConstant::relationshipType('name');
-      $relationshipTypeId = str_replace([
-        '_a_b',
-        '_b_a',
-      ], [
-        '',
-        '',
-      ], $key);
-      $relationshipType = str_replace($relationshipTypeId . '_', '', $key);
-      $orgId = $individualId = NULL;
-      if ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employee of') {
-        $orgId = $relContactId;
-        $individualId = $primaryContactId;
-      }
-      elseif ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employer of') {
-        $orgId = $primaryContactId;
-        $individualId = $relContactId;
-      }
-      if ($orgId && $individualId) {
-        $currentEmpParams[$individualId] = $orgId;
-        CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);
-      }
-    }
+    self::legacyCreateMultiple($relationParams, $relationIds);
   }
 
   /**
