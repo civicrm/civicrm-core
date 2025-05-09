@@ -22,14 +22,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   use CRM_Custom_Page_CustomDataTrait;
 
   /**
-   * Contents of contact_view_options setting.
-   *
-   * @var array
-   * @internal
-   */
-  public $_viewOptions;
-
-  /**
    * Provide support for extensions that are using the _show{Block} properties
    * (e.g. `_showCustomData`, `_showAddress`, `_showPhone` etc)
    *
@@ -242,7 +234,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     // rather than adding to defaults for transparency - this is some old
     // copy & paste.
     $this->assign($defaults);
-    $this->assign('allTabs', $this->getTabs($defaults));
+    $this->assign('allTabs', $this->getTabs([
+      'contact_type' => $defaults['contact_type'],
+      'contact_sub_type' => $defaults['contact_sub_type'],
+      'id' => $defaults['id'],
+    ]));
     unset($defaults);
 
     $this->assign('privacy_values', CRM_Core_SelectValues::privacy());
@@ -277,15 +273,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     // also assign the last modifed details
     $lastModified = CRM_Core_BAO_Log::lastModified($this->_contactId, 'civicrm_contact');
     $this->assign('lastModified', $lastModified);
-
-    $this->_viewOptions = CRM_Core_BAO_Setting::valueOptions(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_view_options',
-      TRUE
-    );
-
-    $changeLog = $this->_viewOptions['log'];
-    $this->assign('changeLog', $changeLog);
 
     // hook for contact summary
     // ignored but needed to prevent warnings
@@ -367,9 +354,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $allTabs = [];
     $getCountParams = [];
     $weight = 10;
-
+    $viewOptions = CRM_Core_BAO_Setting::valueOptions(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'contact_view_options',
+      TRUE
+    );
+    $this->assign('changeLog', $viewOptions['log']);
     foreach (CRM_Core_Component::getEnabledComponents() as $name => $component) {
-      if (!empty($this->_viewOptions[$name]) &&
+      if (!empty($viewOptions[$name]) &&
         CRM_Core_Permission::access($component->name)
       ) {
         $elem = $component->registerTab();
@@ -404,7 +396,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       if ($tab['id'] == 'summary') {
         $allTabs[] = $tab;
       }
-      elseif ($accessCiviCRM && !empty($this->_viewOptions[$tab['id']])) {
+      elseif ($accessCiviCRM && !empty($viewOptions[$tab['id']])) {
         $allTabs[] = $tab + [
           'url' => CRM_Utils_System::url("civicrm/contact/view/{$tab['id']}", "reset=1&cid={$this->_contactId}"),
           'count' => NULL,
