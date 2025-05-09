@@ -29,6 +29,12 @@ class CRM_Upgrade_Incremental_php_SixFour extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_4_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Rename multisite_is_enabled setting', 'renameMultisiteSetting');
+  }
+
+  public static function renameMultisiteSetting(): bool {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET name = "multisite_is_enabled" WHERE name = "is_enabled"');
+    return TRUE;
   }
 
 }

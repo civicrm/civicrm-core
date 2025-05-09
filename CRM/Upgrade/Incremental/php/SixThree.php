@@ -36,16 +36,10 @@ class CRM_Upgrade_Incremental_php_SixThree extends CRM_Upgrade_Incremental_Base 
     for ($i = 1; $i <= $iterations; $i++) {
       $this->addTask('Delete non-attachment rows from civicrm_entity_file', 'deleteNonAttachmentFiles', $i);
     }
-    $this->addTask('Rename multisite_is_enabled setting', 'renameMultisiteSetting');
   }
 
   public static function deleteNonAttachmentFiles(): bool {
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_file WHERE entity_table LIKE "civicrm_value_%" LIMIT ' . self::BATCH_SIZE);
-    return TRUE;
-  }
-
-  public static function renameMultisiteSetting(): bool {
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET name = "multisite_is_enabled" WHERE name = "is_enabled"');
     return TRUE;
   }
 
