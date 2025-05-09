@@ -305,7 +305,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->assertStringContainsStrings($form->getFirstMailBody(), [
       'Junko Adams<br/>',
       '790L Lincoln St S<br />
-Baltimore, New York 10545<br />
+Baltimore, NY 10545<br />
 United States<br />',
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
