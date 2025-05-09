@@ -19,6 +19,7 @@
  * Main page for viewing contact.
  */
 class CRM_Contact_Page_View extends CRM_Core_Page {
+  use CRM_Contact_Form_ContactFormTrait;
 
   /**
    * The id of the object being viewed (note/relationship etc)
