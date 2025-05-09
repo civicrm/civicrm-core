@@ -89,11 +89,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $location = [];
     if (($event_values['is_show_location'] ?? NULL) == 1) {
-      $locationParams = [
+      $location['address'] = CRM_Core_BAO_Address::getValues([
         'entity_id' => $participant->event_id,
         'entity_table' => 'civicrm_event',
-      ];
-      $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
+      ], TRUE);
       CRM_Core_BAO_Address::fixAddress($location['address'][1]);
     }
 
@@ -325,8 +324,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $country->find();
     $country->fetch();
     foreach ($this->line_items as & $line_item) {
-      $location_params = ['entity_id' => $line_item['event']->id, 'entity_table' => 'civicrm_event'];
-      $line_item['location'] = CRM_Core_BAO_Location::getValues($location_params, TRUE);
+      $line_item['location']['address'] = CRM_Core_BAO_Address::getValues(['entity_id' => $line_item['event']->id, 'entity_table' => 'civicrm_event'], TRUE);
       CRM_Core_BAO_Address::fixAddress($line_item['location']['address'][1]);
       if ($line_item['location']['address'][1] === NULL) {
         $line_item['location']['address'][1] = ['display' => ''];
