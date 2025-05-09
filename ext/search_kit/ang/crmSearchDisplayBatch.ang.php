@@ -12,6 +12,7 @@ return [
   'basePages' => ['civicrm/search', 'civicrm/admin/search'],
   'requires' => ['crmSearchDisplay', 'crmUi', 'ui.bootstrap', 'crmSearchTasks'],
   'bundles' => ['bootstrap3'],
+  'permissions' => ['administer queues'],
   'exports' => [
     'crm-search-display-batch' => 'E',
   ],

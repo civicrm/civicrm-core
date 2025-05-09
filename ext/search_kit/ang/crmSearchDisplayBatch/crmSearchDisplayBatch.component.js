@@ -39,6 +39,22 @@
             ctrl.saveRows();
           }, 10000);
         }
+        else {
+          this.reportLinks = [
+            {
+              title: ts('View My Import Batches'),
+              href: CRM.url('civicrm/imports/my-listing'),
+              icon: 'fa-user-tag',
+            },
+          ];
+          if (CRM.checkPerm('administer queues')) {
+            this.reportLinks.push({
+              title: ts('View All Import Batches'),
+              href: CRM.url('civicrm/imports/all-imports'),
+              icon: 'fa-list-alt',
+            });
+          }
+        }
         if (this.isPreviewMode) {
           this.results = [{data: {}}];
           this.loading = false;
