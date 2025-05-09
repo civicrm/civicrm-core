@@ -62,7 +62,7 @@ class CRM_Utils_Address {
     if (!empty($fields['postal_code_suffix'])) {
       $fullPostalCode .= '-' . $fields['postal_code_suffix'];
     }
-
+    self::addLabelFields($fields, str_contains($formatted, '{country_id.world_region'));
     $replacements = [
       'contact.display_name' => $fields['display_name'] ?? NULL,
       'contact.formal_title' => $fields['formal_title'] ?? NULL,
@@ -84,7 +84,7 @@ class CRM_Utils_Address {
       'contact.state_province' => $fields['state_province_id:label'] ?? ($fields['state_province'] ?? NULL),
       'contact.postal_code' => $fullPostalCode,
       'contact.country' => $fields['country_id:label'] ?? ($fields['country'] ?? NULL),
-      'contact.world_region' => $fields['world_region'] ?? NULL,
+      'contact.world_region' => $fields['country_id.world_region:label'] ?? $fields['world_region'] ?? NULL,
       'contact.geo_code_1' => $fields['geo_code_1'] ?? NULL,
       'contact.geo_code_2' => $fields['geo_code_2'] ?? NULL,
       'contact.current_employer' => $fields['current_employer'] ?? NULL,
@@ -199,22 +199,7 @@ class CRM_Utils_Address {
         unset($address[$old]);
       }
     }
-    if (isset($address['country_id'])) {
-      $address['country_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'country_id', $address['country_id']);
-      if (str_contains($formatted, '{country_id.world_region_id:label}') && !isset($address['country_id.world_region_id:label'])) {
-        $address['country_id.world_region_id:label'] = Country::get(FALSE)
-          ->addWhere('id', '=', $address['country_id'])
-          ->addSelect('region_id:label')
-          ->execute()->first()['region_id:label'] ?? '';
-      }
-    }
-    if (isset($address['county_id'])) {
-      $address['county_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'county_id', $address['county_id']);
-    }
-    if (isset($address['state_province_id'])) {
-      $address['state_province_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'state_province_id', $address['state_province_id']);
-      $address['state_province_id:abbr'] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($address['state_province_id']);
-    }
+    self::addLabelFields($address, str_contains($formatted, '{country_id.world_region'));
 
     // @todo - this could all be handled as tokens as a Token Processor tokens class.
     $replacements = [
@@ -435,6 +420,32 @@ class CRM_Utils_Address {
     $countryDefault = Civi::settings()->get('defaultContactCountry');
     // US, UK use miles. Everything else is Km
     return ($countryDefault == '1228' || $countryDefault == '1226') ? 'miles' : 'km';
+  }
+
+  /**
+   * @param array $address
+   * @param bool $isResolveWorldRegion
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  private static function addLabelFields(array &$address, bool $isResolveWorldRegion): void {
+    if (isset($address['country_id'])) {
+      $address['country_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'country_id', $address['country_id']);
+      if ($isResolveWorldRegion && !isset($address['country_id.world_region_id:label'])) {
+        $address['country_id.world_region_id:label'] = Country::get(FALSE)
+          ->addWhere('id', '=', $address['country_id'])
+          ->addSelect('region_id:label')
+          ->execute()->first()['region_id:label'] ?? '';
+      }
+    }
+    if (isset($address['county_id'])) {
+      $address['county_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'county_id', $address['county_id']);
+    }
+    if (isset($address['state_province_id'])) {
+      $address['state_province_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'state_province_id', $address['state_province_id']);
+      $address['state_province_id:abbr'] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($address['state_province_id']);
+    }
   }
 
 }
