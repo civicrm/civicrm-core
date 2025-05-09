@@ -32,6 +32,7 @@
 !/ext/ckeditor4
 !/ext/legacycustomsearches
 !/ext/legacydedupefinder
+!/ext/legacyprofiles
 !/ext/civiimport
 !/ext/civi_campaign
 !/ext/civi_case
