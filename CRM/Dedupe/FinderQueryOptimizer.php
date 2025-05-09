@@ -123,6 +123,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
       ] : [];
       $where[] = "t1.$contactIDFieldName < t2.$contactIDFieldName";
       $from = "{$rule['table']} t1 INNER JOIN {$rule['table']} t2 ON (" . self::getRuleFieldFilter($rule) . ")";
+      $this->queries[$key]['filter'] = self::getRuleFieldFilter($rule);
     }
 
     $sql = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
@@ -301,8 +302,10 @@ class CRM_Dedupe_FinderQueryOptimizer {
           $criteria = [];
           // The part of the query that relates to the field is in double brackets like this.
           // ((t1.first_name IS NOT NULL AND t2.first_name IS NOT NULL AND t1.first_name = t2.first_name AND t1.first_name <> '' AND t2.first_name <> ''))
+          // @todo - it should be sometimes? always? in the filter field now, allowing us to just use that...
+          // and to work towards ditching this regex.
           preg_match('/\((\(.+?\))\)/m', $queryDetail['query'], $criteria);
-          $comboQueries['criteria'][] = $criteria[1];
+          $comboQueries['criteria'][] = $queryDetail['filter'] ?? $criteria[1];
           unset($queries[$queryDetail['key']]);
         }
         $combinedKey = $comboQueries['table'] . '.' . implode('_', $comboQueries['field']) . '.' . $comboQueries['weight'];
