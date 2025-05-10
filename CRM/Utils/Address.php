@@ -63,6 +63,7 @@ class CRM_Utils_Address {
       $fullPostalCode .= '-' . $fields['postal_code_suffix'];
     }
     self::addLabelFields($fields, str_contains($formatted, '{country_id.world_region'));
+
     $replacements = [
       'contact.display_name' => $fields['display_name'] ?? NULL,
       'contact.formal_title' => $fields['formal_title'] ?? NULL,
