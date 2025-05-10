@@ -2310,6 +2310,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->set('membershipTypeID', $this->_params['selectMembership']);
     }
 
+    if (!empty($this->getExistingContributionID())) {
+      // If we are using the ContributionPage in "Invoice Mode" we need to set the existing
+      //   Membership ID if we have one. Otherwise we will create a duplicate Membership.
+      // Contribution Pages don't support multiple memberships so we'll just use the first one.
+      // If there is more than one membership lineItem, the other memberships will not be updated.
+      $membershipLineItems = $this->getOrder()->getMembershipLineItems();
+      $this->_membershipId = reset($membershipLineItems)['entity_id'];
+    }
+
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       $membershipParams['is_test'] = 1;
     }
