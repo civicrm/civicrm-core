@@ -49,6 +49,15 @@
   },
   "require": {
     "php": "~8.0",
+    "ext-bcmath": "*",
+    "ext-curl": "*",
+    "ext-fileinfo": "*",
+    "ext-intl": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-mysqli": "*",
+    "ext-zip": "*",
+    "ext-xml": "*",
     "composer-runtime-api": "~2.0",
     "dompdf/dompdf": "~2.0.4|| ~3.0",
     "firebase/php-jwt": ">=3 <7",
@@ -90,13 +99,9 @@
     "xkerman/restricted-unserialize": "~1.1",
     "typo3/phar-stream-wrapper": "^3.0 || ^4.0",
     "brick/money": "~0.5",
-    "ext-intl": "*",
     "pear/mail_mime": "~1.10",
     "pear/db": "~1.12.1",
     "civicrm/composer-compile-lib": "~0.6 || ~1.0",
-    "ext-json": "*",
-    "ext-mbstring": "*",
-    "ext-mysqli": "*",
     "ezyang/htmlpurifier": "^4.13",
     "phpoffice/phpspreadsheet": "^1.18 || ^2",
     "symfony/polyfill-php80": "^1.0",
@@ -106,12 +111,10 @@
     "symfony/polyfill-php84": "^1.0",
     "soundasleep/html2text": "^2.1",
     "psr/container": "~1.0 || ~2.0",
-    "ext-fileinfo": "*",
     "behat/mink": "^1.10",
     "dmore/chrome-mink-driver": "^2.9",
     "pontedilana/php-weasyprint": "^0.13.0 || ^1",
-    "knplabs/knp-snappy": "^1.4",
-    "ext-bcmath": "*"
+    "knplabs/knp-snappy": "^1.4"
   },
   "scripts": {
     "post-install-cmd": [
