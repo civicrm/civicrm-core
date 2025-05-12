@@ -84,6 +84,16 @@ class SubmitFile extends AbstractProcessor {
     if ($this->isDraft()) {
       return $this->updateDraft($draft, $file['id']);
     }
+    // Handle special case for image URL
+    elseif (isset($entityId) && $this->getFieldName() === 'Image URL') {
+      civicrm_api4('Contact', 'update', [
+        'values' => [
+          'id' => $entityId,
+          'image_URL' => sprintf('/civicrm/contact/imagefile?photo=%s', $file['uri']),
+        ],
+      ]);
+      return [];
+    }
     else {
       return $this->updateEntity($entityId, $file['id']);
     }
