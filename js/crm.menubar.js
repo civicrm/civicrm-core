@@ -394,7 +394,9 @@
         }
       });
       $('#crm-qsearch form[name=search_block]').on('submit', function() {
-        if (!$('#crm-qsearch-input').val()) {
+        const searchValue = $('#crm-qsearch-input').val();
+        const searchkey = $('#crm-qsearch-input').attr('name');
+        if (!searchValue) {
           return false;
         }
         var $menu = $('#crm-qsearch-input').autocomplete('widget');
@@ -405,6 +407,12 @@
             document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: cid});
             return false;
           }
+        }
+        // Form redirects to Advanced Search, which does not automatically search with wildcards,
+        // aside from contact name.
+        // To get comparable results, append wildcard to the search term.
+        else if (searchkey !== 'sort_name' && searchkey !== 'id') {
+          $('#crm-qsearch-input').val(searchValue + '%');
         }
       });
       $('#civicrm-menu').on('show.smapi', function(e, menu) {
