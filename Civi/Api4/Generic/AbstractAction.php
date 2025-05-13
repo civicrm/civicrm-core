@@ -299,7 +299,7 @@ abstract class AbstractAction implements \ArrayAccess {
         $name = $property->getName();
         if ($name != 'version' && $name[0] != '_') {
           $docs = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
-          $docs['default'] = $defaults[$name];
+          $docs['default'] = $defaults[$name] ?? NULL;
           // Exclude `null` which is not a value type
           if (!empty($docs['type']) && is_array($docs['type'])) {
             $docs['type'] = array_diff($docs['type'], ['null']);
