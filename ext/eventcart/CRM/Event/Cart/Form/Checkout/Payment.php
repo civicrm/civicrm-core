@@ -86,16 +86,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $event_values = [];
     CRM_Core_DAO::storeValues($event, $event_values);
-
-    $location = [];
-    if (($event_values['is_show_location'] ?? NULL) == 1) {
-      $location['address'] = CRM_Core_BAO_Address::getValues([
-        'entity_id' => $participant->event_id,
-        'entity_table' => 'civicrm_event',
-      ], TRUE);
-      CRM_Core_BAO_Address::fixAddress($location['address'][1]);
-    }
-
     [$pre_id, $post_id] = CRM_Event_Cart_Form_MerParticipant::get_profile_groups($participant->event_id);
     $payer_values = [
       'email' => '',
@@ -111,7 +101,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $values = [
       'params' => [$participant->id => $participantParams],
       'event' => $event_values,
-      'location' => $location,
       'custom_pre_id' => $pre_id,
       'custom_post_id' => $post_id,
       'payer' => $payer_values,

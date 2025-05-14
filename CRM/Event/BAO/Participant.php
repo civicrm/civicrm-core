@@ -1202,10 +1202,6 @@ UPDATE  civicrm_participant
 
         //get default participant role.
         $eventDetails[$eventId]['participant_role'] = $participantRoles[$eventDetails[$eventId]['default_role_id']] ?? NULL;
-
-        //get the location info
-        $locParams = ['entity_id' => $eventId, 'entity_table' => 'civicrm_event'];
-        $eventDetails[$eventId]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
       }
     }
 

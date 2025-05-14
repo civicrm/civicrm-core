@@ -2378,13 +2378,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
 
-      //get location details
-      $locationParams = [
-        'entity_id' => $eventID,
-        'entity_table' => 'civicrm_event',
-      ];
-      $values['location'] = CRM_Core_BAO_Location::getValues($locationParams);
-
       //for tasks 'Change Participant Status' and 'Update multiple Contributions' case
       //and cases involving status updation through ipn
       // whatever that means!
@@ -2734,7 +2727,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('title', $values['event']['title']);
       $template->assign('event', $values['event']);
       $template->assign('participant', $values['participant']);
-      $template->assign('location', $values['location']);
       $template->assign('customPre', $values['custom_pre_id']);
       $template->assign('customPost', $values['custom_post_id']);
 
@@ -4551,13 +4543,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     $values['participant']['customGroup'] = $participantCustomGroup;
-
-    //get location details
-    $locationParams = [
-      'entity_id' => $eventID,
-      'entity_table' => 'civicrm_event',
-    ];
-    $values['location'] = CRM_Core_BAO_Location::getValues($locationParams);
 
     $ufJoinParams = [
       'entity_table' => 'civicrm_event',
