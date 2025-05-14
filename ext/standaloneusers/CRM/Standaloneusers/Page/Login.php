@@ -27,7 +27,7 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
     $this->assign('breadcrumb', NULL);
 
     // Add the jQuery notify library because this library is only loaded whne the user is logged in. And we need this for CRM.alert
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', "packages/jquery/plugins/jquery.notify.min.js", ['region' => 'html-header']);
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm.packages', "jquery/plugins/jquery.notify.min.js", ['region' => 'html-header']);
 
     parent::run();
   }
