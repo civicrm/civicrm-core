@@ -343,16 +343,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           // CRM-14696 - Improve display for sold out price set options
           $element->setLabel($label . '&nbsp;<span class="sold-out-option">' . ts('Sold out') . '</span>');
         }
-
-        //CRM-10117
-        if ($isQuickConfig) {
-          $message = ts('Please enter a valid amount.');
-        }
-        else {
-          $message = ts('%1 must be a number (with or without decimals).', [1 => $label]);
-        }
         // integers will have money rule applied to them.
-        $qf->addRule($elementName, $message, 'money');
+        $qf->addRule($elementName, ts('%1 must be a number.', [1 => $label]), 'money');
         break;
 
       case 'Radio':
