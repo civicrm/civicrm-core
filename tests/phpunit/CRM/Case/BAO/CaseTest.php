@@ -225,6 +225,84 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
   }
 
   /**
+   * Test that all custom files are migrated to new case when case is assigned to new client.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCaseReassignForCustomFiles(): void {
+    $individual = $this->individualCreate();
+    $customGroup = $this->customGroupCreate([
+      'extends' => 'Case',
+    ]);
+    $customGroup = $customGroup['values'][$customGroup['id']];
+
+    $customFileFieldA = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'html_type'       => 'File',
+      'is_active'       => 1,
+      'default_value'   => 'null',
+      'label'           => 'Custom File A',
+      'name'            => 'custom_file_a',
+      'data_type'       => 'File',
+    ]);
+
+    $customFileFieldB = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'html_type'       => 'File',
+      'is_active'       => 1,
+      'default_value'   => 'null',
+      'label'           => 'Custom File B',
+      'name'            => 'custom_file_b',
+      'data_type'       => 'File',
+    ]);
+
+    // Create two files to attach to the new case
+    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+
+    CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', 'i_bend_bananas.txt');
+    $fileA = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/i_bend_bananas.txt"]);
+
+    CRM_Utils_File::createFakeFile($filepath, 'Wombats will bite your ankles if you run from them.', 'wombats_bite_your_ankles.txt');
+    $fileB = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/wombats_bite_your_ankles.txt"]);
+
+    $caseObj = $this->createCase($individual);
+
+    $this->callAPISuccess('Case', 'create', [
+      'id'                                => $caseObj->id,
+      'custom_' . $customFileFieldA['id'] => $fileA['id'],
+      'custom_' . $customFileFieldB['id'] => $fileB['id'],
+    ]);
+
+    $reassignIndividual = $this->individualCreate();
+    $this->createLoggedInUser();
+    $newCase = CRM_Case_BAO_Case::mergeCases($reassignIndividual, $caseObj->id, $individual, NULL, TRUE);
+
+    $newCaseCustomFields = \Civi\Api4\CiviCase::get(FALSE)
+      ->addWhere('id', '=', $newCase[0])
+      ->addSelect($customGroup['name'] . '.custom_file_a', $customGroup['name'] . '.custom_file_b')
+      ->execute()->first();
+
+    $a = $newCaseCustomFields[$customGroup['name'] . '.custom_file_a'];
+    $b = $newCaseCustomFields[$customGroup['name'] . '.custom_file_b'];
+    $this->assertTrue(CRM_Utils_Rule::positiveInteger($a));
+    $this->assertTrue(CRM_Utils_Rule::positiveInteger($b));
+    $this->assertNotEquals($a, $b, 'Two separate files should be on the new case.');
+    $this->assertNotEquals($a, $fileA['values']['id'], 'The new file A should be a copy of the old file A not the same file.');
+    $this->assertNotEquals($b, $fileB['values']['id'], 'The new file B should be a copy of the old file B not the same file.');
+
+    // delete original files
+    unlink($fileA['values']['uri']);
+    unlink($fileB['values']['uri']);
+
+    $new_file = \Civi\Api4\File::get(FALSE)->addWhere('id', '=', $a)->execute()->first();
+    $this->assertNotEquals($filepath . '/' . $new_file['uri'], $fileA['values']['uri'], 'The new file A should not have the same uri as the old file A');
+    unlink($filepath . '/' . $new_file['uri']);
+    $new_file = \Civi\Api4\File::get(FALSE)->addWhere('id', '=', $b)->execute()->first();
+    $this->assertNotEquals($filepath . '/' . $new_file['uri'], $fileB['values']['uri'], 'The new file B should not have the same uri as the old file B');
+    unlink($filepath . '/' . $new_file['uri']);
+  }
+
+  /**
    * FIXME: need to create an activity to run this test
    * function testGetCases() {
    *   $cases = CRM_Case_BAO_Case::getCases(TRUE, 3);
