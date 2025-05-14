@@ -689,10 +689,30 @@ AND       CEF.entity_id    = %2";
       //     ],
       //   ]);
       // TEMP HACK
-      CRM_Core_DAO::executeQuery("UPDATE `{$customGroup['table_name']}` SET {$customField['column_name']} = NULL WHERE entity_id = %1 AND {$customField['column_name']} = %2", [
+      $ids = CRM_Core_DAO::executeQuery("SELECT id FROM `{$customGroup['table_name']}` WHERE entity_id = %1 AND {$customField['column_name']} = %2", [
         1 => [$params['entityID'], 'Integer'],
         2 => [$params['fileID'], 'Integer'],
       ]);
+      $customParams = [$customGroup['table_name'] => []];
+      while ($ids->fetch()) {
+        $customParams[$customGroup['table_name']][$ids->id] = [];
+        $customParams[$customGroup['table_name']][$ids->id][] = [
+          'custom_group_id' => $customGroup['id'],
+          'custom_field_id' => $customField['id'],
+          'entity_id' => $params['entityID'],
+          'entityTable' => $params['entityTable'],
+          'file_id' => FALSE,
+          'table_name' => $customGroup['table_name'],
+          'id' => $ids->id,
+          'is_multiple' => $customGrouo['is_multiple'],
+          'serialize' => 0,
+          'type' => 'File',
+          'value' => FALSE,
+          'table_name' => $customGroup['table_name'],
+          'column_name' => $customField['column_name'],
+        ];
+      }
+      CRM_Core_BAO_CustomValueTable::create($customParams, 'Edit');
       $refCount = CoreUtil::getRefCountTotal('File', $params['fileID']);
     }
     // Delete file if there are no other references
