@@ -636,4 +636,36 @@ class SettingsBag {
     return $computed;
   }
 
+  /**
+   * Sometimes settings correspond to paths - which then resolving
+   * to get the final usable value
+   *
+   * @param string $key the name of the setting e.g. extensionsDir
+   * @return ?string final path value with any variables resolved, or NULL if not set
+   */
+  public function getPath(string $key): ?string {
+    $rawValue = $this->get($key);
+    return \Civi::paths()->getPath($rawValue);
+  }
+
+  /**
+   * Sometimes settings correspond to URLs - which then need resolving
+   * to get the final usable value
+   *
+   * @param string $key the name of the setting e.g. extensionsURL
+   * @param string $preferFormat
+   *   The preferred format ('absolute', 'relative').
+   *   The result data may not meet the preference -- if the setting
+   *   refers to an external domain, then the result will be
+   *   absolute (regardless of preference).
+   * @param bool|null $ssl
+   *   NULL to autodetect. TRUE to force to SSL.
+   *
+   * @return ?string final value with any variables resolved
+   */
+  public function getUrl(string $key, string $preferFormat = 'relative', ?bool $ssl = NULL): ?string {
+    $rawValue = $this->get($key);
+    return \Civi::paths()->getUrl($rawValue, $preferFormat, $ssl);
+  }
+
 }
