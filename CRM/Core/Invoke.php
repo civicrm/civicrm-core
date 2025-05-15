@@ -150,8 +150,10 @@ class CRM_Core_Invoke {
    * @throws \CRM_Core_Exception
    */
   public static function runItem($item) {
-    $ids = new CRM_Core_IDS();
-    $ids->check($item);
+    if (!defined('CIVICRM_IDS_DISABLE') || !CIVICRM_IDS_DISABLE) {
+      $ids = new CRM_Core_IDS();
+      $ids->check($item);
+    }
 
     if (!PharLoader::isWrapperInstantiated()) {
       // Up to now, we're not guaranteed to have the wrapper. But we prefer to have it.
