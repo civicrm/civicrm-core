@@ -12,9 +12,13 @@
 {if $registerClosed}
 <div class="spacer"></div>
 <div class="messages status no-popup">
-  <i class="crm-i fa-info-circle" aria-hidden="true"></i>
-     &nbsp;{ts}Registration is closed for this event{/ts}
-  </div>
+  <i class="crm-i fa-info-circle" aria-hidden="true"></i>&nbsp;
+  {if $registerStartDate}
+    {ts 1=$registerStartDate|crmDate}Registration will open on %1{/ts}
+  {else}
+    {ts}Registration is closed for this event{/ts}
+  {/if}
+</div>
 {/if}
 {crmPermission has='access CiviEvent'}
 <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">

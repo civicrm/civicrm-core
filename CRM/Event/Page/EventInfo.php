@@ -274,6 +274,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration && CRM_Core_Permission::check('register for events'));
     $this->assign('allowRegistration', $allowRegistration);
 
+    if (!empty($values['event']['registration_start_date'])
+        && strtotime($values['event']['registration_start_date']) > time()) {
+      $this->assign('registerStartDate', $values['event']['registration_start_date']);
+    }
+
     $isAlreadyRegistered = $this->isAlreadyRegistered();
     // noFullMsg was originally passed in to suppress the message about the event being full. The intent
     // was originally such that when you were sending the user back to the info page after registering
