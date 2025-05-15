@@ -81,3 +81,13 @@ WHERE name IN (
 'Roskilde', 'South Jutland', 'Storstrøm', 'Vejle',
 'Vestsjælland', 'Viborg'
 ) AND country_id = @country_id;
+
+-- Updates breadcrumbs for CiviImport;
+DELETE FROM civicrm_menu WHERE path = 'civicrm/import';
+UPDATE civicrm_menu SET breadcrumb = 'a:2:{i:0;a:2:{s:5:"title";s:7:"CiviCRM";s:3:"url";s:16:"/civicrm?reset=1";}i:1;a:2:{s:5:"title";s:15:"Import Contacts";s:3:"url";s:31:"/civicrm/import/contact?reset=1";}}' WHERE path IN ('civicrm/import/contact', 'civicrm/import/contact/summary');
+UPDATE civicrm_menu SET breadcrumb = 'a:2:{i:0;a:2:{s:5:"title";s:7:"CiviCRM";s:3:"url";s:16:"/civicrm?reset=1";}i:1;a:2:{s:5:"title";s:17:"Import Activities";s:3:"url";s:32:"/civicrm/import/activity?reset=1";}}' WHERE path = 'civicrm/import/activity';
+UPDATE civicrm_menu SET breadcrumb = 'a:2:{i:0;a:2:{s:5:"title";s:7:"CiviCRM";s:3:"url";s:16:"/civicrm?reset=1";}i:1;a:2:{s:5:"title";s:20:"Import Contributions";s:3:"url";s:36:"/civicrm/import/contribution?reset=1";}}' WHERE path = 'civicrm/import/contribution';
+UPDATE civicrm_menu SET breadcrumb = 'a:2:{i:0;a:2:{s:5:"title";s:7:"CiviCRM";s:3:"url";s:16:"/civicrm?reset=1";}i:1;a:2:{s:5:"title";s:30:"Import Multi-value Custom Data";s:3:"url";s:30:"/civicrm/import/custom?reset=1";}}' WHERE path = 'civicrm/import/custom';
+UPDATE civicrm_menu SET breadcrumb = 'a:2:{i:0;a:2:{s:5:"title";s:7:"CiviCRM";s:3:"url";s:16:"/civicrm?reset=1";}i:1;a:2:{s:5:"title";s:19:"Import Participants";s:3:"url";s:35:"/civicrm/import/participant?reset=1";}}' WHERE path = 'civicrm/import/participant';
+UPDATE civicrm_menu SET breadcrumb = 'a:2:{i:0;a:2:{s:5:"title";s:7:"CiviCRM";s:3:"url";s:16:"/civicrm?reset=1";}i:1;a:2:{s:5:"title";s:18:"Import Memberships";s:3:"url";s:34:"/civicrm/import/membership?reset=1";}}' WHERE path = 'civicrm/import/membership';
+
