@@ -288,10 +288,11 @@ class CRM_Utils_PDF_Utils {
       'enable_remote' => \Civi::settings()->get('dompdf_enable_remote') ?? TRUE,
     ];
     // only set these ones if a setting exists for them
-    foreach (['font_dir', 'chroot', 'log_output_file'] as $setting) {
-      $value = \Civi::settings()->get("dompdf_$setting");
-      if (isset($value)) {
-        $settings[$setting] = Civi::paths()->getPath($value);
+    foreach (['dompdf_font_dir', 'dompdf_chroot', 'dompdf_log_output_file'] as $setting) {
+      $path = \Civi::settings()->getPath($setting);
+      if (!empty($path)) {
+        $withoutPrefix = substr($setting, 7);
+        $settings[$withoutPrefix] = $path;
       }
     }
 
