@@ -353,7 +353,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // current contribution page id
     $this->getContributionPageID();
-    $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
+    $this->_ccid = $this->getExistingContributionID();
     $this->_emailExists = $this->get('emailExists') ?? FALSE;
     $this->assign('isShowAdminVisibilityFields', CRM_Core_Permission::check('administer CiviCRM'));
 
@@ -415,7 +415,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $isPayLater = $this->_values['is_pay_later'] ?? NULL;
       if ($this->getExistingContributionID()) {
         $this->_values['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-          $this->_ccid,
+          $this->getExistingContributionID(),
           'financial_type_id'
         );
         if ($isPayLater) {
