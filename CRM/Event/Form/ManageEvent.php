@@ -579,4 +579,11 @@ WHERE      e.id = %1
     return $current;
   }
 
+  /**
+   * Override
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['description'];
+  }
 }
