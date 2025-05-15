@@ -257,7 +257,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     ]);
 
     // Create two files to attach to the new case
-    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $customFilesSetting = Civi::settings()->get('customFileUploadDir');
+    $filepath = Civi::paths()->getPath($customFilesSetting);
 
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', 'i_bend_bananas.txt');
     $fileA = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/i_bend_bananas.txt"]);
