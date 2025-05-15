@@ -131,7 +131,6 @@ function _financialacls_civicrm_get_accounts_clause(): string {
       $clause = '= 0';
       Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()] = &$clause;
       $accounts = (array) EntityFinancialAccount::get()
-        ->addWhere('entity_table', '=', 'civicrm_financial_type')
         ->addSelect('entity_id', 'financial_account_id')
         ->addJoin('FinancialType AS financial_type', 'LEFT', [
           'entity_id',
