@@ -51,7 +51,9 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
       $defaults["mapper[$i]"] = [];
       if ($fieldMappings) {
         $fieldMapping = $fieldMappings[$i] ?? [];
-        $this->addMappingToDefaults($defaults, $fieldMapping, $i);
+        if (!empty($fieldMapping['name']) && $fieldMapping['name'] !== ts('do_not_import')) {
+          $this->addMappingToDefaults($defaults, $fieldMapping, $i);
+        }
       }
     }
     if (empty($defaults) && $this->getSubmittedValue('skipColumnHeader')) {
@@ -61,6 +63,20 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     return $defaults;
+  }
+
+  /**
+   * Add the saved mapping to the defaults.
+   *
+   * @param array $defaults
+   * @param array $fieldMapping
+   * @param int $rowNumber
+   *
+   * @return void
+   */
+  public function addMappingToDefaults(array &$defaults, array $fieldMapping, int $rowNumber): void {
+    $fieldName = $fieldMapping['name'];
+    $defaults["mapper[$rowNumber]"] = [$fieldName];
   }
 
 }
