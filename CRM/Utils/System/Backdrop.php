@@ -1204,17 +1204,15 @@ AND    u.status = 1
    * @inheritdoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    if ($maintenance) {
+      \CRM_Core_Error::deprecationMessage('CRM_Utils_System::theme called with $maintenance = TRUE - please use renderMaintenanceMessage instead');
+    }
+
     $ret = FALSE;
 
     if (!$print) {
       if ($maintenance) {
-        backdrop_set_breadcrumb('');
-        backdrop_maintenance_theme();
-        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
-          CRM_Utils_System::addHTMLHead($region->render(''));
-        }
-        print theme('maintenance_page', ['content' => $content]);
-        exit();
+        $content = $this->renderMaintanceMessage($content);
       }
       $ret = TRUE;
     }
@@ -1227,6 +1225,18 @@ AND    u.status = 1
       print $out;
       return NULL;
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function renderMaintanceMessage(&$content) {
+    backdrop_set_breadcrumb('');
+    backdrop_maintenance_theme();
+    if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+      CRM_Utils_System::addHTMLHead($region->render(''));
+    }
+    return theme('maintenance_page', ['content' => $content]);
   }
 
   /**
