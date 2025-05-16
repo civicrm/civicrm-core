@@ -4,39 +4,55 @@ require_once 'riverlea.civix.php';
 use CRM_riverlea_ExtensionUtil as E;
 
 /**
- * Supports multiple theme variations/streams.
+ * Supply available streams to the theme hook
+ *
+ * Note: if this looks labour intensive, don't worry - the output
+ * is cached in \Civi\Core\Themes
  */
 function riverlea_civicrm_themes(&$themes) {
-  $themes['minetta'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Minetta (RiverLea ~Greenwich)',
-    'prefix' => 'streams/minetta/',
-    'search_order' => array('minetta', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['walbrook'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Walbrook (RiverLea ~Shoreditch/Island)',
-    'prefix' => 'streams/walbrook/',
-    'search_order' => array('walbrook', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['hackneybrook'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Hackney Brook (RiverLea ~Finsbury Park)',
-    'prefix' => 'streams/hackneybrook/',
-    'search_order' => array('hackneybrook', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['thames'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Thames (RiverLea ~Aah)',
-    'prefix' => 'streams/thames/',
-    'search_order' => array('thames', '_riverlea_core_', '_fallback_'),
-  );
-  $themes['_riverlea_core_'] = array(
+  // always add (hidden) Riverlea base theme
+  $themes['_riverlea_core_'] = [
     'ext' => 'riverlea',
     'title' => 'Riverlea: base theme',
     'prefix' => 'core/',
-    'search_order' => array('_riverlea_core_', '_fallback_'),
-  );
+    'search_order' => ['_riverlea_core_', '_fallback_'],
+  ];
+
+  try {
+    $streams = \Civi::service('riverlea.dynamic_css')->getAvailableStreamMeta();
+  }
+  catch (\CRM_Core_Exception $e) {
+    // dont crash the whole hook if Riverlea is broken
+    \CRM_Core_Session::setStatus('Error occured making Riverlea streams available to the theme engine: ' . $e->getMessage());
+    return;
+  }
+
+  $streamsById = array_column($streams, NULL, 'id');
+
+  foreach ($streams as $name => $stream) {
+    $themeMeta = [
+      'title' => $stream['label'],
+      'search_order' => [],
+    ];
+
+    $extension = $stream['extension'];
+
+    // we only add the stream itself to the search order if
+    // it has an extension (which indicates it may have its own
+    // file overrides)
+    if ($extension) {
+      $themeMeta['search_order'][] = $name;
+
+      // used to resolve files from this stream
+      $themeMeta['ext'] = $extension;
+      $themeMeta['prefix'] = $stream['file_prefix'] ?? '';
+    }
+
+    $themeMeta['search_order'][] = '_riverlea_core_';
+    $themeMeta['search_order'][] = '_fallback_';
+
+    $themes[$name] = $themeMeta;
+  }
 }
 
 /**
@@ -74,12 +90,26 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
     ]);
   }
   if ($bundle->name === 'coreResources') {
-    // get DynamicCss asset
-    $bundle->addStyleUrl(\Civi::service('asset_builder')->getUrl(
+    // get DynamicCss asset URL
+    $riverUrl = \Civi::service('asset_builder')->getUrl(
       \Civi\riverlea\DynamicCss::CSS_FILE,
-      \Civi\riverlea\DynamicCss::getCssParams()
-    ));
+      \Civi::service('riverlea.dynamic_css')->getCssParams()
+    );
+
+    $bundle->addStyleUrl($riverUrl);
+
+    // TODO: add a non-admin permission for using Previewer
+    if (\CRM_Core_Permission::check('administer CiviCRM')) {
+      \Civi::resources()->addScriptFile('riverlea', 'js/previewer.js');
+
+      // pass the river url to the clientside, so the previewer can easily remove it
+      \Civi::resources()->addVars('riverlea', [
+        'river_url' => $riverUrl,
+        'dark_mode' => \Civi::settings()->get(\CRM_Utils_System::isFrontendPage() ? 'riverlea_dark_mode_frontend' : 'riverlea_dark_mode_backend')
+      ]);
+    }
   }
+
 }
 
 /**
@@ -98,4 +128,52 @@ function riverlea_civicrm_install() {
  */
 function riverlea_civicrm_enable() {
   _riverlea_civix_civicrm_enable();
+}
+
+/**
+ * Implements search tasks hook to add the `activate` action
+ *
+ * @param array $tasks
+ * @param bool $checkPermissions
+ * @param int|null $userId
+ */
+function riverlea_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userId) {
+  if ($checkPermissions && !CRM_Core_Permission::check('administer CiviCRM', $userId)) {
+    return;
+  }
+  $tasks['RiverleaStream']['activate_backend'] = [
+    'title' => E::ts('Activate for Backend'),
+    'icon' => 'fa-briefcase',
+    'number' => '=== 1',
+    'apiBatch' => [
+      'action' => 'activate',
+      'params' => ['backOrFront' => 'backend'],
+      'confirmMsg' => E::ts('Activate stream for backend pages?'),
+      'runMsg' => E::ts('Activating stream...'),
+      'successMsg' => E::ts('Stream activated. You may need to refresh the page or clear your browser cache to see the full effect.'),
+      'errorMsg' => E::ts('An error occurred while attempting to activate the stream.'),
+    ],
+  ];
+  $tasks['RiverleaStream']['activate_frontend'] = [
+    'title' => E::ts('Activate for Frontend'),
+    'icon' => 'fa-shop',
+    'number' => '=== 1',
+    'apiBatch' => [
+      'action' => 'activate',
+      'params' => ['backOrFront' => 'frontend'],
+      'confirmMsg' => E::ts('Activate stream for frontend pages?'),
+      'runMsg' => E::ts('Activating stream...'),
+      'successMsg' => E::ts('Stream activated. You may need to refresh the page or clear your browser cache to see the full effect.'),
+      'errorMsg' => E::ts('An error occurred while attempting to activate the stream.'),
+    ],
+  ];
+  $tasks['RiverleaStream']['preview'] = [
+    'title' => E::ts('Preview'),
+    'icon' => 'fa-eye',
+    'number' => '=== 1',
+    'crmPopup' => [
+      'path' => "/civicrm",
+      'data' => "{name: name.join(',')",
+    ],
+  ];
 }

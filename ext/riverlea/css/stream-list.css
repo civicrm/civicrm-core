@@ -1,0 +1,76 @@
+/* CSS rules for Riverlea stream admin */
+
+civi-riverlea-stream-list ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr) );
+  flex-flow: row wrap;
+  padding-left: 0;
+}
+
+civi-riverlea-stream-list ul > li {
+  margin: 1rem;
+}
+
+civi-riverlea-stream-card {
+  display: block;
+  margin: 1rem;
+  padding: 0.5rem;
+  border: 0.5rem solid transparent;
+  outline: 0.5rem solid transparent;
+  border-radius: var(--crm-roundness);
+}
+civi-riverlea-stream-card.is-set-frontend,
+civi-riverlea-stream-card.is-set-backend {
+  border-color: var(--crm-c-success);
+}
+civi-riverlea-stream-card.is-set-preview {
+  outline-color: var(--crm-c-warning);
+}
+
+civi-riverlea-stream-card h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+civi-riverlea-stream-card .btn.btn-stream-selected {
+  background-color: var(--crm-c-success);
+  color: var(--crm-c-success-text);
+}
+civi-riverlea-stream-card .btn.btn-set-preview.btn-stream-selected {
+  background-color: var(--crm-c-warning);
+  color: var(--crm-c-warning-text);
+}
+
+civi-riverlea-stream-card .civi-riverlea-stream-details code {
+  display: inline-block;
+}
+
+civi-riverlea-stream-list .civi-riverlea-stream-edit-dialog {
+  width: 100%;
+}
+
+civi-riverlea-stream-editor iframe {
+  width: 100%;
+  height: 100%;
+}
+civi-riverlea-stream-editor,
+civi-riverlea-stream-editor fieldset {
+  display: flex;
+  flex-direction: column;
+}
+
+civi-riverlea-stream-variable {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+}
+
+civi-riverlea-stream-variable input[type="color"] {
+  width: 3rem;
+}
+civi-riverlea-stream-variable .input-group {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 0.5rem;
+  align-items: center;
+}
