@@ -38,6 +38,23 @@ class CRM_Upgrade_Incremental_php_SixThree extends CRM_Upgrade_Incremental_Base 
     }
   }
 
+  public function upgrade_6_3_beta1($rev): void {
+    $this->addTask('Add column "UserJob.search_display_id"', 'alterSchemaField', 'UserJob', 'search_display_id', [
+      'title' => ts('SearchDisplay ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'description' => ts('Batch import search display'),
+      'input_attrs' => [
+        'label' => ts('Search Display'),
+      ],
+      'entity_reference' => [
+        'entity' => 'SearchDisplay',
+        'key' => 'id',
+        'fk' => FALSE,
+      ],
+    ], 'queue_id');
+  }
+
   public static function deleteNonAttachmentFiles(): bool {
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_file WHERE entity_table LIKE "civicrm_value_%" LIMIT ' . self::BATCH_SIZE);
     return TRUE;

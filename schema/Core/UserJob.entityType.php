@@ -147,6 +147,22 @@ return [
         'on_delete' => 'SET NULL',
       ],
     ],
+    'search_display_id' => [
+      'title' => ts('SearchDisplay ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'description' => ts('Batch import search display'),
+      'input_attrs' => [
+        'label' => ts('Search Display'),
+      ],
+      'entity_reference' => [
+        'entity' => 'SearchDisplay',
+        'key' => 'id',
+        // Core tables get created before extension tables, so a FK constraint
+        // can't be added to this column.
+        'fk' => FALSE,
+      ],
+    ],
     'metadata' => [
       'title' => ts('Job metadata'),
       'sql_type' => 'text',
