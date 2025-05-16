@@ -740,10 +740,6 @@ class CRM_Core_Permission {
           'access CiviCRM',
         ],
       ],
-      'skip IDS check' => [
-        'label' => $prefix . ts('skip IDS check'),
-        'description' => ts('Warning: Give to trusted roles only; this permission has security implications. IDS system is bypassed for users with this permission. Prevents false errors for admin users.'),
-      ],
       'access uploaded files' => [
         'label' => $prefix . ts('access uploaded files'),
         'description' => ts('View / download files including images and photos'),

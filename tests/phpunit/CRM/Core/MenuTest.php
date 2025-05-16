@@ -31,40 +31,6 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertTrue(!isset($menu['civicrm/foo/bar']['ids_arguments']));
   }
 
-  public function testReadXML_IDS(): void {
-    $xmlString = '<?xml version="1.0" encoding="iso-8859-1" ?>
-    <menu>
-      <item>
-         <path>civicrm/foo/bar</path>
-         <title>Foo Bar</title>
-         <ids_arguments>
-          <json>alpha</json>
-          <json>beta</json>
-          <exception>gamma</exception>
-        </ids_arguments>
-      </item>
-    </menu>
-    ';
-    $xml = simplexml_load_string($xmlString);
-    $menu = [];
-    CRM_Core_Menu::readXML($xml, $menu);
-    $this->assertTrue(isset($menu['civicrm/foo/bar']));
-    $this->assertEquals('Foo Bar', $menu['civicrm/foo/bar']['title']);
-    $this->assertEquals(['alpha', 'beta'], $menu['civicrm/foo/bar']['ids_arguments']['json']);
-    $this->assertEquals(['gamma'], $menu['civicrm/foo/bar']['ids_arguments']['exceptions']);
-    $this->assertEquals([], $menu['civicrm/foo/bar']['ids_arguments']['html']);
-
-    $idsConfig = CRM_Core_IDS::createRouteConfig($menu['civicrm/foo/bar']);
-    // XML
-    $this->assertTrue(in_array('alpha', $idsConfig['General']['json']));
-    // XML
-    $this->assertTrue(in_array('beta', $idsConfig['General']['json']));
-    // XML
-    $this->assertTrue(in_array('gamma', $idsConfig['General']['exceptions']));
-    // Inherited
-    $this->assertTrue(in_array('thankyou_text', $idsConfig['General']['exceptions']));
-  }
-
   /**
    * Check that novel data elements in the menu are correctly
    * stored and loaded.
