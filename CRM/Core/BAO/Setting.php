@@ -245,12 +245,25 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     ];
     $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
     $getFieldsParams = ['version' => 3];
+    $singleSettingName = NULL;
     if (count($settingParams) == 1) {
       // ie we are only setting one field - we'll pass it into getfields for efficiency
-      [$name] = array_keys($settingParams);
-      $getFieldsParams['name'] = $name;
+      [$singleSettingName] = array_keys($settingParams);
+      $getFieldsParams['name'] = $singleSettingName;
     }
     $fields = civicrm_api3('setting', 'getfields', $getFieldsParams);
+    if ($singleSettingName) {
+      // this preserves behaviour from a previous workaround in
+      // SettingsMetadata::_filterSettingsSpecification which always returned
+      // the empty array for unrecognised settings if called with `name` filter
+      // moving here to prevent that causing issues elsewhere
+      // TODO: stop calling this with unrecognised settings and then remove this
+      // workaround so we actually validate
+      if (empty($fields['values'][$singleSettingName])) {
+        $fields['values'][$singleSettingName] = [];
+        \Civi::log()->debug("Unrecognised setting key: {$singleSettingName} - please ensure to define meta for this setting or this may fail in future");
+      }
+    }
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
     if (!empty($invalidParams)) {
       throw new CRM_Core_Exception(implode(',', array_keys($invalidParams)) . " not valid settings");

@@ -166,8 +166,6 @@ class SettingsMetadata {
   protected static function _filterSettingsSpecification($filters, &$settingSpec) {
     if (!empty($filters['name'])) {
       $settingSpec = array_intersect_key($settingSpec, array_flip((array) $filters['name']));
-      // FIXME: This is a workaround for settingsBag::setDb() called by unit tests with settings names that don't exist
-      $settingSpec += array_fill_keys((array) $filters['name'], []);
       unset($filters['name']);
     }
     if (!empty($filters)) {
