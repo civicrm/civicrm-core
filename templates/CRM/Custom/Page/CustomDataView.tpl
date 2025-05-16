@@ -52,7 +52,7 @@
                   {foreach from=$cd_edit.fields item=element key=field_id}
                     <tr>
                       <td class="label">{$element.field_title}</td>
-                      <td class="html-adjust">
+                      <td class="html-adjust crm-cf-datatype-{$element.field_data_type|lower} crm-cf-{$element.field_type|lower}">
                         {if $element.options_per_line != 0}
                           {* sort by fails for option per line. Added a variable to iterate through the element array*}
                           {foreach from=$element.field_value item=val}
