@@ -96,7 +96,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     $fv = $this->controller->exportValues($this->_name);
     $locName = NULL;
 
-    $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
+    $addressReturnProperties = $this->getAddressReturnProperties();
 
     //build the returnproperties
     $returnProperties = ['display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1];
@@ -260,6 +260,25 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       throw new CRM_Core_Exception_PrematureExitException('pdf output called', ['contactRows' => $contactRows, 'format' => $format, 'pdf' => $pdf]);
     }
     $pdf->Output('MailingLabels_CiviCRM.pdf', 'D');
+  }
+
+  /**
+   * Get array of return properties for address fields required for mailing label.
+   *
+   * @return array
+   *   return properties for address e.g
+   *   [street_address => 1, supplemental_address_1 => 1, supplemental_address_2 => 1]
+   */
+  private function getAddressReturnProperties(): array {
+    $mailingFormat = Civi::settings()->get('mailing_format');
+
+    $addressFields = CRM_Utils_Address::sequence($mailingFormat);
+    $addressReturnProperties = array_fill_keys($addressFields, 1);
+
+    if (array_key_exists('postal_code', $addressReturnProperties)) {
+      $addressReturnProperties['postal_code_suffix'] = 1;
+    }
+    return $addressReturnProperties;
   }
 
 }
