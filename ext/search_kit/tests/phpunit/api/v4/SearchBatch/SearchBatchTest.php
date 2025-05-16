@@ -84,6 +84,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ->execute()->single();
 
     $tableName = $userJob['metadata']['DataSource']['table_name'];
+    $this->assertEquals($display['id'], $userJob['search_display_id']);
 
     $expectedFieldNames = ['_entity_id', '_status', '_status_message', '_id', 'first_name', 'contact_sub_type', 'gender_id', 'birth_date', 'is_deceased'];
 
