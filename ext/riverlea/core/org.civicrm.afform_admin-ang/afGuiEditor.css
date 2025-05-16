@@ -20,7 +20,12 @@
 
 #afGuiEditor {
   gap: var(--crm-r);
-  height: 100% !important /* vs inline fixed height */;
+}
+#afGuiEditor-canvas,
+#afGuiEditor-palette,
+#afGuiEditor-canvas > .panel,
+#afGuiEditor-palette > .panel {
+  height: 100%; /* for scrolling panels */
 }
 #afGuiEditor .af-gui-columns {
   display: grid;
@@ -104,7 +109,9 @@
   position: relative;
   border-top: none !important;
   height: 100%;
+  height: calc(100% - 40px);
   background: var(--crm-tab-bg-active);
+  overflow-y: scroll;
 }
 
 /* Edit palette (left side) */
