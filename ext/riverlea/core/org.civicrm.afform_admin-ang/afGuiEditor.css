@@ -109,7 +109,7 @@
   position: relative;
   border-top: none !important;
   height: 100%;
-  height: calc(100% - 40px);
+  height: calc(100% - 41px);
   background: var(--crm-tab-bg-active);
   overflow-y: scroll;
 }
