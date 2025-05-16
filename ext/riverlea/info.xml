@@ -12,7 +12,7 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>[civicrm.releaseDate]</releaseDate>
-  <version>1.4.4-[civicrm.version]</version>
+  <version>1.4.5-[civicrm.version]</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
