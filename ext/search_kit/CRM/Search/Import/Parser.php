@@ -277,8 +277,8 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
 
   public function init() {
     $userJob = $this->getUserJob();
-    $this->display = $userJob['metadata']['DataSource']['search_display'];
-    $this->savedSearch = $userJob['metadata']['DataSource']['saved_search'];
+    $this->display = $userJob['search_display_id.name'];
+    $this->savedSearch = $userJob['search_display_id.saved_search_id.name'];
     $this->loadSavedSearch();
     $this->loadSearchDisplay();
     $this->baseEntity = $this->savedSearch['api_entity'];

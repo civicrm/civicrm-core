@@ -70,6 +70,7 @@ trait UserJobTrait {
   protected function getUserJob(): array {
     if (empty($this->userJob)) {
       $this->userJob = UserJob::get()
+        ->addSelect('*', 'search_display_id.name', 'search_display_id.saved_search_id.name')
         ->addWhere('id', '=', $this->getUserJobID())
         ->execute()
         ->single();
