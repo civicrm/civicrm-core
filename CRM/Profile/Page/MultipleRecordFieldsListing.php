@@ -49,6 +49,13 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   public $_total = NULL;
 
   /**
+   * Render this listing as headers only?
+   *
+   * @var bool
+   */
+  public $_headersOnly;
+
+  /**
    * Get BAO Name.
    *
    * @return string
