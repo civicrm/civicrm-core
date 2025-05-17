@@ -250,7 +250,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .jstree-default.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox::before,
 .crm-container .jstree-default .jstree-checked > .jstree-checkbox::before {
   content: '\f046';
-  color: var(--crm-c-success);
+  color: var(--crm-c-success-on-page-bg);
 }
 .jstree-default > .jstree-no-dots .jstree-closed > .jstree-ocl::before,
 .jstree .jstree-closed > .jstree-ocl::before {
