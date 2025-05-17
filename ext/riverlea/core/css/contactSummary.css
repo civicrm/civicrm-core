@@ -15,6 +15,9 @@
   padding: var(--crm-dash-header-padding);
   margin-left: var(--crm-dash-heading-inset);
 }
+.crm-summary-contactname-block .crm-summary-link {
+  color: inherit;
+}
 
 /* Image */
 
