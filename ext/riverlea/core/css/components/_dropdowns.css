@@ -411,12 +411,12 @@
 
 /* Dropdown alert links */
 
-#afGuiEditor  .af-gui-bar .dropdown-menu a:has(.text-danger) {
+#afGuiEditor .dropdown-menu a:has(.text-danger) {
   display: flex;
   justify-content: center;
   background: var(--crm-dropdown-danger-bg);
 }
-#afGuiEditor  .af-gui-bar .dropdown-menu .text-danger {
+#afGuiEditor .dropdown-menu .text-danger {
   color: var(--crm-c-danger-text);
 }
 
