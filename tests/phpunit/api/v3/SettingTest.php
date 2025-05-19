@@ -558,7 +558,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertAPISuccess($result);
-    $this->assertEquals('Unconfirmed', $result['values'][$domain['id']]['tag_unconfirmed']);
+    $this->assertEquals('over-cms-menu', $result['values'][$domain['id']]['menubar_position']);
 
     // The 'fill' operation is no longer necessary, but third parties might still use it, so let's
     // make sure it doesn't do anything weird (crashing or breaking values).
@@ -566,12 +566,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $result = $this->callAPISuccess('Setting', 'get', $params);
     $this->assertAPISuccess($result);
-    $this->assertArrayHasKey('tag_unconfirmed', $result['values'][$domain['id']]);
+    $this->assertArrayHasKey('menubar_position', $result['values'][$domain['id']]);
 
     // Setting has NULL default. Not returned.
     //$this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
 
-    $this->assertEquals('Unconfirmed', $result['values'][$domain['id']]['tag_unconfirmed']);
+    $this->assertEquals('over-cms-menu', $result['values'][$domain['id']]['menubar_position']);
   }
 
   /**
