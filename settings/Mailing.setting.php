@@ -51,7 +51,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Separator character used when generating VERP (variable envelope return path) Mail-From addresses.'),
     'help_text' => NULL,
-    'settings_pages' => ['mail' => ['weight' => 50]],
+    'settings_pages' => ['smtp' => ['weight' => 300]],
   ],
   'simple_mail_limit' => [
     'group_name' => 'Mailing Preferences',
@@ -71,6 +71,7 @@ return [
     'description' => ts('The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting.'),
     'help_text' => 'CiviCRM forces users sending more than this number of mails to use CiviMails. CiviMails have additional precautions: not sending to contacts who do not want bulk mail, adding domain name and opt out links. You should familiarise yourself with the law relevant to you on bulk mailings if changing this setting. For the US https://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003 is a good place to start.',
     'add' => '4.7.25',
+    'settings_pages' => ['smtp' => ['weight' => 200]],
   ],
   'allow_mail_from_logged_in_contact' => [
     'group_name' => 'Mailing Preferences',
@@ -100,7 +101,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Controls whether scheduled reminders will attempt to process smarty tokens.'),
     'help_text' => NULL,
-    'settings_pages' => ['mailing' => ['weight' => 150]],
+    'settings_pages' => ['smtp' => ['weight' => 250]],
   ],
   'smtp_450_is_permanent' => [
     'group_name' => 'Mailing Preferences',
@@ -117,6 +118,6 @@ return [
     'description' => ts('Consider domains that will not resolve (SMTP Error 450 - class 4.1.2 "Domain not found") as permanent failures.'),
     'help_text' => NULL,
     'help' => ['id' => 'smtp_450_is_permanent'],
-    'settings_pages' => ['mailing' => ['weight' => 160]],
+    'settings_pages' => ['smtp' => ['weight' => 350]],
   ],
 ];
