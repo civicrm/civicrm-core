@@ -52,11 +52,10 @@ class CreateBatch extends AbstractAction {
       'status_id:name' => 'draft',
       'is_template' => FALSE,
       'expires_date' => $this->savedSearch['expires_date'],
+      'search_display_id' => $this->display['id'],
       'metadata' => [
         'DataSource' => [
           'table_name' => $tableName,
-          'saved_search' => $this->savedSearch['name'],
-          'search_display' => $this->display['name'],
           'column_headers' => [],
           'column_specs' => [],
         ],

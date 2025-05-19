@@ -91,17 +91,16 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
       $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);
       $userJob = UserJob::get(TRUE)
         ->addWhere('id', '=', $userJobID)
-        ->addSelect('*', 'status_id:name', 'status_id:label')
+        ->addSelect('*', 'status_id:name', 'status_id:label', 'search_display_id.name', 'search_display_id.saved_search_id.name')
         ->execute()
         ->first();
       $this->assign('statusName', $userJob['status_id:name']);
       $this->assign('statusLabel', $userJob['status_id:label']);
-      $dataSource = $userJob['metadata']['DataSource'] ?? [];
       $searchDisplayLink = '';
       // If this is a SearchKit batch, add a link to get back to the search display.
-      if (isset($dataSource['search_display'])) {
+      if (!empty($userJob['search_display_id.name'])) {
         $searchDisplayLink = \Civi::url('backend://civicrm/search')
-          ->setFragment("display/{$dataSource['saved_search']}/{$dataSource['search_display']}?batch={$userJobID}");
+          ->setFragment("display/{$userJob['search_display_id.saved_search_id.name']}/{$userJob['search_display_id.name']}?batch={$userJobID}");
       }
       $this->assign('searchDisplayLink', (string) $searchDisplayLink);
       $onDuplicate = (int) $userJob['metadata']['submitted_values']['onDuplicate'];
