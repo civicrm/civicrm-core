@@ -277,8 +277,12 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
 
   public function init() {
     $userJob = $this->getUserJob();
-    $this->display = $userJob['metadata']['DataSource']['search_display'];
-    $this->savedSearch = $userJob['metadata']['DataSource']['saved_search'];
+    if (empty($userJob['search_display_id.name'])) {
+      // Exception is caught by ImportSpecProvider::modifySpec to prevent hard crash in Api4 getFields
+      throw new \CRM_Core_Exception('No search display found for this job.');
+    }
+    $this->display = $userJob['search_display_id.name'];
+    $this->savedSearch = $userJob['search_display_id.saved_search_id.name'];
     $this->loadSavedSearch();
     $this->loadSearchDisplay();
     $this->baseEntity = $this->savedSearch['api_entity'];
