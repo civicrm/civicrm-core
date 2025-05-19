@@ -33,9 +33,8 @@ class SKBatchSpecProvider extends AutoService implements SpecProviderInterface {
 
     $select = \CRM_Utils_SQL_Select::from('civicrm_user_job')
       ->where('job_type = "search_batch_import"')
+      ->where('search_display_id IS NOT NULL')
       ->where('metadata LIKE \'%"table_name":"' . $tableName . '"%\'')
-      ->where('metadata LIKE \'%"saved_search":"%\'')
-      ->where('metadata LIKE \'%"search_display":"%\'')
       ->where('metadata LIKE \'%"column_specs":%\'')
       ->select('metadata');
 
