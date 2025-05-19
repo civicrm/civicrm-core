@@ -1,6 +1,12 @@
+1.4.5-6.3beta
+ - CHANGED 'text-danger' in FormBuilder drop-down to cover tabset dropdown 'delete tab'.
+
 1.4.4-6.3alpha
  - FIXED inline checkbox regression (https://lab.civicrm.org/extensions/riverlea/-/merge_requests/51) ht @yashodha
  - FIXED loading animation, re-using nav-bar spinning logo svg, set as a css variable. (ref https://lab.civicrm.org/dev/user-interface/-/issues/84)
+ - FIXED invisible select2 selected item when in a dropdown (ref https://lab.civicrm.org/dev/core/-/issues/5870)
+ - FIXED PrettyPrint code blocks: restored indents lost in 1.3.8-6.0alpha change.
+ - FIXED ol.linenums line-numbering restored.
 
 1.4.3-6.2alpha
 This release makes a series of changes to how emphasis colours (ie primary/success/info/etc) are handled across RiverLea. The main changes:
