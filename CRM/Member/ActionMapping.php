@@ -91,7 +91,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     $query['casDateField'] = str_replace('membership_', 'e.', ($schedule->start_action_date ?? ''));
 
     // Date field needs a proper alias
-    if (strpos($query['casDateField'], 'e.') !== 0 || strpos($query['casDateField'], 'cr.') !== 0) {
+    if (!(str_starts_with($query['casDateField'], 'e.') || str_starts_with($query['casDateField'], 'cr.'))) {
       if ($query['casDateField'] == 'next_sched_contribution_date') {
         // Alias the Auto-renew
         $query['casDateField'] = 'cr.' . $query['casDateField'];
