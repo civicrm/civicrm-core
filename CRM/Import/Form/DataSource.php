@@ -239,7 +239,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       $userJobName = $userJob['name'];
       // Strip off import_ prefix from UserJob.name
       $mappingName = substr($userJobName, 7);
-      $mappingID = Mapping::get(FALSE)->addWhere('name', '=', $mappingName)->addSelect('id')->execute()->first()['id'];
+      // This mapping is deprecated but still used for Contact, Activity.
+      $mappingID = Mapping::get(FALSE)->addWhere('name', '=', $mappingName)->addSelect('id')->execute()->first()['id'] ?? NULL;
       // Unset fields that should not be copied over.
       unset($userJob['id'], $userJob['name'], $userJob['created_date'], $userJob['is_template'], $userJob['queue_id'], $userJob['start_date'], $userJob['end_date']);
       $userJob['metadata']['template_id'] = $templateID;
