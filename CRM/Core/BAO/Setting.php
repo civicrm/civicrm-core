@@ -261,7 +261,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       // workaround so we actually validate
       if (empty($fields['values'][$singleSettingName])) {
         $fields['values'][$singleSettingName] = [];
-        \CRM_Core_Error::deprecatedWarning("Unrecognised setting key: {$singleSettingName} - please ensure to define meta for this setting or this may fail in future");
+        \Civi::log()->debug("Unrecognised setting key: {$singleSettingName} - please ensure to define meta for this setting or this may fail in future");
       }
     }
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
