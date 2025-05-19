@@ -15,6 +15,7 @@ class SettingsStyleTest extends \CiviUnitTestCase {
   const NEW_SETTINGS_WITH_OLD_NAMES = [
     'domain',
     'userFrameworkBaseURL',
+    'navigation',
   ];
 
   protected function setUp(): void {
