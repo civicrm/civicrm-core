@@ -1,5 +1,5 @@
 <!DOCTYPE html >
-<html lang="{$config->lcMessages|substr:0:2}" class="crm-standalone {if !empty($urlIsPublic)}crm-public{/if}">
+<html lang="{$config->lcMessages|substr:0:2}" class="crm-standalone">
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,7 +15,7 @@
   {include file="CRM/common/debug.tpl"}
   {/if}
 
-  <div id="crm-container" class="crm-container standalone-page-padding" lang="{$config->lcMessages|substr:0:2}" xml:lang="{$config->lcMessages|substr:0:2}">
+  <div id="crm-container" class="crm-container standalone-page-padding {if !empty($urlIsPublic)}crm-public{/if}" lang="{$config->lcMessages|substr:0:2}" xml:lang="{$config->lcMessages|substr:0:2}">
     {if $breadcrumb}
       <nav aria-label="{ts escape='htmlattribute'}Breadcrumb{/ts}" class="breadcrumb"><ol>
         <li><a href="/civicrm/dashboard?reset=1" >{ts}Home{/ts}</a></li>
