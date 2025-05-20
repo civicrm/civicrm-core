@@ -20,35 +20,35 @@
  */
 class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
 
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_ContactFormTrait;
+
   /**
    * Phones of the contact that is been viewed
    * @var array
    */
-  private $_phones = [];
+  private array $_phones = [];
 
   /**
    * No of phone blocks for inline edit
    * @var int
    */
-  private $_blockCount = 6;
+  private int $_blockCount = 6;
 
   /**
    * Call preprocess.
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
-
-    //get all the existing phones
-    $phone = new CRM_Core_BAO_Phone();
-    $phone->contact_id = $this->_contactId;
-
-    $this->_phones = CRM_Core_BAO_Block::retrieveBlock($phone);
+    // Get all the existing phones , The array historically starts
+    // with 1 not 0.
+    $this->_phones = $this->getExistingPhonesReIndexed();
   }
 
   /**
    * Build the form object elements for phone object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
 
     $totalBlocks = $this->_blockCount;
@@ -68,10 +68,8 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     $this->assign('actualBlockCount', $actualBlockCount);
     $this->assign('totalBlocks', $totalBlocks);
 
-    $this->applyFilter('__ALL__', 'trim');
-
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
-      CRM_Contact_Form_Edit_Phone::buildQuickForm($this, $blockId, TRUE);
+      $this->addPhoneBlockFields($blockId);
     }
 
     $this->addFormRule(['CRM_Contact_Form_Inline_Phone', 'formRule']);
@@ -121,7 +119,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    *
    * @return array
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $defaults = [];
     if (!empty($this->_phones)) {
       foreach ($this->_phones as $id => $value) {
@@ -139,19 +137,16 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   /**
    * Process the form.
    */
-  public function postProcess() {
-    $params = $this->exportValues();
+  public function postProcess(): void {
+    $params = $this->getSubmittedValues();
 
     // Process / save phones
-    $params['contact_id'] = $this->_contactId;
-    $params['updateBlankLocInfo'] = TRUE;
-    $params['phone']['isIdSet'] = TRUE;
     foreach ($this->_phones as $count => $value) {
       if (!empty($value['id']) && isset($params['phone'][$count])) {
         $params['phone'][$count]['id'] = $value['id'];
       }
     }
-    CRM_Core_BAO_Block::create('phone', $params);
+    $this->savePhones($params['phone']);
 
     $this->log();
     $this->response();

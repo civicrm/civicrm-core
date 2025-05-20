@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Member_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Build the form object.
@@ -27,7 +27,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function buildQuickForm(): void {
     $this->addSavedMappingFields();
-    $this->addFormRule(['CRM_Member_Import_Form_MapField', 'formRule'], $this);
+    $this->addFormRule([__CLASS__, 'formRule'], $this);
 
     $options = $this->getFieldOptions();
     // Suppress non-match contact fields at the QuickForm layer as
@@ -37,9 +37,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         foreach ($option['children'] as $index => $contactField) {
           if (empty($contactField['match_rule'])) {
             unset($option['children'][$index]);
-          }
-          if ($contactField['id'] === 'contact_id') {
-            $option['children'][$index]['id'] = 'membership__contact_id';
           }
         }
       }
@@ -51,9 +48,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
           // which is indistinguishable to convert back - ie ___ could be _. or ._.
           // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
           $name = $membershipField['id'];
-          $name = str_replace('_.', '~~', $name);
-          $name = str_replace('.', '__', $name);
-          $name = 'membership__' . $name;
           $option['children'][$index]['id'] = $name;
         }
       }
@@ -80,22 +74,17 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $importKeys = [];
-    foreach ($fields['mapper'] as $field) {
-      $importKeys[] = [$field];
-    }
-    $parser = $self->getParser();
-    $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-    $errors = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'membership.contact_id', 'contact_id']);
-
-    if (!in_array('membership.id', $fields['mapper']) && !in_array('membership__id', $fields['mapper'])) {
+    $errors = [];
+    $mappedFields = $self->getMappedFields($fields['mapper']);
+    if (!in_array('Membership.id', $mappedFields)) {
+      $errors = $self->validateRequiredContactFields();
       // FIXME: should use the schema titles, not redeclare them
       $requiredFields = [
-        'membership.membership_type_id' => ts('Membership Type'),
-        'membership.start_date' => ts('Membership Start Date'),
+        'Membership.membership_type_id' => ts('Membership Type'),
+        'Membership.start_date' => ts('Membership Start Date'),
       ];
       foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $fields['mapper']) && !in_array(str_replace('membership.', 'membership__', $field), $fields['mapper'])) {
+        if (!in_array($field, $mappedFields)) {
           if (!isset($errors['_qf_default'])) {
             $errors['_qf_default'] = '';
           }

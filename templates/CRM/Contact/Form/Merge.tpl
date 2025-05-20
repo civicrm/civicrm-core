@@ -106,7 +106,7 @@
             {elseif $row.other.fileName}
               {$row.other.fileName|escape}
             {else}
-              {', '|implode:$row.other}
+              {$row.other|join:', '}
             {/if}
             </span>
           </td>
@@ -132,7 +132,7 @@
                 {elseif $row.main.fileName}
                   {$row.main.fileName|escape}
                 {else}
-                  {', '|implode:$row.main}
+                  {$row.main|join:', '}
                 {/if}
                 </span>
               {/strip}
@@ -185,7 +185,7 @@
                 {elseif $row.main.fileName}
                   {$row.main.fileName|escape}
                 {else}
-                  {', '|implode:$row.main}
+                  {$row.main|join:', '}
                 {/if}
               </span>
             </td>

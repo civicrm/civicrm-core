@@ -258,28 +258,28 @@
   margin-top: 5px;
 }
 #bootstrap-theme .alert-success hr {
-  border-top-color: var(--crm-alert-border-help);
+  border-top-color: var(--crm-alert-success-border);
 }
 #bootstrap-theme .alert-success .alert-link {
-  color: var(--crm-alert-text-help);
+  color: var(--crm-alert-success-text);
 }
 #bootstrap-theme .alert-info hr {
-  border-top-color: var(--crm-alert-border-info);
+  border-top-color: var(--crm-alert-info-border);
 }
 #bootstrap-theme .alert-info .alert-link {
-  color: var(--crm-alert-text-info);
+  color: var(--crm-alert-info-text);
 }
 #bootstrap-theme .alert-warning hr {
-  border-top-color: var(--crm-alert-border-warning);
+  border-top-color: var(--crm-alert-warning-border);
 }
 #bootstrap-theme .alert-warning .alert-link {
-  color: var(--crm-alert-text-warning);
+  color: var(--crm-alert-warning-text);
 }
 #bootstrap-theme .alert-danger hr {
-  border-top-color: var(--crm-alert-border-danger);
+  border-top-color: var(--crm-alert-danger-border);
 }
 #bootstrap-theme .alert-danger .alert-link {
-  color: var(--crm-alert-text-danger);
+  color: var(--crm-alert-danger-text);
 }
 
 /* Screen reader */
@@ -1799,19 +1799,17 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
   /* width: 100%; */
   border-radius: var(--crm-roundness);
 }
-#bootstrap-theme .has-success .form-control {
-  border-color: var(--crm-c-green-dark);
-}
+#bootstrap-theme .has-success .form-control,
 #bootstrap-theme .has-success .form-control:focus {
-  border-color: var(--crm-c-green-dark);
+  border-color: var(--crm-alert-success-border);
 }
 #bootstrap-theme .has-success .input-group-addon {
-  color: var(--crm-c-green-dark);
-  background-color: var(--crm-c-green-light);
-  border-color: var(--crm-c-green);
+  color: var(--crm-alert-success-text);
+  background-color: var(--crm-alert-sucess-bg);
+  border-color: var(--crm-alert-success-border);
 }
 #bootstrap-theme .has-success .form-control-feedback {
-  color: var(--crm-c-green);
+  color: var(--crm-c-success-on-page-bg);
 }
 #bootstrap-theme .has-warning .form-control {
   border-color: var(--crm-c-warning);
@@ -1820,27 +1818,27 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
   border-color: var(--crm-c-warning);
 }
 #bootstrap-theme .has-warning .input-group-addon {
-  color: var(--crm-c-warning);
-  background-color: var(--crm-c-amber-light);
-  border-color: var(--crm-c-warning);
+  color: var(--crm-alert-warning-text);
+  background-color: var(--crm-alert-warning-bg);
+  border-color: var(--crm-alert-warning-border);
 }
 #bootstrap-theme .has-warning .form-control-feedback {
   color: var(--crm-c-warning);
 }
 #bootstrap-theme .has-error .form-control,
 #bootstrap-theme .has-error .form-control a.select2-default {
-  border-color: var(--crm-c-alert);
+  border-color: var(--crm-c-danger);
 }
 #bootstrap-theme .has-error .form-control:focus {
-  border-color: var(--crm-c-alert);
+  border-color: var(--crm-c-danger);
 }
 #bootstrap-theme .has-error .input-group-addon {
-  color: var(--crm-c-alert);
-  background-color: # var(--crm-c-red-light);
-  border-color: var(--crm-c-alert);
+  color: var(--crm-alert-danger-text);
+  background-color: var(--crm-alert-danger-bg);
+  border-color: var(--crm-alert-danger-border);
 }
 #bootstrap-theme .has-error .form-control-feedback {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
 }
 
 /* Nav */
@@ -2641,7 +2639,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
 }
 #bootstrap-theme .progress-bar-danger {
-  background-color: var(--crm-c-alert);
+  background-color: var(--crm-c-danger);
 }
 .progress-striped #bootstrap-theme .progress-bar-danger {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
@@ -2795,7 +2793,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme a.list-group-item-success,
 #bootstrap-theme button.list-group-item-success {
-  color: var(--crm-alert-text-help);
+  color: var(--crm-alert-success-text);
 }
 #bootstrap-theme a.list-group-item-success .list-group-item-heading,
 #bootstrap-theme button.list-group-item-success .list-group-item-heading {
@@ -2806,8 +2804,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.list-group-item-success:focus,
 #bootstrap-theme button.list-group-item-success:hover,
 #bootstrap-theme button.list-group-item-success:focus {
-  color: var(--crm-alert-text-help);
-  background-color: var(--crm-alert-background-help);
+  color: var(--crm-alert-success-text);
+  background-color: var(--crm-alert-success-bg);
 }
 #bootstrap-theme a.list-group-item-success.active,
 #bootstrap-theme a.list-group-item-success.active:hover,
@@ -2815,17 +2813,17 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-success.active,
 #bootstrap-theme button.list-group-item-success.active:hover,
 #bootstrap-theme button.list-group-item-success.active:focus {
-  color: var(--crm-c-success-text);
-  background-color: var(--crm-c-success);
-  border-color: var(--crm-c-success);
+  color: var(--crm-alert-success-text);
+  background-color: var(--crm-alert-success-bg);
+  border-color: var(--crm-alert-success-border);
 }
 #bootstrap-theme .list-group-item-info {
-  color: var(--crm-alert-text-info);
-  background-color: var(--crm-alert-background-info);
+  color: var(--crm-alert-info-text);
+  background-color: var(--crm-alert-info-bg);
 }
 #bootstrap-theme a.list-group-item-info,
 #bootstrap-theme button.list-group-item-info {
-  color: var(--crm-alert-text-info);
+  color: var(--crm-alert-info-text);
 }
 #bootstrap-theme a.list-group-item-info .list-group-item-heading,
 #bootstrap-theme button.list-group-item-info .list-group-item-heading {
@@ -2835,8 +2833,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.list-group-item-info:focus,
 #bootstrap-theme button.list-group-item-info:hover,
 #bootstrap-theme button.list-group-item-info:focus {
-  color: var(--crm-alert-text-info);
-  background-color: var(--crm-alert-background-info);
+  color: var(--crm-alert-info-text);
+  background-color: var(--crm-alert-info-bg);
 }
 #bootstrap-theme a.list-group-item-info.active,
 #bootstrap-theme a.list-group-item-info.active:hover,
@@ -2844,17 +2842,17 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-info.active,
 #bootstrap-theme button.list-group-item-info.active:hover,
 #bootstrap-theme button.list-group-item-info.active:focus {
-  color: var(--crm-c-info-text);
-  background-color: var(--crm-c-info);
-  border-color: var(--crm-c-info);
+  color: var(--crm-alert-info-text);
+  background-color: var(--crm-alert-info-bg);
+  border-color: var(--crm-alert-info-border);
 }
 #bootstrap-theme .list-group-item-warning {
-  color: var(--crm-alert-text-warning);
-  background-color: var(--crm-alert-background-warning);
+  color: var(--crm-alert-warning-text);
+  background-color: var(--crm-alert-warning-bg);
 }
 #bootstrap-theme a.list-group-item-warning,
 #bootstrap-theme button.list-group-item-warning {
-  color: var(--crm-alert-text-warning);
+  color: var(--crm-alert-warning-text);
 }
 #bootstrap-theme a.list-group-item-warning .list-group-item-heading,
 #bootstrap-theme button.list-group-item-warning .list-group-item-heading {
@@ -2864,8 +2862,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.list-group-item-warning:focus,
 #bootstrap-theme button.list-group-item-warning:hover,
 #bootstrap-theme button.list-group-item-warning:focus {
-  color: var(--crm-alert-text-warning);
-  background-color: var(--crm-alert-background-warning);
+  color: var(--crm-alert-warning-text);
+  background-color: var(--crm-alert-warning-bg);
 }
 #bootstrap-theme a.list-group-item-warning.active,
 #bootstrap-theme a.list-group-item-warning.active:hover,
@@ -2873,17 +2871,17 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-warning.active,
 #bootstrap-theme button.list-group-item-warning.active:hover,
 #bootstrap-theme button.list-group-item-warning.active:focus {
-  color: var(--crm-c-warning-text);
-  background-color: var(--crm-c-warning);
-  border-color: var(--crm-c-warning);
+  color: var(--crm-alert-warning-text);
+  background-color: var(--crm-alert-warning-bg);
+  border-color: var(--crm-alert-warning-border);
 }
 #bootstrap-theme .list-group-item-danger {
-  color: var(--crm-alert-text-danger);
-  background-color: var(--crm-alert-background-danger);
+  color: var(--crm-alert-danger-text);
+  background-color: var(--crm-alert-danger-bg);
 }
 #bootstrap-theme a.list-group-item-danger,
 #bootstrap-theme button.list-group-item-danger {
-  color: var(--crm-alert-text-danger);
+  color: var(--crm-alert-danger-text);
 }
 #bootstrap-theme a.list-group-item-danger .list-group-item-heading,
 #bootstrap-theme button.list-group-item-danger .list-group-item-heading {
@@ -2893,8 +2891,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.list-group-item-danger:focus,
 #bootstrap-theme button.list-group-item-danger:hover,
 #bootstrap-theme button.list-group-item-danger:focus {
-  color: var(--crm-alert-text-danger);
-  background-color: var(--crm-alert-background-danger);
+  color: var(--crm-alert-danger-text);
+  background-color: var(--crm-alert-danger-bg);
 }
 #bootstrap-theme a.list-group-item-danger.active,
 #bootstrap-theme a.list-group-item-danger.active:hover,
@@ -2902,9 +2900,9 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-danger.active,
 #bootstrap-theme button.list-group-item-danger.active:hover,
 #bootstrap-theme button.list-group-item-danger.active:focus {
-  color: var(--crm-c-alert-text);
-  background-color: var(--crm-c-alert);
-  border-color: var(--crm-c-alert);
+  color: var(--crm-alert-danger-text);
+  background-color: var(--crm-alert-danger-bg);
+  border-color: var(--crm-alert-danger-border);
 }
 #bootstrap-theme .list-group-item-heading {
   margin-top: 0;
@@ -3445,12 +3443,12 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-warning);
 }
 #bootstrap-theme .label-danger {
-  background: var(--crm-c-alert);
-  color: var(--crm-c-alert-text);
+  background: var(--crm-c-danger);
+  color: var(--crm-c-danger-text);
 }
 #bootstrap-theme .label-danger[href]:hover,
 #bootstrap-theme .label-danger[href]:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
 }
 #bootstrap-theme .label i.crm-i {
   color: inherit; /* resets icons inside lables to use the label text colour */

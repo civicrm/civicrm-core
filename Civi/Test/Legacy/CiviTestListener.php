@@ -82,7 +82,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
       $this->tx->rollback()->commit();
       $this->tx = NULL;
     }
-    if ($test instanceof \Civi\Test\HookInterface) {
+    if ($test instanceof \Civi\Core\HookInterface) {
       \CRM_Utils_Hook::singleton()->reset();
     }
     \CRM_Utils_Time::resetTime();
@@ -129,7 +129,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    * @return bool
    */
   protected function isCiviTest(\PHPUnit_Framework_Test $test) {
-    return $test instanceof \Civi\Test\HookInterface || $test instanceof \Civi\Test\HeadlessInterface;
+    return $test instanceof \Civi\Core\HookInterface || $test instanceof \Civi\Test\HeadlessInterface;
   }
 
   /**

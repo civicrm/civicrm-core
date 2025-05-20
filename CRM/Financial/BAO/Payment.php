@@ -105,6 +105,25 @@ class CRM_Financial_BAO_Payment {
     }
     $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
 
+    if (array_key_exists('fee_amount', $params) && $params['fee_amount'] > 0) {
+      $trxnParams = [
+        'contribution_status_id' => $paymentTrxnParams['status_id'],
+        'trxnParams' => [
+          'trxn_date' => $paymentTrxnParams['trxn_date'],
+          'currency' => $paymentTrxnParams['currency'],
+          'trxn_id' => isset($paymentTrxnParams['trxn_id']) ? $paymentTrxnParams['trxn_id'] : NULL,
+          'payment_instrument_id' => isset($paymentTrxnParams['payment_instrument_id']) ? $paymentTrxnParams['payment_instrument_id'] : NULL,
+          'check_number' => isset($paymentTrxnParams['check_number']) ? $paymentTrxnParams['check_number'] : NULL,
+          'pan_truncation' => isset($paymentTrxnParams['pan_truncation']) ? $paymentTrxnParams['pan_truncation'] : NULL,
+          'card_type_id' => isset($paymentTrxnParams['card_type_id']) ? $paymentTrxnParams['card_type_id'] : NULL,
+          'payment_processor_id' => isset($paymentTrxnParams['payment_processor_id']) ? $paymentTrxnParams['payment_processor_id'] : NULL,
+        ],
+      ];
+
+      $trxnParams = array_merge($paymentTrxnParams, $trxnParams);
+      CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams);
+    }
+
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
       // Payment was cancelled. Reverse the financial transactions.
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);

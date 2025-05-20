@@ -759,7 +759,7 @@ event.loc_block_id.phone_id.phone :456 789
 event.description :event description
 event.location :15 Walton St<br />
 up the road<br />
-Emerald City, Maine 90210-1234<br />
+Emerald City, ME 90210-1234<br />
 United States<br />
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
@@ -885,6 +885,7 @@ $100.00
     $this->assertStringContainsString('Beverley Hills
 90210
 California
+CA
 United States', $tokenProcessor->getRow(0)->render('message'));
   }
 
@@ -950,6 +951,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.city}' => 'Domain (Organization) City',
       '{domain.postal_code}' => 'Domain (Organization) Postal Code',
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
+      '{domain.state_province_id:abbr}' => 'Domain (Organization) State Abbreviation',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
       '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
       '{site.message_header}' => 'Message Header',

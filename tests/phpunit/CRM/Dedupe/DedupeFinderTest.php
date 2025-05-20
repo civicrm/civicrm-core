@@ -1,5 +1,6 @@
 <?php
 declare(strict_types = 1);
+use Civi\Api4\Contact;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\DedupeRule;
 
@@ -11,11 +12,26 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->callAPISuccess('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+  }
+
   /**
    * Clean up after the test.
    */
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_contact', 'civicrm_group_contact', 'civicrm_group'], TRUE);
+    if (!empty($this->ids['DedupeRuleGroup'])) {
+      DedupeRule::delete(FALSE)->addWhere('dedupe_rule_group_id', 'IN', $this->ids['DedupeRuleGroup'])
+        ->execute();
+      DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])
+        ->execute();
+    }
+    DedupeRuleGroup::update(FALSE)
+      ->setValues(['used' => 'Supervised'])
+      ->addWhere('name', '=', 'IndividualSupervised')
+      ->execute();
     parent::tearDown();
   }
 
@@ -128,6 +144,145 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the ability of the Dedupe Query Optimizer to join queries appropriately.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function testFinderQueryOptimizerLookup(): void {
+    $this->createRuleGroup(['threshold' => 16]);
+    // Note that in this format the number at the end is the weight.
+    $queries = [
+      ['civicrm_email', 'email', 16],
+      ['civicrm_contact', 'first_name', 7],
+      ['civicrm_phone', 'phone', 5],
+      ['civicrm_contact', 'nick_name', 5],
+      ['civicrm_address', 'street_address', 4],
+      ['civicrm_address', 'city', 3],
+    ];
+    $this->createRules($queries);
+    $this->individualCreate(['first_name' => 'Robert', 'nick_name' => 'Bob', 'address_primary.street_address' => 'sesame street', 'version' => 4]);
+    $result = \CRM_Contact_BAO_Contact::findDuplicates([
+      'civicrm_contact' => ['first_name' => 'Robert', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
+      'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
+      'contact_type' => 'Individual',
+    ]);
+    $this->assertEquals([$this->ids['Contact']['individual_0']], $result);
+    $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
+    // Check that the city query was eliminated - it has data but it's weight of 3 cannot influence the match outcome.
+    // The other queries are combined.
+    $this->assertCount(1, $queries);
+    $query = reset($queries);
+    $this->assertEquals(16, $query['weight']);
+    $this->assertEquals(1, $query['found_rows']);
+    $this->assertLike("SELECT civicrm_address .contact_id id1,  16 weight  FROM civicrm_contact t1
+          INNER JOIN civicrm_address
+          ON t1.id = civicrm_address.contact_id
+          AND civicrm_address.street_address = 'sesame street' WHERE t1.contact_type = 'Individual' AND t1.first_name = 'Robert' AND t1.contact_type = 'Individual' AND t1.nick_name = 'Bob'", $query['query']);
+  }
+
+  /**
+   * Test the Dedupe Query Optimizer when there are 2 tables to join and the second has more than one criteria.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function testFinderQueryOptimizerCombineSecondTable(): void {
+    $this->createRuleGroup(['threshold' => 16]);
+    // Note that in this format the number at the end is the weight.
+    //
+    $queries = [
+      ['civicrm_email', 'email', 16],
+      ['civicrm_contact', 'first_name', 1],
+      ['civicrm_phone', 'phone', 1],
+      ['civicrm_contact', 'nick_name', 7],
+      ['civicrm_address', 'street_address', 5],
+      ['civicrm_address', 'city', 3],
+    ];
+    $this->createRules($queries);
+    $this->individualCreate([
+      'first_name' => 'Robert',
+      'nick_name' => 'Bob',
+      'phone_primary.phone' => 123,
+      'address_primary.street_address' => 'sesame street',
+      'address_primary.city' => 'Bobville',
+      'version' => 4,
+    ]);
+    // One the first name fails to match ALL the others must match.
+    $result = \CRM_Contact_BAO_Contact::findDuplicates([
+      'civicrm_contact' => ['first_name' => 'Bob', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
+      'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
+      'civicrm_phone' => ['phone' => 123],
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
+      'contact_type' => 'Individual',
+    ]);
+    $this->assertEquals([$this->ids['Contact']['individual_0']], $result);
+    $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
+    // One combined query & the after we have the first_name & the phone query.
+    $this->assertCount(3, $queries);
+    $query = reset($queries);
+    $this->assertEquals(15, $query['weight']);
+    $this->assertEquals(1, $query['found_rows']);
+    $this->assertLike("SELECT civicrm_address .contact_id id1,  15 weight  FROM civicrm_contact t1
+          INNER JOIN civicrm_address
+          ON t1.id = civicrm_address.contact_id
+          AND civicrm_address.street_address = 'sesame street'
+          AND civicrm_address.city = 'Bobville'
+          WHERE t1.contact_type = 'Individual' AND t1.nick_name = 'Bob'", $query['query']);
+  }
+
+  /**
+   * Test the Dedupe Query Optimizer when it decides that later queries are 'inclusive'.
+   *
+   * This currently tests that the 'inclusive' code flow does not break. The 'inclusive'
+   * code flow is a legacy flow that decides that if all remaining queries are needed to
+   * reach the threshold they go through a process of building a shared table. The goal
+   * is to dismantle this code in favour of recombining the queries based on the results of
+   * earlier queries. However, the goal of this test is just to ensure there is a test
+   * passing through this logic. When the logic changes the test can check the more efficient
+   * queries are generated.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function testFinderQueryOptimizerFirstRuleChangesLaterQueries(): void {
+    $this->createRuleGroup(['threshold' => 15]);
+    // Note that in this format the number at the end is the weight.
+    $queries = [
+      ['civicrm_contact', 'first_name', 10],
+      ['civicrm_contact', 'last_name', 9],
+      ['civicrm_contact', 'nick_name', 3],
+      ['civicrm_address', 'city', 3],
+    ];
+    $this->createRules($queries);
+    $this->individualCreate([
+      'first_name' => 'Robert',
+      'nick_name' => 'Bob',
+      'last_name' => 'Smith',
+      'phone_primary.phone' => 123,
+      'address_primary.street_address' => 'sesame street',
+      'address_primary.city' => 'Bobville',
+      'version' => 4,
+    ]);
+    // One the first name fails to match ALL the others must match.
+    $result = \CRM_Contact_BAO_Contact::findDuplicates([
+      'civicrm_contact' => ['first_name' => 'Bob', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
+      'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
+      'civicrm_phone' => ['phone' => 123],
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
+      'contact_type' => 'Individual',
+    ]);
+    $this->assertEquals([$this->ids['Contact']['individual_0']], $result);
+    $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
+
+    $this->assertCount(3, $queries);
+    $query = reset($queries);
+    $this->assertEquals(10, $query['weight']);
+    $this->assertEquals(0, $query['found_rows']);
+  }
+
+  /**
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \CRM_Core_Exception
    */
@@ -178,7 +333,10 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->individualCreate(['first_name' => 'Bob', 'last_name' => 'Smith', 'street_address' => '123 Main St']);
     $this->individualCreate(['first_name' => 'Bob', 'email' => 'bob@example.org']);
     $this->individualCreate(['first_name' => 'Bob', 'email' => 'bob@example.org']);
-    $this->callAPISuccess('Job', 'process_batch_merge', ['rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general']]);
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general']])['values'];
+    $this->assertCount(2, $result['merged']);
+    $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
+    $this->assertEquals(['civicrm_email.email.8', 'civicrm_address.street_address.5', 'civicrm_contact.first_name.3'], array_keys($queries));
   }
 
   /**
@@ -679,6 +837,120 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $fields = array_merge($fields, $params);
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, $ruleGroup['id'], ['event_id' => 1]);
     $this->assertCount(2, $ids);
+  }
+
+  public function testFindDuplicateNonReservedRule(): void {
+    $this->createTestEntity('Contact', [
+      'last_name' => 'bob@example.org',
+      'first_name' => 'Bob',
+      'contact_type' => 'Individual',
+    ]);
+    $this->createTestEntity('Contact', [
+      'last_name' => '',
+      'first_name' => 'Bob',
+      'contact_type' => 'Individual',
+    ]);
+    $this->createTestEntity('DedupeRuleGroup', [
+      'contact_type' => 'Individual',
+      'threshold' => 5,
+      'used' => 'Supervised',
+      'name' => 'test-rule',
+    ]);
+    $this->createTestEntity('DedupeRule', [
+      'dedupe_rule_group_id.name' => 'test-rule',
+      'rule_table' => 'civicrm_contact',
+      'rule_field' => 'first_name',
+      'rule_weight' => 3,
+    ]);
+    $this->createTestEntity('DedupeRule', [
+      'dedupe_rule_group_id.name' => 'test-rule',
+      'rule_table' => 'civicrm_contact',
+      'rule_field' => 'last_name',
+      'rule_weight' => 2,
+    ]);
+    DedupeRuleGroup::update(FALSE)
+      ->setValues(['used' => 'General'])
+      ->addWhere('name', '=', 'IndividualSupervised')
+      ->execute();
+
+    // Test finding the match on apiv3 & 4.
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('test-rule')
+      ->setValues([
+        'last_name' => 'bob@example.org',
+        'first_name' => 'Bob',
+      ])
+      ->execute();
+    $this->assertCount(1, $matches);
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+        'first_name' => 'Bob',
+        'last_name' => 'bob@example.org',
+      ],
+    ]);
+    $this->assertEquals(1, $matches['count']);
+
+    // Test again on a non-matched one - apiv3 & 4 again.
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('test-rule')
+      ->setValues([
+        'last_name' => 'bob@example.org',
+        'first_name' => 'Bobby',
+      ])
+      ->execute();
+    $this->assertCount(0, $matches);
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+      ],
+    ]);
+    $this->assertEquals(0, $matches['count']);
+
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+        'first_name' => 'Bob',
+      ],
+    ]);
+    $this->assertEquals(0, $matches['count']);
+
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'rule_group_id' => $this->ids['DedupeRuleGroup']['default'],
+      'match' => [
+        'contact_type' => 'Individual',
+        'first_name' => 'Bob',
+        'last_name' => '',
+      ],
+    ]);
+    $this->assertEquals(0, $matches['count']);
+
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('test-rule')
+      ->setValues([
+        'last_name' => '',
+        'first_name' => 'Bob',
+      ])
+      ->execute();
+    $this->assertCount(0, $matches);
+  }
+
+  public function testDedupeApiCallLackingData(): void {
+    $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'rule_type' => 'Supervised',
+      'contact_type' => 'Individual',
+      'match' => [
+        'contact_type' => 'Individual',
+      ],
+    ]);
+    $this->assertEquals(0, $matches['count']);
   }
 
 }

@@ -88,6 +88,7 @@
               runBatch();
             }
           }, function(error) {
+            CRM.alert(error.error_message, ts('Error'), 'error');
             ctrl.error();
           });
         // Move the bar every second to simulate progress between batches

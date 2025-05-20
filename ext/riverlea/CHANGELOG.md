@@ -1,3 +1,58 @@
+1.4.5-6.3beta
+ - CHANGED 'text-danger' in FormBuilder drop-down to cover tabset dropdown 'delete tab'.
+
+1.4.4-6.3alpha
+ - FIXED inline checkbox regression (https://lab.civicrm.org/extensions/riverlea/-/merge_requests/51) ht @yashodha
+ - FIXED loading animation, re-using nav-bar spinning logo svg, set as a css variable. (ref https://lab.civicrm.org/dev/user-interface/-/issues/84)
+ - FIXED invisible select2 selected item when in a dropdown (ref https://lab.civicrm.org/dev/core/-/issues/5870)
+ - FIXED PrettyPrint code blocks: restored indents lost in 1.3.8-6.0alpha change.
+ - FIXED ol.linenums line-numbering restored.
+
+1.4.3-6.2alpha
+This release makes a series of changes to how emphasis colours (ie primary/success/info/etc) are handled across RiverLea. The main changes:
+ - ADDED - alert border colours are auto-generated using `hsl(from var(--crm-alert-background-X) h s calc(l - Y))`
+ - ADDED - notification icon colours are auto-generated using `hsl(from var(--crm-c-X) h s calc(l + Y))`
+ - ADDED auto primary/secondary hover darken cols via HSL.
+ - CHANGED - 'crm-c-alert' to 'crm-c-danger' (https://github.com/civicrm/civicrm-core/pull/32409)
+ - CHANGED - Walbrook info alert made consistent with other stream and emphasis alerts (no more inverse bg colour)
+ - CHANGED - names of alert emphasis variables made consistent with other names (help becomes 'success', background becomes bg, and the variable targe goes at the end not middle)
+ - CHANGED - made heading bg colours match info colour scheme to simplify dark-mode flip.
+ - CHANGED - variable for danger/red/cancel colours to --crm-c-danger-on-page-bg, for better dark-mode contrast.
+ - CHANGED - variable for form 'required' marker from --crm-c-danger to --crm-notify-danger for a brighter red shade in light and dark mode.
+ - REMOVED - many literal colours from core CSS (ie green/red/etc), particularly Bootstrap, swapping to pairs that should maintain contrast in dark-mode.
+ - REMOVED - most literal colour names in dark modes that inverse, ie light green becomes dark. Instead emphasis variable points to a different colour (Bg cols still inverse, plus some blues).
+ - FIXED - colour contrast issue for `text-X` in dark-mode on all streams.
+ - FIXED - extension manager even row / enabled extension hover was grey, now is darker green
+ - FIXED - icons on extensions page to notify icon colours to stand out more…
+ - FIXED - contrast ratio of AAA added to multiple emphasis colour/text interactions - many were AA or worse (e.g. Minetta Warning/amber, Walbrook blue/primary/info, success, danger).
+ - ADDED CSS VARIABLES
+    --crm-c-info-light - lighter shade of info colour from --crm-alert-info-bg
+    --crm-c-info-on-page-bg - new value for 'text-info'
+    --crm-c-warning-light - lighter shade of warning from --crm-alert-warning-bg
+    --crm-c-warning-on-page-bg - new value for 'text-warning'
+    --crm-c-danger-light - lighter shade of danger from --crm-alert-danger-bg
+    --crm-c-danger-on-page-bg - new value for 'text-danger'
+    --crm-c-success-light - lighter shade of success from --crm-alert-success-bg
+    --crm-c-success-on-page-bg - new value for 'text-success'
+    --crm-c-primary-on-page-bg - new value for 'text-primary' - SearchKit outputs this
+    --crm-c-secondary-on-page-bg - new value for 'text-secondary' - SearchKit outputs this
+
+1.4.2-6.2alpha
+ - FIXED - today's date background on date-picker (https://lab.civicrm.org/dev/core/-/issues/5807).
+ - FIXED - restore .nowrap class (https://lab.civicrm.org/extensions/riverlea/-/issues/125).
+ - FIXED - inconsistent padding around 'add address' block on contact dashboard (https://lab.civicrm.org/extensions/riverlea/-/issues/122).
+ - FIXED - stange alignment on summary modals (https://lab.civicrm.org/extensions/riverlea/-/issues/121).
+
+1.4.1-6.2alpha
+ - FIXED - start/end date appears inline (https://lab.civicrm.org/extensions/riverlea/-/issues/120)
+ - FIXED - float of prev/next on contact dashboard on WordPress in some contexts (https://lab.civicrm.org/extensions/riverlea/-/issues/118).
+ - ADDED - new multi-buttons wrapper `.crm-buttons` to provide uniform gap and wrap around multiple buttons, as no other class provides this - and instead it's handled on a case-by-case basis which is a waste of css. Not used anywhere currently, but referenced in discussion: https://github.com/civicrm/civicrm-core/pull/32344 & https://lab.civicrm.org/extensions/riverlea/-/issues/101.
+
+1.4.0-6.2alpha
+ - FIXED - right-align of event participant contact details removed (https://lab.civicrm.org/extensions/riverlea/-/issues/119).
+ - FIXED - FormBuilder left tabs squash and become illegible when too many items (https://lab.civicrm.org/extensions/riverlea/-/issues/116)
+ - CHANGED - only bottom align delete button when there are a limited number of custom activities (default list plus up to three more custom activities), otherwise keep inline (https://lab.civicrm.org/extensions/riverlea/-/issues/117)
+
 1.3.8-6.0alpha
  - FIXED - solves various issues around the naming of crm-text-light and crm-text-dark (https://github.com/civicrm/civicrm-core/pull/31994);
  - FIXED - Bootstrap Time input fields limit width, not 100%.
@@ -12,7 +67,7 @@
  - FIXED - All Dark - SearchKit 'where' 'and' labels illegible. Changed colour to 'crm-primary-text' to match 'crm-primary' background.
  - FIXED - All Dark - pie chart legend text made legible, setting text fill colour to 'crm-c-text'
  - FIXED - All Dark - '.alert-warning' paragraph text given explicit colour to resolve clash with '.alert' paragraph colour.
- - FIXED - Minetta & Hackney Dark illegible info alerts: 'crm-alert-text-info' changed to '-—crm-c-text-light' from '-—crm-c-blue-light'
+ - FIXED - Minetta & Hackney Dark illegible info alerts: 'crm-alert-info-text' changed to '-—crm-c-text-light' from '-—crm-c-blue-light'
  - FIXED - Minetta & Hackney Dark - illegible alert buttons: removed '--crm-c-alert-text' & '-—crm-c-alert' from dark.css
  - FIXED - Hackney * Thames Dark - warning alert text colour setting removed to make legible.
  - FIXED - Minetta Dark - primary/primary hover darkened with dark.css variables to stand out on tab region navbar.

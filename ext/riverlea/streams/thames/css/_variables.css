@@ -73,6 +73,9 @@
   --crm-c-background5: var(--crm-c-gray-700);
   --crm-c-drag-background: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
   --crm-c-code-background: var(--crm-c-blue-overlay2); /* background for code regions */
+  --crm-c-focus: var(--crm-c-blue-dark);
+  --crm-c-inactive: #696969;
+  /* Emphasis colours */
   --crm-c-primary: var(--crm-c-blue-dark); /* primary button bgs */ /* thames */
   --crm-c-primary-hover: var(--crm-c-blue-darker); /* thames */
   --crm-c-primary-text: var(--crm-c-text-light);
@@ -81,16 +84,15 @@
   --crm-c-secondary-hover: #a1cef3; /* thames */
   --crm-c-secondary-text: var(--crm-c-blue-darker); /* thames */
   --crm-c-secondary-hover-text: var(--crm-c-text-light); /* thames todo */
+  --crm-c-secondary-on-page-bg: var(--crm-c-blue-darker);
   --crm-c-success: var(--crm-c-green-dark);
   --crm-c-success-text: var(--crm-c-text-light);
-  --crm-c-alert: var(--crm-c-red-dark); /* thames */
-  --crm-c-alert-text: var(--crm-c-text-light);
+  --crm-c-danger: var(--crm-c-red-dark); /* thames */
+  --crm-c-danger-text: var(--crm-c-text-light);
   --crm-c-warning: var(--crm-c-amber); /* bg on .btn-warning, .label-warming but border on notification .alert */
   --crm-c-warning-text: var(--crm-c-text);
   --crm-c-info: var(--crm-c-blue-dark);
   --crm-c-info-text: var(--crm-c-text-light);
-  --crm-c-focus: var(--crm-c-blue-dark);
-  --crm-c-inactive: #696969;
 }
 :root {
 /* thames only radii */
@@ -168,8 +170,8 @@
   --crm-btn-warning-text: var(--crm-c-warning-text);
   --crm-btn-success-bg: var(--crm-c-info); /* thames */
   --crm-btn-success-text: #fff; /* thames */
-  --crm-btn-alert-bg: var(--crm-c-red);
-  --crm-btn-alert-text: var(--crm-c-red-dark);
+  --crm-btn-danger-bg: var(--crm-c-red);
+  --crm-btn-danger-text: var(--crm-c-red-dark);
   --crm-btn-icon-bg: unset;
   --crm-btn-icon-border: unset;
   --crm-btn-margin: var(--crm-m) 0;
@@ -249,17 +251,17 @@
   --crm-alert-margin: 0 0 var(--crm-m);
   --crm-alert-border-width: 0; /* thames */
 /* Note 'help' suffix here is for the 'success' boxes. */
-  --crm-alert-background-help: var(--crm-c-blue-light); /* thames */
-  --crm-alert-border-help: unset; /* thames */
-  --crm-alert-text-help: unset; /* thames */
-  --crm-alert-text-warning: var(--crm-c-text);
-  --crm-alert-border-warning: var(--crm-c-yellow);
-  --crm-alert-background-info: var(--crm-c-blue-light);
-  --crm-alert-border-info: var(--crm-c-blue);
-  --crm-alert-text-info: var(--crm-c-blue-darker);
-  --crm-alert-background-danger: var(--crm-c-red-light);
-  --crm-alert-border-danger: var(--crm-c-red);
-  --crm-alert-text-danger: var(--crm-c-red-dark);
+  --crm-alert-success-bg: var(--crm-c-blue-light); /* thames */
+  --crm-alert-success-border: unset; /* thames */
+  --crm-alert-success-text: unset; /* thames */
+  --crm-alert-warning-text: var(--crm-c-text);
+  --crm-alert-warning-border: var(--crm-c-yellow);
+  --crm-alert-info-bg: var(--crm-c-blue-light);
+  --crm-alert-info-border: var(--crm-c-blue);
+  --crm-alert-info-text: var(--crm-c-blue-darker);
+  --crm-alert-danger-bg: var(--crm-c-red-light);
+  --crm-alert-danger-border: var(--crm-c-red);
+  --crm-alert-danger-text: var(--crm-c-red-dark);
 }
 :root {
 /* Form */
@@ -303,7 +305,6 @@
   --crm-tab-bg-hover: var(--crm-c-blue-overlay);
   --crm-tab-bg-active: white;
   --crm-tab-hang: 0 0 calc(-1 * var(--crm-s)) 0; /* lip to extend tab flush with active region - set to 0 for no lip */ /* thames todo check */
-  --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m); /* thames todo check */
   --crm-tab-col: var(--crm-c-text);
   --crm-tab-weight: normal;
@@ -411,7 +412,7 @@
   --crm-dropdown-hover-bg: var(--crm-c-blue-light); /* thames */
   --crm-dropdown-border: 0;
   --crm-dropdown-width: 23ch; /* thames */
-  --crm-dropdown-alert-bg: transparent; /* thames */
+  --crm-dropdown-danger-bg: transparent; /* thames */
   --crm-dropdown-2-bg: var(--crm-c-secondary);
   --crm-dropdown-2-col: var(--crm-c-text);
   --crm-dropdown-2-padding: var(--crm-padding-small);
@@ -423,21 +424,21 @@
   --crm-notify-col: var(--crm-c-text); /* thames */
   --crm-notify-accent-border: 0.875rem 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */ /* thames */
   --crm-notify-radius: 4px; /* thames */
-  --crm-notify-alert: var(--crm-c-alert);
+  --crm-notify-danger: var(--crm-c-danger);
   --crm-notify-warning: var(--crm-c-warning);
   --crm-notify-success: var(--crm-c-success);
   --crm-notify-info: var(--crm-c-info);
 }
 :root {
 /* Icons */
-  --crm-icon-alert: "\f06a";
+  --crm-icon-danger: "\f06a";
   --crm-icon-success: "\f058";
   --crm-icon-info: "\f05a";
   --crm-icon-close: "\f00d";
   --crm-icon-sort: "\f0dc";
   --crm-icon-sort-desc: "\f0dd";
   --crm-icon-sort-asc: "\f0de";
-  --crm-icon-alert-color: inherit;
+  --crm-icon-danger-color: inherit;
   --crm-icon-success-color: inherit;
   --crm-icon-warning-color: inherit;
   --crm-icon-info-color: inherit;

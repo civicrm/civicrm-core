@@ -63,7 +63,14 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {
-    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all Relationship records of this type.') . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ts('Do you want to continue?');
+    $this->deleteMessage = implode(
+      ' ',
+      [
+        ts('WARNING: Deleting this option will result in the loss of all Relationship records of this type.'),
+        ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.'),
+        ts('Do you want to continue?'),
+      ]
+    );
   }
 
   /**

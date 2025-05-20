@@ -227,7 +227,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       ],
       'SELECT * FROM whatever WHERE name = \'Alice\' AND title = \'Bob\' AND year LIKE \'%2012\' ',
     ];
-    list($inputSql, $inputParams, $expectSql) = $cases[0];
+    [$inputSql, $inputParams, $expectSql] = $cases[0];
     $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     $this->assertFalse(($expectSql == $actualSql));
     unset($scope);
@@ -690,6 +690,21 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     foreach ($expectedCidRefs as $table => $refs) {
       $this->assertEquals($refs, $cidRefs[$table]);
     }
+  }
+
+  /**
+   * Test our ability to alter the maximum execution time temporarily.
+   *
+   * https://mariadb.com/kb/en/aborting-statements/
+   *
+   * @return void
+   */
+  public function testSetMaxExecutionTime() {
+    $original = CRM_Core_DAO::getMaxExecutionTime();
+    $autoClean = CRM_Utils_AutoClean::swapMaxExecutionTime(800);
+    $this->assertEquals(800, CRM_Core_DAO::getMaxExecutionTime());
+    $autoClean->cleanup();
+    $this->assertEquals($original, CRM_Core_DAO::getMaxExecutionTime());
   }
 
 }

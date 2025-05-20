@@ -9,6 +9,7 @@
       row: '<?',
       display: '<',
       colKey: '<',
+      colData: '<?',
       isFullRowMode: '<',
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',

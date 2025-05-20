@@ -3490,7 +3490,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             $value = NULL;
             if ($op) {
               $pair = $this->getOperationPair(
-                CRM_Utils_Array::value('operatorType', $field),
+                $field['operatorType'] ?? NULL,
                 $fieldName
               );
               $min = $this->_params["{$fieldName}_min"] ?? NULL;

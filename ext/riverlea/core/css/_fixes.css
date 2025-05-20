@@ -182,11 +182,11 @@ a.crm-expand-row:focus {
 .crm-container .status-past,
 .crm-contact-deceased,
 .crm-container .status-warning {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger-on-page-bg);
 }
 .crm-container .alert.alert-info.font-red { /* for when an info alert wants to be a danger alert! */
-  background-color: var(--crm-alert-background-danger);
-  border-color: var(--crm-alert-border-danger);
+  background-color: var(--crm-alert-danger-bg);
+  border-color: var(--crm-alert-danger-border);
 }
 
 /******************
@@ -566,9 +566,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-case-caseview-form-block h3 {
   background: transparent;
   padding: 0;
-}
-.crm-case-activity-form-block-followup_activity_type_id .crm-form-date-wrapper {
-  display: inline-block;
 }
 .crm-case-activity-form-block table.form-layout-compressed {
   width: 100%;

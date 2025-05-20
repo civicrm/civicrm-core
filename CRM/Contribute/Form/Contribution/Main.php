@@ -383,7 +383,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // build price set form.
       $this->set('priceSetId', $this->_priceSetId);
       if (empty($this->_ccid)) {
-        $this->buildPriceSet($this);
+        $this->buildPriceSet();
       }
       if ($this->_values['is_monetary'] &&
         $this->_values['is_recur'] && empty($this->_values['pledge_id'])
@@ -505,20 +505,18 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Build the price set form.
    *
-   * @param CRM_Core_Form $form
-   *
    * @return void
    * @throws \CRM_Core_Exception
    */
-  private function buildPriceSet($form) {
+  private function buildPriceSet() {
     $validPriceFieldIds = array_keys($this->getPriceFieldMetaData());
-    $form->assign('priceSet', $form->_priceSet);
+    $this->assign('priceSet', $this->_priceSet);
     $this->assign('membershipFieldID');
 
     // @todo - this hook wrangling can be done earlier if we set the form on $this->>order.
-    $feeBlock = &$form->_values['fee'];
+    $feeBlock = &$this->_values['fee'];
     // Call the buildAmount hook.
-    CRM_Utils_Hook::buildAmount($this->getFormContext(), $form, $feeBlock);
+    CRM_Utils_Hook::buildAmount($this->getFormContext(), $this, $feeBlock);
 
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
@@ -573,7 +571,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             }
           }
 
-          CRM_Price_BAO_PriceField::addQuickFormElement($form,
+          CRM_Price_BAO_PriceField::addQuickFormElement($this,
             'price_' . $fieldID,
             $field['id'],
             FALSE,
@@ -586,7 +584,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
-    $form->assign('hasExistingLifetimeMembership', $checklifetime);
+    $this->assign('hasExistingLifetimeMembership', $checklifetime);
   }
 
   /**
@@ -992,23 +990,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $errors['_qf_default'] = ts('Please select at least one membership option.');
         }
       }
-      // @todo - processAmount is to be deprectated - can we use getTotalAmount or
-      // a function of self->order here?
-      CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'],
-        $fields
-      );
 
+      $amount = $self->getOrder()->getTotalAmount();
       $minAmt = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $fields['priceSetId'], 'min_amount');
-      if ($fields['amount'] < 0) {
+      if ($amount < 0) {
         $errors['_qf_default'] = ts('Contribution can not be less than zero. Please select the options accordingly');
       }
-      elseif (!empty($minAmt) && $fields['amount'] < $minAmt) {
+      elseif (!empty($minAmt) && $amount < $minAmt) {
         $errors['_qf_default'] = ts('A minimum amount of %1 should be selected from Contribution(s).', [
           1 => CRM_Utils_Money::format($minAmt),
         ]);
       }
-
-      $amount = $fields['amount'];
     }
 
     if (isset($fields['selectProduct']) &&
@@ -1361,6 +1353,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     if (!$this->getContactID()) {
       CRM_Core_Error::statusBounce(ts('Returning since there is no contact attached to this contribution id.'));
+    }
+    if ($this->getContributionValue('contribution_status_id:name') === 'Cancelled') {
+      throw new CRM_Core_Exception(ts('Sorry, this contribution has been cancelled.'));
     }
 
     $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);

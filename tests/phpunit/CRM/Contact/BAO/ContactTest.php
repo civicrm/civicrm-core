@@ -7,7 +7,7 @@
 class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_contact', 'civicrm_note'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_note', 'civicrm_im', 'civicrm_phone'], TRUE);
     parent::tearDown();
   }
 

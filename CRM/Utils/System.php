@@ -24,7 +24,7 @@ use GuzzleHttp\Psr7\Response;
  *
  * FIXME: This is a massive and random collection that could be split into smaller services
  *
- * @method static void getCMSPermissionsUrlParams() Immediately stop script execution and display a 401 "Access Denied" page.
+ * @method static array getCMSPermissionsUrlParams() Return the CMS-specific url for its permissions page.
  * @method static mixed permissionDenied() Show access denied screen.
  * @method static string getContentTemplate(int|string $print = 0) Get the template path to render whole content.
  * @method static mixed logout() Log out the current user.
@@ -1941,6 +1941,29 @@ class CRM_Utils_System {
 
   public static function sendOkRequestResponse(string $message = 'OK'): void {
     self::sendResponse(new Response(200, [], $message));
+  }
+
+  public static function isMaintenanceMode(): bool {
+    try {
+      $civicrmSetting = \Civi::settings()->get('core_maintenance_mode');
+
+      // inherit => ask the userSystem
+      if ($civicrmSetting === 'inherit') {
+        return CRM_Core_Config::singleton()->userSystem->isMaintenanceMode();
+      }
+
+      // otherwise cast the set value to a boolean
+      // this will follow PHP rules so empty string, 0 etc will be OFF
+      // and anything else will be on
+      return (bool) $civicrmSetting;
+    }
+    catch (\Exception $e) {
+      // catch in case something isn't fully booted and can't answer
+      //
+      // we assume we are *NOT* in maintenance mode. though maybe we
+      // should check a constant / env var / database directly?
+      return FALSE;
+    }
   }
 
 }

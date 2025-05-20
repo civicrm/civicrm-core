@@ -26,6 +26,8 @@ use Civi\Api4\Phone;
  * civicrm_event_page.
  */
 class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
 
   /**
    * @var \Civi\Api4\Generic\Result
@@ -60,7 +62,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $this->setSelectedChild('location');
 
     $this->_values = $this->get('values');
-    if ($this->_id && empty($this->_values)) {
+    if ($this->getEventID() && empty($this->_values)) {
       //get location values.
       $params = [
         'entity_id' => $this->_id,
@@ -134,10 +136,10 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    */
   public function buildQuickForm() {
     CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 2);
-    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 2);
+    $this->addEmailBlockNonContactFields(1);
+    $this->addEmailBlockNonContactFields(2);
+    $this->addPhoneBlockFields(1);
+    $this->addPhoneBlockFields(2);
 
     $this->applyFilter('__ALL__', 'trim');
 
@@ -212,7 +214,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
        * affects the selected LocBlock and not the previous one - whether or not
        * there is a previous LocBlock.
        */
-      CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $this->_id,
+      CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $this->getEventID(),
         'loc_block_id', $params['loc_event_id']
       );
 
@@ -353,7 +355,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $params['loc_block_id'] = LocBlock::save(FALSE)->setRecords([$record])->execute()->first()['id'];
 
     // Finally update Event params.
-    $params['id'] = $this->_id;
+    $params['id'] = $this->getEventID();
     Event::save(FALSE)->addRecord($params)->execute();
 
     // Update tab "disabled" CSS class.

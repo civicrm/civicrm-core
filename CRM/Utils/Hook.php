@@ -1717,10 +1717,9 @@ abstract class CRM_Utils_Hook {
    * @deprecated
    *
    * @param string $object
-   *   Object being imported (for now Contact only, later Contribution, Activity,.
-   *                               Participant and Member)
+   *   Object being imported (Contact only)
    * @param string $usage
-   *   Hook usage/location (for now process only, later mapping and others).
+   *   Hook usage/location (for now process only).
    * @param string $objectRef
    *   Import record object.
    * @param array $params

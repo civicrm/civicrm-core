@@ -384,14 +384,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * In previous versions, this function was the controller for logging out. In Drupal 8, we rewrite the route
-   * to hand off logout to the standard Drupal logout controller. This function should therefore never be called.
-   */
-  public function logout() {
-    // Pass
-  }
-
-  /**
    * Load drupal bootstrap.
    *
    * @param array $params
@@ -1012,6 +1004,26 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     // Sometimes metadata gets cleared while the cms isn't bootstrapped.
     if (!$cleared && function_exists('_drupal_flush_css_js')) {
       _drupal_flush_css_js();
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function isMaintenanceMode(): bool {
+    try {
+      return \Drupal::state()->get('system.maintenance_mode') ?: FALSE;
+    }
+    catch (\Exception $e) {
+      // catch in case Drupal isn't fully booted and can't answer
+      //
+      // we assume we are *NOT* in maintenance mode
+      //
+      // TODO: this may not be a good assumption for e.g. cv cron job
+      // which could be exactly the sort of thing we would want to
+      // prevent running in maintenance mode... maybe we should check
+      // try to check the drupal database directly here?
+      return FALSE;
     }
   }
 

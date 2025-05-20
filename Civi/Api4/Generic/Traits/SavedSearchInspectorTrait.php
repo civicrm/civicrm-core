@@ -136,7 +136,7 @@ trait SavedSearchInspectorTrait {
   }
 
   /**
-   * @return array{entity: string, alias: string, table: string, bridge: string|NULL}[]
+   * @return array{entity: string, alias: string, table: string, on: array, bridge: string|NULL}[]
    */
   protected function getJoins() {
     return $this->getQuery() ? $this->getQuery()->getExplicitJoins() : [];

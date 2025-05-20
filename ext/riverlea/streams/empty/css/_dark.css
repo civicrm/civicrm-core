@@ -10,7 +10,7 @@
   --crm-c-background4: var(--crm-c-gray-600);
   --crm-c-code-background: var(--crm-c-gray-200);
   --crm-c-success: #58a458;
-  --crm-c-alert: #ff899a;
+  --crm-c-danger: #ff899a;
   --crm-c-green-light: #468847;
   --crm-c-green: #55aa57;
   --crm-c-green-dark: #dff0d8;
@@ -42,14 +42,14 @@
   --crm-table-odd-hover: var(--crm-c-gray-700);
   --crm-table-even-row: var(--crm-c-gray-700);
   --crm-table-even-hover: var(--crm-c-gray-600);
-  --crm-alert-text-help: var(--crm-c-text-light);
-  --crm-alert-text-warning: var(--crm-c-text-light);
-  --crm-alert-background-info: var(--crm-c-blue-dark);
-  --crm-alert-text-info: var(--crm-c-blue-light);
+  --crm-alert-success-text: var(--crm-c-text-light);
+  --crm-alert-warning-text: var(--crm-c-text-light);
+  --crm-alert-info-bg: var(--crm-c-blue-dark);
+  --crm-alert-info-text: var(--crm-c-blue-light);
   --crm-c-inactive: var(--crm-c-gray-400);
   --crm-input-color: var(--crm-c-text);
   --crm-input-description: var(--crm-c-gray-300);
-  --crm-alert-text-help: var(--crm-c-text);
+  --crm-alert-success-text: var(--crm-c-text);
   --crm-dialog-header-border-col: transparent;
   --crm-dialog-header-bg: var(--crm-c-background2);
   --crm-dialog-body-bg: var(--crm-c-background2);

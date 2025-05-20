@@ -267,7 +267,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    */
   public function mapConfigToSSL() {
     global $base_url;
-    $base_url = str_replace('http://', 'https://', $base_url);
+    $base_url = str_replace('http://', 'https://', (string) $base_url);
   }
 
   /**
@@ -518,14 +518,6 @@ AND    u.status = 1
       return NULL;
     }
     return $user->uid;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function logout() {
-    module_load_include('inc', 'user', 'user.pages');
-    user_logout();
   }
 
   /**
@@ -1245,6 +1237,10 @@ AND    u.status = 1
     // still have legacy ipn methods that reach this point without bootstrapping
     // hence the check that the fn exists.
     return function_exists('ip_address') ? ip_address() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
+  }
+
+  public function isMaintenanceMode(): bool {
+    return state_get('maintenance_mode', FALSE);
   }
 
 }

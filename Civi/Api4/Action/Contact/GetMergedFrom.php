@@ -43,7 +43,7 @@ class GetMergedFrom extends \Civi\Api4\Generic\AbstractAction {
    */
   public function _run(Result $result): void {
     $activities = [];
-    $deleteActivities = \Civi\Api4\ActivityContact::get(FALSE)
+    $deleteActivities = \Civi\Api4\ActivityContact::get($this->checkPermissions)
       ->addSelect('activity_id')
       ->addWhere('contact_id', '=', $this->contactId)
       ->addWhere('activity_id.activity_type_id:name', '=', 'Contact Merged')
@@ -59,7 +59,7 @@ class GetMergedFrom extends \Civi\Api4\Generic\AbstractAction {
       return;
     }
 
-    $activityContacts = \Civi\Api4\ActivityContact::get(FALSE)
+    $activityContacts = \Civi\Api4\ActivityContact::get($this->checkPermissions)
       ->addSelect('contact_id')
       ->addWhere('activity_id.parent_id', 'IN', $activities)
       ->addWhere('record_type_id:name', '=', 'Activity Targets')

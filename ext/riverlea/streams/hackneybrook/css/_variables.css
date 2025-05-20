@@ -14,23 +14,22 @@
   --crm-c-green-dark: #286520;
   --crm-c-red-dark: #a21b10;
   --crm-c-red: #f9f1f4;
-  --crm-c-amber: #ebac00;
   --crm-c-teal: #399389;
   /* Practical colours */
   --crm-c-text: #2b2b2b;
   --crm-c-divider: 1px solid var(--crm-c-gray-200);
   --crm-c-background: var(--crm-c-gray-025); /* background to page header, often form block & dialog bg */
   --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
+/* Emphasis colours */
   --crm-c-primary: var(--crm-c-gray-025);
-  --crm-c-primary-hover: var(--crm-c-gray-050);
   --crm-c-primary-text: var(--crm-c-text);
   --crm-c-primary-hover-text: var(--crm-c-text);
+  --crm-c-primary-on-page-bg: var(--crm-c-gray-800);
   --crm-c-secondary: var(--crm-c-gray-025);
-  --crm-c-secondary-hover: var(--crm-c-gray-050);
   --crm-c-secondary-text: var(--crm-c-text);
   --crm-c-secondary-hover-text: var(--crm-c-text);
+  --crm-c-secondary-on-page-bg: var(--crm-c-gray-900);
   --crm-c-info: var(--crm-c-blue-darker);
-  --crm-c-warning-text: var(--crm-c-text);
   /* Type */
   --crm-heading-padding: var(--crm-s2) var(--crm-m2);
   /* Buttons */
@@ -47,8 +46,8 @@
   --crm-btn-warning-text: var(--crm-c-text);
   --crm-btn-success-bg: var(--crm-c-primary);
   --crm-btn-success-text: var(--crm-c-text);
-  --crm-btn-alert-bg: var(--crm-c-primary);
-  --crm-btn-alert-text: var(--crm-c-text);
+  --crm-btn-danger-bg: var(--crm-c-primary);
+  --crm-btn-danger-text: var(--crm-c-text);
   --crm-btn-icon-bg: rgba(256,256,256,0.25);
   --crm-btn-icon-border: var(--crm-btn-border);
   --crm-btn-icon-padding: 0px;
@@ -62,8 +61,9 @@
   --crm-expand-header-border: 0 solid transparent;
   /* Alerts */
   --crm-alert-padding: var(--crm-r);
-  --crm-alert-text-help: var(--crm-c-text);
-  --crm-alert-text-info: var(--crm-c-blue-darker);
+  --crm-alert-success-text: var(--crm-c-text);
+  --crm-alert-info-text: var(--crm-c-blue-darker);
+  --crm-alert-danger-text: var(--crm-c-text);
   /* Form */
   --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: var(--crm-c-gray-300);
@@ -132,10 +132,10 @@
   --crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: 0;
   /* Icons */
-  --crm-icon-alert-color: var(--crm-c-alert);
+  --crm-icon-danger-color: var(--crm-c-danger);
   --crm-icon-success-color: var(--crm-c-success);
   --crm-icon-warning-color: var(--crm-c-warning);
-  --crm-icon-info-color: var(--crm-c-info);
+  --crm-icon-info-color: var(--crm-notify-info);
   /* Frontend */
   --crm-f-legend-align: unset;
   --crm-f-legend-size: var(--crm-r2);

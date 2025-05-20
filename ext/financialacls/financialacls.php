@@ -85,6 +85,9 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_selectWhereClause
  */
 function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
+  if (CRM_Core_Permission::check([['all CiviCRM permissions and ACLs', 'administer CiviCRM Financial Types']])) {
+    return;
+  }
 
   switch ($entity) {
     case 'LineItem':
@@ -128,7 +131,6 @@ function _financialacls_civicrm_get_accounts_clause(): string {
       $clause = '= 0';
       Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()] = &$clause;
       $accounts = (array) EntityFinancialAccount::get()
-        ->addWhere('account_relationship:name', '=', 'Income Account is')
         ->addWhere('entity_table', '=', 'civicrm_financial_type')
         ->addSelect('entity_id', 'financial_account_id')
         ->addJoin('FinancialType AS financial_type', 'LEFT', [
@@ -283,7 +285,14 @@ function financialacls_civicrm_permission(&$permissions) {
       'description' => E::ts('%1 contributions of all types', [1 => $action_ts]),
     ];
   }
-  $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, label FROM civicrm_financial_type')->fetchAll();
+  try {
+    $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, label FROM civicrm_financial_type')->fetchAll();
+  }
+  catch (\Civi\Core\Exception\DBQueryException $e) {
+    // dev/core#5794: While upgrade is pending, the 'label' column may not yet exist. We just need a 'label' that's good enough to get to upgrader.
+    $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, name AS label FROM civicrm_financial_type')->fetchAll();
+    // N.B. That's the most likely problem+fix. If there's some other SQL problem, then the fallback query will also throw an exception.
+  }
   foreach ($financialTypes as $type) {
     foreach ($actions as $action => $action_ts) {
       $permissions[$action . ' contributions of type ' . $type['name']] = [

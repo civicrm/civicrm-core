@@ -826,7 +826,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public function setDestination($url = NULL, $setToReferer = FALSE) {
     if (empty($url)) {
       if ($setToReferer) {
-        $url = $_SERVER['HTTP_REFERER'];
+        $url = $_SERVER['HTTP_REFERER'] ?? NULL;
       }
       else {
         $config = CRM_Core_Config::singleton();
@@ -859,7 +859,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   public function invalidKeyCommon() {
     throw new CRM_Core_Exception(
-      ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, ts("Could not find a valid session key."));
+      ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, [ts("Could not find a valid session key.")]);
   }
 
   /**

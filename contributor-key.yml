@@ -109,6 +109,7 @@
 
 - github      : angusfretwell
   name        : Angus Fretwell
+  organization: Buildkite
 
 - github      : AnwenW
   name        : Anwen Williams
@@ -317,6 +318,8 @@
   name        : Christopher Yu
   organization: Giant Rabbit
 
+- github      : chumkui
+
 - github      : clarkac1
   name        : Andy Clark
 
@@ -421,6 +424,9 @@
 
 - github      : devappsoftware
   organization: DevApp
+
+- gitub       : dev-allinappli
+  name        : dev ALL IN APPLI
 
 - github      : devarun
   name        : Arun Singh
@@ -618,6 +624,8 @@
 - github      : giovannidalmas1967
   name        : Giovanni Dalmas
 
+- github      : gitressa
+
 - github      : jmcheung
   name        : Jon-Man Cheung
   organization: GMCVO Databases
@@ -652,6 +660,9 @@
 
 - github      : hosseinamin
   name        : Hossein Amin
+
+- github      : IamDrowsy
+  name        : Albrecht Schmidt
 
 - github      : in2part
 
@@ -1071,6 +1082,8 @@
   name        : Matthew Wire
   organization: MJW Consulting
 
+- github      : Matt5K
+
 - github      : marcineqpol
   name        : Marcin Lewandowski
 
@@ -1159,7 +1172,7 @@
   name        : Mathieu Lutfy
   organization: Coop SymbioTIC
 
-  github      : 19ATf72
+- github      : 19ATf72
   name        : Micah Hobby
   organization: Circle Interactive
 
@@ -1256,6 +1269,8 @@
 
 - github      : otetard
   name        : Olivier Tétard
+
+- github      : ozhamlet
 
 - github      : nowszy
   name        : Pawel Nowak
@@ -1519,6 +1534,9 @@
   name        : Shitij Gugnani
   organization: CompuCorp
 
+- github      : Sjord
+  name        : Sjoerd Langkemper
+
 - name        : James van der Hoven
 
 - name        : Larry Berger
@@ -1732,7 +1750,7 @@
   name        : Vinu Varshith Sekar
   organization: CompuCorp
 
-- github      : vinay-osseed
+- github      : vinugawade
   name        : Vinay Gawade
   organization: OSSeed Technologies LLP
 
@@ -1875,4 +1893,10 @@
   name        : Joanna Suchogórska
   organization: Future Processing
 
-- github      : gitressa
+- github      : peetcreative
+  name        : Peter Klausing
+  organization: 5Knoten
+
+- github      : pzukowicz
+  name        : Patryk Żukowicz
+  organization: TechSoup

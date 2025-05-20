@@ -35,7 +35,7 @@
               {if $activeMember.status !== 'Current' AND $activeMember.status !== 'Cancelled'}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$activeMember.renewPageId`&mid=`$activeMember.id`&reset=1"}" class="button"><span class="nowrap">{ts}Renew Now{/ts}</span></a>{/if}
               {if !empty($activeMember.cancelSubscriptionUrl)}<a href="{$activeMember.cancelSubscriptionUrl}" class="button"><span class="nowrap">{ts}Cancel Subscription{/ts}</span></a>{/if}
               {if !empty($activeMember.updateSubscriptionBillingUrl)}<a href="{$activeMember.updateSubscriptionBillingUrl}" class="button"><span class="nowrap">{ts}Update Billing Information{/ts}</span></a>{/if}
-              {if !empty($activeMember.updateSubscriptionUrl)}<a href="{$activeMember.updateSubscriptionUrl}" class="button"><span class="nowrap">{ts}Chnage Subscription Amount{/ts}</span></a>{/if}
+              {if !empty($activeMember.updateSubscriptionUrl)}<a href="{$activeMember.updateSubscriptionUrl}" class="button"><span class="nowrap">{ts}Change Subscription Amount{/ts}</span></a>{/if}
             </td>
           {/if}
         </tr>

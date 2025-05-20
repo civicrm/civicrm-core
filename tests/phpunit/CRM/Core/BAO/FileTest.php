@@ -122,7 +122,6 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
       'file_type_id' => NULL,
       'mime_type' => 'image/png',
       'uri' => 'fake_file.png',
-      'document' => NULL,
       'description' => 'Fake file',
       'upload_date' => '2023-05-10 15:00:00',
       'created_id' => $contactId,
@@ -146,6 +145,65 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
       ->single();
 
     return $activity;
+  }
+
+  /**
+   * Data provider for testing `generateFileHash` and `validateFileHash`.
+   *
+   * @return array
+   */
+  public function fileHashProvider() {
+    return [
+      // Test case 1: Valid token with a specific fileId
+      'valid_file_hash' => [
+        'fileId' => 123,
+        'genTs' => 'now',
+        'life' => 1,
+        'expectedResult' => TRUE,
+      ],
+
+      // Test case 2: Expired token
+      'expired_file_hash' => [
+        'fileId' => 123,
+        // Token generated 2 hours ago
+        'genTs' => '2 hours ago',
+        'life' => 1,
+        'expectedResult' => FALSE,
+      ],
+
+      // Test case 3: Invalid fileId
+      'invalid_file_id' => [
+        'fileId' => 123,
+        'genTs' => 'now',
+        'life' => 1,
+        'expectedResult' => FALSE,
+        'invalidFileId' => 999,
+      ],
+    ];
+  }
+
+  /**
+   * Test `generateFileHash` and `validateFileHash` using a data provider.
+   *
+   * @dataProvider fileHashProvider
+   */
+  public function testFileHash($fileId, $genTs, $life, $expectedResult, $invalidFileId = NULL) {
+    // We generate it now from its word description because dataproviders run
+    // at the start of the suite, so could have expired already in a
+    // long-running suite.
+    $genTs = strtotime($genTs);
+
+    // Generate token
+    $token = CRM_Core_BAO_File::generateFileHash(NULL, $fileId, $genTs, $life);
+
+    // Validate token (valid or invalid fileId depending on the scenario)
+    $result = CRM_Core_BAO_File::validateFileHash(
+      $token,
+      NULL,
+      $invalidFileId ?: $fileId
+    );
+
+    $this->assertEquals($expectedResult, $result);
   }
 
 }

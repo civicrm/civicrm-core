@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Utils;
 
-use Civi\API\Exception\NotImplementedException;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
 use Civi\Api4\Generic\AbstractAction;
@@ -133,6 +132,22 @@ class CoreUtil {
    */
   public static function getTableName(string $entityName): ?string {
     return self::getInfoItem($entityName, 'table_name');
+  }
+
+  /**
+   * Get sql for table, including database prefix if needed
+   *
+   * @param string $entityName
+   *
+   * @return string|null
+   */
+  public static function getTableExpr(string $entityName): ?string {
+    $tableName = self::getInfoItem($entityName, 'table_name');
+    $databaseName = self::getInfoItem($entityName, 'database_name');
+    if ($databaseName) {
+      return "`$databaseName`.`$tableName`";
+    }
+    return "`$tableName`";
   }
 
   /**
@@ -313,17 +328,11 @@ class CoreUtil {
    * @param string $entityName
    * @param int $entityId
    * @return array{name: string, type: string, count: int, table: string|null, key: string|null}[]
-   * @throws NotImplementedException
    */
   public static function getRefCount(string $entityName, $entityId): array {
-    $daoName = self::getInfoItem($entityName, 'dao');
-    if (!$daoName) {
-      throw new NotImplementedException("Cannot getRefCount for $entityName - dao not found.");
-    }
-    /** @var \CRM_Core_DAO $dao */
-    $dao = new $daoName();
-    $dao->id = $entityId;
-    return $dao->getReferenceCounts();
+    $entity = \Civi::entity($entityName);
+    $idField = self::getIdFieldName($entityName);
+    return $entity->getReferenceCounts([$idField => $entityId]);
   }
 
   /**
@@ -332,11 +341,10 @@ class CoreUtil {
    * @param string $entityName
    * @param $entityId
    * @return int
-   * @throws NotImplementedException
    */
   public static function getRefCountTotal(string $entityName, $entityId): int {
     $total = 0;
-    foreach ((array) self::getRefCount($entityName, $entityId) as $ref) {
+    foreach (self::getRefCount($entityName, $entityId) as $ref) {
       $total += $ref['count'] ?? 0;
     }
     return $total;

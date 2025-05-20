@@ -231,6 +231,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('GREATEST(duration, 0200) AS greatest_of_duration_or_200')
       ->addSelect('LEAST(duration, 300) AS least_of_duration_and_300')
       ->addSelect('ISNULL(duration) AS duration_isnull')
+      ->addSelect('ISNOTNULL(duration) AS duration_isnotnull')
       ->addSelect('IFNULL(duration, 2) AS ifnull_duration_2')
       ->addSelect('created_date')
       ->addSelect('activity_date_time')
@@ -267,6 +268,10 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
 
+    $this->assertEquals(TRUE, $result[$aids[0]]['duration_isnotnull']);
+    $this->assertEquals(FALSE, $result[$aids[1]]['duration_isnotnull']);
+    $this->assertEquals(TRUE, $result[$aids[2]]['duration_isnotnull']);
+
     $this->assertEquals(123, $result[$aids[0]]['ifnull_duration_2']);
     $this->assertEquals(2, $result[$aids[1]]['ifnull_duration_2']);
     $this->assertEquals(456, $result[$aids[2]]['ifnull_duration_2']);
@@ -277,7 +282,20 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       $origin = new \DateTimeImmutable($result[$aid]['created_date']);
       $target = new \DateTimeImmutable($result[$aid]['activity_date_time']);
       $diffInSeconds = $target->getTimestamp() - $origin->getTimestamp();
-      $this->assertEquals($diffInSeconds, $result[$aid]['time_diff']);
+
+      // The behaviors of TIMESTAMPDIFF() and DateTimeImmutable->getTimestamp() are
+      // fundamentally misaligned because
+      // (1) the input columns created_date (TIMESTAMP) and activity_date_time (DATETIME) have different TZ handling, and
+      // (2) https://lab.civicrm.org/dev/core/-/issues/3121 means that MySQL cannot identify appropriate DST offsets.
+      // If your organization's jurisdiction does not observe DST, then maybe you don't care.
+      // Similarly, if you're only interested in high-level differences (days/months/years), then DST is a rounding error.
+      // But in general, until the timezone situation is better, you have to expect TIMESTAMPDIFF() to give flaky outputs.
+
+      // $this->assertEquals($diffInSeconds, $result[$aid]['time_diff']);
+      $this->assertTrue(
+        in_array($result[$aid]['time_diff'], [$diffInSeconds, $diffInSeconds + 3600, $diffInSeconds - 3600])
+      );
+
     }
   }
 
@@ -327,6 +345,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('MONTH(birth_date):label AS month_name')
       ->addSelect('MONTH(birth_date):label')
       ->addSelect('EXTRACT(YEAR_MONTH FROM birth_date) AS year_month')
+      ->addSelect('DATE_SUB(birth_date, INTERVAL 1 YEAR) AS birth_date_minus_1_year')
+      ->addSelect('DATE_ADD(birth_date, INTERVAL 1 YEAR) AS birth_date_plus_1_year')
       ->addSelect('DAYOFWEEK(birth_date) AS day_number')
       ->addSelect('DAYOFWEEK(birth_date):label AS day_name')
       ->addWhere('last_name', '=', $lastName)
@@ -340,6 +360,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('November', $result[0]['month_name']);
     $this->assertEquals('November', $result[0]['MONTH:birth_date:label']);
     $this->assertEquals('200911', $result[0]['year_month']);
+    $this->assertEquals('2008-11-11', $result[0]['birth_date_minus_1_year']);
+    $this->assertEquals('2010-11-11', $result[0]['birth_date_plus_1_year']);
     $this->assertEquals(4, $result[0]['day_number']);
     $this->assertEquals('Wednesday', $result[0]['day_name']);
 
@@ -350,6 +372,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('January', $result[1]['month_name']);
     $this->assertEquals('January', $result[1]['MONTH:birth_date:label']);
     $this->assertEquals('201001', $result[1]['year_month']);
+    $this->assertEquals('2009-01-01', $result[1]['birth_date_minus_1_year']);
+    $this->assertEquals('2011-01-01', $result[1]['birth_date_plus_1_year']);
     $this->assertEquals(6, $result[1]['day_number']);
     $this->assertEquals('Friday', $result[1]['day_name']);
   }

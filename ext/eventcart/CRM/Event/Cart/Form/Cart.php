@@ -347,12 +347,10 @@ SELECT  event.event_full_text,
    * @param array $defaults
    *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
-   * @param bool $microformat
-   *   For location in microformat.
    *
    * @return CRM_Contact_BAO_Contact
    */
-  protected function retrieveContact(&$params, &$defaults = [], $microformat = FALSE) {
+  protected function retrieveContact(&$params, &$defaults = []) {
     if (array_key_exists('contact_id', $params)) {
       $params['id'] = $params['contact_id'];
     }
@@ -372,7 +370,7 @@ SELECT  event.event_full_text,
 
     unset($params['id']);
     $contact->email = $defaults['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $params['contact_id']]);
-    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], $microformat);
+    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']]);
     return $contact;
   }
 

@@ -93,7 +93,7 @@
     </select>
   </form>
 </li>
-<li ng-if="$ctrl.hasDefaultValue && $ctrl.defaultDateType() === 'fixed'">
+<li ng-if="$ctrl.hasDefaultValueInput()">
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
     <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" >
   </form>

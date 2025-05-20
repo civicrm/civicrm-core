@@ -1,4 +1,4 @@
-<span ng-if="dataProvider.getFieldData()[$ctrl.fieldName].file_name">
+<span ng-if="dataProvider.getFieldData()[$ctrl.fieldName].id">
   <a ng-if="dataProvider.getFieldData()[$ctrl.fieldName].url" ng-href="{{:: dataProvider.getFieldData()[$ctrl.fieldName].url }}">
     <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
     {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
@@ -7,12 +7,12 @@
     <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
     {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
   </span>
-  <a class="crm-hover-button" title="{{:: ts('Replace') }}" ng-click="dataProvider.getFieldData()[$ctrl.fieldName].file_name = null">
+  <a class="crm-hover-button" title="{{:: ts('Replace') }}" ng-click="dataProvider.getFieldData()[$ctrl.fieldName].id = null">
     <i class="crm-i fa-times" aria-hidden="true"></i>
   </a>
 </span>
 <input type="file" nv-file-select
-       ng-if="!dataProvider.getFieldData()[$ctrl.fieldName].file_name"
+       ng-if="!dataProvider.getFieldData()[$ctrl.fieldName].id"
        ng-required="$ctrl.defn.required"
        uploader="$ctrl.afFieldset.afFormCtrl.fileUploader"
-       options="{crmApiParams: $ctrl.getFileUploadParams}">
+       options="{crmApiParams: $ctrl.getFileUploadParams, crmDataProvider: dataProvider, crmFieldName: $ctrl.fieldName}">

@@ -164,18 +164,18 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       foreach (array_keys(\CRM_Core_SelectValues::optionAttributes()) as $prop) {
         if (isset($pseudoconstant["{$prop}_column"], $fields[$pseudoconstant["{$prop}_column"]])) {
           $propColumn = $pseudoconstant["{$prop}_column"];
-          $select->select("$propColumn AS $prop");
+          $select->select("`$propColumn` AS `$prop`");
         }
       }
       // Select is_active for filtering
       if (isset($fields['is_active'])) {
-        $select->select('is_active');
+        $select->select('`is_active`');
       }
       // Also component_id for filtering (this is legacy, the new way for extensions to add options is via hook)
       if (isset($fields['component_id'])) {
-        $select->select('component_id');
+        $select->select('`component_id`');
       }
-      // Order by: prefer order_column; or else 'weight' column; or else lobel_column; or as a last resort, $idCol
+      // Order by: prefer order_column; or else 'weight' column; or else label_column; or as a last resort, $idCol
       $orderColumns = [$pseudoconstant['order_column'] ?? NULL, 'weight', $pseudoconstant['label_column'] ?? NULL, $idCol];
       foreach ($orderColumns as $orderColumn) {
         if (isset($fields[$orderColumn])) {
@@ -185,7 +185,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       }
       // Filter on domain, but only if field is required
       if (!empty($fields['domain_id']['required'])) {
-        $select->where('domain_id = #dom', ['#dom' => \CRM_Core_Config::domainID()]);
+        $select->where('`domain_id` = #dom', ['#dom' => \CRM_Core_Config::domainID()]);
       }
       if (!empty($pseudoconstant['condition'])) {
         $select->where($pseudoconstant['condition']);
@@ -294,10 +294,11 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           $field['pseudoconstant'] = $addressField['pseudoconstant'];
         }
         // Set FK for EntityRef, ContactRef & File fields
-        if ($customField['fk_entity'] || $customField['data_type'] === 'ContactReference' || $customField['data_type'] === 'File') {
+        $fkEntity = \CRM_Core_BAO_CustomField::getFkEntity($customField);
+        if ($fkEntity) {
           $onDelete = empty($customField['fk_entity_on_delete']) ? 'SET NULL' : strtoupper(str_replace('_', ' ', $customField['fk_entity_on_delete']));
           $field['entity_reference'] = [
-            'entity' => $customField['fk_entity'] ?? str_replace('Reference', '', $customField['data_type']),
+            'entity' => $fkEntity,
             'key' => 'id',
             'on_delete' => $onDelete,
           ];

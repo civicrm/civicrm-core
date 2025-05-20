@@ -67,6 +67,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
 
     $caseTypeDAO->copyValues($params);
     $result = $caseTypeDAO->save();
+
+    // Reset CRM_Case_PseudoConstant::caseType() to ensure that we can generate any new managed activity-types.
+    CRM_Core_PseudoConstant::flush();
+
     return $result;
   }
 

@@ -115,7 +115,14 @@ function civicrm_api3_file_update($params) {
 function civicrm_api3_file_delete($params) {
 
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
+  $uri = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File', $params['id'], 'uri');
+  $path = \CRM_Core_Config::singleton()->customFileUploadDir . $uri;
   if (CRM_Core_BAO_File::deleteEntityFile('*', $params['id'])) {
+    return civicrm_api3_create_success();
+  }
+  // Not all files are attachments
+  elseif (file_exists($path) && unlink($path)) {
+    CRM_Core_BAO_File::deleteRecord(['id' => $params['id']]);
     return civicrm_api3_create_success();
   }
   else {

@@ -40,7 +40,7 @@
         updateAngular('busy', ts('Just a moment...'));
         updateAngular('formSubmitted', true);
         if (!ctrl.identifier) {
-          alert(ts('Please provide your username/email.'));
+          alert(ts('Please provide your username or email.'));
           return;
         }
         crmApi4('User', 'requestPasswordResetEmail', { identifier: ctrl.identifier })
@@ -58,7 +58,7 @@
         updateAngular('formSubmitted', true);
         updateAngular('pwnd', false);
         if (ctrl.newPassword.length < 8) {
-          alert(ts("Passwords under 8 characters are simply not secure. Ideally you should use a secure password generator."));
+          alert(ts("Passwords under 8 characters are not secure. Ideally you should use a secure password generator."));
           return;
         }
         if (ctrl.newPassword != ctrl.newPasswordAgain) {

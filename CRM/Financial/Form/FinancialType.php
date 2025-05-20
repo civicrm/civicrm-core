@@ -75,7 +75,14 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {
-    $this->deleteMessage = ts('WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.') . ts('Deleting a financial type cannot be undone.') . ts('Do you want to continue?');
+    $this->deleteMessage = implode(
+      ' ',
+      [
+        ts('WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.'),
+        ts('Deleting a financial type cannot be undone.'),
+        ts('Do you want to continue?'),
+      ]
+    );
   }
 
   /**

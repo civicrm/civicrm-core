@@ -68,7 +68,7 @@
                             {/if}
                           {else}
                             {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                              {', '|implode:$element.contact_ref_links}
+                              {$element.contact_ref_links|join:', '}
                             {else}
                               {$element.field_value}
                             {/if}
@@ -120,7 +120,7 @@
                 {else}
                   <div class="content">
                     {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                      {', '|implode:$element.contact_ref_links}
+                      {$element.contact_ref_links|join:', '}
                     {else}
                       {if $element.field_value}{$element.field_value} {else}<br/>{/if}
                     {/if}

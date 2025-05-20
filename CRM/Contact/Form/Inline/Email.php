@@ -50,9 +50,8 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $this->_contactId = $this->getContactID();
 
     // Get all the existing email addresses, The array historically starts
-    // with 1 not 0 so we do something nasty to continue that.
-    $this->_emails = array_merge([0 => 1], (array) $this->getExistingEmails());
-    unset($this->_emails[0]);
+    // with 1 not 0.
+    $this->_emails = $this->getExistingEmailsReIndexed();
 
     // Check if this contact has a first/last/organization/household name
     if ($this->getContactValue('contact_type') === 'Individual') {

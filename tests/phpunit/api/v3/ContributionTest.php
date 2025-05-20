@@ -2707,7 +2707,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * original contribution where there is more than one line item.
    */
   public function testRepeatTransactionPassedInFinancialTypeTwoLineItems(): void {
-    $this->_params = $this->getParticipantOrderParams();
+    $this->_params = $this->getParticipantOrderParams(3);
     $originalContribution = $this->setUpRecurringContribution();
 
     $this->callAPISuccess('Contribution', 'repeattransaction', [
@@ -2830,8 +2830,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionUpdatedCampaign(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $campaignID = $this->campaignCreate();
-    $campaignID2 = $this->campaignCreate();
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+    $campaignID2 = $this->campaignCreate([], 'second');
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $this->individualID,
       'installments' => '12',
       'frequency_interval' => '1',

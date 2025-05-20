@@ -1,0 +1,13 @@
+<tr ng-repeat="(rowIndex, row) in $ctrl.resultsPage">
+  <td>{{ (($ctrl.page - 1) * $ctrl.limit) + rowIndex + 1 }}</td>
+  <td ng-repeat="(colIndex, col) in $ctrl.settings.columns">
+    <span class="crm-search-field-value" ng-if="!$ctrl.results.editable[col.key]">{{ row.data[col.key] }}</span>
+    <crm-search-input ng-if=":: $ctrl.results.editable[col.key]" class="form-inline" field="$ctrl.results.editable[col.key]" ng-model="row.data[col.spec.name]" ng-change="$ctrl.onChangeData()" crm-search-input-focus="false"></crm-search-input>
+  </td>
+  <td>
+    <button type="button" class="btn btn-primary btn-xs" ng-click="$ctrl.deleteRow(rowIndex)">
+      <i class="crm-i fa-trash"></i>
+      <span class="sr-only">{{:: ts('Remove Row') }}</span>
+    </button>
+  </td>
+</tr>

@@ -11,7 +11,9 @@
   {include file=$fieldSpec.template}
 {else}
   <td class="label">{$form.$fieldName.label}
-    {if array_key_exists('help', $fieldSpec) && $fieldSpec.help.id}{help id=$fieldSpec.help.id file=$fieldSpec.help.file}{/if}
+    {if array_key_exists('help', $fieldSpec) && $fieldSpec.help.id}
+      {help values=$fieldSpec.help title=$fieldSpec.title}
+    {/if}
     {if $action == 2 && array_key_exists('is_add_translate_dialog', $fieldSpec)}{include file='CRM/Core/I18n/Dialog.tpl' table=$entityTable field=$fieldName id=$entityID}{/if}
   </td>
   <td>

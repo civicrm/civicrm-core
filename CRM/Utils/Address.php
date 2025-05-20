@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Country;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -32,9 +33,9 @@ class CRM_Utils_Address {
    *   The address fields.
    * @param string $format
    *   The desired address format.
-   * @param bool $microformat
-   *   If true indicates, the address to be built in hcard-microformat standard.
-   * @param bool $unused
+   * @param false $ignore
+   *   Should always be false.
+   * @param false $unused
    *   Should ALWAYS be false.
    * @param string[] $tokenFields
    *
@@ -43,16 +44,12 @@ class CRM_Utils_Address {
    *
    */
   public static function format(
-    $fields,
+    array $fields,
     $format = NULL,
-    $microformat = FALSE,
+    $ignore = FALSE,
     $unused = FALSE,
     $tokenFields = NULL
   ) {
-    if ($microformat) {
-      CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Address::formatVCard (not recommended outside core - figure out a token way)');
-      self::formatVCard($fields);
-    }
     if ($format) {
       CRM_Core_Error::deprecatedWarning('passing format is deprecated, use the token processor directly');
     }
@@ -65,6 +62,7 @@ class CRM_Utils_Address {
     if (!empty($fields['postal_code_suffix'])) {
       $fullPostalCode .= '-' . $fields['postal_code_suffix'];
     }
+    self::addLabelFields($fields, str_contains($formatted, '{country_id.world_region'));
 
     $replacements = [
       'contact.display_name' => $fields['display_name'] ?? NULL,
@@ -76,7 +74,7 @@ class CRM_Utils_Address {
       'contact.prefix_id:label' => $fields['prefix_id:label'] ?? ($fields['individual_prefix'] ?? NULL),
       'contact.individual_suffix' => $fields['suffix_id:label'] ?? ($fields['individual_suffix'] ?? NULL),
       'contact.suffix_id:label' => $fields['suffix_id:label'] ?? ($fields['individual_suffix'] ?? NULL),
-      'contact.address_name' => $fields['address_name'] ?? NULL,
+      'contact.address_name' => $fields['name'] ?? $fields['address_name'] ?? NULL,
       'contact.street_address' => $fields['street_address'] ?? NULL,
       'contact.supplemental_address_1' => $fields['supplemental_address_1'] ?? NULL,
       'contact.supplemental_address_2' => $fields['supplemental_address_2'] ?? NULL,
@@ -84,10 +82,10 @@ class CRM_Utils_Address {
       'contact.city' => $fields['city'] ?? NULL,
       'contact.state_province_name' => $fields['state_province_id:label'] ?? ($fields['state_province_name'] ?? NULL),
       'contact.county' => $fields['county_id:label'] ?? ($fields['county'] ?? NULL),
-      'contact.state_province' => $fields['state_province_id:label'] ?? ($fields['state_province'] ?? NULL),
+      'contact.state_province' => $fields['state_province_id:abbr'] ?? ($fields['state_province'] ?? NULL),
       'contact.postal_code' => $fullPostalCode,
       'contact.country' => $fields['country_id:label'] ?? ($fields['country'] ?? NULL),
-      'contact.world_region' => $fields['world_region'] ?? NULL,
+      'contact.world_region' => $fields['country_id.world_region:label'] ?? $fields['world_region'] ?? NULL,
       'contact.geo_code_1' => $fields['geo_code_1'] ?? NULL,
       'contact.geo_code_2' => $fields['geo_code_2'] ?? NULL,
       'contact.current_employer' => $fields['current_employer'] ?? NULL,
@@ -170,66 +168,62 @@ class CRM_Utils_Address {
   /**
    * Format an address in the vcard format.
    *
-   * @param array $fields
-   *   The address fields.
+   * @param array $address
+   *   The address fields - this should be at minimum the fields that would be
+   *   retrieved from an apiv4 Contact.get call. It could be augmented with other fields
+   *   (e.g if country_id.world_region:label is already known).
    *
    * @return string
    *   formatted address string
    */
-  public static function formatVCard($fields) {
+  public static function formatVCard($address): string {
     $formatted = Civi::settings()->get('address_format');
 
-    $fullPostalCode = $fields['postal_code'] ?? NULL;
-    if (!empty($fields['postal_code_suffix'])) {
-      $fullPostalCode .= '-' . $fields['postal_code_suffix'];
+    $fullPostalCode = $address['postal_code'] ?? NULL;
+    if (!empty($address['postal_code_suffix'])) {
+      $fullPostalCode .= '-' . $address['postal_code_suffix'];
     }
-
-    // make sure that some of the fields do have values
-    $emptyFields = [
-      'supplemental_address_1',
-      'supplemental_address_2',
-      'supplemental_address_3',
-      'state_province_name',
-      'county',
+    // @todo remove these - they are only here to allow this function to keep working while
+    // the calling function is refactored.
+    $legacyFieldConversions = [
+      'address_name' => 'name',
+      'state' => 'state_province_id:label',
+      'state_province_name' => 'state_province_id:abbr',
+      'state_province' => 'state_province_id:abbr',
+      'county' => 'county_id:label',
+      'country' => 'country_id:label',
+      'world_region' => 'country_id.world_region_id:label',
     ];
-    foreach ($emptyFields as $f) {
-      if (!isset($fields[$f])) {
-        $fields[$f] = NULL;
+    foreach ($legacyFieldConversions as $old => $new) {
+      if (isset($address[$old])) {
+        $address[$new] = $address[$old];
+        unset($address[$old]);
       }
     }
+    self::addLabelFields($address, str_contains($formatted, '{country_id.world_region'));
 
+    // @todo - this could all be handled as tokens as a Token Processor tokens class.
     $replacements = [
-      'contact.address_name' => "<span class=\"address-name\">" . $fields['address_name'] . "</span>",
-      'contact.street_address' => "<span class=\"street-address\">" . $fields['street_address'] . "</span>",
-      'contact.supplemental_address_1' => "<span class=\"extended-address\">" . $fields['supplemental_address_1'] . "</span>",
-      'contact.supplemental_address_2' => $fields['supplemental_address_2'],
-      'contact.supplemental_address_3' => $fields['supplemental_address_3'],
-      'contact.city' => "<span class=\"locality\">" . $fields['city'] . "</span>",
-      'contact.state_province_name' => "<span class=\"region\">" . $fields['state_province_name'] . "</span>",
-      'contact.county' => "<span class=\"region\">" . $fields['county'],
-      'contact.state_province' => "<span class=\"region\">" . $fields['state_province'] . "</span>",
-      'contact.postal_code' => "<span class=\"postal-code\">" . $fullPostalCode . "</span>",
-      'contact.country' => "<span class=\"country-name\">" . $fields['country'] . "</span>",
-      'contact.world_region' => "<span class=\"region\">" . $fields['world_region'] . "</span>",
+      'contact.address_name' => empty($address['name']) ? '' : "<span class=\"address-name\">" . $address['name'] . "</span>",
+      'contact.street_address' => empty($address['street_address']) ? '' : "<span class=\"street-address\">" . $address['street_address'] . "</span>",
+      'contact.supplemental_address_1' => empty($address['supplemental_address_1']) ? '' : "<span class=\"extended-address\">" . $address['supplemental_address_1'] . "</span>",
+      'contact.supplemental_address_2' => $address['supplemental_address_2'] ?? '',
+      'contact.supplemental_address_3' => $address['supplemental_address_3'] ?? '',
+      'contact.city' => empty($address['city']) ? '' : "<span class=\"locality\">" . $address['city'] . "</span>",
+      'contact.state_province_name' => empty($address['state_province_id:label']) ? '' : "<span class=\"region\">" . $address['state_province_id:label'] . "</span>",
+      'contact.county' => empty($address['county_id:label']) ? '' : "<span class=\"region\">" . $address['county_id:label'],
+      'contact.state_province' => empty($address['state_province_id:abbr']) ? '' : "<span class=\"region\">" . $address['state_province_id:abbr'] . "</span>",
+      'contact.postal_code' => !$fullPostalCode ? '' : "<span class=\"postal-code\">" . $fullPostalCode . "</span>",
+      'contact.country' => empty($address['country_id:label']) ? '' : "<span class=\"country-name\">" . $address['country_id:label'] . "</span>",
+      'contact.world_region' => empty($address['country_id.world_region_id:label']) ? '' : "<span class=\"region\">" . $address['country_id.world_region_id:label'] . "</span>",
     ];
-
-    // Erase all empty ones, so we don't get blank lines
-    foreach (array_keys($replacements) as $key) {
-      $exactKey = substr($key, 0, 8) == 'contact.' ? substr($key, 8) : $key;
-      if ($key !== 'contact.postal_code' && empty($fields[$exactKey])) {
-        $replacements[$key] = '';
-      }
-    }
-    if (empty($fullPostalCode)) {
-      $replacements['contact.postal_code'] = '';
-    }
 
     // replacements in case of Custom Token
     if (stristr(($formatted ?? ''), 'custom_')) {
-      $customToken = array_keys($fields);
+      $customToken = array_keys($address);
       foreach ($customToken as $value) {
         if (substr($value, 0, 7) == 'custom_') {
-          $replacements["contact.{$value}"] = $fields["{$value}"];
+          $replacements["contact.{$value}"] = $address["{$value}"];
         }
       }
     }
@@ -279,7 +273,7 @@ class CRM_Utils_Address {
         $count++;
       }
     }
-    return $finalFormatted;
+    return $finalFormatted ?? '';
   }
 
   /**
@@ -427,6 +421,32 @@ class CRM_Utils_Address {
     $countryDefault = Civi::settings()->get('defaultContactCountry');
     // US, UK use miles. Everything else is Km
     return ($countryDefault == '1228' || $countryDefault == '1226') ? 'miles' : 'km';
+  }
+
+  /**
+   * @param array $address
+   * @param bool $isResolveWorldRegion
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  private static function addLabelFields(array &$address, bool $isResolveWorldRegion): void {
+    if (isset($address['country_id'])) {
+      $address['country_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'country_id', $address['country_id']);
+      if ($isResolveWorldRegion && !isset($address['country_id.world_region_id:label'])) {
+        $address['country_id.world_region_id:label'] = Country::get(FALSE)
+          ->addWhere('id', '=', $address['country_id'])
+          ->addSelect('region_id:label')
+          ->execute()->first()['region_id:label'] ?? '';
+      }
+    }
+    if (isset($address['county_id'])) {
+      $address['county_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'county_id', $address['county_id']);
+    }
+    if (isset($address['state_province_id'])) {
+      $address['state_province_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'state_province_id', $address['state_province_id']);
+      $address['state_province_id:abbr'] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($address['state_province_id']);
+    }
   }
 
 }

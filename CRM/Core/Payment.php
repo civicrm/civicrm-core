@@ -1672,6 +1672,7 @@ abstract class CRM_Core_Payment {
       throw new CRM_Core_Exception($notFound);
     }
 
+    // handlePaymentNotification() or handlePaymentCron()
     $method = 'handle' . $method;
     $extension_instance_found = FALSE;
 

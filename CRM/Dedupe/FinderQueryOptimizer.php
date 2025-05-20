@@ -28,6 +28,8 @@ class CRM_Dedupe_FinderQueryOptimizer {
 
   private array $queries = [];
 
+  private array $optimizedQueries = [];
+
   /**
    * Threshold weight for merge.
    *
@@ -69,7 +71,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
           'key' => $key,
           'order' => $index + 1,
         ];
-        $this->queries[$key]['query'] = $this->getQuery($this->queries[$key]);
+        $this->addQuery($key);
       }
       $this->threshold = $rule['dedupe_rule_group_id.threshold'];
     }
@@ -79,18 +81,14 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
-   * @param array $rule
-   *
-   * @return string
-   *   SQL query performing the search
-   *   or NULL if params is present and doesn't have and for a field.
+   * @param string $key
    *
    * @throws \CRM_Core_Exception
    * @internal do not call from outside tested core code. No universe uses Feb 2024.
    *
    */
-  public function getQuery(array $rule): ?string {
-
+  private function addQuery(string $key) {
+    $rule = $this->queries[$key];
     $filter = $this->getRuleTableFilter($rule['table']);
     $contactIDFieldName = $this->getContactIDFieldName($rule['table']);
 
@@ -98,7 +96,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
     // based on whether the rule is about substrings or not
     if ($this->lookupParameters) {
       $select = "t1.$contactIDFieldName id1, {$rule['weight']} weight";
-      $subSelect = 'id1, weight';
       $where = $filter ? ['t1.' . $filter] : [];
       $from = "{$rule['table']} t1";
       $str = 'NULL';
@@ -112,6 +109,10 @@ class CRM_Dedupe_FinderQueryOptimizer {
       else {
         $where[] = "t1.{$rule['field']} = '$str'";
       }
+      $this->queries[$key]['where'] = $where;
+      $this->queries[$key]['contact_id_field'] = $contactIDFieldName;
+      $this->queries[$key]['query'] = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
+      return;
     }
     else {
       $select = "t1.$contactIDFieldName id1, t2.$contactIDFieldName id2, {$rule['weight']} weight";
@@ -134,7 +135,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
       // thing in a subquery.
       $sql = "SELECT $subSelect FROM ($sql) subunion";
     }
-    return $sql;
+    $this->queries[$key]['query'] = $sql;
   }
 
   /**
@@ -220,12 +221,19 @@ class CRM_Dedupe_FinderQueryOptimizer {
    *
    * @return array
    */
-  public function getRuleQueries(): array {
-    $queries = [];
-    foreach ($this->queries as $rule) {
-      $queries[$rule['key']] = $rule['query'];
+  public function getFindQueries(): array {
+    $this->optimizedQueries = $this->getUsableQueries();
+    foreach ($this->getCombinableQueries() as $queryCombinations) {
+      $queries = [];
+      foreach ($queryCombinations as $query) {
+        $queryDetail = $this->optimizedQueries[$query];
+        $queries[$queryDetail['table']][$query] = $queryDetail;
+        unset($this->optimizedQueries[$query]);
+      }
+      $this->optimizedQueries += $this->getCombinedQuery($queries);
     }
-    return $queries;
+    uasort($this->optimizedQueries, [$this, 'sortWeightDescending']);
+    return $this->optimizedQueries;
   }
 
   /**
@@ -275,7 +283,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * use one query that includes both.
    */
   public function getOptimizedQueries(): array {
-    $queries = $this->queries;
+    $queries = $this->getUsableQueries();
     // We want to combine cross-tables but looking to do that as a follow on since that will require some
     // more work to figure out. For single table regex does get us there.
     foreach ($this->getCombinableQueriesByTable() as $queryCombinations) {
@@ -302,15 +310,37 @@ class CRM_Dedupe_FinderQueryOptimizer {
         $combinedQuery['query'] = preg_replace('/( \d+ weight )/m', ' ' . $comboQueries['weight'] . ' weight ', $combinedQuery['query']);
         $combinedQuery['weight'] = $comboQueries['weight'];
         $combinedQuery['key'] = $combinedKey;
+        $combinedQuery['table'] = $comboQueries['table'];
         $queries[$combinedKey] = $combinedQuery;
       }
     }
     uasort($queries, [$this, 'sortWeightDescending']);
-    $tableQueryFormat = [];
+
     foreach ($queries as $query) {
-      $tableQueryFormat[$query['key']] = $query['query'];
+      $this->optimizedQueries[$query['key']] = $query;
     }
-    return $tableQueryFormat;
+    return $this->optimizedQueries;
+  }
+
+  /**
+   * Is the query usable.
+   *
+   * This would return false when a poorly constructed rule group includes a rule that can
+   * never contribute to reaching the threshold - e.g if the rule requires a threshold of 8
+   * and has 3 fields with weights 1, 3, and 5 the field with a weight of 1 is unusable as
+   * it will never make a difference to the outcome.
+   *
+   * @param array $query
+   *
+   * @return bool
+   */
+  private function isQueryUsable(array $query): bool {
+    foreach ($this->getValidCombinations() as $validCombination) {
+      if (!empty($validCombination[$query['key']])) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -341,7 +371,107 @@ class CRM_Dedupe_FinderQueryOptimizer {
     return $singleTableCombinableQueries;
   }
 
-  private function sortWeightDescending($a, $b) {
+  /**
+   * @param int $affectedRows
+   * @param string $queryKey
+   *
+   * @return void
+   */
+  public function setQueryResult(int $affectedRows, string $queryKey): void {
+    $this->optimizedQueries[$queryKey]['found_rows'] = $affectedRows;
+  }
+
+  /**
+   * Get usable queries.
+   *
+   * A query is usable when it could contribute to making a match - e.g if the threshold is 8
+   * and there are 3 queries with weights of 5, 3, and 1 the first 2 are usable.
+   *
+   * @return array
+   */
+  public function getUsableQueries(): array {
+    $queries = $this->queries;
+    foreach ($queries as $key => $query) {
+      if (!$this->isQueryUsable($query)) {
+        unset($queries[$key]);
+      }
+    }
+    return $queries;
+  }
+
+  /**
+   * @param array $queries
+   *
+   * @return array
+   */
+  public function getCombinedQuery(array $queries): array {
+    $tables = isset($queries['civicrm_contact']) ? ['civicrm_contact' => ['alias' => 't1', 'query' => []]] : [array_key_first($queries) => ['alias' => 't1', 'query' => []]];
+    foreach ($queries as $table => $tableQueries) {
+      if (!isset($tables[$table])) {
+        $tables[$table] = ['alias' => $table, 'query' => []];
+      }
+      $alias = $tables[$table]['alias'];
+      $tables[$table]['query'] += $this->getSingleTableCombinedQuery($tableQueries, $alias);
+    }
+    if (count($tables) === 1) {
+      return $tables[array_key_first($tables)]['query'];
+    }
+    $combinedQuery = [];
+    $combinedKey = implode('_', array_keys($tables));
+    foreach ($tables as $table) {
+      $query = reset($table['query']);
+      $combinedKey .= '.' . $query['key'];
+      if (empty($combinedQuery)) {
+        $query['from'] = " FROM {$query['table']} {$query['table_alias']}";
+        $query['base_contact_id_field'] = $query['contact_id_field'];
+        $query['base_where'] = ' WHERE ' . implode(' AND ', $query['criteria']);
+        $combinedQuery = $query;
+      }
+      else {
+        $combinedQuery['weight'] += $query['weight'];
+        $combinedQuery['from'] .= "
+          INNER JOIN {$query['table']}
+          ON t1.{$combinedQuery['base_contact_id_field']} = {$query['table']}.{$query['contact_id_field']}
+          AND " . str_replace('t1.', $query['table'] . '.', implode(' AND ', $query['criteria']));
+
+        $combinedQuery['query'] = $query['select'] . ' ' . $combinedQuery['weight'] . ' weight '
+          . $combinedQuery['from']
+          . $combinedQuery['base_where'];
+      }
+    }
+    $combinedQuery['key'] = $combinedKey;
+    return [$combinedKey => $combinedQuery];
+  }
+
+  /**
+   * @param array $tableQueries
+   * @param string $tableAlias
+   *
+   * @return array
+   */
+  public function getSingleTableCombinedQuery(array $tableQueries, string $tableAlias): array {
+    $combinedQuery = ['field' => [], 'criteria' => [], 'weight' => 0];
+    foreach ($tableQueries as $queryDetail) {
+      $combinedQuery['table'] = $queryDetail['table'];
+      $combinedQuery['table_alias'] = $tableAlias;
+      $combinedQuery['weight'] += $queryDetail['weight'];
+      $combinedQuery['field'][] = $queryDetail['field'];
+      $combinedQuery['contact_id_field'] = $queryDetail['contact_id_field'];
+      $combinedQuery['criteria'][] = implode(' AND ', $queryDetail['where']);
+    }
+    $combinedKey = $combinedQuery['table'] . '.' . implode('_', $combinedQuery['field']) . '.' . $combinedQuery['weight'];
+    $combinedQuery['key'] = $combinedKey;
+    $combinedQuery['select'] = "SELECT {$tableAlias} .{$combinedQuery['contact_id_field']} id1, ";
+    $combinedQuery['query'] =
+      $combinedQuery['select']
+      . $combinedQuery['weight'] . ' weight'
+      . ' FROM ' . $combinedQuery['table'] . ' ' . $tableAlias
+      . ' WHERE ' . implode(' AND ', $combinedQuery['criteria']);
+
+    return [$combinedKey => $combinedQuery];
+  }
+
+  private function sortWeightDescending($a, $b): int {
     return ($a['weight'] > $b['weight']) ? -1 : 1;
   }
 
@@ -443,6 +573,221 @@ class CRM_Dedupe_FinderQueryOptimizer {
       }
     }
     return $combinations;
+  }
+
+  /**
+   * It the optimizer being used to lookup existing contacts based on input parameters.
+   *
+   * @internal
+   *
+   * @return bool
+   */
+  public function isLookupMode(): bool {
+    return !empty($this->lookupParameters);
+  }
+
+  /**
+   * Run the queries to build the duplicates table.
+   *
+   * @return string
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @internal this query is part of a refactoring process.
+   *
+   * Ideally it will be worked back into the FinderQueryOptimizer now.
+   *
+   */
+  public function runTablesQuery(): string {
+    if ($this->isLookupMode()) {
+      $dedupeTable = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe')
+        ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
+      $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe');
+      $dedupeTableCopy = $dedupeCopyTemporaryTableObject->getName();
+      $insertClause = "INSERT INTO $dedupeTable  (id1, weight)";
+      $groupByClause = "GROUP BY id1, weight";
+      $dupeCopyJoin = " JOIN $dedupeTableCopy dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
+    }
+    else {
+      $dedupeTable = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe')
+        ->createWithColumns("id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)")->getName();
+      $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe');
+      $dedupeTableCopy = $dedupeCopyTemporaryTableObject->getName();
+      $insertClause = "INSERT INTO $dedupeTable  (id1, id2, weight)";
+      $groupByClause = "GROUP BY id1, id2, weight";
+      $dupeCopyJoin = " JOIN $dedupeTableCopy dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
+    }
+    $patternColumn = '/t1.(\w+)/';
+    $exclWeightSum = [];
+    $tableQueries = $this->getRemainingQueries();
+    $threshold = $this->threshold;
+    while (!empty($tableQueries)) {
+      [$isInclusive, $isDie] = $this->isQuerySetInclusive($threshold, $exclWeightSum);
+
+      if ($isInclusive) {
+        // order queries by table count
+        self::orderByTableCount($tableQueries);
+
+        $weightSum = array_sum($exclWeightSum);
+        $searchWithinDupes = !empty($exclWeightSum) ? 1 : 0;
+
+        while (!empty($tableQueries)) {
+          // extract the next query to be executed
+          $queryKey = array_key_first($tableQueries);
+          $optimizedQuery = $this->optimizedQueries[$queryKey];
+          // since queries are already sorted by weights, we can continue as is
+          unset($tableQueries[$queryKey]);
+          $query = $optimizedQuery['query'];
+
+          if ($searchWithinDupes) {
+            // drop dedupe_copy table just in case if its already there.
+            $dedupeCopyTemporaryTableObject->drop();
+            // get prepared to search within already found dupes if $searchWithinDupes flag is set
+            $dedupeCopyTemporaryTableObject->createWithQuery("SELECT * FROM $dedupeTable WHERE weight >= {$weightSum}");
+
+            preg_match($patternColumn, $query, $matches);
+            $query = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoin), $query);
+
+            // CRM-19612: If there's a union, there will be two WHEREs, and you
+            // can't use the temp table twice.
+            if (preg_match('/' . $dedupeTableCopy . '[\S\s]*(union)[\S\s]*' . $dedupeTableCopy . '/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
+              // Make a second temp table:
+              $dedupeTableCopy2 = CRM_Utils_SQL_TempTable::build()
+                ->setCategory('dedupe')
+                ->createWithQuery("SELECT * FROM $dedupeTable WHERE weight >= {$weightSum}")
+                ->getName();
+              // After the union, use that new temp table:
+              $part1 = substr($query, 0, $matches[1][1]);
+              $query = $part1 . str_replace($dedupeTableCopy, $dedupeTableCopy2, substr($query, $matches[1][1]));
+            }
+          }
+          $searchWithinDupes = 1;
+
+          // construct and execute the intermediate query
+          $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
+          $dao = CRM_Core_DAO::executeQuery($query);
+
+          // FIXME: we need to be more accurate with affected rows, especially for insert vs duplicate insert.
+          // And that will help optimize further.
+          $affectedRows = $dao->affectedRows();
+          $this->setQueryResult($affectedRows, $queryKey);
+
+          // In an inclusive situation, failure of any query means no further processing -
+          if ($this->optimizedQueries[$queryKey]['found_rows'] == 0) {
+            // reset to make sure no further execution is done.
+            $tableQueries = [];
+            break;
+          }
+          $weightSum = $optimizedQuery['weight'] + $weightSum;
+        }
+        // An exclusive situation -
+      }
+      elseif (!$isDie) {
+        $queryKey = array_key_first($tableQueries);
+        $optimizedQuery = $this->optimizedQueries[$queryKey];
+        // since queries are already sorted by weights, we can continue as is
+        unset($tableQueries[$queryKey]);
+        $query = "{$insertClause} {$optimizedQuery['query']} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
+        $dao = CRM_Core_DAO::executeQuery($query);
+        $this->setQueryResult($dao->affectedRows(), $queryKey);
+        if ($this->optimizedQueries[$queryKey]['found_rows'] >= 1) {
+          $exclWeightSum[] = $optimizedQuery['weight'];
+        }
+      }
+      else {
+        // its a die situation
+        break;
+      }
+    }
+    return $dedupeTable;
+  }
+
+  /**
+   * Function to determine if a given query set contains inclusive or exclusive set of weights.
+   * The function assumes that the query set is already ordered by weight in desc order.
+   * @param $tableQueries
+   * @param $threshold
+   * @param array $exclWeightSum
+   *
+   * @return array
+   */
+  private function isQuerySetInclusive($threshold, $exclWeightSum = []) {
+    $input = [];
+    foreach ($this->getRemainingQueries() as $query) {
+      $input[] = $query['weight'];
+    }
+
+    if (!empty($exclWeightSum)) {
+      $input = array_merge($input, $exclWeightSum);
+      rsort($input);
+    }
+
+    if (count($input) == 1) {
+      return [FALSE, $input[0] < $threshold];
+    }
+
+    $totalCombinations = 0;
+    for ($i = 0; $i < count($input); $i++) {
+      $combination = [$input[$i]];
+      if (array_sum($combination) >= $threshold) {
+        $totalCombinations++;
+        continue;
+      }
+      for ($j = $i + 1; $j < count($input); $j++) {
+        $combination[] = $input[$j];
+        if (array_sum($combination) >= $threshold) {
+          $totalCombinations++;
+        }
+      }
+    }
+    return [$totalCombinations == 1, $totalCombinations <= 0];
+  }
+
+  protected function getRemainingQueries(): array {
+    $remaining = [];
+    foreach ($this->optimizedQueries as $key => $query) {
+      if (!isset($query['found_rows'])) {
+        $remaining[$key] = $query;
+      }
+    }
+    return $remaining;
+  }
+
+  /**
+   * Sort queries by number of records for the table associated with them.
+   *
+   * @param array $tableQueries
+   */
+  public static function orderByTableCount(array &$tableQueries): void {
+    uasort($tableQueries, [__CLASS__, 'isTableBigger']);
+  }
+
+  /**
+   * Is the table extracted from the first string larger than the second string.
+   *
+   * @param array $a
+   *   e.g civicrm_contact.first_name
+   * @param array $b
+   *   e.g civicrm_address.street_address
+   *
+   * @return int
+   */
+  private static function isTableBigger(array $a, array $b): int {
+    $tableA = $a['table'];
+    $tableB = $b['table'];
+    if ($tableA === $tableB) {
+      return 0;
+    }
+    return CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableA) <=> CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableB);
+  }
+
+  /**
+   * Store the queries run into a static - this is purely for unit tests to validate.
+   */
+  public function __destruct() {
+    \Civi::$statics[__CLASS__]['queries'] = $this->optimizedQueries;
   }
 
 }

@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.
 
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Entity;
 use Civi\Api4\SearchDisplay;
 use Civi\Search\Admin;
 use Civi\Test\CiviEnvBuilder;
@@ -24,8 +25,8 @@ class EntityDisplayTest extends Api4TestBase {
 
   public static function getDataModes(): array {
     return [
-      ['table'],
-      ['view'],
+      'table' => ['table'],
+      'view' => ['view'],
     ];
   }
 
@@ -58,7 +59,7 @@ class EntityDisplayTest extends Api4TestBase {
     $display = SearchDisplay::create(FALSE)
       ->addValue('saved_search_id', $savedSearch['id'])
       ->addValue('type', 'entity')
-      ->addValue('label', 'MyNewEntity')
+      ->addValue('label', 'My New Entity')
       ->addValue('name', 'MyNewEntity')
       ->addValue('settings', [
         'data_mode' => $dataMode,
@@ -123,6 +124,14 @@ class EntityDisplayTest extends Api4TestBase {
       $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity')->fetchAll();
       $this->assertCount(0, $rows);
     }
+
+    $info = Entity::get(FALSE)
+      ->addWhere('name', '=', 'SK_MyNewEntity')
+      ->execute()->single();
+    $this->assertSame('My New Entity', $info['title']);
+    $this->assertSame('civicrm_sk_my_new_entity', $info['table_name']);
+    $this->assertSame('secondary', $info['searchable']);
+    $this->assertSame(['id', 'first', 'last_name', 'prefix_id', 'created_date', 'modified_date'], $info['search_fields']);
 
     $getFields = civicrm_api4('SK_MyNewEntity', 'getFields', ['loadOptions' => TRUE])->indexBy('name');
     $this->assertNotEmpty($getFields['prefix_id']['options'][1]);

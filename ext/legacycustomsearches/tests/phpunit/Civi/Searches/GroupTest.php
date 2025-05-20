@@ -31,7 +31,7 @@ namespace Civi\Searches;
 
 use Civi\Test;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use CRM_Core_DAO;
 use PHPUnit\Framework\TestCase;

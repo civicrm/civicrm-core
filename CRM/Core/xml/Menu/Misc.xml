@@ -57,7 +57,7 @@
      <title>Assign Users to ACL Roles</title>
      <page_callback>CRM_ACL_Form_EntityRole</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>>
+  </item>
   <item>
      <path>civicrm/file</path>
      <title>Browse Uploaded files</title>
@@ -73,10 +73,9 @@
   <item>
      <path>civicrm/logout</path>
      <title>Log out</title>
-     <page_callback>CRM_Utils_System::logout</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>*always allow*</access_arguments>
+     <page_callback>CRM_Core_Page_Logout</page_callback>
      <weight>9999</weight>
-     <page_type>1</page_type>
   </item>
   <item>
     <path>civicrm/i18n</path>

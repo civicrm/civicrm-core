@@ -69,8 +69,8 @@
 --crm-c-secondary-hover-text: var(--crm-c-text-light);
 --crm-c-success: var(--crm-c-green-dark);
 --crm-c-success-text: var(--crm-c-text-light);
---crm-c-alert: var(--crm-c-red-dark);
---crm-c-alert-text: var(--crm-c-text-light);
+--crm-c-danger: var(--crm-c-red-dark);
+--crm-c-danger-text: var(--crm-c-text-light);
 --crm-c-warning: var(--crm-c-amber);
 --crm-c-warning-text: var(--crm-c-text-light);
 --crm-c-info: var(--crm-c-blue-dark);
@@ -137,16 +137,16 @@
 --crm-btn-height: 28px;
 --crm-btn-icon-spacing: var(--crm-s);
 --crm-btn-icon-size: auto;
---crm-btn-cancel-bg: var(--crm-c-alert);
---crm-btn-cancel-text: var(--crm-c-alert-text);
+--crm-btn-cancel-bg: var(--crm-c-danger);
+--crm-btn-cancel-text: var(--crm-c-danger-text);
 --crm-btn-info-bg: var(--crm-c-info);
 --crm-btn-info-text: var(--crm-c-info-text);
 --crm-btn-warning-bg: var(--crm-c-warning);
 --crm-btn-warning-text: var(--crm-c-warning-text);
 --crm-btn-success-bg: var(--crm-c-success);
 --crm-btn-success-text: var(--crm-c-success-text);
---crm-btn-alert-bg: var(--crm-c-alert);
---crm-btn-alert-text: var(--crm-c-alert-text);
+--crm-btn-danger-bg: var(--crm-c-danger);
+--crm-btn-danger-text: var(--crm-c-danger-text);
 --crm-btn-icon-bg: ; /* btn-icon-* supports distinct border/bg for icons. If applied, set btn-icon-padding to 0px to make the icon bg stretch to the button *
 --crm-btn-icon-border: ;
 --crm-btn-icon-padding: var(--crm-btn-padding-block);
@@ -219,18 +219,18 @@
 --crm-alert-padding: var(--crm-m) var(--crm-m2);
 --crm-alert-margin: 0 0 var(--crm-m);
 --crm-alert-border-width: 1px;
---crm-alert-background-help: var(--crm-c-green-light);
---crm-alert-border-help: var(--crm-c-green);
---crm-alert-text-help: var(--crm-c-green-dark);
---crm-alert-background-warning: var(--crm-c-yellow-light);
---crm-alert-border-warning: var(--crm-c-yellow);
---crm-alert-text-warning: var(--crm-c-text);
---crm-alert-background-info: var(--crm-c-blue-light);
---crm-alert-border-info: var(--crm-c-blue);
---crm-alert-text-info: var(--crm-c-blue-dark);
---crm-alert-background-danger: var(--crm-c-red-light);
---crm-alert-border-danger: var(--crm-c-red);
---crm-alert-text-danger: var(--crm-c-red-dark);
+--crm-alert-success-bg: var(--crm-c-green-light);
+--crm-alert-success-border: var(--crm-c-green);
+--crm-alert-success-text: var(--crm-c-green-dark);
+--crm-alert-warning-bg: var(--crm-c-yellow-light);
+--crm-alert-warning-border: var(--crm-c-yellow);
+--crm-alert-warning-text: var(--crm-c-text);
+--crm-alert-info-bg: var(--crm-c-blue-light);
+--crm-alert-info-border: var(--crm-c-blue);
+--crm-alert-info-text: var(--crm-c-blue-dark);
+--crm-alert-danger-bg: var(--crm-c-red-light);
+--crm-alert-danger-border: var(--crm-c-red);
+--crm-alert-danger-text: var(--crm-c-red-dark);
 /* Form *
 --crm-form-block-box-shadow: var(--crm-block-shadow);
 --crm-form-block-background: var(--crm-c-background);
@@ -366,7 +366,7 @@
 --crm-dropdown-hover-bg: var(--crm-c-page-background);
 --crm-dropdown-border: 0;
 --crm-dropdown-width: 180px;
---crm-dropdown-alert-bg: var(--crm-c-alert); /* for delete links in dropdowns *
+--crm-dropdown-danger-bg: var(--crm-c-danger); /* for delete links in dropdowns *
 --crm-dropdown-2-bg: var(--crm-c-secondary);
 --crm-dropdown-2-col: var(--crm-c-text);
 --crm-dropdown-2-padding: var(--crm-padding-small);
@@ -377,14 +377,14 @@
 --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none *
 --crm-notify-radius: var(--crm-roundness);
 /* Icons *
---crm-icon-alert: "\f06a";
+--crm-icon-danger: "\f06a";
 --crm-icon-success: "\f058";
 --crm-icon-info: "\f05a";
 --crm-icon-close: "\f00d";
 --crm-icon-sort: "\f0dc";
 --crm-icon-sort-desc: "\f0dd";
 --crm-icon-sort-asc: "\f0de";
---crm-icon-alert-color: inherit;
+--crm-icon-danger-color: inherit;
 --crm-icon-success-color: inherit;
 --crm-icon-warning-color: inherit;
 --crm-icon-info-color: inherit;

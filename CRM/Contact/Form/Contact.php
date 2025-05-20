@@ -27,6 +27,18 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Contact_Form_Edit_OpenIDBlockTrait;
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_Edit_IMBlockTrait;
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
+
+  /**
+   * Is this the contact summary edit screen.
+   *
+   * @var bool
+   */
+  protected bool $isContactSummaryEdit = TRUE;
+
 
   /**
    * The contact type of the form.
@@ -242,10 +254,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
         else {
           CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId, 'contact_id' => $this->_contactId], $this->_values);
-          $this->_values['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['im'] = $this->getExistingIMsReIndexed();
+          $this->_values['email'] = $this->getExistingEmailsReIndexed();
+          $this->_values['openid'] = $this->getExistingOpenIDsReIndexed();
+          $this->_values['phone'] = $this->getExistingPhonesReIndexed();
           $this->_values['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
           CRM_Core_BAO_Website::getValues(['contact_id' => $this->_contactId], $this->_values);
           $this->set('values', $this->_values);
@@ -912,7 +924,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
         switch ($blockName) {
           case 'Email':
-            CRM_Contact_Form_Edit_Email::buildQuickForm($this, $instance);
+            $this->addEmailBlockFields($instance);
             // Only display the signature fields if this contact has a CMS account
             // because they can only send email if they have access to the CRM
             $ufID = $this->_contactId && CRM_Core_BAO_UFMatch::getUFId($this->_contactId);
@@ -1031,7 +1043,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     elseif (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE)) {
       // figure out which all groups are intended to be removed
       $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added', NULL, FALSE, TRUE, FALSE, TRUE, NULL, TRUE);
-      if (is_array($contactGroupList)) {
+      if (is_array($contactGroupList) && is_array($params['group'] ?? NULL)) {
         foreach ($contactGroupList as $key) {
           if ((!array_key_exists($key['group_id'], $params['group']) || $params['group'][$key['group_id']] != 1) && empty($key['is_hidden'])) {
             $params['group'][$key['group_id']] = -1;
@@ -1464,27 +1476,23 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return;
     }
     if ($name === 'Phone') {
-      CRM_Contact_Form_Edit_Phone::buildQuickForm($this, $instance);
+      $this->addPhoneBlockFields($instance);
       return;
     }
     if ($name === 'IM') {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this, $instance);
+      $this->addIMBlockFields($instance);
       return;
     }
     if ($name === 'Website') {
       CRM_Contact_Form_Edit_Website::buildQuickForm($this, $instance);
       return;
     }
-    if ($name === 'IM') {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this, $instance);
-      return;
-    }
     if ($name === 'OpenID') {
-      CRM_Contact_Form_Edit_OpenID::buildQuickForm($this, $instance);
+      $this->addOpenIDBlockFields($instance);
       return;
     }
     if ($name === 'Email') {
-      CRM_Contact_Form_Edit_Email::buildQuickForm($this, $instance);
+      $this->addEmailBlockFields($instance);
       return;
     }
     CRM_Core_Error::deprecatedWarning('unused?');

@@ -582,6 +582,25 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Example:
+   *   $data = deepSort($data, fn(array &$a) => sort($a)))
+   *   $data = deepSort($data, fn(array &$a) => uksort($a, 'strnatcmp'))
+   *
+   * @param array $array
+   *   The array that should be sorted.
+   * @param callable $sort
+   *   A function which sorts an array.
+   */
+  public static function deepSort(array &$array, callable $sort): void {
+    $sort($array);
+    foreach ($array as &$value) {
+      if (is_array($value)) {
+        self::deepSort($value, $sort);
+      }
+    }
+  }
+
+  /**
    * Unsets an arbitrary list of array elements from an associative array.
    *
    * @param array $items

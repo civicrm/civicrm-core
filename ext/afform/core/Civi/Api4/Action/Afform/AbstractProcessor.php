@@ -320,21 +320,25 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     // Fill additional info about file fields
     $fileFields = $this->getFileFields($apiEntityName, $entityFields);
     foreach ($fileFields as $fieldName => $fieldDefn) {
-      $select = ['file_name', 'icon'];
-      if ($this->canViewFileAttachments($afEntityName)) {
-        $select[] = 'url';
-      }
       foreach ($result as &$item) {
         if (!empty($item[$fieldName])) {
-          $fileInfo = File::get(FALSE)
-            ->setSelect($select)
-            ->addWhere('id', '=', $item[$fieldName])
-            ->execute()->first();
+          $fileInfo = $this->getFileInfo($item[$fieldName]);
           $item[$fieldName] = $fileInfo;
         }
       }
     }
     return $result;
+  }
+
+  protected function getFileInfo(int $fileId):? array {
+    $select = ['id', 'file_name', 'icon'];
+    if ($this->canViewFileAttachments($this->modelName)) {
+      $select[] = 'url';
+    }
+    return File::get(FALSE)
+      ->setSelect($select)
+      ->addWhere('id', '=', $fileId)
+      ->execute()->first();
   }
 
   private function canViewFileAttachments(string $afEntityName): bool {
@@ -590,15 +594,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         // Use default values from DisplayOnly fields + submittable fields on the form
         $values['fields'] = $this->getForcedDefaultValues($entity['fields']) +
           array_intersect_key($values['fields'] ?? [], $submittableFields);
-        // Unset prefilled file fields
+        // Special handling for file fields
         foreach ($fileFields as $fileFieldName) {
           if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {
-            // File was unchanged
-            if (isset($values['fields'][$fileFieldName]['file_name'])) {
-              unset($values['fields'][$fileFieldName]);
+            // Keep file id
+            if (isset($values['fields'][$fileFieldName]['id'])) {
+              $values['fields'][$fileFieldName] = $values['fields'][$fileFieldName]['id'];
             }
             // File was deleted
-            elseif (array_key_exists('file_name', $values['fields'][$fileFieldName])) {
+            elseif (array_key_exists('id', $values['fields'][$fileFieldName])) {
               $values['fields'][$fileFieldName] = '';
             }
           }
@@ -614,6 +618,12 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           // Enforce the limit set by join[max]
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
           foreach ($joinValues as $index => $vals) {
+            // $vals could be NULL when a join is in a repeating group.
+            // Then $joinValues[0] = null and $joinValues[1] = array
+            if ($vals === NULL) {
+              unset($joinValues[$index]);
+              continue;
+            }
             // As with the main entity, use default values from DisplayOnly fields + values from submittable fields
             $joinValues[$index] = $this->getForcedDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []);
             $joinValues[$index] += array_intersect_key($vals, $allowedFields);

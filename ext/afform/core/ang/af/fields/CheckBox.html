@@ -1,10 +1,10 @@
 <ul class="crm-checkbox-list" id="{{ fieldId }}" ng-if="$ctrl.isMultiple()">
   <li ng-repeat="opt in getOptions() track by opt.id" >
-    <input type="checkbox" checklist-model="dataProvider.getFieldData()[$ctrl.fieldName]" ng-required="$ctrl.defn.required && !dataProvider.getFieldData()[$ctrl.fieldName].length" id="{{ fieldId + opt.id }}" checklist-value="opt.id" />
+    <input type="checkbox" checklist-model="dataProvider.getFieldData()[$ctrl.fieldName]" ng-required="$ctrl.defn.required && !dataProvider.getFieldData()[$ctrl.fieldName].length" id="{{ fieldId + opt.id }}" aria-label="{{$ctrl.defn.label}} {{opt.label}}" checklist-value="opt.id" />
     <label for="{{ fieldId + opt.id }}">{{:: opt.label }}</label>
   </li>
 </ul>
-  <input type="checkbox" ng-required="$ctrl.defn.required" ng-if="!$ctrl.isMultiple()" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" />
+  <input type="checkbox" ng-required="$ctrl.defn.required" ng-if="!$ctrl.isMultiple()" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}"  aria-label="{{$ctrl.defn.label}}"  />
 <label class="crm-af-field-label" for="{{:: fieldId }}" ng-if="!$ctrl.isMultiple() && $ctrl.defn.label" >
   {{:: $ctrl.defn.label }}
   <span class="crm-marker" title="{{:: ts('Required') }}" ng-if="$ctrl.defn.required">*</span>

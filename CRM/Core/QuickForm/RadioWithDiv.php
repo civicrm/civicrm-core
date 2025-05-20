@@ -10,10 +10,7 @@
  */
 
 /**
- *
  * @package CRM
- * @copyright U.S. PIRG Education Fund 2007
- *
  */
 
 require_once 'HTML/QuickForm/radio.php';

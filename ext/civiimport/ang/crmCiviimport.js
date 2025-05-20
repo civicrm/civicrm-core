@@ -2,10 +2,6 @@
   // Declare a list of dependencies.
   angular.module('crmCiviimport', CRM.angRequires('crmCiviimport'));
 
-  // The controller uses *injection*. This default injects a few things:
-  //   $scope -- This is the set of variables shared between JS and HTML.
-  //   crmApi, crmStatus, crmUiHelp -- These are services provided by civicrm-core.
-  //   myContact -- The current contact, defined above in config().
   angular.module('crmCiviimport').component('crmImportUi', {
       templateUrl: '~/crmCiviimport/Import.html',
       controller: function($scope, crmApi4, crmStatus, crmUiHelp) {
@@ -115,7 +111,7 @@
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
               availableEntity = _.clone(entity);
-              availableEntity.children = $scope.filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_field_prefix);
+              availableEntity.children = filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_name + '.');
               fields.push(availableEntity);
             }
           });
@@ -130,19 +126,19 @@
          *
          * @type {(function(*=, *=, *=, *=): (*))|*}
          */
-        $scope.filterEntityFields = (function (isContact, fields, selection, entityFieldPrefix) {
+        function filterEntityFields(isContact, fields, selection, entityFieldPrefix) {
           if (isContact) {
-            return $scope.filterContactFields(fields, selection, entityFieldPrefix);
+            return filterContactFields(fields, selection, entityFieldPrefix);
           }
           return fields;
-        });
+        }
 
         /**
          * Filter contact fields, removing fields not appropriate for the entity or action.
          *
          * @type {function(*=, *): *}
          */
-        $scope.filterContactFields = (function (fields, selection, entityFieldPrefix) {
+        function filterContactFields(fields, selection, entityFieldPrefix) {
           var contactType = selection.contact_type;
           var action = selection.action;
           var rules = $scope.data.dedupeRules;
@@ -166,7 +162,7 @@
 
           }));
           return fields;
-        });
+        }
 
         /**
          * Add the entity to the selected scope.

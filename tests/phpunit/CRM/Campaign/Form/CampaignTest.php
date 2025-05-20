@@ -2,12 +2,19 @@
 
 class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_campaign']);
+    parent::tearDown();
+  }
+
   /**
    * Set up a correct array of form values.
    *
+   * @param string $thousandSeparator
+   *
    * @return array
    */
-  private function getCorrectFormFields($thousandSeparator) {
+  private function getCorrectFormFields(string $thousandSeparator): array {
     return [
       'goal_revenue' => '$10' . $thousandSeparator . '000',
       'is_active' => 1,
@@ -26,7 +33,7 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
    *
    * @dataProvider getThousandSeparators
    */
-  public function testSubmit($thousandSeparator) {
+  public function testSubmit(string $thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $this->createLoggedInUser();
     $form = new CRM_Campaign_Form_Campaign();
@@ -44,7 +51,7 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
    *
    * @dataProvider getThousandSeparators
    */
-  public function testEndDateWithoutDateNotAllowed($thousandSeparator) {
+  public function testEndDateWithoutDateNotAllowed(string $thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $values = $this->getCorrectFormFields($thousandSeparator);
     $values['end_date'] = '00:01';
@@ -59,7 +66,7 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
    *
    * @dataProvider getThousandSeparators
    */
-  public function testEndDateBeforeStartDateNotAllowed($thousandSeparator) {
+  public function testEndDateBeforeStartDateNotAllowed(string $thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $values = $this->getCorrectFormFields($thousandSeparator);
     $values['end_date'] = '1900-01-01 00:00';

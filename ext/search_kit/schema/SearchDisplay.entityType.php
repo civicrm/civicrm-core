@@ -95,7 +95,7 @@ return [
     'acl_bypass' => [
       'title' => E::ts('Bypass ACL Permissions'),
       'sql_type' => 'boolean',
-      'input_type' => 'Checkbox',
+      'input_type' => 'CheckBox',
       'description' => E::ts('Skip permission checks and ACLs when running this display.'),
       'add' => '5.40',
       'default' => FALSE,

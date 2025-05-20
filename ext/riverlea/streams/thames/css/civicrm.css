@@ -108,7 +108,6 @@ html.cms-standalone body {
   color: #fff;
   content: "\f0eb";
   display: inline-block;
-  font-size: 2rem;
   font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
   margin-left: -2.3rem;
@@ -608,16 +607,16 @@ html.crm-standalone  nav.breadcrumb>ol {
 
 /* Override _dropdowns.css */
 #afGuiEditor .af-gui-bar .dropdown-menu {
-  --crm-c-alert-text: var(--crm-c-red-dark);
+  --crm-c-danger-text: var(--crm-c-red-dark);
 }
 /* Override contactSummary.css */
 #crm-contact-actions-list a.delete {
-  --crm-c-alert-text: var(--crm-c-red-dark);
+  --crm-c-danger-text: var(--crm-c-red-dark);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
   /* the hover state gives crm-c-red-dark to the background */
-  --crm-c-alert-text: var(--crm-c-red-light);
+  --crm-c-danger-text: var(--crm-c-red-light);
 }
 
 /* Fix Mosaico wizard */

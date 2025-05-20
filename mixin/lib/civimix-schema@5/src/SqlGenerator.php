@@ -144,7 +144,8 @@ return new class() {
   private function getTableConstraints(array $entity): array {
     $constraints = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
-      if (!empty($field['entity_reference']['entity'])) {
+      // `entity_reference.fk` defaults to TRUE if not set. If FALSE, do not add constraint.
+      if (!empty($field['entity_reference']['entity']) && ($field['entity_reference']['fk'] ?? TRUE)) {
         $fkName = \CRM_Core_BAO_SchemaHandler::getIndexName($entity['table'], $fieldName);
         $constraint = "CONSTRAINT `FK_$fkName` FOREIGN KEY (`$fieldName`)" .
           " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)";
@@ -157,7 +158,7 @@ return new class() {
     return $constraints;
   }
 
-  public static function generateFieldSql(array $field) {
+  public static function generateFieldSql(array $field): string {
     $fieldSql = $field['sql_type'];
     if (!empty($field['collate'])) {
       $fieldSql .= " COLLATE {$field['collate']}";

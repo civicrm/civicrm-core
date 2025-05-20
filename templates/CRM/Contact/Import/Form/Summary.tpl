@@ -16,10 +16,9 @@
  {include file="CRM/common/WizardHeader.tpl"}
  <div class="help">
    <p>
-     {if $unprocessedRowCount}
-       <strong>{ts}The import is still processing.{/ts}</strong>
-     {else}
-       <strong>{ts}Import has completed successfully.{/ts}</strong>
+     <strong>{ts 1=$statusLabel}Import Status: %1{/ts}</strong>
+     {if $statusName === 'draft' && $searchDisplayLink}
+       <br><a href="{$searchDisplayLink}">{ts}Continue Entering Data{/ts}</a>
      {/if}
    </p>
    {if $templateURL}

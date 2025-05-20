@@ -152,7 +152,7 @@ class CiviEnvBuilder {
   protected function assertValid() {
     foreach ($this->steps as $step) {
       if (!$step->isValid()) {
-        throw new RuntimeException("Found invalid step: " . var_dump($step, 1));
+        throw new RuntimeException("Found invalid step: " . var_export($step, TRUE));
       }
     }
   }

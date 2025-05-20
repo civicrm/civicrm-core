@@ -27,6 +27,7 @@ class Finder extends AutoSubscriber {
     $contactIDs = [];
     if ($event->tableName) {
       $contactIDs = explode(',', \CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
+      $contactIDs = array_filter($contactIDs);
     }
     $ruleGroup->contactIds = $contactIDs;
     $tempTable = self::fillTable($ruleGroup, $ruleGroup->id, $contactIDs, []);
@@ -324,6 +325,25 @@ class Finder extends AutoSubscriber {
    */
   public static function orderByTableCount(array &$tableQueries): void {
     uksort($tableQueries, [__CLASS__, 'isTableBigger']);
+  }
+
+  /**
+   * Is the table extracted from the first string larger than the second string.
+   *
+   * @param string $a
+   *   e.g civicrm_contact.first_name
+   * @param string $b
+   *   e.g civicrm_address.street_address
+   *
+   * @return int
+   */
+  public static function isTableBigger(string $a, string $b): int {
+    $tableA = explode('.', $a)[0];
+    $tableB = explode('.', $b)[0];
+    if ($tableA === $tableB) {
+      return 0;
+    }
+    return \CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableA) <=> \CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableB);
   }
 
 }

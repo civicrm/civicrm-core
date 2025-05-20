@@ -44,9 +44,9 @@ function riverlea_civicrm_themes(&$themes) {
  * @return bool
  */
 function _riverlea_is_active() {
-  $themeKey = Civi::service('themes')->getActiveThemeKey();
-  $themeExt = Civi::service('themes')->get($themeKey)['ext'];
-  return ($themeExt === 'riverlea');
+  $themeKey = \Civi::service('themes')->getActiveThemeKey();
+  $themeSearchOrder = \Civi::service('themes')->get($themeKey)['search_order'] ?? [];
+  return in_array('_riverlea_core_', $themeSearchOrder);
 }
 
 function riverlea_civicrm_config(&$config) {

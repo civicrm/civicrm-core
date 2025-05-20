@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\Afform;
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\AfformSubmission;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -29,7 +30,6 @@ class SubmitFile extends AbstractProcessor {
   /**
    * Submission token
    * @var string
-   * @required
    */
   protected $token;
 
@@ -64,8 +64,60 @@ class SubmitFile extends AbstractProcessor {
     if (empty($_FILES['file'])) {
       throw new \CRM_Core_Exception('File upload required');
     }
+    // This uploader can be used when saving a draft or during final submission
+    if ($this->isDraft()) {
+      $draft = $this->getDraft();
+    }
+    else {
+      $entityId = $this->getEntityId();
+    }
+
+    $file = civicrm_api4('File', 'create', [
+      'values' => [
+        'mime_type' => $_FILES['file']['type'],
+        'file_name' => $_FILES['file']['name'],
+        'move_file' => $_FILES['file']['tmp_name'],
+      ],
+      'checkPermissions' => FALSE,
+    ])->single();
+
+    if ($this->isDraft()) {
+      return $this->updateDraft($draft, $file['id']);
+    }
+    else {
+      return $this->updateEntity($entityId, $file['id']);
+    }
+  }
+
+  /**
+   * Load entityIds from web token
+   */
+  protected function loadEntities() {
+    if ($this->isDraft()) {
+      // Not needed when saving a draft
+      return;
+    }
+
+    /** @var \Civi\Crypto\CryptoJwt $jwt */
+    $jwt = \Civi::service('crypto.jwt');
+
+    // Double-decode is needed to convert PHP objects to arrays
+    $info = json_decode(json_encode($jwt->decode($this->token)), TRUE);
+
+    if ($info['civiAfformSubmission']['name'] !== $this->getName()) {
+      throw new UnauthorizedException('Name mismatch');
+    }
+
+    $this->_entityIds = $info['civiAfformSubmission']['data'];
+  }
+
+  private function getEntityApiName(): string {
     $afformEntity = $this->_formDataModel->getEntity($this->modelName);
-    $apiEntity = $this->joinEntity ?: $afformEntity['type'];
+    return $this->joinEntity ?: $afformEntity['type'];
+  }
+
+  private function getEntityId(): mixed {
+    $apiEntity = $this->getEntityApiName();
     $entityIndex = (int) $this->entityIndex;
     $joinIndex = (int) $this->joinIndex;
     $idField = CoreUtil::getIdFieldName($apiEntity);
@@ -79,43 +131,59 @@ class SubmitFile extends AbstractProcessor {
     if (!$entityId) {
       throw new \CRM_Core_Exception('Entity not found');
     }
+    return $entityId;
+  }
 
-    $file = civicrm_api3('Attachment', 'create', [
-      'entity_id' => $entityId,
-      'entity_table' => CoreUtil::getTableName($apiEntity),
-      'mime_type' => $_FILES['file']['type'],
-      'name' => $_FILES['file']['name'],
-      'options' => [
-        'move-file' => $_FILES['file']['tmp_name'],
-      ],
-    ]);
-
+  private function updateEntity(mixed $entityId, int $fileId): array {
+    $apiEntity = $this->getEntityApiName();
+    $idField = CoreUtil::getIdFieldName($apiEntity);
     civicrm_api4($apiEntity, 'update', [
       'values' => [
         $idField => $entityId,
-        $this->fieldName => $file['id'],
+        $this->fieldName => $fileId,
       ],
       'checkPermissions' => FALSE,
     ]);
-
     return [];
   }
 
-  /**
-   * Load entityIds from web token
-   */
-  protected function loadEntities() {
-    /** @var \Civi\Crypto\CryptoJwt $jwt */
-    $jwt = \Civi::service('crypto.jwt');
+  private function getDraft(): array {
+    $cid = \CRM_Core_Session::getLoggedInContactID();
+    if (!$cid) {
+      throw new UnauthorizedException('Only authenticated users may save a draft.');
+    }
+    $draft = AfformSubmission::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addWhere('status_id:name', '=', 'Draft')
+      ->addWhere('afform_name', '=', $this->getName())
+      ->execute()->first();
+    if (!$draft) {
+      throw new \CRM_Core_Exception('Draft not found');
+    }
+    return $draft;
+  }
 
-    // Double-decode is needed to convert PHP objects to arrays
-    $info = json_decode(json_encode($jwt->decode($this->token)), TRUE);
+  private function updateDraft(array $draft, int $fileId): array {
+    $fileInfo = $this->getFileInfo($fileId);
 
-    if ($info['civiAfformSubmission']['name'] !== $this->getName()) {
-      throw new UnauthorizedException('Name mismatch');
+    // Place fileInfo into correct entity
+    $entityData =& $draft['data'][$this->modelName][$this->entityIndex];
+    if ($this->joinEntity) {
+      $entityData['joins'][$this->joinEntity][$this->joinIndex][$this->fieldName] = $fileInfo;
+    }
+    else {
+      $entityData['fields'][$this->fieldName] = $fileInfo;
     }
 
-    $this->_entityIds = $info['civiAfformSubmission']['data'];
+    AfformSubmission::save(FALSE)
+      ->addRecord($draft)
+      ->execute();
+
+    return [$fileInfo];
+  }
+
+  private function isDraft(): bool {
+    return empty($this->token);
   }
 
 }

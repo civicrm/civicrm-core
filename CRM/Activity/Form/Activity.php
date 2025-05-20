@@ -488,7 +488,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->_values['details'] = CRM_Utils_String::purifyHtml($this->_values['details'] ?? '');
       $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$this->_activityId}&action=view&cid={$this->_values['source_contact_id']}");
-      CRM_Utils_Recent::add(CRM_Utils_Array::value('subject', $this->_values, ts('(no subject)')),
+      CRM_Utils_Recent::add($this->_values['subject'] ?? ts('(no subject)'),
         $url,
         $this->_values['id'],
         'Activity',
@@ -877,14 +877,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $deleteParams = ['id' => $activityId];
         $moveToTrash = CRM_Case_BAO_Case::isCaseActivity($activityId);
         CRM_Activity_BAO_Activity::deleteActivity($deleteParams, $moveToTrash);
-
-        // delete tags for the entity
-        $tagParams = [
-          'entity_table' => 'civicrm_activity',
-          'entity_id' => $activityId,
-        ];
-
-        CRM_Core_BAO_EntityTag::del($tagParams);
       }
 
       CRM_Core_Session::setStatus(

@@ -153,13 +153,13 @@
   color: var(--crm-btn-success-text);
 }
 #bootstrap-theme .btn-danger {
-  background: var(--crm-btn-alert-bg);
-  color: var(--crm-btn-alert-text);
+  background: var(--crm-btn-danger-bg);
+  color: var(--crm-btn-danger-text);
 }
 #bootstrap-theme .btn.btn-danger:hover,
 #bootstrap-theme .btn.btn-danger:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-alert-bg);
-  color: var(--crm-btn-alert-text);
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-danger-bg);
+  color: var(--crm-btn-danger-text);
 }
 
 /* BS3 size options */
@@ -297,9 +297,11 @@
 
 /* BS3 Button groups and dropdowns  */
 
-#bootstrap-theme td.text-right:has(.btn + .btn) {
+#bootstrap-theme td.text-right:has(.btn + .btn),
+.crm-container .crm-buttons {
   display: flex;
   gap: var(--crm-s);
+  flex-wrap: wrap;
 }
 #bootstrap-theme td.text-right:has(.btn + .btn) {
   justify-content: end;

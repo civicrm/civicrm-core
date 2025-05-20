@@ -161,6 +161,10 @@
       loadAfforms();
     };
 
+    this.displayIsViewable = function (display) {
+      return display.id && (ctrl.displayTypes[display.type] && ctrl.displayTypes[display.type].grouping !== 'non-viewable');
+    };
+
     this.canAddSmartGroup = function() {
       return !ctrl.savedSearch.groups.length && !ctrl.savedSearch.is_template;
     };

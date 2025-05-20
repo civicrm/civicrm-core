@@ -16,11 +16,14 @@
   </urls>
   <releaseDate>[civicrm.releaseDate]</releaseDate>
   <version>[civicrm.version]</version>
-  <develStage>alpha</develStage>
+  <develStage>stable</develStage>
+  <tags>
+    <tag>mgmt:required</tag>
+  </tags>
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
-  <comments>This extension contains import functionality which was previously in CiviCRM Core. If you use the import functionality it is recommended to enable this extension.</comments>
+  <comments>CiviCRM import functionality</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
     <ext>org.civicrm.search_kit</ext>

@@ -49,6 +49,9 @@
 .crm-container .crm-summary-group .crm-section .label {
   width: 40%;
 }
+.crm-container .crm-summary-group .crm-section .content {
+  margin-left: 40%;
+}
 .crm-container .radio-inline label,
 .crm-container .checkbox-inline label {
   font-family: inherit;
@@ -85,7 +88,7 @@
   margin-bottom: var(--crm-flex-gap);
 }
 .crm-container .crm-marker {
-  color: var(--crm-c-alert);
+  color: var(--crm-notify-danger);
 }
 .crm-container .form-inline {
   padding: var(--crm-s) 0;
@@ -115,7 +118,7 @@
 
 /* Required Mark */
 .crm-container .required-mark::after {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
   content: "*";
   margin-left: var(--crm-s);
 }
@@ -182,7 +185,7 @@ select.crm-form-select:focus,
 .crm-container input.error,
 input.crm-error,
 select.crm-error {
-  border-color: var(--crm-c-alert);
+  border-color: var(--crm-c-danger);
 }
 .crm-container :focus,
 .crm-container .ui-dialog :focus {
@@ -261,7 +264,7 @@ input.crm-form-entityref {
   color: var(--crm-c-success) !important;
 }
 .crm-container .crm-editable-form [type="cancel"] {
-  color: var(--crm-c-alert) !important;
+  color: var(--crm-c-danger) !important;
 }
 /* in place edit  */
 .crm-container .crm-inline-edit,
@@ -682,7 +685,7 @@ input.crm-form-checkbox) + label {
   gap: var(--crm-xs);
 }
 .crm-form-date-wrapper {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   flex-flow: wrap;
   gap: var(--crm-flex-gap);
@@ -774,7 +777,6 @@ input.crm-form-checkbox) + label {
 }
 .ui-datepicker-calendar [data-handler],
 .ui-datepicker-calendar .ui-state-disabled {
-  background-color: var(--crm-gray-50) !important;
   border: 0;
   font-size: var(--crm-small-font-size);
   opacity: 1;
@@ -796,6 +798,10 @@ input.crm-form-checkbox) + label {
   padding: var(--crm-s);
   text-align: center;
   color: var(--crm-c-text);
+}
+.ui-datepicker-today a {
+  background: var(--crm-c-gray-100) !important /* vs other bg */;
+  border-radius: var(--crm-roundness);
 }
 
 /* JQ spinner */

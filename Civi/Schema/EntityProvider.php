@@ -90,6 +90,10 @@ final class EntityProvider {
     return $this->getStorageProvider()->deleteRecords($records);
   }
 
+  public function getReferenceCounts (array $record): array {
+    return $this->getStorageProvider()->getReferenceCounts($record);
+  }
+
   private function getMetaProvider(): EntityMetadataInterface {
     if (!isset($this->meta)) {
       $entity = EntityRepository::getEntity($this->entityName);

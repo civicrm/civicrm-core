@@ -42,7 +42,7 @@ return [
     'type' => 'Array',
     'default' => [],
     'add' => '5.58',
-    'title' => ts('EXPERIMENTAL: Show Event Payment on Confirm?'),
+    'title' => ts('Show Event Payment on Confirm?'),
     'html_type' => 'select',
     'html_attributes' => [
       'class' => 'crm-select2',

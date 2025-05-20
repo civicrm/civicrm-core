@@ -112,7 +112,7 @@
         function displayDialog() {
           dialog.append(
             '<div class="icon-ctrls crm-clearfix">' +
-            '<input class="crm-form-text" name="search" placeholder="&#xf002"/>' +
+            '<input class="crm-form-text" name="search" placeholder="&#x1f50d;"/>' +
             '<select class="crm-form-select"></select>' +
             // Add "No Icon" button unless field is required
             ($input.is('[required]') ? '' : '<button type="button" class="cancel" title=""><i class="crm-i fa-ban" aria-hidden="true"></i> ' + ts('No icon') + '</button>') +

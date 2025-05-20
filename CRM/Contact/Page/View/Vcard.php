@@ -33,10 +33,9 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
 
     $params = [];
     $defaults = [];
-    $ids = [];
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
-    CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
+    CRM_Contact_BAO_Contact::retrieve($params, $defaults);
 
     // now that we have the contact's data - let's build the vCard
     // TODO: non-US-ASCII support (requires changes to the Contact_Vcard_Build class)

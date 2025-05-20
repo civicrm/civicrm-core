@@ -131,6 +131,7 @@
   border-top: var(--crm-c-divider);
   margin-block: var(--crm-s);
   border-radius: var(--crm-roundness);
+  position: relative;
 }
 .crm-search fieldset fieldset {
   padding-top: 0;
@@ -234,7 +235,6 @@ i.crm-i.crm-search-move-icon {
   max-width: 125px;
 }
 .crm-search-admin-edit-columns .crm-draggable > td.form-inline {
-  font-size: 0;
   padding-right: var(--crm-s);
 }
 .crm-search-admin-edit-columns .crm-draggable tfoot td.form-inline {

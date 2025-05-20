@@ -44,14 +44,14 @@
     <table>
       <tr><td>
         {if !empty($form.parent_id)}
-          <label>{ts}Has a Followup Activity?{/ts}</label>
+          <label>{ts}Has a Followup Activity{/ts}</label>
           <br/>
           {$form.parent_id.html}
         {/if}
       </td></tr>
       <tr><td>
       {if !empty($form.followup_parent_id)}
-          <label>{ts}Is a Followup Activity?{/ts}</label>
+          <label>{ts}Is a Followup Activity{/ts}</label>
           <br/>
           {$form.followup_parent_id.html}
         {/if}

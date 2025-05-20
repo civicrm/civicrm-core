@@ -274,11 +274,8 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   protected function submitForm(array $formValues, int $eventID): void {
-    $form = $this->getFormObject('CRM_Event_Form_ManageEvent_Location', array_merge($this->getFormValues(), $formValues));
-    $form->set('id', $eventID);
-    $form->preProcess();
-    $form->buildQuickForm();
-    $form->postProcess();
+    $form = $this->getTestForm('CRM_Event_Form_ManageEvent_Location', array_merge($this->getFormValues(), $formValues), ['id' => $eventID]);
+    $form->processForm();
   }
 
 }

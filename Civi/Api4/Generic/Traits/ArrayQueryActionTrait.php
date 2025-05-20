@@ -243,21 +243,24 @@ trait ArrayQueryActionTrait {
    * @return array
    */
   protected function selectArray($values) {
-    if ($this->getSelect() === ['row_count']) {
+    $select = $this->getSelect();
+    if ($select === ['row_count']) {
       $values = [['row_count' => count($values)]];
     }
-    elseif ($this->getSelect()) {
+    elseif ($values && $select) {
       // Return only fields specified by SELECT
+      $keys = array_flip($select);
       foreach ($values as &$value) {
-        $value = array_intersect_key($value, array_flip($this->getSelect()));
+        $value = array_intersect_key($value, $keys);
       }
     }
-    else {
+    elseif ($values) {
       // With no SELECT specified, return all values that are keyed by plain field name; omit those with :pseudoconstant suffixes
-      foreach ($values as &$value) {
-        $value = array_filter($value, function($key) {
-          return !str_contains($key, ':');
-        }, ARRAY_FILTER_USE_KEY);
+      $keysWithSuffixes = array_filter(array_keys(\CRM_Utils_Array::first($values)), fn($key) => str_contains($key, ':'));
+      if ($keysWithSuffixes) {
+        foreach ($values as &$value) {
+          \CRM_Utils_Array::remove($value, $keysWithSuffixes);
+        }
       }
     }
     return $values;

@@ -82,3 +82,9 @@ af-form {
 .afform-directive:hover .af-admin-edit-form-link {
   opacity: 1;
 }
+
+/* Tabs */
+#bootstrap-theme .crm-tabset {
+  display: block;
+  padding: 10px;
+}

@@ -1084,6 +1084,9 @@ class CRM_Core_Permission {
       ],
       // managed by query object
       'get' => [],
+      'getMergedTo' => [],
+      'getMergedFrom' => [],
+
       // managed by _civicrm_api3_check_edit_permissions
       'update' => [],
       'duplicatecheck' => [
@@ -1825,7 +1828,7 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function isMultisiteEnabled() {
-    return (bool) Civi::settings()->get('is_enabled');
+    return (bool) Civi::settings()->get('multisite_is_enabled');
   }
 
   /**

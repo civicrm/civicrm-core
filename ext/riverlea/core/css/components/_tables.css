@@ -67,25 +67,28 @@ table.dataTable.order-column.stripe tbody tr.even > .sorting_1 {
   background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-table-even-row);
 }
 .crm-container .extension-installed {
-  background: var(--crm-c-green-light);
-  color: var(--crm-alert-text-help);
+  background: var(--crm-alert-success-bg);
+  color: var(--crm-alert-success-text);
 }
 .crm-container .extension-installed summary {
-  color: var(--crm-alert-text-help);
+  color: var(--crm-alert-success-text);
 }
 table.dataTable.display tbody tr.extension-installed.odd {
-  background: linear-gradient(to top,rgba(256,256,256,0.25),rgba(256,256,256,0.25)) var(--crm-c-green-light);
+  background: linear-gradient(to top,rgba(256,256,256,0.2),rgba(256,256,256,0.2)) var(--crm-alert-success-bg);
+}
+table.dataTable.display tbody tr.extension-installed.even:hover {
+  background: linear-gradient(to top,rgba(256,256,256,0.05),rgba(256,256,256,0.05)) var(--crm-alert-success-bg);
 }
 table.dataTable.display tbody tr.extension-installed.odd:hover {
-  background-color: var(--crm-table-odd-hover);
+  background: linear-gradient(to top,rgba(256,256,256,0.25),rgba(256,256,256,0.25)) var(--crm-alert-success-bg);
 }
 table.dataTable.display tbody tr.extension-installed.odd > .sorting_1,
 table.dataTable.order-column.stripe tbody tr.extension-installed.odd > .sorting_1 {
-  background: var(--crm-c-green-light) !important;
+  background: var(--crm-alert-success-bg) !important;
 }
 table.dataTable.display tbody tr.extension-installed.even > .sorting_1,
 table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting_1 {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-c-green-light);
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-alert-success-bg);
 }
 .crm-container td,
 .crm-container table.dataTable thead td {
@@ -95,7 +98,7 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
   border-right: var(--crm-table-column-border);
 }
 .crm-container table td:has(.btn-slide),
-.crm-container table td:not(.crm-case-date):has(.action-item) {
+.crm-container table:not(.crm-info-panel) td:not(.crm-case-date):has(.action-item) {
   text-align: right;
 }
 .crm-container table.crm-mailing-ab-table td:has(.action-item) {
@@ -401,8 +404,8 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table tr.success > th,
 .crm-container table tr.crm-row-ok,
 .crm-container table tr.crm-row-ok > td {
-  background-color: var(--crm-alert-background-help);
-  color: var(--crm-alert-text-help);
+  background-color: var(--crm-alert-success-bg);
+  color: var(--crm-alert-success-text);
 }
 .crm-container .table-hover > tbody > tr > td.success:hover,
 .crm-container .table-hover > tbody > tr > th.success:hover,
@@ -411,21 +414,21 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table-hover > tbody > tr.success:hover > th,
 .crm-container table tr.crm-row-ok:hover > td,
 .crm-container table tr.crm-row-ok > td:hover {
-  background-color: var(--crm-alert-border-help);
+  background-color: var(--crm-alert-success-border);
 }
 .crm-container .table td.warning,
 .crm-container .table th.warning,
 .crm-container .table tr.warning > td,
 .crm-container .table tr.warning > th {
-  background-color: var(--crm-alert-background-warning);
-  color: var(--crm-alert-text-warning);
+  background-color: var(--crm-alert-warning-bg);
+  color: var(--crm-alert-warning-text);
 }
 .crm-container .table-hover > tbody > tr > td.warning:hover,
 .crm-container .table-hover > tbody > tr > th.warning:hover,
 .crm-container .table-hover > tbody > tr.warning:hover > td,
 .crm-container .table-hover > tbody > tr:hover > .warning,
 .crm-container .table-hover > tbody > tr.warning:hover > th {
-  background-color: var(--crm-alert-border-warning);
+  background-color: var(--crm-alert-warning-border);
 }
 .crm-container .table td.danger,
 .crm-container .table th.danger,
@@ -435,8 +438,8 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container table tr.error,
 .crm-container table tr.crm-row-error,
 .crm-container table tr.crm-row-error > td {
-  background-color: var(--crm-alert-background-danger);
-  color: var(--crm-alert-text-danger);
+  background-color: var(--crm-alert-danger-bg);
+  color: var(--crm-alert-danger-text);
 }
 .crm-container .table-hover > tbody > tr > td.danger:hover,
 .crm-container .table-hover > tbody > tr > th.danger:hover,
@@ -445,7 +448,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table-hover > tbody > tr.danger:hover > th,
 .crm-container table tr.crm-row-error:hover > td,
 .crm-container table tr.crm-row-error > td:hover {
-  background-color: var(--crm-alert-border-danger);
+  background-color: var(--crm-alert-danger-border);
 }
 .crm-container .table td.info,
 .crm-container .table th.info,
@@ -453,8 +456,8 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table tr.info > th,
 .crm-container table tr.crm-row-selected,
 .crm-container table tr.crm-row-selected > td {
-  background-color: var(--crm-alert-background-info);
-  color: var(--crm-alert-text-info);
+  background-color: var(--crm-alert-info-bg);
+  color: var(--crm-alert-info-text);
 }
 .crm-container .table-hover > tbody > tr > td.info:hover,
 .crm-container .table-hover > tbody > tr > th.info:hover,
@@ -463,7 +466,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table-hover > tbody > tr.info:hover > th,
 .crm-container table tr.crm-row-selected:hover > td,
 .crm-container table tr.crm-row-selected > td:hover {
-  background-color: var(--crm-alert-border-info);
+  background-color: var(--crm-alert-info-border);
 }
 .crm-container .table-responsive {
   min-height: .01%;

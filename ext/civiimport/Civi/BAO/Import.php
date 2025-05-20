@@ -33,7 +33,7 @@ class Import extends CRM_Core_DAO {
    *
    * @var int
    */
-  protected $_id;
+  public $_id;
 
   /**
    * Primary key field.
@@ -107,9 +107,9 @@ class Import extends CRM_Core_DAO {
     $op = empty($record['_id']) ? 'create' : 'edit';
     $userJobID = $record['_user_job_id'];
     $entityName = 'Import_' . $userJobID;
-    $userJob = UserJob::get($record['check_permissions'])->addWhere('id', '=', $userJobID)->addSelect('metadata', 'job_type', 'created_id')->execute()->first();
+    $checkPermissions = (bool) ($record['check_permissions'] ?? FALSE);
 
-    $tableName = $userJob['metadata']['DataSource']['table_name'];
+    $tableName = self::getTableNameForUserJob($userJobID, $checkPermissions);
     CRM_Utils_Hook::pre($op, $entityName, $record['_id'] ?? NULL, $record);
     $fields = self::getAllFields($tableName);
     $instance = new self();
@@ -126,6 +126,41 @@ class Import extends CRM_Core_DAO {
     }
 
     CRM_Utils_Hook::post($op, $entityName, $instance->_id, $instance);
+
+    return $instance;
+  }
+
+  /**
+   * Delete a record from supplied params.
+   *
+   * @param array $record
+   *   'id' is required.
+   * @return static
+   * @throws CRM_Core_Exception
+   */
+  public static function deleteRecord(array $record) {
+    $idField = static::$_primaryKey[0];
+    $userJobID = $record['_user_job_id'];
+    $entityName = 'Import_' . $userJobID;
+    if (empty($record[$idField])) {
+      throw new CRM_Core_Exception("Cannot delete {$entityName} with no $idField.");
+    }
+    CRM_Utils_Type::validate($record[$idField], 'Positive');
+    $checkPermissions = (bool) ($record['check_permissions'] ?? FALSE);
+
+    CRM_Utils_Hook::pre('delete', $entityName, $record[$idField], $record);
+    $instance = new self();
+    $instance->__table = self::getTableNameForUserJob($userJobID);
+    $instance->$idField = $record[$idField];
+    // Load complete object for the sake of hook_civicrm_post, below
+    $instance->find(TRUE);
+    if (!$instance || !$instance->delete()) {
+      throw new CRM_Core_Exception("Could not delete {$entityName} $idField {$record[$idField]}");
+    }
+    // For other operations this hook is passed an incomplete object and hook listeners can load if needed.
+    // But that's not possible with delete because it's gone from the database by the time this hook is called.
+    // So in this case the object has been pre-loaded so hook listeners have access to the complete record.
+    CRM_Utils_Hook::post('delete', $entityName, $record[$idField], $instance, $record);
 
     return $instance;
   }
@@ -151,10 +186,13 @@ class Import extends CRM_Core_DAO {
     }
     $columns = [];
     $userJob = UserJob::get(FALSE)
-      ->addWhere('metadata', 'LIKE', '%' . $tableName . '%')
+      ->addWhere('metadata', 'LIKE', '%"table_name":"' . $tableName . '"%')
       ->addSelect('metadata', 'job_type')->execute()->first();
     $headers = $userJob['metadata']['DataSource']['column_headers'] ?? [];
-    $entity = \CRM_Core_BAO_UserJob::getType($userJob['job_type'])['entity'];
+    $parserClass = \CRM_Core_BAO_UserJob::getTypeValue($userJob['job_type'], 'class');
+    $parser = new $parserClass();
+    $parser->setUserJobID($userJob['id']);
+    $entity = $parser->getBaseEntity();
 
     try {
       $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
@@ -170,7 +208,7 @@ class Import extends CRM_Core_DAO {
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
       if (!str_starts_with($result->Field, '_')) {
-        $columns[$result->Field]['label'] = ts('Import field') . ':' . ($headers[$userFieldIndex] ?? $result->Field);
+        $columns[$result->Field]['label'] = ts('Import field') . ': ' . ($headers[$userFieldIndex] ?? $result->Field);
         $columns[$result->Field]['data_type'] = 'String';
         $userFieldIndex++;
       }
@@ -198,11 +236,7 @@ class Import extends CRM_Core_DAO {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getFieldsForUserJobID(int $userJobID, bool $checkPermissions = TRUE): array {
-    $userJob = UserJob::get($checkPermissions)
-      ->addWhere('id', '=', $userJobID)
-      ->addSelect('created_id.display_name', 'created_id', 'metadata')
-      ->execute()->first();
-    $tableName = $userJob['metadata']['DataSource']['table_name'];
+    $tableName = self::getTableNameForUserJob($userJobID, $checkPermissions);
     return self::getAllFields($tableName);
   }
 
@@ -216,6 +250,27 @@ class Import extends CRM_Core_DAO {
    */
   public static function tableHasBeenAdded(): bool {
     return TRUE;
+  }
+
+  public static function getTableNameForUserJob(int $userJobID, bool $checkPermissions = FALSE): string {
+    $perm = (int) $checkPermissions;
+    if (isset(\Civi::$statics[__METHOD__][$perm][$userJobID])) {
+      return \Civi::$statics[__METHOD__][$perm][$userJobID];
+    }
+    $userJob = UserJob::get($checkPermissions)
+      ->addWhere('id', '=', $userJobID)
+      ->addSelect('metadata')
+      ->execute()->first();
+    if (!$userJob && $checkPermissions) {
+      throw new \Civi\API\Exception\UnauthorizedException('User does not have access to this import');
+    }
+    $tableName = $userJob['metadata']['DataSource']['table_name'] ?? NULL;
+    if (!$tableName) {
+      throw new \CRM_Core_Exception('Import table not found');
+    }
+    \Civi::$statics[__METHOD__][$perm][$userJobID] = $tableName;
+    \Civi::$statics[__METHOD__][0][$userJobID] = $tableName;
+    return $tableName;
   }
 
   /**

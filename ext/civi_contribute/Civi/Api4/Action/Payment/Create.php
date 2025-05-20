@@ -169,9 +169,7 @@ class Create extends \Civi\Api4\Generic\AbstractCreateAction {
     $savedRecords = [];
     $savedRecords[] = $this->baoToArray($trxn, $this->values);
     \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($savedRecords);
-    foreach ($savedRecords as &$row) {
-      FormattingUtil::formatOutputValues($row, $this->entityFields());
-    }
+    FormattingUtil::formatOutputValues($savedRecords, $this->entityFields());
     $result->exchangeArray($savedRecords);
   }
 

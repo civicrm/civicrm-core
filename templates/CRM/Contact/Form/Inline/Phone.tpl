@@ -29,7 +29,7 @@
     </tr>
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
-    <tr id="Phone_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
+      <tr data-entity='phone' data-block-number={$blockId} id="Phone_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
         <td>{$form.phone.$blockId.phone.html}<span class="crm-phone-ext"> {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</span></td>
         <td>{$form.phone.$blockId.location_type_id.html}</td>
         <td>{$form.phone.$blockId.phone_type_id.html}</td>
@@ -39,6 +39,7 @@
             <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
           {/if}
         </td>
+        {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=phone customFields=$custom_fields_phone blockId=$blockId actualBlockCount=$actualBlockCount}
     </tr>
     {/section}
 </table>

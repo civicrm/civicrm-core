@@ -3,7 +3,7 @@
 use Civi\Api4\Import;
 use Civi\Api4\UserJob;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\CiviEnvBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -68,10 +68,10 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ],
         'import_mappings' => [
-          ['name' => 'external_identifier'],
-          ['name' => 'total_amount'],
-          ['name' => 'receive_date'],
-          ['name' => 'financial_type_id'],
+          ['name' => 'Contact.external_identifier'],
+          ['name' => 'Contribution.total_amount'],
+          ['name' => 'Contribution.receive_date'],
+          ['name' => 'Contribution.financial_type_id'],
           [],
         ],
       ],

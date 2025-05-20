@@ -152,10 +152,21 @@ class CRM_Core_Session {
   /**
    * Resets the session store.
    *
-   * @param int $all
+   * @param int|string $mode
+   *   1: Default mode. Deletes the `CiviCRM` data from $_SESSION.
+   *   2: More invasive version of that. (somehow)
+   *   'keep_login': Less invasive. Preserve basic data (current user ID) from this session. Reset everything else.
    */
-  public function reset($all = 1) {
-    if ($all != 1) {
+  public function reset($mode = 1) {
+    if ($mode === 'keep_login') {
+      if (!empty($this->_session[$this->_key])) {
+        $this->_session[$this->_key] = CRM_Utils_Array::subset(
+          $this->_session[$this->_key],
+          ['ufID', 'userID', 'authx']
+        );
+      }
+    }
+    elseif ($mode != 1) {
       $this->initialize();
 
       // to make certain we clear it, first initialize it to empty

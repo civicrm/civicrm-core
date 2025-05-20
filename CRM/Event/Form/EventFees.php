@@ -51,11 +51,11 @@ class CRM_Event_Form_EventFees {
   /**
    * This function sets the default values for the form in edit/view mode.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Event_Form_Participant|\CRM_Event_Form_Registration_AdditionalParticipant|\CRM_Event_Form_Registration_Register $form
    *
    * @return array
    */
-  public static function setDefaultValues(&$form) {
+  public static function setDefaultValues($form): array {
     $defaults = [];
     $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
 

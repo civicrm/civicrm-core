@@ -23,7 +23,7 @@ if (!defined('CIVI_SETUP')) {
     // more surgical approach would get messy (due to variations of session-encoding),
     // and... it seems to work...
 
-    db_query('UPDATE sessions SET session = NULL');
+    db_query('UPDATE sessions SET session = ?', ['']);
 
     //    foreach(db_query('SELECT sid FROM sessions') as $sid) {
     //      $sessionResult = db_query('SELECT session FROM sessions WHERE sid = :sid', array(

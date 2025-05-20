@@ -42,7 +42,6 @@
     {/if}
   {/if}
   <div class="crm-block crm-form-block crm-member-membershiprenew-form-block">
-    <div>{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
       <tr class="crm-member-membershiprenew-form-block-contact-id">
         <td class="label">{$form.contact_id.label}</td>
@@ -119,10 +118,8 @@
     {/if}
 
     {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Membership' cid=false}
-
-    <div>{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-
     <div class="spacer"></div>
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </div>
   {if $accessContribution and ! $membershipMode}
     {include file="CRM/common/showHideByFieldValue.tpl"

@@ -6,9 +6,9 @@
 .crm-container .alert-success,
 .crm-container .status.crm-ok,
 .crm-container .status.crm-ok.alert {
-  background-color: var(--crm-alert-background-help);
-  border: var(--crm-alert-border-width) solid var(--crm-alert-border-help);
-  color: var(--crm-alert-text-help);
+  background-color: var(--crm-alert-success-bg);
+  border: var(--crm-alert-border-width) solid var(--crm-alert-success-border);
+  color: var(--crm-alert-success-text);
   margin: var(--crm-alert-margin);
   padding: var(--crm-alert-padding);
   border-radius: var(--crm-roundness);
@@ -20,44 +20,44 @@
 .crm-container .status p,
 .crm-container .messages p,
 .crm-container .alert p {
-  color: var(--crm-alert-text-help);
+  color: var(--crm-alert-success-text);
 }
 .crm-container .alert-warning p {
-  color: var(--crm-alert-text-warning);
+  color: var(--crm-alert-warning-text);
 }
 .crm-container .help li,
 .crm-container .status li,
 .crm-container .messages li {
-  color: var(--crm-alert-text-help);
+  color: var(--crm-alert-success-text);
   list-style: initial;
 }
 .crm-container .status.alert,
 .crm-container .alert-warning,
 .crm-container .messages.warning {
-  background-color: var(--crm-alert-background-warning);
-  border-color: var(--crm-alert-border-warning);
-  color: var(--crm-alert-text-warning);
+  background-color: var(--crm-alert-warning-bg);
+  border-color: var(--crm-alert-warning-border);
+  color: var(--crm-alert-warning-text);
 }
 .crm-container .status.error {
-  background-color: var(--crm-alert-background-danger);
-  border-color: var(--crm-alert-border-danger);
-  color: var(--crm-alert-text-danger);
+  background-color: var(--crm-alert-danger-bg);
+  border-color: var(--crm-alert-danger-border);
+  color: var(--crm-alert-danger-text);
 }
 .crm-container .status.alert li,
 .crm-container .alert-warning li,
 .crm-container .messages.warning li {
-  color: var(--crm-alert-text-warning);
+  color: var(--crm-alert-warning-text);
 }
 .crm-container .alert-info,
 .crm-container .messages.crm-empty-table {
-  background-color: var(--crm-alert-background-info);
-  border-color: var(--crm-alert-border-info);
-  color: var(--crm-alert-text-info);
+  background-color: var(--crm-alert-info-bg);
+  border-color: var(--crm-alert-info-border);
+  color: var(--crm-alert-info-text);
 }
 .crm-container .alert-danger {
-  background-color: var(--crm-alert-background-danger);
-  border-color: var(--crm-alert-border-danger);
-  color: var(--crm-alert-text-danger);
+  background-color: var(--crm-alert-danger-bg);
+  border-color: var(--crm-alert-danger-border);
+  color: var(--crm-alert-danger-text);
 }
 .crm-container .help a:not(.btn),
 .crm-container .messages a:not(.btn),

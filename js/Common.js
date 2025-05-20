@@ -617,7 +617,7 @@ if (!CRM.vars) CRM.vars = {};
           results: function(data) {
             return {
               results: data.values,
-              more: data.count > data.countFetched
+              more: data.countMatched > data.countFetched
             };
           },
         },
@@ -637,10 +637,12 @@ if (!CRM.vars) CRM.vars = {};
           // If we already have the data, just return it
           if (!idsNeeded.length) {
             callback(multiple ? existing : existing[0]);
+            $el.trigger('initSelectionComplete');
           } else {
             var params = $.extend({}, getApiParams(), {ids: idsNeeded});
             CRM.api4(entityName, 'autocomplete', params).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
+              $el.trigger('initSelectionComplete');
             });
           }
         },

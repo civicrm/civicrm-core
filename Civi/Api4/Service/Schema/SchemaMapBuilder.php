@@ -129,10 +129,10 @@ class SchemaMapBuilder extends AutoService {
         $customTable->addTableLink('entity_id', $oldJoin);
       }
 
-      // Add joins for entityReference fields
+      // Add joins for fields with foreign keys
       foreach ($customGroup['fields'] as $field) {
-        if ($field['data_type'] === 'EntityReference' && isset($field['fk_entity'])) {
-          $targetEntity = $field['fk_entity'];
+        $targetEntity = \CRM_Core_BAO_CustomField::getFkEntity($field);
+        if ($targetEntity) {
           $targetTable = self::getTableName($targetEntity);
           if (!$targetTable) {
             // the target entity doesn't exist - skip to avoid crashing
@@ -140,11 +140,6 @@ class SchemaMapBuilder extends AutoService {
             continue;
           }
           $joinable = new Joinable($targetTable, 'id', $field['name']);
-          $customTable->addTableLink($field['column_name'], $joinable);
-        }
-
-        if ($field['data_type'] === 'ContactReference') {
-          $joinable = new Joinable('civicrm_contact', 'id', $field['name']);
           if ($field['serialize']) {
             $joinable->setSerialize((int) $field['serialize']);
           }

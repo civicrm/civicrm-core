@@ -46,15 +46,6 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   protected $grouping = NULL;
 
   /**
-   * Possibly always null.... maybe $_title is used...
-   *
-   * The relationship between this & $_title is ambigous & seemingly not worked through.
-   *
-   * @var string
-   */
-  protected $title;
-
-  /**
    * ID of parent report template if list is filtered by template.
    *
    * @var int
@@ -81,9 +72,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    * @return array
    */
   public function info() {
-
     $report = '';
     $queryParams = [];
+
+    // Needed later for translating component names
+    $components = CRM_Core_Component::getComponents();
 
     if ($this->ovID) {
       $report .= " AND v.id = %1 ";
@@ -165,7 +158,6 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       if (!($enabled && CRM_Report_Utils_Report::isInstanceGroupRoleAllowed($dao->id))) {
         continue;
       }
-
       if (trim($dao->title ?? '')) {
         if ($this->ovID) {
           $this->title = ts("Report(s) created from the template: %1", [1 => $dao->label]);
@@ -175,12 +167,25 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         if ($dao->owner_id != NULL) {
           $report_grouping = $my_reports_grouping;
         }
-        $rows[$report_grouping][$dao->id]['title'] = $dao->title;
-        $rows[$report_grouping][$dao->id]['label'] = $dao->label;
-        $rows[$report_grouping][$dao->id]['description'] = $dao->description;
-        $rows[$report_grouping][$dao->id]['url'] = CRM_Utils_System::url("{$url}/{$dao->id}", "reset=1&output=criteria");
-        $rows[$report_grouping][$dao->id]['viewUrl'] = CRM_Utils_System::url("{$url}/{$dao->id}", 'force=1&reset=1');
-        $rows[$report_grouping][$dao->id]['actions'] = $this->getActionLinks($dao->id, $dao->class_name);
+
+        // Display a translated label, if possible
+        if (empty($rows[$report_grouping]['label'])) {
+          $label = $dao->compName;
+          if (!empty($components['Civi' . $report_grouping])) {
+            $label = $components['Civi' . $dao->compName]->info['translatedName'] ?? $dao->compName;
+          }
+          if ($report_grouping == 'Contact') {
+            $label = ts('Contacts');
+          }
+          $rows[$report_grouping]['label'] = $label;
+        }
+
+        $rows[$report_grouping]['list'][$dao->id]['title'] = $dao->title;
+        $rows[$report_grouping]['list'][$dao->id]['label'] = $dao->label;
+        $rows[$report_grouping]['list'][$dao->id]['description'] = $dao->description;
+        $rows[$report_grouping]['list'][$dao->id]['url'] = CRM_Utils_System::url("{$url}/{$dao->id}", "reset=1&output=criteria");
+        $rows[$report_grouping]['list'][$dao->id]['viewUrl'] = CRM_Utils_System::url("{$url}/{$dao->id}", 'force=1&reset=1');
+        $rows[$report_grouping]['list'][$dao->id]['actions'] = $this->getActionLinks($dao->id, $dao->class_name);
       }
     }
     // Move My Reports to the beginning of the reports list
@@ -203,7 +208,6 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     $this->grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
 
     $rows = $this->info();
-    $this->assign('title', $this->title);
     $this->assign('list', $rows);
     if ($this->ovID or $this->compID) {
       // link to view all reports

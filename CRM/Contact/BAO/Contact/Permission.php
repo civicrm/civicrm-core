@@ -210,8 +210,17 @@ WHERE contact_a.id = %1 AND $permission
     //   that somebody might flush the cache away from under our feet,
     //   but the alternative would be a SQL call every time this is called,
     //   and a complete rebuild if the result was an empty set...
+    $currentDomainID = CRM_Core_Config::domainID();
     if (!isset(Civi::$statics[__CLASS__]['processed'])) {
       Civi::$statics[__CLASS__]['processed'] = [
+        $currentDomainID => [
+          CRM_Core_Permission::VIEW => [],
+          CRM_Core_Permission::EDIT => [],
+        ],
+      ];
+    }
+    elseif (!isset(Civi::$statics[__CLASS__]['processed'][$currentDomainID])) {
+      Civi::$statics[__CLASS__]['processed'][$currentDomainID] = [
         CRM_Core_Permission::VIEW => [],
         CRM_Core_Permission::EDIT => [],
       ];
@@ -225,11 +234,11 @@ WHERE contact_a.id = %1 AND $permission
       $operationClause = " operation = 'Edit' ";
       $operation = 'Edit';
     }
-    $queryParams = [1 => [$userID, 'Integer']];
+    $queryParams = [1 => [$userID, 'Integer'], 2 => [$currentDomainID, 'Integer']];
 
     if (!$force) {
       // skip if already calculated
-      if (!empty(Civi::$statics[__CLASS__]['processed'][$type][$userID])) {
+      if (!empty(Civi::$statics[__CLASS__]['processed'][$currentDomainID][$type][$userID])) {
         // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called. Operation: $operation; UserID: $userID");
         return;
       }
@@ -258,10 +267,11 @@ SELECT count(*)
 FROM   civicrm_acl_contact_cache
 WHERE  user_id = %1
 AND    $operationClause
+AND domain_id = %2
 ";
       $count = CRM_Core_DAO::singleValueQuery($sql, $queryParams);
       if ($count > 0) {
-        Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
+        Civi::$statics[__CLASS__]['processed'][$currentDomainID][$type][$userID] = 1;
         $lock->release();
         // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called via check query. Operation: $operation; UserID: $userID");
         return;
@@ -289,19 +299,20 @@ AND    $operationClause
     AND ac.user_id IS NULL
     ";*/
     $sql = " $from WHERE    $permission";
-    $sql = "SELECT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation" . $sql . ' GROUP BY contact_a.id';
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
+    $sql = "SELECT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation, '{$currentDomainID}' as domain_id" . $sql . ' GROUP BY contact_a.id';
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache (user_id, contact_id, operation, domain_id) {$sql}");
 
     // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
     // the permission clause.
     if ($userID && (CRM_Core_Permission::check('edit my contact') ||
       ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')))) {
+      $queryParams[3] = [$operation, 'String'];
       if (!CRM_Core_DAO::singleValueQuery("
-        SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}' LIMIT 1", $queryParams)) {
-        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
+        SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = %3 AND domain_id = %2 LIMIT 1", $queryParams)) {
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation, domain_id ) VALUES(%1, %1, %3, %2)", $queryParams);
       }
     }
-    Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
+    Civi::$statics[__CLASS__]['processed'][$currentDomainID][$type][$userID] = 1;
     $lock->release();
   }
 
@@ -329,12 +340,13 @@ AND    $operationClause
 
     $contactID = (int) CRM_Core_Session::getLoggedInContactID();
     self::cache($contactID);
+    $domainID = CRM_Core_Config::domainID();
 
     if (is_array($contactAlias) && !empty($contactAlias)) {
       //More than one contact alias
       $clauses = [];
       foreach ($contactAlias as $k => $alias) {
-        $clauses[] = " INNER JOIN civicrm_acl_contact_cache aclContactCache_{$k} ON {$alias}.id = aclContactCache_{$k}.contact_id AND aclContactCache_{$k}.user_id = $contactID ";
+        $clauses[] = " INNER JOIN civicrm_acl_contact_cache aclContactCache_{$k} ON {$alias}.id = aclContactCache_{$k}.contact_id AND aclContactCache_{$k}.user_id = $contactID AND aclContactCache_{$k}.domain_id = {$domainID} ";
       }
 
       $fromClause = implode(" ", $clauses);
@@ -342,7 +354,7 @@ AND    $operationClause
     }
     else {
       $fromClause = " INNER JOIN civicrm_acl_contact_cache aclContactCache ON {$contactAlias}.id = aclContactCache.contact_id ";
-      $whereClause = " aclContactCache.user_id = $contactID";
+      $whereClause = " aclContactCache.user_id = $contactID AND aclContactCache.domain_id = {$domainID}";
       if (!CRM_Core_Permission::check('access deleted contacts')) {
         $whereClause .= " AND $contactAlias.is_deleted = 0";
       }
@@ -361,8 +373,9 @@ AND    $operationClause
   public static function cacheSubquery() {
     if (!CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])) {
       $contactID = (int) CRM_Core_Session::getLoggedInContactID();
+      $domainID = CRM_Core_Config::domainID();
       self::cache($contactID);
-      return "IN (SELECT contact_id FROM civicrm_acl_contact_cache WHERE user_id = $contactID)";
+      return "IN (SELECT contact_id FROM civicrm_acl_contact_cache WHERE user_id = $contactID AND domain_id = {$domainID})";
     }
     return NULL;
   }

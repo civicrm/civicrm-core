@@ -174,7 +174,7 @@
   text-decoration: underline;
 }
 #crm-notification-container div.ui-notify-message-style.error {
-  border-color: var(--crm-notify-alert);
+  border-color: var(--crm-notify-danger);
 }
 #crm-notification-container div.ui-notify-message-style.alert,
 #crm-notification-container div.ui-notify-message-style.warning {
@@ -220,7 +220,7 @@
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:focus {
-  background: var(--crm-notify-alert);
+  background: var(--crm-notify-danger);
   border: 0;
 }
 

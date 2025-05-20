@@ -201,10 +201,6 @@ class SiteEmailLegacyOptionValueAdapter extends AutoSubscriber {
     $entityNameProperty = $reflection->getProperty('_entityName');
     $entityNameProperty->setAccessible(TRUE);
     $entityNameProperty->setValue($apiRequest, 'SiteEmailAddress');
-    // Also reset $_entityFields
-    $entityFieldsProperty = $reflection->getProperty('_entityFields');
-    $entityFieldsProperty->setAccessible(TRUE);
-    $entityFieldsProperty->setValue($apiRequest, NULL);
     $allowedFields = array_keys(\Civi::entity('SiteEmailAddress')->getFields());
     if ($reflection->hasProperty('where')) {
       $where = $apiRequest->getWhere();

@@ -77,13 +77,14 @@ tests/output
 tests/phpunit/CiviTest/civicrm.settings.local.php
 tests/phpunit/CiviTest/truncate.xml
 tests/**/*.rtf.php
+tools/patches/dist
 tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html
 tools/tests/reports/testdox.txt
 tools/extensions/org.civicrm.contactlayout
 tools/extensions/phpstorm/.phpstorm.meta.php
-l10n
+/l10n
 vendor
 civicrm.settings.php
 sql/dummy_processor.mysql

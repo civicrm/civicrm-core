@@ -29,6 +29,7 @@
           <div class="crm-content crm-contact_im">{$item.name}</div>
         </div>
         {/if}
+        {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='im' customGroups=$item.custom identifier=$blockId}
       {/if}
     {/foreach}
    </div>

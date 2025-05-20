@@ -122,6 +122,22 @@ WHERE       ps.name = '{$priceSetName}'
   }
 
   /**
+   * Calculate the default price set id
+   * assigned to the contribution/membership etc
+   *
+   * @param string $entity
+   *
+   * @return int
+   *   default price set ID
+   *
+   */
+  public static function getDefaultPriceSetID(string $entity = 'contribution'): int {
+    $priceSet = self::getDefaultPriceSet($entity);
+    $first = reset($priceSet);
+    return (int) $first['setID'];
+  }
+
+  /**
    * Get the price set title.
    *
    * @param int $id
@@ -703,114 +719,6 @@ WHERE  id = %1";
       $cache->set($cacheKey, $data);
     }
     return $data;
-  }
-
-  /**
-   * Build the price set form.
-   *
-   * @param CRM_Core_Form $form
-   * @param string|null $component
-   * @param bool $validFieldsOnly
-   *
-   * @return void
-   *
-   * @deprecated since 5.68. Will be removed around 5.80.
-   */
-  public static function buildPriceSet(&$form, $component = NULL, $validFieldsOnly = TRUE) {
-    CRM_Core_Error::deprecatedWarning('internal function');
-    $priceSetId = $form->get('priceSetId');
-    if (!$priceSetId) {
-      return;
-    }
-
-    $className = CRM_Utils_System::getClassName($form);
-
-    $priceSet = self::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
-    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
-
-    // Mark which field should have the auto-renew checkbox, if any. CRM-18305
-    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
-      $autoRenewMembershipTypes = [];
-      foreach ($form->_membershipTypeValues as $membershipTypeValue) {
-        if ($membershipTypeValue['auto_renew']) {
-          $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
-        }
-      }
-      foreach ($form->_priceSet['fields'] as $field) {
-        if (array_key_exists('options', $field) && is_array($field['options'])) {
-          foreach ($field['options'] as $option) {
-            if (!empty($option['membership_type_id'])) {
-              if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
-                $form->_priceSet['auto_renew_membership_field'] = $field['id'];
-                // Only one field can offer auto_renew memberships, so break here.
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-    $form->_priceSet['id'] ??= $priceSetId;
-    $form->assign('priceSet', $form->_priceSet);
-
-    if ($className == 'CRM_Contribute_Form_Contribution_Main') {
-      $feeBlock = &$form->_values['fee'];
-    }
-    else {
-      $feeBlock = &$form->_priceSet['fields'];
-    }
-
-    // Call the buildAmount hook.
-    CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
-
-    $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
-    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
-    $checklifetime = FALSE;
-    foreach ($feeBlock as $id => $field) {
-      if (($field['visibility'] ?? NULL) == 'public' ||
-        (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
-        !$validFieldsOnly
-      ) {
-        $options = $field['options'] ?? NULL;
-        if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
-          $contactId = $form->getVar('_membershipContactID');
-          if ($contactId && $options) {
-            $contactsLifetimeMemberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
-            $contactsLifetimeMembershipTypes = array_column($contactsLifetimeMemberships, 'membership_type_id');
-            $memTypeIdsInPriceField = array_column($options, 'membership_type_id');
-            $isCurrentMember = (bool) array_intersect($memTypeIdsInPriceField, $contactsLifetimeMembershipTypes);
-            $checklifetime = $checklifetime ?: $isCurrentMember;
-          }
-        }
-
-        $formClasses = ['CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership'];
-
-        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
-          continue;
-        }
-        elseif ($hideAdminValues && !in_array($className, $formClasses)) {
-          foreach ($options as $key => $currentOption) {
-            if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
-              unset($options[$key]);
-            }
-          }
-        }
-        if (!empty($options)) {
-          CRM_Price_BAO_PriceField::addQuickFormElement($form,
-            'price_' . $field['id'],
-            $field['id'],
-            FALSE,
-            $field['is_required'] ?? FALSE,
-            NULL,
-            $options
-          );
-        }
-      }
-    }
-    $form->assign('ispricelifetime', $checklifetime);
-
   }
 
   /**
@@ -1603,6 +1511,26 @@ WHERE     ct.id = cp.financial_type_id AND
       $cacheKey = 'CRM_Price_BAO_PriceSetgetCachedPriceSetDetail_' . $priceSet['id'];
       $cache->delete($cacheKey);
     }
+  }
+
+  /**
+   * Whitelist of possible values for the entity_table field in PriceSetEntity
+   *
+   * @return array
+   */
+  public static function entityTables(): array {
+    return [
+      [
+        'id' => 'civicrm_contribution_page',
+        'name' => 'ContributionPage',
+        'label' => ts('Contribution Page'),
+      ],
+      [
+        'id' => 'civicrm_event',
+        'name' => 'Event',
+        'label' => ts('Event'),
+      ],
+    ];
   }
 
 }

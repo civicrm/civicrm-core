@@ -19,17 +19,7 @@ UPDATE IGNORE `civicrm_navigation` SET `name` = 'Register Your Site', `label` = 
 UPDATE civicrm_contribution_page SET `name` = `id`;
 
 -- Add name field, make frontend_title required (in conjunction with php function)
-{if $multilingual}
-  {foreach from=$locales item=locale}
-    UPDATE `civicrm_contribution_page`
-    SET `title_{$locale}` = ''
-    WHERE `title_{$locale}` IS NULL;
-
-    UPDATE `civicrm_contribution_page`
-    SET `frontend_title_{$locale}` = `title_{$locale}`
-    WHERE `frontend_title_{$locale}` IS NULL OR `frontend_title_{$locale}` = '';
-  {/foreach}
-{else}
+{localize field='title,frontend_title'}
   UPDATE `civicrm_contribution_page`
   SET `title` = ''
   WHERE `title` IS NULL;
@@ -37,4 +27,4 @@ UPDATE civicrm_contribution_page SET `name` = `id`;
   UPDATE `civicrm_contribution_page`
   SET `frontend_title` = `title`
   WHERE `frontend_title` IS NULL OR `frontend_title` = '';
-{/if}
+{/localize}

@@ -252,6 +252,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->assign('pay_later_receipt', '');
         // @fixme These functions all seem to do similar things but take one away and the house of cards falls down..
         $this->assignPaymentProcessor($this->_values['event']['is_pay_later']);
+        // This is required only after the form is submitted to repopulate form fields so that eg. credit card fields
+        //   can be retrieved via getSubmittedValue() from the ThankYou page. Otherwise they are lost.
+        $this->preProcessPaymentOptions();
         CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
         $this->addPaymentProcessorFieldsToForm();
       }
@@ -453,13 +456,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
       if ($this->isShowPaymentOnConfirm()) {
-        // "is_pay_later" may have been set by the registration page. Reset it here.
-        $params[$participantNum]['is_pay_later'] = 0;
-        // Again, here we have to use getSubmitValue because getSubmittedValue is not set.
-        if ($this->getSubmitValue('hidden_processor') === NULL || $this->getSubmitValue('payment_processor_id') == 0) {
-          // If we submitted with no payment processor then we must be pay later - set it here.
-          $params[$participantNum]['is_pay_later'] = 1;
-        }
+        // If payment_processor_id is 0 or unset we are pay later.
+        // Otherwise we are using a payment processor
+        $params[$participantNum]['is_pay_later'] = $this->_values['event']['is_pay_later'] = empty($this->getSubmittedValue('payment_processor_id'));
       }
     }
     $taxAmount = $totalTaxAmount;

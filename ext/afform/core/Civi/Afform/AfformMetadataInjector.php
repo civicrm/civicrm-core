@@ -170,14 +170,6 @@ class AfformMetadataInjector {
       unset($fieldInfo['options'], $fieldDefn['options']);
     }
 
-    if ($inputType === 'DisplayOnly' && isset($fieldDefn['afform_default'])) {
-      $fieldName = $fieldInfo['name'];
-      $defaultValue = \CRM_Utils_JS::decode($fieldDefn['afform_default']);
-      $defaultValue = Utils::formatViewValue($fieldName, $fieldInfo, [$fieldName => $defaultValue]);
-      $fieldDefn['afform_default'] = \CRM_Utils_JS::encode($defaultValue);
-      unset($fieldInfo['options'], $fieldDefn['options']);
-    }
-
     foreach ($fieldInfo as $name => $prop) {
       // Merge array props 1 level deep
       if (in_array($name, $deep) && !empty($fieldDefn[$name])) {

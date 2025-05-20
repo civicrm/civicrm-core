@@ -63,15 +63,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_feeBlock;
 
   /**
-   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields).
-   *
-   * This is rendered via billingBlock.tpl.
-   *
-   * @var array
-   */
-  public $_paymentFields = [];
-
-  /**
    * Is this submission incurring no costs.
    *
    * @param array $fields
@@ -408,9 +399,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->_waitlistMsg = ts("This event has only %1 space(s) left. If you continue and register more than %1 people (including yourself ), the whole group will be wait listed. Or, you can reduce the number of people you are registering to %1 to avoid being put on the waiting list.", [1 => $this->_availableRegistrations]);
 
       if ($this->_requireApproval) {
-        $this->_requireApprovalMsg = CRM_Utils_Array::value('approval_req_text', $this->_values['event'],
-          ts('Registration for this event requires approval. Once your registration(s) have been reviewed, you will receive an email with a link to a web page where you can complete the registration process.')
-        );
+        $this->_requireApprovalMsg = $this->_values['event']['approval_req_text'] ??
+          ts('Registration for this event requires approval. Once your registration(s) have been reviewed, you will receive an email with a link to a web page where you can complete the registration process.');
       }
     }
 
@@ -418,9 +408,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_requireApproval &&
       !$this->_allowWaitlist && !$bypassPayment
     ) {
-      $this->_requireApprovalMsg = CRM_Utils_Array::value('approval_req_text', $this->_values['event'],
-        ts('Registration for this event requires approval. Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.')
-      );
+      $this->_requireApprovalMsg = $this->_values['event']['approval_req_text'] ??
+        ts('Registration for this event requires approval. Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.');
     }
 
     //lets display status to primary page only.

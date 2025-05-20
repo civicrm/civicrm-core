@@ -77,15 +77,15 @@ class Api4SelectQuery extends Api4Query {
       $this->addSpecField($field['name'], $field);
     }
 
-    $tableName = CoreUtil::getTableName($this->getEntity());
-    $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
+    $tableExpr = CoreUtil::getTableExpr($this->getEntity());
+    $this->query = \CRM_Utils_SQL_Select::from($tableExpr . ' ' . self::MAIN_TABLE_ALIAS);
 
     $this->fillEntityValues();
 
     $this->entityAccess[$this->getEntity()] = TRUE;
 
     // Add ACLs first to avoid redundant subclauses
-    $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $this->getEntity(), [], $this->getWhere()));
+    $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $this->getEntity(), NULL, $this->getWhere()));
 
     // Add required conditions if specified by entity
     $requiredConditions = CoreUtil::getInfoItem($this->getEntity(), 'where') ?? [];
@@ -104,9 +104,7 @@ class Api4SelectQuery extends Api4Query {
    */
   public function run(): array {
     $results = $this->getResults();
-    foreach ($results as &$result) {
-      FormattingUtil::formatOutputValues($result, $this->apiFieldSpec, 'get', $this->selectAliases);
-    }
+    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases);
     return $results;
   }
 
@@ -329,18 +327,12 @@ class Api4SelectQuery extends Api4Query {
    *
    * @param string $tableAlias
    * @param string $entityName
-   * @param array $stack
+   * @param array|null $stack
    * @param array[] $conditions
    * @return array
    */
-  public function getAclClause($tableAlias, $entityName, $stack = [], $conditions = []) {
+  public function getAclClause(string $tableAlias, string $entityName, ?array $stack = NULL, array $conditions = []): array {
     if (!$this->getCheckPermissions()) {
-      return [];
-    }
-    // Prevent (most) redundant acl sub clauses if they have already been applied to the main entity.
-    // FIXME: Currently this only works 1 level deep, but tracking through multiple joins would increase complexity
-    // and just doing it for the first join takes care of most acl clause deduping.
-    if (count($stack) === 1 && in_array(reset($stack), $this->aclFields, TRUE)) {
       return [];
     }
     // Glean entity values from the WHERE or ON clause conditions
@@ -365,9 +357,32 @@ class Api4SelectQuery extends Api4Query {
     }
     $baoName = CoreUtil::getBAOFromApiName($entityName);
     $clauses = $baoName::getSelectWhereClause($tableAlias, $entityName, $entityValues);
-    if (!$stack) {
+    if ($stack === NULL) {
       // Track field clauses added to the main entity
       $this->aclFields = array_keys($clauses);
+    }
+    // Dedupe these clauses with ones that have already been applied to the entity being joined on
+    else {
+      $stackLast = array_pop($stack);
+      $stackPrev = array_pop($stack);
+      $lastField = $stackLast;
+      if ($stackLast && $stackPrev) {
+        // Implicit join
+        if (str_starts_with($lastField, "$stackPrev.")) {
+          $lastField = substr($lastField, strlen($stackPrev) + 1);
+        }
+        // Explicit join
+        elseif (str_starts_with($lastField, "$tableAlias.")) {
+          $lastField = substr($lastField, strlen($tableAlias) + 1);
+        }
+        foreach ($clauses as $fieldName => $clause) {
+          if ($fieldName === $lastField && in_array($stackPrev, $this->aclFields, TRUE)) {
+            unset($clauses[$fieldName]);
+            $this->aclFields[] = $stackLast;
+          }
+          $this->aclFields[] = $stackPrev . '.' . $fieldName;
+        }
+      }
     }
     return array_filter($clauses);
   }
@@ -488,7 +503,8 @@ class Api4SelectQuery extends Api4Query {
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
       $tableName = CoreUtil::getTableName($entity);
-      $this->startNewJoin($tableName, $alias);
+      $tableExpr = CoreUtil::getTableExpr($entity);
+      $this->startNewJoin($tableExpr, $alias);
       // Save join info to be retrieved by $this->getExplicitJoin()
       $joinOn = array_filter(array_filter($join, 'is_array'));
       $this->explicitJoins[$alias] = [
@@ -523,10 +539,8 @@ class Api4SelectQuery extends Api4Query {
    */
   private function getJoinConditions($joinTree, $joinEntity, $alias, $joinEntityFields) {
     $conditions = [];
-    // getAclClause() expects a stack of 1-to-1 join fields to help it dedupe, but this is more flexible,
-    // so unless this is a direct 1-to-1 join with the main entity, we'll just hack it
-    // with a padded empty stack to bypass its deduping.
-    $aclStack = [NULL, NULL];
+    // Used to dedupe acl clauses
+    $aclStack = [];
     // See if the ON clause already contains an FK reference to joinEntity
     $explicitFK = array_filter($joinTree, function($clause) use ($alias, $joinEntityFields, &$aclStack) {
       [$sideA, $op, $sideB] = array_pad((array) $clause, 3, NULL);
@@ -539,17 +553,18 @@ class Api4SelectQuery extends Api4Query {
         }
         $joinField = str_replace("$alias.", '', $expr);
         // Check for explicit link to FK entity (include entity_id for dynamic FKs)
-        // FIXME: This is just guessing. We ought to check the schema for all unique fields and foreign keys.
         if (
           // Unique field - might be a link FROM the other entity
+          // FIXME: This is just guessing. We ought to check the schema for all unique fields
           in_array($joinField, ['id', 'name'], TRUE) ||
           // FK field - might be a link TO the other entity
-          $joinField === 'entity_id' || !empty($joinEntityFields[$joinField]['fk_entity'])) {
-          // If the join links to a field on the main entity, ACL clauses can be deduped
-          if (preg_match('/^[_a-z0-9]+$/i', $clause[$otherSide])) {
-            $aclStack = [$clause[$otherSide]];
+          !empty($joinEntityFields[$joinField]['dfk_entities']) || !empty($joinEntityFields[$joinField]['fk_entity'])
+        ) {
+          // If the join links to a field on another entity
+          if (preg_match('/^[_a-z0-9.]+$/i', $clause[$otherSide])) {
+            $aclStack = [$clause[$otherSide], $expr];
+            return TRUE;
           }
-          return TRUE;
         }
       }
       return FALSE;
@@ -566,12 +581,12 @@ class Api4SelectQuery extends Api4Query {
         }
         elseif (str_starts_with($name, "$alias.") && substr_count($name, '.') === 1 && $field['fk_entity'] === $this->getEntity()) {
           $conditions[] = $this->treeWalkClauses([$name, '=', 'id'], 'ON');
-          $aclStack = ['id'];
+          $aclStack = ['id', $name];
         }
       }
       // Hmm, if we came up with > 1 condition, then it's ambiguous how it should be joined so we won't return anything but the generic ACLs
       if (count($conditions) > 1) {
-        $aclStack = [NULL, NULL];
+        $aclStack = [];
         $conditions = [];
       }
     }
@@ -603,13 +618,14 @@ class Api4SelectQuery extends Api4Query {
 
     $bridgeAlias = $alias . '_via_' . strtolower($bridgeEntity);
 
-    $joinTable = CoreUtil::getTableName($joinEntity);
-    [$bridgeTable, $baseRef, $joinRef] = $this->getBridgeRefs($bridgeEntity, $joinEntity);
+    $joinTableExpr = CoreUtil::getTableExpr($joinEntity);
+    $bridgeTableExpr = CoreUtil::getTableExpr($bridgeEntity);
+    [$baseRef, $joinRef] = $this->getBridgeRefs($bridgeEntity, $joinEntity);
 
     $this->registerBridgeJoinFields($bridgeEntity, $joinRef, $baseRef, $alias, $bridgeAlias);
 
     // Used to dedupe acl clauses
-    $aclStack = [NULL, NULL];
+    $aclStack = [];
 
     $linkConditions = $this->getBridgeLinkConditions($bridgeAlias, $alias, $joinEntity, $joinRef);
 
@@ -632,12 +648,12 @@ class Api4SelectQuery extends Api4Query {
     // Info needed for joining custom fields extending the bridge entity
     $this->explicitJoins[$alias]['bridge_table_alias'] = $bridgeAlias;
     // Invert the join so all nested joins will link to the bridge entity
-    $this->openJoin['table'] = $bridgeTable;
+    $this->openJoin['table'] = $bridgeTableExpr;
     $this->openJoin['alias'] = $bridgeAlias;
 
     // Add main table as inner join
     $innerConditions = array_merge($linkConditions, $acls);
-    $this->addJoin('INNER', $joinTable, $alias, $bridgeAlias, $innerConditions);
+    $this->addJoin('INNER', $joinTableExpr, $alias, $bridgeAlias, $innerConditions);
     return array_merge($outerConditions, $bridgeConditions);
   }
 
@@ -654,7 +670,6 @@ class Api4SelectQuery extends Api4Query {
     /** @var \CRM_Core_DAO $bridgeDAO */
     $bridgeDAO = CoreUtil::getInfoItem($bridgeEntity, 'dao');
     $bridgeEntityFields = \Civi\API\Request::create($bridgeEntity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()])->entityFields();
-    $bridgeTable = $bridgeDAO::getTableName();
 
     // Get the 2 bridge reference columns as CRM_Core_Reference_* objects
     $referenceColumns = $bridgeDAO::getReferenceColumns();
@@ -666,7 +681,7 @@ class Api4SelectQuery extends Api4Query {
         }
         foreach ($bridgeDAO::getReferenceColumns() as $baseRef) {
           if ($baseRef->getReferenceKey() === $bridges[$refKey]['to']) {
-            return [$bridgeTable, $baseRef, $joinRef];
+            return [$baseRef, $joinRef];
           }
         }
       }
@@ -744,7 +759,7 @@ class Api4SelectQuery extends Api4Query {
       if ($op === '=' && $sideB && ($sideA === "$alias.{$baseRef->getReferenceKey()}" || $sideB === "$alias.{$baseRef->getReferenceKey()}")) {
         $expr = $sideA === "$alias.{$baseRef->getReferenceKey()}" ? $sideB : $sideA;
         $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = " . $this->getExpression($expr)->render($this);
-        $aclStack = [$expr];
+        $aclStack = [$expr, $bridgeAlias . '.' . $baseRef->getReferenceKey()];
         return FALSE;
       }
       // Explicit link with dynamic "entity_table" column
@@ -761,7 +776,7 @@ class Api4SelectQuery extends Api4Query {
         throw new \CRM_Core_Exception("Unable to join $bridgeEntity to " . $this->getEntity());
       }
       $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = a.`{$baseRef->getTargetKey()}`";
-      $aclStack = [$baseRef->getTargetKey()];
+      $aclStack = [$baseRef->getTargetKey(), $bridgeAlias . '.' . $baseRef->getReferenceKey()];
       if ($baseRef->getTypeColumn()) {
         $dfkOption = array_search($this->getEntity(), $baseRef->getTargetEntities());
         $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = '$dfkOption'";
@@ -792,10 +807,11 @@ class Api4SelectQuery extends Api4Query {
     if ($explicitJoin) {
       $baseTableAlias = array_shift($pathArray);
     }
+    $explicitJoinPrefix = $explicitJoin ? $explicitJoin['alias'] . '.' : '';
 
     // Ensure joinTree array contains base table
     $this->joinTree[$baseTableAlias]['#table_alias'] = $baseTableAlias;
-    $this->joinTree[$baseTableAlias]['#path'] = $explicitJoin ? $baseTableAlias . '.' : '';
+    $this->joinTree[$baseTableAlias]['#path'] = $explicitJoinPrefix;
     // During iteration this variable will refer to the current position in the tree
     $joinTreeNode =& $this->joinTree[$baseTableAlias];
 
@@ -820,7 +836,13 @@ class Api4SelectQuery extends Api4Query {
       }
     }
 
+    // Used to dedupe acl clauses
+    if (isset($pathArray[0])) {
+      $aclStack = [$explicitJoinPrefix . $pathArray[0]];
+    }
+
     foreach ($joinPath as $joinName => $link) {
+      $aclStack[] = $joinName . '.' . $link->getTargetColumn();
       if (!isset($joinTreeNode[$joinName])) {
         $target = $link->getTargetTable();
         $tableAlias = $link->getAlias() . '_' . ++$this->autoJoinSuffix;
@@ -875,7 +897,7 @@ class Api4SelectQuery extends Api4Query {
         if (!$virtualField) {
           $conditions = $link->getConditionsForJoin($baseTableAlias, $tableAlias, $this->openJoin);
           if ($joinEntity) {
-            $conditions = array_merge($conditions, $this->getAclClause($tableAlias, $joinEntity, $joinPath));
+            $conditions = array_merge($conditions, $this->getAclClause($tableAlias, $joinEntity, $aclStack));
           }
           $this->addJoin('LEFT', $target, $tableAlias, $baseTableAlias, $conditions);
         }
@@ -889,9 +911,9 @@ class Api4SelectQuery extends Api4Query {
   /**
    * Begins a new join; as long as it's "open" then additional joins will nest inside it.
    */
-  private function startNewJoin(string $tableName, string $joinAlias): void {
+  private function startNewJoin(string $tableExpr, string $joinAlias): void {
     $this->openJoin = [
-      'table' => $tableName,
+      'table' => $tableExpr,
       'alias' => $joinAlias,
       'subjoins' => [],
     ];
@@ -899,33 +921,33 @@ class Api4SelectQuery extends Api4Query {
 
   private function finishJoin(string $side, $conditions): void {
     $tableAlias = $this->openJoin['alias'];
-    $tableName = $this->openJoin['table'];
+    $tableExpr = $this->openJoin['table'];
     $subjoinClause = '';
     foreach ($this->openJoin['subjoins'] as $subjoin) {
-      $subjoinClause .= " INNER JOIN `{$subjoin['table']}` `{$subjoin['alias']}` ON (" . implode(' AND ', $subjoin['conditions']) . ")";
+      $subjoinClause .= " INNER JOIN {$subjoin['table']} `{$subjoin['alias']}` ON (" . implode(' AND ', $subjoin['conditions']) . ")";
     }
-    $this->query->join($tableAlias, "$side JOIN (`$tableName` `$tableAlias`$subjoinClause) ON " . implode(' AND ', $conditions));
+    $this->query->join($tableAlias, "$side JOIN ($tableExpr `$tableAlias`$subjoinClause) ON " . implode(' AND ', $conditions));
     $this->openJoin = NULL;
   }
 
   /**
    * @param string $side
-   * @param string $tableName
+   * @param string $tableExpr
    * @param string $tableAlias
    * @param string $baseTableAlias
    * @param array $conditions
    */
-  private function addJoin(string $side, string $tableName, string $tableAlias, string $baseTableAlias, array $conditions): void {
+  private function addJoin(string $side, string $tableExpr, string $tableAlias, string $baseTableAlias, array $conditions): void {
     // If this join is based off the current open join, incorporate it
     if ($baseTableAlias === ($this->openJoin['alias'] ?? NULL)) {
       $this->openJoin['subjoins'][] = [
-        'table' => $tableName,
+        'table' => $tableExpr,
         'alias' => $tableAlias,
         'conditions' => $conditions,
       ];
     }
     else {
-      $this->query->join($tableAlias, "$side JOIN `$tableName` `$tableAlias` ON " . implode(' AND ', $conditions));
+      $this->query->join($tableAlias, "$side JOIN $tableExpr `$tableAlias` ON " . implode(' AND ', $conditions));
     }
   }
 

@@ -1,0 +1,1 @@
+Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821

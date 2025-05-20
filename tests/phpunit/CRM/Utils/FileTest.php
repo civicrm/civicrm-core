@@ -94,6 +94,55 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     unlink($newFile);
   }
 
+  public function testCreateDir() {
+    foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
+      $validNewPath = sys_get_temp_dir() . '/testCreateDir-' . uniqid();
+      $this->assertEquals(TRUE, CRM_Utils_File::createDir($validNewPath, $abortMode), 'Should create directory');
+      $this->assertTrue(is_dir($validNewPath));
+      @rmdir($validNewPath);
+    }
+
+    foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
+      $existingPath = __DIR__;
+      $this->assertEquals(NULL, CRM_Utils_File::createDir($existingPath, $abortMode), 'Does not need to create directory');
+    }
+  }
+
+  public function testCreateDir_invalidPath() {
+    $invalidPath = '/zzz';
+    $this->assertFalse(is_dir($invalidPath));
+
+    // If $abort=FALSE, then it simply returns outcome.
+    $this->assertEquals(FALSE, CRM_Utils_File::createDir($invalidPath, FALSE));
+    $this->assertFalse(is_dir($invalidPath));
+
+    // If $abort='exception', then it raises a normal exception.
+    try {
+      CRM_Utils_File::createDir($invalidPath, 'exception');
+      $this->fail('createDir() should throw exception when given invalid path');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertMatchesRegularExpression('/Failed to create directory: /', $e->getMessage());
+      $this->assertFalse(is_dir($invalidPath));
+    }
+
+    // If $abort=TRUE, then it prints+abends.
+    try {
+      try {
+        ob_start();
+        CRM_Utils_File::createDir($invalidPath, TRUE);
+      }
+      finally {
+        $capture = ob_get_clean();
+      }
+      $this->fail('createDir() should abend when given invalid path');
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertFalse(is_dir($invalidPath));
+      $this->assertMatchesRegularExpression('/Could not create directory/', $capture);
+    }
+  }
+
   public function fileNames() {
     $cases = [];
     $cases[] = ['helloworld.txt', TRUE];

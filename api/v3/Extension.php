@@ -200,6 +200,11 @@ function _civicrm_api3_extension_uninstall_spec(&$fields) {
 /**
  * Download and install an extension.
  *
+ * LIMITATIONS: This performs the download and system-flush as a single step. That works for
+ * downloading -new- extensions. However, for downloading -upgraded- extensions, it is
+ * error-prone (dev/core#3686, dev/core#5700). When developing a solution for upgrades,
+ * CRM_Extension_QueueDownloader will be more robust.
+ *
  * @param array $params
  *   Input parameters.
  *   - key: string, eg "com.example.myextension"

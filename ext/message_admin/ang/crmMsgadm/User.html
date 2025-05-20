@@ -1,5 +1,6 @@
 <div id="bootstrap-theme">
   <div crm-ui-debug="$ctrl"></div>
+  <span crm-ui-order="{var: 'myOrder', defaults: ['+msg_title']}"></span>
 
   <div ng-include="'~/crmMsgadm/ListNav.html'"></div>
 
@@ -16,14 +17,14 @@
   <table class="table table-striped">
     <thead>
     <tr>
-      <th>{{:: ts('Title') }}</th>
-      <th>{{:: ts('Subject') }}</th>
-      <th>{{:: ts('Enabled?') }}</th>
+      <th><a crm-ui-order-by="[myOrder, 'msg_title']">{{:: ts('Title') }}</a></th>
+      <th><a crm-ui-order-by="[myOrder, 'msg_subject']">{{:: ts('Subject') }}</a></th>
+      <th><a crm-ui-order-by="[myOrder, 'is_acctive']">{{:: ts('Enabled?') }}</a></th>
       <th></th>
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="record in $ctrl.records | filter:filters.text">
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:myOrder.get()">
       <td>{{record.msg_title}}</td>
       <td>{{record.msg_subject}}</td>
       <td>{{record.is_active ? ts('Yes') : ts('No')}}</td>

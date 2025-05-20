@@ -33,7 +33,7 @@ use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 
 /**
  * @group headless

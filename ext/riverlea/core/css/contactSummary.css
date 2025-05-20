@@ -199,6 +199,7 @@ div.crm-inline-edit-form div.crm-clear {
 .crm-container div.contactCardLeft,
 .crm-container div.contactCardRight {
   width: 100%;
+  overflow: auto;
 }
 .crm-container div.contact_panel table {
   margin-bottom: 0;
@@ -223,12 +224,6 @@ div.crm-inline-edit-form div.crm-clear {
   border-bottom: var(--crm-c-divider);
   border-width: 2px;
 }
-.crm-container div.contact_panel .crm-address-block {
-  margin-bottom: 6px;
-}
-.crm-container .crm-add-address-wrapper {
-  height: 25px;
-}
 .crm-container .crm-summary-row:after {
   clear: both;
   content: ".";
@@ -250,6 +245,11 @@ div.crm-inline-edit-form div.crm-clear {
   padding: var(--crm-m);
   min-width: var(--crm-input-label-width);
   text-align: left;
+}
+/* Prevent wide content over-spilling page */
+.crm-container div.crm-summary-row div.crm-label {
+  max-width: calc(100% - var(--crm-input-label-width));
+  overflow: auto;
 }
 .crm-container div.crm-summary-row div.crm-content {
   padding: var(--crm-m);
@@ -285,7 +285,7 @@ div.crm-inline-edit-form div.crm-clear {
 #crm-contact-actions-list ul a {
   display: block;
 }
-.crm-contact-crm-contact-delete {
+.crm-contact-actions-list-inner:not(:has(.crm-activity-type_6)) .crm-contact-crm-contact-delete {
   margin-top: auto;
 }
 #crm-contact-actions-list .crm-contact_activities-list select {
@@ -296,17 +296,17 @@ div.crm-inline-edit-form div.crm-clear {
   margin-bottom: .25em;
 }
 #crm-contact-actions-list a.delete {
-  background: var(--crm-dropdown-alert-bg);
-  color: var(--crm-c-alert-text);
+  background: var(--crm-dropdown-danger-bg);
+  color: var(--crm-c-danger-text);
   border-radius: var(--crm-roundness);
 }
 #crm-contact-actions-list a.delete .crm-i.fa-trash::before {
-  color: var(--crm-c-alert-text);
+  color: var(--crm-c-danger-text);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
-  color: var(--crm-c-alert-text);
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
+  color: var(--crm-c-danger-text);
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
 }
 
 /* Tags */

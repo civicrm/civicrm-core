@@ -103,6 +103,9 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
       $entityValues = \CRM_Utils_Array::filterByPrefix($item, $prefix);
       $this->transformCustomParams($entityValues, $dedupeParams);
       if ($entityValues) {
+        if ($entity == 'Phone' && array_key_exists('phone', $entityValues)) {
+          $entityValues['phone_numeric'] = preg_replace('/[^\d]/', '', $entityValues['phone']);
+        }
         $dedupeParams['civicrm_' . strtolower($entity)] = $entityValues;
       }
     }

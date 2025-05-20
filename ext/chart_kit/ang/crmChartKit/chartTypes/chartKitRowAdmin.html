@@ -14,33 +14,25 @@
         <label>
           {{:: ts('Maximum rows to show')}}
         </label>
-        <input
-          type="number"
-          class="form-control crm-search-display-chart-max-segments"
-          ng-model="$ctrl.display.settings.maxSegments"
-          />
+        <input type="number" class="form-control crm-search-display-chart-max-segments"
+          ng-model="$ctrl.display.settings.maxSegments" />
       </div>
       <div class="form-inline">
         <label>
-            {{:: ts('Order by')}}
+          {{:: ts('Order by')}}
         </label>
-        <select
-            class="form-control crm-search-display-chart-order-field"
-            ng-model="$ctrl.display.settings.chartOrderColIndex"
-            >
-            <option value="{{ column.index }}" ng-repeat="column in $ctrl.getColumns()">{{ column.label }}</option>
+        <select class="form-control crm-search-display-chart-order-field"
+          ng-model="$ctrl.display.settings.chartOrderColIndex">
+          <option value="{{ column.index }}" ng-repeat="column in $ctrl.getColumns()">{{ column.label }}</option>
         </select>
       </div>
       <div class="form-inline">
         <label>
-            {{:: ts('Order')}}
+          {{:: ts('Order')}}
         </label>
-        <select
-            class="form-control crm-search-display-chart-order-dir"
-            ng-model="$ctrl.display.settings.chartOrderDir"
-            >
-            <option value="ASC">Ascending</option>
-            <option value="DESC">Descending</option>
+        <select class="form-control crm-search-display-chart-order-dir" ng-model="$ctrl.display.settings.chartOrderDir">
+          <option value="ASC">Ascending</option>
+          <option value="DESC">Descending</option>
         </select>
       </div>
     </fieldset>

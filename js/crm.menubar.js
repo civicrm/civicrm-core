@@ -394,7 +394,9 @@
         }
       });
       $('#crm-qsearch form[name=search_block]').on('submit', function() {
-        if (!$('#crm-qsearch-input').val()) {
+        const searchValue = $('#crm-qsearch-input').val();
+        const searchkey = $('#crm-qsearch-input').attr('name');
+        if (!searchValue) {
           return false;
         }
         var $menu = $('#crm-qsearch-input').autocomplete('widget');
@@ -405,6 +407,12 @@
             document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: cid});
             return false;
           }
+        }
+        // Form redirects to Advanced Search, which does not automatically search with wildcards,
+        // aside from contact name.
+        // To get comparable results, append wildcard to the search term.
+        else if (searchkey !== 'sort_name' && searchkey !== 'id') {
+          $('#crm-qsearch-input').val(searchValue + '%');
         }
       });
       $('#civicrm-menu').on('show.smapi', function(e, menu) {
@@ -417,7 +425,7 @@
           label = $selection.parent().text(),
           // Set name because the mini-form submits directly to adv search
           value = $selection.data('advSearchLegacy') || $selection.val();
-        $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label, title: label});
+        $('#crm-qsearch-input').attr({name: value, placeholder: '\ud83d\udd0d ' + label, title: label});
       }
       $('.crm-quickSearchField').click(function() {
         var input = $('input', this);
@@ -466,7 +474,7 @@
         '<a href="#"> ' +
           '<form action="<%= CRM.url(\'civicrm/contact/search/advanced\') %>" name="search_block" method="post">' +
             '<div>' +
-              '<input type="text" id="crm-qsearch-input" name="sort_name" placeholder="\uf002" accesskey="q" />' +
+              '<input type="text" id="crm-qsearch-input" name="sort_name" placeholder="\ud83d\udd0d" accesskey="q" />' +
               '<input type="hidden" name="hidden_location" value="1" />' +
               '<input type="hidden" name="hidden_custom" value="1" />' +
               '<input type="hidden" name="qfKey" />' +

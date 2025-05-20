@@ -623,9 +623,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
             if ($url) {
               $customFiles[$name]['displayURL'] = ts("Attached File") . ": {$url['file_url']}";
 
-              $deleteExtra = ts("Are you sure you want to delete attached file?");
+              // FIXME: Yikes! Deleting records via GET request??
+              $deleteExtra = htmlentities(ts("Are you sure you want to delete attached file?"), ENT_QUOTES);
               $fileId = $url['file_id'];
-              $fileHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId);
+              $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileId);
               $deleteURL = CRM_Utils_System::url('civicrm/file',
                 "reset=1&id={$fileId}&eid=$entityId&fid={$key}&action=delete&fcs={$fileHash}"
               );
@@ -664,9 +665,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
             if ($url) {
               $customFiles[$field['name']]['displayURL'] = ts("Attached File") . ": {$url['file_url']}";
 
-              $deleteExtra = ts("Are you sure you want to delete attached file?");
+              // FIXME: Yikes! Deleting records via GET request??
+              $deleteExtra = htmlentities(ts("Are you sure you want to delete attached file?"), ENT_QUOTES);
               $fileId = $url['file_id'];
-              $fileHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId); /* fieldId=$customFieldID */
+              $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileId);
               $deleteURL = CRM_Utils_System::url('civicrm/file',
                 "reset=1&id={$fileId}&eid=$entityId&fid={$customFieldID}&action=delete&fcs={$fileHash}"
               );

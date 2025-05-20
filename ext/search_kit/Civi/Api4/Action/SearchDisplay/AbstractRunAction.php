@@ -135,7 +135,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * Transforms each row into an array of raw data and an array of formatted columns
    *
    * @param iterable $result
-   * @return array{data: array, columns: array}[]
+   * @return array{data: array, columns: array, key: int, cssClass: string}[]
    */
   protected function formatResult(iterable $result): array {
     $rows = [];
@@ -186,33 +186,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if (!empty($data[$key])) {
           $item = $this->getSelectExpression($key);
           if ($item['expr'] instanceof SqlField && isset($item['fields'][$key]) && $item['fields'][$key]['fk_entity'] === 'File') {
-            return $this->generateFileUrl($data[$key]);
+            return (string) \CRM_Core_BAO_File::getFileUrl($data[$key]);
           }
         }
         return $data[$key] ?? NULL;
     }
-  }
-
-  /**
-   * Convert file id to a readable url
-   *
-   * @param $fileID
-   * @return string
-   * @throws \CRM_Core_Exception
-   */
-  private function generateFileUrl($fileID) {
-    $entityId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile',
-      $fileID,
-      'entity_id',
-      'file_id'
-    );
-    $fileHash = \CRM_Core_BAO_File::generateFileHash($entityId, $fileID);
-    return $this->getUrl('civicrm/file', [
-      'reset' => 1,
-      'id' => $fileID,
-      'eid' => $entityId,
-      'fcs' => $fileHash,
-    ]);
   }
 
   /**
@@ -222,7 +200,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
    */
   private function formatColumn(array $column, array $data, array $settings) {
-    $column += ['rewrite' => NULL, 'label' => NULL, 'key' => ''];
+    $column += ['rewrite' => NULL, 'label' => NULL, 'key' => '', 'type' => NULL];
     $out = [];
     switch ($column['type']) {
       case 'field':
@@ -305,7 +283,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $cssClass[] = $column['alignment'];
     }
     if (!empty($column['show_linebreaks'])) {
-      $cssClass[] = 'crm-search-field-show-linebreaks';
+      if ($column['type'] === 'html') {
+        $out['val'] = nl2br($out['val']);
+      }
+      else {
+        $cssClass[] = 'crm-search-field-show-linebreaks';
+      }
     }
     if ($cssClass) {
       $out['cssClass'] = implode(' ', $cssClass);
@@ -590,6 +573,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function formatLink(array $link, array $data, bool $allowMultiple = FALSE, ?string $text = NULL, $index = 0): ?array {
     $useApi = (!empty($link['entity']) && !empty($link['action']));
+    $originalData = $data;
     if (isset($index)) {
       foreach ($data as $key => $value) {
         if (is_array($value)) {
@@ -618,6 +602,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     elseif (!$this->checkLinkAccess($link, $data)) {
       return NULL;
     }
+    // FIXME: We should use $originalData so button links can render tokens correctly. But
+    // this doesn't match the getLinks() behavior so is out of scope for now.
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
     if (!empty($link['task'])) {
       $keys = ['task', 'text', 'title', 'icon', 'style'];
@@ -627,7 +613,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if (($link['csrf'] ?? NULL) === 'qfKey') {
         $query['qfKey'] = $this->getQfKey($link['path']);
       }
-      $path = $this->replaceTokens($link['path'], $data, 'url');
+      // We use original data so that tokens which rely on array-based columns are correctly rendered.
+      $path = $this->replaceTokens($link['path'], $originalData, 'url');
       if (!$path) {
         // Return null if `$link[path]` is empty or if any tokens do not resolve
         return NULL;
@@ -1069,7 +1056,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     // Ensure either the display uses acl_bypass or the current user has access
     if ($editable['record']) {
-      if (!empty($this->display['settings']['acl_bypass'])) {
+      if (!empty($this->display['acl_bypass'])) {
         $access = TRUE;
       }
       else {
@@ -1135,7 +1122,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Reload field with correct action because `$this->getField()` uses 'get' as the action
       $createModeField = civicrm_api4($getModeField['entity'], 'getFields', [
         'where' => [['name', '=', $getModeField['name']]],
-        'checkPermissions' => empty($this->display['settings']['acl_bypass']),
+        'checkPermissions' => empty($this->display['acl_bypass']),
         'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
         'action' => 'create',
       ])->first() ?? [];

@@ -52,6 +52,7 @@ return [
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
       'description' => ts('Variable name/programmatic handle for this group.'),
+      'required' => TRUE,
       'add' => '1.1',
     ],
     'title' => [
@@ -70,6 +71,7 @@ return [
       'description' => ts('Type of object this group extends (can add other options later e.g. contact_address, etc.).'),
       'add' => '1.1',
       'default' => 'Contact',
+      'required' => TRUE,
       'pseudoconstant' => [
         'callback' => ['CRM_Core_BAO_CustomGroup', 'getCustomGroupExtendsOptions'],
         'suffixes' => [
@@ -119,6 +121,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('Visual relationship between this form and its parent.'),
       'add' => '1.1',
+      'required' => TRUE,
+      'default' => 'Inline',
       'pseudoconstant' => [
         'callback' => ['CRM_Core_SelectValues', 'customGroupStyle'],
       ],

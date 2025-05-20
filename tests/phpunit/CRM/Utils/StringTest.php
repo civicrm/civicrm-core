@@ -351,10 +351,14 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   public function purifyHTMLProvider(): array {
-    $tests = [];
-    $tests[] = ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'];
-    $tests[] = ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>'];
-    return $tests;
+    return [
+      'tokens' => [
+        '<p>To view your dashboard, <a href="https://mysite.org/civicrm/?civiwp=CiviCRM&amp;q=civicrm/user&reset=1&id={contact.contact_id}&{contact.checksum}">click here.</a></p>',
+        '<p>To view your dashboard, <a href="https://mysite.org/civicrm/?civiwp=CiviCRM&amp;q=civicrm/user&amp;reset=1&amp;id={contact.contact_id}&amp;{contact.checksum}">click here.</a></p>',
+      ],
+      'hover' => ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'],
+      'target' => ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>'],
+    ];
   }
 
   /**

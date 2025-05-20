@@ -337,14 +337,17 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     //set values for ipn code.
     foreach (['fee_amount', 'check_number', 'payment_instrument_id'] as $field) {
-      if (!$input[$field] = CRM_Utils_Array::value($field, $params)) {
+      $input[$field] = $params[$field] ?? NULL;
+      if (!$input[$field]) {
         $input[$field] = $contribution->$field;
       }
     }
-    if (!$input['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params)) {
+    $input['trxn_id'] = $params['trxn_id'] ?? NULL;
+    if (!$input['trxn_id']) {
       $input['trxn_id'] = $contribution->invoice_id;
     }
-    if (!$input['amount'] = CRM_Utils_Array::value('total_amount', $params)) {
+    $input['amount'] = $params['total_amount'] ?? NULL;
+    if (!$input['amount']) {
       $input['amount'] = $contribution->total_amount;
     }
     $input['is_test'] = $contribution->is_test;

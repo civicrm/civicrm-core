@@ -138,6 +138,36 @@ class CRM_Extension_Browser {
   }
 
   /**
+   * Prepare a list of download URLs.
+   *
+   * @param array $keys
+   *   The extensions that we want to download.
+   *   Ex: ['apple', 'banana']
+   * @return array
+   *   List of download URLs.
+   *   Ex: ['apple' => 'https://example.com/apple/release/1.0.zip', 'ext2' => 'https://example.com/banana/release/1.2.3.zip']
+   * @throws \CRM_Core_Exception
+   */
+  public function findDownloads(array $keys): array {
+    if (!$this->isEnabled()) {
+      throw new CRM_Core_Exception('Automatic downloading is disabled.');
+    }
+    if ($reqs = $this->checkRequirements()) {
+      $first = array_shift($reqs);
+      throw new CRM_Core_Exception($first['message']);
+    }
+    $downloads = [];
+    foreach ($keys as $key) {
+      if ($info = $this->getExtension($key)) {
+        if ($info->downloadUrl) {
+          $downloads[$key] = $info->downloadUrl;
+        }
+      }
+    }
+    return $downloads;
+  }
+
+  /**
    * Get a description of a particular extension.
    *
    * @param string $key

@@ -1,7 +1,6 @@
 <?php
 
 use Civi\API\Exception\UnauthorizedException;
-use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
 use Civi\BAO\Import;
 
@@ -138,9 +137,6 @@ function _civiimport_civicrm_get_import_tables(): array {
  * @throws \CRM_Core_Exception
  */
 function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templateFile): void {
-  if ($formName === 'CRM_Contribute_Import_Form_MapField') {
-    $templateFile = 'CRM/Import/MapField.tpl';
-  }
   if ($formName === 'CRM_Queue_Page_Monitor') {
     $jobName = CRM_Utils_Request::retrieveValue('name', 'String');
     if (str_starts_with($jobName, 'user_job_')) {
@@ -213,18 +209,6 @@ function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions
  * @throws \CRM_Core_Exception
  */
 function civiimport_civicrm_buildForm(string $formName, $form) {
-  if ($formName === 'CRM_Contribute_Import_Form_MapField') {
-    // Add import-ui app
-    Civi::service('angularjs.loader')->addModules('crmCiviimport');
-    $form->assignCiviimportVariables();
-    $savedMappingID = (int) $form->getSavedMappingID();
-    $savedMapping = [];
-    if ($savedMappingID) {
-      $savedMapping = Mapping::get()->addWhere('id', '=', $savedMappingID)->addSelect('id', 'name', 'description')->execute()->first();
-    }
-    Civi::resources()->addVars('crmImportUi', ['savedMapping' => $savedMapping]);
-  }
-
   if ($formName === 'CRM_Contribute_Import_Form_DataSource') {
     // If we have already configured contact type on the import screen
     // we remove it from the DataSource screen.
@@ -241,7 +225,8 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
   //@todo - do for all Preview forms - just need to fix each Preview.tpl to
   // not open in new tab as they are not yet consolidated into one file.
   // (Or consolidate them now).
-  if ($formName === 'CRM_Contact_Import_Form_Summary' || $formName === 'CRM_Contribute_Import_Form_Preview') {
+  if ($formName === 'CRM_Contact_Import_Form_Summary'
+    || $formName === 'CRM_Contribute_Import_Form_Preview') {
     $form->assign('isOpenResultsInNewTab', TRUE);
     $form->assign('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR', FALSE));
     $form->assign('allRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID(), FALSE));

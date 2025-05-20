@@ -6,6 +6,9 @@ namespace Civi\Api4;
  *
  * Provided by the Search Kit extension.
  *
+ * @method Action\SearchDisplay\CreateBatch createBatch(bool $checkPemissions)
+ * @method Action\SearchDisplay\RunBatch runBatch(bool $checkPemissions)
+ *
  * @since 5.32
  * @searchable secondary
  * @package Civi\Api4

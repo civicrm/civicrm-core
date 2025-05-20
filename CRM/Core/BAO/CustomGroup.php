@@ -2128,6 +2128,34 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'table_name' => 'civicrm_address',
         'allow_is_multiple' => FALSE,
       ],
+      [
+        'id' => 'Phone',
+        'label' => ts('Phones'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_phone',
+        'allow_is_multiple' => FALSE,
+      ],
+      [
+        'id' => 'Email',
+        'label' => ts('Emails'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_email',
+        'allow_is_multiple' => FALSE,
+      ],
+      [
+        'id' => 'IM',
+        'label' => ts('Ims'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_im',
+        'allow_is_multiple' => FALSE,
+      ],
+      [
+        'id' => 'OpenID',
+        'label' => ts('Open IDs'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_openid',
+        'allow_is_multiple' => FALSE,
+      ],
       // TODO: Move to civi_campaign extension (example: OptionValue_cg_extends_objects_grant.mgd.php)
       [
         'id' => 'Campaign',
@@ -2155,21 +2183,25 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'icon' => $contactInfo['icon'],
       ];
     }
+    // Index by id to allow `cg_extend_objects` in the database to override this hardcoded list
+    $options = array_column($options, NULL, 'id');
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'cg_extend_objects', 'id', 'name');
     $ogValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
     foreach ($ogValues as $ogValue) {
-      $options[] = [
-        'id' => $ogValue['value'],
-        'label' => $ogValue['label'],
-        'grouping' => $ogValue['grouping'] ?? NULL,
-        'table_name' => $ogValue['name'],
-        'allow_is_multiple' => !empty($ogValue['filter']),
-      ];
+      if ($ogValue['is_active']) {
+        $options[$ogValue['value']] = [
+          'id' => $ogValue['value'],
+          'label' => $ogValue['label'],
+          'grouping' => $ogValue['grouping'] ?? NULL,
+          'table_name' => $ogValue['name'],
+          'allow_is_multiple' => !empty($ogValue['filter']),
+        ];
+      }
     }
     foreach ($options as &$option) {
       $option['icon'] ??= CoreUtil::getInfoItem($option['id'], 'icon');
     }
-    return $options;
+    return array_values($options);
   }
 
   /**
@@ -2199,13 +2231,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $fileDAO->id = $fieldData;
 
         if ($fileDAO->find(TRUE)) {
-          $fileHash = CRM_Core_BAO_File::generateFileHash($entityIDFieldValue, $fileDAO->id);
+          $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileDAO->id);
           $customValue['id'] = $id;
           $customValue['data'] = $fileDAO->uri;
           $customValue['fid'] = $fileDAO->id;
-          $customValue['fileURL'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$fileDAO->id}&eid={$entityIDFieldValue}&fcs=$fileHash");
+          $customValue['fileURL'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$fileDAO->id}&fcs=$fileHash");
           $customValue['displayURL'] = NULL;
-          $deleteExtra = ts('Are you sure you want to delete attached file.');
+          // FIXME: Yikes! Deleting records via GET request??
+          $deleteExtra = htmlentities(ts('Are you sure you want to delete attached file.'), ENT_QUOTES);
           $deleteURL = [
             CRM_Core_Action::DELETE => [
               'name' => ts('Delete Attached File'),
@@ -2219,7 +2252,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             CRM_Core_Action::DELETE,
             [
               'id' => $fileDAO->id,
-              'eid' => $entityIDFieldValue,
               'fid' => $fieldID,
               'fcs' => $fileHash,
             ],
@@ -2229,7 +2261,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             'File',
             $fileDAO->id
           );
-          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $entityIDFieldValue, $fileDAO->id);
+          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $entityIDFieldValue, $fileDAO->id, $fieldID);
           $customValue['fileName'] = CRM_Utils_File::cleanFileName(basename($fileDAO->uri));
           if ($fileDAO->mime_type === "image/jpeg" ||
             $fileDAO->mime_type === "image/pjpeg" ||
@@ -2238,14 +2270,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             $fileDAO->mime_type === "image/png"
           ) {
             $customValue['displayURL'] = $customValue['fileURL'];
-            $entityId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile',
-              $fileDAO->id,
-              'entity_id',
-              'file_id'
-            );
             $customValue['imageURL'] = str_replace('persist/contribute', 'custom', $config->imageUploadURL) .
               $fileDAO->uri;
-            [$path] = CRM_Core_BAO_File::path($fileDAO->id, $entityId);
+            [$path] = CRM_Core_BAO_File::path($fileDAO->id);
             if ($path && file_exists($path)) {
               [$imageWidth, $imageHeight] = getimagesize($path);
               [$imageThumbWidth, $imageThumbHeight] = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);

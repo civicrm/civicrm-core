@@ -48,7 +48,9 @@ require_once 'api/api.php';
  * @property string $defaultContactStateProvince
  * @property string $monetaryDecimalPoint
  * @property string $monetaryThousandSeparator
- * @property array fiscalYearStart
+ * @property array $fiscalYearStart
+ * @property string $customFileUploadDir user file upload directory with trailing slash
+ * @property string $imageUploadDir media upload directory with trailing slash
  */
 class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 

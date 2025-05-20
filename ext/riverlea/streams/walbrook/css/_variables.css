@@ -21,13 +21,13 @@
   --crm-c-gray-100: #ebeff0;
   --crm-c-gray-050: #f3f6f7;
   --crm-c-gray-025: #fcfcfc;
-  --crm-c-blue: #0071bd;
+  --crm-c-blue: #90c8f4;
+  --crm-c-blue-dark: #005893;
   --crm-c-blue-light: #dff0f4;
-  --crm-c-blue-dark: #66afe9;
-  --crm-c-blue-darker: #458ac3;
-  --crm-c-green: #6cd594;
-  --crm-c-green-light: #bcecd1;
-  --crm-c-green-dark: #1d6338;
+  --crm-c-blue-darker: #043b60;
+  --crm-c-green: #7ed59f;
+  --crm-c-green-light: #ceebda;
+  --crm-c-green-dark: rgb(21, 76, 42);
   --crm-c-red: #91223c;
   --crm-c-red-light: #ecb1bc;
   --crm-c-red-dark: var(--crm-c-text);
@@ -42,16 +42,25 @@
   --crm-c-background: #fff; /* background to page header, often form block & dialog bg */
   --crm-c-drag-background: var(--crm-c-background4); /* background for drag/drop regions, select2 highlight */
   --crm-c-code-background: var(--crm-c-background3); /* background for code regions */
-  --crm-c-primary: var(--crm-c-blue);
-  --crm-c-primary-hover: var(--crm-c-blue-darker);
-  --crm-c-primary-text: var(--crm-c-text-light); /* text colour when on top of primary */
+/* Emphasis colours */
+  --crm-c-primary: var(--crm-c-blue-dark);
   --crm-c-secondary: var(--crm-c-purple);
-  --crm-c-secondary-hover: var(--crm-c-purple-dark);
   --crm-c-success: var(--crm-c-green);
-  --crm-c-success-text: var(--crm-c-text-dark);
-  --crm-c-alert: var(--crm-c-red);
-  --crm-c-warning-text: var(--crm-c-text-dark);
-  --crm-c-info-text: var(--crm-c-text-light);
+  --crm-c-success-text: var(--crm-c-text);
+  --crm-c-success-light: var(--crm-c-green-light);
+  --crm-c-success-on-page-bg: var(--crm-c-green-dark);
+  --crm-c-warning: var(--crm-c-amber);
+  --crm-c-warning-text: var(--crm-c-text);
+  --crm-c-warning-light: var(--crm-c-amber-light);
+  --crm-c-warning-on-page-bg: #873502;
+  --crm-c-danger: var(--crm-c-red);
+  --crm-c-danger-text: var(--crm-c-text-light);
+  --crm-c-danger-light: var(--crm-c-red-light);
+  --crm-c-danger-on-page-bg: var(--crm-c-danger);
+  --crm-c-info: var(--crm-c-blue);
+  --crm-c-info-text: var(--crm-c-text);
+  --crm-c-info-light: var(--crm-c-blue-light);
+  --crm-c-info-on-page-bg: var(--crm-c-blue-darker);
 /* Shadows */
   --crm-block-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
   --crm-popup-shadow: var(--crm-block-shadow);
@@ -73,7 +82,6 @@
   --crm-btn-padding-inline: var(--crm-r2); /* padding for left and right, one value */
   --crm-btn-small-padding: var(--crm-s1) var(--crm-m1);
   --crm-btn-height: 40px;
-  --crm-btn-success-bg: var(--crm-c-green);
 /* Tables */
   --crm-table-outside-border: var(--crm-c-divider);
   --crm-table-background: var(--crm-c-background);
@@ -115,14 +123,9 @@
   --crm-expand2-body-padding: 0;
 /* Alerts */
   --crm-alert-padding: var(--crm-r) var(--crm-r2);
-  --crm-alert-text-help: var(--crm-c-text);
-  --crm-alert-background-warning: var(--crm-c-amber-light);
-  --crm-alert-border-warning: var(--crm-c-amber);
-  --crm-alert-background-info: var(--crm-c-primary);
-  --crm-alert-border-info: var(--crm-c-primary);
-  --crm-alert-text-info: var(--crm-c-primary-text);
-  --crm-alert-text-danger: var(--crm-c-text);
-  --crm-alert-background-danger: var(--crm-c-red-light);
+  --crm-alert-success-text: var(--crm-c-success-on-page-bg);
+  --crm-alert-danger-text: var(--crm-c-text);
+  --crm-alert-info-text: var(--crm-c-info-on-page-bg);
 /* Form */
   --crm-form-block-padding: var(--crm-r);
   --crm-form-block-border-radius: 0;
@@ -206,7 +209,7 @@
   --crm-notify-background: var(--crm-c-background);
   --crm-notify-col: var(--crm-c-text);
   --crm-notify-accent-border: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
-  --crm-notify-alert: #d02e2e;
+  --crm-notify-danger: #d02e2e;
   --crm-notify-warning: #c45008;
   --crm-notify-success: #5a803c;
   --crm-notify-info: #277fa5;

@@ -456,7 +456,7 @@ class CRM_Activity_BAO_Query {
     $form->addRadio('activity_option', '', CRM_Core_SelectValues::activityTextOptions());
     $form->setDefaults(['activity_option' => 6]);
 
-    $form->addYesNo('activity_test', ts('Activity is a Test?'));
+    $form->addYesNo('activity_test', ts('Activity is a Test'));
     $activity_tags = CRM_Core_BAO_Tag::getColorTags('civicrm_activity');
 
     if ($activity_tags) {

@@ -1716,7 +1716,7 @@ $textValue
 
     $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
-    $fileUri = "{$filepath}/{$fileName}";
+    $fileUri = "{$filepath}{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'aaaaaa', $fileName);
 
@@ -1781,7 +1781,7 @@ $textValue
 
     $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
-    $fileUri = "{$filepath}/{$fileName}";
+    $fileUri = "{$filepath}{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
 

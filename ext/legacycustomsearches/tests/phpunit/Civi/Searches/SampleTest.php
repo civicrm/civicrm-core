@@ -6,7 +6,7 @@ use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Test;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\OptionValue;

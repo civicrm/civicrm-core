@@ -39,7 +39,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    *
    * @var array
    */
-  public $_contactTypes;
+  public $_contactTypes = [];
 
   /**
    * The additional clause that we restrict the search with
@@ -84,7 +84,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    */
   public static function preProcessCommon(&$form) {
     $form->_contactIds = [];
-    $form->_contactTypes = [];
 
     $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath) || in_array('map', $form->urlPath);
     if ($isStandAlone) {

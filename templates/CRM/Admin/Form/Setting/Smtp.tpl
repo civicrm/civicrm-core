@@ -10,12 +10,11 @@
 <div class="crm-block crm-form-block crm-smtp-form-block">
   <div>
   <h3>{ts}General{/ts}</h3>
-     <table class="form-layout-compressed">
-       <tr class="crm-smtp-form-block-allow_mail_from_logged_in_contact">
-         <td>{$form.allow_mail_from_logged_in_contact.label} {help id=allow_mail_contact_email}</td>
-         <td class="label">{$form.allow_mail_from_logged_in_contact.html}</td>
-       </tr>
-     </table>
+    <table class="form-layout-compressed">
+      {foreach from=$settings_fields key="setting_name" item="fieldSpec"}
+        {include file="CRM/Admin/Form/Setting/SettingField.tpl"}
+      {/foreach}
+    </table>
   </div>
   {crmRegion name="smtp-mailer-config"}
   <div class="crm-smtp-mailer-form-block">
