@@ -1040,9 +1040,12 @@ function civicrm_api3_contact_proximity($params) {
 
   // check and ensure that lat/long and distance are floats
   if (
-    !CRM_Utils_Rule::numeric($latitude) ||
-    !CRM_Utils_Rule::numeric($longitude) ||
-    !CRM_Utils_Rule::numeric($distance)
+    // We should just declare the data type correctly in the _spec function
+    // and leave this to the api layer, but reluctant to make changes to
+    // apiv3 now.
+    !is_numeric($latitude) ||
+    !is_numeric($longitude) ||
+    !is_numeric($distance)
   ) {
     throw new CRM_Core_Exception(ts('Latitude, Longitude and Distance should exist and be numeric'));
   }
