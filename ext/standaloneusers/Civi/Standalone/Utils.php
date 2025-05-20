@@ -10,6 +10,13 @@ class Utils {
         continue;
       }
 
+      // use /civicrm/home rather than /civicrm/dashboard
+      foreach ($item['child'] as &$subitem) {
+        if ($subitem['attributes']['name'] === 'CiviCRM Home') {
+          $subitem['attributes']['url'] = 'civicrm/home?reset=1';
+        }
+      }
+
       // remove hide menu
       $item['child'] = array_filter($item['child'], fn ($subitem) => ($subitem['attributes']['name'] !== 'Hide Menu'));
 
