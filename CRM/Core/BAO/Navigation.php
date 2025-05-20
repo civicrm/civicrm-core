@@ -916,28 +916,15 @@ ORDER BY weight";
             'weight' => 1,
           ],
         ];
-        if (CIVICRM_UF !== 'Standalone') {
-          $item['child'][] = [
-            'attributes' => [
-              'label' => ts('Hide Menu'),
-              'name' => 'Hide Menu',
-              'url' => '#hidemenu',
-              'icon' => 'crm-i fa-minus',
-              'weight' => 2,
-            ],
-          ];
-        }
-        else {
-          $item['child'][] = [
-            'attributes' => [
-              'label' => ts('Change Password'),
-              'name' => 'Change Password',
-              'url' => 'civicrm/admin/user/password',
-              'icon' => 'crm-i fa-keyboard',
-              'weight' => 2,
-            ],
-          ];
-        }
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('Hide Menu'),
+            'name' => 'Hide Menu',
+            'url' => '#hidemenu',
+            'icon' => 'crm-i fa-minus',
+            'weight' => 2,
+          ],
+        ];
         $item['child'][] = [
           'attributes' => [
             'label' => ts('Log out'),
