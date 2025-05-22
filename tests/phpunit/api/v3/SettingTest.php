@@ -272,33 +272,33 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = [
       'domain_id' => $this->domainID2,
-      'track_civimail_replies' => 'blah',
+      'contact_undelete' => 'blah',
     ];
     $this->callAPIFailure('Setting', 'create', $params);
 
-    $params = ['track_civimail_replies' => '0'];
+    $params = ['contact_undelete' => '0'];
     $this->callAPISuccess('Setting', 'create', $params);
     $getResult = $this->callAPISuccess('Setting', 'get');
-    $this->assertEquals(0, $getResult['values'][$this->currentDomain]['track_civimail_replies']);
+    $this->assertEquals(0, $getResult['values'][$this->currentDomain]['contact_undelete']);
 
     $getResult = $this->callAPISuccess('Setting', 'get');
-    $this->assertEquals(0, $getResult['values'][$this->currentDomain]['track_civimail_replies']);
+    $this->assertEquals(0, $getResult['values'][$this->currentDomain]['contact_undelete']);
     $params = [
       'domain_id' => $this->domainID2,
-      'track_civimail_replies' => '1',
+      'contact_undelete' => '1',
     ];
     $this->callAPISuccess('Setting', 'create', $params);
     $getResult = $this->callAPISuccess('Setting', 'get', ['domain_id' => $this->domainID2]);
-    $this->assertEquals(1, $getResult['values'][$this->domainID2]['track_civimail_replies']);
+    $this->assertEquals(1, $getResult['values'][$this->domainID2]['contact_undelete']);
 
     $params = [
       'domain_id' => $this->domainID2,
-      'track_civimail_replies' => 'TRUE',
+      'contact_undelete' => 'TRUE',
     ];
     $this->callAPISuccess('Setting', 'create', $params);
     $getResult = $this->callAPISuccess('Setting', 'get', ['domain_id' => $this->domainID2]);
 
-    $this->assertEquals(1, $getResult['values'][$this->domainID2]['track_civimail_replies'], 'check TRUE is converted to 1');
+    $this->assertEquals(1, $getResult['values'][$this->domainID2]['contact_undelete'], 'check TRUE is converted to 1');
   }
 
   /**
@@ -456,12 +456,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testGetValue(int $version): void {
     $this->_apiversion = $version;
     $params = [
-      'name' => 'petition_contacts',
-      'group' => 'Campaign Preferences',
+      'name' => 'menubar_color',
+      'group' => 'CiviCRM Preferences',
     ];
 
     $result = $this->callAPISuccess('setting', 'getvalue', $params);
-    $this->assertEquals('Petition Contacts', $result);
+    $this->assertEquals('#1b1b1b', $result);
   }
 
   /**
@@ -558,7 +558,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertAPISuccess($result);
-    $this->assertEquals('Unconfirmed', $result['values'][$domain['id']]['tag_unconfirmed']);
+    $this->assertEquals('over-cms-menu', $result['values'][$domain['id']]['menubar_position']);
 
     // The 'fill' operation is no longer necessary, but third parties might still use it, so let's
     // make sure it doesn't do anything weird (crashing or breaking values).
@@ -566,12 +566,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $result = $this->callAPISuccess('Setting', 'get', $params);
     $this->assertAPISuccess($result);
-    $this->assertArrayHasKey('tag_unconfirmed', $result['values'][$domain['id']]);
+    $this->assertArrayHasKey('menubar_position', $result['values'][$domain['id']]);
 
     // Setting has NULL default. Not returned.
     //$this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
 
-    $this->assertEquals('Unconfirmed', $result['values'][$domain['id']]['tag_unconfirmed']);
+    $this->assertEquals('over-cms-menu', $result['values'][$domain['id']]['menubar_position']);
   }
 
   /**

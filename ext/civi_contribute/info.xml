@@ -30,6 +30,7 @@
   <mixins>
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Contribute</namespace>
