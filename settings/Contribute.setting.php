@@ -140,7 +140,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'settings_pages' => ['contribute' => ['weight' => 150]],
+    'settings_pages' => ['contribute' => ['weight' => 80]],
   ],
   'tax_display_settings' => [
     'default' => 'Inclusive',
