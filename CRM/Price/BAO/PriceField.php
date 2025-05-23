@@ -349,7 +349,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $type = 'money';
         }
         else {
-          $type = 'numeric';
+          $type = 'numberInternational';
         }
         // integers will have numeric rule applied to them.
         $qf->addRule($elementName, ts('%1 must be a number.', [1 => $label]), $type);

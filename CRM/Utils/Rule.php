@@ -473,6 +473,18 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * @param string|int|float|null $value
+   *
+   * @return bool
+   */
+  public static function numberInternational($value): bool {
+    $escapedThousand = preg_quote((string) \Civi::settings()->get('monetaryThousandSeparator'));
+    $escapedDecimal = preg_quote((string) \Civi::settings()->get('monetaryDecimalPoint'));
+    $pattern = '/^-?(?:\d{1,3}(?:' . $escapedThousand . '\d{3})+|\d+)(?:' . $escapedDecimal . '\d+)?$/';
+    return preg_match($pattern, (string) $value) === 1;
+  }
+
+  /**
    * Test whether $value is alphanumeric.
    *
    * Underscores and dashes are also allowed!
