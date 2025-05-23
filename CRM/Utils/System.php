@@ -1202,7 +1202,11 @@ class CRM_Utils_System {
    * @return void
    */
   public static function setNoRobotsFlag(): void {
-    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    $region = CRM_Core_Region::instance('html-header', TRUE);
+    $region->add([
+      'type' => 'markup',
+      'markup' => '<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">',
+    ]);
   }
 
   /**
