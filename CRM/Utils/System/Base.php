@@ -115,6 +115,7 @@ abstract class CRM_Utils_System_Base {
    *   The new string to be appended.
    */
   public function addHTMLHead($head) {
+    \CRM_Core_Error::deprecatedFunctionWarning("addHTMLHead is deprecated in " . self::class);
   }
 
   /**
