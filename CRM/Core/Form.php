@@ -456,6 +456,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'autocomplete',
       'validContact',
       'email',
+      'numberInternational',
     ];
 
     foreach ($rules as $rule) {
@@ -3185,7 +3186,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Numeric fields are not in submittableMoneyFields (for now)
     $fieldRules = $this->_rules[$fieldName] ?? [];
     foreach ($fieldRules as $rule) {
-      if ('money' === $rule['type']) {
+      if ('money' === $rule['type'] || 'numberInternational' === $rule['type']) {
         return CRM_Utils_Rule::cleanMoney($value);
       }
     }

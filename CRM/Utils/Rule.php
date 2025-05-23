@@ -473,6 +473,34 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * @param float|int|string|null $value
+   *
+   * @return bool
+   */
+  public static function numberInternational(float|int|string|null $value): bool {
+    $escapedThousand = preg_quote((string) \Civi::settings()->get('monetaryThousandSeparator'));
+    $escapedDecimal = preg_quote((string) \Civi::settings()->get('monetaryDecimalPoint'));
+    // This pattern supports:
+    // - Western format: 1,234,567.89
+    // - Or 1.234.234,89 (or any other configured separator)
+    // - Indian format: 12,34,567.89
+    // - Unformatted numbers: 1234567.89
+    // Optional negative sign and decimal part.
+    $pattern = "/^-?(?:" .
+      // Western grouping
+      "\d{1,3}(?:{$escapedThousand}\d{3})+" .
+      "|" .
+      // Indian grouping
+      "\d{1,2}(?:{$escapedThousand}\d{2}){1,}(?:{$escapedThousand}\d{3})" .
+      "|" .
+      // Plain number
+      "\d+" .
+      ")" .
+      "(?:{$escapedDecimal}\d+)?$/";
+    return preg_match($pattern, (string) $value) === 1;
+  }
+
+  /**
    * Test whether $value is alphanumeric.
    *
    * Underscores and dashes are also allowed!
