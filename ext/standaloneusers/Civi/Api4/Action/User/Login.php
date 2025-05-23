@@ -100,7 +100,7 @@ class Login extends AbstractAction {
    */
   protected function passwordCheck(Result $result) {
 
-    $successUrl = '/civicrm';
+    $successUrl = '/civicrm/home';
     if (!empty($this->originalUrl) && parse_url($this->originalUrl, PHP_URL_PATH) !== '/civicrm/login') {
       // We will return to this URL on success.
       $successUrl = $this->originalUrl;
