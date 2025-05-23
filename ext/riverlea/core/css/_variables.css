@@ -192,6 +192,7 @@
   --crm-panel-background: var(--crm-c-page-background);
   --crm-panel-border: var(--crm-c-divider);
   --crm-panel-head-margin: 0px;
+  --crm-panel-head-height: 37px;
 /* Accordions */
   --crm-expand-icon: "\f0da"; /* unicode value for FontAwesome icon */
   --crm-expand-icon-color: var(--text);

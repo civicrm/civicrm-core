@@ -207,6 +207,7 @@
   --crm-panel-background: white;
   --crm-panel-border: var(--crm-c-divider);
   --crm-panel-head-margin: 0px;
+  --crm-panel-head-height: 42px;
 }
 :root {
 /* Accordions */
