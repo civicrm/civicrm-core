@@ -31,7 +31,7 @@ use GuzzleHttp\Psr7\Response;
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
  * @method static void appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb link to the existing breadcrumbs.
  * @method static void resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
- * @method static void addHTMLHead(string $head) Append a string to the head of the HTML file.
+ * @method static void addHTMLHead(string $head) Append a string to the head of the HTML file. Note: this is only used in Drupal/Backdrop/Joomla and is deprecated in Wordpress/Standalone
  * @method static string postURL(int $action) Determine the post URL for a form.
  * @method static string|null getUFLocale() Get the locale of the CMS.
  * @method static bool setUFLocale(string $civicrm_language) Set the locale of the CMS.
@@ -1202,7 +1202,11 @@ class CRM_Utils_System {
    * @return void
    */
   public static function setNoRobotsFlag(): void {
-    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    $region = CRM_Core_Region::instance('html-header', TRUE);
+    $region->add([
+      'type' => 'markup',
+      'markup' => '<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">',
+    ]);
   }
 
   /**

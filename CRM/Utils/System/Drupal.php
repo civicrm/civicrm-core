@@ -897,7 +897,7 @@ AND    u.status = 1
         drupal_set_breadcrumb('');
         drupal_maintenance_theme();
         if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
-          CRM_Utils_System::addHTMLHead($region->render(''));
+          $this->addHTMLHead($region->render(''));
         }
         print theme('maintenance_page', ['content' => $content]);
         exit();
