@@ -148,6 +148,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'is_secret' => TRUE,
   ],
   'profile_add_to_group_double_optin' => [
     'group_name' => 'Mailing Preferences',
