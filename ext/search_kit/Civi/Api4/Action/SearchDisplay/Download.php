@@ -208,20 +208,25 @@ class Download extends AbstractRunAction {
         $cell = $sheet->getCell([$colNum + 1, $rowNum + 2]);
         $cell->setValue($this->formatColumnValue($col, $value));
 
-        if ($col['dataType'] === 'Money') {
-          $numberFormatter = new \NumberFormatter($moneyLocale . '@currency=' . $value['val']['currency'], \NumberFormatter::CURRENCY);
-          $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
-          $cell->getStyle()->getNumberFormat()->setFormatCode(new Currency($currencySymbol, locale: $numberFormatter->getLocale()));
-        }
-        elseif ($col['dataType'] === 'Date') {
-          $format = isset($col['format']) ? \Civi::settings()->get($col['format'])
-            : \CRM_Core_Config::singleton()->dateformatFull;
-          $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
-        }
-        elseif ($col['dataType'] === 'Timestamp') {
-          $format = isset($col['format']) ? \Civi::settings()->get($col['format'])
-            : \CRM_Core_Config::singleton()->dateformatDatetime;
-          $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
+        if (!$col['rewrite']) {
+          if ($col['dataType'] === 'Money') {
+            $numberFormatter =
+              new \NumberFormatter($moneyLocale . '@currency=' . $value['val']['currency'], \NumberFormatter::CURRENCY);
+            $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+            $cell->getStyle()->getNumberFormat()->setFormatCode(
+              new Currency($currencySymbol, locale: $numberFormatter->getLocale())
+            );
+          }
+          elseif ($col['dataType'] === 'Date') {
+            $format = isset($col['format']) ? \Civi::settings()->get($col['format'])
+              : \CRM_Core_Config::singleton()->dateformatFull;
+            $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
+          }
+          elseif ($col['dataType'] === 'Timestamp') {
+            $format = isset($col['format']) ? \Civi::settings()->get($col['format'])
+              : \CRM_Core_Config::singleton()->dateformatDatetime;
+            $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
+          }
         }
       }
     }
@@ -240,6 +245,10 @@ class Download extends AbstractRunAction {
    */
   protected function formatColumnValue(array $col, array $value) {
     $val = $value['val'];
+
+    if ($col['rewrite']) {
+      return $val;
+    }
 
     if ($col['dataType'] === 'Money') {
       return $val['value'];
