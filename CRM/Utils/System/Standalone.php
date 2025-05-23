@@ -160,34 +160,30 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   *
+   * Note: Standalone renders the html-header region directly in its smarty page template
+   * so this should never be called
    */
   public function addHTMLHead($header) {
-    $template = CRM_Core_Smarty::singleton();
-    // Smarty's append function does not check for the existence of the var before appending to it.
-    // So this prevents a stupid notice error:
-    $template->ensureVariablesAreAssigned(['pageHTMLHead']);
-    $template->append('pageHTMLHead', $header);
-    return;
+    throw new \CRM_Core_Exception('addHTMLHead should never be called in Standalone');
   }
 
   /**
-   * @inheritDoc
+   * @inheritdoc
+   *
+   * No such things as CMS-rendering in Standlaone => always return FALSE
    */
   public function addStyleUrl($url, $region) {
-    if ($region != 'html-header') {
-      return FALSE;
-    }
-    $this->addHTMLHead('<link rel="stylesheet" href="' . $url . '"></style>');
+    return FALSE;
   }
 
   /**
-   * @inheritDoc
+   * @inheritdoc
+   *
+   * No such things as CMS-rendering in Standlaone => always return FALSE
    */
   public function addStyle($code, $region) {
-    if ($region != 'html-header') {
-      return FALSE;
-    }
-    $this->addHTMLHead('<style>' . $code . '</style>');
+    return FALSE;
   }
 
   /**

@@ -5,13 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="{$config->resourceBase}i/logo_lg.png" >
 
-  {* @todo crmRegion below should replace this, but not working? *}
-  {if isset($pageHTMLHead)}
-    {foreach from=$pageHTMLHead item=i}
-      {$i}
-    {/foreach}
-  {/if}
-
   {crmRegion name='html-header'}
   {/crmRegion}
 
