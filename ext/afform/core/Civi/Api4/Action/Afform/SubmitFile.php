@@ -87,6 +87,10 @@ class SubmitFile extends AbstractProcessor {
     else {
       $apiEntity = $this->getEntityApiName();
       $entityTable = CoreUtil::getTableName($apiEntity);
+      $attachmentParams = [
+        'entity_id' => $entityId,
+        'entity_table' => $entityTable
+      ];
       $file = civicrm_api3('Attachment', 'create', $attachmentParams);
 
       /**
@@ -97,14 +101,14 @@ class SubmitFile extends AbstractProcessor {
         $filepath = pathinfo($file['values'][$fileId]['path']);
         $result = civicrm_api4('Contact', 'update', [
           'values' => [
-            'id' => $entityId, 
+            'id' => $entityId,
             'image_URL' => sprintf('/civicrm/contact/imagefile?photo=%s', $filepath['basename']),
           ],
         ]);
-        
+
         return [];
       }
-  
+
       // Update multi-record custom field with value
       if (strpos($apiEntity, 'Custom_') === 0) {
         return $this->updateEntity($entityId, $file['id']);
