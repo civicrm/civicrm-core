@@ -85,7 +85,28 @@ class SubmitFile extends AbstractProcessor {
       return $this->updateDraft($draft, $file['id']);
     }
     else {
-      return $this->updateEntity($entityId, $file['id']);
+      $file = civicrm_api3('Attachment', 'create', $attachmentParams);
+
+      /**
+       * Updates contact record to use existing file table data for contact_image. Temporary fix for dev/core#4251
+       */
+      if ($attachmentParams['entity_table'] == 'civicrm_contact' && isset($attachmentParams['entity_id'])) {
+        $fileId = $file['id'];
+        $filepath = pathinfo($file['values'][$fileId]['path']);
+        $result = civicrm_api4('Contact', 'update', [
+          'values' => [
+            'id' => $attachmentParams['entity_id'], 
+            'image_URL' => sprintf('/civicrm/contact/imagefile?photo=%s', $filepath['basename']),
+          ],
+        ]);
+        
+        return [];
+      }
+  
+      // Update multi-record custom field with value
+      if (strpos($apiEntity, 'Custom_') === 0) {
+        return $this->updateEntity($entityId, $file['id']);
+      }
     }
   }
 
