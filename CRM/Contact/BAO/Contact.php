@@ -129,6 +129,15 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
       }
     }
 
+    if (isset($params['preferred_communication_method']) && is_array($params['preferred_communication_method'])) {
+      if (!empty($params['preferred_communication_method']) && empty($params['preferred_communication_method'][0])) {
+        CRM_Core_Error::deprecatedWarning(' Form layer formatting should never get to the BAO');
+        CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
+        $contact->preferred_communication_method = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
+        unset($params['preferred_communication_method']);
+      }
+    }
+
     $defaults = ['source' => $params['contact_source'] ?? NULL];
     if ($params['contact_type'] === 'Organization' && isset($params['organization_name'])) {
       $defaults['display_name'] = $params['organization_name'];

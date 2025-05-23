@@ -1,5 +1,7 @@
 1.4.5-6.3beta
- - CHANGED 'text-danger' in FormBuilder drop-down to cover tabset dropdown 'delete tab'.
+ - RESOLVED 'text-danger' in FormBuilder drop-down to cover tabset dropdown 'delete tab'.
+ - CHANGED restored internal scrolling in FormBuilder for each panel to support longer forms (https://lab.civicrm.org/extensions/riverlea/-/issues/114)
+ - ADDED CSS VARIABLE '--crm-panel-head-height' to handle different stream panel head / tab-bar heights for the internal scrolling calculation.
 
 1.4.4-6.3alpha
  - FIXED inline checkbox regression (https://lab.civicrm.org/extensions/riverlea/-/merge_requests/51) ht @yashodha

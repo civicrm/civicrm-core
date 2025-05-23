@@ -97,6 +97,7 @@
   --crm-table-nested-border: 0 solid transparent;
 /* Panels */
   --crm-panel-head-margin: var(--crm-m2);
+  --crm-panel-head-height: 48px;
 /* Accordions */
   --crm-expand-icon: "\f105"; /* unicode value for FontAwesome icon */
   --crm-expand-icon-color: unset;
