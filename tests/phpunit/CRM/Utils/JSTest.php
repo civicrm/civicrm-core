@@ -251,8 +251,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
         "{a: 'Apple', b: 'Banana', c: [0, -2, 3.15]}",
       ],
       [
-        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ['a' => ["fo\\'oo", '"bar"'], 'b' => []]]],
-        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar&', 'bar(foo)'], b: {a: ['fo\\\\\\'oo', '\"bar\"'], b: {}}}}",
+        ['a.b-c' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ["'a'" => ["fo\\'oo", '"bar"'], 'b' => []]]],
+        "{'a.b-c': ['foo', 'bar'], b: {'\'a\'': ['foo/bar&', 'bar(foo)'], b: {'\'a\'': ['fo\\\\\\'oo', '\"bar\"'], b: {}}}}",
       ],
       [TRUE, 'true'],
       [' ', "' '"],
@@ -313,12 +313,12 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       [
         '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\' , \'foo\&\': getFoo("Some \"quoted\" thing"), "ba\'[(r": function() {return "bar"}}',
         ['status' => '/^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\'', 'foo&' => 'getFoo("Some \"quoted\" thing")', "ba'[(r" => 'function() {return "bar"}'],
-        '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\', "foo&": getFoo("Some \"quoted\" thing"), "ba\'[(r": function() {return "bar"}}',
+        '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\', \'foo&\': getFoo("Some \"quoted\" thing"), \'ba\\\'[(r\': function() {return "bar"}}',
       ],
       [
         '{"some\"key": typeof foo === \'number\' ? true : false , "O\'Really?": ",((,", \'A"quote"\': 1 + 1 , "\\\\&\\/" : 0}',
         ['some"key' => 'typeof foo === \'number\' ? true : false', "O'Really?" => '",((,"', 'A"quote"' => '1 + 1', '\\&/' => '0'],
-        '{\'some"key\': typeof foo === \'number\' ? true : false, "O\'Really?": ",((,", \'A"quote"\': 1 + 1, "\\\\&/": 0}',
+        '{\'some"key\': typeof foo === \'number\' ? true : false, \'O\\\'Really?\': ",((,", \'A"quote"\': 1 + 1, \'\\\\&/\': 0}',
       ],
       [
         '[foo ? 1 : 2 , 3 ,  function() {return 1 + 1;}, /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\' , 3.14   ]',

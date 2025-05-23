@@ -27,7 +27,7 @@
     {include file="CRM/Contact/Page/View/Summary.tpl"}
     <form action="{crmURL p='civicrm/contact/view' q="cid=`$contactId`&reset=1"}" method="post" id="Print2" >
       <div class="form-item">
-           <span class="element-right"><input onclick="window.print(); return false" class="crm-form-submit default" name="_qf_Print_next" value="{ts}Print{/ts}" type="submit" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="crm-form-submit" name="_qf_Print_back" value="{ts}Done{/ts}" type="submit" /></span>
+           <span class="element-right"><input onclick="window.print(); return false" class="crm-form-submit default" name="_qf_Print_next" value="{ts escape='htmlattribute'}Print{/ts}" type="submit" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="crm-form-submit" name="_qf_Print_back" value="{ts escape='htmlattribute'}Done{/ts}" type="submit" /></span>
       </div>
     </form>
 </div>

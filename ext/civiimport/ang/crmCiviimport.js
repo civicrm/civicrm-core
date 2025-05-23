@@ -2,10 +2,6 @@
   // Declare a list of dependencies.
   angular.module('crmCiviimport', CRM.angRequires('crmCiviimport'));
 
-  // The controller uses *injection*. This default injects a few things:
-  //   $scope -- This is the set of variables shared between JS and HTML.
-  //   crmApi, crmStatus, crmUiHelp -- These are services provided by civicrm-core.
-  //   myContact -- The current contact, defined above in config().
   angular.module('crmCiviimport').component('crmImportUi', {
       templateUrl: '~/crmCiviimport/Import.html',
       controller: function($scope, crmApi4, crmStatus, crmUiHelp) {
@@ -33,7 +29,8 @@
           $scope.data.dedupeRules = CRM.vars.crmImportUi.dedupeRules;
           // Used for select contact type select-options.
           $scope.data.contactTypes = CRM.vars.crmImportUi.contactTypes;
-
+          // The headers from the data-source + any previously added user-defined rows.
+          $scope.data.columnHeaders = CRM.vars.crmImportUi.columnHeaders;
           $scope.data.entities = {};
           // Available entities is entityMetadata mapped to a form-friendly format
           $scope.entitySelection = [];
@@ -72,7 +69,7 @@
           function buildImportMappings() {
             $scope.data.importMappings = [];
             var importMappings = $scope.userJob.metadata.import_mappings;
-            _.each($scope.userJob.metadata.DataSource.column_headers, function (header, index) {
+            _.each($scope.data.columnHeaders, function (header, index) {
               var fieldName = $scope.data.defaults['mapper[' + index + ']'][0];
               if (Boolean(fieldName)) {
                 fieldName = fieldName.replace('__', '.');
@@ -114,7 +111,7 @@
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
               availableEntity = _.clone(entity);
-              availableEntity.children = $scope.filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_field_prefix);
+              availableEntity.children = filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_name + '.');
               fields.push(availableEntity);
             }
           });
@@ -129,19 +126,19 @@
          *
          * @type {(function(*=, *=, *=, *=): (*))|*}
          */
-        $scope.filterEntityFields = (function (isContact, fields, selection, entityFieldPrefix) {
+        function filterEntityFields(isContact, fields, selection, entityFieldPrefix) {
           if (isContact) {
-            return $scope.filterContactFields(fields, selection, entityFieldPrefix);
+            return filterContactFields(fields, selection, entityFieldPrefix);
           }
           return fields;
-        });
+        }
 
         /**
          * Filter contact fields, removing fields not appropriate for the entity or action.
          *
          * @type {function(*=, *): *}
          */
-        $scope.filterContactFields = (function (fields, selection, entityFieldPrefix) {
+        function filterContactFields(fields, selection, entityFieldPrefix) {
           var contactType = selection.contact_type;
           var action = selection.action;
           var rules = $scope.data.dedupeRules;
@@ -165,7 +162,7 @@
 
           }));
           return fields;
-        });
+        }
 
         /**
          * Add the entity to the selected scope.
@@ -243,6 +240,26 @@
         });
 
         /**
+         * Add another row to the mapping.
+         *
+         * This row will use a default value and be the same for all rows imported.
+         *
+         * @type {$scope.addRow}
+         */
+        $scope.addRow = (function () {
+          $scope.data.importMappings.push({'header' : '', 'selectedField' : undefined});
+          $scope.userJob.metadata.DataSource.column_headers.push('');
+        });
+
+        $scope.alterRow = (function (index, row) {
+          if (row.header === '' && row.selectedField === '') {
+            // Deleting a mapped row.
+            $scope.data.importMappings.splice(index, 1);
+            $scope.userJob.metadata.DataSource.column_headers.splice(index, 1);
+          }
+        });
+
+        /**
          * Save the user job configuration on save.
          *
          * We add two arrays to the 'metadata' key. This is in the format returned from `Parser->getFieldMappings()`
@@ -257,6 +274,7 @@
          * @type {$scope.save}
          */
         $scope.save = (function ($event) {
+          $event.preventDefault();
           $scope.userJob.metadata.entity_configuration = {};
           $scope.userJob.metadata.import_mappings = [];
           _.each($scope.entitySelection, function (entity) {
@@ -280,7 +298,16 @@
               entity_data: entityConfig
             });
           });
-          crmApi4('UserJob', 'save', {records: [$scope.userJob]});
+          crmApi4('UserJob', 'save', {records: [$scope.userJob]})
+            .then(function(result) {
+              // Only post the form if the save succeeds.
+              document.getElementById("MapField").submit();
+            },
+            function(failure) {
+              // @todo add more error handling - for now, at least we waited...
+              document.getElementById("MapField").submit();
+            }
+          );
         });
 
         $scope.load();

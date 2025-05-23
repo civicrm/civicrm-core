@@ -28,4 +28,14 @@ trait ImportSaveTrait {
     return parent::write($items);
   }
 
+  /**
+   * Override parent method which expects self::fields() to actually return something
+   * @param \CRM_Core_DAO $bao
+   * @param array $input
+   * @return array
+   */
+  public function baoToArray($bao, $input): array {
+    return $bao->toArray();
+  }
+
 }

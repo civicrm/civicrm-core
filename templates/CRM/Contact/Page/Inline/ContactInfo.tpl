@@ -9,7 +9,7 @@
 *}
 {* data-edit-params to reload this info whenever relationship gets updated *}
 <div id="crm-contactinfo-content" {if $permission EQ 'edit'} class="crm-inline-edit" {/if} data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_ContactInfo"{rdelim}'>
-  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Edit info{/ts}"{/if}>
+  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts escape='htmlattribute'}Edit info{/ts}"{/if}>
     {if $permission EQ 'edit'}
     <div class="crm-edit-help">
       <span class="crm-i fa-pencil" aria-hidden="true"></span> {ts}Edit info{/ts}
@@ -21,7 +21,7 @@
         <div class="crm-label">{ts}Employer{/ts}</div>
         <div class="crm-content crm-contact-current_employer">
           {if !empty($current_employer_id)}
-          <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$current_employer_id`"}" title="{ts}view current employer{/ts}">{$current_employer}</a>
+          <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$current_employer_id`"}" title="{ts escape='htmlattribute'}view current employer{/ts}">{$current_employer}</a>
           {/if}
         </div>
       </div>

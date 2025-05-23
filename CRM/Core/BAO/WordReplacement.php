@@ -45,7 +45,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
     $wordReplacement->id = $id;
     $wordReplacement->copyValues($params);
     $wordReplacement->save();
-    if (!isset($params['options']) || CRM_Utils_Array::value('wp-rebuild', $params['options'], TRUE)) {
+    if (!isset($params['options']) || ($params['options']['wp-rebuild'] ?? TRUE)) {
       self::rebuild();
     }
     return $wordReplacement;
@@ -66,7 +66,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
     $wordReplacement->copyValues($params);
     $wordReplacement->save();
-    if (!isset($params['options']) || CRM_Utils_Array::value('wp-rebuild', $params['options'], TRUE)) {
+    if (!isset($params['options']) || ($params['options']['wp-rebuild'] ?? TRUE)) {
       self::rebuild();
     }
     return $wordReplacement;
@@ -263,11 +263,8 @@ WHERE  domain_id = %1
    *   List of word replacements (enabled/disabled) for the given locale.
    */
   public static function getLocaleCustomStrings($locale, $domainId = NULL) {
-    if ($domainId === NULL) {
-      $domainId = CRM_Core_Config::domainID();
-    }
-
-    return CRM_Utils_Array::value($locale, self::_getLocaleCustomStrings($domainId));
+    $domainId ??= CRM_Core_Config::domainID();
+    return self::_getLocaleCustomStrings($domainId)[$locale] ?? [];
   }
 
   /**
@@ -279,9 +276,10 @@ WHERE  domain_id = %1
    */
   private static function _getLocaleCustomStrings($domainId) {
     // TODO: Would it be worthwhile using memcache here?
+    // Disable i18n rewrite in query to avoid infinite recursion as this function is called from ts() and the rewrite fetches the schema which also uses ts()
     $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', [
       1 => [$domainId, 'Integer'],
-    ]);
+    ], TRUE, NULL, FALSE, FALSE);
     while ($domain->fetch()) {
       return empty($domain->locale_custom_strings) ? [] : CRM_Utils_String::unserialize($domain->locale_custom_strings);
     }

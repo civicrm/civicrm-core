@@ -85,7 +85,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     );
 
     if ($this->_action & CRM_Core_Action::UPDATE && $this->_id) {
-      $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_BAO_Batch', 'status_id');
+      $batchStatus = CRM_Batch_BAO_Batch::buildOptions('status_id');
 
       // unset exported status
       $exportedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Exported');

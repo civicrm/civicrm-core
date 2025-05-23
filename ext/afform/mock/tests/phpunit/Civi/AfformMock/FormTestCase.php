@@ -29,6 +29,12 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
 
   protected $formName = NULL;
 
+  public static function setUpBeforeClass(): void {
+    \Civi\Test::e2e()
+      ->install(['org.civicrm.afform', 'org.civicrm.afform-mock'])
+      ->apply();
+  }
+
   protected function setUp(): void {
     parent::setUp();
 
@@ -50,7 +56,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
   }
 
   protected function revertForm() {
-    \Civi\Api4\Afform::revert()
+    \Civi\Api4\Afform::revert(FALSE)
       ->addWhere('name', '=', $this->getFormName())
       ->execute();
     return $this;
@@ -76,6 +82,9 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
   protected function getFormMeta(): array {
     $scanner = new \CRM_Afform_AfformScanner();
     $meta = $scanner->getMeta($this->getFormName());
+    if (empty($meta)) {
+      throw new \RuntimeException(sprintf("Failed to find metadata for form (%s)", $this->getFormName()));
+    }
     $scanner->addComputedFields($meta);
     return $meta;
   }
@@ -88,7 +97,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
    * @return mixed
    */
   protected function prefill($params) {
-    $params['name'] = $params['name'] ?? $this->getFormName();
+    $params['name'] ??= $this->getFormName();
     return $this->callApi4AjaxSuccess('Afform', 'prefill', $params);
   }
 
@@ -100,7 +109,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
    * @return mixed
    */
   protected function prefillError($params) {
-    $params['name'] = $params['name'] ?? $this->getFormName();
+    $params['name'] ??= $this->getFormName();
     return $this->callApi4AjaxError('Afform', 'prefill', $params);
   }
 
@@ -112,7 +121,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
    * @return mixed
    */
   protected function submit($params) {
-    $params['name'] = $params['name'] ?? $this->getFormName();
+    $params['name'] ??= $this->getFormName();
     return $this->callApi4AjaxSuccess('Afform', 'submit', $params);
   }
 
@@ -124,7 +133,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
    * @return mixed
    */
   protected function submitError($params) {
-    $params['name'] = $params['name'] ?? $this->getFormName();
+    $params['name'] ??= $this->getFormName();
     return $this->callApi4AjaxError('Afform', 'submit', $params);
   }
 

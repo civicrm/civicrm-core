@@ -20,7 +20,6 @@ use CRM_Afform_ExtensionUtil as E;
  * @see https://lab.civicrm.org/extensions/afform
  * @labelField title
  * @iconField type:icon
- * @searchable none
  * @since 5.31
  * @package Civi\Api4
  */
@@ -118,6 +117,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\SubmitDraft
+   */
+  public static function submitDraft($checkPermissions = TRUE) {
+    return (new Action\Afform\SubmitDraft('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Afform\GetOptions
    */
   public static function getOptions($checkPermissions = TRUE) {
@@ -144,12 +152,14 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'name',
           'title' => E::ts('Name'),
+          'input_type' => 'Text',
         ],
         [
           'name' => 'type',
           'title' => E::ts('Type'),
           'pseudoconstant' => ['optionGroupName' => 'afform_type'],
           'default_value' => 'form',
+          'input_type' => 'Select',
         ],
         [
           'name' => 'requires',
@@ -170,10 +180,12 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'title',
           'title' => E::ts('Title'),
           'required' => $self->getAction() === 'create',
+          'input_type' => 'Text',
         ],
         [
           'name' => 'description',
           'title' => E::ts('Description'),
+          'input_type' => 'Text',
         ],
         [
           'name' => 'placement',
@@ -182,20 +194,29 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Array',
         ],
         [
-          'name' => 'summary_contact_type',
-          'title' => E::ts('Summary Contact Type'),
+          'name' => 'placement_filters',
+          'title' => E::ts('Placement Filters'),
           'data_type' => 'Array',
-          'options' => \CRM_Contact_BAO_ContactType::contactTypePairs(),
+          'description' => 'E.g. contact_type, case_type, event_type, etc.',
         ],
         [
-          'name' => 'summary_weight',
-          'title' => E::ts('Order'),
+          'name' => 'placement_weight',
+          'title' => E::ts('Placement Order'),
           'data_type' => 'Integer',
+        ],
+        [
+          'name' => 'tags',
+          'title' => E::ts('Tags'),
+          'pseudoconstant' => [
+            'callback' => [Utils\AfformTags::class, 'getTagOptions'],
+          ],
+          'data_type' => 'Array',
+          'input_type' => 'Select',
         ],
         [
           'name' => 'icon',
           'title' => E::ts('Icon'),
-          'description' => 'Icon shown in the contact summary tab',
+          'description' => 'Icon shown in the placement',
         ],
         [
           'name' => 'server_route',
@@ -239,6 +260,7 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'create_submission',
           'title' => E::ts('Log Submissions'),
           'data_type' => 'Boolean',
+          'description' => E::ts('Keep a log of the date, time, user, and items saved by each form submission.'),
         ],
         [
           'name' => 'manual_processing',
@@ -251,6 +273,12 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'email_confirmation_template_id',
           'data_type' => 'Integer',
+        ],
+        [
+          'title' => E::ts('Autosave Draft'),
+          'name' => 'autosave_draft',
+          'data_type' => 'Boolean',
+          'description' => E::ts('For authenticated users, form will auto-save periodically.'),
         ],
         [
           'name' => 'navigation',
@@ -269,6 +297,16 @@ class Afform extends Generic\AbstractEntity {
           'title' => E::ts('Date Modified'),
           'data_type' => 'Timestamp',
           'readonly' => TRUE,
+        ],
+        [
+          'name' => 'confirmation_type',
+          'pseudoconstant' => ['optionGroupName' => 'afform_confirmation_type'],
+          'default_value' => 'redirect_to_url',
+        ],
+        [
+          'name' => 'confirmation_message',
+          'title' => E::ts('Confirmation Message'),
+          'input_type' => 'Text',
         ],
       ];
       // Calculated fields returned by get action
@@ -330,6 +368,7 @@ class Afform extends Generic\AbstractEntity {
           'description' => 'Name of extension which provides this form',
           'readonly' => TRUE,
           'pseudoconstant' => ['callback' => ['CRM_Core_BAO_Managed', 'getBaseModules']],
+          'input_type' => 'Select',
         ];
         $fields[] = [
           'name' => 'search_displays',
@@ -350,13 +389,14 @@ class Afform extends Generic\AbstractEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
-      'default' => [['administer CiviCRM', 'administer afform']],
+      'default' => ['administer afform'],
       // These all check form-level permissions
       'get' => [],
       'getOptions' => [],
       'prefill' => [],
       'submit' => [],
       'submitFile' => [],
+      'submitDraft' => [],
     ];
   }
 

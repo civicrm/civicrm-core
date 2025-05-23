@@ -19,6 +19,7 @@
  * form to process actions on the field aspect of Custom
  */
 class CRM_Price_Form_Option extends CRM_Core_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The price field id saved to the session for an update.
@@ -42,18 +43,31 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   protected $_moneyFields = ['amount', 'non_deductible_amount'];
 
   /**
+   * price_set_id being edited
+   *
+   * @var int
+   */
+  protected $_sid;
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
    */
   public function preProcess() {
     $this->setPageTitle(ts('Price Option'));
-    $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive',
-      $this
-    );
-    $this->_oid = CRM_Utils_Request::retrieve('oid', 'Positive',
-      $this
-    );
+    $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this);
+    $this->_oid = CRM_Utils_Request::retrieve('oid', 'Positive', $this);
+
+    // Must set entityID for defaults to load via AJAX.
+    $this->assign('entityID', $this->_oid);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('PriceFieldValue');
+    }
   }
 
   /**
@@ -147,7 +161,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       ) {
         $this->_sid = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'price_set_id', 'id');
       }
-      $this->isEvent = FALSE;
       $extendComponentId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'extends', 'id');
       $this->assign('showMember', FALSE);
       if ($this->isComponentPriceOption($extendComponentId, 'CiviMember')) {
@@ -161,7 +174,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       }
       else {
         if ($this->isComponentPriceOption($extendComponentId, 'CiviEvent')) {
-          $this->isEvent = TRUE;
           // count
           $this->add('number', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
@@ -322,20 +334,19 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       return NULL;
     }
     else {
-      $params = $this->controller->exportValues('Option');
+      $params = $this->getSubmittedValues();
 
       foreach ($this->_moneyFields as $field) {
         $params[$field] = CRM_Utils_Rule::cleanMoney(trim($params[$field]));
       }
       $params['price_field_id'] = $this->_fid;
-      $params['is_default'] = $params['is_default'] ?? FALSE;
-      $params['is_active'] = $params['is_active'] ?? FALSE;
-      $params['visibility_id'] = $params['visibility_id'] ?? FALSE;
-      $ids = [];
-      if ($this->_oid) {
-        $params['id'] = $this->_oid;
-      }
-      $optionValue = CRM_Price_BAO_PriceFieldValue::create($params, $ids);
+      $params['is_default'] ??= FALSE;
+      $params['is_active'] ??= FALSE;
+      $params['visibility_id'] ??= FALSE;
+      $params['id'] = $this->_oid ?? NULL;
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $params['id'], 'PriceFieldValue');
+
+      CRM_Price_BAO_PriceFieldValue::writeRecord($params);
 
       CRM_Core_Session::setStatus(ts("The option '%1' has been saved.", [1 => $params['label']]), ts('Value Saved'), 'success');
     }

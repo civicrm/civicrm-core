@@ -44,7 +44,7 @@ ORDER By  v.weight
 
     $rows = [];
     while ($dao->fetch()) {
-      if (trim($dao->description)) {
+      if (trim($dao->description ?? '')) {
         $rows[$dao->value] = $dao->description;
       }
       else {

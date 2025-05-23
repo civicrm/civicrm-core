@@ -10,6 +10,7 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 use Civi\FlexMailer\Event\RunEvent;
 use Civi\FlexMailer\FlexMailerTask;
@@ -22,8 +23,12 @@ use Civi\Token\TokenRow;
  *
  * The DefaultComposer uses a TokenProcessor to generate all messages as
  * a batch.
+ *
+ * @service civi_flexmailer_default_composer
  */
-class DefaultComposer extends BaseListener {
+class DefaultComposer extends AutoService {
+
+  use IsActiveTrait;
 
   public function onRun(RunEvent $e) {
     // FIXME: This probably doesn't belong here...
@@ -58,9 +63,9 @@ class DefaultComposer extends BaseListener {
 
     $tpls = $this->createMessageTemplates($e);
     $tp->addMessage('subject', $tpls['subject'] ?? '', 'text/plain');
-    $tp->addMessage('body_text', isset($tpls['text']) ? $tpls['text'] : '',
+    $tp->addMessage('body_text', $tpls['text'] ?? '',
       'text/plain');
-    $tp->addMessage('body_html', isset($tpls['html']) ? $tpls['html'] : '',
+    $tp->addMessage('body_html', $tpls['html'] ?? '',
       'text/html');
 
     $hasContent = FALSE;

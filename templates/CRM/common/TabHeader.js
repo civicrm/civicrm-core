@@ -123,13 +123,18 @@
    * @param count {Number}
    */
   CRM.tabHeader.updateCount = function(tab, count) {
-    var oldClass = getCountClass(tab);
+    if (typeof count === 'boolean') {
+      return;
+    }
+    let oldClass = getCountClass(tab);
     if (oldClass) {
       $(tab).removeClass(oldClass);
     }
-    $(tab)
-      .addClass('crm-count-' + count)
-      .find('a em').html('' + count);
+    let countElement = $(tab).addClass('crm-count-' + count).find('a em');
+    if (!countElement.length) {
+      countElement = $(tab).find('a').append('<em></em>').find('em');
+    }
+    countElement.text('' + count);
   };
 
   /**

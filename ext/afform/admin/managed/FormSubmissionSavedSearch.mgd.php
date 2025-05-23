@@ -14,9 +14,6 @@ return [
       'values' => [
         'name' => 'AfAdmin_Submission_List',
         'label' => E::ts('Form Submissions'),
-        'form_values' => NULL,
-        'mapping_id' => NULL,
-        'search_custom_id' => NULL,
         'api_entity' => 'AfformSubmission',
         'api_params' => [
           'version' => 4,
@@ -27,8 +24,6 @@ return [
             'status_id:label',
           ],
         ],
-        'expires_date' => NULL,
-        'description' => NULL,
       ],
       'match' => [
         'name',
@@ -100,6 +95,12 @@ return [
               'dataType' => 'Integer',
               'label' => E::ts('Submission Status'),
               'sortable' => TRUE,
+              'icons' => [
+                [
+                  'field' => 'status_id:icon',
+                  'side' => 'left',
+                ],
+              ],
             ],
             [
               'size' => 'btn-xs',
@@ -122,7 +123,7 @@ return [
                   'text' => E::ts('Process'),
                   'style' => 'default',
                   'condition' => [
-                    'status_id:label',
+                    'status_id:name',
                     '=',
                     'Pending',
                   ],
@@ -130,6 +131,15 @@ return [
                   'entity' => 'AfformSubmission',
                   'action' => '',
                   'join' => '',
+                  'target' => 'crm-popup',
+                ],
+                [
+                  'icon' => 'fa-rectangle-xmark',
+                  'text' => E::ts('Reject'),
+                  'style' => 'warning',
+                  'condition' => [],
+                  'task' => 'reject',
+                  'entity' => 'AfformSubmission',
                   'target' => 'crm-popup',
                 ],
               ],
@@ -144,6 +154,7 @@ return [
             ],
           ],
           'placeholder' => 5,
+          'actions_display_mode' => 'menu',
         ],
         'acl_bypass' => FALSE,
       ],

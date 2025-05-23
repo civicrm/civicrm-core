@@ -16,25 +16,19 @@
  */
 
 /**
- * State machine for managing different states of the Import process.
- *
+ * State machine for managing different pages while setting up PCP flow.
  */
 class CRM_PCP_StateMachine_PCP extends CRM_Core_StateMachine {
 
   /**
    * Class constructor.
    *
-   * @param object $controller
-   * @param \const|int $action
-   *
-   * @internal param \CRM_Contact_Import_Controller $object
-   * @return \CRM_PCP_StateMachine_PCP CRM_Contact_Import_StateMachine
+   * @param CRM_PCP_Controller_PCP $controller
+   * @param int $action
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
-
-    $session = CRM_Core_Session::singleton();
-    $session->set('singleForm', FALSE);
+    CRM_Core_Session::singleton()->set('singleForm', FALSE);
 
     $this->_pages = [
       'CRM_PCP_Form_PCPAccount' => NULL,

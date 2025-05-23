@@ -16,7 +16,7 @@ use Civi\Api4\Contribution;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
+class CRM_Core_Payment_PayPalProIPN {
 
   /**
    * Input parameters from payment processor. Store these so that
@@ -129,9 +129,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @throws CRM_Core_Exception
    */
   public function __construct($inputData) {
-    $this->setInputParameters($inputData);
+    if (!is_array($inputData)) {
+      throw new CRM_Core_Exception('Invalid input parameters');
+    }
+    $this->_inputParameters = $inputData;
     $this->setInvoiceData();
-    parent::__construct();
   }
 
   /**
@@ -205,7 +207,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function retrieve($name, $type, $abort = TRUE) {
     $value = CRM_Utils_Type::validate(
-      CRM_Utils_Array::value($name, $this->_inputParameters),
+      $this->_inputParameters[$name] ?? NULL,
       $type,
       FALSE
     );
@@ -259,7 +261,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
           // In future moving to create pending & then complete, but this OK for now.
           // Also consider accepting 'Failed' like other processors.
           $input['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-          $input['invoice_id'] = md5(uniqid(rand(), TRUE));
+          $input['invoice_id'] = bin2hex(random_bytes(16));
           $input['original_contribution_id'] = $this->getContributionID();
           $input['contribution_recur_id'] = $this->getContributionRecurID();
 

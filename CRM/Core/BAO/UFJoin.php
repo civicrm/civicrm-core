@@ -183,7 +183,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * @param array $conditions
    * @return array
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;

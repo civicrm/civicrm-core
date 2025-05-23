@@ -13,10 +13,10 @@
     <div class="messages status no-popup">{include file="CRM/Contribute/Form/Task.tpl"}</div>
 {/if}
 
-<div class="crm-accordion-wrapper crm-html_email-accordion ">
-  <div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-html_email-accordion " open>
+  <summary>
     {$form.more_options_header.html}
-  </div><!-- /.crm-accordion-header -->
+  </summary>
   <div class="crm-accordion-body">
     <table class="form-layout-compressed">
       <tr><td class="label-left">{$form.thankyou_update.html} {$form.thankyou_update.label}</td><td></td></tr>
@@ -36,12 +36,12 @@
         <td>{$form.email_options.html}</td>
       </tr>
       <tr>
-        <td class="label-left">{$form.from_email_address.label}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+        <td class="label-left">{$form.from_email_address.label}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
         <td>{$form.from_email_address.html}</td>
       </tr>
     </table>
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+  </div>
+</details>
 
 {include file="CRM/Contact/Form/Task/PDFLetterCommon.tpl"}
 

@@ -52,13 +52,13 @@
 </div>
 {else}
     <div class="messages status no-popup">
-      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
       {ts}None found.{/ts}
     </div>
 {/if}
     {if !empty($setupActions)}
         <form>
-            <select id="crm-mail-setup" name="crm-mail-setup" class="crm-select2 crm-form-select" aria-label="{ts}Add Mail Account{/ts}">
+            <select id="crm-mail-setup" name="crm-mail-setup" class="crm-select2 crm-form-select" aria-label="{ts escape='htmlattribute'}Add Mail Account{/ts}">
                 <option value="" aria-hidden="true">{ts}Add Mail Account{/ts}</option>
                 {foreach from=$setupActions key=setupActionsName item=setupAction}
                     <option data-url="{$setupAction.url|escape}" value="{$setupActionsName|escape}">{$setupAction.title|escape}</option>

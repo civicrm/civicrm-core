@@ -12,7 +12,7 @@
   {if $action eq 8}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
-      {ts 1=$gLabel}WARNING: Deleting this option will result in the loss of all %1 related records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
+      {$deleteMessage|escape}
     </div>
   {else}
     <table class="form-layout-compressed">
@@ -21,13 +21,6 @@
              <td class="label">{ts}Custom Search Path{/ts}</td>
              <td>{$form.label.html}<br />
                 <span class="description">{ts}Enter the "class path" for this custom search here.{/ts}
-             </td>
-           </tr>
-        {elseif $gName eq 'from_email_address'}
-           <tr class="crm-admin-options-form-block-from_email_address">
-             <td class="label">{ts}FROM Email Address{/ts} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_option_value' field='label' id=$id}{/if}</td>
-             <td>{$form.label.html}<br />
-                <span class="description">{ts}Include double-quotes (&quot;) around the name and angle-brackets (&lt; &gt;) around the email address.<br />EXAMPLE: <em>&quot;Client Services&quot; &lt;clientservices@example.org&gt;</em>{/ts}<span>
              </td>
            </tr>
         {elseif $gName eq 'redaction_rule'}
@@ -156,6 +149,11 @@
              <td>{$form.contact_type_id.html}</td>
            </tr>
         {/if}
+        <tr class="crm-admin-options-form-block-custom_data">
+          <td colspan="2">
+            {include file="CRM/common/customDataBlock.tpl" customDataType='OptionValue' cid=false}
+          </td>
+        </tr>
     </table>
   {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

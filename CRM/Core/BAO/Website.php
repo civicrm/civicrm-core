@@ -18,7 +18,7 @@
 /**
  * This class contain function for Website handling.
  */
-class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
+class CRM_Core_BAO_Website extends CRM_Core_DAO_Website implements Civi\Core\HookInterface {
   use CRM_Contact_AccessTrait;
 
   /**

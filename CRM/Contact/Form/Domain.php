@@ -19,6 +19,8 @@
  * This class is to build the form for adding Group.
  */
 class CRM_Contact_Form_Domain extends CRM_Core_Form {
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
 
   /**
    * The group id, used when editing a group
@@ -64,8 +66,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   public function preProcess() {
     $this->setTitle(ts('Organization Address and Contact Info'));
-    $breadCrumbPath = CRM_Utils_System::url('civicrm/admin', 'reset=1');
-    CRM_Utils_System::appendBreadCrumb(ts('Administer'), $breadCrumbPath);
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
 
@@ -94,8 +94,9 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
       unset($params['id']);
       $locParams = ['contact_id' => $domainDefaults['contact_id']];
-      $this->_locationDefaults = $defaults = CRM_Core_BAO_Location::getValues($locParams);
-
+      $this->_locationDefaults['address'] = $defaults['address'] = CRM_Core_BAO_Address::getValues($locParams);
+      $this->_locationDefaults['phone'] = $defaults['phone'] = $this->getExistingPhonesReIndexed();
+      $this->_locationDefaults['email'] = $defaults['email'] = $this->getExistingEmailsReIndexed();
       $config = CRM_Core_Config::singleton();
       if (!isset($defaults['address'][1]['country_id'])) {
         $defaults['address'][1]['country_id'] = $config->defaultContactCountry;
@@ -122,8 +123,15 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     //build location blocks.
     $this->assign('addressSequence', CRM_Core_BAO_Address::addressSequence());
     CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
+
+    //Email box
+    $this->addField("email[1][email]", [
+      'entity' => 'email',
+      'aria-label' => ts('Email 1'),
+      'label' => ts('Email 1'),
+    ]);
+    $this->addRule("email[1][email]", ts('Email is not valid.'), 'email');
+    $this->addPhoneBlockFields(1);
 
     $this->addButtons([
       [
@@ -162,7 +170,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    */
   public static function formRule($fields) {
     // check for state/country mapping
-    $errors = CRM_Contact_Form_Edit_Address::formRule($fields, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullObject);
+    $errors = CRM_Contact_Form_Edit_Address::formRule($fields);
     // $errors === TRUE means no errors from above formRule excution,
     // so declaring $errors to array for further processing
     if ($errors === TRUE) {
@@ -180,7 +188,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * Process the form when submitted.
    */
   public function postProcess() {
-    $params = $this->exportValues();
+    $params = $this->getSubmittedValues();
     $params['entity_id'] = $this->_id;
     $params['entity_table'] = CRM_Core_BAO_Domain::getTableName();
     $domain = CRM_Core_BAO_Domain::edit($params, $this->_id);
@@ -230,6 +238,10 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     CRM_Core_Session::setStatus(ts("Domain information for '%1' has been saved.", [1 => $domain->name]), ts('Saved'), 'success');
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
+  }
+
+  public function getContactID() {
+    return CRM_Core_BAO_Domain::getDomain()->contact_id;
   }
 
 }

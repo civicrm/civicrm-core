@@ -38,14 +38,6 @@
     <weight>411</weight>
   </item>
   <item>
-    <path>civicrm/admin/options/from_email_address/civimail</path>
-    <title>From Email Addresses</title>
-    <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
-    <page_callback>CRM_Admin_Page_Options</page_callback>
-    <adminGroup>CiviMail</adminGroup>
-    <weight>415</weight>
-  </item>
-  <item>
     <path>civicrm/admin/mailSettings</path>
     <title>Mail Accounts</title>
     <page_callback>CRM_Admin_Page_MailSettings</page_callback>
@@ -115,7 +107,7 @@
   <item>
     <path>civicrm/mailing/unsubscribe</path>
     <title>Unsubscribe</title>
-    <page_callback>CRM_Mailing_Form_Unsubscribe</page_callback>
+    <page_callback>CRM_Mailing_Page_Unsubscribe</page_callback>
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>
     <weight>640</weight>
@@ -159,14 +151,6 @@
     <access_arguments>access CiviMail;create mailings</access_arguments>
     <path_arguments>mid=%%mid%%</path_arguments>
     <weight>680</weight>
-  </item>
-  <item>
-    <path>civicrm/mailing/forward</path>
-    <title>Forward Mailing</title>
-    <page_callback>CRM_Mailing_Form_ForwardMailing</page_callback>
-    <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
-    <is_public>true</is_public>
-    <weight>685</weight>
   </item>
   <item>
     <path>civicrm/mailing/report/event</path>

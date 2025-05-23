@@ -26,20 +26,17 @@ class CRM_Mailing_Event_BAO_MailingEventOpened extends CRM_Mailing_Event_DAO_Mai
    */
   public static function open($queue_id) {
     // First make sure there's a matching queue event.
-
-    $success = FALSE;
-
     $q = new CRM_Mailing_Event_BAO_MailingEventQueue();
     $q->id = $queue_id;
     if ($q->find(TRUE)) {
-      $oe = new CRM_Mailing_Event_BAO_MailingEventOpened();
-      $oe->event_queue_id = $queue_id;
-      $oe->time_stamp = date('YmdHis');
-      $oe->save();
-      $success = TRUE;
+      self::writeRecord([
+        'event_queue_id' => $queue_id,
+        'time_stamp' => date('YmdHis'),
+      ]);
+      return TRUE;
     }
 
-    return $success;
+    return FALSE;
   }
 
   /**
@@ -100,7 +97,7 @@ class CRM_Mailing_Event_BAO_MailingEventOpened extends CRM_Mailing_Event_DAO_Mai
       return $dao->N;
     }
     else {
-      return $dao->opened ? $dao->opened : 0;
+      return $dao->opened ?: 0;
     }
   }
 

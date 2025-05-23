@@ -42,49 +42,37 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'delete in CiviCase' => [
-        ts('delete in CiviCase'),
-        ts('Delete cases'),
+        'label' => ts('delete in CiviCase'),
+        'description' => ts('Delete cases'),
       ],
       'administer CiviCase' => [
-        ts('administer CiviCase'),
-        ts('Define case types, access deleted cases'),
+        'label' => ts('administer CiviCase'),
+        'description' => ts('Define case types, access deleted cases'),
       ],
       'access my cases and activities' => [
-        ts('access my cases and activities'),
-        ts('View and edit only those cases managed by this user'),
+        'label' => ts('access my cases and activities'),
+        'description' => ts('View and edit only those cases managed by this user'),
       ],
       'access all cases and activities' => [
-        ts('access all cases and activities'),
-        ts('View and edit all cases (for visible contacts)'),
+        'label' => ts('access all cases and activities'),
+        'description' => ts('View and edit all cases (for visible contacts)'),
       ],
       'add cases' => [
-        ts('add cases'),
-        ts('Open a new case'),
+        'label' => ts('add cases'),
+        'description' => ts('Open a new case'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 
   /**
-   * @inheritDoc
+   * Called via hook to include references from case xml
    */
-  public function getReferenceCounts($dao) {
+  public static function getReferenceCounts($dao): array {
     $result = [];
     if ($dao instanceof CRM_Core_DAO_OptionValue) {
       /** @var CRM_Core_DAO_OptionValue $dao */

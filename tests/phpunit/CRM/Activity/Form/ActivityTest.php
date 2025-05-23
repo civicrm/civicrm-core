@@ -11,6 +11,13 @@ use Civi\Test\Invasive;
  */
 class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
+  /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
   use FormTrait;
 
   protected $assignee1;
@@ -190,6 +197,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
       'entity_id' => $activity['id'],
       'entity_table' => 'civicrm_activity',
       'content' => 'delete me',
+      'version' => 3,
     ]);
     $this->assertNotEmpty($attachment['id']);
 
@@ -303,7 +311,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $form->assignActivityType();
 
     // Check the smarty template has the correct values assigned.
-    $keyValuePair = $form->getTemplate()->get_template_vars('activityTypeNameAndLabel');
+    $keyValuePair = $form->getTemplate()->getTemplateVars('activityTypeNameAndLabel');
     $this->assertEquals('47395hc', $keyValuePair['machineName']);
     $this->assertEquals('Hide Cookies', $keyValuePair['displayLabel']);
 

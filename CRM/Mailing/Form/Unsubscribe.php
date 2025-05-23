@@ -51,20 +51,16 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $isConfirm = CRM_Utils_Request::retrieveValue('confirm', 'Boolean', FALSE, FALSE, 'GET');
 
     if (!$job_id || !$queue_id || !$hash) {
-      CRM_Utils_System::sendResponse(
-        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: missing parameters"))
-      );
+      CRM_Utils_System::sendInvalidRequestResponse(ts("Invalid request: missing parameters"));
     }
 
     // verify that the three numbers above match
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
-      CRM_Utils_System::sendResponse(
-        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: bad parameters"))
-      );
+      CRM_Utils_System::sendInvalidRequestResponse(ts("Invalid request: bad parameters"));
     }
 
-    list($displayName, $email) = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
+    [$displayName, $email] = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
     $this->assign('display_name', $displayName);
     $nameMasked = '';
     $names = explode(' ', $displayName);
@@ -77,7 +73,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $this->assign('email', $email);
     $this->_email = $email;
 
-    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_id, $hash, TRUE);
     $this->assign('groups', $groups ?? []);
     $groupExist = NULL;
     foreach ($groups as $value) {
@@ -95,7 +91,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    CRM_Utils_System::setNoRobotsFlag();
     $this->setTitle(ts('Unsubscribe Confirmation'));
 
     $buttons = [
@@ -119,7 +115,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     CRM_Core_Session::singleton()->pushUserContext($confirmURL);
 
     // Email address verified
-    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($this->_job_id, $this->_queue_id, $this->_hash);
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $this->_queue_id, $this->_hash);
 
     if (!empty($groups)) {
       CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($this->_queue_id, $groups, FALSE, $this->_job_id);

@@ -1,11 +1,11 @@
 <?php
 
 require_once 'financialacls.civix.php';
-// phpcs:disable
+
 use Civi\Api4\EntityFinancialAccount;
+use Civi\Api4\FinancialType;
 use Civi\Api4\MembershipType;
 use CRM_Financialacls_ExtensionUtil as E;
-// phpcs:enable
 
 /**
  * Implements hook_civicrm_config().
@@ -59,7 +59,7 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
   }
   if (in_array($objectName, ['LineItem', 'Product'], TRUE) && !empty($params['check_permissions'])) {
     if (empty($params['financial_type_id']) && !empty($params['id'])) {
-      $dao = CRM_Core_DAO_AllCoreTables::getFullName($objectName);
+      $dao = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($objectName);
       $params['financial_type_id'] = CRM_Core_DAO::getFieldValue($dao, $params['id'], 'financial_type_id');
     }
     $operationMap = ['delete' => CRM_Core_Action::DELETE, 'edit' => CRM_Core_Action::UPDATE, 'create' => CRM_Core_Action::ADD];
@@ -85,7 +85,7 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_selectWhereClause
  */
 function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
-  if (!financialacls_is_acl_limiting_enabled()) {
+  if (CRM_Core_Permission::check([['all CiviCRM permissions and ACLs', 'administer CiviCRM Financial Types']])) {
     return;
   }
 
@@ -96,6 +96,12 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
     case 'Contribution':
     case 'Product':
       $clauses['financial_type_id'][] = _financialacls_civicrm_get_type_clause();
+      if ($entity === 'Contribution') {
+        $unavailableTypes = _financialacls_civicrm_get_inaccessible_financial_types();
+        if (!empty($unavailableTypes)) {
+          $clauses['id'][] = 'AND NOT EXISTS (SELECT 1 FROM civicrm_line_item WHERE contribution_id = {id} AND financial_type_id IN (' . implode(',', $unavailableTypes) . '))';
+        }
+      }
       break;
 
     case 'Membership':
@@ -125,7 +131,6 @@ function _financialacls_civicrm_get_accounts_clause(): string {
       $clause = '= 0';
       Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()] = &$clause;
       $accounts = (array) EntityFinancialAccount::get()
-        ->addWhere('account_relationship:name', '=', 'Income Account is')
         ->addWhere('entity_table', '=', 'civicrm_financial_type')
         ->addSelect('entity_id', 'financial_account_id')
         ->addJoin('FinancialType AS financial_type', 'LEFT', [
@@ -163,9 +168,24 @@ function _financialacls_civicrm_get_type_clause(): string {
  */
 function _financialacls_civicrm_get_accessible_financial_types(): array {
   $types = [];
-  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::VIEW, FALSE, TRUE);
   if (empty($types)) {
     $types = [0];
+  }
+  return array_keys($types);
+}
+
+/**
+ * Get an array of the ids of accessible financial types.
+ *
+ * If none then it will be [0]
+ *
+ * @return int[]
+ */
+function _financialacls_civicrm_get_inaccessible_financial_types(): array {
+  $types = (array) FinancialType::get(FALSE)->addSelect('id')->execute()->indexBy('id');
+  foreach (_financialacls_civicrm_get_accessible_financial_types() as $accessibleFinancialType) {
+    unset($types[$accessibleFinancialType]);
   }
   return array_keys($types);
 }
@@ -211,6 +231,14 @@ function financialacls_civicrm_buildAmount($component, $form, &$feeBlock) {
       unset($feeBlock[$key]);
     }
   }
+  if (is_a($form, 'CRM_Event_Form_Participant')
+    && empty($feeBlock)
+    && ($_REQUEST['snippet'] ?? NULL) == CRM_Core_Smarty::PRINT_NOFORM
+  ) {
+    CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
+    return FALSE;
+  }
+
 }
 
 /**
@@ -246,23 +274,37 @@ function financialacls_civicrm_permission(&$permissions) {
     return;
   }
   $actions = [
-    'add' => ts('add'),
-    'view' => ts('view'),
-    'edit' => ts('edit'),
-    'delete' => ts('delete'),
+    'add' => E::ts('add'),
+    'view' => E::ts('view'),
+    'edit' => E::ts('edit'),
+    'delete' => E::ts('delete'),
   ];
-  $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate');
-  foreach ($financialTypes as $id => $type) {
+  foreach ($actions as $action => $action_ts) {
+    $permissions[$action . ' contributions of all types'] = [
+      'label' => E::ts("CiviCRM: %1 contributions of all types", [1 => $action_ts]),
+      'description' => E::ts('%1 contributions of all types', [1 => $action_ts]),
+    ];
+  }
+  try {
+    $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, label FROM civicrm_financial_type')->fetchAll();
+  }
+  catch (\Civi\Core\Exception\DBQueryException $e) {
+    // dev/core#5794: While upgrade is pending, the 'label' column may not yet exist. We just need a 'label' that's good enough to get to upgrader.
+    $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, name AS label FROM civicrm_financial_type')->fetchAll();
+    // N.B. That's the most likely problem+fix. If there's some other SQL problem, then the fallback query will also throw an exception.
+  }
+  foreach ($financialTypes as $type) {
     foreach ($actions as $action => $action_ts) {
-      $permissions[$action . ' contributions of type ' . $type] = [
-        ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
-        ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+      $permissions[$action . ' contributions of type ' . $type['name']] = [
+        'label' => E::ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type['label']]),
+        'description' => E::ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type['label']]),
+        'implied_by' => [$action . ' contributions of all types'],
       ];
     }
   }
   $permissions['administer CiviCRM Financial Types'] = [
-    ts('CiviCRM: administer CiviCRM Financial Types'),
-    ts('Administer access to Financial Types'),
+    'label' => E::ts('CiviCRM: administer CiviCRM Financial Types'),
+    'description' => E::ts('Administer access to Financial Types'),
   ];
 }
 
@@ -285,12 +327,44 @@ function _financialacls_civi_api4_authorizeContribution(\Civi\Api4\Event\Authori
     if ($e->getActionName() === 'delete') {
       // First check contribution financial type
       // Now check permissioned line items & permissioned contribution
-      if (!CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE, $e->getUserID())
-      ) {
+      if (!_civicrm_financial_acls_check_permissioned_line_items($contributionID, 'delete', FALSE, $e->getUserID())) {
         $e->setAuthorized(FALSE);
       }
     }
   }
+}
+
+/**
+ * Function to check if lineitems present in a contribution have permissioned FTs.
+ *
+ * @param int $id
+ *   contribution id
+ * @param string $op
+ *   the mode of operation, can be add, view, edit, delete
+ * @param bool $force
+ * @param int $contactID
+ *
+ * @return bool
+ */
+function _civicrm_financial_acls_check_permissioned_line_items($id, $op, $force = TRUE, $contactID = NULL) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return TRUE;
+  }
+  $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
+  $flag = FALSE;
+  foreach ($lineItems as $items) {
+    if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $items['financial_type_id']), $contactID)) {
+      if ($force) {
+        throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
+      }
+      $flag = FALSE;
+      break;
+    }
+    else {
+      $flag = TRUE;
+    }
+  }
+  return $flag;
 }
 
 /**
@@ -329,26 +403,31 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
   if (!financialacls_is_acl_limiting_enabled()) {
     return;
   }
-  if (in_array($entity, ['Contribution', 'ContributionRecur'], TRUE) && $field === 'financial_type_id' && $params['context'] === 'search') {
-    $action = CRM_Core_Action::VIEW;
-    // At this stage we are only considering the view action. Code from
-    // CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes().
-    $actions = [
-      CRM_Core_Action::VIEW => 'view',
-      CRM_Core_Action::UPDATE => 'edit',
-      CRM_Core_Action::ADD => 'add',
-      CRM_Core_Action::DELETE => 'delete',
-    ];
-    $cacheKey = 'available_types_' . $action;
-    if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
-      foreach ($options as $finTypeId => $type) {
-        if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
-          unset($options[$finTypeId]);
+  $context = $params['context'];
+  $checkPermissions = (bool) ($params['check_permissions'] ?? TRUE);
+  if (in_array($entity, ['Contribution', 'ContributionRecur'], TRUE) && $field === 'financial_type_id' && $checkPermissions) {
+    if ($context === 'search' || $context === 'create' || $context === 'full') {
+      // At this stage we are only considering the view & create actions. Code from
+      // CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes().
+      $actions = [
+        CRM_Core_Action::VIEW => 'view',
+        CRM_Core_Action::UPDATE => 'edit',
+        CRM_Core_Action::ADD => 'add',
+        CRM_Core_Action::DELETE => 'delete',
+      ];
+      $action = $context === 'search' ? CRM_Core_Action::VIEW : CRM_Core_Action::ADD;
+      $cacheKey = 'available_types_' . $context;
+      if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
+        foreach ($options as $finTypeId => $option) {
+          $type = is_string($option) ? $option : $option['name'];
+          if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
+            unset($options[$finTypeId]);
+          }
         }
+        \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey] = $options;
       }
-      \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey] = $options;
+      $options = \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey];
     }
-    $options = \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey];
   }
 }
 
@@ -361,7 +440,8 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
  * @return bool
  */
 function financialacls_is_acl_limiting_enabled(): bool {
-  return (bool) Civi::settings()->get('acl_financial_type');
+  // @todo - remove this...
+  return TRUE;
 }
 
 /**
@@ -388,7 +468,7 @@ function financialacls_civicrm_alterMenu(array &$menu): void {
 
 /**
  * @param string $formName
- * @param \CRM_Core_Form $form
+ * @param \CRM_Event_Form_Registration|\CRM_Contribute_Form_Contribution $form
  */
 function financialacls_civicrm_preProcess(string $formName, \CRM_Core_Form $form): void {
   if (!financialacls_is_acl_limiting_enabled()) {
@@ -399,6 +479,14 @@ function financialacls_civicrm_preProcess(string $formName, \CRM_Core_Form $form
     if (!CRM_Core_Permission::check('add contributions of type ' . $form->getContributionPageValue('financial_type_id:name'))) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
+  }
+
+  // check for ability to add contributions of type
+  if (str_starts_with($formName, 'CRM_Event_Form_Registration_') && $form->getEventValue('is_monetary')
+    && !CRM_Core_Permission::check(
+      'add contributions of type ' . CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $form->getEventValue('financial_type_id')))
+  ) {
+    CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
   }
 
 }
@@ -415,6 +503,29 @@ function financialacls_civicrm_links(string $op, ?string $objectName, $objectID,
   }
   if ($objectName === 'MembershipType') {
     $financialType = CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', CRM_Member_BAO_MembershipType::getMembershipType($objectID)['financial_type_id']);
+  }
+  if ($objectName === 'Contribution') {
+    // Now check for lineItems
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID((int) $objectID);
+    foreach ($lineItems as $item) {
+      $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $item['financial_type_id']);
+      if (!CRM_Core_Permission::check('view contributions of type ' . $financialType)) {
+        // Remove all links & early return for this contribution if there is an un-viewable financial type.
+        $links = [];
+        return;
+      }
+      if (!CRM_Core_Permission::check('edit contributions of type ' . $financialType)) {
+        unset($links[CRM_Core_Action::UPDATE]);
+      }
+      if (!CRM_Core_Permission::check('delete contributions of type ' . $financialType)) {
+        unset($links[CRM_Core_Action::DELETE]);
+      }
+    }
+    $financialTypeID = $values['financial_type_id'] ?? CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $objectID, 'financial_type_id');
+    $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $financialTypeID);
+  }
+
+  if (!empty($financialType)) {
     $hasEditPermission = CRM_Core_Permission::check('edit contributions of type ' . $financialType);
     $hasDeletePermission = CRM_Core_Permission::check('delete contributions of type ' . $financialType);
     if (!$hasDeletePermission || !$hasEditPermission) {

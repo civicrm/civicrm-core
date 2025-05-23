@@ -1,0 +1,62 @@
+/* Bootstrap Nav */
+
+.crm-container .nav {
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  cursor: var(--crm-hover-clickable);
+}
+.crm-container .nav > li {
+  position: relative;
+  display: block;
+}
+.crm-container .nav > li > a {
+  padding: var(--crm-m) var(--crm-r);
+}
+.crm-container .nav > li > a:hover,
+.crm-container .nav > li > a:focus {
+  text-decoration: none;
+  background-color: var(--crm-c-background2);
+}
+.crm-container .nav > li.disabled > a {
+  color: var(--crm-c-inactive);
+}
+.crm-container .nav > li.disabled > a:hover,
+.crm-container .nav > li.disabled > a:focus {
+  color: var(--crm-c-inactive);
+  text-decoration: none;
+  cursor: not-allowed;
+  background-color: transparent;
+}
+.crm-container .nav .open > a,
+.crm-container .nav .open > a:hover,
+.crm-container .nav .open > a:focus {
+  background-color: var(--crm-c-background2);
+  border-color: var(--crm-c-link);
+}
+.crm-container .nav .nav-divider {
+  height: 1px;
+  margin: var(--crm-m) 0;
+  overflow: hidden;
+  background-color: var(--crm-c-divider);
+}
+.crm-container .nav > li > a > img {
+  max-width: none;
+}
+.crm-container .nav.nav-stacked {
+  flex-direction: column;
+}
+#civicrm-menu-nav #civicrm-menu .crm-logo-sm {
+  background: var(--crm-svg-logo);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+}
+.crm-container .nav.nav-pills {
+  gap: var(--crm-flex-gap);
+}

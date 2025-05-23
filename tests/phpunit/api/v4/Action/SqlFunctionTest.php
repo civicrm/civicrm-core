@@ -213,10 +213,11 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('first_name', 'hello')
       ->execute()->first()['id'];
     $sampleData = [
-      ['subject' => 'abc', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 123, 'location' => 'abc'],
-      ['subject' => 'xyz', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'location' => 'abc', 'is_deleted' => 1],
-      ['subject' => 'def', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 456, 'location' => 'abc'],
+      ['subject' => 'abc', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 123, 'location' => 'abc', 'activity_date_time' => '2025-02-01 01:00:00'],
+      ['subject' => 'xyz', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'location' => 'abc', 'is_deleted' => 1, 'activity_date_time' => '2025-02-01 01:00:03'],
+      ['subject' => 'def', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 456, 'location' => 'abc', 'activity_date_time' => '2025-02-01 03:00:00'],
     ];
+
     $aids = Activity::save(FALSE)
       ->setRecords($sampleData)
       ->execute()->column('id');
@@ -230,7 +231,11 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('GREATEST(duration, 0200) AS greatest_of_duration_or_200')
       ->addSelect('LEAST(duration, 300) AS least_of_duration_and_300')
       ->addSelect('ISNULL(duration) AS duration_isnull')
+      ->addSelect('ISNOTNULL(duration) AS duration_isnotnull')
       ->addSelect('IFNULL(duration, 2) AS ifnull_duration_2')
+      ->addSelect('created_date')
+      ->addSelect('activity_date_time')
+      ->addSelect('TIMESTAMPDIFF(SECOND, created_date, activity_date_time) AS time_diff')
       ->addOrderBy('id')
       ->execute()->indexBy('id');
 
@@ -263,9 +268,35 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
 
+    $this->assertEquals(TRUE, $result[$aids[0]]['duration_isnotnull']);
+    $this->assertEquals(FALSE, $result[$aids[1]]['duration_isnotnull']);
+    $this->assertEquals(TRUE, $result[$aids[2]]['duration_isnotnull']);
+
     $this->assertEquals(123, $result[$aids[0]]['ifnull_duration_2']);
     $this->assertEquals(2, $result[$aids[1]]['ifnull_duration_2']);
     $this->assertEquals(456, $result[$aids[2]]['ifnull_duration_2']);
+
+    // Calculate expected TIMESTAMPDIFF
+    foreach ($aids as $aid) {
+      // Calculate difference between created_date and activity_date_time
+      $origin = new \DateTimeImmutable($result[$aid]['created_date']);
+      $target = new \DateTimeImmutable($result[$aid]['activity_date_time']);
+      $diffInSeconds = $target->getTimestamp() - $origin->getTimestamp();
+
+      // The behaviors of TIMESTAMPDIFF() and DateTimeImmutable->getTimestamp() are
+      // fundamentally misaligned because
+      // (1) the input columns created_date (TIMESTAMP) and activity_date_time (DATETIME) have different TZ handling, and
+      // (2) https://lab.civicrm.org/dev/core/-/issues/3121 means that MySQL cannot identify appropriate DST offsets.
+      // If your organization's jurisdiction does not observe DST, then maybe you don't care.
+      // Similarly, if you're only interested in high-level differences (days/months/years), then DST is a rounding error.
+      // But in general, until the timezone situation is better, you have to expect TIMESTAMPDIFF() to give flaky outputs.
+
+      // $this->assertEquals($diffInSeconds, $result[$aid]['time_diff']);
+      $this->assertTrue(
+        in_array($result[$aid]['time_diff'], [$diffInSeconds, $diffInSeconds + 3600, $diffInSeconds - 3600])
+      );
+
+    }
   }
 
   public function testStringFunctions(): void {
@@ -314,6 +345,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('MONTH(birth_date):label AS month_name')
       ->addSelect('MONTH(birth_date):label')
       ->addSelect('EXTRACT(YEAR_MONTH FROM birth_date) AS year_month')
+      ->addSelect('DATE_SUB(birth_date, INTERVAL 1 YEAR) AS birth_date_minus_1_year')
+      ->addSelect('DATE_ADD(birth_date, INTERVAL 1 YEAR) AS birth_date_plus_1_year')
       ->addSelect('DAYOFWEEK(birth_date) AS day_number')
       ->addSelect('DAYOFWEEK(birth_date):label AS day_name')
       ->addWhere('last_name', '=', $lastName)
@@ -327,6 +360,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('November', $result[0]['month_name']);
     $this->assertEquals('November', $result[0]['MONTH:birth_date:label']);
     $this->assertEquals('200911', $result[0]['year_month']);
+    $this->assertEquals('2008-11-11', $result[0]['birth_date_minus_1_year']);
+    $this->assertEquals('2010-11-11', $result[0]['birth_date_plus_1_year']);
     $this->assertEquals(4, $result[0]['day_number']);
     $this->assertEquals('Wednesday', $result[0]['day_name']);
 
@@ -337,8 +372,58 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('January', $result[1]['month_name']);
     $this->assertEquals('January', $result[1]['MONTH:birth_date:label']);
     $this->assertEquals('201001', $result[1]['year_month']);
+    $this->assertEquals('2009-01-01', $result[1]['birth_date_minus_1_year']);
+    $this->assertEquals('2011-01-01', $result[1]['birth_date_plus_1_year']);
     $this->assertEquals(6, $result[1]['day_number']);
     $this->assertEquals('Friday', $result[1]['day_name']);
+  }
+
+  public function testAnniversaryFunctions(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2001-02-28'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => '2000-02-29'],
+    ];
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => $sampleData,
+    ]);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('birth_date')
+      ->addSelect('next_birthday')
+      ->addSelect('NEXTANNIV(birth_date) AS next_birthday_date')
+      ->addSelect('DAYSTOANNIV(birth_date) AS next_birthday_count')
+      ->addWhere('last_name', '=', $lastName)
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertEquals('2001-02-28', $result[0]['birth_date']);
+    $this->assertEquals('2000-02-29', $result[1]['birth_date']);
+    $this->assertNotNull($result[0]['next_birthday']);
+    $this->assertNotNull($result[1]['next_birthday']);
+    $this->assertNotNull($result[0]['next_birthday_count']);
+    $this->assertNotNull($result[1]['next_birthday_count']);
+    $this->assertNotNull($result[0]['next_birthday_date']);
+    $this->assertNotNull($result[1]['next_birthday_date']);
+    $this->assertEquals($result[0]['next_birthday'], $result[0]['next_birthday_count']);
+    $this->assertEquals($result[1]['next_birthday'], $result[1]['next_birthday_count']);
+
+    // Check upcoming birthday is a date in the future
+    $this->assertGreaterThanOrEqual(date('Y-m-d'), $result[0]['next_birthday_date']);
+    [$y, $md] = explode('-', $result[0]['next_birthday_date'], 2);
+    $this->assertEquals('02-28', $md);
+
+    // This birthday falls on a leap year.
+    [$y, $md] = explode('-', $result[1]['next_birthday_date'], 2);
+    $this->assertGreaterThanOrEqual(date('Y'), $y);
+    // If the upcoming date falls on a leap year, we expect feb 29 to be returned
+    if ((new \IntlGregorianCalendar())->isLeapYear($y)) {
+      $this->assertEquals('02-29', $md);
+    }
+    // Otherwise it should return feb 28
+    else {
+      $this->assertEquals('02-28', $md);
+    }
   }
 
   public function testIncorrectNumberOfArguments(): void {

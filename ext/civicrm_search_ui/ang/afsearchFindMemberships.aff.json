@@ -1,0 +1,31 @@
+{
+    "type": "search",
+    "requires": null,
+    "entity_type": null,
+    "join_entity": null,
+    "title": "Find Memberships",
+    "description": null,
+    "placement": [],
+    "summary_contact_type": null,
+    "summary_weight": null,
+    "icon": "fa-id-badge",
+    "server_route": "civicrm/sk/members",
+    "is_public": false,
+    "permission": [
+        "access CiviCRM",
+        "access CiviMember"
+    ],
+    "permission_operator": "AND",
+    "redirect": null,
+    "submit_enabled": true,
+    "submit_limit": null,
+    "create_submission": false,
+    "manual_processing": false,
+    "allow_verification_by_email": false,
+    "email_confirmation_template_id": null,
+    "navigation": {
+        "parent": "Experimental",
+        "label": "Find Memberships",
+        "weight": 0
+    }
+}

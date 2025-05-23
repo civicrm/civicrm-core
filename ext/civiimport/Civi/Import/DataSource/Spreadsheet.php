@@ -157,7 +157,7 @@ class Spreadsheet extends \CRM_Import_DataSource implements DataSourceInterface 
     $sql = [];
     foreach ($dataRows as $row) {
       // CRM-17859 Trim non-breaking spaces from columns.
-      $row = array_map([__CLASS__, 'trimNonBreakingSpaces'], $row);
+      $row = array_map([__CLASS__, 'trimWhiteSpace'], $row);
       $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql[] = "('" . implode("', '", $row) . "')";
 

@@ -97,12 +97,12 @@ class CRM_Report_Form_Instance {
     $form->add('number', 'cache_minutes', ts('Cache dashlet for'), ['class' => 'four', 'min' => 1]);
     $form->addElement('checkbox', 'add_to_my_reports', ts('Add to My Reports?'), NULL);
 
-    $form->addElement('checkbox', 'is_reserved', ts('Reserved Report?'));
+    $form->addElement('advcheckbox', 'is_reserved', ts('Reserved Report?'));
     if (!CRM_Core_Permission::check('administer reserved reports')) {
       $form->freeze('is_reserved');
     }
 
-    $getPerms = \Civi\Api4\Permission::get(0)
+    $getPerms = \Civi\Api4\Permission::get(FALSE)
       ->addWhere('is_active', '=', 1)
       ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
       ->setOrderBy(['title' => 'ASC'])
@@ -125,6 +125,7 @@ class CRM_Report_Form_Instance {
           'size' => 5,
           'style' => 'width:240px',
           'class' => 'advmultiselect',
+          'title' => ts('ACL Group/Role'),
         ]
       );
       $grouprole->setButtonAttributes('add', ['value' => ts('Add >>')]);
@@ -134,7 +135,7 @@ class CRM_Report_Form_Instance {
     // navigation field
     $parentMenu = CRM_Core_BAO_Navigation::getNavigationList();
 
-    $form->add('select', 'parent_id', ts('Parent Menu'), ['' => ts('- select -')] + $parentMenu, FALSE, ['class' => 'crm-select2 huge']);
+    $form->add('select', 'parent_id', ts('Parent Menu'), ['' => ts('- select -')] + $parentMenu);
 
     // For now we only providing drilldown for one primary detail report only. In future this could be multiple reports
     foreach ($form->_drilldownReport as $reportUrl => $drillLabel) {
@@ -246,7 +247,7 @@ class CRM_Report_Form_Instance {
 
     if ($instanceID) {
       // this is already retrieved via Form.php
-      $defaults['description'] = $defaults['description'] ?? NULL;
+      $defaults['description'] ??= NULL;
       if (!empty($defaults['header'])) {
         $defaults['report_header'] = $defaults['header'];
       }

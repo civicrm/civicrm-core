@@ -24,6 +24,7 @@ class CRM_Afform_ArrayHtml {
       '*' => 'text',
       'af-fieldset' => 'text',
       'data' => 'js',
+      'actions' => 'js',
     ],
     'af-entity' => [
       '#selfClose' => TRUE,
@@ -127,7 +128,7 @@ class CRM_Afform_ArrayHtml {
       }
     }
 
-    if (isset($array['#markup']) && (!$this->formatWhitespace || strpos($array['#markup'], '<') === FALSE)) {
+    if (isset($array['#markup']) && (!$this->formatWhitespace || !str_contains($array['#markup'], '<'))) {
       $buf .= '>' . $array['#markup'] . '</' . $tag . '>';
     }
     elseif (isset($array['#markup'])) {
@@ -140,7 +141,7 @@ class CRM_Afform_ArrayHtml {
     else {
       $contents = $this->convertArraysToHtml($children);
       // No indentation if contents are only text
-      if (!$this->formatWhitespace || strpos($contents, '<') === FALSE) {
+      if (!$this->formatWhitespace || !str_contains($contents, '<')) {
         $buf .= '>' . $contents;
       }
       else {
@@ -199,7 +200,12 @@ class CRM_Afform_ArrayHtml {
 
     $doc = new DOMDocument();
     $doc->preserveWhiteSpace = !$this->formatWhitespace;
-    @$doc->loadHTML("<?xml encoding=\"utf-8\" ?><html><body>$html</body></html>");
+    // Angular/js isn't fussy about arbitrary tags but libxml is for html data, so ignore errors.
+    // See also Civi\Afform\Symbols::scan()
+    $oldErrorStatus = libxml_use_internal_errors(TRUE);
+    $doc->loadHTML("<?xml encoding=\"utf-8\" ?><html><body>$html</body></html>");
+    libxml_clear_errors();
+    libxml_use_internal_errors($oldErrorStatus);
 
     // FIXME: Validate expected number of child nodes
 
@@ -371,7 +377,10 @@ class CRM_Afform_ArrayHtml {
    * @return string
    */
   public function replaceUnicodeChars($markup) {
-    return htmlspecialchars_decode(htmlentities($markup, ENT_COMPAT, 'utf-8', FALSE));
+    $replace = [
+      ["\xc2\xa0", '&nbsp;'],
+    ];
+    return str_replace(array_column($replace, 0), array_column($replace, 1), $markup);
   }
 
   /**
@@ -381,10 +390,16 @@ class CRM_Afform_ArrayHtml {
    * @return bool
    */
   public function isNodeEditable(array $item) {
-    if ($item['#tag'] === 'af-field' || $item['#tag'] === 'af-form' || isset($item['af-fieldset']) || isset($item['af-join'])) {
+    // TODO: Make these more prominent/discoverable/hookable
+    $editableTags = ['af-field', 'af-form', 'af-tabset', 'af-tab'];
+    $editableAttributes = ['af-fieldset', 'af-join'];
+    $editableClasses = ['af-container', 'af-text', 'af-button'];
+    if (in_array($item['#tag'], $editableTags, TRUE)) {
       return TRUE;
     }
-    $editableClasses = ['af-container', 'af-text', 'af-button'];
+    if (array_intersect($editableAttributes, array_keys($item))) {
+      return TRUE;
+    }
     $classes = explode(' ', $item['class'] ?? '');
     return (bool) array_intersect($editableClasses, $classes);
   }

@@ -21,16 +21,16 @@
         {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
       </div>
     {else}
-     <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and empty($skipTitle)}collapsed{/if}">
+     <details class="custom-group custom-group-{$cd_edit.name} crm-accordion-bold crm-custom-accordion" {if $cd_edit.collapse_display and empty($skipTitle)}{else}open{/if}>
       {if empty($skipTitle)}
-      <div class="crm-accordion-header">
+      <summary>
         {$cd_edit.title}
-       </div><!-- /.crm-accordion-header -->
+       </summary>
       {/if}
       <div class="crm-accordion-body">
         {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
       </div>
-     </div>
+     </details>
     {/if}
     {if $cgCount}
       <div id="custom_group_{$group_id}_{$cgCount}"></div>

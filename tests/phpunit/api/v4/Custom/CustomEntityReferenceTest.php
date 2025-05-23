@@ -17,9 +17,9 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomField;
 use Civi\Api4\Individual;
 use Civi\Api4\Organization;
@@ -27,17 +27,17 @@ use Civi\Api4\Organization;
 /**
  * @group headless
  */
-class CustomEntityReferenceTest extends CustomTestBase {
+class CustomEntityReferenceTest extends Api4TestBase {
 
   /**
    * Ensure custom fields of type EntityReference correctly apply filters
    */
   public function testEntityReferenceCustomField(): void {
     $subject = uniqid();
-    CustomGroup::create()->setValues([
+    $this->createTestRecord('CustomGroup', [
       'title' => 'EntityRefFields',
       'extends' => 'Individual',
-    ])->execute();
+    ]);
     $field = CustomField::create()->setValues([
       'label' => 'TestActivityReference',
       'custom_group_id.name' => 'EntityRefFields',
@@ -58,6 +58,7 @@ class CustomEntityReferenceTest extends CustomTestBase {
     $this->assertNull($spec['suffixes']);
     $this->assertEquals('EntityRef', $spec['input_type']);
     $this->assertEquals('Activity', $spec['fk_entity']);
+    $this->assertEquals('id', $spec['fk_column']);
     $this->assertEquals($subject, $spec['input_attrs']['filter']['subject']);
     // Check results
     $activities = $this->saveTestRecords('Activity', [
@@ -82,10 +83,10 @@ class CustomEntityReferenceTest extends CustomTestBase {
    * Ensure custom fields of type EntityReference correctly apply filters
    */
   public function testEntityReferenceCustomFieldByContactType(): void {
-    CustomGroup::create()->setValues([
+    $this->createTestRecord('CustomGroup', [
       'title' => 'EntityRefFields',
       'extends' => 'Individual',
-    ])->execute();
+    ]);
     CustomField::create()->setValues([
       'label' => 'TestOrgRef',
       'custom_group_id.name' => 'EntityRefFields',
@@ -107,7 +108,7 @@ class CustomEntityReferenceTest extends CustomTestBase {
         ['contact_type' => 'Individual'],
         ['contact_type' => 'Household'],
       ],
-    ])->indexBy('contact_type')->column('id');
+    ])->column('id', 'contact_type');
     // Autocomplete by id
     $result = (array) Organization::autocomplete(FALSE)
       ->setFieldName("Contact.EntityRefFields.TestOrgRef")

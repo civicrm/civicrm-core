@@ -8,16 +8,16 @@
  +--------------------------------------------------------------------+
 *}
 
-<div id="report-tab-set-filters" class="civireport-criteria">
+<div id="report-tab-set-filters" role="tabpanel" class="civireport-criteria">
   <div class="report-layout">
       {assign var="counter" value=1}
       {foreach from=$filterGroups item=filterGroup}
         {* Wrap custom field sets in collapsed accordion pane. *}
         {if $filterGroup.use_accordion_for_field_selection}
-          <div class="crm-accordion-wrapper crm-accordion collapsed">
-            <div class="crm-accordion-header">
+          <details class="crm-accordion-bold crm-accordion">
+            <summary>
               {$filterGroup.group_title}
-            </div><!-- /.crm-accordion-header -->
+            </summary>
             <div class="crm-accordion-body">
         {/if}
         <table class="report-layout">
@@ -37,7 +37,12 @@
                     <td class="label report-contents">{if !empty($field.title)}{$field.title}{/if}</td>
                     <td class="report-contents">{$form.$fieldOp.html}</td>
                     <td>
-                      <span id="{$filterVal}_cell">{$form.$filterVal.label}&nbsp;{$form.$filterVal.html}</span>
+                      <span id="{$filterVal}_cell">
+                        <label class="sr-only" for="{$form.$filterVal.id}">
+                          {if !empty($field.title)}{$field.title}{else}{$field.name}{/if} filter value
+                        </label>
+                        {$form.$filterVal.label}&nbsp;{$form.$filterVal.html}
+                      </span>
                       <span id="{$filterMin}_max_cell">
                         {if array_key_exists($filterMin, $form) && $form.$filterMin}{$form.$filterMin.label}&nbsp;{$form.$filterMin.html}&nbsp;&nbsp;{/if}
                         {if array_key_exists($filterMax, $form) && $form.$filterMax}{$form.$filterMax.label}&nbsp;{$form.$filterMax.html}{/if}
@@ -49,8 +54,8 @@
         {/foreach}
         </table>
         {if $filterGroup.use_accordion_for_field_selection}
-            </div><!-- /.crm-accordion-body -->
-          </div><!-- /.crm-accordion-wrapper -->
+            </div>
+          </details>
         {/if}
       {/foreach}
   </div>

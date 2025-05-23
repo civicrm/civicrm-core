@@ -24,6 +24,12 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_contact', 'civicrm_address']);
   }
 
+  public function tearDown(): void {
+    \Civi::settings()->set('pinnedContactCountries', []);
+    CRM_Core_I18n::singleton()->setLocale('en_US');
+    parent::tearDown();
+  }
+
   /**
    * Create() method (create and update modes)
    */
@@ -732,6 +738,106 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure shared address updates work in opposite direction
+   *
+   * If Person A shares their address with Person B and person B updates
+   * the address, ensure it is updated in Person A's record.
+   */
+  public function testSharedAddressReverseUpdate(): void {
+    // Create two contacts. ContactA shares their address with ContactB.
+    $contactIdA = $this->individualCreate([], 0);
+    $contactIdB = $this->individualCreate([], 1);
+
+    $addressParamsA = [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+    ];
+    $addAddressA = \Civi\Api4\Address::create(FALSE);
+    foreach ($addressParamsA as $key => $value) {
+      $addAddressA = $addAddressA->addValue($key, $value);
+    }
+    $addressA = $addAddressA->execute()->first();
+
+    $addressParamsB = [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'master_id' => $addressA['id'],
+      'contact_id' => $contactIdB,
+    ];
+    $addAddressB = \Civi\Api4\Address::create(FALSE);
+    foreach ($addressParamsB as $key => $value) {
+      $addAddressB = $addAddressB->addValue($key, $value);
+    }
+    $addressB = $addAddressB->execute()->first();
+
+    // Update ContactB's address.
+    $updateAddressParamsB = [
+      'id' => $addressB['id'],
+      'street_address' => '456 New Street St.',
+      'master_id' => $addressA['id'],
+    ];
+    $updateAddressB = \Civi\Api4\Address::update(FALSE);
+    foreach ($updateAddressParamsB as $key => $value) {
+      $updateAddressB = $updateAddressB->addValue($key, $value);
+    }
+    $updatedAddressB = $updateAddressB->execute()->first();
+
+    // Is the update reflected in ContactA's address?
+    $updatedAddressA = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('street_address')
+      ->addWhere('id', '=', $addressA['id'])
+      ->execute()->first();
+
+    $this->assertEquals($updatedAddressB['street_address'], $updatedAddressA['street_address']);
+
+    // Update ContactB's address again, but leave out the master id. We should still
+    // update the master id address record, even if we leave it out (e.g. could be a
+    // profile that doesn't include the master id value).
+    $updateAddressParamsB = [
+      'id' => $addressB['id'],
+      'street_address' => '456 New Street St.',
+    ];
+    $updateAddressB = \Civi\Api4\Address::update(FALSE);
+    foreach ($updateAddressParamsB as $key => $value) {
+      $updateAddressB = $updateAddressB->addValue($key, $value);
+    }
+    $updatedAddressB = $updateAddressB->execute()->first();
+
+    // Is the update reflected in ContactA's address?
+    $updatedAddressA = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('street_address')
+      ->addWhere('id', '=', $addressA['id'])
+      ->execute()->first();
+
+    $this->assertEquals($updatedAddressB['street_address'], $updatedAddressA['street_address']);
+
+    // Update ContactB's address again, but set master id to NULL. We should not
+    // update the master id address record.
+    $updateAddressParamsB = [
+      'id' => $addressB['id'],
+      'street_address' => '890 I Am Moving Out St.',
+      'master_id' => NULL,
+    ];
+    $updateAddressB = \Civi\Api4\Address::update(FALSE);
+    foreach ($updateAddressParamsB as $key => $value) {
+      $updateAddressB = $updateAddressB->addValue($key, $value);
+    }
+    $updatedAddressB = $updateAddressB->execute()->first();
+
+    // The update should not be reflected in ContactA's address
+    $updatedAddressA = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('street_address')
+      ->addWhere('id', '=', $addressA['id'])
+      ->execute()->first();
+
+    $this->assertNotEquals($updatedAddressB['street_address'], $updatedAddressA['street_address']);
+
+  }
+
+  /**
    * dev/dev/core#1670 - Ensure that the custom fields on adresses are copied
    * to inherited address
    * 1. test the creation of the shared address with custom field
@@ -828,6 +934,60 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals(1152, $availableCountries[1]);
     // United States
     $this->assertEquals(1228, $availableCountries[2]);
+  }
+
+  public function testPinnedCountryWithEntity(): void {
+    \Civi::settings()->set('pinnedContactCountries', ['1228']);
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('US', $countries[0]['name']);
+  }
+
+  public function testCountryLabelTranslation(): void {
+    CRM_Core_I18n::singleton()->setLocale('nl_NL');
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $checked = [];
+    foreach ($countries as $country) {
+      switch ($country['name']) {
+        case 'NL':
+          $this->assertEquals('Nederland', $country['label']);
+          $checked[] = 'NL';
+          break;
+
+        case 'US':
+          $this->assertEquals('Verenigde Staten', $country['label']);
+          $checked[] = 'US';
+          break;
+      }
+    }
+    $this->assertCount(2, $checked, 'Country list incomplete');
+  }
+
+  public function testCountrySorting(): void {
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('AF', $countries[0]['name']);
+    // Åland Islands should sort second in en_US locale
+    $this->assertEquals('AX', $countries[1]['name']);
+    $this->assertEquals('AL', $countries[2]['name']);
+    $this->assertEquals('ZW', array_pop($countries)['name']);
+
+    CRM_Core_I18n::singleton()->setLocale('nl_NL');
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('AF', $countries[0]['name']);
+    // Åland Islands
+    $this->assertEquals('AX', $countries[1]['name']);
+    $this->assertEquals('AL', $countries[2]['name']);
+    $this->assertEquals('US', $countries[237]['name']);
+    $this->assertEquals('CH', array_pop($countries)['name']);
+
+    CRM_Core_I18n::singleton()->setLocale('it_IT');
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('AF', $countries[0]['name']);
+    $this->assertEquals('AL', $countries[1]['name']);
+    $this->assertEquals('DZ', $countries[2]['name']);
+    // Åland Islands
+    $this->assertEquals('AX', $countries[104]['name']);
+    $this->assertEquals('US', $countries[213]['name']);
+    $this->assertEquals('ZW', array_pop($countries)['name']);
   }
 
   /**

@@ -16,7 +16,7 @@
 {if $rows}
     {foreach from=$rows item=customTitle key=csid}
         <div class="action-link">
-            <a href="{crmURL p="civicrm/contact/search/custom" q="csid=`$csid`&reset=1"}" title="{ts}Use this search{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$customTitle}</a>
+            <a href="{crmURL p="civicrm/contact/search/custom" q="csid=`$csid`&reset=1"}" title="{ts escape='htmlattribute'}Use this search{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$customTitle}</a>
         </div>
     {/foreach}
 {else}

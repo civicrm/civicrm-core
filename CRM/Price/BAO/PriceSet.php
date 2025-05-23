@@ -122,6 +122,22 @@ WHERE       ps.name = '{$priceSetName}'
   }
 
   /**
+   * Calculate the default price set id
+   * assigned to the contribution/membership etc
+   *
+   * @param string $entity
+   *
+   * @return int
+   *   default price set ID
+   *
+   */
+  public static function getDefaultPriceSetID(string $entity = 'contribution'): int {
+    $priceSet = self::getDefaultPriceSet($entity);
+    $first = reset($priceSet);
+    return (int) $first['setID'];
+  }
+
+  /**
    * Get the price set title.
    *
    * @param int $id
@@ -507,12 +523,15 @@ WHERE  id = %1";
    *
    * We call this function when more than one being present would represent an error
    * starting format derived from current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
+   *
    * @param array $priceSet
    *
-   * @throws CRM_Core_Exception
    * @return int
+   * @throws CRM_Core_Exception
+   * @deprecated since 5.82 will be removed around 5.92
    */
   public static function getOnlyPriceFieldID(array $priceSet) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     if (count($priceSet['fields']) > 1) {
       throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
     }
@@ -524,111 +543,18 @@ WHERE  id = %1";
    * current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
    * @param array $priceSet
    *
+   * @deprecated since 5.82 will be removed around 5.92
+   *
    * @throws CRM_Core_Exception
    * @return int
    */
   public static function getOnlyPriceFieldValueID(array $priceSet) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $priceFieldID = self::getOnlyPriceFieldID($priceSet);
     if (count($priceSet['fields'][$priceFieldID]['options']) > 1) {
       throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
     }
     return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
-  }
-
-  /**
-   * Initiate price set such that various non-BAO things are set on the form.
-   *
-   * This function is not really a BAO function so the location is misleading.
-   *
-   * @param CRM_Core_Form $form
-   *   Form entity id.
-   * @param string $entityTable
-   * @param bool $doNotIncludeExpiredFields
-   * @param int $priceSetId
-   *   Price Set ID
-   *
-   * @throws \CRM_Core_Exception
-   * @deprecated in CiviCRM 5.58, will be removed around CiviCRM 5.70.
-   */
-  public static function initSet(&$form, $entityTable = 'civicrm_event', $doNotIncludeExpiredFields = FALSE, $priceSetId = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-
-    // get price info
-    if ($priceSetId) {
-      if ($form->_action & CRM_Core_Action::UPDATE) {
-        $entityId = $entity = NULL;
-
-        switch ($entityTable) {
-          case 'civicrm_event':
-            $entity = 'participant';
-            if (in_array(CRM_Utils_System::getClassName($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register'])) {
-              $entityId = $form->_id;
-            }
-            else {
-              $entityId = $form->_participantId;
-            }
-            break;
-
-          case 'civicrm_contribution_page':
-          case 'civicrm_contribution':
-            $entity = 'contribution';
-            $entityId = $form->_id;
-            break;
-        }
-
-        if ($entityId && $entity) {
-          $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($entityId, $entity);
-        }
-        $required = FALSE;
-      }
-      else {
-        $required = TRUE;
-      }
-
-      $form->_priceSetId = $priceSetId;
-      $priceSet = self::getSetDetail($priceSetId, $required, $doNotIncludeExpiredFields);
-      $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-      $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
-
-      //get the price set fields participant count.
-      if ($entityTable === 'civicrm_event') {
-        //get option count info.
-        $form->_priceSet['optionsCountTotal'] = self::getPricesetCount($priceSetId);
-        if ($form->_priceSet['optionsCountTotal']) {
-          $optionsCountDetails = [];
-          if (!empty($form->_priceSet['fields'])) {
-            foreach ($form->_priceSet['fields'] as $field) {
-              foreach ($field['options'] as $option) {
-                $count = $option['count'] ?? 0;
-                $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
-              }
-            }
-          }
-          $form->_priceSet['optionsCountDetails'] = $optionsCountDetails;
-        }
-
-        //get option max value info.
-        $optionsMaxValueTotal = 0;
-        $optionsMaxValueDetails = [];
-
-        if (!empty($form->_priceSet['fields'])) {
-          foreach ($form->_priceSet['fields'] as $field) {
-            foreach ($field['options'] as $option) {
-              $maxVal = $option['max_value'] ?? 0;
-              $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
-              $optionsMaxValueTotal += $maxVal;
-            }
-          }
-        }
-
-        $form->_priceSet['optionsMaxValueTotal'] = $optionsMaxValueTotal;
-        if ($optionsMaxValueTotal) {
-          $form->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
-        }
-      }
-      $form->set('priceSetId', $form->_priceSetId);
-      $form->set('priceSet', $form->_priceSet);
-    }
   }
 
   /**
@@ -665,7 +591,7 @@ WHERE  id = %1";
    * @todo $priceSetID is a pseudoparam for permit override - we should stop passing it where we
    * don't specifically need it & find a better way where we do.
    */
-  public static function processAmount($fields, &$params, &$lineItem, $priceSetID = NULL) {
+  public static function processAmount($fields, &$params, &$lineItem = [], $priceSetID = NULL) {
     // using price set
     foreach ($fields as $id => $field) {
       if (empty($params["price_{$id}"]) ||
@@ -678,7 +604,7 @@ WHERE  id = %1";
       [$params, $lineItem] = self::getLine($params, $lineItem, $priceSetID, $field, $id);
     }
     $order = new CRM_Financial_BAO_Order();
-    $order->setLineItems($lineItem);
+    $order->setLineItems((array) $lineItem);
     $params['amount_level'] = $order->getAmountLevel();
     $params['amount'] = $order->getTotalAmount();
     $params['tax_amount'] = $order->getTotalTaxAmount();
@@ -763,7 +689,9 @@ WHERE  id = %1";
         ->execute()->first();
       $data['fields'] = (array) PriceField::get(FALSE)
         ->addWhere('price_set_id', '=', $priceSetID)
+        ->addWhere('is_active', '=', TRUE)
         ->addSelect('*', 'visibility_id:name')
+        ->addOrderBy('weight', 'ASC')
         ->execute()->indexBy('id');
       foreach ($data['fields'] as &$field) {
         $field['options'] = [];
@@ -776,7 +704,9 @@ WHERE  id = %1";
       }
       $options = PriceFieldValue::get(FALSE)
         ->addWhere('price_field_id', 'IN', array_keys($data['fields']))
+        ->addWhere('is_active', '=', TRUE)
         ->setSelect($select)
+        ->addOrderBy('weight', 'ASC')
         ->execute();
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       foreach ($options as $option) {
@@ -789,113 +719,6 @@ WHERE  id = %1";
       $cache->set($cacheKey, $data);
     }
     return $data;
-  }
-
-  /**
-   * Build the price set form.
-   *
-   * @param CRM_Core_Form $form
-   * @param string|null $component
-   * @param bool $validFieldsOnly
-   *
-   * @return void
-   *
-   * @deprecated since 5.68. Will be removed around 5.80.
-   */
-  public static function buildPriceSet(&$form, $component = NULL, $validFieldsOnly = TRUE) {
-    $priceSetId = $form->get('priceSetId');
-    if (!$priceSetId) {
-      return;
-    }
-
-    $className = CRM_Utils_System::getClassName($form);
-
-    $priceSet = self::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
-    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
-
-    // Mark which field should have the auto-renew checkbox, if any. CRM-18305
-    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
-      $autoRenewMembershipTypes = [];
-      foreach ($form->_membershipTypeValues as $membershipTypeValue) {
-        if ($membershipTypeValue['auto_renew']) {
-          $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
-        }
-      }
-      foreach ($form->_priceSet['fields'] as $field) {
-        if (array_key_exists('options', $field) && is_array($field['options'])) {
-          foreach ($field['options'] as $option) {
-            if (!empty($option['membership_type_id'])) {
-              if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
-                $form->_priceSet['auto_renew_membership_field'] = $field['id'];
-                // Only one field can offer auto_renew memberships, so break here.
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-    $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
-    $form->assign('priceSet', $form->_priceSet);
-
-    if ($className == 'CRM_Contribute_Form_Contribution_Main') {
-      $feeBlock = &$form->_values['fee'];
-    }
-    else {
-      $feeBlock = &$form->_priceSet['fields'];
-    }
-
-    // Call the buildAmount hook.
-    CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
-
-    $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
-    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
-    $checklifetime = FALSE;
-    foreach ($feeBlock as $id => $field) {
-      if (($field['visibility'] ?? NULL) == 'public' ||
-        (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
-        !$validFieldsOnly
-      ) {
-        $options = $field['options'] ?? NULL;
-        if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
-          $contactId = $form->getVar('_membershipContactID');
-          if ($contactId && $options) {
-            $contactsLifetimeMemberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
-            $contactsLifetimeMembershipTypes = array_column($contactsLifetimeMemberships, 'membership_type_id');
-            $memTypeIdsInPriceField = array_column($options, 'membership_type_id');
-            $isCurrentMember = (bool) array_intersect($memTypeIdsInPriceField, $contactsLifetimeMembershipTypes);
-            $checklifetime = $checklifetime ?: $isCurrentMember;
-          }
-        }
-
-        $formClasses = ['CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership'];
-
-        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
-          continue;
-        }
-        elseif ($hideAdminValues && !in_array($className, $formClasses)) {
-          foreach ($options as $key => $currentOption) {
-            if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
-              unset($options[$key]);
-            }
-          }
-        }
-        if (!empty($options)) {
-          CRM_Price_BAO_PriceField::addQuickFormElement($form,
-            'price_' . $field['id'],
-            $field['id'],
-            FALSE,
-            $field['is_required'] ?? FALSE,
-            NULL,
-            $options
-          );
-        }
-      }
-    }
-    $form->assign('ispricelifetime', $checklifetime);
-
   }
 
   /**
@@ -1688,6 +1511,26 @@ WHERE     ct.id = cp.financial_type_id AND
       $cacheKey = 'CRM_Price_BAO_PriceSetgetCachedPriceSetDetail_' . $priceSet['id'];
       $cache->delete($cacheKey);
     }
+  }
+
+  /**
+   * Whitelist of possible values for the entity_table field in PriceSetEntity
+   *
+   * @return array
+   */
+  public static function entityTables(): array {
+    return [
+      [
+        'id' => 'civicrm_contribution_page',
+        'name' => 'ContributionPage',
+        'label' => ts('Contribution Page'),
+      ],
+      [
+        'id' => 'civicrm_event',
+        'name' => 'Event',
+        'label' => ts('Event'),
+      ],
+    ];
   }
 
 }

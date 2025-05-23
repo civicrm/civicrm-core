@@ -329,7 +329,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       // Skip registration if event_id is NULL
       if (empty($row['event_id'])) {
-        Civi::log()->warning('Participant record without event ID. You have invalid data in your database!');
+        Civi::log()->warning('Participant record (' . $row['participant_id'] . ') without event ID. You have invalid data in your database!');
         continue;
       }
 
@@ -402,7 +402,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         $result->participant_id
       );
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type, FALSE, $result->contact_id
       );
 
       $row['paid'] = CRM_Event_BAO_Event::isMonetary($row['event_id']);
@@ -425,7 +425,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       }
       $rows[] = $row;
     }
-    CRM_Core_Selector_Controller::$_template->assign_by_ref('lineItems', $lineItems);
+    CRM_Core_Smarty::singleton()->assign('lineItems', $lineItems ?? []);
 
     return $rows;
   }

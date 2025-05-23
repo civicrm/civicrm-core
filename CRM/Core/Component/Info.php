@@ -140,34 +140,11 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
-   * Provides permissions that are used by component.
-   * Needs to be implemented in component's information
-   * class.
+   * Defines permissions that are used by component.
    *
-   * NOTE: if using conditionally permission return,
-   * implementation of $getAllUnconditionally is required.
-   *
-   * @param bool $getAllUnconditionally
-   *
-   * @return array|null
-   *   collection of permissions, null if none
-   */
-  abstract public function getPermissions($getAllUnconditionally = FALSE);
-
-  /**
-   * Determine how many other records refer to a given record.
-   *
-   * @param CRM_Core_DAO $dao
-   *   The item for which we want a reference count.
    * @return array
-   *   each item in the array is an array with keys:
-   *   - name: string, eg "sql:civicrm_email:contact_id"
-   *   - type: string, eg "sql"
-   *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
    */
-  public function getReferenceCounts($dao) {
-    return [];
-  }
+  abstract public function getPermissions();
 
   /**
    * Provides information about user dashboard element.

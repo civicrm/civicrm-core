@@ -14,6 +14,8 @@
  */
 class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
+  use CRM_Custom_Form_CustomDataTrait;
+
   /**
    * The relationship id, used when editing the relationship
    *
@@ -35,7 +37,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_rtype;
 
   /**
-   * This is a string which is used to determine the relationship between to contacts
+   * This is a string which is used to determine the relationship between to contacts eg. 1_a_b or 1_b_a
+   *   where 1 is the relationship type
    * @var string
    */
   public $_rtypeId;
@@ -109,29 +112,62 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   public function preProcess() {
     $this->_contactId = $this->get('contactId');
-
-    $this->_contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'contact_type');
-
     $this->_relationshipId = $this->get('id');
 
+    $contact = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('display_name', 'contact_type')
+      ->addWhere('id', '=', $this->_contactId)
+      ->execute()
+      ->first();
+    $this->_contactType = $contact['contact_type'];
+    $this->_display_name_a = $contact['display_name'];
+    $this->assign('display_name_a', htmlspecialchars($this->_display_name_a));
+
     $this->_rtype = CRM_Utils_Request::retrieve('rtype', 'String', $this);
-
     $this->_rtypeId = CRM_Utils_Request::retrieve('relTypeId', 'String', $this);
+    $this->_caseId = CRM_Utils_Request::retrieve('caseID', 'Integer', $this);
 
-    $this->_display_name_a = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'display_name');
-
-    $this->assign('display_name_a', $this->_display_name_a);
     //get the relationship values.
     $this->_values = [];
     if ($this->_relationshipId) {
-      $params = ['id' => $this->_relationshipId];
-      CRM_Core_DAO::commonRetrieve('CRM_Contact_DAO_Relationship', $params, $this->_values);
+      $this->_values = \Civi\Api4\Relationship::get(FALSE)
+        ->addSelect('*')
+        ->addWhere('id', '=', $this->_relationshipId)
+        ->execute()
+        ->first();
+      // Set "rtype" (relationship direction)
+      if ($this->_values['contact_id_a'] == $this->_contactId) {
+        $this->_rtype = 'a_b';
+      }
+      else {
+        $this->_rtype = 'b_a';
+      }
+      // Set relationship Type ID (eg. 1)
+      $this->_relationshipTypeId = $this->_values['relationship_type_id'];
+      // Set rtypeId (eg. 1_a_b)
+      $this->_rtypeId = $this->_values['relationship_type_id'] . '_' . $this->_rtype;
+    }
+    else {
+      if (!$this->_rtypeId) {
+        $params = CRM_Utils_Request::exportValues();
+        if (isset($params['relationship_type_id'])) {
+          $this->_rtypeId = $params['relationship_type_id'];
+          // get the relationship type id
+          $this->_relationshipTypeId = str_replace(['_a_b', '_b_a'], ['', ''], $this->_rtypeId);
+          //get the relationship type
+          if (!$this->_rtype) {
+            $this->_rtype = str_replace($this->_relationshipTypeId . '_', '', $this->_rtypeId);
+          }
+        }
+      }
     }
 
     // Check for permissions
     if (in_array($this->_action, [CRM_Core_Action::ADD, CRM_Core_Action::UPDATE, CRM_Core_Action::DELETE])) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)
-        && !CRM_Contact_BAO_Contact_Permission::allow($this->_values['contact_id_b'], CRM_Core_Permission::EDIT)) {
+        ||
+        (!empty($this->_values['contact_id_b']) && !CRM_Contact_BAO_Contact_Permission::allow($this->_values['contact_id_b'], CRM_Core_Permission::EDIT))
+      ) {
         CRM_Core_Error::statusBounce(ts('You do not have the necessary permission to edit this contact.'));
       }
     }
@@ -155,28 +191,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         break;
     }
 
-    $this->_caseId = CRM_Utils_Request::retrieve('caseID', 'Integer', $this);
-
-    if (!$this->_rtypeId) {
-      $params = CRM_Utils_Request::exportValues();
-      if (isset($params['relationship_type_id'])) {
-        $this->_rtypeId = $params['relationship_type_id'];
-      }
-      elseif (!empty($this->_values)) {
-        $this->_rtypeId = $this->_values['relationship_type_id'] . '_' . $this->_rtype;
-      }
-    }
-
-    //get the relationship type id
-    $this->_relationshipTypeId = str_replace(['_a_b', '_b_a'], ['', ''], $this->_rtypeId);
-
-    //get the relationship type
-    if (!$this->_rtype) {
-      $this->_rtype = str_replace($this->_relationshipTypeId . '_', '', $this->_rtypeId);
-    }
-
-    //need to assign custom data type and subtype to the template - FIXME: explain why
-    $this->assign('customDataType', 'Relationship');
+    //need to assign custom data subtype to the template for the initial load of custom fields.
     $this->assign('customDataSubType', $this->_relationshipTypeId);
     $this->assign('entityID', $this->_relationshipId);
 
@@ -190,12 +205,25 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_relationshipTypeId, 1, 'Relationship', $this->_relationshipId);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Relationship', array_filter([
+        'id' => $this->getRelationshipID(),
+        'relationship_type_id' => $this->_relationshipTypeId,
+      ]));
     }
+  }
+
+  /**
+   * @api supported for use from outside core.
+   *
+   * @return int|null
+   */
+  public function getRelationshipID(): ?int {
+    return $this->_relationshipId;
   }
 
   /**
@@ -381,13 +409,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   public function postProcess() {
     // Store the submitted values in an array.
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     $values = $this->submit($params);
     if (empty($values)) {
       return;
     }
-    list ($params, $relationshipIds) = $values;
+    [$params, $relationshipIds] = $values;
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
@@ -489,7 +517,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $jsData[$id] = array_filter(array_intersect_key($allRelationshipNames[$id], $whatWeWant));
         // Add user-friendly placeholder
         foreach (['a', 'b'] as $x) {
-          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : (CRM_Utils_Array::value("contact_type_$x", $jsData[$id]));
+          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : ($jsData[$id]["contact_type_$x"] ?? NULL);
           $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', [strtolower($contactTypes[$type]['label'])]) : ts('- select contact -');
         }
       }

@@ -72,7 +72,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $this->rebuildTriggers = FALSE;
     }
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_relationship', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_relationship', 'civicrm_entity_tag', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
     foreach ($this->originalValues as $entity => $entities) {
       foreach ($entities as $values) {
         $this->callAPISuccess($entity, 'create', $values);
@@ -505,7 +505,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test that non-contact entity tags are untouched in merge.
    */
   public function testContributionEntityTag(): void {
-    $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'tag_used_for', 'value' => 'civicrm_contribution', 'label' => 'Contribution']);
+    $this->createTestEntity('OptionValue', ['option_group_id:name' => 'tag_used_for', 'value' => 'civicrm_contribution', 'label' => 'Contribution']);
     $tagID = $this->tagCreate(['name' => 'Big', 'used_for' => 'civicrm_contribution'])['id'];
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
@@ -2534,6 +2534,29 @@ ENDSQLUPDATE;
       'email_subject' => 'This is the email subject',
       'email_to' => 'reportperson@example.com',
     ]);
+  }
+
+  /**
+   * Test that Job.execute is disabled when in Maintenance Mode
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMaintenanceModeGate(): void {
+    $settings = \Civi::settings();
+
+    // stash the starting value of setting
+    $startMode = $settings->get('core_maintenance_mode');
+
+    $settings->set('core_maintenance_mode', TRUE);
+    $result = $this->callAPISuccess('Job', 'execute');
+    $this->assertEquals($result['skipped'] ?? NULL, 'maintenance_mode');
+
+    $settings->set('core_maintenance_mode', FALSE);
+    $result = $this->callAPISuccess('Job', 'execute');
+    $this->assertEquals($result['skipped'] ?? FALSE, FALSE);
+
+    // revert
+    $settings->set('core_maintenance_mode', $startMode);
   }
 
 }

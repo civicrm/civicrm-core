@@ -67,7 +67,7 @@ class Api4SelectQueryTest extends Api4TestBase {
     $query = new Api4SelectQuery($api);
     $this->assertEquals(
       'SELECT SUM(`a`.`amount`) AS `SUM_amount`
-FROM civicrm_pledge a',
+FROM `civicrm_pledge` a',
       trim($query->getSql())
     );
   }

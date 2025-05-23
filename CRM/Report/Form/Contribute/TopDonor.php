@@ -346,7 +346,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
    * @param int $rowCount
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     // lets do the pager if in html mode
     $this->_limit = NULL;
 

@@ -40,7 +40,7 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
       ->setColumnName('id')
       ->setDescription(ts('Url at which this file can be downloaded'))
       ->setType('Extra')
-      ->setSqlRenderer([__CLASS__, 'renderFileUrl'])
+      ->setReadonly(TRUE)
       ->addOutputFormatter([__CLASS__, 'formatFileUrl']);
     $spec->addFieldSpec($field);
 
@@ -49,6 +49,7 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
       ->setTitle(ts('Filetype Icon'))
       ->setColumnName('mime_type')
       ->setDescription(ts('Icon associated with this filetype'))
+      ->setReadonly(TRUE)
       ->setType('Extra')
       ->addOutputFormatter([__CLASS__, 'formatFileIcon']);
     $spec->addFieldSpec($field);
@@ -57,10 +58,31 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
     $field->setLabel(ts('Is Image'))
       ->setTitle(ts('File is Image'))
       ->setColumnName('mime_type')
+      ->setReadonly(TRUE)
       ->setDescription(ts('Is this a recognized image type file'))
       ->setType('Extra')
       ->setSqlRenderer([__CLASS__, 'renderFileIsImage']);
     $spec->addFieldSpec($field);
+
+    $field = new FieldSpec('content', $spec->getEntity(), 'String');
+    $field->setLabel(ts('Content'))
+      ->setTitle(ts('Content'))
+      ->setColumnName('uri')
+      ->setDescription(ts('Contents of file'))
+      ->setType('Extra')
+      ->addOutputFormatter([__CLASS__, 'formatFileContent']);
+    $spec->addFieldSpec($field);
+
+    if ($spec->getAction() === 'create') {
+      $spec->getFieldByName('mime_type')->setRequired(TRUE);
+
+      $field = new FieldSpec('move_file', $spec->getEntity(), 'String');
+      $field->setLabel(ts('Move File'))
+        ->setTitle(ts('Move File'))
+        ->setDescription(ts('Name of temporary uploaded file'))
+        ->setType('Extra');
+      $spec->addFieldSpec($field);
+    }
   }
 
   public static function formatFileName(&$uri) {
@@ -73,6 +95,18 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
     }
   }
 
+  public static function formatFileContent(&$uri) {
+    if ($uri && is_string($uri)) {
+      $dir = \CRM_Core_Config::singleton()->customFileUploadDir;
+      $path = $dir . DIRECTORY_SEPARATOR . $uri;
+      if (file_exists($path)) {
+        $uri = file_get_contents($path);
+        return;
+      }
+    }
+    $uri = NULL;
+  }
+
   /**
    * Unused until we bump min sql version to 8
    * @see formatFileName
@@ -83,46 +117,14 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
     return "REGEX_REPLACE({$field['sql_name']}, $pattern, '.')";
   }
 
-  public static function renderFileUrl(array $idField, Api4SelectQuery $query): string {
-    // Getting a link to the file requires the `entity_id` from the `civicrm_entity_file` table
-    // If the file was implicitly joined, the joined-from-entity has the id we want
-    if ($idField['implicit_join']) {
-      $joinField = $query->getField($idField['implicit_join']);
-      $entityIdField = $query->getFieldSibling($joinField, 'id');
-    }
-    // If it's explicitly joined FROM another entity, get the id of the parent
-    elseif ($idField['explicit_join']) {
-      $parent = $query->getJoinParent($idField['explicit_join']);
-      $joinPrefix = $parent ? "$parent." : '';
-      $entityIdField = $query->getField($joinPrefix . 'id');
-    }
-    // If it's explicitly joined TO another entity, use the id of the other
-    if (!isset($entityIdField)) {
-      foreach ($query->getExplicitJoins() as $join) {
-        if ($join['bridge'] === 'EntityFile') {
-          $entityIdField = $query->getField($join['alias'] . '.id');
-        }
-      }
-    }
-    if (isset($entityIdField)) {
-      return "CONCAT('civicrm/file?reset=1&id=', $idField[sql_name], '&eid=', $entityIdField[sql_name])";
-    }
-    // Guess we couldn't find an `entity_id` in the query. This function could probably be improved.
-    return "NULL";
-  }
-
   public static function renderFileIsImage(array $mimeTypeField, Api4SelectQuery $query): string {
     $uriField = $query->getFieldSibling($mimeTypeField, 'uri');
     return "IF(($mimeTypeField[sql_name] LIKE 'image/%') AND ($uriField[sql_name] NOT LIKE '%.unknown'), 1, 0)";
   }
 
   public static function formatFileUrl(&$value) {
-    $args = [];
-    // renderFileUrl() will have formatted the output in-sql to `civicrm/file?reset=1&id=id&eid=entity_id`
-    if (is_string($value) && str_contains($value, '?')) {
-      parse_str(explode('?', $value)[1], $args);
-      $value .= '&fcs=' . \CRM_Core_BAO_File::generateFileHash($args['eid'], $args['id']);
-      $value = (string) \Civi::url('frontend://' . $value, 'a');
+    if ($value && is_numeric($value)) {
+      $value = (string) \CRM_Core_BAO_File::getFileUrl($value);
     }
   }
 
@@ -133,7 +135,7 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
   }
 
   public function applies($entity, $action): bool {
-    return $entity === 'File' && $action === 'get';
+    return $entity === 'File';
   }
 
 }

@@ -13,20 +13,18 @@
 
 <div class="crm-event-id-{$event.id} crm-block crm-event-thankyou-form-block">
     {* Don't use "normal" thank-you message for Waitlist and Approval Required registrations - since it will probably not make sense for those situations. dgg *}
-    {if $event.thankyou_text AND (not $isOnWaitlist AND not $isRequireApproval)}
+    {if array_key_exists('thankyou_text', $event) AND (not $isOnWaitlist AND not $isRequireApproval)}
         <div id="intro_text" class="crm-section event_thankyou_text-section">
             <p>
-            {$event.thankyou_text}
+            {$event.thankyou_text|purify}
             </p>
         </div>
     {/if}
 
-    {* Show link to Tell a Friend (CRM-2153) *}
-    {if $friendText}
-        <div id="tell-a-friend" class="crm-section tell_friend_link-section">
-            <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$friendText}</span></a>
-       </div><br /><br />
-    {/if}
+  {* Show link to Tell a Friend (CRM-2153). Other extensions can also add text here but they must purify it *}
+  {foreach from=$extensionHtml item='html'}
+    {$html}
+  {/foreach}
 
     {* Add button for donor to create their own Personal Campaign page *}
     {if $pcpLink}
@@ -43,8 +41,7 @@
              </p>
         {elseif $isRequireApproval}
             <p>
-                <span class="bold">{ts}Your registration has been submitted.{/ts}
-                {ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</span>
+                <span class="bold">{ts}Your registration has been submitted.{/ts}</span>
             </p>
         {elseif $is_pay_later and $paidEvent and !$isAmountzero}
             <div class="bold">{$pay_later_receipt}</div>
@@ -81,27 +78,27 @@
                 {$event.fee_label}
             </div>
             {if $lineItem}
-                {include file="CRM/Price/Page/LineItem.tpl" context="Event"}
+                {include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount hookDiscount=''}
             {elseif $amount || $amount == 0}
               <div class="crm-section no-label amount-item-section">
                     {foreach from=$finalAmount item=amount key=level}
                   <div class="content">
-                      {$amount.amount|crmMoney}&nbsp;&nbsp;{$amount.label}
+                      {$amount.amount|crmMoney:$currency}&nbsp;&nbsp;{$amount.label}
                   </div>
                   <div class="clear"></div>
                     {/foreach}
                 </div>
                 {if $totalTaxAmount}
-                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
+                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney:$currency}</div>
                   <div class="clear"></div>
                 {/if}
                 {if $totalAmount}
                  <div class="crm-section no-label total-amount-section">
-                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
+                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney:$currency}</div>
                     <div class="clear"></div>
                   </div>
 
-                    {if $hookDiscount.message}
+                    {if $hookDiscount}
                         <div class="crm-section hookDiscount-section">
                             <em>({$hookDiscount.message})</em>
                         </div>
@@ -139,20 +136,6 @@
         </div>
     {/if}
 
-    {if $event.participant_role neq 'Attendee' and $defaultRole}
-        <div class="crm-group participant_role-group">
-            <div class="header-dark">
-                {ts}Participant Role{/ts}
-            </div>
-            <div class="crm-section no-label participant_role-section">
-                <div class="content">
-                    {$event.participant_role}
-                </div>
-            <div class="clear"></div>
-          </div>
-        </div>
-    {/if}
-
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
     {if $billingName or $address}
         <div class="crm-group billing_name_address-group">
@@ -177,18 +160,18 @@
             {ts}Credit Card Information{/ts}
           </div>
           <div class="crm-section no-label credit_card_details-section">
-            <div class="content">{$credit_card_type}</div>
-            <div class="content">{$credit_card_number}</div>
-            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
+            <div class="content credit_card_type">{$credit_card_type}</div>
+            <div class="content credit_card_number">{$credit_card_number}</div>
+            <div class="content credit_card_exp_date">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         </div>
       {/crmRegion}
     {/if}
 
-    {if $event.thankyou_footer_text}
+    {if array_key_exists('thankyou_footer_text', $event) && $event.thankyou_footer_text}
         <div id="footer_text" class="crm-section event_thankyou_footer-section">
-            <p>{$event.thankyou_footer_text}</p>
+            <p>{$event.thankyou_footer_text|purify}</p>
         </div>
     {/if}
 

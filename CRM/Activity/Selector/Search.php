@@ -268,7 +268,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       if ($this->_context === 'search') {
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->activity_id;
       }
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type, FALSE, $result->contact_id
       );
       $accessMailingReport = FALSE;
       $activityTypeId = $row['activity_type_id'];
@@ -321,9 +321,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
 
       $engagementLevel = $row['activity_engagement_level'] ?? NULL;
       if ($engagementLevel) {
-        $row['activity_engagement_level'] = CRM_Utils_Array::value($engagementLevel,
-          $engagementLevels, $engagementLevel
-        );
+        $row['activity_engagement_level'] = $engagementLevels[$engagementLevel] ?? $engagementLevel;
       }
 
       // Check if recurring activity.

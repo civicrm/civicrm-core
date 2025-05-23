@@ -345,15 +345,28 @@ Czech Republic
    */
   public function testLocationTokens(): void {
     $contactID = $this->individualCreate(['email' => 'me@example.com']);
-    Address::create()->setValues([
+    $this->createTestEntity('Address', [
       'contact_id' => $contactID,
       'is_primary' => TRUE,
       'street_address' => 'Heartbreak Hotel',
       'supplemental_address_1' => 'Lonely Street',
-    ])->execute();
-    $text = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address}';
-    $text = $this->renderText(['contactId' => $contactID], $text);
-    $this->assertEquals('Anthony me@example.com Heartbreak Hotel', $text);
+      'state_province_id:name' => 'New York',
+    ], 'primary');
+
+    $this->createTestEntity('Address', [
+      'contact_id' => $contactID,
+      'is_billing' => TRUE,
+      'street_address' => 'Heartbreak Motel',
+      'supplemental_address_1' => 'Lonely Avenue',
+      'country_id:name' => 'United States',
+      'state_province_id:name' => 'California',
+    ], 'billing');
+    $template = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address} {contact.address_billing.supplemental_address_1} {contact.address_billing.state_province_id:abbr}';
+    $text = $this->renderText(['contactId' => $contactID], $template);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel Lonely Avenue CA', $text);
+    Address::delete()->addWhere('id', '=', $this->ids['Address']['billing'])->execute();
+    $text = $this->renderText(['contactId' => $contactID], $template);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel Lonely Street NY', $text);
   }
 
   /**
@@ -709,7 +722,7 @@ contribution_recur.payment_instrument_id:name :Check
     return "participant.status_id :2
 participant.role_id :1
 participant.register_date :February 19th, 2007
-participant.source :Wimbeldon
+participant.source :Wimbledon
 participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
@@ -746,7 +759,7 @@ event.loc_block_id.phone_id.phone :456 789
 event.description :event description
 event.location :15 Walton St<br />
 up the road<br />
-Emerald City, Maine 90210-1234<br />
+Emerald City, ME 90210-1234<br />
 United States<br />
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
@@ -872,6 +885,7 @@ $100.00
     $this->assertStringContainsString('Beverley Hills
 90210
 California
+CA
 United States', $tokenProcessor->getRow(0)->render('message'));
   }
 
@@ -937,8 +951,10 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.city}' => 'Domain (Organization) City',
       '{domain.postal_code}' => 'Domain (Organization) Postal Code',
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
+      '{domain.state_province_id:abbr}' => 'Domain (Organization) State Abbreviation',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
       '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
+      '{site.message_header}' => 'Message Header',
     ];
   }
 
@@ -1039,7 +1055,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.title}' => 'Event Title',
       '{event.start_date}' => 'Event Start Date',
       '{event.end_date}' => 'Event End Date',
-      '{event.event_type_id:label}' => 'Type',
+      '{event.event_type_id:label}' => 'Event Type',
       '{event.summary}' => 'Event Summary',
       '{event.loc_block_id.email_id.email}' => 'Event Contact Email',
       '{event.loc_block_id.phone_id.phone}' => 'Event Contact Phone',
@@ -1071,6 +1087,9 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{' . $entity . '.contribution_recur_id.cancel_date}' => 'Cancel Date',
       '{' . $entity . '.contribution_recur_id.cancel_reason}' => 'Cancellation Reason',
       '{' . $entity . '.contribution_recur_id.end_date}' => 'Recurring Contribution End Date',
+      '{' . $entity . '.contribution_recur_id.next_sched_contribution_date}' => 'Next Scheduled Contribution Date',
+      '{' . $entity . '.contribution_recur_id.failure_count}' => 'Number of Failures',
+      '{' . $entity . '.contribution_recur_id.failure_retry_date}' => 'Retry Failed Attempt Date',
       '{' . $entity . '.contribution_recur_id.financial_type_id}' => 'Financial Type ID',
     ];
   }
@@ -1138,7 +1157,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'event_id' => $this->ids['Event'][0],
       'fee_amount' => 50,
       'fee_level' => 'steep',
-      $this->getCustomFieldName('participant_int') => '99999',
+      $this->getCustomFieldName('participant_int', 4) => '99999',
     ]);
   }
 
@@ -1180,7 +1199,7 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
    *
    * @return \Civi\Token\TokenProcessor
    */
-  protected function getTokenProcessor(array $override): TokenProcessor {
+  protected function getTokenProcessor(array $override = []): TokenProcessor {
     return new TokenProcessor(\Civi::dispatcher(), array_merge([
       'controller' => __CLASS__,
     ], $override));
@@ -1197,7 +1216,7 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
    * @return string
    */
   protected function renderText(array $rowContext, string $text, array $context = [], $isHtml = TRUE): string {
-    $context['schema'] = $context['schema'] ?? [];
+    $context['schema'] ??= [];
     foreach (array_keys($rowContext) as $key) {
       $context['schema'][] = $key;
     }
@@ -1206,6 +1225,23 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
     $tokenProcessor->addMessage('text', $text, 'text/' . ($isHtml ? 'html' : 'plain'));
     $tokenProcessor->evaluate();
     return $tokenProcessor->getRow(0)->render('text');
+  }
+
+  public function testQuotedTokens(): void {
+    $quoteOptions = [
+      '"',
+      '&lquote;',
+      '&rquote;',
+      '&quot;',
+      '&#8221;',
+      '&#8220;',
+      '&#x22;',
+    ];
+    Civi::settings()->set('dateformatFull', '%B %E%f, %Y');
+    foreach ($quoteOptions as $quote) {
+      $date = CRM_Utils_Date::customFormat(date('Y-m-d H:i:s'), '%B %E%f, %Y');
+      $this->assertEquals($date, $this->renderText([], '{domain.now|crmDate:' . $quote . 'Full' . $quote . '}'), 'render with quote type :' . $quote);
+    }
   }
 
 }

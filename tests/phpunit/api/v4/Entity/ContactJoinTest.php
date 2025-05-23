@@ -111,7 +111,7 @@ class ContactJoinTest extends Api4TestBase {
       'email_billing.email' => 'b@test.com',
       'address_billing.city' => 'Hello',
       'address_billing.state_province_id:abbr' => 'AK',
-      'address_billing.country_id:abbr' => 'USA',
+      'address_billing.country_id:abbr' => 'US',
     ]);
     $addr = Address::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])

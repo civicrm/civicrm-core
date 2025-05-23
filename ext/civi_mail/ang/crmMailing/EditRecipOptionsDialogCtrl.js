@@ -5,7 +5,7 @@
   //   - "mailing" (APIv3 mailing object)
   //   - "fields" (list of fields)
   angular.module('crmMailing').controller('EditRecipOptionsDialogCtrl', function EditRecipOptionsDialogCtrl($scope, crmUiHelp) {
-    $scope.ts = CRM.ts(null);
+    $scope.ts = CRM.ts('civi_mail');
     $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
   });
 

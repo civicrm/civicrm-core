@@ -259,17 +259,17 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
         // CRM-4038: fix value display
         foreach ($defaults['value'] as & $amount) {
-          $amount = trim(CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($amount));
+          $amount = trim(CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($amount, 9));
         }
       }
     }
 
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['min_amount'])) {
-      $defaults['min_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['min_amount']);
+      $defaults['min_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($defaults['min_amount'], 9);
     }
     if (isset($defaults['max_amount'])) {
-      $defaults['max_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['max_amount']);
+      $defaults['max_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($defaults['max_amount'], 9);
     }
 
     if (!empty($defaults['payment_processor'])) {
@@ -478,7 +478,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     foreach ($fields as $field => $defaultVal) {
-      $val = CRM_Utils_Array::value($field, $params, $defaultVal);
+      $val = $params[$field] ?? $defaultVal;
       if (in_array($field, $resetFields)) {
         $val = $defaultVal;
       }
@@ -494,8 +494,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $params['recur_frequency_unit'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['recur_frequency_unit'])
       );
-      $params['is_recur_interval'] = $params['is_recur_interval'] ?? FALSE;
-      $params['is_recur_installments'] = $params['is_recur_installments'] ?? FALSE;
+      $params['is_recur_interval'] ??= FALSE;
+      $params['is_recur_installments'] ??= FALSE;
     }
 
     if (!empty($params['adjust_recur_start_date'])) {
@@ -539,14 +539,16 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $params['payment_processor'] = 'null';
     }
 
-    $contributionPage = CRM_Contribute_BAO_ContributionPage::create($params);
+    $contributionPage = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
     $contributionPageID = $contributionPage->id;
 
     // prepare for data cleanup.
-    $deleteAmountBlk = $deletePledgeBlk = $deletePriceSet = FALSE;
-    if ($this->_priceSetID) {
-      $deletePriceSet = TRUE;
-    }
+    $deleteAmountBlk = $deletePledgeBlk = FALSE;
+    // We delete the link to the price set (the price set entity record) when
+    // one exists and there is neither a contribution or membership section enabled.
+    // This amount form can set & unset the contribution section but must check the database
+    // for the membership section (membership block).
+    $deletePriceSet = $this->_priceSetID && !$this->getSubmittedValue('amount_block_is_active') && !$this->getMembershipBlockID();
     if ($this->_pledgeBlockID) {
       $deletePledgeBlk = TRUE;
     }
@@ -558,9 +560,9 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
       if (!empty($params['amount_block_is_active'])) {
         // handle price set.
+        $deletePriceSet = FALSE;
         if ($priceSetID) {
           // add/update price set.
-          $deletePriceSet = FALSE;
           if (!empty($params['price_field_id']) || !empty($params['price_field_other'])) {
             $deleteAmountBlk = TRUE;
           }
@@ -568,8 +570,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
           CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageID, $priceSetID);
         }
         else {
-
-          $deletePriceSet = FALSE;
           // process contribution amount block
           $deleteAmountBlk = FALSE;
 
@@ -771,12 +771,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
             foreach ($pledgeBlock as $key) {
               $pledgeBlockParams[$key] = $params[$key] ?? NULL;
             }
-            $pledgeBlockParams['is_pledge_interval'] = CRM_Utils_Array::value('is_pledge_interval',
-              $params, FALSE
-            );
-            $pledgeBlockParams['pledge_start_date'] = CRM_Utils_Array::value('pledge_start_date',
-              $params, FALSE
-            );
+            $pledgeBlockParams['is_pledge_interval'] = $params['is_pledge_interval'] ?? FALSE;
+            $pledgeBlockParams['pledge_start_date'] = $params['pledge_start_date'] ?? FALSE;
             // create pledge block.
             CRM_Pledge_BAO_PledgeBlock::create($pledgeBlockParams);
           }
@@ -795,7 +791,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
           }
           else {
             $deleteAmountBlk = TRUE;
-            $deletePriceSet = TRUE;
           }
         }
       }

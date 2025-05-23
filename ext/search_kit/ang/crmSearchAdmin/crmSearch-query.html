@@ -1,0 +1,10 @@
+<div>
+  <strong>API:</strong>
+</div>
+<pre>{{ $ctrl.debug.apiParams }}</pre>
+<pre ng-if="$ctrl.debug.timeIndex">{{ ts('Request took %1 seconds.', {1: $ctrl.debug.timeIndex}) }}</pre>
+<div ng-if="$ctrl.perm.viewDebugOutput">
+  <strong>SQL:</strong>
+  <pre ng-if="!$ctrl.debug.sql">{{:: ts('Run search to view SQL') }}</pre>
+  <pre ng-repeat="query in $ctrl.debug.sql">{{ query }}</pre>
+</div>

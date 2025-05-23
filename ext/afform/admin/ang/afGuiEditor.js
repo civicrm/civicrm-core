@@ -14,14 +14,25 @@
             evaluate(item['#children']);
             _.each(item, function(prop, key) {
               if (_.isString(prop) && !_.includes(doNotEval, key)) {
-                var str = _.trim(prop);
-                if (str[0] === '{' || str[0] === '[' || str.slice(0, 3) === 'ts(') {
-                  item[key] = $parse(str)({ts: CRM.ts('afform')});
+                if (looksLikeJs(prop)) {
+                  try {
+                    item[key] = $parse(prop)({ts: CRM.ts('afform')});
+                  } catch (e) {
+                  }
                 }
               }
             });
           }
         });
+      }
+
+      function looksLikeJs(str) {
+        str = _.trim(str);
+        let firstChar = str.charAt(0);
+        let lastChar = str.slice(-1);
+        return (firstChar === '{' && lastChar === '}') ||
+          (firstChar === '[' && lastChar === ']') ||
+          str.slice(0, 3) === 'ts(';
       }
 
       function getStyles(node) {
@@ -81,6 +92,27 @@
         }
       }
 
+      // Convert value to javascript notation
+      function encode(value) {
+        const encoded = JSON.stringify(value);
+        const split = encoded.split('"');
+        // Convert double-quotes to single-quotes if possible
+        if (split.length === 3 && split[0] === '' && split[2] === '' && encoded.indexOf("'") < 0) {
+          return "'" + split[1] + "'";
+        }
+        return encoded;
+      }
+
+      // Convert javascript notation to value
+      function decode(encoded) {
+        // Single-quoted string
+        if (encoded.startsWith("'") && encoded.charAt(encoded.length - 1) === "'") {
+          return encoded.substring(1, encoded.length - 1);
+        }
+        // Anything else
+        return JSON.parse(encoded);
+      }
+
       return {
         // Called when loading a new afform for editing - clears out stale metadata
         resetMeta: function() {
@@ -127,15 +159,6 @@
               CRM.afGuiEditor.entities[entityName].fields = fields;
             }
           });
-          // Optimization - since contact fields are a combination of these three,
-          // the server doesn't send contact fields if sending contact-type fields
-          if ('Individual' in data.fields || 'Household' in data.fields || 'Organization' in data.fields) {
-            CRM.afGuiEditor.entities.Contact.fields = _.assign({},
-              (CRM.afGuiEditor.entities.Individual || {}).fields,
-              (CRM.afGuiEditor.entities.Household || {}).fields,
-              (CRM.afGuiEditor.entities.Organization || {}).fields
-            );
-          }
           _.each(data.search_displays, function(display) {
             CRM.afGuiEditor.searchDisplays[display['saved_search_id.name'] + (display.name ? '.' + display.name : '')] = display;
           });
@@ -163,7 +186,7 @@
           // Non-aggregated query will return the same search multiple times - once per display
           crmApi4('SavedSearch', 'get', {
             select: ['name', 'label', 'display.name', 'display.label', 'display.type:name', 'display.type:icon'],
-            where: [['api_entity', 'IS NOT NULL'], ['api_params', 'IS NOT NULL']],
+            where: [['api_entity', 'IS NOT NULL'], ['api_params', 'IS NOT NULL'], ['is_template', '=', false]],
             join: [['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']]],
             orderBy: {'label':'ASC'}
           }).then(function(searches) {
@@ -248,6 +271,78 @@
         modifyClasses: modifyClasses,
         getStyles: getStyles,
         setStyle: setStyle,
+
+        // Convert search display filters to js notation
+        stringifyDisplayFilters: function(filters) {
+          if (!filters || !filters.length) {
+            return null;
+          }
+          const output = filters.map((filter) => {
+            const keyVal = [
+              // Enclose the key in quotes unless it is purely alphanumeric
+              filter.name.match(/\W/) ? encode(filter.name) : filter.name,
+            ];
+            // Object dot notation
+            if (filter.mode !== 'val' && !filter.value.match(/\W/)) {
+              keyVal.push(filter.mode + '.' + filter.value);
+            }
+            // Object bracket notation
+            else if (filter.mode !== 'val') {
+              keyVal.push(filter.mode + '[' + encode(filter.value) + ']');
+            }
+            // Literal value
+            else {
+              keyVal.push(encode(filter.value));
+            }
+            return keyVal.join(': ');
+          });
+          return '{' + output.join(', ') + '}';
+        },
+
+        // Convert search display filter string to array
+        parseDisplayFilters: function(filterString) {
+          if (!filterString || filterString === '{}') {
+            return [];
+          }
+          // Split contents by commas, ignoring commas inside quotes
+          const rawValues = _.trim(filterString, '{}').split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
+          return rawValues.map((raw) => {
+            raw = _.trim(raw);
+            let split;
+            if (raw.charAt(0) === '"') {
+              split = raw.slice(1).split(/"[ ]*:/);
+            } else if (raw.charAt(0) === "'") {
+              split = raw.slice(1).split(/'[ ]*:/);
+            } else {
+              split = raw.split(':');
+            }
+            const key = _.trim(split[0]);
+            const value = _.trim(split[1]);
+            let mode = 'val';
+            if (value.startsWith('routeParams')) {
+              mode = 'routeParams';
+            } else if (value.startsWith('options')) {
+              mode = 'options';
+            }
+            let info = {
+              name: key,
+              mode: mode
+            };
+            // Object dot notation
+            if (mode !== 'val' && value.startsWith(mode + '.')) {
+              info.value = value.replace(mode + '.', '');
+            }
+            // Object bracket notation
+            else if (mode !== 'val') {
+              info.value = decode(value.substring(value.indexOf('[') + 1, value.lastIndexOf(']')));
+            }
+            // Literal value
+            else {
+              info.value = decode(value);
+            }
+            return info;
+          }, []);
+        },
 
         pickIcon: function() {
           var deferred = $q.defer();

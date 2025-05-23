@@ -34,7 +34,7 @@ class CRM_Report_Page_Report extends CRM_Core_Page {
       'String', FALSE, TRUE
     );
 
-    $extKey = strpos(CRM_Utils_Array::value('name', $templateInfo), '.');
+    $extKey = strpos($templateInfo['name'] ?? '', '.');
 
     $reportClass = NULL;
 

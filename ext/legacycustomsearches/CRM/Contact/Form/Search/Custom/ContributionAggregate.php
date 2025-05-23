@@ -181,7 +181,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
     ];
     $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
     foreach ($fields as $fieldName => $field) {
-      $fields[$fieldName] = array_merge(CRM_Utils_Array::value($fieldName, $metadata, []), $field);
+      $fields[$fieldName] = array_merge($metadata[$fieldName] ?? [], $field);
     }
     return $fields;
   }
@@ -207,10 +207,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
       'receive_date_low',
       'receive_date_high',
     ] as $dateFieldName) {
-      $dateParams[$dateFieldName] = CRM_Utils_Array::value(
-        $dateFieldName,
-        $this->_formValues
-      );
+      $dateParams[$dateFieldName] = $this->_formValues[$dateFieldName] ?? NULL;
     }
 
     if ($dateParams['receive_date_relative']) {

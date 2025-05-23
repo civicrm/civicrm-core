@@ -98,14 +98,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     $scanBlocks = function($layout) use (&$scanBlocks, &$info, &$entities, $allAfforms) {
       // Find declared af-entity tags
       foreach (\CRM_Utils_Array::findAll($layout, ['#tag' => 'af-entity']) as $afEntity) {
-        // Convert "Contact" to "Individual", "Organization" or "Household"
-        if ($afEntity['type'] === 'Contact' && !empty($afEntity['data'])) {
-          $data = \CRM_Utils_JS::decode($afEntity['data']);
-          $entities[] = $data['contact_type'] ?? $afEntity['type'];
-        }
-        else {
-          $entities[] = $afEntity['type'];
-        }
+        $entities[] = $afEntity['type'];
       }
       $joins = array_column(\CRM_Utils_Array::findAll($layout, 'af-join'), 'af-join');
       $entities = array_unique(array_merge($entities, $joins));
@@ -144,17 +137,13 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         $scanBlocks($info['definition']['layout']);
       }
 
-      if (array_intersect($entities, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-        $entities[] = 'Contact';
-      }
-
       // The full contents of blocks used on the form have been loaded. Get basic info about others relevant to these entities.
       $this->loadAvailableBlocks($entities, $info);
     }
 
     if ($info['definition']['type'] === 'block') {
       $blockEntity = $info['definition']['join_entity'] ?? $info['definition']['entity_type'] ?? NULL;
-      if ($blockEntity) {
+      if ($blockEntity && $blockEntity !== '*') {
         $entities[] = $blockEntity;
       }
       $scanBlocks($info['definition']['layout']);
@@ -184,7 +173,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
             ->setSavedSearch($displayTag['search-name']);
         }
         $display = $displayGet
-          ->addSelect('*', 'type:name', 'type:icon', 'saved_search_id.name', 'saved_search_id.label', 'saved_search_id.api_entity', 'saved_search_id.api_params')
+          ->addSelect('*', 'type:name', 'type:icon', 'saved_search_id.name', 'saved_search_id.label', 'saved_search_id.api_entity', 'saved_search_id.api_params', 'saved_search_id.form_values')
           ->execute()->first();
         if (!$display) {
           continue;
@@ -213,15 +202,12 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       $this->loadAvailableBlocks($entities, $info, [['join_entity', 'IS NULL']]);
     }
 
-    // Optimization - since contact fields are a combination of these three,
-    // we'll combine them client-side rather than sending them via ajax.
-    elseif (array_intersect($entities, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-      $entities = array_diff($entities, ['Contact']);
-    }
-
     foreach (array_diff($entities, $this->skipEntities) as $entity) {
       $info['entities'][$entity] = AfformAdminMeta::getApiEntity($entity);
       $info['fields'][$entity] = AfformAdminMeta::getFields($entity, ['action' => $getFieldsMode]);
+      foreach ($info['fields'][$entity] as $key => $field) {
+        $info['fields'][$entity][$key]['original_input_type'] = $field['input_type'];
+      }
       $behaviors = AfformBehavior::get(FALSE)
         ->addWhere('entities', 'CONTAINS', $entity)
         ->execute();
@@ -261,6 +247,10 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     $entities = array_diff($entities, $this->skipEntities);
     if (!$this->skipEntities) {
       $entities[] = '*';
+    }
+    // A block of type "Contact" also applies to "Individual", "Organization" & "Household".
+    if (array_intersect($entities, \CRM_Contact_BAO_ContactType::basicTypes())) {
+      $entities[] = 'Contact';
     }
     if ($entities) {
       $blockInfo = Afform::get($this->checkPermissions)

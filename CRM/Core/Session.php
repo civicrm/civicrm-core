@@ -152,10 +152,21 @@ class CRM_Core_Session {
   /**
    * Resets the session store.
    *
-   * @param int $all
+   * @param int|string $mode
+   *   1: Default mode. Deletes the `CiviCRM` data from $_SESSION.
+   *   2: More invasive version of that. (somehow)
+   *   'keep_login': Less invasive. Preserve basic data (current user ID) from this session. Reset everything else.
    */
-  public function reset($all = 1) {
-    if ($all != 1) {
+  public function reset($mode = 1) {
+    if ($mode === 'keep_login') {
+      if (!empty($this->_session[$this->_key])) {
+        $this->_session[$this->_key] = CRM_Utils_Array::subset(
+          $this->_session[$this->_key],
+          ['ufID', 'userID', 'authx']
+        );
+      }
+    }
+    elseif ($mode != 1) {
       $this->initialize();
 
       // to make certain we clear it, first initialize it to empty
@@ -452,10 +463,11 @@ class CRM_Core_Session {
    * Stores an alert to be displayed to the user via crm-messages.
    *
    * @param string $text
-   *   The status message
+   *   The status message.
    *
    * @param string $title
-   *   The optional title of this message
+   *   The optional title of this message. For accessibility reasons,
+   *   please terminate with a full stop/period.
    *
    * @param string $type
    *   The type of this message (printed as a css class). Possible options:
@@ -550,12 +562,9 @@ class CRM_Core_Session {
    * @return int|null
    *   contact ID of logged in user
    */
-  public static function getLoggedInContactID() {
-    $session = CRM_Core_Session::singleton();
-    if (!is_numeric($session->get('userID'))) {
-      return NULL;
-    }
-    return (int) $session->get('userID');
+  public static function getLoggedInContactID(): ?int {
+    $userId = CRM_Core_Session::singleton()->get('userID');
+    return is_numeric($userId) ? (int) $userId : NULL;
   }
 
   /**
@@ -565,12 +574,12 @@ class CRM_Core_Session {
    *
    * @throws CRM_Core_Exception
    */
-  public function getLoggedInContactDisplayName() {
+  public function getLoggedInContactDisplayName(): string {
     $userContactID = CRM_Core_Session::getLoggedInContactID();
     if (!$userContactID) {
       return '';
     }
-    return civicrm_api3('Contact', 'getvalue', ['id' => $userContactID, 'return' => 'display_name']);
+    return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userContactID, 'display_name') ?? '';
   }
 
   /**

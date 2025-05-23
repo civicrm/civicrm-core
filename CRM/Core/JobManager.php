@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Job;
+
 /**
  * This interface defines methods that need to be implemented
  * by every scheduled job (cron task) in CiviCRM.
@@ -24,6 +26,7 @@ class CRM_Core_JobManager {
    * Format is ($id => CRM_Core_ScheduledJob).
    *
    * @var CRM_Core_ScheduledJob[]
+   * @deprecated
    */
   public $jobs = NULL;
 
@@ -32,16 +35,19 @@ class CRM_Core_JobManager {
    */
   public $currentJob = NULL;
 
+  /**
+   * @var array
+   *
+   * @fixme How are these set? What do they do?
+   */
   public $singleRunParams = [];
 
-  public $_source = NULL;
-
   /**
-   * Class constructor.
+   * @var string|null
+   *
+   * @fixme Looks like this is only used by "singleRun"
    */
-  public function __construct() {
-    $this->jobs = $this->getJobs();
-  }
+  public $_source = NULL;
 
   /**
    * @param bool $auth
@@ -57,13 +63,41 @@ class CRM_Core_JobManager {
 
     // it's not asynchronous at this stage
     CRM_Utils_Hook::cron($this);
-    foreach ($this->jobs as $job) {
-      if ($job->is_active) {
-        if ($job->needsRunning()) {
-          $this->executeJob($job);
-        }
+
+    // Get a list of the jobs that have completed previously
+    $successfulJobs = Job::get(FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->addClause('OR', ['last_run', 'IS NULL'], ['last_run', '<=', 'last_run_end', TRUE])
+      ->addOrderBy('name', 'ASC')
+      ->execute()
+      ->indexBy('id')
+      ->getArrayCopy();
+
+    // Get a list of jobs that have not completed previously.
+    // This could be because they are a new job that has not yet run or a job that is fatally crashing (eg. OOM).
+    // If last_run is NULL the job has never run and will be selected above so exclude it here
+    // If last_run_end is NULL the job has never completed successfully.
+    // If last_run_end is < last_run job has completed successfully in the past but is now failing to complete.
+    $maybeUnsuccessfulJobs = Job::get(FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('last_run', 'IS NOT NULL')
+      ->addClause('OR', ['last_run_end', 'IS NULL'], ['last_run', '>', 'last_run_end', TRUE])
+      ->addOrderBy('name', 'ASC')
+      ->execute()
+      ->indexBy('id')
+      ->getArrayCopy();
+
+    $jobs = array_merge($successfulJobs, $maybeUnsuccessfulJobs);
+    foreach ($jobs as $job) {
+      $temp = ['class' => NULL, 'parameters' => NULL, 'last_run' => NULL];
+      $scheduledJobParams = array_merge($temp, $job);
+      $jobDAO = new CRM_Core_ScheduledJob($scheduledJobParams);
+
+      if ($jobDAO->needsRunning()) {
+        $this->executeJob($jobDAO);
       }
     }
+
     $this->logEntry('Finishing scheduled jobs execution.');
 
     // Set last cron date for the status check
@@ -124,7 +158,7 @@ class CRM_Core_JobManager {
     try {
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
-    catch (Exception$e) {
+    catch (Exception $e) {
       $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
       $result = $e;
     }
@@ -132,32 +166,8 @@ class CRM_Core_JobManager {
     $this->logEntry('Finished execution of ' . $job->name . ' with result: ' . $this->apiResultToMessage($result));
     $this->currentJob = FALSE;
 
-    //Disable outBound option after executing the job.
-    $environment = CRM_Core_Config::environment(NULL, TRUE);
-    if ($environment != 'Production' && !empty($job->apiParams['runInNonProductionEnvironment'])) {
-      Civi::settings()->set('mailing_backend', ['outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED]);
-    }
-  }
-
-  /**
-   * Retrieves the list of jobs from the database,
-   * populates class param.
-   *
-   * @return array
-   *   ($id => CRM_Core_ScheduledJob)
-   */
-  private function getJobs(): array {
-    $jobs = [];
-    $dao = new CRM_Core_DAO_Job();
-    $dao->orderBy('name');
-    $dao->domain_id = CRM_Core_Config::domainID();
-    $dao->find();
-    while ($dao->fetch()) {
-      $temp = ['class' => NULL, 'parameters' => NULL, 'last_run' => NULL];
-      CRM_Core_DAO::storeValues($dao, $temp);
-      $jobs[$dao->id] = new CRM_Core_ScheduledJob($temp);
-    }
-    return $jobs;
+    // Save the job last run end date (if this doesn't get written we know the job crashed and was not caught (eg. OOM).
+    $job->saveLastRunEnd();
   }
 
   /**
@@ -191,7 +201,7 @@ class CRM_Core_JobManager {
    * @param $entity
    * @param $job
    * @param array $params
-   * @param null $source
+   * @param string|null $source
    */
   public function setSingleRunParams($entity, $job, $params, $source = NULL) {
     $this->_source = $source;
@@ -254,8 +264,8 @@ class CRM_Core_JobManager {
    */
   private function apiResultToMessage($apiResult) {
     $status = ($apiResult['is_error'] ?? FALSE) ? ts('Failure') : ts('Success');
-    $msg = CRM_Utils_Array::value('error_message', $apiResult, 'empty error_message!');
-    $vals = CRM_Utils_Array::value('values', $apiResult, 'empty values!');
+    $msg = $apiResult['error_message'] ?? 'empty error_message!';
+    $vals = $apiResult['values'] ?? 'empty values!';
     if (is_array($msg)) {
       $msg = serialize($msg);
     }

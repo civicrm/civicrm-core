@@ -11,6 +11,13 @@
 class CRM_ACL_ListTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * @var array
    */
   protected $allowedContactsACL = [];

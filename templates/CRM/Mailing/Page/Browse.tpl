@@ -28,8 +28,6 @@
 
 {if $rows}
     {include file="CRM/common/pager.tpl" location="top"}
-    {include file="CRM/common/pagerAToZ.tpl"}
-
     {strip}
     <table class="selector row-highlight">
       <thead class="sticky">
@@ -68,14 +66,14 @@
         <td class="crm-mailing-start">{$row.start}</td>
         <td class="crm-mailing-end">{$row.end}</td>
        {if call_user_func(array('CRM_Campaign_BAO_Campaign','isComponentEnabled'))}
-          <td class="crm-mailing-campaign crm-editable crmf-campaign_id" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.campaign}</td>
+          <td class="crm-mailing-campaign crm-editable crmf-campaign_id" data-type="select" data-empty-option="{ts escape='htmlattribute'}- none -{/ts}">{$row.campaign}</td>
       {/if}
         <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>
       {/foreach}
     </table>
     {/strip}
-
+    {include file="CRM/common/pagerAToZ.tpl"}
     {include file="CRM/common/pager.tpl" location="bottom"}
     {if $showLinks}
       <div class="action-link">

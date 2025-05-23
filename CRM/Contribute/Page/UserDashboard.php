@@ -80,7 +80,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
 
       $action = array_sum(array_keys(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur['id'], (int) $recur['contact_id'])));
 
-      $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recur['id'], 'recur');
+      $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recur['id']);
       $hideUpdate = $details->membership_id & $details->auto_renew;
 
       if ($hideUpdate) {
@@ -123,7 +123,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    * (currently CRM_Utils_Invoicing) with a view to possible removal from core.
    */
   public function isIncludeInvoiceLinks() {
-    if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {
+    if (!\Civi::settings()->get('invoicing')) {
       return FALSE;
     }
     $dashboardOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -140,6 +140,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    */
   public function run() {
     $this->assign('isIncludeInvoiceLinks', $this->isIncludeInvoiceLinks());
+    $this->assign('canViewMyInvoicesOrAccessCiviContribute', CRM_Core_Permission::check([['view my invoices', 'access CiviContribute']]));
     parent::preProcess();
     $this->listContribution();
   }

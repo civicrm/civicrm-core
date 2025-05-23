@@ -100,7 +100,7 @@
       };
 
       this.showFullscreen = function(dashlet) {
-        ctrl.fullscreenDashlet = true;
+        ctrl.fullscreenDashlet = dashlet.name;
         var options = CRM.utils.adjustDialogDefaults({
           width: '90%',
           height: '90%',

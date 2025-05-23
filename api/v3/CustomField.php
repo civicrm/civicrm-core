@@ -33,7 +33,7 @@ function civicrm_api3_custom_field_create(array $params): array {
 
   // Legacy handling for old way of naming serialized fields
   if (!empty($params['html_type'])) {
-    if ($params['html_type'] === 'CheckBox' || strpos($params['html_type'], 'Multi-') === 0) {
+    if ($params['html_type'] === 'CheckBox' || str_starts_with($params['html_type'], 'Multi-')) {
       $params['serialize'] = 1;
     }
     $params['html_type'] = str_replace(['Multi-Select', 'Select Country', 'Select State/Province'], 'Select', $params['html_type']);
@@ -153,7 +153,7 @@ function civicrm_api3_custom_field_get($params) {
   if ($handleLegacy && !empty($params['html_type'])) {
     $serializedTypes = ['CheckBox', 'Multi-Select', 'Multi-Select Country', 'Multi-Select State/Province'];
     if (is_string($params['html_type'])) {
-      if (strpos($params['html_type'], 'Multi-Select') === 0) {
+      if (str_starts_with($params['html_type'], 'Multi-Select')) {
         $params['html_type'] = str_replace('Multi-Select', 'Select', $params['html_type']);
         $params['serialize'] = 1;
       }
@@ -235,7 +235,7 @@ function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDet
       break;
 
     case 'Float':
-      if (!CRM_Utils_Rule::numeric($value)) {
+      if (!is_numeric($value)) {
         $errors[$fieldName] = 'Invalid numeric value for ' . $fieldName;
       }
       break;
@@ -335,6 +335,25 @@ function civicrm_api3_custom_field_setvalue($params) {
   $result = civicrm_api3_generic_setValue(["entity" => 'CustomField', 'params' => $params]);
   if (empty($result['is_error'])) {
     CRM_Utils_System::flushCache();
+  }
+  return $result;
+}
+
+function civicrm_api3_custom_field_getoptions($params) {
+  $result = civicrm_api3_generic_getoptions(['entity' => 'CustomField', 'params' => $params]);
+  // This provides legacy support for APIv3, allowing no-longer-existent html types
+  if ($params['field'] === 'html_type') {
+    $extras = [
+      'Multi-Select' => 'Multi-Select',
+      'Select Country' => 'Select Country',
+      'Multi-Select Country' => 'Multi-Select Country',
+      'Select State/Province' => 'Select State/Province',
+      'Multi-Select State/Province' => 'Multi-Select State/Province',
+    ];
+    if (!empty($params['sequential'])) {
+      $extras = CRM_Utils_Array::makeNonAssociative($extras);
+    }
+    $result['values'] = array_merge($result['values'], $extras);
   }
   return $result;
 }

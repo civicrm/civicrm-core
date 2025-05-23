@@ -114,15 +114,15 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
     $emailName = '';
-
-    if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
       // this is a transaction related page
-      $emailName = 'email-' . $form->_bltID;
+      $emailName = 'email-' . $billingLocationTypeID;
     }
     else {
       // find the email field in a profile page
       foreach ($fields as $name => $dontCare) {
-        if (substr($name, 0, 5) == 'email') {
+        if (str_starts_with($name, 'email')) {
           $emailName = $name;
           break;
         }
@@ -182,6 +182,24 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritdoc
+   *
+   * Joomla has a very slightly different main template
+   * from the shared CMSPrint.tpl
+   *
+   * @todo can we merge these and do away with this
+   * override? might need to update the breadcrumbs
+   * function below to match the others
+   */
+  public static function getContentTemplate($print = 0): string {
+    // I fear some callers of this function still pass FALSE rather than int
+    if (!$print) {
+      return 'CRM/common/joomla.tpl';
+    }
+    return parent::getContentTemplate($print);
+  }
+
+  /**
    * @inheritDoc
    */
   public function setTitle($title, $pageTitle = NULL) {
@@ -201,7 +219,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function appendBreadCrumb($breadCrumbs) {
     $template = CRM_Core_Smarty::singleton();
-    $bc = $template->get_template_vars('breadcrumb');
+    $bc = $template->getTemplateVars('breadcrumb');
 
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
@@ -219,7 +237,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         $bc[] = $crumbs;
       }
     }
-    $template->assign_by_ref('breadcrumb', $bc);
+    $template->assign('breadcrumb', $bc);
   }
 
   /**
@@ -285,7 +303,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       // Get Itemid using JInput::get()
       $input = Joomla\CMS\Factory::getApplication()->input;
       $itemIdNum = $input->get("Itemid");
-      if ($itemIdNum && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
+      if ($itemIdNum && (!str_contains($path, 'civicrm/payment/ipn'))) {
         $Itemid = "{$separator}Itemid=" . $itemIdNum;
       }
     }
@@ -512,9 +530,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function logout() {
-    session_destroy();
-    CRM_Utils_System::setHttpHeader("Location", "index.php");
+  public function postLogoutUrl(): string {
+    return "/index.php";
   }
 
   /**
@@ -651,8 +668,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $config = JFactory::getConfig();
     $timezone = $config->get('offset');
     if ($timezone) {
-      date_default_timezone_set($timezone);
-      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+      $this->setTimeZone($timezone);
     }
     if (version_compare(JVERSION, '4.0', '>=')) {
       // Boot the DI container
@@ -988,7 +1004,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // For Joomla CiviCRM Core files always live within the admistrator folder and $base_url is different on the frontend compared to the backend.
-    if (strpos($baseURL, 'administrator') === FALSE) {
+    if (!str_contains($baseURL, 'administrator')) {
       $userFrameworkResourceURL = $baseURL . "administrator/components/com_civicrm/civicrm/";
     }
     else {

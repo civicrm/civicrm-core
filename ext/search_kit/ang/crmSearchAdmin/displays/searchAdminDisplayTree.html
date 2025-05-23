@@ -1,0 +1,82 @@
+<div class="alert alert-warning" ng-if="!$ctrl.hierarchicalEntity">
+  {{:: ts('%1 do not support hierarchical nesting. Consider using a different display type.', {1: $ctrl.parent.getMainEntity().title_plural}) }}
+</div>
+<div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
+
+<fieldset>
+  <legend>{{:: ts('Display Settings') }}</legend>
+
+  <details>
+    <summary>{{:: ts('Sorting') }}</summary>
+    <div ng-if="$ctrl.sortableEntity" class="form-inline">
+      <div class="checkbox-inline form-control">
+        <label>
+          <input type="checkbox" ng-checked="!!$ctrl.display.settings.draggable" ng-click="$ctrl.parent.toggleDraggable()">
+          <span>{{:: ts('Drag and drop sorting') }}</span>
+        </label>
+      </div>
+    </div>
+    <fieldset ng-if="!$ctrl.display.settings.draggable" ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
+    <div ng-if="$ctrl.hierarchicalEntity" class="form-inline">
+      <select class="form-control" ng-model="$ctrl.display.settings.collapsible" title="{{:: ts('Should hierarchical tree be collapsible') }}">
+        <option value="">{{:: ts('Not collapsible') }}</option>
+        <option value="open">{{:: ts('Collapsible - Open') }}</option>
+        <option value="closed">{{:: ts('Collapsible - Closed') }}</option>
+      </select>
+    </div>
+  </details>
+
+  <details>
+    <summary>{{:: ts('Style') }}</summary>
+    <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
+    <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the tree is empty.') }}">
+      <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
+      <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
+    </div>
+    <search-admin-css-rules label="{{:: ts('Item Style') }}" item="$ctrl.display.settings"></search-admin-css-rules>
+  </details>
+
+  <details>
+    <summary>{{:: ts('Header') }}</summary>
+    <div class="form-inline">
+      <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
+    </div>
+    <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
+  </details>
+</fieldset>
+
+<fieldset class="crm-search-admin-edit-columns-wrapper">
+  <legend>
+    {{:: ts('Fields') }}
+  </legend>
+  <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+    <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
+      <i class="crm-i fa-arrows crm-search-move-icon"></i>
+      <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
+        <i class="crm-i fa-ban"></i>
+      </button>
+      <details>
+        <summary> {{ $ctrl.parent.getColLabel(col) }}</summary>
+        <div class="form-inline" title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
+          <label><input type="checkbox" ng-model="col.break"> {{:: ts('New Line') }}</label>
+        </div>
+        <div class="form-inline crm-search-admin-flex-row">
+          <label>
+            <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getColLabel(col)" >
+            {{:: ts('Label') }}
+          </label>
+          <input ng-if="col.label" class="form-control crm-flex-1" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
+          <crm-search-admin-token-select ng-if="col.label" model="col" field="label" suffix=":label"></crm-search-admin-token-select>
+        </div>
+        <div class="form-inline" ng-if="col.label">
+          <label style="visibility: hidden"><input type="checkbox" disabled></label><!--To indent by 1 checkbox-width-->
+          <div class="checkbox">
+            <label><input type="checkbox" ng-model="col.forceLabel"> {{:: ts('Show label even when field is blank') }}</label>
+          </div>
+        </div>
+        <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
+      </details>
+    </fieldset>
+  </fieldset>
+</fieldset>

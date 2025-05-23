@@ -3,7 +3,6 @@ namespace Civi\FlexMailer\API;
 
 use Civi\FlexMailer\FlexMailer;
 use Civi\FlexMailer\FlexMailerTask;
-use Civi\FlexMailer\Listener\Abdicator;
 
 class MailingPreview {
 
@@ -33,13 +32,7 @@ class MailingPreview {
       $mailing->copyValues($params);
     }
 
-    if (!Abdicator::isFlexmailPreferred($mailing) && empty($mailing->sms_provider_id)) {
-      require_once 'api/v3/Mailing.php';
-      return civicrm_api3_mailing_preview($params);
-    }
-
-    $contactID = \CRM_Utils_Array::value('contact_id', $params,
-      \CRM_Core_Session::singleton()->get('userID'));
+    $contactID = $params['contact_id'] ?? \CRM_Core_Session::getLoggedInContactID();
 
     $job = new class extends \CRM_Mailing_BAO_MailingJob {
 
@@ -77,7 +70,7 @@ class MailingPreview {
     $flexMailer->fireComposeBatch([$task]);
 
     return civicrm_api3_create_success([
-      'id' => isset($params['id']) ? $params['id'] : NULL,
+      'id' => $params['id'] ?? NULL,
       'contact_id' => $contactID,
       'subject' => $task->getMailParam('Subject'),
       'body_html' => $task->getMailParam('html'),

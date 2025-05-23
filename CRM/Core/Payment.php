@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Participant;
 use Civi\Payment\System;
 use Civi\Payment\Exception\PaymentProcessorException;
 use Civi\Payment\PropertyBag;
@@ -589,7 +590,13 @@ abstract class CRM_Core_Payment {
         return '';
 
       case 'contributionPageContinueText':
-        return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
+        if ($params['amount'] <= 0.0 || (int) $this->_paymentProcessor['billing_mode'] === 4) {
+          return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
+        }
+        if ($params['is_payment_to_existing']) {
+          return ts('Click the <strong>Make Payment</strong> button to proceed with the payment.');
+        }
+        return ts('Click the <strong>Make Contribution</strong> button to proceed with the payment.');
 
       case 'contributionPageConfirmText':
         if ($params['amount'] <= 0.0) {
@@ -1234,9 +1241,15 @@ abstract class CRM_Core_Payment {
     }
 
     if ($this->_component == 'event') {
+      $eventID = NULL;
+      if ($participantID) {
+        $eventID = Participant::get(FALSE)->addWhere('id', '=', $participantID)
+          ->addSelect('event_id')->execute()->single()['event_id'];
+      }
       return CRM_Utils_System::url($this->getBaseReturnUrl(), [
         'reset' => 1,
         'cc' => 'fail',
+        'id' => $eventID,
         'participantId' => $participantID,
       ],
         TRUE, NULL, FALSE
@@ -1659,6 +1672,7 @@ abstract class CRM_Core_Payment {
       throw new CRM_Core_Exception($notFound);
     }
 
+    // handlePaymentNotification() or handlePaymentCron()
     $method = 'handle' . $method;
     $extension_instance_found = FALSE;
 
@@ -1896,6 +1910,19 @@ abstract class CRM_Core_Payment {
   public function supportsNoReturn(): bool {
     $billingMode = (int) $this->_paymentProcessor['billing_mode'];
     return $billingMode === self::BILLING_MODE_NOTIFY || $billingMode === self::BILLING_MODE_BUTTON;
+  }
+
+  /**
+   * Checks if payment processor supports not returning to the form processing on recurring.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturnForRecurring(): bool {
+    return $this->supportsNoReturn();
   }
 
   /**

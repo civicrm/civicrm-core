@@ -30,7 +30,7 @@
        <td>{$form.sms_provider_id.html} {help id ="id-provider" file="CRM/Contact/Form/Task/SMS.hlp"}</td>
     </tr>
     <tr class="crm-contactsms-form-block-recipient">
-       <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
+       <td class="label">{$form.to.label}</td>
        <td>{$form.to.html}
     <div class="spacer"></div>
       </td>
@@ -40,7 +40,7 @@
    </tr>
 
 
-{if $SMSTask}
+{if array_key_exists('SMStemplate', $form)}
     <tr class="crm-contactPhone-form-block-template">
         <td class="label">{$form.SMStemplate.label}</td>
         <td>{$form.SMStemplate.html}</td>
@@ -69,31 +69,3 @@
 {/if}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-<script type="text/javascript">
-
-{if $toContact}
-    toContact  = {$toContact};
-{/if}
-
-{literal}
-CRM.$(function($){
-  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0}{literal}";
-  function phoneSelect(el){
-    $(el).data('api-entity', 'contact').crmSelect2({
-      minimumInputLength: 1,
-      multiple: true,
-      ajax: {
-        url: sourceDataUrl,
-        data: function(term) {
-          return { name: term, id: 1};
-        },
-        results: function(response) {
-          return { results: response };
-        }
-      }
-    }).select2('data', toContact);
-  }
-  phoneSelect('#to');
-});
-</script>
-{/literal}

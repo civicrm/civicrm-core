@@ -390,17 +390,13 @@ class CRM_Utils_REST {
     }
     $param = array_map('htmlentities', $_GET);
     unset($param['q']);
-    $smarty->assign_by_ref("request", $param);
+    $smarty->assign("request", $param);
 
     if (!self::isWebServiceRequest()) {
 
       $smarty->assign('tplFile', $tpl);
       $config = CRM_Core_Config::singleton();
       $content = $smarty->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
-
-      if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-        CRM_Utils_System::addHTMLHead($region->render(''));
-      }
       CRM_Utils_System::appendTPLFile($tpl, $content);
 
       return CRM_Utils_System::theme($content);
@@ -550,7 +546,7 @@ class CRM_Utils_REST {
         $call[0],
         $call[1],
       ];
-      $output[$key] = self::process($args, CRM_Utils_Array::value(2, $call, []));
+      $output[$key] = self::process($args, $call[2] ?? []);
     }
     return $output;
   }
@@ -631,6 +627,10 @@ class CRM_Utils_REST {
    *       <A HREF>, <IFRAME>, <IMG>, `Location:`, or similar CSRF vector.
    */
   public static function isWebServiceRequest(): bool {
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+      return TRUE;
+    }
+
     if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? NULL) === 'XMLHttpRequest') {
       return TRUE;
     }

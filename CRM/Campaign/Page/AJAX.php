@@ -21,6 +21,7 @@
 class CRM_Campaign_Page_AJAX {
 
   public static function registerInterview() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $fields = [
       'result',
       'voter_id',
@@ -41,7 +42,7 @@ class CRM_Campaign_Page_AJAX {
 
     $customKey = "field_{$voterId}_custom";
     foreach ($_POST as $key => $value) {
-      if (strpos($key, $customKey) !== FALSE) {
+      if (str_contains($key, $customKey)) {
         $customFieldKey = str_replace(str_replace(substr($customKey, -6), '', $customKey), '', $key);
         $params[$customFieldKey] = $value;
       }
@@ -57,8 +58,8 @@ class CRM_Campaign_Page_AJAX {
 
     //lets pickup contat related fields.
     foreach ($_POST as $key => $value) {
-      if (strpos($key, "field_{$voterId}_") !== FALSE &&
-        strpos($key, "field_{$voterId}_custom") === FALSE
+      if (str_contains($key, "field_{$voterId}_") &&
+        !str_contains($key, "field_{$voterId}_custom")
       ) {
         $key = substr($key, strlen("field_{$voterId}_"));
         $params[$key] = $value;
@@ -290,7 +291,7 @@ class CRM_Campaign_Page_AJAX {
       );
       while ($result->fetch()) {
         $contactID = $result->contact_id;
-        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
+        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type,
           FALSE,
           $result->contact_id
         );

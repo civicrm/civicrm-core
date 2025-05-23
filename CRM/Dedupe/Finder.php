@@ -25,6 +25,8 @@ class CRM_Dedupe_Finder {
    * Return a contact_id-keyed array of arrays of possible dupes
    * (of the key contact_id) - limited to dupes of $cids if provided.
    *
+   * @deprecated avoid calling this function directly as it is likely to change.
+   *
    * @param int $rgid
    *   Rule group id.
    * @param array $cids
@@ -41,20 +43,36 @@ class CRM_Dedupe_Finder {
   public static function dupes($rgid, $cids = [], $checkPermissions = TRUE) {
     $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
     $rgBao->id = $rgid;
-    $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
       throw new CRM_Core_Exception('Dedupe rule not found for selected contacts');
     }
 
-    $rgBao->fillTable();
-    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermissions));
     $dupes = [];
-    while ($dao->fetch()) {
-      $dupes[] = [$dao->id1, $dao->id2, $dao->weight];
-    }
-    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
 
+    // Note the table will be dropped when the variable is destroyed (at the end of this function)
+    // due to the `__destruct` function on the class.
+    $table = $cids ? self::getIdTable($cids) : NULL;
+    $tableName = $table ? $table->getName() : NULL;
+    CRM_Utils_Hook::findExistingDuplicates($dupes, [$rgid], $tableName, $checkPermissions);
+    foreach ($dupes as &$dupe) {
+      // re-format to original
+      $dupe = [$dupe['entity_id_1'], $dupe['entity_id_2'], $dupe['weight']];
+    }
     return $dupes;
+  }
+
+  private static function getIdTable($ids): CRM_Utils_SQL_TempTable {
+    $table = new CRM_Utils_SQL_TempTable();
+    $table->setAutodrop();
+    $table->setDurable();
+    $table->createWithColumns(
+      'id int(10)'
+    );
+    CRM_Core_DAO::executeQuery('ALTER TABLE ' . $table->getName() . ' ADD index(id)');
+    $insert = ' INSERT INTO ' . $table->getName() . ' (`id`)
+      VALUES (' . implode('), (', $ids) . ')';
+    CRM_Core_DAO::executeQuery($insert);
+    return $table;
   }
 
   /**
@@ -78,6 +96,8 @@ class CRM_Dedupe_Finder {
    * @param int $ruleGroupID
    *   The id of the dedupe rule we should be using.
    *
+   * @deprecated since 6.0 will be removed around 6.24 (long deprecation as there are many non-core callers)
+   *
    * @return array
    *   matching contact ids
    * @throws \CRM_Core_Exception
@@ -89,13 +109,7 @@ class CRM_Dedupe_Finder {
     $except = [],
     $ruleGroupID = NULL
   ) {
-    // If $params is empty there is zero reason to proceed.
-    if (!$params) {
-      return [];
-    }
     $checkPermission = $params['check_permission'] ?? TRUE;
-    // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
-    $params = array_filter($params);
 
     $foundByID = FALSE;
     if ($ruleGroupID) {
@@ -108,6 +122,12 @@ class CRM_Dedupe_Finder {
     }
 
     if (!$foundByID) {
+      // @todo - add noisy deprecation - this is already set
+      // unless this function is called directly, rather than via
+      // a supported api. No core uses do this - they all go through
+      // `BAO_Contact::getDuplicateContacts()`. Extensions should use
+      // the v3 Contact.duplicatecheck or (preferably) v4 api
+      // Contact.getDuplicates().
       $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
       $rgBao->contact_type = $ctype;
       $rgBao->used = $used;
@@ -115,23 +135,15 @@ class CRM_Dedupe_Finder {
         throw new CRM_Core_Exception("$used rule for $ctype does not exist");
       }
     }
-
-    if (isset($params['civicrm_phone']['phone_numeric'])) {
-      $orig = $params['civicrm_phone']['phone_numeric'];
-      $params['civicrm_phone']['phone_numeric'] = preg_replace('/[^\d]/', '', $orig);
-    }
-    $rgBao->params = $params;
-    $rgBao->fillTable();
-
-    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermission));
-    $dupes = [];
-    while ($dao->fetch()) {
-      if (isset($dao->id) && $dao->id) {
-        $dupes[] = $dao->id;
-      }
-    }
-    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
-    return array_diff($dupes, $except);
+    $finderParams = [
+      'rule_group_id' => $rgBao->id,
+      'contact_type' => $ctype,
+      'check_permission' => $checkPermission,
+      'excluded_contact_ids' => $except,
+      'match_params' => $params,
+      'rule' => $used,
+    ];
+    return CRM_Contact_BAO_Contact::findDuplicates($finderParams, ['is_legacy_usage' => TRUE]);
   }
 
   /**
@@ -161,6 +173,100 @@ class CRM_Dedupe_Finder {
   }
 
   /**
+   * @param array $fields
+   * @param array $flat
+   * @param string $ctype
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private static function appendCustomDataFields(array &$fields, array &$flat, string $ctype): void {
+    $subTypes = $fields['contact_sub_type'] ?? [];
+    // Only return custom for subType + unrestricted or return all custom
+    // fields.
+    if (!is_array($subTypes)) {
+      if (empty($subTypes)) {
+        $subTypes = [];
+      }
+      else {
+        $subTypes = (array) $subTypes;
+      }
+    }
+    foreach ($subTypes as $index => $subType) {
+      $validatedSubType = self::validateSubTypeByEntity($ctype, $subType);
+      if ($subType !== $validatedSubType) {
+        // This is a security check rather than a deprecation.
+        \Civi::log()->warning('invalid subtype passed to duplicate check {type}', ['type' => $subType]);
+        unset($subTypes[$index]);
+      }
+    }
+
+    $filters = [
+      'extends' => $ctype,
+      'is_active' => TRUE,
+    ];
+    if ($subTypes) {
+      foreach ($subTypes as $subType) {
+        $filters['extends_entity_column_value'][] = $subType;
+      }
+      $filters['extends_entity_column_value'][] = NULL;
+    }
+
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
+    $customFields = [];
+    foreach ($customGroups as $group) {
+      foreach ($group['fields'] as $field) {
+        $customFields[$field['id']] = $field;
+      }
+    }
+
+    foreach ($customFields as $field) {
+      $fieldId = $field['id'];
+      $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
+
+      // Reset all checkbox, radio and multiselect data
+      if ($field['html_type'] === 'Radio' || $serialize) {
+        $customFields[$fieldId]['customValue']['data'] = 'NULL';
+      }
+
+      $v = NULL;
+      foreach ($fields as $key => $val) {
+        if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match) &&
+          $match[1] == $field['id']
+        ) {
+          $v = $val;
+        }
+      }
+
+      if (!isset($customFields[$fieldId]['customValue'])) {
+        // field exists in db so populate value from "form".
+        $customFields[$fieldId]['customValue'] = [];
+      }
+
+      // Serialize checkbox and multi-select data (using array keys for checkbox)
+      if ($serialize) {
+        $v = ($v && $field['html_type'] === 'Checkbox') ? array_keys($v) : $v;
+        $v = $v ? CRM_Utils_Array::implodePadded($v) : NULL;
+      }
+
+      switch ($field['html_type']) {
+
+        case 'Select Date':
+          $date = CRM_Utils_Date::processDate($v);
+          $flat[$field['column_name']] = $date;
+          break;
+
+        case 'File':
+          $flat[$field['column_name']] = NULL;
+          break;
+
+        default:
+          $flat[$field['column_name']] = $v ?? NULL;
+          break;
+      }
+    }
+  }
+
+  /**
    * A hackish function needed to massage CRM_Contact_Form_$ctype::formRule()
    * object into a valid $params array for dedupe
    *
@@ -177,33 +283,25 @@ class CRM_Dedupe_Finder {
     $flat = [];
     CRM_Utils_Array::flatten($fields, $flat);
 
-    // FIXME: This may no longer be necessary - check inputs
-    $replace_these = [
-      'individual_prefix' => 'prefix_id',
-      'individual_suffix' => 'suffix_id',
-      'gender' => 'gender_id',
-    ];
-    foreach (['individual_suffix', 'individual_prefix', 'gender'] as $name) {
-      if (!empty($fields[$name])) {
-        $flat[$replace_these[$name]] = $flat[$name];
-        unset($flat[$name]);
-      }
-    }
-
     // handle {birth,deceased}_date
     foreach (['birth_date', 'deceased_date'] as $date) {
       if (!empty($fields[$date])) {
+        $original = $fields[$date];
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {
           $flat[$date] = CRM_Utils_Date::format($flat[$date]);
         }
         $flat[$date] = CRM_Utils_Date::processDate($flat[$date]);
+        if ($flat[$date] !== $original) {
+          CRM_Core_Error::deprecatedWarning('passing in mis-formatted date values is deprecated');
+        }
       }
     }
 
     if (!empty($flat['contact_source'])) {
       $flat['source'] = $flat['contact_source'];
       unset($flat['contact_source']);
+      CRM_Core_Error::deprecatedWarning('passing in mis-named source field is deprecated');
     }
 
     // handle preferred_communication_method
@@ -217,20 +315,7 @@ class CRM_Dedupe_Finder {
     }
 
     // handle custom data
-
-    $subTypes = $fields['contact_sub_type'] ?? [];
-    // Only return custom for subType + unrestricted or return all custom
-    // fields.
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
-    CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
-    foreach ($tree as $key => $cg) {
-      if (!is_int($key)) {
-        continue;
-      }
-      foreach ($cg['fields'] as $cf) {
-        $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
-      }
-    }
+    self::appendCustomDataFields($fields, $flat, $ctype);
 
     // if the key is dotted, keep just the last part of it
     foreach ($flat as $key => $value) {
@@ -278,13 +363,8 @@ class CRM_Dedupe_Finder {
         }
       }
       if ($table === 'civicrm_phone') {
-        $fixes = [
-          'phone' => 'phone_numeric',
-        ];
-        foreach ($fixes as $orig => $target) {
-          if (!empty($flat[$orig])) {
-            $params[$table][$target] = $flat[$orig];
-          }
+        if (!empty($flat['phone'])) {
+          $flat['phone_numeric'] = preg_replace('/[^\d]/', '', $flat['phone']);
         }
       }
       foreach ($fields as $field => $title) {
@@ -297,63 +377,48 @@ class CRM_Dedupe_Finder {
   }
 
   /**
-   * Parse duplicate pairs into a standardised array and store in the prev_next_cache.
+   * Validates contact subtypes and event types.
    *
-   * @param array $foundDupes
-   * @param string $cacheKeyString
+   * Performs case-insensitive matching of strings and outputs the correct case.
+   * e.g. an input of "meeting" would output "Meeting".
    *
-   * @return array
-   *   Dupe pairs with the keys
-   *   -srcID
-   *   -srcName
-   *   -dstID
-   *   -dstName
-   *   -weight
-   *   -canMerge
+   * For all other entities, it doesn't validate except to check the subtype is an integer.
+   *
+   * @param string $entityType
+   * @param string $subType
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
    */
-  public static function parseAndStoreDupePairs($foundDupes, $cacheKeyString) {
-    $cids = [];
-    foreach ($foundDupes as $dupe) {
-      $cids[$dupe[0]] = 1;
-      $cids[$dupe[1]] = 1;
-    }
-    $cidString = implode(', ', array_keys($cids));
+  private static function validateSubTypeByEntity($entityType, $subType) {
 
-    $dao = CRM_Core_DAO::executeQuery("SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name");
-    $displayNames = [];
-    while ($dao->fetch()) {
-      $displayNames[$dao->id] = $dao->display_name;
+    if (is_numeric($subType)) {
+      return $subType;
     }
 
-    $userId = CRM_Core_Session::getLoggedInContactID();
-    foreach ($foundDupes as $dupes) {
-      $srcID = $dupes[1];
-      $dstID = $dupes[0];
-      // The logged in user should never be the src (ie. the contact to be removed).
-      if ($srcID == $userId) {
-        $srcID = $dstID;
-        $dstID = $userId;
-      }
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
+    $contactTypes['Contact'] = 1;
 
-      $mainContacts[] = $row = [
-        'dstID' => (int) $dstID,
-        'dstName' => $displayNames[$dstID],
-        'srcID' => (int) $srcID,
-        'srcName' => $displayNames[$srcID],
-        'weight' => $dupes[2],
-        'canMerge' => TRUE,
-      ];
-
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
-        ('civicrm_contact', %1, %2, %3, %4)", [
-          1 => [$dstID, 'Integer'],
-          2 => [$srcID, 'Integer'],
-          3 => [$cacheKeyString, 'String'],
-          4 => [serialize($row), 'String'],
-        ]
-      );
+    if (!array_key_exists($entityType, $contactTypes)) {
+      throw new CRM_Core_Exception('Invalid Entity Filter');
     }
-    return $mainContacts;
+
+    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+    $subTypes = array_column($subTypes, 'name', 'name');
+    // When you create a new contact type it gets saved in mixed case in the database.
+    // Eg. "Service User" becomes "Service_User" in civicrm_contact_type.name
+    // But that field does not differentiate case (eg. you can't add Service_User and service_user because mysql will report a duplicate error)
+    // webform_civicrm and some other integrations pass in the name as lowercase to API3 Contact.duplicatecheck
+    // Since we can't actually have two strings with different cases in the database perform a case-insensitive search here:
+    $subTypesByName = array_combine($subTypes, $subTypes);
+    $subTypesByName = array_change_key_case($subTypesByName, CASE_LOWER);
+    $subTypesByKey = array_change_key_case($subTypes, CASE_LOWER);
+    $subTypeKey = mb_strtolower($subType);
+    if (!array_key_exists($subTypeKey, $subTypesByKey) && !in_array($subTypeKey, $subTypesByName)) {
+      \Civi::log()->debug("entityType: {$entityType}; subType: {$subType}");
+      throw new CRM_Core_Exception('Invalid Filter');
+    }
+    return $subTypesByName[$subTypeKey] ?? $subTypesByKey[$subTypeKey];
   }
 
 }

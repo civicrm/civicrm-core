@@ -15,21 +15,22 @@
 {include file="CRM/common/info.tpl" infoType="no-popup profile-preview-msg" infoMessage=" "}
 <div class="crm-form-block">
 
-{if ! empty( $fields )}
-  {if $viewOnly}
-  {* wrap in crm-container div so crm styles are used *}
-    <div id="crm-container-inner" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
-      {strip}
-        {include file="CRM/UF/Form/Block.tpl" prefix=false mode=false hideFieldset=false}
-      {/strip}
-    </div> {* end crm-container div *}
-  {else}
-    {capture assign=infoMessage}{ts}This CiviCRM profile field is view only.{/ts}{/capture}
-  {include file="CRM/common/info.tpl"}
+  {if ! empty( $fields )}
+    {if $viewOnly}
+      {* wrap in crm-container div so crm styles are used *}
+      <div id="crm-container-inner" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+        {strip}
+          {include file="CRM/UF/Form/Block.tpl" prefix=false mode=false hideFieldset=false}
+        {/strip}
+      </div> {* end crm-container div *}
+    {else}
+      {capture assign=infoMessage}{ts}This CiviCRM profile field is view only.{/ts}{/capture}
+      {include file="CRM/common/info.tpl"}
+    {/if}
+  {/if} {* fields array is not empty *}
+  {if array_key_exists('buttons', $form)}
+    <div class="crm-submit-buttons">
+      {include file="CRM/common/formButtons.tpl" location=''}
+    </div>
   {/if}
-{/if} {* fields array is not empty *}
-
-  <div class="crm-submit-buttons">
-  {include file="CRM/common/formButtons.tpl" location=''}
-  </div>
 </div>

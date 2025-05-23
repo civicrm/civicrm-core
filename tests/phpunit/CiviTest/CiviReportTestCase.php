@@ -15,11 +15,8 @@
 class CiviReportTestCase extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    // TODO Figure out how to automatically drop all temporary tables.
-    // Note that MySQL doesn't provide a way to list them, so we would need
-    // to keep track ourselves (eg CRM_Core_TemporaryTableManager) or reset
-    // the MySQL connection between test runs.
-
+    $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_email', 'civicrm_contact', 'civicrm_address']);
     $this->quickCleanup($this->_tablesToTruncate);
     parent::tearDown();
   }
@@ -99,7 +96,8 @@ class CiviReportTestCase extends CiviUnitTestCase {
   public function getArrayFromCsv($csvFile) {
     $arrFile = [];
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
-      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+      // php 8.x fgetcsv(): the $escape parameter must be provided as its default value will change.
+      while (($data = fgetcsv($handle, 1000, ",", '"', '')) !== FALSE) {
         $arrFile[] = $data;
       }
       fclose($handle);

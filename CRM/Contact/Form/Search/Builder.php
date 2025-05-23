@@ -84,7 +84,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     $fieldNameTypes = [];
     foreach ($fields as $name => $field) {
       // Assign date type to respective field name, which will be later used to modify operator list
-      $fieldNameTypes[$name] = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $field));
+      $fieldNameTypes[$name] = CRM_Utils_Type::typeToString($field['type'] ?? NULL);
       // it's necessary to know which of the fields are searchable by label
       if (isset($field['searchByLabel']) && $field['searchByLabel']) {
         $searchByLabelFields[] = $name;
@@ -568,9 +568,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
       foreach ($value as $key1 => $value1) {
         //CRM-2676, replacing the conflict for same custom field name from different custom group.
-        $customGroupName = CRM_Core_BAO_Mapping::getCustomGroupName($key1);
+        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($key1);
 
-        if ($customGroupName) {
+        if ($customFieldId) {
+          $customGroupName = CRM_Core_BAO_CustomField::getField($customFieldId)['custom_group']['title'];
+          $customGroupName = CRM_Utils_String::ellipsify($customGroupName, 13);
           $relatedMapperFields[$key][$key1] = $mapperFields[$key][$key1] = $customGroupName . ': ' . $value1['title'];
         }
         else {
@@ -591,7 +593,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       }
     }
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
@@ -626,8 +628,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
     $sel3[''] = NULL;
     $sel5[''] = NULL;
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
     asort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {

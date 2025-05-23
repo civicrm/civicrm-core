@@ -12,7 +12,7 @@
    {if $action eq 8}
       <div class="messages status no-popup">
           {icon icon="fa-info-circle"}{/icon}
-          {ts}WARNING: Deleting this option gruop will result in the loss of all records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
+          {ts}WARNING: Deleting this option group will result in the loss of all records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
       </div>
      {else}
       <table class="form-layout-compressed">

@@ -63,7 +63,7 @@ class CRM_Report_OutputHandler_Csv extends OutputHandlerBase implements OutputHa
    */
   public function getOutputString():string {
     //@todo Hmm. See note in CRM_Report_Form::endPostProcess about $rows.
-    $rows = $this->getForm()->getTemplate()->get_template_vars('rows');
+    $rows = $this->getForm()->getTemplate()->getTemplateVars('rows');
 
     // avoid pass-by-ref warning
     $form = $this->getForm();
@@ -76,7 +76,7 @@ class CRM_Report_OutputHandler_Csv extends OutputHandlerBase implements OutputHa
    */
   public function download() {
     //@todo Hmm. See note in CRM_Report_Form::endPostProcess about $rows.
-    $rows = $this->getForm()->getTemplate()->get_template_vars('rows');
+    $rows = $this->getForm()->getTemplate()->getTemplateVars('rows');
 
     // avoid pass-by-ref warning
     $form = $this->getForm();

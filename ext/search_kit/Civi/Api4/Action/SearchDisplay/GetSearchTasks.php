@@ -86,7 +86,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           'icon' => 'fa-toggle-on',
           'apiBatch' => [
             'action' => 'update',
-            'params' => ['values' => ['is_active' => TRUE]],
+            'params' => [
+              'values' => ['is_active' => TRUE],
+              'where' => [['is_active', '=', FALSE]],
+            ],
             'runMsg' => E::ts('Enabling %1 %2...'),
             'successMsg' => E::ts('Successfully enabled %1 %2.'),
             'errorMsg' => E::ts('An error occurred while attempting to enable %1 %2.'),
@@ -97,7 +100,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           'icon' => 'fa-toggle-off',
           'apiBatch' => [
             'action' => 'update',
-            'params' => ['values' => ['is_active' => FALSE]],
+            'params' => [
+              'values' => ['is_active' => FALSE],
+              'where' => [['is_active', '=', TRUE]],
+            ],
             'confirmMsg' => E::ts('Are you sure you want to disable %1 %2?'),
             'runMsg' => E::ts('Disabling %1 %2...'),
             'successMsg' => E::ts('Successfully disabled %1 %2.'),
@@ -193,36 +199,6 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           ],
         ];
       }
-      if (\CRM_Core_Component::isEnabled('CiviMail') && (
-        \CRM_Core_Permission::access('CiviMail') || !$this->checkPermissions ||
-        (\CRM_Mailing_Info::workflowEnabled() && \CRM_Core_Permission::check('create mailings'))
-      )) {
-        $tasks[$entity['name']]['contact.mailing'] = [
-          'title' => E::ts('Email - schedule/send via CiviMail'),
-          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskMailing.html'],
-          'icon' => 'fa-paper-plane',
-        ];
-      }
-    }
-
-    if ($entity['name'] === 'Contribution') {
-      // FIXME: tasks() function always checks permissions, should respect `$this->checkPermissions`
-      foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
-        if (!empty($task['url'])) {
-          $path = explode('?', $task['url'], 2)[0];
-          $menu = \CRM_Core_Menu::get($path);
-          $key = \CRM_Core_Key::get($menu['page_callback'], TRUE);
-
-          $tasks[$entity['name']]['contribution.' . $id] = [
-            'title' => $task['title'],
-            'icon' => $task['icon'] ?? 'fa-gear',
-            'crmPopup' => [
-              'path' => "'{$task['url']}'",
-              'data' => "{id: ids.join(','), qfKey: '$key'}",
-            ],
-          ];
-        }
-      }
     }
 
     // Call `hook_civicrm_searchKitTasks` which serves 3 purposes:
@@ -247,6 +223,13 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       $task['entity'] = $entity['name'];
       // Add default for number of rows action requires
       $task += ['number' => '> 0'];
+      if (!empty($task['apiBatch']['fields'])) {
+        $this->getApiBatchFields($task);
+      }
+      // If action includes a WHERE clause, add it to the conditions (see e.g. the enable/disable actions)
+      if (!empty($task['apiBatch']['params']['where'])) {
+        $task['conditions'] = array_merge($task['conditions'] ?? [], $task['apiBatch']['params']['where']);
+      }
     }
 
     usort($tasks[$entity['name']], function($a, $b) {
@@ -254,6 +237,19 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     });
 
     $result->exchangeArray($tasks[$entity['name']]);
+  }
+
+  private function getApiBatchFields(array &$task) {
+    $fieldInfo = civicrm_api4($task['entity'], 'getFields', [
+      'checkPermissions' => $this->getCheckPermissions(),
+      'action' => $task['apiBatch']['action'] ?? 'update',
+      'select' => ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'required', 'nullable'],
+      'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
+      'where' => [['name', 'IN', array_column($task['apiBatch']['fields'], 'name')]],
+    ])->indexBy('name');
+    foreach ($task['apiBatch']['fields'] as &$field) {
+      $field += $fieldInfo[$field['name']] ?? [];
+    }
   }
 
   public static function fields(): array {

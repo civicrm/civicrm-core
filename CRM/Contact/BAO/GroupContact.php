@@ -64,6 +64,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
             'group_id' => $event->object->group_id,
             'contact_id' => $event->object->contact_id,
             'status' => $event->object->status,
+            'method' => $event->params['method'] ?? 'API',
+            'tracking' => $event->params['tracking'] ?? NULL,
           ],
         ])->execute();
       }
@@ -466,8 +468,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         LEFT JOIN civicrm_subscription_history
           ON ( civicrm_group_contact.contact_id = civicrm_subscription_history.contact_id
           AND civicrm_subscription_history.group_id = {$groupID} )";
-      $where = "AND civicrm_subscription_history.method ='Email'";
-      $orderBy = "ORDER BY civicrm_subscription_history.id DESC";
+      $orderBy = "ORDER BY civicrm_subscription_history.id DESC LIMIT 1";
     }
     $query = "
 SELECT    *
@@ -475,7 +476,6 @@ SELECT    *
           $leftJoin
   WHERE civicrm_group_contact.contact_id = %1
   AND civicrm_group_contact.group_id = %2
-          $where
           $orderBy
 ";
 
@@ -736,27 +736,25 @@ AND    contact_id IN ( $contactStr )
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
+   * Legacy option getter
+   *
+   * @deprecated
    *
    * @param string $fieldName
    * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
-   *   whatever is known about this dao object.
    *
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
-
-    // Sort group list by hierarchy
-    // TODO: This will only work when api.entity is "group_contact". What about others?
+    // Legacy formatting used by some forms
+    // TODO: Do any forms still use this? If not, remove this function.
     if (($fieldName == 'group' || $fieldName == 'group_id') && ($context == 'search' || $context == 'create')) {
-      $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
+      $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
+      return CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
     }
 
-    return $options;
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
 }

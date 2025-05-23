@@ -20,9 +20,6 @@
 {/if}
 
 {if empty($printOnly)} {* NO print section starts *}
-  {if empty($section)}
-    {include file="CRM/common/chart.tpl" divId="chart_$uniqueId"}
-  {/if}
   {if !empty($chartData)}
     {literal}
     <script type="text/javascript">
@@ -32,7 +29,7 @@
 
          $.each( allData, function( chartID, chartValues ) {
            var divName = {/literal}"chart_{$uniqueId}"{literal};
-           createChart( chartID, divName, chartValues.size.xSize, chartValues.size.ySize, allData[chartID].object );
+           CRM.visual.createChart( chartID, divName, allData[chartID].object );
          });
        });
 

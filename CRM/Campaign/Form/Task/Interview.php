@@ -70,8 +70,8 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     else {
       parent::preProcess();
       //get the survey id from user submitted values.
-      $this->_surveyId = CRM_Utils_Array::value('campaign_survey_id', $this->get('formValues'));
-      $this->_interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->get('formValues'));
+      $this->_surveyId = $this->get('formValues')['campaign_survey_id'] ?? NULL;
+      $this->_interviewerId = $this->get('formValues')['survey_interviewer_id'] ?? NULL;
     }
 
     if ($this->_surveyId) {

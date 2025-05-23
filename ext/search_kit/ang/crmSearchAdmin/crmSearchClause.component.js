@@ -5,6 +5,7 @@
     bindings: {
       fields: '<',
       clauses: '<',
+      aliases: '<?',
       format: '@',
       op: '@',
       allowFunctions: '<',
@@ -19,6 +20,7 @@
     controller: function ($scope, $element, searchMeta, crmUiHelp) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
+        functionCache = {},
         meta = {};
       this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
       this.sortOptions = {
@@ -49,8 +51,22 @@
       };
 
       this.getFieldOrFunction = function(expr) {
+        // Search select clause for this alias (used for HAVING expressions which only include the alias)
+        if (this.aliases) {
+          let fullExpr = this.aliases.find(item => item.endsWith(' AS ' + expr));
+          expr = fullExpr || expr;
+        }
+        if (expr in functionCache) {
+          return functionCache[expr];
+        }
         if (ctrl.hasFunction(expr)) {
-          return searchMeta.parseExpr(expr).fn;
+          // This function has to return a reference to avoid angering angular
+          // But we also can't alter the global `fn` variables returned by `parseExpr()`
+          // So make a copy of the object and stash it locally to return by ref
+          let parsed = _.cloneDeep(searchMeta.parseExpr(expr));
+          // Pass-thru data_type of expression if fn doesn't have a data_type
+          parsed.fn.data_type = parsed.fn.data_type || parsed.data_type;
+          return (functionCache[expr] = parsed.fn);
         }
         return ctrl.getField(expr);
       };

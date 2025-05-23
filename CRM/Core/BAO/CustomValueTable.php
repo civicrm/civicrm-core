@@ -69,107 +69,33 @@ class CRM_Core_BAO_CustomValueTable {
 
         foreach ($fields as $field) {
           // fix the value before we store it
-          $value = $field['value'];
+          $serialize = $field['serialize'] ?? NULL;
+          $value = $serialize ? CRM_Core_DAO::serializeField($field['value'], $serialize) : $field['value'];
           $type = $field['type'];
+
           switch ($type) {
             case 'StateProvince':
-              $type = 'Integer';
-              if (is_array($value)) {
-                $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
-                $type = 'String';
-              }
-              elseif (!is_numeric($value) && !strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
-                //fix for multi select state, CRM-3437
-                $mulValues = explode(',', $value);
-                $validStates = [];
-                foreach ($mulValues as $key => $stateVal) {
-                  $states = [];
-                  $states['state_province'] = trim($stateVal);
-
-                  CRM_Utils_Array::lookupValue($states, 'state_province',
-                    CRM_Core_PseudoConstant::stateProvince(), TRUE
-                  );
-                  if (empty($states['state_province_id'])) {
-                    CRM_Utils_Array::lookupValue($states, 'state_province',
-                      CRM_Core_PseudoConstant::stateProvinceAbbreviation(), TRUE
-                    );
-                  }
-                  $validStates[] = $states['state_province_id'] ?? NULL;
-                }
-                $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                  $validStates
-                );
-                $type = 'String';
-              }
-              elseif (!$value) {
-                // CRM-3415
-                // using type of timestamp allows us to sneak in a null into db
-                // gross but effective hack
-                $value = NULL;
-                $type = 'Timestamp';
-              }
-              else {
-                $type = 'String';
-              }
-              break;
-
             case 'Country':
-              $type = 'Integer';
-              if (is_array($value)) {
-                $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
-                $type = 'String';
-              }
-              elseif (!is_numeric($value) && !strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
-                //fix for multi select country, CRM-3437
-                $mulValues = explode(',', $value);
-                $validCountries = [];
-                foreach ($mulValues as $key => $countryVal) {
-                  $countries = [];
-                  $countries['country'] = trim($countryVal);
-                  CRM_Utils_Array::lookupValue($countries, 'country',
-                    CRM_Core_PseudoConstant::country(), TRUE
-                  );
-                  if (empty($countries['country_id'])) {
-                    CRM_Utils_Array::lookupValue($countries, 'country',
-                      CRM_Core_PseudoConstant::countryIsoCode(), TRUE
-                    );
-                  }
-                  $validCountries[] = $countries['country_id'] ?? NULL;
-                }
-                $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                  $validCountries
-                );
-                $type = 'String';
-              }
-              elseif (!$value) {
+              $type = $serialize ? 'String' : 'Integer';
+              if (!$value) {
                 // CRM-3415
                 // using type of timestamp allows us to sneak in a null into db
                 // gross but effective hack
                 $value = NULL;
                 $type = 'Timestamp';
-              }
-              else {
-                $type = 'String';
               }
               break;
 
             case 'File':
+              if (!empty($field['id'])) {
+                self::deleteFile($field);
+              }
               if (!$field['file_id']) {
                 $value = 'null';
                 break;
               }
-
-              // need to add/update civicrm_entity_file
-              $entityFileDAO = new CRM_Core_DAO_EntityFile();
-              $entityFileDAO->file_id = $field['file_id'];
-              $entityFileDAO->find(TRUE);
-
-              $entityFileDAO->entity_table = $field['table_name'];
-              $entityFileDAO->entity_id = $field['entity_id'];
-              $entityFileDAO->file_id = $field['file_id'];
-              $entityFileDAO->save();
               $value = $field['file_id'];
-              $type = 'String';
+              $type = 'Integer';
               break;
 
             case 'Date':
@@ -186,26 +112,32 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'ContactReference':
-              if ($value == NULL || $value === '' || $value === $VS . $VS) {
-                $type = 'Timestamp';
-                $value = NULL;
-              }
-              elseif (strpos($value, $VS) !== FALSE) {
+              if ($serialize) {
                 $type = 'String';
                 // Validate the string contains only integers and value-separators
                 $validChars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, $VS];
                 if (str_replace($validChars, '', $value)) {
                   throw new CRM_Core_Exception('Contact ID must be of type Integer');
                 }
+                // Prevent saving an empty "array" which results in a fatal error on render.
+                if ($value === '' || $value === $VS . $VS) {
+                  $value = NULL;
+                }
               }
               else {
                 $type = 'Integer';
+              }
+              // An empty value should be stored as NULL
+              if (!$value) {
+                $type = 'Timestamp';
+                $value = NULL;
               }
               break;
 
             case 'EntityReference':
               $type = 'Integer';
-              if ($value == NULL || $value === '') {
+              // An empty value should be stored as NULL
+              if (!$value) {
                 $type = 'Timestamp';
                 $value = NULL;
               }
@@ -296,26 +228,25 @@ class CRM_Core_BAO_CustomValueTable {
    * Given a field return the mysql data type associated with it.
    *
    * @param string $type
-   * @param int $maxLength
+   * @param int|null $maxLength
    *
    * @return string
    *   the mysql data store placeholder
    */
-  public static function fieldToSQLType($type, $maxLength = 255) {
-    if (!isset($maxLength) ||
-      !is_numeric($maxLength) ||
-      $maxLength <= 0
-    ) {
-      $maxLength = 255;
-    }
-
+  public static function fieldToSQLType(string $type, $maxLength = NULL) {
     switch ($type) {
       case 'String':
+        $maxLength = $maxLength ?: 255;
+        return "varchar($maxLength)";
+
       case 'Link':
+        // URLs can be up to 2047 characters
+        // according to https://www.sitemaps.org/protocol.html#locdef
+        $maxLength = $maxLength ?: 2047;
         return "varchar($maxLength)";
 
       case 'Boolean':
-        return 'tinyint';
+        return 'boolean';
 
       case 'Int':
         return 'int';
@@ -371,8 +302,7 @@ class CRM_Core_BAO_CustomValueTable {
           'table_name' => $customValue['table_name'],
           'column_name' => $customValue['column_name'],
           // is_multiple refers to the custom group, serialize refers to the field.
-          // @todo is_multiple can be null - does that mean anything different from 0?
-          'is_multiple' => $customValue['is_multiple'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customValue['custom_group_id'], 'is_multiple'),
+          'is_multiple' => (int) ($customValue['is_multiple'] ?? CRM_Core_BAO_CustomGroup::getGroup(['id' => $customValue['custom_group_id']])['is_multiple']),
           'serialize' => $customValue['serialize'] ?? (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customValue['custom_field_id'], 'serialize'),
           'file_id' => $customValue['file_id'],
         ];
@@ -580,54 +510,30 @@ AND    $cond
     // custom_X => value or custom_X_VALUEID => value (for multiple values), VALUEID == -1, -2 etc for new insertions
     $fieldValues = [];
     foreach ($params as $n => $v) {
-      if ($customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($n, TRUE)) {
-        $fieldID = (int ) $customFieldInfo[0];
-        if (CRM_Utils_Type::escape($fieldID, 'Integer', FALSE) === NULL) {
-          throw new CRM_Core_Exception(ts('field ID needs to be of type Integer for index %1',
-            [1 => $fieldID]
-          ));
-        }
-        if (!array_key_exists($fieldID, $fieldValues)) {
-          $fieldValues[$fieldID] = [];
-        }
+      $customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($n, TRUE);
+      if ($customFieldInfo[0]) {
+        $fieldId = (int) $customFieldInfo[0];
         $id = -1;
         if ($customFieldInfo[1]) {
-          $id = (int ) $customFieldInfo[1];
+          $id = (int) $customFieldInfo[1];
         }
-        $fieldValues[$fieldID][] = [
+        $fieldValues[$fieldId][] = [
           'value' => $v,
           'id' => $id,
         ];
       }
     }
 
-    $fieldIDList = implode(',', array_keys($fieldValues));
-
-    // format it so that we can just use create
-    $sql = "
-SELECT cg.table_name  as table_name ,
-       cg.id          as cg_id      ,
-       cg.is_multiple as is_multiple,
-       cg.extends     as extends,
-       cf.column_name as column_name,
-       cf.id          as cf_id      ,
-       cf.html_type   as html_type  ,
-       cf.data_type   as data_type  ,
-       cf.serialize   as serialize
-FROM   civicrm_custom_group cg,
-       civicrm_custom_field cf
-WHERE  cf.custom_group_id = cg.id
-AND    cf.id IN ( $fieldIDList )
-";
-
-    $dao = CRM_Core_DAO::executeQuery($sql);
     $cvParams = [];
-
-    while ($dao->fetch()) {
-      $dataType = $dao->data_type == 'Date' ? 'Timestamp' : $dao->data_type;
-      foreach ($fieldValues[$dao->cf_id] as $fieldValue) {
+    foreach ($fieldValues as $fieldId => $fieldVals) {
+      $fieldInfo = CRM_Core_BAO_CustomField::getField($fieldId);
+      if (!$fieldInfo) {
+        throw new CRM_Core_Exception("Custom field with id $fieldId not found.");
+      }
+      $dataType = $fieldInfo['data_type'] == 'Date' ? 'Timestamp' : $fieldInfo['data_type'];
+      foreach ($fieldVals as $fieldValue) {
         // Serialize array values
-        if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($dao)) {
+        if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($fieldInfo)) {
           $fieldValue['value'] = CRM_Utils_Array::implodePadded($fieldValue['value']);
         }
         // Format null values correctly
@@ -657,7 +563,7 @@ AND    cf.id IN ( $fieldIDList )
           throw new CRM_Core_Exception(ts('value: %1 is not of the right field data type: %2',
             [
               1 => $fieldValue['value'],
-              2 => $dao->data_type,
+              2 => $fieldInfo['data_type'],
             ]
           ));
         }
@@ -666,13 +572,13 @@ AND    cf.id IN ( $fieldIDList )
           'entity_id' => $params['entityID'],
           'value' => $fieldValue['value'],
           'type' => $dataType,
-          'custom_field_id' => $dao->cf_id,
-          'custom_group_id' => $dao->cg_id,
-          'table_name' => $dao->table_name,
-          'column_name' => $dao->column_name,
-          'is_multiple' => $dao->is_multiple,
-          'serialize' => $dao->serialize,
-          'extends' => $dao->extends,
+          'custom_field_id' => $fieldInfo['id'],
+          'custom_group_id' => $fieldInfo['custom_group']['id'],
+          'table_name' => $fieldInfo['custom_group']['table_name'],
+          'column_name' => $fieldInfo['column_name'],
+          'is_multiple' => $fieldInfo['custom_group']['is_multiple'],
+          'serialize' => $fieldInfo['serialize'],
+          'extends' => $fieldInfo['custom_group']['extends'],
         ];
 
         if (!empty($params['id'])) {
@@ -683,18 +589,18 @@ AND    cf.id IN ( $fieldIDList )
           $cvParam['file_id'] = $fieldValue['value'];
         }
 
-        if (!array_key_exists($dao->table_name, $cvParams)) {
-          $cvParams[$dao->table_name] = [];
+        if (!array_key_exists($cvParam['table_name'], $cvParams)) {
+          $cvParams[$cvParam['table_name']] = [];
         }
 
-        if (!array_key_exists($fieldValue['id'], $cvParams[$dao->table_name])) {
-          $cvParams[$dao->table_name][$fieldValue['id']] = [];
+        if (!array_key_exists($fieldValue['id'], $cvParams[$cvParam['table_name']])) {
+          $cvParams[$cvParam['table_name']][$fieldValue['id']] = [];
         }
 
         if ($fieldValue['id'] > 0) {
           $cvParam['id'] = $fieldValue['id'];
         }
-        $cvParams[$dao->table_name][$fieldValue['id']][] = $cvParam;
+        $cvParams[$cvParam['table_name']][$fieldValue['id']][] = $cvParam;
       }
     }
 
@@ -795,6 +701,25 @@ AND    cf.id IN ( $fieldIDList )
         $result["custom_{$id}"] = $value;
       }
       return $result;
+    }
+  }
+
+  /**
+   * Delete orphaned files from disk when updating custom file fields
+   */
+  private static function deleteFile(array $field) {
+    $sql = CRM_Utils_SQL_Select::from($field['table_name'])
+      ->select($field['column_name'])
+      ->where("id = #id", ['#id' => $field['id']])
+      ->toSQL();
+    $fileId = CRM_Core_DAO::singleValueQuery($sql);
+    if ($fileId && $fileId != ($field['file_id'] ?? NULL)) {
+      $refCount = \Civi\Api4\Utils\CoreUtil::getRefCountTotal('File', $fileId);
+      if ($refCount <= 1) {
+        \Civi\Api4\File::delete(FALSE)
+          ->addWhere('id', '=', $fileId)
+          ->execute();
+      }
     }
   }
 

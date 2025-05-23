@@ -39,7 +39,6 @@ function civicrm_api3_custom_group_create($params) {
       'ParticipantEventName',
       'ParticipantEventType',
     ];
-    $params['extends_entity_column_id'] = 'null';
     if (in_array($extendsEntity, $participantEntities)
     ) {
       $params['extends_entity_column_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $extendsEntity, 'value', 'name');
@@ -118,6 +117,20 @@ function civicrm_api3_custom_group_setvalue($params) {
   $result = civicrm_api3_generic_setValue(["entity" => 'CustomGroup', 'params' => $params]);
   if (empty($result['is_error'])) {
     CRM_Utils_System::flushCache();
+  }
+  return $result;
+}
+
+function civicrm_api3_custom_group_getoptions($params) {
+  $result = civicrm_api3_generic_getoptions(['entity' => 'CustomGroup', 'params' => $params]);
+  // This provides legacy support for APIv3, which also needs the ParticipantEventName etc pseudo-selectors
+  if ($params['field'] === 'extends') {
+    $options = CRM_Core_SelectValues::customGroupExtends();
+    $options = CRM_Core_PseudoConstant::formatArrayOptions($params['context'] ?? NULL, $options);
+    if (!empty($params['sequential'])) {
+      $options = CRM_Utils_Array::makeNonAssociative($options);
+    }
+    $result['values'] = $options;
   }
   return $result;
 }

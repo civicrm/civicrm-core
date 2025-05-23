@@ -47,9 +47,9 @@
             <td>{$row.in_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-                <a class="action-item crm-hover-button" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
+                <a class="action-item crm-hover-button" href="#Removed" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
                   {ts}Remove{/ts}</a>
-                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (remove contact AND delete their record of having been in this group).{/ts}">
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Delete %1 from %2? (remove contact AND delete their record of having been in this group).{/ts}">
                   {ts}Delete{/ts}</a>
               {/if}
             </td>
@@ -62,17 +62,14 @@
   {if $contactSmartGroupSettings neq 3}
     <div class="spacer" style="height: 1.5em;"></div>
     <div class="accordion ui-accordion ui-widget ui-helper-reset">
-      <div class="crm-accordion-wrapper crm-ajax-accordion crm-smartgroup-accordion {if $contactSmartGroupSettings eq 1}collapsed{/if}">
-        <div class="crm-accordion-header" id="crm-contact_smartgroup" contact_id="{$contactId}">
+      <details class="crm-accordion-bold crm-ajax-accordion crm-smartgroup-accordion" {if $contactSmartGroupSettings eq 1}{else}open{/if}>
+        <summary  id="crm-contact_smartgroup" contact_id="{$contactId}">
           {ts}Smart Groups{/ts}
-        </div>
-        <!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
           <div class="crm-contact_smartgroup" style="min-height: 3em;"></div>
         </div>
-        <!-- /.crm-accordion-body -->
-      </div>
-      <!-- /.crm-accordion-wrapper -->
+      </details>
     </div>
   {/if}
 
@@ -101,9 +98,9 @@
             <td>{$row.pending_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-                <a class="action-item crm-hover-button" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
+                <a class="action-item crm-hover-button" href="#Removed" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
                   {ts}Remove{/ts}</a>
-                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Pending Groups){/ts}">
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Pending Groups){/ts}">
                   {ts}Delete{/ts}</a>
               {/if}
             </td>
@@ -142,11 +139,11 @@
             <td>
               {if $permission EQ 'edit'}
                 {if $row.saved_search_id}
-                <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 manually into %2, overriding smart group critera?{/ts}">
+                <a class="action-item crm-hover-button" href="#Added" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Add %1 manually into %2, overriding smart group critera?{/ts}">
                   {ts}Manual Add{/ts}
                 </a>
                 {else}
-                <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
+                <a class="action-item crm-hover-button" href="#Added" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
                   {ts}Rejoin Group{/ts}
                 </a>
                 {/if}
@@ -155,11 +152,11 @@
             <td>
               {if $permission EQ 'edit'}
                 {if $row.saved_search_id}
-                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}They will be in the smart group or not based on the smart group criteria.{/ts}">
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}They will be in the smart group or not based on the smart group criteria.{/ts}">
                   {ts}Delete{/ts}
                 </a>
                 {else}
-                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}This group will no longer be listed under Removed Groups.{/ts}">
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}This group will no longer be listed under Removed Groups.{/ts}">
                   {ts}Delete{/ts}
                 </a>
                 {/if}
@@ -185,8 +182,8 @@
       }
     }
     // bind first click of accordion header to load crm-accordion-body with snippet
-    $('.view-contact-groups .crm-ajax-accordion.collapsed .crm-accordion-header').one('click', loadPanes);
-    $('.view-contact-groups .crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(loadPanes);
+    $('.view-contact-groups .crm-ajax-accordion:not([open]) summary').one('click', loadPanes);
+    $('.view-contact-groups .crm-ajax-accordion[open] summary').each(loadPanes);
     // Handle enable/delete links
     var that;
     function refresh() {

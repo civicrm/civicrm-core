@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* This file provides the template for inline editing of ims *}
-{$form.oplock_ts.html}
 <table class="crm-inline-edit-form">
     <tr>
       <td colspan="5">
@@ -20,7 +19,7 @@
     <tr>
       <td>{ts}Instant Messenger{/ts}&nbsp;
       {if $actualBlockCount lt 5}
-        <span id="add-more-im" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
+        <span id="add-more-im" title="{ts escape='htmlattribute'}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
       {/if}
       </td>
       <td>{ts}IM Location{/ts}</td>
@@ -30,16 +29,17 @@
     </tr>
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
-    <tr id="IM_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
+    <tr data-entity='im' data-block-number={$blockId} id="IM_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
         <td>{$form.im.$blockId.name.html}&nbsp;</td>
         <td>{$form.im.$blockId.location_type_id.html}</td>
         <td>{$form.im.$blockId.provider_id.html}</td>
         <td align="center" class="crm-im-is_primary">{$form.im.$blockId.is_primary.1.html}</td>
         <td>
           {if $blockId gt 1}
-            <a class="crm-delete-inline crm-hover-button" href="#" title="{ts}Delete IM{/ts}"><span class="icon delete-icon"></span></a>
+            <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete IM{/ts}"><span class="icon delete-icon"></span></a>
           {/if}
         </td>
+      {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=im customFields=$custom_fields_im blockId=$blockId actualBlockCount=$actualBlockCount}
     </tr>
     {/section}
 </table>

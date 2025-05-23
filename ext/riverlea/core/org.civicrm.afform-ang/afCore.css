@@ -1,0 +1,113 @@
+/* Style rules for Form Builder Admin
+   Forked on 29 July 24. Called on Form Builder front-end
+   Status: merged */
+
+.af-api4-action-running {
+  cursor: not-allowed;
+  color: var(--crm-c-darkest);
+}
+a.af-api4-action-idle {
+  cursor: var(--crm-hover-clickable);
+}
+.crm-container .af-container.af-layout-cols,
+.af-container.af-layout-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-flex-gap);
+}
+.af-container.af-layout-cols > *,
+.af-container.af-layout-inline > * {
+  flex: 1;
+}
+.af-container.af-layout-inline {
+  flex-direction: row;
+}
+.af-container.af-layout-cols > .af-title {
+  flex: 0 0 100%;
+}
+.af-container.af-layout-inline > .af-title {
+  display: block;
+  width: 100%;
+}
+.afform-directive,
+af-form {
+  display: block;
+  position: relative;
+}
+#bootstrap-theme .input-group .crm-af-field {
+  display: inline-block;
+}
+#bootstrap-theme .input-group .afform-search-operator {
+  width: 6rem;
+}
+[af-repeat-item] {
+  position: relative;
+}
+#bootstrap-theme [af-repeat-item] .af-repeat-remove-btn {
+  min-width: 30px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* Accordion */
+.crm-container details.af-container {
+  border: var(--crm-expand-border);
+  border-radius: var(--crm-expand-radius);
+  padding-block: 0;
+}
+details.af-container > *:not(summary) { /* adds padding to Afform internal details */
+  padding-inline: var(--crm-r);
+}
+details.af-container > *:nth-of-type(1):not(summary) {
+  padding-top: var(--crm-m);
+}
+details.af-container > *:last-of-type {
+  padding-bottom: var(--crm-m);
+}
+
+/* Card style */
+.af-container-style-pane {
+  background-color: var(--crm-form-block-background);
+  border-radius: var(--crm-form-block-border-radius);
+  box-shadow: var(--crm-form-block-box-shadow);
+  position: relative;
+  padding: var(--crm-form-block-padding);
+  padding-top: 50px !important;
+}
+#bootstrap-theme .af-container-style-pane > .af-title {
+  background-color: var(--crm-c-background5);
+  color: var(--crm-c-text-light);
+  border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: var(--crm-m) var(--crm-r);
+  margin-top: 0;
+}
+
+/* Admin edit links */
+.afform-directive .af-admin-edit-form-link {
+  position: absolute !important;
+  right: 0;
+  top: 0;
+  opacity: .5;
+}
+.afform-directive .af-admin-edit-form-link.open,
+.afform-directive:hover .af-admin-edit-form-link {
+  opacity: 1;
+}
+
+/* Fieldset */
+
+fieldset.af-container.af-layout-inline {
+  border: 0;
+}
+
+/* Radio buttons */
+
+.af-field-type-radio .crm-af-field {
+  display: flex;
+  padding-block: 0.25rem;
+}

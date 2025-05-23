@@ -2,7 +2,7 @@
   <div class="crm-summary-row">
     <div class="crm-label" id="tagLink">
       <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}"
-         title="{ts}Edit Tags{/ts}">{ts}Tags{/ts}</a>
+         title="{ts escape='htmlattribute'}Edit Tags{/ts}">{ts}Tags{/ts}</a>
     </div>
     <div class="crm-content" id="tags">
       {foreach from=$contactTag item=tagName key=tagId}
@@ -26,7 +26,7 @@
       <span class="crm-contact-contact_id">{$contactId}</span>
       {if $userRecordUrl}
         <span class="crm-contact-user_record_id">
-          &nbsp;/&nbsp;<a title="{ts}View user record{/ts}" class="user-record-link"
+          &nbsp;/&nbsp;<a title="{ts escape='htmlattribute'}View user record{/ts}" class="user-record-link"
                           href="{$userRecordUrl}">{$userRecordId}</a>
         </span>
       {/if}

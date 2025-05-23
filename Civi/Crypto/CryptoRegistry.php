@@ -11,6 +11,7 @@
 
 namespace Civi\Crypto;
 
+use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 
 /**
@@ -30,7 +31,7 @@ use Civi\Crypto\Exception\CryptoException;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CryptoRegistry {
+class CryptoRegistry extends AutoService {
 
   const LAST_WEIGHT = 32768;
 
@@ -60,6 +61,7 @@ class CryptoRegistry {
    * @return \Civi\Crypto\CryptoRegistry
    * @throws \CRM_Core_Exception
    * @throws \Civi\Crypto\Exception\CryptoException
+   * @service crypto.registry
    */
   public static function createDefaultRegistry(): CryptoRegistry {
     $registry = new static();
@@ -189,7 +191,7 @@ class CryptoRegistry {
    * @return bool
    */
   public function isValidKeyId($id) {
-    if (strpos($id, "\n") !== FALSE) {
+    if (str_contains($id, "\n")) {
       return FALSE;
     }
     return (bool) preg_match(';^[a-zA-Z0-9_\-\.:,=+/\;\\\\]+$;s', $id);

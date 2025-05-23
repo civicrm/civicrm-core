@@ -48,7 +48,7 @@ class Container {
    * each (eg "templates_c/CachedCiviContainer.$ENVID.php").
    *
    * Constants:
-   *   - CIVICRM_CONTAINER_CACHE -- 'always' [default], 'never', 'auto'
+   *   - CIVICRM_CONTAINER_CACHE -- 'auto' [default], 'always', 'never',
    *   - CIVICRM_DSN
    *   - CIVICRM_DOMAIN_ID
    *
@@ -159,44 +159,40 @@ class Container {
     ))
       ->setFactory([new Reference(self::SELF), 'createApiKernel'])->setPublic(TRUE);
 
-    $container->setDefinition('cxn_reg_client', new Definition(
-      'Civi\Cxn\Rpc\RegistrationClient',
-      []
-    ))
-      ->setFactory('CRM_Cxn_BAO_Cxn::createRegistrationClient')->setPublic(TRUE);
-
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
     $container->setDefinition('psr_log_manager', new Definition('Civi\Core\LogManager', []))->setPublic(TRUE);
     // With the default log-manager, you may overload a channel by defining a service, e.g.
     // $container->setDefinition('log.ipn', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
 
     $basicCaches = [
-      'js_strings' => 'js_strings',
-      'community_messages' => 'community_messages',
-      'checks' => 'checks',
-      'session' => 'CiviCRM Session',
-      'long' => 'long',
-      'groups' => 'contact groups',
-      'navigation' => 'navigation',
-      'customData' => 'custom data',
-      'fields' => 'contact fields',
-      'contactTypes' => 'contactTypes',
-      'metadata' => 'metadata',
+      // $cacheServiceName => array $cacheCreateParams,
+      // @see \CRM_Utils_Cache::create()
+      'js_strings' => ['withArray' => 'fast'],
+      'community_messages' => [],
+      'checks' => [],
+      // Putting session-cache in global scope means that QF form-state will endure across upgrades.
+      // (*For better or worse -- mostly better.*)
+      'session' => ['name' => 'CiviCRM Session', 'scope' => 'global'],
+      'long' => ['withArray' => 'fast'],
+      'groups' => ['name' => 'contact groups', 'withArray' => 'fast'],
+      'navigation' => ['withArray' => 'fast'],
+      'customData' => ['name' => 'custom data', 'withArray' => 'fast'],
+      'fields' => ['name' => 'contact fields', 'withArray' => 'fast'],
+      'contactTypes' => ['withArray' => 'fast'],
+      'metadata' => ['withArray' => 'fast'],
+      'angular' => ['withArray' => 'fast'],
     ];
-    $verSuffixCaches = ['metadata'];
-    $verSuffix = '_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version());
-    foreach ($basicCaches as $cacheSvc => $cacheGrp) {
-      $definitionParams = [
-        'name' => $cacheGrp . (in_array($cacheGrp, $verSuffixCaches) ? $verSuffix : ''),
+    // Use the FastArrayDecorator on caches where (1) we don't really care about TTL,
+    // (2) they're accessed frequently, (3) there's not much risk of concurrency issues.
+    foreach ($basicCaches as $cacheSvc => $cacheParams) {
+      $cacheDefaults = [
+        // Most caches should not be shared/re-used across versions.
+        'scope' => 'version',
+        'name' => $cacheSvc,
+        'service' => $cacheSvc,
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       ];
-      // For Caches that we don't really care about the ttl for and/or maybe accessed
-      // fairly often we use the fastArrayDecorator which improves reads and writes, these
-      // caches should also not have concurrency risk.
-      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata', 'js_strings'];
-      if (in_array($cacheSvc, $fastArrayCaches)) {
-        $definitionParams['withArray'] = 'fast';
-      }
+      $definitionParams = $cacheParams + $cacheDefaults;
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
         'CRM_Utils_Cache_Interface',
         [$definitionParams]
@@ -211,6 +207,10 @@ class Container {
         [
           'name' => 'CiviCRM Search PrevNextCache',
           'type' => ['SqlGroup'],
+          'scope' => 'global',
+          // Scope is debatable. Logically, version scope might make sense. But there are several
+          // places which bypass $cache object and use this name, so any prefix/suffix would
+          // require more updates.
         ],
       ]
     ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
@@ -221,6 +221,7 @@ class Container {
       'CRM_Utils_Cache_Interface',
       [
         [
+          'scope' => 'version',
           'name' => 'extension_browser',
           'type' => ['SqlGroup', 'ArrayCache'],
         ],
@@ -238,15 +239,6 @@ class Container {
 
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactory('CRM_Utils_Mail::createMailer')->setPublic(TRUE);
-
-    $container->setDefinition('crypto.registry', new Definition('Civi\Crypto\CryptoRegistry'))
-      ->setFactory('Civi\Crypto\CryptoRegistry::createDefaultRegistry')->setPublic(TRUE);
-
-    $container->setDefinition('crypto.token', new Definition('Civi\Crypto\CryptoToken', []))
-      ->setPublic(TRUE);
-
-    $container->setDefinition('crypto.jwt', new Definition('Civi\Crypto\CryptoJwt', []))
-      ->setPublic(TRUE);
 
     $bootServiceTypes = [
       'cache.settings' => \CRM_Utils_Cache_Interface::class,
@@ -353,6 +345,7 @@ class Container {
       'Civi\Token\TokenCompatSubscriber',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+
     $container->setDefinition("crm_mailing_action_tokens", new Definition(
       'CRM_Mailing_ActionTokens',
       []
@@ -397,13 +390,29 @@ class Container {
       'CRM_Core_DomainTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+
+    // For each DAO that supports tokens by declaring the token class...
+    $entities = \CRM_Core_DAO_AllCoreTables::tokenClasses();
+    foreach ($entities as $entity => $class) {
+      $container->setDefinition('crm_entity_token_' . strtolower($entity), new Definition(
+        $class,
+        [$entity]
+      ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    }
+
     $container->setDefinition('crm_token_tidy', new Definition(
       '\Civi\Token\TidySubscriber',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
     $dispatcherDefn = $container->getDefinition('dispatcher');
-    foreach (\CRM_Core_DAO_AllCoreTables::getBaoClasses() as $baoEntity => $baoClass) {
+    // Get all declared BAO classes
+    $baoClasses = \CRM_Core_DAO_AllCoreTables::getBaoClasses();
+    // "Extra" BAO classes that don't have a DAO but still need to listen to hooks
+    $baoClasses[] = \CRM_Core_BAO_CustomValue::class;
+    foreach ($baoClasses as $key => $baoClass) {
+      // Key will be a valid entity name for all but the "extra" classes which don't have a DAO entity.
+      $baoEntity = is_numeric($key) ? NULL : $key;
       $listenerMap = EventScanner::findListeners($baoClass, $baoEntity);
       if ($listenerMap) {
         $file = (new \ReflectionClass($baoClass))->getFileName();
@@ -432,9 +441,10 @@ class Container {
    * @return \Civi\Angular\Manager
    */
   public function createAngularManager() {
-    $moduleEnvId = md5(\CRM_Core_Config_Runtime::getId());
     $angCache = \CRM_Utils_Cache::create([
-      'name' => substr('angular_' . $moduleEnvId, 0, 32),
+      'scope' => 'version',
+      'name' => 'angular',
+      'service' => 'angular_manager',
       'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       'withArray' => 'fast',
       'prefetch' => TRUE,
@@ -467,7 +477,7 @@ class Container {
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
-    $dispatcher->addListener('civi.core.install', ['\Civi\Core\LocalizationInitializer', 'initialize']);
+    $dispatcher->addListener('&civi.mailing.track', ['CRM_Mailing_BAO_MailingTrackableURL', 'on_civi_mailing_track'], -500);
     $dispatcher->addListener('hook_civicrm_post', ['\CRM_Core_Transaction', 'addPostCommit'], -1000);
     $dispatcher->addListener('hook_civicrm_pre', $aliasEvent('hook_civicrm_pre', 'entity'), 100);
     $dispatcher->addListener('civi.dao.preDelete', ['\CRM_Core_BAO_EntityTag', 'preDeleteOtherEntity']);
@@ -483,8 +493,6 @@ class Container {
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\Core\Event\SystemInstallEvent', 'hookEventDefs']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\Civi\Angular\Page\Modules', 'buildAngularModules']);
     $dispatcher->addListenerService('civi.region.render', ['angularjs.loader', 'onRegionRender']);
-    $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Utils_VisualBundle', 'buildAssetJs']);
-    $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Utils_VisualBundle', 'buildAssetCss']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Core_Resources', 'renderMenubarStylesheet']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Core_Resources', 'renderL10nJs']);
     $dispatcher->addListener('hook_civicrm_coreResourceList', ['\CRM_Utils_System', 'appendCoreResources']);
@@ -495,6 +503,7 @@ class Container {
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findConstPermissions'], 975);
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCiviPermissions'], 950);
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCmsPermissions'], 925);
+    $dispatcher->addListener('hook_civicrm_permission_check', ['CRM_Core_Permission', 'checkConstPermissions'], 1000);
 
     $dispatcher->addListener('hook_civicrm_postSave_civicrm_domain', ['\CRM_Core_BAO_Domain', 'onPostSave']);
     $dispatcher->addListener('hook_civicrm_unhandled_exception', [
@@ -673,6 +682,7 @@ class Container {
     $bootServices['userPermissionClass'] = new $userPermissionClass();
 
     $bootServices['cache.settings'] = \CRM_Utils_Cache::create([
+      'scope' => 'version',
       'name' => 'settings',
       'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
     ]);
@@ -682,7 +692,11 @@ class Container {
     $bootServices['lockManager'] = self::createLockManager();
 
     if ($loadFromDB && $runtime->dsn) {
+      if (defined('CIVICRM_BOOTSTRAP_FORBIDDEN')) {
+        throw new \LogicException("This process should not bootstrap CiviCRM. (CIVICRM_BOOTSTRAP_FORBIDDEN)");
+      }
       \CRM_Core_DAO::init($runtime->dsn);
+      $bootServices['settings_manager']->dbAvailable();
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton()->getClassLoader()->register();

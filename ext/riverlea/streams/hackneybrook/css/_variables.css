@@ -1,0 +1,148 @@
+/*
+    Name: HackneyBrook;
+    Description: named after the Hackney Brook, a tributary of the River Lea that ran through Finsbury Park;
+    Riverlea version: 1.3.8;
+*/
+
+:root {
+  --crm-version: 'Hackney, v' var(--crm-release);
+  /* Fonts */
+  --crm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
+  /* Colour names */
+  --crm-c-gray-025: #f9f9f9;
+  --crm-c-green-light: #cff0be;
+  --crm-c-green-dark: #286520;
+  --crm-c-red-dark: #a21b10;
+  --crm-c-red: #f9f1f4;
+  --crm-c-teal: #399389;
+  /* Practical colours */
+  --crm-c-text: #2b2b2b;
+  --crm-c-divider: 1px solid var(--crm-c-gray-200);
+  --crm-c-background: var(--crm-c-gray-025); /* background to page header, often form block & dialog bg */
+  --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
+/* Emphasis colours */
+  --crm-c-primary: var(--crm-c-gray-025);
+  --crm-c-primary-text: var(--crm-c-text);
+  --crm-c-primary-hover-text: var(--crm-c-text);
+  --crm-c-primary-on-page-bg: var(--crm-c-gray-800);
+  --crm-c-secondary: var(--crm-c-gray-025);
+  --crm-c-secondary-text: var(--crm-c-text);
+  --crm-c-secondary-hover-text: var(--crm-c-text);
+  --crm-c-secondary-on-page-bg: var(--crm-c-gray-900);
+  --crm-c-info: var(--crm-c-blue-darker);
+  /* Type */
+  --crm-heading-padding: var(--crm-s2) var(--crm-m2);
+  /* Buttons */
+  --crm-btn-border: 1px solid var(--crm-c-gray-300);
+  --crm-btn-padding-block: 2px; /* padding for top and bottom, one value */
+  --crm-btn-height: 31px;
+  --crm-btn-icon-spacing: var(--crm-m1);
+  --crm-btn-icon-size: var(--crm-btn-height);
+  --crm-btn-cancel-bg: var(--crm-c-primary);
+  --crm-btn-cancel-text: var(--crm-c-text);
+  --crm-btn-info-bg: var(--crm-c-primary);
+  --crm-btn-info-text: var(--crm-c-text);
+  --crm-btn-warning-bg: var(--crm-c-primary);
+  --crm-btn-warning-text: var(--crm-c-text);
+  --crm-btn-success-bg: var(--crm-c-primary);
+  --crm-btn-success-text: var(--crm-c-text);
+  --crm-btn-danger-bg: var(--crm-c-primary);
+  --crm-btn-danger-text: var(--crm-c-text);
+  --crm-btn-icon-bg: rgba(256,256,256,0.25);
+  --crm-btn-icon-border: var(--crm-btn-border);
+  --crm-btn-icon-padding: 0px;
+  /* Tables */
+  --crm-table-outside-border: var(--crm-c-divider);
+  /* Accordions */
+  /* .crm-accordion-bold */
+  --crm-expand-header-bg: var(--crm-c-gray-200);
+  --crm-expand-header-bg-active: var(--crm-c-gray-300);
+  --crm-expand-header-color: var(--crm-c-text);
+  --crm-expand-header-border: 0 solid transparent;
+  /* Alerts */
+  --crm-alert-padding: var(--crm-r);
+  --crm-alert-success-text: var(--crm-c-text);
+  --crm-alert-info-text: var(--crm-c-blue-darker);
+  --crm-alert-danger-text: var(--crm-c-text);
+  /* Form */
+  --crm-input-color: var(--crm-c-text);
+  --crm-input-border-color: var(--crm-c-gray-300);
+  --crm-input-box-shadow: 0;
+  --crm-input-label-weight: normal;
+  --crm-input-label-width: 10em;
+  --crm-fieldset-border: 1px;
+  /* Tabs */
+  --crm-tabs-border: var(--crm-c-divider);
+  --crm-tab-count-bg: var(--crm-c-blue-dark);
+  --crm-tab-count-col: var(--crm-c-text-light);
+  --crm-tab-border: 1px solid var(--crm-c-gray-400);
+  /* Contact dashboard */
+  --crm-dash-border: 0;
+  --crm-dash-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
+  --crm-side-tabs-width: 200px;
+  --crm-dash-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
+  --crm-dash-tabs-gap: var(--crm-m);
+  --crm-dash-tabs-bg: transparent;
+  --crm-dash-tabs-padding: var(--crm-r) 0;
+  --crm-dash-tab-bg: transparent;
+  --crm-dash-tab-bg-hover: var(--crm-c-background);
+  --crm-dash-tab-padding: var(--crm-m2) var(--crm-m1) var(--crm-m2) var(--crm-r);
+  --crm-dash-tab-border: 1px solid transparent;
+  --crm-dash-tab-border-hover: var(--crm-c-divider);
+  --crm-dash-tab-border-width: 1px 0 1px 1px; /* to remove border on one side for hanging tabs */
+  --crm-dash-tab-width: auto; /* 100% to fill column width, auto to only cover contents */
+  --crm-dash-tab-align: right;
+  --crm-dash-tab-hang: 0 -1px 0 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-dash-tab-radius: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
+  --crm-dash-summary-row-bg: var(--crm-c-background3);
+  --crm-dash-heading-inset: var(--crm-side-tabs-width);
+  --crm-dash-panel-padding: var(--crm-r);
+  --crm-dash-panel-bg: var(--crm-c-background);
+  --crm-dash-panel-border: var(--crm-c-divider);
+  --crn-dash-panel-radius: var(--crm-dash-roundness);
+  --crm-dash-image-size: 100px;
+  --crm-dash-image-radius: 200px;
+  --crm-dash-image-right: 0; /* distance from right of dashboard */
+  --crm-dash-image-top: -10px; /* distance from top of dashboard */
+  --crm-dash-image-border: 0;
+  /* Dialog */
+  --crm-dialog-header-bg: var(--crm-c-background4);
+  --crm-dialog-header-col: var(--crm-c-text);
+  --crm-dialog-header-size: var(--crm-r);
+  --crm-dialog-header-padding: var(--crm-s) var(--crm-m1) var(--crm-s) var(--crm-m2);
+  --crm-dialog-header-radius: var(--crm-dialog-radius) var(--crm-dialog-radius) 0 0;
+  --crm-dialog-body-bg: var(--crm-c-page-background);
+  --crm-dialog-body-padding: var(--crm-r);
+  /* Dashlet */
+  --crm-dashlet-border: var(--crm-c-divider);
+  --crm-dashlet-padding: 0;
+  --crm-dashlet-content-padding: var(--crm-m);
+  --crm-dashlet-tabs-border: 3px solid #fff;
+  --crm-dashlet-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+  /* Button dropdowns */
+  --crm-dropdown-bg: var(--crm-c-page-background);
+  --crm-dropdown-col: var(--crm-c-text);
+  --crm-dropdown-hover-bg: var(--crm-c-secondary-hover);
+  --crm-dropdown-border: var(--crm-btn-border);
+  --crm-dropdown-width: 180px;
+  --crm-dropdown-2-bg: var(--crm-c-background3);
+  /* Notifications */
+  --crm-notify-background: rgb(0,0,0);
+  --crm-notify-padding: 10px 10px 15px 15px;
+  --crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
+  --crm-notify-radius: 0;
+  /* Icons */
+  --crm-icon-danger-color: var(--crm-c-danger);
+  --crm-icon-success-color: var(--crm-c-success);
+  --crm-icon-warning-color: var(--crm-c-warning);
+  --crm-icon-info-color: var(--crm-notify-info);
+  /* Frontend */
+  --crm-f-legend-align: unset;
+  --crm-f-legend-size: var(--crm-r2);
+  --crm-f-form-width: 50vw;
+  --crm-f-label-position: unset; /* 'unset' = stacked, 'left' = left align, in combination with width below */
+  --crm-f-label-align: left;
+  --crm-f-label-margin: 0 var(--crm-s);
+  --crm-f-label-width: unset;
+  --crm-f-label-weight: bold;
+}

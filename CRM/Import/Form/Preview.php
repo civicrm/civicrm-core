@@ -52,7 +52,7 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
   public function setStatusUrl() {
     $statusID = $this->get('statusID');
     if (!$statusID) {
-      $statusID = md5(uniqid(rand(), TRUE));
+      $statusID = bin2hex(random_bytes(16));
       $this->set('statusID', $statusID);
     }
     $statusUrl = CRM_Utils_System::url('civicrm/ajax/status', "id={$statusID}", FALSE, NULL, FALSE);

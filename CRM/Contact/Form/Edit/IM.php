@@ -29,9 +29,13 @@ class CRM_Contact_Form_Edit_IM {
    *   Block number to build.
    * @param bool $blockEdit
    *   Is it block edit.
+   *
+   * @deprecated since 6.3 will be removed around 6.10
    */
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     if (!$blockCount) {
+      CRM_Core_Error::deprecatedWarning('pass in blockCount');
       $blockId = ($form->get('IM_Block_Count')) ? $form->get('IM_Block_Count') : 1;
     }
     else {
@@ -40,9 +44,9 @@ class CRM_Contact_Form_Edit_IM {
     $form->applyFilter('__ALL__', 'trim');
 
     //IM provider select
-    $form->addField("im[$blockId][provider_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL]);
+    $form->addField("im[$blockId][provider_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'title' => ts('IM Type %1', [1 => $blockId])]);
     //Block type select
-    $form->addField("im[$blockId][location_type_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'option_url' => NULL]);
+    $form->addField("im[$blockId][location_type_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'option_url' => NULL, 'title' => ts('IM Location %1', [1 => $blockId])]);
 
     //IM box
     $form->addField("im[$blockId][name]", ['entity' => 'im', 'aria-label' => ts('Instant Messenger %1', [1 => $blockId])]);

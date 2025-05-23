@@ -51,12 +51,13 @@ class CRM_Event_Form_EventFees {
   /**
    * This function sets the default values for the form in edit/view mode.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Event_Form_Participant|\CRM_Event_Form_Registration_AdditionalParticipant|\CRM_Event_Form_Registration_Register $form
    *
    * @return array
    */
-  public static function setDefaultValues(&$form) {
+  public static function setDefaultValues($form): array {
     $defaults = [];
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
 
     if ($form->_pId) {
       $ids = [];
@@ -78,20 +79,20 @@ class CRM_Event_Form_EventFees {
           $form->assign('discount', $discounts[$defaults['discount_id']]);
         }
 
-        $form->assign('fee_amount', CRM_Utils_Array::value('fee_amount', $defaults));
-        $form->assign('fee_level', CRM_Utils_Array::value('fee_level', $defaults));
+        $form->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
+        $form->assign('fee_level', $defaults['fee_level'] ?? NULL);
       }
     }
 
     if ($form->_mode) {
       $config = CRM_Core_Config::singleton();
       // set default country from config if no country set
-      if (empty($defaults["billing_country_id-{$form->_bltID}"])) {
-        $defaults["billing_country_id-{$form->_bltID}"] = $config->defaultContactCountry;
+      if (empty($defaults["billing_country_id-{$billingLocationTypeID}"])) {
+        $defaults["billing_country_id-{$billingLocationTypeID}"] = $config->defaultContactCountry;
       }
 
-      if (empty($defaults["billing_state_province_id-{$form->_bltID}"])) {
-        $defaults["billing_state_province_id-{$form->_bltID}"] = $config->defaultContactStateProvince;
+      if (empty($defaults["billing_state_province_id-{$billingLocationTypeID}"])) {
+        $defaults["billing_state_province_id-{$billingLocationTypeID}"] = $config->defaultContactStateProvince;
       }
 
       $billingDefaults = $form->getProfileDefaults('Billing', $form->_contactId);
@@ -162,18 +163,19 @@ class CRM_Event_Form_EventFees {
         }
       }
 
-      $form->assign('totalAmount', CRM_Utils_Array::value('fee_amount', $defaults));
+      $form->assign('totalAmount', $defaults['fee_amount'] ?? NULL);
       if ($form->_action == CRM_Core_Action::UPDATE) {
         $fee_level = $defaults['fee_level'];
         CRM_Event_BAO_Participant::fixEventLevel($fee_level);
         $form->assign('fee_level', $fee_level);
-        $form->assign('fee_amount', CRM_Utils_Array::value('fee_amount', $defaults));
+        $form->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
       }
     }
 
     //CRM-4453
     if (!empty($defaults['participant_fee_currency'])) {
       $form->assign('fee_currency', $defaults['participant_fee_currency']);
+      $form->assign('currency', $defaults['participant_fee_currency']);
     }
 
     // CRM-4395

@@ -16,18 +16,18 @@
   #civicrm-news-feed .crm-news-feed-unread .crm-news-feed-item-title {
     font-weight: bold;
   }
-  #civicrm-news-feed .collapsed .crm-accordion-header {
+  #civicrm-news-feed details:not([open]) summary {
     text-overflow: ellipsis;
     text-wrap: none;
     white-space: nowrap;
     overflow: hidden;
   }
   #civicrm-news-feed .crm-news-feed-item-preview {
-    color: #8d8d8d;
-    display: none;
-  }
-  #civicrm-news-feed .collapsed .crm-news-feed-item-preview {
     display: inline;
+    color: #8d8d8d;
+  }
+  #civicrm-news-feed details[open] .crm-news-feed-item-preview {
+    display: none;
   }
   #civicrm-news-feed .crm-news-feed-item-link {
     margin-bottom: 0;
@@ -46,10 +46,10 @@
   {foreach from=$feeds item="channel"}
     <div id="civicrm-news-feed-{$channel.name}">
     {foreach from=$channel.items item=article}
-      <details class="crm-accordion-wrapper">
-        <summary class="crm-accordion-header">
+      <details class="crm-accordion-bold">
+        <summary>
           <span class="crm-news-feed-item-title">{$article.title|smarty:nodefaults|purify}</span>
-          <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|smarty:nodefaults|strip_tags|mb_substr:0:150}{else}{$article.description|smarty:nodefaults|strip_tags}{/if}</span>
+          <span class="crm-news-feed-item-preview"> - {$article.description|smarty:nodefaults|strip_tags|mb_substr:0:150}</span>
         </summary>
         <div class="crm-accordion-body">
           <div>{$article.description|smarty:nodefaults|purify}</div>
@@ -88,7 +88,7 @@
             if ($.inArray(itemKey, opened[key]) < 0) {
               $(this).addClass('crm-news-feed-unread');
               ++count;
-              $(this).one('crmAccordion:open', function () {
+              $(this).one('click', function () {
                 $(this).removeClass('crm-news-feed-unread');
                 $('em', $tab).text(--count || '');
                 opened[key].push(itemKey);

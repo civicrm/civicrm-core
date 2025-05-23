@@ -19,6 +19,35 @@
  * Main page for viewing contact.
  */
 class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
+  use CRM_Custom_Page_CustomDataTrait;
+
+  /**
+   * Provide support for extensions that are using the _show{Block} properties
+   * (e.g. `_showCustomData`, `_showAddress`, `_showPhone` etc)
+   *
+   * These properties were dynamically defined,
+   * based on the available `contact_edit_options`,
+   * and so have been deprecated for PHP 8.2 support.
+   *
+   * Extension authors can read contact_edit_options directly.
+   * The show{Block} values are also still assigned to the template layer.
+   *
+   * @param string $name
+   * @return bool|null
+   */
+  public function __get($name) {
+    if (str_starts_with($name, '_show')) {
+      $blockName = substr($name, strlen('_show'));
+      $editOptions = CRM_Core_BAO_Setting::valueOptions(
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'contact_edit_options'
+      );
+
+      CRM_Core_Error::deprecatedWarning('_show{Block} properties are deprecated in CRM_Contact_Page_View_Summary. Read contact_edit_options directly instead.');
+      return $editOptions[$blockName] ?? FALSE;
+    }
+    return NULL;
+  }
 
   /**
    * Heart of the viewing process.
@@ -148,13 +177,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     ];
 
     CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId], $defaults);
-    $defaults['im'] = $this->getLocationValues($this->_contactId, 'IM');
-    $defaults['email'] = $this->getLocationValues($this->_contactId, 'Email');
-    $defaults['openid'] = $this->getLocationValues($this->_contactId, 'OpenID');
-    $defaults['phone'] = $this->getLocationValues($this->_contactId, 'Phone');
-    // This microformat magic is still required...
-    $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
-    $defaults['website'] = $this->getLocationValues($this->_contactId, 'Website');
+    $this->assign('im', $this->getLocationValues($this->_contactId, 'IM'));
+    $this->assign('email', $this->getLocationValues($this->_contactId, 'Email'));
+    $this->assign('openid', $this->getLocationValues($this->_contactId, 'OpenID'));
+    $this->assign('phone', $this->getLocationValues($this->_contactId, 'Phone'));
+    $this->assign('website', $this->getLocationValues($this->_contactId, 'Website'));
+
     // Copy employer fields to the current_employer keys.
     if (($defaults['contact_type'] === 'Individual') && !empty($defaults['employer_id']) && !empty($defaults['organization_name'])) {
       $defaults['current_employer'] = $defaults['organization_name'];
@@ -165,28 +193,23 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $mailingBackend = Civi::settings()->get('mailing_backend');
     $this->assign('mailingOutboundOption', $mailingBackend['outBound_option']);
 
-    if (!empty($defaults['address'])) {
-      foreach ($defaults['address'] as & $val) {
-        CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']), FALSE);
-      }
+    // This microformat magic is still required...
+    $addresses = (array) CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
+    foreach ($addresses as $blockId => &$blockVal) {
+      // Does this do anything?
+      CRM_Utils_Array::lookupValue($blockVal, 'location_type', CRM_Core_BAO_Address::buildOptions('location_type_id'), FALSE);
 
-      foreach ($defaults['address'] as $blockId => $blockVal) {
-        $idValue = $blockVal['id'];
-        if (!empty($blockVal['master_id'])) {
-          $idValue = $blockVal['master_id'];
-        }
-        $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst('address'), NULL, $idValue, NULL, [],
-          NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
-        // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
-        $defaults['address'][$blockId]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
+      $idValue = $blockVal['id'];
+      if (!empty($blockVal['master_id'])) {
+        $idValue = $blockVal['master_id'];
       }
-      // reset template variable since that won't be of any use, and could be misleading
-      $this->assign("dnc_viewCustomData", NULL);
+      $addresses[$blockId]['custom'] = $this->addBlockCustomData('Address', $idValue);
     }
+    $this->assign('address', $addresses);
 
     $defaults['gender_display'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'gender_id', $defaults['gender_id'] ?? NULL);
 
-    $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
+    $communicationStyle = CRM_Contact_DAO_Contact::buildOptions('communication_style_id');
     if (!empty($communicationStyle)) {
       if (!empty($defaults['communication_style_id'])) {
         $defaults['communication_style_display'] = $communicationStyle[$defaults['communication_style_id']];
@@ -204,10 +227,17 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     // get contact tags
     $defaults['contactTag'] = CRM_Core_BAO_EntityTag::getContactTags($this->_contactId);
     if (!empty($defaults['contactTag'])) {
+      // @todo - this looks like it is just overwritten a few lines down in the assign.
       $defaults['allTags'] = CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', FALSE);
     }
+    // @todo - stop assigning defaults - assign variables individually
+    // rather than adding to defaults for transparency - this is some old
+    // copy & paste.
+    $this->assign($defaults);
+    $this->assign('allTabs', $this->getTabs());
+    unset($defaults);
 
-    $defaults['privacy_values'] = CRM_Core_SelectValues::privacy();
+    $this->assign('privacy_values', CRM_Core_SelectValues::privacy());
 
     //Show blocks only if they are visible in edit form
     $editOptions = CRM_Core_BAO_Setting::valueOptions(
@@ -216,15 +246,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     );
 
     foreach ($editOptions as $blockName => $value) {
-      $varName = '_show' . $blockName;
-      $this->$varName = $value;
-      $this->assign(substr($varName, 1), $this->$varName);
+      $varName = 'show' . $blockName;
+      $this->assign($varName, $value);
     }
 
     // get contact name of shared contact names
     $sharedAddresses = [];
-    $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
-    foreach ($defaults['address'] as $key => $addressValue) {
+    $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($addresses);
+    foreach ($addresses as $key => $addressValue) {
       if (!empty($addressValue['master_id']) &&
         !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']
       ) {
@@ -236,30 +265,17 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
     $this->assign('sharedAddresses', $sharedAddresses);
 
-    $this->assign($defaults);
-
     // FIXME: when we sort out TZ isssues with DATETIME/TIMESTAMP, we can skip next query
     // also assign the last modifed details
     $lastModified = CRM_Core_BAO_Log::lastModified($this->_contactId, 'civicrm_contact');
-    $this->assign_by_ref('lastModified', $lastModified);
-
-    $this->_viewOptions = CRM_Core_BAO_Setting::valueOptions(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_view_options',
-      TRUE
-    );
-
-    $changeLog = $this->_viewOptions['log'];
-    $this->assign_by_ref('changeLog', $changeLog);
-
-    $this->assign('allTabs', $this->getTabs($defaults));
+    $this->assign('lastModified', $lastModified);
 
     // hook for contact summary
     // ignored but needed to prevent warnings
     $contentPlacement = CRM_Utils_Hook::SUMMARY_BELOW;
     CRM_Utils_Hook::summary($this->_contactId, $content, $contentPlacement);
     if ($content) {
-      $this->assign_by_ref('hookContent', $content);
+      $this->assign('hookContent', $content);
       $this->assign('hookContentPlacement', $contentPlacement);
     }
   }
@@ -330,13 +346,18 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getTabs(array $contact) {
+  public function getTabs(): array {
     $allTabs = [];
     $getCountParams = [];
     $weight = 10;
-
+    $viewOptions = CRM_Core_BAO_Setting::valueOptions(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'contact_view_options',
+      TRUE
+    );
+    $this->assign('changeLog', $viewOptions['log']);
     foreach (CRM_Core_Component::getEnabledComponents() as $name => $component) {
-      if (!empty($this->_viewOptions[$name]) &&
+      if (!empty($viewOptions[$name]) &&
         CRM_Core_Permission::access($component->name)
       ) {
         $elem = $component->registerTab();
@@ -371,7 +392,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       if ($tab['id'] == 'summary') {
         $allTabs[] = $tab;
       }
-      elseif ($accessCiviCRM && !empty($this->_viewOptions[$tab['id']])) {
+      elseif ($accessCiviCRM && !empty($viewOptions[$tab['id']])) {
         $allTabs[] = $tab + [
           'url' => CRM_Utils_System::url("civicrm/contact/view/{$tab['id']}", "reset=1&cid={$this->_contactId}"),
           'count' => NULL,
@@ -382,18 +403,31 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     // now add all the custom tabs
-    $entityType = $this->get('contactType');
-    $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups(
-      $entityType,
-      'civicrm/contact/view/cd',
-      $this->_contactId
-    );
+    $filters = [
+      'is_active' => TRUE,
+      'extends' => $this->get('contactType'),
+      'style' => ['Tab', 'Tab with table'],
+    ];
+    $subTypes = CRM_Utils_Array::explodePadded($this->get('contactSubtype'));
+    if ($subTypes) {
+      // Include groups for this subtype OR groups with no subtype
+      $subTypes[] = NULL;
+      $filters['extends_entity_column_value'] = $subTypes;
+    }
+    else {
+      $filters['extends_entity_column_value'] = NULL;
+    }
+    $activeGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::VIEW);
 
     foreach ($activeGroups as $group) {
+      // Skip if custom group has no enabled fields
+      if (!count($group['fields'])) {
+        continue;
+      }
       $id = "custom_{$group['id']}";
       $allTabs[] = [
         'id' => $id,
-        'url' => CRM_Utils_System::url($group['path'], $group['query'] . "&selectedChild=$id"),
+        'url' => CRM_Utils_System::url('civicrm/contact/view/cd', "reset=1&gid={$group['id']}&cid={$this->_contactId}&selectedChild=$id"),
         'title' => $group['title'],
         'weight' => $weight,
         'count' => NULL,
@@ -407,37 +441,45 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     // Allow other modules to add or remove tabs
     $context = [
-      'contact_id' => $contact['id'],
-      'contact_type' => $contact['contact_type'],
-      'contact_sub_type' => CRM_Utils_Array::explodePadded($contact['contact_sub_type'] ?? NULL),
+      'contact_id' => $this->getContactID(),
+      'contact_type' => $this->getContactValue('contact_type'),
+      'contact_sub_type' => $this->getContactValue('contact_sub_type'),
     ];
     CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
 
     // Remove any tabs that don't apply to this contact type
     foreach (array_keys($allTabs) as $key) {
       $tabContactType = (array) ($allTabs[$key]['contact_type'] ?? []);
-      if ($tabContactType && !in_array($contact['contact_type'], $tabContactType, TRUE)) {
+      if ($tabContactType && !in_array($this->getContactValue('contact_type'), $tabContactType, TRUE)) {
         unset($allTabs[$key]);
       }
     }
 
-    $expectedKeys = ['count', 'class', 'template', 'hideCount', 'icon'];
-
-    foreach ($allTabs as &$tab) {
-      // Ensure tab has all expected keys
-      $tab += array_fill_keys($expectedKeys, NULL);
+    foreach ($allTabs as $key => $tab) {
       // Get tab counts last to avoid wasting time; if a tab was removed by hook, the count isn't needed.
       if (!isset($tab['count']) && isset($getCountParams[$tab['id']])) {
-        $tab['count'] = call_user_func_array([
+        $allTabs[$key]['count'] = call_user_func_array([
           'CRM_Contact_BAO_Contact',
           'getCountComponent',
         ], $getCountParams[$tab['id']]);
       }
     }
 
+    // ensure all keys used in the template are set, to avoid notices
+    $allTabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($allTabs);
+
+    // ensure the array keys match the value in the "id" of each item
+    $tabs = [];
+
+    foreach ($allTabs as $key => $tab) {
+      $finalKey = $tab['id'] ?? $key;
+      $tabs[$finalKey] = $tab;
+    }
+
     // now sort the tabs based on weight
-    usort($allTabs, ['CRM_Utils_Sort', 'cmpFunc']);
-    return $allTabs;
+    uasort($tabs, ['CRM_Utils_Sort', 'cmpFunc']);
+
+    return $tabs;
   }
 
   /**
@@ -477,8 +519,21 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       foreach ($optionFields as $optionField) {
         $locationEntities[$index][$fieldMap[$optionField]] = $locationEntity[$optionField . ':label'];
       }
+      $locationEntities[$index]['custom'] = $this->addBlockCustomData($entity, $locationEntity['id']);
     }
     return $locationEntities;
+  }
+
+  /**
+   * @param string $entityType
+   *
+   * @param int $entityID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function addBlockCustomData(string $entityType, int $entityID): array {
+    return $this->getCustomDataFieldsForEntityDisplay($entityType, $entityID);
   }
 
 }

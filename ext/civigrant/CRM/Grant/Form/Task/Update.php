@@ -43,7 +43,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $grantStatus = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
+    $grantStatus = CRM_Grant_DAO_Grant::buildOptions('status_id');
     $this->addElement('select', 'status_id', ts('Grant Status'), ['' => ''] + $grantStatus);
 
     $this->addElement('text', 'amount_granted', ts('Amount Granted'));

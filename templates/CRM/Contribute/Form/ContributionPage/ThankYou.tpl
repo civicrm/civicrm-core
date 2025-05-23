@@ -40,7 +40,7 @@
   </td>
     </tr>
     <tr class="crm-contribution-contributionpage-thankyou-form-block-receipt_from_email">
-      <td class="label">{$form.receipt_from_email.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span> {help id="id_receipt-from-email"}</td>
+      <td class="label">{$form.receipt_from_email.label} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span> {help id="id_receipt-from-email"}</td>
       <td class="html-adjust">{$form.receipt_from_email.html}</td>
     </tr>
     <tr class="crm-contribution-contributionpage-thankyou-form-block-receipt_text">

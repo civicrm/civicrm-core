@@ -70,4 +70,4 @@ CREATE TABLE `civicrm_oauth_contact_token` (
   )
 
 ,          CONSTRAINT FK_civicrm_oauth_contact_token_client_id FOREIGN KEY (`client_id`) REFERENCES `civicrm_oauth_client`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_oauth_contact_token_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
-)  ENGINE=InnoDB  ;
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;

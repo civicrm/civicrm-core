@@ -140,12 +140,13 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
   /**
    * hook implementation for testHookEmailProcessor
    */
-  public function hookImplForEmailProcessor($type, &$params, $mail, &$result, $action = NULL) {
+  public function hookImplForEmailProcessor($type, &$params, $mail, &$result, $action = NULL, ?int $mailSettingId = NULL) {
+    $this->assertEquals($this->mailSettingsId, $mailSettingId);
     if ($type !== 'activity') {
       return;
     }
     // change the activity type depending on subject
-    if (strpos($mail->subject, 'for hooks') !== FALSE) {
+    if (str_contains($mail->subject, 'for hooks')) {
       $this->callAPISuccess('Activity', 'create', ['id' => $result['id'], 'activity_type_id' => 'Phone Call']);
     }
   }

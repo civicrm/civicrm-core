@@ -31,18 +31,18 @@
       {assign var="showEdit" value=0}
       <tr>
         <td id="{$cd_edit.name}_{$index}" class="section-shown form-item">
-          <div class="crm-accordion-wrapper{if !empty($cd_edit.collapse_display) && empty($skipTitle)} collapsed{/if}">
+          <details class="crm-accordion-bold" {if !empty($cd_edit.collapse_display) && empty($skipTitle)}{else}open{/if}>
             {if !$skipTitle}
-              <div class="crm-accordion-header">
+              <summary>
                 {$cd_edit.title}
-              </div>
+              </summary>
             {/if}
             <div class="crm-accordion-body">
               {if $groupId and $cvID and $editPermission and $cd_edit.editable}
                 <div class="crm-submit-buttons">
                   <a href="#" class="crm-hover-button crm-custom-value-del"
                      data-post='{ldelim}"valueID": "{$cvID}", "groupID": "{$customGroupId}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'
-                     title="{ts 1=$cd_edit.title|cat:" `$rowCount`"}Delete %1{/ts}">
+                     title="{ts escape='htmlattribute' 1=$cd_edit.title|cat:" `$rowCount`"}Delete %1{/ts}">
                     <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}
                   </a>
                 </div>
@@ -68,7 +68,7 @@
                             {/if}
                           {else}
                             {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                              {', '|implode:$element.contact_ref_links}
+                              {$element.contact_ref_links|join:', '}
                             {else}
                               {$element.field_value}
                             {/if}
@@ -83,7 +83,7 @@
             </div>
             <!-- end of body -->
             <div class="clear"></div>
-          </div>
+          </details>
           <!-- end of main accordion -->
         </td>
       </tr>
@@ -120,7 +120,7 @@
                 {else}
                   <div class="content">
                     {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                      {', '|implode:$element.contact_ref_links}
+                      {$element.contact_ref_links|join:', '}
                     {else}
                       {if $element.field_value}{$element.field_value} {else}<br/>{/if}
                     {/if}

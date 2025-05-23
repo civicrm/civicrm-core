@@ -21,13 +21,6 @@
 abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
-   * Does this CMS / UF support a CMS specific logging mechanism?
-   * @var bool
-   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
-   */
-  public $supports_UF_Logging = TRUE;
-
-  /**
    */
   public function __construct() {
     /**
@@ -114,7 +107,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     // Handle absolute urls
     // compares $url (which is some unknown/untrusted value from a third-party dev) to the CMS's base url (which is independent of civi's url)
     // to see if the url is within our drupal dir, if it is we are able to treated it as an internal url
-    if (strpos($url_path, $base_url) === 0) {
+    if (str_starts_with($url_path, $base_url)) {
       $file = trim(str_replace($base_url, '', $url_path), '/');
       // CRM-18130: Custom CSS URL not working if aliased or rewritten
       if (file_exists(DRUPAL_ROOT . '/' . $file)) {
@@ -123,7 +116,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
     // Handle relative urls that are within the CiviCRM module directory
-    elseif (strpos($url_path, $base) === 0) {
+    elseif (str_starts_with($url_path, $base)) {
       $internal = TRUE;
       $url = $this->appendCoreDirectoryToResourceBase(dirname(drupal_get_path('module', 'civicrm')) . '/') . trim(substr($url_path, strlen($base)), '/');
     }
@@ -277,7 +270,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function logger($message, $priority = NULL) {
-    if (CRM_Core_Config::singleton()->userFrameworkLogging) {
+    if (CRM_Core_Config::singleton()->userFrameworkLogging && function_exists('watchdog')) {
       watchdog('civicrm', '%message', ['%message' => $message], $priority ?? WATCHDOG_DEBUG);
     }
   }
@@ -286,7 +279,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function clearResourceCache() {
-    _drupal_flush_css_js();
+    // Sometimes metadata gets cleared while the cms isn't bootstrapped.
+    if (function_exists('_drupal_flush_css_js')) {
+      _drupal_flush_css_js();
+    }
   }
 
   /**
@@ -505,8 +501,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
       // Config must be re-initialized to reset the base URL
       // otherwise links will have the wrong language prefix/domain.
-      $config = CRM_Core_Config::singleton();
-      $config->free();
+      $domain = \CRM_Core_BAO_Domain::getDomain();
+      \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
 
       return TRUE;
     }
@@ -572,7 +568,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     if (!empty($action)) {
       return $action;
     }
-    return $this->url($_GET['q']);
+    return (string) Civi::url('current://' . $_GET['q']);
   }
 
   /**
@@ -623,10 +619,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function parseDrupalSiteNameFromRoot($civicrm_root) {
     $siteName = NULL;
-    if (strpos($civicrm_root,
-        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
-      ) === FALSE
-    ) {
+    if (!str_contains($civicrm_root, DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules')) {
       $startPos = strpos($civicrm_root,
         DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
       );
@@ -792,15 +785,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
     $emailName = '';
-
-    if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
       // this is a transaction related page
-      $emailName = 'email-' . $form->_bltID;
+      $emailName = 'email-' . $billingLocationTypeID;
     }
     else {
       // find the email field in a profile page
       foreach ($fields as $name => $dontCare) {
-        if (substr($name, 0, 5) == 'email') {
+        if (str_starts_with($name, 'email')) {
           $emailName = $name;
           break;
         }
@@ -845,6 +838,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
 
     return $profile;
+  }
+
+  /**
+   * @inheritdoc
+   *
+   * We support sending CiviCRM logs to Watchdog
+   */
+  public function supportsUfLogging(): bool {
+    return TRUE;
   }
 
 }

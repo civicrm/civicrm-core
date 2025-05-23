@@ -392,16 +392,6 @@ class CRM_Core_Block {
 
     $values = [];
 
-    // Deprecated hook with typo.  Please don't use this!
-    CRM_Utils_Hook::links('create.new.shorcuts',
-      NULL,
-      CRM_Core_DAO::$_nullObject,
-      $values
-    );
-    if ($values) {
-      CRM_Core_Error::deprecatedWarning('hook_civicrm_links "create.new.shorcuts" deprecated in favor of "create.new.shortcuts"');
-    }
-
     foreach ($shortCuts as $key => $short) {
       $values[$key] = self::setShortCutValues($short);
     }
@@ -409,7 +399,7 @@ class CRM_Core_Block {
     // Hook that enables extensions to add user-defined links
     CRM_Utils_Hook::links('create.new.shortcuts',
       NULL,
-      CRM_Core_DAO::$_nullObject,
+      NULL,
       $values
     );
 

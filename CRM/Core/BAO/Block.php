@@ -236,7 +236,7 @@ class CRM_Core_BAO_Block {
           $valueId = FALSE;
           if ($blockName == 'phone') {
             $phoneTypeBlockValue = $blockValue['phoneTypeId'] ?? NULL;
-            if ($phoneTypeBlockValue == CRM_Utils_Array::value('phone_type_id', $value)) {
+            if ($phoneTypeBlockValue == ($value['phone_type_id'] ?? NULL)) {
               $valueId = TRUE;
             }
           }
@@ -385,7 +385,7 @@ class CRM_Core_BAO_Block {
        * is_primary to 1
        * @see https://issues.civicrm.org/jira/browse/CRM-10451
        */
-      if ($existingEntities->N == 1 && $existingEntities->id == CRM_Utils_Array::value('id', $params)) {
+      if ($existingEntities->N == 1 && $existingEntities->id == ($params['id'] ?? NULL)) {
         $params['is_primary'] = 1;
         return;
       }

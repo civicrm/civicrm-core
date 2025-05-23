@@ -7,7 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/common/chart.tpl"}
 {* Alerts for critical configuration settings. *}
 {$communityMessages}
 <div class="clear"></div>

@@ -545,7 +545,7 @@
             .then(function (deliveryInfos) {
               var count = Object.keys(deliveryInfos).length;
               if (count === 0) {
-                CRM.alert(ts('Could not identify any recipients. Perhaps your test group is empty, or you tried sending to contacts that do not exist and you have no permission to add contacts.'));
+                CRM.alert(ts('Could not identify any recipients. Perhaps your test group is empty, all contacts are set to deceased/opt out/do_not_email, or you tried sending to contacts that do not exist and you have no permission to add contacts.'));
               }
             })
           ;
@@ -560,7 +560,6 @@
       {name: 'Delivered',     title: ts('Successful Deliveries'),   searchFilter: '&mailing_delivery_status=Y', eventsFilter: '&event=delivered', reportType: 'detail', reportFilter: '&delivery_status_value=successful'},
       {name: 'Opened',        title: ts('Unique Opens'),           searchFilter: '&mailing_open_status=Y',     eventsFilter: '&event=opened', reportType: 'opened', reportFilter: ''},
       {name: 'Unique Clicks', title: ts('Unique Clicks'),          searchFilter: '&mailing_click_status=Y',    eventsFilter: '&event=click&distinct=1', reportType: 'clicks', reportFilter: ''},
-      // {name: 'Forward',    title: ts('Forwards'),                searchFilter: '&mailing_forward=1',         eventsFilter: '&event=forward', reportType: 'detail', reportFilter: '&is_forwarded_value=1'},
       // {name: 'Replies',    title: ts('Replies'),                 searchFilter: '&mailing_reply_status=Y',    eventsFilter: '&event=reply', reportType: 'detail', reportFilter: '&is_replied_value=1'},
       {name: 'Bounces',       title: ts('Bounces'),                 searchFilter: '&mailing_delivery_status=N', eventsFilter: '&event=bounce', reportType: 'bounce', reportFilter: ''},
       {name: 'Unsubscribers', title: ts('Unsubscribes & Opt-outs'), searchFilter: '&mailing_unsubscribe=1',     eventsFilter: '&event=unsubscribe', reportType: 'detail', reportFilter: '&is_unsubscribed_value=1'},
@@ -639,7 +638,7 @@
             scope.mailing = newValue;
           });
           scope.crmMailingConst = CRM.crmMailing;
-          scope.ts = CRM.ts(null);
+          scope.ts = CRM.ts('civi_mail');
           scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
           scope.checkPerm = CRM.checkPerm;
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};

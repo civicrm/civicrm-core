@@ -1,8 +1,8 @@
 <div id="bootstrap-theme" class="afadmin-list">
   <h1 crm-page-title>{{:: ts('FormBuilder') }}</h1>
 
-  <ul class="nav nav-tabs">
-    <li role="presentation" ng-repeat="tab in $ctrl.tabs" ng-class="{active: tab.name === $ctrl.tab}">
+  <ul role="tablist" class="nav nav-tabs">
+    <li role="tab" ng-repeat="tab in $ctrl.tabs" ng-class="{active: tab.name === $ctrl.tab}">
       <a href ng-click="$ctrl.tab = tab.name; $ctrl.searchAfformList = ''">
         <i class="crm-i {{ tab.icon }}"></i> {{:: tab.plural }}
         <span class="badge">{{ $ctrl.afforms[tab.name].length }}</span>
@@ -12,7 +12,7 @@
 
   <div class="form-inline">
     <label for="afform-list-filter">{{:: ts('Filter:') }}</label>
-    <input class="form-control" type="search" id="afform-list-filter" ng-model="$ctrl.searchAfformList" placeholder="&#xf002">
+    <input class="form-control" type="search" id="afform-list-filter" ng-model="$ctrl.searchAfformList" placeholder="&#x1f50d;">
     <div class="btn-group pull-right" ng-if="types[$ctrl.tab].options !== false" af-gui-menu>
       <a ng-if="types[$ctrl.tab].default" ng-href="{{ types[$ctrl.tab].default }}" class="btn btn-primary">
         {{ ts('New %1', {1: types[$ctrl.tab].label }) }}
@@ -23,7 +23,7 @@
       </button>
       <ul class="dropdown-menu" ng-if="menu.open">
         <li ng-class="{disabled: !types[$ctrl.tab].options || !types[$ctrl.tab].options.length}">
-          <input ng-if="types[$ctrl.tab].options && types[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#xf002" ng-model="searchCreateLinks.label">
+          <input ng-if="types[$ctrl.tab].options && types[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#x1f50d;" ng-model="searchCreateLinks.label">
           <a href ng-if="!types[$ctrl.tab].options"><i class="crm-i fa-spinner fa-spin"></i></a>
           <a href ng-if="types[$ctrl.tab].options && !types[$ctrl.tab].options.length">{{:: ts('None Found') }}</a>
         </li>
@@ -75,7 +75,12 @@
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'base_module'"></i>
         {{:: ts('Package') }}
       </th>
-      <th></th>
+      <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('tags')">
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'tags'"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'tags'"></i>
+        {{:: ts('Tags') }}
+      </th>
+      <th>{{:: ts('Actions') }}</th>
     </tr>
     </thead>
     <tbody>
@@ -90,7 +95,9 @@
           {{:: afform.server_route }}
         </a>
       </td>
-      <td>{{:: afform.placement.join(', ') }}</td>
+      <td>
+        {{:: afform.placement.join(', ') }}
+      </td>
       <td ng-if="$ctrl.tab === 'form'">
         {{:: afform.submit_currently_open ? ts('Open') : ts('Closed') }}
         <span ng-if="afform.submit_limit && afform.submit_enabled">
@@ -107,6 +114,9 @@
       </td>
       <td>
         {{:: afform['base_module:label'] }}
+      </td>
+      <td>
+        {{:: afform.tags.join(', ') }}
       </td>
       <td class="text-right">
         <a ng-if="afform.type !== 'system'" ng-href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>

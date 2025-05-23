@@ -19,6 +19,7 @@
  * Main page for viewing contact.
  */
 class CRM_Contact_Page_View extends CRM_Core_Page {
+  use CRM_Contact_Form_ContactFormTrait;
 
   /**
    * The id of the object being viewed (note/relationship etc)
@@ -64,33 +65,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       $qfKey = NULL;
     }
     $this->assign('searchKey', $qfKey);
-
-    // retrieve the group contact id, so that we can get contact id
-    $gcid = CRM_Utils_Request::retrieve('gcid', 'Positive', $this);
-
-    if (!$gcid) {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    }
-    else {
-      $this->_contactId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_GroupContact', $gcid, 'contact_id');
-    }
-
-    if (!$this->_contactId) {
-      CRM_Core_Error::statusBounce(
-        ts('We could not find a contact id.'),
-        CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
-      );
-    }
-
-    // ensure that the id does exist
-    if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'id') != $this->_contactId) {
-      CRM_Core_Error::statusBounce(
-        ts('A Contact with that ID does not exist: %1', [1 => $this->_contactId]),
-        CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
-      );
-    }
-
-    $this->assign('contactId', $this->_contactId);
+    $this->assign('contactId', $this->getContactID());
 
     // see if we can get prev/next positions from qfKey
     $navContacts = [
@@ -341,13 +316,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
     $obj->assign('userRecordUrl', $userRecordUrl);
 
-    if (CRM_Core_Permission::check('access Contact Dashboard')) {
-      $dashboardURL = CRM_Utils_System::url('civicrm/user',
-        "reset=1&id={$cid}"
-      );
-      $obj->assign('dashboardURL', $dashboardURL);
-    }
-
     // See if other modules want to add links to the activtity bar
     $hookLinks = [];
     CRM_Utils_Hook::links('view.contact.activity',
@@ -368,11 +336,47 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   protected function getGroupOrganizationUrl(string $contactType): string {
     if ($contactType !== 'Organization' || !CRM_Core_Permission::check('administer Multiple Organizations')
       || !CRM_Contact_BAO_GroupOrganization::hasGroupAssociated($this->_contactId)
-      || !Civi::settings()->get('is_enabled')
+      || !Civi::settings()->get('multisite_is_enabled')
     ) {
       return '';
     }
     return CRM_Utils_System::url('civicrm/group', "reset=1&oid={$this->_contactId}");
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   *
+   * @api This function will not change in a minor release and is supported for
+   *  use outside of core. This annotation / external support for properties
+   *  is only given where there is specific test cover.
+   */
+  public function getContactID(): int {
+    if (!isset($this->_contactId)) {
+      // retrieve the group contact id, so that we can get contact id
+      $gcid = CRM_Utils_Request::retrieve('gcid', 'Positive', $this);
+
+      if (!$gcid) {
+        $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+      }
+      else {
+        $this->_contactId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_GroupContact', $gcid, 'contact_id');
+      }
+
+      if (!$this->_contactId) {
+        CRM_Core_Error::statusBounce(
+          ts('We could not find a contact id.'),
+          CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
+        );
+      }
+      // ensure that the id does exist
+      if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'id') != $this->_contactId) {
+        CRM_Core_Error::statusBounce(
+          ts('A Contact with that ID does not exist: %1', [1 => $this->_contactId]),
+          CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
+        );
+      }
+    }
+    return $this->_contactId;
   }
 
 }

@@ -19,6 +19,15 @@
  * Form helper class for an OpenID object.
  */
 class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
+  use CRM_Contact_Form_Edit_OpenIDBlockTrait;
+  use CRM_Contact_Form_ContactFormTrait;
+
+  /**
+   * Is this the contact summary edit screen.
+   *
+   * @var bool
+   */
+  protected bool $isContactSummaryEdit = FALSE;
 
   /**
    * Ims of the contact that is been viewed.
@@ -37,12 +46,9 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
    */
   public function preProcess() {
     parent::preProcess();
-
-    //get all the existing openids
-    $openid = new CRM_Core_BAO_OpenID();
-    $openid->contact_id = $this->_contactId;
-
-    $this->_openids = CRM_Core_BAO_Block::retrieveBlock($openid);
+    // Get all the existing ims , The array historically starts
+    // with 1 not 0.
+    $this->_openids = $this->getExistingOpenIDsReIndexed();
   }
 
   /**
@@ -71,7 +77,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
     $this->applyFilter('__ALL__', 'trim');
 
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
-      CRM_Contact_Form_Edit_OpenID::buildQuickForm($this, $blockId, TRUE);
+      $this->addOpenIDBlockFields($blockId);;
     }
 
     $this->addFormRule(['CRM_Contact_Form_Inline_OpenID', 'formRule']);
@@ -138,19 +144,16 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   /**
    * Process the form.
    */
-  public function postProcess() {
-    $params = $this->exportValues();
+  public function postProcess(): void {
+    $params = $this->getSubmittedValues();
 
     // Process / save openID
-    $params['contact_id'] = $this->_contactId;
-    $params['updateBlankLocInfo'] = TRUE;
-    $params['openid']['isIdSet'] = TRUE;
     foreach ($this->_openids as $count => $value) {
       if (!empty($value['id']) && isset($params['openid'][$count])) {
         $params['openid'][$count]['id'] = $value['id'];
       }
     }
-    CRM_Core_BAO_Block::create('openid', $params);
+    $this->saveOpenIDss($params['openid']);
 
     $this->log();
     $this->response();

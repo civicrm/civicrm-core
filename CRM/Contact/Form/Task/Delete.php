@@ -65,8 +65,8 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     // sort out whether it’s a delete-to-trash, delete-into-oblivion or restore (and let the template know)
     $values = $this->controller->exportValues();
-    $this->_skipUndelete = (CRM_Core_Permission::check('access deleted contacts') and (CRM_Utils_Request::retrieve('skip_undelete', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::DELETE_PERMANENTLY));
-    $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::RESTORE);
+    $this->_skipUndelete = (CRM_Core_Permission::check('access deleted contacts') and (CRM_Utils_Request::retrieve('skip_undelete', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::DELETE_PERMANENTLY) || in_array('delete-permanently', $this->urlPath));
+    $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::RESTORE or in_array('restore-contact', $this->urlPath));
 
     if ($this->_restore && !CRM_Core_Permission::check('access deleted contacts')) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this contact.'));
@@ -78,10 +78,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $this->assign('trash', Civi::settings()->get('contact_undelete') and !$this->_skipUndelete);
     $this->assign('restore', $this->_restore);
 
-    if ($this->_restore) {
-      $this->setTitle(ts('Restore Contact'));
-    }
-
     if ($cid) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to delete this contact. Note: you can delete contacts if you can edit them.'));
@@ -89,13 +85,18 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       elseif (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
         CRM_Core_Error::statusBounce(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
       }
-
+      // Indicates it is not called from search context so 'view selected contacts' link is suppressed.
+      $this->assign('isSelectedContacts', FALSE);
       $this->_contactIds = [$cid];
       $this->_single = TRUE;
       $this->assign('totalSelectedContacts', 1);
     }
     else {
       parent::preProcess();
+    }
+
+    if ($this->_restore) {
+      $this->setTitle(ts('Restore Contact'));
     }
 
     $this->_sharedAddressMessage = $this->get('sharedAddressMessage');
@@ -246,11 +247,21 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     }
     // Alert user of any failures
     if ($not_deleted) {
-      $status = ts('The contact might be the Membership Organization of a Membership Type. You will need to edit the Membership Type and change the Membership Organization before you can delete this contact.');
       $title = ts('Unable to Delete');
+      // If the contact has a CMS account, you can't delete them. The deletion
+      // call just returns TRUE or FALSE, so we check if they have a CMS account
+      // Note: we're not using CRM_Core_BAO_UFMatch::getUFId() because that's cached.
+      $ufmatch = new CRM_Core_DAO_UFMatch();
+      $ufmatch->contact_id = $cid;
+      $ufmatch->domain_id = CRM_Core_Config::domainID();
+      if ($ufmatch->find(TRUE)) {
+        $status = ts('The contact has a CMS account. You will need to delete it before you can delete this contact.');
+      }
+      else {
+        $status = ts('The contact might be the Membership Organization of a Membership Type. You will need to edit the Membership Type and change the Membership Organization before you can delete this contact.');
+      }
       $session->setStatus('<ul><li>' . implode('</li><li>', $not_deleted) . '</li></ul>' . $status, $title, 'error');
     }
-
     if (isset($this->_sharedAddressMessage) && $this->_sharedAddressMessage['count'] > 0) {
       if (count($this->_sharedAddressMessage['contactList']) == 1) {
         $message = ts('The following contact had been sharing an address with a contact you just deleted. Their address will no longer be shared, but has not been removed or altered.');

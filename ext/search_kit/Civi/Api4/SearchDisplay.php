@@ -6,8 +6,11 @@ namespace Civi\Api4;
  *
  * Provided by the Search Kit extension.
  *
+ * @method Action\SearchDisplay\CreateBatch createBatch(bool $checkPemissions)
+ * @method Action\SearchDisplay\RunBatch runBatch(bool $checkPemissions)
+ *
  * @since 5.32
- * @searchable none
+ * @searchable secondary
  * @package Civi\Api4
  */
 class SearchDisplay extends Generic\DAOEntity {
@@ -43,6 +46,15 @@ class SearchDisplay extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\SearchDisplay\InlineEdit
+   */
+  public static function inlineEdit($checkPermissions = TRUE) {
+    return (new Action\SearchDisplay\InlineEdit(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\SearchDisplay\GetDefault
    */
   public static function getDefault($checkPermissions = TRUE) {
@@ -52,13 +64,13 @@ class SearchDisplay extends Generic\DAOEntity {
 
   public static function permissions() {
     $permissions = parent::permissions();
-    $permissions['default'] = [['administer CiviCRM data', 'administer search_kit']];
+    $permissions['default'] = ['administer search_kit'];
     // Anyone with access to CiviCRM can view search displays (but not necessarily the results)
     $permissions['get'] = $permissions['getDefault'] = ['access CiviCRM'];
     // Anyone with access to CiviCRM can do search tasks (but not necessarily all of them)
     $permissions['getSearchTasks'] = ['access CiviCRM'];
     // Permission to run or download search results is checked internally
-    $permissions['run'] = $permissions['download'] = [];
+    $permissions['run'] = $permissions['download'] = $permissions['inlineEdit'] = [];
     return $permissions;
   }
 

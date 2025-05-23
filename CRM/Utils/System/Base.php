@@ -38,13 +38,6 @@ abstract class CRM_Utils_System_Base {
   public $is_wordpress = FALSE;
 
   /**
-   * Does this CMS / UF support a CMS specific logging mechanism?
-   * @var bool
-   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
-   */
-  public $supports_UF_Logging = FALSE;
-
-  /**
    * @var bool
    *   TRUE, if the CMS allows CMS forms to be extended by hooks.
    */
@@ -69,15 +62,48 @@ abstract class CRM_Utils_System_Base {
   abstract public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL);
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb.
+   * Returns the Smarty template path to the main template that renders the content.
    *
-   * @param array $breadCrumbs
+   * In CMS contexts, this goes inside their theme, but Standalone needs to render the full HTML page.
+   *
+   * @var int|string $print
+   *   Should match a CRM_Core_Smarty::PRINT_* constant,
+   *   or equal 0 if not in print mode.
+   */
+  public static function getContentTemplate($print = 0): string {
+    if ($print === CRM_Core_Smarty::PRINT_JSON) {
+      return 'CRM/common/snippet.tpl';
+    }
+
+    switch ($print) {
+      case 0:
+        // Not a print context.
+        // Despite what the template is called
+        return 'CRM/common/CMSPrint.tpl';
+
+      case CRM_Core_Smarty::PRINT_PAGE:
+        return 'CRM/common/print.tpl';
+
+      case 'xls':
+      case 'doc':
+        return 'CRM/Contact/Form/Task/Excel.tpl';
+
+      default:
+        return 'CRM/common/snippet.tpl';
+    }
+  }
+
+  /**
+   * Append additional breadcrumbs to the existing breadcrumb trail.
+   *
+   * @param array $breadCrumbs array of arrays
+   * sub-arrays should each have 'title' and 'url' keys
    */
   public function appendBreadCrumb($breadCrumbs) {
   }
 
   /**
-   * Reset an additional breadcrumb tag to the existing breadcrumb.
+   * Reset the breadcrumb trail
    */
   public function resetBreadCrumb() {
   }
@@ -89,6 +115,7 @@ abstract class CRM_Utils_System_Base {
    *   The new string to be appended.
    */
   public function addHTMLHead($head) {
+    \CRM_Core_Error::deprecatedFunctionWarning("addHTMLHead is deprecated in " . self::class);
   }
 
   /**
@@ -113,9 +140,7 @@ abstract class CRM_Utils_System_Base {
     }
 
     $current_path = CRM_Utils_System::currentPath();
-    return $this->url($current_path,
-      NULL, TRUE, NULL, FALSE
-    );
+    return (string) Civi::url('current://' . $current_path, 'a');
   }
 
   /**
@@ -164,15 +189,15 @@ abstract class CRM_Utils_System_Base {
   public function getRouteUrl(string $scheme, string $path, ?string $query): ?string {
     switch ($scheme) {
       case 'frontend':
-        return $this->url($path, $query, TRUE, NULL, TRUE, FALSE, FALSE);
+        return $this->url($path, $query, TRUE, NULL, TRUE, FALSE);
 
       case 'service':
         // The original `url()` didn't have an analog for "service://". But "frontend" is probably the closer bet?
         // Or maybe getNotifyUrl() makes sense?
-        return $this->url($path, $query, TRUE, NULL, TRUE, FALSE, FALSE);
+        return $this->url($path, $query, TRUE, NULL, TRUE, FALSE);
 
       case 'backend':
-        return $this->url($path, $query, TRUE, NULL, FALSE, TRUE, FALSE);
+        return $this->url($path, $query, TRUE, NULL, FALSE, TRUE);
 
       // If the UF defines other major UI/URL conventions, then you might hypothetically handle
       // additional schemes.
@@ -278,12 +303,22 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Immediately stop script execution, log out the user and redirect to the home page.
+   * Logout the current user session
    *
-   * @deprecated
-   *   This function should be removed in favor of linking to the CMS's logout page
+   * Alias for _authx_uf()->logoutSession
    */
   public function logout() {
+    _authx_uf()->logoutSession();
+  }
+
+  /**
+   * Url to redirect users to after logging out, in the context of an HTTP session
+   *
+   * @see CRM_Core_Page_Logout
+   * @return string
+   */
+  public function postLogoutUrl(): string {
+    return '/';
   }
 
   /**
@@ -719,10 +754,14 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Set timezone in mysql so that timestamp fields show the correct time.
+   * Set MySQL timezone so that timestamp fields show the correct time.
+   *
+   * @param ?string $timeZone
+   *    Timezone string - if none provided will be fetched from system
    */
-  public function setMySQLTimeZone() {
-    $timeZoneOffset = $this->getTimeZoneOffset();
+  public function setMySQLTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?? $this->getTimeZoneString();
+    $timeZoneOffset = \CRM_Utils_Time::getTimeZoneOffsetFromString($timeZone);
     if ($timeZoneOffset) {
       $sql = "SET time_zone = '$timeZoneOffset'";
       CRM_Core_DAO::executeQuery($sql);
@@ -730,47 +769,43 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Get timezone from CMS.
+   * Set PHP timezone
    *
-   * @return string|false|null
+   * @param ?string $timeZone
+   *    Timezone string - default value will be fetched
+   *    using getTimeZoneString if not provided or falsey
    */
-  public function getTimeZoneOffset() {
-    $timezone = $this->getTimeZoneString();
-    if ($timezone) {
-      if ($timezone == 'UTC' || $timezone == 'Etc/UTC') {
-        // CRM-17072 Let's short-circuit all the zero handling & return it here!
-        return '+00:00';
-      }
-      $tzObj = new DateTimeZone($timezone);
-      $dateTime = new DateTime("now", $tzObj);
-      $tz = $tzObj->getOffset($dateTime);
-
-      if ($tz === 0) {
-        // CRM-21422
-        return '+00:00';
-      }
-
-      if (empty($tz)) {
-        return FALSE;
-      }
-
-      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
-
-      if ($timeZoneOffset > 0) {
-        $timeZoneOffset = '+' . $timeZoneOffset;
-      }
-      return $timeZoneOffset;
-    }
-    return NULL;
+  public function setPhpTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?: $this->getTimeZoneString();
+    date_default_timezone_set($timeZone);
   }
 
   /**
-   * Get timezone as a string.
+   * Set system timezone (both PHP + MySQL)
+   */
+  public function setTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?? $this->getTimeZoneString();
+
+    $this->setPhpTimeZone($timeZone);
+    $this->setMySQLTimeZone($timeZone);
+  }
+
+  /**
+   * Get timezone from CMS as a string.
    * @return string
    *   Timezone string e.g. 'America/Los_Angeles'
    */
   public function getTimeZoneString() {
     return date_default_timezone_get();
+  }
+
+  /**
+   * Get timezone offset from CMS
+   *
+   * @return string|false|null
+   */
+  public function getTimeZoneOffset() {
+    return \CRM_Utils_Time::getTimeZoneOffsetFromString($this->getTimeZoneString());
   }
 
   /**
@@ -967,6 +1002,27 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Whether to allow access to CMS user sync action
+   * @return bool
+   */
+  public function allowSynchronizeUsers() {
+    return TRUE;
+  }
+
+  /**
+   * Run CMS user sync if allowed, otherwise just returns empty array
+   * @return array
+   */
+  public function synchronizeUsersIfAllowed() {
+    if ($this->allowSynchronizeUsers()) {
+      return $this->synchronizeUsers();
+    }
+    else {
+      return [];
+    }
+  }
+
+  /**
    * Send an HTTP Response base on PSR HTTP RespnseInterface response.
    *
    * @param \Psr\Http\Message\ResponseInterface $response
@@ -977,7 +1033,7 @@ abstract class CRM_Utils_System_Base {
       CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
     }
     echo $response->getBody();
-    CRM_Utils_System::civiExit();
+    CRM_Utils_System::civiExit(0, ['response' => $response]);
   }
 
   /**
@@ -1197,6 +1253,34 @@ abstract class CRM_Utils_System_Base {
     $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
 
     return $profile;
+  }
+
+  /**
+   * Hook for further system boot once the main CiviCRM
+   * Container is up (only used in Standalone currently)
+   */
+  public function postContainerBoot(): void {
+  }
+
+  /**
+   * Does this CMS / UF support a CMS specific logging mechanism?
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
+   * @todo - it would be nice to provide UF specific meta for the userFrameworkLogging setting
+   *
+   * @return bool
+   */
+  public function supportsUfLogging(): bool {
+    return FALSE;
+  }
+
+  /**
+   * Does the userSystem think we are in maintenance mode?
+   *
+   * @return bool
+   */
+  public function isMaintenanceMode(): bool {
+    // if not implemented at CMS level, we assume FALSE
+    return FALSE;
   }
 
 }

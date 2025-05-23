@@ -21,19 +21,6 @@
  */
 class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
-  public function setUp(): void {
-    parent::setUp();
-
-    $this->quickCleanup([
-      'civicrm_contact',
-      'civicrm_address',
-      'civicrm_loc_block',
-      'civicrm_email',
-      'civicrm_phone',
-      'civicrm_im',
-    ]);
-  }
-
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
@@ -43,6 +30,10 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
       'civicrm_contact',
       'civicrm_openid',
       'civicrm_loc_block',
+      'civicrm_address',
+      'civicrm_email',
+      'civicrm_phone',
+      'civicrm_im',
     ];
     $this->quickCleanup($tablesToTruncate);
     parent::tearDown();
@@ -61,8 +52,6 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->assertDBNull('CRM_Core_DAO_Address', 'Saint Helier St', 'id', 'street_address',
       'Database check, Address created successfully.'
     );
-
-    $this->contactDelete($contactId);
   }
 
   /**
@@ -181,8 +170,6 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     ];
     $compareParams = ['phone' => '9833910234'];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
-
-    $this->contactDelete($contactId);
   }
 
   /**

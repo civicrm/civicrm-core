@@ -53,13 +53,12 @@ trait CRM_Contact_Form_Task_PDFTrait {
    * @throws \CRM_Core_Exception
    */
   public function addPDFElementsToForm(): void {
-    $form = $this;
     // This form outputs a file so should never be submitted via ajax
-    $form->preventAjaxSubmit();
+    $this->preventAjaxSubmit();
 
     //Added for CRM-12682: Add activity subject and campaign fields
-    CRM_Campaign_BAO_Campaign::addCampaign($form);
-    $form->add(
+    CRM_Campaign_BAO_Campaign::addCampaign($this);
+    $this->add(
       'text',
       'subject',
       ts('Activity Subject'),
@@ -69,16 +68,16 @@ trait CRM_Contact_Form_Task_PDFTrait {
 
     // Added for dev/core#2121,
     // To support sending a custom pdf filename before downloading.
-    $form->addElement('hidden', 'pdf_file_name');
+    $this->addElement('hidden', 'pdf_file_name');
 
-    $form->addSelect('format_id', [
+    $this->addSelect('format_id', [
       'label' => ts('Select Format'),
       'placeholder' => ts('Default'),
       'entity' => 'message_template',
       'field' => 'pdf_format_id',
       'option_url' => 'civicrm/admin/pdfFormats',
     ]);
-    $form->add(
+    $this->add(
       'select',
       'paper_size',
       ts('Paper Size'),
@@ -86,7 +85,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
       FALSE,
       ['onChange' => 'selectPaper( this.value ); showUpdateFormatChkBox();']
     );
-    $form->add(
+    $this->add(
       'select',
       'orientation',
       ts('Orientation'),
@@ -94,7 +93,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
       FALSE,
       ['onChange' => 'updatePaperDimensions(); showUpdateFormatChkBox();']
     );
-    $form->add(
+    $this->add(
       'select',
       'metric',
       ts('Unit of Measure'),
@@ -102,28 +101,28 @@ trait CRM_Contact_Form_Task_PDFTrait {
       FALSE,
       ['onChange' => "selectMetric( this.value );"]
     );
-    $form->add(
+    $this->add(
       'text',
       'margin_left',
       ts('Left Margin'),
       ['size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"],
       TRUE
     );
-    $form->add(
+    $this->add(
       'text',
       'margin_right',
       ts('Right Margin'),
       ['size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"],
       TRUE
     );
-    $form->add(
+    $this->add(
       'text',
       'margin_top',
       ts('Top Margin'),
       ['size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"],
       TRUE
     );
-    $form->add(
+    $this->add(
       'text',
       'margin_bottom',
       ts('Bottom Margin'),
@@ -143,31 +142,89 @@ trait CRM_Contact_Form_Task_PDFTrait {
      * );
      * }
      */
-    $form->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
-    $form->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));
+    $this->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
+    $this->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));
 
-    $form->assign('useThisPageFormat', ts('Always use this Page Format with the new template?'));
-    $form->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
-    $form->assign('totalSelectedContacts', !is_null($form->_contactIds) ? count($form->_contactIds) : 0);
+    $this->assign('useThisPageFormat', ts('Always use this Page Format with the new template?'));
+    $this->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
+    $this->assign('totalSelectedContacts', !is_null($this->_contactIds) ? count($this->_contactIds) : 0);
 
-    $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
+    $this->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
     $documentTypes = implode(',', CRM_Core_SelectValues::documentApplicationType());
-    $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=255 accept="' . $documentTypes . '"');
-    $form->addUploadElement("document_file");
+    $this->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=255 accept="' . $documentTypes . '"');
+    $this->addUploadElement("document_file");
 
-    CRM_Mailing_BAO_Mailing::commonCompose($form);
+    CRM_Mailing_BAO_Mailing::commonCompose($this);
 
-    $buttons = $this->getButtons($form);
-    $form->addButtons($buttons);
+    // Looks like legacy erg rather than functional code? get & then add?
+    $buttons = $this->getButtons();
+    $this->addButtons($buttons);
 
-    $form->addFormRule(['CRM_Core_Form_Task_PDFLetterCommon', 'formRule'], $form);
+    $this->addFormRule([__CLASS__, 'formRulePDF'], $this);
+  }
+
+  /**
+   * Form rule.
+   *
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *
+   * @return bool|array
+   *   TRUE if no errors, else array of errors.
+   */
+  public static function formRulePDF($fields, $files) {
+    $errors = [];
+    $deprecatedTokens = [
+      '{case.status_id}' => '{case.status_id:label}',
+      '{case.case_type_id}' => '{case.case_type_id:label}',
+      '{membership.status}' => '{membership.status_id:label}',
+      '{membership.type}' => '{membership.membership_type_id:label}',
+      '{contribution.campaign}' => '{contribution.campaign_id:label}',
+      '{contribution.payment_instrument}' => '{contribution.payment_instrument_id:label}',
+      '{contribution.contribution_id}' => '{contribution.id}',
+      '{contribution.contribution_source}' => '{contribution.source}',
+    ];
+    $tokenErrors = [];
+    foreach ($deprecatedTokens as $token => $replacement) {
+      if (str_contains($fields['html_message'], $token)) {
+        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
+      }
+    }
+    if (!empty($tokenErrors)) {
+      $errors['html_message'] = implode('<br>', $tokenErrors);
+    }
+
+    // If user uploads non-document file other than odt/docx
+    if (empty($fields['template']) &&
+      !empty($files['document_file']['tmp_name']) &&
+      array_search($files['document_file']['type'], CRM_Core_SelectValues::documentApplicationType()) == NULL
+    ) {
+      $errors['document_file'] = ts('Invalid document file format');
+    }
+    //Added for CRM-1393
+    if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
+      $errors['saveTemplateName'] = ts("Enter name to save message template");
+    }
+    if (!is_numeric($fields['margin_left'])) {
+      $errors['margin_left'] = ts('Margin must be numeric');
+    }
+    if (!is_numeric($fields['margin_right'])) {
+      $errors['margin_right'] = ts('Margin must be numeric');
+    }
+    if (!is_numeric($fields['margin_top'])) {
+      $errors['margin_top'] = ts('Margin must be numeric');
+    }
+    if (!is_numeric($fields['margin_bottom'])) {
+      $errors['margin_bottom'] = ts('Margin must be numeric');
+    }
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**
    * Prepare form.
    */
   public function preProcessPDF(): void {
-    $form = $this;
     $defaults = [];
     $fromEmails = $this->getFromEmails();
     if (is_numeric(key($fromEmails))) {
@@ -175,10 +232,17 @@ trait CRM_Contact_Form_Task_PDFTrait {
       $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
     }
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
-      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
     }
-    $form->setDefaults($defaults);
-    $form->setTitle(ts('Print/Merge Document'));
+    $this->setDefaults($defaults);
+    $this->setTitle(ts('Print/Merge Document'));
+  }
+
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      // Because value contains <angle brackets>
+      'from_email_address',
+    ];
   }
 
   /**
@@ -221,7 +285,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
    *     if the form controller does not exist), else FALSE
    */
   protected function isLiveMode(): bool {
-    return strpos($this->controller->getButtonName(), '_preview') === FALSE;
+    return !str_contains($this->controller->getButtonName(), '_preview');
   }
 
   /**
@@ -236,7 +300,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($this->isLiveMode()) {
-      $activityIds = $this->createActivities($html_message, $this->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
+      $activityIds = $this->createActivities($html_message, $this->_contactIds, $formValues['subject'], $formValues['campaign_id'] ?? NULL);
     }
 
     if (!empty($formValues['document_file_path'])) {
@@ -436,7 +500,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
-    elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
+    elseif (($formValues['template'] ?? 0) > 0) {
       if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = {$formValues['format_id']} WHERE id = {$formValues['template']}";
       }

@@ -17,26 +17,6 @@
 class CRM_OAuth_BAO_OAuthClient extends CRM_OAuth_DAO_OAuthClient {
 
   /**
-   * Create a new OAuthClient based on array-data
-   *
-   * @param array $params key-value pairs
-   * @return CRM_OAuth_DAO_OAuthClient|NULL
-   *
-   * public static function create($params) {
-   * $className = 'CRM_OAuth_DAO_OAuthClient';
-   * $entityName = 'OAuthClient';
-   * $hook = empty($params['id']) ? 'create' : 'edit';
-   *
-   * CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
-   * $instance = new $className();
-   * $instance->copyValues($params);
-   * $instance->save();
-   * CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
-   *
-   * return $instance;
-   * } */
-
-  /**
    * @return array
    *   ~~Ex: ['my_provider' => 'My Provider']~~
    *   Ex: ['my_provider' => 'my_provider']

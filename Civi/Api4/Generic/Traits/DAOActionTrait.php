@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Generic\Traits;
 
-use Civi\Api4\CustomField;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
@@ -119,6 +118,9 @@ trait DAOActionTrait {
 
     foreach ($items as &$item) {
       $entityId = $item[$idField] ?? NULL;
+      if (CoreUtil::isContact($this->getEntityName())) {
+        $entityId = FormattingUtil::resolveContactID($idField, $entityId);
+      }
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
 
@@ -146,9 +148,7 @@ trait DAOActionTrait {
     }
 
     \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    foreach ($result as &$row) {
-      FormattingUtil::formatOutputValues($row, $this->entityFields());
-    }
+    FormattingUtil::formatOutputValues($result, $this->entityFields());
     return $result;
   }
 
@@ -190,7 +190,7 @@ trait DAOActionTrait {
    *
    * @param array $record
    */
-  private function resolveFKValues(array &$record): void {
+  protected function resolveFKValues(array &$record): void {
     // Resolve domain id first
     uksort($record, function($a, $b) {
       return substr($a, 0, 9) == 'domain_id' ? -1 : 1;
@@ -258,27 +258,22 @@ trait DAOActionTrait {
         $value = '';
       }
 
-      if ($field['html_type'] === 'CheckBox') {
-        // this function should be part of a class
-        formatCheckBoxField($value, 'custom_' . $field['id'], $this->getEntityName());
+      // Uglify checkbox values for the sake of CustomField::formatCustomField()
+      if ($field['html_type'] === 'CheckBox' && is_array($value)) {
+        $value = array_fill_keys($value, TRUE);
       }
 
       // Match contact id to strings like "user_contact_id"
       // FIXME handle arrays for multi-value contact reference fields, etc.
-      if ($field['data_type'] === 'ContactReference' && is_string($value) && !is_numeric($value)) {
-        // FIXME decouple from v3 API
-        require_once 'api/v3/utils.php';
-        $value = \_civicrm_api3_resolve_contactID($value);
-        if ('unknown-user' === $value) {
-          throw new \CRM_Core_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
-        }
+      if (in_array($field['data_type'], ['ContactReference', 'EntityReference']) && is_string($value)) {
+        $value = FormattingUtil::resolveContactID($field['name'], $value);
       }
 
       \CRM_Core_BAO_CustomField::formatCustomField(
         $field['id'],
         $customParams,
         $value,
-        $field['custom_group_id.extends'],
+        $field['extends'],
         // todo check when this is needed
         NULL,
         $entityId,
@@ -296,33 +291,30 @@ trait DAOActionTrait {
    *
    * @param string $fieldExpr
    *   Field identifier with possible suffix, e.g. MyCustomGroup.MyField1:label
-   * @return array{id: int, name: string, entity: string, suffix: string, html_type: string, data_type: string}|NULL
+   * @return array{id: int, name: string, entity: string, suffix: string, html_type: string, data_type: string, extends: string, table_name: string}|NULL
    */
-  protected function getCustomFieldInfo(string $fieldExpr) {
-    if (strpos($fieldExpr, '.') === FALSE) {
+  protected function getCustomFieldInfo(string $fieldExpr): ?array {
+    if (!str_contains($fieldExpr, '.')) {
       return NULL;
     }
     [$groupName, $fieldName] = explode('.', $fieldExpr);
     [$fieldName, $suffix] = array_pad(explode(':', $fieldName), 2, NULL);
-    $cacheKey = "APIv4_Custom_Fields-$groupName";
-    $info = \Civi::cache('metadata')->get($cacheKey);
-    if (!isset($info[$fieldName])) {
-      $info = [];
-      $fields = CustomField::get(FALSE)
-        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group_id.extends', 'column_name', 'custom_group_id.table_name')
-        ->addWhere('custom_group_id.name', '=', $groupName)
-        ->execute()->indexBy('name');
-      foreach ($fields as $name => $field) {
-        $field['custom_field_id'] = $field['id'];
-        $field['table_name'] = $field['custom_group_id.table_name'];
-        unset($field['custom_group_id.table_name']);
-        $field['name'] = $groupName . '.' . $name;
-        $field['entity'] = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($field['custom_group_id.extends']);
-        $info[$name] = $field;
+    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if ($customGroup['name'] === $groupName) {
+        foreach ($customGroup['fields'] as $field) {
+          if ($field['name'] === $fieldName) {
+            $field['custom_field_id'] = $field['id'];
+            $field['table_name'] = $customGroup['table_name'];
+            $field['extends'] = $customGroup['extends'];
+            $field['name'] = "$groupName.$fieldName";
+            $field['entity'] = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($customGroup['extends']);
+            $field['suffix'] = $suffix;
+            return $field;
+          }
+        }
       }
-      \Civi::cache('metadata')->set($cacheKey, $info);
     }
-    return isset($info[$fieldName]) ? ['suffix' => $suffix] + $info[$fieldName] : NULL;
+    return NULL;
   }
 
   /**
@@ -341,17 +333,34 @@ trait DAOActionTrait {
       return;
     }
     $newWeight = $record[$weightField] ?? NULL;
-    $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
 
     $filters = [];
     foreach ($grouping ?? [] as $filter) {
-      $filters[$filter] = $record[$filter] ?? (empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $filter));
+      if (array_key_exists($filter, $record)) {
+        $filters[$filter] = $record[$filter];
+      }
+      elseif (!empty($record[$idField])) {
+        $filters[$filter] = $daoName::getDbVal($filter, $record[$idField]);
+      }
     }
     // Supply default weight for new record
     if (!isset($record[$weightField]) && empty($record[$idField])) {
-      $record[$weightField] = $this->getMaxWeight($daoName, $filters, $weightField);
+      $max = $this->getMaxWeight($daoName, $filters, $weightField);
+      $record[$weightField] = $max;
     }
     else {
+      $oldWeight = NULL;
+      // Look up the old weight using filters (it's only relevant if this record is still within the same filter grouping)
+      if (!empty($record[$idField])) {
+        $where = [[$idField, '=', $record[$idField]]];
+        foreach ($filters as $filter => $value) {
+          $where[] = [$filter, '=', $value];
+        }
+        $oldWeight = civicrm_api4($this->getEntityName(), 'get', [
+          'select' => [$weightField],
+          'where' => $where,
+        ])[0][$weightField] ?? NULL;
+      }
       $record[$weightField] = \CRM_Utils_Weight::updateOtherWeights($daoName, $oldWeight, $newWeight, $filters, $weightField);
     }
   }
@@ -367,6 +376,7 @@ trait DAOActionTrait {
    * @return int|mixed
    */
   private function getMaxWeight($daoName, $filters, $weightField) {
+    ksort($filters);
     $key = $daoName . json_encode($filters);
     if (!isset($this->_maxWeights[$key])) {
       $this->_maxWeights[$key] = \CRM_Utils_Weight::getMax($daoName, $filters, $weightField) + 1;

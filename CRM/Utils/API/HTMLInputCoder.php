@@ -62,6 +62,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'html_message',
         'body_html',
         'msg_html',
+        // MessageTemplate subject might contain the < character in a smarty tag
+        'msg_subject',
         'description',
         'intro',
         'thankyou_text',
@@ -92,6 +94,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'pay_later_text',
         'pay_later_receipt',
         // This is needed for FROM Email Address configuration. dgg
+        // TODO: Maybe can be removed now with the migration to "SiteEmailAddress" entity... but who knows if any other entity has a label field that allows html?
         'label',
         // This is needed for navigation items urls
         'url',

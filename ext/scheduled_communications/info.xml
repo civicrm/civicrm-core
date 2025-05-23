@@ -12,11 +12,11 @@
     <url desc="Chat">https://chat.civicrm.org/civicrm/channels/search-improvements</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2023-12-08</releaseDate>
-  <version>5.70.alpha1</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.70</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <comments>Click on the chat link above to discuss development, report problems or ask questions.</comments>
   <classloader>
@@ -25,7 +25,7 @@
   </classloader>
   <civix>
     <namespace>CRM/ScheduledCommunications</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
     <angularModule>crmScheduledCommunications</angularModule>
   </civix>
   <mixins>

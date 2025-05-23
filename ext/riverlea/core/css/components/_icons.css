@@ -1,0 +1,359 @@
+.crm-container .messages .crm-i {
+  padding: 0 var(--crm-m) var(--crm-s) 0;
+  float: left;
+}
+.crm-container div:not(.crm-search-display-editable-buttons) > button.btn-xs:has(.fa-times),
+.crm-container .crm-hover-button:has(.crm-i),
+.crm-container .crm-hover-button:has(.crm-i):hover,
+.crm-container .crm-hover-button:has(.crm-i):focus {
+  background: transparent;
+  color: var(--crm-c-link) !important;
+  padding: var(--crm-btn-small-padding);
+}
+.crm-container .select2-container[class*=" fa-"]::before,
+.crm-container .messages.crm-empty-table > img /* removes inform.gif icon */ {
+  display: none;
+}
+input#crm-qsearch-input::placeholder {
+  font-family: sans-serif, 'FontAwesome'; /* Fix for type in placeholders */
+}
+
+/* Notification icons */
+.crm-container #crm-notification-container div.ui-notify-message.error .notify-content .crm-i.fa-exclamation-triangle,
+.crm-container #crm-notification-container div.ui-notify-message div.icon {
+  display: none;
+}
+#crm-notification-container .ui-notify-message a.ui-notify-cross::before,
+.crm-container #crm-notification-container div.ui-notify-message h1::before,
+div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
+.crm-container .delete-icon,
+.crm-container span.batch-valid,
+.crm-container span.batch-invalid,
+.crm-container .messages.crm-empty-table::before {
+  font-family: "Font Awesome 6 Free", "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  text-rendering: auto;
+  font-size: var(--crm-font-size);
+  margin: 0 var(--crm-m) 0 0;
+}
+.crm-container #crm-notification-container div.ui-notify-message.error h1::before,
+.crm-container span.batch-invalid::before {
+  content: var(--crm-icon-danger);
+  color: var(--crm-notify-danger);
+}
+.crm-container #crm-notification-container div.ui-notify-message.success h1::before,
+.crm-container span.batch-valid::before {
+  content: var(--crm-icon-success);
+  color: var(--crm-notify-success);
+}
+.crm-container #crm-notification-container div.ui-notify-message.info h1::before,
+.crm-container .messages.crm-empty-table::before {
+  content: var(--crm-icon-info);
+  color: var(--crm-notify-info);
+}
+.crm-container #crm-notification-container div.ui-notify-message.alert h1::before,
+.crm-container #crm-notification-container div.ui-notify-message.warning h1::before {
+  content: var(--crm-icon-danger);
+  color: var(--crm-notify-warning);
+}
+.crm-container .messages.crm-empty-table > i.crm-i {
+  display: none; /* removes double icon when markup uses both */
+}
+
+/* Help icon */
+.crm-container a.helpicon::before {
+  content: "\f059";
+}
+.crm-container a.helpicon:hover,
+.crm-container a.helpicon:focus {
+  text-decoration: none;
+}
+
+/* Check icon */
+.crm-container .crm-i.fa-check,
+.crm-container .crm-i.fa-check-circle,
+.crm-container .btn-success .crm-i,
+.crm-container .crm-i.fa-plus-circle {
+  color: var(--crm-icon-success-color);
+}
+
+/* Close icon */
+#crm-notification-container .ui-notify-message a.ui-notify-cross,
+.crm-container div.civicrm-community-messages a.civicrm-community-message-dismiss,
+.crm-container .ui-icon-circle-close {
+  font-size: 0;
+  float: right;
+  text-decoration: none;
+  padding: 0 0 0 0.5rem;
+  opacity: 0.5; /* matches Bootstrap */
+  background-image: none;
+  position: relative !important;
+  text-indent: 0;
+  height: auto;
+  width: auto;
+}
+#crm-notification-container .ui-notify-message a.ui-notify-cross::before,
+div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
+.crm-container .ui-icon-circle-close::before {
+  content: var(--crm-icon-close);
+  color: var(--crm-notify-col);
+}
+.crm-container .ui-icon-circle-close:hover,
+.crm-container .ui-icon-circle-close:focus,
+#crm-notification-container .ui-notify-message a.ui-notify-cross:hover,
+#crm-notification-container .ui-notify-message a.ui-notify-cross:focus {
+  opacity: 1;
+  transition: 0.2s;
+}
+.crm-container .crm-i.fa-times,
+.crm-container .btn-danger .crm-i,
+.crm-container button .fa-times {
+  color: var(--crm-icon-danger-color);
+}
+.crm-container .crm-dashlet-header a.fa-times {
+  color: var(--crm-dashlet-header-col);
+}
+
+/* Info icon */
+.crm-container .crm-i.fa-info,
+.crm-container .btn-info .crm-i::before {
+  color: var(--crm-icon-info-color);
+}
+
+/* Warning icon */
+.crm-container .crm-i.fa-warning,
+.crm-container .btn-warning .crm-i::before {
+  color: var(--crm-icon-warning-color);
+}
+
+/* Table sorting icons */
+.crm-container tr a.sorting,
+.crm-container tr a.sorting_asc,
+.crm-container tr a.sorting_desc,
+.crm-search-display th.crm-sortable-col,
+.crm-container table.dataTable thead th.sorting,
+.crm-container table.dataTable thead th.sorting_asc,
+.crm-container table.dataTable thead th.sorting_desc {
+  background-image: none;
+  color: var(--crm-table-header-col);
+  box-shadow: none;
+  line-height: 1;
+}
+.crm-container tr a.sorting,
+.crm-container tr a.sorting_asc,
+.crm-container tr a.sorting_desc {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: start;
+  gap: var(--crm-flex-gap);
+  align-items: center;
+}
+.crm-container th a:hover,
+.crm-container th a:focus {
+  text-decoration: none;
+}
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
+  /* Bootstrap & SearchKit sort resets */
+  position: absolute;
+  margin-left: -1.5ch;
+  color: var(--crm-table-sort-col);
+  line-height: inherit;
+  font-style: normal;
+  text-rendering: auto;
+  font-family: "Font Awesome 6 Free", "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  cursor: var(--crm-hover-clickable);
+  opacity: 1;
+}
+.crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
+  padding-left: 2ch;
+}
+.crm-container a.sorting::after,
+.crm-container a.sorting_asc::after,
+.crm-container a.sorting_desc::after,
+.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
+.crm-container table.dataTable thead th.sorting::before,
+.crm-container table.dataTable thead th.sorting_asc::before,
+.crm-container table.dataTable thead th.sorting_desc::before,
+.jstree-default .jstree-icon {
+  font-family: "Font Awesome 6 Free", "FontAwesome";
+  font-style: normal;
+  text-rendering: auto;
+  font-size: var(--crm-dash-icon-size);
+  content: var(--crm-icon-sort);
+  color: var(--crm-table-sort-col);
+  cursor: var(--crm-hover-clickable);
+}
+.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
+.crm-container table.dataTable thead th.sorting::before,
+.crm-container table.dataTable thead th.sorting_asc::before,
+.crm-container table.dataTable thead th.sorting_desc::before,
+.jstree-default .jstree-icon {
+  margin-right: 0.5rem;
+}
+.crm-container a.sorting_asc::after,
+.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-asc::before,
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-asc::before,
+.crm-container table.dataTable thead th.sorting_asc::before {
+  content: var(--crm-icon-sort-asc);
+  color: var(--crm-table-sort-active-col);
+}
+.crm-container a.sorting_desc::after,
+.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-desc::before,
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-desc::before,
+.crm-container table.dataTable thead th.sorting_desc::before {
+  content: var(--crm-icon-sort-desc);
+  color: var(--crm-table-sort-active-col);
+}
+
+/* Trash icons */
+.crm-container .delete-icon {
+  background-image: none;
+  color: var(--crm-alert-danger-text);
+}
+.crm-container .delete-button > .delete-icon {
+  color: inherit;
+}
+.crm-container .delete-icon::before,
+.crm-container .crm-i.fa-trash::before {
+  content: "\f1f8";
+  color: var(--crm-icon-danger-color);
+}
+.crm-container .delete-icon:hover::before,
+.crm-container .delete-icon:focus::before {
+  color: var(--crm-icon-danger-color);
+}
+
+/* Jqueery UI icons (tags) */
+.crm-container .jstree-wholerow-ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--crm-xs);
+}
+.jstree-default > .jstree-wholerow-ul > li.jstree-node {
+  margin-inline: 0;
+}
+.jstree-default .jstree-wholerow-clicked,
+.jstree-default .jstree-wholerow-hovered {
+  background: transparent !important;
+}
+.crm-container .jstree-default .jstree-icon {
+  background-image: inherit;
+  font-size: var(--crm-r1);
+  margin-right: var(--btn-icon-spacing);
+}
+.crm-container .jstree-default .jstree-checkbox::before {
+  content: '\f096';
+}
+.crm-container .jstree-default.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox::before,
+.crm-container .jstree-default .jstree-checked > .jstree-checkbox::before {
+  content: '\f046';
+  color: var(--crm-c-success-on-page-bg);
+}
+.jstree-default > .jstree-no-dots .jstree-closed > .jstree-ocl::before,
+.jstree .jstree-closed > .jstree-ocl::before {
+  display: block;
+  content: '\f105';
+  color: var(--crm-c-text);
+}
+.jstree-default > .jstree-no-dots .jstree-open > .jstree-ocl::before,
+.jstree .jstree-open > .jstree-ocl::before {
+  display: block;
+  content: '\f107';
+  color: var(--crm-c-text);
+}
+.crm-container .jstree-default .jstree-search {
+  color: var(--crm-c-danger);
+  font-weight: normal;
+}
+.crm-container #navigation-tree li.jstree-node {
+  background-image: none;
+}
+
+/* Resets icons with unwanted backgrounds */
+.crm-container a.crm-hover-button:has(span.icon) {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Spinners */
+.crm-container button i.crm-i.fa-spinner,
+.crm-container #bootstrap-theme .btn i.crm-i.fa-spinner {
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+/* Ban icon - lower opacity as it's double layered */
+
+.crm-i.fa-ban.fa-stack-2x {
+  opacity: 0.5;
+}
+
+/* Icon picker - vs crm-iconPicker.css */
+.crm-container #crmIconPicker .icon-ctrls {
+  display: flex;
+}
+.crm-container #crmIconPicker .icon-ctrls > button {
+  float: none;
+  margin-left: auto;
+  display: flex;
+}
+.crm-container #crmIconPicker a.ui-button .ui-icon {
+  margin-top: 0;
+  font-size: var(--crm-r2);
+}
+.crm-container #crmIconPicker .icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-m2);
+  margin-top: 1rem;
+}
+.crm-container #crmIconPicker a.ui-button {
+  color: var(--crm-c-text) !important;
+  background: transparent;
+  width: var(--crm-r2);
+  height: var(--crm-r2);
+  border: 0;
+  padding: 0;
+  display: inline-block;
+}
+/* Credit Card Icons */
+
+.crm-credit_card_type-icons {
+  display: flex;
+  gap: var(--crm-flex-gap);
+}
+.crm-credit_card_type-icons a::before {
+  font-family: "Font Awesome 6 Free", "FontAwesome";
+  font-style: normal;
+  text-rendering: auto;
+  font-size: var(--crm-dash-icon-size);
+  display: inline-block;
+  content: '\f09d';
+  font-size: 2.5rem;
+  line-height: 1;
+}
+.crm-credit_card_type-icons a span {
+  display: none;
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-visa::before {
+  content: '\f1f0';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-mastercard::before {
+  content: '\f1f1';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-amex::before {
+  content: '\f1f3';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-discover::before {
+  content: '\f1f2';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-jcb::before {
+  content: '\f24b';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-unionpay::before {
+  content: '\f09d'; /* uses generic, see https://github.com/FortAwesome/Font-Awesome/issues/4561 */
+}

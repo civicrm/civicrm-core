@@ -61,13 +61,44 @@ AND    {$this->_componentClause}";
         'title' => ts('Search Results'),
       ],
     ];
-    CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this, FALSE);
+    $this->_contactIds = $this->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
+    $this->preProcessFromAddress();
     // we have all the contribution ids, so now we get the contact ids
     parent::setContactIDs();
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     $this->setTitle(ts('Print Contribution Receipts'));
     // Ajax submit would interfere with pdf file download
     $this->preventAjaxSubmit();
+  }
+
+  /**
+   * Pre Process Form Addresses to be used in Quickform
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function preProcessFromAddress() {
+    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
+
+    if (empty($fromEmailValues)) {
+      CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
+    }
+
+    $defaults = [];
+    if (is_numeric(key($fromEmailValues))) {
+      $emailID = (int) key($fromEmailValues);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
+    }
+    $this->setDefaults($defaults);
+  }
+
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      // Because value contains <angle brackets>
+      'from_email_address',
+    ];
   }
 
   /**
@@ -167,6 +198,10 @@ AND    {$this->_componentClause}";
 
       $contribution = new CRM_Contribute_BAO_Contribution();
       $contribution->id = $contribID;
+      // @todo This fetch makes no sense because there is no query dao so
+      // $contribution only gets `id` set. It should be
+      // $contribution->find(TRUE). But then also it seems this isn't really
+      // used.
       $contribution->fetch();
 
       // set some fake input values so we can reuse IPN code
@@ -178,7 +213,7 @@ AND    {$this->_componentClause}";
       $input['trxn_date'] = $contribution->trxn_date ?? NULL;
       $input['receipt_update'] = $params['receipt_update'];
       $input['contribution_status_id'] = $contribution->contribution_status_id;
-      $input['paymentProcessor'] = empty($contribution->trxn_id) ? NULL :
+      $input['payment_processor_id'] = empty($contribution->trxn_id) ? NULL :
         CRM_Core_DAO::singleValueQuery("SELECT payment_processor_id
           FROM civicrm_financial_trxn
           WHERE trxn_id = %1

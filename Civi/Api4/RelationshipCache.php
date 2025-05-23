@@ -42,6 +42,15 @@ class RelationshipCache extends Generic\AbstractEntity {
   }
 
   /**
+   * @param bool $checkPermissions
+   * @return Action\RelationshipCache\Rebuild
+   */
+  public static function rebuild($checkPermissions = TRUE) {
+    return (new Action\RelationshipCache\Rebuild(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * @return array
    */
   public static function getInfo() {

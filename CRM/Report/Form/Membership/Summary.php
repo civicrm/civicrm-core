@@ -314,8 +314,8 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
     $this->formatDisplay($rows);
 
-    $this->assign_by_ref('columnHeaders', $this->_columnHeaders);
-    $this->assign_by_ref('rows', $rows);
+    $this->assign('columnHeaders', $this->_columnHeaders);
+    $this->assign('rows', $rows);
     $this->assign('statistics', $this->statistics($rows));
 
     if (!empty($this->_params['charts'])) {

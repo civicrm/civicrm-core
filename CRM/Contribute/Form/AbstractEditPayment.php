@@ -37,6 +37,11 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   public $_action;
 
+  /**
+   * @var int
+   *
+   * @deprecated
+   */
   public $_bltID;
 
   public $_fields = [];
@@ -165,13 +170,15 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $contributionID;
 
   /**
-   * Get the contribution id that has been created or is being edited.
+   * Get the contribution ID.
    *
-   * @internal - not supported for outside core.
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
    *
    * @return int|null
    */
-  protected function getContributionID(): ?int {
+  public function getContributionID(): ?int {
     return $this->contributionID;
   }
 
@@ -235,6 +242,28 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $invoiceID;
 
   /**
+   * Provide support for extensions that are used to being able to retrieve _lineItem
+   *
+   * Note extension should call getPriceSetID() and getLineItems() directly.
+   * They are supported for external use per the api annotation.
+   *
+   * @param string $name
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function __get($name) {
+    if ($name === '_params') {
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined property _params - use externally supported function getSubmittedValues()');
+      return $this->getSubmittedValues();
+    }
+    if ($name === '_lineItem') {
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined property _params - use externally supported function getSubmittedValues()');
+      return [0 => $this->getLineItems()];
+    }
+    CRM_Core_Error::deprecatedWarning('attempt to access invalid property :' . $name);
+  }
+
+  /**
    * Get the unique invoice ID.
    *
    * This is generated if one has not already been generated.
@@ -243,7 +272,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   public function getInvoiceID(): string {
     if (!$this->invoiceID) {
-      $this->invoiceID = md5(uniqid(mt_rand(), TRUE));
+      $this->invoiceID = bin2hex(random_bytes(16));
     }
     return $this->invoiceID;
   }
@@ -329,22 +358,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   }
 
   /**
-   * @param string $type
-   *   Eg 'Contribution'.
-   * @param string $subType
-   * @param int $entityId
-   */
-  public function applyCustomData($type, $subType, $entityId) {
-    $this->set('type', $type);
-    $this->set('subType', $subType);
-    $this->set('entityId', $entityId);
-
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, 1, $type, $entityId);
-    CRM_Custom_Form_CustomData::buildQuickForm($this);
-    CRM_Custom_Form_CustomData::setDefaultValues($this);
-  }
-
-  /**
    * @return array
    *   Array of valid processors. The array resembles the DB table but also has 'object' as a key
    * @throws Exception
@@ -401,7 +414,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
     // this required to show billing block
     // @todo remove this assignment the billing block is now designed to be always included but will not show fieldsets unless those sets of fields are assigned
-    $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
+    $this->assign('paymentProcessor', $this->_paymentProcessor);
   }
 
   /**
@@ -411,19 +424,20 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   public function unsetCreditCardFields($submittedValues) {
     //Offline Contribution.
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     $unsetParams = [
       'payment_processor_id',
-      "email-{$this->_bltID}",
+      "email-{$billingLocationTypeID}",
       'hidden_buildCreditCard',
       'hidden_buildDirectDebit',
       'billing_first_name',
       'billing_middle_name',
       'billing_last_name',
       'street_address-5',
-      "city-{$this->_bltID}",
-      "state_province_id-{$this->_bltID}",
-      "postal_code-{$this->_bltID}",
-      "country_id-{$this->_bltID}",
+      "city-{$billingLocationTypeID}",
+      "state_province_id-{$billingLocationTypeID}",
+      "postal_code-{$billingLocationTypeID}",
+      "country_id-{$billingLocationTypeID}",
       'credit_card_number',
       'cvv2',
       'credit_card_exp_date',
@@ -510,7 +524,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
     $tplParams['credit_card_exp_date'] = isset($params['credit_card_exp_date']) ? CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($params['credit_card_exp_date'])) : NULL;
     $tplParams['credit_card_type'] = $params['credit_card_type'] ?? NULL;
-    $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $params));
+    $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard($params['credit_card_number'] ?? NULL);
     return $tplParams;
   }
 
@@ -536,15 +550,15 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     foreach (array_keys($this->_fields) as $name) {
       $fields[$name] = 1;
     }
-
-    $fields["address_name-{$this->_bltID}"] = 1;
+    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
+    $fields["address_name-{$billingLocationID}"] = 1;
 
     //ensure we don't over-write the payer's email with the member's email
     if ($contactID == $this->_contactID) {
-      $fields["email-{$this->_bltID}"] = 1;
+      $fields["email-{$billingLocationID}"] = 1;
     }
 
-    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params);
     $fields = $this->formatParamsForPaymentProcessor($fields);
 
     if ($hasBillingField) {
@@ -581,12 +595,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected function getBillingDefaults($defaults) {
     // set default country from config if no country set
     $config = CRM_Core_Config::singleton();
-    if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
-      $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (empty($defaults["billing_country_id-{$billingLocationTypeID}"])) {
+      $defaults["billing_country_id-{$billingLocationTypeID}"] = \Civi::settings()->get('defaultContactCountry');
     }
 
-    if (empty($defaults["billing_state_province_id-{$this->_bltID}"])) {
-      $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
+    if (empty($defaults["billing_state_province_id-{$billingLocationTypeID}"])) {
+      $defaults["billing_state_province_id-{$billingLocationTypeID}"] = \Civi::settings()->get('defaultContactStateProvince');
     }
 
     $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
@@ -641,21 +656,12 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   /**
    * Assign the values to build the payment info block.
-   *
-   * @return string
-   *   Block title.
    */
   protected function assignPaymentInfoBlock() {
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, TRUE);
-    $title = ts('View Payment');
-    if (!empty($this->_component) && $this->_component == 'event') {
-      $info = CRM_Event_BAO_Participant::participantDetails($this->_id);
-      $title .= " - {$info['title']}";
-    }
     $this->assign('transaction', TRUE);
     $this->assign('payments', $paymentInfo['transaction'] ?? NULL);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
-    return $title;
   }
 
   protected function assignContactEmailDetails(): void {

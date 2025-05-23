@@ -38,7 +38,7 @@
 <script type="text/javascript">
   CRM.$(function($) {
     var blockNo = {/literal}{$blockId}{literal},
-      contactType = {/literal}{$contactType|@json_encode}{literal},
+      contactType = {/literal}{$contactType|@json_encode nofilter}{literal},
       $addRelationshipSection = $('#shared-address-' + blockNo + ' .shared-address-add-relationship'),
       $employerSection = $('#shared-address-' + blockNo + ' .shared-address-add-relationship .employer'),
       $employerLabel = $('#shared-address-' + blockNo + ' .shared-address-add-relationship label .addrel-employer'),

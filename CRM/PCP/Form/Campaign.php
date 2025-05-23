@@ -122,7 +122,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $owner_notification_option = CRM_Core_DAO::getFieldValue('CRM_PCP_BAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
     }
     else {
-      $owner_notification_option = CRM_PCP_BAO_PCP::getOwnerNotificationId($this->controller->get('component_page_id'), $this->_component ? $this->_component : 'contribute');
+      $owner_notification_option = CRM_PCP_BAO_PCP::getOwnerNotificationId($this->controller->get('component_page_id'), $this->_component ?: 'contribute');
     }
     if ($owner_notification_option == CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCPBlock', 'owner_notify_id', 'owner_chooses')) {
       $this->assign('owner_notification_option', TRUE);
@@ -194,7 +194,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     $params['title'] = $params['pcp_title'];
     $params['intro_text'] = $params['pcp_intro_text'];
     $params['contact_id'] = $contactID;
-    $params['page_id'] = $this->get('component_page_id') ? $this->get('component_page_id') : $this->_contriPageId;
+    $params['page_id'] = $this->get('component_page_id') ?: $this->_contriPageId;
     $params['page_type'] = $this->_component;
 
     // since we are allowing html input from the user
@@ -299,8 +299,8 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
       if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-        $fixUrl = CRM_Utils_System::url('civicrm/admin/domain', 'action=update&reset=1');
-        CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+        $fixUrl = CRM_Utils_System::url('civicrm/admin/options/site_email_address');
+        CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid "Site Email Address" in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
       }
 
       //if more than one email present for PCP notification ,

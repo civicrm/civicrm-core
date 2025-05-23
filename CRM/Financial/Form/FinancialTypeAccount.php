@@ -168,20 +168,38 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
       if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
         $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
         $financialAccountType = $financialAccountType[$this->_submitValues['account_relationship']] ?? NULL;
-        $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
+        $result = \Civi\Api4\FinancialAccount::get()
+          ->addSelect('id', 'label')
+          ->addWhere('financial_account_type_id', '=', $financialAccountType)
+          ->addWhere('is_active', '=', TRUE)
+          ->addOrderBy('label')
+          ->execute()
+          ->column('label', 'id');
 
         $financialAccountSelect = ['' => ts('- select -')] + $result;
       }
       else {
+        $result = \Civi\Api4\FinancialAccount::get()
+          ->addSelect('id', 'label')
+          ->addWhere('is_active', '=', TRUE)
+          ->addOrderBy('label')
+          ->execute()
+          ->column('label', 'id');
         $financialAccountSelect = [
           'select' => ts('- select -'),
-        ] + CRM_Contribute_PseudoConstant::financialAccount();
+        ] + $result;
       }
     }
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
       $financialAccountType = $financialAccountType[$this->_defaultValues['account_relationship']];
-      $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
+      $result = \Civi\Api4\FinancialAccount::get()
+        ->addSelect('id', 'label')
+        ->addWhere('financial_account_type_id', '=', $financialAccountType)
+        ->addWhere('is_active', '=', TRUE)
+        ->addOrderBy('label')
+        ->execute()
+        ->column('label', 'id');
 
       $financialAccountSelect = ['' => ts('- select -')] + $result;
     }
@@ -211,7 +229,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
     $errorMsg = [];
     $errorFlag = FALSE;
     if ($self->_action == CRM_Core_Action::DELETE) {
-      $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+      $relationValues = CRM_Financial_DAO_EntityFinancialAccount::buildOptions('account_relationship');
       if (($values['financial_account_id'] ?? NULL) != 'select') {
         if ($relationValues[$values['account_relationship']] == 'Premiums Inventory Account is' || $relationValues[$values['account_relationship']] == 'Cost of Sales Account is') {
           $premiumsProduct = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_PremiumsProduct', $values['financial_type_id'], 'product_id', 'financial_type_id');

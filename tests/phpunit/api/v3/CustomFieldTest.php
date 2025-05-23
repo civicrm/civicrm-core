@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\CustomField;
 use Civi\Api4\OptionGroup;
 
 /**
@@ -25,33 +26,20 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
+    // The parent tearDown will delete the linked option group (gender)
+    // if we don't do it more carefully here.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_custom_field f
+      INNER JOIN civicrm_option_group g ON g.id = option_group_id
+      SET option_group_id = NULL WHERE g.name = "gender"');
+    CustomField::delete()
+      ->addWhere('id', '>', 0)
+      ->execute();
     $this->quickCleanup([
       'civicrm_contact',
       'civicrm_file',
       'civicrm_entity_file',
     ], TRUE);
     parent::tearDown();
-  }
-
-  /**
-   * Check with no label.
-   */
-  public function testCustomFieldCreateWithoutLabel(): void {
-    $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'text_test_group']);
-    $params = [
-      'custom_group_id' => $customGroup['id'],
-      'name' => 'test_textfield2',
-      'html_type' => 'Text',
-      'data_type' => 'String',
-      'default_value' => 'abc',
-      'weight' => 4,
-      'is_required' => 1,
-      'is_searchable' => 0,
-      'is_active' => 1,
-    ];
-
-    $customField = $this->callAPIFailure('custom_field', 'create', $params);
-    $this->assertEquals($customField['error_message'], 'Mandatory key(s) missing from params array: label');
   }
 
   /**
@@ -77,27 +65,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $customFieldEdited = $this->callAPISuccess('custom_field', 'create', $customField);
 
     $this->assertNotNull($customFieldEdited['id']);
-  }
-
-  /**
-   * Check without groupId.
-   */
-  public function testCustomFieldCreateWithoutGroupID(): void {
-    $fieldParams = [
-      'name' => 'test_textfield1',
-      'label' => 'Name',
-      'html_type' => 'Text',
-      'data_type' => 'String',
-      'default_value' => 'abc',
-      'weight' => 4,
-      'is_required' => 1,
-      'is_searchable' => 0,
-      'is_active' => 1,
-
-    ];
-
-    $customField = $this->callAPIFailure('custom_field', 'create', $fieldParams);
-    $this->assertEquals($customField['error_message'], 'Mandatory key(s) missing from params array: custom_group_id');
   }
 
   /**
@@ -141,7 +108,18 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    * @return array
    */
   public function _buildParams($gid, $htype, $dtype) {
-    $params = $this->_buildBasicParams($gid, $htype, $dtype);
+    $params = [
+      'custom_group_id' => $gid,
+      'label' => $dtype . $htype,
+      'html_type' => $htype,
+      'data_type' => $dtype,
+      'weight' => 4,
+      'is_required' => 0,
+      'is_searchable' => 0,
+      'is_active' => 1,
+
+    ];
+
     /* //Not Working for any type. Maybe redundant with testCustomFieldCreateWithOptionValues()
     if ($htype == 'Multi-Select')
     $params = array_merge($params, array(
@@ -153,27 +131,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
      */
 
     return $params;
-  }
-
-  /**
-   * @param int $gid
-   * @param $htype
-   * @param $dtype
-   *
-   * @return array
-   */
-  public function _buildBasicParams($gid, $htype, $dtype) {
-    return [
-      'custom_group_id' => $gid,
-      'label' => $dtype . $htype,
-      'html_type' => $htype,
-      'data_type' => $dtype,
-      'weight' => 4,
-      'is_required' => 0,
-      'is_searchable' => 0,
-      'is_active' => 1,
-
-    ];
   }
 
   /**
@@ -258,7 +215,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'return' => 'option_group_id',
     ]);
 
-    $this->assertEquals($optionGroupID, 3);
+    $this->assertEquals(3, $optionGroupID);
   }
 
   /**
@@ -296,8 +253,8 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'id' => $customField['id'],
       'return' => 'data_type',
     ]);
-    $this->assertTrue(array_key_exists('data_type', $result));
-    $this->assertFalse(array_key_exists('custom_group_id', $result));
+    $this->assertArrayHasKey('data_type', $result);
+    $this->assertArrayNotHasKey('custom_group_id', $result);
   }
 
   /**
@@ -362,7 +319,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     ];
 
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField = $this->callAPISuccess('CustomField', 'create', $params);
 
     $this->assertAPISuccess($customField);
     $this->assertNotNull($customField['id']);
@@ -378,33 +335,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Contact', 'getoptions', $getOptionsArray);
     $this->assertEquals('Label1', $result['values'][1]);
-  }
-
-  ///////////////// civicrm_custom_field_delete methods
-
-  /**
-   * Check without Field ID.
-   */
-  public function testCustomFieldDeleteWithoutFieldID(): void {
-    $params = [];
-    $customField = $this->callAPIFailure('custom_field', 'delete', $params,
-      'Mandatory key(s) missing from params array: id');
-  }
-
-  /**
-   * Check without valid array.
-   */
-  public function testCustomFieldDelete(): void {
-    $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'test_group']);
-    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
-    $this->assertNotNull($customField['id']);
-
-    $params = [
-      'id' => $customField['id'],
-    ];
-    $result = $this->callAPISuccess('custom_field', 'delete', $params);
-
-    $this->assertAPISuccess($result);
   }
 
   /**

@@ -114,16 +114,16 @@ class DAOGetAction extends AbstractGetAction {
           $result->setCountMatched(count($rows) + $this->getOffset());
           $getCount = FALSE;
         }
-        else {
-          // Set rowCount for backward compatibility.
-          $result->rowCount = count($rows) + $this->getOffset();
-        }
+        // Set rowCount for backward compatibility.
+        $result->rowCount = count($rows) + $this->getOffset();
       }
     }
 
     if ($getCount) {
       $query = new Api4SelectQuery($this);
       $result->setCountMatched($query->getCount());
+      // Set rowCount for backward compatibility.
+      $result->rowCount = $result->countMatched();
     }
   }
 
@@ -145,9 +145,13 @@ class DAOGetAction extends AbstractGetAction {
 
   /**
    * @param string $entity
+   *   Name of api entity to join with
    * @param string|bool $type
+   *   Should be 'LEFT' or 'INNER' (bool preserved for legacy support)
    * @param string $bridge
+   *   Optional name of bridge entity. This can be omitted, as a 3rd argument to the function would be interpreted as the first condition.
    * @param array ...$conditions
+   *   One or more conditions, each condition is an array like ['field', '=', 'expr']
    * @return DAOGetAction
    */
   public function addJoin(string $entity, $type = 'LEFT', $bridge = NULL, ...$conditions): DAOGetAction {

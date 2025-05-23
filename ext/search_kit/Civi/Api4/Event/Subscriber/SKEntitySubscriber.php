@@ -19,6 +19,8 @@ use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Service\AutoService;
+use Civi\Search\Meta;
+use Civi\Search\SKEntityGenerator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -36,8 +38,8 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
   public static function getSubscribedEvents(): array {
     return [
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
-      'hook_civicrm_pre' => 'onPreSaveDisplay',
-      'hook_civicrm_post' => 'onPostSaveDisplay',
+      'hook_civicrm_pre::SearchDisplay' => 'onPreSaveDisplay',
+      'hook_civicrm_post::SearchDisplay' => 'onPostSaveDisplay',
     ];
   }
 
@@ -54,7 +56,6 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'title' => $display['label'],
         'title_plural' => $display['label'],
         'description' => $display['settings']['description'] ?? NULL,
-        'primary_key' => ['_row'],
         'type' => ['SavedSearch'],
         'table_name' => $display['tableName'],
         'class_args' => [$display['name']],
@@ -62,7 +63,11 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'searchable' => 'secondary',
         'class' => SKEntity::class,
         'icon' => 'fa-search-plus',
+        'search_fields' => [],
       ];
+      foreach ($display['settings']['columns'] as $column) {
+        $event->entities[$display['entityName']]['search_fields'][] = $column['spec']['name'];
+      }
     }
   }
 
@@ -83,6 +88,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     // Drop the old table if it exists
     if ($oldName) {
       \CRM_Core_BAO_SchemaHandler::dropTable(_getSearchKitDisplayTableName($oldName));
+      \CRM_Core_DAO::executeQuery(sprintf('DROP VIEW IF EXISTS `%s`', _getSearchKitDisplayTableName($oldName)));
     }
     if ($event->action === 'delete') {
       // Delete scheduled jobs when deleting entity
@@ -100,81 +106,62 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       'attributes' => 'ENGINE=InnoDB',
       'fields' => [],
     ];
-    // Primary key field
-    $table['fields'][] = [
-      'name' => '_row',
-      'type' => 'int unsigned',
-      'primary' => TRUE,
-      'required' => TRUE,
-      'attributes' => 'AUTO_INCREMENT',
-      'comment' => 'Row number',
-    ];
     foreach ($newSettings['columns'] as &$column) {
       $expr = $this->getSelectExpression($column['key']);
       if (!$expr) {
         continue;
       }
-      $column['spec'] = $this->formatFieldSpec($column, $expr);
+      $column['spec'] = Meta::formatFieldSpec($column, $expr);
       $table['fields'][] = $this->formatSQLSpec($column, $expr);
     }
     // Store new settings with added column spec
     $event->params['settings'] = $newSettings;
-    $sql = \CRM_Core_BAO_SchemaHandler::buildTableSQL($table);
-    // do not i18n-rewrite
-    \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+
+    $mode = $event->params['settings']['data_mode'] ?? 'table';
+    switch ($mode) {
+      case 'table':
+      case '':
+        $sql = \CRM_Core_BAO_SchemaHandler::buildTableSQL($table);
+        // do not i18n-rewrite
+        \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+        break;
+
+      case 'view':
+        $tableName = _getSearchKitDisplayTableName($newName);
+        $tempSettings = $event->params['settings'];
+        $query = (new SKEntityGenerator())->createQuery($this->savedSearch['api_entity'], $this->savedSearch['api_params'], $tempSettings);
+        $columnSpecs = array_column($tempSettings['columns'], 'spec');
+        $columns = implode(', ', array_column($columnSpecs, 'name'));
+        $sql = "CREATE VIEW `$tableName` ($columns) AS " . $query->getSql();
+
+        // do not i18n-rewrite
+        \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+        break;
+
+      default:
+        throw new \LogicException("Search display $event->id has invalid mode ($mode)");
+    }
   }
 
   /**
    * @param array $column
-   * @param array{fields: array, expr: SqlExpression, dataType: string} $expr
-   * @return array
-   */
-  private function formatFieldSpec(array $column, array $expr): array {
-    // Strip the pseuoconstant suffix
-    [$name, $suffix] = array_pad(explode(':', $column['key']), 2, NULL);
-    // Sanitize the name
-    $name = \CRM_Utils_String::munge($name, '_', 255);
-    $spec = [
-      'name' => $name,
-      'data_type' => $expr['dataType'],
-      'suffixes' => $suffix ? ['id', $suffix] : NULL,
-      'options' => FALSE,
-    ];
-    if ($expr['expr']->getType() === 'SqlField') {
-      $field = \CRM_Utils_Array::first($expr['fields']);
-      $spec['fk_entity'] = $field['fk_entity'] ?? NULL;
-      $spec['original_field_name'] = $field['name'];
-      $spec['original_field_entity'] = $field['entity'];
-      if ($suffix) {
-        // Options will be looked up by SKEntitySpecProvider::getOptionsForSKEntityField
-        $spec['options'] = TRUE;
-      }
-    }
-    elseif ($expr['expr']->getType() === 'SqlFunction') {
-      if ($suffix) {
-        $spec['options'] = CoreUtil::formatOptionList($expr['expr']::getOptions(), $spec['suffixes']);
-      }
-    }
-    return $spec;
-  }
-
-  /**
-   * @param array $column
-   * @param array{fields: array, expr: SqlExpression, dataType: string} $expr
+   * @param array{fields: array, expr: \Civi\Api4\Query\SqlExpression, dataType: string} $expr
    * @return array
    */
   private function formatSQLSpec(array $column, array $expr): array {
-    // Try to use the exact sql column type as the original field
     $field = \CRM_Utils_Array::first($expr['fields']);
-    if (!empty($field['column_name']) && !empty($field['table_name'])) {
+    // Store serialized values as text
+    if ($expr['expr']->getSerialize()) {
+      $type = 'text';
+    }
+    // Try to use the exact sql column type as the original field
+    elseif (!empty($field['column_name']) && !empty($field['table_name']) && $field['data_type'] === $expr['dataType']) {
       $columns = \CRM_Core_DAO::executeQuery("DESCRIBE `{$field['table_name']}`")
         ->fetchMap('Field', 'Type');
       $type = $columns[$field['column_name']] ?? NULL;
     }
-    // If we can't get the exact data type from the column, take an educated guess
-    if (empty($type) ||
-      ($expr['expr']->getType() !== 'SqlField' && $field['data_type'] !== $expr['dataType'])
-    ) {
+    // If we can't get the data type from the column, take an educated guess
+    if (empty($type)) {
       $map = [
         'Array' => 'text',
         'Boolean' => 'tinyint',
@@ -184,8 +171,9 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'String' => 'text',
         'Text' => 'text',
         'Timestamp' => 'datetime',
+        'Money' => 'decimal(20,2)',
       ];
-      $type = $map[$expr['dataType']] ?? $type;
+      $type = $map[$expr['dataType']] ?? 'text';
     }
     $defn = [
       'name' => $column['spec']['name'],
@@ -196,8 +184,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     // Add FK indexes
     if ($expr['expr']->getType() === 'SqlField' && !empty($field['fk_entity'])) {
       $defn['fk_table_name'] = CoreUtil::getTableName($field['fk_entity']);
-      // FIXME look up fk_field_name from schema, don't assume it's always "id"
-      $defn['fk_field_name'] = 'id';
+      $defn['fk_field_name'] = $field['fk_column'];
       $defn['fk_attributes'] = ' ON DELETE SET NULL';
     }
     return $defn;

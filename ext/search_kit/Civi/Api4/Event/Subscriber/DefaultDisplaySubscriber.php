@@ -122,6 +122,8 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     if ($e->display['settings']) {
       return;
     }
+    /** @var \Civi\Api4\Action\SearchDisplay\GetDefault $getDefaultAction */
+    $getDefaultAction = $e->apiAction;
     $e->display['settings'] += [
       'description' => $e->savedSearch['description'] ?? NULL,
       'sort' => [],
@@ -137,8 +139,8 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     if (!empty($e->savedSearch['api_entity']) && empty($e->savedSearch['api_params']['orderBy'])) {
       $e->display['settings']['sort'] = self::getDefaultSort($e->savedSearch['api_entity']);
     }
-    foreach ($e->apiAction->getSelectClause() as $key => $clause) {
-      $e->display['settings']['columns'][] = $e->apiAction->configureColumn($clause, $key);
+    foreach ($getDefaultAction->getSelectClause() as $key => $clause) {
+      $e->display['settings']['columns'][] = $getDefaultAction->configureColumn($clause, $key);
     }
     // Table-specific settings
     if ($e->display['type'] === 'table') {
@@ -151,7 +153,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
         'size' => 'btn-xs',
         'style' => 'secondary-outline',
         'alignment' => 'text-right',
-        'links' => $e->apiAction->getLinksMenu(),
+        'links' => $getDefaultAction->getLinksMenu(),
       ];
     }
   }

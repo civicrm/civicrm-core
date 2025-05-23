@@ -159,25 +159,26 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    */
   public function formatCustomDataChangesForDetail(array $params): string {
     $formattedDetails = [];
-    foreach ($params as $customField => $newCustomValue) {
-      if (strpos($customField, 'custom_') === 0) {
-        if (($this->_defaults[$customField] ?? '') === $newCustomValue) {
+    foreach ($params as $fieldKey => $newCustomValue) {
+      if (str_starts_with($fieldKey, 'custom_')) {
+        if (($this->_defaults[$fieldKey] ?? '') === $newCustomValue) {
           // Don't show values that did not change
           continue;
         }
         // We need custom field ID from custom_XX_1
-        [, $customFieldId] = explode('_', $customField);
+        [, $customFieldId] = explode('_', $fieldKey);
 
         if (!empty($customFieldId) && is_numeric($customFieldId)) {
           // Got a custom field ID
-          $label = civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'label']);
+          $customField = CRM_Core_BAO_CustomField::getField($customFieldId);
+          $label = $customField['label'];
 
           // Convert dropdown and other machine values to human labels.
           // Money is special for non-US locales because at this point it's in human format so we don't
           // want to try to convert it.
-          $oldValue = $this->_defaults[$customField] ?? '';
+          $oldValue = $this->_defaults[$fieldKey] ?? '';
           $newValue = $newCustomValue;
-          if ('Money' !== (string) civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'data_type'])) {
+          if ('Money' !== $customField['data_type']) {
             $oldValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
               'custom_field_id' => $customFieldId,
               'entity_id' => $this->_entityID,

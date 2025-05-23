@@ -1,15 +1,7 @@
 <?php
 
 /**
- * Civi v5.19 does not provide all the API's we would need to define
- * FlexMailer in an extension, but you can patch core to simulate them.
- * These define()s tell core to enable any such hacks (if available).
  */
-
-define('CIVICRM_FLEXMAILER_HACK_DELIVER', '\Civi\FlexMailer\FlexMailer::createAndRun');
-define('CIVICRM_FLEXMAILER_HACK_SENDABLE', '\Civi\FlexMailer\Validator::createAndRun');
-define('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS', 'call://civi_flexmailer_required_tokens/getRequiredTokens');
-
 require_once 'flexmailer.civix.php';
 
 use CRM_Flexmailer_ExtensionUtil as E;
@@ -47,4 +39,18 @@ function flexmailer_civicrm_enable() {
 function flexmailer_civicrm_container($container) {
   $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
   \Civi\FlexMailer\Services::registerServices($container);
+}
+
+/**
+ * @see \CRM_Utils_Hook::scanClasses()
+ */
+function flexmailer_civicrm_scanClasses(array &$classes): void {
+  $prefix = 'Civi\\FlexMailer\\';
+  $dir = __DIR__ . '/src';
+  $delim = '\\';
+
+  foreach (\CRM_Utils_File::findFiles($dir, '*.php', TRUE) as $relFile) {
+    $relFile = str_replace(DIRECTORY_SEPARATOR, '/', $relFile);
+    $classes[] = $prefix . str_replace('/', $delim, substr($relFile, 0, -4));
+  }
 }

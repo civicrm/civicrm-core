@@ -147,7 +147,6 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
       ['table' => 'civicrm_mailing_event_bounce', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this bounce event occurred.'],
       ['table' => 'civicrm_mailing_event_confirm', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this confirmation event occurred.'],
       ['table' => 'civicrm_mailing_event_delivered', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this delivery event occurred.'],
-      ['table' => 'civicrm_mailing_event_forward', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this forward event occurred.'],
       ['table' => 'civicrm_mailing_event_opened', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this open event occurred.'],
       ['table' => 'civicrm_mailing_event_reply', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this reply event occurred.'],
       ['table' => 'civicrm_mailing_event_subscribe', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this subscription event occurred.'],

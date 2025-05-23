@@ -29,7 +29,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $product = CRM_Contribute_BAO_Product::create($params);
+    $product = CRM_Contribute_BAO_Product::writeRecord($params);
     $result = $this->assertDBNotNull('CRM_Contribute_BAO_Product', $product->id,
       'sku', 'id',
       'Database check on updated product record.'
@@ -52,7 +52,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $product = CRM_Contribute_BAO_Product::create($params);
+    $product = CRM_Contribute_BAO_Product::writeRecord($params);
     $params = ['id' => $product->id];
     $default = [];
     $result = CRM_Contribute_BAO_Product::retrieve($params, $default);
@@ -73,7 +73,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $product = CRM_Contribute_BAO_Product::create($params);
+    $product = CRM_Contribute_BAO_Product::writeRecord($params);
     CRM_Contribute_BAO_Product::deleteRecord(['id' => $product->id]);
 
     $params = ['id' => $product->id];

@@ -210,7 +210,8 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
    * Test upgrading multiple Event smart groups of different formats
    */
   public function testMultipleEventSmartGroupDateConversions(): void {
-    $this->callAPISuccess('SavedSearch', 'create', [
+    $savedSearchIds = [];
+    $savedSearchIds[] = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         ['event_start_date_low', '=', '20191001000000'],
         ['event_end_date_high', '=', '20191031235959'],
@@ -218,26 +219,26 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
           'event' => 'this.month',
         ],
       ],
-    ]);
-    $this->callAPISuccess('SavedSearch', 'create', [
+    ])['id'];
+    $savedSearchIds[] = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         ['event_start_date_low', '=', '20191001000000'],
       ],
-    ]);
-    $this->callAPISuccess('SavedSearch', 'create', [
+    ])['id'];
+    $savedSearchIds[] = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         'event_start_date_low' => '20191001000000',
         'event_end_date_high' => '20191031235959',
         'event_relative' => 'this.month',
       ],
-    ]);
-    $this->callAPISuccess('SavedSearch', 'create', [
+    ])['id'];
+    $savedSearchIds[] = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         'event_start_date_low' => '10/01/2019',
         'event_end_date_high' => '',
         'event_relative' => '0',
       ],
-    ]);
+    ])['id'];
     $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
     $smartGroupConversionObject->renameFields([
       ['old' => 'event_start_date_low', 'new' => 'event_low'],
@@ -249,23 +250,25 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
       ],
     ]);
     $expectedResults = [
-      1 => [
+      $savedSearchIds[0] => [
         'relative_dates' => [],
         2 => ['event_relative', '=', 'this.month'],
       ],
-      2 => [
+      $savedSearchIds[1] => [
         0 => ['event_low', '=', '2019-10-01 00:00:00'],
         1 => ['event_relative', '=', 0],
       ],
-      3 => [
+      $savedSearchIds[2] => [
         'event_relative' => 'this.month',
       ],
-      4 => [
+      $savedSearchIds[3] => [
         'event_relative' => 0,
         'event_low' => '2019-10-01 00:00:00',
       ],
     ];
-    $savedSearches = $this->callAPISuccess('SavedSearch', 'get', []);
+    $savedSearches = $this->callAPISuccess('SavedSearch', 'get', [
+      'id' => ['IN' => $savedSearchIds],
+    ]);
     foreach ($savedSearches['values'] as $id => $savedSearch) {
       $this->assertEquals($expectedResults[$id], $savedSearch['form_values']);
     }
@@ -606,37 +609,6 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
         'id_max' => '',
         'id_op' => 'lte',
         'id_value' => '',
-        'contact_type_op' => 'in',
-        'contact_type_value' => [],
-        'contact_sub_type_op' => 'in',
-        'contact_sub_type_value' => [],
-        'is_deleted_op' => 'eq',
-        'is_deleted_value' => 0,
-        'preferred_language_op' => 'in',
-        'preferred_language_value' => [],
-        'do_not_email_op' => 'eq',
-        'do_not_email_value' => '',
-        'do_not_phone_op' => 'eq',
-        'do_not_phone_value' => '',
-        'do_not_mail_op' => 'eq',
-        'do_not_mail_value' => '',
-        'do_not_sms_op' => 'eq',
-        'do_not_sms_value' => '',
-        'is_opt_out_op' => 'eq',
-        'is_opt_out_value' => '',
-        'first_name_op' => 'has',
-        'first_name_value' => '',
-        'prefix_id_op' => 'in',
-        'prefix_id_value' => [],
-        'suffix_id_op' => 'in',
-        'suffix_id_value' => [],
-        'gender_id_op' => 'in',
-        'gender_id_value' => [],
-        'birth_date_relative' => '',
-        'birth_date_from' => '',
-        'birth_date_to' => '',
-        'is_deceased_op' => 'eq',
-        'is_deceased_value' => '',
         'contribution_or_soft_op' => 'eq',
         'contribution_or_soft_value' => 'contributions_only',
         'receive_date_relative' => 0,
@@ -649,22 +621,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
         'contribution_source_value' => '',
         'currency_op' => 'in',
         'currency_value' => [],
-        'non_deductible_amount_min' => '',
-        'non_deductible_amount_max' => '',
-        'non_deductible_amount_op' => 'lte',
-        'non_deductible_amount_value' => '',
-        'financial_type_id_op' => 'in',
-        'financial_type_id_value' => [],
-        'contribution_page_id_op' => 'in',
-        'contribution_page_id_value' => [],
-        'payment_instrument_id_op' => 'in',
-        'payment_instrument_id_value' => [],
-        'contribution_status_id_op' => 'in',
         'contribution_status_id_value' => [0 => 1],
-        'total_amount_min' => '',
-        'total_amount_max' => '',
-        'total_amount_op' => 'lte',
-        'total_amount_value' => '',
         'cancel_date_relative' => '',
         'cancel_date_from' => '',
         'cancel_date_to' => '',
@@ -674,21 +631,6 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
         'soft_credit_type_id_value' => [],
         'card_type_id_op' => 'in',
         'card_type_id_value' => [],
-        'ordinality_op' => 'in',
-        'ordinality_value' => [],
-        'note_value' => '',
-        'street_address_op' => 'has',
-        'street_address_value' => '',
-        'postal_code_op' => 'has',
-        'postal_code_value' => '',
-        'city_op' => 'has',
-        'city_value' => '',
-        'country_id_op' => 'in',
-        'country_id_value' => [],
-        'state_province_id_op' => 'in',
-        'state_province_id_value' => [],
-        'county_id_op' => 'in',
-        'county_id_value' => [],
         'tagid_op' => 'in',
         'tagid_value' => [],
         'gid_op' => 'in',
@@ -717,7 +659,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     ]);
     CRM_Upgrade_Incremental_php_FiveTwentyFive::convertReportsJcalendarToDatePicker();
     $reportGet = $this->callAPISuccess('ReportInstance', 'getsingle', ['id' => $report['id']]);
-    $formValues = unserialize($reportGet['form_values']);
+    $formValues = @unserialize($reportGet['form_values']);
     $this->assertEquals('1991-11-01 00:00:00', $formValues['receive_date_from']);
   }
 

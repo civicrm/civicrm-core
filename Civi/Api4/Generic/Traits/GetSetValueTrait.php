@@ -12,6 +12,8 @@
 
 namespace Civi\Api4\Generic\Traits;
 
+use Civi\Api4\Utils\FormattingUtil;
+
 /**
  * Trait for actions with a `$values` array
  */
@@ -45,13 +47,36 @@ trait GetSetValueTrait {
   }
 
   /**
-   * Retrieve a single value
+   * Retrieve a single value, transforming pseudoconstants as necessary
    *
-   * @param string $fieldName
+   * @param string $fieldExpr
    * @return mixed|null
    */
-  public function getValue(string $fieldName) {
-    return $this->values[$fieldName] ?? NULL;
+  public function getValue(string $fieldExpr) {
+    if (array_key_exists($fieldExpr, $this->values)) {
+      return $this->values[$fieldExpr];
+    }
+    // If exact match not found, try pseudoconstants
+    [$fieldName, $suffix] = array_pad(explode(':', $fieldExpr), 2, NULL);
+    $field = civicrm_api4($this->getEntityName(), 'getFields', [
+      'checkPermissions' => FALSE,
+      'where' => [['name', '=', $fieldName]],
+    ])->first();
+    if (empty($field['options'])) {
+      return NULL;
+    }
+    foreach ($this->values as $key => $value) {
+      // Resolve pseudoconstant expressions
+      if (!array_key_exists($fieldName, $this->values) && str_starts_with($key, "$fieldName:")) {
+        $options = FormattingUtil::getPseudoconstantList($field, $key, $this->getValues());
+        $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
+      }
+    }
+    if ($suffix && array_key_exists($fieldName, $this->values)) {
+      $options = FormattingUtil::getPseudoconstantList($field, $fieldExpr, $this->getValues());
+      $this->values[$fieldExpr] = FormattingUtil::replacePseudoconstant($options, $this->values[$fieldName]);
+    }
+    return $this->values[$fieldExpr] ?? NULL;
   }
 
   /**

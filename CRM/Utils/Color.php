@@ -54,7 +54,7 @@ class CRM_Utils_Color {
   public static function getRgb($color) {
     $color = str_replace(' ', '', $color);
     $color = self::nameToHex($color) ?? $color;
-    if (strpos($color, 'rgb(') === 0) {
+    if (str_starts_with($color, 'rgb(')) {
       return explode(',', substr($color, 4, strpos($color, ')') - 4));
     }
     $color = ltrim($color, '#');
@@ -100,7 +100,7 @@ class CRM_Utils_Color {
    * @return string|null
    */
   public static function nameToHex($colorName) {
-    if (strpos($colorName, '#') !== FALSE || strpos($colorName, '(') !== FALSE) {
+    if (str_contains($colorName, '#') || str_contains($colorName, '(')) {
       return NULL;
     }
     if (empty(Civi::$statics[__CLASS__]['names'])) {

@@ -48,6 +48,7 @@ trait CRMTraits_Event_ScenarioTrait {
     $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
       'first_name' => 'Participant1',
       'last_name' => 'LastName',
+      'job_title' => 'oracle',
       'email-Primary' => 'participant1@example.com',
       'additional_participants' => 2,
       'payment_processor_id' => 0,
@@ -60,6 +61,7 @@ trait CRMTraits_Event_ScenarioTrait {
       ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
         'first_name' => 'Participant2',
         'last_name' => 'LastName',
+        'job_title' => 'wizard',
         'email-Primary' => 'participant2@example.com',
         'priceSetId' => $this->getPriceSetID('PaidEvent'),
         'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
@@ -67,9 +69,54 @@ trait CRMTraits_Event_ScenarioTrait {
       ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
         'first_name' => 'Participant3',
         'last_name' => 'LastName',
+        'job_title' => 'seer',
         'email-Primary' => 'participant3@example.com',
         'priceSetId' => $this->getPriceSetID('PaidEvent'),
         'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_plus'],
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+    $this->sentMail = $form->getMail();
+    $participants = Participant::get(FALSE)
+      ->addWhere('event_id', '=', $this->getEventID('PaidEvent'))
+      ->addOrderBy('registered_by_id')
+      ->execute();
+    foreach ($participants as $index => $participant) {
+      $identifier = $participant['registered_by_id'] ? 'participant_' . $index : 'primary';
+      $this->setTestEntity('Participant', $participant, $identifier);
+      $this->setTestEntityID('Contact', $participant['contact_id'], $identifier);
+    }
+
+  }
+
+  /**
+   * Create a participant registration with 2 registered_by participants.
+   *
+   * This follows the front end form multiple participant flow with tax enabled.
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
+   */
+  protected function createScenarioMultipleParticipantPendingFreeEvent(): void {
+    $this->eventCreateUnpaid();
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Participant1',
+      'last_name' => 'LastName',
+      'job_title' => 'oracle',
+      'email-Primary' => 'participant1@example.com',
+      'additional_participants' => 2,
+    ], ['id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant2',
+        'last_name' => 'LastName',
+        'job_title' => 'wizard',
+        'email-Primary' => 'participant2@example.com',
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant3',
+        'last_name' => 'LastName',
+        'job_title' => 'seer',
+        'email-Primary' => 'participant3@example.com',
       ])
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
       ->processForm();

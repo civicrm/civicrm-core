@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $config->languageLimit && $config->languageLimit|@count >= 2 and $translatePermission}
-  <a href="{crmURL p='civicrm/i18n' q="reset=1&table=$table&field=$field&id=$id"}" data-field="{$field}" class="crm-hover-button crm-multilingual-edit-button" title="{ts}Languages{/ts}">
+  <a href="{crmURL p='civicrm/i18n' q="reset=1&table=$table&field=$field&id=$id"}" data-field="{$field}" class="crm-hover-button crm-multilingual-edit-button" title="{ts escape='htmlattribute'}Languages{/ts}">
     <i class="crm-i fa-language fa-lg" aria-hidden="true"></i>
   </a>
 {/if}

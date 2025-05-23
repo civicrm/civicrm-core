@@ -21,18 +21,11 @@ use CRM_Core_DAO;
 class SK_Entity extends CRM_Core_DAO {
 
   /**
-   * This is the primary key - it has an underscore to prevent possible conflicts with other columns.
-   *
-   * @var int
-   */
-  protected $_row;
-
-  /**
    * Primary key field.
    *
    * @var string[]
    */
-  public static $_primaryKey = ['_row'];
+  public static $_primaryKey = [];
 
   /**
    * Over-ride the parent to prevent a NULL return.
@@ -49,25 +42,6 @@ class SK_Entity extends CRM_Core_DAO {
    */
   public static function tableHasBeenAdded(): bool {
     return TRUE;
-  }
-
-  /**
-   * Defines the primary key(s).
-   *
-   * @return array
-   */
-  public function keys() {
-    return ['_row'];
-  }
-
-  /**
-   * Tells DB_DataObject which keys use autoincrement.
-   * Overrides the default 'id'.
-   *
-   * @return array
-   */
-  public function sequenceKey() {
-    return ['_row', TRUE];
   }
 
 }

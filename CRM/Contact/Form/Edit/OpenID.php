@@ -29,9 +29,12 @@ class CRM_Contact_Form_Edit_OpenID {
    *   Block number to build.
    * @param bool $blockEdit
    *   Is it block edit.
+   * @deprecated since 6.3 will be removed around 6.10
    */
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     if (!$blockCount) {
+      CRM_Core_Error::deprecatedWarning('pass in blockCount');
       $blockId = ($form->get('OpenID_Block_Count')) ? $form->get('OpenID_Block_Count') : 1;
     }
     else {
@@ -45,7 +48,7 @@ class CRM_Contact_Form_Edit_OpenID {
     $form->addRule("openid[$blockId][openid]", ts('OpenID is not a valid URL.'), 'url');
 
     //Block type
-    $form->addElement('select', "openid[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
+    $form->addElement('select', "openid[$blockId][location_type_id]", '', CRM_Core_DAO_Address::buildOptions('location_type_id'));
 
     //is_Primary radio
     $js = ['id' => "OpenID_" . $blockId . "_IsPrimary"];

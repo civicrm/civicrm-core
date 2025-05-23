@@ -35,9 +35,8 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
     $permissionCheck = FALSE;
     $statusMessage = '';
-    if ($config->userFramework != 'Joomla') {
-      $permissionCheck = CRM_Core_Permission::check('administer CiviCRM');
-    }
+
+    $permissionCheck = CRM_Core_Permission::check('administer CiviCRM');
     //get the pcp id.
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
@@ -190,9 +189,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $fileInfo = reset($entityFile);
       $fileId = $fileInfo['fileID'];
       $altText = htmlspecialchars($fileInfo['description'] ?? '');
-      $fileHash = CRM_Core_BAO_File::generateFileHash($this->_id, $fileId);
+      $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileId);
       $image = '<img src="' . CRM_Utils_System::url('civicrm/file',
-          "reset=1&id=$fileId&eid={$this->_id}&fcs={$fileHash}"
+          "reset=1&id=$fileId&fcs={$fileHash}"
         ) . '" alt="' . $altText . '"/>';
       $this->assign('image', $image);
     }

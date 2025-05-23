@@ -27,6 +27,9 @@ if (!defined('CIVI_SETUP')) {
         $e->getModel()->extras['adminPassWasSpecified'] = TRUE;
         $e->getModel()->extras['adminPass'] = $e->getField('adminPass');
       }
+      if ($e->getField('adminEmail')) {
+        $e->getModel()->extras['adminEmail'] = $e->getField('adminEmail');
+      }
     }
 
   }, \Civi\Setup::PRIORITY_PREPARE);

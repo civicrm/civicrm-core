@@ -46,7 +46,7 @@ class CRM_Core_ManagedEntities {
    * Perform an asynchronous reconciliation when the transaction ends.
    * @param array|null $modules
    */
-  public static function scheduleReconciliation(array $modules = NULL) {
+  public static function scheduleReconciliation(?array $modules = NULL) {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
       function ($modules) {
@@ -66,41 +66,6 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Read a managed entity using APIv3.
-   *
-   * @deprecated
-   *
-   * @param string $moduleName
-   *   The name of the module which declared entity.
-   * @param string $name
-   *   The symbolic name of the entity.
-   * @return array|NULL
-   *   API representation, or NULL if the entity does not exist
-   */
-  public function get($moduleName, $name) {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    $dao = new CRM_Core_DAO_Managed();
-    $dao->module = $moduleName;
-    $dao->name = $name;
-    if ($dao->find(TRUE)) {
-      $params = [
-        'id' => $dao->entity_id,
-      ];
-      $result = NULL;
-      try {
-        $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
-      }
-      catch (Exception $e) {
-        $this->onApiError($dao->module, $dao->name, 'getsingle', $result['error_message'], $e);
-      }
-      return $result;
-    }
-    else {
-      return NULL;
-    }
-  }
-
-  /**
    * Identify any enabled/disabled modules. Add new entities, update
    * existing entities, and remove orphaned (stale) entities.
    *
@@ -112,6 +77,16 @@ class CRM_Core_ManagedEntities {
     $modules = $modules ? (array) $modules : NULL;
     $declarations = $this->getDeclarations($modules);
     $plan = $this->createPlan($declarations, $modules);
+    if (!CRM_Core_Config::isUpgradeMode()) {
+      $plan = $this->optimizePlan($plan);
+      // Loosely: The optimizer omits UPDATEs if the declaration-checksum is unchanged.
+
+      // NOTE: For records with `update=>always`, you still need _some_ occasion to re-save
+      // (to undo local-edits). System-upgrades are an OK time: frequent enough to make a difference,
+      // but not so frequent as to be a drag.
+      // FUTURE OPTIMIZATION: If we can actively prevent runtime edits for records with `update=>always`,
+      // then maybe expand optimizer and use it during upgrade-mode.
+    }
     $this->reconcileEntities($plan);
   }
 
@@ -134,6 +109,7 @@ class CRM_Core_ManagedEntities {
     ]);
     if ($mgd->id && isset($declarations[0])) {
       $item = ['update' => 'always'] + $declarations[0] + $mgd->toArray();
+      $item['declaration_checksum'] = $declarations[0]['checksum'];
       $this->backfillDefaults($item);
       $this->updateExistingEntity($item);
       return TRUE;
@@ -162,7 +138,7 @@ class CRM_Core_ManagedEntities {
       'action' => 'create',
       'where' => $condition,
     ]);
-    $defaultValues = $getFields->indexBy('name')->column('default_value');
+    $defaultValues = $getFields->column('default_value', 'name');
     $item['params']['values'] += $defaultValues;
   }
 
@@ -197,6 +173,44 @@ class CRM_Core_ManagedEntities {
    */
   private function filterPlanByAction(array $plan, string $action): array {
     return CRM_Utils_Array::findAll($plan, ['managed_action' => $action]);
+  }
+
+  /**
+   * Examine the steps in the plan. Identify any steps that are likely to be extraneous/redundant.
+   *
+   * @param array $plan
+   * @return array
+   *   Updated plan
+   */
+  private function optimizePlan(array $plan): array {
+    $extManager = CRM_Extension_System::singleton()->getManager();
+
+    $isLive = function(array $item) use ($extManager) {
+      // Keep all INSERTs and DELETEs. Only UPDATEs can be optimized-out.
+      if ($item['managed_action'] !== 'update') {
+        return TRUE;
+      }
+
+      // When toggling an extension, let's evaluate its mgds fully.
+      if ($extManager->getActiveProcesses($item['module'])) {
+        return TRUE;
+      }
+
+      // For ordinary UPDATE plans, we only care if the checksum has changed.
+      return $item['declaration_checksum'] !== $item['checksum'];
+    };
+
+    $newPlan = array_filter($plan, $isLive);
+    return $newPlan;
+  }
+
+  protected function computeChecksum(array $declaration) {
+    if (isset($declaration['checksum'])) {
+      throw new \LogicException("Checksums cannot be assigned to hook_managed declarations. They must be singularly computed at runtime.");
+    }
+    CRM_Utils_Array::deepSort($declaration, fn(array &$a) => ksort($a));
+    $serialized = json_encode($declaration, JSON_UNESCAPED_SLASHES);
+    return base64_encode(hash('sha256', $serialized, TRUE));
   }
 
   /**
@@ -246,6 +260,7 @@ class CRM_Core_ManagedEntities {
     $dao->entity_type = $item['entity_type'];
     $dao->entity_id = $id;
     $dao->cleanup = $item['cleanup'] ?? 'always';
+    $dao->checksum = $item['declaration_checksum'];
     $dao->save();
   }
 
@@ -323,6 +338,7 @@ class CRM_Core_ManagedEntities {
       $dao->cleanup = $item['cleanup'] ?? NULL;
       // Reset the `entity_modified_date` timestamp if reverting record.
       $dao->entity_modified_date = $doUpdate ? 'null' : NULL;
+      $dao->checksum = $item['declaration_checksum'];
       $dao->update();
     }
   }
@@ -353,6 +369,13 @@ class CRM_Core_ManagedEntities {
       $dao = new CRM_Core_DAO_Managed();
       $dao->id = $item['id'];
       $dao->entity_modified_date = 'null';
+      $dao->checksum = 'disabled';
+      $dao->update();
+    }
+    else {
+      $dao = new CRM_Core_DAO_Managed();
+      $dao->id = $item['id'];
+      $dao->checksum = 'disabled';
       $dao->update();
     }
   }
@@ -375,7 +398,10 @@ class CRM_Core_ManagedEntities {
         break;
 
       case 'unused':
-        if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
+        if (!$item['entity_id']) {
+          $getRefCount = [];
+        }
+        elseif (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
           $getRefCount = CoreUtil::getRefCount($item['entity_type'], $item['entity_id']);
         }
         else {
@@ -557,6 +583,9 @@ class CRM_Core_ManagedEntities {
         $declarations[$index] += ['name' => $index];
       }
     }
+    foreach ($declarations as $index => $declaration) {
+      $declarations[$index]['checksum'] = $this->computeChecksum($declaration);
+    }
     return $declarations;
   }
 
@@ -578,6 +607,7 @@ class CRM_Core_ManagedEntities {
       // Set to disable or delete if module is disabled or missing - it will be overwritten below if module is active.
       $action = $this->isModuleDisabled($managedEntity['module']) ? 'disable' : 'delete';
       $plan[$key] = array_merge($managedEntity, ['managed_action' => $action]);
+      $plan[$key]['checksum'] ??= NULL; /* Pre-upgrade, field may not exist in DB */
     }
     foreach ($declarations as $declaration) {
       $key = "{$declaration['module']}_{$declaration['name']}_{$declaration['entity']}";
@@ -589,6 +619,7 @@ class CRM_Core_ManagedEntities {
       $plan[$key]['params'] = $declaration['params'];
       $plan[$key]['cleanup'] = $declaration['cleanup'] ?? NULL;
       $plan[$key]['update'] = $declaration['update'] ?? 'always';
+      $plan[$key]['declaration_checksum'] = $declaration['checksum'];
     }
     return $plan;
   }

@@ -223,7 +223,6 @@
   </item>
   <item>
      <path>civicrm/dashlet/getting-started</path>
-     <title>CiviCRM Resources</title>
      <page_callback>CRM_Dashlet_Page_GettingStarted</page_callback>
   </item>
 
@@ -236,11 +235,6 @@
 <item>
      <path>civicrm/ajax/groupTree</path>
      <page_callback>CRM_Contact_Page_AJAX::groupTree</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-</item>
-<item>
-     <path>civicrm/ajax/custom</path>
-     <page_callback>CRM_Contact_Page_AJAX::customField</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
@@ -257,11 +251,6 @@
 <item>
      <path>civicrm/ajax/checkemail</path>
      <page_callback>CRM_Contact_Page_AJAX::getContactEmail</page_callback>
-     <access_callback>1</access_callback>
-</item>
-<item>
-     <path>civicrm/ajax/checkphone</path>
-     <page_callback>CRM_Contact_Page_AJAX::getContactPhone</page_callback>
      <access_callback>1</access_callback>
 </item>
 <item>
@@ -307,7 +296,7 @@
 </item>
 <item>
    <path>civicrm/contact/deduperules</path>
-   <title>Find and Merge Duplicate Contacts</title>
+   <title>Manage Duplicates</title>
    <desc>Manage the rules used to identify potentially duplicate contact records. Scan for duplicates using a selected rule and merge duplicate contact data as needed.</desc>
    <page_callback>CRM_Contact_Page_DedupeRules</page_callback>
    <access_arguments>administer dedupe rules;merge duplicate contacts</access_arguments>
@@ -316,7 +305,7 @@
 </item>
 <item>
    <path>civicrm/contact/dedupefind</path>
-   <title>Find and Merge Duplicate Contacts</title>
+   <title>Manage Duplicates</title>
    <page_callback>CRM_Contact_Page_DedupeFind</page_callback>
    <access_arguments>merge duplicate contacts</access_arguments>
 </item>

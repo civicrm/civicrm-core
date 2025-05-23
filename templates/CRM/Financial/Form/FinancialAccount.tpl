@@ -16,9 +16,9 @@
   </div>
 {else}
   <table class="form-layout-compressed">
-    <tr class="crm-contribution-form-block-name">
-      <td class="label">{$form.name.label}</td>
-      <td class="html-adjust">{$form.name.html}</td>
+    <tr class="crm-contribution-form-block-label">
+      <td class="label">{$form.label.label}</td>
+      <td class="html-adjust">{$form.label.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-description">
       <td class="label">{$form.description.label}</td>
@@ -75,9 +75,7 @@
       </td>
     </tr>
   </table>
-  <div id="financial_account_custom_field_extension_section" class="crm-accordion-wrapper crm-financial-account-panel">
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-  </div>
+  {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='FinancialAccount' customDataSubType=false cid=false}
 {/if}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>

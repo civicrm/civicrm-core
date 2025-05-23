@@ -101,6 +101,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ];
     $this->quickCleanUpFinancialEntities();
     $this->deleteNonDefaultRelationshipTypes();
+    $this->restoreMembershipTypes();
     $this->quickCleanup($tablesToTruncate, TRUE);
     parent::tearDown();
   }
@@ -907,8 +908,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test creating a current employer through API.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContactCreateCurrentEmployer(): void {
     // Here we will just do the get for set-up purposes.
@@ -1314,6 +1313,26 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertIsArray($fields['values']['custom_' . $ids['custom_field_id']]);
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  public function testGetOptions(): void {
+    $options = $this->callAPISuccess($this->_entity, 'getoptions', ['field' => 'worldregion_id']);
+    $this->assertContains('Europe and Central Asia', $options['values']);
+
+    $options = $this->callAPISuccess($this->_entity, 'getoptions', ['field' => 'country']);
+    $this->assertContains('France', $options['values']);
+
+    $options = $this->callAPISuccess($this->_entity, 'getoptions', ['field' => 'state_province']);
+    $this->assertContains('Alaska', $options['values']);
+  }
+
+  public function testGetOptionsWithCustom(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => $this->entity], 'select', 'foo');
+    $this->callAPISuccess('CustomField', 'create', ['id' => $this->ids['CustomField']['fooselect'], 'is_active' => 0]);
+    $options = $this->callAPISuccess($this->entity, 'getoptions', ['field' => 'custom_' . $this->ids['CustomField']['fooselect']]);
+    $this->callAPISuccess('CustomField', 'create', ['id' => $this->ids['CustomField']['fooselect'], 'is_active' => 1]);
+    $options = $this->callAPISuccess($this->entity, 'getoptions', ['field' => 'custom_' . $this->ids['CustomField']['fooselect']]);
+    $this->assertEquals(['R' => 'Red', 'Y' => 'Yellow', 'G' => 'Green'], $options['values']);
   }
 
   /**
@@ -3385,6 +3404,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         ],
       ],
     ]);
+    foreach ([1, 2, 3] as $num) {
+      $this->callAPISuccess('EntityTag', 'create', [
+        'entity_table' => 'civicrm_contact',
+        'entity_id' => $result['id'],
+        'tag_id' => $this->tagCreate(['name' => "taggy $num"])['id'],
+      ]);
+    }
 
     //$dao = new CRM_Contact_BAO_Contact();
     //$dao->id = $result['id'];
@@ -3403,6 +3429,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('civicrm_email', $refCountsIdx['sql:civicrm_email:contact_id']['table']);
     $this->assertEquals(2, $refCountsIdx['sql:civicrm_phone:contact_id']['count']);
     $this->assertEquals('civicrm_phone', $refCountsIdx['sql:civicrm_phone:contact_id']['table']);
+    $this->assertEquals(3, $refCountsIdx['sql:civicrm_entity_tag:entity_id']['count']);
+    $this->assertEquals('civicrm_entity_tag', $refCountsIdx['sql:civicrm_entity_tag:entity_id']['table']);
     $this->assertNotTrue(isset($refCountsIdx['sql:civicrm_address:contact_id']));
   }
 
@@ -4758,7 +4786,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function validateContactField(string $fieldName, $expected, ?int $contactID, array $criteria = NULL): void {
+  protected function validateContactField(string $fieldName, $expected, ?int $contactID, ?array $criteria = NULL): void {
     $api = Contact::get()->addSelect($fieldName);
     if ($criteria) {
       $api->setWhere([$criteria]);

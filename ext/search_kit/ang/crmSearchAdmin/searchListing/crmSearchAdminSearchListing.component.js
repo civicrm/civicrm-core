@@ -8,19 +8,20 @@
       tabCount: '='
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
-    controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
+    controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, searchDisplayEditableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait)),
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait)),
         afformLoad;
 
       $scope.crmUrl = CRM.url;
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
-      this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&
+      this.afformAdminEnabled = CRM.checkPerm('administer afform') &&
         'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
       const scheduledCommunicationsEnabled = 'scheduled_communications' in CRM.crmSearchAdmin.modules;
+      const scheduledCommunicationsAllowed = CRM.checkPerm('schedule communications');
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -35,6 +36,7 @@
             'api_entity',
             'api_entity:label',
             'api_params',
+            'is_template',
             // These two need to be in the select clause so they are allowed as filters
             'created_id.display_name',
             'modified_id.display_name',
@@ -80,7 +82,8 @@
         this.initializeDisplay($scope, $element);
         // Keep tab counts up-to-date - put rowCount in current tab if there are no other filters
         $scope.$watch('$ctrl.rowCount', function(val) {
-          if (typeof val === 'number' && angular.equals(['has_base'], getActiveFilters())) {
+          let activeFilters = getActiveFilters().filter(item => item !== 'has_base' && item !== 'is_template');
+          if (typeof val === 'number' && !activeFilters.length) {
             ctrl.tabCount = val;
           }
         });
@@ -106,6 +109,10 @@
           if (!row.data['api_entity:label']) {
             row.permissionToEdit = false;
           }
+          // Users without 'schedule communications' permission do not have edit access
+          if (scheduledCommunicationsEnabled && !scheduledCommunicationsAllowed && row.data.schedule_id) {
+            row.permissionToEdit = false;
+          }
           // Saves rendering cycles to not show an empty menu of search displays
           if (!row.data.display_name) {
             row.openDisplayMenu = false;
@@ -113,10 +120,6 @@
         });
         updateAfformCounts();
       });
-
-      this.encode = function(params) {
-        return encodeURI(angular.toJson(params));
-      };
 
       this.deleteOrRevert = function(row) {
         var search = row.data,
@@ -236,32 +239,34 @@
             ]
           }
         };
-        if (ctrl.afformEnabled) {
+        if (ctrl.afformEnabled && !ctrl.filters.is_template) {
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Forms'),
             path: '~/crmSearchAdmin/searchListing/afforms.html'
           });
         }
-        // Add scheduled communication column if extension is enabled
-        if (scheduledCommunicationsEnabled) {
+        // Add scheduled communication column if user is allowed to use them
+        if (scheduledCommunicationsAllowed && !ctrl.filters.is_template) {
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Communications'),
             path: '~/crmSearchAdmin/searchListing/communications.html'
           });
         }
-        ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
-            label: ts('Smart Group')
-          })
-        );
-        if (ctrl.filters.has_base) {
+        if (!ctrl.filters.is_template) {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
+              label: ts('Smart Group')
+            })
+          );
+        }
+        if (ctrl.filters.has_base || ctrl.filters.is_template) {
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('base_module:label', {
               label: ts('Package'),
               title: '[base_module]',
-              empty_value: ts('Missing'),
+              empty_value: ctrl.filters.has_base ? ts('Missing') : null,
               cssRules: [
                 ['font-italic', 'base_module:label', 'IS EMPTY']
               ]
@@ -296,13 +301,15 @@
             })
           );
         }
-        ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('expires_date', {
-            label: ts('Expires'),
-            title: '[expires_date]',
-            rewrite: '[expires]'
-          })
-        );
+        if (!ctrl.filters.is_template) {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('expires_date', {
+              label: ts('Expires'),
+              title: '[expires_date]',
+              rewrite: '[expires]'
+            })
+          );
+        }
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',

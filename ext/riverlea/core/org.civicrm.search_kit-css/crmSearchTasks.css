@@ -1,0 +1,21 @@
+/* Style rules for SearchKit Admin
+   Forked on 12 June 24. Called on SearchKit Admin pages
+   Status: not merged (theme edits at foot) */
+
+.crm-search-task-progress {
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid lightgrey;
+}
+.crm-search-display.crm-search-display-table td > crm-search-display-editable,
+.crm-search-display.crm-search-display-table td > .crm-editable-disabled,
+.crm-search-display.crm-search-display-table td > .crm-editable-enabled {
+  display: inline-block;
+}
+crm-search-display-editable .form-inline,
+.crm-dashlet .crm-search-display crm-search-display-editable .form-inline {
+  padding: 0 !important /* vs _form.css */;
+}
+.crm-search-display-editable-buttons button {
+  padding: var(--crm-padding-small) !important;
+}

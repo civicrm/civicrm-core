@@ -9,7 +9,7 @@
 *}
 {* template for building website block *}
 <div id="crm-website-content" {if $permission EQ 'edit'} class="crm-inline-edit" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_Website"{rdelim}'{/if}>
-  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Add or edit website{/ts}"{/if}>
+  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts escape='htmlattribute'}Add or edit website{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
         <span class="crm-i fa-pencil" aria-hidden="true"></span> {if empty($website)}{ts}Add website{/ts}{else}{ts}Add or edit website{/ts}{/if}

@@ -62,7 +62,8 @@
     return $(el).each(function() {
       var data = $(this).data('edit-params');
       if (data) {
-        data.snippet = data.reset = 1;
+        data.reset = 1;
+        data.snippet = 2; // CRM_Core_Smarty::PRINT_SNIPPET
         data.class_name = data.class_name.replace('Form', 'Page');
         data.type = 'page';
         $(this).closest('.crm-summary-block').load(CRM.url('civicrm/ajax/inline', data), function() {
@@ -238,15 +239,11 @@
         return false;
       })
       // make sure only one is_primary radio is checked
+      // Note this is no longer required for the email block
+      // & similar changes to phone, address, im, openid would allow removal from them as well.
       .on('change', '[class$=is_primary] input', function() {
         if ($(this).is(':checked')) {
           $('[class$=is_primary] input', $(this).closest('form')).not(this).prop('checked', false);
-        }
-      })
-      // make sure only one builk_mail radio is checked
-      .on('change', '.crm-email-bulkmail input', function(){
-        if ($(this).is(':checked')) {
-          $('.crm-email-bulkmail input').not(this).prop('checked', false);
         }
       })
       // handle delete link within blocks
@@ -254,6 +251,11 @@
         var row = $(this).closest('tr');
         var form = $(this).closest('form');
         row.hide();
+        var blockNumber = row.data('block-number');
+        if (blockNumber) {
+          $('.crm-block-entity-' + row.data('entity') + '-' + blockNumber).addClass('hiddenElement');
+          $('input', '.crm-block-entity-' + row.data('entity') + '-' + blockNumber).val('');
+        }
         $('input', row).val('');
         //if the primary is checked for deleted block
         //unset and set first as primary
@@ -288,6 +290,11 @@
         var form = $(this).closest('form');
         var row = $('tr[class="hiddenElement"]:first', form);
         row.removeClass('hiddenElement');
+        var blockNumber = row.data('block-number');
+        if (blockNumber) {
+          $('.crm-block-entity-' + row.data('entity') + '-' + blockNumber).removeClass('hiddenElement');
+        }
+
         $('input:focus', form).blur();
         $('input:first', row).focus();
         if ($('tr[class="hiddenElement"]').length < 1) {

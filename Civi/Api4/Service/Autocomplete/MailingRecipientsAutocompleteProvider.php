@@ -45,7 +45,7 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
       !is_array($e->savedSearch) ||
       $e->savedSearch['api_entity'] !== 'EntitySet' ||
       ($e->fieldName !== 'Mailing.recipients_include' && $e->fieldName !== 'Mailing.recipients_exclude') ||
-      strpos($e->formName ?? '', 'crmMailing.') !== 0
+      !str_starts_with($e->formName ?? '', 'crmMailing.')
     ) {
       return;
     }

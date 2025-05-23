@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Contact;
+
 /**
  * Class CRM_Event_Cart_Form_Checkout_Payment
  */
@@ -16,6 +18,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $payer_contact_id;
   public $is_pay_later = FALSE;
   public $pay_later_receipt;
+  public $_price_values;
+  public $_paymentFields;
+  public $sub_trxn_index;
+  public $trxn_id;
+  public $trxn_date;
 
   /**
    * @var array
@@ -37,9 +44,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'id' => $participant->id,
       'event_id' => $event->id,
       'register_date' => date('YmdHis'),
-      'source' => CRM_Utils_Array::value('participant_source', $params, $this->description),
+      'source' => $params['participant_source'] ?? $this->description,
       'is_pay_later' => $this->is_pay_later,
-      'fee_amount' => CRM_Utils_Array::value('amount', $params, 0),
+      'fee_amount' => $params['amount'] ?? 0,
       'fee_currency' => $params['currencyID'] ?? NULL,
     ];
 
@@ -58,7 +65,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $this->assign('isOnWaitlist', $participant->must_wait);
 
     $participantParams['is_test'] = 0;
-    if ($this->_action & CRM_Core_Action::PREVIEW || CRM_Utils_Array::value('mode', $params) == 'test') {
+    if ($this->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) == 'test') {
       $participantParams['is_test'] = 1;
     }
 
@@ -81,16 +88,15 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     CRM_Core_DAO::storeValues($event, $event_values);
 
     $location = [];
-    if (CRM_Utils_Array::value('is_show_location', $event_values) == 1) {
-      $locationParams = [
+    if (($event_values['is_show_location'] ?? NULL) == 1) {
+      $location['address'] = CRM_Core_BAO_Address::getValues([
         'entity_id' => $participant->event_id,
         'entity_table' => 'civicrm_event',
-      ];
-      $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
+      ], TRUE);
       CRM_Core_BAO_Address::fixAddress($location['address'][1]);
     }
 
-    list($pre_id, $post_id) = CRM_Event_Cart_Form_MerParticipant::get_profile_groups($participant->event_id);
+    [$pre_id, $post_id] = CRM_Event_Cart_Form_MerParticipant::get_profile_groups($participant->event_id);
     $payer_values = [
       'email' => '',
       'name' => '',
@@ -309,37 +315,39 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public function emailReceipt($events_in_cart, $params) {
     $contact_details = CRM_Contact_BAO_Contact::getContactDetails($this->payer_contact_id);
     $state_province = new CRM_Core_DAO_StateProvince();
-    $state_province->id = $params["billing_state_province_id-{$this->_bltID}"];
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
+    $state_province->id = $params["billing_state_province_id-{$billingID}"];
     $state_province->find();
     $state_province->fetch();
     $country = new CRM_Core_DAO_Country();
-    $country->id = $params["billing_country_id-{$this->_bltID}"];
+    $country->id = $params["billing_country_id-{$billingID}"];
     $country->find();
     $country->fetch();
     foreach ($this->line_items as & $line_item) {
-      $location_params = ['entity_id' => $line_item['event']->id, 'entity_table' => 'civicrm_event'];
-      $line_item['location'] = CRM_Core_BAO_Location::getValues($location_params, TRUE);
+      $line_item['location']['address'] = CRM_Core_BAO_Address::getValues(['entity_id' => $line_item['event']->id, 'entity_table' => 'civicrm_event'], TRUE);
       CRM_Core_BAO_Address::fixAddress($line_item['location']['address'][1]);
+      if ($line_item['location']['address'][1] === NULL) {
+        $line_item['location']['address'][1] = ['display' => ''];
+      }
     }
     $send_template_params = [
       'table' => 'civicrm_msg_template',
       'contactId' => $this->payer_contact_id,
-      'from' => current(CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE)),
+      'from' => CRM_Core_BAO_Domain::getFromEmail(),
       'groupName' => 'msg_tpl_workflow_event',
       'isTest' => FALSE,
       'toEmail' => $contact_details[1],
       'toName' => $contact_details[0],
       'tplParams' => [
         'billing_name' => "{$params['billing_first_name']} {$params['billing_last_name']}",
-        'billing_city' => $params["billing_city-{$this->_bltID}"],
+        'billing_city' => $params["billing_city-{$billingID}"],
         'billing_country' => $country->name,
-        'billing_postal_code' => $params["billing_postal_code-{$this->_bltID}"],
+        'billing_postal_code' => $params["billing_postal_code-{$billingID}"],
         'billing_state' => $state_province->abbreviation,
-        'billing_street_address' => $params["billing_street_address-{$this->_bltID}"],
+        'billing_street_address' => $params["billing_street_address-{$billingID}"],
         'credit_card_exp_date' => $params['credit_card_exp_date'],
         'credit_card_type' => $params['credit_card_type'],
         'credit_card_number' => "************" . substr($params['credit_card_number'], -4, 4),
-        // XXX cart->get_discounts
         'discounts' => $this->discounts,
         'email' => $contact_details[1],
         'events_in_cart' => $events_in_cart,
@@ -398,7 +406,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    */
   public function preProcess() {
     $params = $this->_submitValues;
-    $this->is_pay_later = CRM_Utils_Array::value('is_pay_later', $params, FALSE) && !CRM_Utils_Array::value('payment_completed', $params);
+    $this->is_pay_later = !empty($params['is_pay_later']) && empty($params['payment_completed']);
 
     parent::preProcess();
   }
@@ -409,17 +417,16 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public function postProcess() {
     $trxnDetails = NULL;
     $params = $this->_submitValues;
-
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
     $main_participants = $this->cart->get_main_event_participants();
 
     $transaction = new CRM_Core_Transaction();
 
     foreach ($main_participants as $participant) {
-      $defaults = [];
-      $ids = ['contact_id' => $participant->contact_id];
-      $contact = CRM_Contact_BAO_Contact::retrieve($ids, $defaults);
-      $contact->is_deleted = 0;
-      $contact->save();
+      Contact::update(FALSE)
+        ->addValue('is_deleted', FALSE)
+        ->addWhere('id', '=', $participant->contact_id)
+        ->execute();
     }
 
     $trxn_prefix = 'VR';
@@ -439,18 +446,18 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         "billing_first_name" => 1,
         "billing_middle_name" => 1,
         "billing_last_name" => 1,
-        "billing_street_address-{$this->_bltID}" => 1,
-        "billing_city-{$this->_bltID}" => 1,
-        "billing_state_province_id-{$this->_bltID}" => 1,
-        "billing_postal_code-{$this->_bltID}" => 1,
-        "billing_country_id-{$this->_bltID}" => 1,
-        "address_name-{$this->_bltID}" => 1,
-        "email-{$this->_bltID}" => 1,
+        "billing_street_address-{$billingID}" => 1,
+        "billing_city-{$billingID}" => 1,
+        "billing_state_province_id-{$billingID}" => 1,
+        "billing_postal_code-{$billingID}" => 1,
+        "billing_country_id-{$billingID}" => 1,
+        "address_name-{$billingID}" => 1,
+        "email-{$billingID}" => 1,
       ];
 
-      $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+      $params["address_name-{$billingID}"] = ($params['billing_first_name'] ?? '') . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
 
-      $params["email-{$this->_bltID}"] = $params['billing_contact_email'];
+      $params["email-{$billingID}"] = $params['billing_contact_email'];
       CRM_Contact_BAO_Contact::createProfileContact(
         $params,
         $billing_fields,
@@ -465,7 +472,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
 
     $params['now'] = date('YmdHis');
-    $params['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $params['invoiceID'] = bin2hex(random_bytes(16));
     $params['amount'] = $this->total;
     $params['financial_type_id'] = $this->financial_type_id;
     if ($this->payment_required && empty($params['is_pay_later'])) {
@@ -478,7 +485,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $this->cart->save();
     $this->set('last_event_cart_id', $this->cart->id);
 
-    $contribution_statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $params['payment_instrument_id'] = NULL;
     if (!empty($params['is_pay_later'])) {
       $params['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
@@ -488,10 +494,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $params['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card');
     }
     if ($this->is_pay_later && empty($params['payment_completed'])) {
-      $params['contribution_status_id'] = array_search('Pending', $contribution_statuses);
+      $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     }
     else {
-      $params['contribution_status_id'] = array_search('Completed', $contribution_statuses);
+      $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $params['participant_status'] = 'Registered';
       $params['is_pay_later'] = 0;
     }
@@ -555,7 +561,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-    CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, TRUE);
+    CRM_Core_Payment_Form::mapParams(NULL, $params, $params, TRUE);
 
     try {
       $result = $payment->doPayment($params);
@@ -605,7 +611,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'trxn_id' => "{$params['trxn_id']}-{$this->sub_trxn_index}",
       'currency' => $params['currencyID'] ?? NULL,
       'source' => $event->title,
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
       'contribution_status_id' => $params['contribution_status_id'],
       'payment_instrument_id' => $params['payment_instrument_id'],
       'check_number' => $params['check_number'] ?? NULL,
@@ -655,11 +661,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $default_country = new CRM_Core_DAO_Country();
     $default_country->iso_code = CRM_Core_BAO_Country::defaultContactCountry();
     $default_country->find(TRUE);
-    $defaults["billing_country_id-{$this->_bltID}"] = $default_country->id;
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
+    $defaults["billing_country_id-{$billingID}"] = $default_country->id;
 
     if (self::getContactID()) {
       $params = ['id' => self::getContactID()];
-      $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
+      $contact = $this->retrieveContact($params, $defaults);
 
       foreach ($contact->email as $email) {
         if ($email['is_billing']) {
@@ -681,11 +688,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $billing_address = CRM_Event_Cart_BAO_MerParticipant::billing_address_from_contact($contact);
 
       if ($billing_address != NULL) {
-        $defaults["billing_street_address-{$this->_bltID}"] = $billing_address['street_address'];
-        $defaults["billing_city-{$this->_bltID}"] = $billing_address['city'];
-        $defaults["billing_postal_code-{$this->_bltID}"] = $billing_address['postal_code'];
-        $defaults["billing_state_province_id-{$this->_bltID}"] = $billing_address['state_province_id'];
-        $defaults["billing_country_id-{$this->_bltID}"] = $billing_address['country_id'];
+        $defaults["billing_street_address-{$billingID}"] = $billing_address['street_address'];
+        $defaults["billing_city-{$billingID}"] = $billing_address['city'];
+        $defaults["billing_postal_code-{$billingID}"] = $billing_address['postal_code'];
+        $defaults["billing_state_province_id-{$billingID}"] = $billing_address['state_province_id'];
+        $defaults["billing_country_id-{$billingID}"] = $billing_address['country_id'];
       }
     }
 

@@ -11,12 +11,12 @@
 <div class="crm-block crm-form-block crm-tag-form-block">
   <div class="status">
     {ts 1=$tags|@count}You are about to combine the following %1 tags into a single tag:{/ts}<br />
-    {', '|implode:$tags}
+    {$tags|join:', '}
   </div>
   <table class="form-layout-compressed">
     <tr class="crm-tag-form-block-label">
-      <td class="label">{$form.name.label}</td>
-      <td>{$form.name.html}</td>
+      <td class="label">{$form.label.label}</td>
+      <td>{$form.label.html}</td>
     </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

@@ -53,9 +53,9 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
     );
 
     $this->assign('groupCount', $count);
-    $this->assign_by_ref('groupIn', $in);
-    $this->assign_by_ref('groupPending', $pending);
-    $this->assign_by_ref('groupOut', $out);
+    $this->assign('groupIn', $in);
+    $this->assign('groupPending', $pending);
+    $this->assign('groupOut', $out);
   }
 
   /**

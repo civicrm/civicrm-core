@@ -11,14 +11,17 @@
 
 <div id="search-status">
   <table class="form-layout-compressed">
+  {if !empty($savedSearch.name) or ($context == 'Event' && $participantCount && ($pager->_totalItems ne $participantCount))}
   <tr>
     <td style="width: 40%;">
-    {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
-    {ts count=$pager->_totalItems plural="%count Results"}%count Result{/ts}{if $selectorLabel}&nbsp;-&nbsp;{$selectorLabel}{/if}
+    {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}Smart Group{/ts}){/if}
     {if $context == 'Event' && $participantCount && ($pager->_totalItems ne $participantCount)}
         <br />{ts}Actual participant count{/ts} : {$participantCount} {help id="id-actual_participant_count" file="CRM/Event/Form/Search/Results.hlp"} &nbsp;
     {/if}
     </td>
+  </tr>
+  {/if}
+  <tr>
     <td>
         {* Search criteria are passed to tpl in the $qill array *}
         {if $qill}

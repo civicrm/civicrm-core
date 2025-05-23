@@ -285,16 +285,21 @@
       .on('crmBeforeLoad', function(e) {
         if ($(e.target).is(this)) {
           accordionStates = [];
-          $('.crm-accordion-wrapper', this).each(function() {
-            accordionStates.push($(this).hasClass('collapsed'));
+          $('details', this).each(function() {
+            accordionStates.push($(this).prop('open') ? true : false);
           });
         }
       })
       .on('crmLoad', function(e) {
         if ($(e.target).is(this)) {
-          var $targets = $('.crm-accordion-wrapper', this);
-          $.each(accordionStates, function(i, isCollapsed) {
-            $targets.eq(i).toggleClass('collapsed', isCollapsed);
+          var $targets = $('details', this);
+          $.each(accordionStates, function(i, isOpen) {
+            if (isOpen) {
+              $targets.eq(i).prop('open', true);
+            }
+            else {
+              $targets.eq(i).removeProp('open');
+            }
           });
         }
       });

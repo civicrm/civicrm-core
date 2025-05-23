@@ -18,8 +18,6 @@ class SqlFunctionIF extends SqlFunction {
 
   protected static $category = self::CATEGORY_COMPARISON;
 
-  protected static $dataType = 'String';
-
   protected static function params(): array {
     return [
       [
@@ -31,11 +29,13 @@ class SqlFunctionIF extends SqlFunction {
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull', 'SqlFunction'],
         'label' => ts('Then'),
+        'can_be_empty' => TRUE,
       ],
       [
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull', 'SqlFunction'],
         'label' => ts('Else'),
+        'can_be_empty' => TRUE,
       ],
     ];
   }

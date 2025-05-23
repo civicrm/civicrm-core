@@ -126,13 +126,13 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Utils_Cache_Interface|null $cache
    * @param null $cacheKey
    * @param string $appendPathGarbage
    *
    * @return array
    */
-  public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
+  public function _createContainer(?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
     /*
     $container = new CRM_Extension_Container_Static(array(
     'test.foo.bar' => array(

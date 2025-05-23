@@ -57,6 +57,13 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists('visibility_id', $validationResult));
   }
 
+  public function testFieldMetadata(): void {
+    $fields = CRM_Price_DAO_PriceFieldValue::fields();
+    $this->assertSame([18, 9], $fields['amount']['precision']);
+    $this->assertSame(CRM_Utils_Type::T_MONEY, $fields['amount']['type']);
+    $this->assertArrayNotHasKey('maxlength', $fields['amount']);
+  }
+
   /**
    * Test submitting a large float value is stored correctly in the db.
    *
@@ -69,7 +76,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $thousands = Civi::settings()->get('monetaryThousandSeparator');
     $decimal = Civi::settings()->get('monetaryDecimalPoint');
-    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
+    $paramsSet['title'] = 'Price Set' . bin2hex(random_bytes(4));
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 'Event Fee';

@@ -27,8 +27,7 @@ class CRM_Mailing_Event_BAO_MailingEventUnsubscribe extends CRM_Mailing_Event_DA
   /**
    * Unsubscribe a contact from the domain.
    *
-   * @param int $job_id
-   *   The job ID.
+   * @param null $unused
    * @param int $queue_id
    *   The Queue Event ID of the recipient.
    * @param string $hash
@@ -36,8 +35,9 @@ class CRM_Mailing_Event_BAO_MailingEventUnsubscribe extends CRM_Mailing_Event_DA
    *
    * @return bool
    *   Was the contact successfully unsubscribed?
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function unsub_from_domain($job_id, $queue_id, $hash) {
+  public static function unsub_from_domain($unused, $queue_id, $hash): bool {
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
       return FALSE;
@@ -50,12 +50,12 @@ class CRM_Mailing_Event_BAO_MailingEventUnsubscribe extends CRM_Mailing_Event_DA
       $email = new CRM_Core_BAO_Email();
       $email->id = $q->email_id;
       if ($email->find(TRUE)) {
-        $sql = "
+        $sql = '
 UPDATE civicrm_email
 SET    on_hold = 2,
        hold_date = %1
 WHERE  email = %2
-";
+';
         $sqlParams = [
           1 => [$now, 'Timestamp'],
           2 => [$email->email, 'String'],
@@ -93,8 +93,7 @@ WHERE  email = %2
   /**
    * Unsubscribe a contact from all groups that received this mailing.
    *
-   * @param int $job_id
-   *   The job ID.
+   * @param null $unused
    * @param int $queue_id
    *   The Queue Event ID of the recipient.
    * @param string $hash
@@ -107,7 +106,7 @@ WHERE  email = %2
    *
    * @throws \CRM_Core_Exception
    */
-  public static function unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE): ?array {
+  public static function unsub_from_mailing($unused, $queue_id, $hash, $return = FALSE): ?array {
     // First make sure there's a matching queue event.
 
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
@@ -117,40 +116,8 @@ WHERE  email = %2
 
     $contact_id = $q->contact_id;
 
-    $mailing_id = (int) civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
-    $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
+    $relevant_mailing_id = self::getRelevantMailingID($queue_id);
 
-    // We need a mailing id that points to the mailing that defined the recipients.
-    // This is usually just the passed-in mailing_id, however in the case of AB
-    // tests, it's the variant 'A' one.
-    $relevant_mailing_id = $mailing_id;
-
-    // Special case for AB Tests:
-    if (in_array($mailing_type, ['experiment', 'winner'])) {
-      // The mailing belongs to an AB test.
-      // See if we can find an AB test where this is variant B.
-      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
-      if (!empty($mailing_id_a)) {
-        // OK, we were given mailing B and we looked up variant A which is the relevant one.
-        $relevant_mailing_id = $mailing_id_a;
-      }
-      else {
-        // No, it wasn't variant B, let's see if we can find an AB test where
-        // the given mailing was the winner (C).
-        $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_c');
-        if (!empty($mailing_id_a)) {
-          // OK, this was the winner and we looked up variant A which is the relevant one.
-          $relevant_mailing_id = $mailing_id_a;
-        }
-        // (otherwise we were passed in variant A so we already have the relevant_mailing_id correct already.)
-      }
-    }
-
-    // Make a list of groups and a list of prior mailings that received this
-    // mailing.  Nb. the 'Base' group is called the 'Unsubscribe group' in the
-    // UI.
-    // Just to definitely make it SQL safe.
-    $relevant_mailing_id = (int) $relevant_mailing_id;
     $do = CRM_Core_DAO::executeQuery(
       "SELECT entity_table, entity_id, group_type
         FROM civicrm_mailing_group
@@ -208,7 +175,7 @@ WHERE  email = %2
     $groupIds = array_merge($groupIds, CRM_Contact_BAO_Group::getChildGroupIds($groupIds));
 
     $baseGroupIds = array_keys($base_groups);
-    CRM_Utils_Hook::unsubscribeGroups('unsubscribe', $mailing_id, $contact_id, $groupIds, $baseGroupIds);
+    CRM_Utils_Hook::unsubscribeGroups('unsubscribe', $q->mailing_id, $contact_id, $groupIds, $baseGroupIds);
 
     // Now we have a complete list of recipient groups.  Filter out all
     // those except smart groups, those that the contact belongs to and
@@ -231,7 +198,7 @@ WHERE  email = %2
      * how a UNION would work.
      */
     $groupsCachedSQL = "
-            SELECT      grp.id as group_id,
+            SELECT      grp.id as id,
                         grp.title as title,
                         grp.frontend_title as frontend_title,
                         grp.frontend_description as frontend_description,
@@ -247,7 +214,7 @@ WHERE  email = %2
                         ) GROUP BY grp.id";
 
     $groupsAddedSQL = "
-            SELECT      grp.id as group_id,
+            SELECT      grp.id as id,
                         grp.title as title,
                         grp.frontend_title as frontend_title,
                         grp.frontend_description as frontend_description,
@@ -267,30 +234,19 @@ WHERE  email = %2
     ];
     $doCached = CRM_Core_DAO::executeQuery($groupsCachedSQL, $groupsParams);
     $doAdded = CRM_Core_DAO::executeQuery($groupsAddedSQL, $groupsParams);
-
+    $allGroups = $doAdded->fetchAll() + $doCached->fetchAll();
     if ($return) {
       $returnGroups = [];
-      while ($doCached->fetch()) {
-        $returnGroups[$doCached->group_id] = [
-          'title' => !empty($doCached->frontend_title) ? $doCached->frontend_title : $doCached->title,
-          'description' => !empty($doCached->frontend_description) ? $doCached->frontend_description : $doCached->description,
-        ];
-      }
-      while ($doAdded->fetch()) {
-        $returnGroups[$doAdded->group_id] = [
-          'title' => $doAdded->frontend_title,
-          'description' => $doAdded->frontend_description,
+      foreach ($allGroups as $group) {
+        $returnGroups[$group['id']] = [
+          'title' => $group['frontend_title'],
+          'description' => $group['frontend_description'],
         ];
       }
       return $returnGroups;
     }
-    else {
-      while ($doCached->fetch()) {
-        $groups[$doCached->group_id] = $doCached->frontend_title;
-      }
-      while ($doAdded->fetch()) {
-        $groups[$doAdded->group_id] = $doAdded->frontend_title;
-      }
+    foreach ($allGroups as $group) {
+      $groups[$group['id']] = $group['frontend_title'];
     }
     $transaction = new CRM_Core_Transaction();
     $contacts = [$contact_id];
@@ -335,8 +291,6 @@ WHERE  email = %2
   public static function send_unsub_response($queue_id, $groups, $is_domain, $job) {
     $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $jobObject = new CRM_Mailing_BAO_MailingJob();
-    $jobTable = $jobObject->getTableName();
     $mailingObject = new CRM_Mailing_DAO_Mailing();
     $mailingTable = $mailingObject->getTableName();
     $contactsObject = new CRM_Contact_DAO_Contact();
@@ -351,9 +305,9 @@ WHERE  email = %2
 
     $dao = new CRM_Mailing_BAO_Mailing();
     $dao->query("   SELECT * FROM $mailingTable
-                        INNER JOIN $jobTable ON
-                            $jobTable.mailing_id = $mailingTable.id
-                        WHERE $jobTable.id = $job");
+                        INNER JOIN civicrm_mailing_event_queue queue ON
+                            queue.mailing_id = $mailingTable.id
+                        WHERE queue.id = $queue_id");
     $dao->fetch();
 
     $component = new CRM_Mailing_BAO_MailingComponent();
@@ -395,7 +349,7 @@ WHERE  email = %2
       }
     }
 
-    [$addresses, $urls] = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash, $eq->email);
+    [$addresses, $urls] = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash);
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
@@ -431,8 +385,9 @@ WHERE  email = %2
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'html' => $html,
       'text' => $text,
+      'contactId' => $eq->contact_id,
     ];
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'u', $job, $queue_id, $eq->hash);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'u', NULL, $queue_id, $eq->hash);
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
       $params['messageId'] = $params['Message-ID'];
     }
@@ -462,7 +417,7 @@ WHERE  email = %2
   ) {
     $dao = new CRM_Core_DAO();
 
-    $unsub = self::$_tableName;
+    $unsub = self::getTableName();
     $queueObject = new CRM_Mailing_Event_BAO_MailingEventQueue();
     $queue = $queueObject->getTableName();
     $mailingObject = new CRM_Mailing_BAO_Mailing();
@@ -504,7 +459,7 @@ WHERE  email = %2
       return $dao->N;
     }
     else {
-      return $dao->unsubs ? $dao->unsubs : 0;
+      return $dao->unsubs ?: 0;
     }
   }
 
@@ -536,7 +491,7 @@ WHERE  email = %2
 
     $dao = new CRM_Core_DAO();
 
-    $unsub = self::$_tableName;
+    $unsub = self::getTableName();
     $queueObject = new CRM_Mailing_Event_BAO_MailingEventQueue();
     $queue = $queueObject->getTableName();
     $mailingObject = new CRM_Mailing_BAO_Mailing();
@@ -644,6 +599,57 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     }
 
     return [$displayName, $email];
+  }
+
+  /**
+   * Get the mailing ID that is relevant to the given queue record.
+   *
+   * If we are unsubscribing from one of an a-b test we want to unsubscribe from the
+   * 'a' variant which has the relevant information.
+   *
+   * @param int $queue_id
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  private static function getRelevantMailingID(int $queue_id): int {
+    $mailing_id = (int) civicrm_api3('MailingEventQueue', 'getvalue', [
+      'id' => $queue_id,
+      'return' => 'mailing_id',
+    ]);
+    $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
+
+    // We need a mailing id that points to the mailing that defined the recipients.
+    // This is usually just the passed-in mailing_id, however in the case of AB
+    // tests, it's the variant 'A' one.
+    $relevant_mailing_id = $mailing_id;
+
+    // Special case for AB Tests:
+    if (in_array($mailing_type, ['experiment', 'winner'])) {
+      // The mailing belongs to an AB test.
+      // See if we can find an AB test where this is variant B.
+      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
+      if (!empty($mailing_id_a)) {
+        // OK, we were given mailing B and we looked up variant A which is the relevant one.
+        $relevant_mailing_id = $mailing_id_a;
+      }
+      else {
+        // No, it wasn't variant B, let's see if we can find an AB test where
+        // the given mailing was the winner (C).
+        $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_c');
+        if (!empty($mailing_id_a)) {
+          // OK, this was the winner and we looked up variant A which is the relevant one.
+          $relevant_mailing_id = $mailing_id_a;
+        }
+        // (otherwise we were passed in variant A so we already have the relevant_mailing_id correct already.)
+      }
+    }
+
+    // Make a list of groups and a list of prior mailings that received this
+    // mailing.  Nb. the 'Base' group is called the 'Unsubscribe group' in the
+    // UI.
+    // Just to definitely make it SQL safe.
+    return (int) $relevant_mailing_id;
   }
 
 }

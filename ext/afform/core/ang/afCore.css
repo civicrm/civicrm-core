@@ -36,6 +36,10 @@ af-form {
   display: inline-block;
 }
 
+#bootstrap-theme .input-group .afform-search-operator {
+  width: 6rem;
+}
+
 [af-repeat-item] {
   position: relative;
 }
@@ -77,4 +81,10 @@ af-form {
 .afform-directive .af-admin-edit-form-link.open,
 .afform-directive:hover .af-admin-edit-form-link {
   opacity: 1;
+}
+
+/* Tabs */
+#bootstrap-theme .crm-tabset {
+  display: block;
+  padding: 10px;
 }

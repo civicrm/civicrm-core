@@ -59,15 +59,13 @@ body.admin.com_civicrm.layout-default #crm-qsearch label {
 
 @media (max-width: $breakMin) {
 
-  body.com_civicrm.layout-default #header {
-    margin-bottom: $menubarHeight;
-  }
-
   body.admin.com_civicrm.layout-default #civicrm-menu-nav {
-    margin-top: calc($menubarHeight + 14px);
     background: #1b1b1b;
-    z-index: 1000;
     height: $menubarHeight;
     border-top: 1px solid #aaa;
+  }
+
+  body.admin.com_civicrm.layout-default .breadcrumb {
+    margin-top: 2.5rem;
   }
 }

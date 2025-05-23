@@ -37,7 +37,7 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
       return MembershipType::get(FALSE)
         ->addWhere('domain_id.name', '=', $domain)
         ->addOrderBy('weight')
-        ->execute()->indexBy('name')->column('weight');
+        ->execute()->column('weight', 'name');
     };
 
     // Create 2 domains. Control domain is to ensure updating one doesn't affect the other

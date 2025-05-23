@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\MailingComponent;
 
 /**
  * This class generates form components for Location Type.
@@ -88,12 +89,11 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = [];
-    $params = [];
 
     if (isset($this->_id)) {
-      $params = ['id' => $this->_id];
-      CRM_Mailing_BAO_MailingComponent::retrieve($params, $defaults);
+      $defaults = MailingComponent::get(FALSE)
+        ->addWhere('id', '=', $this->_id)
+        ->execute()->single();
     }
     else {
       $defaults['is_active'] = 1;
@@ -183,6 +183,13 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       $errors['body_html'] = ts("Please provide either HTML or TEXT format for the Body.");
     }
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['body_html'];
   }
 
 }

@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $otherOptions}
-  <div id="report-tab-other-options" class="civireport-criteria">
+  <div id="report-tab-other-options" role="tabpanel" class="civireport-criteria">
     <table class="report-layout">
       {assign var="optionCount" value=0}
       <tr class="crm-report crm-report-criteria-field">

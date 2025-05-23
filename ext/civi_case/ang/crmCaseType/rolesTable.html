@@ -18,8 +18,8 @@ Required vars: caseType
 	    <td>{{relType.displayLabel}}</td>
 	    <td><input type="checkbox" ng-model="relType.creator" ng-true-value="'1'" ng-false-value="'0'"></td>
 	    <td><input type="radio" ng-model="relType.manager" value="1" ng-change="onManagerChange(relType)"></td>
-	    <td><input ng-list class="big"
-				crm-entityref="{entity: 'Group', api: {id_field: 'name', params: {is_hidden: 0, is_active: 1}}, select: {allowClear: true, multiple: true, placeholder: ts('Select Group')}}"
+	    <td><input ng-list="" class="big"
+				crm-entityref="{entity: 'Group', api: {id_field: 'name', params: {is_hidden: 0, is_active: 1}}, select: {allowClear: true, multiple: true, separator: '\u0001', placeholder: ts('Select Group')}}"
 				ng-model="relType.groups"
 			/></td>
 	    <td>

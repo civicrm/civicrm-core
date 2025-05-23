@@ -20,6 +20,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_customGroupExtends = [
     'Activity',
     'Individual',
+    'Organization',
+    'Contact',
   ];
 
   protected $_nonDisplayFields = [];
@@ -140,6 +142,30 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'default' => TRUE,
             'required' => TRUE,
           ],
+          'contact_source_employer_id' => [
+            'name' => 'employer_id',
+            'alias' => 'civicrm_contact_source',
+            'dbAlias' => "civicrm_contact_source.employer_id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ],
+          'contact_assignee_employer_id' => [
+            'name' => 'employer_id',
+            'alias' => 'civicrm_contact_assignee',
+            'dbAlias' => "civicrm_contact_assignee.employer_id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ],
+          'contact_target_employer_id' => [
+            'name' => 'employer_id',
+            'alias' => 'civicrm_contact_target',
+            'dbAlias' => "civicrm_contact_target.employer_id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ],
         ],
         'filters' => [
           'contact_source' => [
@@ -220,6 +246,26 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           ],
         ],
       ],
+      'civicrm_employer' => [
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'fields' => [
+          'contact_source_employer' => [
+            'name' => 'display_name',
+            'title' => ts('Source Employer'),
+            'alias' => 'civicrm_employer_source',
+          ],
+          'contact_assignee_employer' => [
+            'name' => 'display_name',
+            'title' => ts('Assignee Employer'),
+            'alias' => 'civicrm_employer_assignee',
+          ],
+          'contact_target_employer' => [
+            'name' => 'display_name',
+            'title' => ts('Target Employer'),
+            'alias' => 'civicrm_employer_target',
+          ],
+        ],
+      ],
       'civicrm_activity' => [
         'dao' => 'CRM_Activity_DAO_Activity',
         'fields' => [
@@ -296,7 +342,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'title' => ts('Activity Priority'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
+            'options' => CRM_Activity_DAO_Activity::buildOptions('priority_id'),
           ],
         ],
         'order_bys' => [
@@ -437,7 +483,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           str_contains($clause, 'civicrm_email_assignee.') ||
           str_contains($clause, 'civicrm_email_source.') ||
           str_contains($clause, 'civicrm_phone_assignee.') ||
-          str_contains($clause, 'civicrm_phone_source.')
+          str_contains($clause, 'civicrm_phone_source.') ||
+          str_contains($clause, 'civicrm_employer_assignee.') ||
+          str_contains($clause, 'civicrm_employer_source.')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -453,6 +501,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           str_contains($clause, 'civicrm_email_source.') ||
           str_contains($clause, 'civicrm_phone_target.') ||
           str_contains($clause, 'civicrm_phone_source.') ||
+          str_contains($clause, 'civicrm_employer_target.') ||
+          str_contains($clause, 'civicrm_employer_source.') ||
           str_contains($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
@@ -469,6 +519,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           str_contains($clause, 'civicrm_email_assignee.') ||
           str_contains($clause, 'civicrm_phone_target.') ||
           str_contains($clause, 'civicrm_phone_assignee.') ||
+          str_contains($clause, 'civicrm_employer_target.') ||
+          str_contains($clause, 'civicrm_employer_assignee.') ||
           str_contains($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
@@ -489,6 +541,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           str_contains($clause, 'civicrm_email_contact_assignee_email') ||
           str_contains($clause, 'civicrm_email_contact_target_email') ||
           str_contains($clause, 'civicrm_phone_contact_target_phone') ||
+          str_contains($clause, 'civicrm_employer_contact_source_employer') ||
+          str_contains($clause, 'civicrm_employer_contact_assignee_employer') ||
+          str_contains($clause, 'civicrm_employer_contact_target_employer') ||
           str_contains($clause, 'civicrm_address_')
         ) {
           $this->_selectClauses[$key] = "GROUP_CONCAT(DISTINCT $clause SEPARATOR ';') as $clause";
@@ -562,9 +617,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             if ($op && !($fieldName === "contact_{$recordType}" && ($op === 'nnll' || $op === 'nll'))) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
               if ($field['name'] == 'include_case_activities') {
                 $clause = NULL;
@@ -771,10 +826,14 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
   ADD COLUMN civicrm_contact_contact_source VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_assignee_id VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_source_id VARCHAR(128),
+  ADD COLUMN civicrm_contact_contact_assignee_employer_id VARCHAR(128),
+  ADD COLUMN civicrm_contact_contact_source_employer_id VARCHAR(128),
   ADD COLUMN civicrm_phone_contact_assignee_phone VARCHAR(128),
   ADD COLUMN civicrm_phone_contact_source_phone VARCHAR(128),
   ADD COLUMN civicrm_email_contact_assignee_email VARCHAR(128),
-  ADD COLUMN civicrm_email_contact_source_email VARCHAR(128)";
+  ADD COLUMN civicrm_email_contact_source_email VARCHAR(128),
+  ADD COLUMN civicrm_employer_contact_assignee_employer VARCHAR(128),
+  ADD COLUMN civicrm_employer_contact_source_employer VARCHAR(128)";
     $this->executeReportQuery($tempQuery);
 
     // 3. fill temp table with assignee results
@@ -873,8 +932,8 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
-    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+    $priority = CRM_Activity_DAO_Activity::buildOptions('priority_id');
+    $genders = CRM_Contact_DAO_Contact::buildOptions('gender_id');
     $viewLinks = FALSE;
 
     // Would we ever want to retrieve from the form controller??
@@ -905,7 +964,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         if (empty($this->_params['include_case_activities_value']) || empty($rows[$rowNum]['civicrm_case_activity_case_id'])) {
           // Generate a "view activity" link
           $actActionLinks = CRM_Activity_Selector_Activity::actionLinks($row['civicrm_activity_activity_type_id'],
-            CRM_Utils_Array::value('civicrm_activity_source_record_id', $rows[$rowNum]),
+            $rows[$rowNum]['civicrm_activity_source_record_id'] ?? NULL,
             FALSE,
             $rows[$rowNum]['civicrm_activity_id']
           );
@@ -987,6 +1046,64 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
               }
             }
             $rows[$rowNum]['civicrm_contact_contact_target'] = implode('; ', $link);
+          }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_employer_contact_source_employer', $row)) {
+        if ($value = $row['civicrm_contact_contact_source_employer_id']) {
+          if ($viewLinks) {
+            $url = CRM_Utils_System::url('civicrm/contact/view',
+              'reset=1&cid=' . $value,
+              $this->_absoluteUrl
+            );
+            $rows[$rowNum]['civicrm_employer_contact_source_employer_link'] = $url;
+            $rows[$rowNum]['civicrm_employer_contact_source_employer_hover'] = $onHover;
+          }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_employer_contact_assignee_employer', $row)) {
+        $assigneeNames = explode(';', $row['civicrm_employer_contact_assignee_employer']);
+        if ($value = $row['civicrm_contact_contact_assignee_employer_id']) {
+          $assigneeContactIds = explode(';', $value);
+          $link = [];
+          if ($viewLinks) {
+            foreach ($assigneeContactIds as $id => $value) {
+              if (isset($value) && isset($assigneeNames[$id])) {
+                $url = CRM_Utils_System::url('civicrm/contact/view',
+                  'reset=1&cid=' . $value,
+                  $this->_absoluteUrl
+                );
+                $link[] = "<a title='" . $onHover . "' href='" . $url .
+                  "'>{$assigneeNames[$id]}</a>";
+              }
+            }
+            $rows[$rowNum]['civicrm_employer_contact_assignee_employer'] = implode('; ', $link);
+          }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_employer_contact_target_employer', $row)) {
+        $targetNames = explode(';', $row['civicrm_employer_contact_target_employer']);
+        if ($value = $row['civicrm_contact_contact_target_employer_id']) {
+          $targetContactIds = explode(';', $value);
+          $link = [];
+          if ($viewLinks) {
+            foreach ($targetContactIds as $id => $value) {
+              if (isset($value) && isset($targetNames[$id])) {
+                $url = CRM_Utils_System::url("civicrm/contact/view",
+                  'reset=1&cid=' . $value,
+                  $this->_absoluteUrl
+                );
+                $link[] = "<a title='" . $onHover . "' href='" . $url .
+                  "'>{$targetNames[$id]}</a>";
+              }
+            }
+            $rows[$rowNum]['civicrm_employer_contact_target_employer'] = implode('; ', $link);
           }
           $entryFound = TRUE;
         }
@@ -1186,6 +1303,12 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           LEFT JOIN civicrm_phone civicrm_phone_{$recordType}
                  ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_{$recordType}.contact_id AND
                     civicrm_phone_{$recordType}.is_primary = 1 ";
+    }
+
+    if ($this->isTableSelected('civicrm_employer')) {
+      $this->_from .= "
+          LEFT JOIN civicrm_contact civicrm_employer_{$recordType}
+                 ON civicrm_contact_{$recordType}.employer_id = civicrm_employer_{$recordType}.id";
     }
     $this->_aliases['civicrm_contact'] = "civicrm_contact_{$recordType}";
 

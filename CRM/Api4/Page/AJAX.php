@@ -24,6 +24,19 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
    */
   public function run() {
     $response = [];
+
+    if (\CRM_Utils_System::isMaintenanceMode() && ($this->urlPath[3] ?? NULL) !== 'User') {
+      if (!CRM_Core_Permission::check([['administer CiviCRM system', 'cms:bypass maintenance mode']])) {
+        // HTTP 503 Service Unavailable
+        $this->httpResponseCode = 503;
+        $this->returnJSON([
+          'status_code' => 503,
+          'status_message' => 'Temporarily unavailable for maintenance.',
+        ]);
+        return;
+      }
+    }
+
     // `$this->urlPath` contains the http request path as an exploded array.
     // Path for single calls is `civicrm/ajax/api4/Entity/action` with `params` passed to $_REQUEST
     // or for multiple calls the path is `civicrm/ajax/api4` with `calls` passed to $_POST
@@ -123,9 +136,8 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       unset($response['rowCount']);
       $response['count'] = $result->count();
       $response['countFetched'] = $result->countFetched();
-      if (in_array('row_count', $params['select'] ?? [])) {
-        // We can only return countMatched (whose value is independent of LIMIT clauses) if row_count was in the select.
-        $response['countMatched'] = $result->count();
+      if ($result->hasCountMatched()) {
+        $response['countMatched'] = $result->countMatched();
       }
       // If at least one call succeeded, we give a success code
       $this->httpResponseCode = 200;

@@ -80,10 +80,6 @@ class Kernel {
       return $this->formatResult($apiRequest, $apiResponse);
     }
     catch (\Exception $e) {
-      if ($apiRequest) {
-        $this->dispatcher->dispatch('civi.api.exception', new ExceptionEvent($e, NULL, $apiRequest, $this));
-      }
-
       if ($e instanceof \CRM_Core_Exception) {
         $err = $this->formatApiException($e, $apiRequest);
       }
@@ -139,23 +135,31 @@ class Kernel {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function runRequest($apiRequest) {
-    $this->boot($apiRequest);
-
-    [$apiProvider, $apiRequest] = $this->resolve($apiRequest);
-
     try {
-      $this->authorize($apiProvider, $apiRequest);
+      $this->boot($apiRequest);
+
+      [$apiProvider, $apiRequest] = $this->resolve($apiRequest);
+
+      try {
+        $this->authorize($apiProvider, $apiRequest);
+      }
+      catch (\Civi\API\Exception\UnauthorizedException $e) {
+        // We catch and re-throw to log for visibility
+        \CRM_Core_Error::backtrace('API Request Authorization failed', TRUE);
+        throw $e;
+      }
+
+      [$apiProvider, $apiRequest] = $this->prepare($apiProvider, $apiRequest);
+      $result = $apiProvider->invoke($apiRequest);
+
+      return $this->respond($apiProvider, $apiRequest, $result);
     }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      // We catch and re-throw to log for visibility
-      \CRM_Core_Error::backtrace('API Request Authorization failed', TRUE);
+    catch (\Exception $e) {
+      if ($apiRequest) {
+        $this->dispatcher->dispatch('civi.api.exception', new ExceptionEvent($e, NULL, $apiRequest, $this));
+      }
       throw $e;
     }
-
-    [$apiProvider, $apiRequest] = $this->prepare($apiProvider, $apiRequest);
-    $result = $apiProvider->invoke($apiRequest);
-
-    return $this->respond($apiProvider, $apiRequest, $result);
   }
 
   /**
@@ -227,7 +231,7 @@ class Kernel {
     /** @var \Civi\API\Event\AuthorizeEvent $event */
     $event = $this->dispatcher->dispatch('civi.api.authorize', new AuthorizeEvent($apiProvider, $apiRequest, $this, \CRM_Core_Session::getLoggedInContactID() ?: 0));
     if (!$event->isAuthorized()) {
-      throw new \Civi\API\Exception\UnauthorizedException("Authorization failed");
+      throw new \Civi\API\Exception\UnauthorizedException("Authorization failed: CiviCRM APIv{$apiRequest['version']} ({$apiRequest['entity']}::{$apiRequest['action']})");
     }
   }
 

@@ -8,11 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-content-block crm-contribution-view-form-block">
-<div class="action-link">
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
-</div>
 <table class="crm-info-panel">
   {if $is_test}
     <div class="help">
@@ -28,39 +23,33 @@
     <td>{$financial_type}{if $is_test} {ts}(test){/ts} {/if}</td>
   </tr>
   <tr class="crm-contribution-form-block-source">
-    <td class="label">{ts}Contribution Source{/ts}</td>
-    <td>{$source}</td>
+    <td class="label">{ts}Source{/ts}</td>
+    <td>{$source|escape}</td>
   </tr>
   {if empty($is_template)}
   <tr class="crm-contribution-form-block-receive_date">
-    <td class="label">{ts}Contribution Date{/ts}</td>
+    <td class="label">{ts}Date{/ts}</td>
     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
   </tr>
   {/if}
-  <tr class="crm-contribution-form-block-total_amount">
-    <td class="label">{ts}Contribution Amount{/ts}</td>
-    <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
-        {if $contribution_recur_id}
-          <a class="open-inline action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
-              {ts}View Recurring Contribution{/ts}
-          </a>
-          <br/>
-            {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
-        {/if}
-    </td>
-  </tr>
+</table>
+{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+{if $contribution_recur_id}
+  <a class="open-inline action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
+      {ts}View Recurring Contribution{/ts}
+  </a>
+  <br/>
+  {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
+{/if}
+<div class="clear"></div>
+<br>
+<table class="crm-info-panel">
   {if $associatedParticipants}
     <tr class="crm-contribution-form-block-associated_participants">
       <td class="label">{ts}Associated participants{/ts}</td>
       <td>
         {include file="CRM/Contribute/Form/ContributionViewAssociatedParticipants.tpl" associatedParticipants=$associatedParticipants}
       </td>
-    </tr>
-  {/if}
-  {if $invoicing && $tax_amount}
-    <tr class="crm-contribution-form-block-tax_amount">
-      <td class="label">{ts 1=$taxTerm}Total %1 Amount{/ts}</td>
-      <td>{$tax_amount|crmMoney:$currency}</td>
     </tr>
   {/if}
   {if $non_deductible_amount}
@@ -71,7 +60,7 @@
   {/if}
   {if $fee_amount}
     <tr class="crm-contribution-form-block-fee_amount">
-      <td class="label">{ts}Fee Amount{/ts}</td>
+      <td class="label">{ts}Processor Fee{/ts}</td>
       <td>{$fee_amount|crmMoney:$currency}</td>
     </tr>
   {/if}
@@ -158,14 +147,10 @@
       </tr>
     {/if}
   {/foreach}
-
-  {if $trxn_id}
-    <tr class="crm-contribution-form-block-trxn_id">
-      <td class="label">{ts}Transaction ID{/ts}</td>
-      <td>{$trxn_id}</td>
-    </tr>
-  {/if}
-
+  <tr class="crm-contribution-form-block-id">
+    <td class="label">{ts}Contribution ID{/ts}</td>
+    <td>{$id}</td>
+  </tr>
   {if $invoice_number}
     <tr class="crm-contribution-form-block-invoice_number">
       <td class="label">{ts}Invoice Number{/ts}</td>
@@ -186,30 +171,25 @@
       <td>{$thankyou_date|crmDate}</td>
     </tr>
   {/if}
-  <tr class="crm-contribution-form-block-payment-info">
-    <td class='label'>{ts}Payment Summary{/ts}</td>
-    <td id='payment-info'></td>
-  </tr>
-  {if empty($is_template)}
-  <tr class="crm-contribution-form-block-payment-details">
-    <td class="label">{ts}Payment Details{/ts}</td>
-    <td>{include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}</td>
-  </tr>
-  {/if}
 </table>
 
+{if empty($is_template)}
+  <h3>{ts}Payment Details{/ts}</h3>
+  {include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}
+{/if}
+
 {if $softContributions && count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
-  <div class="crm-accordion-wrapper crm-soft-credit-pane">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-soft-credit-pane" open>
+    <summary>
       {ts}Soft Credit{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel crm-soft-credit-listing">
         {foreach from=$softContributions item="softCont"}
           <tr>
             <td>
               <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.contact_id`"}"
-                 title="{ts}View contact record{/ts}">{$softCont.contact_name}
+                 title="{ts escape='htmlattribute'}View contact record{/ts}">{$softCont.contact_name}
               </a>
             </td>
             <td>{$softCont.amount|crmMoney:$currency}
@@ -221,14 +201,14 @@
         {/foreach}
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {if $premium}
-  <div class="crm-accordion-wrapper ">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold " open>
+    <summary>
       {ts}Premium Information{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
         <td class="label">{ts}Premium{/ts}</td>
@@ -236,17 +216,17 @@
         <td class="label">{ts}Option{/ts}</td>
         <td>{$option}</td>
         <td class="label">{ts}Fulfilled{/ts}</td>
-        <td>{$fulfilled|truncate:10:''|crmDate}</td>
+        <td>{if $fulfilled}{$fulfilled|truncate:10:''|crmDate}{else}{ts}No{/ts}{/if}</td>
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {if $pcp_id}
-  <div id='PCPView' class="crm-accordion-wrapper ">
-    <div class="crm-accordion-header">
+  <details id='PCPView' class="crm-accordion-bold " open>
+    <summary>
       {ts}Personal Campaign Page Contribution Information{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
         <tr>
@@ -258,7 +238,7 @@
         <tr>
           <td class="label">{ts}Soft Credit To{/ts}</td>
           <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$pcp_soft_credit_to_id`"}" id="view_contact"
-                 title="{ts}View contact record{/ts}">{$pcp_soft_credit_to_name}</a></td>
+                 title="{ts escape='htmlattribute'}View contact record{/ts}">{$pcp_soft_credit_to_name}</a></td>
         </tr>
         <tr>
           <td class="label">{ts}In Public Honor Roll?{/ts}</td>
@@ -278,7 +258,7 @@
         {/if}
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {include file="CRM/Custom/Page/CustomDataView.tpl"}
@@ -291,6 +271,8 @@
     </div>
   </fieldset>
 {/if}
+
+<div id="payment-info"></div>
 {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
 
 <div class="crm-submit-buttons">

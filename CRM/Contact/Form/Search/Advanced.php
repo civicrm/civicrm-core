@@ -21,6 +21,24 @@
 class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
   /**
+   * @var string
+   * @internal
+   */
+  public $_searchPane;
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $_searchOptions = [];
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $_paneTemplatePath = [];
+
+  /**
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
@@ -63,13 +81,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     ];
 
     //check if there are any custom data searchable fields
-    $extends = array_merge(['Contact'],
-      CRM_Contact_BAO_ContactType::basicTypes(),
-      CRM_Contact_BAO_ContactType::subTypes()
-    );
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
-      $extends
-    );
+    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact', 'is_active' => TRUE]);
     // if no searchable fields unset panel
     if (empty($groupDetails)) {
       unset($paneNames[ts('Custom Fields')]);
@@ -349,7 +361,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       unset($this->_formValues['contact_taglist']);
       foreach ($taglist as $value) {
         if ($value) {
-          $value = explode(',', $value);
+          $value = !is_array($value) ? explode(',', $value) : $value;
           foreach ($value as $tId) {
             if (is_numeric($tId)) {
               $this->_formValues['contact_tags'][] = $tId;

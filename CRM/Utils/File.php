@@ -59,8 +59,11 @@ class CRM_Utils_File {
    *
    * @param string $path
    *   The path name.
-   * @param bool $abort
-   *   Should we abort or just return an invalid code.
+   * @param bool|string $abort
+   *   How should we respond to a failure when creating the directory?
+   *   FALSE: Do not abort. Proceed. The return-value indicates outcome.
+   *   TRUE: Abort the process (echo+exit).
+   *   'exception': Throw an ordinary exception.
    * @return bool|NULL
    *   NULL: Folder already exists or was not specified.
    *   TRUE: Creation succeeded.
@@ -73,7 +76,10 @@ class CRM_Utils_File {
 
     CRM_Utils_File::createDir(dirname($path), $abort);
     if (@mkdir($path, 0777) == FALSE) {
-      if ($abort) {
+      if ($abort === 'exception') {
+        throw new CRM_Core_Exception("Failed to create directory: $path");
+      }
+      elseif ($abort) {
         $docLink = CRM_Utils_System::docURL2('Moving an Existing Installation to a New Server or Location', NULL, NULL, NULL, NULL, "wiki");
         echo "Error: Could not create directory: $path.<p>If you have moved an existing CiviCRM installation from one location or server to another there are several steps you will need to follow. They are detailed on this CiviCRM wiki page - {$docLink}. A fix for the specific problem that caused this error message to be displayed is to set the value of the config_backend column in the civicrm_domain table to NULL. However we strongly recommend that you review and follow all the steps in that document.</p>";
 
@@ -103,18 +109,47 @@ class CRM_Utils_File {
       throw new CRM_Core_Exception('Overly broad deletion');
     }
 
+    $target = rtrim($target, '/' . DIRECTORY_SEPARATOR);
+
+    if (!file_exists($target) && !is_link($target)) {
+      return;
+    }
+
+    if (!is_dir($target)) {
+      CRM_Core_Session::setStatus(ts('cleanDir() can only remove directories. %1 is not a directory.', [1 => $target]), ts('Warning'), 'error');
+      return;
+    }
+
+    if (is_link($target) /* it's a directory based on a symlink... no need to recurse... */) {
+      if ($rmdir) {
+        static::try_unlink($target, 'symlink');
+      }
+      return;
+    }
+
     if ($dh = @opendir($target)) {
       while (FALSE !== ($sibling = readdir($dh))) {
         if (!in_array($sibling, $exceptions)) {
           $object = $target . DIRECTORY_SEPARATOR . $sibling;
-
-          if (is_dir($object)) {
+          if (is_link($object)) {
+            // Strangely, symlinks to directories under Windows need special treatment
+            if (PHP_OS_FAMILY === "Windows" && is_dir($object)) {
+              if (!rmdir($object)) {
+                CRM_Core_Session::setStatus(ts('Unable to remove directory symlink %1', [1 => $object]), ts('Warning'), 'error');
+              }
+            }
+            else {
+              CRM_Utils_File::try_unlink($object, "symlink");
+            }
+          }
+          elseif (is_dir($object)) {
             CRM_Utils_File::cleanDir($object, $rmdir, $verbose);
           }
           elseif (is_file($object)) {
-            if (!unlink($object)) {
-              CRM_Core_Session::setStatus(ts('Unable to remove file %1', [1 => $object]), ts('Warning'), 'error');
-            }
+            CRM_Utils_File::try_unlink($object, "file");
+          }
+          else {
+            CRM_Utils_File::try_unlink($object, "other filesystem object");
           }
         }
       }
@@ -131,6 +166,15 @@ class CRM_Utils_File {
           CRM_Core_Session::setStatus(ts('Unable to remove directory %1', [1 => $target]), ts('Warning'), 'error');
         }
       }
+    }
+  }
+
+  /**
+   * Helper function to avoid repetition in cleanDir: execute unlink and produce a warning on failure.
+   */
+  private static function try_unlink($object, $description) {
+    if (!unlink($object)) {
+      CRM_Core_Session::setStatus(ts('Unable to remove %1 %2', [1 => $description, 2 => $object]), ts('Warning'), 'error');
     }
   }
 
@@ -282,11 +326,14 @@ class CRM_Utils_File {
   }
 
   /**
+   * Runs an SQL query.
    *
    * @param string|null $dsn
    * @param string $queryString
    * @param string $prefix
    * @param bool $dieOnErrors
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function runSqlQuery($dsn, $queryString, $prefix = NULL, $dieOnErrors = TRUE) {
     $string = $prefix . $queryString;
@@ -296,13 +343,11 @@ class CRM_Utils_File {
     }
     else {
       require_once 'DB.php';
-      $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
       try {
-        $options = CRM_Utils_SQL::isSSLDSN($dsn) ? ['ssl' => TRUE] : [];
-        $db = DB::connect($dsn, $options);
+        $db = CRM_Utils_SQL::connect($dsn);
       }
       catch (Exception $e) {
-        die("Cannot open $dsn: " . $e->getMessage());
+        throw new CRM_Core_Exception("Cannot open $dsn: " . $e->getMessage());
       }
     }
 
@@ -324,7 +369,7 @@ class CRM_Utils_File {
         }
         catch (Exception $e) {
           if ($dieOnErrors) {
-            die("Cannot execute $query: " . $e->getMessage());
+            throw new CRM_Core_Exception("Cannot execute $query: " . $e->getMessage());
           }
           else {
             echo "Cannot execute $query: " . $e->getMessage() . "<p>";
@@ -419,7 +464,7 @@ class CRM_Utils_File {
    * @return string
    */
   public static function makeFileName($name, bool $unicode = FALSE) {
-    $uniqID = md5(uniqid(rand(), TRUE));
+    $uniqID = bin2hex(random_bytes(16));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
       0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
@@ -470,7 +515,7 @@ class CRM_Utils_File {
    */
   public static function duplicate($filePath) {
     $oldName = pathinfo($filePath, PATHINFO_FILENAME);
-    $uniqID = md5(uniqid(rand(), TRUE));
+    $uniqID = bin2hex(random_bytes(16));
     $newName = preg_replace('/(_[\w]{32})$/', '', $oldName) . '_' . $uniqID;
     $newPath = str_replace($oldName, $newName, $filePath);
     copy($filePath, $newPath);
@@ -491,7 +536,7 @@ class CRM_Utils_File {
     if ($dh = opendir($path)) {
       while (FALSE !== ($elem = readdir($dh))) {
         if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
-          $files[] .= $path . $elem;
+          $files[] = $path . $elem;
         }
       }
       closedir($dh);
@@ -691,9 +736,6 @@ HTACCESS;
    * @see tempnam
    */
   public static function tempnam($prefix = 'tmp-') {
-    // $config = CRM_Core_Config::singleton();
-    // $nonce = md5(uniqid() . $config->dsn . $config->userFrameworkResourceURL);
-    // $fileName = "{$config->configAndLogDir}" . $prefix . $nonce . $suffix;
     $fileName = tempnam(sys_get_temp_dir(), $prefix);
     return $fileName;
   }
@@ -948,11 +990,7 @@ HTACCESS;
       'jpg' => 'jpeg',
       'svg' => 'svg+xml',
     ];
-    $mimeType = 'image/' . CRM_Utils_Array::value(
-      $fileExtension,
-      $translateMimeTypes,
-      $fileExtension
-    );
+    $mimeType = 'image/' . ($translateMimeTypes[$fileExtension] ?? $fileExtension);
 
     return self::getFileURL($path, $mimeType, $url);
   }
@@ -1062,7 +1100,7 @@ HTACCESS;
     }
     $iconClasses = Civi::$statics[__CLASS__]['mimeIcons'];
     foreach ($iconClasses as $text => $icon) {
-      if (strpos(($mimeType ?? ''), $text) === 0) {
+      if (str_starts_with(($mimeType ?? ''), $text)) {
         return $icon;
       }
     }
@@ -1138,7 +1176,7 @@ HTACCESS;
     set_error_handler(function($errno, $errstr) {
       // If this is open_basedir-related, convert it to an exception so we
       // can catch it.
-      if (strpos($errstr, 'open_basedir restriction in effect') !== FALSE) {
+      if (str_contains($errstr, 'open_basedir restriction in effect')) {
         throw new \ErrorException($errstr, $errno);
       }
       // Continue with normal error handling so other errors still happen.

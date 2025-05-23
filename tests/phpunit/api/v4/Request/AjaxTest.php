@@ -39,7 +39,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
       'httpx' => $_SERVER['HTTP_X_REQUESTED_WITH'] ?? NULL,
     ];
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
-    $_SERVER['HTTP_REFERER'] = $_SERVER['HTTP_REFERER'] ?? NULL;
+    $_SERVER['HTTP_REFERER'] ??= NULL;
     http_response_code(200);
   }
 
@@ -63,6 +63,38 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     ]);
     $this->assertEquals(400, http_response_code());
     $this->assertStringContainsString('SECURITY', $response['error_message']);
+  }
+
+  /**
+   * Check the AJAX api is disabled in Maintenance Mode
+   * without 'bypass maintenance mode' permission
+   */
+  public function testMaintenanceModeGate(): void {
+    $settings = \Civi::settings();
+
+    $startMode = $settings->get('core_maintenance_mode');
+
+    $settings->set('core_maintenance_mode', TRUE);
+
+    // enable maintenance mode
+    \Civi::settings()->set('core_maintenance_mode', TRUE);
+
+    // restrict user permissions so we dont have bypass permission
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts'];
+    $response = $this->runAjax([
+      'path' => 'civicrm/ajax/api4/Contact/get',
+    ]);
+    $this->assertEquals(503, http_response_code());
+
+    // now add bypass maintenance mode permission
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'cms:bypass maintenance mode'];
+    $response = $this->runAjax([
+      'path' => 'civicrm/ajax/api4/Contact/get',
+    ]);
+    $this->assertEquals(200, http_response_code());
+
+    // revert to starting mode
+    $settings->set('core_maintenance_mode', $startMode);
   }
 
   /**

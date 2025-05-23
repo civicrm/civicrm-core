@@ -23,7 +23,7 @@
  *   <civix><setting-page-title>My Custom Title</setting-page-title></civix>
  *
  * @mixinName setting-admin
- * @mixinVersion 1.1.0
+ * @mixinVersion 1.1.1
  * @since 5.68
  */
 
@@ -157,7 +157,10 @@ return function ($mixInfo, $bootCache) {
     $about = About::instance($mixInfo);
     $perm = 'administer ' . $mixInfo->shortName;
     if (!isset($permissions[$perm])) {
-      $permissions[$perm] = ts('%1: Administer settings', [1 => $about->getLabel()]);
+      $permissions[$perm] = [
+        'label' => ts('%1: Administer settings', [1 => $about->getLabel()]),
+        'description' => ts('Edit configuration settings for the %1 extension', [1 => $about->getLabel()]),
+      ];
     }
   }, -1000);
 

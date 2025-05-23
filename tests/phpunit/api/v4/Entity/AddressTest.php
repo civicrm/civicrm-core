@@ -91,6 +91,46 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains($addreses[3], $result);
   }
 
+  public function testMasterAddressUpdate(): void {
+    $contact = $this->createTestRecord('Contact');
+    $master = $this->createTestRecord('Address', [
+      'contact_id' => $contact['id'],
+      'street_address' => 'Somewhere 123',
+    ]);
+    $address = $this->createTestRecord('Address', [
+      'master_id' => $master['id'],
+      'contact_id' => $this->createTestRecord('Contact')['id'],
+    ]);
+
+    Address::update(FALSE)
+      ->addValue('id', $master['id'])
+      ->addValue('master_id', '')
+      ->addValue('street_address', 'Somewhere 234')
+      ->execute();
+
+    // Child address should be updated
+    $result = Address::get(FALSE)
+      ->addWhere('id', '=', $address['id'])
+      ->execute()->single();
+    // Should still retain master id
+    $this->assertEquals($master['id'], $result['master_id']);
+    $this->assertEquals('Somewhere 234', $result['street_address']);
+
+    // Unlink child address
+    Address::update(FALSE)
+      ->addValue('id', $address['id'])
+      ->addValue('master_id', NULL)
+      ->execute();
+
+    // Child address should be unlinked
+    $result = Address::get(FALSE)
+      ->addWhere('id', '=', $address['id'])
+      ->execute()->single();
+    // Should still retain master id
+    $this->assertNull($result['master_id']);
+    $this->assertEquals('Somewhere 234', $result['street_address']);
+  }
+
   public function testMasterAddressJoin(): void {
     $contact = $this->createTestRecord('Contact');
     $master = $this->createTestRecord('Address', [

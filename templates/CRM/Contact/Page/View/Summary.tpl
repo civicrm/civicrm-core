@@ -32,11 +32,11 @@
 
         {* CRM-12735 - Conditionally include the Actions and Edit buttons if contact is NOT in trash.*}
         {if !$isDeleted}
-          {if call_user_func(array('CRM_Core_Permission','check'), 'access CiviCRM')}
+          {crmPermission has='access CiviCRM'}
             <li class="crm-contact-activity crm-summary-block">
               {include file="CRM/Contact/Page/Inline/Actions.tpl"}
             </li>
-          {/if}
+          {/crmPermission}
           {* Include Edit button if contact has 'edit contacts' permission OR user is viewing their own contact AND has 'edit my contact' permission. CRM_Contact_Page_View::checkUserPermission handles this and assigns $permission true as needed. *}
           {if $permission EQ 'edit'}
             <li>
@@ -48,28 +48,23 @@
         {/if}
 
         {* Check for permissions to provide Restore and Delete Permanently buttons for contacts that are in the trash. *}
-        {if call_user_func(array('CRM_Core_Permission','check'), 'access deleted contacts') and $is_deleted}
-          <li class="crm-contact-restore">
-            {crmButton p='civicrm/contact/view/delete' q="reset=1&cid=$contactId&restore=1" class="delete" icon="undo"}
-              {ts}Restore from Trash{/ts}
-            {/crmButton}
-          </li>
-
-          {if call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
-            <li class="crm-contact-permanently-delete">
-              {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId&skip_undelete=1" class="delete" icon="trash"}
-                {ts}Delete Permanently{/ts}
+        {crmPermission has='access deleted contacts'}
+          {if $is_deleted}
+            <li class="crm-contact-restore">
+              {crmButton p='civicrm/contact/view/delete' q="reset=1&cid=$contactId&restore=1" class="delete" icon="undo"}
+                {ts}Restore from Trash{/ts}
               {/crmButton}
             </li>
-          {/if}
 
-        {elseif call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
-          <li class="crm-contact-delete">
-            {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
-              {ts}Delete Contact{/ts}
-            {/crmButton}
-          </li>
-        {/if}
+            {crmPermission has='delete contacts'}
+              <li class="crm-contact-permanently-delete">
+                {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId&skip_undelete=1" class="delete" icon="trash"}
+                  {ts}Delete Permanently{/ts}
+                {/crmButton}
+              </li>
+            {/crmPermission}
+          {/if}
+        {/crmPermission}
 
         {* Previous and Next contact navigation when accessing contact summary from search results. *}
         {if $nextPrevError}
@@ -106,30 +101,8 @@
     </div><!-- .crm-actions-ribbon -->
   {/if}
 
-  <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
-    <div id="mainTabContainer">
-      <ul class="crm-contact-tabs-list">
-        {foreach from=$allTabs item=tabValue}
-          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all{if is_numeric($tabValue.count)} crm-count-{$tabValue.count}{/if}{if $tabValue.class} {$tabValue.class}{/if}">
-            <a href="{if $tabValue.template}#contact-{$tabValue.id}{else}{$tabValue.url|smarty:nodefaults}{/if}" title="{$tabValue.title|escape}">
-              <i class="{if !empty($tabValue.icon)}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
-              <span>{$tabValue.title}</span>
-              {if empty($tabValue.hideCount)}<em>{if is_numeric($tabValue.count)}{$tabValue.count}{/if}</em>{/if}
-            </a>
-          </li>
-        {/foreach}
-      </ul>
+  {include file='CRM/common/TabHeader.tpl' tabHeader=$allTabs containerClasses="crm-contact-page crm-inline-edit-container" listClasses="crm-contact-tabs-list" tabIdPrefix="contact-"}
 
-      {foreach from=$allTabs item=tabValue}
-        {if !empty($tabValue.template)}
-          <div id="contact-{$tabValue.id}">
-            {include file=$tabValue.template}
-          </div>
-        {/if}
-      {/foreach}
-    </div>
-    <div class="clear"></div>
-  </div>
 {/if}
 
 {* CRM-10560 *}

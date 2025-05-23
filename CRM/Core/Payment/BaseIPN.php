@@ -47,6 +47,7 @@ class CRM_Core_Payment_BaseIPN {
    * Constructor.
    */
   public function __construct() {
+    CRM_Core_Error::deprecatedWarning('CRM_Core_Payment_BaseIPN will be removed around 6.6 - if you see this warning your payment processor needs to be updated!');
     self::$_now = date('YmdHis');
   }
 

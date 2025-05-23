@@ -11,7 +11,7 @@
     var SETTING_DEBOUNCE_MS = 5000;
     var RECIPIENTS_PREVIEW_LIMIT = 50;
 
-    var ts = $scope.ts = CRM.ts();
+    var ts = $scope.ts = CRM.ts('civi_mail');
 
     $scope.recipients = null;
     $scope.outdated = null;

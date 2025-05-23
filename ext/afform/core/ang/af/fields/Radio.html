@@ -1,7 +1,7 @@
-<label ng-repeat="opt in getOptions() track by opt.id" >
-  <input class="crm-form-radio" name="{{:: fieldId }}" type="radio" ng-model="getSetValue" ng-required="$ctrl.defn.required" ng-model-options="{getterSetter: true}" ng-value="opt.id" />
+<label ng-repeat="opt in getOptions() track by opt.id" for="{{ fieldId + opt.id }}" class="radio-inline">
+  <input class="crm-form-radio" id="{{ fieldId + opt.id }}" name="{{:: fieldId }}" type="radio" ng-model="getSetValue" ng-required="$ctrl.defn.required" ng-model-options="{getterSetter: true}" ng-value="opt.id"  aria-label="{{opt.label}}" />
   {{:: opt.label }}
 </label>
-<a ng-if="!$ctrl.defn.required" class="crm-hover-button" title="{{:: ts('Clear') }}" ng-show="!!dataProvider.getFieldData()[$ctrl.fieldName] || dataProvider.getFieldData()[$ctrl.fieldName] === false || dataProvider.getFieldData()[$ctrl.fieldName] === 0" ng-click="dataProvider.getFieldData()[$ctrl.fieldName] = null">
+	<a ng-if="!$ctrl.defn.required" class="crm-hover-button" title="{{:: ts('Clear') }}" ng-show="!!dataProvider.getFieldData()[$ctrl.fieldName] || dataProvider.getFieldData()[$ctrl.fieldName] === false || dataProvider.getFieldData()[$ctrl.fieldName] === 0" ng-click="dataProvider.getFieldData()[$ctrl.fieldName] = null" aria-label="{{:: ts('Clear') }}">
   <i class="crm-i fa-times" aria-hidden="true"></i>
 </a>

@@ -24,7 +24,7 @@ use Civi\Api4\MockBasicEntity;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\CiviEnvBuilder;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\Invasive;
 use Civi\Test\TransactionalInterface;
 
@@ -100,6 +100,12 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->execute()
       ->indexBy('identifier');
 
+    // 3 total records saved
+    $this->assertEquals(3, $result->countFetched());
+    // 2 records updated
+    $this->assertEquals(2, $result->countMatched());
+
+    // Check updated values
     $this->assertTrue(5 === $result[$id1]['weight']);
     $this->assertEquals('new', $result[$id2]['foo']);
     $this->assertEquals('two', $result[$id2]['group']);

@@ -28,7 +28,7 @@
           <div>
             <p><strong>{ts}Currently set to: {/ts}<span class='js-dedupe-rules-current'></span></strong></p>
             <p class='js-dedupe-rules-desc'></p>
-            <p><button class='crm-button js-dedupe-rules-change' type='button' {if NOT $canChangeUsage} disabled title='{ts 1=$ruleUsed}To change the usage for this rule, please configure another rule as %1{/ts}'{/if}>{ts}Change usage{/ts}</button></p>
+            <p><button class='crm-button js-dedupe-rules-change' type='button' {if NOT $canChangeUsage} disabled title='{ts escape='htmlattribute' 1=$ruleUsed}To change the usage for this rule, please configure another rule as %1{/ts}'{/if}>{ts}Change usage{/ts}</button></p>
           </div>
         </td>
      </tr>
@@ -102,7 +102,7 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
-<div class='dedupe-rules-dialog' data-title='{ts escape='js'}Change usage{/ts}' data-button-close='{ts escape='js'}Close{/ts}' data-button-update='{ts escape='js'}Update{/ts}' hidden>
+<div class='dedupe-rules-dialog' data-title='{ts escape='htmlattribute'}Change usage{/ts}' data-button-close='{ts escape='htmlattribute'}Close{/ts}' data-button-update='{ts escape='htmlattribute'}Update{/ts}' hidden>
   <p>{ts}CiviCRM includes three types of dedupe rule. <strong>You can only configure one 'Unsupervised' and one 'Supervised' rule for each contact type, but you can configure any number of additional 'General' rules to provide other criteria to scan for possible duplicates.</strong>{/ts}</p>
   <p>{ts}Selecting 'Unsupervised' or 'Supervised' will convert the previously configured rule of that type to 'General'.{/ts}</p>
   <div>

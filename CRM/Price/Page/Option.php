@@ -163,8 +163,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         }
       }
       $customOption[$id]['order'] = $customOption[$id]['weight'];
-      $customOption[$id]['help_pre'] = $customOption[$id]['help_pre'] ?? NULL;
-      $customOption[$id]['help_post'] = $customOption[$id]['help_post'] ?? NULL;
+      $customOption[$id]['help_pre'] ??= NULL;
+      $customOption[$id]['help_post'] ??= NULL;
       $customOption[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         [
           'oid' => $id,
@@ -229,9 +229,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     if ($action & CRM_Core_Action::DELETE) {
       // add breadcrumb
       $url = CRM_Utils_System::url('civicrm/admin/price/field/option', 'reset=1');
-      CRM_Utils_System::appendBreadCrumb(ts('Price Option'),
-        $url
-      );
+      CRM_Utils_System::appendBreadCrumb([
+        [
+          'title' => ts('Price Option'),
+          'url' => $url,
+        ],
+      ]);
       $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceFieldValue::getOptionLabel($oid));
       $comps = [
         'Event' => 'civicrm_event',

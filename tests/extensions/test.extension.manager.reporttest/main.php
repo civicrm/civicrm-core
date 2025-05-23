@@ -36,7 +36,7 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
     if ($this->cid) {
       // link back to contact summary
       $this->assign('backURL', CRM_Utils_System::url('civicrm/contact/view', "reset=1&selectedChild=log&cid={$this->cid}", FALSE, NULL, FALSE));
-      $this->assign('revertURL', self::$_template->get_template_vars('revertURL') . "&cid={$this->cid}");
+      $this->assign('revertURL', self::$_template->getTemplateVars('revertURL') . "&cid={$this->cid}");
     }
     else {
       // link back to summary report

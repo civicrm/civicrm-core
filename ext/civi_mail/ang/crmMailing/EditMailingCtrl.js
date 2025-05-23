@@ -9,7 +9,7 @@
     $scope.checkPerm = CRM.checkPerm;
     $scope.mailingFields = mailingFields;
 
-    var ts = $scope.ts = CRM.ts(null);
+    var ts = $scope.ts = CRM.ts('civi_mail');
     $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
     var block = $scope.block = crmBlocker();
     var myAutosave = null;

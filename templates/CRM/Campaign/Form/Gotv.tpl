@@ -100,7 +100,7 @@
 
       //collapse the search form.
       var searchFormName = '#search_form_' + {/literal}'{$searchVoterFor}'{literal};
-      CRM.$( searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
+      CRM.$( searchFormName + 'details').prop('open', false);
     }, 'html' );
   }
 

@@ -42,10 +42,10 @@ class ActionMapping extends \Civi\ActionSchedule\MappingBase {
 
   public function getEntityTable(\CRM_Core_DAO_ActionSchedule $actionSchedule): string {
     $this->loadSavedSearch($actionSchedule->entity_value);
-    return \CRM_Core_DAO_AllCoreTables::getTableForEntityName($this->savedSearch['api_entity']);
+    return CoreUtil::getTableName($this->savedSearch['api_entity']);
   }
 
-  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+  public function modifyApiSpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
     $spec->getFieldByName('entity_value')
       ->setLabel(ts('Saved Search'))
       ->setInputAttr('multiple', FALSE);
@@ -67,7 +67,7 @@ class ActionMapping extends \Civi\ActionSchedule\MappingBase {
       ->addWhere('is_current', '=', TRUE)
       // Limit to searches that have something to do with contacts
       // FIXME: Matching `api_params LIKE %contact%` is a cheap trick with no real understanding of the appropriateness of the SavedSearch for use as a Scheduled Reminder.
-      ->addClause('OR', ['api_entity', '=', 'Contact'], ['api_params', 'LIKE', '%contact%'])
+      ->addClause('OR', ['api_entity', 'IN', ['Contact', 'Individual', 'Household', 'Organization']], ['api_params', 'LIKE', '%contact%'])
       ->execute()->getArrayCopy();
   }
 
@@ -109,6 +109,21 @@ class ActionMapping extends \Civi\ActionSchedule\MappingBase {
       }
     }
     return $fieldNames;
+  }
+
+  public static function getLimitToOptions(): array {
+    return [
+      [
+        'id' => 3,
+        'name' => 'copy',
+        'label' => ts('Send copy to'),
+      ],
+      [
+        'id' => 4,
+        'name' => 'reroute',
+        'label' => ts('Send instead to'),
+      ],
+    ];
   }
 
   /**
@@ -172,9 +187,13 @@ class ActionMapping extends \Civi\ActionSchedule\MappingBase {
       $sqlSelect['casDateField'] = "'" . \CRM_Utils_Type::escape($schedule->absolute_date, 'String') . "'";
     }
     else {
-      $sqlSelect['casDateField'] = SqlExpression::convert($schedule->start_action_date)->render($apiQuery);
+      $sqlSelect['casDateField'] = $this->getSelectExpression($schedule->start_action_date)['expr']->render($apiQuery);
     }
     return $sqlSelect;
+  }
+
+  public function sendToAdditional($entityId): bool {
+    return FALSE;
   }
 
 }

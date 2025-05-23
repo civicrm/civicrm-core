@@ -17,6 +17,8 @@
 
 /**
  * Helper class to build navigation links
+ *
+ * @deprecated since 5.72 will be removed around 5.78.
  */
 class CRM_Event_Form_ManageEvent_TabHeader {
 
@@ -25,14 +27,18 @@ class CRM_Event_Form_ManageEvent_TabHeader {
    *
    * @return array
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.72 will be removed around 5.78.
    */
   public static function build(&$form) {
+    CRM_Core_Error::deprecatedWarning('no alternative');
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
-      $tabs = self::process($form);
+      $tabs = self::process($form) ?? [];
       $form->set('tabHeader', $tabs);
     }
-    $form->assign_by_ref('tabHeader', $tabs);
+    $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
+    $form->assign('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting([
@@ -49,8 +55,11 @@ class CRM_Event_Form_ManageEvent_TabHeader {
    *
    * @return array
    * @throws Exception
+   *
+   * @deprecated since 5.72 will be removed around 5.78.
    */
   public static function process(&$form) {
+    CRM_Core_Error::deprecatedWarning('no alternative');
     if ($form->getVar('_id') <= 0) {
       return NULL;
     }
@@ -77,7 +86,6 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
     }
 
-    $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
     $tabs['pcp'] = ['title' => ts('Personal Campaigns')] + $default;
     $tabs['repeat'] = ['title' => ts('Repeat')] + $default;
 
@@ -184,8 +192,7 @@ WHERE      e.id = %1
         $link = "civicrm/event/manage/{$key}";
         $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
 
-        $tabs[$key]['link'] = (isset($value['link']) ? $value['link'] :
-          CRM_Utils_System::url($link, $query));
+        $tabs[$key]['link'] = $value['link'] ?? CRM_Utils_System::url($link, $query);
       }
     }
 
@@ -194,8 +201,11 @@ WHERE      e.id = %1
 
   /**
    * @param CRM_Event_Form_ManageEvent $form
+   *
+   * @deprecated since 5.72 will be removed around 5.78.
    */
   public static function reset(&$form) {
+    CRM_Core_Error::deprecatedWarning('no alternative');
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
@@ -204,8 +214,11 @@ WHERE      e.id = %1
    * @param $tabs
    *
    * @return int|string
+   *
+   * @deprecated since 5.72 will be removed around 5.78.
    */
   public static function getCurrentTab($tabs) {
+    CRM_Core_Error::deprecatedWarning('no alternative');
     static $current = FALSE;
 
     if ($current) {

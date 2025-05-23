@@ -44,7 +44,7 @@
         {if !$sections} {* section headers and sticky headers aren't playing nice yet *}
             <thead class="sticky">
             <tr>
-              {$tableHeader|smarty:nodefaults}
+              {$tableHeader nofilter}
             </tr>
         </thead>
         {/if}
@@ -90,7 +90,10 @@
               {/if}
               {/if}
           {/foreach}
-          <tr  class="{cycle values="odd-row,even-row"} {if $row.class}{$row.class}{/if} crm-report" id="crm-report_{$rowid}">
+          <tr
+            class="{cycle values="odd-row,even-row"} {if array_key_exists('class', $row)}{$row.class}{/if} crm-report"
+            id="crm-report_{$rowid}"
+          >
               {foreach from=$columnHeaders item=header key=field}
                   {assign var=fieldLink value=$field|cat:"_link"}
                   {assign var=fieldHover value=$field|cat:"_hover"}

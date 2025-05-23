@@ -14,7 +14,7 @@
      <div class="crm-submit-buttons">{$form.buttons.html}</div>
    {/if}
 {else}
-    <div id="customData"></div>
+    <div id="customData_{$contact_type}" class="crm-customData-block"></div>
     <div class="crm-submit-buttons">{$form.buttons.html}</div>
 
     {*include custom data js file*}
@@ -45,4 +45,3 @@
   {/if}
   {include file="CRM/Form/attachmentjs.tpl"}
 {/if}
-

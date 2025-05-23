@@ -37,7 +37,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  private $fixtures = [];
+  private array $fixtures = [];
 
   /**
    * Generic usable membership type id.
@@ -790,7 +790,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'id' => $customField['id'],
       'token' => sprintf('{contact.custom_%s}', $customField['id']),
       'name' => sprintf('custom_%s', $customField['id']),
-      'value' => 'text ' . substr(sha1(mt_rand()), 0, 7),
+      'value' => 'text ' . bin2hex(random_bytes(4)),
     ];
 
     $this->fixtures['sched_on_custom_date'] = [
@@ -833,6 +833,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'civicrm_action_schedule',
       'civicrm_action_log',
       'civicrm_email',
+      'civicrm_campaign',
     ], TRUE);
     parent::tearDown();
   }
@@ -956,15 +957,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // In this example, we test activity tokens
     $activityTokens = '{activity.subject};;{activity.details};;{activity.activity_date_time}';
-    $activity = [
-      'status_id' => 1,
-      'activity_type_id' => 2,
-      'activity_date_time' => '20120615100000',
-      'is_current_revision' => 1,
-      'is_deleted' => 0,
-      'subject' => 'Phone call',
-      'details' => 'A phone call about a bear',
-    ];
     $activityTokensExpected = 'Phone call;;A phone call about a bear;;June 15th, 2012 10:00 AM';
     $cases[4] = [
       // Schedule definition.
@@ -1030,9 +1022,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ])->execute();
 
     CRM_Utils_Time::setTime('2012-06-14 15:00:00');
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('job', 'send_reminder');
-    $this->mut->assertRecipients([['test-member@example.com']]);
-    foreach ($this->mut->getAllMessages('ezc') as $message) {
+    $mailUtil->assertRecipients([['test-member@example.com']]);
+    foreach ($mailUtil->getAllMessages('ezc') as $message) {
       /** @var ezcMail $message */
 
       $messageArray = [];
@@ -1057,7 +1050,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
           "Check that '$field'' matches regex. " . print_r(['expected' => $patterns, 'actual' => $messageArray], 1));
       }
     }
-    $this->mut->clearMessages();
   }
 
   /**
@@ -1714,6 +1706,94 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         // After the email is sent, another one is not sent
         'time' => '2012-06-01 02:00:00',
         'recipients' => [],
+      ],
+    ]);
+  }
+
+  /**
+   * Test Membership Renewal Reminders.
+   */
+  public function testAutoRenewMembershipSchedule(): void {
+    // Create 3 memberships.
+    // Normal membership with end_date = 20120615
+    $membership = $this->createMembershipFromFixture('rolling_membership', 'Grace');
+    $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $membership['contact_id'],
+      'email' => 'test-member@example.com',
+    ]);
+    $membershipTypeID = $membership['membership_type_id'];
+
+    // Auto-renew membership with cancelled recurring payment.
+    $membership2 = $this->createMembershipFromFixture('rolling_membership', 'Grace', [], ['membership_type_id' => $membershipTypeID]);
+    $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $membership2['contact_id'],
+      'email' => 'test-cancelrenew@example.com',
+    ]);
+
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+      'contact_id' => $membership2['contact_id'],
+      'installments' => NULL,
+      'frequency_interval' => '3',
+      'amount' => '100',
+      'contribution_status_id' => 4,
+      'start_date' => '2012-03-15 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+    ]);
+    $this->callAPISuccess('Membership', 'create', [
+      'id' => $membership2['id'],
+      'contribution_recur_id' => $contributionRecur['id'],
+    ]);
+
+    // Auto-renew membership with active recurring payment.
+    $membership3 = $this->createMembershipFromFixture('rolling_membership', 'Grace', [], ['membership_type_id' => $membershipTypeID]);
+    $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $membership3['contact_id'],
+      'email' => 'test-activerenew@example.com',
+    ]);
+
+    $contributionRecur2 = $this->callAPISuccess('contribution_recur', 'create', [
+      'contact_id' => $membership3['contact_id'],
+      'installments' => NULL,
+      'frequency_interval' => '3',
+      'amount' => '100',
+      'contribution_status_id' => 2,
+      'start_date' => '2012-03-15 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+    ]);
+    $this->callAPISuccess('Membership', 'create', [
+      'id' => $membership3['id'],
+      'contribution_recur_id' => $contributionRecur2['id'],
+    ]);
+
+    // Create Reminder to send to auto-renew memberships only.
+    $this->createScheduleFromFixtures('sched_membership_end_2month', [
+      'entity_value' => $membership['membership_type_id'],
+      'entity_status' => 2,
+    ]);
+
+    // end_date=2012-06-15 ; schedule is 2 month after end_date
+    $this->assertCronRuns([
+      [
+        // Only active auto-renew contact shiould receive the reminder.
+        'time' => '2012-08-15 01:00:00',
+        'recipients' => [['test-activerenew@example.com']],
+      ],
+    ]);
+
+    // Create Reminder to send to normal memberships only.
+    $this->createScheduleFromFixtures('sched_membership_end_2month', [
+      'entity_value' => $membership['membership_type_id'],
+      'entity_status' => 1,
+    ]);
+
+    // end_date=2012-06-15 ; schedule is 2 month after end_date
+    $this->assertCronRuns([
+      [
+        // Both normal member & cancelled renewal member shiould receive the reminder.
+        'time' => '2012-08-15 01:00:00',
+        'recipients' => [['test-member@example.com'], ['test-cancelrenew@example.com']],
       ],
     ]);
   }
@@ -2711,8 +2791,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @param string $fixture
    * @param array $extraParams
-   *
-   * @throws \CRM_Core_Exception
    */
   protected function createScheduleFromFixtures(string $fixture, array $extraParams = []): void {
     $id = $this->callAPISuccess('ActionSchedule', 'create', array_merge($this->fixtures[$fixture], $extraParams))['id'];

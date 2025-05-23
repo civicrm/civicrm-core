@@ -46,6 +46,31 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
   }
 
   /**
+   */
+  public static function on_civi_search_autocompleteDefault(GenericHookEvent $e) {
+    // Adjust search params for menubar-quicksearch
+    if ($e->formName === 'crmMenubar' && $e->fieldName === 'crm-qsearch-input') {
+      // If doing a search by a field other than the default,
+      // add that field to the main column
+      if ($e->filters) {
+        $filterField = array_keys($e->filters)[0];
+        // If the filter is from a multi-record custom field set, add necessary join to the query
+        if (str_contains($filterField, '.')) {
+          [$customGroupName, $customFieldName] = explode('.', $filterField);
+          $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $customGroupName]);
+          if (!empty($customGroup['is_multiple'])) {
+            $e->savedSearch['api_params']['join'][] = [
+              "Custom_$customGroupName AS $customGroupName",
+              'INNER',
+              ['id', '=', "$customGroupName.entity_id"],
+            ];
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Provide default SearchDisplay for Contact autocompletes
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
@@ -53,6 +78,12 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || !CoreUtil::isContact($e->savedSearch['api_entity'])) {
       return;
+    }
+    if ($e->savedSearch['api_entity'] === 'Contact') {
+      $contactTypeIcon = ['field' => 'contact_type:icon'];
+    }
+    else {
+      $contactTypeIcon = ['icon' => CoreUtil::getInfoItem($e->savedSearch['api_entity'], 'icon')];
     }
     $e->display['settings'] = [
       'sort' => [
@@ -64,7 +95,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
           'key' => 'sort_name',
           'icons' => [
             ['field' => 'contact_sub_type:icon'],
-            ['field' => 'contact_type:icon'],
+            $contactTypeIcon,
           ],
         ],
         [
@@ -75,8 +106,8 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         ],
       ],
     ];
-    // Adjust display for quicksearch input - the display only needs one column
-    // as the menubar autocomplete does not support descriptions
+    // Adjust search display for menubar-quicksearch
+    // The display only needs one column as the menubar autocomplete does not support descriptions
     if (($e->context['formName'] ?? NULL) === 'crmMenubar' && ($e->context['fieldName'] ?? NULL) === 'crm-qsearch-input') {
       $column = ['type' => 'field'];
       // Map contact_autocomplete_options settings to v4 format
@@ -89,20 +120,29 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         7 => 'address_primary.country_id:label',
         8 => 'address_primary.postal_code',
       ];
+      $filterFields = [];
       // If doing a search by a field other than the default,
       // add that field to the main column
       if (!empty($e->context['filters'])) {
-        $filterField = array_keys($e->context['filters'])[0];
+        $filterFields[] = array_keys($e->context['filters'])[0];
       }
-      elseif (\Civi::settings()->get('includeEmailInName')) {
-        $filterField = 'email_primary.email';
+      else {
+        if (\Civi::settings()->get('includeEmailInName')) {
+          $filterFields[] = 'email_primary.email';
+        }
+        if (\Civi::settings()->get('includeNickNameInName')) {
+          $filterFields[] = 'nick_name';
+        }
       }
-      // Search on name + filter/email
-      if (!empty($filterField)) {
-        $column['key'] = $filterField;
-        $column['rewrite'] = "[sort_name] :: [$filterField]";
+      if (!empty($filterFields)) {
+        // Take the first one as the key.
+        $column['key'] = $filterFields[0];
         $column['empty_value'] = '[sort_name]';
-        $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, [$filterField]);
+        $column['rewrite'] = "[sort_name]";
+        foreach ($filterFields as $filterField) {
+          $column['rewrite'] .= " :: [$filterField]";
+          $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, [$filterField]);
+        }
       }
       // No filter & email search disabled: search on name only
       else {

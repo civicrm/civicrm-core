@@ -133,6 +133,7 @@ function civicrm_api3_payment_create($params) {
       }
     }
   }
+  _civicrm_api3_format_params_for_create($params, 'FinancialTrxn');
   // Check if it is an update
   if (!empty($params['id'])) {
     $amount = $params['total_amount'];

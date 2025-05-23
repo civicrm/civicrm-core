@@ -22,10 +22,11 @@ class ExtraJoinable extends Joinable {
    *
    * @param string $baseTableAlias
    * @param string $targetTableAlias
+   * @param array|null $openJoin
    *
    * @return array
    */
-  public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias) {
+  public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias, ?array $openJoin) {
     $conditions = [];
     $this->addExtraJoinConditions($conditions, $baseTableAlias, $targetTableAlias);
     return $conditions;

@@ -1,0 +1,525 @@
+.crm-container table:not(.crm-inline-edit-form,
+.crm-table-group-summary) {
+  border: var(--crm-table-outside-border);
+  background: var(--crm-table-background);
+  box-shadow: var(--crm-block-shadow);
+  margin: 0 0 var(--crm-r);
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 100%;
+}
+.crm-container table thead {
+  background-color: var(--crm-table-header-bg);
+}
+.crm-container th,
+.crm-container table thead.sticky th,
+.crm-container table.dataTable thead th,
+.crm-container tr.columnheader td {
+  background-color: var(--crm-table-header-bg);
+  border-bottom: var(--crm-table-header-bottom);
+  color: var(--crm-table-header-col);
+  font-family: var(--crm-font-bold);
+  font-weight: bold;
+  padding: var(--crm-table-padding);
+  text-align: left;
+}
+.crm-container table:not(thead) tr {
+  border-bottom: var(--crm-table-row-border);
+  background-color: transparent;
+}
+.crm-container .odd-row,
+.crm-container .odd,
+tbody.scrollContent,
+.crm-container table.dataTable.stripe tbody tr.odd,
+.crm-container table.dataTable.display tbody tr.odd {
+  background-color: var(--crm-table-odd-row);
+}
+.crm-container table.dataTable.hover tbody tr.odd:hover,
+.crm-container table.dataTable.display tbody tr.odd:hover,
+.crm-container table.row-highlight tr:hover,
+.crm-container .crm-row-selected,
+.crm-container .odd-row:hover,
+.crm-container .odd:hover {
+  background-color: var(--crm-table-odd-hover);
+}
+table.dataTable.display tbody tr.odd > .sorting_1,
+table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-table-odd-row);
+}
+.crm-container .even-row,
+.crm-container .even,
+tbody.scrollContent tr.alternateRow {
+  background-color: var(--crm-table-even-row);
+}
+.crm-container table.dataTable.hover tbody tr.even:hover,
+.crm-container table.dataTable.display tbody tr.even:hover,
+.crm-container table.row-highlight tr.even-row:hover,
+.crm-container table.row-highlight tr.even:hover,
+.crm-container .even-row.crm-row-selected,
+.crm-container .even.crm-row-selected ,
+.crm-container .even-row:hover,
+.crm-container .even:hover,
+tbody.scrollContent tr.alternateRow:hover {
+  background-color: var(--crm-table-even-hover);
+}
+table.dataTable.display tbody tr.even > .sorting_1,
+table.dataTable.order-column.stripe tbody tr.even > .sorting_1 {
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-table-even-row);
+}
+.crm-container .extension-installed {
+  background: var(--crm-alert-success-bg);
+  color: var(--crm-alert-success-text);
+}
+.crm-container .extension-installed summary {
+  color: var(--crm-alert-success-text);
+}
+table.dataTable.display tbody tr.extension-installed.odd {
+  background: linear-gradient(to top,rgba(256,256,256,0.2),rgba(256,256,256,0.2)) var(--crm-alert-success-bg);
+}
+table.dataTable.display tbody tr.extension-installed.even:hover {
+  background: linear-gradient(to top,rgba(256,256,256,0.05),rgba(256,256,256,0.05)) var(--crm-alert-success-bg);
+}
+table.dataTable.display tbody tr.extension-installed.odd:hover {
+  background: linear-gradient(to top,rgba(256,256,256,0.25),rgba(256,256,256,0.25)) var(--crm-alert-success-bg);
+}
+table.dataTable.display tbody tr.extension-installed.odd > .sorting_1,
+table.dataTable.order-column.stripe tbody tr.extension-installed.odd > .sorting_1 {
+  background: var(--crm-alert-success-bg) !important;
+}
+table.dataTable.display tbody tr.extension-installed.even > .sorting_1,
+table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting_1 {
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-alert-success-bg);
+}
+.crm-container td,
+.crm-container table.dataTable thead td {
+  padding: var(--crm-table-padding);
+}
+.crm-container table.selector td {
+  border-right: var(--crm-table-column-border);
+}
+.crm-container table td:has(.btn-slide),
+.crm-container table:not(.crm-info-panel) td:not(.crm-case-date):has(.action-item) {
+  text-align: right;
+}
+.crm-container table.crm-mailing-ab-table td:has(.action-item) {
+  text-align: unset;
+}
+.crm-container table.form-layout td:has(details) {
+  padding: 0;
+}
+.crm-form-block .form-item table,
+.crm-form-block .form-item table tr,
+.crm-container .crm-form-block:not( .crm-report-field-form-block,
+.crm-group-search-form-block,
+#map-field,
+#payLaterOptions,
+.crm-membership-form-block,
+.crm-contribution-form-block,
+.crm-case-caseview-form-block,
+.crm-case-activity-form-block) table:not(#preview-counts),
+.crm-container .crm-form-block:not( .crm-report-field-form-block,
+.crm-group-search-form-block,
+.crm-membership-form-block,
+.crm-contribution-form-block,
+.crm-case-caseview-form-block,
+.crm-case-activity-form-block) table:not(#preview-counts) tr,
+.crm-container .crm-accordion-body table.form-layout-compressed,
+.crm-container .crm-search-form-block table.form-layout-compressed,
+.crm-container .crm-case-activity-form-block > table,
+.crm-container table.no-border,
+.crm-container table.no-border tr,
+.crm-container table#crm-activity-view-table,
+.crm-container .crm-report-form-block table.form-layout-compressed {
+  box-shadow: none;
+  border: 0 solid transparent;
+  background: transparent;
+}
+.crm-container .crm-form-block.crm-report-field-form-block table,
+.crm-container .CRM_Contribute_Form_ContributionCharts #chartData table,
+.crm-container .crm-case-caseview-form-block table {
+  box-shadow: none;
+}
+.crm-selection-reset {
+  padding: var(--crm-m) 0;
+  margin-bottom: var(--crm-m);
+  display: block;
+}
+
+/* Sticky header */
+.crm-sticky thead > tr > th,
+.crm-container table thead.sticky {
+  background-color: var(--crm-table-header-bg);
+}
+.crm-container thead div.sticky-header {
+  height: var(--crm-r);
+}
+.crm-sticky thead,
+.crm-container thead div.sticky-header {
+  border-bottom: 2px solid #cfcec3;
+  background-color: var(--crm-table-header-bg);
+  z-index: 10;
+}
+.crm-sticky thead {
+  position: sticky;
+  top: var(--crm-menubar-bottom);
+  box-shadow: 0 2px 2px -1px #cfcec3;
+}
+
+/* Data Tables */
+.crm-container .dataTables_wrapper .dataTables_length,
+.crm-container .dataTables_wrapper .dataTables_filter,
+.crm-container .dataTables_wrapper .dataTables_info,
+.crm-container .dataTables_wrapper .dataTables_processing,
+.crm-container .dataTables_wrapper .dataTables_paginate {
+  color: var(--crm-c-text) !important;
+}
+.crm-container .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.crm-container .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
+.crm-container .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+  color: var(--crm-c-text) !important; /* vs jqueery.dataTables.css */
+}
+
+/* Nested table */
+.crm-container .crm-child-row tr:first-child {
+  border: 1px solid var(--crm-c-page-background);
+}
+.crm-container .crm-child-row {
+  border-top: 1px solid var(--crm-c-gray-400);
+  border-bottom: 1px solid var(--crm-c-gray-025);
+}
+.crm-container .crm-child-row table {
+  box-shadow: none;
+  border: var(--crm-table-nested-border);
+}
+.crm-container .crm-child-row th {
+  opacity: 0.7;
+}
+.crm-container .crm-child-row > td:has(table) {
+  padding: var(--crm-table-nested-padding);
+}
+.crm-container tr.crm-child-row:hover {
+  background-color: transparent;
+}
+.crm-container tr.crm-child-row > td {
+  box-shadow: inset 0 10px 8px -10px rgba(0,0,0,.3), inset 0 -11px 8px -9px rgba(0,0,0,.15);
+  background: var(--crm-table-inset-bg);
+}
+
+/* Nested, inset table - groups page */
+tbody .crm-row-child {
+  border-top: 1px solid var(--crm-c-gray-400);
+}
+tbody .crm-row-child ~ .crm-row-child {
+  border-top: 0;
+}
+tbody .crm-row-child:not(:has(~ .crm-row-child)) {
+  border-bottom: 1px solid var(--crm-c-gray-025);
+}
+tbody .crm-row-child td {
+  box-shadow: inset 0 10px 8px -10px rgba(0,0,0,.15);
+  background: var(--crm-table-inset-bg);
+}
+tbody .crm-row-child:hover td {
+  background: var(--crm-table-odd-hover);
+  cursor: var(--crm-hover-clickable);
+}
+tbody .crm-row-child ~ .crm-row-child td {
+  box-shadow: none;
+}
+tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
+  box-shadow: inset 0 -11px 8px -9px rgba(0,0,0,.15);
+}
+
+/* Compressed table */
+.crm-container table.form-layout-compressed {
+  width: var(--crm-table-compressed-width);
+  border: var(--crm-table-outside-border);
+  background: var(--crm-table-background);
+  box-shadow: var(--crm-block-shadow);
+  margin: var(--crm-m) 0 var(--crm-l);
+}
+.crm-container table.form-layout-compressed th {
+  background: transparent;
+  border: none;
+  padding: var(--crm-table-padding);
+}
+.crm-container .crm-form-block > .form-layout-compressed {
+  /* handles double box/border issue when table is in a form block,
+    e.g. civicrm/member/add?reset=1&action=add&context=standalone */
+  box-shadow: none;
+  border: 0 solid transparent;
+  background: transparent;
+}
+
+/* Advance search compressed table */
+#search-status table.form-layout-compressed {
+  border: 0;
+  background: var(--crm-c-background);
+  width: 100%;
+  border: 0;
+  padding: var(--crm-padding-reg);
+  border-radius: var(--crm-roundness);
+  margin: 0;
+}
+#search-status table.form-layout-compressed tr {
+  border: 0;
+}
+#search-status table.form-layout-compressed td {
+  padding-inline: var(--crm-padding-reg);
+}
+#search-status table.form-layout-compressed tr:first-of-type td,
+#search-status table.form-layout-compressed tr:last-of-type td {
+  padding-block: var(--crm-padding-reg);
+}
+
+/* Report table */
+.crm-container table.report {
+  width: auto;
+}
+.crm-container table.report td {
+  border: var(--crm-table-row-border);
+  background-color: var(--crm-table-even-row);
+}
+.crm-container tr.columnheader-dark th {
+  background-color: var(--crm-c-gray-700);
+  color: var(--crm-c-text-light);
+  border: 1px solid var(--crm-c-gray-800);
+}
+
+/* Batch entry table */
+.crm-container .crm-grid-table {
+  display: table;
+  border-collapse: collapse;
+  border: var(--crm-table-outside-border);
+  background-color: var(--crm-table-background);
+}
+.crm-container .crm-grid-row,
+.crm-container .crm-grid-header {
+  display: table-row;
+}
+.crm-container .crm-grid-header {
+  white-space: nowrap;
+}
+.crm-container .crm-grid-cell {
+  display: table-cell;
+  border-right: 1px solid var(--crm-table-column-border);
+  padding: var(--crm-table-padding);
+  vertical-align: top;
+}
+
+/* Fees tables (contribs/events) */
+.crm-container table#map-field-table {
+  width: auto;
+  border: var(--crm-table-outside-border);
+  margin-top: var(--crm-padding-reg);
+}
+
+/* Pay later table (nested inside another table) */
+
+.crm-container table#payLater table#payLaterOptions.form-layout {
+  border: 1px solid #dedede;
+  background: var(--crm-c-page-background);
+}
+
+/* Table bg colours */
+
+.crm-container .table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: var(--crm-r1);
+}
+.crm-container .table > thead > tr > th,
+.crm-container .table > thead > tr > td,
+.crm-container .table > tbody > tr > th,
+.crm-container .table > tbody > tr > td,
+.crm-container .table > tfoot > tr > th,
+.crm-container .table > tfoot > tr > td {
+  padding: var(--crm-table-padding);
+}
+.crm-container .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
+  padding-inline: 0.5em;
+}
+.crm-container .table > tbody + tbody {
+  border-top: var(--crm-table-header-bottom);
+}
+.crm-container .table-condensed > thead > tr > th,
+.crm-container .table-condensed > thead > tr > td,
+.crm-container .table-condensed > tbody > tr > th,
+.crm-container .table-condensed > tbody > tr > td,
+.crm-container .table-condensed > tfoot > tr > th,
+.crm-container .table-condensed > tfoot > tr > td {
+  padding: var(--crm-s1);
+}
+.crm-container .table-bordered {
+  border: var(--crm-table-outside-border);
+}
+.crm-container .table-bordered > thead > tr > th,
+.crm-container .table-bordered > thead > tr > td,
+.crm-container .table-bordered > tbody > tr > th,
+.crm-container .table-bordered > tbody > tr > td,
+.crm-container .table-bordered > tfoot > tr > th,
+.crm-container .table-bordered > tfoot > tr > td {
+  border: var(--crm-table-outside-border);
+}
+.crm-container .table-bordered > thead > tr > th,
+.crm-container .table-bordered > thead > tr > td {
+  border-bottom-width: 2px;
+}
+.crm-container .table-striped > tbody > tr {
+  background-color: var(--crm-table-even-row);
+}
+.crm-container .table-striped > tbody > tr:nth-of-type(2n+1) {
+  background-color: var(--crm-table-odd-row);
+}
+.crm-container .table-striped > tbody > tr:hover {
+  background-color: var(--crm-table-even-hover);
+}
+.crm-container .table-striped > tbody > tr:nth-of-type(2n+1):hover {
+  background-color: var(--crm-table-odd-hover);
+}
+.crm-container .table > thead > tr > td.active,
+.crm-container .table > thead > tr > th.active,
+.crm-container .table > thead > tr.active > td,
+.crm-container .table > thead > tr.active > th,
+.crm-container .table > tbody > tr > td.active,
+.crm-container .table > tbody > tr > th.active,
+.crm-container .table > tbody > tr.active > td,
+.crm-container .table > tbody > tr.active > th,
+.crm-container .table > tfoot > tr > td.active,
+.crm-container .table > tfoot > tr > th.active,
+.crm-container .table > tfoot > tr.active > td,
+.crm-container .table > tfoot > tr.active > th {
+  background-color: var(--crm-table-odd-row);
+}
+.crm-container .table-hover > tbody > tr > td.active:hover,
+.crm-container .table-hover > tbody > tr > th.active:hover,
+.crm-container .table-hover > tbody > tr.active:hover > td,
+.crm-container .table-hover > tbody > tr:hover > .active,
+.crm-container .table-hover > tbody > tr.active:hover > th {
+  background-color: var(--crm-table-odd-hover);
+}
+.crm-container .table td.success,
+.crm-container .table th.success,
+.crm-container .table tr.success > td,
+.crm-container .table tr.success > th,
+.crm-container table tr.crm-row-ok,
+.crm-container table tr.crm-row-ok > td {
+  background-color: var(--crm-alert-success-bg);
+  color: var(--crm-alert-success-text);
+}
+.crm-container .table-hover > tbody > tr > td.success:hover,
+.crm-container .table-hover > tbody > tr > th.success:hover,
+.crm-container .table-hover > tbody > tr.success:hover > td,
+.crm-container .table-hover > tbody > tr:hover > .success,
+.crm-container .table-hover > tbody > tr.success:hover > th,
+.crm-container table tr.crm-row-ok:hover > td,
+.crm-container table tr.crm-row-ok > td:hover {
+  background-color: var(--crm-alert-success-border);
+}
+.crm-container .table td.warning,
+.crm-container .table th.warning,
+.crm-container .table tr.warning > td,
+.crm-container .table tr.warning > th {
+  background-color: var(--crm-alert-warning-bg);
+  color: var(--crm-alert-warning-text);
+}
+.crm-container .table-hover > tbody > tr > td.warning:hover,
+.crm-container .table-hover > tbody > tr > th.warning:hover,
+.crm-container .table-hover > tbody > tr.warning:hover > td,
+.crm-container .table-hover > tbody > tr:hover > .warning,
+.crm-container .table-hover > tbody > tr.warning:hover > th {
+  background-color: var(--crm-alert-warning-border);
+}
+.crm-container .table td.danger,
+.crm-container .table th.danger,
+.crm-container .table tr.danger > td,
+.crm-container .table tr.danger > th,
+.crm-container table tr.error > td,
+.crm-container table tr.error,
+.crm-container table tr.crm-row-error,
+.crm-container table tr.crm-row-error > td {
+  background-color: var(--crm-alert-danger-bg);
+  color: var(--crm-alert-danger-text);
+}
+.crm-container .table-hover > tbody > tr > td.danger:hover,
+.crm-container .table-hover > tbody > tr > th.danger:hover,
+.crm-container .table-hover > tbody > tr.danger:hover > td,
+.crm-container .table-hover > tbody > tr:hover > .danger,
+.crm-container .table-hover > tbody > tr.danger:hover > th,
+.crm-container table tr.crm-row-error:hover > td,
+.crm-container table tr.crm-row-error > td:hover {
+  background-color: var(--crm-alert-danger-border);
+}
+.crm-container .table td.info,
+.crm-container .table th.info,
+.crm-container .table tr.info > td,
+.crm-container .table tr.info > th,
+.crm-container table tr.crm-row-selected,
+.crm-container table tr.crm-row-selected > td {
+  background-color: var(--crm-alert-info-bg);
+  color: var(--crm-alert-info-text);
+}
+.crm-container .table-hover > tbody > tr > td.info:hover,
+.crm-container .table-hover > tbody > tr > th.info:hover,
+.crm-container .table-hover > tbody > tr.info:hover > td,
+.crm-container .table-hover > tbody > tr:hover > .info,
+.crm-container .table-hover > tbody > tr.info:hover > th,
+.crm-container table tr.crm-row-selected:hover > td,
+.crm-container table tr.crm-row-selected > td:hover {
+  background-color: var(--crm-alert-info-border);
+}
+.crm-container .table-responsive {
+  min-height: .01%;
+  overflow-x: auto;
+}
+
+/* Responsive table */
+
+@media screen and (max-width: 767px) {
+  .crm-container .table-responsive,
+  .crm-container table {
+    width: 100%;
+    margin-bottom: var(--crm-r);
+    overflow-y: hidden;
+    border: var(--crm-table-outside-border);
+    display: contents; /* expirmental addition to provide more responsive behaviour */
+  }
+  .crm-container .table-responsive > .table {
+    margin-bottom: 0;
+  }
+  .crm-container .table-responsive > .table > thead > tr > th,
+  .crm-container .table-responsive > .table > thead > tr > td,
+  .crm-container .table-responsive > .table > tbody > tr > th,
+  .crm-container .table-responsive > .table > tbody > tr > td,
+  .crm-container .table-responsive > .table > tfoot > tr > th,
+  .crm-container .table-responsive > .table > tfoot > tr > td,
+  .crm-container th,
+  .crm-container td {
+    white-space: nowrap;
+  }
+  .crm-container .table-responsive > .table-bordered {
+    border: 0;
+  }
+  .crm-container .table-responsive > .table-bordered > thead > tr > th:first-child,
+  .crm-container .table-responsive > .table-bordered > thead > tr > td:first-child,
+  .crm-container .table-responsive > .table-bordered > tbody > tr > th:first-child,
+  .crm-container .table-responsive > .table-bordered > tbody > tr > td:first-child,
+  .crm-container .table-responsive > .table-bordered > tfoot > tr > th:first-child,
+  .crm-container .table-responsive > .table-bordered > tfoot > tr > td:first-child {
+    border-left: 0;
+  }
+  .crm-container .table-responsive > .table-bordered > thead > tr > th:last-child,
+  .crm-container .table-responsive > .table-bordered > thead > tr > td:last-child,
+  .crm-container .table-responsive > .table-bordered > tbody > tr > th:last-child,
+  .crm-container .table-responsive > .table-bordered > tbody > tr > td:last-child,
+  .crm-container .table-responsive > .table-bordered > tfoot > tr > th:last-child,
+  .crm-container .table-responsive > .table-bordered > tfoot > tr > td:last-child {
+    border-right: 0;
+  }
+  .crm-container .table-responsive > .table-bordered > tbody > tr:last-child > th,
+  .crm-container .table-responsive > .table-bordered > tbody > tr:last-child > td,
+  .crm-container .table-responsive > .table-bordered > tfoot > tr:last-child > th,
+  .crm-container .table-responsive > .table-bordered > tfoot > tr:last-child > td {
+    border-bottom: 0;
+  }
+}

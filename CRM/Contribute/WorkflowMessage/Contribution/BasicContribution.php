@@ -119,7 +119,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
   private function addExampleData(GenericWorkflowMessage $messageTemplate, $example): void {
     $messageTemplate->setContact(Test::example('entity/Contact/Barb'));
     $contribution = Test::example('entity/Contribution/Euro5990/completed');
-    $example['currency'] = $example['currency'] ?? \Civi::settings()->get('defaultCurrency');
+    $example['currency'] ??= \Civi::settings()->get('defaultCurrency');
     if (isset($example['contribution_params'])) {
       $contribution = array_merge($contribution, $example['contribution_params']);
     }

@@ -10,7 +10,6 @@
  */
 
 use Civi\Api4\Contact;
-use Civi\Api4\CustomGroup;
 
 /**
  *
@@ -97,7 +96,7 @@ class CRM_Dedupe_Merger {
         ],
         'rel_table_relationships' => [
           'title' => ts('Relationships'),
-          'tables' => ['civicrm_relationship'],
+          'tables' => ['civicrm_relationship', 'civicrm_relationship_cache'],
           'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=rel'),
         ],
         'rel_table_custom_groups' => [
@@ -624,15 +623,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $cidRefs
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected static function filterRowBasedCustomDataFromCustomTables(array &$cidRefs) {
-    $customTables = (array) CustomGroup::get(FALSE)
-      ->setSelect(['table_name'])
-      ->addWhere('is_multiple', '=', 0)
-      ->addWhere('extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::contactTypes()))
-      ->execute()
-      ->indexBy('table_name');
+    $filters = [
+      'is_multiple' => FALSE,
+      'extends' => 'Contact',
+    ];
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters);
+    $customTables = array_column($customGroups, NULL, 'table_name');
     foreach (array_intersect_key($cidRefs, $customTables) as $tableName => $cidSpec) {
       if (in_array('entity_id', $cidSpec, TRUE)) {
         unset($cidRefs[$tableName][array_search('entity_id', $cidSpec, TRUE)]);
@@ -731,286 +729,52 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     ) {
       $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
     }
-    elseif (array_key_exists('contact_sub_type_hidden', $params) &&
-      !empty($params['contact_sub_type_hidden'])
-    ) {
-      CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-      // if profile was used, and had any subtype, we obtain it from there
-      //CRM-13596 - add to existing contact types, rather than overwriting
-      if (empty($data['contact_sub_type'])) {
-        // If we don't have a contact ID the $data['contact_sub_type'] will not be defined...
-        $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
-      }
-      else {
-        $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-        if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
-          //CRM-20517 - make sure contact_sub_type gets the correct delimiters
-          $data['contact_sub_type'] = trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR);
-          $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
-        }
-      }
-    }
-
-    $locationType = [];
-    $count = 1;
-
     //add contact id
     $data['contact_id'] = $contactID;
-    $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
 
-    $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
-
-    $blocks = ['email', 'phone', 'im', 'openid'];
-
-    $multiplFields = ['url'];
-    // prevent overwritten of formatted array, reset all block from
-    // params if it is not in valid format (since import pass valid format)
-    foreach ($blocks as $blk) {
-      if (array_key_exists($blk, $params) &&
-        !is_array($params[$blk])
-      ) {
-        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-        unset($params[$blk]);
-      }
-    }
-
-    $primaryPhoneLoc = NULL;
     $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
-      [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
 
-      if ($locTypeId == 'Primary') {
-        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-        if (in_array($fieldName, $blocks)) {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
-        }
-        else {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
-        }
-        $primaryLocationType = $locTypeId;
-      }
-
-      if (is_numeric($locTypeId) &&
-        !in_array($fieldName, $multiplFields) &&
-        substr($fieldName, 0, 7) != 'custom_'
-      ) {
-        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-        $index = $locTypeId;
-
-        if (is_numeric($typeId)) {
-          $index .= '-' . $typeId;
-        }
-        if (!in_array($index, $locationType)) {
-          $locationType[$count] = $index;
-          $count++;
+      if (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
+        // for autocomplete transfer hidden value instead of label
+        if ($params[$key] && isset($params[$key . '_id'])) {
+          $value = $params[$key . '_id'];
         }
 
-        $loc = CRM_Utils_Array::key($index, $locationType);
-
-        $blockName = self::getLocationEntityForKey($fieldName);
-
-        $data[$blockName][$loc]['location_type_id'] = $locTypeId;
-
-        //set is_billing true, for location type "Billing"
-        if ($locTypeId == $billingLocationTypeId) {
-          $data[$blockName][$loc]['is_billing'] = 1;
+        // we need to append time with date
+        if ($params[$key] && isset($params[$key . '_time'])) {
+          $value .= ' ' . $params[$key . '_time'];
         }
 
-        if ($contactID) {
-          //get the primary location type
-          if ($locTypeId == $primaryLocationType) {
-            $data[$blockName][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($locTypeId == $defaultLocationId) {
-          $data[$blockName][$loc]['is_primary'] = 1;
-        }
-
-        if (in_array($fieldName, ['phone'])) {
-          if ($typeId) {
-            $data['phone'][$loc]['phone_type_id'] = $typeId;
-          }
-          else {
-            $data['phone'][$loc]['phone_type_id'] = '';
-          }
-          $data['phone'][$loc]['phone'] = $value;
-
-          //special case to handle primary phone with different phone types
-          // in this case we make first phone type as primary
-          if (isset($data['phone'][$loc]['is_primary']) && !$primaryPhoneLoc) {
-            $primaryPhoneLoc = $loc;
-          }
-
-          if ($loc != $primaryPhoneLoc) {
-            unset($data['phone'][$loc]['is_primary']);
-          }
-        }
-        elseif ($fieldName == 'email') {
-          $data['email'][$loc]['email'] = $value;
-          if (empty($contactID)) {
-            $data['email'][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($fieldName == 'im') {
-          if (isset($params[$key . '-provider_id'])) {
-            $data['im'][$loc]['provider_id'] = $params[$key . '-provider_id'];
-          }
-          if (strpos($key, '-provider_id') !== FALSE) {
-            $data['im'][$loc]['provider_id'] = $params[$key];
-          }
-          else {
-            $data['im'][$loc]['name'] = $value;
-          }
-        }
-        elseif ($fieldName == 'openid') {
-          $data['openid'][$loc]['openid'] = $value;
-        }
-        else {
-          if ($fieldName === 'state_province') {
-            // CRM-3393
-            if (is_numeric($value) && ((int ) $value) >= 1000) {
-              $data['address'][$loc]['state_province_id'] = $value;
-            }
-            elseif (empty($value)) {
-              $data['address'][$loc]['state_province_id'] = '';
-            }
-            else {
-              $data['address'][$loc]['state_province'] = $value;
-            }
-          }
-          elseif ($fieldName === 'country') {
-            // CRM-3393
-            if (is_numeric($value) && ((int ) $value) >= 1000
-            ) {
-              $data['address'][$loc]['country_id'] = $value;
-            }
-            elseif (empty($value)) {
-              $data['address'][$loc]['country_id'] = '';
-            }
-            else {
-              $data['address'][$loc]['country'] = $value;
-            }
-          }
-          elseif ($fieldName === 'county') {
-            $data['address'][$loc]['county_id'] = $value;
-          }
-          elseif ($fieldName == 'address_name') {
-            $data['address'][$loc]['name'] = $value;
-          }
-          elseif (substr($fieldName, 0, 14) === 'address_custom') {
-            $data['address'][$loc][substr($fieldName, 8)] = $value;
-          }
-          else {
-            $data[$blockName][$loc][$fieldName] = $value;
-          }
-        }
-      }
-      else {
-        if (substr($key, 0, 4) === 'url-') {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          $websiteField = explode('-', $key);
-          $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
-          $data['website'][$websiteField[1]]['url'] = $value;
-        }
-        elseif (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          //save email/postal greeting and addressee values if any, CRM-4575
-          $data[$key . '_id'] = $value;
-        }
-        elseif (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
-          // for autocomplete transfer hidden value instead of label
-          if ($params[$key] && isset($params[$key . '_id'])) {
-            $value = $params[$key . '_id'];
-          }
-
-          // we need to append time with date
-          if ($params[$key] && isset($params[$key . '_time'])) {
-            $value .= ' ' . $params[$key . '_time'];
-          }
-
-          // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
-          if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
-            ($value == '' || !isset($value))
-          ) {
-            continue;
-          }
-
-          $valueId = NULL;
-          if (!empty($params['customRecordValues'])) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            if (is_array($params['customRecordValues']) && !empty($params['customRecordValues'])) {
-              foreach ($params['customRecordValues'] as $recId => $customFields) {
-                if (is_array($customFields) && !empty($customFields)) {
-                  foreach ($customFields as $customFieldName) {
-                    if ($customFieldName == $key) {
-                      $valueId = $recId;
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          //CRM-13596 - check for contact_sub_type_hidden first
-          if (array_key_exists('contact_sub_type_hidden', $params)) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            $type = $params['contact_sub_type_hidden'];
-          }
-          else {
-            $type = $data['contact_type'];
-            if (!empty($data['contact_sub_type'])) {
-              $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-            }
-          }
-
-          CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
-            $data['custom'],
-            $value,
-            $type,
-            $valueId,
-            $contactID,
-            FALSE,
-            FALSE
-          );
-        }
-        elseif ($key === 'edit') {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
+        // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
+        if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
+          ($value == '' || !isset($value))
+        ) {
           continue;
         }
-        else {
-          if ($key === 'location') {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            foreach ($value as $locationTypeId => $field) {
-              foreach ($field as $block => $val) {
-                if ($block === 'address' && array_key_exists('address_name', $val)) {
-                  $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-                }
-              }
-            }
-          }
-          if ($key === 'phone' && isset($params['phone_ext'])) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            $data[$key] = $value;
-            foreach ($value as $cnt => $phoneBlock) {
-              if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
-                $data[$key][$cnt]['phone_ext'] = CRM_Utils_Array::retrieveValueRecursive($params['phone_ext'][$cnt], 'phone_ext');
-              }
-            }
-          }
-          elseif (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
-            && ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-            ($key === 'current_employer' && empty($params['current_employer']))) {
-            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-            // to avoid update with empty values
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            continue;
-          }
-          else {
-            $data[$key] = $value;
-          }
+
+        $valueId = NULL;
+
+        //CRM-13596 - check for contact_sub_type_hidden first
+        $type = $data['contact_type'];
+        if (!empty($data['contact_sub_type'])) {
+          $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
         }
+
+        $includeViewOnly = TRUE;
+        CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
+          $data['custom'],
+          $value,
+          $type,
+          $valueId,
+          $contactID,
+          FALSE,
+          FALSE,
+          $includeViewOnly,
+        );
+      }
+      else {
+        $data[$key] = $value;
       }
     }
 
@@ -1062,25 +826,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // CRM-17556 Get all non-empty fields, to make comparison easier
       if (!empty($main[$validField]) || !empty($other[$validField])) {
         $result['contact'][] = $validField;
-      }
-    }
-
-    $mainEvs = CRM_Core_BAO_CustomValueTable::getEntityValues($main['id']);
-    $otherEvs = CRM_Core_BAO_CustomValueTable::getEntityValues($other['id']);
-    $keys = array_unique(array_merge(array_keys($mainEvs), array_keys($otherEvs)));
-    foreach ($keys as $key) {
-      // Exclude multi-value fields CRM-13836
-      if (strpos($key, '_')) {
-        continue;
-      }
-      $key1 = $mainEvs[$key] ?? NULL;
-      $key2 = $otherEvs[$key] ?? NULL;
-      // We wish to retain '0' as it has a different meaning than NULL on a checkbox.
-      // However I can't think of a case where an empty string is more meaningful than null
-      // or where it would be FALSE or something else nullish.
-      $valuesToIgnore = [NULL, '', []];
-      if (!in_array($key1, $valuesToIgnore, TRUE) || !in_array($key2, $valuesToIgnore, TRUE)) {
-        $result['custom'][] = $key;
       }
     }
     return $result;
@@ -1415,18 +1160,21 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * Get the location data from a location array, filtering out metadata.
+   * Get the location data from a location array, filtering out metadata and empty fields.
+   *
+   * The function is intended to allow us to find out if address/email etc records have any
+   * 'real' data like address information or an email address. If not they are not merge candidates.
    *
    * This returns data like street_address but not metadata like is_primary, on_hold etc.
    *
    * @param array $location
    *
-   * @return mixed
+   * @return array
    */
-  public static function getLocationDataFields($location) {
+  public static function getLocationDataFields(array $location): array {
     $keysToIgnore = array_merge(self::ignoredFields(), ['display', 'location_type_id']);
     foreach ($location as $field => $value) {
-      if (in_array($field, $keysToIgnore, TRUE)) {
+      if (!$value || in_array($field, $keysToIgnore, TRUE)) {
         unset($location[$field]);
       }
     }
@@ -1444,37 +1192,42 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'address' => [
         'label' => 'Address',
         'displayField' => 'display',
-        'sortString' => 'location_type_id',
+        'order_by' => ['location_type_id' => 'ASC'],
         'hasLocation' => TRUE,
         'hasType' => FALSE,
+        'entity' => 'Address',
       ],
       'email' => [
         'label' => 'Email',
         'displayField' => 'display',
-        'sortString' => 'location_type_id',
+        'order_by' => ['location_type_id' => 'ASC'],
         'hasLocation' => TRUE,
         'hasType' => FALSE,
+        'entity' => 'Email',
       ],
       'im' => [
         'label' => 'IM',
         'displayField' => 'name',
-        'sortString' => 'location_type_id,provider_id',
+        'order_by' => ['location_type_id' => 'ASC', 'provider_id' => 'ASC'],
         'hasLocation' => TRUE,
         'hasType' => 'provider_id',
+        'entity' => 'IM',
       ],
       'phone' => [
         'label' => 'Phone',
         'displayField' => 'phone',
-        'sortString' => 'location_type_id,phone_type_id',
+        'order_by' => ['location_type_id' => 'ASC', 'phone_type_id' => 'ASC'],
         'hasLocation' => TRUE,
         'hasType' => 'phone_type_id',
+        'entity' => 'Phone',
       ],
       'website' => [
         'label' => 'Website',
         'displayField' => 'url',
-        'sortString' => 'website_type_id',
+        'order_by' => ['website_type_id' => 'ASC'],
         'hasLocation' => FALSE,
         'hasType' => 'website_type_id',
+        'entity' => 'Website',
       ],
     ];
   }
@@ -1633,41 +1386,54 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = self::getTree($main['contact_type'], $mainID,
-      $main['contact_sub_type'] ?? NULL,
-      $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
-    );
-    $otherTree = self::getTree($main['contact_type'], $otherID,
-      $other['contact_sub_type'] ?? NULL,
-      $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
-    );
+    $filters = [
+      'extends' => $main['contact_type'],
+      'is_active' => TRUE,
+      'is_multiple' => FALSE,
+      'extends_entity_column_value' => NULL,
+    ];
+    if (!empty($other['contact_sub_type'])) {
+      $filters['extends_entity_column_value'] = array_merge([NULL], $other['contact_sub_type']);
+    }
+    $otherTree = CRM_Core_BAO_CustomGroup::getAll($filters, $checkPermissions ? CRM_Core_Permission::EDIT : NULL);
 
-    foreach ($otherTree as $gid => $group) {
-      if (!isset($group['fields'])) {
-        continue;
-      }
-
-      foreach ($group['fields'] as $fid => $field) {
-        $mainContactValue = $mainTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
-        $otherContactValue = $otherTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
-        if (in_array($fid, $compareFields['custom'])) {
-          $rows["custom_group_$gid"]['title'] = $rows["custom_group_$gid"]['title'] ?? $group['title'];
-
-          if ($mainContactValue) {
-            foreach ($mainContactValue as $valueId => $values) {
-              $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomField::displayValue($values['data'], $fid);
-            }
+    foreach ($otherTree as $group) {
+      $mainCustomValues = Contact::get(FALSE)
+        ->addWhere('id', '=', $mainID)
+        ->addSelect($group['name'] . '.*')
+        ->execute()->first();
+      $otherCustomValues = Contact::get(FALSE)
+        ->addWhere('id', '=', $otherID)
+        ->addSelect($group['name'] . '.*')
+        ->execute()->first();
+      foreach ($group['fields'] as $field) {
+        $fid = $field['id'];
+        $apiFieldName = "{$group['name']}.{$field['name']}";
+        $mainContactValue = ($mainCustomValues[$apiFieldName] ?? NULL);
+        $otherContactValue = $otherCustomValues[$apiFieldName] ?? NULL;
+        $validEmptyValues = [0, '0', FALSE];
+        // If at least one contact has meaningful data in the field then add it in.
+        if ($mainContactValue || $otherContactValue
+         || in_array($mainContactValue, $validEmptyValues, TRUE)
+         || in_array($otherContactValue, $validEmptyValues, TRUE)
+        ) {
+          $rows["custom_group_{$group['id']}"]['title'] ??= $group['title'];
+          $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomField::displayValue($mainContactValue, $fid);
+          $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomField::displayValue($otherContactValue, $fid);
+          // The value assigned to the check box on the quick form is a string that holds the
+          // value to be carried over on submit. It would be a lot simpler if the checkbox
+          // just submitted TRUE or FALSE - but that may be hard to retrofit. The qfKeyBug string
+          // has to be used so that 0 is not treated as 'do not transfer'. One might argue
+          // the bug is in the design not the qfZero... just saying
+          $checkboxValue = in_array($otherContactValue, $validEmptyValues, TRUE) ? $qfZeroBug : $otherContactValue;
+          if (!$checkboxValue) {
+            // if the field does not have meaningful data then we use the word 'null'.
+            // an empty string, an empty array & NULL are all treated as being meaningful
+            // but 0, '0' or FALSE are treated as meaningful.
+            $checkboxValue = 'null';
           }
-          $value = 'null';
-          if ($otherContactValue) {
-            foreach ($otherContactValue as $valueId => $values) {
-              $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomField::displayValue($values['data'], $fid);
-              if ($values['data'] === 0 || $values['data'] === '0') {
-                $values['data'] = $qfZeroBug;
-              }
-              $value = ($values['data']) ? $values['data'] : $value;
-            }
-          }
+          // Value could be loaded as an array from the api.
+          $checkboxValue = is_array($checkboxValue) ? CRM_Utils_Array::implodePadded($checkboxValue) : (string) $checkboxValue;
           $rows["move_custom_$fid"]['title'] = $field['label'];
 
           $elements[] = [
@@ -1676,10 +1442,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             2 => NULL,
             3 => NULL,
             4 => NULL,
-            5 => $value,
+            5 => $checkboxValue,
             'is_checked' => (!isset($rows["move_custom_$fid"]['main']) || $rows["move_custom_$fid"]['main'] === ''),
           ];
-          $migrationInfo["move_custom_$fid"] = $value;
+          $migrationInfo["move_custom_$fid"] = $checkboxValue;
         }
       }
     }
@@ -1697,258 +1463,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $result['other_details']['location_blocks'] = $locations['other'];
 
     return $result;
-  }
-
-  /**
-   * Function is separated from shared function & can likely be distilled to an api call.
-   *
-   * @todo clean up post split.
-   *
-   * Get custom groups/fields data for type of entity in a tree structure representing group->field hierarchy
-   * This may also include entity specific data values.
-   *
-   * An array containing all custom groups and their custom fields is returned.
-   *
-   * @param string $entityType
-   *   Of the contact whose contact type is needed.
-   * @param int $entityID
-   * @param array $subTypes
-   * @param bool|int $checkPermission
-   *   Either a CRM_Core_Permission constant or FALSE to disable checks
-   *
-   * @return array
-   *   Custom field 'tree'.
-   *
-   *   The returned array is keyed by group id and has the custom group table fields
-   *   and a sub-key 'fields' holding the specific custom fields.
-   *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
-   *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
-   *
-   * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
-   *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
-   *   With caching the performance impact would be small & the function would be cleaner
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private static function getTree(
-    $entityType,
-    int $entityID,
-    $subTypes,
-    $checkPermission
-  ) {
-
-    if (!is_array($subTypes)) {
-      if (empty($subTypes)) {
-        $subTypes = [];
-      }
-      else {
-        if (stristr($subTypes, ',')) {
-          $subTypes = explode(',', $subTypes);
-        }
-        else {
-          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
-        }
-      }
-    }
-
-    // create a new tree
-
-    // legacy hardcoded list of data to return
-    $toReturn = [
-      'custom_field' => [
-        'id',
-        'name',
-        'label',
-        'column_name',
-        'data_type',
-        'html_type',
-        'default_value',
-        'attributes',
-        'is_required',
-        'is_view',
-        'help_pre',
-        'help_post',
-        'options_per_line',
-        'start_date_years',
-        'end_date_years',
-        'date_format',
-        'time_format',
-        'option_group_id',
-        'in_selector',
-        'serialize',
-      ],
-      'custom_group' => [
-        'id',
-        'name',
-        'table_name',
-        'title',
-        'help_pre',
-        'help_post',
-        'collapse_display',
-        'style',
-        'is_multiple',
-        'extends',
-        'extends_entity_column_id',
-        'extends_entity_column_value',
-        'max_multiple',
-        'is_public',
-      ],
-    ];
-
-    // create select
-    $select = [];
-    foreach ($toReturn as $tableName => $tableColumn) {
-      foreach ($tableColumn as $columnName) {
-        $select[] = "civicrm_{$tableName}.{$columnName} as civicrm_{$tableName}_{$columnName}";
-      }
-    }
-    $strSelect = 'SELECT ' . implode(', ', $select);
-
-    // from, where, order by
-    $strFrom = '
-FROM     civicrm_custom_group
-LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicrm_custom_group.id)
-';
-
-    // if entity is either individual, organization or household pls get custom groups for 'contact' too.
-    if ($entityType === 'Individual' || $entityType === 'Organization' ||
-      $entityType === 'Household'
-    ) {
-      $in = "'$entityType', 'Contact'";
-    }
-    elseif (strpos($entityType, "'") !== FALSE) {
-      // this allows the calling function to send in multiple entity types
-      $in = $entityType;
-    }
-    else {
-      // quote it
-      $in = "'$entityType'";
-    }
-
-    $params = [];
-    $sqlParamKey = 1;
-    $subType = '';
-    if (!empty($subTypes)) {
-      foreach ($subTypes as $key => $subType) {
-        $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType));
-      }
-      $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
-      $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
-
-      $strWhere = "
-WHERE civicrm_custom_group.is_active = 1
-  AND civicrm_custom_field.is_active = 1
-  AND civicrm_custom_group.extends IN ($in)
-  AND $subTypeClause
-";
-    }
-    else {
-      $strWhere = "
-WHERE civicrm_custom_group.is_active = 1
-  AND civicrm_custom_field.is_active = 1
-  AND civicrm_custom_group.extends IN ($in)
-";
-    }
-
-    if ($checkPermission) {
-      // ensure that the user has access to these custom groups
-      $strWhere .= " AND " .
-        CRM_Core_Permission::customGroupClause($checkPermission,
-          'civicrm_custom_group.'
-        );
-    }
-
-    $orderBy = "
-ORDER BY civicrm_custom_group.weight,
-         civicrm_custom_group.title,
-         civicrm_custom_field.weight,
-         civicrm_custom_field.label
-";
-
-    // final query string
-    $queryString = "$strSelect $strFrom $strWhere $orderBy";
-
-    // lets see if we can retrieve the groupTree from cache
-    $cacheString = $queryString . '_Inline';
-
-    $cacheKey = 'CRM_Core_DAO_CustomGroup_Query ' . md5($cacheString);
-    $multipleFieldGroupCacheKey = 'CRM_Core_DAO_CustomGroup_QueryMultipleFields ' . md5($cacheString);
-    $cache = CRM_Utils_Cache::singleton();
-    $groupTree = $cache->get($cacheKey);
-    $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
-
-    if (empty($groupTree)) {
-      [$multipleFieldGroups, $groupTree] = CRM_Core_BAO_CustomGroup::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
-
-      $cache->set($cacheKey, $groupTree);
-      $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
-    }
-    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
-    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
-    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
-    $singleFieldTables = [];
-    // now that we have all the groups and fields, lets get the values
-    // since we need to know the table and field names
-    // add info to groupTree
-
-    if (isset($groupTree['info']) && !empty($groupTree['info']) &&
-      !empty($groupTree['info']['tables'])
-    ) {
-      $groupTree['info']['where'] = NULL;
-
-      foreach ($groupTree['info']['tables'] as $table => $fields) {
-        $groupTree['info']['from'][] = $table;
-        $select = [
-          "{$table}.id as {$table}_id",
-          "{$table}.entity_id as {$table}_entity_id",
-        ];
-        foreach ($fields as $column => $dontCare) {
-          $select[] = "{$table}.{$column} as {$table}_{$column}";
-        }
-        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
-        if ($entityID) {
-          $groupTree['info']['where'][] = "{$table}.entity_id = $entityID";
-          if (in_array($table, $multipleFieldGroups) &&
-            CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($entityID, $table)
-          ) {
-            $entityMultipleSelectClauses[$table] = $select;
-          }
-          else {
-            $singleFieldTables[] = $table;
-            $entitySingleSelectClauses = array_merge($entitySingleSelectClauses, $select);
-          }
-
-        }
-      }
-      if ($entityID && !empty($singleFieldTables)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
-      }
-      $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
-      if (!empty($multipleFieldTablesWithEntityData)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData);
-      }
-
-    }
-    return $groupTree;
-  }
-
-  /**
-   * Suppose you have a SQL column, $column, which includes a delimited list, and you want
-   * a WHERE condition for rows that include $value. Use whereListHas().
-   *
-   * @param string $column
-   * @param string $value
-   * @param string $delimiter
-   *
-   * @return string
-   *   SQL condition.
-   * @throws \CRM_Core_Exception
-   */
-  private static function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
-    // ?
-    $bareValue = trim($value, $delimiter);
-    $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
-    return "($column LIKE \"$escapedValue\")";
   }
 
   /**
@@ -2031,28 +1545,17 @@ ORDER BY civicrm_custom_group.weight,
       $submitted = [];
     }
 
-    // Move view only custom fields CRM-5362
-    $viewOnlyCustomFields = [];
     foreach ($submitted as $key => $value) {
-      if (strpos($key, 'custom_') === 0) {
+      if (str_starts_with($key, 'custom_')) {
         $fieldID = (int) substr($key, 7);
-        $fieldMetadata = CRM_Core_BAO_CustomField::getCustomFieldsForContactType($contactType, FALSE)[$fieldID] ?? NULL;
+        $fieldMetadata = CRM_Core_BAO_CustomField::getField($fieldID);
         if ($fieldMetadata) {
           $htmlType = (string) $fieldMetadata['html_type'];
-          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldMetadata);
-          $isView = (bool) $fieldMetadata['is_view'];
+          $isSerialized = $fieldMetadata['serialize'];
+          $isView = $fieldMetadata['is_view'];
           $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
-          if ($isView) {
-            $viewOnlyCustomFields[$key] = $submitted[$key];
-          }
         }
       }
-    }
-
-    // special case to set values for view only, CRM-5362
-    if (!empty($viewOnlyCustomFields)) {
-      $viewOnlyCustomFields['entityID'] = $mainId;
-      CRM_Core_BAO_CustomValueTable::setValues($viewOnlyCustomFields);
     }
 
     // dev/core#996 Ensure that the earliest created date is stored against the kept contact id
@@ -2233,8 +1736,8 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Get the cache key string for the merge action.
    *
-   * @param int $rule_group_id
-   * @param int $group_id
+   * @param int|null $rule_group_id
+   * @param int|null $group_id
    * @param array $criteria
    *   Additional criteria to narrow down the merge group.
    *   Currently we are only supporting the key 'contact' within it.
@@ -2250,8 +1753,8 @@ ORDER BY civicrm_custom_group.weight,
   public static function getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions, $searchLimit) {
     $contactType = CRM_Dedupe_BAO_DedupeRuleGroup::getContactTypeForRuleGroup($rule_group_id);
     $cacheKeyString = "merge_{$contactType}";
-    $cacheKeyString .= $rule_group_id ? "_{$rule_group_id}" : '_0';
-    $cacheKeyString .= $group_id ? "_{$group_id}" : '_0';
+    $cacheKeyString .= '_' . (int) $rule_group_id;
+    $cacheKeyString .= '_' . (int) $group_id;
     $cacheKeyString .= '_' . (int) $searchLimit;
     $cacheKeyString .= !empty($criteria) ? md5(serialize($criteria)) : '_0';
     if ($checkPermissions) {
@@ -2310,11 +1813,6 @@ ORDER BY civicrm_custom_group.weight,
    * @throws CRM_Core_Exception
    */
   public static function getMergeContactDetails($contactID): array {
-    $params = [
-      'contact_id' => $contactID,
-      'version' => 3,
-      'return' => array_merge(['display_name'], self::getContactFields()),
-    ];
     $result = Contact::get(FALSE)->addWhere('id', '=', $contactID)->execute()->first();
 
     // CRM-18480: Cancel the process if the contact is already deleted
@@ -2543,7 +2041,7 @@ ORDER BY civicrm_custom_group.weight,
         continue;
       }
       elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) ||
-          strpos($key, 'move_custom_') === 0
+          str_starts_with($key, 'move_custom_')
         ) and $val !== NULL
       ) {
         // Rule: If both main-contact, and other-contact have a field with a
@@ -2655,7 +2153,7 @@ ORDER BY civicrm_custom_group.weight,
       }
       elseif ($mode === 'aggressive') {
         unset($conflicts[$key]);
-        if (strpos($key, 'move_location_') !== 0) {
+        if (!str_starts_with($key, 'move_location_')) {
           // @todo - just handling plain contact fields for now because I think I need a bigger refactor
           // of the below to handle locations & will do as a follow up.
           $resolved['contact'][substr($key, 5)] = $migrationInfo[$key]['main'];
@@ -2824,28 +2322,27 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param int $cid
    * @param array $blockInfo
-   * @param string $blockName
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  private static function buildLocationBlockForContact($cid, $blockInfo, $blockName): array {
+  private static function buildLocationBlockForContact(int $cid, array $blockInfo): array {
     $searchParams = [
-      'contact_id' => $cid,
+      'where' => [['contact_id', '=', $cid]],
       // CRM-17556 Order by field-specific criteria
-      'options' => [
-        'sort' => $blockInfo['sortString'],
-      ],
+      'orderBy' => $blockInfo['order_by'],
+      'checkPermissions' => FALSE,
+      'select' => ['*', 'custom.*'],
     ];
     $locationBlock = [];
-    $values = civicrm_api3($blockName, 'get', $searchParams);
-    if ($values['count']) {
+    $values = civicrm_api4($blockInfo['entity'], 'get', $searchParams);
+    if (count($values)) {
       $cnt = 0;
-      foreach ($values['values'] as $value) {
+      foreach ($values as $value) {
         $locationBlock[$cnt] = $value;
         // Fix address display
-        if ($blockName == 'address') {
+        if ($blockInfo['entity'] == 'Address') {
           // For performance avoid geocoding while merging https://issues.civicrm.org/jira/browse/CRM-21786
           // we can expect existing geocode values to be retained.
           $value['skip_geocode'] = TRUE;
@@ -2854,7 +2351,7 @@ ORDER BY civicrm_custom_group.weight,
           $locationBlock[$cnt]['display'] = CRM_Utils_Address::format($value);
         }
         // Fix email display
-        elseif ($blockName == 'email') {
+        elseif ($blockInfo['entity'] == 'Email') {
           $locationBlock[$cnt]['display'] = CRM_Utils_Mail::format($value);
         }
 
@@ -2932,12 +2429,12 @@ ORDER BY civicrm_custom_group.weight,
   protected static function addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, array $locations, array $rows, array $elements, array $migrationInfo): array {
     // Collect existing fields from both 'main' and 'other' contacts first
     // This allows us to match up location/types when building the table rows
-    $locations['main'][$blockName] = self::buildLocationBlockForContact($mainId, $blockInfo, $blockName);
-    $locations['other'][$blockName] = self::buildLocationBlockForContact($otherId, $blockInfo, $blockName);
+    $locations['main'][$blockName] = self::buildLocationBlockForContact($mainId, $blockInfo);
+    $locations['other'][$blockName] = self::buildLocationBlockForContact($otherId, $blockInfo);
 
     // Now, build the table rows appropriately, based off the information on
     // the 'other' contact
-    if (!empty($locations['other']) && !empty($locations['other'][$blockName])) {
+    if (!empty($locations['other'][$blockName])) {
       foreach ($locations['other'][$blockName] as $count => $value) {
 
         $displayValue = $value[$blockInfo['displayField']];
@@ -3056,7 +2553,7 @@ ORDER BY civicrm_custom_group.weight,
 
           // Put this field's location type at the top of the list
           $tmpIdList = $typeOptions['values'];
-          $defaultTypeId = [$thisTypeId => CRM_Utils_Array::value($thisTypeId, $tmpIdList)];
+          $defaultTypeId = [$thisTypeId => $tmpIdList[$thisTypeId] ?? NULL];
           unset($tmpIdList[$thisTypeId]);
 
           // Add the element

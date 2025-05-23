@@ -68,7 +68,7 @@ trait CRM_Financial_Form_SalesTaxTrait {
    * @return string
    */
   public function getTaxRateForFinancialType($financialTypeID) {
-    return CRM_Utils_Array::value($financialTypeID, $this->getTaxRatesForFinancialTypes());
+    return $this->getTaxRatesForFinancialTypes()[$financialTypeID] ?? NULL;
   }
 
 }

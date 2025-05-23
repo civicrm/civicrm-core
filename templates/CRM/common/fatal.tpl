@@ -13,13 +13,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 
 <head>
-  <title>{$pageTitle|escape}</title>
+  <title>{ts}Error{/ts}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <base href="{$config->resourceBase}" />
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
     @import url({$config->resourceBase}css/crm-i.css);
-    @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
+    @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
   </style>
 </head>
 <body>
@@ -29,21 +29,20 @@
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
     @import url({$config->resourceBase}css/crm-i.css);
-    @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
+    @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
   </style>
 {/if}
 <div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
- <span class="status-fatal">{ts}Sorry, due to an error, we are unable to fulfill your request at the moment. You may want to contact your administrator or service provider with more details about what action you were performing when this occurred.{/ts}</span>
     <div class="crm-section crm-error-message">{$message|escape}</div>
     {if !empty($error.message) && $message != $error.message}
         <hr style="solid 1px" />
         <div class="crm-section crm-error-message">{$error.message|escape}</div>
     {/if}
     {if (!empty($code) || !empty($mysql_code) || !empty($errorDetails)) AND $config->debug}
-        <div class="crm-accordion-wrapper collapsed crm-fatal-error-details-block">
-         <div class="crm-accordion-header" onclick="toggle(this);";>
+        <details class="crm-accordion-bold crm-fatal-error-details-block">
+         <summary>
           {ts}Error Details{/ts}
-         </div><!-- /.crm-accordion-header -->
+         </summary>
          <div class="crm-accordion-body">
             {if !empty($code)}
                 <div class="crm-section">{ts}Error Code:{/ts} {$code|purify}</div>
@@ -54,25 +53,12 @@
             {if !empty($errorDetails)}
                 <div class="crm-section">{ts}Additional Details:{/ts} {$errorDetails|purify}</div>
             {/if}
-         </div><!-- /.crm-accordion-body -->
-        </div><!-- /.crm-accordion-wrapper -->
+         </div>
+        </details>
     {/if}
-    <p><a href="{$config->userFrameworkBaseURL}" title="{ts}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>
+    <p><a href="{$config->userFrameworkBaseURL}" title="{ts escape='htmlattribute'}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>
 </div>
 </div> {* end crm-container div *}
-{literal}
-<script language="JavaScript">
-function toggle( element ) {
-    var parent = element.parentNode;
-    var className = parent.className;
-    if ( className  == 'crm-accordion-wrapper collapsed crm-fatal-error-details-block') {
-        parent.className = 'crm-accordion-wrapper  crm-fatal-error-details-block';
-    } else {
-        parent.className = 'crm-accordion-wrapper collapsed crm-fatal-error-details-block';
-    }
-}
-</script>
-{/literal}
 {if $config->userFramework != 'WordPress'}
 </body>
 </html>

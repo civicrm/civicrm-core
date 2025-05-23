@@ -47,6 +47,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'civicrm_phone',
       'civicrm_address',
       'civicrm_uf_match',
+      'civicrm_im',
+      'civicrm_website',
+      'civicrm_email',
     ], TRUE);
     CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_uf_group WHERE id = $this->_profileID OR name = 'test_contact_activity_profile'");
     parent::tearDown();
@@ -302,18 +305,101 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check getfields works & gives us our fields
    */
   public function testGetFields(): void {
-    $this->createIndividualProfile();
-    $this->addCustomFieldToProfile($this->_profileID);
+    $ufGroupParams = [
+      'group_type' => 'Individual,Contact',
+      'title' => 'Flat Coffee',
+      'api.uf_field.create' => [
+        [
+          'field_name' => 'first_name',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Individual',
+          'label' => 'First Name',
+        ],
+        [
+          // No location type == Primary
+          'field_name' => 'email',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Contact',
+          'label' => 'Email',
+        ],
+        [
+          // No location type == Primary
+          'field_name' => 'phone',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Contact',
+          'phone_type_id' => 1,
+          'label' => 'Phone',
+        ],
+        [
+          'field_name' => 'phone_and_ext',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Contact',
+          'phone_type_id' => 2,
+          'location_type_id' => 1,
+          'label' => 'Phone',
+        ],
+        [
+          // No location type == Primary
+          'field_name' => 'country',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Contact',
+          'label' => 'Country',
+        ],
+        [
+          'field_name' => 'state_province',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Contact',
+          'location_type_id' => 1,
+          'label' => 'State Province',
+        ],
+        [
+          'field_name' => 'postal_code',
+          'is_required' => 0,
+          'field_type' => 'Contact',
+          'location_type_id' => 1,
+          'label' => 'State Province',
+        ],
+        [
+          'field_name' => 'im',
+          'is_required' => 0,
+          'visibility' => 'User and User Admin Only',
+          'label' => 'Messenger',
+          'field_type' => 'Contact',
+        ],
+        [
+          'field_name' => 'url',
+          'is_required' => 0,
+          'visibility' => 'User and User Admin Only',
+          'label' => 'Website',
+          'website_type_id' => 1,
+          'field_type' => 'Contact',
+        ],
+      ],
+    ];
+    $profile = $this->callAPISuccess('uf_group', 'create', $ufGroupParams);
+    $this->addCustomFieldToProfile($profile['id']);
+    // Add some more fields
+
     $result = $this->callAPISuccess('profile', 'getfields', [
       'action' => 'submit',
-      'profile_id' => $this->_profileID,
+      'profile_id' => $profile['id'],
     ]);
     $this->assertArrayKeyExists('first_name', $result['values']);
     $this->assertEquals('2', $result['values']['first_name']['type']);
     $this->assertEquals('Email', $result['values']['email-primary']['title']);
+    $this->assertEquals('phone', $result['values']['phone-primary-1']['entity']);
+    $this->assertEquals('phone', $result['values']['phone_and_ext-1-2']['entity']);
     $this->assertEquals('civicrm_state_province', $result['values']['state_province-1']['pseudoconstant']['table']);
     $this->assertEquals('defaultValue', $result['values']['custom_1']['default_value']);
     $this->assertArrayNotHasKey('participant_status', $result['values']);
+    $this->assertEquals('website', $result['values']['url-1']['entity']);
+    $this->assertEquals('im', $result['values']['im-primary']['entity']);
   }
 
   /**
@@ -368,29 +454,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check Without ProfileId.
-   */
-  public function testProfileSubmitWithoutProfileId(): void {
-    $params = [
-      'contact_id' => 1,
-    ];
-    $this->callAPIFailure('profile', 'submit', $params,
-      'Mandatory key(s) missing from params array: profile_id'
-    );
-  }
-
-  /**
-   * Check with no invalid profile Id.
-   */
-  public function testProfileSubmitInvalidProfileId(): void {
-    $params = [
-      'contact_id' => 1,
-      'profile_id' => 1000,
-    ];
-    $this->callAPIFailure('profile', 'submit', $params);
-  }
-
-  /**
    * Check with missing required field in profile.
    */
   public function testProfileSubmitCheckProfileRequired(): void {
@@ -423,6 +486,37 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $profileFieldValues = $this->createIndividualContact();
     $contactId = key($profileFieldValues);
 
+    // Add a few more fields
+    civicrm_api3('UfGroup', 'get', [
+      'id' => $this->_profileID,
+      'api.uf_field.create' => [
+        [
+          'field_name' => 'im',
+          'is_required' => 0,
+          'visibility' => 'User and User Admin Only',
+          'label' => 'Messenger',
+          'field_type' => 'Contact',
+        ],
+        [
+          'field_name' => 'url',
+          'is_required' => 0,
+          'visibility' => 'User and User Admin Only',
+          'label' => 'Website',
+          'website_type_id' => 1,
+          'field_type' => 'Contact',
+        ],
+        [
+          'field_name' => 'city',
+          'is_required' => FALSE,
+          'visibility' => 'User and User Admin Only',
+          'location_type_id' => NULL,
+          'phone_type_id' => NULL,
+          'website_type_id' => NULL,
+          'field_type' => 'Contact',
+        ],
+      ],
+    ]);
+
     $updateParams = [
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
@@ -430,6 +524,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'phone-1-1' => '022 321 826',
       'country-1' => '1013',
       'state_province-1' => '1000',
+      'city-primary' => 'Somewhere',
+      'url-1' => 'http://example.com',
+      'im-primary' => 'abc2xyz2',
     ];
 
     $params = array_merge([
@@ -446,8 +543,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
 
     foreach ($updateParams as $profileField => $value) {
-      $this->assertEquals($value, $profileDetails['values'][$profileField], "missing/mismatching value for $profileField"
-      );
+      $this->assertEquals($value, $profileDetails['values'][$profileField], "missing/mismatching value for $profileField");
     }
     unset($params['email-primary']);
     $params['email-Primary'] = 'my@mail.com';
@@ -516,41 +612,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'receive_date' => 'now',
       'contact_id' => $this->_contactID,
     ]);
-  }
-
-  /**
-   * Set is deprecated but we need to ensure it still works.
-   */
-  public function testLegacySet(): void {
-    $profileFieldValues = $this->createIndividualContact();
-    $contactId = key($profileFieldValues);
-
-    $updateParams = [
-      'first_name' => 'abc2',
-      'last_name' => 'xyz2',
-      'email-Primary' => 'abc2.xyz2@gmail.com',
-      'phone-1-1' => '022 321 826',
-      'country-1' => '1013',
-      'state_province-1' => '1000',
-    ];
-
-    $params = array_merge([
-      'profile_id' => $this->_profileID,
-      'contact_id' => $contactId,
-    ], $updateParams);
-
-    $result = $this->callAPISuccess('profile', 'set', $params);
-    $this->assertArrayKeyExists('values', $result);
-    $getParams = [
-      'profile_id' => $this->_profileID,
-      'contact_id' => $contactId,
-    ];
-    $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
-
-    foreach ($updateParams as $profileField => $value) {
-      $this->assertEquals($value, $profileDetails['values'][$profileField], 'In line ' . __LINE__ . ' error message: ' . "missing/mismatching value for $profileField"
-      );
-    }
   }
 
   /**

@@ -47,7 +47,7 @@ class CRM_Core_IDS {
     }
 
     // lets bypass a few civicrm urls from this check
-    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates', 'civicrm/ajax/api4'];
+    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates', 'civicrm/ajax/api4', 'civicrm/payment/ipn'];
     CRM_Utils_Hook::idsException($skip);
     $this->path = $route['path'];
     if (in_array($this->path, $skip)) {
@@ -237,7 +237,7 @@ class CRM_Core_IDS {
 
     $data = [];
     $session = CRM_Core_Session::singleton();
-    $session_id = CRM_Core_Config::singleton()->userSystem->getSessionId() ? CRM_Core_Config::singleton()->userSystem->getSessionId() : '0';
+    $session_id = CRM_Core_Config::singleton()->userSystem->getSessionId() ?: '0';
     foreach ($result as $event) {
       $data[] = [
         'name' => $event->getName(),

@@ -216,6 +216,8 @@ body.af-gui-dragging {
 #afGuiEditor af-gui-container,
 #afGuiEditor af-gui-markup,
 #afGuiEditor af-gui-field,
+#afGuiEditor .af-gui-block-label,
+#afGuiEditor .af-gui-tabset,
 #afGuiEditor af-gui-edit-options {
   display: block;
 }
@@ -419,7 +421,7 @@ body.af-gui-dragging {
   left: -4px;
 }
 
-#afGuiEditor .dropdown-menu li {
+#afGuiEditor ul.dropdown-menu {
   cursor: default;
 }
 
@@ -432,6 +434,9 @@ body.af-gui-dragging {
   white-space: nowrap;
 }
 
+#afGuiEditor .dropdown-menu li .checkbox-inline label {
+  font-weight: normal;
+}
 #afGuiEditor .dropdown-menu li > * > label {
   font-weight: normal;
   cursor: pointer;

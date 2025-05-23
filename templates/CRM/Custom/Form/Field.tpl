@@ -29,6 +29,10 @@
       <td class="label">{$form.fk_entity.label} <span class="crm-marker">*</span></td>
       <td class="html-adjust">{$form.fk_entity.html}</td>
     </tr>
+    <tr class="crm-custom-field-form-block-fk_entity_on_delete">
+      <td class="label">{$form.fk_entity_on_delete.label} <span class="crm-marker">*</span></td>
+      <td class="html-adjust">{$form.fk_entity_on_delete.html}</td>
+    </tr>
     <tr class="crm-custom-field-form-block-serialize">
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
@@ -151,7 +155,7 @@
       <td class="label">{$form.is_searchable.label}</td>
       <td class="html-adjust">{$form.is_searchable.html}
         {if $action neq 4}
-          <br /><span class="description">{ts}Can you search on this field in the Advanced and component search forms? Also determines whether you can include this field as a display column and / or filter in related detail reports.{/ts}</span>
+          <br /><span class="description">{ts}Adds a database index which helps speed up searches on this field significantly. However, it can require more storage and can slow down the system if the data is frequently updated.{/ts}</span>
         {/if}
       </td>
     </tr>
@@ -202,6 +206,7 @@
 
       // Show/hide entityReference selector
       $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
+      $('.crm-custom-field-form-block-fk_entity_on_delete').toggle(dataType === 'EntityReference');
     }
 
     function onChangeHtmlType() {
@@ -224,7 +229,7 @@
 
     function showSearchRange(dataType) {
       if (_.includes(['Date', 'Int', 'Float', 'Money'], dataType)) {
-        $("#searchByRange", $form).toggle($('#is_searchable', $form).is(':checked'));
+        $("#searchByRange", $form).show();
       } else {
         $("#searchByRange", $form).hide();
       }

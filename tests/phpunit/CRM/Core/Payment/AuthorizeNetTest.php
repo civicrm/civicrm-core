@@ -438,8 +438,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   public function testChangeSubscription(): void {
     $this->setUpClient($this->getExpectedUpdateResponse());
     $params = [
-      'hidden_custom' => '1',
-      'hidden_custom_group_count' => ['' => 1],
       'qfKey' => '38588554ecd5c01d5ecdedf3870d9100_7980',
       'entryURL' => 'http://dmaster.local/civicrm/contribute/updaterecur?reset=1&amp;action=update&amp;crid=2&amp;cid=202&amp;context=contribution',
       'amount' => '9.67',

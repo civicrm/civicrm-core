@@ -10,11 +10,13 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Action\GetLinks;
 use Civi\Api4\Import\CheckAccessAction;
 use Civi\Api4\Generic\DAOGetAction;
 use Civi\Api4\Generic\DAOGetFieldsAction;
 use Civi\Api4\Action\GetActions;
 use Civi\Api4\Import\Create;
+use Civi\Api4\Import\Delete;
 use Civi\Api4\Import\Save;
 use Civi\Api4\Import\Update;
 use Civi\Api4\Import\Import as ImportAction;
@@ -97,10 +99,43 @@ class Import {
   /**
    * @param int $userJobID
    * @param bool $checkPermissions
+   * @return \Civi\Api4\Import\Delete
+   * @throws \CRM_Core_Exception
+   */
+  public static function delete(int $userJobID, bool $checkPermissions = TRUE): Delete {
+    return (new Delete('Import_' . $userJobID, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param string $userJobID
+   * @param bool $checkPermissions
+   * @return Generic\BasicReplaceAction
+   * @throws \CRM_Core_Exception
+   */
+  public static function replace($userJobID, $checkPermissions = TRUE) {
+    return (new Generic\BasicReplaceAction("Import_$userJobID", __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param int $userJobID
+   * @param bool $checkPermissions
    * @return \Civi\Api4\Action\GetActions
    */
   public static function getActions(int $userJobID, bool $checkPermissions = TRUE): GetActions {
     return (new GetActions('Import_' . $userJobID, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param int $userJobID
+   * @param bool $checkPermissions
+   *
+   * @return \Civi\Api4\Action\GetLinks
+   */
+  public static function getLinks(int $userJobID, bool $checkPermissions = TRUE): GetLinks {
+    return (new GetLinks('Import_' . $userJobID, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -119,7 +154,6 @@ class Import {
    *
    * @return \Civi\Api4\Import\Import
    *
-   * @throws \API_Exception
    */
   public static function import(int $userJobID, bool $checkPermissions = TRUE): ImportAction {
     return (new ImportAction('Import_' . $userJobID, __FUNCTION__))
@@ -131,7 +165,6 @@ class Import {
    * @param bool $checkPermissions
    *
    * @return \Civi\Api4\Import\Validate
-   * @throws \API_Exception
    */
   public static function validate(int $userJobID, bool $checkPermissions = TRUE): Validate {
     return (new Validate('Import_' . $userJobID, __FUNCTION__))->setCheckPermissions($checkPermissions);

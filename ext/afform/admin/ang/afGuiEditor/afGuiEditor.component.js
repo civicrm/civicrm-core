@@ -18,7 +18,7 @@
       mode: '@'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, afGui, $parse, $timeout) {
+    controller: function($scope, crmApi4, afGui, $parse, $timeout, $location, $route, $rootScope) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
 
       this.afform = null;
@@ -30,7 +30,7 @@
         undoHistory = [],
         undoPosition = 0,
         undoAction = null,
-        lastSaved,
+        lastSaved = {},
         sortableOptions = {};
 
       // ngModelOptions to debounce input
@@ -103,6 +103,11 @@
         }
         editor.afform.icon = editor.afform.icon || 'fa-list-alt';
         editor.afform.placement = editor.afform.placement || [];
+        // An empty object gets miscast by json_encode as [].
+        // FIXME: Maybe the Afform.get api ought to return empty arrays as NULL to avoid this problem.
+        if (!editor.afform.placement_filters || Array.isArray(editor.afform.placement_filters)) {
+          editor.afform.placement_filters = {};
+        }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
         $scope.entities = {};
@@ -139,6 +144,10 @@
         }
 
         editor.afform.permission_operator = editor.afform.permission_operator || 'AND';
+        // set redirect to url as default if not set
+        if (!editor.afform.confirmation_type && editor.meta.confirmation_types.length > 0) {
+          editor.afform.confirmation_type = editor.meta.confirmation_types[0].value;
+        }
 
         // Initialize undo history
         undoAction = 'initialLoad';
@@ -238,6 +247,14 @@
         }));
 
         function addToCanvas() {
+          // Set default mode of behaviors
+          if (afGui.meta.behaviors[meta.entity]) {
+            afGui.meta.behaviors[meta.entity].forEach(behavior => {
+              if (behavior.default_mode) {
+                $scope.entities[type + num][behavior.key] = behavior.default_mode;
+              }
+            });
+          }
           // Add this af-entity tag after the last existing one
           var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
           editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
@@ -303,9 +320,6 @@
       };
 
       this.getEntityDefn = function(entity) {
-        if (entity.type === 'Contact' && entity.data && entity.data.contact_type) {
-          return editor.meta.entities[entity.data.contact_type];
-        }
         return editor.meta.entities[entity.type];
       };
 
@@ -333,23 +347,123 @@
         return filter ? _.filter($scope.entities, filter) : _.toArray($scope.entities);
       };
 
-      this.isContactSummary = function() {
-        return editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab');
+      const placementEntities = {};
+      const allPlacementEntities = getPlacementEntitiesFromMeta(this.meta.afform_placement);
+
+      // Converts metaPlacements array to `{contact_id: Contact, event_id: Event, etc.}`
+      function getPlacementEntitiesFromMeta(metaPlacements) {
+        const placements = {};
+        metaPlacements.forEach((item) => {
+          _.extend(placements, editor.meta.placement_entities[item.id]);
+        });
+        return placements;
+      }
+
+      function getPlacementEntityLabel(entityName) {
+        const entityLabel = (afGui.getEntity(entityName) || {}).label || entityName;
+        return ts('%1 being Viewed', {1: entityLabel});
+      }
+
+      this.hasPlacementEntities = function() {
+        if (editor.afform.placement.length > 0) {
+          return editor.meta.afform_placement.some((item) => editor.afform.placement.includes(item.id) && item.grouping);
+        }
+        return false;
+      };
+
+      // Returns currently available placementEntities (as reference for compatibility with ng-repeat)
+      this.getPlacementEntities = function() {
+        // Return the placementEntities object after ensuring it is up-to-date
+        if (editor.afform.placement.length > 0) {
+          const placements = getPlacementEntitiesFromMeta(editor.meta.afform_placement.filter(item => editor.afform.placement.includes(item.id)));
+          // Unset any unused keys e.g. if a placement has been deselected
+          Object.keys(allPlacementEntities).forEach((key) => {
+            if (!(key in placements)) {
+              delete placementEntities[key];
+            }
+          });
+          // Add items from current placements
+          Object.keys(placements).forEach((key) => {
+            if (!(key in placementEntities)) {
+              placementEntities[key] = {
+                key: key,
+                entity: placements[key],
+                label: getPlacementEntityLabel(placements[key]),
+                filter: editor.meta.placement_filters[placements[key]],
+              };
+            }
+          });
+        } else {
+          Object.keys(placementEntities).forEach((key) => delete placementEntities[key]);
+        }
+        return placementEntities;
       };
 
       this.onChangePlacement = function() {
-        if (!editor.isContactSummary()) {
-          _.each(editor.searchDisplays, function(searchDisplay) {
-            delete searchDisplay.element.filters;
-          });
+        if (!editor.searchDisplays) {
+          return;
+        }
+        const placementEntities = this.getPlacementEntities();
+        if (Object.keys(placementEntities).length) {
+          editor.afform.placement_filters = editor.afform.placement_filters || {};
         } else {
-          _.each(editor.searchDisplays, function(searchDisplay) {
-            var filterOptions = getSearchFilterOptions(searchDisplay.settings);
-            if (filterOptions.length) {
-              searchDisplay.element.filters = filterOptions[0].key;
+          delete editor.afform.placement_filters;
+        }
+        Object.values(editor.searchDisplays).forEach((searchDisplay) => {
+          const filterValues = [];
+          // Remove any non-applicable filters
+          const filters = afGui.parseDisplayFilters(searchDisplay.element.filters).filter((filter) => {
+            if (filter.mode === 'options') {
+              if (filter.value in allPlacementEntities && !(filter.value in placementEntities)) {
+                return false;
+              }
+              filterValues.push(filter.value);
+            }
+            return true;
+          });
+          // Set default filters for newly-added placements
+          Object.keys(placementEntities).forEach((key) => {
+            if (!(key in filterValues)) {
+              const targetEntity = placementEntities[key].entity;
+              const searchEntity = searchDisplay.settings['saved_search_id.api_entity'];
+              // Filter on main entity id
+              if (targetEntity === searchEntity) {
+                filters.push({
+                  mode: 'options',
+                  name: 'id',
+                  value: key,
+                });
+              }
+              // Filter on a reference e.g. Address.contact_id
+              else {
+                const entityDef = afGui.getEntity(searchEntity);
+                const referenceField = Object.values(entityDef.fields).find((field) => field.fk_entity === targetEntity);
+                if (referenceField) {
+                  filters.push({
+                    mode: 'options',
+                    name: referenceField.name,
+                    value: key,
+                  });
+                }
+              }
             }
           });
-        }
+          searchDisplay.element.filters = afGui.stringifyDisplayFilters(filters);
+          if (!searchDisplay.element.filters) {
+            delete searchDisplay.element.filters;
+          }
+        });
+      };
+
+      this.placementRequiresServerRoute = function() {
+        let requiresServerRoute = false;
+        editor.afform.placement.forEach(function(placement) {
+          const item = editor.meta.afform_placement.find(item => item.id === placement);
+          if (item && item.filter) {
+            requiresServerRoute = item.text;
+          }
+        });
+        return requiresServerRoute;
       };
 
       // Gets complete field defn, merging values from the field with default values
@@ -543,43 +657,6 @@
         }
       };
 
-      // This function used to be needed to build a menu of available contact_id fields
-      // but is no longer used for that and is overkill for what it does now.
-      function getSearchFilterOptions(searchDisplay) {
-        var
-          entityCount = {},
-          options = [];
-
-        addFields(searchDisplay['saved_search_id.api_entity'], '');
-
-        _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
-          var joinInfo = join[0].split(' AS ');
-          addFields(joinInfo[0], joinInfo[1] + '.');
-        });
-
-        function addFields(entityName, prefix) {
-          var entity = afGui.getEntity(entityName);
-          entityCount[entity.entity] = (entityCount[entity.entity] || 0) + 1;
-          var count = (entityCount[entity.entity] > 1 ? ' ' + entityCount[entity.entity] : '');
-          if (entityName === 'Contact') {
-            options.push({
-              key: "{'" + prefix + "id': options.contact_id}",
-              label: entity.label + count
-            });
-          } else {
-            _.each(entity.fields, function(field) {
-              if (field.fk_entity === 'Contact') {
-                options.push({
-                  key: "{'" + prefix + field.name + "': options.contact_id}",
-                  label: entity.label + count + ' ' + field.label
-                });
-              }
-            });
-          }
-        }
-        return options;
-      }
-
       this.getLink = function() {
         if (editor.afform.server_route) {
           return CRM.url(editor.afform.server_route, null, editor.afform.is_public ? 'front' : 'back');
@@ -644,6 +721,8 @@
             if (!editor.afform.name) {
               undoAction = 'save';
               editor.afform.name = data[0].name;
+              // Update path to editing url
+              changePathQuietly('/edit/' + data[0].name);
             }
             // Update undo history - mark current snapshot as "saved"
             _.each(undoHistory, function(snapshot, index) {
@@ -703,6 +782,18 @@
           }
         });
       };
+
+      // Change the URL path without triggering a route change
+      function changePathQuietly(newPath) {
+        const lastRoute = $route.current;
+        // Intercept location change and restore current route
+        const un = $rootScope.$on('$locationChangeSuccess', function() {
+          $route.current = lastRoute;
+          un();
+        });
+        return $location.path(newPath);
+      }
+
     }
   });
 

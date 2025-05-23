@@ -12,21 +12,21 @@
     <div class="crm-report-criteria"> {* criteria section starts *}
       <div id="mainTabContainer">
         {*tab navigation bar*}
-        <ul>
+        <ul role="tablist">
           {foreach from=$tabs item='tab'}
-            <li class="ui-corner-all">
+            <li class="ui-corner-all" role="tab">
               <a title="{$tab.title|escape}" href="#report-tab-{$tab.div_label}">{$tab.title}</a>
             </li>
           {/foreach}
           {if !empty($instanceForm) OR !empty($instanceFormError)}
-            <li id="tab_settings" class="ui-corner-all">
-              <a title="{ts}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
+            <li id="tab_settings" class="ui-corner-all" role="tab">
+              <a title="{ts escape='htmlattribute'}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
             </li>
-            <li class="ui-corner-all">
-              <a title="{ts}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
+            <li class="ui-corner-all" role="tab">
+              <a title="{ts escape='htmlattribute'}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
             </li>
-            <li class="ui-corner-all">
-              <a title="{ts}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
+            <li class="ui-corner-all" role="tab">
+              <a title="{ts escape='htmlattribute'}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
             </li>
           {/if}
         </ul>

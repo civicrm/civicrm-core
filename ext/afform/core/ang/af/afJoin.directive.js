@@ -12,6 +12,8 @@
           var self = ctrls[0];
           self.afFieldset = ctrls[1];
           self.repeatItem = ctrls[2];
+          // Used when there is > 1 block per entity
+          self.offset = self.afFieldset.getJoinOffset($attr.afJoin);
         },
         controller: function($scope) {
           var self = this;
@@ -39,10 +41,10 @@
           };
           this.getFieldData = function() {
             var data = this.getData();
-            if (!data.length) {
-              data.push({});
+            if (!data[this.offset]) {
+              data[this.offset] = {};
             }
-            return data[0];
+            return data[this.offset];
           };
         }
       };

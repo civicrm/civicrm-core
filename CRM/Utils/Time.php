@@ -126,7 +126,7 @@ class CRM_Utils_Time {
    * @return string
    */
   public static function setTime($newDateTime, $returnFormat = 'YmdHis') {
-    $mode = getenv('TIME_FUNC') ? getenv('TIME_FUNC') : 'natural';
+    $mode = getenv('TIME_FUNC') ?: 'natural';
 
     list ($modeName, $modeNum) = explode(":", "$mode:");
 
@@ -183,6 +183,10 @@ class CRM_Utils_Time {
     self::$callback = NULL;
   }
 
+  public static function isOverridden(): bool {
+    return isset(self::$callback);
+  }
+
   /**
    * Approximate time-comparison. $a and $b are considered equal if they
    * are within $threshold seconds of each other.
@@ -198,6 +202,78 @@ class CRM_Utils_Time {
   public static function isEqual($a, $b, $threshold = 0) {
     $diff = strtotime($b) - strtotime($a);
     return (abs($diff) <= $threshold);
+  }
+
+  /**
+   * Get timezone offset from a timezone string
+   *
+   * @return string|false|null
+   */
+  public static function getTimeZoneOffsetFromString(string $timezone) {
+    if ($timezone) {
+      if ($timezone == 'UTC' || $timezone == 'Etc/UTC') {
+        // CRM-17072 Let's short-circuit all the zero handling & return it here!
+        return '+00:00';
+      }
+      $tzObj = new DateTimeZone($timezone);
+      $dateTime = new DateTime("now", $tzObj);
+      $tz = $tzObj->getOffset($dateTime);
+
+      if ($tz === 0) {
+        // CRM-21422
+        return '+00:00';
+      }
+
+      if (empty($tz)) {
+        return FALSE;
+      }
+
+      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
+
+      if ($timeZoneOffset > 0) {
+        $timeZoneOffset = '+' . $timeZoneOffset;
+      }
+      return $timeZoneOffset;
+    }
+    return NULL;
+  }
+
+  /**
+   * Rewrite a SQL query to use overridden date/time values for unit tests.
+   *
+   * @param string $query
+   *   The query to rewrite.
+   *
+   * @return string
+   *   The rewritten query with mocked time replacements.
+   */
+  public static function rewriteQuery(string $query): string {
+    $time = NULL;
+
+    // SQL date expressions => PHP date formats.
+    $patterns = [
+      '/\bNOW\(\s*\)/' => 'Y-m-d H:i:s',
+      '/\bCURDATE\(\s*\)/' => 'Y-m-d',
+      '/\bCURTIME\(\s*\)/' => 'H:i:s',
+      '/\bCURRENT_DATE\b/' => 'Y-m-d',
+      '/\bCURRENT_TIME\b/' => 'H:i:s',
+      '/\bCURRENT_TIMESTAMP\b/' => 'Y-m-d H:i:s',
+      '/\bSYSDATE\(\)/' => 'Y-m-d H:i:s',
+      '/\bLOCALTIME\b/' => 'Y-m-d H:i:s',
+      '/\bLOCALTIMESTAMP\b/' => 'Y-m-d H:i:s',
+    ];
+
+    // Callback ensures self::time() is called no more than once per query.
+    // During most unit tests, calling self::time() has the effect of advancing time by 500ms (default mode = `linear:500ms`).
+    // Stashing and re-using the value prevents the clock advancing more than expected.
+    foreach ($patterns as $pattern => $format) {
+      $query = preg_replace_callback($pattern, function() use ($format, &$time) {
+        $time ??= self::time();
+        return '"' . date($format, $time) . '"';
+      }, $query);
+    }
+
+    return $query;
   }
 
 }

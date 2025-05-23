@@ -2,37 +2,57 @@
 
 namespace Civi\Api4\Action\Afform;
 
-use Civi\Api4\Utils\CoreUtil;
-
 /**
  * Class Prefill
+ *
  * @package Civi\Api4\Action\Afform
  */
 class Prefill extends AbstractProcessor {
 
-  /**
-   * Name of the field being matched (typically 'id')
-   * @var string
-   */
-  protected $matchField;
-
   protected function processForm() {
     $entityValues = $this->_entityValues;
-    foreach ($entityValues as $afformEntityName => &$valueSets) {
-      $afformEntity = $this->_formDataModel->getEntity($afformEntityName);
-      if ($this->matchField) {
-        $matchFieldDefn = $this->_formDataModel->getField($afformEntity['type'], $this->matchField, 'create');
-        // When creating an entity based on an existing one e.g. Event.template_id
-        if (($matchFieldDefn['input_attrs']['autofill'] ?? NULL) === 'create') {
-          $idField = CoreUtil::getIdFieldName($afformEntity['type']);
-          foreach ($valueSets as &$valueSet) {
-            $valueSet['fields'][$this->matchField] = $valueSet['fields'][$idField];
-            unset($valueSet['fields'][$idField]);
-          }
+    return \CRM_Utils_Array::makeNonAssociative($entityValues, 'name', 'values');
+  }
+
+  protected function loadEntities() {
+    if ($this->fillMode === 'form') {
+      if (!empty($this->args['sid'])) {
+        $afformSubmission = \Civi\Api4\AfformSubmission::get()
+          ->addSelect('data')
+          ->addWhere('id', '=', $this->args['sid'])
+          ->addWhere('afform_name', '=', $this->name)
+          ->execute()->first();
+      }
+      // Restore saved draft
+      elseif (\CRM_Core_Session::getLoggedInContactID()) {
+        $afformSubmission = \Civi\Api4\AfformSubmission::get(FALSE)
+          ->addSelect('data')
+          ->addWhere('contact_id', '=', \CRM_Core_Session::getLoggedInContactID())
+          ->addWhere('afform_name', '=', $this->name)
+          ->addWhere('status_id:name', '=', 'Draft')
+          ->execute()->first();
+      }
+    }
+    if (!empty($afformSubmission['data'])) {
+      $this->populateSubmissionData($afformSubmission['data']);
+    }
+    else {
+      parent::loadEntities();
+    }
+  }
+
+  /**
+   * Load the data from submission table
+   */
+  protected function populateSubmissionData(array $submissionData) {
+    $this->_entityValues = $this->_formDataModel->getEntities();
+    foreach ($this->_entityValues as $entity => &$values) {
+      foreach ($submissionData as $e => $submission) {
+        if ($entity === $e) {
+          $values = $submission ?? [];
         }
       }
     }
-    return \CRM_Utils_Array::makeNonAssociative($entityValues, 'name', 'values');
   }
 
 }

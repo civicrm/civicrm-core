@@ -71,11 +71,11 @@ class GetOptions extends AbstractProcessor {
         ->addSelect('api_entity', 'api_params')
         ->execute()->single();
       // If field is not prefixed with a join, it's from the main entity
-      $entity = $savedSearch['api__entity'];
+      $entity = $savedSearch['api_entity'];
       // Check to see if field belongs to a join
       foreach ($savedSearch['api_params']['join'] ?? [] as $join) {
         [$joinEntity, $joinAlias] = array_pad(explode(' AS ', $join[0]), 2, '');
-        if (strpos($fieldName, $joinAlias . '.') === 0) {
+        if (str_starts_with($fieldName, $joinAlias . '.')) {
           $entity = $joinEntity;
           $fieldName = substr($fieldName, strlen($joinAlias) + 1);
         }

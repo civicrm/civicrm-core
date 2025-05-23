@@ -7,26 +7,32 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $pager|smarty:nodefaults and $pager->_response|smarty:nodefaults}
-    {if $pager->_response.numPages > 1}
-        <div class="crm-pager">
-            <span class="element-right">
-            {if $location eq 'top'}
-              {$pager->_response.titleTop|smarty:nodefaults}
-            {else}
-              {$pager->_response.titleBottom|smarty:nodefaults}
-            {/if}
-            </span>
+{if $pager && $pager->_response}
+  {if $pager->_response.numPages > 1}
+    <div class="crm-pager">
+      {if $location eq 'top'}
+        <span class="element-right">
           <span class="crm-pager-nav">
-          {$pager->_response.first|smarty:nodefaults}&nbsp;
-          {$pager->_response.back|smarty:nodefaults}&nbsp;
-          {$pager->_response.next|smarty:nodefaults}&nbsp;
-          {$pager->_response.last|smarty:nodefaults}&nbsp;
-          {$pager->_response.status}
+            {$pager->_response.back nofilter}
+            {$pager->_response.next nofilter}
           </span>
-
-        </div>
-    {/if}
+        </span>
+        <span class="crm-pager-nav">
+          {$pager->_response.status}
+        </span>
+      {else}
+        <span class="element-right">
+          {$pager->_response.titleBottom nofilter}
+        </span>
+        <span class="crm-pager-nav">
+          {$pager->_response.first nofilter}&nbsp;
+          {$pager->_response.back nofilter}&nbsp;
+          {$pager->_response.next nofilter}&nbsp;
+          {$pager->_response.last nofilter}&nbsp;
+        </span>
+      {/if}
+    </div>
+  {/if}
 
     {* Controller for 'Rows Per Page' *}
     {if $location eq 'bottom' and $pager->_totalItems > 25}
@@ -47,7 +53,7 @@
             numPages = {$pager->_response.numPages},
             currentPage = {$pager->_response.currentPage},
             perPageCount = {$pager->_perPage},
-            currentLocation = {$pager->_response.currentLocation|json_encode},
+            currentLocation = {$pager->_response.currentLocation|json_encode nofilter},
             spinning = null,
             refreshing = false;
           {literal}

@@ -28,7 +28,7 @@ class AfformBehavior extends Generic\AbstractEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
-      'get' => [['administer CiviCRM', 'administer afform']],
+      'get' => ['administer afform'],
     ];
   }
 
@@ -67,6 +67,11 @@ class AfformBehavior extends Generic\AbstractEntity {
           'name' => 'modes',
           'data_type' => 'Array',
           'description' => 'Nested array of supported behavior modes, keyed by entity name',
+        ],
+        [
+          'name' => 'default_mode',
+          'data_type' => 'String',
+          'description' => 'If set then mode will not be de-selectable',
         ],
       ];
     }))->setCheckPermissions(TRUE);

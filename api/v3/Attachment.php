@@ -139,7 +139,7 @@ function civicrm_api3_attachment_create($params) {
   $entityFileDao->file_id = $fileDao->id;
   $entityFileDao->save();
 
-  $path = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $fileDao->uri;
+  $path = $config->customFileUploadDir . $fileDao->uri;
   if (is_string($content)) {
     file_put_contents($path, $content);
   }
@@ -238,7 +238,7 @@ function civicrm_api3_attachment_delete($params) {
   $filePaths = [];
   $fileIds = [];
   while ($dao->fetch()) {
-    $filePaths[] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
+    $filePaths[] = $config->customFileUploadDir . $dao->uri;
     $fileIds[] = $dao->id;
   }
 
@@ -410,7 +410,7 @@ function _civicrm_api3_attachment_parse_params($params) {
  */
 function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $returnContent, $isTrusted) {
   $config = CRM_Core_Config::singleton();
-  $path = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $fileDao->uri;
+  $path = $config->customFileUploadDir . $fileDao->uri;
 
   $result = [
     'id' => $fileDao->id,
@@ -423,9 +423,9 @@ function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $retur
     'icon' => CRM_Utils_File::getIconFromMimeType($fileDao->mime_type),
     'created_id' => $fileDao->created_id,
   ];
-  $fileHash = CRM_Core_BAO_File::generateFileHash($result['entity_id'], $result['id']);
+  $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $result['id']);
   $result['url'] = CRM_Utils_System::url(
-    'civicrm/file', 'reset=1&id=' . $result['id'] . '&eid=' . $result['entity_id'] . '&fcs=' . $fileHash,
+    'civicrm/file', 'reset=1&id=' . $result['id'] . '&fcs=' . $fileHash,
     TRUE,
     NULL,
     FALSE,

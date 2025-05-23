@@ -13,7 +13,7 @@
   financialTypeName:::{$financialTypeName}
   contactID:::{$contactID}
   contributionID:::{$contributionID}
-  amount:::{$amount}
+  amount:::{contribution.total_amount}
   {if !empty($amount_level)}
   amount_level:::{$amount_level}
   {/if}

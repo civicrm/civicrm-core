@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 trait CRM_Core_Form_EntityFormTrait {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The id of the object being edited / created.
@@ -34,7 +35,7 @@ trait CRM_Core_Form_EntityFormTrait {
    * Deletion message to be assigned to the form.
    *
    * Depending on the screen, the deletionMessage may be plain-text (`{$deletionMessage|escape}`)
-   * or HTML (`{$deletionMessage|smarty:nodefaults}`). Be sure your controller+template agree.
+   * or HTML (`{$deletionMessage nofilter}`). Be sure your controller+template agree.
    *
    * @var string
    */
@@ -156,9 +157,45 @@ trait CRM_Core_Form_EntityFormTrait {
     if ($this->isSuppressCustomData()) {
       return TRUE;
     }
-    $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
-    if (isset($customisableEntities[$this->getDefaultEntity()])) {
-      CRM_Custom_Form_CustomData::addToForm($this, $this->getEntitySubTypeId());
+
+    /*
+    @todo - this would be the preferred code here to better support
+    php8.2 & take advantage of code improvements
+    Note in this example an additional filter (membership_type_id)
+    is relevant although for most entities it isn't.
+    if ($this->isSubmitted()) {
+    // The custom data fields are added to the form by an ajax form.
+    // However, if they are not present in the element index they will
+    // not be available from `$this->getSubmittedValue()` in post process.
+    // We do not have to set defaults or otherwise render - just add to the element index.
+    $this->addCustomDataFieldsToForm($this->getDefaultEntity(), array_filter([
+    'id' => $this->getEntityId(),
+    'membership_type_id' => $this->getSubmittedValue('membership_type_id')
+    ]));
+    }
+     */
+    $this->assign('customDataType', $this->getDefaultEntity());
+    $this->assign('customDataSubType', $this->getEntitySubTypeId());
+    $this->assign('entityID', $this->getEntityId());
+    $this->assign('cid', NULL);
+    if ($this->isSubmitted()) {
+      $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
+      if (isset($customisableEntities[$this->getDefaultEntity()])) {
+        if ($this->getEntitySubTypeId()) {
+          // Supporting entity subtypes form the EntityFormTrait is not
+          // used in core & is likely not used anywhere / was a good idea that
+          // didn't fully happen. If anyone is winding up here they should override
+          // the entire addCustomDataToForm function - e.g like the backoffice membership
+          // forms do
+          // @todo - add some noisy deprecation at some point.
+          CRM_Custom_Form_CustomData::addToForm($this, $this->getEntitySubTypeId());
+        }
+        else {
+          $this->addCustomDataFieldsToForm($this->getDefaultEntity(), array_filter([
+            'id' => $this->getEntityId(),
+          ]));
+        }
+      }
     }
   }
 
@@ -184,7 +221,7 @@ trait CRM_Core_Form_EntityFormTrait {
     $this->assign('entityFields', $this->entityFields);
     $this->assign('entityID', $this->getEntityId());
     $this->assign('entityInClassFormat', strtolower(str_replace('_', '-', $this->getDefaultEntity())));
-    $this->assign('entityTable', CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDefaultEntity())));
+    $this->assign('entityTable', CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->getDefaultEntity())));
     $this->addCustomDataToForm();
     $this->addFormButtons();
 
@@ -313,7 +350,7 @@ trait CRM_Core_Form_EntityFormTrait {
   protected function addEntityFieldsToTemplate() {
     foreach ($this->getEntityFields() as $fieldSpec) {
       if (empty($fieldSpec['not-auto-addable'])) {
-        $element = $this->addField($fieldSpec['name'], [], CRM_Utils_Array::value('required', $fieldSpec), FALSE);
+        $element = $this->addField($fieldSpec['name'], [], $fieldSpec['required'] ?? FALSE, FALSE);
         if (!empty($fieldSpec['is_freeze'])) {
           $element->freeze();
         }

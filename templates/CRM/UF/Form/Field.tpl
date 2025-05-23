@@ -17,7 +17,7 @@
   <table class="form-layout-compressed">
     <tr class="crm-uf-field-form-block-field_name">
       <td class="label">{$form.field_name.label} {help id='field_name_0'}</td>
-      <td>{$form.field_name.html|smarty:nodefaults}<br />
+      <td>{$form.field_name.html nofilter}<br />
         <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
     </tr>
     <tr class="crm-uf-field-form-block-label">
@@ -69,13 +69,13 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
-{$initHideBoxes|smarty:nodefaults}
+{$initHideBoxes nofilter}
 
 {literal}
 <script type="text/javascript">
 
 CRM.$(function($) {
-  var otherModule = {/literal}{$otherModules|@json_encode}{literal};
+  var otherModule = {/literal}{$otherModules|@json_encode nofilter}{literal};
   if ( $.inArray( "Profile", otherModule ) > -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').show();
   }
@@ -141,15 +141,6 @@ function showLabel( ) {
   {/foreach}
   {literal}
 
-  // Code to set Profile Field help, from custom data field help
-  if (fieldId.substring(0, 7) == 'custom_') {
-    fieldId = fieldId.substring( fieldId.length, 7);
-    var dataUrl = {/literal}"{crmURL p='civicrm/ajax/custom' h=0}"{literal};
-    cj.post( dataUrl, { id: fieldId }, function(data) {
-      cj('#help_post').val(data.help_post);
-      cj('#help_pre').val(data.help_pre);
-    }, 'json');
-  }
 }
 
 {/literal}{if $action neq 8}{literal}
@@ -190,45 +181,40 @@ CRM.$(function($) {
 });
 {/literal}{/if}{literal}
 
-cj("#field_name_1").change(
-  function() {
-    multiSummaryToggle(cj(this).val());
-  });
-
 CRM.$(function($) {
-  var fieldId = cj("#field_name_1").val();
-  multiSummaryToggle(fieldId);
-});
+  $("#field_name_1").change(handleCustomField).each(handleCustomField);
 
-function multiSummaryToggle(customId) {
-  if (customId && customId.match(/custom_[\d]/)) {
-
-    var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' q='className=CRM_UF_Page_AJAX&fnName=checkIsMultiRecord&json=1' h=0}"{literal};
-    dataUrl = dataUrl + '&customId=' + customId;
-    cj.ajax({  url: dataUrl,
-      async: false,
-      global: false,
-      dataType : 'json',
-      success : function(response) {
-        if (response.is_multi != 0 ) {
-          cj('.crm-uf-field-form-block-is_multi').show();
-        }
-        else {
-          if (cj('#is_multi_summary').is(':checked')) {
-            cj('#is_multi_summary').prop('checked', false);
-          }
-          cj('.crm-uf-field-form-block-is_multi').hide();
-        }
-      }
-    });
+  function hideMultiSummary() {
+    $('#is_multi_summary').prop('checked', false);
+    $('.crm-uf-field-form-block-is_multi').hide();
   }
-  else {
-    if (cj('#is_multi_summary').is(':checked')) {
-      cj('#is_multi_summary').prop('checked', false);
+
+  function handleCustomField() {
+    const fieldName = $(this).val();
+    if (fieldName && fieldName.match(/^custom_[\d]/)) {
+      const customFieldId = fieldName.split('_')[1];
+
+      CRM.api4('CustomField', 'get', {
+        select: ['help_pre', 'help_post', 'custom_group_id.is_multiple'],
+        where: [['id', '=', customFieldId]]
+      }, 0).then(function(result) {
+        if (result && result.help_pre) {
+          $('#help_pre').val(result.help_pre);
+        }
+        if (result && result.help_post) {
+          $('#help_post').val(result.help_post);
+        }
+        if (result && result['custom_group_id.is_multiple']) {
+          $('.crm-uf-field-form-block-is_multi').show();
+        } else {
+          hideMultiSummary()
+        }
+      });
+    } else {
+      hideMultiSummary();
     }
-    cj('.crm-uf-field-form-block-is_multi').hide();
   }
-}
+});
 
 function viewOnlyShowHide() {
   var is_search = cj('#is_search_label, #is_search_html');

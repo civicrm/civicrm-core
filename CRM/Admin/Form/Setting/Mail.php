@@ -20,17 +20,6 @@
  */
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
-  protected $_settings = [
-    'mailerBatchLimit' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mailThrottleTime' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mailerJobSize' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mailerJobsMax' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'verpSeparator' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    // dev/core#1768 Make this interval configurable.
-    'civimail_sync_interval' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-  ];
-
   /**
    * Build the form object.
    */
@@ -47,18 +36,16 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    */
   public static function formRule($fields) {
     $errors = [];
-    if (CRM_Utils_Array::value('mailerJobSize', $fields) > 0) {
-      if (CRM_Utils_Array::value('mailerJobSize', $fields) < 1000) {
+    if (isset($fields['mailerJobSize']) && $fields['mailerJobSize'] > 0) {
+      if ($fields['mailerJobSize'] < 1000) {
         $errors['mailerJobSize'] = ts('The job size must be at least 1000 or set to 0 (unlimited).');
       }
-      elseif (CRM_Utils_Array::value('mailerJobSize', $fields) <
-        CRM_Utils_Array::value('mailerBatchLimit', $fields)
-      ) {
+      elseif ($fields['mailerJobSize'] < ($fields['mailerBatchLimit'] ?? 0)) {
         $errors['mailerJobSize'] = ts('A job size smaller than the batch limit will negate the effect of the batch limit.');
       }
     }
     // dev/core#1768 Check the civimail_sync_interval setting.
-    if (CRM_Utils_Array::value('civimail_sync_interval', $fields) < 1) {
+    if (($fields['civimail_sync_interval'] ?? 0) < 1) {
       $errors['civimail_sync_interval'] = ts('Error - the synchronization interval must be at least 1');
     }
     return empty($errors) ? TRUE : $errors;

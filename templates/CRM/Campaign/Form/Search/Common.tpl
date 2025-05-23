@@ -14,10 +14,10 @@
 {if $searchVoterFor}
   {assign var='searchForm' value="search_form_$searchVoterFor"}
 {/if}
-  <div id="{$searchForm}" class="crm-accordion-wrapper crm-contribution_search_form-accordion {if $rows}collapsed{/if}">
-    <div class="crm-accordion-header {if !$votingTab} crm-master-accordion-header{/if}">
+  <details id="{$searchForm}" class="{if !$votingTab} crm-accordion-light{else}crm-accordion-bold{/if} crm-contribution_search_form-accordion" {if $rows}{else}open{/if}>
+    <summary>
     {ts}Edit Search Criteria{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
 
     <div class="crm-accordion-body">
     {strip}
@@ -50,7 +50,7 @@
         </tr>
         <tr>
           <td>
-            <label>{ts}Contact Type(s){/ts}</label>
+            <label>{ts}Contact Type{/ts}</label>
           </td>
           <td>
             {$form.contact_type.html}
@@ -106,35 +106,12 @@
             {$form.postal_code.html}
           </td>
         </tr>
-        {if $customSearchFields.ward || $customSearchFields.precinct}
-          <tr>
-            {if $customSearchFields.ward}
-              {assign var='ward' value=$customSearchFields.ward}
-              <td>
-                {$form.$ward.label}
-              </td>
-              <td>
-                {$form.$ward.html}
-              </td>
-            {/if}
-
-            {if $customSearchFields.precinct}
-              {assign var='precinct' value=$customSearchFields.precinct}
-              <td>
-                {$form.$precinct.label}
-              </td>
-              <td>
-                {$form.$precinct.html}
-              </td>
-            {/if}
-          </tr>
-        {/if}
         <tr>
           <td colspan="2">
             {if $context eq 'search'}
               {$form.buttons.html}
               {else}
-              <a class="searchVoter button" style="float:left;" href="#" title={ts}Search{/ts} onClick="searchVoters( '{$qfKey}' );return false;">{ts}Search{/ts}</a>
+              <a class="searchVoter button" style="float:left;" href="#" title="{ts escape='htmlattribute'}Search{/ts}" onClick="searchVoters( '{$qfKey}' );return false;">{ts}Search{/ts}</a>
             {/if}
           </td>
         </tr>
@@ -142,7 +119,7 @@
     {/strip}
 
     </div>
-  </div>
+  </details>
 </div>
 
 {literal}

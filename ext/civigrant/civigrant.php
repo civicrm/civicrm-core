@@ -54,16 +54,16 @@ function civigrant_civicrm_summaryActions(&$menu, $cid) {
  */
 function civigrant_civicrm_permission(&$permissions) {
   $permissions['access CiviGrant'] = [
-    E::ts('CiviGrant:') . ' ' . E::ts('access CiviGrant'),
-    E::ts('View all grants'),
+    'label' => E::ts('CiviGrant:') . ' ' . E::ts('access CiviGrant'),
+    'description' => E::ts('View all grants'),
   ];
   $permissions['edit grants'] = [
-    E::ts('CiviGrant:') . ' ' . E::ts('edit grants'),
-    E::ts('Create and update grants'),
+    'label' => E::ts('CiviGrant:') . ' ' . E::ts('edit grants'),
+    'description' => E::ts('Create and update grants'),
   ];
   $permissions['delete in CiviGrant'] = [
-    E::ts('CiviGrant:') . ' ' . E::ts('delete in CiviGrant'),
-    E::ts('Delete grants'),
+    'label' => E::ts('CiviGrant:') . ' ' . E::ts('delete in CiviGrant'),
+    'description' => E::ts('Delete grants'),
   ];
 }
 

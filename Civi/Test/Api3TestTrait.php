@@ -338,7 +338,7 @@ trait Api3TestTrait {
     $chains = $custom = [];
     foreach ($v3Params as $key => $val) {
       foreach ($toRemove as $remove) {
-        if (strpos($key, $remove) === 0) {
+        if (str_starts_with($key, $remove)) {
           if ($remove == 'api.') {
             $chains[$key] = $val;
           }
@@ -387,7 +387,13 @@ trait Api3TestTrait {
       $v3Fields['version'] = ['name' => 'version', 'api.aliases' => ['domain_version']];
       unset($v3Fields['domain_version']);
     }
-
+    if ($v4Entity == 'Payment') {
+      unset($v3Fields['entity_id']);
+      if (!empty($v3Params['contribution_id']) && $v4Action === 'get') {
+        $v4Params['contributionID'] = $v3Params['contribution_id'];
+        \CRM_Utils_Array::remove($v3Params, 'contribution_id');
+      }
+    }
     foreach ($v3Fields as $name => $field) {
       // Resolve v3 aliases
       foreach ($field['api.aliases'] ?? [] as $alias) {
@@ -397,7 +403,7 @@ trait Api3TestTrait {
         }
       }
       // Convert custom field names
-      if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+      if (str_starts_with($name, 'custom_') && is_numeric($name[7])) {
         // Strictly speaking, using titles instead of names is incorrect, but it works for
         // unit tests where names and titles are identical and saves an extra db lookup.
         $custom[$field['groupTitle']][$field['title']] = $name;
@@ -420,7 +426,7 @@ trait Api3TestTrait {
         unset($v3Params['option_group_id']);
       }
       if (isset($field['pseudoconstant'], $v3Params[$name]) && $field['type'] === \CRM_Utils_Type::T_INT && !is_numeric($v3Params[$name]) && is_string($v3Params[$name])) {
-        $v3Params[$name] = \CRM_Core_PseudoConstant::getKey(\CRM_Core_DAO_AllCoreTables::getFullName($v4Entity), $name, $v3Params[$name]);
+        $v3Params[$name] = \CRM_Core_PseudoConstant::getKey(\CRM_Core_DAO_AllCoreTables::getDAONameForEntity($v4Entity), $name, $v3Params[$name]);
       }
     }
 
@@ -515,8 +521,6 @@ trait Api3TestTrait {
       $actionInfo = \civicrm_api4($v4Entity, 'getActions', ['checkPermissions' => FALSE, 'where' => [['name', '=', $v4Action]]]);
     }
     catch (NotImplementedException $e) {
-      // For now we'll mark the test incomplete if a v4 entity doesn't exit yet
-      $this->markTestIncomplete($e->getMessage());
     }
     if (!isset($actionInfo[0])) {
       throw new \Exception("Api4 $v4Entity $v4Action does not exist.");
@@ -675,7 +679,7 @@ trait Api3TestTrait {
 
     // Replace $value.field_name
     foreach ($params as $name => $param) {
-      if (is_string($param) && strpos($param, '$value.') === 0) {
+      if (is_string($param) && str_starts_with($param, '$value.')) {
         $param = substr($param, 7);
         $params[$name] = $result[$param] ?? NULL;
       }

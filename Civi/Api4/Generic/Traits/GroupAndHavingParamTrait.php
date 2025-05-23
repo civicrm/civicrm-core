@@ -52,14 +52,15 @@ trait GroupAndHavingParamTrait {
    * @param string $expr
    * @param string $op
    * @param mixed $value
+   * @param bool $isExpression
    * @return $this
    * @throws \CRM_Core_Exception
    */
-  public function addHaving(string $expr, string $op, $value = NULL) {
+  public function addHaving(string $expr, string $op, $value = NULL, bool $isExpression = FALSE) {
     if (!in_array($op, CoreUtil::getOperators())) {
       throw new \CRM_Core_Exception('Unsupported operator');
     }
-    $this->having[] = [$expr, $op, $value];
+    $this->having[] = [$expr, $op, $value, $isExpression];
     return $this;
   }
 

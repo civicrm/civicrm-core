@@ -14,14 +14,15 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-
+use Civi\Api4\Activity;
+use Civi\Api4\Contact;
 
 /**
  * Class to parse activity csv files.
  */
 class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
 
-  protected $_newActivity;
+  protected string $baseEntity = 'Activity';
 
   /**
    * Get information about the provided job.
@@ -48,7 +49,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
   /**
    * The initializer code, called before the processing.
    */
-  public function init() {
+  public function init(): void {
     $this->setFieldMetadata();
   }
 
@@ -58,195 +59,171 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    */
-  public function import($values) {
+  public function import(array $values): void {
+    $values = array_values($values);
     $rowNumber = (int) ($values[array_key_last($values)]);
     // First make sure this is a valid line
     try {
       $params = $this->getMappedRow($values);
-
-      if (!empty($params['source_contact_external_identifier'])) {
-        $params['source_contact_id'] = $this->lookupExternalIdentifier($params['source_contact_external_identifier'], $this->getContactType(), $params['contact_id'] ?? NULL);
+      $activityParams = $params['Activity'];
+      $targetContactParams = $params['TargetContact'] ?? [];
+      $sourceContactParams = $params['SourceContact'] ?? [];
+      $assigneeContactParams = $params['AssigneeContact'] ?? [];
+      if (array_keys($targetContactParams) === ['email_primary.email']) {
+        $targetContactParams['contact_type'] = 'Individual';
       }
+      $activityParams['target_contact_id'] = $this->getContactID($targetContactParams, empty($targetContactParams['id']) ? NULL : (int) $targetContactParams['id'], 'TargetContact', $this->getDedupeRulesForEntity('TargetContact'));
+      $activityParams['assignee_contact_id'] = $this->getContactID($assigneeContactParams, empty($assigneeContactParams['id']) ? NULL : (int) $assigneeContactParams['id'], 'AssigneeContact', $this->getDedupeRulesForEntity('AssigneeContact'));
 
-      if (empty($params['external_identifier']) && empty($params['target_contact_id'])) {
-
-        // Retrieve contact id using contact dedupe rule.
-        // Since we are supporting only individual's activity import.
-        $params['contact_type'] = 'Individual';
-        $params['version'] = 3;
-        $matchedIDs = CRM_Contact_BAO_Contact::getDuplicateContacts($params, 'Individual');
-
-        if (!empty($matchedIDs)) {
-          if (count($matchedIDs) > 1) {
-            throw new CRM_Core_Exception('Multiple matching contact records detected for this row. The activity was not imported');
-          }
-          $cid = $matchedIDs[0];
-          $params['target_contact_id'] = $cid;
-          $params['version'] = 3;
-          $newActivity = civicrm_api('activity', 'create', $params);
-          if (!empty($newActivity['is_error'])) {
-            throw new CRM_Core_Exception($newActivity['error_message']);
-          }
-
-          $this->_newActivity[] = $newActivity['id'];
-          $this->setImportStatus($rowNumber, 'IMPORTED', '', $newActivity['id']);
-          return;
-
-        }
-        // Using new Dedupe rule.
-        $ruleParams = [
-          'contact_type' => 'Individual',
-          'used' => 'Unsupervised',
-        ];
-        $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
-
-        $disp = NULL;
-        foreach ($fieldsArray as $value) {
-          if (array_key_exists(trim($value), $params)) {
-            $paramValue = $params[trim($value)];
-            if (is_array($paramValue)) {
-              $disp .= $params[trim($value)][0][trim($value)] . " ";
-            }
-            else {
-              $disp .= $params[trim($value)] . " ";
-            }
-          }
-        }
-
-        if (!empty($params['external_identifier'])) {
-          if ($disp) {
-            $disp .= "AND {$params['external_identifier']}";
-          }
-          else {
-            $disp = $params['external_identifier'];
-          }
-        }
-        if (empty($params['id'])) {
-          throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
+      try {
+        $activityParams['source_contact_id'] = $this->getContactID($sourceContactParams, empty($sourceContactParams['id']) ? NULL : (int) $sourceContactParams['id'], 'SourceContact', $this->getDedupeRulesForEntity('SourceContact'));
+      }
+      catch (CRM_Core_Exception $e) {
+        if (empty($activityParams['id'])) {
+          $activityParams['source_contact_id'] = CRM_Core_Session::getLoggedInContactID();
         }
       }
-      if (!empty($params['external_identifier'])) {
-        $targetContactId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $params['external_identifier'], 'id', 'external_identifier'
-        );
-
-        if (!empty($params['target_contact_id']) &&
-          $params['target_contact_id'] != $targetContactId
-        ) {
-          throw new CRM_Core_Exception('Mismatch of External ID:' . $params['external_identifier'] . ' and Contact Id:' . $params['target_contact_id']);
-        }
-        if ($targetContactId) {
-          $params['target_contact_id'] = $targetContactId;
-        }
-        else {
-          throw new CRM_Core_Exception('No Matching Contact for External ID:' . $params['external_identifier']);
-        }
-      }
-
-      $params['version'] = 3;
-      $newActivity = civicrm_api('activity', 'create', $params);
-      if (!empty($newActivity['is_error'])) {
-        throw new CRM_Core_Exception($newActivity['error_message']);
-      }
+      $newActivity = Activity::save()
+        ->addRecord($activityParams)
+        ->execute()->first();
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       return;
     }
-    $this->_newActivity[] = $newActivity['id'];
     $this->setImportStatus($rowNumber, 'IMPORTED', '', $newActivity['id']);
-  }
-
-  /**
-   * Get the row from the csv mapped to our parameters.
-   *
-   * @param array $values
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public function getMappedRow(array $values): array {
-    $params = [];
-    foreach ($this->getFieldMappings() as $i => $mappedField) {
-      if ($mappedField['name'] === 'do_not_import') {
-        continue;
-      }
-      if ($mappedField['name']) {
-        $fieldName = $this->getFieldMetadata($mappedField['name'])['name'];
-        if (in_array($mappedField['name'], ['target_contact_id', 'source_contact_id', 'source_contact_external_identifier'])) {
-          $fieldName = $mappedField['name'];
-        }
-        $params[$fieldName] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
-      }
-    }
-    return $params;
   }
 
   /**
    * @return array
    */
   protected function getRequiredFields(): array {
-    return [['activity_type_id', 'activity_date_time']];
+    return [['Activity.activity_type_id', 'Activity.activity_date_time']];
+  }
+
+  /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   */
+  public function getImportEntities() : array {
+    return [
+      'Activity' => [
+        'text' => ts('Activity Fields'),
+        'entity_title' => ts('Activity'),
+        'is_contact' => FALSE,
+        'actions' => [
+          ['id' => 'save', 'text' => ts('Create or Update using ID'), 'description' => ts('Skip if no match found')],
+        ],
+        'selected' => [
+          'action' => 'save',
+        ],
+        'default_action' => 'save',
+        'entity_name' => 'Activity',
+      ],
+      'TargetContact' => [
+        'text' => ts('Target Contact Fields'),
+        'entity_title' => ts('Target Contact'),
+        'is_contact' => TRUE,
+        'unique_fields' => ['external_identifier', 'id'],
+        'supports_multiple' => TRUE,
+        'actions' => $this->getActions(['select', 'ignore', 'update']),
+        'selected' => [
+          'action' => 'select',
+          'contact_type' => 'Individual',
+        ],
+        'default_action' => 'select',
+        'entity_name' => 'TargetContact',
+      ],
+      'SourceContact' => [
+        'text' => ts('Source Contact Fields'),
+        'entity_title' => ts('Source Contact'),
+        'is_contact' => TRUE,
+        'unique_fields' => ['external_identifier', 'id'],
+        'supports_multiple' => FALSE,
+        'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore']) : $this->getActions(['select', 'update', 'save']),
+        'selected' => [
+          'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
+        ],
+        'default_action' => 'select',
+        'entity_name' => 'SourceContact',
+      ],
+      'AssigneeContact' => [
+        'text' => ts('assignee Contact Fields'),
+        'entity_title' => ts('Assignee Contact'),
+        'is_contact' => TRUE,
+        'unique_fields' => ['external_identifier', 'id'],
+        'supports_multiple' => TRUE,
+        'actions' => $this->getActions(['select', 'ignore']),
+        'selected' => [
+          'action' => 'ignore',
+        ],
+        'default_action' => 'ignore',
+        'entity_name' => 'AssigneeContact',
+      ],
+    ];
   }
 
   /**
    * Ensure metadata is loaded.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
-      $activityContact = CRM_Activity_BAO_ActivityContact::import();
-      $fields = ['' => ['title' => ts('- do not import -')]];
-
-      $tmpFields = CRM_Activity_DAO_Activity::import();
-      $contactFields = CRM_Contact_BAO_Contact::importableFields('Individual', NULL);
-
-      // Using new Dedupe rule.
-      $ruleParams = [
-        'contact_type' => 'Individual',
-        'used' => 'Unsupervised',
-      ];
-      $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
-
-      $tmpContactField = [];
-      if (is_array($fieldsArray)) {
-        foreach ($fieldsArray as $value) {
-          $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
-            $value,
-            'id',
-            'column_name'
-          );
-          $value = trim($customFieldId ? 'custom_' . $customFieldId : $value);
-          $tmpContactField[$value] = $contactFields[$value];
-          $tmpContactField[$value]['title'] = $tmpContactField[$value]['title'] . " (match to contact)";
-        }
+      $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']];
+      $activityFields = (array) Activity::getFields()
+        ->addWhere('readonly', '=', FALSE)
+        ->addWhere('usage', 'CONTAINS', 'import')
+        ->setAction('save')
+        ->addOrderBy('title')
+        ->execute()->indexBy('name');
+      foreach ($activityFields as $fieldName => $field) {
+        $field['entity_instance'] = 'Activity';
+        $field['entity_prefix'] = 'Activity.';
+        $fields['Activity.' . $fieldName] = $field;
       }
-      $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
-      $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' (target contact)' . ' (match to contact)';
-      $tmpContactField['source_contact_external_identifier'] = $contactFields['external_identifier'];
-      $tmpContactField['source_contact_external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' (source contact)' . ' (match to contact)';
+      $idSchema = Contact::getFields(FALSE)
+        ->addWhere('name', '=', 'id')
+        ->execute()->single();
+      // For other entities contact_id is part of the main entity - that doesn't work here so
+      // hacking the ID in since the function won't add it.
+      $contactFields = [];
+      foreach (['SourceContact', 'TargetContact', 'AssigneeContact'] as $activityContactType) {
+        $matchText = ' ' . ts('(match to %1)', [1 => $activityContactType]);
+        $contactFields[$activityContactType . '.id'] = $idSchema;
+        $contactFields[$activityContactType . '.id']['title'] .= $matchText;
+        $contactFields[$activityContactType . '.id']['match_rule'] = '*';
+        $contactFields[$activityContactType . '.id']['entity_instance'] = $activityContactType;
+        $contactFields[$activityContactType . '.id']['contact_type'] = ['Individual', 'Organization', 'Household'];
+        $contactFields += $this->getContactFields('Individual', $activityContactType);
+      }
 
-      $fields = array_merge($fields, $tmpContactField);
-      $fields = array_merge($fields, $tmpFields);
-      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
-
-      $fields = array_merge($fields, [
-        'source_contact_id' => [
-          'title' => ts('Source Contact'),
-          'headerPattern' => '/Source.Contact?/i',
-          'name' => 'source_type_id',
-          'options' => FALSE,
-          'type' => CRM_Utils_Type::T_INT,
-        ],
-        'target_contact_id' => [
-          'title' => ts('Target Contact'),
-          'headerPattern' => '/Target.Contact?/i',
-          'name' => 'target_type_id',
-          'options' => FALSE,
-          'type' => CRM_Utils_Type::T_INT,
-        ],
-      ]);
+      $fields += $contactFields;
       $this->importableFieldsMetadata = $fields;
     }
+  }
+
+  /**
+   * Get the metadata field for which importable fields does not key the actual field name.
+   *
+   * This is intended as a transitional function to handle fields like
+   * (and probably only) target_contact.email_primary.email when the
+   * declared field is 'email_primary.email'
+   *
+   * @return string[]
+   */
+  protected function getOddlyMappedMetadataFields(): array {
+    $contactSpecificFields = [];
+    foreach ($this->importableFieldsMetadata as $index => $field) {
+      if (!str_starts_with($index, 'target_contact.')
+        && !str_starts_with($index, 'source_contact')
+        && ($field['entity'] ?? '') === 'Contact') {
+        $contactSpecificFields['target_contact.' . $index] = $index;
+        $contactSpecificFields['source_contact.' . $index] = $index;
+      }
+    }
+    return $contactSpecificFields;
   }
 
 }

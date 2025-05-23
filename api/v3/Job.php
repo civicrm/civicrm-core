@@ -74,6 +74,7 @@ function civicrm_api3_job_clone($params) {
   $id = $params['id'];
   unset($params['id']);
   $params['last_run'] = 'null';
+  $params['last_run_end'] = 'null';
   $params['scheduled_run_date'] = 'null';
   $newJobDAO = CRM_Core_BAO_Job::copy($id, $params);
   return civicrm_api3('Job', 'get', ['id' => $newJobDAO->id]);
@@ -112,6 +113,12 @@ function civicrm_api3_job_delete($params) {
  *   API Result Array
  */
 function civicrm_api3_job_execute($params) {
+  if (\CRM_Utils_System::isMaintenanceMode() && !$params['run_in_maintenance_mode']) {
+    // skip execution
+    return civicrm_api3_create_success(0, $params, 'Job', NULL, $dao, [
+      'skipped' => 'maintenance_mode',
+    ]);
+  }
 
   $facility = new CRM_Core_JobManager();
   $facility->execute(FALSE);
@@ -127,6 +134,11 @@ function civicrm_api3_job_execute($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_job_execute_spec(&$params) {
+  $params['run_in_maintenance_mode'] = [
+    'title' => ts('Run jobs even if system is in maintenance mode'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => FALSE,
+  ];
 }
 
 /**
@@ -139,6 +151,8 @@ function _civicrm_api3_job_execute_spec(&$params) {
  *   API Result Array
  */
 function civicrm_api3_job_geocode($params) {
+  // We are in api v3, so version has already done it's job.
+  unset($params['version']);
   $gc = new CRM_Utils_Address_BatchUpdate($params);
 
   $result = $gc->run();

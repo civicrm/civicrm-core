@@ -24,16 +24,13 @@ class CRM_Core_I18n {
   const NONE = 'none', AUTO = 'auto';
 
   /**
-   * @var callable|null
-   *   A callback function which handles SQL string encoding.
-   *   Set NULL to use the default, CRM_Core_DAO::escapeString().
-   *   This is used by `ts(..., [escape=>sql])`.
+   * @var string
+   * @deprecated
+   *   This variable has 1-2 references in contrib, which -probably- aren't functionally
+   *   necessary. (Extensions don't load in pre-installation environments...)
+   *   But we'll keep the property stub just to prevent crashes.
    *
-   * This option is not intended for general consumption. It is only intended
-   * for certain pre-boot/pre-install contexts.
-   *
-   * You might ask, "Why on Earth does string-translation have an opinion on
-   * SQL escaping?" Good question!
+   *   Replaced by $GLOBALS['CIVICRM_SQL_ESCAPER'].
    */
   public static $SQL_ESCAPER = NULL;
 
@@ -45,14 +42,12 @@ class CRM_Core_I18n {
    * @return string
    */
   protected static function escape($text, $mode) {
+    if (!$mode) {
+      return $text;
+    }
     switch ($mode) {
       case 'sql':
-        if (self::$SQL_ESCAPER == NULL) {
-          return CRM_Core_DAO::escapeString($text);
-        }
-        else {
-          return call_user_func(self::$SQL_ESCAPER, $text);
-        }
+        return CRM_Core_DAO::escapeString($text);
 
       case 'js':
         return substr(json_encode($text, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), 1, -1);
@@ -60,7 +55,7 @@ class CRM_Core_I18n {
       case 'htmlattribute':
         return htmlspecialchars($text, ENT_QUOTES);
     }
-    return $text;
+    throw new Exception('Invalid escape mode: ' . $mode);
   }
 
   /**
@@ -696,7 +691,6 @@ class CRM_Core_I18n {
     // For self::getLocale()
     global $tsLocale;
     $tsLocale = $civicrmLocale->ts;
-
     CRM_Core_I18n::singleton()->reactivate();
   }
 
@@ -782,12 +776,12 @@ class CRM_Core_I18n {
    *   Ex: $stringTable['enabled']['wildcardMatch']['foo'] = 'bar';
    */
   private function getWordReplacements() {
-    if (isset(Civi\Test::$statics['testPreInstall'])) {
+    if (defined('CIVI_SETUP') || isset(Civi\Test::$statics['testPreInstall'])) {
       return [];
     }
 
     // FIXME: Is there a constant we can reference instead of hardcoding en_US?
-    $replacementsLocale = $this->locale ? $this->locale : 'en_US';
+    $replacementsLocale = $this->locale ?: 'en_US';
     if ((!isset(Civi::$statics[__CLASS__]) || !array_key_exists($replacementsLocale, Civi::$statics[__CLASS__]))) {
       if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
         Civi::$statics[__CLASS__][$replacementsLocale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($replacementsLocale);
@@ -799,72 +793,4 @@ class CRM_Core_I18n {
     return Civi::$statics[__CLASS__][$replacementsLocale];
   }
 
-}
-
-/**
- * Short-named function for string translation, defined in global scope so it's available everywhere.
- *
- * @param string $text
- *   String for translating.
- *   Ex: 'Hello, %1!'
- * @param array $params
- *   An array of additional parameters, as per `crm_translate()`.
- *   Ex: [1 => 'Dave']
- * @return string
- *   The translated string
- *   Ex: '¡Buenos días Dave!`
- * @see \CRM_Core_I18n::crm_translate()
- */
-function ts($text, $params = []) {
-  static $bootstrapReady = FALSE;
-  static $lastLocale = NULL;
-  static $i18n = NULL;
-  static $function = NULL;
-
-  if ($text == '') {
-    return '';
-  }
-
-  // When the settings become available, lookup customTranslateFunction.
-  if (!$bootstrapReady) {
-    $bootstrapReady = (bool) \Civi\Core\Container::isContainerBooted();
-    if ($bootstrapReady) {
-      // just got ready: determine whether there is a working custom translation function
-      $config = CRM_Core_Config::singleton();
-      if (!empty($config->customTranslateFunction) && function_exists($config->customTranslateFunction)) {
-        $function = $config->customTranslateFunction;
-      }
-    }
-  }
-
-  $civicrmLocale = CRM_Core_I18n::getLocale();
-  if (!$i18n or $lastLocale != $civicrmLocale) {
-    $i18n = CRM_Core_I18n::singleton();
-    $lastLocale = $civicrmLocale;
-  }
-
-  if ($function) {
-    return $function($text, $params);
-  }
-  else {
-    return $i18n->crm_translate($text, $params);
-  }
-}
-
-/**
- * Alternate name for `ts()`
- *
- * This is functionally equivalent to `ts()`. However, regular `ts()` is subject to extra linting
- * rules. Using `_ts()` can bypass the linting rules for the rare cases where you really want
- * special/dynamic values.
- *
- * @param array ...$args
- * @return string
- * @see ts()
- * @see \CRM_Core_I18n::crm_translate()
- * @internal
- */
-function _ts(...$args) {
-  $f = 'ts';
-  return $f(...$args);
 }

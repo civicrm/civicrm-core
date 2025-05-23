@@ -4,15 +4,6 @@ This extension provides an integration with PayPal's Payflow Pro service. It sup
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
-## Requirements
-
-* PHP v7.2+
-* CiviCRM 5.38
-
-## Installation (Web UI)
-
-Learn more about installing CiviCRM extensions in the [CiviCRM Sysadmin Guide](https://docs.civicrm.org/sysadmin/en/latest/customize/extensions/).
-
 ## Getting Started
 
 After enabling the extension you will need to go to Administer >> System Settings >> Payment Processors and create a Payment Processor that uses Payflow Pro

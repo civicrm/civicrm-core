@@ -24,3 +24,7 @@
     </ul>
   </div>
 </div>
+<select ng-if="$ctrl.display.settings.actions" class="form-control" ng-model="$ctrl.display.settings.actions_display_mode">
+  <option value="menu">{{:: ts('Dropdown') }}</option>
+  <option value="buttons">{{:: ts('Buttons') }}</option>
+</select>

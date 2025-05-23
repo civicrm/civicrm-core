@@ -40,7 +40,7 @@
     </fieldset>
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5>{{:: $ctrl.action === 'save' ? ts('Adding tags...') : ts('Removing tags...') }}</h5>
-      <crm-search-batch-runner entity="'EntityTag'" action="{{ $ctrl.action }}" id-field="entity_id" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
+      <crm-search-batch-runner entity="'EntityTag'" action="{{ $ctrl.action }}" id-field="entity_id" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess(result)" error="$ctrl.onError()" ></crm-search-batch-runner>
     </div>
 
     <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>

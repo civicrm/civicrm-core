@@ -56,6 +56,7 @@
         }
         else {
           cj("#invoicing_blocks").hide();
+          cj('#invoice_is_email_pdf_invoice_is_email_pdf').prop('checked', false);
         }
       });
     });

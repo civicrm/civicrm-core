@@ -1,7 +1,7 @@
 (function(angular, $, _) {
 
   angular.module('crmMailing').controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses, crmUiAlert) {
-    var ts = CRM.ts(null);
+    var ts = CRM.ts('civi_mail');
 
     function changeAlert(winnerField, loserField) {
       crmUiAlert({

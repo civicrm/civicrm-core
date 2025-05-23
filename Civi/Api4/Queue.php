@@ -11,6 +11,7 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Action\Queue\ClaimItems;
+use Civi\Api4\Action\Queue\Reset;
 use Civi\Api4\Action\Queue\RunItems;
 use Civi\Api4\Action\Queue\Run;
 
@@ -24,7 +25,7 @@ use Civi\Api4\Action\Queue\Run;
  * @since 5.47
  * @package Civi\Api4
  */
-class Queue extends \Civi\Api4\Generic\DAOEntity {
+class Queue extends Generic\DAOEntity {
 
   use Generic\Traits\ManagedEntity;
 
@@ -86,6 +87,17 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
    */
   public static function run($checkPermissions = TRUE) {
     return (new Run(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * Delete all items in a queue.
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\Queue\Reset
+   */
+  public static function reset($checkPermissions = TRUE) {
+    return (new Reset(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

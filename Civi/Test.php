@@ -31,15 +31,15 @@ class Test {
   public static function asPreInstall($callback) {
     $conn = \Civi\Test::pdo();
 
-    $oldEscaper = \CRM_Core_I18n::$SQL_ESCAPER;
+    $oldEscaper = $GLOBALS['CIVICRM_SQL_ESCAPER'] ?? NULL;
     \Civi\Test::$statics['testPreInstall'] = (\Civi\Test::$statics['testPreInstall'] ?? 0) + 1;
     try {
-      \CRM_Core_I18n::$SQL_ESCAPER = function ($text) use ($conn) {
+      $GLOBALS['CIVICRM_SQL_ESCAPER'] = function ($text) use ($conn) {
         return substr($conn->quote($text), 1, -1);
       };
       return $callback();
     } finally {
-      \CRM_Core_I18n::$SQL_ESCAPER = $oldEscaper;
+      $GLOBALS['CIVICRM_SQL_ESCAPER'] = $oldEscaper;
       \Civi\Test::$statics['testPreInstall']--;
       if (\Civi\Test::$statics['testPreInstall'] <= 0) {
         unset(\Civi\Test::$statics['testPreInstall']);
@@ -110,21 +110,24 @@ class Test {
    */
   public static function headless() {
     $civiRoot = dirname(__DIR__);
-    $builder = new \Civi\Test\CiviEnvBuilder();
+    $builder = new \Civi\Test\CiviEnvBuilder('Headless System');
     $builder
-      ->callback(function ($ctx) {
+      ->callback(function ($builder) {
         if (CIVICRM_UF !== 'UnitTests') {
           throw new \RuntimeException("\\Civi\\Test::headless() requires CIVICRM_UF=UnitTests");
         }
         $dbName = \Civi\Test::dsn('database');
-        fprintf(STDERR, "Installing {$dbName} schema\n");
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
       ->coreSchema()
       ->sql("DELETE FROM civicrm_extension")
       ->callback(function ($ctx) {
         \Civi\Test::data()->populate();
-      }, 'populate');
+      }, 'populate')
+      ->callback(function ($ctx) {
+        // (1) Set baseline components. (2) Listeners on this setting are janky about "revert()".
+        \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+      }, 'reset');
     $builder->install(['org.civicrm.search_kit', 'org.civicrm.afform', 'authx']);
     return $builder;
   }
@@ -245,9 +248,7 @@ class Test {
           continue;
         }
         else {
-          var_dump($result);
-          var_dump($pdo->errorInfo());
-          // die( "Cannot execute $query: " . $pdo->errorInfo() );
+          throw new \RuntimeException('Cannot execute query: ' . json_encode([$query, $pdo->errorInfo()], JSON_PRETTY_PRINT));
         }
       }
     }

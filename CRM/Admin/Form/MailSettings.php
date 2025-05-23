@@ -66,7 +66,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
     $this->add('select', 'protocol',
       ts('Protocol'),
-      ['' => ts('- select -')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol'),
+      ['' => ts('- select -')] + CRM_Core_DAO_MailSettings::buildOptions('protocol'),
       TRUE
     );
 
@@ -126,15 +126,15 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
-    $defaults['is_ssl'] = $defaults['is_ssl'] ?? TRUE;
-    $defaults['is_default'] = $defaults['is_default'] ?? 0;
+    $defaults['is_ssl'] ??= TRUE;
+    $defaults['is_default'] ??= 0;
     $defaults['activity_type_id'] = $defaults['activity_type_id'] ??
       CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
-    $defaults['activity_status'] = $defaults['activity_status'] ?? 'Completed';
-    $defaults['activity_source'] = $defaults['activity_source'] ?? 'from';
-    $defaults['activity_targets'] = $defaults['activity_targets'] ?? 'to,cc,bcc';
-    $defaults['activity_assignees'] = $defaults['activity_assignees'] ?? 'from';
-    $defaults['is_active'] = $defaults['is_active'] ?? TRUE;
+    $defaults['activity_status'] ??= 'Completed';
+    $defaults['activity_source'] ??= 'from';
+    $defaults['activity_targets'] ??= 'to,cc,bcc';
+    $defaults['activity_assignees'] ??= 'from';
+    $defaults['is_active'] ??= TRUE;
 
     return $defaults;
   }

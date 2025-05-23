@@ -13,9 +13,7 @@
         <div class="messages help">{$priceSet.help_pre|purify}</div>
     {/if}
 
-    {assign var='adminFld' value=false}
-    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
-      {assign var='adminFld' value=true}
+    {crmPermission has='administer CiviCRM'}
       {if $priceSet.id && !$priceSet.is_quick_config}
         <div class='float-right'>
           <a class="crm-hover-button" target="_blank" href="{crmURL p="civicrm/admin/price/field" q="reset=1&action=browse&sid=`$priceSet.id`" fb=1}">
@@ -23,16 +21,16 @@
           </a>
         </div>
       {/if}
-    {/if}
+    {/crmPermission}
 
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
-        {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard'}
+        {if $element.visibility !== 'admin' || $isShowAdminVisibilityFields}
             {if $element.help_pre}<span class="content description">{$element.help_pre|purify}</span><br />{/if}
             <div class="crm-section {$element.name|escape}-section crm-price-field-id-{$field_id}">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_`$field_id`"}
-              <div class="label">{$form.$element_name.label|purify}</div>
+              <div class="label">{$form.$element_name.label}</div>
               <div class="content {$element.name|escape}-content">
                 {assign var="elementCount" value="0"}
                 {assign var="optionCount" value="0"}
@@ -60,7 +58,7 @@
 
                 {assign var="element_name" value="price_"|cat:$field_id}
 
-                <div class="label">{$form.$element_name.label|purify}</div>
+                <div class="label">{$form.$element_name.label}</div>
                 <div class="content {$element.name|escape}-content">
                   {$form.$element_name.html}
                   {if $element.html_type eq 'Text'}
@@ -79,7 +77,7 @@
                           <span class='crm-price-amount-tax'> + {$option.tax_amount|crmMoney:$currency} {$taxTerm}</span>
                         {/if}
                       {else}
-                        {$option.amount|crmMoney:$currency} {$fieldHandle} {$form.$fieldHandle.frozen}
+                        {$option.amount|crmMoney:$currency}
                       {/if}
                       {if $form.$element_name.frozen EQ 1} ({ts}Sold out{/ts}){/if}
                     {/foreach}
@@ -95,21 +93,19 @@
                 </div>
 
             {/if}
-              {if !empty($extends) && $extends eq "Membership"}
-                {if ($element.id == $priceSet.auto_renew_membership_field)}
-                  <div id="allow_auto_renew">
-                    <div class='crm-section auto-renew'>
-                      <div class='label'></div>
-                      <div class='content' id="auto_renew_section">
-                        {if $form.auto_renew}
-                          {$form.auto_renew.html}&nbsp;{$form.auto_renew.label|smarty:nodefaults|purify}
-                        {/if}
-                      </div>
-                      <div class='content' id="force_renew" style='display: none'>{ts}Membership will renew automatically.{/ts}</div>
-                    </div>
+            {if (array_key_exists('auto_renew', $form)) && !empty($extends) && $extends eq "Membership" && array_key_exists('supports_auto_renew', $element) && $element.supports_auto_renew}
+              <div id="allow_auto_renew">
+                <div class='crm-section auto-renew'>
+                  <div class='label'></div>
+                  <div class='content' id="auto_renew_section">
+                    {if $form.auto_renew}
+                      {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
+                    {/if}
                   </div>
-                {/if}
-              {/if}
+                  <div class='content' id="force_renew" style='display: none'>{ts}Membership will renew automatically.{/ts}</div>
+                </div>
+              </div>
+            {/if}
               <div class="clear"></div>
           </div>
         {/if}

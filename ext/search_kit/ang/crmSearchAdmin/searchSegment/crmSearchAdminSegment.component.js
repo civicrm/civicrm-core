@@ -57,6 +57,10 @@
         }
       };
 
+      this.getOptionKey = function(expr) {
+        return expr.split(':')[1] || 'id';
+      };
+
       function getDefaultField() {
         var item = _.findLast(ctrl.segment.items, function(item) {
           return item.when && item.when[0] && item.when[0][0];

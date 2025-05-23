@@ -137,7 +137,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   public function processStandardTimeline($activitySetXML, &$params) {
     if ('Change Case Type' == ($params['activityTypeName'] ?? '')
-      && CRM_Utils_Array::value('resetTimeline', $params, TRUE)
+      && ($params['resetTimeline'] ?? TRUE)
     ) {
       // delete all existing activities which are non-empty
       $this->deleteEmptyActivity($params);
@@ -263,7 +263,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         $maxInstances = (string) $recordXML->max_instances;
         $activityTypeInfo = $activityTypes[$activityTypeName] ?? NULL;
 
-        if ($activityTypeInfo['id']) {
+        if ($activityTypeInfo) {
           if ($maskAction) {
             if ($maskAction == 'edit' && '0' === (string) $recordXML->editable) {
               $result[$maskAction][] = $activityTypeInfo['id'];
@@ -401,10 +401,8 @@ AND        a.is_deleted = 0
    * @param array $params
    *
    * @return bool
-   * @throws CRM_Core_Exception
-   * @throws Exception
    */
-  public function createActivity($activityTypeXML, &$params) {
+  public function createActivity($activityTypeXML, &$params): bool {
     $activityTypeName = (string) $activityTypeXML->name;
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(TRUE, TRUE);
     $activityTypeInfo = $activityTypes[$activityTypeName] ?? NULL;

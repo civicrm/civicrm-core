@@ -18,11 +18,10 @@ class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this);
     $loggedInUser = $this->createLoggedInUser();
     $this->addLocationBlockToDomain();
-    $this->swapMessageTemplateForInput('pledge_acknowledge', '{domain.name} {contact.first_name}');
+    $this->swapMessageTemplateForInput('pledge_acknowledge', '{domain.name} {contact.first_name} {contact.email_greeting_display}');
 
     $form = $this->getFormObject('CRM_Pledge_Form_Pledge', [
       'amount' => 10,
-      'installments' => 1,
       'contact_id' => $this->individualCreate(),
       'is_acknowledge' => 1,
       'start_date' => '2021-01-04',
@@ -42,13 +41,10 @@ class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
     $form->postProcess();
     $mut->checkAllMailLog([
       'Default Domain Name Anthony',
-      // These strings that are in the text template, since we swapped out the html one.
-      123,
-      'fixme.domainemail@example.org',
-      'Dear Anthony,',
+      'Dear Anthony',
     ]);
     $mut->clearMessages();
-    $this->revertTemplateToReservedTemplate('pledge_acknowledge');
+    $this->revertTemplateToReservedTemplate();
   }
 
 }

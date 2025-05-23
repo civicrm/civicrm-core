@@ -33,7 +33,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'edit api keys', 'view all contacts', 'edit all contacts'];
     $key = \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
     $isSafe = function ($mixed) use ($key) {
-      return strpos(json_encode($mixed), $key) === FALSE;
+      return !str_contains(json_encode($mixed), $key);
     };
 
     $contact = Contact::create()
@@ -206,7 +206,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       if ($mixed instanceof Result) {
         $mixed = $mixed->getArrayCopy();
       }
-      return strpos(json_encode($mixed), $key) === FALSE;
+      return !str_contains(json_encode($mixed), $key);
     };
 
     $contact = Contact::create(FALSE)

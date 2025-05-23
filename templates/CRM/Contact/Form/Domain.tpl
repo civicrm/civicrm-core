@@ -55,10 +55,3 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 {/if}
 </div>
-
-{* phone_2 a email_2 only included in form if CiviMail enabled. *}
-{if array_search('CiviMail', $config->enableComponents)}
-    <script type="text/javascript">
-    cj('a#addEmail,a#addPhone').hide();
-    </script>
-{/if}

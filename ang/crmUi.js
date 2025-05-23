@@ -14,7 +14,7 @@
         scope: {
           crmUiAccordion: '='
         },
-        template: '<details class="crm-accordion-wrapper"><summary class="crm-accordion-header">{{crmUiAccordion.title}} <a crm-ui-help="help" ng-if="help"></a></summary><div class="crm-accordion-body" ng-transclude></div></details>',
+        template: '<details class="crm-accordion-bold"><summary>{{crmUiAccordion.title}} <a crm-ui-help="help" ng-if="help"></a></summary><div class="crm-accordion-body" ng-transclude></div></details>',
         transclude: true,
         link: function (scope, element, attrs) {
           scope.help = null;
@@ -82,22 +82,29 @@
           ngModel.$render = function () {
             element.val(ngModel.$viewValue).change();
           };
+          let settings = angular.copy(scope.crmUiDatepicker || {});
+          // Set defaults to be non-restrictive
+          settings.start_date_years = settings.start_date_years || 100;
+          settings.end_date_years = settings.end_date_years || 100;
 
-          element
-            .crmDatepicker(scope.crmUiDatepicker)
-            .on('change', function() {
-              // Because change gets triggered from the $render function we could be either inside or outside the $digest cycle
-              $timeout(function() {
-                var requiredLength = 19;
-                if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
-                  requiredLength = 10;
-                }
-                if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
-                  requiredLength = 8;
-                }
-                ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
+          // Wait for interpolated elements like {{placeholder}} to render
+          $timeout(function() {
+            element
+              .crmDatepicker(settings)
+              .on('change', function () {
+                // Because change gets triggered from the $render function we could be either inside or outside the $digest cycle
+                $timeout(function() {
+                  let requiredLength = 19;
+                  if (settings.time === false) {
+                    requiredLength = 10;
+                  }
+                  if (settings.date === false) {
+                    requiredLength = 8;
+                  }
+                  ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
+                });
               });
-            });
+          });
         }
       };
     })
@@ -616,7 +623,7 @@
                 var newVal = _.cloneDeep(ngModel.$modelValue);
                 // Fix possible data-type mismatch
                 if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
-                  newVal = newVal.length ? newVal.split(',') : [];
+                  newVal = newVal.length ? newVal.split(scope.crmUiSelect.separator || ',') : [];
                 }
                 element.select2('val', newVal);
               });
@@ -624,6 +631,10 @@
           }
           function refreshModel() {
             var oldValue = ngModel.$viewValue, newValue = element.select2('val');
+            // Let ng-list do the splitting
+            if (Array.isArray(newValue) && attrs.ngList) {
+              newValue = newValue.join(attrs.ngList);
+            }
             if (oldValue != newValue) {
               scope.$parent.$apply(function () {
                 ngModel.$setViewValue(newValue);
@@ -650,7 +661,8 @@
               };
             });
           } else {
-            init();
+            // Wait for interpolated elements like {{placeholder}} to render
+            $timeout(init);
           }
         }
       };
@@ -1109,6 +1121,7 @@
     // Example: <button crm-confirm="{message: ts('Are you sure you want to continue?')}" on-yes="frobnicate(123)">Frobincate</button>
     // Example: <button crm-confirm="{type: 'disable', obj: myObject}" on-yes="myObject.is_active=0; myObject.save()">Disable</button>
     // Example: <button crm-confirm="{templateUrl: '~/path/to/view.html', export: {foo: bar}}" on-yes="frobnicate(123)">Frobincate</button>
+    // Example: <button crm-confirm="{confirmed: true}" on-yes="frobnicate(123)">Frobincate</button>
     .directive('crmConfirm', function ($compile, $rootScope, $templateRequest, $q) {
       // Helpers to calculate default options for CRM.confirm()
       var defaultFuncs = {
@@ -1165,6 +1178,11 @@
                 stubId = 'crmUiConfirm_' + (++confirmCount);
                 options.message = '<div id="' + stubId + '"></div>';
               }
+            }
+
+            if (options.confirmed) {
+              scope.$apply(attrs.onYes);
+              return;
             }
 
             CRM.confirm(_.extend(defaults, options))
@@ -1282,10 +1300,21 @@
     .directive('crmUiIconPicker', function($timeout) {
       return {
         restrict: 'A',
-        controller: function($element) {
+        require: '?ngModel', // Soft require ngModel
+        controller: function($element, $scope, $attrs) {
           CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
             $timeout(function() {
               $element.crmIconPicker();
+
+              // If ngModel is present, set up two-way binding
+              if ($attrs.ngModel) {
+                $scope.$watch($attrs.ngModel, function(newValue) {
+                  if (newValue !== undefined) {
+                    // Update the value in the picker
+                    $element.val(newValue).trigger('change');
+                  }
+                });
+              }
             });
           });
         }

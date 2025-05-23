@@ -8,22 +8,11 @@ require_once 'CiviTest/CiviCaseTestCase.php';
 class CRM_Case_XMLProcessorTest extends CiviCaseTestCase {
 
   /**
-   * @var CRM_Case_XMLProcessor
-   */
-  private $processor;
-
-  public function setUp(): void {
-    parent::setUp();
-
-    $this->processor = new CRM_Case_XMLProcessor();
-  }
-
-  /**
    * Test that allRelationshipTypes() doesn't have name and label mixed up
    * and that is has the right directions.
    */
   public function testAllRelationshipTypes(): void {
-
+    $processor = new CRM_Case_XMLProcessor();
     // Add a relationship type to test against.
     $params = [
       'contact_type_a' => 'Individual',
@@ -34,23 +23,20 @@ class CRM_Case_XMLProcessorTest extends CiviCaseTestCase {
       'label_b_a' => 'Food poison tester for',
       'description' => 'Food poison tester',
     ];
-    $result = $this->callAPISuccess('relationship_type', 'create', $params);
+    $result = $this->createTestEntity('RelationshipType', $params);
     $relationshipTypeID = $result['id'];
 
     // All we can test against is label, so just check A and B are right (or
     // wrong, depending on your point of view). Let's not use the words right
     // and wrong let's just call it one way and the other way.
-    $relationshipTypes = $this->processor->allRelationshipTypes(FALSE);
+    $relationshipTypes = $processor->allRelationshipTypes(FALSE);
     $this->assertEquals('Food poison tester is', $relationshipTypes["{$relationshipTypeID}_a_b"]);
     $this->assertEquals('Food poison tester for', $relationshipTypes["{$relationshipTypeID}_b_a"]);
 
     // For true, B and A are the other way around here.
-    $relationshipTypes = $this->processor->allRelationshipTypes(TRUE);
+    $relationshipTypes = $processor->allRelationshipTypes(TRUE);
     $this->assertEquals('Food poison tester is', $relationshipTypes["{$relationshipTypeID}_b_a"]);
     $this->assertEquals('Food poison tester for', $relationshipTypes["{$relationshipTypeID}_a_b"]);
-
-    // cleanup
-    $this->callAPISuccess('relationship_type', 'delete', ['id' => $relationshipTypeID]);
   }
 
 }

@@ -50,7 +50,7 @@ class MailParams {
     // 1. Consolidate: 'toName' and 'toEmail' should be 'To'.
     $toName = trim($mailParams['toName']);
     $toEmail = trim($mailParams['toEmail']);
-    if ($toName == $toEmail || strpos($toName, '@') !== FALSE) {
+    if ($toName == $toEmail || str_contains($toName, '@')) {
       $toName = NULL;
     }
     else {

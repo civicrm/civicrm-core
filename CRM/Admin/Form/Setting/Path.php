@@ -20,16 +20,6 @@
  */
 class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
 
-  protected $_settings = [
-    'uploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'imageUploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'customFileUploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'customTemplateDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'customPHPPathDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'extensionsDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'ext_max_depth' => CRM_Core_BAO_Setting::EXT,
-  ];
-
   /**
    * Build the form object.
    *

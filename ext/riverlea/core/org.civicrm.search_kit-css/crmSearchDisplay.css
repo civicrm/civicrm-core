@@ -1,0 +1,78 @@
+/* Style rules for SearchKit Admin
+   Forked on 19 July 24. Called on SearchKit pages
+   Status: merged */
+
+/* Sortable headers */
+.crm-search-display th.crm-sortable-col {
+  cursor: var(--crm-hover-clickable);
+  white-space: nowrap;
+}
+.crm-search-display th.crm-sortable-col span {
+  white-space: break-spaces;
+  word-wrap: initial;
+}
+.crm-search-display th i.fa-sort-desc,
+.crm-search-display th i.fa-sort-asc {
+  color: var(--crm-c-primary);
+}
+.crm-search-display th:not(:hover) i.fa-sort {
+  opacity: .5;
+}
+.crm-search input.ng-invalid,
+.crm-search-display input.ng-invalid,
+.crm-search-task-dialog input.ng-invalid {
+  border-color: var(--crm-c-warning);
+}
+#crm-search-results-page-size {
+  width: 60px;
+}
+.crm-search-display button.dropdown-toggle {
+  white-space: nowrap;
+  font-size: var(--crm-font-size);
+}
+
+/* Loading placeholders */
+.crm-search-loading-placeholder {
+  height: 2em;
+  width: 80%;
+  min-width: 4em;
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0,0,0,.03);
+  display: inline-block;
+}
+.crm-search-loading-placeholder::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: -150px;
+  top: 0;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(to right, transparent 0%, rgba(0,0,0,.05) 50%, transparent 100%);
+  animation: searchKitLoadingAnimation 1s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+}
+@keyframes searchKitLoadingAnimation {
+  from {
+    left: -150px;
+  }
+  to {
+    left: 100%;
+  }
+}
+.crm-search-display ul.pagination > li {
+  margin: 0;
+}
+
+/* Contact page */
+
+#mainTabContainer .crm-search-display .form-group.pull-right,
+#bootstrap-theme .afform-directive .btn-group.pull-right {
+  display: flex;
+  gap: var(--crm-flex-gap);
+  justify-content: end;
+  float: inherit;
+}
+.crm-contact-page .crm-search-display-pager {
+  padding: 0 var(--crm-r) var(--crm-r) var(--crm-r);
+}

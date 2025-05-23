@@ -41,7 +41,7 @@ class OAuthLeagueFacade {
       $clientDef['options'] ?? [],
       $localOptions
     );
-    $options['redirectUri'] = $options['redirectUri'] ?? \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
+    $options['redirectUri'] ??= \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
 
     return [$class, $options];
   }

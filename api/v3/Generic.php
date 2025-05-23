@@ -44,6 +44,7 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
     $results = [];
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
     if (!empty($apiRequest['params']['fieldname'])) {
       CRM_Utils_PseudoConstant::flushConstant($apiRequest['params']['fieldname']);
     }
@@ -63,7 +64,7 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   $subentity = $apiRequest['params']['contact_type'] ?? NULL;
   $action = $apiRequest['params']['action'] ?? NULL;
   $sequential = empty($apiRequest['params']['sequential']) ? 0 : 1;
-  $apiRequest['params']['options'] = $apiRequest['params']['options'] ?? [];
+  $apiRequest['params']['options'] ??= [];
   $optionsToResolve = (array) ($apiRequest['params']['options']['get_options'] ?? []);
 
   if (!$action || $action == 'getvalue' || $action == 'getcount') {
@@ -476,7 +477,7 @@ function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
     $fields = civicrm_api3_generic_getfields(['entity' => $apiRequest['entity'], ['params' => ['action' => 'create']]]);
     $params['field']['options'] = [];
     foreach ($fields['values'] as $name => $field) {
-      if (isset($field['pseudoconstant']) || CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_BOOLEAN) {
+      if (isset($field['pseudoconstant']) || ($field['type'] ?? NULL) == CRM_Utils_Type::T_BOOLEAN) {
         $params['field']['options'][$name] = $field['title'] ?? $name;
       }
     }

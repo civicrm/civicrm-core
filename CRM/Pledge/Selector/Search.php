@@ -342,7 +342,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         $result->pledge_id
       );
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type, FALSE, $result->contact_id
       );
       $rows[] = $row;
     }

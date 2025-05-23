@@ -142,8 +142,8 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
    */
   public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
-      $defaults['weight'] = CRM_Utils_Array::value('weight', CRM_Core_BAO_LabelFormat::getDefaultValues($this->_group), 0);
-      $defaults['font_name'] = CRM_Utils_Array::value('font-name', CRM_Core_BAO_LabelFormat::getDefaultValues($this->_group), '');
+      $defaults['weight'] = CRM_Core_BAO_LabelFormat::getDefaultValues($this->_group)['weight'] ?? 0;
+      $defaults['font_name'] = CRM_Core_BAO_LabelFormat::getDefaultValues($this->_group)['font-name'] ?? '';
     }
     else {
       $defaults = $this->_values;

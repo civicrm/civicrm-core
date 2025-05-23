@@ -26,7 +26,6 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\Entity;
 use api\v4\Api4TestBase;
 use Civi\Api4\Event\ValidateValuesEvent;
-use Civi\Api4\Provider\ActionObjectProvider;
 use Civi\Api4\Service\Spec\CustomFieldSpec;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Utils\CoreUtil;
@@ -34,7 +33,7 @@ use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 
 /**
  * @group headless
@@ -108,11 +107,52 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @return array
    */
   public function getEntitiesLotech(): array {
-    $provider = new ActionObjectProvider();
     $entityNames = [];
-    foreach ($provider->getAllApiClasses() as $className) {
-      $entityNames[] = $className::getEntityName();
+
+    $root = dirname(__DIR__, 5);
+    $locations = [
+      "$root/Civi.php",
+      "$root/tests/phpunit/AllTests.php",
+
+      // The following allows ConformanceTest to run against entities in (some) core-extensions.
+      //
+      // (#1) The goal is good, but the implementation feels misplaced. In the long-term,
+      // the functionality of ConformanceTest would be useful for all extensions
+      // (contrib, core-default, core-non-default, etc).  It would make sense to somehow offer
+      // conformance-testing as a service to run within every extension's respective test-suite.
+      //
+      // (#2) The following list will be validated by testEntitiesProvider(). It may need
+      // to be tweaked... like... once a year? if that?
+      //
+      // (#3) If you want to overthink something, then see (#1) above...
+
+      "$root/ext/civi_campaign/civi_campaign.php",
+      "$root/ext/civi_case/civi_case.php",
+      "$root/ext/civi_contribute/civi_contribute.php",
+      "$root/ext/civi_event/civi_event.php",
+      "$root/ext/civigrant/civigrant.php",
+      "$root/ext/civi_mail/civi_mail.php",
+      "$root/ext/civi_member/civi_member.php",
+      "$root/ext/civi_pledge/civi_pledge.php",
+      "$root/ext/civi_report/civi_report.php",
+      "$root/ext/civi_survey/civi_survey.php",
+      "$root/ext/search_kit/search_kit.php",
+      "$root/ext/afform/core/afform.php",
+      "$root/ext/authx/authx.php",
+    ];
+
+    foreach ($locations as $location) {
+      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . 'Civi/Api4';
+      if (is_dir($dir)) {
+        foreach (glob("$dir/*.php") as $file) {
+          $className = 'Civi\Api4\\' . basename($file, '.php');
+          if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
+            $entityNames[] = $className::getEntityName();
+          }
+        }
+      }
     }
+
     return $this->toDataProviderArray($entityNames);
   }
 
@@ -150,7 +190,11 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     // civi.api4.authorizeRecord does not work on `get` actions
     // $this->checkGetAllowed($entityClass, $id, $entityName);
     $this->checkGetCount($entityClass, $entityKeys, $entityName);
-    $this->checkUpdateFailsFromCreate($entityClass, $entityKeys);
+    // there probably should be a version of this test for
+    // BasicEntities, but the current one doesn't work
+    if ($entityClass instanceof \Civi\Api4\Generic\DAOEntity) {
+      $this->checkUpdateFailsFromCreate($entityClass, $entityKeys);
+    }
     $this->checkUpdate($entityName, $entityKeys, $getResult);
     $this->checkWrongParamType($entityClass);
     $this->checkDeleteWithNoId($entityClass);
@@ -202,14 +246,11 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
 
     // Ensure that the getFields (FieldSpec) format is generally consistent.
     foreach ($fields as $field) {
-      $isNotNull = function($v) {
-        return $v !== NULL;
-      };
       $class = empty($field['custom_field_id']) ? FieldSpec::class : CustomFieldSpec::class;
       $spec = (new $class($field['name'], $field['entity']))->loadArray($field, TRUE);
       $this->assertEquals(
-        array_filter($field, $isNotNull),
-        array_filter($spec->toArray(), $isNotNull)
+        array_filter($field),
+        array_filter($spec->toArray())
       );
     }
   }

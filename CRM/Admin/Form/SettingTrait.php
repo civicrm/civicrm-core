@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Setting;
 
 /**
  * This trait allows us to consolidate Preferences & Settings forms.
@@ -70,6 +71,9 @@ trait CRM_Admin_Form_SettingTrait {
       // This array_merge re-orders to the key order of $this->_settings.
       $this->settingsMetadata = array_merge($this->_settings, $this->settingsMetadata);
     }
+    uasort($this->settingsMetadata, function ($a, $b) {
+      return $this->isWeightHigher($a, $b);
+    });
     return $this->settingsMetadata;
   }
 
@@ -126,7 +130,7 @@ trait CRM_Admin_Form_SettingTrait {
    * @return mixed
    */
   protected function getSettingMetadataItem($setting, $item) {
-    return CRM_Utils_Array::value($item, $this->getSettingsMetaData()[$setting]);
+    return $this->getSettingsMetaData()[$setting][$item] ?? NULL;
   }
 
   /**
@@ -150,6 +154,7 @@ trait CRM_Admin_Form_SettingTrait {
    */
   protected function getSettingsOrderedByWeight() {
     $settingMetaData = $this->getSettingsMetaData();
+    // Probably unnessary to do this again.
     $settingMetaData = $this->filterMetadataByWeight($settingMetaData);
 
     return $settingMetaData;
@@ -192,15 +197,15 @@ trait CRM_Admin_Form_SettingTrait {
             $props['html_type'],
             $setting,
             $props['title'],
-            ($options !== NULL) ? $options : CRM_Utils_Array::value('html_attributes', $props, []),
-            ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
+            ($options !== NULL) ? $options : $props['html_attributes'] ?? [],
+            ($options !== NULL) ? $props['html_attributes'] ?? [] : NULL
           );
         }
         elseif ($add === 'addSelect') {
-          $this->addElement('select', $setting, $props['title'], $options, CRM_Utils_Array::value('html_attributes', $props));
+          $this->addElement('select', $setting, $props['title'], $options, $props['html_attributes'] ?? NULL);
         }
         elseif ($add === 'addCheckBox') {
-          $this->addCheckBox($setting, '', $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
+          $this->addCheckBox($setting, '', $options, NULL, $props['html_attributes'] ?? NULL, NULL, NULL, ['&nbsp;&nbsp;']);
         }
         elseif ($add === 'addCheckBoxes') {
           $newOptions = array_flip($options);
@@ -227,7 +232,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, $props['title'], $props['entity_reference_options']);
         }
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], CRM_Utils_Array::value('html_attributes', $props), '&nbsp;&nbsp;');
+          $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
         }
         elseif ($add === 'add') {
           $this->add($props['html_type'], $setting, $props['title'], $options, FALSE, $props['html_extra'] ?? NULL);
@@ -351,8 +356,17 @@ trait CRM_Admin_Form_SettingTrait {
         // This will be an array with one value.
         $settings[$setting] = (bool) reset($settings[$setting]);
       }
+      elseif ($settingMetaData['type'] === 'Integer') {
+        // QuickForm is pretty slack when it comes to types, cast to an integer.
+        if (is_numeric($settingValue)) {
+          $settings[$setting] = (int) $settingValue;
+        }
+        if (!$settingValue && empty($settingMetaData['is_required'])) {
+          $settings[$setting] = NULL;
+        }
+      }
     }
-    civicrm_api3('setting', 'create', $settings);
+    Setting::set(FALSE)->setValues($settings)->execute();
   }
 
   /**
@@ -404,22 +418,33 @@ trait CRM_Admin_Form_SettingTrait {
    * @return array
    */
   protected function filterMetadataByWeight(array $settingMetaData): array {
-    $filter = $this->getSettingPageFilter();
-
-    usort($settingMetaData, function ($a, $b) use ($filter) {
-      // Handle cases in which a comparison is impossible. Such will be considered ties.
-      if (
-        // A comparison can't be made unless both setting weights are declared.
-        !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
-        // A pair of settings might actually have the same weight.
-        || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
-      ) {
-        return 0;
-      }
-
-      return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
+    usort($settingMetaData, function ($a, $b) {
+      return $this->isWeightHigher($a, $b);
     });
     return $settingMetaData;
+  }
+
+  /**
+   * Is the relevant weight of b higher than a.
+   *
+   * @param array $a
+   * @param array $b
+   *
+   * @return int
+   */
+  protected function isWeightHigher(array $a, array $b): int {
+    $filter = $this->getSettingPageFilter();
+    // Handle cases in which a comparison is impossible. Such will be considered ties.
+    if (
+      // A comparison can't be made unless both setting weights are declared.
+      !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
+      // A pair of settings might actually have the same weight.
+      || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
+    ) {
+      return 0;
+    }
+
+    return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
   }
 
 }

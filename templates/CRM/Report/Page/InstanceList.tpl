@@ -20,16 +20,14 @@
     <div class="crm-block crm-form-block crm-report-instanceList-form-block">
       {counter start=0 skip=1 print=false}
       {foreach from=$list item=rows key=report}
-        <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
-          <div class="crm-accordion-header">
-            {if $title}{$title}{elseif $report EQ 'Contribute'}{ts}Contribution Reports{/ts}{else}{ts 1=$report}%1 Reports{/ts}{/if}</a>
-          </div><!-- /.crm-accordion-header -->
+        <details class="crm-accordion-bold " open>
+          <summary>{$rows.label}</summary>
           <div class="crm-accordion-body">
             <div id="{$report}" class="boxBlock">
               <table class="report-layout">
-                {foreach from=$rows item=row}
+                {foreach from=$rows.list item=row}
                   <tr id="row_{counter}" class="crm-report-instanceList">
-                    <td class="crm-report-instanceList-title" style="width:35%"><a href="{$row.url}" title="{ts}Run this report{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> <strong>{$row.title}</strong></a></td>
+                    <td class="crm-report-instanceList-title" style="width:35%"><a href="{$row.url}" title="{ts escape='htmlattribute'}Run this report{/ts}"><strong>{$row.title}</strong></a></td>
                     <td class="crm-report-instanceList-description">{$row.description}</td>
                     <td>
                     <a href="{$row.viewUrl}" class="action-item crm-hover-button">{ts}View Results{/ts}</a>
@@ -37,7 +35,7 @@
                       <ul class="panel">
                         {foreach from=$row.actions item=action key=action_name}
                           <li><a href="{$action.url}" class="{$action_name} action-item crm-hover-button small-popup"
-                          {if $action.confirm_message}onclick="return window.confirm({$action.confirm_message|json_encode|htmlspecialchars})"{/if}
+                          {if $action.confirm_message}onclick="return window.confirm({$action.confirm_message|json_encode|escape})"{/if}
                           title="{$action.label|escape}">{$action.label}</a></li>
                         {/foreach}
                       </ul>
@@ -48,7 +46,7 @@
               </table>
             </div>
           </div>
-        </div>
+        </details>
       {/foreach}
     </div>
 

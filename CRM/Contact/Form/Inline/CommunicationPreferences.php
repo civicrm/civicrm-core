@@ -51,7 +51,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       $name = "{$greeting}_display";
-      $this->assign($name, CRM_Utils_Array::value($name, $defaults));
+      $this->assign($name, $defaults[$name] ?? NULL);
     }
     return $defaults;
   }
@@ -65,7 +65,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
     // Process / save communication preferences
 
     // this is a chekbox, so mark false if we dont get a POST value
-    $params['is_opt_out'] = $params['is_opt_out'] ?? FALSE;
+    $params['is_opt_out'] ??= FALSE;
     $params['contact_type'] = $this->_contactType;
     $params['contact_id'] = $this->_contactId;
 

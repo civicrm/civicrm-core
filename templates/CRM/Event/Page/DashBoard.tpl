@@ -37,7 +37,7 @@
     <tbody>
     {foreach from=$eventSummary.events item=values key=id}
     <tr class="crm-event_{$id}">
-        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle|smarty:nodefaults|purify}</a>
+        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts escape='htmlattribute'}View event info page{/ts}">{$values.eventTitle|smarty:nodefaults|purify}</a>
             {if $values.is_repeating_event}
                 <br/>
                 {if $values.is_repeating_event eq $id}
@@ -53,25 +53,25 @@
         <td class="nowrap crm-event-startDate">{$values.startDate}&nbsp;{if $values.endDate}to{/if}&nbsp;{$values.endDate}</td>
         <td class="right crm-event-participants_url">
             {if $values.participants and $values.participants_url}
-    <a href="{$values.participants_url}" title="{ts 1=$eventSummary.countedStatusANDRoles}List %1 participants{/ts}">{ts}Counted{/ts}:&nbsp;{$values.participants}</a>
+    <a href="{$values.participants_url}" title="{ts escape='htmlattribute' 1=$eventSummary.countedStatusANDRoles}List %1 participants{/ts}">{ts}Counted{/ts}:&nbsp;{$values.participants}</a>
       {else}
     {ts}Counted{/ts}:&nbsp;{$values.participants}
       {/if}
 
       {if $values.notCountedParticipants and $values.notCountedParticipants_url}
-    <a href="{$values.notCountedParticipants_url}" title="{ts 1=$eventSummary.nonCountedStatusANDRoles}List %1 participants{/ts}">{ts}Not&nbsp;Counted{/ts}:&nbsp;{$values.notCountedParticipants}</a><hr />
+    <a href="{$values.notCountedParticipants_url}" title="{ts escape='htmlattribute' 1=$eventSummary.nonCountedStatusANDRoles}List %1 participants{/ts}">{ts}Not&nbsp;Counted{/ts}:&nbsp;{$values.notCountedParticipants}</a><hr />
       {else}
     {ts}Not&nbsp;Counted{/ts}:&nbsp;{$values.notCountedParticipants}<hr />
       {/if}
 
       {if $values.notCountedDueToStatus and $values.notCountedDueToStatus_url}
-    <a href="{$values.notCountedDueToStatus_url}" title="{ts 1=$eventSummary.nonCountedStatus}List %1 participants{/ts}">{ts}Not&nbsp;Counted&nbsp;Due&nbsp;To&nbsp;Status{/ts}:&nbsp;{$values.notCountedDueToStatus}</a><hr />
+    <a href="{$values.notCountedDueToStatus_url}" title="{ts escape='htmlattribute' 1=$eventSummary.nonCountedStatus}List %1 participants{/ts}">{ts}Not&nbsp;Counted&nbsp;Due&nbsp;To&nbsp;Status{/ts}:&nbsp;{$values.notCountedDueToStatus}</a><hr />
       {else}
     {ts}Not&nbsp;Counted&nbsp;Due&nbsp;To&nbsp;Status{/ts}:&nbsp;{$values.notCountedDueToStatus}<hr />
       {/if}
 
             {if $values.notCountedDueToRole and $values.notCountedDueToRole_url}
-    <a href="{$values.notCountedDueToRole_url}" title="{ts 1=$eventSummary.nonCountedRoles}List %1 participants{/ts}">{ts}Not&nbsp;Counted&nbsp;Due&nbsp;To&nbsp;Role{/ts}:&nbsp;{$values.notCountedDueToRole}</a><hr />
+    <a href="{$values.notCountedDueToRole_url}" title="{ts escape='htmlattribute' 1=$eventSummary.nonCountedRoles}List %1 participants{/ts}">{ts}Not&nbsp;Counted&nbsp;Due&nbsp;To&nbsp;Role{/ts}:&nbsp;{$values.notCountedDueToRole}</a><hr />
       {else}
     {ts}Not&nbsp;Counted&nbsp;Due&nbsp;To&nbsp;Role{/ts}:&nbsp;{$values.notCountedDueToRole}<hr />
       {/if}
@@ -79,7 +79,7 @@
             {foreach from=$values.statuses item=class}
                 {if $class}
                     {foreach from=$class item=status}
-                        <a href="{$status.url}" title="{ts 1=$status.label}List %1 participants{/ts}">{$status.label}: {$status.count}</a>
+                        <a href="{$status.url}" title="{ts escape='htmlattribute' 1=$status.label}List %1 participants{/ts}">{$status.label}: {$status.count}</a>
                     {/foreach}
                     <hr />
                 {/if}
@@ -89,7 +89,7 @@
       {if $actionColumn}
         <td class="crm-event-isMap">
           {if $values.isMap}
-            <a href="{$values.isMap}" title="{ts}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
+            <a href="{$values.isMap}" title="{ts escape='htmlattribute'}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
             &nbsp;|&nbsp;
           {/if}
           {if $values.configure}
@@ -105,7 +105,7 @@
                             href="{crmURL p="`$v.url`" q="reset=1&action=browse&setTab=1&id=`$id`"}">{$v.title}</a></li>
                       {else}
                         <li><a title="{$v.title|escape}" class="action-item crm-hover-button no-popup {$status}"
-                            href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
+                            href="{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$id`&selectedChild=`$k`"}">{$v.title}</a></li>
                       {/if}
                     {/foreach}
                   </ul>
@@ -125,13 +125,9 @@
 {else}
     <br />
     <div class="messages status no-popup">
-        <table>
-            <tr>{icon icon="fa-info-circle"}{/icon}</tr>
-            <tr>
-                {ts}There are no active Events to display.{/ts}
-                {ts 1=$newEventURL}You can <a href="%1">Create a New Event</a> now.{/ts}
-            </tr>
-        </table>
+      {icon icon="fa-info-circle"}{/icon}
+      {ts}There are no active Events to display.{/ts}
+      {ts 1=$newEventURL}You can <a href="%1">Create a New Event</a> now.{/ts}
     </div>
 {/if}
 

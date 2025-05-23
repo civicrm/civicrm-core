@@ -101,15 +101,6 @@ class CRM_Export_BAO_Export {
       $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
     );
 
-    if (!$selectAll && $componentTable && !empty($exportParams['additional_group'])) {
-      // If an Additional Group is selected, then all contacts in that group are
-      // added to the export set (filtering out duplicates).
-      // Really - the calling function could do this ... just saying
-      // @todo take a whip to the calling function.
-      CRM_Core_DAO::executeQuery("
-INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_contact gc WHERE gc.group_id = {$exportParams['additional_group']} ON DUPLICATE KEY UPDATE {$componentTable}.contact_id = gc.contact_id"
-      );
-    }
     // rectify params to what proximity search expects if there is a value for prox_distance
     // CRM-7021
     // @todo - move this back to the calling functions
@@ -146,7 +137,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $paymentDetails = [];
     if ($processor->isExportPaymentFields()) {
       // get payment related in for event and members
-      $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
+      $paymentDetails = $processor->getContributionDetails();
       //get all payment headers.
       // If we haven't selected specific payment fields, load in all the
       // payment headers.
@@ -169,7 +160,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $count = -1;
 
-    $sqlColumns = $processor->getSQLColumns();
     $processor->createTempTable();
     $limitReached = FALSE;
 
@@ -196,7 +186,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
         // output every $tempRowCount rows
         if ($count % $tempRowCount == 0) {
-          self::writeDetailsToTable($processor, $componentDetails, $sqlColumns);
+          self::writeDetailsToTable($processor, $componentDetails);
           $componentDetails = [];
         }
       }

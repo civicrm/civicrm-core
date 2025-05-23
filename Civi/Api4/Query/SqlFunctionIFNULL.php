@@ -18,8 +18,6 @@ class SqlFunctionIFNULL extends SqlFunction {
 
   protected static $category = self::CATEGORY_COMPARISON;
 
-  protected static $dataType = 'String';
-
   protected static function params(): array {
     return [
       [
@@ -31,6 +29,7 @@ class SqlFunctionIFNULL extends SqlFunction {
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlFunction', 'SqlString', 'SqlNumber', 'SqlNull'],
         'label' => ts('Fallback value'),
+        'can_be_empty' => TRUE,
       ],
     ];
   }

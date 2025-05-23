@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
@@ -30,11 +30,24 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
+   * Should contact fields be filtered which determining fields to show.
+   *
+   * This applies to Participant import as we put all contact fields in the metadata
+   * but only present those used for a match in QuickForm - the civiimport extension has
+   * more functionality to update and create.
+   *
+   * @return bool
+   */
+  protected function isFilterContactFields() : bool {
+    return TRUE;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
     unset($this->_mapperFields['participant_is_test']);
 
@@ -49,11 +62,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       foreach ($remove as $value) {
         unset($this->_mapperFields[$value]);
       }
-    }
-    elseif (
-      $this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_SKIP
-      || $this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_NOCHECK) {
-      unset($this->_mapperFields['participant_id']);
     }
   }
 
@@ -75,59 +83,23 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @param $files
+   * @param array $files
    * @param self $self
    *
    * @return array|true
    *   list of errors to be posted back to the form
+   * @throws \CRM_Core_Exception
    */
   public static function formRule($fields, $files, $self) {
-    $errors = [];
-    // define so we avoid notices below
-    $errors['_qf_default'] = '';
-
-    if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = [];
-      foreach ($fields['mapper'] as $mapperPart) {
-        $importKeys[] = $mapperPart[0];
-      }
-      // FIXME: should use the schema titles, not redeclare them
-      $requiredFields = [
-        'contact_id' => ts('Contact ID'),
-        'event_id' => ts('Event ID'),
-      ];
-
-      $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields($self->getContactType(), $importKeys);
-
-      foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $importKeys)) {
-          if ($field === 'contact_id') {
-            if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys) ||
-              in_array('participant_id', $importKeys)
-            ) {
-              continue;
-            }
-            if ($self->isUpdateExisting()) {
-              $errors['_qf_default'] .= ts('Missing required field: Provide Participant ID') . '<br />';
-            }
-            else {
-              $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $contactFieldsBelowWeightMessage " . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
-            }
-          }
-          elseif (!in_array('event_title', $importKeys)) {
-            $errors['_qf_default'] .= ts('Missing required field: Provide %1 or %2',
-                [1 => $title, 2 => 'Event Title']
-              ) . '<br />';
-          }
-        }
+    $mappedFields = $self->getMappedFields($fields['mapper']);
+    if (!in_array('Participant.id', $mappedFields)) {
+      $requiredError = $self->validateRequiredContactFields();
+      if (!in_array('Participant.event_id', $mappedFields)) {
+        $requiredError[] = ts('Missing required field: %1', [1 => 'Event']) . '<br />';
       }
     }
 
-    if (empty($errors['_qf_default'])) {
-      unset($errors['_qf_default']);
-    }
-
-    return empty($errors) ? TRUE : $errors;
+    return empty($requiredError) ? TRUE : ['_qf_default' => implode('<br', $requiredError)];
   }
 
   /**
@@ -153,7 +125,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       $highlightedFieldsArray = [
         'id',
         'event_id',
-        'event_title',
         'status_id',
       ];
       foreach ($highlightedFieldsArray as $name) {

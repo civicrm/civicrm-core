@@ -9,11 +9,10 @@
 *}
 {* Search form and results for Activities *}
 <div class="crm-form-block crm-search-form-block">
-  <details class="crm-accordion-wrapper crm-advanced_search_form-accordion" open="">
-    <summary class="crm-accordion-header crm-master-accordion-header">
+  <details class="crm-accordion-light crm-advanced_search_form-accordion" {if !$rows}open=""{/if}">
+    <summary>
       {ts}Edit Search Criteria{/ts}
     </summary>
-    <!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
       <div id="searchForm" class="form-item">
         {strip}
@@ -22,7 +21,7 @@
               <td colspan="2">
                 {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}
                 <div>
-                  <div class="description font-italic">{ts}Complete OR Partial Name{/ts}
+                  <div class="description font-italic">{ts}Name{/ts}
                     <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
                     <span class="contact-name-option option-2">{ts} of the Assignee Contact{/ts}</span>
                     <span class="contact-name-option option-3">{ts} of the Target Contact{/ts}</span>

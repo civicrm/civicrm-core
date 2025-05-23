@@ -34,6 +34,18 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    */
   private $limit;
 
+  public function getLimit(): int {
+    return $this->limit;
+  }
+
+  public function getOffset(): int {
+    return $this->offset;
+  }
+
+  public function getStatuses(): array {
+    return $this->statuses;
+  }
+
   /**
    * @param int $limit
    *
@@ -41,7 +53,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    */
   public function setLimit(int $limit): DataSourceInterface {
     $this->limit = $limit;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
   }
 
@@ -52,7 +64,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    */
   public function setOffset(int $offset): CRM_Import_DataSource {
     $this->offset = $offset;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
   }
 
@@ -137,7 +149,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    */
   public function setStatuses(array $statuses): DataSourceInterface {
     $this->statuses = $statuses;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
   }
 
@@ -184,12 +196,21 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
       return NULL;
     }
     $values = $this->queryResultObject->toArray();
-    /* trim whitespace around the values */
-    foreach ($values as $k => $v) {
-      $values[$k] = trim($v, " \t\r\n");
-    }
     $this->row = $values;
     return $values;
+  }
+
+  /**
+   * Flush the existing query to retrieve rows.
+   *
+   * The query will be run again, potentially retrieving newly-available rows.
+   * Note the 'newly available' could mean an external process has intervened.
+   * For example the import_extensions lazy-loads into the import table.
+   *
+   * @return void
+   */
+  private function flushQueryResults() {
+    $this->queryResultObject = NULL;
   }
 
   /**
@@ -315,23 +336,36 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    *   could be cases where it still clashes but time didn't tell in this case)
    * 2) the show fields query used to get the column names excluded the
    *   administrative fields, relying on this convention.
-   * 3) we have the capitalisation on _statusMsg - @param string $tableName
+   *
+   * @param string $tableName
    *
    * @throws \CRM_Core_Exception
-   * @todo change to _status_message
    */
   protected function addTrackingFieldsToTable(string $tableName): void {
-    CRM_Core_DAO::executeQuery("
-     ALTER TABLE $tableName
-       ADD COLUMN _entity_id INT,
-       " . $this->getAdditionalTrackingFields() . "
-       ADD COLUMN _status VARCHAR(32) DEFAULT 'NEW' NOT NULL,
-       ADD COLUMN _status_message LONGTEXT,
-       ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-       ADD INDEX(_id),
-       ADD INDEX(_status)
-       "
-    );
+    $trackingFields = self::getStandardTrackingFields();
+    // Insert additional fields after `_entity_id`
+    // (kept this order to keep refactor minimal, but does the column order really matter?)
+    array_splice($trackingFields, 1, 0, $this->getAdditionalTrackingFields());
+
+    $sql = 'ALTER TABLE ' . $tableName . ' ADD COLUMN ' . implode(', ADD COLUMN ', $trackingFields);
+    $sql .= ', ADD INDEX(' . implode('), ADD INDEX(', self::getStandardIndices()) . ')';
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+  }
+
+  public static function getStandardTrackingFields(): array {
+    return [
+      '_entity_id INT',
+      '_status VARCHAR(32) DEFAULT "NEW" NOT NULL',
+      '_status_message LONGTEXT',
+      '_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT',
+    ];
+  }
+
+  public static function getStandardIndices(): array {
+    return [
+      '_id',
+      '_status',
+    ];
   }
 
   /**
@@ -339,11 +373,11 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    *
    * @throws \CRM_Core_Exception
    */
-  private function getAdditionalTrackingFields(): string {
-    $sql = '';
+  private function getAdditionalTrackingFields(): array {
+    $sql = [];
     $fields = $this->getParser()->getTrackingFields();
     foreach ($fields as $fieldName => $spec) {
-      $sql .= 'ADD COLUMN  _' . $fieldName . ' ' . $spec['type'] . ',';
+      $sql[] = '_' . $fieldName . ' ' . $spec['type'];
     }
     return $sql;
   }

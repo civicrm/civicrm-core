@@ -15,10 +15,27 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
+
+  /**
+   * The "Single object" instance.
+   * Used to output a single row of the form (at the specified index)
+   *
+   * @var null|int
+   */
+  protected $_soInstance = NULL;
+
+  /**
+   * The default number of strings to output
+   *
+   * @var int
+   */
   protected $_numStrings = 10;
 
-  protected $_stringName = NULL;
-
+  /**
+   * Indicate if this form should warn users of unsaved changes
+   *
+   * @var bool
+   */
   public $unsavedChangesWarn = TRUE;
 
   /**
@@ -31,7 +48,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     // should rewrite this UI.
     CRM_Core_BAO_WordReplacement::rebuild(FALSE);
 
-    $this->_soInstance = $_GET['instance'] ?? NULL;
+    $this->_soInstance = CRM_Utils_Request::retrieve('instance', 'Positive', NULL, FALSE, NULL, 'GET');
     $this->assign('soInstance', $this->_soInstance);
   }
 
@@ -182,7 +199,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     for ($i = 1; $i <= $this->_numStrings; $i++) {
       if (!empty($params['new'][$i]) && !empty($params['old'][$i])) {
         if (isset($params['enabled']) && !empty($params['enabled'][$i])) {
-          if (!empty($params['cb']) && !empty($params['cb'][$i])) {
+          if (!empty($params['cb'][$i])) {
             $enabled['exactMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
           else {

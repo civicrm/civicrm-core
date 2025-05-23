@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-group-search-form-block">
-  <div class="crm-accordion-wrapper crm-search_builder-accordion">
-    <div class="crm-accordion-header crm-master-accordion-header">
+  <details class="crm-accordion-light crm-search_builder-accordion" open>
+    <summary>
       {ts}Find Groups{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <div id="searchForm">
         <table class="form-layout">
@@ -63,13 +63,13 @@
         </table>
       </div>
     </div>
-  </div>
+  </details>
 <div class="css_right">
   <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
 </div>
-{if call_user_func(array('CRM_Core_Permission','check'), 'edit groups')}
+{crmPermission has='edit groups'}
   {assign var='editableClass' value='crm-editable'}
-{/if}
+{/crmPermission}
 <table class="crm-group-selector crm-ajax-table" data-order='[[0,"asc"]]'>
   <thead>
     <tr>
@@ -150,7 +150,7 @@
           if (parentsOnly) {
             $('tbody tr.crm-group-parent', settings.nTable).each(function () {
               $(this).find('td:first')
-                .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
+                .prepend('{/literal}<span class="collapsed show-children" title="{ts escape='htmlattribute'}show child groups{/ts}"/></span>{literal}')
                 .find('div').css({'display': 'inline'});
             });
           }
@@ -232,7 +232,7 @@
                 }
                 appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="' + val.row_classes.join(' ') + '">';
                 if ( val.is_parent ) {
-                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div>' + smartGroupText + '</td>';
+                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts escape='htmlattribute'}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div>' + smartGroupText + '</td>';
                 }
                 else {
                   appendHTML += '<td class="crm-group-name' + levelClass + '"><div class="crmf-title {/literal}{$editableClass}{literal}"><span class="crm-no-children"></span>' + val.title + '</div>' + smartGroupText + '</td>';

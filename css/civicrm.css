@@ -6,6 +6,15 @@
  * All styles should start with .crm-container unless they are specific to the main div only
  */
 
+/**
+ * CiviCRM themes do not generally have dark mode, so this declares we expect light mode
+ * for system components (and our responsive svg logo).
+ * In Riverlea, this is overridden depending on the dark mode setting.
+ */
+.crm-container {
+  color-scheme: only light;
+}
+
 /* Use this class to hide text that should only be there for screen readers */
 .sr-only {
   border: 0;
@@ -125,15 +134,37 @@ input.crm-form-checkbox + label {
   vertical-align: top;
 }
 /* Styles for Sticky Header */
+.crm-sticky thead > tr > th,
 .crm-container table thead.sticky {
   background-color: #fff;
 }
 
 .crm-container thead div.sticky-header {
   height: 15px;
+}
+
+.crm-sticky thead,
+.crm-container thead div.sticky-header {
   border-bottom: 2px solid #cfcec3;
   background-color: #fff;
   z-index: 10;
+}
+
+.crm-sticky thead {
+  position: sticky;
+  top: var(--crm-menubar-bottom);
+  box-shadow: 0 2px 2px -1px #cfcec3;
+}
+
+@media (max-width: 782px) {
+  /** WP **/
+  .wp-admin .crm-sticky thead {
+    top: 48px;
+  }
+  /** Drupal **/
+  .path-civicrm.crm-menu-visible {
+    top: 39px;
+  }
 }
 
 /* Styles for Sorting Header */
@@ -270,7 +301,7 @@ input.crm-form-entityref {
   border-top: 1px solid #696969;
 }
 
-/* Size the verticle heights in crm-containers by class. */
+/* Size the vertical heights in crm-containers by class. */
 .crm-container .ht-one {
   height: 1em;
 }
@@ -413,6 +444,17 @@ input.crm-form-entityref {
 .crm-container .crm-section,
 .crm-container div.crm-field-wrapper {
   margin-bottom: 1em;
+}
+
+@media (min-width:1079px) {
+  .wp-toolbar {
+    --crm-sticky-top: 80px;
+  }
+  .wp-toolbar .crm-menubar-above-cms-menu,
+  .wp-toolbar .crm-menubar-below-cms-menu {
+    --crm-sticky-top: 112px;
+  }
+
 }
 
 /* todo: See PR#19968 to move towards configurable breakpoints */
@@ -982,30 +1024,30 @@ input.crm-form-entityref {
   border: 2px solid #999999;
 }
 
-#crm-container .float-left {
+.crm-container .float-left {
   float: left;
   padding: 4px 0;
   clear: none;
 }
 
-#crm-container .float-left + .float-left {
+.crm-container .float-left + .float-left {
   margin-left: 1em;
 }
 
-#crm-container .float-right {
+.crm-container .float-right {
   float: right;
   width: auto;
   padding: 4px 0;
   clear: none;
 }
 
-#crm-container .align-right {
+.crm-container .align-right {
   display: block;
   margin-right: 20px;
   text-align: right;
 }
 
-#crm-container .element-right {
+.crm-container .element-right {
   float: right;
   margin-right: 35px;
 }
@@ -1786,10 +1828,6 @@ input.crm-form-entityref {
   vertical-align: top;
 }
 
-#crm-container table.report-layout tr {
-  font-size: 0.95em;
-}
-
 #crm-container .report-label {
   text-align: right;
   font-weight: bold;
@@ -1863,8 +1901,10 @@ input.crm-form-entityref {
 
 .crm-container .crm-submit-buttons,
 .crm-container .action-link {
-  height: 27px;
   margin: 4px 0 4px 2px;
+}
+.crm-container .action-link {
+  height: 27px;
 }
 
 .crm-container .register_link-top {
@@ -1902,9 +1942,7 @@ input.crm-form-entityref {
   text-decoration: none;
   cursor: pointer;
   border: 1px solid #3e3e3e;
-  display: block;
-  float: left;
-  overflow: hidden;
+  display: inline-block;
   line-height: 135%;
   border-radius: 3px;
 }
@@ -2106,7 +2144,7 @@ a.crm-i:hover {
   content: "\f059";
 }
 
-div.crm-accordion-header a.helpicon {
+details > summary a.helpicon {
   color: inherit;
 }
 div.crm-master-accordion-header a.helpicon {
@@ -2193,6 +2231,10 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 /* Specific types of headers */
+
+.crm-container details {
+  margin: 0.25rem 0;
+}
 
 .crm-container summary { /* default summary setting*/
   display: list-item;
@@ -2281,12 +2323,26 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 .crm-container div.collapsed .crm-accordion-body,
+.crm-container fieldset.collapsed .crm-accordion-body,
 .crm-container .crm-collapsible.collapsed .collapsible-title + * {
   display: none;
 }
 
+/* Ex: Advanced Search (but not limited to) */
+.crm-container details.crm-accordion-settings summary {
+  text-align: right;
+}
+.crm-container details.crm-accordion-settings summary::before {
+  content: '\f013';
+}
+
 .crm-container details details {
   padding: 0 0.25rem; /* adds padding for nested accordions */
+}
+
+.crm-container details table.dataTable {
+  width: 100% !important; /* stops collapsed dataTables: dev/user-interface/-/issues/73 */
+  box-sizing: border-box;
 }
 
 /* Collapse icon */
@@ -2301,7 +2357,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container details > summary:before {
   font-family: "FontAwesome";
   display: inline-block;
-  width: 1em;
+  padding-right: 0.5rem;
   content: "\f0da";
   font-size: 13px;
 }
@@ -2320,7 +2376,7 @@ div.crm-master-accordion-header a.helpicon {
 /* Accordion bodies */
 
 .crm-container .crm-accordion-wrapper .crm-accordion-body,
-.crm-container details.crm-accordion-bold .crm-accordion-body {
+.crm-container details.crm-accordion-bold > .crm-accordion-body {
   border-radius: 0 0 4px 4px;
   border: 1px solid #70716b;
   border-top: 0;
@@ -2736,6 +2792,7 @@ div.crm-container form {
 
 /* tables */
 .crm-container table {
+  position: relative;
   border: 1px solid #efefef;
 }
 
@@ -2810,7 +2867,6 @@ tbody.scrollContent tr.alternateRow {
 .crm-container th.sorting .DataTables_sort_icon {
   display: none;
 }
-
 
 /*contact summary page */
 #crm-container div.contact_details {
@@ -3257,7 +3313,7 @@ span.crm-select-item-color {
   width: 93%;
 }
 
-/* Checkbox gropus */
+/* Checkbox groups */
 .crm-container ul.crm-checkbox-list {
   list-style: none;
   margin: 0;
@@ -3314,6 +3370,31 @@ span.crm-select-item-color {
 }
 .crm-container ul.crm-checkbox-list.crm-sortable-list li input {
   left: 23px;
+}
+/* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
+.crm-container .crm-multiple-checkbox-radio-options {
+  --gap: 1em;
+  --checkbox-width: 2em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}
+/* Reset checkbox width when its rendered as text '(x)' in confirmation screens /dev/core/-/issues/5550 */
+.crm-container.crm-public .crm-profile-view .crm-option-label-pair {
+  --checkbox-width: auto;
+}
+/* Override more general styling */
+.crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
+input.crm-form-checkbox) + label {
+  margin-left: 0;
+}
+.crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
+  display: grid;
+  grid-template-columns: var(--checkbox-width) 1fr;
+  align-items: baseline;
+}
+.crm-container .crm-multiple-checkbox-radio-options.crm-options-per-line .crm-option-label-pair {
+  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--gap)) / var(--crm-opts-per-line));
 }
 
 /* classes related to batch entry operation */
@@ -3970,19 +4051,11 @@ span.crm-status-icon {
   margin-left: 30px;
 }
 
+
 /* Standalone-only styles. A minimal set to make it usable out-of-the-box. */
 html.crm-standalone body {
-  --sa-font-family: sans-serif;
-  --roundness: 3px;
-  --error-colour: #a00;
-  --warning-colour: #fbb862;
-  --success-colour: #86c66c;
-  --label-colour: #464354;
-  --background-colour: rgb(242,242,237);
-  --box-padding: 1.6rem;
-  --box-background: #fff;
   margin: 0;
   padding: 0;
-  font-family: var(--sa-font-family);
-  background-color: var(--background-colour);
+  font-family: var(--crm-font, sans-serif);
+  background-color: var(--crm-c-page-background, #f8f8f8);
 }

@@ -34,16 +34,14 @@ trait ArrayQueryActionTrait {
     if (in_array('row_count', $this->getSelect())) {
       $result->setCountMatched(count($values));
     }
-    else {
-      // Set total count before applying limit
-      //
-      // This is kept here for backward compatibility, but could be confusing because
-      // the API behaviour is different with ArrayQueryActionTrait than with DAO
-      // queries. With DAO queries, the rowCount is only the same as the total
-      // matched count in specific cases, whereas with the implementation here we are
-      // setting rowCount explicitly to the matches count, before we apply limit.
-      $result->rowCount = count($values);
-    }
+    // Set total count before applying limit
+    //
+    // This is kept here for backward compatibility, but could be confusing because
+    // the API behaviour is different with ArrayQueryActionTrait than with DAO
+    // queries. With DAO queries, the rowCount is only the same as the total
+    // matched count in specific cases, whereas with the implementation here we are
+    // setting rowCount explicitly to the matches count, before we apply limit.
+    $result->rowCount = count($values);
 
     $values = $this->limitArray($values);
     $values = $this->selectArray($values);
@@ -107,11 +105,11 @@ trait ArrayQueryActionTrait {
   /**
    * @param array $row
    * @param array $condition
-   * @param int $index
+   * @param int|null $index
    * @return bool
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public static function filterCompare(array $row, array $condition, int $index = NULL): bool {
+  public static function filterCompare(array $row, array $condition, ?int $index = NULL): bool {
     $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
     $expected = $condition[2] ?? NULL;
@@ -119,10 +117,21 @@ trait ArrayQueryActionTrait {
     if (isset($index) && is_array($value) && $operator !== 'IN' && $operator !== 'NOT IN') {
       $value = $value[$index] ?? NULL;
     }
+    return self::compareValues($value, $operator, $expected);
+  }
+
+  public static function compareValues($value, string $operator, $expected): bool {
     switch ($operator) {
       case '=':
       case '!=':
       case '<>':
+        // For parity with SQL operators, do case-insensitive matching
+        if (is_string($value)) {
+          $value = strtolower($value);
+        }
+        if (is_string($expected)) {
+          $expected = strtolower($expected);
+        }
         $equal = $value == $expected;
         // PHP is too imprecise about comparing the number 0
         if ($expected === 0 || $expected === '0') {
@@ -161,6 +170,9 @@ trait ArrayQueryActionTrait {
 
       case 'LIKE':
       case 'NOT LIKE':
+        if ($value === NULL) {
+          return FALSE;
+        }
         $pattern = '/^' . str_replace('%', '.*', preg_quote($expected, '/')) . '$/i';
         return !preg_match($pattern, $value) == ($operator != 'LIKE');
 
@@ -168,6 +180,10 @@ trait ArrayQueryActionTrait {
       case 'NOT REGEXP':
       case 'REGEXP BINARY':
       case 'NOT REGEXP BINARY':
+        if ($value === NULL) {
+          return FALSE;
+        }
+
         // Perform case-sensitive matching for BINARY operator, otherwise insensitive
         $i = str_ends_with($operator, 'BINARY') ? '' : 'i';
         $pattern = '/' . str_replace('/', '\\/', $expected) . "/$i";
@@ -227,21 +243,24 @@ trait ArrayQueryActionTrait {
    * @return array
    */
   protected function selectArray($values) {
-    if ($this->getSelect() === ['row_count']) {
+    $select = $this->getSelect();
+    if ($select === ['row_count']) {
       $values = [['row_count' => count($values)]];
     }
-    elseif ($this->getSelect()) {
+    elseif ($values && $select) {
       // Return only fields specified by SELECT
+      $keys = array_flip($select);
       foreach ($values as &$value) {
-        $value = array_intersect_key($value, array_flip($this->getSelect()));
+        $value = array_intersect_key($value, $keys);
       }
     }
-    else {
+    elseif ($values) {
       // With no SELECT specified, return all values that are keyed by plain field name; omit those with :pseudoconstant suffixes
-      foreach ($values as &$value) {
-        $value = array_filter($value, function($key) {
-          return strpos($key, ':') === FALSE;
-        }, ARRAY_FILTER_USE_KEY);
+      $keysWithSuffixes = array_filter(array_keys(\CRM_Utils_Array::first($values)), fn($key) => str_contains($key, ':'));
+      if ($keysWithSuffixes) {
+        foreach ($values as &$value) {
+          \CRM_Utils_Array::remove($value, $keysWithSuffixes);
+        }
       }
     }
     return $values;

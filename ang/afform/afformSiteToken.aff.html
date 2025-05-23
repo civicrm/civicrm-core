@@ -1,0 +1,18 @@
+<af-form ctrl="afform">
+  <af-entity data="{source: 'Site Token'}" type="SiteToken" name="SiteToken1" label="Site Token 1" actions="{create: true, update: true}" security="FBAC" url-autofill="1" />
+  <fieldset af-fieldset="SiteToken1" class="af-container">
+    <afblock-name-sitetoken></afblock-name-sitetoken>
+    <div class="af-markup" af-if="([[&amp;quot;SiteToken1[0][fields][is_reserved]&amp;quot;,&amp;quot;==&amp;quot;,&amp;quot;true&amp;quot;]])">
+      <p><strong>Key</strong><br />
+The <em>Key</em>&nbsp;field is not editable because this token is reserved.&nbsp;</p>
+
+    </div>
+    <af-field name="name" defn="{required: true, input_attrs: {}, label: 'Key', help_post: 'E.g. in the token {site.example}, the Key is &quot;example&quot;. Must be alphanumeric without punctuation or spaces.'}" af-if="([[&amp;quot;SiteToken1[0][fields][is_reserved]&amp;quot;,&amp;quot;!=&amp;quot;,&amp;quot;true&amp;quot;]])" />
+    <af-field name="label" defn="{input_attrs: {placeholder: 'The name of'}, help_post: 'User-visible label for this token, as it appears in the Tokens drop-down list.'}" />
+    <af-field name="body_html" defn="{label: 'Value (HTML)', help_post: 'Value to be inserted for this token in an HTML context.'}" />
+    <af-field name="body_text" defn="{label: 'Value (Text)', help_post: 'Value to be inserted for this token in a text-only context.'}" />
+    <af-field name="is_active" defn="{afform_default: true}" />
+    <af-field name="is_reserved" defn="{input_type: 'Hidden', label: false}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>

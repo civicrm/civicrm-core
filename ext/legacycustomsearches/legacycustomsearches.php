@@ -53,9 +53,11 @@ function legacycustomsearches_civicrm_buildGroupContactCache(array $savedSearch,
   $addSelect = "$groupID AS group_id";
   $ssParams = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
 
-  $customSearchClass = $ssParams['customSearchClass'];
+  // A lack of customSearchClass key probably indicates a deeper problem, but shouldn't hold up the system
+  $customSearchClass = $ssParams['customSearchClass'] ?? NULL;
+
   // check if there is a special function - formatSavedSearchFields defined in the custom search form
-  if (method_exists($customSearchClass, 'formatSavedSearchFields')) {
+  if ($customSearchClass && method_exists($customSearchClass, 'formatSavedSearchFields')) {
     $customSearchClass::formatSavedSearchFields($ssParams);
   }
 
@@ -65,7 +67,7 @@ function legacycustomsearches_civicrm_buildGroupContactCache(array $savedSearch,
   }
   $searchSQL = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID)->contactIDs();
   $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
-  if (strpos($searchSQL, 'WHERE') === FALSE) {
+  if (!str_contains($searchSQL, 'WHERE')) {
     $searchSQL .= " WHERE contact_a.id $excludeClause";
   }
   else {

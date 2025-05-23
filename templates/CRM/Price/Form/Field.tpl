@@ -81,55 +81,43 @@
 <div class="crm-block crm-form-block crm-price-field-form-block">
   <table class="form-layout">
     <tr class="crm-price-field-form-block-label">
-      <td class="label">{$form.label.label|smarty:nodefaults|purify}</td>
+      <td class="label">{$form.label.label|smarty:nodefaults}</td>
       <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field' field='label' id=$fid}{/if}{$form.label.html}
       </td>
     </tr>
     <tr class="crm-price-field-form-block-html_type">
-      <td class="label">{$form.html_type.label|smarty:nodefaults|purify}</td>
+      <td class="label">{$form.html_type.label|smarty:nodefaults}</td>
       <td>{$form.html_type.html}
       </td>
     </tr>
-  {if $action neq 4 and $action neq 2}
-    <tr>
-      <td>&nbsp;</td>
-      <td class="description">{ts}Select the html type used to offer options for this field{/ts}
-      </td>
-    </tr>
-  {/if}
   </table>
-
   <div class="spacer"></div>
   <div id="price-block" {if $action eq 2 && $form.html_type.value.0 eq 'Text'} class="show-block" {else} class="hiddenElement" {/if}>
     <table class="form-layout">
       <tr class="crm-price-field-form-block-price">
-        <td class="label">{$form.price.label|smarty:nodefaults|purify} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td>
-        <td>{$form.price.html}
-        {if $action neq 4}
-          <br /><span class="description">{ts}Unit price.{/ts}</span> {help id="id-negative"}
-        {/if}
-        </td>
+        <td class="label">{$form.price.label|smarty:nodefaults} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span> {help id="id-negative"}</td>
+        <td>{$form.price.html}</td>
       </tr>
       <tr class="crm-price-field-form-block-non-deductible-amount">
-        <td class="label">{$form.non_deductible_amount.label|smarty:nodefaults|purify}</td>
+        <td class="label">{$form.non_deductible_amount.label|smarty:nodefaults}</td>
         <td>{$form.non_deductible_amount.html}</td>
       </tr>
     {if $useForEvent}
       <tr class="crm-price-field-form-block-count">
-        <td class="label">{$form.count.label|smarty:nodefaults|purify}</td>
+        <td class="label">{$form.count.label|smarty:nodefaults}</td>
         <td>{$form.count.html}<br />
           <span class="description">{ts}Enter a value here if you want to increment the number of registered participants per unit against the maximum number of participants allowed for this event.{/ts}</span>
           {help id="id-participant-count"}
         </td>
       </tr>
       <tr class="crm-price-field-form-block-max_value">
-        <td class="label">{$form.max_value.label|smarty:nodefaults|purify}</td>
+        <td class="label">{$form.max_value.label|smarty:nodefaults}</td>
         <td>{$form.max_value.html}
         </td>
       </tr>
     {/if}
       <tr class="crm-price-field-form-block-financial_type">
-        <td class="label">{$form.financial_type_id.label|smarty:nodefaults|purify}<span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td></td>
+        <td class="label">{$form.financial_type_id.label|smarty:nodefaults}<span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span></td></td>
         <td>
         {if !$financialType}
           {capture assign=ftUrl}{crmURL p='civicrm/admin/financial/financialType' q="reset=1"}{/capture}
@@ -169,7 +157,7 @@
     </tr>
 
     <tr class="crm-price-field-form-block-help_pre">
-      <td class="label">{$form.help_pre.label|smarty:nodefaults|purify}</td>
+      <td class="label">{$form.help_pre.label|smarty:nodefaults}</td>
       <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field' field='help_pre' id=$fid}{/if}{$form.help_pre.html|crmAddClass:huge}&nbsp;
       {if $action neq 4}
         <div class="description">{ts}Explanatory text displayed to users at the beginning of this field.{/ts}</div>
@@ -178,7 +166,7 @@
     </tr>
 
     <tr class="crm-price-field-form-block-help_post">
-      <td class="label">{$form.help_post.label|smarty:nodefaults|purify}</td>
+      <td class="label">{$form.help_post.label|smarty:nodefaults}</td>
       <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field' field='help_post' id=$fid}{/if}{$form.help_post.html|crmAddClass:huge}&nbsp;
       {if $action neq 4}
         <div class="description">{ts}Explanatory text displayed to users below this field.{/ts}</div>
@@ -209,8 +197,8 @@
       <td>&nbsp;{$form.is_required.html}</td>
     </tr>
     <tr class="crm-price-field-form-block-visibility_id">
-      <td class="label">{$form.visibility_id.label}</td>
-      <td>&nbsp;{$form.visibility_id.html}  {help id="id-visibility"}</td>
+      <td class="label">{$form.visibility_id.label} {help id="id-visibility"}</td>
+      <td>&nbsp;{$form.visibility_id.html}</td>
     </tr>
     <tr class="crm-price-field-form-block-is_active">
       <td class="label">{$form.is_active.label}</td>

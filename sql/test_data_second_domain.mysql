@@ -31,14 +31,14 @@ SELECT @locBlockId := id from civicrm_loc_block where phone_id = @phoneId AND em
   SELECT @domainID := id FROM civicrm_domain where name = 'Second Domain';
 
   SELECT @option_group_id_mail_approval_status := max(id) from civicrm_option_group where name = 'mail_approval_status';
-  SELECT @option_group_id_fma            := max(id) from civicrm_option_group where name = 'from_email_address';
   SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMail';
+
+INSERT INTO civicrm_site_email_address (display_name, email, is_default, description, domain_id)
+values ('FIXME', '<info@EXAMPLE.ORG>', '1', 'Default domain email address and from name.', @domainID);
 
   INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`)
 VALUES
--- from email address.
-  (@option_group_id_fma, '"FIXME" <info@EXAMPLE.ORG>', '1', '"FIXME" <info@EXAMPLE.ORG>', NULL, 0, 1, 1, 'Default domain email address and from name.', 0, 0, 1, NULL, @domainID, NULL ),
 
 -- Mail Approval Status Preferences
   (@option_group_id_mail_approval_status, 'Approved' , 1, 'Approved', NULL, 0, 1, 1, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
@@ -122,7 +122,7 @@ VALUES
     ( @domainID, 'civicrm/group&reset=1',                                   'Manage Groups',          'Manage Groups',        'access CiviCRM',   '',             @contactlastID, '1', '1',   9 ),
     ( @domainID, 'civicrm/admin/tag&reset=1&action=add',                    'New Tag',                'New Tag',              'administer CiviCRM', '',           @contactlastID, '1', NULL, 10 ),
     ( @domainID, 'civicrm/admin/tag&reset=1',                               'Manage Tags (Categories)', 'Manage Tags (Categories)', 'administer CiviCRM', '',     @contactlastID, '1','1', 11 ),
-    ( @domainID, 'civicrm/contact/deduperules&reset=1',  'Find and Merge Duplicate Contacts', 'Find and Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 12 );
+    ( @domainID, 'civicrm/contact/deduperules&reset=1',  'Merge Duplicate Contacts', 'Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 12 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -170,7 +170,7 @@ VALUES
     ( @domainID, 'civicrm/event&reset=1',                                   'Dashboard',          'CiviEvent Dashboard',  'access CiviEvent', '',    @eventlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/participant/add&reset=1&action=add&context=standalone', 'Register Event Participant', 'Register Event Participant', 'access CiviEvent,edit event participants', 'AND', @eventlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/event/search&reset=1',                            'Find Participants',  'Find Participants',    'access CiviEvent', '',    @eventlastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/event/import&reset=1',                            'Import Participants','Import Participants',  'access CiviEvent,edit event participants', 'AND',    @eventlastID, '1', '1',  4 ),
+    ( @domainID, 'civicrm/import/participant&reset=1',                            'Import Participants','Import Participants',  'access CiviEvent,edit event participants', 'AND',    @eventlastID, '1', '1',  4 ),
     ( @domainID, 'civicrm/event/add&reset=1&action=add',                    'New Event',          'New Event',            'access CiviEvent,edit all events', 'AND',    @eventlastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/event/manage&reset=1',                            'Manage Events',      'Manage Events',        'access CiviEvent,edit all events', 'AND',    @eventlastID, '1', 1, 6 ),
     ( @domainID, 'civicrm/admin/pcp?reset=1&page_type=event',               'Personal Campaign Pages',    'Personal Campaign Pages',   'access CiviEvent,administer CiviCRM', 'AND', @eventlastID, '1', 1, 7 ),
@@ -208,7 +208,7 @@ VALUES
     ( @domainID, 'civicrm/member/add&reset=1&action=add&context=standalone', 'New Membership', 'New Membership',  'access CiviMember,edit memberships', 'AND', @memberlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/member/search&reset=1',                       'Find Memberships',    'Find Memberships','access CiviMember', '', @memberlastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/batch&reset=1',                       'Batches',    'Batches','access CiviMember,access CiviContribute', '', @memberlastID, '1', NULL, 4 ),
-    ( @domainID, 'civicrm/member/import&reset=1',                       'Import Memberships',  'Import Members',  'access CiviMember,edit memberships', 'AND', @memberlastID, '1', 1, 5 ),
+    ( @domainID, 'civicrm/import/membership&reset=1',                       'Import Memberships',  'Import Members',  'access CiviMember,edit memberships', 'AND', @memberlastID, '1', 1, 5 ),
     ( @domainID, 'civicrm/admin/price&reset=1&action=add',              'New Price Set',       'New Price Set',   'access CiviMember,administer CiviCRM', 'AND',  @memberlastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/admin/price&reset=1',                         'Manage Price Sets',   'Manage Price Sets', 'access CiviMember,administer CiviCRM', 'AND',  @memberlastID, '1', NULL, 7 );
 
@@ -362,15 +362,15 @@ SET @systemSettingslastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, 'civicrm/admin/setting/component&reset=1', 'Enable CiviCRM Components', 'Enable Components',                                 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 1 ),
-    ( @domainID, 'civicrm/admin/extensions&reset=1',        'Manage Extensions', 'Manage Extensions', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 2 ),
+    ( @domainID, 'civicrm/menu/rebuild?reset=1',                        'Clear Caches', 'cache_clear',                                        'administer CiviCRM', '', @systemSettingslastID, '1', 1, 0 ),
+    ( @domainID, 'civicrm/admin/setting/component&reset=1',             'Enable CiviCRM Components', 'Enable Components',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 1 ),
+    ( @domainID, 'civicrm/admin/extensions&reset=1',                    'Manage Extensions', 'Manage Extensions',                             'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/admin/setting/smtp&reset=1',                  'Outbound Email (SMTP/Sendmail)', 'Outbound Email',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/admin/paymentProcessor&reset=1',              'Payment Processors', 'Payment Processors',                           'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 4 ),
     ( @domainID, 'civicrm/admin/setting/mapping&reset=1',               'Mapping and Geocoding', 'Mapping and Geocoding',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/admin/setting/misc&reset=1',                  'Undelete, Logging and ReCAPTCHA', 'Undelete, Logging and ReCAPTCHA', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/admin/setting/path&reset=1',                  'Directories',        'Directories',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 7 ),
     ( @domainID, 'civicrm/admin/setting/url&reset=1',                   'Resource URLs',      'Resource URLs',                                'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 8 ),
-    ( @domainID, 'civicrm/admin/setting/updateConfigBackend&reset=1',   'Cleanup Caches and Update Paths', 'Cleanup Caches and Update Paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/setting/uf&reset=1',                    'CMS Database Integration',    'CMS Integration',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 10 ),
     ( @domainID, 'civicrm/admin/options/safe_file_extension&group=safe_file_extension&reset=1', 'Safe File Extensions', 'Safe File Extensions','administer CiviCRM', '',@systemSettingslastID, '1', NULL, 11 ),
     ( @domainID, 'civicrm/admin/options?reset=1',                       'Option Groups', 'Option Groups',                                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 12 ),
@@ -907,4 +907,4 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, CONCAT('civicrm/report/instance/', @instanceID,'&reset=1'), 'Mailing Detail Report', 'Mailing Detail Report', 'administer CiviMail', 'OR', @reportlastID, '1', NULL, @instanceID+2 );
 UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @instanceID;
-UPDATE civicrm_domain SET version = '5.70.alpha1';
+UPDATE civicrm_domain SET version = '6.4.alpha1';

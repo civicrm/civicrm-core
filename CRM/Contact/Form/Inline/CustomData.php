@@ -35,26 +35,66 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   protected $_entityType;
 
   /**
-   * Call preprocess.
+   * Build the form object elements for custom data.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
-    parent::preProcess();
-
+  public function buildQuickForm(): void {
+    parent::buildQuickForm();
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE, NULL);
     $this->assign('customGroupId', $this->_groupID);
-    $customRecId = CRM_Utils_Request::retrieve('customRecId', 'Positive', $this, FALSE, 1);
-    $cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1);
-    $subType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId, ',');
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, $cgcount,
-      $this->_contactType, $this->_contactId);
-  }
+    $type = $this->_contactType;
+    $groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1);
+    $this->assign('cgCount', $groupCount);
 
-  /**
-   * Build the form object elements for custom data.
-   */
-  public function buildQuickForm() {
-    parent::buildQuickForm();
-    CRM_Custom_Form_CustomData::buildQuickForm($this);
+    $extendsEntityColumn = CRM_Utils_Request::retrieve('subName', 'String', $this);
+    if ($extendsEntityColumn === 'null') {
+      // Is this reachable?
+      $extendsEntityColumn = NULL;
+    }
+
+    //carry qf key, since this form is not inheriting core form.
+    if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
+      $this->assign('qfKey', $qfKey);
+    }
+
+    $typeCheck = CRM_Utils_Request::retrieve('type', 'String');
+    $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive');
+    if (isset($typeCheck) && $urlGroupId) {
+      $this->_groupID = $urlGroupId;
+    }
+    else {
+      $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
+    }
+
+    $gid = (isset($this->_groupID)) ? $this->_groupID : NULL;
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
+      NULL,
+      $this->getContactID(),
+      $gid,
+      CRM_Contact_BAO_Contact::getContactSubType($this->getContactID()),
+      $extendsEntityColumn
+    );
+
+    if (property_exists($this, '_customValueCount') && !empty($groupTree)) {
+      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->getContactID());
+    }
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $groupCount, $this);
+
+    if (isset($this->_groupTree) && is_array($this->_groupTree)) {
+      $keys = array_keys($groupTree);
+      foreach ($keys as $key) {
+        $this->_groupTree[$key] = $groupTree[$key];
+      }
+    }
+    else {
+      $this->_groupTree = $groupTree;
+    }
+    $this->addElement('hidden', 'hidden_custom', 1);
+    $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1));
+    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
   }
 
   /**
@@ -62,20 +102,22 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    *
    * @return array
    */
-  public function setDefaultValues() {
-    return CRM_Custom_Form_CustomData::setDefaultValues($this);
+  public function setDefaultValues(): array {
+    $defaults = [];
+    CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE, $this->get('action'));
+    return $defaults;
   }
 
   /**
    * Process the form.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     // Process / save custom data
     // Get the form values and groupTree
     $params = $this->getSubmittedValues();
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
-      $this->_contactId,
+      $this->getContactID(),
       $this->_entityType
     );
 

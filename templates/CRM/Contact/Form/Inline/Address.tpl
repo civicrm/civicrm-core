@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* This file builds html for address block inline edit *}
-{$form.oplock_ts.html}
   <table class="form-layout crm-edit-address-form crm-inline-edit-form">
     <tr>
       <td>

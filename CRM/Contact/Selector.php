@@ -212,7 +212,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
 
     $displayRelationshipType = $this->_formValues['display_relationship_type'] ?? NULL;
-    $operator = CRM_Utils_Array::value('operator', $this->_formValues, 'AND');
+    $operator = $this->_formValues['operator'] ?? 'AND';
 
     // rectify params to what proximity search expects if there is a value for prox_distance
     // CRM-7021
@@ -307,6 +307,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           elseif ($value['key'] === 'email') {
             $url = 'civicrm/contact/view/activity';
             $qs = "atype=3&action=add&reset=1&cid=%%id%%{$extraParams}";
+          }
+          elseif ($value['key'] === 'note') {
+            $url = 'civicrm/note';
+            $qs = "reset=1&action=add&entity_table=civicrm_contact&entity_id='%%id%%{$extraParams}";
           }
 
           self::$_links[$counter++] = [
@@ -421,7 +425,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           if (!empty($field['in_selector']) &&
             !in_array($name, $skipFields)
           ) {
-            if (strpos($name, '-') !== FALSE) {
+            if (str_contains($name, '-')) {
               [$fieldName, $lType, $type] = CRM_Utils_System::explode('-', $name, 3);
 
               if ($lType === 'Primary') {
@@ -602,7 +606,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
 
     if ($this->_ufGroupID) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
 
       $names = [];
       static $skipFields = ['group', 'tag'];
@@ -610,7 +614,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         if (!empty($field['in_selector']) &&
           !in_array($key, $skipFields)
         ) {
-          if (strpos($key, '-') !== FALSE) {
+          if (str_contains($key, '-')) {
             [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $key, 3);
 
             if ($id === 'Primary') {
@@ -690,7 +694,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (strpos($property, '-im')) {
           $row[$property] = $result->$property;
           if (!empty($result->$property)) {
-            $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+            $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
             $providerId = $property . "-provider_id";
             $providerName = $imProviders[$result->$providerId];
             $row[$property] = $result->$property . " ({$providerName})";
@@ -705,25 +709,22 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $row[$property] = $result->$greeting;
         }
         elseif (isset($pseudoconstants[$property])) {
-          $row[$property] = CRM_Utils_Array::value(
-            $result->{$pseudoconstants[$property]['dbName']},
-            $pseudoconstants[$property]['values']
-          );
+          $row[$property] = $pseudoconstants[$property]['values'][$result->{$pseudoconstants[$property]['dbName']}] ?? NULL;
         }
-        elseif (strpos($property, '-url') !== FALSE) {
+        elseif (str_contains($property, '-url')) {
           $websiteUrl = '';
           $websiteKey = str_replace('-url', '', $property);
           $propertyArray = explode('-', $property);
           $websiteFld = $websiteKey . '-' . array_pop($propertyArray);
           if (!empty($result->$websiteFld)) {
-            $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+            $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
             $websiteType = $websiteTypes[$result->{"$websiteKey-website_type_id"}];
             $websiteValue = $result->$websiteFld;
             $websiteUrl = "<a href=\"{$websiteValue}\">{$websiteValue}  ({$websiteType})</a>";
           }
           $row[$property] = $websiteUrl;
         }
-        elseif (strpos($property, '-email') !== FALSE) {
+        elseif (str_contains($property, '-email')) {
           [$locType] = explode("-email", $property);
           $onholdProperty = "{$locType}-on_hold";
 
@@ -847,14 +848,14 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         $contactUrl = CRM_Utils_System::url('civicrm/contact/view',
           "reset=1&cid={$result->contact_id}&key={$this->_key}&context={$this->_context}"
         );
-        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
+        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type,
           FALSE,
           $result->contact_id,
           TRUE,
           $contactUrl
         );
 
-        $row['contact_type_orig'] = $result->contact_sub_type ? $result->contact_sub_type : $result->contact_type;
+        $row['contact_type_orig'] = $result->contact_sub_type ?: $result->contact_type;
         $row['contact_id'] = $result->contact_id;
         $row['sort_name'] = $result->sort_name;
         // Surely this if should be if NOT - otherwise it's just wierd.
@@ -969,6 +970,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             'url' => 'civicrm/contact/view/delete',
             'qs' => 'reset=1&cid=%%id%%&restore=1',
             'title' => ts('Restore Contact'),
+            'weight' => 80,
           ],
         ];
         if (CRM_Core_Permission::check('delete contacts')) {

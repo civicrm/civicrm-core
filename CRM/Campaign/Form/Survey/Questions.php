@@ -47,9 +47,9 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $subTypeId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $this->_surveyId, 'activity_type_id');
-    if (!CRM_Core_BAO_CustomGroup::autoCreateByActivityType($subTypeId)) {
+    if (!self::autoCreateCustomGroup($subTypeId)) {
       // everything
       $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, FALSE);
       // FIXME: Displays weird "/\ Array" message; doesn't work with tabs
@@ -78,6 +78,26 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
     // Note: Because this is in a tab, we also preload the schema via CRM_Campaign_Form_Survey::preProcess
 
     parent::buildQuickForm();
+  }
+
+  public static function autoCreateCustomGroup($activityTypeId) {
+    $existing = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Activity', 'extends_entity_column_value' => $activityTypeId]);
+    if ($existing) {
+      return TRUE;
+    }
+    // everything
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, FALSE);
+    $params = [
+      'version' => 3,
+      'extends' => 'Activity',
+      'extends_entity_column_id' => NULL,
+      'extends_entity_column_value' => CRM_Utils_Array::implodePadded([$activityTypeId]),
+      'title' => ts('%1 Questions', [1 => $activityTypes[$activityTypeId]]),
+      'style' => 'Inline',
+      'is_active' => 1,
+    ];
+    $result = civicrm_api('CustomGroup', 'create', $params);
+    return !$result['is_error'];
   }
 
   /**

@@ -1,7 +1,7 @@
 <?php
 
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -25,7 +25,7 @@ class api_v4_OAuthSessionTokenTest extends \PHPUnit\Framework\TestCase implement
   public function setUp(): void {
     parent::setUp();
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client'));
-    $this->assertNull(CRM_Core_Session::singleton()->get('OAuthSessionTokens') ?? NULL);
+    $this->assertNull(CRM_Core_Session::singleton()->get('OAuthSessionTokens'));
   }
 
   protected function tearDown(): void {

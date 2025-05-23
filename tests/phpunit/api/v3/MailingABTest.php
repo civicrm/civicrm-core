@@ -106,7 +106,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function groupPctProvider() {
+  public function groupPctProvider(): array {
     // array(int $totalSize, int $groupPct, int $expectedCountA, $expectedCountB, $expectedCountC)
     $cases = [];
     $cases[] = [400, 7, 28, 28, 344];
@@ -167,7 +167,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    * Create a test. Declare the second mailing a winner. Ensure that key
    * fields propagate to the final mailing.
    */
-  public function testSubmitWinnderId(): void {
+  public function testSubmitWinnerId(): void {
     $checkSyncFields = ['subject', 'body_text'];
 
     $result = $this->groupContactCreate($this->_groupID, 20, TRUE);

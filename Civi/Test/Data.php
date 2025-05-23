@@ -22,7 +22,7 @@ class Data {
       $sqlDir = dirname(dirname(__DIR__)) . "/sql";
 
       if (!isset(\Civi\Test::$statics['locale_data'])) {
-        $schema = new \CRM_Core_CodeGen_Schema(\Civi\Test::codeGen());
+        $schema = new \CRM_Core_CodeGen_PhpSchema(\Civi\Test::codeGen());
         \Civi\Test::$statics['locale_data'] = $schema->generateLocaleDataSql('en_US');
       }
 

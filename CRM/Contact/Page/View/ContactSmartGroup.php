@@ -58,10 +58,10 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
       }
 
       if (!empty($smart)) {
-        $this->assign_by_ref('groupSmart', $smart);
+        $this->assign('groupSmart', $smart);
       }
       if (!empty($parent)) {
-        $this->assign_by_ref('groupParent', $parent);
+        $this->assign('groupParent', $parent);
       }
     }
   }

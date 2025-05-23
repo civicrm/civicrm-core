@@ -84,11 +84,11 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
       return $search->url;
     }
 
-    $open = new CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen();
-    $open->event_queue_id = $queue_id;
-    $open->trackable_url_id = $url_id;
-    $open->time_stamp = date('YmdHis');
-    $open->save();
+    self::writeRecord([
+      'event_queue_id' => $queue_id,
+      'trackable_url_id' => $url_id,
+      'time_stamp' => date('YmdHis'),
+    ]);
 
     return $search->url;
   }

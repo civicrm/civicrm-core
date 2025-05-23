@@ -79,7 +79,7 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
     $contributionPageTokens = ['frontend_title', 'pay_later_text', 'pay_later_receipt', 'is_share', 'receipt_text'];
     $tokens += $this->getRelatedTokensForEntity('ContributionPage', 'contribution_page_id', $contributionPageTokens, ['is_share']);
 
-    $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'next_sched_contribution_date', 'failure_count', 'failure_retry_date', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
+    $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
     $tokens += $this->getRelatedTokensForEntity('ContributionRecur', 'contribution_recur_id', ['*'], $hiddenTokens);
     return $tokens;
   }
@@ -101,7 +101,7 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
       $address = Address::get(FALSE)
         ->addWhere('id', '=', $addressID)
         ->addSelect('*', 'state_province_id:label', 'country_id:label')
-        ->execute()->first();
+        ->execute()->first() ?? [];
       // We have name in the address_id.name token.
       unset($address['name']);
       return \CRM_Utils_Address::format($address);

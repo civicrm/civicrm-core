@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Extension;
+use Psr\Log\LogLevel;
+
 /**
  *
  * @package CRM
@@ -82,29 +85,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkPhpMysqli() {
-    $messages = [];
-
-    if (!extension_loaded('mysqli')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Future versions of CiviCRM may require the PHP extension "%2". To ensure that your system will be compatible, please install it in advance. For more explanation, see <a href="%1">the announcement</a>.',
-          [
-            1 => 'https://civicrm.org/blog/totten/psa-please-verify-php-extension-mysqli',
-            2 => 'mysqli',
-          ]),
-          ts('Forward Compatibility: Enable "mysqli"'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-server'
-      );
-    }
-
-    return $messages;
-  }
-
-  /**
    * Check that the MySQL time settings match the PHP time settings.
    *
    * @return CRM_Utils_Check_Message[]
@@ -170,7 +150,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
-      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG)
+      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG && !defined('CIVICRM_MAIL_LOG_AND_SEND'))
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK)
     ) {
@@ -200,15 +180,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
     $domainName    = $domain->name;
-    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/from_email_address", "&reset=1");
+    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/site_email_address");
     $fixDomainName = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1");
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       if (!$domainName || $domainName == 'Default Domain Name') {
-        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default FROM Email Address </a> (for system-generated emails).",
+        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default Site Email Address </a> (for system-generated emails).",
           [
             1 => $fixDomainName,
             2 => $fixEmailUrl,
@@ -216,7 +196,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         );
       }
       else {
-        $msg = ts('Please enter a <a href="%1">default FROM Email Address</a> (for system-generated emails).',
+        $msg = ts('Please enter a <a href="%1">default Site Email Address</a> (for system-generated emails).',
           [1 => $fixEmailUrl]);
       }
     }
@@ -243,16 +223,16 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @param bool $force
    * @return CRM_Utils_Check_Message[]
    */
-  public function checkDefaultMailbox($force = FALSE) {
+  public function checkDefaultMailbox($force = FALSE): array {
     $messages = [];
 
     // CiviMail doesn't work in non-production environments; skip.
-    if (!$force && CRM_Core_Config::environment() != 'Production') {
+    if (!$force && CRM_Core_Config::environment() !== 'Production') {
       return $messages;
     }
 
     if (CRM_Core_Component::isEnabled('CiviMail') &&
-      CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG"
+      CRM_Core_BAO_MailSettings::defaultDomain() === "EXAMPLE.ORG"
     ) {
       $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
@@ -591,8 +571,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $e->getMessage(),
-        ts('Extension download error'),
-        \Psr\Log\LogLevel::ERROR,
+        ts('Unable to get updates to extensions'),
+        \Psr\Log\LogLevel::WARNING,
         'fa-plug'
       );
       return $messages;
@@ -766,11 +746,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
 
     $setting = Civi::settings()->get('enable_components');
-    $exts = \Civi\Api4\Extension::get(FALSE)
+    $exts = Extension::get(FALSE)
       ->addWhere('key', 'LIKE', 'civi_%')
       ->addWhere('status', '=', 'installed')
       ->execute()
-      ->indexBy('key')->column('status');
+      ->column('status', 'key');
     if (empty($setting) || empty($exts)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
@@ -804,7 +784,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'job_id' => $job['id'],
         'options' => ['sort' => "id desc", 'limit' => 1],
       ])['values'][0]['description'] ?? NULL;
-      if (!empty($lastExecutionMessage) && strpos($lastExecutionMessage, 'Failure') !== FALSE) {
+      if (!empty($lastExecutionMessage) && str_contains($lastExecutionMessage, 'Failure')) {
         $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
         $html .= '<tr>
           <td>' . $job['name'] . ' </td>
@@ -855,6 +835,31 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ['path' => 'civicrm/admin/extensions/upgrade', 'query' => ['reset' => 1, 'destination' => CRM_Utils_System::url('civicrm/a/#/status')]]
       );
       return [$message];
+    }
+    return [];
+  }
+
+  /**
+   * Checks if logging is enabled but Civi-report is not.
+   *
+   * @return CRM_Utils_Check_Message[]
+   * @throws \CRM_Core_Exception
+   */
+  public function checkLoggingHasCiviReport(): array {
+    if (Civi::settings()->get('logging')) {
+      $isEnabledCiviReport = (bool) Extension::get(FALSE)
+        ->addWhere('key', '=', 'civi_report')
+        ->addWhere('status', '=', 'installed')
+        ->execute()->countFetched();
+      return $isEnabledCiviReport ? [] : [
+        new CRM_Utils_Check_Message(
+          __FUNCTION__,
+          ts('You have enabled detailed logging but to display this in the change log tab CiviReport must be enabled'),
+          ts('CiviReport required to display detailed logging.'),
+          LogLevel::WARNING,
+          'fa-plug'
+        ),
+      ];
     }
     return [];
   }
@@ -1040,7 +1045,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     // Ensure that the MySQL driver supports utf8mb4 encoding.
     $version = mysqli_get_client_info();
-    if (strpos($version, 'mysqlnd') !== FALSE) {
+    if (str_contains($version, 'mysqlnd')) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {
@@ -1092,21 +1097,60 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
-  public function checkPHPIntlExists() {
+  public function checkPHPIntlExists(): array {
     $messages = [];
     if (!extension_loaded('intl')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('This system currently does not have the PHP-Intl extension enabled.  Please contact your system administrator about getting the extension enabled.'),
         ts('Missing PHP Extension: INTL'),
-        \Psr\Log\LogLevel::WARNING,
+        LogLevel::WARNING,
         'fa-server'
       );
     }
     return $messages;
   }
 
-  public function checkAngularModuleSettings() {
+  /**
+   * Let people know if they could improve performance by defining the exclude directory.
+   *
+   * @return array
+   */
+  public function checkExcludeDirectories(): array {
+    $messages = [];
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && !defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned'),
+        ts('Performance can be improved by configuring the exclude directories path'),
+        LogLevel::NOTICE,
+        'fa-flag'
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Let people know if they could improve performance by defining the template compile check.
+   *
+   * @return array
+   */
+  public function checkTemplateCompileCheck(): array {
+    $messages = [];
+    $isProbablyDevelopmentSite = str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'staging') || str_contains(CIVICRM_UF_BASEURL, 'dev');
+    if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK') && !$isProbablyDevelopmentSite && !\Civi::settings()->get('debug_enabled')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('You can improve performance on production sites by specifying the CIVICRM_TEMPLATE_COMPILE_CHECK in the civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#disable-compile-check'),
+        ts('Performance can be improved on live sites by defining the template compile check'),
+        LogLevel::NOTICE,
+        'fa-flag'
+      );
+    }
+    return $messages;
+  }
+
+  public function checkAngularModuleSettings(): array {
     $messages = [];
     $modules = Civi::container()->get('angular')->getModules();
     foreach ($modules as $name => $module) {
@@ -1119,7 +1163,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             3 => 'target="_blank" href="https://github.com/civicrm/civicrm-core/pull/19052"',
           ]),
           ts('Unsupported Angular Setting'),
-          \Psr\Log\LogLevel::WARNING,
+          LogLevel::WARNING,
           'fa-code'
         );
       }
@@ -1127,7 +1171,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
-  public function checkForMultipleL10NDirs() {
+  public function checkForMultipleL10NDirs(): array {
     $messages = [];
     $dirs = [];
 
@@ -1163,7 +1207,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('There are multiple l10n directories, listed below. The one that appears to be in use is %1. You may wish to remove the others to avoid confusion when updating translation files.', [1 => $current_l10n])
           . '<p><ul>' . $dirlist . '</ul></p>',
         ts('Multiple l10n Directories'),
-        \Psr\Log\LogLevel::WARNING,
+        LogLevel::WARNING,
         'fa-files-o'
       );
     }
@@ -1172,8 +1216,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Avoid issues with trailing slashes and mixed separators on windows.
+   *
+   * @param string $path
+   *
+   * @return string
    */
-  private static function normalizePath($path) {
+  private static function normalizePath($path): string {
     return rtrim(str_replace(DIRECTORY_SEPARATOR, '/', $path), '/');
   }
 

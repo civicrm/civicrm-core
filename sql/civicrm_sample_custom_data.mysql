@@ -80,7 +80,8 @@ INSERT INTO  `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`
   VALUES  ('soup_selection', 'Soup Selection', 0, 1);
 SELECT @ogid := MAX(id) FROM civicrm_option_group;
 
-INSERT INTO civicrm_custom_group ( name, title,  extends, extends_entity_column_id, extends_entity_column_value, style, is_active, table_name) VALUES ('Food_Preference', 'Food Preference', 'Participant', 2, '1', 'Inline', 1, 'civicrm_value_food_preference_2');
+INSERT INTO `civicrm_custom_group` (`name`, `title`, `extends`, `extends_entity_column_id`, `extends_entity_column_value`, `style`, `is_active`, `table_name`, `weight`)
+  VALUES ('Food_Preference', 'Food Preference', 'Participant', 2, '1', 'Inline', 1, 'civicrm_value_food_preference_2', 2);
 SELECT @cgid := MAX(id) FROM civicrm_custom_group;
 
 INSERT INTO civicrm_custom_field ( custom_group_id, label, name, data_type, html_type, is_active, text_length, note_columns, note_rows, column_name, option_group_id, is_searchable ) VALUES  ( @cgid, 'Soup Selection', 'Soup_Selection', 'String',  'Radio',   1,  255, 60, 4, 'soup_selection_4', @ogid, 1);
@@ -95,8 +96,8 @@ CREATE TABLE civicrm_value_food_preference_2 ( id INT(10) UNSIGNED NOT NULL AUTO
 
 -- Donors’ custom data
 
-INSERT INTO `civicrm_custom_group` (`name`, `title`, `extends`, `extends_entity_column_id`, `extends_entity_column_value`, `style`, `is_active`, `table_name`)
-  VALUES ('Donor_Information', 'Donor Information', 'Contribution', NULL, NULL, 'Inline', 1, 'civicrm_value_donor_information_3');
+INSERT INTO `civicrm_custom_group` (`name`, `title`, `extends`, `extends_entity_column_id`, `extends_entity_column_value`, `style`, `is_active`, `table_name`, `weight`)
+  VALUES ('Donor_Information', 'Donor Information', 'Contribution', NULL, NULL, 'Inline', 1, 'civicrm_value_donor_information_3', 3);
 
 SELECT @cgid_contribution := MAX(id) FROM civicrm_custom_group;
 

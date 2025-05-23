@@ -18,6 +18,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\ReflectionUtils;
+
 require_once 'HTML/QuickForm/Page.php';
 
 /**
@@ -198,6 +200,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * This gets used in CRM_Core_Form_Tag via multiple routes
    */
   public $_tagsetInfo;
+
+  /**
+   * @var true
+   */
+  private bool $isValidated = FALSE;
 
   /**
    * @return string
@@ -383,7 +390,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->_state->setName($this->_name);
     }
     $this->_action = (int) $action;
-
+    $this->registerElementType('radio_with_div', 'CRM/Core/QuickForm/RadioWithDiv.php', 'CRM_Core_QuickForm_RadioWithDiv');
+    $this->registerElementType('group_with_div', 'CRM/Core/QuickForm/GroupWithDiv.php', 'CRM_Core_QuickForm_GroupWithDiv');
+    $this->registerElementType('advcheckbox_with_div', 'CRM/Core/QuickForm/AdvCheckBoxWithDiv.php', 'CRM_Core_QuickForm_AdvCheckBoxWithDiv');
     $this->registerRules();
 
     // let the constructor initialize this, should happen only once
@@ -394,7 +403,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Workaround for CRM-15153 - give each form a reasonably unique css class
     $this->addClass(CRM_Utils_System::getClassName($this));
 
-    $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
+    $this->assign('snippet', $_GET['snippet'] ?? NULL);
     $this->setTranslatedFields();
   }
 
@@ -535,7 +544,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
       if (!empty($attributes['aria-label']) || $label) {
-        $attributes['aria-label'] = $attributes['aria-label'] ?? $label;
+        $attributes['aria-label'] ??= $label;
       }
       $type = 'text';
     }
@@ -663,6 +672,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Register a field with quick form as supporting a file upload.
+   *
+   * @param array $fieldNames
+   *
+   * @return void
+   */
+  public function registerFileField(array $fieldNames): void {
+    // hack for field type File
+    $formUploadNames = $this->get('uploadNames');
+    if (is_array($formUploadNames)) {
+      $fieldNames = array_unique(array_merge($formUploadNames, $fieldNames));
+    }
+
+    $this->set('uploadNames', $fieldNames);
+  }
+
+  /**
    * This virtual function is used to build the form.
    *
    * It replaces the buildForm associated with QuickForm_Page. This allows us to put
@@ -715,7 +741,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($hookErrors)) {
       $this->_errors += $hookErrors;
     }
-
+    $this->isValidated = TRUE;
     return (0 == count($this->_errors));
   }
 
@@ -726,8 +752,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * buildQuickForm.
    */
   public function buildForm() {
-    $this->_formBuilt = TRUE;
-
     $this->preProcess();
 
     CRM_Utils_Hook::preProcess(get_class($this), $this);
@@ -757,7 +781,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     if (!empty($defaults)) {
-      $this->setDefaults($defaults);
+      $this->setPurifiedDefaults($defaults);
     }
 
     // call the form hook
@@ -784,7 +808,34 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // our ensured variables get blown away, so we need to set them even if
     // it's already been initialized.
     self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
-    self::$_template->addExpectedTabHeaderKeys();
+    $this->_formBuilt = TRUE;
+  }
+
+  /**
+   * Override this in a subclass to prevent fields intended to contain
+   * "raw html" from getting broken. E.g. system message templates
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [];
+  }
+
+  public function setPurifiedDefaults($defaults) {
+    $exclude = $this->getFieldsToExcludeFromPurification();
+    foreach ($defaults as $index => $default) {
+      if (!in_array($index, $exclude, TRUE) && is_string($default) && !is_numeric($default)) {
+        $hasEncodedAmp = str_contains('&amp;', $default);
+        $hasEncodedQuote = str_contains('&quot;', $default);
+        $defaults[$index] = CRM_Utils_String::purifyHTML($default);
+        if (!$hasEncodedAmp) {
+          $defaults[$index] = str_replace('&amp;', '&', $defaults[$index]);
+        }
+        if (!$hasEncodedQuote) {
+          $defaults[$index] = str_replace('&quot;', '"', $defaults[$index]);
+        }
+      }
+    }
+    $this->setDefaults($defaults);
   }
 
   /**
@@ -850,7 +901,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $attrs['accesskey'] = 'S';
         }
         $buttonContents = CRM_Core_Page::crmIcon($button['icon'] ?? $defaultIcon) . ' ' . $button['name'];
-        $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
+        $buttonName = $this->getButtonName($button['type'], $button['subName'] ?? NULL);
         $attrs['class'] .= " crm-button crm-button-type-{$button['type']} crm-button{$buttonName}";
         $attrs['type'] = 'submit';
         $prevnext[] = $this->createElement('xbutton', $buttonName, $buttonContents, $attrs);
@@ -866,7 +917,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       // hack - addGroup uses an array to express variable spacing, read from the last element
-      $spacing[] = CRM_Utils_Array::value('spacing', $button, self::ATTR_SPACING);
+      $spacing[] = $button['spacing'] ?? self::ATTR_SPACING;
     }
     $this->addGroup($prevnext, 'buttons', '', $spacing, FALSE);
   }
@@ -906,7 +957,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return string
    */
   public function getTitle() {
-    return $this->_title ? $this->_title : ts('ERROR: Title is not Set');
+    return $this->_title ?: ts('ERROR: Title is not Set');
   }
 
   /**
@@ -1017,7 +1068,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $params['country'] = $params["country-$billingLocationID"] = $params["billing_country-$billingLocationID"] = CRM_Core_PseudoConstant::countryIsoCode($params["billing_country_id-$billingLocationID"]);
     }
 
-    [$hasAddressField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($params, $this->_bltID);
+    [$hasAddressField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($params);
     if ($hasAddressField) {
       $params = array_merge($params, $addressParams);
     }
@@ -1114,7 +1165,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected function handlePreApproval(&$params) {
     try {
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-      $params['component'] = $params['component'] ?? 'contribute';
+      $params['component'] ??= 'contribute';
       $result = $payment->doPreApproval($params);
       if (empty($result)) {
         // This could happen, for example, when paypal looks at the button value & decides it is not paypal express.
@@ -1122,7 +1173,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      CRM_Core_Error::statusBounce(ts('Payment approval failed with message :') . $e->getMessage(), $payment->getCancelUrl($params['qfKey'], CRM_Utils_Array::value('participant_id', $params)));
+      CRM_Core_Error::statusBounce(ts('Payment approval failed with message :') . $e->getMessage(), $payment->getCancelUrl($params['qfKey'], $params['participant_id'] ?? NULL));
     }
 
     $this->set('pre_approval_parameters', $result['pre_approval_parameters']);
@@ -1373,9 +1424,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Name of variable.
    * @param mixed $value
    *   Value of variable.
+   *
+   * @deprecated since 5.72 will be removed around 5.84
    */
   public function assign_by_ref($var, &$value) {
-    self::$_template->assign_by_ref($var, $value);
+    CRM_Core_Error::deprecatedFunctionWarning('assign');
+    self::$_template->assign($var, $value);
   }
 
   /**
@@ -1393,12 +1447,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Returns an array containing template variables.
    *
+   * @deprecated since 5.69 will be removed around 5.93. use getTemplateVars.
+   *
    * @param string $name
    *
    * @return array
    */
   public function get_template_vars($name = NULL) {
-    return self::$_template->get_template_vars($name);
+    return $this->getTemplateVars($name);
+  }
+
+  /**
+   * Get the value/s assigned to the Template Engine (Smarty).
+   *
+   * @param string|null $name
+   */
+  public function getTemplateVars($name = NULL) {
+    return self::$_template->getTemplateVars($name);
   }
 
   /**
@@ -1426,14 +1491,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
       // We use a class here to avoid html5 issues with collapsed cutsomfield sets.
-      $optAttributes['class'] = $optAttributes['class'] ?? '';
+      $optAttributes['class'] ??= '';
       if ($required) {
         $optAttributes['class'] .= ' required';
       }
-      $element = $this->createElement('radio', NULL, NULL, $var, $key, $optAttributes);
+      $element = $this->createElement('radio_with_div', NULL, NULL, $var, $key, $optAttributes);
       $options[] = $element;
     }
-    $group = $this->addGroup($options, $name, $title, $separator);
+    if (!empty($attributes['options_per_line'])) {
+      $group = $this->addElement('group_with_div', $name, $title, $options, $separator, TRUE);
+      $group->setAttribute('options_per_line', $attributes['options_per_line']);
+    }
+    else {
+      $group = $this->addGroup($options, $name, $title, $separator);
+    }
 
     $optionEditKey = 'data-option-edit-path';
     if (!empty($attributes[$optionEditKey])) {
@@ -1568,6 +1639,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * @deprecated
+   * Use $this->addDatePickerRange() instead.
+   *
    * @param string $name
    * @param string $from
    * @param string $to
@@ -1577,7 +1651,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $displayTime
    */
   public function addDateRange($name, $from = '_from', $to = '_to', $label = 'From:', $dateFormat = 'searchDate', $required = FALSE, $displayTime = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Core_Form::addDatePickerRange insted');
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::addDatePickerRange');
     if ($displayTime) {
       $this->addDateTime($name . $from, $label, $required, ['formatType' => $dateFormat]);
       $this->addDateTime($name . $to, ts('To:'), $required, ['formatType' => $dateFormat]);
@@ -1621,7 +1695,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $label,
       $options,
       $required,
-      ['class' => 'crm-select2']
+      ['class' => 'crm-select2', 'title' => $label]
     );
     $attributes = ['formatType' => 'searchDate'];
     $extra = ['time' => $isDateTime];
@@ -1713,7 +1787,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $props['placeholder'] = $placeholder;
     }
     // Handle custom field
-    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+    if (str_starts_with($name, 'custom_') && is_numeric($name[7])) {
       [, $id] = explode('_', $name);
       $label = $props['label'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
@@ -1728,7 +1802,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (
           $uniqueName === $props['field'] ||
           ($fieldSpec['name'] ?? NULL) === $props['field'] ||
-          in_array($props['field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, []))
+          in_array($props['field'], $fieldSpec['api.aliases'] ?? [])
         ) {
           break;
         }
@@ -1822,9 +1896,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // Handle custom fields
-    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+    if (str_starts_with($name, 'custom_') && is_numeric($name[7])) {
       $fieldId = (int) substr($name, 7);
-      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $context == 'search', CRM_Utils_Array::value('label', $props));
+      return CRM_Core_BAO_CustomField::addQuickFormElement($this, $name, $fieldId, $required, $context == 'search', $props['label'] ?? NULL);
     }
 
     // Core field - get metadata.
@@ -1856,7 +1930,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       if ($context == 'search') {
         $widget = $widget == 'Select2' ? $widget : 'Select';
-        $props['multiple'] = $props['multiple'] ?? TRUE;
+        $props['multiple'] ??= TRUE;
       }
       elseif (!empty($fieldSpec['serialize'])) {
         $props['multiple'] = TRUE;
@@ -1894,7 +1968,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Number':
       case 'Email':
         //TODO: Autodetect ranges
-        $props['size'] = $props['size'] ?? 60;
+        $props['size'] ??= 60;
         return $this->add(strtolower($widget), $name, $label, $props, $required);
 
       case 'hidden':
@@ -1902,8 +1976,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'TextArea':
         //Set default columns and rows for textarea.
-        $props['rows'] = $props['rows'] ?? 4;
-        $props['cols'] = $props['cols'] ?? 60;
+        $props['rows'] ??= 4;
+        $props['cols'] ??= 60;
         if (empty($props['maxlength']) && isset($fieldSpec['length'])) {
           $props['maxlength'] = $fieldSpec['length'];
         }
@@ -1942,7 +2016,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'Select':
       case 'Select2':
-        $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
+        $props['class'] = ($props['class'] ?? 'big') . ' crm-select2';
         // TODO: Add and/or option for fields that store multiple values
         return $this->add(strtolower($widget), $name, $label, $options, $required, $props);
 
@@ -1981,14 +2055,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'EntityRef':
         // Auto-apply filters from field metadata
-        foreach ($fieldSpec['html']['filter'] ?? [] as $filter) {
-          [$k, $v] = explode('=', $filter);
+        foreach ($fieldSpec['html']['filter'] ?? [] as $k => $v) {
           $props['api']['params'][$k] = $v;
         }
         return $this->addEntityRef($name, $label, $props, $required);
 
       case 'Password':
-        $props['size'] = $props['size'] ?? 60;
+        $props['size'] ??= 60;
         return $this->add('password', $name, $label, $props, $required);
 
       // Check datatypes of fields
@@ -2096,6 +2169,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return mixed
    */
   public function getVar($name) {
+    try {
+      $property = ReflectionUtils::getCodeDocs((new ReflectionProperty($this, $name)), 'Property');
+      if (!empty($property['deprecated'])) {
+        CRM_Core_Error::deprecatedWarning('deprecated property accessed :' . $name);
+      }
+      if (!empty($property['internal'])) {
+        CRM_Core_Error::deprecatedWarning('internal property accessed (this property could change without warning):' . $name);
+      }
+    }
+    catch (\ReflectionException $e) {
+      // If the variable isn't defined you can't access its properties to check if it's deprecated. Let php 8.2 deal with those warnings.
+    }
+    // @todo - add warnings for internal properties & protected properties.
     return $this->$name;
   }
 
@@ -2131,6 +2217,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Key / value pair.
    */
   public function addDate($name, $label, $required = FALSE, $attributes = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::add("datepicker")');
     if (!empty($attributes['formatType'])) {
       // get actual format
       $params = ['name' => $attributes['formatType']];
@@ -2220,6 +2307,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $attributes
    */
   public function addDateTime($name, $label, $required = FALSE, $attributes = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::add("datepicker")');
     $addTime = ['addTime' => TRUE];
     if (is_array($attributes)) {
       $attributes = array_merge($attributes, $addTime);
@@ -2332,7 +2420,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $props['api']['fieldName'] = $this->getDefaultEntity() . '.' . $name;
     }
     $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
-    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['placeholder'] ??= self::selectOrAnyPlaceholder($props, $required);
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = json_encode($props['api']);
     $props['data-api-entity'] = $props['entity'];
@@ -2364,7 +2452,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
-    $props['api'] = CRM_Utils_Array::value('api', $props, []);
+    $props['api'] = $props['api'] ?? [];
     $props['entity'] = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($props['entity'] ?? 'Contact');
     $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-entityref');
 
@@ -2372,13 +2460,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($props['create']);
     }
 
-    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['placeholder'] ??= self::selectOrAnyPlaceholder($props, $required);
 
     $defaults = [];
     if (!empty($props['multiple'])) {
       $defaults['multiple'] = TRUE;
     }
-    $props['select'] = CRM_Utils_Array::value('select', $props, []) + $defaults;
+    $props['select'] = ($props['select'] ?? []) + $defaults;
 
     $this->formatReferenceFieldAttributes($props, get_class($this));
     return $this->add('text', $name, $label, $props, $required);
@@ -2789,10 +2877,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // This is appropriate as it is a pseudofield.
       $this->setConstants(['task' => '']);
       $this->assign('taskMetaData', $tasks);
-      $select = $this->add('select', 'task', NULL, ['' => ts('Actions')], FALSE, [
+      $select = $this->add('select', 'task', NULL, ['' => ts('Actions')], FALSE,
+      [
         'class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions',
-      ]
-      );
+        'title' => ts('Actions'),
+      ]);
       foreach ($tasks as $key => $task) {
         $attributes = [];
         if (isset($task['data'])) {
@@ -2827,10 +2916,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * This is like a save point :-). The next status bounce will
    * return the browser to this url unless another is added.
    *
-   * @param string $path
+   * @param string|null $path
    *   Path string e.g. `civicrm/foo/bar?reset=1`, defaults to current path.
    */
-  protected function pushUrlToUserContext(string $path = NULL): void {
+  protected function pushUrlToUserContext(?string $path = NULL): void {
     $url = CRM_Utils_System::url($path ?: CRM_Utils_System::currentPath() . '?reset=1',
       '', FALSE, NULL, FALSE);
     CRM_Core_Session::singleton()->pushUserContext($url);
@@ -3044,8 +3133,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * These values have been validated against the fields added to the form.
    * https://pear.php.net/manual/en/package.html.html-quickform.html-quickform.exportvalues.php
+   * unless the function is being called during before the submission has
+   * been validated. In which the values are not yet validated & hence
+   * taking directly from $_POST.
    *
-   * Any money processing has also been done.
+   * Fields with money or number formats are converted from localised formats
+   * before returning.
    *
    * @param string $fieldName
    *
@@ -3057,19 +3150,43 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function getSubmittedValue(string $fieldName) {
     if (empty($this->exportedValues)) {
+      if (!$this->isValidated) {
+        // Trying to access the submitted value before during during validate.
+        // In this case we get the submitValue which is equivalent to the value
+        // in $_POST. By contrast exportValues will filter out fields
+        // that have not been added to QuickForm.
+        $value = $this->getSubmitValue($fieldName);
+        if (is_string($value)) {
+          // Precaution since we are dealing with values directly in $_POST.
+          $value = CRM_Utils_String::purifyHTML($value);
+        }
+        return $this->getUnLocalizedSubmittedValue($fieldName, $value);
+      }
       $this->exportedValues = $this->controller->exportValues($this->_name);
     }
     $value = $this->exportedValues[$fieldName] ?? NULL;
+    return $this->getUnLocalizedSubmittedValue($fieldName, $value);
+  }
+
+  /**
+   * Sanitize by de-formatting any localised money.
+   *
+   * This should never be called from postProcess directly -
+   * getSubmittedValue() & getSubmittedValues() are the go.
+   *
+   * @internal - avoid using outside of core as this could change.
+   *
+   * @return mixed
+   */
+  protected function getUnLocalizedSubmittedValue($fieldName, $value) {
     if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
       return CRM_Utils_Rule::cleanMoney($value);
     }
-    else {
-      // Numeric fields are not in submittableMoneyFields (for now)
-      $fieldRules = $this->_rules[$fieldName] ?? [];
-      foreach ($fieldRules as $rule) {
-        if ('money' === $rule['type']) {
-          return CRM_Utils_Rule::cleanMoney($value);
-        }
+    // Numeric fields are not in submittableMoneyFields (for now)
+    $fieldRules = $this->_rules[$fieldName] ?? [];
+    foreach ($fieldRules as $rule) {
+      if ('money' === $rule['type']) {
+        return CRM_Utils_Rule::cleanMoney($value);
       }
     }
     return $value;

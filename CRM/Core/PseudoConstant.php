@@ -38,13 +38,6 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
-   * activity type
-   * @var array
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
-   */
-  private static $activityType;
-
-  /**
    * States, provinces
    * @var array
    */
@@ -106,14 +99,9 @@ class CRM_Core_PseudoConstant {
   private static $accountOptionValues;
 
   /**
-   * Low-level option getter, rarely accessed directly.
-   * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
-   * @see https://docs.civicrm.org/dev/en/latest/framework/pseudoconstant/
+   * Legacy option getter.
    *
-   * NOTE: If someone undertakes a refactoring of this, please consider the use-case of
-   * the Setting.getoptions API. There is no DAO/field, but it would be nice to use the
-   * same 'pseudoconstant' struct in *.settings.php. This means loosening the coupling
-   * between $field lookup and the $pseudoconstant evaluation.
+   * @deprecated in favor of `Civi::entity()->getOptions()`
    *
    * @param string $daoName
    * @param string $fieldName
@@ -152,10 +140,10 @@ class CRM_Core_PseudoConstant {
       'condition' => [],
       'values' => [],
     ];
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName);
 
     // Custom fields are not in the schema
-    if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
+    if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7])) {
       $customField = new CRM_Core_BAO_CustomField();
       $customField->id = (int) substr($fieldName, 7);
       $options = $customField->getOptions($context);
@@ -332,13 +320,22 @@ class CRM_Core_PseudoConstant {
       if (!$daoName) {
         return NULL;
       }
-      // We don't have good mapping so have to do a bit of guesswork from the menu
-      [, $parent, , $child] = explode('_', $daoName);
-      $sql = "SELECT path FROM civicrm_menu
+
+      $dao = new $daoName();
+      $path = $dao::getEntityPaths()['browse'] ?? NULL;
+
+      if (!$path) {
+        // We don't have good mapping so have to do a bit of guesswork from the menu
+        // @todo Get rid of this! It's unreliable and doesn't work if the path is replaced by
+        // an afform one because the callback changes to CRM_Afform_Page_AfformBase
+        [, $parent, , $child] = explode('_', $daoName);
+        $sql = "SELECT path FROM civicrm_menu
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
         LIMIT 1";
-      return CRM_Core_DAO::singleValueQuery($sql);
+        $path = CRM_Core_DAO::singleValueQuery($sql);
+      }
+      return $path;
     }
     return NULL;
   }
@@ -442,7 +439,7 @@ class CRM_Core_PseudoConstant {
   /**
    * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
-   * Get all Activty types.
+   * Get all Activity types.
    *
    * The static array activityType is returned
    *
@@ -450,7 +447,7 @@ class CRM_Core_PseudoConstant {
    * @return array
    *   array reference of all activity types.
    */
-  public static function &activityType() {
+  public static function activityType() {
     $args = func_get_args();
     $all = $args[0] ?? TRUE;
     $includeCaseActivities = $args[1] ?? FALSE;
@@ -461,12 +458,12 @@ class CRM_Core_PseudoConstant {
     $index = (int) $all . '_' . $returnColumn . '_' . (int) $includeCaseActivities;
     $index .= '_' . (int) $includeCampaignActivities;
     $index .= '_' . (int) $onlyComponentActivities;
-
-    if (NULL === self::$activityType) {
-      self::$activityType = [];
+    if (!isset(\Civi::$statics[__CLASS__]['activityType'])) {
+      \Civi::$statics[__CLASS__]['activityType'] = [];
     }
+    $activityTypes = &\Civi::$statics[__CLASS__]['activityType'];
 
-    if (!isset(self::$activityType[$index]) || $reset) {
+    if (!isset($activityTypes[$index]) || $reset) {
       $condition = NULL;
       if (!$all) {
         $condition = 'AND filter = 0';
@@ -506,9 +503,9 @@ class CRM_Core_PseudoConstant {
       }
       $condition = $condition . ' AND ' . $componentClause;
 
-      self::$activityType[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
+      $activityTypes[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
     }
-    return self::$activityType[$index];
+    return $activityTypes[$index];
   }
 
   /**
@@ -884,10 +881,12 @@ WHERE  id = %1";
    *
    * @return array
    */
-  public static function relationshipTypeOptions() {
+  public static function relationshipTypeOptions($fieldName = NULL, $options = []) {
     $relationshipTypes = [];
-    $relationshipLabels = self::relationshipType();
-    foreach (self::relationshipType('name') as $id => $type) {
+    $onlyActive = empty($options['include_disabled']) ? 1 : NULL;
+    $relationshipLabels = self::relationshipType('label', FALSE, $onlyActive);
+    $relationshipNames = self::relationshipType('name', FALSE, $onlyActive);
+    foreach ($relationshipNames as $id => $type) {
       $relationshipTypes[$type['name_a_b']] = $relationshipLabels[$id]['label_a_b'];
       if ($type['name_b_a'] && $type['name_b_a'] != $type['name_a_b']) {
         $relationshipTypes[$type['name_b_a']] = $relationshipLabels[$id]['label_b_a'];
@@ -1507,7 +1506,7 @@ WHERE  id = %1
    *   List of options, each as a record of id+name+label.
    *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
    */
-  public static function formatArrayOptions($context, array &$options) {
+  public static function formatArrayOptions(?string $context, array $options): array {
     // Already flat; return keys/values according to context
     if (!isset($options[0]) || !is_array($options[0])) {
       // For validate context, machine names are expected in place of labels.
@@ -1522,7 +1521,7 @@ WHERE  id = %1
     foreach ($options as $option) {
       // Some fallbacks in case the array is missing a 'name' or 'label' or 'abbr'
       $id = $option[$key] ?? $option['id'] ?? $option['name'];
-      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'];
+      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'] ?? $option['id'];
     }
     return $result;
   }

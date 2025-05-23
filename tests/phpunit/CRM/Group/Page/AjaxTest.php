@@ -50,7 +50,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     CRM_Utils_Hook::singleton()->reset();
     $this->quickCleanup(['civicrm_group']);
     $config = CRM_Core_Config::singleton();
-    unset($config->userPermissionClass->permissions);
+    $config->userPermissionClass->permissions = NULL;
     parent::tearDown();
   }
 

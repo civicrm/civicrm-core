@@ -124,7 +124,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
 
     $this->assertNotEmpty($urlPatterns);
     foreach ($urlPatterns as $urlPattern) {
-      $this->assertRegExp($urlPattern[0], $urlPattern[1]);
+      $this->assertMatchesRegularExpression($urlPattern[0], $urlPattern[1]);
     }
   }
 

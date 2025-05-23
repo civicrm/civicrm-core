@@ -43,9 +43,9 @@
       </tr>
     {/if}
   </table>
-  <fieldset class="crm-collapsible">
-    <legend class="collapsible-title">{ts}Optional Constraints{/ts}</legend>
-      <div>
+  <details class="crm-accordion-light">
+    <summary>{ts}Optional Constraints{/ts}</summary>
+    <div class="crm-accordion-body">
       <table class="form-layout">
         <tr class="crm-contribution-form-block-payment_instrument">
           <td class="label">{$form.payment_instrument_id.label}</td>
@@ -61,7 +61,7 @@
         </tr>
       </table>
     </div>
-  </fieldset>
+  </details>
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>

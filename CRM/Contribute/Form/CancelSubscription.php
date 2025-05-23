@@ -66,20 +66,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       'selfService' => $this->isSelfService(),
     ];
 
-    if ($this->_crid) {
-      // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
-      if ($this->getSubscriptionDetails()->membership_id) {
-        $this->_mid = $this->getSubscriptionDetails()->membership_id;
-      }
-    }
-
-    if ($this->_mid) {
+    if ($this->getMembershipID()) {
       $this->_mode = 'auto_renew';
       // CRM-18468: crid is more accurate than mid for getting
       // subscriptionDetails, so don't get them again.
 
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_mid, 'membership_type_id');
+      $membershipTypeId = $this->getMembershipValue('membership_type_id');
       $membershipType = $membershipTypes[$membershipTypeId] ?? '';
       $this->assign('membershipType', $membershipType);
       $cancelRecurTextParams['membershipType'] = $membershipType;
@@ -92,10 +85,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
     }
 
-    if (
-      (!$this->_crid && !$this->_coid && !$this->_mid) ||
-      (!$this->getSubscriptionDetails())
-    ) {
+    if (!$this->getSubscriptionDetails()) {
       CRM_Core_Error::statusBounce(ts('Required information missing.'));
     }
 
@@ -104,7 +94,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     // handle context redirection
     CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
 
-    $this->setTitle($this->_mid ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
+    $this->setTitle($this->getMembershipID() ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
     $this->assign('mode', $this->_mode);
 
     if ($this->isSelfService() || !$this->_paymentProcessorObj->supports('cancelRecurring')) {
@@ -160,7 +150,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     if (!empty($this->_donorEmail)) {
       $this->add('checkbox', 'is_notify', ts('Notify Contributor?') . " ({$this->_donorEmail})");
     }
-    if ($this->_mid) {
+    if ($this->getMembershipID()) {
       $cancelButton = ts('Cancel Automatic Membership Renewal');
     }
     else {
@@ -234,16 +224,16 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     try {
       civicrm_api3('ContributionRecur', 'cancel', [
         'id' => $this->getSubscriptionDetails()->recur_id,
-        'membership_id' => $this->_mid,
+        'membership_id' => $this->getMembershipID(),
         'processor_message' => $message,
         'cancel_reason' => $this->getSubmittedValue('cancel_reason'),
       ]);
 
       $tplParams = [];
-      if ($this->_mid) {
-        $inputParams = ['id' => $this->_mid];
+      if ($this->getMembershipID()) {
+        $inputParams = ['id' => $this->getMembershipID()];
         CRM_Member_BAO_Membership::getValues($inputParams, $tplParams);
-        $tplParams = $tplParams[$this->_mid];
+        $tplParams = $tplParams[$this->getMembershipID()];
         $tplParams['membership_status']
           = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $tplParams['status_id']);
         $tplParams['membershipType']

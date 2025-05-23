@@ -15,7 +15,7 @@
 <p>{ts}Configure mailing labels for your site using tokens, which are replaced by contact field values when the labels are generated. Place your cursor within the Mailing Labels box where you want to the token to be inserted. Then click the "Insert Tokens" link to see a list of available tokens (including custom fields). Insert the token by clicking the desired token name.{/ts}</p>
 <ul>
   <li>{ts}Address field values are taken from the contact's <strong>primary</strong> location.{/ts}</li>
-  <li>{ts 1=&#123;contact.state_province&#125; 2=&#123;contact.state_province_name&#125;}Use the %1 token for state/province abbreviation or %2 for full state/province name.{/ts}</li>
+  <li>{ts 1="&#123;contact.state_province&#125;" 2="&#123;contact.state_province_name&#125;"}Use the %1 token for state/province abbreviation or %2 for full state/province name.{/ts}</li>
   <li>{ts}Add spaces or punctuation to layout by surrounding them with brackets.{/ts}
     <ul><li>{ts}EXAMPLE:{/ts} {literal}{, }{/literal}</li></ul></li>
   <li>{ts}If you want to include the county in your mailing labels, the <strong>County</strong> checkbox must be checked in the Address Editing section on this screen, and county names must be added to the civicrm_county table in your database.{/ts}</li>

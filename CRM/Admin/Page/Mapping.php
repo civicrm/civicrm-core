@@ -55,12 +55,14 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/mapping',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Mapping'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/mapping',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Mapping'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

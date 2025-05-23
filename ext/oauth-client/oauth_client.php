@@ -1,9 +1,7 @@
 <?php
 
 require_once 'oauth_client.civix.php';
-// phpcs:disable
 use CRM_OauthClient_ExtensionUtil as E;
-// phpcs:enable
 
 /**
  * Implements hook_civicrm_config().
@@ -23,24 +21,25 @@ function oauth_client_civicrm_config(&$config) {
 function oauth_client_civicrm_permission(&$permissions) {
   $prefix = ts('CiviCRM') . ': ';
   $permissions['manage OAuth client'] = [
-    $prefix . ts('manage OAuth client'),
-    ts('Create and delete OAuth client connections'),
+    'label' => $prefix . ts('manage OAuth client'),
+    'description' => ts('Create and delete OAuth client connections'),
   ];
   $permissions['manage OAuth client secrets'] = [
-    $prefix . ts('manage OAuth client secrets'),
-    ts('Access OAuth secrets'),
+    'label' => $prefix . ts('manage OAuth client secrets'),
+    'description' => ts('Access OAuth secrets'),
   ];
   $permissions['create OAuth tokens via auth code flow'] = [
-    $prefix . ts('create OAuth tokens via auth code flow'),
-    ts('Create OAuth tokens via the authorization code flow'),
+    'label' => $prefix . ts('create OAuth tokens via auth code flow'),
+    'description' => ts('Create OAuth tokens via the authorization code flow'),
   ];
   $permissions['manage my OAuth contact tokens'] = [
-    $prefix . ts('manage my OAuth contact tokens'),
-    ts("Manage user's own OAuth tokens"),
+    'label' => $prefix . ts('manage my OAuth contact tokens'),
+    'description' => ts("Manage user's own OAuth tokens"),
   ];
   $permissions['manage all OAuth contact tokens'] = [
-    $prefix . ts('manage all OAuth contact tokens'),
-    ts("Manage OAuth tokens for all contacts"),
+    'label' => $prefix . ts('manage all OAuth contact tokens'),
+    'description' => ts("Manage OAuth tokens for all contacts"),
+    'implies' => ['manage my OAuth contact tokens'],
   ];
 }
 

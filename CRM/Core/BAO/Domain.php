@@ -110,10 +110,10 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @return string
    */
   protected static function getMissingDomainFromEmailMessage(): string {
-    $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address',
+    $url = CRM_Utils_System::url('civicrm/admin/options/site_email_address',
       'reset=1'
     );
-    $status = ts("There is no valid default from email address configured for the domain. You can configure here <a href='%1'>Configure From Email Address.</a>", [1 => $url]);
+    $status = ts("There is no valid default email address configured for the site. <a href='%1'>Configure Site Email Addresses.</a>", [1 => $url]);
     return $status;
   }
 
@@ -121,8 +121,11 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Get the location values of a domain.
    *
    * @return CRM_Core_BAO_Location[]|NULL
+   *
+   * @deprecated since 6.3 will be removed around 6.13.
    */
   public function getLocationValues() {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
     if ($this->_location == NULL) {
       $params = [
         'contact_id' => $this->contact_id,
@@ -182,29 +185,27 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
    * @param bool $skipFatal
-   * @param bool $returnString
-   *  If you are using this second parameter you probably are better
-   *  calling `getFromEmail()` which will return an actual string.
+   * @param bool $returnFormatted
+   *   Deprecated param. Use `getFromEmail()` instead.
    *
    * @return array
    *   name & email for domain
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getNameAndEmail($skipFatal = FALSE, $returnString = FALSE) {
-    $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
+  public static function getNameAndEmail($skipFatal = FALSE, $returnFormatted = FALSE): array {
+    $fromEmailAddress = \Civi\Api4\SiteEmailAddress::get(FALSE)
+      ->addSelect('display_name', 'email')
+      ->addWhere('domain_id', '=', 'current_domain')
+      ->addWhere('is_default', '=', TRUE)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first();
     if (!empty($fromEmailAddress)) {
-      if ($returnString) {
-        // Return a string like: "Demonstrators Anonymous" <info@example.org>
-        return $fromEmailAddress;
+      if ($returnFormatted) {
+        CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Domain::getFromEmail', 'CRM_Core_BAO_Domain::getNameAndEmail with $returnFormatted = TRUE');
+        return [CRM_Utils_Mail::formatFromAddress($fromEmailAddress)];
       }
-      foreach ($fromEmailAddress as $key => $value) {
-        $email = CRM_Utils_Mail::pluckEmailFromHeader($value);
-        $fromArray = explode('"', $value);
-        $fromName = $fromArray[1] ?? NULL;
-        break;
-      }
-      return [$fromName, $email];
+      return [$fromEmailAddress['display_name'], $fromEmailAddress['email']];
     }
 
     if ($skipFatal) {
@@ -220,15 +221,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Get the domain email in a format suitable for using as the from address.
    *
    * @return string
+   *   E.g. '"Demonstrators Anonymous" <info@example.org>'
    * @throws \CRM_Core_Exception
    */
   public static function getFromEmail(): string {
-    $email = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
-    $email = current($email);
-    if (!$email) {
-      throw new CRM_Core_Exception(self::getMissingDomainFromEmailMessage());
-    }
-    return $email;
+    $fromAddress = self::getNameAndEmail();
+    return CRM_Utils_Mail::formatFromAddress(['display_name' => $fromAddress[0], 'email' => $fromAddress[1]]);
   }
 
   /**
@@ -263,7 +261,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     }
 
     $domainGroupID = Civi::settings()->get('domain_group_id');
-    $multisite = Civi::settings()->get('is_enabled');
+    $multisite = Civi::settings()->get('multisite_is_enabled');
 
     if ($domainGroupID) {
       $groupID = $domainGroupID;

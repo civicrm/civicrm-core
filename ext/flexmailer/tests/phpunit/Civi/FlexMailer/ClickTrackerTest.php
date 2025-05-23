@@ -1,8 +1,9 @@
 <?php
 namespace Civi\FlexMailer;
 
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
 use Civi\FlexMailer\ClickTracker\TextClickTracker;
@@ -15,6 +16,8 @@ use Civi\FlexMailer\ClickTracker\HtmlClickTracker;
  */
 class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
 
+  protected static $mockTrackedUrl = 'http://example.com/extern?u=1';
+
   protected $mailing_id;
 
   public function setUpHeadless() {
@@ -25,20 +28,11 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ->apply();
   }
 
-  public function setUp(): void {
-    // Mock the getTrackerURL call; we don't need to test creating a row in a table.
-    // If you want this to work without runkit, then either (a) make the dummy rows or (b) switch this to a hook/event that is runtime-configurable.
-    require_once 'CRM/Mailing/BAO/TrackableURL.php';
-    \runkit7_method_rename('\CRM_Mailing_BAO_MailingTrackableURL', 'getBasicTrackerURL', 'orig_getBasicTrackerURL');
-    \runkit7_method_add('\CRM_Mailing_BAO_MailingTrackableURL', 'getBasicTrackerURL', '$a, $b, $c', 'return \'http://example.com/extern?u=1&qid=1\';', RUNKIT7_ACC_STATIC | RUNKIT7_ACC_PRIVATE);
-    parent::setUp();
-  }
-
-  public function tearDown(): void {
-    // Reset the class.
-    \runkit7_method_remove('\CRM_Mailing_BAO_MailingTrackableURL', 'getBasicTrackerURL');
-    \runkit7_method_rename('\CRM_Mailing_BAO_MailingTrackableURL', 'orig_getBasicTrackerURL', 'getBasicTrackerURL');
-    parent::tearDown();
+  public static function on_civi_mailing_track(GenericHookEvent $event) {
+    if (static::$mockTrackedUrl) {
+      $event->url = static::$mockTrackedUrl;
+      $event->stopPropagation();
+    }
   }
 
   /**
@@ -149,6 +143,14 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $msg = '<p><a href="https://civińcrm.org">See This</a></p>';
     $result = $filter->filterContent($msg, 1, 1);
     $this->assertEquals('<p><a href="http://example.com/extern?u=1&amp;qid=1" rel=\'nofollow\'>See This</a></p>', $result);
+  }
+
+  public function testTraditionalViewMailingTokenFormat(): void {
+    static::$mockTrackedUrl = NULL;
+    $filter = new HtmlClickTracker();
+    $msg = '<p><a href="http://civicrm.org/civicrm/mailing/view?id={mailing.key}&{contact.checksum}&cid={contact.contact_id}">View online</a></p>';
+    $result = $filter->filterContent($msg, 1, 1);
+    $this->assertEquals('<p><a href="http://civicrm.org/civicrm/mailing/view?id={mailing.key}&amp;{contact.checksum}&amp;cid={contact.contact_id}" rel=\'nofollow\'>View online</a></p>', $result);
   }
 
 }

@@ -4,15 +4,18 @@
   angular.module('crmSearchTasks').component('crmSearchInput', {
     bindings: {
       field: '<',
-      'op': '<',
-      'format': '<',
-      'optionKey': '<'
+      op: '<',
+      format: '<',
+      optionKey: '<',
+      showLabel: '<',
     },
     require: {ngModel: 'ngModel'},
     templateUrl: '~/crmSearchTasks/crmSearchInput/crmSearchInput.html',
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+
+      this.domId = 'search-input-' + Math.random().toString(36).substr(2, 9);
 
       this.$onInit = function() {
 
@@ -31,8 +34,30 @@
         });
 
         this.ngModel.$render = function() {
-          ctrl.value = ctrl.ngModel.$viewValue;
+          ctrl.value = formatDataType(ctrl.ngModel.$viewValue);
         };
+
+        function formatDataType(val) {
+          // Do not reformat pseudoconstant values (:name, :label, etc)
+          if (ctrl.optionKey && ctrl.optionKey !== 'id') {
+            return val;
+          }
+          if (Array.isArray(val)) {
+            const formatted = angular.copy(val);
+            formatted.forEach((v, i) => formatted[i] = formatDataType(v));
+            return formatted;
+          }
+          if (['Integer', 'Float'].includes(ctrl.field ? ctrl.field.data_type : null)) {
+            let newVal = Number(val);
+            // FK Entities can use a mix of numeric & string values (see "static" options)
+            // Also see afGuiFieldValue.convertDataType
+            if ((ctrl.field.name === 'id' || ctrl.field.fk_entity) && ('' + newVal) !== val) {
+              return val;
+            }
+            return newVal;
+          }
+          return val;
+        }
 
       };
     }

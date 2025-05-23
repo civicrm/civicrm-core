@@ -73,10 +73,8 @@ class CRM_Utils_Money {
     }
 
     if (!self::$_currencySymbols) {
-      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
-        'keyColumn' => 'name',
-        'labelColumn' => 'symbol',
-      ]);
+      self::$_currencySymbols = CRM_Contribute_DAO_Contribution::buildOptions('currency', 'abbreviate');
+
     }
 
     // ensure $currency is a valid currency code
@@ -93,14 +91,14 @@ class CRM_Utils_Money {
     // amount is already converted properly,
     // so don't mess with it again.
     // @todo deprecate handling for the html tags because .... WTF
-    if (strpos($amount, '<') === FALSE) {
+    if (!str_contains($amount, '<')) {
       $amount = self::replaceCurrencySeparators($amount);
     }
 
     $replacements = [
       '%a' => $amount,
       '%C' => $currency,
-      '%c' => CRM_Utils_Array::value($currency, self::$_currencySymbols, $currency),
+      '%c' => self::$_currencySymbols[$currency] ?? $currency,
     ];
     return strtr($format, $replacements);
   }
@@ -202,7 +200,7 @@ class CRM_Utils_Money {
    * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
   protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
-    $currency = $currency ?? CRM_Core_Config::singleton()->defaultCurrency;
+    $currency ??= CRM_Core_Config::singleton()->defaultCurrency;
     $currencyObject = self::getCurrencyObject($currency);
     $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
@@ -347,7 +345,9 @@ class CRM_Utils_Money {
     if (is_numeric($amount) && function_exists('money_format')) {
       $lc = setlocale(LC_MONETARY, 0);
       setlocale(LC_MONETARY, 'en_US.utf8', 'en_US', 'en_US.utf8', 'en_US', 'C');
+      // phpcs:disable
       $amount = money_format($valueFormat, $amount);
+      // phpcs:enable
       setlocale(LC_MONETARY, $lc);
     }
     return $amount;

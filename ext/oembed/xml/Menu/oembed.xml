@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/oembed</path>
+    <page_callback>CRM_Oembed_Page_Oembed</page_callback>
+    <title>Oembed</title>
+    <is_public>1</is_public>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/share</path>
+    <page_callback>CRM_Oembed_Page_OembedShare</page_callback>
+    <title>OembedShare</title>
+    <is_public>1</is_public>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+</menu>

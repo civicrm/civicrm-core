@@ -20,8 +20,6 @@
  */
 class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
-  protected $_settings = [];
-
   protected $_uf = NULL;
 
   /**

@@ -28,20 +28,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
   protected $_queryParams;
 
   /**
-   * Are we restricting ourselves to a single contact.
-   *
-   * @var bool
-   */
-  protected $_single = FALSE;
-
-  /**
-   * Return limit.
-   *
-   * @var int
-   */
-  protected $_limit;
-
-  /**
    * Prefix for the controller.
    *
    * @var string
@@ -219,12 +205,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
 
     if (!$this->_force) {
       return;
-    }
-
-    $status = CRM_Utils_Request::retrieve('status', 'String');
-    if ($status) {
-      $this->_formValues['grant_status_id'] = $status;
-      $this->_defaults['grant_status_id'] = $status;
     }
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);

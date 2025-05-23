@@ -21,8 +21,8 @@
         rangeElements = ['', '2'],
         dateRangeElements = ['1', '2'],
         yesNo = [
-          {id: '1', label: ts('Yes')},
-          {id: '0', label: ts('No')}
+          {id: true, label: ts('Yes')},
+          {id: false, label: ts('No')}
         ];
       $scope.editingOptions = false;
 
@@ -64,15 +64,6 @@
         // If field has limited operators, set appropriately
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
-        }
-        setDateOptions();
-
-        if (ctrl.getDefn().input_type == 'Date') {
-          if (!getSet('default_date_type')) {
-            ctrl.defaultDateType = getSet('default_date_type', 'fixed');
-          } else {
-            ctrl.defaultDateType = getSet("default_date_type");
-          }
         }
       };
 
@@ -163,6 +154,10 @@
           }
           return entityRefOptions;
         }
+        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
+          ctrl.node.defn = ctrl.node.defn || {};
+          return $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
+        }
         return ctrl.getDefn().options || (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
       };
 
@@ -177,6 +172,16 @@
 
       function inputTypeCanBe(type) {
         var defn = ctrl.getDefn();
+        if (defn.readonly) {
+          switch (type) {
+            case 'DisplayOnly':
+            case 'Hidden':
+              return true;
+
+            default:
+              return false;
+          }
+        }
         if (defn.input_type === type) {
           return true;
         }
@@ -186,7 +191,7 @@
             return defn.options || defn.data_type === 'Boolean';
 
           case 'Select':
-            return defn.options || defn.data_type === 'Boolean' || defn.input_type === 'EntityRef' || (defn.input_type === 'Date' && ctrl.isSearch());
+            return defn.options || defn.data_type === 'Boolean' || (defn.input_type === 'EntityRef' && !ctrl.isSearch()) || (defn.input_type === 'Date' && ctrl.isSearch());
 
           case 'Date':
             return defn.input_type === 'Date';
@@ -211,14 +216,18 @@
       }
 
       // Returns a value from either the local field defn or the base defn
-      $scope.getProp = function(propName) {
-        var path = propName.split('.'),
-          item = path.pop(),
-          localDefn = drillDown(ctrl.node.defn || {}, path);
+      $scope.getProp = function(propName, defaultValue) {
+        const path = propName.split('.');
+        const item = path.pop();
+        const localDefn = drillDown(ctrl.node.defn || {}, path);
         if (typeof localDefn[item] !== 'undefined') {
           return localDefn[item];
         }
-        return drillDown(ctrl.getDefn(), path)[item];
+        const fieldDefn = drillDown(ctrl.getDefn(), path);
+        if (typeof fieldDefn[item] !== 'undefined') {
+          return fieldDefn[item];
+        }
+        return defaultValue;
       };
 
       // Checks for a value in either the local field defn or the base defn
@@ -251,7 +260,6 @@
         if (ctrl.hasDefaultValue) {
           $scope.toggleDefaultValue();
         }
-        setDateOptions();
       };
 
       $scope.toggleAttr = function(attr) {
@@ -268,14 +276,11 @@
       }
 
       function setFieldDefn() {
-        ctrl.fieldDefn = angular.extend({}, ctrl.getDefn(), ctrl.node.defn);
-      }
-
-      function setDateOptions() {
-        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
-          ctrl.node.defn = ctrl.node.defn || {};
-          ctrl.node.defn.options = $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
-          setFieldDefn();
+        // Deeply merge defn to include nested settings e.g. `input_attrs.time`.
+        ctrl.fieldDefn = angular.merge({}, ctrl.getDefn(), ctrl.node.defn);
+        // Undo deep merge of options array.
+        if (ctrl.node.defn && ctrl.node.defn.options) {
+          ctrl.fieldDefn.options = JSON.parse(JSON.stringify(ctrl.node.defn.options));
         }
       }
 
@@ -285,21 +290,70 @@
           ctrl.hasDefaultValue = false;
         } else {
           ctrl.hasDefaultValue = true;
+          // Boolean default value should be set right away, as there are no options
+          if (ctrl.getDefn().data_type === 'Boolean') {
+            getSet('afform_default', true);
+          }
         }
       };
 
-      $scope.setDefaultDateType = function() {
-        ctrl.defaultDateType = getSet('default_date_type');
+      // Return `true` if field has a default value and it's not a boolean or relative date
+      this.hasDefaultValueInput = function() {
+        return ctrl.hasDefaultValue && ctrl.getDefn().data_type !== 'Boolean' && ctrl.defaultDateType() === 'fixed';
+      };
+
+      this.defaultDateType = function(newValue) {
+        if (arguments.length) {
+          if (newValue === 'relative') {
+            getSet('afform_default', 'now +0 day');
+          }
+          if (newValue === 'now') {
+            getSet('afform_default', 'now');
+          }
+          if (newValue === 'fixed') {
+            getSet('afform_default', '');
+          }
+        }
+        if (this.fieldDefn.input_type === 'Date') {
+          const defaultVal = getSet('afform_default');
+          if (defaultVal === 'now') {
+            return 'now';
+          }
+          else if (typeof defaultVal === 'string' && defaultVal.startsWith('now')) {
+            return 'relative';
+          }
+        }
+        return 'fixed';
+      };
+
+      this.defaultDateOffset = function(newValue) {
+        let defaultVals = getSet('afform_default').split(' ');
+        if (arguments.length) {
+          defaultVals[1] = newValue < 0 ? newValue : '+' + newValue;
+          getSet('afform_default', defaultVals.join(' '));
+        }
+        return parseInt(defaultVals[1], 10);
+      };
+
+      this.defaultDateUnit = function(newValue) {
+        let defaultVals = getSet('afform_default').split(' ');
+        if (arguments.length) {
+          defaultVals[2] = newValue;
+          getSet('afform_default', defaultVals.join(' '));
+        }
+        return defaultVals[2];
+      };
+
+      this.defaultDatePlural = function() {
+        return Math.abs(this.defaultDateOffset()) !== 1;
       };
 
       $scope.defaultValueContains = function(val) {
-        val = '' + val;
         var defaultVal = getSet('afform_default');
         return defaultVal === val || (_.isArray(defaultVal) && _.includes(defaultVal, val));
       };
 
       $scope.toggleDefaultValueItem = function(val) {
-        val = '' + val;
         if (defaultValueShouldBeArray()) {
           if (!_.isArray(getSet('afform_default'))) {
             ctrl.node.defn = ctrl.node.defn || {};
@@ -389,7 +443,7 @@
           }
           return val;
         }
-        return $scope.getProp(propName);
+        return $scope.getProp(propName) || '';
       }
       this.getSet = getSet;
 

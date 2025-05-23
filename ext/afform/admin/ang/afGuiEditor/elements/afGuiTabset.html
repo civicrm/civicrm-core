@@ -1,0 +1,28 @@
+<div class="af-gui-bar">
+  <div class="form-inline">
+    <span>{{:: ts('Tab Set') }}</span>
+    <div class="btn-group pull-right" af-gui-menu>
+      <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
+        <span><i class="crm-i fa-gear"></i></span>
+      </button>
+      <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiTabset-menu.html'"></ul>
+    </div>
+  </div>
+</div>
+<ul class="nav nav-tabs" role="tablist">
+  <li ng-repeat="(tabIndex, tab) in $ctrl.node['#children']" role="tab" class="dropdown" ng-class="{active: tabIndex === $ctrl.selectedTab}">
+    <a href ng-click="$ctrl.selectTab(tabIndex)">
+      <i class="crm-i {{ tab.icon }}" ng-if="tab.icon"></i>
+      {{ tab['title'] }}
+      <button class="btn btn-default btn-xs af-gui-add-element-button" data-tab-id="{{ tabIndex }}" ng-click="$ctrl.getSearchDisplays(tabIndex)">
+        <span>
+          <i class="crm-i fa-gear"></i>
+        </span>
+      </button>
+    </a>
+    <ul class="dropdown-menu" ng-class="{'dropdown-menu-right': tabIndex &gt; 1 && tabIndex == ($ctrl.node['#children'].length - 1)}" style="display: block" ng-if="$ctrl.menuOpen === tabIndex" ng-include="'~/afGuiEditor/elements/afGuiTab-menu.html'"></ul>
+  </li>
+</ul>
+<div ng-repeat="(tabIndex, item) in $ctrl.node['#children']" ng-if="tabIndex === $ctrl.selectedTab">
+  <af-gui-container node="item" entity-name="$ctrl.entityName" data-entity="{{ $ctrl.getDataEntity() }}" ></af-gui-container>
+</div>

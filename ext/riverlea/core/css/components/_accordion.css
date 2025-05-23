@@ -1,0 +1,155 @@
+.crm-container details {
+  background-color: unset;
+  border-radius: var(--crm-expand-radius);
+  margin: var(--crm-expand-gap);
+}
+.crm-container summary {
+  display: list-item;
+  list-style: none;
+  cursor: var(--crm-hover-clickable);
+  font-size: var(--crm-font-size);
+  font-family: var(--crm-expand-header-font);
+  font-weight: var(--crm-expand-header-weight);
+  color: var(--crm-c-text);
+  border-radius: var(--crm-expand-radius);
+  padding: var(--crm-expand-header-padding);
+}
+.crm-container details[open] > summary { /* open version of that */
+  border-radius: var(--crm-expand-radius) var(--crm-expand-radius) 0 0;
+}
+.crm-container table summary { /* Makes summary match the size of the rest of the table it's in */
+  font-size: inherit;
+}
+.crm-container summary::-webkit-details-marker { /* Safari fix to remove summary icon */
+  display: none;
+}
+.crm-container details ~ details {
+  margin: var(--crm-expand-gap);
+}
+.crm-container details:has(input.crm-inline-error) summary,
+.crm-container details:has(input.crm-inline-error) summary.active {
+  background-color: var(--crm-alert-danger-bg);
+  color: var(--crm-alert-danger-text);
+  border-color: var(--crm-alert-danger-border);
+}
+
+/* Expand/collapse icons */
+.crm-container details > summary::before {
+  font-size: var(--crm-font-size);
+  content: var(--crm-expand-icon);
+  color: var(--crm-expand-icon-color);
+  font-style: normal;
+  line-height: 1.35;
+  font-family: FontAwesome;
+  text-rendering: auto;
+  text-indent: inherit;
+  margin-right: var(--crm-expand-icon-spacing);
+  display: inline-block;
+  transform-origin: center center;
+  transition: var(--crm-expand-transition);
+}
+.crm-container details[open] > summary::before {
+  transform: var(--crm-expand-transform);
+  transition: var(--crm-expand-transition);
+}
+
+/* Style 1 'bold' */
+.crm-container .crm-accordion-bold {
+  background-color: var(--crm-expand-body-bg);
+}
+.crm-container .crm-accordion-bold > summary {
+  background-color: var(--crm-expand-header-bg);
+  color: var(--crm-expand-header-color);
+  border: var(--crm-expand-header-border);
+  border-width: var(--crm-expand-header-border-width);
+  font-weight: var(--crm-expand-header-weight);
+  font-family: var(--crm-expand-header-font);
+}
+.crm-container .crm-accordion-bold > summary a {
+  color: var(--crm-expand-header-color);
+}
+.crm-container .crm-accordion-bold > summary.active,
+.crm-container .crm-accordion-bold > summary:hover,
+.crm-container .crm-accordion-bold > summary:focus { /* hover version of that */
+  background-color: var(--crm-expand-header-bg-active);
+}
+.crm-container .crm-accordion-bold > .crm-accordion-body {
+  padding: var(--crm-expand-body-padding);
+  border: var(--crm-expand-border);
+  border-width: var(--crm-expand-border-width);
+  border-radius: 0 0 var(--crm-expand-radius) var(--crm-expand-radius);
+  box-shadow: var(--crm-expand-body-box-shadow);
+}
+.crm-container details.crm-accordion-bold:not( > summary) {
+  border: var(--crm-expand-border);
+  padding: var(--crm-expand-body-padding);
+}
+
+/* Style 2 'light' */
+.crm-container .crm-accordion-light {
+  background-color: var(--crm-expand2-body-bg);
+}
+.crm-container .crm-accordion-light > summary {
+  font-family: var(--crm-expand2-header-font);
+  font-weight: var(--crm-expand2-header-weight);
+  background-color: var(--crm-expand2-header-bg);
+  color: var(--crm-expand2-header-color);
+  border: var(--crm-expand2-header-border);
+  border-width: var(--crm-expand2-header-border-width);
+  padding: var(--crm-expand2-header-padding);
+}
+.crm-container .crm-accordion-light > summary.active,
+.crm-container .crm-accordion-light > summary:hover,
+.crm-container .crm-accordion-light > summary:focus { /* hover version of that */
+  background-color: var(--crm-expand2-header-bg-active);
+}
+.crm-container .crm-accordion-light > summary a {
+  color: var(--crm-expand2-header-color);
+}
+.crm-container .crm-accordion-light > .crm-accordion-body {
+  padding: var(--crm-expand2-body-padding);
+  background: var(--crm-expand2-body-bg);
+  border: var(--crm-expand2-border);
+  border-width: var(--crm-expand2-border-width);
+  border-radius: 0 0 var(--crm-expand-radius) var(--crm-expand-radius);
+}
+.crm-container details.crm-accordion-light:not( > summary) {
+  border: 0;
+  padding: 0;
+}
+
+/* Style 3 'settings' */
+.crm-container details.crm-accordion-settings summary {
+  text-align: right;
+}
+.crm-container details.crm-accordion-settings summary::before {
+  content: '\f013';
+}
+.crm-container details.crm-accordion-settings > .crm-accordion-body {
+  padding: var(--crm-expand2-header-padding);
+}
+
+/* Contact dashboard */
+#contact-summary details,
+#contact-summary .crm-accordion-light > summary,
+#contact-summary .crm-accordion-light > summary.active,
+#contact-summary .crm-accordion-light > summary:hover,
+#contact-summary .crm-accordion-light > summary:focus,
+#Contact .crm-accordion-light > summary,
+#Contact .crm-accordion-light > summary:hover,
+#Contact .crm-accordion-light > summary:focus {
+  box-shadow: none;
+  border: 0 solid transparent;
+  background-color: transparent;
+  color: var(--crm-c-text);
+}
+#contact-summary details .crm-summary-block {
+  box-shadow: var(--crm-block-shadow);
+  margin-bottom: 0;
+}
+#contact-summary summary {
+  padding: var(--crm-m) !important;
+}
+#contact-summary details .crm-accordion-body {
+  box-shadow: none;
+}

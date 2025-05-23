@@ -26,6 +26,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
+    CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->useTransaction(TRUE);
   }
 
@@ -92,8 +93,6 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     ];
     // deprecated or API.Get is not supported/implemented
     $skippableEntities = [
-      'Cxn',
-      'CxnApp',
       'Logging',
       'MailingEventConfirm',
       'MailingEventResubscribe',
@@ -111,7 +110,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     ];
     // fetch all entities
     $entities = $this->callAPISuccess('Entity', 'get', []);
-    $skippableEntities = array_merge($skippableEntities, $entities['deprecated']);
+    $skippableEntities = array_merge($skippableEntities, $entities['deprecated'] ?? []);
 
     foreach ($entities['values'] as $entity) {
       $params = ['check_permissions' => 1];

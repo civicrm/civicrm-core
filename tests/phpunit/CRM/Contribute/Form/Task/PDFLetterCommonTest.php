@@ -138,7 +138,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $this->_individualId,
       'total_amount' => 6,
-      'campaign_id' => $this->campaignCreate(['title' => $campaignTitle], FALSE),
+      'campaign_id' => $this->campaignCreate(['title' => $campaignTitle]),
       'financial_type_id' => 'Donation',
       $customFieldKey => 'Text_',
     ];
@@ -262,12 +262,14 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAllContributionTokens(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    $this->hookClass = CRM_Utils_Hook::singleton();
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
 
     $this->createLoggedInUser();
     $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Contribution']);
-    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one'], FALSE);
+    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one']);
     $tokens = $this->getAllContributionTokens();
     $formValues = [
       'document_type' => 'pdf',
@@ -387,9 +389,9 @@ emo
     $this->createLoggedInUser();
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hook_aggregateTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
-    $this->mut = new CiviMailUtils($this, TRUE);
-    $this->_individualId = $this->individualCreate();
-    $this->_individualId2 = $this->individualCreate();
+    $mailUtil = new CiviMailUtils($this, TRUE);
+    $contact1ID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
     $htmlMessage = '{aggregate.rendered_token}';
     $formValues = [
       'group_by' => 'contact_id',
@@ -401,14 +403,14 @@ emo
 
     $contributionIDs = [];
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $contact1ID,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
     ]);
     $contributionIDs[] = $contribution['id'];
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId2,
+      'contact_id' => $contact2ID,
       'total_amount' => 10,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
@@ -416,7 +418,7 @@ emo
     $contributionIDs[] = $contribution['id'];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId2,
+      'contact_id' => $contact2ID,
       'total_amount' => 1,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
@@ -499,11 +501,9 @@ emo
     $this->assertEquals(2, $activities['count']);
     $this->assertEquals($html[1], $activities['values'][0]['details']);
     $this->assertEquals($html[2], $activities['values'][1]['details']);
-    // Checking it is not called multiple times.
-    // once for each contact create + once for the activities.
-    // By calling the cached function we can get this down to 1
-    $this->assertEquals(3, $this->hookTokensCalled);
-    $this->mut->checkAllMailLog($html);
+    // Checking the cacheable hook is not called multiple times.
+    $this->assertEquals(1, $this->hookTokensCalled);
+    $mailUtil->checkAllMailLog($html);
 
   }
 
@@ -570,8 +570,7 @@ value=$contact_aggregate+$contribution.total_amount}
   public function hook_aggregateTokenValues(array &$values, $contactIDs, $job = NULL, $tokens = [], $context = NULL) {
     foreach ($contactIDs as $contactID) {
       CRM_Core_Smarty::singleton()->assign('messageContactID', $contactID);
-      $values[$contactID]['aggregate.rendered_token'] = CRM_Core_Smarty::singleton()
-        ->fetch('string:' . $this->getHtmlMessage());
+      $values[$contactID]['aggregate.rendered_token'] = CRM_Utils_String::parseOneOffStringThroughSmarty($this->getHtmlMessage());
     }
   }
 

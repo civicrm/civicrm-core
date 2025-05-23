@@ -12,6 +12,8 @@ use Civi\Api4\Participant;
 trait CRM_Event_WorkflowMessage_ParticipantTrait {
 
   use CRM_Contribute_WorkflowMessage_ContributionTrait;
+  use CRM_Core_WorkflowMessage_ProfileTrait;
+
   /**
    * @var int
    *
@@ -49,6 +51,17 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * @scope tplParams as isShowParticipantCount
    */
   public $isShowParticipantCount;
+
+  /**
+   * What is the participant count, if 'specifically configured'.
+   *
+   * See getter notes.
+   *
+   * @var bool
+   *
+   * @scope tplParams as participantCount
+   */
+  public $participantCount;
 
   /**
    * @var int
@@ -175,12 +188,28 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * @throws \CRM_Core_Exception
    */
   public function getIsShowParticipantCount(): bool {
+    return (bool) $this->getParticipantCount();
+  }
+
+  /**
+   * Get the count of participants, where count is used in the line items.
+   *
+   * This might be the case where a line item represents a table of 6 people.
+   *
+   * Where the price field value does not record the participant count we ignore.
+   *
+   * This lack of specifying it is a bit unclear but seems to be 'presumed 1'.
+   * From the templates point of view it is not information to present if not
+   * configured.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getParticipantCount() {
+    $count = 0;
     foreach ($this->getLineItems() as $lineItem) {
-      if ((int) $lineItem['participant_count'] > 1) {
-        return TRUE;
-      }
+      $count += $lineItem['participant_count'];
     }
-    return FALSE;
+    return $count;
   }
 
   /**
@@ -220,7 +249,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * Get the participant fields we need to load.
    */
   protected function getFieldsToLoadForParticipant(): array {
-    return ['registered_by_id'];
+    return ['registered_by_id', 'contact_id'];
   }
 
   /**
@@ -251,15 +280,12 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    */
   public function getParticipants(): array {
     if (!$this->participants) {
-      if (!$this->getLineItems()) {
-        return [];
-      }
       // Initiate with the current participant to ensure they are first.
       $participants = [$this->participantID => ['id' => $this->participantID, 'tax_rate_breakdown' => []]];
-      if ($this->isCiviContributeEnabled()) {
+      if ($this->getLineItems() && $this->isCiviContributeEnabled()) {
         foreach ($this->getLineItems() as $lineItem) {
           if ($lineItem['entity_table'] === 'civicrm_participant') {
-            $participantID = $lineItem['entity_id'];
+            $participantID = (int) $lineItem['entity_id'];
           }
           else {
             // It is not clear if this could ever be true - testing the CiviCRM event
@@ -287,10 +313,16 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
           $participants[$participantID]['tax_rate_breakdown'][$lineItem['tax_rate']]['amount'] += $lineItem['tax_amount'];
         }
       }
-
+      elseif ($this->getIsPrimary()) {
+        $participants += (array) Participant::get(FALSE)
+          ->setSelect(['id'])
+          ->addWhere('registered_by_id', '=', $this->getPrimaryParticipantID())
+          ->execute()->indexBy('id');
+      }
       $count = 1;
       foreach ($participants as $participantID => &$participant) {
         $participant['id'] = $participantID;
+        $participant['is_primary'] = $this->getParticipantID() === $participantID;
         $participant['index'] = $count;
         $participant['contact'] = $this->getParticipantContact($participantID);
         foreach ($participant['tax_rate_breakdown'] ?? [] as $rate => $details) {
@@ -298,9 +330,12 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
             unset($participant['tax_rate_breakdown'][$rate]);
           }
         }
-        if (array_keys($participant['tax_rate_breakdown']) === [0]) {
+        if (array_keys($participant['tax_rate_breakdown'] ?? []) === [0]) {
           // If the only tax rate charged is 0% then no tax breakdown is returned.
           $participant['tax_rate_breakdown'] = [];
+        }
+        if (!isset($participant['line_items'])) {
+          $participant['line_items'] = [];
         }
         $count++;
       }

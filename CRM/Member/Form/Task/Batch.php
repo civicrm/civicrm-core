@@ -39,6 +39,8 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    */
   protected $_userContext;
 
+  private array $_fields;
+
   /**
    * Build all the data structures needed to build the form.
    *
@@ -80,7 +82,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     $this->setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
-    $this->_fields = [];
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
 
     // remove file type field and then limit fields
@@ -140,7 +141,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
               $customValue['extends_entity_column_value']
             );
           }
-          if ((CRM_Utils_Array::value($typeId, $entityColumnValue)) ||
+          if (!empty($entityColumnValue[$typeId]) ||
             CRM_Utils_System::isNull($entityColumnValue[$typeId] ?? NULL)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $memberId);
@@ -206,7 +207,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    * @return mixed
    * @throws \CRM_Core_Exception
    */
-  public function submit(array $params) {
+  protected function submit(array $params) {
     $dates = [
       'membership_join_date',
       'membership_start_date',
@@ -227,7 +228,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
       unset($value['membership_type']);
 
       //Get the membership status
-      $value['status_id'] = (CRM_Utils_Array::value('membership_status', $value)) ? $value['membership_status'] : CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $key, 'status_id');
+      $value['status_id'] = !empty($value['membership_status']) ? $value['membership_status'] : CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $key, 'status_id');
       unset($value['membership_status']);
       foreach ($dates as $val) {
         if (isset($value[$val])) {

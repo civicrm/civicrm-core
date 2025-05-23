@@ -43,9 +43,9 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP implements \Civi\Core\HookInterfac
     if ($event->action === 'create') {
       // For some reason `status_id` is allowed to be empty
       // FIXME: Why?
-      $event->params['status_id'] = $event->params['status_id'] ?? 0;
+      $event->params['status_id'] ??= 0;
       // Supply default for `currency`
-      $event->params['currency'] = $event->params['currency'] ?? Civi::settings()->get('defaultCurrency');
+      $event->params['currency'] ??= Civi::settings()->get('defaultCurrency');
     }
   }
 
@@ -504,7 +504,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
       return FALSE;
     }
 
-    $pcpStatus = CRM_Core_PseudoConstant::get('CRM_PCP_BAO_PCP', 'status_id');
+    $pcpStatus = CRM_PCP_BAO_PCP::buildOptions('status_id');
     $approvedId = array_search('Approved', $pcpStatus);
 
     $params = ['id' => $pcpId];
@@ -673,8 +673,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-      $fixUrl = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'reset=1');
-      throw new CRM_Core_Exception(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+      $fixUrl = CRM_Utils_System::url('civicrm/admin/options/site_email_address');
+      throw new CRM_Core_Exception(ts('The site administrator needs to enter a valid "Site Email Address" in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
     }
 
     $receiptFrom = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
@@ -966,6 +966,30 @@ INNER JOIN civicrm_uf_group ufgroup
       return CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_page_id', $id);
     }
     return CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'event_id', $id);
+  }
+
+  /**
+   * Possible values for the page_type field, used for dynamic foreign key lookups
+   *
+   * This is a non-standard dfk. Normally the columns would be named "entity_table" & "entity_id",
+   * and normally the `entity_table` field would contain a table name like "civicrm_contribution"
+   * instead of an arbitrary string like 'contribute'.
+   *
+   * @return array
+   */
+  public static function pageTypeOptions(): array {
+    return [
+      [
+        'id' => 'contribute',
+        'name' => 'ContributionPage',
+        'label' => ts('Contributions'),
+      ],
+      [
+        'id' => 'event',
+        'name' => 'Event',
+        'label' => ts('Events'),
+      ],
+    ];
   }
 
 }

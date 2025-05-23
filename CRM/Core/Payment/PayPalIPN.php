@@ -16,7 +16,7 @@ use Civi\Api4\Contribution;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
+class CRM_Core_Payment_PayPalIPN {
 
   /**
    * Input parameters from payment processor. Store these so that
@@ -43,10 +43,13 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   public function __construct($inputData) {
     // CRM-19676
     $params = (!empty($inputData['custom'])) ?
-      array_merge($inputData, json_decode($inputData['custom'], TRUE)) :
+      array_merge($inputData, json_decode($inputData['custom'], TRUE) ?? []) :
       $inputData;
-    $this->setInputParameters($params);
-    parent::__construct();
+
+    if (!is_array($params)) {
+      throw new CRM_Core_Exception('Invalid input parameters');
+    }
+    $this->_inputParameters = $params;
   }
 
   /**
@@ -58,7 +61,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    */
   public function retrieve($name, $type, $abort = TRUE) {
-    $value = CRM_Utils_Type::validate(CRM_Utils_Array::value($name, $this->_inputParameters), $type, FALSE);
+    $value = CRM_Utils_Type::validate($this->_inputParameters[$name] ?? NULL, $type, FALSE);
     if ($abort && $value === NULL) {
       throw new CRM_Core_Exception("PayPalIPN: Could not find an entry for $name");
     }

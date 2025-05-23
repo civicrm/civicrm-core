@@ -82,8 +82,8 @@ class CRM_Core_ShowHideBlocks {
 
     $template = CRM_Core_Smarty::singleton();
     $template->ensureVariablesAreAssigned(['elemType']);
-    $template->assign_by_ref('hideBlocks', $hide);
-    $template->assign_by_ref('showBlocks', $show);
+    $template->assign('hideBlocks', $hide);
+    $template->assign('showBlocks', $show);
   }
 
   /**

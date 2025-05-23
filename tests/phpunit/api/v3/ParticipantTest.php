@@ -91,6 +91,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Test get participants with role_id.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetParticipantWithRole(): void {
     $roleId = [1, 2, 3];
@@ -105,22 +107,18 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $params = [
       'role_id' => 2,
     ];
-    $result = $this->callAPISuccess('participant', 'get', $params);
+    $result = $this->callAPISuccess('Participant', 'get', $params);
     //Assert all the returned participants has a role_id of 2
     foreach ($result['values'] as $values) {
       $this->assertEquals(2, $values['participant_role_id']);
     }
 
-    $this->participantCreate([
-      'id' => $this->ids['Participant']['primary'],
-      'role_id' => NULL,
-      'event_id' => $this->getEventID(),
-    ]);
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_participant SET role_id = NULL WHERE id = ' . $this->ids['Participant']['primary']);
 
     $params['role_id'] = [
       'IS NULL' => 1,
     ];
-    $result = $this->callAPISuccess('participant', 'get', $params);
+    $result = $this->callAPISuccess('Participant', 'get', $params);
     foreach ($result['values'] as $values) {
       $this->assertEquals(NULL, $values['participant_role_id']);
     }
@@ -166,7 +164,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertEquals($result['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
     $this->assertEquals('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertEquals('Wimbledon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
     $params = [
       'id' => $this->ids['Participant']['primary'],
       'return' => 'id,participant_register_date,event_id',
@@ -210,7 +208,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertEquals($result['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
     $this->assertEquals('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertEquals('Wimbledon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
     $this->assertEquals($result['id'], $result['values'][$this->ids['Participant']['primary']]['id']);
   }
 
@@ -232,7 +230,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Participant', 'get', $params)['values'];
     $this->assertEquals($this->getEventID(), $result[$this->ids['Participant']['primary']]['event_id']);
     $this->assertEquals('2007-02-19 00:00:00', $result[$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $result[$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertEquals('Wimbledon', $result[$this->ids['Participant']['primary']]['participant_source']);
     $this->assertEquals($this->getEventID(), $result[$this->ids['Participant']['primary']]['api.event.get']['id']);
   }
 
@@ -262,7 +260,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($this->ids['Participant']['primary'], $participant['id']);
     $this->assertEquals($this->getEventID(), $participant['values'][$participant['id']]['event_id']);
     $this->assertEquals('2007-02-19 00:00:00', $participant['values'][$participant['id']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $participant['values'][$participant['id']]['participant_source']);
+    $this->assertEquals('Wimbledon', $participant['values'][$participant['id']]['participant_source']);
     $this->assertEquals($participant['id'], $participant['values'][$participant['id']]['id']);
   }
 
@@ -312,7 +310,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccess('Participant', 'get', $params);
     $this->assertEquals($participant['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
     $this->assertEquals('2007-02-19 00:00:00', $participant['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $participant['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertEquals('Wimbledon', $participant['values'][$this->ids['Participant']['primary']]['participant_source']);
   }
 
   /**
@@ -688,13 +686,13 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->isValidateFinancialsOnPostAssert = FALSE;
     $participantID = $this->participantCreate([
       'contact_id' => $this->_contactID,
-      'status_id' => 5,
+      'status_id.name' => 'Pending from pay later',
       'event_id' => $this->getEventID(),
     ]);
     $participantID2 = $this->participantCreate([
       'contact_id' => $this->_contactID2,
       'event_id' => $this->getEventID(),
-      'status_id' => 5,
+      'status_id.name' => 'Pending from pay later',
       'registered_by_id' => $participantID,
     ]);
 

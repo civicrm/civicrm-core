@@ -19,6 +19,8 @@
  * This class generates form components for case activity.
  */
 class CRM_Case_Form_Case extends CRM_Core_Form {
+  use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Case_Form_CaseFormTrait;
 
   /**
    * The context
@@ -29,7 +31,12 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
   /**
    * Case Id
+   *
    * @var int
+   *
+   * @internal
+   *
+   * use getCaseID to access.
    */
   public $_caseId = NULL;
 
@@ -78,6 +85,21 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   public $submitOnce = TRUE;
 
   /**
+   * @var float|int|mixed|string|null
+   *
+   * This is inconsistently set & likely to be replaced by a local variable or getter.
+   */
+  public $_contactID;
+
+  /**
+   * @var float|int|mixed|string|null
+   * @deprecated
+   *
+   * This is inconsistently set & likely to be replaced by a local variable or getter.
+   */
+  public $_caseStatusId;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -95,6 +117,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     if (empty($this->_action)) {
@@ -177,22 +201,42 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
     $this->assign('clientName', isset($this->_currentlyViewedContactId) ? $contact->display_name : NULL);
 
-    $session = CRM_Core_Session::singleton();
-    $this->_currentUserId = $session->get('userID');
+    $this->_currentUserId = CRM_Core_Session::getLoggedInContactID();
 
-    //Add activity custom data is included in this page
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_activityTypeId, 1, 'Activity');
-    $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-    $className::preProcess($this);
-    $activityGroupTree = $this->_groupTree;
+    CRM_Case_Form_Activity_OpenCase::preProcess($this);
 
-    // Add case custom data to form
-    $caseTypeId = CRM_Utils_Array::value('case_type_id', CRM_Utils_Request::exportValues(), $this->_caseTypeId);
-    CRM_Custom_Form_CustomData::addToForm($this, $caseTypeId);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Case', array_filter([
+        'id' => $this->getCaseID(),
+        'case_type_id' => $this->getSubmittedValue('case_type_id'),
+      ]));
+      $this->addCustomDataFieldsToForm('Activity', [
+        'activity_type_id' => $this->_activityTypeId,
+      ]);
+    }
+    // Used for loading custom data fields
+    $this->assign('activityTypeID', $this->_activityTypeId);
+    $this->assign('caseTypeID', $this->getSubmittedValue('case_type_id') ?: $this->getCaseValue('case_type_id'));
+  }
 
-    // so that grouptree is not populated with case fields, since the grouptree is used
-    // for populating activity custom fields.
-    $this->_groupTree = $activityGroupTree;
+  /**
+   * Get the selected Case ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getCaseID(): ?int {
+    if (!isset($this->_caseId)) {
+      $this->_caseId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_caseId;
   }
 
   /**
@@ -202,10 +246,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
       return [];
     }
-    $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-    $defaults = $className::setDefaultValues($this);
-    $defaults = array_merge($defaults, CRM_Custom_Form_CustomData::setDefaultValues($this));
-    return $defaults;
+    return CRM_Case_Form_Activity_OpenCase::setDefaultValues($this);
   }
 
   public function buildQuickForm() {
@@ -232,9 +273,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       ]);
       return;
     }
-
-    // Add the activity custom data to the form
-    CRM_Custom_Form_CustomData::buildQuickForm($this);
 
     // we don't want to show button on top of custom form
     $this->assign('noPreCustomButton', TRUE);
@@ -274,8 +312,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       ],
     ]);
 
-    $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-    $className::buildQuickForm($this);
+    CRM_Case_Form_Activity_OpenCase::buildQuickForm($this);
   }
 
   /**
@@ -287,7 +324,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
       return TRUE;
     }
-    $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
+    $className = "CRM_Case_Form_Activity_OpenCase";
     $this->addFormRule([$className, 'formRule'], $this);
     $this->addFormRule(['CRM_Case_Form_Case', 'formRule'], $this);
   }
@@ -309,25 +346,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * Wrapper for unit testing the post process submit function.
-   *
-   * @param $params
-   * @param $activityTypeFile
-   * @param $contactId
-   * @param $context
-   * @return CRM_Case_BAO_Case
-   */
-  public function testSubmit($params, $activityTypeFile, $contactId, $context = "case") {
-    $this->controller = new CRM_Core_Controller();
-
-    $this->_activityTypeFile = $activityTypeFile;
-    $this->_currentUserId = $contactId;
-    $this->_context = $context;
-
-    return $this->submit($params);
-  }
-
-  /**
    * Submit the form with given params.
    *
    * @param $params
@@ -337,19 +355,14 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // 1. call begin post process
     if ($this->_activityTypeFile) {
-      $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-      $className::beginPostProcess($this, $params);
+      CRM_Case_Form_Activity_OpenCase::beginPostProcess($this, $params);
     }
 
-    if (!empty($params['hidden_custom']) &&
-      !isset($params['custom'])
-    ) {
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
-        $params,
-        NULL,
-        'Case'
-      );
-    }
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
+      $this->getSubmittedValues(),
+      NULL,
+      'Case'
+    );
 
     // 2. create/edit case
     if (!empty($params['case_type_id'])) {
@@ -388,16 +401,14 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     CRM_Core_Session::singleton()->pushUserContext($url);
 
     // 3. format activity custom data
-    if (!empty($params['hidden_custom'])) {
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $this->_activityId,
-        'Activity'
-      );
-    }
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
+      $this->_activityId,
+      'Activity'
+    );
 
     // 4. call end post process
     if ($this->_activityTypeFile) {
-      $className::endPostProcess($this, $params);
+      CRM_Case_Form_Activity_OpenCase::endPostProcess($this, $params);
     }
 
     return $caseObj;

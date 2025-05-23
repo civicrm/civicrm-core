@@ -9,6 +9,13 @@ use Civi\Token\TokenProcessor;
 class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * Set up for tests.
    */
   public function setUp(): void {
@@ -51,7 +58,7 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['activityId']]);
 
     $this->assertEquals(array_merge($this->getActivityTokens(), CRM_Core_SelectValues::domainTokens()), $tokenProcessor->listTokens());
-    $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
+    $html_message = "\n" . implode("\n", array_column($data, '0')) . "\n";
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
     try {
       $output = $form->createDocument([$activity['id']], $html_message, []);

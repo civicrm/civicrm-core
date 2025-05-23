@@ -112,7 +112,7 @@ class CRM_Activity_Selector_SearchTest extends CiviUnitTestCase {
    *
    * @noinspection PhpUnusedParameterInspection
    */
-  public static function linkHook(string $op, string $objectName, int &$objectId, array &$links, int &$mask = NULL, array $values = []): void {
+  public static function linkHook(string $op, string $objectName, int &$objectId, array &$links, ?int &$mask = NULL, array $values = []): void {
     if ($values['activity_type_id']) {
       $links = [];
     }

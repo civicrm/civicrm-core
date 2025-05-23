@@ -107,6 +107,34 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Checks if payment processor supports not returning to the form processing.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturn(): bool {
+    $billingMode = (int) $this->_paymentProcessor['billing_mode'];
+    return $billingMode === self::BILLING_MODE_NOTIFY;
+  }
+
+  /**
+   * Checks if payment processor supports not returning to the form processing on recurring.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturnForRecurring(): bool {
+    $billingMode = (int) $this->_paymentProcessor['billing_mode'];
+    return $billingMode === self::BILLING_MODE_NOTIFY || $billingMode === self::BILLING_MODE_BUTTON;
+  }
+
+  /**
    * Does this processor support pre-approval.
    *
    * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
@@ -1124,7 +1152,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $keyPos = strpos($str, '=');
 
       // position of value
-      $valPos = strpos($str, '&') ? strpos($str, '&') : strlen($str);
+      $valPos = strpos($str, '&') ?: strlen($str);
 
       /*getting the Key and Value values and storing in a Associative Array*/
 

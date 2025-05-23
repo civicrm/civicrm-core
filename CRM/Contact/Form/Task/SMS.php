@@ -19,6 +19,7 @@
  * This class provides the functionality to sms a group of contacts.
  */
 class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
+  use CRM_Contact_Form_Task_SMSTrait;
 
   /**
    * Are we operating in "single mode", i.e. sending sms to one
@@ -35,15 +36,20 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
    */
   public $_templates = NULL;
 
-  public function preProcess() {
+  /**
+   * @var float|int|mixed|string|null
+   */
+  public $_context;
+
+  public function preProcess(): void {
 
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
 
-    CRM_Contact_Form_Task_SMSCommon::preProcessProvider($this);
-
-    if (!$cid && $this->_context != 'standalone') {
+    $this->_single = $this->_context !== 'search';
+    $this->bounceOnNoActiveProviders();
+    if (!$cid && $this->_context !== 'standalone') {
       parent::preProcess();
     }
 
@@ -57,25 +63,7 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
   public function buildQuickForm() {
     //enable form element
     $this->assign('suppressForm', FALSE);
-    $this->assign('SMSTask', TRUE);
-    CRM_Contact_Form_Task_SMSCommon::buildQuickForm($this);
-  }
-
-  /**
-   * Process the form after the input has been submitted and validated.
-   */
-  public function postProcess() {
-    CRM_Contact_Form_Task_SMSCommon::postProcess($this);
-  }
-
-  /**
-   * List available tokens for this form.
-   *
-   * @return array
-   */
-  public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    return $tokens;
+    $this->buildSmsForm();
   }
 
 }
