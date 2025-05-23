@@ -38,7 +38,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @return bool
    */
   public function isLoaded(): bool {
-    return class_exists('JFactory');
+    return class_exists('JFactory') || class_exists('Joomla\CMS\Factory');
   }
 
   /**
@@ -49,7 +49,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $userParams = JComponentHelper::getParams('com_users');
 
     if (version_compare(JVERSION, '4.0.0', 'ge')) {
-      $model = JFactory::getApplication()->bootComponent('com_users')->getMVCFactory()->createModel('Registration', 'Site');
+      $factoryClassName = $this->factoryClassName();
+
+      $model = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createModel('Registration', 'Site');
       $model->set('data', new \stdClass());
     }
     else {
@@ -210,7 +212,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $template = CRM_Core_Smarty::singleton();
     $template->assign('pageTitle', $pageTitle);
 
-    $document = JFactory::getDocument();
+    $factoryClassName = $this->factoryClassName();
+    $document = $factoryClassName::getDocument();
     $document->setTitle($title);
   }
 
@@ -251,7 +254,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function addHTMLHead($string = NULL) {
     if ($string) {
-      $document = JFactory::getDocument();
+      $factoryClassName = $this->factoryClassName();
+      $document = $factoryClassName::getDocument();
       $document->addCustomTag($string);
     }
   }
@@ -261,7 +265,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function addStyleUrl($url, $region) {
     if ($region == 'html-header') {
-      $document = JFactory::getDocument();
+      $factoryClassName = $this->factoryClassName();
+      $document = $factoryClassName::getDocument();
       $document->addStyleSheet($url);
       return TRUE;
     }
@@ -273,7 +278,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function addStyle($code, $region) {
     if ($region == 'html-header') {
-      $document = JFactory::getDocument();
+      $factoryClassName = $this->factoryClassName();
+      $document = $factoryClassName::getDocument();
       $document->addStyleDeclaration($code);
       return TRUE;
     }
@@ -301,7 +307,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $script = 'index.php';
 
       // Get Itemid using JInput::get()
-      $input = Joomla\CMS\Factory::getApplication()->input;
+      $factoryClassName = $this->factoryClassName();
+      $input = $factoryClassName::getApplication()->input;
       $itemIdNum = $input->get("Itemid");
       if ($itemIdNum && (!str_contains($path, 'civicrm/payment/ipn'))) {
         $Itemid = "{$separator}Itemid=" . $itemIdNum;
@@ -322,7 +329,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // gross hack for joomla, we are in the backend and want to send a frontend url
-    if ($frontend && $config->userFramework == 'Joomla') {
+    if ($frontend) {
       // handle both joomla v1.5 and v1.6, CRM-7939
       $url = str_replace('/administrator/index2.php', '/index.php', $url);
       $url = str_replace('/administrator/index.php', '/index.php', $url);
@@ -335,8 +342,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         $joomlaVersion = JVERSION;
       }
       else {
-        $jversion = new JVersion();
-        $joomlaVersion = $jversion->getShortVersion();
+        $joomlaBase = self::getBasePath();
+        $joomlaVersion = $this->getJVersion($joomlaBase);
       }
 
       if (version_compare($joomlaVersion, '1.6') >= 0) {
@@ -465,7 +472,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function setUserSession($data) {
     [$userID, $ufID] = $data;
     $user = new JUser($ufID);
-    $session = JFactory::getSession();
+    $factoryClassName = $this->factoryClassName();
+    $session = $factoryClassName::getSession();
     $session->set('user', $user);
 
     parent::setUserSession($data);
@@ -477,6 +485,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param string $message
    */
   public function setMessage($message) {
+  }
+
+  public function factoryClassName(): string {
+    if (version_compare(JVERSION, '5.0.0', 'ge')) {
+      return '\Joomla\CMS\Factory';
+    }
+    return 'JFactory';
   }
 
   /**
@@ -491,8 +506,15 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       return FALSE;
     }
     $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
+    $factoryClassName = self::factoryClassName();
     if (!empty($password)) {
-      $instance = JFactory::getApplication('site');
+      if (version_compare(JVERSION, '4.0.0', 'ge')) {
+        $this->loadJoomlaApplication('site');
+        $instance = $factoryClassName::getApplication();
+      }
+      else {
+        $instance = $factoryClassName::getApplication('site');
+      }
       $params = [
         'username' => $username,
         'password' => $password,
@@ -502,8 +524,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // Save details in Joomla session
-    $user = JFactory::getUser($uid);
-    $jsession = JFactory::getSession();
+    $user = $factoryClassName::getUser($uid);
+    $jsession = $factoryClassName::getSession();
     $jsession->set('user', $user);
 
     // Save details in Civi session
@@ -539,7 +561,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getUFLocale() {
     if (defined('_JEXEC')) {
-      $conf = JFactory::getConfig();
+      $factoryClassName = $this->factoryClassName();
+      $conf = $factoryClassName::getConfig();
       $locale = $conf->get('language');
       return str_replace('-', '_', $locale);
     }
@@ -665,35 +688,19 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // Set timezone for Joomla on Cron
-    $config = JFactory::getConfig();
+    $factoryClassName = $this->factoryClassName();
+    $config = $factoryClassName::getConfig();
     $timezone = $config->get('offset');
     if ($timezone) {
       $this->setTimeZone($timezone);
     }
     if (version_compare(JVERSION, '4.0', '>=')) {
-      // Boot the DI container
-      $container = \Joomla\CMS\Factory::getContainer();
-      /*
-       * Alias the session service keys to the web session service as that is the primary session backend for this application
-       *
-       * In addition to aliasing "common" service keys, we also create aliases for the PHP classes to ensure autowiring objects
-       * is supported.  This includes aliases for aliased class names, and the keys for aliased class names should be considered
-       * deprecated to be removed when the class name alias is removed as well.
-       */
-      $container->alias('session', 'session.cli')
-        ->alias('JSession', 'session.cli')
-        ->alias(\Joomla\CMS\Session\Session::class, 'session.cli')
-        ->alias(\Joomla\Session\Session::class, 'session.cli')
-        ->alias(\Joomla\Session\SessionInterface::class, 'session.cli');
-      // Instantiate the application.
       if (PHP_SAPI == 'cli') {
-        $app = $container->get(\Joomla\CMS\Application\ConsoleApplication::class);
+        $this->loadJoomlaApplication('cli');
       }
       else {
-        $app = $container->get(\Joomla\CMS\Application\AdministratorApplication::class);
+        $this->loadJoomlaApplication('admin');
       }
-      // Set the application as global app
-      \Joomla\CMS\Factory::$application = $app;
     }
 
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
@@ -732,7 +739,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getLoggedInUfID() {
-    $user = JFactory::getUser();
+    $factoryClassName = $this->factoryClassName();
+    $user = $factoryClassName::getUser();
     return ($user->guest) ? NULL : $user->id;
   }
 
@@ -740,7 +748,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getLoggedInUniqueIdentifier() {
-    $user = JFactory::getUser();
+    $factoryClassName = $this->factoryClassName();
+    $user = $factoryClassName::getUser();
     return $this->getUniqueIdentifierFromUserObject($user);
   }
 
@@ -749,7 +758,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getUser($contactID) {
     $user_details = parent::getUser($contactID);
-    $user = JFactory::getUser($user_details['id']);
+    $factoryClassName = $this->factoryClassName();
+    $user = $factoryClassName::getUser($user_details['id']);
     $user_details['name'] = $user->name;
     return $user_details;
   }
@@ -772,7 +782,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    $timezone = JFactory::getConfig()->get('offset');
+    $factoryClassName = $this->factoryClassName();
+    $timezone = $factoryClassName::getConfig()->get('offset');
     return !$timezone ? date_default_timezone_get() : $timezone;
   }
 
@@ -784,8 +795,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getModules() {
     $result = [];
-
-    $db = JFactory::getDbo();
+    $factoryClassName = $this->factoryClassName();
+    $db = $factoryClassName::getDbo();
     $query = $db->getQuery(TRUE);
     $query->select('type, folder, element, enabled')
       ->from('#__extensions')
@@ -1067,6 +1078,39 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     // in Joomla without administrator login.
     $profile = str_replace('/administrator/', '/index.php', $profile);
     return $profile;
+  }
+
+  protected function loadJoomlaApplication(string $applicationName) {
+    // Boot the DI container
+    if ($applicationName === 'site') {
+      $applicationClass = \Joomla\CMS\Application\SiteApplication::class;
+      $session = 'session.web.site';
+    }
+    elseif ($applicationName == 'admin') {
+      $applicationClass = \Joomla\CMS\Application\AdministratorApplication::class;
+      $session = 'session.web.administrator';
+    }
+    else {
+      $applicationClass = \Joomla\CMS\Application\ConsoleApplication::class;
+      $session = 'session.cli';
+    }
+    $container = \Joomla\CMS\Factory::getContainer();
+    /*
+     * Alias the session service keys to the web session service as that is the primary session backend for this application
+     *
+     * In addition to aliasing "common" service keys, we also create aliases for the PHP classes to ensure autowiring objects
+     * is supported.  This includes aliases for aliased class names, and the keys for aliased class names should be considered
+     * deprecated to be removed when the class name alias is removed as well.
+     */
+    $container->alias('session', $session)
+      ->alias('JSession', $session)
+      ->alias(\Joomla\CMS\Session\Session::class, $session)
+      ->alias(\Joomla\Session\Session::class, $session)
+      ->alias(\Joomla\Session\SessionInterface::class, $session);
+    // Instantiate the application.
+    $app = $container->get($applicationClass);
+    // Set the application as global app
+    \Joomla\CMS\Factory::$application = $app;
   }
 
 }
