@@ -14,23 +14,25 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\API\EntityLookupTrait;
 
 /**
  * Form to process actions on the field aspect of Custom.
  */
 class CRM_UF_Form_Field extends CRM_Core_Form {
+  use EntityLookupTrait;
 
   /**
    * The uf group id saved to the session for an update.
    *
-   * @var int
+   * @var int|false
    */
   public $_gid;
 
   /**
    * The field id, used when editing the field.
    *
-   * @var int
+   * @var int|false
    */
   protected $_id;
 
@@ -75,17 +77,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @return void
    */
-  public function preProcess() {
-    $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-
-    if (!$this->_gid && $this->_id) {
-      $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $this->_id, 'uf_group_id');
-      $this->set('_gid', $this->_gid);
-    }
-    if ($this->_gid) {
-      $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
-
+  public function preProcess(): void {
+    $this->assign('fieldId', $this->getUFFieldID());
+    $this->assign('fieldTitle', $this->getUFFieldValue('title'));
+    if ($this->getUFGroupID()) {
       $this->setPageTitle(ts('Profile Field'));
 
       $url = CRM_Utils_System::url('civicrm/admin/uf/group/field',
@@ -156,12 +151,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     //CRM-4363 check for in selector or searchable fields.
     $this->_hasSearchableORInSelector = CRM_Core_BAO_UFField::checkSearchableORInSelector($this->_gid);
-
-    $this->assign('fieldId', $this->_id);
-    if ($this->_id) {
-      $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $this->_id, 'label');
-      $this->assign('fieldTitle', $fieldTitle);
-    }
   }
 
   /**
@@ -209,7 +198,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         ($defaults['field_name'] == "url") ? $defaults['website_type_id'] : $defaults['location_type_id'],
         $defaults['phone_type_id'] ?? NULL,
       ];
-      $this->_gid = $defaults['uf_group_id'];
     }
     else {
       $defaults['is_active'] = 1;
@@ -232,7 +220,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     //hidden field to catch the field id in profile
     $this->add('hidden', 'field_id', $this->_id);
 
-    $fields = CRM_Core_BAO_UFField::getAvailableFields($this->_gid, $defaults);
+    $fields = CRM_Core_BAO_UFField::getAvailableFields($this->getUFGroupID(), $defaults);
 
     $noSearchable = $hasWebsiteTypes = [];
 
@@ -469,6 +457,68 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $this->addFormRule(['CRM_UF_Form_Field', 'formRule'], $this);
 
     $this->setDefaults($defaults);
+  }
+
+  /**
+   * Get the Field ID being acted on.
+   *
+   * @spi supported for external use.
+   *
+   * @return int|null
+   */
+  public function getUFFieldID(): ?int {
+    if (!isset($this->_id)) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this) ?: FALSE;
+    }
+    return $this->_id ?: NULL;
+  }
+
+  /**
+   * Get the Field ID being acted on.
+   *
+   * @spi supported for external use.
+   *
+   * @return int|null
+   */
+  public function getUFFieldValue(string $fieldName) {
+    if (!$this->getUFFieldID()) {
+      return NULL;
+    }
+    if (!$this->isDefined('UFField')) {
+      $this->define('UFField', 'UFField', ['id' => $this->getUFFieldID()]);
+    }
+    return $this->lookup('UFField', $fieldName);
+  }
+
+  /**
+   * Get the Field ID being acted on.
+   *
+   * @spi supported for external use.
+   *
+   * @return int|null
+   */
+  public function getUFGroupValue(string $fieldName) {
+    if (!$this->isDefined('UFGroup')) {
+      $this->define('UFGroup', 'UFGroup', ['id' => $this->getUFGroupID()]);
+    }
+    return $this->lookup('UFGroup', $fieldName);
+  }
+
+  /**
+   * Get the Field ID being acted on.
+   *
+   * @spi supported for external use.
+   *
+   * @return int|null
+   */
+  public function getUFGroupID(): ?int {
+    if (!isset($this->_gid)) {
+      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this) ?: FALSE;
+      if (!$this->_gid) {
+        $this->_gid = $this->getUFFieldValue('uf_group_id') ?: FALSE;
+      }
+    }
+    return $this->_gid ?: NULL;
   }
 
   /**
