@@ -98,32 +98,28 @@ return [
             ],
             [
               'type' => 'field',
+              'key' => 'is_active',
+              'dataType' => 'Boolean',
+              'label' => E::ts('Enabled'),
+              'sortable' => FALSE,
+              'icons' => [],
+              'rewrite' => '',
+            ],
+            [
+              'type' => 'field',
               'key' => 'is_default',
               'dataType' => 'Boolean',
-              'label' => E::ts('Default?'),
+              'label' => E::ts('Default'),
               'sortable' => FALSE,
-              'rewrite' => '[none]',
               'title' => NULL,
+              'rewrite' => '[none]',
               'icons' => [
                 [
                   'icon' => 'fa-check',
                   'side' => 'left',
-                  'if' => [
-                    'is_default',
-                    '=',
-                    TRUE,
-                  ],
+                  'if' => ['is_default', '=', TRUE],
                 ],
               ],
-            ],
-            [
-              'type' => 'field',
-              'key' => 'is_active',
-              'dataType' => 'Boolean',
-              'label' => E::ts('Enabled?'),
-              'sortable' => FALSE,
-              'icons' => [],
-              'rewrite' => '',
             ],
             [
               'links' => [

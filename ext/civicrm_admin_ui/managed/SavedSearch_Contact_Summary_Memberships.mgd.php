@@ -139,7 +139,7 @@ return [
               'dataType' => 'Boolean',
               'label' => E::ts('Auto Renew'),
               'sortable' => FALSE,
-              'rewrite' => ' ',
+              'rewrite' => '[none]',
               'icons' => [
                 [
                   'icon' => 'fa-exclamation-triangle',
@@ -387,7 +387,7 @@ return [
               'dataType' => 'Boolean',
               'label' => E::ts('Auto Renew'),
               'sortable' => FALSE,
-              'rewrite' => ' ',
+              'rewrite' => '[none]',
               'icons' => [
                 [
                   'icon' => 'fa-exclamation-triangle',
