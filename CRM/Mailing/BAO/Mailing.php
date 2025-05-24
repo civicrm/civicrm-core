@@ -2034,7 +2034,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
         $form->add('select', "{$prefix}template", ts('Use Template'),
           ['' => ts('- select -')] + $templates[$prefix], FALSE,
-          ['onChange' => "selectValue( this.value, '{$prefix}');", 'class' => 'crm-select2 huge']
+          ['onChange' => "selectValue( this.value, '{$prefix}');", 'class' => 'crm-select2 huge', 'title' => ts('Use Template')]
         );
       }
       if (\CRM_Core_Permission::check('edit message templates')) {
