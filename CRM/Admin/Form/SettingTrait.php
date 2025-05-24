@@ -225,7 +225,7 @@ trait CRM_Admin_Form_SettingTrait {
         elseif ($add === 'addChainSelect') {
           $this->addChainSelect($setting, ['label' => $props['title']] + $props['chain_select_settings']);
         }
-        elseif ($add === 'addMonthDay') {
+        elseif (in_array($add, ['addMonthDay', 'addDateTime'])) {
           $this->add('date', $setting, $props['title'], CRM_Core_SelectValues::date(NULL, 'M d'));
         }
         elseif ($add === 'addEntityRef') {
