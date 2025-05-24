@@ -89,8 +89,19 @@ class SubmitFile extends AbstractProcessor {
       $entityTable = CoreUtil::getTableName($apiEntity);
       $attachmentParams = [
         'entity_id' => $entityId,
-        'entity_table' => $entityTable
+        'mime_type' => $_FILES['file']['type'],
+        'name' => $_FILES['file']['name'],
+        'options' => [
+          'move-file' => $_FILES['file']['tmp_name'],
+        ],
       ];
+
+    if (strpos($this->fieldName, '.')) {
+      $attachmentParams['field_name'] = $this->convertFieldNameToApi3($apiEntity, $this->fieldName);
+    }
+    else {
+      $attachmentParams['entity_table'] = CoreUtil::getTableName($apiEntity);
+    }
       $file = civicrm_api3('Attachment', 'create', $attachmentParams);
 
       /**
