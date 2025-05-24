@@ -85,7 +85,45 @@ class SubmitFile extends AbstractProcessor {
       return $this->updateDraft($draft, $file['id']);
     }
     else {
-      return $this->updateEntity($entityId, $file['id']);
+      $apiEntity = $this->getEntityApiName();
+      $entityTable = CoreUtil::getTableName($apiEntity);
+      $attachmentParams = [
+        'entity_id' => $entityId,
+        'mime_type' => $_FILES['file']['type'],
+        'name' => $_FILES['file']['name'],
+        'options' => [
+          'move-file' => $_FILES['file']['tmp_name'],
+        ],
+      ];
+
+    if (strpos($this->fieldName, '.')) {
+      $attachmentParams['field_name'] = $this->convertFieldNameToApi3($apiEntity, $this->fieldName);
+    }
+    else {
+      $attachmentParams['entity_table'] = CoreUtil::getTableName($apiEntity);
+    }
+      $file = civicrm_api3('Attachment', 'create', $attachmentParams);
+
+      /**
+       * Updates contact record to use existing file table data for contact_image. Temporary fix for dev/core#4251
+       */
+      if ($entityTable == 'civicrm_contact' && isset($entityId)) {
+        $fileId = $file['id'];
+        $filepath = pathinfo($file['values'][$fileId]['path']);
+        $result = civicrm_api4('Contact', 'update', [
+          'values' => [
+            'id' => $entityId,
+            'image_URL' => sprintf('/civicrm/contact/imagefile?photo=%s', $filepath['basename']),
+          ],
+        ]);
+
+        return [];
+      }
+
+      // Update multi-record custom field with value
+      if (strpos($apiEntity, 'Custom_') === 0) {
+        return $this->updateEntity($entityId, $file['id']);
+      }
     }
   }
 
