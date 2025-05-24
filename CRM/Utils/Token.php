@@ -1262,8 +1262,11 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
+   *
+   * @deprecated since 6.3 will be removed around 6.15
    */
-  public static function &replaceUserTokens($str, $knownTokens = NULL, $escapeSmarty = FALSE) {
+  public static function replaceUserTokens($str, $knownTokens = NULL, $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $key = 'user';
     if (!$knownTokens ||
       !isset($knownTokens[$key])
@@ -1289,6 +1292,7 @@ class CRM_Utils_Token {
    */
   public static function getUserTokenReplacement($token, $escapeSmarty = FALSE) {
     $value = '';
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
 
     [$objectName, $objectValue] = explode('-', $token, 2);
 
