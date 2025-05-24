@@ -78,16 +78,16 @@ class ParticipantTest extends Api4TestBase {
     ];
 
     // - create dummy participants record
+    $sourceCount = count($dummy['sources']);
     $records = [];
     for ($i = 0; $i < $participantCount; $i++) {
       $records[] = [
         'event_id' => $dummy['events'][$i % $eventCount]['id'],
         'contact_id' => $dummy['contacts'][$i % $contactCount]['id'],
-        // 3 = number of sources
-        'source' => $dummy['sources'][$i % 3],
+        'source' => $dummy['sources'][$i % $sourceCount],
       ];
     }
-    $this->saveTestRecords('Participant', [
+    $dummy['participants'] = $this->saveTestRecords('Participant', [
       'records' => $records,
       'defaults' => [
         'status_id' => 2,
@@ -212,8 +212,13 @@ class ParticipantTest extends Api4TestBase {
       ->addWhere('event_id', '=', $secondEventId)
       ->setCheckPermissions(FALSE)
       ->execute();
+    // These are positions in the list of participants
     $expectedDeletes = [2, 7, 12, 17];
-    $this->assertEquals($expectedDeletes, array_column((array) $deleteResult, 'id'),
+    // Convert to IDs
+    $expectedDeletesIds = array_map(function ($a) use ($dummy) {
+      return $dummy['participants'][$a - 1]['id'];
+    }, $expectedDeletes);
+    $this->assertEquals($expectedDeletesIds, array_column((array) $deleteResult, 'id'),
       "didn't delete every second record as expected");
 
     $sqlCount = $this->getRowCount('civicrm_participant');

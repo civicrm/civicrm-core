@@ -34,7 +34,7 @@ class ContributionSoftTest extends BaseTestClass {
   public function testGetSoftContributionList(): void {
     $this->createTwoSoftCredits();
     $expectedCredits = [
-      1 => [
+      0 => [
         'amount' => '$100.00',
         'currency' => 'USD',
         'contributor_id' => $this->ids['Contact'][0],
@@ -53,7 +53,7 @@ class ContributionSoftTest extends BaseTestClass {
         'contribution_status' => 'Completed',
         'sct_label' => NULL,
       ],
-      2 => [
+      1 => [
         'amount' => '$200.00',
         'currency' => 'USD',
         'contributor_id' => $this->ids['Contact'][1],
@@ -75,23 +75,24 @@ class ContributionSoftTest extends BaseTestClass {
     ];
     $dataTableParameters = [];
     $list = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->ids['Contact']['credited'], NULL, 0, $dataTableParameters);
+    $actualCredits = array_values($list);
     $this->assertEquals(2, $dataTableParameters['total']);
-    foreach ($expectedCredits[1] as $key => $value) {
-      $this->assertEquals($value, $list[1][$key], $key);
+    foreach ($expectedCredits as $index => $credit) {
+      foreach ($credit as $key => $value) {
+        $this->assertEquals($value, $actualCredits[$index][$key], $key);
+      }
     }
-    foreach ($expectedCredits[2] as $key => $value) {
-      $this->assertEquals($value, $list[2][$key], $key);
-    }
-    $this->assertEquals($this->ids['Contribution']['permitted'], $list[1]['contribution_id']);
+    $this->assertEquals($this->ids['Contribution']['permitted'], $actualCredits[0]['contribution_id']);
 
     // And with ACL restrictions.
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
     $list = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->ids['Contact']['credited']);
-    $this->assertArrayNotHasKey(2, $list);
+    $actualCredits = array_values($list);
+    $this->assertEquals(1, count($actualCredits));
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS  ac');
     CRM_Core_DAO::executeQuery('CREATE TABLE ac SELECT id FROM civicrm_relationship');
-    foreach ($expectedCredits[1] as $key => $value) {
-      $this->assertEquals($value, $list[1][$key], $key);
+    foreach ($expectedCredits[0] as $key => $value) {
+      $this->assertEquals($value, $actualCredits[0][$key], $key);
     }
   }
 
