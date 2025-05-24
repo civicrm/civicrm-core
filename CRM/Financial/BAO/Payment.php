@@ -351,13 +351,6 @@ class CRM_Financial_BAO_Payment {
     if (!empty($participantRecords)) {
       $entities['participant'] = $participantRecords[0]['api.Participant.get']['values'][0];
       $entities['event'] = civicrm_api3('Event', 'getsingle', ['id' => $entities['participant']['event_id']]);
-      if (!empty($entities['event']['is_show_location'])) {
-        $locationParams = [
-          'entity_id' => $entities['event']['id'],
-          'entity_table' => 'civicrm_event',
-        ];
-        $entities['location'] = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
-      }
     }
 
     return $entities;
@@ -403,7 +396,6 @@ class CRM_Financial_BAO_Payment {
       'receive_date' => $entities['payment']['trxn_date'],
       'paidBy' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $entities['payment']['payment_instrument_id']),
       'isShowLocation' => (!empty($entities['event']) ? $entities['event']['is_show_location'] : FALSE),
-      'location' => $entities['location'] ?? NULL,
       'event' => $entities['event'] ?? NULL,
       'component' => (!empty($entities['event']) ? 'event' : 'contribution'),
       'isRefund' => $entities['payment']['total_amount'] < 0,
@@ -439,7 +431,6 @@ class CRM_Financial_BAO_Payment {
       'receive_date',
       'paidBy',
       'isShowLocation',
-      'location',
       'isRefund',
       'refundAmount',
       'totalPaid',

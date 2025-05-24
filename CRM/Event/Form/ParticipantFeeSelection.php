@@ -625,16 +625,6 @@ SELECT  id, html_type
 
     $this->assign('event', $event);
 
-    $this->assign('isShowLocation', $event['is_show_location']);
-    if (($event['is_show_location'] ?? NULL) == 1) {
-      $locationParams = [
-        'entity_id' => $params['event_id'],
-        'entity_table' => 'civicrm_event',
-      ];
-      $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
-      $this->assign('location', $location);
-    }
-
     if ($this->_isPaidEvent) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       if (!$this->_mode) {
