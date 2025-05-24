@@ -268,8 +268,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $this->_location_types = CRM_Core_DAO_Address::buildOptions('location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    $this->_website_types = CRM_Core_DAO_Website::buildOptions('website_type_id');
-
     /**
      * FIXME: dirty hack to make the default option show up first.  This
      * avoids a mozilla browser bug with defaults on dynamically constructed
@@ -343,7 +341,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
               $sel3[$k][$key] = $this->_location_types;
             }
             elseif ($hasWebsiteTypes[$k][$key]) {
-              $sel3[$k][$key] = $this->_website_types;
+              $options = \Civi::entity('Website')->getOptions('website_type_id');
+              $sel3[$k][$key] = array_column($options, 'name', 'id');
             }
             else {
               $sel3[$key] = NULL;
