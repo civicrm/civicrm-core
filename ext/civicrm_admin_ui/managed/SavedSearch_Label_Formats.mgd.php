@@ -80,29 +80,25 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'is_default',
-              'dataType' => 'Boolean',
-              'label' => E::ts('Default'),
-              'sortable' => TRUE,
-              'rewrite' => '{ }',
-              'icons' => [
-                [
-                  'icon' => 'fa-check',
-                  'side' => 'left',
-                  'if' => [
-                    'is_default',
-                    '=',
-                    TRUE,
-                  ],
-                ],
-              ],
-            ],
-            [
-              'type' => 'field',
               'key' => 'is_reserved',
               'dataType' => 'Boolean',
               'label' => E::ts('Reserved'),
               'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_default',
+              'dataType' => 'Boolean',
+              'label' => E::ts('Default'),
+              'sortable' => TRUE,
+              'rewrite' => '[none]',
+              'icons' => [
+                [
+                  'icon' => 'fa-check',
+                  'side' => 'left',
+                  'if' => ['is_default', '=', TRUE],
+                ],
+              ],
             ],
             [
               'text' => '',

@@ -157,16 +157,12 @@ return [
               'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
-              'rewrite' => ' ',
+              'rewrite' => '[none]',
               'icons' => [
                 [
-                  'icon' => 'fa-check-square-o',
+                  'icon' => 'fa-check',
                   'side' => 'left',
-                  'if' => [
-                    'is_default',
-                    '=',
-                    TRUE,
-                  ],
+                  'if' => ['is_default', '=', TRUE],
                 ],
               ],
             ],
