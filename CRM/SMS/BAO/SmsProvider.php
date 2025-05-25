@@ -144,16 +144,16 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
    * @return mixed
    */
   public static function getProviderInfo($providerID, $returnParam = NULL, $returnDefaultString = NULL) {
-    static $providerInfo = [];
 
-    if (!array_key_exists($providerID, $providerInfo)) {
-      $providerInfo[$providerID] = [];
+    if (!isset(\Civi::$statics[__CLASS__ . __FUNCTION__][$providerID])) {
+
+      $providerInfo = [];
 
       $dao = new CRM_SMS_DAO_SmsProvider();
       $dao->id = $providerID;
       if ($dao->find(TRUE)) {
-        CRM_Core_DAO::storeValues($dao, $providerInfo[$providerID]);
-        $inputLines = explode("\n", $providerInfo[$providerID]['api_params']);
+        CRM_Core_DAO::storeValues($dao, $providerInfo);
+        $inputLines = explode("\n", $providerInfo['api_params']);
         $inputVals = [];
         foreach ($inputLines as $value) {
           if ($value) {
@@ -161,19 +161,20 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
             $inputVals[trim($key)] = trim($val);
           }
         }
-        $providerInfo[$providerID]['api_params'] = $inputVals;
+        $providerInfo['api_params'] = $inputVals;
 
         // Replace the api_type ID with the string value
         $apiTypes = CRM_Core_OptionGroup::values('sms_api_type');
-        $apiTypeId = $providerInfo[$providerID]['api_type'];
-        $providerInfo[$providerID]['api_type'] = $apiTypes[$apiTypeId] ?? $apiTypeId;
+        $apiTypeId = $providerInfo['api_type'];
+        $providerInfo['api_type'] = $apiTypes[$apiTypeId] ?? $apiTypeId;
       }
+      \Civi::$statics[__CLASS__ . __FUNCTION__][$providerID] = $providerInfo;
     }
 
     if ($returnParam) {
-      return $providerInfo[$providerID][$returnParam] ?? $returnDefaultString;
+      return \Civi::$statics[__CLASS__ . __FUNCTION__][$providerID][$returnParam] ?? $returnDefaultString;
     }
-    return $providerInfo[$providerID];
+    return \Civi::$statics[__CLASS__ . __FUNCTION__][$providerID];
   }
 
 }
