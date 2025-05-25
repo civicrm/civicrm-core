@@ -985,9 +985,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if ($path[0] === '/' || str_contains($path, 'http://') || str_contains($path, 'https://')) {
       return $path;
     }
+
+    $flags = NULL;
     // Use absolute urls when downloading spreadsheet
-    $absolute = $this->getActionName() === 'download';
-    return \CRM_Utils_System::url($path, $query, $absolute, NULL, FALSE);
+    if ($this->getActionName() === 'download') {
+      $flags = 'a';
+    }
+    return (string) \Civi::url($path, $flags)->addQuery($query);
   }
 
   /**
