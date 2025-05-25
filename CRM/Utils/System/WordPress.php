@@ -933,13 +933,17 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $creds['user_password'] = $user_data['user_pass'];
         $creds['remember'] = TRUE;
 
-        // Authenticate and log the user in.
-        $user = wp_signon($creds, FALSE);
-        if (is_wp_error($user)) {
-          Civi::log()->error("Could not log the user in. WordPress returned: " . $user->get_error_message());
-        }
-        else {
-          $logged_in = TRUE;
+        $should_login_user = boolval(get_option('civicrm_automatically_sign_in_user', TRUE));
+        if (TRUE === $should_login_user) {
+          // Authenticate and log the user in.
+          $user = wp_signon($creds, FALSE);
+          if (is_wp_error($user)) {
+            Civi::log()
+              ->error("Could not log the user in. WordPress returned: " . $user->get_error_message());
+          }
+          else {
+            $logged_in = TRUE;
+          }
         }
       }
 
