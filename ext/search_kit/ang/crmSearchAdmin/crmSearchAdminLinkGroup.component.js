@@ -66,19 +66,17 @@
       this.permissions = CRM.crmSearchAdmin.permissions;
 
       $scope.pickIcon = function(index) {
-        searchMeta.pickIcon().then(function(icon) {
-          ctrl.group[index].icon = icon;
-        });
+        searchMeta.pickIcon().then(icon => ctrl.group[index].icon = icon);
       };
 
       function setDefaults(item, newValue) {
-        _.each(linkProps, function(prop) {
+        linkProps.forEach(prop => {
           item[prop] = newValue[prop] || (prop === 'condition' ? [] : '');
         });
       }
 
       this.addItem = function(item) {
-        var newItem = _.pick(item, linkProps);
+        const newItem = _.pick(item, linkProps);
         setDefaults(newItem, newItem);
         ctrl.group.push(newItem);
       };
@@ -100,21 +98,19 @@
           condition: [],
           path: 'civicrm/'
         });
-        var defaultLinks = _.filter(ctrl.links, function(link) {
-          return link.action && !link.join;
-        });
-        _.each(ctrl.group, function(item) {
-          setDefaults(item, item);
-        });
         if (!ctrl.group.length) {
+          const defaultLinks = ctrl.links.filter(link => link.action && !link.join);
           if (defaultLinks.length) {
-            _.each(defaultLinks, ctrl.addItem);
+            defaultLinks.forEach(ctrl.addItem);
           } else {
             ctrl.addItem(JSON.parse(this.default));
           }
         }
+        else {
+          ctrl.group.forEach(item => setDefaults(item, item));
+        }
         $element.on('change', 'select.crm-search-admin-add-link', function() {
-          var $select = $(this);
+          const $select = $(this);
           $scope.$apply(function() {
             ctrl.addItem(JSON.parse($select.val()));
             $select.val('');
