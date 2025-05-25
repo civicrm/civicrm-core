@@ -109,6 +109,13 @@
       this.originalSavedSearch = _.cloneDeep(this.savedSearch);
       this.groupExists = !!this.savedSearch.groups.length;
 
+      this.savedSearch.displays.forEach(function(display) {
+        // PHP json_encode() turns an empty object into []. Convert back to {}.
+        if (display.settings && Array.isArray(display.settings.pager)) {
+          display.settings.pager = {};
+        }
+      });
+
       const path = $location.path();
       // In create mode, set defaults and bind params to route for easy copy/paste
       if (path.includes('create/')) {
