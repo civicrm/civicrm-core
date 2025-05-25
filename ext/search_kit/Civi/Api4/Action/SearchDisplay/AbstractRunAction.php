@@ -881,7 +881,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           ],
         ]);
         $link['path'] = $getLinks[0]['path'] ?? NULL;
-        $link['conditions'] = $getLinks[0]['conditions'] ?? [];
+        $link['conditions'] = array_merge($link['conditions'], $getLinks[0]['conditions'] ?? []);
         // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
         if ($this->canAggregate($link['prefix'] . $idKey)) {
           $link['prefix'] = 'GROUP_CONCAT_' . str_replace('.', '_', $link['prefix']);
@@ -893,7 +893,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Process task links
       elseif (!$link['path'] && !empty($link['task'])) {
         $task = $this->getTask($link['task']);
-        $link['conditions'] = $task['conditions'] ?? [];
+        $link['conditions'] = array_merge($link['conditions'], $task['conditions'] ?? []);
         // Convert legacy tasks (which have a url)
         if (!empty($task['crmPopup'])) {
           $idField = CoreUtil::getIdFieldName($link['entity']);
@@ -927,7 +927,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $condition[0] = $link['prefix'] . $condition[0];
       }
     }
-    // Combine predefined link conditions with condition set in the search display
+    // Backward-compat: search displays created prior to 6.4 only supported 1 condition
     if (!empty($link['condition'])) {
       $link['conditions'][] = $link['condition'];
     }

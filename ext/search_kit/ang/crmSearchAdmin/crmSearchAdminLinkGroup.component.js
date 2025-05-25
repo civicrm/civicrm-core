@@ -15,7 +15,9 @@
     controller: function ($scope, $element, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
-        linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
+        linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'conditions'];
+
+      this.conditionCount = [];
 
       ctrl.permissionOperators = [
         {key: 'CONTAINS', value: ts('Includes')},
@@ -43,11 +45,11 @@
         return {results: permissionField.concat(selectFields)};
       };
 
-      this.onChangeCondition = function(item) {
-        if (item.condition[0]) {
-          item.condition[1] = '=';
+      this.onChangeCondition = function(item, index) {
+        if (item.conditions[index][0]) {
+          item.conditions[index][1] = '=';
         } else {
-          item.condition = [];
+          item.conditions.splice(index, 1);
         }
       };
 
@@ -70,8 +72,13 @@
       };
 
       function setDefaults(item, newValue) {
+        // Backward support for singular "condition" from older versions of SearchKit (pre 6.4)
+        if (newValue.condition && (!item.conditions|| !item.conditions.length)) {
+          item.conditions = [newValue.condition];
+          delete item.condition;
+        }
         linkProps.forEach(prop => {
-          item[prop] = newValue[prop] || (prop === 'condition' ? [] : '');
+          item[prop] = newValue[prop] || (prop === 'conditions' ? [] : '');
         });
       }
 
@@ -95,7 +102,7 @@
           style: 'default',
           text: ts('Link'),
           icon: 'fa-external-link',
-          condition: [],
+          conditions: [],
           path: 'civicrm/'
         });
         if (!ctrl.group.length) {
@@ -116,6 +123,15 @@
             $select.val('');
           });
         });
+
+        // Track number of conditions per item, for use with the "Add Condition" selector
+        $scope.$watch('$ctrl.group', function() {
+          // Timeout prevents bouncy-ness in the onChange of the "Add Condition" element
+          $timeout(function() {
+            ctrl.conditionCount = _.map(ctrl.group, item => item.conditions.length);
+          });
+        }, true);
+
       };
 
     }
