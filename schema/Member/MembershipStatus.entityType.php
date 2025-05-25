@@ -13,9 +13,10 @@ return [
     'label_field' => 'label',
   ],
   'getPaths' => fn() => [
-    'add' => 'civicrm/admin/member/membershipStatus?action=add&reset=1',
-    'update' => 'civicrm/admin/member/membershipStatus?action=update&id=[id]&reset=1',
-    'delete' => 'civicrm/admin/member/membershipStatus?action=delete&id=[id]&reset=1',
+    'browse' => 'civicrm/admin/member/membershipStatus?reset=1',
+    'add' => 'civicrm/admin/member/membershipStatus/add?action=add&reset=1',
+    'update' => 'civicrm/admin/member/membershipStatus/add?action=update&id=[id]&reset=1',
+    'delete' => 'civicrm/admin/member/membershipStatus/add?action=delete&id=[id]&reset=1',
   ],
   'getFields' => fn() => [
     'id' => [
