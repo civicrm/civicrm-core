@@ -20,6 +20,7 @@ namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Queue;
+use Civi\Api4\QueueItem;
 use Civi\Api4\UserJob;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\QueueTestTrait;
@@ -42,13 +43,21 @@ class QueueTest extends Api4TestBase {
   }
 
   /**
+   * @throws \CRM_Core_Exception
+   */
+  public function tearDown(): void {
+    QueueItem::delete(FALSE)->addWhere('queue_name', '=', 'test-queue')
+      ->execute();
+    parent::tearDown();
+  }
+
+  /**
    * Setup a queue with a line of back-to-back tasks.
    *
    * The first task runs normally. The second task fails at first, but it is retried, and then
    * succeeds.
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testBasicLinearPolling(): void {
     $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_linear';
@@ -716,6 +725,54 @@ class QueueTest extends Api4TestBase {
     }
     $this->assertTrue($ready, 'Wait condition not met');
     return $waitCount;
+  }
+
+  /**
+   * Test that queue item permits updates to other fields, but not data.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function testQueueItem(): void {
+    \Civi::queue('test-queue', [
+      'type' => 'Sql',
+      'runner' => 'task',
+      'error' => 'delete',
+    ])->createItem(new \CRM_Queue_Task(
+      [QueueTest::class, 'doSomething'],
+      ['first']
+    ));
+
+    $item = QueueItem::get(FALSE)->addWhere('queue_name', '=', 'test-queue')
+      ->execute()->single();
+
+    $queueCreateFields = QueueItem::getFields(TRUE)->setAction('create')->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('data', $queueCreateFields);
+
+    $queueUpdateFields = QueueItem::getFields(TRUE)->setAction('update')->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('data', $queueUpdateFields);
+
+    // Expect data to be FALSE because it is a serialized object. If that changes
+    // it might be appropriate to update this test but we need to think through
+    // any permission implications. In some cases personal information might be
+    // held here (eg. email addresses that are queued for deletion) that may require
+    // permission care.
+    $this->assertFalse($item['data'], 'this is returning false because it is an object');
+    QueueItem::update(TRUE)->addWhere('id', '=', $item['id'])
+      ->setValues(['release_time' => '2025-12-12'])
+      ->execute();
+
+    $item = QueueItem::get(FALSE)->addWhere('queue_name', '=', 'test-queue')
+      ->execute()->single();
+    $this->assertEquals('2025-12-12 00:00:00', $item['release_time']);
+
+    QueueItem::update(TRUE)->addWhere('id', '=', $item['id'])
+      ->setValues(['data' => 'do_noting'])
+      ->execute();
+
+    $data = \CRM_Core_DAO::singleValueQuery('SELECT data from civicrm_queue_item WHERE id = ' . $item['id']);
+    $this->assertStringContainsString('doSomething', $data);
+    $this->assertStringNotContainsString('do_nothing', $data);
   }
 
 }
