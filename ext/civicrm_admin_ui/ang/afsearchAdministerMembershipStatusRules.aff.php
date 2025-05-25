@@ -6,5 +6,7 @@ return [
   'title' => E::ts('Membership Status Rules'),
   'icon' => 'fa-list-alt',
   'server_route' => 'civicrm/admin/member/membershipStatus',
-  'permission' => ['administer CiviCRM'],
+  'permission' => [
+    'administer CiviCRM',
+  ],
 ];
