@@ -29,6 +29,7 @@ class CRM_Upgrade_Incremental_php_SixFour extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_4_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Create TranslationSource table', 'createEntityTable', '6.4.alpha1.TranslationSource.entityType.php');
     $this->addTask('Rename multisite_is_enabled setting', 'renameMultisiteSetting');
     $this->addTask('Remove Foreign Key References from cache tables', 'removeForeignKeyReferencesCacheTables');
     $this->addTask('Increase length of MailingEventBounce.bounce_reason field', 'alterSchemaField', 'MailingEventBounce', 'bounce_reason', [
