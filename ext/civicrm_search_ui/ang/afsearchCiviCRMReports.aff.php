@@ -9,5 +9,4 @@ return [
   'permission' => [
     'access CiviReport',
   ],
-  'modified_date' => '2023-12-05 02:57:53',
 ];
