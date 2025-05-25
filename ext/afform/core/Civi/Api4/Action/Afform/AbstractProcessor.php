@@ -723,8 +723,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @return int|string|null
    */
   protected static function getNestedKey(array $values) {
-    $firstValue = \CRM_Utils_Array::first(array_filter($values));
-    return is_array($firstValue) && $firstValue ? array_keys($firstValue)[0] : NULL;
+    $firstNonEmptyValue = \CRM_Utils_Array::first(array_filter($values));
+    return is_array($firstNonEmptyValue) ? array_keys($firstNonEmptyValue)[0] : NULL;
   }
 
   /**
