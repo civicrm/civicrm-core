@@ -23,6 +23,13 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
   use CRM_Core_Form_EntityFormTrait;
 
   /**
+   * The name of the BAO object for this form.
+   *
+   * @var string
+   */
+  protected $_BAOName = 'CRM_Member_BAO_MembershipStatus';
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -64,7 +71,6 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
 
   public function preProcess() {
     $this->_id = $this->get('id');
-    $this->_BAOName = 'CRM_Member_BAO_MembershipStatus';
   }
 
   /**
