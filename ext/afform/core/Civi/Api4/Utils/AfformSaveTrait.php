@@ -13,6 +13,12 @@ trait AfformSaveTrait {
 
   use AfformFormatTrait;
 
+  /**
+   * Translatable Strings
+   * string $translateStrings
+   */
+  protected $stringTranslations = [];
+
   protected function writeRecord($item) {
     /** @var \CRM_Afform_AfformScanner $scanner */
     $scanner = \Civi::service('afform_scanner');
@@ -48,7 +54,13 @@ trait AfformSaveTrait {
     if (isset($item['layout'])) {
       $layoutPath = $scanner->createSiteLocalPath($item['name'], 'aff.html');
       \CRM_Utils_File::createDir(dirname($layoutPath));
-      file_put_contents($layoutPath, $this->convertInputToHtml($item['layout']));
+      $html = $this->convertInputToHtml($item['layout']);
+
+      // Are we multilingual
+      if (\CRM_Core_I18n::isMultiLingual()) {
+        $this->saveTranslations($html);
+      }
+      file_put_contents($layoutPath, $html);
       // FIXME check for writability then success. Report errors.
     }
 
@@ -80,6 +92,73 @@ trait AfformSaveTrait {
     $item['module_name'] = _afform_angular_module_name($item['name'], 'camel');
     $item['directive_name'] = _afform_angular_module_name($item['name'], 'dash');
     return $meta + $item;
+  }
+
+  /**
+   * Save Translation Strings from Form
+   * string $html
+   */
+  protected function saveTranslations($html) {
+    $strings = [];
+    $doc = \phpQuery::newDocument($html, 'text/html');
+
+    // Find content to be translated
+    $contentSelectors = 'p.af-text, div.af-markup, button';
+    $doc->find($contentSelectors)->each(function(\DOMElement $item) {
+      $this->saveTranslatableString($item->textContent);
+    });
+
+    // attributes to be translated
+    foreach (['af-title', 'af-copy', 'af-repeat'] as $attribute) {
+      $doc->find('[' . $attribute . ']')->each(function(\DOMElement $item) use ($attribute, &$strings) {
+        $this->saveTranslatableString($item->getAttribute($attribute));
+      });
+    }
+
+    // defn sub-attributes to be translated
+    $doc->find('af-field[defn]')->each(function(\DOMElement $item) use (&$strings) {
+      $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'),1);
+      foreach (['label', 'help_pre', 'help_post', 'placeholder'] as $attribute) {
+        if (isset($defn[$attribute])) {
+          $this->saveTranslatableString($defn[$attribute]);
+        }
+      }
+      if (isset($defn['options'])) {
+        foreach ($defn['options'] as $idx => $option) {
+          if (isset($option['label'])) {
+            $this->saveTranslatableString($option['label']);
+          }
+        }
+      }
+    });
+
+    // Save the strings
+    if (!empty($this->stringTranslations)) {
+      $this->stringTranslations = array_unique($this->stringTranslations);
+
+      // Build the array for the table
+      $strings = [];
+      foreach($this->stringTranslations as $value) {
+        $strings[] = ['source' => $value];
+      }
+
+      \Civi\Api4\TranslationSource::save(FALSE)
+        ->addRecord(...$strings)
+        ->setMatch([
+          'source',
+        ])
+        ->execute();
+
+    }
+  }
+
+  /**
+   * Record String for translation
+   */
+  protected function saveTranslatableString($value) {
+    if (strpos($value, '{{') === FALSE) {
+      $this->stringTranslations[] = $value;
+    }
   }
 
 }
