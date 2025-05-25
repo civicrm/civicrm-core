@@ -19,18 +19,18 @@ return [
             'id',
             'activity_type_id:label',
             'subject',
-            'GROUP_CONCAT(DISTINCT Activity_ActivityContact_Contact_01.display_name) AS GROUP_CONCAT_Activity_ActivityContact_Contact_01_display_name',
-            'GROUP_CONCAT(DISTINCT Activity_ActivityContact_Contact_02.display_name) AS GROUP_CONCAT_Activity_ActivityContact_Contact_02_display_name',
             'activity_date_time',
-            'GROUP_CONCAT(DISTINCT Activity_ActivityContact_Contact_03.display_name) AS GROUP_CONCAT_Activity_ActivityContact_Contact_03_display_name',
             'status_id:label',
-            'source_contact_id.sort_name',
+            'GROUP_CONCAT(DISTINCT Activity_ActivityContact_Contact_02.sort_name) AS GROUP_CONCAT_Activity_ActivityContact_Contact_02_sort_name',
+            'GROUP_CONCAT(DISTINCT Activity_ActivityContact_Contact_01.sort_name) AS GROUP_CONCAT_Activity_ActivityContact_Contact_01_sort_name',
+            'GROUP_CONCAT(DISTINCT Activity_ActivityContact_Contact_03.sort_name) AS GROUP_CONCAT_Activity_ActivityContact_Contact_03_sort_name',
+            'ISNOTNULL(parent_id) AS ISNOTNULL_parent_id',
           ],
           'orderBy' => [],
-          'where' => [],
-          'groupBy' => [
-            'id',
+          'where' => [
+            ['is_deleted', '=', FALSE],
           ],
+          'groupBy' => ['id'],
           'join' => [
             [
               'Contact AS Activity_ActivityContact_Contact_01',
@@ -44,7 +44,7 @@ return [
               [
                 'Activity_ActivityContact_Contact_01.record_type_id:name',
                 '=',
-                '"Activity Source"',
+                '"Activity Targets"',
               ],
             ],
             [
@@ -59,7 +59,7 @@ return [
               [
                 'Activity_ActivityContact_Contact_02.record_type_id:name',
                 '=',
-                '"Activity Targets"',
+                '"Activity Source"',
               ],
             ],
             [
@@ -81,9 +81,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -99,7 +97,7 @@ return [
         'saved_search_id.name' => 'ActivitySearch',
         'type' => 'table',
         'settings' => [
-          'description' => NULL,
+          'description' => E::ts(NULL),
           'sort' => [
             [
               'activity_date_time',
@@ -134,7 +132,7 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_01_display_name',
+              'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_02_sort_name',
               'dataType' => 'String',
               'label' => E::ts('Added by'),
               'sortable' => TRUE,
@@ -142,14 +140,15 @@ return [
                 'path' => '',
                 'entity' => 'Contact',
                 'action' => 'view',
-                'join' => 'Activity_ActivityContact_Contact_01',
-                'target' => '_blank',
+                'join' => 'Activity_ActivityContact_Contact_02',
+                'target' => '',
+                'task' => '',
               ],
-              'title' => E::ts('View source contact'),
+              'title' => E::ts('View Activity Contacts 2'),
             ],
             [
               'type' => 'field',
-              'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_02_display_name',
+              'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_01_sort_name',
               'dataType' => 'String',
               'label' => E::ts('With'),
               'sortable' => TRUE,
@@ -157,14 +156,15 @@ return [
                 'path' => '',
                 'entity' => 'Contact',
                 'action' => 'view',
-                'join' => 'Activity_ActivityContact_Contact_02',
-                'target' => '_blank',
+                'join' => 'Activity_ActivityContact_Contact_01',
+                'target' => '',
+                'task' => '',
               ],
-              'title' => E::ts('View Activity Contacts 2'),
+              'title' => E::ts('View Activity Contacts'),
             ],
             [
               'type' => 'field',
-              'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_03_display_name',
+              'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_03_sort_name',
               'dataType' => 'String',
               'label' => E::ts('Assigned'),
               'sortable' => TRUE,
@@ -173,9 +173,10 @@ return [
                 'entity' => 'Contact',
                 'action' => 'view',
                 'join' => 'Activity_ActivityContact_Contact_03',
-                'target' => '_blank',
+                'target' => '',
+                'task' => '',
               ],
-              'title' => E::ts('View assigned Contact'),
+              'title' => E::ts('View Activity Contacts 3'),
             ],
             [
               'type' => 'field',
@@ -192,7 +193,7 @@ return [
               'sortable' => TRUE,
             ],
             [
-              'text' => '',
+              'text' => E::ts(''),
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
@@ -210,9 +211,7 @@ return [
                   'condition' => [
                     'activity_type_id:name',
                     'NOT IN',
-                    [
-                      'Contribution',
-                    ],
+                    ['Contribution'],
                   ],
                 ],
                 [
@@ -244,9 +243,7 @@ return [
                   'condition' => [
                     'activity_type_id:name',
                     'NOT IN',
-                    [
-                      'Contribution',
-                    ],
+                    ['Contribution'],
                   ],
                 ],
                 [
@@ -262,9 +259,7 @@ return [
                   'condition' => [
                     'activity_type_id:name',
                     'NOT IN',
-                    [
-                      'Contribution',
-                    ],
+                    ['Contribution'],
                   ],
                 ],
               ],
@@ -273,11 +268,9 @@ return [
             ],
           ],
           'actions' => TRUE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'headerCount' => TRUE,
+          'actions_display_mode' => 'menu',
         ],
       ],
       'match' => [

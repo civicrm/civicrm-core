@@ -1,9 +1,9 @@
 <div af-fieldset="">
   <div class="af-container">
     <div class="af-container af-layout-inline">
-      <af-field name="source_contact_id" />
       <af-field name="target_contact_id" defn="{label: 'With', input_attrs: {}}" />
       <af-field name="assignee_contact_id" />
+      <af-field name="source_contact_id" />
     </div>
     <div class="af-container af-layout-inline">
       <af-field name="activity_type_id" defn="{input_attrs: {multiple: true}}" />
@@ -17,11 +17,18 @@
     </div>
     <div class="af-container af-layout-inline">
       <af-field name="priority_id" defn="{input_attrs: {multiple: true}}" />
-      <af-field name="is_test" defn="{input_type: 'Radio', afform_default: '0'}" />
       <af-field name="location" />
+      <af-field name="is_test" defn="{input_type: 'Radio'}" />
+      <af-field name="ISNOTNULL_parent_id" defn="{input_type: 'Radio'}" />
     </div>
   </div>
   <div class="af-markup">
+    
+    
+    
+    
+    
+    
     
     <!--
     <p>TODO :<br />
@@ -33,6 +40,12 @@
 - Default Filter : in core search there is a default filter about contribution that I don't find (diff : 50 activities old:491<>SK:641)<br />
 &nbsp;</p>
 -->
+  
+  
+  
+  
+  
+  
   
   </div>
   <crm-search-display-table search-name="ActivitySearch" display-name="Search_Activities"></crm-search-display-table>
