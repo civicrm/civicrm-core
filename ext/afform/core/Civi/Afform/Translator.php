@@ -57,8 +57,7 @@ class Translator extends AutoService implements EventSubscriberInterface {
 
         // defn sub-attributes to be translated
         $doc->find('af-field[defn]')->each(function(\DOMElement $item) {
-          $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'),1);
-          $item->setAttribute('debug', gettype($defn));
+          $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'));
           foreach (['label', 'help_pre', 'help_post', 'placeholder'] as $attribute) {
             if (isset($defn[$attribute])) {
               $defn[$attribute] = ts($defn[$attribute]);

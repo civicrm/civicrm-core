@@ -6,6 +6,8 @@ use CRM_Afform_ExtensionUtil as E;
  */
 class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
 
+  use \Civi\Api4\Utils\AfformSaveTrait;
+
   /**
    * Update names of blocks and joins
    *
@@ -96,6 +98,22 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
   public function upgrade_1003(): bool {
     $this->ctx->log->info('Applying update 1003 - add status column to afform submissions.');
     $this->addColumn('civicrm_afform_submission', 'status_id', "INT UNSIGNED NOT NULL  DEFAULT 1 COMMENT 'fk to Afform Submission Status options in civicrm_option_values'");
+    return TRUE;
+  }
+
+  /**
+   * Upgrade 1004 - initialize form builder source to translate
+   * @see https://github.com/civicrm/civicrm-core/pull/32859
+   * @return bool
+   */
+  public function upgrade_1004(): bool {
+    $this->ctx->log->info('Applying update 1004 - initialize translatable afform string sources.');
+    $allAfforms = \Civi::service('afform_scanner')->findFilePaths();
+    foreach ($allAfforms as $name => $path) {
+      $fullpath = array_values($path)[0] . '.aff.html';
+      $html = file_get_contents($fullpath);
+      $this->saveTranslations($html);
+    }
     return TRUE;
   }
 
