@@ -32,6 +32,8 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    */
   public function check($str, $userId = NULL) {
     // Generic cms 'administer users' role tranlates to users with the 'edit_users' capability' in WordPress
+    /* Let's kill the mapped permissions */
+    /*
     $str = $this->translatePermission($str, 'WordPress', [
       'administer users' => 'edit_users',
     ]);
@@ -41,6 +43,13 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
+      */
+
+    $permissions = CRM_Core_Permission::basicPermissions( false, false );
+    if ( ! array_key_exists( $str, $permissions ) ) {
+      return false;
+    }
+
 
     // CRM-15629
     // During some extern/* calls we don't bootstrap CMS hence
@@ -54,20 +63,26 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     require_once ABSPATH . WPINC . '/pluggable.php';
 
     // for administrators give them all permissions
+    /* remove */
+    /*
     if (!function_exists('current_user_can')) {
       return TRUE;
     }
+    */
 
     $user = $userId ? get_userdata($userId) : wp_get_current_user();
 
-    if ($userId !== 0 && ($user->has_cap('super admin') || $user->has_cap('administrator'))) {
+    /* Let's kill permissions by role */
+    /*
+    if (($user->has_cap('super admin') || $user->has_cap('administrator'))) {
       return TRUE;
     }
+    */
 
     // Make string lowercase and convert spaces into underscore
     $str = CRM_Utils_String::munge(strtolower($str));
 
-    if ($userId !== 0 && $user->exists()) {
+    if ($user->exists()) {
       // Check whether the logged in user has the capabilitity
       if ($user->has_cap($str)) {
         return TRUE;
