@@ -1,5 +1,5 @@
 <!DOCTYPE html >
-<html lang="{$config->lcMessages|substr:0:2}" class="crm-standalone">
+<html lang="{$config->lcMessages|substr:0:2}" class="crm-standalone {if !empty($urlIsPublic)}crm-standalone-frontend{/if}">
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
