@@ -21,7 +21,7 @@
       this.afformAdminEnabled = CRM.checkPerm('administer afform') &&
         'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
       const scheduledCommunicationsEnabled = 'scheduled_communications' in CRM.crmSearchAdmin.modules;
-      const scheduledCommunicationsAllowed = CRM.checkPerm('schedule communications');
+      const scheduledCommunicationsAllowed = scheduledCommunicationsEnabled && CRM.checkPerm('schedule communications');
 
       this.apiEntity = 'SavedSearch';
       this.search = {
