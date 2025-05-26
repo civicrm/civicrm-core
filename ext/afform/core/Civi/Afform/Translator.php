@@ -21,26 +21,17 @@ class Translator extends AutoService implements EventSubscriberInterface {
    * @param \Civi\Angular\Manager $angular
    */
   public function translateAfform($angular) {
-    // 1. only formBuilder = ok
-    // 2. can we make it work before some other angular complexity is added (e.g. icons) = faux problème 
-    // 3. loop on selectors
 
-/*
-- af-entity[label]
-- af-field[defn.label]
-- af-field[defn.help_pre]
-- af-field[defn.help_post]
-- af-field[defn.placeholder]
-- af-field[defn.options.label] => (Custom options for Date -- Or we have a custom case for all date fields) i.e. defn="{options: [{id: 'this.day', label: 'Today'}
-- p.af-text (should we add a class for saying it's translatable?)
-- div.af-markup (should we add a class for saying it's translatable?) -> it should be assumed to be 
-- fieldset[af-copy] (label of the copie button)
-- fieldset[af-repeat] (label of the repeat button)
-- button
-- [af-title] */
+   /**
+    * Find all the content that should be auto send to ts function
+    * There are 3 kinds of translation :
+    * - html tag content
+    * - html attribute values
+    * - json sub-attribute in defn html attribute
+    */
 
     $changeSet = \Civi\Angular\ChangeSet::create('translate')
-      ->alterHtml(';.aff.html;', function (\phpQueryObject $doc) {
+      ->alterHtml(';\.aff\.html$;', function (\phpQueryObject $doc) {
 
         // content to be translated
         $contentSelectors = 'p.af-text, div.af-markup, button';
@@ -76,9 +67,8 @@ class Translator extends AutoService implements EventSubscriberInterface {
     $angular->add($changeSet);
   }
 
-  // TODO: make this a generic class
   public function translateContent(&$item) {
-    $item->textContent = ts($item->textContent);
+    $item->textContent = _ts($item->textContent);
   }
 
   public function translateAttribute(&$item, $attribute) {
