@@ -28,6 +28,11 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   public $_surveyId;
 
   /**
+   * @var array
+   */
+  protected $_values;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -66,9 +71,9 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
 
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
-    $this->assign('context', $this->_context);
+    $this->assign('context', $context);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 

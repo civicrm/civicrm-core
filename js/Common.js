@@ -614,11 +614,19 @@ if (!CRM.vars) CRM.vars = {};
               page: pageNum || 1
             }, getApiParams()))};
           },
-          results: function(data) {
-            return {
-              results: data.values,
-              more: data.countMatched > data.countFetched
+          results: function(response, page, query) {
+            const data = {
+              results: response.values,
+              more: response.countMatched > response.countFetched,
             };
+            if (!data.results.length && data.more) {
+              data.results.push({
+                id: '',
+                label: ts('ID %1 not found.', {1: query.term}),
+                disabled: true,
+              });
+            }
+            return data;
           },
         },
         minimumInputLength: 1,
