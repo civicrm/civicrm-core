@@ -30,6 +30,17 @@ class Download extends AbstractRunAction {
    */
   protected $format = 'array';
 
+  /**
+   * Download SK as an actual file.
+   *
+   * when set to false, only the content of the file is returned.
+   * content of file will be based on format selected.
+   * usefull when wanting to store reports through jobs or code.
+   *
+   * @var bool
+   */
+  protected $downloadAsFile = TRUE;
+
   private $formats = [
     'xlsx' => [
       'writer' => 'Xlsx',
@@ -116,11 +127,17 @@ class Download extends AbstractRunAction {
         break;
 
       default:
-        $this->sendHeaders($fileName);
+        // Only send headers when downloading as a file.
+        if ($this->downloadAsFile) {
+          $this->sendHeaders($fileName);
+        }
         $this->outputSpreadsheet($rows, $columns);
     }
 
-    \CRM_Utils_System::civiExit();
+    // Only need to exit when downloading file.
+    if ($this->downloadAsFile) {
+      \CRM_Utils_System::civiExit();
+    }
   }
 
   /**
