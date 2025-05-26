@@ -457,7 +457,8 @@ return [
     'image_URL' => [
       'title' => ts('Image Url'),
       'sql_type' => 'text',
-      'input_type' => 'File',
+      'input_type' => 'Text',
+      'readonly' => TRUE,
       'description' => ts('optional URL for preferred image (photo, logo, etc.) to display for this contact.'),
       'add' => '1.1',
       'usage' => [
@@ -467,7 +468,22 @@ return [
       ],
       'input_attrs' => [
         'size' => '30',
+        'label' => ts('Image URL'),
+      ],
+    ],
+    'image_file_id' => [
+      'title' => ts('Image File ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'File',
+      'description' => ts('FK to civicrm_file'),
+      'add' => '6.4',
+      'input_attrs' => [
         'label' => ts('Image'),
+      ],
+      'entity_reference' => [
+        'entity' => 'File',
+        'key' => 'id',
+        'fk' => FALSE,
       ],
     ],
     'preferred_communication_method' => [

@@ -28,6 +28,7 @@
  * @property string|null $nick_name
  * @property string|null $legal_name
  * @property string|null $image_URL
+ * @property string|null $image_file_id
  * @property string|null $preferred_communication_method
  * @property string|null $preferred_language
  * @property string|null $hash

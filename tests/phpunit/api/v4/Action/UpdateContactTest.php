@@ -65,4 +65,21 @@ class UpdateContactTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('Tester', $contact[0]['last_name']);
   }
 
+  public function testContactImage(): void {
+    $file = $this->createTestRecord('File', [
+        'mime_type' => 'image/png',
+        'file_name' => 'test.png',
+        'content' => 'Hello World',
+    ]);
+    $contact = Contact::create(FALSE)
+      ->addValue('first_name', 'Johann')
+      ->addValue('last_name', 'Tester')
+      ->addValue('contact_type', 'Individual')
+      ->addValue('image_file_id', $file['id'])
+      ->execute()
+      ->first();
+
+    $this->assertStringContainsString('civicrm%2Fcontact%2Fimagefile&photo=' . $file['uri'], $contact['image_URL']);
+  }
+
 }

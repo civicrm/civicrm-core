@@ -30,6 +30,21 @@ class CRM_Upgrade_Incremental_php_SixFour extends CRM_Upgrade_Incremental_Base {
   public function upgrade_6_4_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Rename multisite_is_enabled setting', 'renameMultisiteSetting');
+    $this->addTask('Add Contact Image file reference', 'alterSchemaField', 'Contact', 'image_file_id', [
+      'title' => ts('Image File ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'File',
+      'description' => ts('FK to civicrm_file'),
+      'add' => '6.4',
+      'input_attrs' => [
+        'label' => ts('Image'),
+      ],
+      'entity_reference' => [
+        'entity' => 'File',
+        'key' => 'id',
+        'fk' => FALSE,
+      ],
+    ], 'image_URL');
   }
 
   public static function renameMultisiteSetting(): bool {

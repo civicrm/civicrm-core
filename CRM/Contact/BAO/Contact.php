@@ -1138,6 +1138,24 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
+   * Callback for hook_civicrm_pre().
+   * @param string $op
+   * @param string $objectName
+   * @param int $id
+   * @param array $params
+   * @throws CRM_Core_Exception
+   */
+  public static function hook_civicrm_pre($op, $objectName, $id, &$params): void {
+    // Add or update the contact image private URL in civicrm_contact
+    if (in_array($op, ['create', 'edit']) && \Civi\Api4\Utils\CoreUtil::isContact($objectName)) {
+      if (isset($params['image_file_id'])) {
+        $image_uri = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File', $params['image_file_id'], 'uri');
+        $params['image_URL'] = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $image_uri, TRUE, NULL, FALSE, TRUE);
+      }
+    }
+  }
+
+  /**
    * Extract contact id from url for deleting contact image.
    */
   public static function processImage() {
