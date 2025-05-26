@@ -171,7 +171,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * @inheritdoc
    *
-   * No such things as CMS-rendering in Standlaone => always return FALSE
+   * No such things as CMS-rendering in Standalone => always return FALSE
    */
   public function addStyleUrl($url, $region) {
     return FALSE;
@@ -180,7 +180,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * @inheritdoc
    *
-   * No such things as CMS-rendering in Standlaone => always return FALSE
+   * No such things as CMS-rendering in Standalone => always return FALSE
    */
   public function addStyle($code, $region) {
     return FALSE;
