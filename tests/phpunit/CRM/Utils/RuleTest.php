@@ -70,9 +70,21 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider numberInternationalDataProvider
+   *
+   * @param float|int|string $inputData
+   * @param $expectedResult
+   * @param string $thousandSeparator
+   */
+  public function testNumberInternational(float|int|string $inputData, $expectedResult, string $thousandSeparator = ','): void {
+    $this->setCurrencySeparators($thousandSeparator);
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::numberInternational($inputData));
+  }
+
+  /**
    * @return array
    */
-  public function numericDataProvider() {
+  public function numericDataProvider(): array {
     return [
       [10, TRUE],
       ['145.0E+3', FALSE],
@@ -80,6 +92,32 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       [-10, TRUE],
       ['-10', TRUE],
       ['-10foo', FALSE],
+    ];
+  }
+
+  /**
+   * @return array
+   */
+  public function numberInternationalDataProvider(): array {
+    return [
+      'basic_integer' => [10, TRUE],
+      'no_separator_us' => ['1000.68', TRUE],
+      'no_separator_euro' => ['1000,68', TRUE, '.'],
+      'thousand_separated_us' => ['1,000.90', TRUE],
+      'thousand_separated_euro' => ['1.000,90', TRUE, '.'],
+      'million_separated_us' => ['1,000,000.90', TRUE],
+      'million_separated_euro' => ['1.000.000,90', TRUE, '.'],
+      'negative_million_separated_us' => ['-1,000,000.90', TRUE],
+      'negative_million_separated_euro' => ['-1.000.000,90', TRUE, '.'],
+      'rupee-like' => ['1,50,000', TRUE, ','],
+      'rupee-two' => ['3,00,00,000', TRUE, ','],
+      'thousand_separated_us_$' => ['$1,000.90', FALSE],
+      'thousand_separated_euro_$' => ['$1.000,90', FALSE, '.'],
+      'scientific' => ['145.0E+3', FALSE],
+      'string' => ['10', TRUE],
+      'negative' => [-10, TRUE],
+      'negative_string' => ['-10', TRUE],
+      'extra_word' => ['-10foo', FALSE],
     ];
   }
 
