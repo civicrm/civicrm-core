@@ -112,7 +112,15 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
     foreach ($allAfforms as $name => $path) {
       $fullpath = array_values($path)[0] . '.aff.html';
       $html = file_get_contents($fullpath);
-      $this->saveTranslations($html);
+
+      // Get title.
+      $form = \Civi\Api4\Afform::get(FALSE)
+        ->addWhere('name', '=', $name)
+        ->addSelect('title')
+        ->execute()
+        ->first();
+
+      $this->saveTranslations($form, $html);
     }
     return TRUE;
   }

@@ -18,7 +18,7 @@
 class CRM_Utils_JS {
 
   /**
-   * Parse a javascript file for translatable strings.
+   * Parse a javascript file for translatable strings using ts().
    *
    * @param string $jsCode
    *   Raw Javascript code.
@@ -48,6 +48,33 @@ class CRM_Utils_JS {
     return array_values($strings);
   }
 
+  /**
+   * Get Afform content selectors
+   */
+  public static function getContentSelectors() {
+    return ['p.af-text', 'div.af-markup', 'button'];
+  }
+
+  /**
+   * Get Afform Attribute selectors
+   */
+  public static function getAttributeSelectors() {
+    return ['af-title', 'af-copy', 'af-repeat'];
+  }
+
+  /**
+   * Get Afform Sub-attribute selectors
+   */
+  public static function getDefnSelectors() {
+    return ['label', 'help_pre', 'help_post', 'input_attrs', 'options'];
+  }
+
+  /**
+   * Get Afform input attributes
+   */
+  public static function getInputAttributeSelectors() {
+     return ['label', 'placeholder'];
+  }
   /**
    * Identify duplicate, adjacent, identical closures and consolidate them.
    *
