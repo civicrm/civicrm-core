@@ -67,9 +67,9 @@ class UpdateContactTest extends Api4TestBase implements TransactionalInterface {
 
   public function testContactImage(): void {
     $file = $this->createTestRecord('File', [
-        'mime_type' => 'image/png',
-        'file_name' => 'test.png',
-        'content' => 'Hello World',
+      'mime_type' => 'image/png',
+      'file_name' => 'test.png',
+      'content' => 'Hello World',
     ]);
     $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
