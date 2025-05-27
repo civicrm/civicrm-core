@@ -1043,6 +1043,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       // Ensure all required values exist for create action
       $vals = array_keys(array_filter($editable['record']));
+      // Ignore pseudoconstant suffixes in field names
+      $vals = array_map(fn($v) => explode(':', $v)[0], $vals);
       $vals[] = $editable['value_key'];
       $missingRequiredFields = civicrm_api4($editable['entity'], 'getFields', [
         'action' => 'create',
