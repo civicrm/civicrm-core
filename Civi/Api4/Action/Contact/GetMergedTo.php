@@ -63,7 +63,7 @@ class GetMergedTo extends \Civi\Api4\Generic\AbstractAction {
         ->execute()
         ->first()['contact_id'];
     }
-    $result[] = ['id' => $returnId];
+    $result[] = (empty($returnId) ? $returnId : ['id' => $returnId]);
   }
 
 }
