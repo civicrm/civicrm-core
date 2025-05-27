@@ -484,6 +484,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If enabled, deleted contacts will be moved to trash (instead of being destroyed). Users with the proper permission are able to search for the deleted contacts and restore them (or delete permanently).'),
     'help_text' => NULL,
+    'validate_callback' => 'CRM_Core_BAO_Setting::validateBoolSetting',
     'settings_pages' => ['misc' => ['weight' => 20]],
   ],
   'allowPermDeleteFinancial' => [
