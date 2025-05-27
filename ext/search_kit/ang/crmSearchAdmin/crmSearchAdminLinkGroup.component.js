@@ -73,7 +73,7 @@
 
       function setDefaults(item, newValue) {
         // Backward support for singular "condition" from older versions of SearchKit (pre 6.4)
-        if (newValue.condition && (!item.conditions|| !item.conditions.length)) {
+        if (newValue.condition && newValue.condition.length && (!item.conditions|| !item.conditions.length)) {
           item.conditions = [newValue.condition];
           delete item.condition;
         }
