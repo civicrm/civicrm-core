@@ -1092,11 +1092,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   private function fieldBelongsToEntity($entityName, $fieldName, $entityValues, $checkPermissions = TRUE) {
     try {
-      return (bool) civicrm_api4($entityName, 'getFields', [
+      $fields = civicrm_api4($entityName, 'getFields', [
         'checkPermissions' => $checkPermissions,
         'where' => [['name', '=', $fieldName]],
         'values' => $entityValues,
-      ])->count();
+      ]);
+      return (bool) $fields->count();
     }
     catch (\CRM_Core_Exception $e) {
       return FALSE;
