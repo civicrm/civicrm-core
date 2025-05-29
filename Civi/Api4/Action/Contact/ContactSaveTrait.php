@@ -90,4 +90,21 @@ trait ContactSaveTrait {
     }
   }
 
+  /**
+   * Get fields the logged in user is not permitted to act on.
+   *
+   * Override parent to exclude api_key as this is dealt with elsewhere.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getUnpermittedFields(): array {
+    $fields = parent::getUnpermittedFields();
+    if (\CRM_Core_Session::getLoggedInContactID()) {
+      // This is handled in the BAO to allow for edit own api key.
+      unset($fields['api_key']);
+    }
+    return $fields;
+  }
+
 }

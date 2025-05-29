@@ -27,6 +27,44 @@ trait DAOActionTrait {
   private $_maxWeights = [];
 
   /**
+   * Get fields the logged in user is not permitted to act on.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getUnpermittedFields(): array {
+    $unpermittedFields = [];
+    if ($this->getCheckPermissions()) {
+      $fields = $this->entityFields();
+      foreach ($fields as $field) {
+        if (!empty($field['permission']) && !\CRM_Core_Permission::check($field['permission'])) {
+          $unpermittedFields[$field['name']] = ['permission' => $field['permission'], 'own_permission' => []];
+        }
+      }
+    }
+    return $unpermittedFields;
+  }
+
+  /**
+   * Filter out any fields with field level permissions.
+   *
+   * @param array $items
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function filterUnpermittedFields(array &$items): void {
+    $unpermittedFields = $this->getUnpermittedFields();
+    $userID = \CRM_Core_Session::getLoggedInContactID();
+    if ($unpermittedFields) {
+      foreach ($items as &$item) {
+        foreach ($unpermittedFields as $unpermittedField => $permissions) {
+          unset($item[$unpermittedField]);
+        }
+      }
+    }
+  }
+
+  /**
    * @return \CRM_Core_DAO|string
    */
   protected function getBaoName() {
@@ -165,6 +203,7 @@ trait DAOActionTrait {
     $baoName = $this->getBaoName();
 
     $method = method_exists($baoName, 'create') ? 'create' : (method_exists($baoName, 'add') ? 'add' : NULL);
+    $this->filterUnpermittedFields($items);
     // Use BAO create or add method if not deprecated
     if ($method && !ReflectionUtils::isMethodDeprecated($baoName, $method)) {
       foreach ($items as $item) {
