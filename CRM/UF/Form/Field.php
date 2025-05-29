@@ -647,8 +647,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule for custom data extends entity column values.
    *
-   * @param Object $customField
-   *   Custom field.
+   * @param int $customGroupID
    * @param int $gid
    *   Group Id.
    * @param string $fieldType
@@ -659,8 +658,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @return array
    *   list of errors to be posted back to the form
    */
-  public static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
-    // fix me : check object $customField
+  public static function formRuleCustomDataExtentColumnValue(int $customGroupID, $gid, $fieldType, &$errors) {
     if (in_array($fieldType, [
       'Participant',
       'Contribution',
@@ -668,7 +666,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       'Activity',
       'Case',
     ])) {
-      $params = ['id' => $customField->custom_group_id];
+      $params = ['id' => $customGroupID];
       $customGroup = [];
       CRM_Core_BAO_CustomGroup::retrieve($params, $customGroup);
       if (($fieldType != ($customGroup['extends'] ?? NULL)) || empty($customGroup['extends_entity_column_value'])) {
@@ -782,9 +780,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       //get custom field id
       $customFieldId = explode('_', $profileFieldName);
       if ($customFieldId[0] == 'custom') {
-        $customField = CRM_Core_BAO_CustomField::getFieldObject($customFieldId[1]);
+        $customField = CRM_Core_BAO_CustomField::getField($customFieldId[1]);
         $isCustomField = TRUE;
-        if (!empty($fields['field_id']) && !$customField->is_active && $is_active) {
+        if (!empty($fields['field_id']) && !$customField['is_active'] && $is_active) {
           $errors['field_name'] = ts('Cannot set this field "Active" since the selected custom field is disabled.');
         }
 
@@ -906,7 +904,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
 
         if ($isCustomField && !isset($errors['field_name'])) {
-          self::formRuleCustomDataExtentColumnValue($customField, $self->_gid, $fieldType, $errors);
+          self::formRuleCustomDataExtentColumnValue($customField['custom_group_id'], $self->_gid, $fieldType, $errors);
         }
         break;
 
