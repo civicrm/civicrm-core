@@ -176,7 +176,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     $addressCustomFields = array_keys(CRM_Core_BAO_CustomField::getFieldsForImport('Address'));
 
-    if (isset($this->_id)) {
+    if ($this->getUFFieldID()) {
       $params = ['id' => $this->_id];
       CRM_Core_BAO_UFField::retrieve($params, $defaults);
 
@@ -222,7 +222,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $fields = CRM_Core_BAO_UFField::getAvailableFields($this->getUFGroupID(), $defaults);
 
-    $noSearchable = $hasWebsiteTypes = [];
+    $noSearchable = $hasWebsiteTypes = $hasLocationTypes = [];
     $mapperFields = [];
 
     foreach ($fields as $key => $value) {
@@ -254,23 +254,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
     $this->assign('noSearchable', $noSearchable);
-
-    $this->_location_types = CRM_Core_DAO_Address::buildOptions('location_type_id');
-    $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    /**
-     * FIXME: dirty hack to make the default option show up first.  This
-     * avoids a mozilla browser bug with defaults on dynamically constructed
-     * selector widgets.
-     */
-    if ($defaultLocationType) {
-      $defaultLocation = $this->_location_types[$defaultLocationType->id];
-      unset($this->_location_types[$defaultLocationType->id]);
-      $this->_location_types = [
-        $defaultLocationType->id => $defaultLocation,
-      ] + $this->_location_types;
-    }
-
-    $this->_location_types = ['Primary'] + $this->_location_types;
 
     // since we need a hierarchical list to display contact types & subtypes,
     // this is what we going to display in first selector
@@ -312,10 +295,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $sel3[''] = NULL;
     $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
     ksort($phoneTypes);
-
+    $locationTypes = $this->getLocationTypes();
     foreach ($sel1 as $k => $sel) {
       if ($k) {
-        foreach ($this->_location_types as $key => $value) {
+        foreach ($locationTypes as $key => $value) {
           $sel4[$k]['phone'][$key] = &$phoneTypes;
           $sel4[$k]['phone_and_ext'][$key] = &$phoneTypes;
         }
@@ -327,7 +310,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if (is_array($mapperFields[$k])) {
           foreach ($mapperFields[$k] as $key => $value) {
             if ($hasLocationTypes[$k][$key]) {
-              $sel3[$k][$key] = $this->_location_types;
+              $sel3[$k][$key] = $locationTypes;
             }
             elseif ($hasWebsiteTypes[$k][$key]) {
               $options = \Civi::entity('Website')->getOptions('website_type_id');
@@ -391,7 +374,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
 
     // proper interpretation of spec in CRM-8732
-    if (!isset($this->_id) && in_array('Search Profile', $otherModules)) {
+    if (!$this->getUFFieldID() && in_array('Search Profile', $otherModules)) {
       $defaults['visibility'] = 'Public Pages and Listings';
     }
 
@@ -664,8 +647,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule for custom data extends entity column values.
    *
-   * @param Object $customField
-   *   Custom field.
+   * @param int $customGroupID
    * @param int $gid
    *   Group Id.
    * @param string $fieldType
@@ -676,8 +658,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @return array
    *   list of errors to be posted back to the form
    */
-  public static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
-    // fix me : check object $customField
+  public static function formRuleCustomDataExtentColumnValue(int $customGroupID, $gid, $fieldType, &$errors) {
     if (in_array($fieldType, [
       'Participant',
       'Contribution',
@@ -685,7 +666,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       'Activity',
       'Case',
     ])) {
-      $params = ['id' => $customField->custom_group_id];
+      $params = ['id' => $customGroupID];
       $customGroup = [];
       CRM_Core_BAO_CustomGroup::retrieve($params, $customGroup);
       if (($fieldType != ($customGroup['extends'] ?? NULL)) || empty($customGroup['extends_entity_column_value'])) {
@@ -799,9 +780,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       //get custom field id
       $customFieldId = explode('_', $profileFieldName);
       if ($customFieldId[0] == 'custom') {
-        $customField = CRM_Core_BAO_CustomField::getFieldObject($customFieldId[1]);
+        $customField = CRM_Core_BAO_CustomField::getField($customFieldId[1]);
         $isCustomField = TRUE;
-        if (!empty($fields['field_id']) && !$customField->is_active && $is_active) {
+        if (!empty($fields['field_id']) && !$customField['is_active'] && $is_active) {
           $errors['field_name'] = ts('Cannot set this field "Active" since the selected custom field is disabled.');
         }
 
@@ -854,7 +835,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $fieldType = $fields['field_name'][0];
 
     //get the group type.
-    $groupType = CRM_Core_BAO_UFGroup::calculateGroupType($self->_gid, FALSE, $fields['field_id'] ?? NULL);
+    $groupType = CRM_Core_BAO_UFGroup::calculateGroupType($self->getUFGroupID(), FALSE, $fields['field_id'] ?? NULL);
 
     switch ($fieldType) {
       case 'Contact':
@@ -923,7 +904,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
 
         if ($isCustomField && !isset($errors['field_name'])) {
-          self::formRuleCustomDataExtentColumnValue($customField, $self->_gid, $fieldType, $errors);
+          self::formRuleCustomDataExtentColumnValue($customField['custom_group_id'], $self->_gid, $fieldType, $errors);
         }
         break;
 
@@ -1034,6 +1015,22 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
       }
     }
+  }
+
+  /**
+   * @return array
+   */
+  private function getLocationTypes(): array {
+    $locationTypes = \Civi::entity('Address')->getOptions('location_type_id');
+    $defaultLocationTypeID = CRM_Core_BAO_LocationType::getDefault()->id;
+    $firstTypes = [0 => 'Primary'];
+    // Make the default option show up first.
+    if ($defaultLocationTypeID) {
+      $firstTypes[(int) $defaultLocationTypeID] = $locationTypes[$defaultLocationTypeID]['label'];
+      unset($locationTypes[$defaultLocationTypeID]);
+    }
+
+    return $firstTypes + array_column($locationTypes, 'label', 'id');
   }
 
 }
