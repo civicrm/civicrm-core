@@ -38,6 +38,7 @@
             'api_params',
             'is_template',
             // These two need to be in the select clause so they are allowed as filters
+            'created_id',
             'created_id.display_name',
             'modified_id.display_name',
             'created_date',
@@ -105,6 +106,11 @@
       this.onPostRun.push(function(apiResults) {
         _.each(apiResults.run, function(row) {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
+          // If someone has edit own permission, we need to override and only allow if they are the owner.
+          if (!CRM.checkPerm('all CiviCRM permissions and ACLs') && CRM.checkPerm('edit own search_kit') && (CRM.config.cid !== row.data.created_id)) {
+            row.permissionToEdit = false;
+          }
+
           // If main entity doesn't exist, no can edit
           if (!row.data['api_entity:label']) {
             row.permissionToEdit = false;
@@ -116,6 +122,12 @@
           // Saves rendering cycles to not show an empty menu of search displays
           if (!row.data.display_name) {
             row.openDisplayMenu = false;
+          }
+
+          row.permissionToDelete = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
+          // If someone has 'delete own search_kit' permission, we need to override and only allow if they are the owner.
+          if (!CRM.checkPerm('all CiviCRM permissions and ACLs') && CRM.checkPerm('delete own search_kit') && (CRM.config.cid !== row.data.created_id)) {
+            row.permissionToDelete = false;
           }
         });
         updateAfformCounts();
