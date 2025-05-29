@@ -618,45 +618,16 @@ function civicrm_api3_mailing_stats($params) {
   if (empty($params['job_id'])) {
     $params['job_id'] = NULL;
   }
-  foreach (['Recipients', 'Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened'] as $detail) {
-    switch ($detail) {
-      case 'Recipients':
-        $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_MailingEventQueue::getTotalCount($params['mailing_id'], $params['job_id']),
-        ];
-        break;
 
-      case 'Delivered':
-        $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_MailingEventDelivered::getTotalCount($params['mailing_id'], $params['job_id'], $params['date']),
-        ];
-        break;
+  // Populate the stats (the odd key names are used by the CiviMail A/B reports)
+  $stats[$params['mailing_id']]['Recipients'] = CRM_Mailing_Event_BAO_MailingEventQueue::getTotalCount($params['mailing_id'], $params['job_id']);
+  $stats[$params['mailing_id']]['Delivered'] = CRM_Mailing_Event_BAO_MailingEventDelivered::getTotalCount($params['mailing_id'], $params['job_id'], $params['date']);
+  $stats[$params['mailing_id']]['Bounces'] = CRM_Mailing_Event_BAO_MailingEventBounce::getTotalCount($params['mailing_id'], $params['job_id'], $params['date']);
+  $stats[$params['mailing_id']]['Unsubscribers'] = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], NULL, $params['date']);
+  $stats[$params['mailing_id']]['OptOuts'] = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], TRUE, $params['date']);
+  $stats[$params['mailing_id']]['Unique Clicks'] = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], NULL, $params['date']);
+  $stats[$params['mailing_id']]['Opened'] = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']);
 
-      case 'Bounces':
-        $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_MailingEventBounce::getTotalCount($params['mailing_id'], $params['job_id'], $params['date']),
-        ];
-        break;
-
-      case 'Unsubscribers':
-        $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], NULL, $params['date']),
-        ];
-        break;
-
-      case 'Unique Clicks':
-        $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], NULL, $params['date']),
-        ];
-        break;
-
-      case 'Opened':
-        $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']),
-        ];
-        break;
-    }
-  }
   $stats[$params['mailing_id']]['delivered_rate'] = $stats[$params['mailing_id']]['opened_rate'] = $stats[$params['mailing_id']]['clickthrough_rate'] = '0.00%';
   if (!empty(CRM_Mailing_Event_BAO_MailingEventQueue::getTotalCount($params['mailing_id'], $params['job_id']))) {
     $stats[$params['mailing_id']]['delivered_rate'] = round((100.0 * $stats[$params['mailing_id']]['Delivered']) / CRM_Mailing_Event_BAO_MailingEventQueue::getTotalCount($params['mailing_id'], $params['job_id']), 2) . '%';

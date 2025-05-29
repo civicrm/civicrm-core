@@ -809,6 +809,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
       'Opened' => 20,
       'Unique Clicks' => 0,
       'Unsubscribers' => 20,
+      'OptOuts' => 0,
       'delivered_rate' => '80%',
       'opened_rate' => '25%',
       'clickthrough_rate' => '0%',

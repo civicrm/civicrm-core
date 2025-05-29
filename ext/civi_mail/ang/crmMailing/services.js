@@ -562,8 +562,8 @@
       {name: 'Unique Clicks', title: ts('Unique Clicks'),          searchFilter: '&mailing_click_status=Y',    eventsFilter: '&event=click&distinct=1', reportType: 'clicks', reportFilter: ''},
       // {name: 'Replies',    title: ts('Replies'),                 searchFilter: '&mailing_reply_status=Y',    eventsFilter: '&event=reply', reportType: 'detail', reportFilter: '&is_replied_value=1'},
       {name: 'Bounces',       title: ts('Bounces'),                 searchFilter: '&mailing_delivery_status=N', eventsFilter: '&event=bounce', reportType: 'bounce', reportFilter: ''},
-      {name: 'Unsubscribers', title: ts('Unsubscribes & Opt-outs'), searchFilter: '&mailing_unsubscribe=1',     eventsFilter: '&event=unsubscribe', reportType: 'detail', reportFilter: '&is_unsubscribed_value=1'},
-      // {name: 'OptOuts',    title: ts('Opt-Outs'),                searchFilter: '&mailing_optout=1',          eventsFilter: '&event=optout', reportType: 'detail', reportFilter: ''}
+      {name: 'Unsubscribers', title: ts('Unsubscribe Requests'), searchFilter: '&mailing_unsubscribe=1', eventsFilter: '&event=unsubscribe', reportType: 'detail', reportFilter: '&is_unsubscribed_value=1'},
+      {name: 'OptOuts', title: ts('Opt-out Requests'), searchFilter: '&mailing_optout=1', eventsFilter: '&event=optout', reportType: 'detail', reportFilter: ''}
     ];
 
     return {
