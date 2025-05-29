@@ -982,10 +982,24 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
-    if ($pearError instanceof DB_Error) {
-      throw new DBQueryException($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
+    $message = $pearError->getMessage();
+
+    // wrapped in case settings aren't available yet
+    try {
+      if (\Civi::settings()->get('debug_enabled')) {
+        $message .= ' ' . $pearError->getUserInfo();
+      }
     }
-    throw new CRM_Core_Exception($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
+    catch (\Exception $e) {
+      // well we tried
+    }
+
+    $code = $pearError->getCode();
+
+    if ($pearError instanceof DB_Error) {
+      throw new DBQueryException($message, $code, ['exception' => $pearError]);
+    }
+    throw new CRM_Core_Exception($message, $code, ['exception' => $pearError]);
   }
 
   /**
