@@ -326,28 +326,35 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     if ($maintenance) {
-      // if maintenance, we need to wrap in a minimal header
-      $headerContent = CRM_Core_Region::instance('html-header', FALSE)->render('');
-
-      // note - now adding #crm-container is a hacky way to avoid rendering
-      // the civicrm menubar. @todo a better way
-      $content = <<<HTML
-        <!DOCTYPE html >
-        <html class="crm-standalone">
-          <head>
-            {$headerContent}
-          </head>
-          <body>
-            <div class="crm-container standalone-page-padding">
-              {$content}
-            </div>
-          </body>
-        </html>
-      HTML;
+      \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_Base::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
+      $content = $this->renderMaintenanceMessage($content, $print);
     }
-
     print $content;
     return NULL;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function renderMaintenanceMessage(string $content): string {
+    // wrap in a minimal header
+    $headerContent = CRM_Core_Region::instance('html-header', FALSE)->render('');
+
+    // note - not adding #crm-container is a hacky way to avoid rendering
+    // the civicrm menubar. @todo a better way
+    return <<<HTML
+      <!DOCTYPE html >
+      <html class="crm-standalone">
+        <head>
+          {$headerContent}
+        </head>
+        <body>
+          <div class="crm-container standalone-page-padding">
+            {$content}
+          </div>
+        </body>
+      </html>
+    HTML;
   }
 
   /**
