@@ -176,7 +176,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     $addressCustomFields = array_keys(CRM_Core_BAO_CustomField::getFieldsForImport('Address'));
 
-    if (isset($this->_id)) {
+    if ($this->getUFFieldID()) {
       $params = ['id' => $this->_id];
       CRM_Core_BAO_UFField::retrieve($params, $defaults);
 
@@ -374,7 +374,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
 
     // proper interpretation of spec in CRM-8732
-    if (!isset($this->_id) && in_array('Search Profile', $otherModules)) {
+    if (!$this->getUFFieldID() && in_array('Search Profile', $otherModules)) {
       $defaults['visibility'] = 'Public Pages and Listings';
     }
 
@@ -835,7 +835,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $fieldType = $fields['field_name'][0];
 
     //get the group type.
-    $groupType = CRM_Core_BAO_UFGroup::calculateGroupType($self->_gid, FALSE, $fields['field_id'] ?? NULL);
+    $groupType = CRM_Core_BAO_UFGroup::calculateGroupType($self->getUFGroupID(), FALSE, $fields['field_id'] ?? NULL);
 
     switch ($fieldType) {
       case 'Contact':
