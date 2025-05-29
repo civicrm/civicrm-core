@@ -311,7 +311,10 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     // Otherwise: Merely TRUNCATE and INSERT basic data
     $b = new \Civi\Test\CiviEnvBuilder('Basic Data');
-    $b->callback([\Civi\Test::data(), 'populate']);
+    $b->callback([\Civi\Test::data(), 'populate'])
+      ->callback(function ($ctx) {
+        \Civi\Test::schema()->setAutoIncrement();
+      });
     return $b;
   }
 
@@ -1722,6 +1725,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       CRM_Core_DAO::executeQuery($sql);
     }
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
+
+    // Truncate resets the autoincrements, so re-apply separation
+    \Civi\Test::schema()->setAutoIncrement();
   }
 
   /**
