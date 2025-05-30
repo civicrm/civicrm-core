@@ -32,6 +32,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'is_secret' => TRUE,
   ],
   'verpSeparator' => [
     'group_name' => 'Mailing Preferences',
