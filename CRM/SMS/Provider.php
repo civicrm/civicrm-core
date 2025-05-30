@@ -79,9 +79,10 @@ abstract class CRM_SMS_Provider {
    * @param array $recipients
    * @param string $header
    * @param string $message
-   * @param int $dncID
+   * @param int|null $jobID
+   * @param int|null $userID
    */
-  abstract public function send($recipients, $header, $message, $dncID = NULL);
+  abstract public function send($recipients, $header, $message, $jobID = NULL, $userID = NULL);
 
   /**
    * @param int $apiMsgID
