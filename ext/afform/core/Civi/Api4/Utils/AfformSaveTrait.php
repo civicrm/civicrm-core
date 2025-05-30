@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\Afform\StringScanner;
 use Civi\Api4\TranslationSource;
 use Civi\Api4\Afform;
 use Civi\Afform\Utils;
@@ -14,12 +15,6 @@ use Civi\Afform\Utils;
 trait AfformSaveTrait {
 
   use AfformFormatTrait;
-
-  /**
-   * Translatable Strings
-   * string $translateStrings
-   */
-  protected $stringTranslations = [];
 
   /**
    *
@@ -105,95 +100,20 @@ trait AfformSaveTrait {
    * string $html
    */
   protected function saveTranslations($form, $html) {
-    $strings = [];
-    $doc = \phpQuery::newDocument($html, 'text/html');
-
-    // Record Title.
-    if (isset($form['title'])) {
-      $this->stringTranslations[] = $form['title'];
-    }
-
-    // Find markup to be translated.
-    $contentSelectors = \CRM_Utils_JS::getContentSelectors();
-    $contentSelectors = implode(',', $contentSelectors);
-    $doc->find($contentSelectors)->each(function (\DOMElement $item) {
-      $markup = '';
-      foreach ($item->childNodes as $child) {
-        $markup .= $child->ownerDocument->saveXML($child);
-      }
-      $this->saveTranslatableString($markup);
-    });
-
-    // Find attributes to be translated.
-    $attributes = \CRM_Utils_JS::getAttributeSelectors();
-    foreach ($attributes as $attribute) {
-      $doc->find('[' . $attribute . ']')->each(function (\DOMElement $item) use ($attribute) {
-        $this->saveTranslatableString($item->getAttribute($attribute));
-      });
-    }
-
-    // Get sub-attributes to be translated.
-    $defnSelectors = \CRM_Utils_JS::getDefnSelectors();
-    $inputSelectors = \CRM_Utils_JS::getInputAttributeSelectors();
-    $doc->find('af-field[defn]')->each(function (\DOMElement $item) use ($defnSelectors, $inputSelectors) {
-      $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'));
-      // Check Defn Selectors.
-      foreach ($defnSelectors as $attribute) {
-        if (isset($defn[$attribute]) && is_array($defn[$attribute])) {
-          $input = $defn[$attribute];
-          if (is_array($input)) {
-            foreach ($input as $item) {
-              $this->processTranslatableArray($inputSelectors, $item);
-            }
-          }
-          else {
-            $this->processTranslatableArray($inputSelectors, $input);
-          }
-        }
-        else {
-          $this->saveTranslatableString($defn[$attribute]);
-        }
-      }
-    });
+    $strings = (new StringScanner())->scan($form, $html)->getStrings();
 
     // Save the form strings.
-    if (!empty($this->stringTranslations)) {
-      $this->stringTranslations = array_unique($this->stringTranslations);
-
+    if (!empty($strings)) {
       // Build the array for the table.
-      $strings = [];
-      foreach ($this->stringTranslations as $value) {
-        $strings[] = ['source' => $value];
+      $records = [];
+      foreach ($strings as $value) {
+        $records[] = ['source' => $value];
       }
 
       TranslationSource::save(FALSE)
-        ->addRecord(...$strings)
-        ->setMatch([
-          'source',
-        ])
+        ->setRecords($records)
+        ->setMatch(['source'])
         ->execute();
-
-    }
-  }
-
-  /**
-   * Process array of selectors.
-   */
-  protected function processTranslatableArray($selectors, $item) {
-    foreach ($selectors as $selector) {
-      if (isset($item[$selector])) {
-        $this->saveTranslatableString($item[$selector]);
-      }
-    }
-  }
-
-  /**
-   * Record String for translation.
-   */
-  protected function saveTranslatableString($value) {
-    $value = trim($value);
-    if ((strpos($value, '{{') === FALSE) && !empty($value)) {
-      $this->stringTranslations[] = $value;
     }
   }
 
