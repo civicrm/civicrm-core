@@ -673,7 +673,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
           'icon' => 'crm-i test',
           'permission' => ['access CiviCRM'],
           'weight' => 50,
-          'domain_id' => 'current_domain',
+          // 'domain_id' => 'current_domain', // This is implied if not set
         ],
         'match' => ['name'],
       ],
@@ -684,14 +684,16 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertCount(1, $result);
     $this->assertSame(['name'], $result[0]['params']['match']);
 
-    // Enable multisite with multiple domains
-    \Civi::settings()->set('multisite_is_enabled', TRUE);
     Domain::create(FALSE)
       ->addValue('name', 'Another domain')
       ->addValue('version', CRM_Utils_System::version())
       ->execute()->single();
     $allDomains = Domain::get(FALSE)->addSelect('id')->addOrderBy('id')->execute();
     $this->assertGreaterThan(1, $allDomains->count());
+    foreach ($allDomains as $domain) {
+      // Enable multisite with multiple domains
+      \Civi::settings($domain['id'])->set('multisite_is_enabled', TRUE);
+    }
 
     $managedRecords = [];
     \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
