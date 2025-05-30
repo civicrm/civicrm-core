@@ -52,7 +52,7 @@ class CRM_Utils_JS {
    * Get Afform content selectors
    */
   public static function getContentSelectors() {
-    return ['p.af-text', 'div.af-markup', 'button'];
+    return ['.af-title', 'p.af-text', 'div.af-markup', 'button'];
   }
 
   /**
@@ -66,14 +66,7 @@ class CRM_Utils_JS {
    * Get Afform Sub-attribute selectors
    */
   public static function getDefnSelectors() {
-    return ['label', 'help_pre', 'help_post', 'input_attrs', 'options'];
-  }
-
-  /**
-   * Get Afform input attributes
-   */
-  public static function getInputAttributeSelectors() {
-    return ['label', 'placeholder'];
+    return ['label', 'help_pre', 'help_post', 'input_attrs.placeholder', 'options.*.label'];
   }
 
   /**

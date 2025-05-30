@@ -67,7 +67,6 @@ class CRM_Core_BAO_TranslationSource extends CRM_Core_DAO_TranslationSource impl
    */
   public static function getTranslationSources($language) {
     $sources = [];
-    // FIXME: filter by lang
     $sql = "
 SELECT source, string
 FROM civicrm_translation t
