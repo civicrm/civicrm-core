@@ -54,9 +54,12 @@ body {
 }
 /* Remove list styles (bullets/numbers) */
 .crm-container ol,
-.crm-container ul,
-.crm-container menu {
+.crm-container ul {
   list-style: none;
+}
+/* Restores list styles for text-editor regions */
+.crm-container :is(tr,td).html-adjust :is(ol,ul) {
+  list-style: initial;
 }
 /* For images to not be able to exceed their container */
 .crm-container img {
