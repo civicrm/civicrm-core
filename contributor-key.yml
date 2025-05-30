@@ -441,11 +441,15 @@
   name        : Peter Haight
   organization: Giant Rabbit
 
-- github      : dlobo
-  name        : Donald Lobo
+- github      : djnatedagreat
+  name        : Nate Harris
+  organization: New York State Senate
 
 - github      : dkguru
   organization: Jesper Angelo
+
+- github      : dlobo
+  name        : Donald Lobo
 
 - github      : don-alejandro-z
 
@@ -1349,6 +1353,8 @@
 - github      : petednz
   name        : Peter Davis
   organization: Fuzion
+
+- github      : Peter-Reck
 
 - github      : pillarsdotnet
   name        : Bob Vincent
