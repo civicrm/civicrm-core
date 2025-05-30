@@ -220,10 +220,21 @@ abstract class Api4Query {
           }
 
           if (is_array($clause[2])) {
+            // Not should be applied to the entire clause instead of each piece
+            $not = '';
+            if (str_starts_with($clause[1], 'NOT')) {
+              $not = 'NOT';
+              $clause[1] = substr($clause[1], 4);
+            }
             $queryString = '';
 
             foreach ($clause[2] as $value) {
               $subclauses = $clause;
+              // Strings must be quoted in ON clause
+              if ($type === 'ON' && is_string($value)) {
+                $value = "'$value'";
+              }
+
               $subclauses[2] = $value;
 
               if ($queryString !== '') {
@@ -239,7 +250,7 @@ abstract class Api4Query {
               }
             }
 
-            return $queryString;
+            return "$not($queryString)";
           }
         }
 

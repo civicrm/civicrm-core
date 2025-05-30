@@ -319,7 +319,7 @@ class PseudoconstantTest extends Api4TestBase {
 
     $this->assertArrayNotHasKey($participant['id'], (array) $search2);
 
-    //CONTINAS
+    // CONTAINS
     $contact2 = $this->createTestRecord('Contact');
     $this->createTestRecord('Participant', [
       'contact_id' => $contact2['id'],
@@ -354,7 +354,7 @@ class PseudoconstantTest extends Api4TestBase {
     $this->assertEquals(['1', '2'], $search1->first()['role_id']);
     $this->assertCount(1, $search1);
 
-    //NOT CONTAINS
+    // NOT CONTAINS
     $search1 = Participant::get()
       ->addSelect('role_id', 'role_id:label')
       ->addWhere('role_id:label', 'NOT CONTAINS', ['Attendee'])
@@ -369,7 +369,7 @@ class PseudoconstantTest extends Api4TestBase {
       ->execute();
     $this->assertCount(0, $search1);
 
-    //CONTAINS ONE OF
+    // CONTAINS ONE OF
     $search1 = Participant::get()
       ->addSelect('role_id', 'role_id:label')
       ->addWhere('role_id:label', 'CONTAINS ONE OF', 'Volunteer')
@@ -406,7 +406,7 @@ class PseudoconstantTest extends Api4TestBase {
     $this->assertEquals(['1', '2'], $search1->first()['role_id']);
     $this->assertCount(2, $search1);
 
-    //NOT CONTAINS ONE OF
+    // NOT CONTAINS ONE OF
     $search1 = Participant::get()
       ->addSelect('role_id', 'role_id:label')
       ->addWhere('role_id:label', 'NOT CONTAINS ONE OF', ['Volunteer'])

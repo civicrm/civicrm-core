@@ -390,9 +390,19 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('two', $result->first()['group']);
 
     $result = MockBasicEntity::get()
-      ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', ['apple', 'pear'])
+      ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', ['apple', 'apple'])
       ->execute();
-    $this->assertCount(0, $result);
+    $this->assertCount(1, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS', ['apple', 'banana'])
+      ->execute();
+    $this->assertCount(2, $result);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS', 'pear')
