@@ -164,7 +164,7 @@ class SubmitFile extends AbstractProcessor {
   }
 
   private function updateDraft(array $draft, int $fileId): array {
-    $fileInfo = $this->getFileInfo($fileId);
+    $fileInfo = $this->getFileInfo($fileId, $this->modelName);
 
     // Place fileInfo into correct entity
     $entityData =& $draft['data'][$this->modelName][$this->entityIndex];
