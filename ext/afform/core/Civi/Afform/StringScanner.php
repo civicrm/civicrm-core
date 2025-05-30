@@ -54,21 +54,8 @@ class StringScanner {
     $doc->find('af-field[defn]')->each(function (\DOMElement $item) use ($defnSelectors, $inputSelectors) {
       $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'));
       // Check Defn Selectors.
-      foreach ($defnSelectors as $attribute) {
-        if (isset($defn[$attribute]) && is_array($defn[$attribute])) {
-          $input = $defn[$attribute];
-          if (is_array($input)) {
-            foreach ($input as $item) {
-              $this->scanArray($inputSelectors, $item);
-            }
-          }
-          else {
-            $this->scanArray($inputSelectors, $input);
-          }
-        }
-        else {
-          $this->scanString($defn[$attribute]);
-        }
+      foreach ($defnSelectors as $selector) {
+        $this->defnLookupTranslate($defn, $selector);
       }
     });
 
@@ -76,12 +63,28 @@ class StringScanner {
   }
 
   /**
-   * Process array of selectors.
+   * Helper to find defn data recursively
    */
-  private function scanArray($selectors, $item) {
-    foreach ($selectors as $selector) {
-      if (isset($item[$selector])) {
-        $this->scanString($item[$selector]);
+  protected function defnLookupTranslate(&$defn, $selector) {
+    $subsels = explode('.', $selector);
+    if (count($subsels) == 1) {
+      if (isset($defn[$selector]) && !is_array($defn[$selector])) {
+        $this->scanString($defn[$selector]);
+      }
+    }
+    elseif (count($subsels) > 1) {
+      // go deeper in the defn array
+      $parentSel = $subsels[0];
+      unset($subsels[0]);
+      // we use '*' to indicate that this is an array of objects so we can loop on the array
+      if (isset($subsels[1]) && $subsels[1] == '*') {
+        unset($subsels[1]);
+        foreach ($defn[$parentSel] as &$subDefn) {
+          $this->defnLookupTranslate($subDefn, implode('.', $subsels));
+        }
+      }
+      elseif (isset($defn[$parentSel])) {
+        $this->defnLookupTranslate($defn[$parentSel], implode('.', $subsels));
       }
     }
   }
