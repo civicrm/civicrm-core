@@ -207,6 +207,20 @@ class SettingsBag {
   }
 
   /**
+   * Alias of hasExplicit retained for backwards compatibility
+   *
+   * @deprecated
+   *
+   * @param string $key
+   *   The simple name of the setting.
+   * @return bool
+   */
+  public function hasExplict($key) {
+    \CRM_Core_Error::deprecatedFunctionWarning('hasExplicit (spelt correctly)');
+    return $this->hasExplicit($key);
+  }
+
+  /**
    * Determine if the entity has explicitly designated a value.
    *
    * Note that get() may still return other values based on
@@ -216,7 +230,7 @@ class SettingsBag {
    *   The simple name of the setting.
    * @return bool
    */
-  public function hasExplict($key) {
+  public function hasExplicit($key) {
     // NULL means no designated value.
     return isset($this->values[$key]);
   }
