@@ -44,6 +44,7 @@ class Translator extends AutoService implements EventSubscriberInterface {
             function (\DOMElement $item) use ($contentSelectors) {
               $pqItem = pq($item);
               $markup = $pqItem->html();
+              $markup = trim($markup);
               if (!empty($markup)) {
                 $translated = html_entity_decode(_ts(htmlentities($markup)));
                 if ($markup !== $translated) {
