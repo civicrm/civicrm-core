@@ -42,13 +42,13 @@ class Translator extends AutoService implements EventSubscriberInterface {
           $contentSelectors = implode(',', $contentSelectors);
           $doc->find($contentSelectors)->each(
             function (\DOMElement $item) use ($contentSelectors) {
-              $markup = '';
-              foreach ($item->childNodes as $child) {
-                $markup .= $child->ownerDocument->saveXML($child);
-              }
-              $markup = trim($markup);
+              $pqItem = pq($item);
+              $markup = $pqItem->html();
               if (!empty($markup)) {
-                $item->replaceWith(_ts($markup));
+                $translated = _ts($markup);
+                if ($markup !== $translated) {
+                  $pqItem->html($translated);
+                }
               }
             }
           );
