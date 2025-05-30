@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Generic\AbstractAction;
-use Civi\Api4\TranslationSource;
 use Civi\Core\HookInterface;
 
 /**
@@ -72,7 +70,7 @@ class CRM_Core_BAO_TranslationSource extends CRM_Core_DAO_TranslationSource impl
     // FIXME: filter by lang
     $sql = "
 SELECT source, string
-FROM civicrm_translation t 
+FROM civicrm_translation t
   INNER JOIN civicrm_translation_source ts ON t.entity_table = 'civicrm_translation_source' AND t.entity_field = 'source' AND t.entity_id = ts.id
 WHERE t.language = %1 AND t.status_id = 1";
     $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$language, 'String']], TRUE, NULL, FALSE, FALSE);

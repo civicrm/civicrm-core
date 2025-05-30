@@ -11,5 +11,3 @@ class Translate extends \Civi\Api4\Generic\BasicSaveAction {
   use \Civi\Api4\Utils\AfformTranslateTrait;
 
 }
-
-

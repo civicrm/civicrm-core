@@ -380,7 +380,6 @@ class CRM_Core_I18n {
 
     if (!isset($params['skip_translation'])) {
 
-
       if (!empty($domain)) {
         // It might be prettier to cast to an array, but this is high-traffic stuff.
         if (is_array($domain)) {
@@ -455,7 +454,9 @@ class CRM_Core_I18n {
     }
 
     $tsTable = $this->getTranslationReplacements();
-    if (isset($tsTable[$text])) $text = $tsTable[$text];
+    if (isset($tsTable[$text])) {
+      $text = $tsTable[$text];
+    }
 
     // dont translate if we've done exactMatch already
     if (!$exactMatch) {
@@ -799,7 +800,6 @@ class CRM_Core_I18n {
     return Civi::$statics[__CLASS__][$replacementsLocale];
   }
 
-
   private function getTranslationReplacements() {
     if (defined('CIVI_SETUP') || isset(Civi\Test::$statics['testPreInstall'])) {
       return [];
@@ -819,6 +819,5 @@ class CRM_Core_I18n {
     }
     return Civi::$statics[__CLASS__][$translationReplacement];
   }
-
 
 }

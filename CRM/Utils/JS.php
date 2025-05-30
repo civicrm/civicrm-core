@@ -73,8 +73,9 @@ class CRM_Utils_JS {
    * Get Afform input attributes
    */
   public static function getInputAttributeSelectors() {
-     return ['label', 'placeholder'];
+    return ['label', 'placeholder'];
   }
+
   /**
    * Identify duplicate, adjacent, identical closures and consolidate them.
    *
