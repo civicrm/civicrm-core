@@ -45,7 +45,7 @@ class Translator extends AutoService implements EventSubscriberInterface {
               $pqItem = pq($item);
               $markup = $pqItem->html();
               if (!empty($markup)) {
-                $translated = _ts($markup);
+                $translated = html_entity_decode(_ts(htmlentities($markup)));
                 if ($markup !== $translated) {
                   $pqItem->html($translated);
                 }
@@ -65,22 +65,11 @@ class Translator extends AutoService implements EventSubscriberInterface {
 
           // Translate Defn values.
           $defnSelectors = \CRM_Utils_JS::getDefnSelectors();
-          $inputSelectors = \CRM_Utils_JS::getInputAttributeSelectors();
           $doc->find('af-field[defn]')->each(
-            function (\DOMElement $item) use ($defnSelectors, $inputSelectors) {
+            function (\DOMElement $item) use ($defnSelectors) {
               $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'), 1);
-              // $item->setAttribute('debug', gettype($defn));
-              foreach ($defnSelectors as $attribute) {
-                if (isset($defn[$attribute])) {
-                  if (is_array($defn[$attribute])) {
-                    foreach ($defn[$attribute] as $input) {
-                      $this->translateItemArray($input, $inputSelectors);
-                    }
-                  }
-                  else {
-                    $this->translateItemArray($defn[$attribute], $inputSelectors);
-                  }
-                }
+              foreach ($defnSelectors as $selector) {
+                $this->defnLookupTranslate($defn, $selector);
               }
               $item->setAttribute('defn', \CRM_Utils_JS::encode($defn));
             }
@@ -98,12 +87,28 @@ class Translator extends AutoService implements EventSubscriberInterface {
   }
 
   /**
-   * Helper to translate subattributes.
+   * Helper to translate defn data recursively
    */
-  public function translateItemArray(&$item, $selectors) {
-    foreach ($selectors as $selector) {
-      if (isset($item[$selector])) {
-        $item[$selector] = _ts($item[$selector]);
+  public function defnLookupTranslate(&$defn, $selector) {
+    $subsels = explode('.', $selector);
+    if (count($subsels) == 1) {
+      if (isset($defn[$selector]) && !is_array($defn[$selector])) {
+        $defn[$selector] = _ts($defn[$selector]);
+      }
+    }
+    elseif (count($subsels) > 1) {
+      // go deeper in the defn array
+      $parentSel = $subsels[0];
+      unset($subsels[0]);
+      // we use '*' to indicate that this is an array of objects so we can loop on the array
+      if (isset($subsels[1]) && $subsels[1] == '*') {
+        unset($subsels[1]);
+        foreach ($defn[$parentSel] as &$subDefn) {
+          $this->defnLookupTranslate($subDefn, implode('.', $subsels));
+        }
+      }
+      elseif (isset($defn[$parentSel])) {
+        $this->defnLookupTranslate($defn[$parentSel], implode('.', $subsels));
       }
     }
   }
