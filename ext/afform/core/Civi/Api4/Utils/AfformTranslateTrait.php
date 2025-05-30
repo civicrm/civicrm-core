@@ -2,7 +2,6 @@
 
 namespace Civi\Api4\Utils;
 
-use Civi\Afform\Utils;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -28,12 +27,12 @@ trait AfformTranslateTrait {
     }
     else {
       // Fetch existing metadata
-//      $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->setAction('create')->addSelect('name')->execute()->column('name');
-//      unset($fields[array_search('layout', $fields)]);
+      //      $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->setAction('create')->addSelect('name')->execute()->column('name');
+      //      unset($fields[array_search('layout', $fields)]);
 
-//      $orig = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->setSelect($fields)->execute()->first();
+      //      $orig = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->setSelect($fields)->execute()->first();
       $form = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->execute()->first();
-Civi::log()->warning('orig '.var_export($form,true));
+      Civi::log()->warning('orig ' . var_export($form, TRUE));
 
       // Translate the main title
       if (!empty($form['title'])) {
@@ -61,7 +60,7 @@ Civi::log()->warning('orig '.var_export($form,true));
     $translateStrings = [];
 
     // Loop through passed fields
-    foreach($fields as $field) {
+    foreach ($fields as $field) {
       if (!empty($field['#children'])) {
         $childrenStrings = $this->getFieldTranslations($field['#children']);
         $translateStrings = array_merge($translateStrings, $childrenStrings);
@@ -71,10 +70,10 @@ Civi::log()->warning('orig '.var_export($form,true));
           $translateStrings[]['source'] = $field['label'];
         }
         elseif (!empty($field['af-title'])) {
-          $translateStrings[]['source']  = $field['af-title'];
+          $translateStrings[]['source'] = $field['af-title'];
         }
         elseif (!empty($field['#text'])) {
-          $translateStrings[]['source']  = $field['#text'];
+          $translateStrings[]['source'] = $field['#text'];
         }
       }
     }
@@ -99,4 +98,5 @@ Civi::log()->warning('orig '.var_export($form,true));
       ])
       ->execute();
   }
+
 }
