@@ -9,9 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
- namespace Civi\Api4\Service\Links;
+namespace Civi\Api4\Service\Links;
 
- use Civi\API\Event\RespondEvent;
+use Civi\API\Event\RespondEvent;
 
 /**
  * @service
@@ -49,18 +49,18 @@ class OptionValueLinksProvider extends \Civi\Core\Service\AutoSubscriber {
       $editLinkIndex = self::getActionIndex($links, 'update');
       $deleteLinkIndex = self::getActionIndex($links, 'delete');
       // Add link to manage OptionValue
-      /*$links[] = [
-        'ui_action' => 'advanced',
-        'api_action' => 'update',
-        'api_values' => NULL,
-        'entity' => 'OptionValue',
-        'path' => "civicrm/contact/view/OptionValue?reset=1&id=$optionValueId&action=view",
-        'text' => ts('Manage OptionValue'),
-        'icon' => CoreUtil::getInfoItem('OptionValue', 'icon'),
-        'weight' => 80,
-        'target' => NULL,
-      ];*/
-      $idToken = $optionValueId ?: '[id]';  
+      // /*$links[] = [
+      //   'ui_action' => 'advanced',
+      //   'api_action' => 'update',
+      //   'api_values' => NULL,
+      //   'entity' => 'OptionValue',
+      //   'path' => "civicrm/contact/view/OptionValue?reset=1&id=$optionValueId&action=view",
+      //   'text' => ts('Manage OptionValue'),
+      //   'icon' => CoreUtil::getInfoItem('OptionValue', 'icon'),
+      //   'weight' => 80,
+      //   'target' => NULL,
+      // ];*/
+      $idToken = $optionValueId ?: '[id]';
       $optionValue = \Civi\Api4\OptionValue::get(FALSE)
         ->addSelect('value')
         ->addWhere('id', '=', $optionValueId)
