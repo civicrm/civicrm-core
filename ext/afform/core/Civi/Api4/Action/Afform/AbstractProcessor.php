@@ -318,7 +318,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     foreach ($fileFields as $fieldName => $fieldDefn) {
       foreach ($result as &$item) {
         if (!empty($item[$fieldName])) {
-          $fileInfo = $this->getFileInfo($item[$fieldName]);
+          $fileInfo = $this->getFileInfo($item[$fieldName], $afEntityName);
           $item[$fieldName] = $fileInfo;
         }
       }
@@ -326,9 +326,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return $result;
   }
 
-  protected function getFileInfo(int $fileId):? array {
+  protected function getFileInfo(int $fileId, string $afEntityName):? array {
     $select = ['id', 'file_name', 'icon'];
-    if ($this->canViewFileAttachments($this->modelName)) {
+    if ($this->canViewFileAttachments($afEntityName)) {
       $select[] = 'url';
     }
     return File::get(FALSE)
