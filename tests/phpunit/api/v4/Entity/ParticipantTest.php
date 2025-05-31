@@ -19,6 +19,7 @@
 
 namespace api\v4\Entity;
 
+use Civi\Api4\Contact;
 use Civi\Api4\Event;
 use Civi\Api4\Participant;
 use api\v4\Api4TestBase;
@@ -322,17 +323,18 @@ class ParticipantTest extends Api4TestBase {
       'label' => 'Role2',
       'name' => 'role_2',
     ]);
+    $cid = $this->saveTestRecords('Contact', ['records' => 3])->column('id');
     $participants = $this->saveTestRecords('Participant', [
       'records' => [
-        ['role_id:name' => 'role_1'],
-        ['role_id:name' => 'role_2'],
-        ['role_id:name' => ['role_1', 'role_2']],
+        ['role_id:name' => 'role_1', 'contact_id' => $cid[0]],
+        ['role_id:name' => 'role_2', 'contact_id' => $cid[1]],
+        ['role_id:name' => ['role_1', 'role_2'], 'contact_id' => $cid[2]],
       ],
     ])->column('id');
 
     $hasRole1 = Participant::get(FALSE)
       ->addSelect('id')
-      ->addWhere('role_id:name', 'CONTAINS', 'role_1')
+      ->addWhere('role_id:name', 'CONTAINS', ['role_1'])
       ->execute()->column('id');
     $this->assertEquals([$participants[0], $participants[2]], $hasRole1);
 
@@ -347,6 +349,42 @@ class ParticipantTest extends Api4TestBase {
       ->addWhere('role_id:name', 'NOT CONTAINS', 'role_1')
       ->execute()->column('id');
     $this->assertEquals([$participants[1]], $notHasRole1);
+
+    $contactWithBothRoles = Contact::get(FALSE)
+      ->addJoin('Participant AS participant', 'INNER',
+        ['id', '=', 'participant.contact_id'],
+        ['participant.role_id:name', 'CONTAINS', ['role_1', 'role_2']],
+      )
+      ->execute()->single();
+    $this->assertEquals($cid[2], $contactWithBothRoles['id']);
+
+    $contactWithEitherRoles = Contact::get(FALSE)
+      ->addJoin('Participant AS participant', 'INNER',
+        ['id', '=', 'participant.contact_id'],
+        ['participant.role_id:name', 'CONTAINS ONE OF', ['role_1', 'role_2']],
+      )
+      ->execute();
+    $this->assertEquals($cid, $contactWithEitherRoles->column('id'));
+
+    $contactWithOneRole = Contact::get(FALSE)
+      ->addJoin('Participant AS participant', 'INNER',
+        ['id', '=', 'participant.contact_id'],
+        ['participant.role_id:name', 'CONTAINS ONE OF', ['role_1', 'role_2']],
+        ['participant.role_id:name', 'NOT CONTAINS', ['role_1', 'role_2']],
+      )
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertEquals([$cid[0], $cid[1]], $contactWithOneRole->column('id'));
+
+    $contactWithFirstRole = Contact::get(FALSE)
+      ->addJoin('Participant AS participant', 'INNER',
+        ['id', '=', 'participant.contact_id'],
+        ['participant.role_id:name', 'CONTAINS ONE OF', ['role_1', 'role_2']],
+        ['participant.role_id:name', 'NOT CONTAINS ONE OF', ['role_2']],
+      )
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertEquals([$cid[0]], $contactWithFirstRole->column('id'));
   }
 
   /**
