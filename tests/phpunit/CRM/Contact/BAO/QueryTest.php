@@ -964,8 +964,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $params = [
       'extends' => 'Relationship',
     ];
-    $customGroup = $this->customGroupCreate($params);
-    $customFieldId = $this->customFieldCreate(['custom_group_id' => $customGroup['id']])['id'];
+    $customGroupId = $this->customGroupCreate($params)['id'];
+    $customFieldId = $this->customFieldCreate(['custom_group_id' => $customGroupId])['id'];
     $contactID_a = $this->individualCreate();
     $contactID_b = $this->individualCreate();
     $relationship = $this->callAPISuccess('Relationship', 'create', [

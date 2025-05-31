@@ -2001,7 +2001,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact' => [
         'external_identifier' => 'uniquer and specialler',
         'first_name' => 'different',
-        'custom_1' => 'mummy loves me more',
+        $this->getCustomFieldName('text') => 'mummy loves me more',
       ],
     ], $conflicts['aggressive']['resolved']);
   }

@@ -737,7 +737,7 @@ emo
       'contact.address_primary.county_id:label:',
       'contact.contact_is_deleted:',
       'contact.county:',
-      'contact.custom_6:',
+      'contact.' . $this->getCustomFieldName('file') . ':',
       'contact.deceased_date:',
       'contact.do_not_phone:',
     ], array_values($emptyLines), 'Most tokens should have data.');
@@ -944,19 +944,19 @@ emo
       '{contact.im_primary.name}' => 'IM Screen Name',
       '{contact.address_primary.country_id.region_id:name}' => 'World Region',
       '{contact.website_first.url}' => 'Website',
-      '{contact.custom_9}' => 'Contact reference field :: Custom Group',
-      '{contact.custom_7}' => 'Country :: Custom Group',
-      '{contact.custom_8}' => 'Country-multi :: Custom Group',
-      '{contact.custom_4}' => 'Enter integer here :: Custom Group',
-      '{contact.custom_1}' => 'Enter text here :: Custom Group',
-      '{contact.custom_6}' => 'My file :: Custom Group',
-      '{contact.custom_2}' => 'Pick Color :: Custom Group',
-      '{contact.custom_13}' => 'Pick Shade :: Custom Group',
-      '{contact.custom_10}' => 'State :: Custom Group',
-      '{contact.custom_11}' => 'State-multi :: Custom Group',
-      '{contact.custom_5}' => 'test_link :: Custom Group',
-      '{contact.custom_12}' => 'Yes No :: Custom Group',
-      '{contact.custom_3}' => 'Test Date :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['contact_reference'] . '}' => 'Contact reference field :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['country'] . '}' => 'Country :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['multi_country'] . '}' => 'Country-multi :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['int'] . '}' => 'Enter integer here :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['text'] . '}' => 'Enter text here :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['file'] . '}' => 'My file :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['select_string'] . '}' => 'Pick Color :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['checkbox'] . '}' => 'Pick Shade :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['state'] . '}' => 'State :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['multi_state'] . '}' => 'State-multi :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['link'] . '}' => 'test_link :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['boolean'] . '}' => 'Yes No :: Custom Group',
+      '{contact.custom_'. $this->ids['CustomField']['select_date'] . '}' => 'Test Date :: Custom Group',
       '{contact.checksum}' => 'Checksum',
       '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
@@ -1225,19 +1225,19 @@ im:IM Screen Name
 openid:OpenID
 world_region:America South, Central, North and Caribbean
 url:https://civicrm.org
-custom_1:Bobsled
-custom_2:Red
-custom_3:01/20/2021 12:00AM
-custom_4:999
-custom_5:<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
-custom_6:
-custom_7:New Zealand
-custom_8:France, Canada
-custom_9:Mr. Spider Man II
-custom_10:Queensland
-custom_11:Victoria, New South Wales
-custom_12:Yes
-custom_13:Purple
+' . $this->getCustomFieldName() . ':Bobsled
+' . $this->getCustomFieldName('select_string') . ':Red
+' . $this->getCustomFieldName('select_date') . ':01/20/2021 12:00AM
+' . $this->getCustomFieldName('int') . ':999
+' . $this->getCustomFieldName('link') . ':<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
+' . $this->getCustomFieldName('file') . ':
+' . $this->getCustomFieldName('country') . ':New Zealand
+' . $this->getCustomFieldName('multi_country') . ':France, Canada
+' . $this->getCustomFieldName('contact_reference') . ':Mr. Spider Man II
+' . $this->getCustomFieldName('state') . ':Queensland
+' . $this->getCustomFieldName('multi_state') . ':Victoria, New South Wales
+' . $this->getCustomFieldName('boolean') . ':Yes
+' . $this->getCustomFieldName('checkbox') . ':Purple
 checksum:cs=' . $checksum . '
 contact_id:' . $tokenData['contact_id'] . '
 ';
@@ -1322,19 +1322,19 @@ im_primary.provider_id:label |Yahoo
 im_primary.name |IM Screen Name
 address_primary.country_id.region_id:name |America South, Central, North and Caribbean
 website_first.url |https://civicrm.org
-custom_9 |Mr. Spider Man II
-custom_7 |New Zealand
-custom_8 |France, Canada
-custom_4 |999
-custom_1 |Bobsled
-custom_6 |
-custom_2 |Red
-custom_13 |Purple
-custom_10 |Queensland
-custom_11 |Victoria, New South Wales
-custom_5 |<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
-custom_12 |Yes
-custom_3 |01/20/2021 12:00AM
+' . $this->getCustomFieldName('contact_reference') . ' |Mr. Spider Man II
+' . $this->getCustomFieldName('country') . ' |New Zealand
+' . $this->getCustomFieldName('multi_country') . ' |France, Canada
+' . $this->getCustomFieldName('int') . ' |999
+' . $this->getCustomFieldName() . ' |Bobsled
+' . $this->getCustomFieldName('file') . ' |
+' . $this->getCustomFieldName('select_string') . ' |Red
+' . $this->getCustomFieldName('checkbox') . ' |Purple
+' . $this->getCustomFieldName('state') . ' |Queensland
+' . $this->getCustomFieldName('multi_state') . ' |Victoria, New South Wales
+' . $this->getCustomFieldName('link') . ' |<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
+' . $this->getCustomFieldName('boolean') . ' |Yes
+' . $this->getCustomFieldName('select_date') . ' |01/20/2021 12:00AM
 checksum |cs=' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |

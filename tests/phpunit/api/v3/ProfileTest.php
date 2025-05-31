@@ -383,7 +383,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       ],
     ];
     $profile = $this->callAPISuccess('uf_group', 'create', $ufGroupParams);
-    $this->addCustomFieldToProfile($profile['id']);
+    $ids = $this->addCustomFieldToProfile($profile['id']);
     // Add some more fields
 
     $result = $this->callAPISuccess('profile', 'getfields', [
@@ -396,7 +396,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals('phone', $result['values']['phone-primary-1']['entity']);
     $this->assertEquals('phone', $result['values']['phone_and_ext-1-2']['entity']);
     $this->assertEquals('civicrm_state_province', $result['values']['state_province-1']['pseudoconstant']['table']);
-    $this->assertEquals('defaultValue', $result['values']['custom_1']['default_value']);
+    $this->assertEquals('defaultValue', $result['values']['custom_' . $ids['custom_field_id']]['default_value']);
     $this->assertArrayNotHasKey('participant_status', $result['values']);
     $this->assertEquals('website', $result['values']['url-1']['entity']);
     $this->assertEquals('im', $result['values']['im-primary']['entity']);
@@ -1149,13 +1149,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * @param int $profileID
    */
-  public function addCustomFieldToProfile(int $profileID): void {
+  public function addCustomFieldToProfile(int $profileID): array {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, '');
     $this->uFFieldCreate([
       'uf_group_id' => $profileID,
       'field_name' => 'custom_' . $ids['custom_field_id'],
       'contact_type' => 'Contact',
     ]);
+    return $ids;
   }
 
 }
