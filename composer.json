@@ -36,7 +36,6 @@
     },
     "files": ["functions.php", "guzzle_php81_shim.php"]
   },
-  "include-path": ["vendor/tecnickcom"],
   "config": {
     "platform": {
       "php": "8.0.0"
