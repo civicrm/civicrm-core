@@ -51,7 +51,7 @@ class StringScanner {
 
     // Get sub-attributes to be translated.
     $defnSelectors = \CRM_Utils_JS::getDefnSelectors();
-    $doc->find('af-field[defn]')->each(function (\DOMElement $item) use ($defnSelectors, $inputSelectors) {
+    $doc->find('af-field[defn]')->each(function (\DOMElement $item) use ($defnSelectors) {
       $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'));
       // Check Defn Selectors.
       foreach ($defnSelectors as $selector) {
