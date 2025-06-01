@@ -1007,8 +1007,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
             if ($g['visibility'] != 'User and User Admin Only' ||
               CRM_Utils_Array::key(CRM_Core_Permission::VIEW, $groupPerm)
             ) {
-              $title[] = $g['title'];
               if ($g['visibility'] == 'Public Pages') {
+                $title[] = $g['title'];
                 $ids[] = $g['group_id'];
               }
             }
