@@ -219,6 +219,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
         // dynamically? (or is the expectation that old versions of files are totally gone forever?)
 
         // old values come through with the whole file path in the `name` key
+        $filename = NULL;
         if (!empty($value['name'])) {
           $filename = basename($value['name']);
         }
