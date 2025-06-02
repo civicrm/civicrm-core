@@ -119,7 +119,11 @@
         }
 
         function convertDataType(val) {
-          if (dataType === 'Integer' || dataType === 'Float') {
+          // A regex is always a string
+          if (ctrl.op && ctrl.op.includes('REGEXP')) {
+            dataType = 'String';
+          }
+          else if (dataType === 'Integer' || dataType === 'Float') {
             let newVal = Number(val);
             // FK Entities can use a mix of numeric & string values (see `"static": options` above)
             if (ctrl.field.fk_entity && ('' + newVal) !== val) {
