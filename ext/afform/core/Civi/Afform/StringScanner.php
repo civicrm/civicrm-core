@@ -33,12 +33,7 @@ class StringScanner {
     $contentSelectors = \CRM_Utils_JS::getContentSelectors();
     $contentSelectors = implode(',', $contentSelectors);
     $doc->find($contentSelectors)->each(function (\DOMElement $item) {
-      // FIXME: Should this be:   $this->scanString(pq($item)->html());
-      $markup = '';
-      foreach ($item->childNodes as $child) {
-        $markup .= $child->ownerDocument->saveXML($child);
-      }
-      $this->scanString($markup);
+      $this->scanString(trim(pq($item)->html()));
     });
 
     // Find attributes to be translated.
