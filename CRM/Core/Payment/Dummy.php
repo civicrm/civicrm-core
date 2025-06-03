@@ -375,4 +375,11 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     return TRUE;
   }
 
+  /**
+   * Dummy template is included in the afPayment module
+   */
+  public function getAfformTemplate(): ?string {
+    return '~/afPayment/dummy.html';
+  }
+
 }
