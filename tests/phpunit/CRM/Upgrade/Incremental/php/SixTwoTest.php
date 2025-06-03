@@ -36,10 +36,14 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ],
         'import_mappings' => [
+          // All 3 variants of activity_date_time should wind up as 'Activity.activity_date_time'
           ['name' => 'activity_date_time'],
-          ['name' => ''],
+          ['name' => 'Activity.Activity.activity_date_time'],
+          ['name' => 'Activity.activity_date_time'],
           ['name' => 'target_contact.email_primary.email'],
           ['name' => 'source_contact.id'],
+          // Another variant of one that got a bit messaged up.
+          ['name' => 'Activity.TargetContact.id'],
         ],
       ],
       'status_id:name' => 'draft',
@@ -60,9 +64,11 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
     $job = UserJob::get(FALSE)->addWhere('id', '=', $userJobID)->execute()->single();
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
-      ['name' => ''],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
       ['name' => 'TargetContact.email_primary.email'],
       ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
     ], $job['metadata']['import_mappings']);
 
     $templateJob = UserJob::get(FALSE)
@@ -70,16 +76,20 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
       ->execute()->indexBy('id');
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
-      ['name' => ''],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
       ['name' => 'TargetContact.email_primary.email'],
       ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
     ], $templateJob[$userJobID]['metadata']['import_mappings']);
 
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
-      ['name' => ''],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
       ['name' => 'TargetContact.email_primary.email'],
       ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
     ], $templateJob[$userJobID2]['metadata']['import_mappings']);
 
     // Now check a re-run will not double-append prefixes
@@ -89,16 +99,20 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
       ->execute()->indexBy('id');
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
-      ['name' => ''],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
       ['name' => 'TargetContact.email_primary.email'],
       ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
     ], $templateJob[$userJobID]['metadata']['import_mappings']);
 
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
-      ['name' => ''],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
       ['name' => 'TargetContact.email_primary.email'],
       ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
     ], $templateJob[$userJobID2]['metadata']['import_mappings']);
 
   }
