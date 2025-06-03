@@ -156,6 +156,7 @@ return [
       'input_attrs' => [
         'label' => ts('Search Display'),
       ],
+      'add' => '6.3',
       'entity_reference' => [
         'entity' => 'SearchDisplay',
         'key' => 'id',
