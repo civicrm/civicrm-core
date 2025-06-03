@@ -31,6 +31,7 @@ class CRM_Upgrade_Incremental_php_SixFour extends CRM_Upgrade_Incremental_Base {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Rename multisite_is_enabled setting', 'renameMultisiteSetting');
     $this->addTask('Remove Foreign Key References from cache tables', 'removeForeignKeyReferencesCacheTables');
+    $this->addTask('Install legacyprofiles extension', 'installLegacyProfiles');
   }
 
   public static function removeForeignKeyReferencesCacheTables(): bool {
@@ -42,6 +43,37 @@ class CRM_Upgrade_Incremental_php_SixFour extends CRM_Upgrade_Incremental_Base {
 
   public static function renameMultisiteSetting(): bool {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET name = "multisite_is_enabled" WHERE name = "is_enabled"');
+    return TRUE;
+  }
+
+  /**
+   * Install legacyprofiles extension.
+   *
+   * This feature is restructured as a core extension - which is primarily a code cleanup step.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function installLegacyProfiles(): bool {
+    // Based on the instructions for the FiveThirty financialacls upgrade step
+    // Install via direct SQL manipulation. Note that:
+    // (1) This extension has no activation logic as of 5.75 (the DB tables are still in core)
+    // (2) This extension is not enabled on new installs.
+    // (3) Caches are flushed at the end of the upgrade.
+    // ($) Over long term, upgrade steps are more reliable in SQL. API/BAO sometimes don't work mid-upgrade.
+    $active = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_uf_field WHERE visibility != "User and User Admin Only" LIMIT 1');
+    if ($active) {
+      $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+        'type' => 'module',
+        'full_name' => 'legacyprofiles',
+        'name' => 'legacyprofiles',
+        'label' => 'Legacy Profiles',
+        'file' => 'legacyprofiles',
+        'schema_version' => NULL,
+        'is_active' => 1,
+      ]);
+      CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+    }
     return TRUE;
   }
 
