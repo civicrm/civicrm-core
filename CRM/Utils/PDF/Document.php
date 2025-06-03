@@ -87,7 +87,7 @@ class CRM_Utils_PDF_Document {
 
     foreach ((array) $pages as $page => $html) {
       $section = $phpWord->addSection($pageStyle + ['breakType' => 'nextPage']);
-      \PhpOffice\PhpWord\Shared\Html::addHtml($section, $html);
+      \PhpOffice\PhpWord\Shared\Html::addHtml($section, str_replace(['{literal}', '{/literal}'], '', $html));
     }
 
     self::printDoc($phpWord, $ext, $fileName);
