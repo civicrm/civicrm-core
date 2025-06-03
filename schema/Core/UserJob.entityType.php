@@ -152,6 +152,7 @@ return [
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
       'description' => ts('Batch import search display'),
+      'add' => '6.3',
       'input_attrs' => [
         'label' => ts('Search Display'),
       ],
