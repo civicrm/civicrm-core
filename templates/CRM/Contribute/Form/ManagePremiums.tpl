@@ -38,27 +38,36 @@
      <span class="description">{ts}Optional product SKU or code. If used, this value will be included in contributor receipts.{/ts}</span>
   </td>
      </tr>
-     <tr class="crm-contribution-form-block-imageOption" >
-        <td class="label">{$form.imageOption.label}</td>
+     <tr class="crm-contribution-form-block-imageOption">
+      <td class="label">{$form.imageOption.label}</td>
       <td>
-      <fieldset><div class="description">
-        <p>{ts}You can give this premium a picture that will be displayed on the contribution page. Both a 50 x 50 pixel thumbnail image and a 200 x 200 pixel larger image will be displayed. Images must be in GIF, JPEG, or PNG format.{/ts}</p>
-        <p>{ts}You can upload an image from your computer OR enter a URL for an image already on the Web. If you chose to upload an image file, a 'thumbnail' version will be automatically created for you. If you don't have an image available at this time, you may also choose to display a 'No Image Available' icon by selecting the 'default image'.{/ts}</p>
-                  </div>
+        {if $imageURL}
+          <img src="{$imageURL}" alt="{ts escape="htmlattribute"}Current Image{/ts}"/>
+        {/if}
+        <div class="description">
+          <p>{ts}You can give this premium a picture that will be displayed on the contribution page. The image displayed will be resized to a maximum of 200x200 pixels. Images must be in GIF, JPEG, or PNG format.{/ts}</p>
+        </div>
   <table class="form-layout-compressed">
-    {if !empty($thumbnailUrl)}<tr class="odd-row"><td class="describe-image" colspan="2"><strong>{ts}Current Image Thumbnail{/ts}</strong><br /><img src="{$thumbnailUrl}" /></td></tr>{/if}
-    <tr class="crm-contribution-form-block-imageOption"><td>{$form.imageOption.image.html}</td><td>{$form.uploadFile.html}</td></tr>
-  <tr class="crm-contribution-form-block-imageOption-thumbnail"><td colspan="2">{$form.imageOption.thumbnail.html}</td></tr>
+    <tr class="crm-contribution-form-block-imageOption">
+      <td colspan="2">{$form.imageOption.image.html}</td>
+    </tr>
+    <tr id="uploadFileRow" class="hiddenElement">
+      <td class="label"><label for="uploadFile">{ts}File{/ts}</label></td>
+      <td>{$form.uploadFile.html}</td>
+    </tr>
+    <tr class="crm-contribution-form-block-imageOption-thumbnail">
+      <td colspan="2">{$form.imageOption.thumbnail.html}</td>
+    </tr>
     <tr id="imageURL"{if $action neq 2} class="hiddenElement"{/if}>
-        <td class="label">{$form.imageUrl.label}</td><td>{$form.imageUrl.html|crmAddClass:huge}</td>
+      <td class="label">{$form.imageUrl.label}</td><td>{$form.imageUrl.html|crmAddClass:huge}</td>
     </tr>
-    <tr id="thumbnailURL"{if $action neq 2} class="hiddenElement"{/if}>
-        <td class="label">{$form.thumbnailUrl.label}</td><td>{$form.thumbnailUrl.html|crmAddClass:huge}</td>
+    <tr>
+      <td colspan="2">{$form.imageOption.default_image.html}</td>
     </tr>
-  <tr><td colspan="2">{$form.imageOption.default_image.html}</td></tr>
-  <tr><td colspan="2">{$form.imageOption.noImage.html}</td></tr>
+    <tr>
+      <td colspan="2">{$form.imageOption.noImage.html}</td>
+    </tr>
   </table>
-        </fieldset>
         </td>
     </tr>
     <tr class="crm-contribution-form-block-min_contribution">
@@ -144,21 +153,19 @@
 
 <script type="text/javascript">
 {literal}
-
 function add_upload_file_block(parms) {
-  if (parms =='thumbnail') {
-
-          document.getElementById("imageURL").style.display="table-row";
-        document.getElementById("thumbnailURL").style.display="table-row";
-
-  } else {
-
-        document.getElementById("imageURL").style.display="none";
-        document.getElementById("thumbnailURL").style.display="none";
-
+  if (parms == 'thumbnail') {
+    document.getElementById("imageURL").style.display = "table-row";
+    document.getElementById("uploadFileRow").style.display = "none";
+  }
+  else if (parms == 'image') {
+    document.getElementById("uploadFileRow").style.display = "table-row";
+    document.getElementById("imageURL").style.display = "none";
+  }
+  else {
+    document.getElementById("imageURL").style.display = "none";
   }
 }
-
 {/literal}
 </script>
 
