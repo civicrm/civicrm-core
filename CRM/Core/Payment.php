@@ -1973,4 +1973,116 @@ abstract class CRM_Core_Payment {
     return [];
   }
 
+  /**
+   * startCheckout is an alternative to doPayment intended to allow more user flows, such as
+   * client-side redirects or JS handling. It is the starting point for afform_payments
+   *
+   * It receives a PropertyBag of payment params related to the contribution, plus urls for
+   * where to send the user depending on how the payment is going.
+   *
+   * Possible flows:
+   *  - Complete server-side: take all the payment parameters upfront, pass them to CiviCRM
+   *    server, CiviCRM server processes the payment (presumably talking to payment server-server)
+   *    and then the payment is complete.
+   *
+   *  - Process then redirect: take some payment params, maybe talk to the payment server behind the scenes to work out
+   *    where to send the user, return a redirect url
+   *
+   *  - Process then hand back to client-side: take some payment params, maybe talk to the payment server behind the
+   *    scenes to get some info, pass back some params to the client, JS on the client takes it
+   *    from there
+   *
+   * The default implementation is based on the complete server-side. It just work for simple
+   * legacy processors, but the expectation is most Payment Processors will override this method
+   * for more elegant handling.
+   *
+   * One key difference with doPayment: we shouldn't expect the calling code to create the
+   * CiviCRM Payment record. The Payment Processor should implement this at the appropriate time.
+   * For some processors this will be done later, in response to a postback from the payment server.
+   * Some processors may want to do it here, based on the result of doPayment. (This is included in
+   * the default implementation above. getPaymentCreateParams is factored out to allow overriding
+   * this separately if there are)
+   *
+   * @param array $paymentParams
+   *   params for the payment (as would be passed to doPayment) this is most commonly an array
+   *   of line items for the contribution, and some details about the contact doing the paying
+   * @param string $successUrl
+   *   where to take the user to after successful payment
+   * @param string $failUrl
+   *   where to take the user to if payment is unsuccessful
+   * @param string $cancelUrl
+   *   where to take the user to if they cancel payment
+   *
+   * @return array
+   *   response indicating the next step for the user. what form this takes is WIP,
+   *   but currently this is only consumed by Contribution.checkout
+   *
+   * @see \Civi\Api4\Action\Contribution\Checkout
+   *   (in afform_payment extension)
+   */
+  public function startCheckout(array $paymentParams, string $successUrl, string $failUrl, string $cancelUrl): array {
+    $payment = $this->doPayment($paymentParams);
+
+    // check payment status
+    $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $payment['payment_status_id']);
+    switch ($paymentStatus) {
+      case 'Completed':
+        \Civi\Api4\Payment::create(FALSE)
+          ->addValues($this->getPaymentCreateParams($paymentParams, $payment))
+          // should this be configurable? assume for now that email notifications
+          // will be configured and sent at the Afform level, so we dont
+          // want to email here
+          ->setNotificationForCompleteOrder(FALSE)
+          ->execute();
+
+        return [
+          'redirect' => $successUrl,
+        ];
+
+      case 'Cancelled':
+        return [
+          'redirect' => $cancelUrl,
+        ];
+
+      case 'Failed':
+        return [
+          'redirect' => $failUrl,
+        ];
+
+      default:
+        // unusual status - but the payment hasn't failed, and no error has
+        // been thrown, so we will assume everything is ok
+        return [
+          'redirect' => $successUrl,
+        ];
+    }
+
+  }
+
+  /**
+   * @param array $paymentParams the payment params passed to doPaymnt
+   * @param array $payment the result of doPayment
+   *
+   * TODO: is this useful as a generic map? what keys are consistently returned
+   * from doPayment?
+   *
+   * @return array array of values to pass to Payment.create
+   */
+  protected function getPaymentCreateParams(array $paymentParams, $payment): array {
+    return [
+      'contribution_id' => $paymentParams['contributionID'],
+      'payment_processor_id' => $this->_paymentProcessor['id'],
+      'payment_instrument_id' => $this->_paymentProcessor['payment_instrument_id'],
+      'total_amount' => $payment['amount'],
+      'trxn_id' => $payment['trxn_id'] ?? NULL,
+      'fee_amount' => $payment['fee_amount'] ?? NULL,
+      'order_reference' => $payment['order_reference'] ?? NULL,
+      'trxn_date' => date('Ymd H:i:s'),
+      // 'card_type_id' => $paymentParams['credit_card_type'],
+      // 'trxn_result_code' => ?
+      // 'check_number' => ?,
+      // 'pan_truncation' => substr($paymentParams['credit_card_number'], -4),
+    ];
+  }
+
 }
