@@ -67,9 +67,11 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase implements HeadlessInte
     $exs['original-text-3'] = [
       // Here, we have 3 localizable texts... but there are no replacement strings... so we just keep the originals.
       "<af-form ctrl=\"afform\"><p class=\"af-text\">Localizable<br> Text</p>\n<div class=\"af-markup\">Boo<br>Boo</div>\n<button>Go time!</button></af-form>",
-      ['Localizable<br/> Text', 'Boo<br/>Boo', 'Go time!'],
+      ['Localizable<br> Text', 'Boo<br>Boo', 'Go time!'],
       [],
       "<af-form ctrl=\"afform\" ng-form=\"afformTranslatorTest\"><p class=\"af-text\">Localizable<br> Text</p>\n<div class=\"af-markup\">Boo<br>Boo</div>\n<button>Go time!</button></af-form>",
+      // There were no substitutions at all, so we end up with the original `<br>`.
+      // If there were some substitutions, then it end up as `<br/>`, which would be OK too.
     ];
     $exs['original-rich-text'] = [
       // Here, we have localizable text... but there is no replacement string... so we just keep the original.
@@ -78,12 +80,26 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase implements HeadlessInte
       [],
       "<af-form ctrl=\"afform\" ng-form=\"afformTranslatorTest\"><p class=\"af-text\"><em>Localizable</em> Text</p></af-form>",
     ];
-    $exs['basic-translation'] = [
+    $exs['basic-translation-em'] = [
       // Here, we have localizable text... and we do translate it...
       "<af-form ctrl=\"afform\"><p class=\"af-text\"><em>Localizable</em> Text</p></af-form>",
       ['<em>Localizable</em> Text'],
       ['<em>Localizable</em> Text' => 'Texte <em>localisable</em>'],
       "<af-form ctrl=\"afform\" ng-form=\"afformTranslatorTest\"><p class=\"af-text\">Texte <em>localisable</em></p></af-form>",
+    ];
+    $exs['basic-translation-br-1'] = [
+      // The localizable text includes `<br>` (no slash).
+      "<af-form ctrl=\"afform\"><p class=\"af-text\">Localizable<br> Text</p></af-form>",
+      ['Localizable<br> Text'],
+      ['Localizable<br> Text' => 'Texte<br> localisable'],
+      "<af-form ctrl=\"afform\" ng-form=\"afformTranslatorTest\"><p class=\"af-text\">Texte<br> localisable</p></af-form>",
+    ];
+    $exs['basic-translation-br-2'] = [
+      // The localizable text includes `<br/>` (with slash).
+      "<af-form ctrl=\"afform\"><p class=\"af-text\">Localizable<br/> Text</p></af-form>",
+      ['Localizable<br> Text'],
+      ['Localizable<br> Text' => 'Texte<br> localisable'],
+      "<af-form ctrl=\"afform\" ng-form=\"afformTranslatorTest\"><p class=\"af-text\">Texte<br> localisable</p></af-form>",
     ];
     $exs['mixed-static-translated'] = [
       // Here, we have a mix of static text and localizable text...
@@ -96,7 +112,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase implements HeadlessInte
     return $exs;
     // return [$exs['static-text']];
     // return [$exs['original-rich-text']];
-    // return [$exs['basic-translation']];
+    // return [$exs['basic-translation-br-1']];
     // return [$exs['mixed-static-translated']];
   }
 
