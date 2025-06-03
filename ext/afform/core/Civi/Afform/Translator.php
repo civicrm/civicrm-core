@@ -102,7 +102,7 @@ class Translator extends AutoService implements EventSubscriberInterface {
       $parentSel = $subsels[0];
       unset($subsels[0]);
       // we use '*' to indicate that this is an array of objects so we can loop on the array
-      if (isset($subsels[1]) && $subsels[1] == '*') {
+      if (isset($subsels[1]) && $subsels[1] == '*' && !empty($defn[$parentSel])) {
         unset($subsels[1]);
         foreach ($defn[$parentSel] as &$subDefn) {
           $this->defnLookupTranslate($subDefn, implode('.', $subsels));
