@@ -4,7 +4,7 @@ namespace Civi\AfformMock;
 
 use Civi\Test\LocaleTestTrait;
 use CRM_AfformMock_ExtensionUtil as E;
-use Civi\Afform\StringScanner;
+use Civi\Afform\StringVisitor;
 use Civi\Api4\Afform;
 
 /**
@@ -80,7 +80,7 @@ class MockTranslateTest extends \PHPUnit\Framework\TestCase implements \Civi\Tes
     $this->assertEquals(trim($inputHtml), trim($savedHtml), 'Saved HTML should be an exact match to the input');
 
     // Does the string-scanner find our localizable strings?
-    $actualStrings = (new StringScanner())->scan([], $inputHtml)->getStrings();
+    $actualStrings = StringVisitor::extractStrings([], $inputHtml);
     sort($actualStrings);
     sort($expectStrings);
     $this->assertEquals($expectStrings, $actualStrings, 'Scanner should find expected strings');

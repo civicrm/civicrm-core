@@ -2,7 +2,7 @@
 
 namespace Civi\Api4\Utils;
 
-use Civi\Afform\StringScanner;
+use Civi\Afform\StringVisitor;
 use Civi\Api4\TranslationSource;
 use Civi\Api4\Afform;
 use Civi\Afform\Utils;
@@ -100,7 +100,7 @@ trait AfformSaveTrait {
    * string $html
    */
   protected function saveTranslations($form, $html) {
-    $strings = (new StringScanner())->scan($form, $html)->getStrings();
+    $strings = StringVisitor::extractStrings($form, $html);
 
     // Save the form strings.
     if (!empty($strings)) {
