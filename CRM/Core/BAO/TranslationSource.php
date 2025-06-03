@@ -73,8 +73,10 @@ FROM civicrm_translation t
   INNER JOIN civicrm_translation_source ts ON t.entity_table = 'civicrm_translation_source' AND t.entity_field = 'source' AND t.entity_id = ts.id
 WHERE t.language = %1 AND t.status_id = 1";
     $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$language, 'String']], TRUE, NULL, FALSE, FALSE);
+    // These columns seem to be like 'civicrm_contact.first_name'... stored with HTML entities...
+    $htmlInput = CRM_Utils_API_HTMLInputCoder::singleton();
     while ($dao->fetch()) {
-      $sources[$dao->source] = $dao->string;
+      $sources[$htmlInput->decodeValue($dao->source)] = $htmlInput->decodeValue($dao->string);
     }
     return $sources;
   }
