@@ -69,6 +69,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
   protected $_entityValues = [];
 
+  protected array $_response = [];
+
   /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws \CRM_Core_Exception
@@ -725,6 +727,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected static function getNestedKey(array $values) {
     $firstValue = \CRM_Utils_Array::first(array_filter($values));
     return is_array($firstValue) && $firstValue ? array_keys($firstValue)[0] : NULL;
+  }
+
+  /**
+   * Stash things to return in the Api response
+   *
+   * @param string $key
+   * @param mixed $value
+   */
+  public function setResponseItem(string $key, mixed $value): void {
+    $this->_response[$key] = $value;
   }
 
   /**
