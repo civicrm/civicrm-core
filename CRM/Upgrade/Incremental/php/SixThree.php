@@ -55,6 +55,26 @@ class CRM_Upgrade_Incremental_php_SixThree extends CRM_Upgrade_Incremental_Base 
     ], 'queue_id');
   }
 
+  /**
+   * @param \CRM_Queue_TaskContext|null $context
+   * @param string $entity
+   *
+   * @return true
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function upgradeImportMappingFields($context, string $entity): bool {
+    CRM_Upgrade_Incremental_php_SixTwo::upgradeImportMappingFields($context, $entity);
+    return TRUE;
+  }
+
+  public function upgrade_6_3_beta2($rev): void {
+    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Activity');
+    $this->addTask('Update Membership mappings', 'upgradeImportMappingFields', 'Membership');
+    $this->addTask('Update Contribution mappings', 'upgradeImportMappingFields', 'Contribution');
+    $this->addTask('Update Participant mappings', 'upgradeImportMappingFields', 'Participant');
+  }
+
   public static function deleteNonAttachmentFiles(): bool {
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_file WHERE entity_table LIKE "civicrm_value_%" LIMIT ' . self::BATCH_SIZE);
     return TRUE;

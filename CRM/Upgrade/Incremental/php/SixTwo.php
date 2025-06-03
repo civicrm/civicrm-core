@@ -160,29 +160,39 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       ]);
     }
 
-    $userJob = new \CRM_Core_DAO_UserJob();
-    $userJob->job_type = strtolower($entity) . '_import';
-    $userJob->find();
+    $userJob = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_user_job WHERE job_type = %1', [1 => [strtolower($entity) . '_import', 'String']]);
     while ($userJob->fetch()) {
+      $dao = new CRM_Core_DAO_UserJob();
+      $dao->id = $userJob->id;
       $metadata = json_decode($userJob->metadata, TRUE);
       if (empty($metadata['import_mappings']) && !empty($metadata['Template']['mapping_id'])) {
         $mappingByID = self::getImportMappings($entity, $metadata['Template']['mapping_id']);
         $metadata['import_mappings'] = reset($mappingByID);
       }
+      if (!$metadata['import_mappings']) {
+        $metadata['import_mappings'] = [];
+      }
       foreach ($metadata['import_mappings'] as &$mapping) {
         if (!empty($mapping['name'])) {
+          $parts = explode('.', $mapping['name']);
+          $fieldEntity = $parts[0];
+          $validEntities = ['SoftCreditContact', 'Contribution', 'Contact', 'Activity', 'TargetContact', 'SourceContact', 'Membership', 'Participant'];
+
+          if (in_array($fieldEntity, $validEntities)) {
+            continue;
+          }
           $convertedName = self::getConvertedName($mapping['name'], $entity);
           if ($convertedName === 'do_not_import') {
             $convertedName = '';
           }
           $mapping['name'] = $convertedName;
         }
-        else {
+        elseif (!isset($mapping['name']) || $mapping['name'] !== '') {
           $mapping['name'] = '';
         }
       }
-      $userJob->metadata = json_encode($metadata);
-      $userJob->save();
+      $dao->metadata = json_encode($metadata);
+      $dao->save();
     }
     self::ensureTemplateJobsExist($entity);
     return TRUE;

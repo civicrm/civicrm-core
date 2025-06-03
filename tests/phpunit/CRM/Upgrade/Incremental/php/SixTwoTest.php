@@ -46,6 +46,8 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
       'job_type' => 'activity_import',
     ];
     $userJobID = UserJob::create()->setValues($userJobParameters)->execute()->first()['id'];
+    $userJobID2 = UserJob::create()->setValues($userJobParameters + ['is_template' => TRUE, 'name' => 'template_name'])->execute()->first()['id'];
+
     CRM_Upgrade_Incremental_php_SixTwo::upgradeImportMappingFields(NULL, 'Activity');
 
     $mappings = MappingField::get()
@@ -64,14 +66,40 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
     ], $job['metadata']['import_mappings']);
 
     $templateJob = UserJob::get(FALSE)
-      ->addWhere('name', '=', 'import_Activity import')
-      ->addWhere('is_template', '=', TRUE)->execute()->single();
+      ->addWhere('id', 'IN', [$userJobID, $userJobID2])
+      ->execute()->indexBy('id');
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
       ['name' => ''],
       ['name' => 'TargetContact.email_primary.email'],
       ['name' => 'SourceContact.id'],
-    ], $templateJob['metadata']['import_mappings']);
+    ], $templateJob[$userJobID]['metadata']['import_mappings']);
+
+    $this->assertEquals([
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => ''],
+      ['name' => 'TargetContact.email_primary.email'],
+      ['name' => 'SourceContact.id'],
+    ], $templateJob[$userJobID2]['metadata']['import_mappings']);
+
+    // Now check a re-run will not double-append prefixes
+    CRM_Upgrade_Incremental_php_SixTwo::upgradeImportMappingFields(NULL, 'Activity');
+    $templateJob = UserJob::get(FALSE)
+      ->addWhere('id', 'IN', [$userJobID, $userJobID2])
+      ->execute()->indexBy('id');
+    $this->assertEquals([
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => ''],
+      ['name' => 'TargetContact.email_primary.email'],
+      ['name' => 'SourceContact.id'],
+    ], $templateJob[$userJobID]['metadata']['import_mappings']);
+
+    $this->assertEquals([
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => ''],
+      ['name' => 'TargetContact.email_primary.email'],
+      ['name' => 'SourceContact.id'],
+    ], $templateJob[$userJobID2]['metadata']['import_mappings']);
 
   }
 
