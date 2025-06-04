@@ -4,8 +4,12 @@
       <p>{{:: ts('Compose and send a mass-mailing to the %1 selected contacts (you will be able to add or exclude additional groups of contacts in the next step).', {1: $ctrl.ids.length}) }}</p>
     </div>
     <label for="crm-search-task-mailing-name">{{:: ts('Mailing Name') }} <span class="crm-marker">*</span></label>
-    <input required class="form-control" id="crm-search-task-mailing-name" ng-model="$ctrl.name">
+    <input required class="form-control" id="crm-search-task-mailing-name" ng-model="$ctrl.mailing.name">
     <br>
+    <div class="form-inline" ng-if="$ctrl.templateTypes.length">
+      <label for="crm-search-task-mailing-template_type">{{:: ts('Mailing Type') }}</label>
+      <input id="crm-search-task-mailing-template_type" class="form-control" ng-model="$ctrl.mailing.template_type" crm-ui-select="{data: $ctrl.templateTypes, allowClear: false}">
+    </div>
     <div ng-if="!$ctrl.run" class="alert" ng-class="{'alert-success': $ctrl.recipientCount === $ctrl.ids.length, 'alert-danger': $ctrl.recipientCount === 0, 'alert-warning': $ctrl.recipientCount !== 0 && $ctrl.recipientCount &lt; $ctrl.ids.length}">
       <div ng-if="!$ctrl.recipientCount && $ctrl.recipientCount !== 0">
         <i class="crm-i fa-spinner fa-spin"></i>

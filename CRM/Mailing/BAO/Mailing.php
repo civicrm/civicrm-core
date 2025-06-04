@@ -2490,6 +2490,8 @@ ORDER BY civicrm_mailing.id DESC";
       $types = [];
       $types[] = [
         'name' => 'traditional',
+        'label' => ts('Traditional'),
+        'description' => ts('Standard CiviMail interface with wysiwyg editor.'),
         'editorUrl' => CRM_Mailing_Info::workflowEnabled() ? '~/crmMailing/EditMailingCtrl/workflow.html' : '~/crmMailing/EditMailingCtrl/2step.html',
         'weight' => 0,
       ];
@@ -2514,17 +2516,21 @@ ORDER BY civicrm_mailing.id DESC";
   }
 
   /**
-   * Get a list of template types.
+   * Pseudoconstant callback for `template_type` field.
    *
    * @return array
-   *   Array(string $name => string $label).
    */
-  public static function getTemplateTypeNames() {
-    $r = [];
+  public static function getTemplateTypeNames(): array {
+    $types = [];
     foreach (self::getTemplateTypes() as $type) {
-      $r[$type['name']] = $type['name'];
+      $types[] = [
+        'id' => $type['name'],
+        'name' => $type['name'],
+        'label' => $type['label'] ?? ucfirst($type['name']),
+        'description' => $type['description'] ?? NULL,
+      ];
     }
-    return $r;
+    return $types;
   }
 
 }
