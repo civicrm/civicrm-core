@@ -76,7 +76,9 @@ WHERE t.language = %1 AND t.status_id = 1";
     // These columns seem to be like 'civicrm_contact.first_name'... stored with HTML entities...
     $htmlInput = CRM_Utils_API_HTMLInputCoder::singleton();
     while ($dao->fetch()) {
-      $sources[$htmlInput->decodeValue($dao->source)] = $htmlInput->decodeValue($dao->string);
+      if (!empty($dao->string)) {
+        $sources[$htmlInput->decodeValue($dao->source)] = $htmlInput->decodeValue($dao->string);
+      }
     }
     return $sources;
   }
