@@ -32,7 +32,7 @@
      table[class=devicewidth] {width: 440px!important;text-align:center!important;}
      table[class=devicewidthmob] {width: 414px!important;text-align:center!important;}
      table[class=devicewidthinner] {width: 414px!important;text-align:center!important;}
-     img[class=banner] {width: 440px!important;auto!important;}
+     img[class=banner] {width: 440px!important;height:auto!important;}
      img[class=col2img] {width: 440px!important;height:auto!important;}
      table[class="cols3inner"] {width: 100px!important;}
      table[class="col3img"] {width: 131px!important;}
@@ -53,7 +53,7 @@
      table[class="cols3inner"] {width: 260px!important;}
      img[class="col3img"] {width: 280px!important;height: auto!important;}
      table[class="col3img"] {width: 280px!important;}
-     img[class="blog"] {width: 280px!important;auto!important;}
+     img[class="blog"] {width: 280px!important;height:auto!important;}
      td[class="padding-top-right15"]{padding:15px 15px 0 0 !important;}
      td[class="padding-right15"]{padding-right:15px !important;}
      }
