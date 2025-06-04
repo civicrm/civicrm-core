@@ -2006,6 +2006,21 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * @return ?string (optional) name of an angular module on afforms that use this payment processor
+   */
+  public function getAfformModule(): ?string {
+    return NULL;
+  }
+
+  /**
+   * @return ?string (optional) name of angular partial to load in the afform payment params element when
+   *   using this payment processor
+   */
+  public function getAfformTemplate(): ?string {
+    return NULL;
+  }
+
+  /**
    * Get a map between Api4 field keys on the contribution record and payment params
    * used in doPayment/doCheckout
    *
