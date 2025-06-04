@@ -1964,7 +1964,7 @@ abstract class CRM_Core_Payment {
    *    processor's infrastructure confirming the payment has been made
    *  - some processors may want to complete the payment within doCheckout
    *
-   * @param PropertyBag $paymentParams
+   * @param Civi\Payment\PropertyBag $paymentParams
    *   params for the payment - as would be passed to doPayment. this is most commonly an array
    *   of line items for the contribution, and some details about the contact doing the paying
    * @param ?string $successUrl
@@ -1972,10 +1972,12 @@ abstract class CRM_Core_Payment {
    * @param ?string $failUrl
    *   url to take the user to if payment is unsuccessful
    *
-   * @return array response indicating the next step for the user. what form this takes is WIP,
+   * @return array
+   *   response indicating the next step for the user. what form this takes is WIP,
    *   but currently this is consumed by Contribution.pay
    *
-   * @see \Civi\Api4\Action\Contribution\Pay (in afform_payment extension)
+   * @see \Civi\Api4\Action\Contribution\Pay
+   *  (in afform_payment extension)
    */
   public function doCheckout(PropertyBag &$paymentParams, ?string $successUrl, ?string $failUrl): array {
     try {
@@ -2006,6 +2008,26 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * @return ?string (optional) name of an angular module on afforms that use this payment processor
+   */
+  public function getAfformModule(): ?string {
+    return NULL;
+  }
+
+  /**
+   * @param $processor
+   *   configured processor record from PaymentProcessor api4
+   *
+   * @return array
+   *   config to be passed to the clientside payment block
+   *   this may include a `template` to use for the payment block element
+   *   or arbitrary things the payment processor needs - like settings or keys stored on the server
+   */
+  public function getAfformConfig(array $processor): array {
+    return [];
+  }
+
+  /**
    * Get a map between Api4 field keys on the contribution record and payment params
    * used in doPayment/doCheckout
    *
@@ -2015,10 +2037,12 @@ abstract class CRM_Core_Payment {
    * - what values might need casting etc?
    * - how to handle multiple addresses or other linked records
    *
-   * @return array map of fields on Contribution and Address entities, to expected keys
+   * @return array
+   *   map of fields on Contribution and Address entities, to expected keys
    *   in the payment parameters ParameterBag
-
-   * @see \Civi\Api4\Action\Contribution\Pay (in afform_payment extension)
+   *
+   * @see \Civi\Api4\Action\Contribution\Pay
+   *   (in afform_payment extension)
    */
   public function getPaymentParamFetchMap(): array {
     return [
