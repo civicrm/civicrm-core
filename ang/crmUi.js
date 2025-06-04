@@ -101,6 +101,14 @@
                   if (settings.date === false) {
                     requiredLength = 8;
                   }
+                  else if (typeof settings.date === 'string') {
+                    var lowerFormat = settings.date.toLowerCase();
+                    // FIXME: parseDate doesn't work with incomplete date formats; skip validation if no month, day or year in format
+                    if (lowerFormat.indexOf('y') < 0 || lowerFormat.indexOf('m') < 0 || lowerFormat.indexOf('d') < 0) {
+                      // skipping the validation by setting the actual length of datepicker value
+                      requiredLength = element.val().length;
+                    }
+                  }
                   ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
                 });
               });
