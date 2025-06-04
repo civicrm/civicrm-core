@@ -40,6 +40,7 @@
           }, 10000);
         }
         else {
+          this.newBatchRowCount = 1;
           this.reportLinks = [
             {
               title: ts('View My Import Batches'),
@@ -100,6 +101,7 @@
         crmApi4('SearchDisplay', 'createBatch', {
           savedSearch: this.search,
           display: this.display,
+          rowCount: this.newBatchRowCount,
         }, 0).then(function(userJob) {
           $location.search('batch', userJob.id);
         });
