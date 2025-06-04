@@ -12,6 +12,8 @@ use Civi\Api4\UserJob;
  * @method $this setSavedSearch(string $savedSearchName)
  * @method $this setDisplay(string $displayName)
  * @method string getDisplay()
+ * @method $this setRowCount(int $rowCount)
+ * @method int getRowCount()
  *
  * @since 6.3
  */
@@ -33,6 +35,13 @@ class CreateBatch extends AbstractAction {
    * @required
    */
   protected $display;
+
+  /**
+   * Number of rows to insert
+   *
+   * @var int
+   */
+  protected $rowCount = 1;
 
   /**
    * @inheritDoc
@@ -90,9 +99,12 @@ class CreateBatch extends AbstractAction {
       ->setValues($userJob)
       ->execute()->single();
 
-    // Add an empty row to get the user started
-    $sql = "INSERT INTO `$tableName` () VALUES ()";
-    \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+    // Add empty rows per $this->rowCount
+    if ($this->rowCount > 0) {
+      $values = rtrim(str_repeat("(),", $this->rowCount), ",");
+      $sql = "INSERT INTO `$tableName` () VALUES $values";
+      \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+    }
   }
 
   private function getSqlType(array $fieldSpec) {

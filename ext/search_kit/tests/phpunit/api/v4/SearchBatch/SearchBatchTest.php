@@ -284,8 +284,12 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $userJob = SearchDisplay::createBatch(FALSE)
       ->setSavedSearch($name)
       ->setDisplay($name)
+      ->setRowCount(3)
       ->execute()->single();
     $apiName = 'Import_' . $userJob['id'];
+
+    $rows = civicrm_api4($apiName, 'get');
+    $this->assertEquals([1, 2, 3], $rows->column('_id'));
 
     $fields = civicrm_api4($apiName, 'getFields', ['loadOptions' => TRUE])->indexBy('label');
 

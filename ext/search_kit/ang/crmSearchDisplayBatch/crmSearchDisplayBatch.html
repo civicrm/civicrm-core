@@ -1,6 +1,13 @@
 <div ng-if="!$ctrl.userJobId && !$ctrl.isPreviewMode" class="crm-search-display crm-search-display-batch">
   <ul class="list-group">
-    <li class="list-group-item">
+    <li class="list-group-item form-inline">
+      <div class="form-group">
+        <label class="sr-only" for="crm-create-new-batch-row-count">{{:: ts('Initial row count for new batch') }}</label>
+        <div class="input-group">
+          <input type="number" min="1" step="1" class="form-control" id="crm-create-new-batch-row-count" ng-model="$ctrl.newBatchRowCount" title="{{:: ts('Initial row count for new batch') }}">
+          <div class="input-group-addon">{{:: ts('Rows') }}</div>
+        </div>
+      </div>
       <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
         <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
         <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
