@@ -1953,4 +1953,24 @@ abstract class CRM_Core_Payment {
     return FALSE;
   }
 
+  /**
+   * @return ?string (optional) name of an angular module on afforms that use this payment processor
+   */
+  public function getAfformModule(): ?string {
+    return NULL;
+  }
+
+  /**
+   * @param $processor
+   *   configured processor record from PaymentProcessor api4
+   *
+   * @return array
+   *   config to be passed to the clientside payment block
+   *   this may include a `template` to use for the payment block element
+   *   or arbitrary things the payment processor needs - like settings or keys stored on the server
+   */
+  public function getAfformConfig(array $processor): array {
+    return [];
+  }
+
 }
