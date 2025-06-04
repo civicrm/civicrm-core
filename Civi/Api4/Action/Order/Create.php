@@ -62,6 +62,10 @@ class Create extends AbstractAction {
         throw new \CRM_Core_Exception(ts('Invalid financial type %1', [1 => $financialType]));
       }
     }
+    // generate invoice id if not set
+    if (empty($values['invoice_id'])) {
+      $values['invoice_id'] = bin2hex(random_bytes(16));
+    }
     return $values;
   }
 
