@@ -84,6 +84,8 @@ class CRM_Financial_BAO_Order {
 
   private array $contributionValues;
 
+  private ?int $existingContributionID = NULL;
+
   /**
    * @param bool $isExcludeExpiredFields
    *
@@ -999,6 +1001,17 @@ class CRM_Financial_BAO_Order {
         $this->setPriceSetID($lineItems[0]['price_field_id.price_set_id']);
       }
     }
+    elseif ($this->getExistingContributionID()) {
+      $lineItems = $this->getLinesForContribution();
+      // Set the price set ID from the first line item (we need to set this here
+      // to prevent a loop later when we retrieve the price field metadata to
+      // set the 'title' (as accessed from workflow message templates).
+      // Contributions *should* all have line items, but historically, imports did not create them.
+      if ($lineItems) {
+        $firstItem = reset($lineItems);
+        $this->setPriceSetID($firstItem['price_field_id.price_set_id']);
+      }
+    }
     else {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
         if ($valueID !== '') {
@@ -1370,6 +1383,10 @@ class CRM_Financial_BAO_Order {
       $lineItem['tax_amount'] = 0.0;
       $lineItem['line_total_inclusive'] = $lineItem['line_total'];
     }
+    if ($this->getExistingContributionID() && $lineItem['unit_price'] === 1.0) {
+      // Perhaps the existing contribution ID check can go...
+      $lineItem['qty'] = $lineItem['line_total'];
+    }
     if (!empty($lineItem['qty'])) {
       $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
     }
@@ -1386,7 +1403,8 @@ class CRM_Financial_BAO_Order {
    * @throws \CRM_Core_Exception
    */
   protected function getLinesFromTemplateContribution(): array {
-    $lines = $this->getLinesForContribution();
+    // Rekey the array to a 0 index with array_merge.
+    $lines = array_merge($this->getLinesForContribution());
     foreach ($lines as &$line) {
       // The apiv4 insists on adding id - so let it get all the details
       // and we will filter out those that are not part of a template here.
@@ -1422,7 +1440,7 @@ class CRM_Financial_BAO_Order {
    */
   protected function getLinesForContribution(): array {
     return (array) LineItem::get(FALSE)
-      ->addWhere('contribution_id', '=', $this->getTemplateContributionID())
+      ->addWhere('contribution_id', '=', $this->getExistingContributionID() ?: $this->getTemplateContributionID())
       ->setSelect([
         'contribution_id',
         'entity_id',
@@ -1441,7 +1459,7 @@ class CRM_Financial_BAO_Order {
         'participant_count',
         'membership_num_terms',
       ])
-      ->execute();
+      ->execute()->indexBy('id');
   }
 
   /**
@@ -1575,6 +1593,14 @@ class CRM_Financial_BAO_Order {
       return $entityValues['id'];
     }
     return civicrm_api4($entity, 'save', ['records' => [$entityValues]])->first()['id'];
+  }
+
+  public function getExistingContributionID(): ?int {
+    return $this->existingContributionID;
+  }
+
+  public function setExistingContributionID(?int $existingContributionID): void {
+    $this->existingContributionID = $existingContributionID;
   }
 
 }
