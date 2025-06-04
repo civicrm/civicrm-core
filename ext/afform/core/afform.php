@@ -235,6 +235,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'select' => ['redirect', 'name', 'title', 'autosave_draft', 'confirmation_type', 'confirmation_message'],
     'where' => [['name', '=', $params['name']]],
   ], 0);
+  $formMetaData['title'] = _ts($formMetaData['title']);
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
     'camel' => $moduleName,
