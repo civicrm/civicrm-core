@@ -756,4 +756,32 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return $actions;
   }
 
+  /**
+   * Function to replace tokens with entity values in e.g. redirect urls
+   *
+   * Tokens look like [Participant1.0.id]
+   *
+   * @param string $text
+   *
+   * @return string
+   */
+  public function replaceTokens(string $text): string {
+    $matches = [];
+    preg_match_all('/\[[a-zA-Z0-9]{1,}\.[0-9]{1,}\.[^.]{1,}\]/', $text, $matches);
+
+    foreach ($matches[0] as $match) {
+      // strip [ ] and split on .
+      [$entityName, $index, $field] = explode('.', substr($match, 1, -1));
+      if ($field === 'id') {
+        $value = $this->_entityIds[$entityName][$index]['id'];
+      }
+      else {
+        $value = $this->_entityValues[$entityName][$index]['fields'][$field];
+      }
+      $text = str_replace($match, $value, $text);
+    }
+
+    return $text;
+  }
+
 }
