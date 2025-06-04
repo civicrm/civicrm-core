@@ -157,6 +157,20 @@ class Kernel {
     catch (\Exception $e) {
       if ($apiRequest) {
         $this->dispatcher->dispatch('civi.api.exception', new ExceptionEvent($e, NULL, $apiRequest, $this));
+        if ($e->getErrorClass() === 'DBQueryException' && $e->getMessage() === 'DB Error: already exists'
+            && $apiRequest['version'] === 4) {
+          // It is quite common to receive the "DB Error: already exists". If you don't have debug enabled
+          //   and the calling code did not catch and/or log anything else it can be impossible to work out
+          //   why it happened.
+          // We might want to expand this to other types of error in the future.
+          if (method_exists($apiRequest, 'getValues')) {
+            $values = $apiRequest->getValues();
+          }
+          elseif (method_exists($apiRequest, 'getRecords')) {
+            $values = $apiRequest->getRecords();
+          }
+          \Civi::log()->error("API{$apiRequest['version']} {$apiRequest->getEntityName()}:{$apiRequest->getActionName()} {$e->getErrorClass()}: {$e->getMessage()}", $values ?? []);
+        }
       }
       throw $e;
     }
