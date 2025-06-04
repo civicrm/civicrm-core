@@ -135,21 +135,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       }
     }
     if ($importType === 'Import Contribution') {
-      $userJob = new \CRM_Core_DAO_UserJob();
-      $userJob->job_type = 'contribution_import';
-      $userJob->find();
-      while ($userJob->fetch()) {
-        $metadata = json_decode($userJob->metadata, TRUE);
-        if (!empty($metadata['import_mappings'])) {
-          foreach ($metadata['import_mappings'] as &$mapping) {
-            if (isset($fieldsToConvert[$mapping['name']])) {
-              $mapping['name'] = $fieldsToConvert[$mapping['name']];
-            }
-            $userJob->metadata = json_encode($metadata);
-            $userJob->save();
-          }
-        }
-      }
+      CRM_Upgrade_Incremental_php_SixTwo::upgradeUserJobs('Contribution');
     }
     return TRUE;
   }
