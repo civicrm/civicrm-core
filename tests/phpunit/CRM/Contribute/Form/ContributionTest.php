@@ -890,9 +890,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *
    * @dataProvider getThousandSeparators
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testSubmitUpdate(string $thousandSeparator): void {
     $contactID = $this->individualCreate();
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_line_item AUTO_INCREMENT=58');
     $this->setCurrencySeparators($thousandSeparator);
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(6100.10),
