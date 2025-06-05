@@ -195,7 +195,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
         $this->mappingName = Mapping::get(FALSE)
           ->addWhere('id', '=', $savedMappingID)
           ->execute()
-          ->first()['name'];
+          ->first()['name'] ?? '';
       }
     }
     return $this->mappingName ?? '';
