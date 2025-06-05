@@ -68,7 +68,7 @@
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "~1.9.4",
     "marcj/topsort": "~1.1",
-    "phpoffice/phpword": "dev-master#44e6c268e3c03b0ce5e5ca2665c400a211d34d8b",
+    "phpoffice/phpword": "^1.4",
     "phpseclib/phpseclib": "~2.0",
     "pear/validate_finance_creditcard": "0.7.0",
     "pear/auth_sasl": "1.2.0",
