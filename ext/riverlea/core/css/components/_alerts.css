@@ -29,7 +29,6 @@
 .crm-container .status li,
 .crm-container .messages li {
   color: var(--crm-alert-success-text);
-  list-style: initial;
 }
 .crm-container .status.alert,
 .crm-container .alert-warning,
