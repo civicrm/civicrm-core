@@ -86,6 +86,3 @@
 .status-debug-information {
   font-size: var(--crm-small-font-size);
 }
-.crm-status-message-body ul {
-  list-style: inherit;
-}

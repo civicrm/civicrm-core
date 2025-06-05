@@ -54,9 +54,13 @@ body {
 }
 /* Remove list styles (bullets/numbers) */
 .crm-container ol,
-.crm-container ul,
-.crm-container menu {
+.crm-container ul {
   list-style: none;
+}
+/* Restores list styles for rich text output to UA stylesheet definition */
+.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body) :is(ol,ul) {
+  list-style: revert;
+  padding: revert;
 }
 /* For images to not be able to exceed their container */
 .crm-container img {
