@@ -31,6 +31,12 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
     $names = $this->_itemsToGet('name');
     $filter = $names ? ['name' => $names] : [];
     $settings = \Civi\Core\SettingsMetadata::getMetadata($filter, $this->domainId, $this->loadOptions);
+
+    // FIXME: This is a workaround for a workaround for settingsBag::setDb() which means [] is returned
+    // for non-existent settings if passed in name filter
+    // @see SettingsMetadata::_filterSettingsSpecification
+    $settings = array_filter($settings);
+
     $getReadonly = $this->_isFieldSelected('readonly');
     foreach ($settings as $index => $setting) {
       // Unserialize default value
