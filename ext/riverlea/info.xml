@@ -22,7 +22,7 @@
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
-    <namespace>CRM/riverlea</namespace>
+    <namespace>CRM/Riverlea</namespace>
     <format>25.01.1</format>
   </civix>
   <mixins>

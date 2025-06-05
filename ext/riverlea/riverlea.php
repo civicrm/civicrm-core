@@ -76,8 +76,8 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
   if ($bundle->name === 'coreResources') {
     // get DynamicCss asset
     $bundle->addStyleUrl(\Civi::service('asset_builder')->getUrl(
-      \Civi\riverlea\DynamicCss::CSS_FILE,
-      \Civi\riverlea\DynamicCss::getCssParams()
+      \Civi\Riverlea\DynamicCss::CSS_FILE,
+      \Civi\Riverlea\DynamicCss::getCssParams()
     ));
   }
 }
