@@ -93,13 +93,6 @@ class SaveFile extends AbstractRunAction {
 
     $rows = $this->formatResult($apiResult);
 
-    $entity_table = 'civicrm_saved_search';
-    $entity_id = $this->savedSearch['id'];
-    if (!empty($this->display['id'])) {
-      $entity_id = $this->display['id'];
-      $entity_table = 'civicrm_search_display';
-    }
-
     if ($this->appendDate) {
       $this->fileName .= date("_Ymd", time());
     }
@@ -150,8 +143,8 @@ class SaveFile extends AbstractRunAction {
       $fileDao->find(TRUE);
 
       $entityFileDao = new \CRM_Core_DAO_EntityFile();
-      $entityFile['entity_table'] = $entity_table;
-      $entityFile['entity_id'] = $entity_id;
+      $entityFile['entity_table'] = 'civicrm_saved_search';
+      $entityFile['entity_id'] = $this->savedSearch['id'];
       $entityFileDao->copyValues($entityFile);
       $entityFileDao->file_id = $fileDao->id;
       $entityFileDao->save();
