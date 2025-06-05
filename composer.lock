@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bb5590d554c29b033f5826c93fcd79c0",
+    "content-hash": "9a705f23c9a57500d5b7a6cfdee4e9a1",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2810,16 +2810,16 @@
         },
         {
             "name": "phpoffice/phpword",
-            "version": "dev-master",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PHPWord.git",
-                "reference": "44e6c268e3c03b0ce5e5ca2665c400a211d34d8b"
+                "reference": "6d75328229bc93790b37e93741adf70646cea958"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PHPWord/zipball/44e6c268e3c03b0ce5e5ca2665c400a211d34d8b",
-                "reference": "44e6c268e3c03b0ce5e5ca2665c400a211d34d8b",
+                "url": "https://api.github.com/repos/PHPOffice/PHPWord/zipball/6d75328229bc93790b37e93741adf70646cea958",
+                "reference": "6d75328229bc93790b37e93741adf70646cea958",
                 "shasum": ""
             },
             "require": {
@@ -2848,7 +2848,6 @@
                 "ext-xmlwriter": "Allows writing OOXML and ODF",
                 "ext-xsl": "Allows applying XSL style sheet to headers, to main document part, and to footers of an OOXML template"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -2913,9 +2912,9 @@
             ],
             "support": {
                 "issues": "https://github.com/PHPOffice/PHPWord/issues",
-                "source": "https://github.com/PHPOffice/PHPWord/tree/master"
+                "source": "https://github.com/PHPOffice/PHPWord/tree/1.4.0"
             },
-            "time": "2025-06-03T05:06:38+00:00"
+            "time": "2025-06-05T10:32:36+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -5960,9 +5959,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "phpoffice/phpword": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -5974,7 +5971,7 @@
         "ext-mysqli": "*",
         "ext-fileinfo": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.0.0"
     },
