@@ -125,6 +125,18 @@ class Submit extends AbstractProcessor {
     // todo - add only if needed?
     $this->setResponseItem('token', $this->generatePostSubmitToken());
 
+    if (!empty($this->_response['redirect']) || !empty($this->_reponse['message'] ?? NULL)) {
+      // redirect / message is already set, ignore defaults
+    }
+    elseif ($this->_afform['confirmation_type'] === 'show_confirmation_message') {
+      $message = $this->replaceTokens($this->_afform['confirmation_message']);
+      $this->setResponseItem('message', $message);
+    }
+    elseif ($this->_afform['redirect']) {
+      $redirect = $this->replaceTokens($this->_afform['redirect']);
+      $this->setResponseItem('redirect', $redirect);
+    }
+
     return [$this->_response];
   }
 

@@ -89,6 +89,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
     $this->loadEntities();
+    // TODO: use _response more consistently
     $result->exchangeArray($this->processForm());
   }
 
@@ -730,12 +731,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Stash things to return in the Api response
+   * Set a key in the api response
+   *
+   * Note: key should be recognised by the afForm controller
+   * expected keys are:
+   *   token, redirect, message
    *
    * @param string $key
    * @param mixed $value
    */
-  public function setResponseItem(string $key, mixed $value): void {
+  public function setResponseItem(string $key, $value): void {
     $this->_response[$key] = $value;
   }
 
