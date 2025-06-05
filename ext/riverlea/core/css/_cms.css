@@ -158,7 +158,6 @@ body.wp-admin .crm-container input:not([type=checkbox]):not([type=radio]):not(.c
 body.wp-admin .crm-container p,
 body.wp-admin .crm-container li {
   margin-bottom: 0; /* resets WP li bottom margin */
-  list-style: none;
   white-space: inherit;
 }
 body.wp-admin .crm-container div.ui-notify-message .notify-content li {
