@@ -313,7 +313,7 @@
 --crm-dash-panel-bg: #fff;
 --crm-dash-panel-border: 0;
 --crm-dash-panel-radius: 0 0 var(--crm-dash-roundness) var(--crm-dash-roundness);
---crm-dash-edit-border: 2px dashed var(--crm-c-gray-300);
+--crm-dash-edit-border: 1px dashed var(--crm-c-gray-300);
 --crm-dash-block-padding: 0;
 --crm-dash-block-bg: ;
 --crm-dash-block-radius: var(--crm-roundness);
