@@ -40,10 +40,73 @@
 use Civi\Core\ClassScanner;
 
 return function ($mixInfo, $bootCache) {
+  $classloaderRules = $bootCache->define('class-scan-rules-' . $mixInfo->shortName, function() use ($mixInfo) {
+    $infoXmlFile = $mixInfo->getPath('info.xml');
+    [$info, $error] = \CRM_Utils_XML::parseFile($infoXmlFile);
+    if ($error) {
+      Civi::log()->error("Failed to parse $infoXmlFile");
+      return [];
+    }
+    if (!isset($info->classloader)) {
+      return [];
+    }
+    $rules = [];
+    foreach ($info->classloader as $classloader) {
+      foreach ($classloader->children() as $psr) {
+        $type = 'psr0';
+        if ($psr->getName() == 'psr4') {
+          $type = 'psr4';
+        }
+        $path = (string) $psr->attributes()->path;
+        if (empty($path) || $path == '.') {
+          $path = 'CRM';
+        }
+        $rule = [
+          'type' => $type,
+          'prefix' => (string) $psr->attributes()->prefix,
+          'path' => $path,
+          'class-delim' => '\\',
+          'exclude-prefixes' => [],
+          'include-rules' => [],
+          'include-rules-match' => 'all',
+        ];
+        foreach ($psr->children() as $child) {
+          if ($child->getName() == 'scanner-exclude-prefix') {
+            $rule['exclude-prefixes'][] = (string) $child;
+          }
+          elseif ($child->getName() == 'scanner-include') {
+            if ($child->attributes()->match) {
+              $rule['include-rules-match'] = (string) $child->attributes()->match;
+            }
+            foreach ($child->children() as $includeRule) {
+              if ($includeRule->getName() == 'ext') {
+                $minVersion = '*';
+                $maxVersion = '*';
+                if ($includeRule->attributes()->min_ver) {
+                  $minVersion = (string) $includeRule->attributes()->min_ver;
+                }
+                if ($includeRule->attributes()->max_ver) {
+                  $maxVersion = (string) $includeRule->attributes()->max_ver;
+                }
+                $rule['include-rules'][] = [
+                  'ext' => (string) $includeRule,
+                  'min-ver' => $minVersion,
+                  'max-var' => $maxVersion,
+                ];
+              }
+            }
+          }
+        }
+        $rules[] = $rule;
+      }
+    }
+    return $rules;
+  });
+
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
-  Civi::dispatcher()->addListener('hook_civicrm_scanClasses', function ($event) use ($mixInfo) {
+  Civi::dispatcher()->addListener('hook_civicrm_scanClasses', function ($event) use ($mixInfo, $classloaderRules) {
     if (!$mixInfo->isActive()) {
       return;
     }
@@ -54,26 +117,45 @@ return function ($mixInfo, $bootCache) {
     if ($all === NULL) {
       $baseDir = CRM_Utils_File::addTrailingSlash($mixInfo->getPath());
       $all = [];
-      ClassScanner::scanFolders($all, $baseDir, 'CRM', '_');
 
-      /** @var CRM_Extension_Mapper $extMap */
+      /**
+       * @var CRM_Extension_Mapper $extMap
+       */
       $extMap = CRM_Extension_System::singleton()->getMapper();
-      /** @var CRM_Extension_Info $info */
-      $info = $extMap->keyToInfo($mixInfo->longName);
-      if (!empty($info->classloader)) {
-        foreach ($info->classloader as $mapping) {
-          $requiredExtensionsAreInstalled = true;
-          if (!empty($mapping['requires-ext'])) {
-            foreach ($mapping['requires-ext'] as $requireExtension) {
-              if (!$extMap->isActiveModule($requireExtension)) {
-                $requiredExtensionsAreInstalled = false;
-                break;
+      foreach ($classloaderRules as $mapping) {
+        $excludeRegEx = NULL;
+        if (is_array($mapping['exclude-prefixes']) && count($mapping['exclude-prefixes'])) {
+          $excludeRegEx = '(' . implode("|", array_map('preg_quote', $mapping['exclude-prefixes'])) . ')';
+        }
+        $requiredExtensionsAreInstalled = TRUE;
+        if (count($mapping['include-rules'])) {
+          if ($mapping['include-rules-match'] == 'any') {
+            $requiredExtensionsAreInstalled = FALSE;
+          }
+          foreach ($mapping['include-rules'] as $requireExtension) {
+            $extIsValid = FALSE;
+            if ($extMap->isActiveModule($requireExtension['ext'])) {
+              $reqExtInfo = $extMap->keyToInfo($requireExtension['ext']);
+              $minVersionMatch = TRUE;
+              $maxVersionMatch = TRUE;
+              if ($requireExtension['min_ver'] != '*' && !version_compare($requireExtension['min_ver'], $reqExtInfo->version, '<')) {
+                $minVersionMatch = FALSE;
               }
+              if ($requireExtension['max_ver'] != '*' && !version_compare($requireExtension['max_ver'], $reqExtInfo->version, '>')) {
+                $maxVersionMatch = FALSE;
+              }
+              $extIsValid = $minVersionMatch && $maxVersionMatch;
+            }
+            if ($mapping['include-rules-match'] == 'any' && $extIsValid) {
+              $requiredExtensionsAreInstalled = TRUE;
+            }
+            elseif ($mapping['include-rules-match'] == 'all' && !$extIsValid) {
+              $requiredExtensionsAreInstalled = FALSE;
             }
           }
-          if ($requiredExtensionsAreInstalled && !empty($mapping['path']) && $mapping['type'] == 'psr4') {
-            ClassScanner::scanFolders($all, $baseDir, $mapping['path'], '\\');
-          }
+        }
+        if ($requiredExtensionsAreInstalled && !empty($mapping['path'])) {
+          ClassScanner::scanFolders($all, $baseDir, $mapping['path'], $mapping['class-delim'], $excludeRegEx);
         }
       }
       $cache->set($cacheKey, $all, ClassScanner::TTL);

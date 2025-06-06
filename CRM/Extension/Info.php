@@ -318,7 +318,6 @@ class CRM_Extension_Info {
             'type' => 'psr4',
             'prefix' => (string) $psr4->attributes()->prefix,
             'path' => (string) $psr4->attributes()->path,
-            'requires-ext' => strlen((string) $psr4->attributes()->{"requires-ext"}) ? explode(",", (string) $psr4->attributes()->{"requires-ext"}) : [],
           ];
         }
         foreach ($val->psr0 as $psr0) {
@@ -326,7 +325,6 @@ class CRM_Extension_Info {
             'type' => 'psr0',
             'prefix' => (string) $psr0->attributes()->prefix,
             'path' => (string) $psr0->attributes()->path,
-            'requires-ext' => [],
           ];
         }
       }
