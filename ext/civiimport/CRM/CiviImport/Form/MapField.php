@@ -1,7 +1,5 @@
 <?php
 
-use Civi\Api4\Mapping;
-
 class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
 
   public function preProcess(): void {
@@ -10,13 +8,24 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     Civi::service('angularjs.loader')->addModules('crmCiviimport');
     $this->assignCiviimportVariables();
 
-    // @todo - remove the mapping part - once we have removed from js - tey should all have userJobs templates now.
-    $savedMappingID = (int) $this->getSavedMappingID();
-    $savedMapping = [];
-    if ($savedMappingID) {
-      $savedMapping = Mapping::get()->addWhere('id', '=', $savedMappingID)->addSelect('id', 'name', 'description')->execute()->first();
+    $templateJob = $this->getTemplateJob();
+    if ($templateJob) {
+      Civi::resources()->addVars('crmImportUi', ['savedMapping' => ['name' => substr($templateJob['name'], 7)]]);
     }
-    Civi::resources()->addVars('crmImportUi', ['savedMapping' => $savedMapping]);
+  }
+
+  /**
+   * Save the Field Mapping.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function saveMapping(): void {
+    if ($this->getSubmittedValue('saveMapping')) {
+      $this->createTemplateJob();
+    }
+    if ($this->getSubmittedValue('updateMapping')) {
+      $this->updateUserJobMetadata('Template', ['is_use_template' => TRUE]);
+    }
   }
 
   /**
@@ -77,6 +86,30 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
   public function addMappingToDefaults(array &$defaults, array $fieldMapping, int $rowNumber): void {
     $fieldName = $fieldMapping['name'];
     $defaults["mapper[$rowNumber]"] = [$fieldName];
+  }
+
+  /**
+   * Add the saved mapping fields to the form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function addSavedMappingFields(): void {
+    $savedMappingID = $this->getSavedMappingID();
+    //to save the current mappings
+    if (!$this->getTemplateID()) {
+      $saveDetailsName = ts('Save this field mapping');
+      $this->applyFilter('saveMappingName', 'trim');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    else {
+      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
+      $saveDetailsName = ts('Save as a new field mapping');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
+    $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
   }
 
 }
