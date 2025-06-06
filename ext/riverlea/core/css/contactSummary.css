@@ -65,7 +65,7 @@
   width: fit-content;
   float: left;
   box-shadow: rgba(255, 255, 255, 0.3) 0 0 0 99999px;
-/}
+}
 .contactCardRight .crm-inline-edit.form,
 .contactCardRight {
   float: right;
@@ -404,7 +404,8 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
   .crm-container .contact_panel.crm-contact-summary-layout-row {
     flex-direction: column;
   }
-  .contactCardRight .crm-inline-edit.form, .contactCardRight {
+  .contactCardRight .crm-inline-edit.form,
+  .contactCardRight {
     float: none;
   }
 }
