@@ -1,6 +1,6 @@
 <?php
 
-namespace Civi\riverlea;
+namespace Civi\Riverlea;
 
 use CRM_riverlea_ExtensionUtil as E;
 
