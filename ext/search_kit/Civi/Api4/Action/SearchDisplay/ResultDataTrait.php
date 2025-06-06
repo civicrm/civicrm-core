@@ -20,6 +20,14 @@ trait ResultDataTrait {
    */
   protected $format = 'array';
   private $formats = [
+    'array' => [
+      'writer' => 'JSON',
+      'mime' => 'application/json',
+    ],
+    'csv' => [
+      'writer' => 'CSV',
+      'mime' => 'text/csv',
+    ],
     'xlsx' => [
       'writer' => 'Xlsx',
       'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
