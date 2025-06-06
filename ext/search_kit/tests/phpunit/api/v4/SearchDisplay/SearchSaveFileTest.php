@@ -3,25 +3,16 @@ namespace api\v4\SearchDisplay;
 
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Api4\SavedSearch;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 
 /**
- * FIXME - Add test description.
- *
- *  - With TransactionalInterface, any data changes made by setUp() or test****() functions will
- *    rollback automatically -- as long as you don't manipulate schema or truncate tables.
- *    If this test needs to manipulate schema or truncate tables, then either:
- *       a. Do all that using setupHeadless() and Civi\Test.
- *       b. Disable TransactionalInterface, and handle all setup/teardown yourself.
- *
  * @group headless
  */
 class SearchSaveFileTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
   public function setUpHeadless() {
-    // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
-    // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
     return \Civi\Test::headless()
       ->installMe(__DIR__)
       ->apply();
@@ -44,63 +35,42 @@ class SearchSaveFileTest extends \PHPUnit\Framework\TestCase implements Headless
       ->setDefaults(['activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid])
       ->execute();
 
-    $params = [
-      'checkPermissions' => FALSE,
-      'format' => 'array',
-      'savedSearch' => [
+    SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => 'TestContactActivity',
+        'label' => 'TestContactActivity',
         'api_entity' => 'Activity',
         'api_params' => [
           'version' => 4,
           'select' => ['subject', 'details'],
           'where' => [],
         ],
-      ],
-      'display' => [
-        'type' => 'table',
-        'label' => '',
-        'settings' => [
-          'limit' => 2,
-          'actions' => TRUE,
-          'pager' => [],
-          'columns' => [
-            [
-              'key' => 'subject',
-              'label' => 'Duration Subject',
-              'dataType' => 'String',
-              'type' => 'field',
-              'rewrite' => '[duration] [subject]',
-            ],
-            // This column ought to be removed by the download action
-            [
-              'type' => 'links',
-              'links' => [],
-            ],
-            [
-              'key' => 'details',
-              'label' => 'Details',
-              'dataType' => 'String',
-              'type' => 'html',
-            ],
-          ],
-          'sort' => [
-            ['id', 'ASC'],
-          ],
-        ],
-      ],
+      ])
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'array',
+      'savedSearch' => 'TestContactActivity',
       'filters' => ['subject' => $subject],
       'afform' => NULL,
       'appendDate' => TRUE,
       'reportName' => 'Save File Test',
       'fileName' => 'Test_File',
+      'folderName' => 'TestDirectory',
     ];
 
-    $data = (array) civicrm_api4('SearchDisplay', 'saveFile', $params);
-    $file = json_decode($data);
+    $data = civicrm_api4('SearchDisplay', 'saveFile', $params);
+    $file = $data['file'];
     $config = \CRM_Core_Config::singleton();
     $directoryName = $config->customFileUploadDir;
 
+    // Assert file creation.
+    // ---------------------------------
+    // Make sure report name is correct.
     $this->assertEquals('Save File Test', $file->description);
     $this->assertEquals('application/json', $file->mime_type);
+
     // The following directory and name checks may not be needed if the
     // overall file exists check passes, it would mean these aren't needed.
     // --------------------
@@ -112,11 +82,28 @@ class SearchSaveFileTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertStringStartsWith($directoryName . 'TestDirectory/Test_File', $file->uri);
     // Check to see if our test file name, with current date,
     // is found in the returned URL.
-    $this->assertStringStartsWith($directoryName . 'TestDirectory/Test_File_' . date("_Ymd", time()), $file->uri);
+    $this->assertStringStartsWith($directoryName . 'TestDirectory/Test_File' . date("_Ymd", time()), $file->uri);
 
     // --------------------
     // Make sure our saved file exists in the file system.
     $this->assertFileExists($file->uri);
+
+    // Assert entity file creation.
+    $entityFiles = civicrm_api4('EntityFile', 'get', [
+      'where' => [
+        ['entity_table', '=', 'civicrm_saved_search'],
+        ['file_id', '=', $file->id],
+      ],
+    ]);
+
+    // Make sure we have a result record.
+    $this->assertCount(1, $entityFiles);
+
+    // Make sure we are getting back the correct entity_table.
+    $this->assertEquals('civicrm_saved_search', $entityFiles->first()['entity_table']);
+
+    // Make sure the file_id matches.
+    $this->assertEquals($file->id, $entityFiles->first()['file_id']);
   }
 
 }
