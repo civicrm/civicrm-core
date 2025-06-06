@@ -214,21 +214,29 @@ select.crm-error {
 .crm-container .two {
   width: 3rem; /* .two is used on number inputs that need 1rem for the controls */
 }
-.crm-container .four {
-  width: 4rem;
+.crm-container .four,
+.crm-container input.four,
+.crm-container .crm-form-select.four {
+  width: 4em;
 }
-.crm-container .six {
-  width: 6rem;
+.crm-container .six,
+.crm-container input.six,
+.crm-container .crm-form-select.six {
+  width: 6em;
 }
-.crm-container .eight {
-  width: 8rem;
+.crm-container .eight,
+.crm-container input.eight,
+.crm-container .crm-form-select.eight {
+  width: 8em;
 }
 .crm-container .twelve,
-.crm-container .medium {
-  width: 12rem;
+.crm-container .medium,
+.crm-container input.twelve,
+.crm-container input.medium  {
+  width: 12em;
 }
 .crm-container .twenty {
-  width: 20rem;
+  width: 20em;
 }
 .crm-container .big {
   width: var(--crm-big-input);
@@ -407,7 +415,7 @@ input.crm-form-checkbox) + label {
   width: auto;
   max-width: 100%;
 }
-.crm-container .select2-container {
+.crm-container .select2-container:not(.four,.six,.eight,.twelve,.medium) {
   width: var(--crm-big-input) !important /* vs inline fixed width */;
 }
 .crm-container .select2-container-multi {
