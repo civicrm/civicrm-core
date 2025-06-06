@@ -48,9 +48,6 @@ class SaveFile extends AbstractRunAction {
    */
   protected $appendDate = FALSE;
 
-
-  use ResultDataTrait;
-
   /**
    * @param \Civi\Api4\Result\SearchDisplayRunResult $result
    * @throws \CRM_Core_Exception
