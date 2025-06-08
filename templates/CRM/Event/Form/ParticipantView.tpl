@@ -45,8 +45,8 @@
         <tr class="crm-event-participantview-form-block-additionalParticipants">
             <td class="label">{ts}Also Registered by this Participant{/ts}</td>
             <td>
-                {foreach from=$additionalParticipants key=participantName item=participantURL}
-                    <a href="{$participantURL}" title="{ts escape='htmlattribute'}view additional participant{/ts}">{$participantName|escape}</a><br />
+                {foreach from=$additionalParticipants key=participantName item=participant}
+                  <a href="{$participant.url}" title="{ts escape='htmlattribute'}view additional participant{/ts}">{$participantName|escape}</a>{if $participant.status} ({$participant.status}){/if}<br />
                 {/foreach}
             </td>
         </tr>
