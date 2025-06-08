@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Contact;
 
 /**
  * Form helper class for communication preferences inline edit section.
@@ -59,23 +60,24 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
   /**
    * Process the form.
    */
-  public function postProcess() {
-    $params = $this->exportValues();
-
-    // Process / save communication preferences
-
-    // this is a chekbox, so mark false if we dont get a POST value
-    $params['is_opt_out'] ??= FALSE;
-    $params['contact_type'] = $this->_contactType;
-    $params['contact_id'] = $this->_contactId;
-
-    if (!empty($this->_contactSubType)) {
-      $params['contact_sub_type'] = $this->_contactSubType;
+  public function postProcess(): void {
+    $params = [
+      'preferred_communication_method' => array_keys($this->getSubmittedValue('preferred_communication_method') ?? []),
+      'is_opt_out' => (bool) $this->getSubmittedValue('is_opt_out'),
+      'id' => $this->getContactID(),
+      'communication_style_id' => $this->getSubmittedValue('communication_style_id'),
+    ];
+    foreach ($this->getSubmittedValue('privacy') as $field => $value) {
+      $params[$field] = (bool) $value;
     }
-
-    if (!isset($params['preferred_communication_method'])) {
-      $params['preferred_communication_method'] = 'null';
+    foreach (['addressee', 'email_greeting', 'postal_greeting'] as $type) {
+      $params[$type . '_id'] = $this->getSubmittedValue($type . '_id');
+      $params[$type . '_custom'] = $this->getSubmittedValue($type . '_custom');
     }
+    Contact::update()
+      ->setValues($params)
+      ->addWhere('id', '=', $this->getContactID())
+      ->execute();
     CRM_Contact_BAO_Contact::create($params);
 
     $this->response();
