@@ -499,16 +499,16 @@ class CRM_Upgrade_Incremental_MessageTemplates {
 
   /**
    * Get the upgrade messages.
+   *
+   * @fromVer version we are upgrading from
    */
-  public function getUpgradeMessages() {
+  public function getUpgradeMessages($fromVer) {
     $updates = $this->getTemplatesToUpdate();
 
+    $uneditedTemplates = [];
     // workflow_name is not available pre-5.26, so we won't check if templates are changed or not pre-5.26
-    try {
+    if (version_compare($fromVer, 5.26, '>=')) {
       $uneditedTemplates = $this->getUneditedTemplates();
-    }
-    catch (Exception $e) {
-      $uneditedTemplates = [];
     }
 
     $messages = [];
