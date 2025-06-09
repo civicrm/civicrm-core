@@ -448,9 +448,22 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
  * To use the filesystem                use a value of 'FileCache'
  * To not use any caching (not recommended), use a value of 'NoCache'
  *
+ * If you are using Standalone and Redis you should probably set
+ * your session handler to Redis too - see below.
  */
 if (!defined('CIVICRM_DB_CACHE_CLASS')) {
   define('CIVICRM_DB_CACHE_CLASS', 'ArrayCache');
+}
+
+/**
+ * If you are using Redis for your DB Cache you should probably also set
+ * you session cache to Redis.
+ *
+ * You should also review your Redis session locking configuration per
+ * https://docs.civicrm.org/sysadmin/en/latest/setup/cache/#config-redis
+ */
+if (!defined('CIVICRM_SESSION_HANDLER')) {
+  define('CIVICRM_SESSION_HANDLER', '');
 }
 
 /**
