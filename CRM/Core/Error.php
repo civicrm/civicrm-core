@@ -984,10 +984,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function exceptionHandler($pearError) {
     $message = $pearError->getMessage();
 
-    // wrapped in case settings aren't available yet
+    // wrapped in case settings/log aren't available yet
     try {
+      $messageWithDetails = $message . ' ' . $pearError->getUserInfo();
+
+      \Civi::log()->debug($messageWithDetails);
+
       if (\Civi::settings()->get('debug_enabled')) {
-        $message .= ' ' . $pearError->getUserInfo();
+        // if debug is enabled we print full error details to screen
+        // as well as log
+        $message = $messageWithDetails;
       }
     }
     catch (\Exception $e) {
