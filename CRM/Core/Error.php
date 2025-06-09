@@ -988,7 +988,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     try {
       $messageWithDetails = $message . ' ' . $pearError->getUserInfo();
 
-      \Civi::log()->debug($messageWithDetails);
+      \Civi::log()->debug($messageWithDetails . "\n\n" . self::formatBacktrace($pearError->getBacktrace()));
 
       if (\Civi::settings()->get('debug_enabled')) {
         // if debug is enabled we print full error details to screen
