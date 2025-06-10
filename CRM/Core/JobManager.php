@@ -21,6 +21,11 @@ use Civi\Api4\Job;
 class CRM_Core_JobManager {
 
   /**
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * Jobs.
    *
    * Format is ($id => CRM_Core_ScheduledJob).
@@ -48,6 +53,13 @@ class CRM_Core_JobManager {
    * @fixme Looks like this is only used by "singleRun"
    */
   public $_source = NULL;
+
+  /**
+   * @param \Psr\Log\LoggerInterface|null $logger
+   */
+  public function __construct($logger = NULL) {
+    $this->logger = $logger ?: new CRM_Core_JobLogger();
+  }
 
   /**
    * @param bool $auth
@@ -211,50 +223,37 @@ class CRM_Core_JobManager {
   }
 
   /**
+   * Add a log entry.
+   *
+   * NOTE: This signature has been around forever, and it's used a little bit in contrib.
+   * However, you will likely find it more meaningful to call the $logger, as in:
+   *
+   *   $this->logger->warning("Careful!", $this->createLogContext());
+   *   $this->logger->error("Uh oh!", $this->createLogContext());
+   *
    * @param string $message
    */
   public function logEntry($message) {
-    $domainID = CRM_Core_Config::domainID();
-    $dao = new CRM_Core_DAO_JobLog();
+    $this->logger->log(Psr\Log\LogLevel::INFO, $message, $this->createLogContext());
+  }
 
-    $dao->domain_id = $domainID;
-
-    /*
-     * The description is a summary of the message.
-     * HTML tags are stripped from the message.
-     * The description is limited to 240 characters
-     * and has an ellipsis added if it is truncated.
-     */
-    $maxDescription = 240;
-    $ellipsis = " (...)";
-    $description = strip_tags($message);
-    if (strlen($description) > $maxDescription) {
-      $description = substr($description, 0, $maxDescription - strlen($ellipsis)) . $ellipsis;
-    }
-    $dao->description = $description;
-
+  private function createLogContext($init = []): array {
+    $context = $init;
     if ($this->currentJob) {
-      $dao->job_id = $this->currentJob->id;
-      $dao->name = $this->currentJob->name;
-      $dao->command = ts("Entity:") . " " . $this->currentJob->api_entity . " " . ts("Action:") . " " . $this->currentJob->api_action;
-      $data = "";
-      if (!empty($this->currentJob->parameters)) {
-        $data .= "\n\nParameters raw (from db settings): \n" . $this->currentJob->parameters;
-      }
+      $context['job'] = $this->currentJob;
       $singleRunParamsKey = strtolower($this->currentJob->api_entity . '_' . $this->currentJob->api_action);
       if (array_key_exists($singleRunParamsKey, $this->singleRunParams)) {
-        $data .= "\n\nParameters raw (" . $this->_source . "): \n" . serialize($this->singleRunParams[$singleRunParamsKey]);
-        $data .= "\n\nParameters parsed (and passed to API method): \n" . serialize($this->singleRunParams[$singleRunParamsKey]);
+        $context['singleRun']['parameters'] = $this->singleRunParams[$singleRunParamsKey];
+        $context['effective']['parameters'] = $this->singleRunParams[$singleRunParamsKey];
       }
       else {
-        $data .= "\n\nParameters parsed (and passed to API method): \n" . serialize($this->currentJob->apiParams);
+        $context['effective']['parameters'] = $this->currentJob->apiParams;
       }
-
-      $data .= "\n\nFull message: \n" . $message;
-
-      $dao->data = $data;
     }
-    $dao->save();
+    if ($this->_source) {
+      $context['source'] = $this->_source;
+    }
+    return $context;
   }
 
   /**
