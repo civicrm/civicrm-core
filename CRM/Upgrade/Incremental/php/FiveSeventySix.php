@@ -72,7 +72,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
        " . $domain['id'] . ",
        'message_header',
        '" . ts('Message Header') . "',
-     '<!-- " . ts('This is the %1 token HTML content.', [1 => '{site.message_header}']) . " -->',
+     '<!-- " . CRM_Core_DAO::escapeString(ts('This is the %1 token HTML content.', [1 => '{site.message_header}'])) . " -->',
       '', 1, 1)"
       );
     }
