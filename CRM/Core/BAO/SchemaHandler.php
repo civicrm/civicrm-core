@@ -589,6 +589,10 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool TRUE if FK is found
    */
   public static function checkFKExists(string $table_name, string $constraint_name): bool {
+    if (!isset(\Civi::$statics['CRM_Core_DAO']['init'])) {
+      // This could get called early during installation.
+      return FALSE;
+    }
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
       WHERE TABLE_SCHEMA = DATABASE()
