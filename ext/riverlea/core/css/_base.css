@@ -73,9 +73,6 @@ body {
 .crm-container table {
   border-collapse: collapse;
 }
-.crm-container details {
-  display: initial;
-}
 
 /* JQueryUI resets (!important vs JQuery UI css) */
 

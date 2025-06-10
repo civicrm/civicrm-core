@@ -101,7 +101,7 @@ return new class() {
 
   private function generateCreateTableSql(array $entity): string {
     $definition = $this->getTableDefinition($entity);
-    $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
+    $sql = "CREATE TABLE IF NOT EXISTS `{$entity['table']}` (\n  " .
       implode(",\n  ", $definition) .
       "\n)\n" .
       $this->getTableOptions() . ";\n";
