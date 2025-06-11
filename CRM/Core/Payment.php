@@ -2013,11 +2013,12 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * @return ?string (optional) name of angular partial to load in the afform payment params element when
-   *   using this payment processor
+   * @return array config to be passed to the clientside payment block
+   *   this may include a `template` to use for the payment block element
+   *   or arbitrary things the payment processor needs - like settings or keys stored on the server
    */
-  public function getAfformTemplate(): ?string {
-    return NULL;
+  public function getAfformConfig(array $processor): array {
+    return [];
   }
 
   /**
