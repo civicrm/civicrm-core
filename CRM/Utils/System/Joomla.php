@@ -38,7 +38,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @return bool
    */
   public function isLoaded(): bool {
-    return class_exists('JFactory') || class_exists('Joomla\CMS\Factory');
+    return class_exists('JFactory') || class_exists('\Joomla\CMS\Factory');
   }
 
   /**
@@ -83,15 +83,23 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $values['username'] = trim($params['cms_name']);
     $values['password1'] = $values['password2'] = $params['cms_pass'];
     $values['email1'] = $values['email2'] = trim($params[$mailParam]);
-
-    $lang = JFactory::getLanguage();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $lang = JFactory::getLanguage();
+    }
+    else {
+      $lang = $factoryClassName::getApplication()->getLanguage();
+    }
     $lang->load('com_users', $baseDir);
 
     $register = $model->register($values);
-
-    $ufID = JUserHelper::getUserId($values['username']);
-    JUserHelper::addUserToGroup($ufID, $userType);
-
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $ufID = JUserHelper::getUserId($values['username']);
+      JUserHelper::addUserToGroup($ufID, $userType);
+    }
+    else {
+      $ufID = \Joomla\CMS\User\UserHelper::getUserId($values['username']);
+      \Joomla\CMS\User\UserHelper::addUserToGroup($ufID, $userType);
+    }
     return $ufID;
   }
 
@@ -103,7 +111,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
     $values = [];
-    $user = JUser::getInstance($ufID);
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $user = JUser::getInstance($ufID);
+    }
+    else {
+      $factoryClassName = $this->factoryClassName();
+      $user = $factoryClassName::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($ufID);
+    }
 
     $values['email'] = $ufName;
     $user->bind($values);
@@ -149,8 +163,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $errors['cms_name'] = ts('Your username contains invalid characters or is too short');
     }
 
-    $JUserTable = &JTable::getInstance('User', 'JTable');
-
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $JUserTable = &JTable::getInstance('User', 'JTable');
+    }
+    else {
+      $factoryClassName = $this->factoryClassName();
+      $JUserTable = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createTable('user', 'JTable', []);
+    }
     $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select('username, email');
@@ -212,8 +231,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $template = CRM_Core_Smarty::singleton();
     $template->assign('pageTitle', $pageTitle);
 
-    $factoryClassName = $this->factoryClassName();
-    $document = $factoryClassName::getDocument();
+    $document = $this->getJoomlaDocument();
     $document->setTitle($title);
   }
 
@@ -254,8 +272,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function addHTMLHead($string = NULL) {
     if ($string) {
-      $factoryClassName = $this->factoryClassName();
-      $document = $factoryClassName::getDocument();
+      $document = $this->getJoomlaDocument();
       $document->addCustomTag($string);
     }
   }
@@ -265,8 +282,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function addStyleUrl($url, $region) {
     if ($region == 'html-header') {
-      $factoryClassName = $this->factoryClassName();
-      $document = $factoryClassName::getDocument();
+      $document = $this->getJoomlaDocument();
       $document->addStyleSheet($url);
       return TRUE;
     }
@@ -278,8 +294,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function addStyle($code, $region) {
     if ($region == 'html-header') {
-      $factoryClassName = $this->factoryClassName();
-      $document = $factoryClassName::getDocument();
+      $document = $this->getJoomlaDocument();
       $document->addStyleDeclaration($code);
       return TRUE;
     }
@@ -308,7 +323,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
       // Get Itemid using JInput::get()
       $factoryClassName = $this->factoryClassName();
-      $input = $factoryClassName::getApplication()->input;
+      $input = $factoryClassName::getApplication()->getInput();
       $itemIdNum = $input->get("Itemid");
       if ($itemIdNum && (!str_contains($path, 'civicrm/payment/ipn'))) {
         $Itemid = "{$separator}Itemid=" . $itemIdNum;
@@ -361,6 +376,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function setEmail(&$user) {
     global $database;
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $JUserTable = &JTable::getInstance('User', 'JTable');
+    }
+    else {
+      $factoryClassName = $this->factoryClassName();
+      $JUserTable = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createTable('user', 'JTable', []);
+    }
+    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select($db->quoteName('email'))
       ->from($db->quoteName('#__users'))
@@ -397,11 +420,16 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, FALSE);
     }
 
-    jimport('joomla.application.component.helper');
-    jimport('joomla.database.table');
-    jimport('joomla.user.helper');
-
-    $JUserTable = JTable::getInstance('User', 'JTable');
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      jimport('joomla.application.component.helper');
+      jimport('joomla.database.table');
+      jimport('joomla.user.helper');
+      $JUserTable = &JTable::getInstance('User', 'JTable');
+    }
+    else {
+      $factoryClassName = $this->factoryClassName();
+      $JUserTable = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createTable('user', 'JTable', []);
+    }
 
     $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
@@ -435,7 +463,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         }
       }
       else {
-        if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) {
+        if (version_compare(JVERSION, '4.0', 'lt') && !JUserHelper::verifyPassword($password, $dbPassword, $dbId)) {
+          return FALSE;
+        }
+        elseif (\Joomla\CMS\User\UserHelper::verifyPassword($password, $dbPassword, $dbId)) {
           return FALSE;
         }
 
@@ -471,9 +502,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function setUserSession($data) {
     [$userID, $ufID] = $data;
-    $user = new JUser($ufID);
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $user = new JUser($ufID);
+    }
+    else {
+      $user = new \Joomla\CMS\User\User($ufID);
+    }
     $factoryClassName = $this->factoryClassName();
-    $session = $factoryClassName::getSession();
+    $session = $factoryClassName::getApplication()->getSession();
     $session->set('user', $user);
 
     parent::setUserSession($data);
@@ -488,7 +524,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   public function factoryClassName(): string {
-    if (version_compare(JVERSION, '5.0.0', 'ge')) {
+    if (version_compare(JVERSION, '4.0.0', 'ge')) {
       return '\Joomla\CMS\Factory';
     }
     return 'JFactory';
@@ -501,12 +537,18 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @return bool
    */
   public function loadUser($username, $password = NULL) {
-    $uid = JUserHelper::getUserId($username);
+    $factoryClassName = self::factoryClassName();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $uid = JUserHelper::getUserId($username);
+    }
+    else {
+      $uid = \Joomla\CMS\User\UserHelper::getUserId($username);
+    }
     if (empty($uid)) {
       return FALSE;
     }
     $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
-    $factoryClassName = self::factoryClassName();
+
     if (!empty($password)) {
       if (version_compare(JVERSION, '4.0.0', 'ge')) {
         $this->loadJoomlaApplication('site');
@@ -524,8 +566,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // Save details in Joomla session
-    $user = $factoryClassName::getUser($uid);
-    $jsession = $factoryClassName::getSession();
+    if (version_compare(JVERSION, '4.0.0', 'ge')) {
+      $user = $factoryClassName::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($uid);
+    }
+    else {
+      $user = $factoryClassName::getUser($uid);
+    }
+    $jsession = $factoryClassName::getApplication()->getSession();
     $jsession->set('user', $user);
 
     // Save details in Civi session
@@ -536,8 +583,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   public function getUfId($username) {
-    jimport('joomla.user.helper');
-    $uid = JUserHelper::getUserId($username);
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      jimport('joomla.user.helper');
+      $uid = JUserHelper::getUserId($username);
+    }
+    else {
+      $uid = \Joomla\CMS\User\UserHelper::getUserId($username);
+    }
     return empty($uid) ? NULL : $uid;
   }
 
@@ -562,7 +614,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getUFLocale() {
     if (defined('_JEXEC')) {
       $factoryClassName = $this->factoryClassName();
-      $conf = $factoryClassName::getConfig();
+      $conf = $factoryClassName::getApplication()->getConfig();
       $locale = $conf->get('language');
       return str_replace('-', '_', $locale);
     }
@@ -611,6 +663,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $jversion = new $class();
       define('JVERSION', $jversion->getShortVersion());
     }
+  }
+
+  protected function getJoomlaDocument() {
+    $factoryClassName = $this->factoryClassName();
+    $document = $factoryClassName::getApplication()->getDocument();
+    return $document;
   }
 
   /**
@@ -689,7 +747,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // Set timezone for Joomla on Cron
     $factoryClassName = $this->factoryClassName();
-    $config = $factoryClassName::getConfig();
+    $config = $factoryClassName::getApplication()->getConfig();
     $timezone = $config->get('offset');
     if ($timezone) {
       $this->setTimeZone($timezone);
@@ -713,7 +771,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isUserLoggedIn() {
-    $user = JFactory::getUser();
+    $factoryClassName = $this->factoryClassName();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $user = $factoryClassName::getUser();
+    }
+    else {
+      $user = $factoryClassName::getApplication()->getIdentity();
+    }
     return !$user->guest;
   }
 
@@ -721,7 +785,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isUserRegistrationPermitted() {
-    $userParams = JComponentHelper::getParams('com_users');
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $userParams = JComponentHelper::getParams('com_users');
+    }
+    else {
+      $userParams = \Joomla\CMS\Component\ComponentHelper::getParams('com_users');
+    }
     if (!$userParams->get('allowUserRegistration')) {
       return FALSE;
     }
@@ -740,7 +809,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getLoggedInUfID() {
     $factoryClassName = $this->factoryClassName();
-    $user = $factoryClassName::getUser();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $user = $factoryClassName::getUser();
+    }
+    else {
+      $user = $factoryClassName::getApplication()->getIdentity();
+    }
     return ($user->guest) ? NULL : $user->id;
   }
 
@@ -749,7 +823,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getLoggedInUniqueIdentifier() {
     $factoryClassName = $this->factoryClassName();
-    $user = $factoryClassName::getUser();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $user = $factoryClassName::getUser();
+    }
+    else {
+      $user = $factoryClassName::getApplication()->getIdentity();
+    }
     return $this->getUniqueIdentifierFromUserObject($user);
   }
 
@@ -759,7 +838,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getUser($contactID) {
     $user_details = parent::getUser($contactID);
     $factoryClassName = $this->factoryClassName();
-    $user = $factoryClassName::getUser($user_details['id']);
+    if (version_compare(JVERSION, '4.0.0', 'ge')) {
+      $user = $factoryClassName::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($user_details['id']);
+    }
+    else {
+      $user = $factoryClassName::getUser($user_details['id']);
+    }
     $user_details['name'] = $user->name;
     return $user_details;
   }
@@ -783,7 +867,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getTimeZoneString() {
     $factoryClassName = $this->factoryClassName();
-    $timezone = $factoryClassName::getConfig()->get('offset');
+    $timezone = $factoryClassName::getApplication()->getConfig()->get('offset');
     return !$timezone ? date_default_timezone_get() : $timezone;
   }
 
@@ -796,7 +880,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getModules() {
     $result = [];
     $factoryClassName = $this->factoryClassName();
-    $db = $factoryClassName::getDbo();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $db = $factoryClassName::getDbo();
+    }
+    else {
+      $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+    }
     $query = $db->getQuery(TRUE);
     $query->select('type, folder, element, enabled')
       ->from('#__extensions')
@@ -918,7 +1007,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     $userRecordUrl = NULL;
     // if logged in user has user edit access, then allow link to other users joomla profile
-    if (JFactory::getUser()->authorise('core.edit', 'com_users')) {
+    if (JFactory::getApplication()->getIdentity()->authorise('core.edit', 'com_users')) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
     }
     elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
@@ -930,7 +1019,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function checkPermissionAddUser() {
-    if (JFactory::getUser()->authorise('core.create', 'com_users')) {
+    if (JFactory::getApplication()->getIdentity()->authorise('core.create', 'com_users')) {
       return TRUE;
     }
   }
@@ -947,8 +1036,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $mail = 'email';
     $name = 'name';
 
-    $JUserTable = JTable::getInstance('User', 'JTable');
-
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $JUserTable = &JTable::getInstance('User', 'JTable');
+    }
+    else {
+      $factoryClassName = $this->factoryClassName();
+      $JUserTable = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createTable('user', 'JTable', []);
+    }
     $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select($id . ', ' . $mail . ', ' . $name);
@@ -1109,6 +1203,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       ->alias(\Joomla\Session\SessionInterface::class, $session);
     // Instantiate the application.
     $app = $container->get($applicationClass);
+    $app->createExtensionNamespaceMap();
     // Set the application as global app
     \Joomla\CMS\Factory::$application = $app;
   }
