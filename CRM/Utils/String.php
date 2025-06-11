@@ -665,14 +665,16 @@ class CRM_Utils_String {
    *
    * @param string $string
    * @param int $maxLen
-   *
+   * @param string $ellipsis
+   *  The literal form of the ellipsis.
    * @return string
    */
-  public static function ellipsify($string, $maxLen) {
+  public static function ellipsify($string, $maxLen, $ellipsis = '...') {
     if (mb_strlen($string, 'UTF-8') <= $maxLen) {
       return $string;
     }
-    return mb_substr($string, 0, $maxLen - 3, 'UTF-8') . '...';
+    $ellipsisLen = mb_strlen($ellipsis, 'UTF-8');
+    return mb_substr($string, 0, $maxLen - $ellipsisLen, 'UTF-8') . $ellipsis;
   }
 
   /**

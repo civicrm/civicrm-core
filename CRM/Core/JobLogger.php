@@ -26,19 +26,7 @@ class CRM_Core_JobLogger extends \Psr\Log\AbstractLogger {
     $dao = new CRM_Core_DAO_JobLog();
     $dao->domain_id = CRM_Core_Config::domainID();
 
-    /*
-     * The description is a summary of the message.
-     * HTML tags are stripped from the message.
-     * The description is limited to 240 characters
-     * and has an ellipsis added if it is truncated.
-     */
-    $maxDescription = 240;
-    $ellipsis = " (...)";
-    $description = strip_tags($message);
-    if (strlen($description) > $maxDescription) {
-      $description = substr($description, 0, $maxDescription - strlen($ellipsis)) . $ellipsis;
-    }
-
+    $description = CRM_Utils_String::ellipsify(strip_tags($message), 255, ' (...)');
     $dao->description = $description;
 
     if (!empty($context['job'])) {
