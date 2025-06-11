@@ -1,15 +1,16 @@
 # RiverLea Theme Framework
 
-This Framework separates CiviCRM's visual/UI CSS from structural CSS, using CSS variables. Installing it provides you with four subthemes or 'Streams' which are entirely created with CSS variables (other than Thames, which uses a little bit of CSS as well):
+This Framework separates CiviCRM's visual/UI CSS from structural CSS, using CSS variables. Installing it provides you with four new Riverlea Themes or "Streams" which are almost entirely created with CSS variables:
  - Minetta, named after the river that runs under Greenwich, NYC. It is based on Civi's default 'Greenwich' theme.
  - Walbrook, named after the river that runs under Shoreditch, London. It is based on Shoreditch/TheIsland theme.
  - Hackney, named after the river that runs under Finsbury Park, based on Finsbury Park theme.
  - Thames, named after the river that runs close to Artful Robot HQ, based on their Aah theme.
- You can chose between these subthemes via Display Settings, where you can also set dark-mode preferences.
 
- The extension is licensed under [AGPL-3.0](LICENSE.txt).
+When you enable CiviCRM, you will see these themes in your usual CiviCRM theme options on the Display Settings page.
 
- ## Use in Front-End CiviCRM
+The extension is licensed under [AGPL-3.0](LICENSE.txt).
+
+## Use in Front-End CiviCRM
 
 **USE WITH CAUTION AND TESTING** While RiverLea has been widely tested in the backend of CiviCRM, be very careful to use in front-end. Given the wide number of themes and scenarios for front-end pages, for existing sites we recommend only applying it to an existing web front-end after comprehensive testing on a dev site.
 
@@ -42,40 +43,23 @@ Please ignore previous numbering patterns.
 
 ## Installation
 
-### With (CLI, Zip)
-
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-cd <extension-dir>
-wget https://lab.civicrm.org/extensions/riverlea/-/archive/main/riverlea-main.zip
-unzip riverlea-main.zip
-```
-
-### With (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-git clone https://lab.civicrm.org/extensions/riverlea.git
-cv en riverlea
-```
+This extension is bundled with CiviCRM core from version 5.82 onwards. You can install it from the Manage Extensions page.
 
 ### After installation
 
-After installing the extension, go to Nav menu > Administer > Customize Data and Screens > Display Preferences, and select which subtheme/stream you want.
+After installing the extension, go to Nav menu > Administer > Customize Data and Screens > Display Preferences, and select the stream you want.
+
+You can also set your Dark Mode preference on this screen: either always use Light Mode, always use Dark Mode, or let the user's browser/OS decide.
 
 ## Extension Structure
 
-### Core variables
-A list of all base variables used on all streams is at `core/css/_variables.css`.
+### Core directory - `core`
 
-### Stream/subtheme directories
-Each ‘stream’ or subtheme directory must contain a further directory `css` with a `_variables.css`file and a `_dark.css` if darkmode is supported. Variables in this `_variables.css` file will overrule any variables in the core list above. The subtheme can also include fonts, images and other CSS files, which can be loaded from the `_variables.css` file as an import.
+The majority of the Riverlea extension is a layer of core CSS, which styles CiviCRM markup based on the value
+of a number of CSS variables.
 
-### Core directory
+The list of all CSS variables with their default values can be found at `core/css/_variables.css`.
+
 Contains CSS files in:
 - In the **core/css** directory are theme files marked with an underscore:
   - core/css/_base.css – resets, basic type, colours, links, positioning
@@ -88,6 +72,13 @@ Contains CSS files in:
 - civicrm.css - the core theme css file which loads the other files
 - other files here without underscore (`admin.css`, `api4-explorer.css`, `contactSummary.css` etc) overrides civicrm's CSS core directory with files of the same name that are called by templates and only load in certain parts of Civi. E.g. `dashboard.css` loads on the CiviCRM main dashboard, and no-where else.
 - three directories: `org.civicrm.afform-ang` for Afform output, `org.civicrm.afform_admin-ang` for FormBuilder and `org.civicrm.search_kit-css` for SearchKit replace css files in core Civi extensions.
+
+### Stream directories - `streams/[stream_name]`
+Each stream in the extension has a subdirectory under `streams` which primarily contains CSS files for the stream: a `_variables.css`file and a `_dark.css` if darkmode is supported. Variables in this `_variables.css` file will overrule any variables in the core list above.
+
+A stream could also include fonts, images and other CSS files, which can be loaded from the `_variables.css` file as an import.
+
+Each stream also has a Managed Record file which is used to "install" the stream. These are found in the `managed` directory.
 
 ## Customising
 
@@ -103,53 +94,30 @@ For instance, to give all contribution page buttons rounded corners, you could a
 
 Exploring the _variables.css file will give you idea of how much can be overwritten.
 
-### 2. Create a subtheme 'stream'
+### 2. Create a new stream
 
-1. Inside the `/streams/` directory is an example stream called `empty`. Duplicate this and rename it the name of your stream.
-2. In riverlea.php add a theme array to the function `riverlea_civicrm_themes(&$themes)`.
-3. Edit `/streams/[streamname]/css/_variables.css` with your custom css variables. You can link to other CSS files, fonts or images in this file - inside the stream.
+Currently the best way to create a new stream is by adding a managed record to an extension.
 
-E.g. to add a stream called "Vimur", you would name the directory 'vimur', and add the following:
+1. Enable the `mgd-php` mixin in your extensions `info.xml`
 
 ```
- function riverlea_civicrm_themes(&$themes) {
-  $themes['vimur'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Riverlea: Vimur',
-    'prefix' => 'streams/vimur/',
-  );
-  $themes['minetta'] = array(
-    'ext' => 'riverlea',
-    'title' => 'Riverlea: Minetta (~Greenwich)',
-    'prefix' => 'streams/minetta/',
-  );
-  …
- }
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>mgd-php@1.0.0</mixin>
+    ...
+  </mixins>
 ```
+
+2. Copy the template `*.mgd.php` from the `docs` folder of this extension into your extension's `managed` folder (create the managed folder if it doesn't exist). Remove the `.template` part so the file extension is `*.mgd.php`.
+
+3. Update the `use CRM_riverlea_ExtensionUtil` line for the equivalent from your extension.
+
+4. You can add variable declarations directly to the `vars` and `vars_dark` keys in the `*.mgd.php` file.
+
+5. Or you can create `stream/main.css` and `stream/dark.css` files in your extension, and add your CSS to them. It's best to use variable declarations as much as possible to maintain compatibility with future versions
+of CiviCRM.
 
 Use of the [ThemeTest extension](https://lab.civicrm.org/extensions/themetest) is recommended to more quickly identify which CSS variables match which UI element, and test multiple variations for each.
-
-IMPORTANT NOTE: Every time you upgrade RiverLea you will need to add your Stream again. This is obviously less than ideal, so for produciton you may prefer option 3:
-
-### 3. Create a subtheme extension
-
-NB: this approach has had very limited testing
-
-1. Create a theme extension using Civix, following the [instructions in the CiviCRM Developer Guide](https://docs.civicrm.org/dev/en/latest/framework/theme/).
-2. Create a subtheme of RiverLea using the instructions in **2. Create a subtheme 'stream'** above.
-3. Copy the subtheme into the root of your new theme extenion.
-4. Edit its main php file, enable both extensions and select your stream.
-E.g. for a stream called 'styx', with a theme extension called 'ocean', then in ocean.php you would write:
-
-```
-function ocean_civicrm_themes(&$themes) {
-  $themes['styx'] = array(
-    'ext' => 'ocean',
-    'title' => 'River Styx',
-    'prefix' => 'styx/',
-    'search_order' => array('_riverlea_core_', 'styx',  '_fallback_'),
-  );
-}
 
 ## Troubleshooting
 - Unless you really need it (e.g. applying an urgent fix, or running a test), delete the custom/ext version of RiverLea, once you are on CiviCRM 5.80 or later.
