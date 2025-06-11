@@ -170,12 +170,13 @@ class CRM_Core_JobManager {
     try {
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
-    catch (Exception $e) {
+    catch (\Throwable $e) {
       $this->logger->error('Error while executing ' . $job->name . ': ' . $e->getMessage(), $this->createLogContext());
       $result = $e;
     }
     CRM_Utils_Hook::postJob($job, $params, $result);
-    $this->logger->info('Finished execution of ' . $job->name . ' with result: ' . $this->apiResultToMessage($result), $this->createLogContext());
+    $logLevel = ($result instanceof \Throwable || !empty($result['is_error'])) ? \Psr\Log\LogLevel::ERROR : \Psr\Log\LogLevel::INFO;
+    $this->logger->log($logLevel, 'Finished execution of ' . $job->name . ' with result: ' . $this->apiResultToMessage($result), $this->createLogContext());
     $this->currentJob = FALSE;
 
     // Save the job last run end date (if this doesn't get written we know the job crashed and was not caught (eg. OOM).
