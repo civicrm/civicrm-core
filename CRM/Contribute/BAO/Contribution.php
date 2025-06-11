@@ -20,6 +20,7 @@ use Civi\Api4\ContributionSoft;
 use Civi\Api4\MembershipLog;
 use Civi\Api4\PaymentProcessor;
 use Civi\Api4\UFJoin;
+use Civi\Core\Event\PreEvent;
 use Civi\Core\Event\PostEvent;
 use Civi\Order\Event\OrderCompleteEvent;
 
@@ -614,6 +615,25 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     return $contribution;
+  }
+
+  /**
+   * Event fired when creating a contribution
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
+    if ($event->action === 'create') {
+
+      // generate an invoice_id if not provided
+      // TODO: the same calculation is done in various places in the form layer
+      // would be good to remove
+      if (!isset($event->params['invoice_id'])) {
+        $event->params['invoice_id'] = bin2hex(random_bytes(16));
+      }
+    }
   }
 
   /**
