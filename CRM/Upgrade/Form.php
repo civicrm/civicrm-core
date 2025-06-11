@@ -781,7 +781,22 @@ SET    version = '$version'
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
     $config->userSystem->flush();
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild([
+      'ext' => TRUE,
+      'files' => TRUE,
+      'tables' => TRUE,
+      'sessions' => FALSE,
+      'metadata' => TRUE,
+      'system' => TRUE,
+      'userjob' => TRUE,
+      'menu' => TRUE,
+      'perms' => FALSE,
+      'strings' => TRUE,
+      'settings' => TRUE,
+      'cases' => TRUE,
+      'triggers' => FALSE,
+      'entities' => TRUE,
+    ])->execute();
     // NOTE: triggerRebuild is FALSE becaues it will run again in a moment (via fixSchemaDifferences).
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the Page. We reset later in doFinish().
 
