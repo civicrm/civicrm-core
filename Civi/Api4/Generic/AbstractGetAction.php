@@ -158,7 +158,9 @@ abstract class AbstractGetAction extends AbstractQueryAction {
           return TRUE;
         }
         elseif (is_array($clause[1])) {
-          return $this->_whereContains($fieldName, $clause[1]);
+          if ($this->_whereContains($fieldName, $clause[1])) {
+            return TRUE;
+          }
         }
       }
     }
