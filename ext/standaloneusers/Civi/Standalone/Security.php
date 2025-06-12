@@ -113,6 +113,14 @@ class Security {
       ->addSelect('hashed_password', 'id')
       ->execute()
       ->first();
+    if (!$user && str_contains($username, '@')) {
+      $user = \Civi\Api4\User::get(FALSE)
+        ->addWhere('uf_name', '=', $username)
+        ->addWhere('is_active', '=', TRUE)
+        ->addSelect('hashed_password', 'id')
+        ->execute()
+        ->first();
+    }
 
     if ($user && $this->checkHashedPassword($plaintextPassword, $user['hashed_password'])) {
       return $user['id'];
