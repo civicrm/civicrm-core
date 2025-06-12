@@ -16,16 +16,21 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public function preInstall() {
-    $config = \CRM_Core_Config::singleton();
-    // We generally only want to run on standalone. In theory, we might also run headless tests.
-    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_UnitTests'])) {
-      throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
+  public function preInstall(): void {
+    $entity = include __DIR__ . '/../../schema/User.entityType.php';
+    $tableName = 'civicrm_uf_match';
+    $ctx = new CRM_Queue_TaskContext();
+    foreach ($entity['getFields']() as $fieldName => $fieldSpec) {
+      // We can't run the next line in preInstall - so it's contents are copied here.
+      // CRM_Upgrade_Incremental_Base::alterSchemaField(NULL, 'User', $fieldName, $params);
+      $fieldSql = Civi::schemaHelper()->arrayToSql($fieldSpec);
+      if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
+        CRM_Upgrade_Incremental_Base::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+      }
+      else {
+        CRM_Upgrade_Incremental_Base::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+      }
     }
-    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_UnitTests'])) {
-      throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
-    }
-    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_uf_match');
   }
 
   /**
