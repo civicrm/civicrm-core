@@ -40,12 +40,16 @@ function afform_login_token_civicrm_enable(): void {
  */
 function afform_login_token_civicrm_check(&$messages, $statusNames, $includeDisabled) {
   if (!in_array('jwt', \Civi::settings()->get('authx_auto_cred'))) {
+    $authxTs = fn($s, $p = []) => _ts($s, [...$p, 'domain' => ['authx', NULL]]);
     $messages[] = new \CRM_Utils_Check_Message(
       'afform_login_token_authx',
-      E::ts('Afform Login-Tokens requires that JSON Web Tokens are included as an acceptable credential for Auto Login in your AuthX configuration. Please <a href="%1">review your configuration here</a>.', [
+      E::ts('This extension uses JSON Web Tokens (JWT) for automatic login, but that feature is disabled. Please review the <a href="%1">Authentication settings</a> and update the "<em>%2</em>".', [
         1 => \Civi::url('backend://civicrm/admin/setting/authx'),
+        2 => $authxTs('Acceptable credentials (%1)', [
+          1 => $authxTs('Auto Login', []),
+        ]),
       ]),
-      E::ts('AuthX Configuration'),
+      E::ts('Form Core Login-Tokens'),
       \Psr\Log\LogLevel::ERROR,
       'fa-chain-broken'
     );
