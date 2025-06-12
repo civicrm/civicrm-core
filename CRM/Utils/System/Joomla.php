@@ -466,7 +466,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         if (version_compare(JVERSION, '4.0', 'lt') && !JUserHelper::verifyPassword($password, $dbPassword, $dbId)) {
           return FALSE;
         }
-        elseif (\Joomla\CMS\User\UserHelper::verifyPassword($password, $dbPassword, $dbId)) {
+        elseif (!\Joomla\CMS\User\UserHelper::verifyPassword($password, $dbPassword, $dbId)) {
           return FALSE;
         }
 
