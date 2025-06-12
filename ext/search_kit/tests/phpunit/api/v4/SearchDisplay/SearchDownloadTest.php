@@ -5,6 +5,8 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
  * @group headless
@@ -170,6 +172,120 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     }
     catch (\CRM_Core_Exception_PrematureExitException $e) {
       // All good, we expected the api to exit
+    }
+  }
+
+  /**
+   * Test downloading xlsx format.
+   */
+  public function testDownloadXlsx(): void {
+    $cid = Contact::create(FALSE)
+      ->setValues([
+        'birth_date' => '2020-05-23',
+        'do_not_email' => FALSE,
+        'do_not_mail' => TRUE,
+      ])->execute()->single()['id'];
+    // API doesn't allow to set created_date.
+    \CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET created_date = "2025-05-23 01:02:03" WHERE id = ' . $cid);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'xlsx',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'where' => [['id', '=', $cid]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'test',
+        'settings' => [
+          'actions' => TRUE,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'dataType' => 'Integer',
+              'label' => 'Contact ID',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'created_date',
+              'dataType' => 'Timestamp',
+              'label' => 'Created Date',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'birth_date',
+              'dataType' => 'Date',
+              'label' => 'Birth Date',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'do_not_email',
+              'dataType' => 'Boolean',
+              'label' => 'Do Not Email',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'do_not_mail',
+              'dataType' => 'Boolean',
+              'label' => 'Do Not Mail (rewrite)',
+              'rewrite' => 'rewrite: [do_not_mail]',
+            ],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    ob_start();
+    try {
+      civicrm_api4('SearchDisplay', 'download', $params);
+      static::fail();
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      // All good, we expected the api to exit
+    }
+
+    $xlsx = ob_get_clean();
+    $tmpFile = tempnam(sys_get_temp_dir(), 'SearchDownloadTestXslx');
+    try {
+      file_put_contents($tmpFile, $xlsx);
+      $reader = IOFactory::createReader('Xlsx');
+      $spreadsheet = $reader->load($tmpFile);
+      $sheet = $spreadsheet->getSheet(0);
+
+      static::assertSame(2, $sheet->getHighestRow());
+      static::assertSame('E', $sheet->getHighestColumn());
+
+      static::assertSame('Contact ID', $sheet->getCell('A1')->getValue());
+      static::assertSame($cid, $sheet->getCell('A2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('A2')->getDataType());
+      static::assertSame('General', $sheet->getCell('A2')->getStyle()->getNumberFormat()->getFormatCode());
+
+      static::assertSame('Created Date', $sheet->getCell('B1')->getValue());
+      static::assertSame(45800.043090278, $sheet->getCell('B2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('B2')->getDataType());
+      static::assertSame('mmmm d, yyyy  h:mm AM/PM', $sheet->getCell('B2')->getStyle()->getNumberFormat()->getFormatCode());
+
+      static::assertSame('Birth Date', $sheet->getCell('C1')->getValue());
+      static::assertSame(43974.0, $sheet->getCell('C2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('C2')->getDataType());
+      static::assertSame('mmmm d, yyyy', $sheet->getCell('C2')->getStyle()->getNumberFormat()->getFormatCode());
+
+      static::assertSame('Do Not Email', $sheet->getCell('D1')->getValue());
+      static::assertFalse($sheet->getCell('D2')->getValue());
+      static::assertSame(DataType::TYPE_BOOL, $sheet->getCell('D2')->getDataType());
+
+      static::assertSame('Do Not Mail (rewrite)', $sheet->getCell('E1')->getValue());
+      static::assertSame('rewrite: 1', $sheet->getCell('E2')->getValue());
+      static::assertSame(DataType::TYPE_STRING, $sheet->getCell('E2')->getDataType());
+    }
+    finally {
+      unlink($tmpFile);
     }
   }
 
