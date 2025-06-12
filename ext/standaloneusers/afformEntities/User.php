@@ -3,7 +3,7 @@ return [
   'type' => 'primary',
   'entity' => 'User',
   'label' => 'User',
-  'defaults' => [],
+  'defaults' => '{}',
   'icon' => 'fa-user',
   'unique_fields' => ['username'],
 ];
