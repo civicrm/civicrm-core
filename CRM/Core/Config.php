@@ -88,9 +88,9 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       \Civi\Core\Container::boot($loadFromDB);
 
       if ($loadFromDB && self::$_singleton->dsn) {
-        self::$_singleton->userSystem->postContainerBoot();
-
         Civi::service('settings_manager')->bootComplete();
+
+        self::$_singleton->userSystem->postContainerBoot();
 
         $domain = \CRM_Core_BAO_Domain::getDomain();
         \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
