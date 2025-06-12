@@ -187,8 +187,16 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   //   return TRUE;
   // }
 
+  /**
+   * Copy drupal 7 users and roles to the civicrm_uf_match and civicrm_role tables.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
   private function copyDrupalUsersAndRoles(): void {
-    $roles = user_roles(); // Returns array: rid => role name
+    // Returns array: rid => role name
+    $roles = user_roles();
     $role_permissions = user_role_permissions(array_keys($roles));
     foreach ($roles as $rid => $role) {
       // create roles matching d7 roles
@@ -212,7 +220,7 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
         2 => [$name, 'String'],
         3 => [$label, 'String'],
         // implode, bookend serialize
-        4 => [$permissions, 'String']
+        4 => [$permissions, 'String'],
       ]);
 
     }
@@ -266,6 +274,7 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
       }
     }
   }
+
   /**
    * Create table civicrm_session
    *
