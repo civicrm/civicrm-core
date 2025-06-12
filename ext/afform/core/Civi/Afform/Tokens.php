@@ -152,7 +152,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     }
     catch (CryptoException $exception) {
       \Civi::log()->warning(
-        'Civi\Afform\LegacyTokens cannot generate tokens due to crypto exception.',
+        'Civi\Afform\Tokens cannot generate tokens due to crypto exception.',
         ['exception' => $exception]);
     }
 
