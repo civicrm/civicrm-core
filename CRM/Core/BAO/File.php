@@ -852,6 +852,7 @@ HEREDOC;
       'civicrm_activity' => ts('Activity'),
       'civicrm_case' => ts('Case'),
       'civicrm_note' => ts('Note'),
+      'civicrm_saved_search' => ts('Saved Search'),
     ];
   }
 
