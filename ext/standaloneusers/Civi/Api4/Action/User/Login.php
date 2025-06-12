@@ -106,6 +106,9 @@ class Login extends AbstractAction {
       $successUrl = $this->originalUrl;
     }
 
+    // clean whitespace
+    $this->identifier = trim($this->identifier);
+
     // Check user+password
     if (empty($this->identifier) || empty($this->password)) {
       $result['publicError'] = "Missing password/username";
