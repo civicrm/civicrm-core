@@ -241,7 +241,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       }
       if (preg_match('#^(afform|afsearch)#i', $id)) {
         $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $id));
-        // @see afform_civicrm_tabset()
+        // @see \Civi\Afform\Placement\TabsetPlacement
         if (str_starts_with($tabId, 'custom_')) {
           // custom group tab forms use name, but need to replace tabs using ID
           // remove 'afsearchTabCustom_' from the form name to get the group name
