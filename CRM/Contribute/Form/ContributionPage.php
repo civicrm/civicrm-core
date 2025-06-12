@@ -144,7 +144,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
     $buttons = [
       [
-        'type' => 'next',
+        'type' => 'upload',
         'name' => ts('Save'),
         'isDefault' => TRUE,
       ],
@@ -353,12 +353,12 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
       $this->postProcessHook();
 
-      if ($this->controller->getButtonName('submit') == "_qf_{$className}_next") {
+      if ($this->controller->getButtonName('upload') == "_qf_{$className}_upload") {
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute/{$subPage}",
           "action=update&reset=1&id={$this->_id}"
         ));
       }
-      elseif ($this->controller->getButtonName('submit') == "_qf_{$className}_submit_savenext") {
+      elseif ($this->controller->getButtonName('upload') == "_qf_{$className}_upload_savenext") {
         if ($nextPage) {
           CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute/{$nextPage}",
             "action=update&reset=1&id={$this->_id}"
