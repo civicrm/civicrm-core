@@ -69,6 +69,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
   protected $_entityValues = [];
 
+  protected array $_response = [];
+
   /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws \CRM_Core_Exception
@@ -87,6 +89,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
     $this->loadEntities();
+    // TODO: use _response more consistently
     $result->exchangeArray($this->processForm());
   }
 
@@ -728,6 +731,20 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Set a key in the api response
+   *
+   * Note: key should be recognised by the afForm controller
+   * expected keys are:
+   *   token, redirect, message
+   *
+   * @param string $key
+   * @param mixed $value
+   */
+  public function setResponseItem(string $key, $value): void {
+    $this->_response[$key] = $value;
+  }
+
+  /**
    * Function to get allowed action of a join entity
    *
    * @param array $mainEntity
@@ -742,6 +759,34 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
 
     return $actions;
+  }
+
+  /**
+   * Function to replace tokens with entity values in e.g. redirect urls
+   *
+   * Tokens look like [Participant1.0.id]
+   *
+   * @param string $text
+   *
+   * @return string
+   */
+  public function replaceTokens(string $text): string {
+    $matches = [];
+    preg_match_all('/\[[a-zA-Z0-9]{1,}\.[0-9]{1,}\.[^.]{1,}\]/', $text, $matches);
+
+    foreach ($matches[0] as $match) {
+      // strip [ ] and split on .
+      [$entityName, $index, $field] = explode('.', substr($match, 1, -1));
+      if ($field === 'id') {
+        $value = $this->_entityIds[$entityName][$index]['id'];
+      }
+      else {
+        $value = $this->_entityValues[$entityName][$index]['fields'][$field];
+      }
+      $text = str_replace($match, $value, $text);
+    }
+
+    return $text;
   }
 
 }
