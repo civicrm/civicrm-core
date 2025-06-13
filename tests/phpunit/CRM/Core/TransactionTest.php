@@ -39,7 +39,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function dataCreateAndCommitStyles() {
+  public static function dataCreateAndCommitStyles() {
     return [
       ['sql-insert', 'implicit-commit'],
       ['sql-insert', 'explicit-commit'],

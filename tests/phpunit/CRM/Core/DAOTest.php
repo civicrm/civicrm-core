@@ -106,7 +106,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function composeQueryExamples() {
+  public static function composeQueryExamples() {
     $cases = [];
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');
 

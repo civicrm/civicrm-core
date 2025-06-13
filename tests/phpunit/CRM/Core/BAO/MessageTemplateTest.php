@@ -61,7 +61,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getLocaleConfigurations(): array {
+  public static function getLocaleConfigurations(): array {
     $yesPartials = ['partial_locales' => TRUE, 'uiLanguages' => ['en_US']];
     $noPartials = ['partial_locales' => FALSE, 'uiLanguages' => ['en_US'], 'format_locale' => 'en_US'];
 

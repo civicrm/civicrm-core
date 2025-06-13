@@ -385,7 +385,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($result, CRM_Core_Resources::isAjaxMode());
   }
 
-  public function ajaxModeData(): array {
+  public static function ajaxModeData(): array {
     return [
       [['q' => 'civicrm/ajax/foo'], TRUE],
       [['q' => 'civicrm/case/ajax/foo'], TRUE],

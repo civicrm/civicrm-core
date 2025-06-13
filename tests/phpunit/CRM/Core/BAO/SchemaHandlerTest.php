@@ -124,7 +124,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function columnTests(): array {
+  public static function columnTests(): array {
     $columns = [];
     $columns[] = ['civicrm_contribution', 'total_amount'];
     $columns[] = ['civicrm_contact', 'first_name'];

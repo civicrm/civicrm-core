@@ -14,7 +14,7 @@ class CRM_Core_Smarty_plugins_HtxtTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function supportedCases(): array {
+  public static function supportedCases(): array {
     $cases = [];
     $cases[] = ['yum yum apple_pie!', '{htxt id="apple_pie"}yum yum apple_pie!{/htxt}', ['id' => 'apple_pie']];
     $cases[] = ['yum yum Apple-Pie!', '{htxt id=\'Apple-Pie\'}yum yum Apple-Pie!{/htxt}', ['id' => 'Apple-Pie']];

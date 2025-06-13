@@ -41,7 +41,7 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
     }
   }
 
-  public function exampleValues() {
+  public static function exampleValues() {
     $binary = '';
     for ($i = 0; $i < 256; $i++) {
       $binary .= chr($i);

@@ -869,7 +869,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function mailerExamples(): array {
+  public static function mailerExamples(): array {
     $cases = [];
 
     // Some tokens - short as subject has 128char limit in DB.

@@ -543,7 +543,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
   }
 
-  public function supportedAddressParsingLocales() {
+  public static function supportedAddressParsingLocales() {
     return [
       ['en_US'],
       ['en_CA'],

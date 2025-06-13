@@ -48,7 +48,7 @@ trait CRM_Core_Resources_CollectionTestTrait {
    */
   abstract public function createEmptyCollection();
 
-  public function getSnippetExamples() {
+  public static function getSnippetExamples() {
     $allowsMarkup = ($this instanceof CRM_Core_RegionTest);
     $defaultCount = ($this instanceof CRM_Core_RegionTest) ? 1 : 0;
     $es = [];
