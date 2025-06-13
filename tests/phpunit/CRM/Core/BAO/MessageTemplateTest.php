@@ -89,21 +89,21 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
     $result['fr_FR matches fr_FR (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
     $result['fr_FR matches fr_FR (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
-    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
-    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, self::getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, self::getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
 
     $result['fr_CA matches fr_CA (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
     $result['fr_CA matches fr_CA (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
-    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
-    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, self::getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, self::getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
 
     $result['th_TH matches th_TH (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'th_TH', $rendered['th_TH']];
     $result['th_TH falls back to site default translation (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'th_TH', $rendered['en_US']];
     // Absent a translation for the site default language it should fall back to the message template.
     $result['th_TH falls back to system default (all-tpls; no-partials)'] = [$noPartials, array_diff_key($allTemplates, ['en_US' => TRUE]), 'th_TH', $rendered['*']];
     // ^^ The essence of the `partial_locales` setting -- whether partially-supported locales (th_TH) use mixed-mode or fallback to completely diff locale.
-    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
-    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, self::getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, self::getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
 
     // Check that the en_US template is loaded, if exists.
     $result['en_US matches en_US (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'en_US', $rendered['en_US']];
@@ -122,7 +122,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getLocaleTemplates(array $allTemplates, array $locales): array {
+  public static function getLocaleTemplates(array $allTemplates, array $locales): array {
     return CRM_Utils_Array::subset($allTemplates, $locales);
   }
 

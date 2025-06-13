@@ -160,7 +160,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    */
   public static function getSavedSearches() {
     $return = [];
-    $searches = $this->getSearches();
+    $searches = self::getSearches();
     foreach ($searches as $key => $search) {
       $return[] = [$search['form_values'], $search['expected'], $key];
     }
@@ -174,7 +174,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getSearches() {
+  public static function getSearches() {
     return [
       'checkbox_format_1_first' => [
         'form_values' => [

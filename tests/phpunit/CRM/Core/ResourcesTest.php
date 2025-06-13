@@ -32,7 +32,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * @var string
    * For testing cache buster generation
    */
-  protected $cacheBusterString = 'xBkdk3';
+  protected static $cacheBusterString = 'xBkdk3';
 
   protected $originalRequest;
   protected $originalGet;
@@ -420,7 +420,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   public function testAddingCacheCode(string $url, string $expected): void {
     $resources = CRM_Core_Resources::singleton();
-    $resources->setCacheCode($this->cacheBusterString);
+    $resources->setCacheCode(self::$cacheBusterString);
     $this->assertEquals($expected, $resources->addCacheCode($url));
   }
 
@@ -429,7 +429,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   public static function urlForCacheCodeProvider(): array {
     $cacheBusterString = Civi::resources()
-      ->setCacheCode($this->cacheBusterString)
+      ->setCacheCode(self::$cacheBusterString)
       ->getCacheCode();
     return [
       [
