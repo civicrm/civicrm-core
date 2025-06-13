@@ -50,7 +50,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getCsvFiles(): array {
+  public static function getCsvFiles(): array {
     return [
       // import.csv is utf8-encoded, with no BOM
       [

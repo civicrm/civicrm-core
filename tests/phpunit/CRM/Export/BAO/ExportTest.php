@@ -1350,7 +1350,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getReasonsNotToMail(): array {
+  public static function getReasonsNotToMail(): array {
     return [
       [['is_deceased' => 1], []],
       [['do_not_mail' => 1], []],
