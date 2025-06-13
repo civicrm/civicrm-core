@@ -3,6 +3,7 @@
 namespace Civi\Core;
 
 use Civi\Core\Exception\UnknownAssetException;
+use Firebase\JWT\ExpiredException;
 
 /**
  * Class AssetBuilder
@@ -352,6 +353,10 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
         'mimeType' => 'text/plain',
         'content' => $e->getMessage(),
       ];
+    }
+    catch (ExpiredException $e) {
+      // Not sure what we should do here?
+      return [];
     }
   }
 
