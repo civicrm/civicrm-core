@@ -778,6 +778,8 @@ SET    version = '$version'
   }
 
   public static function doRebuild(CRM_Queue_TaskContext $ctx): bool {
+    CRM_Upgrade_DispatchPolicy::assertActive('upgrade.finish');
+
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
     $config->userSystem->flush();
 
