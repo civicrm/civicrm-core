@@ -414,7 +414,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('IMPORTED', $row['_status']);
   }
 
-  public function requiredFields(): array {
+  public static function requiredFields(): array {
     return [
       'contact_id' => [['Membership.contact_id', 'Membership.membership_type_id', 'Membership.start_date']],
       'external_identifier' => [['Contact.external_identifier', 'Membership.membership_type_id', 'Membership.start_date']],

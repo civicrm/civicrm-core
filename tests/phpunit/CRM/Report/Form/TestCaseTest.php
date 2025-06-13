@@ -42,7 +42,7 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   /**
    * @return array
    */
-  public function dataProvider(): array {
+  public static function dataProvider(): array {
     $testCaseA = [
       'CRM_Report_Form_Contribute_Detail',
       [

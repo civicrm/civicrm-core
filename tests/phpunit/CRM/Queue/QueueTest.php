@@ -35,7 +35,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   /**
    * Return a list of persistent and transient queue providers.
    */
-  public function getQueueSpecs() {
+  public static function getQueueSpecs() {
     $queueSpecs = [];
     $queueSpecs['Sql'] = [
       [
