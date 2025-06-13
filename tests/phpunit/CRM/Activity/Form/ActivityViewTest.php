@@ -491,7 +491,7 @@ ENDDETAILS
    */
   public static function caseActivityTypesProvider(): array {
     // We want the same set as non-case, but the url is different, and expected results might change.
-    $data = $this->activityTypesProvider();
+    $data = self::activityTypesProvider();
     $newData = [];
     foreach ($data as $key => $value) {
       $newData['case-' . $key] = $data[$key];
