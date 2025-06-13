@@ -96,7 +96,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
     return $recs;
   }
 
-  public function restrictionCases() {
+  public static function restrictionCases() {
     $calls = $rules = [];
     $recs = $this->getFixtures();
 

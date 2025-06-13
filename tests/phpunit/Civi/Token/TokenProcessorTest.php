@@ -180,7 +180,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
   }
 
-  public function getPartialNonPartial(): array {
+  public static function getPartialNonPartial(): array {
     return [
       'no-partial' => [['partial_locales' => FALSE]],
       'yes-partial' => [['partial_locales' => TRUE]],
@@ -460,7 +460,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 
-  public function getFilterExamples(): array {
+  public static function getFilterExamples(): array {
     $exampleTokens = [
       // All the "{my_text.*}" tokens will be treated as plain-text ("text/plain").
       'my_text' => [

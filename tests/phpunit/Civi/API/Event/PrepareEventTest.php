@@ -25,7 +25,7 @@ class PrepareEventTest extends \CiviUnitTestCase {
     $this->kernel = new Kernel($this->dispatcher);
   }
 
-  public function getPrepareExamples() {
+  public static function getPrepareExamples() {
     $apiCall = ['Widget', 'frobnicate', ['id' => 98, 'whimsy' => 'green', 'version' => self::MOCK_VERSION]];
 
     $exs = [];
