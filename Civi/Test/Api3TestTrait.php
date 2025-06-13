@@ -22,7 +22,7 @@ trait Api3TestTrait {
    *
    * @return array
    */
-  public function versionThreeAndFour() {
+  public static function versionThreeAndFour() {
     return [
       'APIv3' => [3],
       'APIv4' => [4],
