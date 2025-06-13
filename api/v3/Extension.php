@@ -73,7 +73,7 @@ function _civicrm_api3_extension_install_spec(&$fields) {
  *   API result
  */
 function civicrm_api3_extension_upgrade() {
-  Civi::rebuild(['*' => TRUE, 'triggers' => TRUE, 'sessions' => FALSE])->execute();
+  Civi::rebuild(['*' => TRUE, 'sessions' => FALSE])->execute();
   $queue = CRM_Extension_Upgrades::createQueue();
   $runner = new CRM_Queue_Runner([
     'title' => 'Extension Upgrades',
