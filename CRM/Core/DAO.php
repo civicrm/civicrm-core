@@ -3488,6 +3488,9 @@ SELECT contact_id
     if ($value === '') {
       return [];
     }
+    if (is_array($value)) {
+      return $value;
+    }
     switch ($serializationType) {
       case self::SERIALIZE_SEPARATOR_BOOKEND:
         return (array) CRM_Utils_Array::explodePadded($value);
