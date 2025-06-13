@@ -16,7 +16,7 @@ class CRM_Utils_UrlTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function relativeCases() {
+  public static function relativeCases() {
     // array(0 => $absoluteUrl, 1 => $currentHost, 2 => $expectedResult)
     $cases = [];
     $cases[] = ['//example.com/', 'example.com', '/'];

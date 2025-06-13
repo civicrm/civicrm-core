@@ -84,7 +84,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getURLs() {
+  public static function getURLs() {
     return [
       [
         'https://example.com?ab=cd',

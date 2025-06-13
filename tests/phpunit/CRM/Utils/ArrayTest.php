@@ -239,7 +239,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals('buenos dias', $x);
   }
 
-  public function getSortExamples() {
+  public static function getSortExamples() {
     $red = ['label' => 'Red', 'id' => 1, 'weight' => '90'];
     $orange = ['label' => 'Orange', 'id' => 2, 'weight' => '70'];
     $yellow = ['label' => 'Yellow', 'id' => 3, 'weight' => '10'];

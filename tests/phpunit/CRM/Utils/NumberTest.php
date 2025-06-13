@@ -14,7 +14,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function randomDecimalCases() {
+  public static function randomDecimalCases() {
     $cases = [];
     // array(array $precision, int $expectedMinInclusive, int $expectedMaxExclusive)
     $cases[] = [[1, 0], 0, 10];

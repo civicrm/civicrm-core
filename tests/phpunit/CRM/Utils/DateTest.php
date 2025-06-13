@@ -295,7 +295,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * dataProvider for testRelativeToAbsoluteGeneral()
    * @return array
    */
-  public function relativeDateProvider(): array {
+  public static function relativeDateProvider(): array {
     return [
       [
         'input' => [

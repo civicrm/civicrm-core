@@ -26,7 +26,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function translateExamples() {
+  public static function translateExamples() {
     $cases = [];
     $cases[] = [
       '',

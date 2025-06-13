@@ -133,7 +133,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function parsePrefixData(): array {
+  public static function parsePrefixData(): array {
     $cases = [];
     $cases[] = ['administer CiviCRM', NULL, [NULL, 'administer CiviCRM']];
     $cases[] = ['create contributions of type Event Fee: Canada', NULL, [NULL, 'create contributions of type Event Fee: Canada']];

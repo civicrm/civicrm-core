@@ -72,7 +72,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function fileExtensions() {
+  public static function fileExtensions() {
     return [
       ['txt'],
       ['danger'],

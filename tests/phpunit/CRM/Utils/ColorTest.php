@@ -18,7 +18,7 @@ class CRM_Utils_ColorTest extends CiviUnitTestCase {
     $this->assertEquals($text, CRM_Utils_Color::getContrast($background));
   }
 
-  public function contrastExamples() {
+  public static function contrastExamples() {
     return [
       ['ef4444', 'white'],
       ['FAA31B', 'black'],

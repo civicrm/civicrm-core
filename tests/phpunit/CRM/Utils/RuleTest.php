@@ -26,7 +26,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function integerDataProvider() {
+  public static function integerDataProvider() {
     return [
       [10, TRUE],
       ['145E+3', FALSE],

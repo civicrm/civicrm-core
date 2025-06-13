@@ -23,7 +23,7 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function escapeExamples() {
+  public static function escapeExamples() {
     $cases = [];
     $cases[] = ["Hello
     this is, a test!",
