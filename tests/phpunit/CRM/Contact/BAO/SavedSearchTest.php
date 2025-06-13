@@ -158,7 +158,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getSavedSearches() {
+  public static function getSavedSearches() {
     $return = [];
     $searches = $this->getSearches();
     foreach ($searches as $key => $search) {
