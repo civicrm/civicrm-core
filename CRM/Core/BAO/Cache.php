@@ -37,7 +37,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * Cleanup ACL and System Level caches
    */
   public static function resetCaches() {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
   /**
