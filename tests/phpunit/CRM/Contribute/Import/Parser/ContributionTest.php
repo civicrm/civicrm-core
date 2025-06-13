@@ -615,7 +615,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function validateData(): array {
+  public static function validateData(): array {
     return [
       'email_first_name_last_name' => [['fields' => ['Contact.email_primary.email', 'Contact.first_name', 'Contact.last_name'], 'valid' => TRUE]],
       'email_last_name' => [['fields' => ['Contact.email_primary.email', 'Contact.last_name'], 'valid' => TRUE]],
