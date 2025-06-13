@@ -156,7 +156,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    * Dataprovider for some import tests.
    * @return array
    */
-  public function activityImportValidationProvider(): array {
+  public static function activityImportValidationProvider(): array {
     /**
      * Because this is a dataprovider that runs before setup, we
      * can't specify values that don't exist yet, but we're mostly

@@ -182,7 +182,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function activityTypesProvider(): array {
+  public static function activityTypesProvider(): array {
     $data = [
       'meeting-text' => [
         [
@@ -489,7 +489,7 @@ ENDDETAILS
    * data provider for testNewlinesLookRight() for case activities
    * @return array
    */
-  public function caseActivityTypesProvider(): array {
+  public static function caseActivityTypesProvider(): array {
     // We want the same set as non-case, but the url is different, and expected results might change.
     $data = $this->activityTypesProvider();
     $newData = [];

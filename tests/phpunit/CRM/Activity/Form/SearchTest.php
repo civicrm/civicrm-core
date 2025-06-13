@@ -164,7 +164,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
    * dataprovider for testTaskController
    * @return array
    */
-  public function taskControllerProvider(): array {
+  public static function taskControllerProvider(): array {
     return [
       [CRM_Activity_Task::TASK_DELETE],
       [CRM_Activity_Task::TASK_PRINT],
