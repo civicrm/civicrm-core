@@ -912,7 +912,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Creatd Date merge cases
    * @return array
    */
-  public function createdDateMergeCases() {
+  public static function createdDateMergeCases() {
     $cases = [];
     // Normal pattern merge into the lower id
     $cases[] = [0, 1];
