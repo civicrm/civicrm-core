@@ -390,7 +390,7 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals(0, $startResult->count());
   }
 
-  public function getDelayableDrivers(): array {
+  public static function getDelayableDrivers(): array {
     return [
       'Sql' => [['type' => 'Sql', 'runner' => 'task', 'error' => 'delete']],
       'SqlParallel' => [['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']],
@@ -423,7 +423,7 @@ class QueueTest extends Api4TestBase {
     $this->assertTrue(\CRM_Utils_Time::time() >= $releaseTime);
   }
 
-  public function getErrorModes(): array {
+  public static function getErrorModes(): array {
     return [
       'delete' => ['delete'],
       'abort' => ['abort'],

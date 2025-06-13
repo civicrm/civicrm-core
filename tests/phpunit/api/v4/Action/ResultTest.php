@@ -163,7 +163,7 @@ class ResultTest extends Api4TestBase implements TransactionalInterface {
   /**
    *
    */
-  public function dataForTestCounts() {
+  public static function dataForTestCounts() {
 
     $withoutRowCount = ['id'];
     $withRowCount = ['id', 'row_count'];

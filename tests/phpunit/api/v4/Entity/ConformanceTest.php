@@ -106,7 +106,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    *
    * @return array
    */
-  public function getEntitiesLotech(): array {
+  public static function getEntitiesLotech(): array {
     $entityNames = [];
 
     $root = dirname(__DIR__, 5);

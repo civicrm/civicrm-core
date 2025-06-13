@@ -853,7 +853,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals($expected, \CRM_Core_BAO_Managed::isAPi4ManagedType($entityName));
   }
 
-  public function sampleEntityTypes() {
+  public static function sampleEntityTypes() {
     $entityTypes = [
       // v3 pseudo-entity
       'ActivityType' => FALSE,

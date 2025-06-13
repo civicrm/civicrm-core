@@ -60,7 +60,7 @@ This is the base class.';
     $this->assertEquals("In the child class, foo has been barred.\n\n - In general, you can do nothing with it.", $doc['comment']);
   }
 
-  public function docBlockExamples() {
+  public static function docBlockExamples() {
     return [
       [
         "/**

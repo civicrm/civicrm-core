@@ -48,7 +48,7 @@ class SelectUtilTest extends Api4TestBase {
     'contact_id.phone.phone_type_id',
   ];
 
-  public function getSelectExamples() {
+  public static function getSelectExamples() {
     return [
       ['any', ['*'], TRUE],
       ['any', ['*', 'one', 'two'], TRUE],
@@ -71,7 +71,7 @@ class SelectUtilTest extends Api4TestBase {
     $this->assertEquals($expected, SelectUtil::isFieldSelected($field, $selects));
   }
 
-  public function getMatchingExamples() {
+  public static function getMatchingExamples() {
     return [
       [array_slice($this->emailFieldNames, 0, 12), '*'],
       [[], 'nothing'],
