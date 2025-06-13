@@ -37,7 +37,11 @@ class Flush extends \Civi\Api4\Generic\AbstractAction {
   protected $session = FALSE;
 
   public function _run(\Civi\Api4\Generic\Result $result) {
-    \CRM_Core_Invoke::rebuildMenuAndCaches($this->triggers, $this->session);
+    \Civi::rebuild([
+      '*' => TRUE,
+      'triggers' => $this->triggers,
+      'sessions' => $this->session,
+    ])->execute();
   }
 
 }
