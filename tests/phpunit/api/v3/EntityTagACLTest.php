@@ -95,7 +95,7 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
   /**
    * Get entities which can be tagged in data provider format.
    */
-  public function taggableEntities() {
+  public static function taggableEntities() {
     $return = [];
     foreach ($this->getTagOptions() as $entity) {
       $return[] = [$entity];

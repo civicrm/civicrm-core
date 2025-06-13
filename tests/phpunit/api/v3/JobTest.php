@@ -148,7 +148,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Data provider for testing email greeting template.
    */
-  public function dataProviderNamesAndGreetings(): array {
+  public static function dataProviderNamesAndGreetings(): array {
     return [
       [
         'params' => ['first_name' => 'Anthony'],
@@ -843,7 +843,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getMergeLocationData(): array {
+  public static function getMergeLocationData(): array {
     $address1 = ['street_address' => 'Buckingham Palace', 'city' => 'London'];
     $address2 = ['street_address' => 'The Doghouse', 'supplemental_address_1' => 'under the blanket'];
     $data = $this->getMergeLocations($address1, $address2, 'Address');
@@ -944,7 +944,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Data provider for testBatchMergeEmailOnHold: combinations of on_hold & expected outcomes.
    */
-  public function getOnHoldSets(): array {
+  public static function getOnHoldSets(): array {
     // Each row specifies: contact 1 on_hold, contact 2 on_hold, merge? (0 or 1),
     return [
       [FALSE, FALSE, TRUE, NULL],
@@ -980,7 +980,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Get the various rule combinations.
    */
-  public function getRuleSets(): array {
+  public static function getRuleSets(): array {
     $contactTypes = ['Individual', 'Organization', 'Household'];
     $ruleTypes = ['Unsupervised', 'General', 'Supervised'];
     $ruleGroups = [];
@@ -1291,7 +1291,7 @@ ENDSQLUPDATE;
   /**
    * Get data for batch merge.
    */
-  public function getMergeSets(): array {
+  public static function getMergeSets(): array {
     $data = [
       [
         [

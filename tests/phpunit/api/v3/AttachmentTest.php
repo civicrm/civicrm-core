@@ -62,7 +62,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function okCreateProvider(): array {
+  public static function okCreateProvider(): array {
     // array($entityClass, $createParams, $expectedContent)
     $cases = [];
 
@@ -117,7 +117,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badCreateProvider(): array {
+  public static function badCreateProvider(): array {
     // array($entityClass, $createParams, $expectedError)
     $cases = [];
 
@@ -171,7 +171,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badUpdateProvider(): array {
+  public static function badUpdateProvider(): array {
     // array($entityClass, $createParams, $updateParams, $expectedError)
     $cases = [];
 
@@ -204,7 +204,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function okGetProvider(): array {
+  public static function okGetProvider(): array {
     // array($getParams, $expectedNames)
     $cases = [];
 
@@ -257,7 +257,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badGetProvider(): array {
+  public static function badGetProvider(): array {
     // array($getParams, $expectedNames)
     $cases = [];
 

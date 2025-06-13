@@ -310,7 +310,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
   }
 
-  public function concurrencyExamples(): array {
+  public static function concurrencyExamples(): array {
     $es = [];
 
     // Launch 3 workers, but mailerJobsMax limits us to 1 worker.

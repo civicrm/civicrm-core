@@ -536,7 +536,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function submitProvider() {
+  public static function submitProvider() {
     // $useLogin, $params, $expectedFailure, $expectedJobCount
     $cases = [];
     $cases[] = [
