@@ -47,7 +47,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function truncDecimalCases() {
+  public static function truncDecimalCases() {
     $cases = [];
     // array($value, $precision, $expectedValue)
     $cases[] = [523, [1, 0], 5];
@@ -72,7 +72,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
     );
   }
 
-  public function sizeCases() {
+  public static function sizeCases() {
     $cases = [];
     $cases[] = ['20M', '20971520'];
     $cases[] = ['40G', '42949672960'];

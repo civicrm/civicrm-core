@@ -427,7 +427,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function urlForCacheCodeProvider(): array {
+  public static function urlForCacheCodeProvider(): array {
     $cacheBusterString = Civi::resources()
       ->setCacheCode($this->cacheBusterString)
       ->getCacheCode();
@@ -450,7 +450,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * return array
    */
-  public function urlsToCheckIfFullyFormed(): array {
+  public static function urlsToCheckIfFullyFormed(): array {
     return [
       ['civicrm/test/page', FALSE],
       ['#', FALSE],

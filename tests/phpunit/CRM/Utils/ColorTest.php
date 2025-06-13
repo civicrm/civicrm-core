@@ -40,7 +40,7 @@ class CRM_Utils_ColorTest extends CiviUnitTestCase {
     $this->assertEquals($expectedHex, CRM_Utils_Color::rgbToHex($rgb));
   }
 
-  public function rgbExamples() {
+  public static function rgbExamples() {
     return [
       ['#fff', [255, 255, 255], '#ffffff'],
       ['white', [255, 255, 255], '#ffffff'],

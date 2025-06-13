@@ -27,7 +27,7 @@ class CRM_Core_Smarty_plugins_HtxtTest extends CiviUnitTestCase {
     return $cases;
   }
 
-  public function unsupportedCases(): array {
+  public static function unsupportedCases(): array {
     $cases = [];
     $cases[] = ['{htxt id=$dynamic.zx["$f{b}"]}not supported{/htxt}', []];
     $cases[] = ['{htxt id=\'dragonfruit"}not supported{/htxt}', []];

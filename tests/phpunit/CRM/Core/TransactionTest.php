@@ -29,7 +29,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function dataCreateStyle() {
+  public static function dataCreateStyle() {
     return [
       ['sql-insert'],
       ['bao-create'],

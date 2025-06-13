@@ -2391,7 +2391,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * provides testdata for testEventRegistrationLimitTo
    * @return array[]
    */
-  public function provideEventRegistrationLimitToData() {
+  public static function provideEventRegistrationLimitToData() {
     return [
        [['role_id' => 1, 'recipient_listing' => 1], TRUE],
        [['role_id' => 1, 'recipient_listing' => 2], FALSE],

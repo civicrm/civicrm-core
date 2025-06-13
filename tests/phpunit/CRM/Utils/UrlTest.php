@@ -69,7 +69,7 @@ class CRM_Utils_UrlTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, $actual, "Within \"$currentHost\", \"$absoluteUrl\" should render as \"$expectedResult\"");
   }
 
-  public function getChildOfExamples(): array {
+  public static function getChildOfExamples(): array {
     $es = [];
 
     $es[] = ['http://example.com/child', 'http://example.com/', TRUE];
@@ -140,7 +140,7 @@ class CRM_Utils_UrlTest extends CiviUnitTestCase {
     $this->assertTrue($count > 0, "Should have at least 1 check");
   }
 
-  public function getInternalRouteExamples_good():array {
+  public static function getInternalRouteExamples_good():array {
     $examples = [];
     $examples[] = ['https://example.com/civicrm/foo', 'https://example.com', ['path' => 'civicrm/foo']];
     $examples[] = ['https://example.com/civicrm/foo/', 'https://example.com', ['path' => 'civicrm/foo/']];
@@ -172,7 +172,7 @@ class CRM_Utils_UrlTest extends CiviUnitTestCase {
     $this->assertEquals($actualResult, $expectResult, sprintf("Scenario (%s) yielded incorrect value (%s)\n", json_encode(func_get_args()), json_encode($actualResult)));
   }
 
-  public function getInternalRouteExamples_bad():array {
+  public static function getInternalRouteExamples_bad():array {
     $examples = [];
     $examples[] = ['https://unknown.com/', 'https://example.com', 'Failed to parse internal URL. Unrecognized host.'];
     $examples[] = ['https://unknown.com/civicrm/foo', 'https://example.com', 'Failed to parse internal URL. Unrecognized host.'];

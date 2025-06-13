@@ -168,7 +168,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getExternURLs() {
+  public static function getExternURLs() {
     return [
       [
         'extern/url',
@@ -251,7 +251,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertTrue(CRM_Utils_System::isNull($arr));
   }
 
-  public function crudLinkExamples() {
+  public static function crudLinkExamples() {
     return [
       'Contact:update' => [
         ['entity' => 'Contact', 'action' => 'update', 'id' => 123],

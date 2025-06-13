@@ -158,7 +158,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function booleanDataProvider(): array {
+  public static function booleanDataProvider(): array {
     // array(0 => $input, 1 => $expectedOutput)
     $cases = [];
     $cases[] = [TRUE, TRUE];
@@ -195,7 +195,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertSame($expected, $actual);
   }
 
-  public function wildcardCases(): array {
+  public static function wildcardCases(): array {
     $cases = [];
     $cases[] = ['*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang']];
     $cases[] = ['foo.*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz']];
@@ -250,7 +250,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @noinspection HttpUrlsUsage
    */
-  public function simplifyURLProvider(): array {
+  public static function simplifyURLProvider(): array {
     $config = CRM_Core_Config::singleton();
     $urlParts = CRM_Utils_String::simpleParseUrl($config->userFrameworkBaseURL);
     $localDomain = $urlParts['host+port'];
@@ -321,7 +321,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function parseURLProvider(): array {
+  public static function parseURLProvider(): array {
     return [
       'prototypical example' => [
         'https://example.com:8000/foo/bar/?id=1#fragment',
@@ -354,7 +354,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     ];
   }
 
-  public function purifyHTMLProvider(): array {
+  public static function purifyHTMLProvider(): array {
     return [
       'tokens' => [
         '<p>To view your dashboard, <a href="https://mysite.org/civicrm/?civiwp=CiviCRM&amp;q=civicrm/user&reset=1&id={contact.contact_id}&{contact.checksum}">click here.</a></p>',
@@ -377,7 +377,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals($expectedString, CRM_Utils_String::purifyHTML($testString));
   }
 
-  public function getGoodSerializeExamples(): array {
+  public static function getGoodSerializeExamples(): array {
     $strings = [];
     $strings[] = ['a:1:{s:1:"a";s:1:"b";}'];
     $strings[] = ['d:1.2;'];
@@ -397,7 +397,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals(unserialize($str), CRM_Utils_String::unserialize($str));
   }
 
-  public function getBadSerializeExamples(): array {
+  public static function getBadSerializeExamples(): array {
     $strings = [];
     $strings[] = ['O:8:"stdClass":0:{}'];
     $strings[] = ['O:9:"Exception":7:{s:10:"*message";s:3:"abc";s:17:"ExceptionString";s:0:"";s:7:"*code";i:0;s:7:"*file";s:17:"Command line code";s:7:"*line";i:1;s:16:"ExceptionTrace";a:0:{}s:19:"ExceptionPrevious";N;}'];
@@ -426,7 +426,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function convertStringToSnakeCaseProvider(): array {
+  public static function convertStringToSnakeCaseProvider(): array {
     return [
       // Test simple CamelCase to snake_case
       ['MyThings', 'my_things'],
@@ -475,7 +475,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function convertStringToCamelProvider(): array {
+  public static function convertStringToCamelProvider(): array {
     return [
       // Test with default ucfirst = TRUE
       ['my_things', TRUE, 'MyThings'],
@@ -527,7 +527,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function convertStringToDashProvider(): array {
+  public static function convertStringToDashProvider(): array {
     return [
       // Test converting CamelCase to dash-case
       ['CamelCase', 'camel-case'],

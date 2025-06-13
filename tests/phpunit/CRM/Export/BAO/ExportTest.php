@@ -1442,7 +1442,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function additionalFieldsDataProvider(): array {
+  public static function additionalFieldsDataProvider(): array {
     return [
       [
         // 0 defaults to 'contact'
@@ -1480,7 +1480,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * get data for testing field metadata by query mode.
    */
-  public function allFieldsDataProvider(): array {
+  public static function allFieldsDataProvider(): array {
     return [
       [
         0,
@@ -1922,7 +1922,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @todo - still being built up.
    *
    */
-  public function getAllSpecifiableReturnFields(): array {
+  public static function getAllSpecifiableReturnFields(): array {
     return [
       [
         CRM_Export_Form_Select::EVENT_EXPORT,
@@ -2166,7 +2166,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getSqlColumnsOutput(): array {
+  public static function getSqlColumnsOutput(): array {
     return [
       [
         0,

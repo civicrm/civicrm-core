@@ -1198,7 +1198,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $activityGroup['id']]);
   }
 
-  public function contactEntityNameProvider(): iterable {
+  public static function contactEntityNameProvider(): iterable {
     yield ['Contact'];
     yield ['Household'];
     yield ['Individual'];

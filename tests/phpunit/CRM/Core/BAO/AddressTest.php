@@ -568,7 +568,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertFalse($isNotSupported);
   }
 
-  public function sampleOFUnsupportedAddressParsingLocales() {
+  public static function sampleOFUnsupportedAddressParsingLocales() {
     return [
       ['en_GB'],
       ['af_ZA'],

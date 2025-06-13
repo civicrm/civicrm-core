@@ -83,7 +83,7 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
     $this->assertEquals($originalValue, $return_2);
   }
 
-  public function getCleanKeyExamples() {
+  public static function getCleanKeyExamples() {
     $es = [];
     // allowed chars
     $es[] = ['hello_world and/other.planets', 'hello_world-20and-2fother.planets'];

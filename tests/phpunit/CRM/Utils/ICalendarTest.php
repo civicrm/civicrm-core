@@ -48,7 +48,7 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getSendParameters() {
+  public static function getSendParameters() {
     return [
       [
         ['calendar_data', 'text/xml', 'utf-8', NULL, NULL],
