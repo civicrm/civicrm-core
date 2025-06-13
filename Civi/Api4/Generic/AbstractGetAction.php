@@ -154,13 +154,13 @@ abstract class AbstractGetAction extends AbstractQueryAction {
     $fieldName = (array) $fieldName;
     foreach ($clauses as $clause) {
       if (is_array($clause) && is_string($clause[0])) {
-        if (in_array($clause[0], $fieldName)) {
-          return TRUE;
-        }
-        elseif (is_array($clause[1])) {
+        if (is_array($clause[1])) {
           if ($this->_whereContains($fieldName, $clause[1])) {
             return TRUE;
           }
+        }
+        elseif (in_array($clause[0], $fieldName)) {
+          return TRUE;
         }
       }
     }
