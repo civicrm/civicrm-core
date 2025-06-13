@@ -134,8 +134,8 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
   }
 
   public static function getUpdateBadExamples(): array {
-    $createOk = $this->getCreateOKExamples()['asDraft'][0];
-    $bads = $this->getCreateBadExamples();
+    $createOk = self::getCreateOKExamples()['asDraft'][0];
+    $bads = self::getCreateBadExamples();
 
     $es = [];
     foreach ($bads as $id => $bad) {

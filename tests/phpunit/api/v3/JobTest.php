@@ -846,10 +846,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public static function getMergeLocationData(): array {
     $address1 = ['street_address' => 'Buckingham Palace', 'city' => 'London'];
     $address2 = ['street_address' => 'The Doghouse', 'supplemental_address_1' => 'under the blanket'];
-    $data = $this->getMergeLocations($address1, $address2, 'Address');
-    $data = array_merge($data, $this->getMergeLocations(['phone' => '12345', 'phone_type_id' => 1], ['phone' => '678910', 'phone_type_id' => 1], 'Phone'));
-    $data = array_merge($data, $this->getMergeLocations(['phone' => '12345'], ['phone' => '678910'], 'Phone'));
-    return array_merge($data, $this->getMergeLocations(['email' => 'mini@me.com'], ['email' => 'mini@me.org'], 'Email', [
+    $data = self::getMergeLocations($address1, $address2, 'Address');
+    $data = array_merge($data, self::getMergeLocations(['phone' => '12345', 'phone_type_id' => 1], ['phone' => '678910', 'phone_type_id' => 1], 'Phone'));
+    $data = array_merge($data, self::getMergeLocations(['phone' => '12345'], ['phone' => '678910'], 'Phone'));
+    return array_merge($data, self::getMergeLocations(['email' => 'mini@me.com'], ['email' => 'mini@me.org'], 'Email', [
       [
         'email' => 'anthony_anderson@civicrm.org',
         'location_type_id' => 'Home',
@@ -1665,7 +1665,7 @@ ENDSQLUPDATE;
    *
    * @return array
    */
-  public function getMergeLocations(array $locationParams1, array $locationParams2, string $entity, array $additionalExpected = []): array {
+  public static function getMergeLocations(array $locationParams1, array $locationParams2, string $entity, array $additionalExpected = []): array {
     return [
       [
         'matching_primary' => [

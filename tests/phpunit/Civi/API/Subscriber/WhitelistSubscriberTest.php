@@ -24,7 +24,7 @@ use Civi\Core\CiviEventDispatcher;
  */
 class WhitelistSubscriberTest extends \CiviUnitTestCase {
 
-  protected function getFixtures() {
+  protected static function getFixtures() {
     $recs = [];
 
     $recs['widget'] = [
@@ -98,7 +98,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
 
   public static function restrictionCases() {
     $calls = $rules = [];
-    $recs = $this->getFixtures();
+    $recs = self::getFixtures();
 
     $calls['Widget.get-all'] = [
       'entity' => 'Widget',
@@ -349,7 +349,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
    * @dataProvider restrictionCases
    */
   public function testEach($apiRequest, $rules, $expectSuccess) {
-    $recs = $this->getFixtures();
+    $recs = self::getFixtures();
 
     $this->hookClass->setHook('civicrm_entityTypes', function (array &$entityTypes) {
       $entityTypes['Widget'] = [

@@ -27,7 +27,7 @@ use Civi\Api4\Utils\SelectUtil;
  */
 class SelectUtilTest extends Api4TestBase {
 
-  private $emailFieldNames = [
+  private static $emailFieldNames = [
     'id',
     'contact_id',
     'location_type_id',
@@ -73,7 +73,7 @@ class SelectUtilTest extends Api4TestBase {
 
   public static function getMatchingExamples() {
     return [
-      [array_slice($this->emailFieldNames, 0, 12), '*'],
+      [array_slice(self::$emailFieldNames, 0, 12), '*'],
       [[], 'nothing'],
       [['email'], 'email'],
       [['contact_id', 'location_type_id'], '*_id'],
@@ -94,7 +94,7 @@ class SelectUtilTest extends Api4TestBase {
    * @param $pattern
    */
   public function testGetMatchingFields($expected, $pattern) {
-    $this->assertEquals($expected, SelectUtil::getMatchingFields($pattern, $this->emailFieldNames));
+    $this->assertEquals($expected, SelectUtil::getMatchingFields($pattern, self::$emailFieldNames));
   }
 
 }

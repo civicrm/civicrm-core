@@ -95,7 +95,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @throws \CRM_Core_Exception
    */
   public function getEntitiesHitech(): array {
-    return $this->toDataProviderArray(Entity::get(FALSE)->execute()->column('name'));
+    return self::toDataProviderArray(Entity::get(FALSE)->execute()->column('name'));
   }
 
   /**
@@ -153,7 +153,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
       }
     }
 
-    return $this->toDataProviderArray($entityNames);
+    return self::toDataProviderArray($entityNames);
   }
 
   /**
@@ -546,7 +546,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    *   List of data-provider arguments, one for each entity-name.
    *   Ex: ['Foo' => ['Foo'], 'Bar' => ['Bar']]
    */
-  protected function toDataProviderArray($names) {
+  protected static function toDataProviderArray($names) {
     sort($names);
 
     $result = [];
