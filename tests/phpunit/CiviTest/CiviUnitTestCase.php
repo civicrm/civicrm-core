@@ -3258,7 +3258,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getThousandSeparators(): array {
+  public static function getThousandSeparators(): array {
     return [['.'], [',']];
   }
 
@@ -3267,7 +3267,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getBooleanDataProvider(): array {
+  public static function getBooleanDataProvider(): array {
     return [[TRUE], [FALSE]];
   }
 

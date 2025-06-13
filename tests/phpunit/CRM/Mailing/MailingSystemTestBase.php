@@ -316,7 +316,7 @@ United States
    *
    * @return array
    */
-  public function urlTrackingExamples() {
+  public static function urlTrackingExamples() {
     $cases = [];
 
     // Tracking disabled
