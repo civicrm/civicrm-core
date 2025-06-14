@@ -1125,6 +1125,23 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Get the CRM database as a 'prefix'.
+   *
+   * This returns a string that can be prepended to a query to include a CRM table.
+   *
+   * However, this string should contain backticks, or not, in accordance with the
+   * CMS's drupal views expectations, if any.
+   */
+  public function getCMSDatabasePrefix(): string {
+    $crmDatabase = DB::parseDSN(CRM_Core_Config::singleton()->dsn)['database'];
+    $cmsDatabase = DB::parseDSN(CRM_Core_Config::singleton()->userFrameworkDSN)['database'];
+    if ($crmDatabase === $cmsDatabase) {
+      return '';
+    }
+    return "`$cmsDatabase`.";
+  }
+
+  /**
    * Invalidates the cache of dynamic routes and forces a rebuild.
    */
   public function invalidateRouteCache() {
