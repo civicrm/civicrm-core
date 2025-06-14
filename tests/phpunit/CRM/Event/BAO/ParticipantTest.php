@@ -309,7 +309,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($details['eligible'], $successExpected);
   }
 
-  public function selfServiceScenarios(): array {
+  public static function selfServiceScenarios(): array {
     // Standard pass scenario
     $scenarios[] = [
       'selfSvcEnabled' => 1,

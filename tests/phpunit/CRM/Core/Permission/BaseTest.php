@@ -15,7 +15,7 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
    * @return array
    *   (0 => input to translatePermission, 1 => expected output from translatePermission)
    */
-  public function translateData(): array {
+  public static function translateData(): array {
     $cases = [];
 
     $cases[] = ['administer CiviCRM', 'administer CiviCRM'];

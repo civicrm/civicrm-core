@@ -408,7 +408,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals('IMPORTED', $row['_status']);
   }
 
-  public function requiredFields(): array {
+  public static function requiredFields(): array {
     return [
       'contact_id' => [['Participant.contact_id', 'Participant.status_id', 'Participant.event_id']],
       'external_identifier' => [['Contact.external_identifier', 'Participant.status_id', 'Participant.event_id']],

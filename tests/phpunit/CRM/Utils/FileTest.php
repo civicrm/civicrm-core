@@ -72,7 +72,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function fileExtensions() {
+  public static function fileExtensions() {
     return [
       ['txt'],
       ['danger'],
@@ -143,7 +143,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function fileNames() {
+  public static function fileNames() {
     $cases = [];
     $cases[] = ['helloworld.txt', TRUE];
     $cases[] = ['../helloworld.txt', FALSE];
@@ -164,7 +164,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_File::isValidFileName($fileName));
   }
 
-  public function pathToFileExtension() {
+  public static function pathToFileExtension() {
     $cases = [];
     $cases[] = ['/evil.pdf', 'pdf'];
     $cases[] = ['/helloworld.jpg', 'jpg'];
@@ -182,7 +182,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertEquals($expectedExtension, CRM_Utils_File::getExtensionFromPath($path));
   }
 
-  public function mimeTypeToExtension() {
+  public static function mimeTypeToExtension() {
     $cases = [];
     $cases[] = ['text/plain', ['txt', 'text', 'conf', 'def', 'list', 'log', 'in', 'ini']];
     $cases[] = ['image/jpeg', ['jpeg', 'jpg', 'jpe']];
@@ -505,7 +505,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirProvider(): array {
+  public static function isDirProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -529,7 +529,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirInvalidArgsProvider(): array {
+  public static function isDirInvalidArgsProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [-2.34555, FALSE],
@@ -545,7 +545,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirBasedirProvider(): array {
+  public static function isDirBasedirProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -572,7 +572,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * dataprovider for testMakeFilenameWithUnicode
    * @return array
    */
-  public function makeFilenameWithUnicodeProvider(): array {
+  public static function makeFilenameWithUnicodeProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -667,7 +667,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function trueOrFalse(): array {
+  public static function trueOrFalse(): array {
     return [
       'TRUE' => [TRUE],
       'FALSE' => [FALSE],

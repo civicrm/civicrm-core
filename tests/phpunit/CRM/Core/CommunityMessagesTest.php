@@ -141,7 +141,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function badWebResponses() {
+  public static function badWebResponses() {
     self::initWebResponses();
     $result = [
       [self::$webResponses['http-error']],

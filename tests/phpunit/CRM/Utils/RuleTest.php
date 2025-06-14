@@ -26,7 +26,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function integerDataProvider() {
+  public static function integerDataProvider() {
     return [
       [10, TRUE],
       ['145E+3', FALSE],
@@ -49,7 +49,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function positiveDataProvider() {
+  public static function positiveDataProvider() {
     return [
       [10, TRUE],
       ['145.0E+3', FALSE],
@@ -84,7 +84,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function numericDataProvider(): array {
+  public static function numericDataProvider(): array {
     return [
       [10, TRUE],
       ['145.0E+3', FALSE],
@@ -98,7 +98,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function numberInternationalDataProvider(): array {
+  public static function numberInternationalDataProvider(): array {
     return [
       'basic_integer' => [10, TRUE],
       'no_separator_us' => ['1000.68', TRUE],
@@ -133,7 +133,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function booleanDataProvider() {
+  public static function booleanDataProvider() {
     return [
       [TRUE, TRUE],
       ['TRUE', TRUE],
@@ -162,7 +162,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function moneyDataProvider() {
+  public static function moneyDataProvider() {
     return [
       [10, '.', ',', 'USD', TRUE],
       ['145.0E+3', '.', ',', 'USD', FALSE],
@@ -239,7 +239,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function colorDataProvider() {
+  public static function colorDataProvider() {
     return [
       ['#000000', TRUE],
       ['#ffffff', TRUE],
@@ -260,7 +260,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function extenionKeyTests() {
+  public static function extenionKeyTests() {
     $keys = [];
     $keys[] = ['org.civicrm.multisite', TRUE];
     $keys[] = ['au.org.contribute2016', TRUE];
@@ -280,7 +280,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function alphanumericData() {
+  public static function alphanumericData() {
     $expectTrue = [
       0,
       999,

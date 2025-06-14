@@ -11,7 +11,7 @@ class CRM_Core_PageTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function iconTestData() {
+  public static function iconTestData() {
     // first item is icon, text, condition, and attribs, second is expected markup
     return [
       [

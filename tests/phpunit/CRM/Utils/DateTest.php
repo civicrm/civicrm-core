@@ -295,7 +295,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * dataProvider for testRelativeToAbsoluteGeneral()
    * @return array
    */
-  public function relativeDateProvider(): array {
+  public static function relativeDateProvider(): array {
     return [
       [
         'input' => [
@@ -2688,7 +2688,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function dateDataProvider(): array {
+  public static function dateDataProvider(): array {
     return [
       // YYYY-mm-dd format - eg. 2022-10-01.
       '2022-10-01' => ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001000000'],

@@ -1606,7 +1606,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Data provider for testLongUnicodeIndividualName
    * @return array
    */
-  public function longUnicodeIndividualNames():array {
+  public static function longUnicodeIndividualNames():array {
     return [
       'much less than 128' => [
         [
@@ -1690,7 +1690,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Data provider for testLongUnicodeOrgName
    * @return array
    */
-  public function longUnicodeOrgNames():array {
+  public static function longUnicodeOrgNames():array {
     return [
       'much less than 128' => [
         'асдадасда шшшшшшшшшш',

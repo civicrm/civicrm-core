@@ -106,7 +106,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function composeQueryExamples() {
+  public static function composeQueryExamples() {
     $cases = [];
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');
 
@@ -236,7 +236,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function sqlNameDataProvider() {
+  public static function sqlNameDataProvider() {
     return [
       ['this is a long string', 30, FALSE, 'this is a long string'],
       [
@@ -424,7 +424,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @return array
    * @throws \ReflectionException
    */
-  public function serializationMethods() {
+  public static function serializationMethods() {
     $constants = [];
     $simpleData = [
       NULL,

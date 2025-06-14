@@ -152,7 +152,7 @@ class CRM_Core_BAO_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function fileHashProvider() {
+  public static function fileHashProvider() {
     return [
       // Test case 1: Valid token with a specific fileId
       'valid_file_hash' => [

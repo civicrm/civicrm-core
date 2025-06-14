@@ -1790,7 +1790,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function additionalInfoProvider(): array {
+  public static function additionalInfoProvider(): array {
     return [
       'no-date' => [
         'input' => [
