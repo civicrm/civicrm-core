@@ -201,7 +201,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertBodyRegexp($this->sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'require']));
   }
 
-  public function getAuthUrlPermissionExamples(): array {
+  public static function getAuthUrlPermissionExamples(): array {
     // What kind of users might request the form?
     $asDemo = ['xheader', 'jwt', 'getDemoCID'];
     $asLebowski = ['xheader', 'jwt', 'getLebowskiCID'];

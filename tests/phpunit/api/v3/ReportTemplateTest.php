@@ -150,7 +150,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getReportTemplatesSupportingSelectWhere(): array {
+  public static function getReportTemplatesSupportingSelectWhere(): array {
     $allTemplates = self::getReportTemplates();
     // Exclude all that do not work as of test being written. I have not dug into why not.
     $currentlyExcluded = [

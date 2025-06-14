@@ -199,7 +199,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Get international string data for testing against api calls.
    */
-  public function getInternationalStrings(): array {
+  public static function getInternationalStrings(): array {
     $invocations = [];
     $invocations[] = ['Scarabée'];
     $invocations[] = ['Iñtërnâtiônàlizætiøn'];
@@ -3666,7 +3666,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getPhoneStrings(): array {
+  public static function getPhoneStrings(): array {
     return [
       ['phone-Primary-1'],
       ['phone-Primary'],
@@ -4702,7 +4702,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function versionAndPrivacyOption(): array {
+  public static function versionAndPrivacyOption(): array {
     $version = [3, 4];
     $fields = ['do_not_mail', 'do_not_email', 'do_not_sms', 'is_opt_out', 'do_not_trade'];
     $tests = [];

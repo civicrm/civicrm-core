@@ -350,7 +350,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['First', 'Second', 'Third', 'Fourth'], array_column($sampleFields, 'title'));
   }
 
-  public function entityFieldsWithDependencies(): array {
+  public static function entityFieldsWithDependencies(): array {
     return [
       ['Contact', ['contact_type', 'contact_sub_type']],
       ['Case', ['case_type_id', 'status_id']],

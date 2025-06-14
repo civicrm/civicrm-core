@@ -700,7 +700,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function createLocalizedContributionDataProvider(): array {
+  public static function createLocalizedContributionDataProvider(): array {
     return [
       [10, '.', ',', 'USD', TRUE],
       ['145.0E+3', '.', ',', 'USD', FALSE],
@@ -2516,7 +2516,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function contributionStatusProvider(): array {
+  public static function contributionStatusProvider(): array {
     $contributionStatuses = civicrm_api3('OptionValue', 'get', [
       'return' => ['id', 'name'],
       'option_group_id' => 'contribution_status',
@@ -3152,7 +3152,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getScheduledDateData(): array {
+  public static function getScheduledDateData(): array {
     $result = [];
     $result[]['2016-08-31-1-month'] = [
       'data' => [
@@ -4812,7 +4812,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getRepeatTransactionNextSchedData(): array {
+  public static function getRepeatTransactionNextSchedData(): array {
     // Both these tests handle/test the case that next_sched_contribution_date is empty when Contribution.repeattransaction
     //   is called for the first time. Historically setting it was inconsistent but on new updates it should always be set.
     /*

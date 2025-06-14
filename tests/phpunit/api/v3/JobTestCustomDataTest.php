@@ -153,7 +153,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getCheckboxData() {
+  public static function getCheckboxData() {
     $data = [
       [
         'null_merges_with_set' => [

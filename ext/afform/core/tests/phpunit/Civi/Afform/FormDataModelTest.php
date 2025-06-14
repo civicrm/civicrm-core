@@ -20,7 +20,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     return \Civi\Test::headless()->installMe(__DIR__)->apply();
   }
 
-  public function getEntityExamples() {
+  public static function getEntityExamples() {
     $cases = [];
 
     $cases[] = [

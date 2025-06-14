@@ -66,7 +66,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
    *
    * @return array
    */
-  public function dataProvider(): array {
+  public static function dataProvider(): array {
     return [
       //  Search by Household name: 'Household 9'
       [

@@ -82,7 +82,7 @@ class CoreUtilTest extends Api4TestBase {
     $this->assertEquals('Civi\Api4\CustomValue', CoreUtil::getApiClass('Custom_' . $multiGroup['name']));
   }
 
-  public function getNamespaceExamples(): array {
+  public static function getNamespaceExamples(): array {
     return [
       ['\Foo', 'Foo'],
       ['\Foo\Bar', 'Bar'],

@@ -191,7 +191,7 @@ class GroupTest extends TestCase implements HeadlessInterface, HookInterface, Tr
   /**
    * @return array
    */
-  public function dataProvider(): array {
+  public static function dataProvider(): array {
     return [
       'Exclude static group 3' => [
         'form_values' => ['excludeGroups' => [3]],
