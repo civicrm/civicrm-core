@@ -128,8 +128,6 @@ class CRM_Contact_Task extends CRM_Core_Task {
             'CRM_Contact_Form_Task_Batch',
           ],
           'result' => TRUE,
-          'url' => 'civicrm/task/pick-profile',
-          'icon' => 'fa-pencil',
         ],
         self::PDF_LETTER => [
           'title' => ts('Print/merge document'),
