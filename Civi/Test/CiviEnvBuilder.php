@@ -240,7 +240,7 @@ class CiviEnvBuilder {
       else {
         $test = $GLOBALS['CIVICRM_TEST_CASE'];
         $this->appliedBy = get_class($test) . '::';
-        $this->appliedBy .= (is_callable($test, 'name') ? $test->name() : $test->getName());
+        $this->appliedBy .= (is_callable([$test, 'name']) ? $test->name() : $test->getName());
       }
 
       $this->assertValid();
