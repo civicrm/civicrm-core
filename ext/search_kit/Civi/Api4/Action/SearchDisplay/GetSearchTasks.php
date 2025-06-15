@@ -170,9 +170,6 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           !empty($task['url']) &&
           !in_array($id, $redundant)
         ) {
-          if ($task['url'] === 'civicrm/task/pick-profile') {
-            $task['title'] = E::ts('Profile Update');
-          }
           $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
 
           // Print Labels action does not support popups, open full-screen
