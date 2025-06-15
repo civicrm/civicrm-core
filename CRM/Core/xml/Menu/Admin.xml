@@ -299,7 +299,7 @@
   <item>
      <path>civicrm/admin/scheduleReminders</path>
      <title>Schedule Reminders</title>
-     <desc>Schedule Reminders.</desc>
+     <desc>Schedule Reminders</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
      <access_arguments>administer CiviCRM data</access_arguments>
      <adminGroup>Communications</adminGroup>
