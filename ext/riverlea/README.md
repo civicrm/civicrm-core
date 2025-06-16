@@ -82,7 +82,15 @@ Each stream also has a Managed Record file which is used to "install" the stream
 
 ## Customising
 
-Adding a customiser is on the roadmap, with a working prototype, but until its issues are resolved customising can be done through one of the three following methods:
+Riverlea is designed to allow users to customise their UI by tweaking variables or creating new streams.
+
+At this stage, small changes are still being made to the variable structure, so any customisations you make may require revisiting in a future upgrade.
+
+The `core/css/_variables.css` file will give you idea of variables which can be altered.
+
+A [Customiser tool](https://github.com/civicrm/civicrm-core/pull/32344) is also being developed to create and edit Streams more easily through the UI.
+
+Use of the [ThemeTest extension](https://lab.civicrm.org/extensions/themetest) is recommended to more quickly identify which CSS variables match which UI element, and test multiple variations for each.
 
 ### 1. Add CSS variables to your parent theme
 
@@ -92,11 +100,31 @@ For instance, to give all contribution page buttons rounded corners, you could a
 --crm-btn-radius: 2rem;
 ```
 
-Exploring the _variables.css file will give you idea of how much can be overwritten.
+### 2. Add a custom CSS snippet in an extension
 
-### 2. Create a new stream
+You can override variables by listening to `hook_civicrm_alterBundle`:
 
-Currently the best way to create a new stream is by adding a managed record to an extension.
+```
+function my_ext_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
+  if ($bundle->name === 'coreResources') {
+    $riverleaOverrides = <<<CSS
+      :root {
+        --crm-c-primary: green;
+      }
+    CSS;
+    # weight should override river.css
+    $bundle->addStyle($riverleaOverrides, ['weight' => 200]);
+  }
+}
+```
+
+### 3. Create a new stream (preview)
+
+New streams can be created using CiviCRM's Managed Entity system. (This is the same mechanism as can be used for packaging SearchKits, CustomFields, ContactTypes etc).
+
+The Customiser will provide tools to automate some of this process.
+
+0. If not adding to an existing extension, [follow the docs to create one](https://docs.civicrm.org/dev/en/latest/extensions/civix/#generate-module).
 
 1. Enable the `mgd-php` mixin in your extensions `info.xml`
 
@@ -117,7 +145,6 @@ Currently the best way to create a new stream is by adding a managed record to a
 5. Or you can create `stream/main.css` and `stream/dark.css` files in your extension, and add your CSS to them. It's best to use variable declarations as much as possible to maintain compatibility with future versions
 of CiviCRM.
 
-Use of the [ThemeTest extension](https://lab.civicrm.org/extensions/themetest) is recommended to more quickly identify which CSS variables match which UI element, and test multiple variations for each.
 
 ## Troubleshooting
 - Unless you really need it (e.g. applying an urgent fix, or running a test), delete the custom/ext version of RiverLea, once you are on CiviCRM 5.80 or later.
