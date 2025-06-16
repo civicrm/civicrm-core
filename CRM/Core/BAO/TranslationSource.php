@@ -52,17 +52,6 @@ class CRM_Core_BAO_TranslationSource extends CRM_Core_DAO_TranslationSource impl
   }
 
   /**
-   * Mark these fields as translatable.
-   *
-   * @todo move this definition to the metadata.
-   *
-   * @see CRM_Utils_Hook::translateFields
-   */
-  public static function hook_civicrm_translateFields(&$fields) {
-    $fields['civicrm_translation_source']['source'] = TRUE;
-  }
-
-  /**
    * Get all the translations sources replacement
    */
   public static function getTranslationSources($language) {
@@ -70,7 +59,7 @@ class CRM_Core_BAO_TranslationSource extends CRM_Core_DAO_TranslationSource impl
     $sql = "
 SELECT source, string
 FROM civicrm_translation t
-  INNER JOIN civicrm_translation_source ts ON t.entity_table = 'civicrm_translation_source' AND t.entity_field = 'source' AND t.entity_id = ts.id
+  INNER JOIN civicrm_translation_source ts ON t.source_key = ts.source_key
 WHERE t.language = %1 AND t.status_id = 1";
     $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$language, 'String']], TRUE, NULL, FALSE, FALSE);
     // These columns seem to be like 'civicrm_contact.first_name'... stored with HTML entities...
@@ -81,6 +70,26 @@ WHERE t.language = %1 AND t.status_id = 1";
       }
     }
     return $sources;
+  }
+
+  /**
+   * Create String Unique Identifier (GUID)
+   * string $original
+   * @return $guid
+   */
+  public static function createGuid(string $original): string {
+    $raw = mb_strtolower($original);
+    $raw = preg_replace(';\</?(b|i|strong|em)\>;', '', $raw);
+    $raw = preg_replace('/\s+/', ' ', $raw);
+    $raw = trim($raw);
+
+    // We want it to be short, which md5 does. We're not really security-sensitive about collisions.
+    // Hostile translators can easily screw with you regardless -- a manufactured collision is the least of it.
+
+    // $digest = hash_hmac('md5', $raw, 'FIXME_SECRET_VALUE', TRUE); // Strongly prevent collisions (yay) but hinder staging<=>prod (ugh)
+    $digest = hash('md5', $raw, TRUE);
+
+    return CRM_Utils_String::base64UrlEncode($digest);
   }
 
 }

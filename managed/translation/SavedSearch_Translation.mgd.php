@@ -19,7 +19,7 @@ foreach (\CRM_Core_I18n::getMultilingual() as $index => $langCode) {
         'label' => ts('Translations for %1', [1 => $languages[$langCode]]),
         'form_values' => [
           'join' => [
-            'TranslationSource_Translation_entity_id_01' => 'Translated Strings',
+            'TranslationSource_Translation_source_key_01' => 'Translated Strings',
           ],
         ],
         'api_entity' => 'TranslationSource',
@@ -28,38 +28,23 @@ foreach (\CRM_Core_I18n::getMultilingual() as $index => $langCode) {
           'select' => [
             'id',
             'source',
-            'TranslationSource_Translation_entity_id_01.string',
-            'TranslationSource_Translation_entity_id_01.language:label',
+            'TranslationSource_Translation_source_key_01.string',
+            'TranslationSource_Translation_source_key_01.language:label',
           ],
           'orderBy' => [],
           'where' => [],
           'groupBy' => [],
           'join' => [
             [
-              'Translation AS TranslationSource_Translation_entity_id_01',
+              'Translation AS TranslationSource_Translation_source_key_01',
               'LEFT',
               [
-                'id',
+                'source_key',
                 '=',
-                'TranslationSource_Translation_entity_id_01.entity_id',
+                'TranslationSource_Translation_source_key_01.source_key',
               ],
               [
-                'TranslationSource_Translation_entity_id_01.entity_table',
-                '=',
-                "'civicrm_translation_source'",
-              ],
-              [
-                'TranslationSource_Translation_entity_id_01.entity_table:name',
-                '=',
-                '"civicrm_translation_source"',
-              ],
-              [
-                'TranslationSource_Translation_entity_id_01.entity_field:name',
-                '=',
-                '"source"',
-              ],
-              [
-                'TranslationSource_Translation_entity_id_01.language:name',
+                'TranslationSource_Translation_source_key_01.language:name',
                 '=',
                 "\"$langCode\"",
               ],
@@ -89,7 +74,7 @@ foreach (\CRM_Core_I18n::getMultilingual() as $index => $langCode) {
           'description' => NULL,
           'sort' => [
             [
-              'TranslationSource_Translation_entity_id_01.string',
+              'TranslationSource_Translation_source_key_01.string',
               'ASC',
             ],
             [
@@ -111,7 +96,7 @@ foreach (\CRM_Core_I18n::getMultilingual() as $index => $langCode) {
             ],
             [
               'type' => 'field',
-              'key' => 'TranslationSource_Translation_entity_id_01.string',
+              'key' => 'TranslationSource_Translation_source_key_01.string',
               'dataType' => 'Text',
               'label' => ts('Translation'),
               'sortable' => TRUE,
@@ -121,7 +106,7 @@ foreach (\CRM_Core_I18n::getMultilingual() as $index => $langCode) {
                   'icon' => 'fa-square-plus',
                   'side' => 'left',
                   'if' => [
-                    'TranslationSource_Translation_entity_id_01.string',
+                    'TranslationSource_Translation_source_key_01.string',
                     'IS EMPTY',
                   ],
                 ],
