@@ -1978,7 +1978,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->individualID,
       'email-5' => 'anthony_anderson@civicrm.org',
       'payment_processor_id' => 0,
-      'currencyID' => 'USD',
       'is_pay_later' => 1,
       'invoiceID' => 'f28e1ddc86f8c4a0ff5bcf46393e4bc8',
       'description' => 'Online Contribution: Help Support CiviCRM!',
@@ -1991,7 +1990,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'pay_later_receipt:::This is a pay later receipt',
       'contributionPageId:::' . $contributionPageID,
       'title:::Test Contribution Page',
-      'amount:::$100.00',
+      'amount:::CA$100.00',
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
