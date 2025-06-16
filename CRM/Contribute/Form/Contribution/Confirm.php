@@ -1490,16 +1490,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // @fixme: Can we use eg. $this->getSubmittedValue('campaign_id') ?: $this->getContributionPageValue('campaign_id');
         $campaignID = $this->_params['campaign_id'] ?? ($this->_values['campaign_id'] ?? NULL);
 
-        [$membership, $renewalMode, $dates] = self::legacyProcessMembership(
-          $contactID, $membershipTypeID, $isTest,
-          date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
-          $customFieldsFormatted,
-          $numTerms, $membershipID, $pending,
-          $contributionRecurID, $membershipSource, $isPayLater,
-          $campaignID,
-          $membershipContribution,
-          $membershipLineItems
-        );
+        if (!$this->getExistingContributionID()) {
+          // @todo get rid of this function!
+          // Need to check that it's not actually doing anything useful in other scenarios
+          // For getExistingContributionID()/invoice mode it does nothing helpful!
+          // Most (all?) of this functionality is handled in OrderCompleteSubscriber::updateMembershipBasedOnCompletionOfContribution
+          [$membership, $renewalMode, $dates] = self::legacyProcessMembership(
+            $contactID, $membershipTypeID, $isTest,
+            date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
+            $customFieldsFormatted,
+            $numTerms, $membershipID, $pending,
+            $contributionRecurID, $membershipSource, $isPayLater,
+            $campaignID,
+            $membershipContribution,
+            $membershipLineItems
+          );
+        }
 
         $this->set('renewal_mode', $renewalMode);
 
