@@ -21,7 +21,6 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
    * Test the right emails exist after submitting the location form twice.
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSubmit(): void {
     $eventID = (int) $this->eventCreateUnpaid()['id'];
