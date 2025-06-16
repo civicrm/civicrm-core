@@ -104,15 +104,18 @@ trait AfformSaveTrait {
 
     // Save the form strings.
     if (!empty($strings)) {
+      // Create context hash (for now we just record the entity)
+      $context_key = \CRM_Core_BAO_TranslationSource::createGuid(':::afform');
+
       // Build the array for the table.
       $records = [];
       foreach ($strings as $value) {
-        $records[] = ['source' => $value];
+        $source_key = \CRM_Core_BAO_TranslationSource::createGuid($value);
+        $records[] = ['source' => $value, 'source_key' => $source_key, 'context_key' => $context_key, 'entity' => 'afform'];
       }
-
       TranslationSource::save(FALSE)
         ->setRecords($records)
-        ->setMatch(['source'])
+        ->setMatch(['source_key'])
         ->execute();
     }
   }

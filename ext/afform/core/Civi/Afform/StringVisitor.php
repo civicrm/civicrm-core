@@ -45,7 +45,7 @@ class StringVisitor {
    * @throws \CRM_Core_Exception
    */
   public function visit(array &$form, $doc, $callback) {
-    if (isset($form['title'])) {
+    if (!empty($form['title'])) {
       $form['title'] = $callback($form['title']);
     }
 
@@ -83,7 +83,7 @@ class StringVisitor {
     $defnSelectors = \CRM_Utils_JS::getDefnSelectors();
     $doc->find('af-field[defn]')->each(
       function (\DOMElement $item) use ($defnSelectors, $callback) {
-        $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'), 1);
+        $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'));
         foreach ($defnSelectors as $selector) {
           $this->defnLookupTranslate($defn, $selector, $callback);
         }
