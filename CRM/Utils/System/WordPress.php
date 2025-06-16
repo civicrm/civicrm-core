@@ -1280,10 +1280,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         TRUE
       )
       ) {
-        $contactCreated++;
+        $contactMatching++;
       }
       else {
-        $contactMatching++;
+        $contactCreated++;
       }
       if (is_object($match)) {
         $match->free();
