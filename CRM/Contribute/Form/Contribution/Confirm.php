@@ -1985,7 +1985,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_params['accountingCode'] = $this->_values['accountingCode'] ?? NULL;
 
     // fix currency ID
-    $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
+    $this->_params['currencyID'] = $this->getCurrency();
 
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
 
