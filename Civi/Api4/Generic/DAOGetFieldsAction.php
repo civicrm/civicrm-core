@@ -108,8 +108,13 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
         if (isset($this->values[$key]) && $this->values[$key] !== '') {
           $fieldName = FormattingUtil::removeSuffix($key);
           if (!isset($this->values[$fieldName])) {
-            $options = FormattingUtil::getPseudoconstantList(['name' => $fieldName, 'entity' => $this->getEntityName()], $key, $this->values);
-            $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
+            try {
+              $options = FormattingUtil::getPseudoconstantList(['name' => $fieldName, 'entity' => $this->getEntityName()], $key, $this->values);
+              $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
+            }
+            catch (\CRM_Core_Exception $e) {
+              // No option list
+            }
           }
         }
         unset($this->values[$key]);
