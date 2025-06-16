@@ -59,7 +59,7 @@ class CRM_Utils_JS {
    * Get Afform Attribute selectors
    */
   public static function getAttributeSelectors() {
-    return ['af-title', 'af-copy', 'af-repeat'];
+    return ['af-title', 'af-copy', 'af-repeat', 'title'];
   }
 
   /**
