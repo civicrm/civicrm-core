@@ -886,6 +886,14 @@ AND    u.status = 1
     return $text;
   }
 
+  public function getCRMDatabasePrefix(): string {
+    $crmDatabaseName = parent::getCRMDatabaseName();
+    if (!empty($crmDatabaseName)) {
+      return "`$crmDatabaseName`.";
+    }
+    return $crmDatabaseName;
+  }
+
   /**
    * @inheritdoc
    */
