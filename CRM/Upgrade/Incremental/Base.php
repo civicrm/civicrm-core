@@ -333,7 +333,7 @@ class CRM_Upgrade_Incremental_Base {
       $schema->fixSchemaDifferences();
     }
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
 
     return TRUE;
@@ -353,7 +353,7 @@ class CRM_Upgrade_Incremental_Base {
     $manager->disable($extensionKeys);
     $manager->uninstall($extensionKeys);
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
 
     return TRUE;
