@@ -778,6 +778,10 @@ SET    version = '$version'
   }
 
   public static function doRebuild(CRM_Queue_TaskContext $ctx): bool {
+    // The dispatch policy should already be set to 'upgrade.finish'.
+    // But there's one report of getting here with 'upgrade.main' (not yet reproduced).
+    $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
+
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
     $config->userSystem->flush();
 
