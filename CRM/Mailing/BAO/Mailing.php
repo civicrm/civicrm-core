@@ -1412,6 +1412,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $report['event_totals'] = [];
     $path = 'civicrm/mailing/report/event';
     $elements = [
+      'recipients',
       'queue',
       'delivered',
       'url',
@@ -1494,9 +1495,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['jobs'][] = $row;
     }
 
-    if (empty($report['event_totals']['queue'])) {
-      $report['event_totals']['queue'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
-    }
+    $report['event_totals']['recipients'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
 
     if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];
