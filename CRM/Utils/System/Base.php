@@ -1114,6 +1114,8 @@ abstract class CRM_Utils_System_Base {
    *
    * However, this string should contain backticks, or not, in accordance with the
    * CMS's drupal views expectations, if any.
+   *
+   * @deprecated
    */
   public function getCRMDatabasePrefix(): string {
     $crmDatabase = DB::parseDSN(CRM_Core_Config::singleton()->dsn)['database'];
@@ -1122,6 +1124,40 @@ abstract class CRM_Utils_System_Base {
       return '';
     }
     return "`$crmDatabase`.";
+  }
+
+  /**
+   * Get the CMS database name.
+   *
+   * This returns an empty string if the CRM/CMS database is shared.
+   * Otherwise it returns the name of the CMS database.
+   *
+   * @return string
+   */
+  public function getCMSDatabaseName(): string {
+    $crmDatabase = DB::parseDSN(CRM_Core_Config::singleton()->dsn)['database'];
+    $cmsDatabase = DB::parseDSN(CRM_Core_Config::singleton()->userFrameworkDSN)['database'];
+    if ($crmDatabase === $cmsDatabase) {
+      return '';
+    }
+    return $cmsDatabase;
+  }
+
+  /**
+   * Get the CRM database name.
+   *
+   * This returns an empty string if the CRM/CMS database is shared.
+   * Otherwise it returns the name of the CRM database.
+   *
+   * @return string
+   */
+  public function getCRMDatabaseName(): string {
+    $crmDatabase = DB::parseDSN(CRM_Core_Config::singleton()->dsn)['database'];
+    $cmsDatabase = DB::parseDSN(CRM_Core_Config::singleton()->userFrameworkDSN)['database'];
+    if ($crmDatabase === $cmsDatabase) {
+      return '';
+    }
+    return $crmDatabase;
   }
 
   /**
