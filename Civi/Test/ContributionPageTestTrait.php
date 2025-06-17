@@ -477,6 +477,7 @@ trait ContributionPageTestTrait {
         'module' => 'CiviContribute',
         'uf_group_id:name' => $profileName,
         'entity_id' => $this->getContributionPageID($identifier),
+        'entity_table' => 'civicrm_contribution_page',
       ])->execute()->first(), $profileIdentifier);
     }
     catch (\CRM_Core_Exception $e) {
