@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<extension key="legacyprofiles" type="module">
+  <file>legacyprofiles</file>
+  <name>legacyprofiles</name>
+  <description>Re-enables legacy features for profiles</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Documentation">https://docs.civicrm.org/</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/core/-/issues</url>
+    <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <comments>These features have been replaced by SearchKit and FormBuilder</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/Legacyprofiles</namespace>
+    <format>25.01.1</format>
+    <angularModule>crmLegacyprofiles</angularModule>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
+  </mixins>
+</extension>

@@ -379,15 +379,20 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     $js .= "</script>\n";
+
+    $legacyprofiles = function_exists('legacyprofiles_civicrm_config');
+    $this->assign('legacyprofiles', $legacyprofiles);
     $this->assign('initHideBoxes', $js);
 
-    $this->add('select',
-      'visibility',
-      ts('Visibility'),
-      CRM_Core_SelectValues::ufVisibility(),
-      TRUE,
-      ['onChange' => "showHideSelectorSearch(this.value);"]
-    );
+    if ($legacyprofiles) {
+      $this->add('select',
+        'visibility',
+        ts('Visibility'),
+        CRM_Core_SelectValues::ufVisibility(),
+        TRUE,
+        ['onChange' => "showHideSelectorSearch(this.value);"]
+      );
+    }
 
     //CRM-4363
     $js = ['onChange' => "mixProfile();"];
@@ -404,11 +409,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $this->add('textarea', 'help_pre', ts('Field Pre Help'), $attributes['help_pre']);
     $this->add('textarea', 'help_post', ts('Field Post Help'), $attributes['help_post']);
 
-    $this->add('advcheckbox', 'is_required', ts('Required?'));
+    $this->add('advcheckbox', 'is_required', ts('Required'));
 
-    $this->add('advcheckbox', 'is_multi_summary', ts('Include in multi-record listing?'));
-    $this->add('advcheckbox', 'is_active', ts('Active?'));
-    $this->add('advcheckbox', 'is_view', ts('View Only?'));
+    $this->add('advcheckbox', 'is_multi_summary', ts('Include in multi-record listing'));
+    $this->add('advcheckbox', 'is_active', ts('Active'));
+    $this->add('advcheckbox', 'is_view', ts('View Only'));
 
     $this->add('text', 'label', ts('Field Label'), $attributes['label']);
 
@@ -532,6 +537,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $params['uf_group_id'] = $this->_gid;
     if ($params['visibility'] == 'User and User Admin Only') {
       $params['is_searchable'] = $params['in_selector'] = 0;
+    }
+    // When legacyprofiles is disabled the visibility field is not there
+    if (empty($params['visibility'])) {
+      $params['visibility'] = 'User and User Admin Only';
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {

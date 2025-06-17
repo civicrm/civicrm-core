@@ -313,15 +313,11 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       }
     }
 
-    // also get the search tpl name
     $this->assign('searchTPL', $formController->getHookedTemplateFileName());
-
     $this->assign('search', $this->_search);
 
-    // search if search returned a form error?
-    if ((empty($_GET['reset']) || !empty($_GET['force'])) &&
-      !$searchError
-    ) {
+    // Check if search returned a form error?
+    if ((empty($_GET['reset']) || !empty($_GET['force'])) && !$searchError) {
       $this->assign('isReset', FALSE);
 
       $gidString = $this->_gid;
