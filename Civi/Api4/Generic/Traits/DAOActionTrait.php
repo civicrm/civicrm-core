@@ -398,6 +398,7 @@ trait DAOActionTrait {
         $oldWeight = civicrm_api4($this->getEntityName(), 'get', [
           'select' => [$weightField],
           'where' => $where,
+          'checkPermissions' => $this->getCheckPermissions(),
         ])[0][$weightField] ?? NULL;
       }
       $record[$weightField] = \CRM_Utils_Weight::updateOtherWeights($daoName, $oldWeight, $newWeight, $filters, $weightField);
