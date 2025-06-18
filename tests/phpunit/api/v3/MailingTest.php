@@ -782,6 +782,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $sql = "UPDATE civicrm_mailing_job SET is_test = 0 WHERE mailing_id = {$mail['id']}";
     CRM_Core_DAO::executeQuery($sql);
 
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_recipients(mailing_id,contact_id,email_id,phone_id) SELECT mailing_id,contact_id,email_id,phone_id FROM civicrm_mailing_event_queue");
+
     foreach (['bounce', 'unsubscribe', 'opened'] as $type) {
       $temporaryTable = CRM_Utils_SQL_TempTable::build()->setCategory($type)->createWithQuery("SELECT event_queue_id, time_stamp, id as delivered_id
         FROM civicrm_mailing_event_delivered
@@ -804,6 +806,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $expectedResult = [
       //since among 100 mails 20 has been bounced
       'Recipients' => 100,
+      'Queued' => 100,
       'Delivered' => 80,
       'Bounces' => 20,
       'Opened' => 20,

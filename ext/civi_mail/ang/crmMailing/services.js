@@ -556,7 +556,8 @@
 
   angular.module('crmMailing').factory('crmMailingStats', function (crmApi, crmLegacy) {
     var statTypes = [
-      {name: 'Recipients',    title: ts('Intended Recipients'),     searchFilter: '',                           eventsFilter: '&event=queue', reportType: 'detail', reportFilter: ''},
+      {name: 'Recipients',    title: ts('Intended Recipients'),     searchFilter: '',                           eventsFilter: '', reportType: false, reportFilter: ''},
+      {name: 'Queued',        title: ts('Mailings Sent'),     searchFilter: '',                           eventsFilter: '&event=queue', reportType: 'detail', reportFilter: ''},
       {name: 'Delivered',     title: ts('Successful Deliveries'),   searchFilter: '&mailing_delivery_status=Y', eventsFilter: '&event=delivered', reportType: 'detail', reportFilter: '&delivery_status_value=successful'},
       {name: 'Opened',        title: ts('Unique Opens'),           searchFilter: '&mailing_open_status=Y',     eventsFilter: '&event=opened', reportType: 'opened', reportFilter: ''},
       {name: 'Unique Clicks', title: ts('Unique Clicks'),          searchFilter: '&mailing_click_status=Y',    eventsFilter: '&event=click&distinct=1', reportType: 'clicks', reportFilter: ''},
