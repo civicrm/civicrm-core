@@ -421,8 +421,8 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .CRM_Contact_Form_Contact > .crm-form-block > details,
 .CRM_Contact_Form_Contact > .crm-form-block > div > details {
   margin-inline: calc(-1 * var(--crm-form-block-padding));
-  padding-inline: var(--crm-expand-2-body-padding);
-  margin-bottom: var(--crm-expand-2-body-padding);
+  padding-inline: var(--crm-expand2-body-padding);
+  margin-bottom: var(--crm-expand2-body-padding);
 }
 .crm-container .crm-add-address-wrapper {
   height: auto;
