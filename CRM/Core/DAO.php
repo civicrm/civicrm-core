@@ -1956,7 +1956,7 @@ LIKE %1
     $tr = [];
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
-        if (CRM_Utils_Type::validate($item[0], $item[1]) !== NULL) {
+        if (CRM_Utils_Type::validate($item[0], $item[1], TRUE, $item[2] ?? 'One of the parameters ') !== NULL) {
           $item[0] = self::escapeString($item[0]);
           if ($item[1] == 'String' ||
             $item[1] == 'Memo' ||
