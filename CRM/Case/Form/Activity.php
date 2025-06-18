@@ -525,8 +525,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         CRM_Core_BAO_EntityTag::create($tagParams, 'civicrm_activity', $vval['actId']);
 
         //save free tags
-        if (isset($params['taglist']) && !empty($params['taglist'])) {
-          CRM_Core_Form_Tag::postProcess($params['taglist'], $vval['actId'], 'civicrm_activity', $this);
+        if (isset($params['activity_taglist']) && !empty($params['activity_taglist'])) {
+          CRM_Core_Form_Tag::postProcess($params['activity_taglist'], $vval['actId'], 'civicrm_activity', $this);
         }
       }
 
