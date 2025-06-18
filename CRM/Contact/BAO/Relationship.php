@@ -1697,7 +1697,7 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @see CRM_Dedupe_Merger::cpTables()
    */
-  public static function mergeRelationships($mainId, $otherId, &$sqls) {
+  public static function mergeRelationships(int $mainId, int $otherId, &$sqls) {
     // Delete circular relationships
     $sqls[] = "DELETE FROM civicrm_relationship
       WHERE (contact_id_a = $mainId AND contact_id_b = $otherId AND case_id IS NULL)
@@ -1709,6 +1709,9 @@ AND cc.sort_name LIKE '%$name%'";
       WHERE r1.relationship_type_id = r2.relationship_type_id
       AND r1.id <> r2.id
       AND r1.case_id IS NULL AND r2.case_id IS NULL
+      AND r1.is_active = r2.is_active
+      AND ((r1.start_date = r2.start_date) OR (r1.start_date IS NULL AND r2.start_date IS NULL))
+      AND ((r1.end_date = r2.end_date) OR (r1.end_date IS NULL AND r2.end_date IS NULL))
       AND (
         r1.contact_id_a = $mainId AND r2.contact_id_a = $otherId AND r1.contact_id_b = r2.contact_id_b
         OR r1.contact_id_b = $mainId AND r2.contact_id_b = $otherId AND r1.contact_id_a = r2.contact_id_a
