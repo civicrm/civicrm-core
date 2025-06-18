@@ -1,0 +1,6 @@
+{htxt id="import-batch-size-id"}
+<p>{ts}If your imports time out, reduce this number. You can increase it for better import performance on servers with longer timeouts.{/ts}</p>
+{/htxt}
+{htxt id="dedupe-default-limit-id"}
+<p>{ts}Deduping larger databases can crash the server. By configuring a limit other than 0 here the dedupe query will only search for matches against a limited number of contacts.{/ts}</p>
+{/htxt}
