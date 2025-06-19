@@ -224,6 +224,13 @@ table.advmultiselect {
   box-shadow: none;
   border-radius: var(--crm-roundness);
 }
+.crm-container .panel-body:before, #bootstrap-theme .panel-body:after {
+  display: table;
+  content: " ";
+}
+.crm-container .panel-body:after {
+  clear: both;
+}
 .crm-container .panel-title {
   margin-top: 0;
   margin-bottom: 0;

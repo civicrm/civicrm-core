@@ -189,6 +189,7 @@
 #bootstrap-theme .btn-block {
   display: block;
   width: 100%;
+  max-width: 100%;
 }
 #bootstrap-theme .btn-block + .btn-block {
   margin-top: 5px;
