@@ -1240,7 +1240,7 @@ class CRM_Core_CodeGen_GenerateData {
     //But at the end of setup we are appending sample custom data, so for consistency
     //reset the cache.
     Civi::cache('fields')->flush();
-    CRM_Core_BAO_Cache::resetCaches();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
   /**
