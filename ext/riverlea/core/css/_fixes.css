@@ -360,12 +360,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
   margin-bottom: 0;
 }
-.crm-container .crm-search-nav-tabs { /* Fix for SK tabs border */
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  margin-bottom: 0;
-  border-bottom: 0;
-}
 .crm-container .panel-heading:has(.nav-tabs) {
   padding: 0;
   border-bottom: 0;
@@ -380,14 +374,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   box-shadow: none;
   border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
   background: var(--crm-tab-bg-active);
-  overflow-x: auto;
-}
-.crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table table {
-  border-width: 1px 0 0 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  box-shadow: none;
-  margin-bottom: 0;
 }
 .crm-container .afadmin-list >  .form-inline,
 .crm-search > .ng-scope > .form-inline {

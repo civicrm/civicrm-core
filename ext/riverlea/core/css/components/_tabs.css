@@ -1,7 +1,6 @@
 /* JQuery UI tabs */
 
 .crm-container .ui-tabs,
-.crm-container .crm-search-nav-tabs,
 .crm-container .afadmin-list .nav.nav-tabs { /* entire tab region */
   border: var(--crm-tabs-border);
   border-radius: var(--crm-tabs-radius);
