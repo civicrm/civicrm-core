@@ -123,6 +123,7 @@ class Rebuilder {
         Civi::cache('long')->flush();
         Civi::cache('settings')->flush();
         Civi::cache('js_strings')->flush();
+        Civi::cache('angular')->clear();
         Civi::cache('community_messages')->flush();
         Civi::cache('groups')->flush();
         Civi::cache('navigation')->flush();
