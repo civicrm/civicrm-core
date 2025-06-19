@@ -170,7 +170,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {

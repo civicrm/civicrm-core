@@ -117,7 +117,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     CRM_Core_Config::clearDBCache();
     // This doesn't make a lot of sense to me, but it maintains pre-existing behavior.
     Civi::cache('session')->clear();
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
     CRM_Core_Resources::singleton()->resetCacheCode();
     $this->rebuildMenu();
 
