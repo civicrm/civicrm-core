@@ -663,7 +663,7 @@ function civicrm_api3_job_cleanup($params) {
   }
 
   if ($memCache) {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
   if ($wordRplc) {
