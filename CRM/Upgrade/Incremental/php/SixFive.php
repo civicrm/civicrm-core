@@ -22,6 +22,44 @@
 class CRM_Upgrade_Incremental_php_SixFive extends CRM_Upgrade_Incremental_Base {
 
   /**
+   * Compute any messages which should be displayed before upgrade.
+   *
+   * Downstream classes should implement this method to generate their messages.
+   *
+   * This method will be invoked multiple times. Implementations MUST consult the `$rev`
+   * before deciding what messages to add. See the examples linked below.
+   *
+   * @see \CRM_Upgrade_Incremental_php_FiveTwenty::setPreUpgradeMessage()
+   *
+   * @param string $preUpgradeMessage
+   *   Accumulated list of messages. Alterable.
+   * @param string $rev
+   *   The incremental version number. (Called repeatedly, once for each increment.)
+   *
+   *   Ex: Suppose the system upgrades from 5.7.3 to 5.10.0. The method FiveEight::setPreUpgradeMessage()
+   *   will be called for each increment of '5.8.*' ('5.8.alpha1' => '5.8.beta1' =>  '5.8.0').
+   * @param null $currentVer
+   *   This is the penultimate version targeted by the upgrader.
+   *   Equivalent to CRM_Utils_System::version().
+   */
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    $path = CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH') ?: CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH');
+    if ($rev == '6.5.alpha1' && !$path) {
+      $smarty2Path = \Civi::paths()->getPath('[civicrm.packages]/Smarty/Smarty.class.php');
+      $preUpgradeMessage .= '<br/>' . ts("WARNING: Your site is currently using the Smarty2 library which is being replaced by the Smarty5 library.")
+        . " " . ts("If you take no action your site will now switch to using Smarty5. Some sites use extensions which have not been upgraded to work with Smarty5")
+        . " " . ts("If your extensions or other custom code will not run on Smarty5, you should log an issue with the maintainer. If the maintainer does not respond you should consider uninstalling the extension.")
+        . " " . ts("In the short term you can make your site continue to use Smarty2 by editing your civicrm.settings.php file and adding the line %1",
+          [1 => sprintf("<pre>  define('CIVICRM_SMARTY_AUTOLOAD_PATH',\n    %s);</pre>", htmlentities(var_export($smarty2Path, 1)))])
+        . (ts('Upcoming versions will standardize on Smarty v5. CiviCRM <a %1>v6.4-ESR</a> will provide extended support for Smarty v2, v3, & v4. To learn more and discuss, see the <a %2>Smarty transition page</a>.' . '</p>', [
+          1 => 'target="_blank" href="' . htmlentities('https://civicrm.org/esr') . '"',
+          2 => 'target="_blank" href="' . htmlentities('https://civicrm.org/redirect/smarty-v3') . '"',
+        ])
+        );
+    }
+  }
+
+  /**
    * Upgrade step; adds tasks including 'runSql'.
    *
    * @param string $rev
