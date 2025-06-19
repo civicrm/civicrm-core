@@ -47,7 +47,7 @@ class CRM_Upgrade_Incremental_php_SixFive extends CRM_Upgrade_Incremental_Base {
     if ($rev == '6.5.alpha1' && !$path) {
       $smarty2Path = \Civi::paths()->getPath('[civicrm.packages]/Smarty/Smarty.class.php');
       $preUpgradeMessage .= '<br/>' . ts("WARNING: Your site is currently using the Smarty2 library which is being replaced by the Smarty5 library.")
-        . " " . ts("If you take no action your site will now switch to using Smarty5. Some sites use extensions which have not been upgraded to work with Smarty5")
+        . " " . ts("If you take no action your site will now switch to using Smarty5. Some sites use extensions which have not been upgraded to work with Smarty5.")
         . " " . ts("If your extensions or other custom code will not run on Smarty5, you should log an issue with the maintainer. If the maintainer does not respond you should consider uninstalling the extension.")
         . " " . ts("In the short term you can make your site continue to use Smarty2 by editing your civicrm.settings.php file and adding the line %1",
           [1 => sprintf("<pre>  define('CIVICRM_SMARTY_AUTOLOAD_PATH',\n    %s);</pre>", htmlentities(var_export($smarty2Path, 1)))])
