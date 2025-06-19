@@ -171,17 +171,9 @@ a.crm-expand-row:focus {
     ALERTS
 *******************/
 
-.crm-container del,
 .crm-container .ui-icons_deleted,
-.crm-container table.caseSelector td.status-urgent,
 .crm-container .font-red,
-.crm-container .status-removed,
-.crm-container .status-overdue,
-.crm-container .status-fatal,
-.crm-container .status-hold,
-.crm-container .status-past,
-.crm-contact-deceased,
-.crm-container .status-warning {
+.crm-contact-deceased {
   color: var(--crm-c-danger-on-page-bg);
 }
 .crm-container .alert.alert-info.font-red { /* for when an info alert wants to be a danger alert! */
