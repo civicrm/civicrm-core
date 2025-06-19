@@ -697,7 +697,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   public function membershipTypeCreate(array $params = [], string $identifer = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge([
       'name' => 'General',

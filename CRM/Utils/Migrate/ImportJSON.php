@@ -56,7 +56,7 @@ class CRM_Utils_Migrate_ImportJSON {
     );
 
     // clean up all caches etc
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
   }
 
   /**
