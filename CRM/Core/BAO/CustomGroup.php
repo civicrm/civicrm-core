@@ -2188,7 +2188,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'cg_extend_objects', 'id', 'name');
     $ogValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
     foreach ($ogValues as $ogValue) {
-      if ($ogValue['is_active']) {
+      if ($ogValue['is_active'] && \Civi\Schema\EntityRepository::tableExists($ogValue['name'])) {
         $options[$ogValue['value']] = [
           'id' => $ogValue['value'],
           'label' => $ogValue['label'],
