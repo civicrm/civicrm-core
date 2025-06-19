@@ -661,13 +661,17 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       $session_cookie_name = 'SESSCIVISO';
     }
 
-    // session lifetime in seconds (default = 24 minutes)
-    $session_max_lifetime = (Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 24) * 60;
+    // session lifetime in seconds
+    // default = 24 days - NOTE this called too early to be read from ext/standaloneusers/settings/standaloneusers.setting.php
+    // so these should be kept in sync manually
+    $defaultLifetimeInMinutes = 24 * 24 * 60;
+    $lifetimeInMinutes = (Civi::settings()->get('standaloneusers_session_max_lifetime') ?? $defaultLifetimeInMinutes);
 
     session_start([
       'cookie_httponly'  => 1,
       'cookie_secure'    => !empty($_SERVER['HTTPS']),
-      'gc_maxlifetime'   => $session_max_lifetime,
+      // unit is seconds
+      'gc_maxlifetime'   => $lifetimeInMinutes * 60,
       'name'             => $session_cookie_name,
       'use_cookies'      => 1,
       'use_only_cookies' => 1,
