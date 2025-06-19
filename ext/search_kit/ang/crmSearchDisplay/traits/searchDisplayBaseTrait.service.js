@@ -103,7 +103,7 @@
               ctrl.toolbar = apiResults.run.toolbar;
               // If there are no results on initial load, open an "autoOpen" toolbar link
               ctrl.toolbar.forEach((link) => {
-                if (link.autoOpen && requestId === 1 && !ctrl.results.length) {
+                if (link.autoOpen && ctrl._runCount === 1 && !ctrl.results.length) {
                   CRM.loadForm(link.url)
                     .on('crmFormSuccess', (e, data) => {
                       ctrl.rowCount = null;
