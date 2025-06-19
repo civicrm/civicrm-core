@@ -225,11 +225,11 @@ table.advmultiselect {
   border-radius: var(--crm-roundness);
 }
 .crm-container .panel-body:before, #bootstrap-theme .panel-body:after {
-	display: table;
-	content: " ";
+  display: table;
+  content: " ";
 }
 .crm-container .panel-body:after {
-	clear: both;
+  clear: both;
 }
 .crm-container .panel-title {
   margin-top: 0;
