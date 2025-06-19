@@ -417,6 +417,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       'code' => NULL,
       'exception' => $exception,
     ];
+    if (is_a($exception, '\Civi\Core\Exception\DBQueryException')) {
+      $vars['message'] = $exception->getUserMessage();
+    }
     if (!$vars['message']) {
       $vars['message'] = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', [1 => 'https://civicrm.org/bug-reporting']);
     }
