@@ -359,7 +359,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $transaction->commit();
 
     // reset the cache
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     CRM_Utils_Hook::post($op, 'CustomGroup', $group->id, $group);
 
