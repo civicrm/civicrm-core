@@ -112,7 +112,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
 
     $test->setUpHeadless();
 
-    \CRM_Utils_System::flushCache();
+    \Civi::rebuild(['system' => TRUE])->execute();
     \Civi::reset();
     \CRM_Core_Session::singleton()->set('userID', NULL);
     // ugh, performance
