@@ -98,6 +98,18 @@ details.af-container > *:last-of-type {
 .afform-directive:hover .af-admin-edit-form-link {
   opacity: 1;
 }
+#bootstrap-theme .af-admin-edit-form-link > button {
+  background: hsl(from var(--crm-c-page-background) h s calc(l - 10));
+  color: var(--crm-c-text);
+  border-radius: 2rem;
+  height: inherit;
+  padding: 0.4rem !important;
+  border: 0;
+}
+#bootstrap-theme .af-admin-edit-form-link > button .crm-i {
+  padding: 0;
+  border: 0;
+}
 
 /* Fieldset */
 
