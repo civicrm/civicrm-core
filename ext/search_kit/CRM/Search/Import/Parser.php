@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
 use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -92,10 +94,23 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
       $lineItems[] = ['line_total' => $contributionValues['total_amount']];
     }
     try {
-      $contribution = \Civi\Api4\Order::create()
+      $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionValues['contribution_status_id'] ?? NULL);
+      $contribution = Order::create()
         ->setContributionValues($contributionValues)
         ->setLineItems($lineItems)
         ->execute()->single();
+      if ($contributionStatus === 'Completed') {
+        Payment::create()
+          ->setValues([
+            'contribution_id' => $contribution['id'],
+            'total_amount' => $contribution['total_amount'],
+            'check_number' => $contribution['check_number'] ?? NULL,
+            'trxn_id' => $contribution['trxn_id'] ?? NULL,
+            'trxn_date' => $contribution['receive_date'] ?? 'now',
+            'payment_instrument_id' => $contribution['payment_instrument_id'],
+          ])
+          ->execute();
+      }
       $mappedRow[$contributionKey]['id'] = $contribution['id'];
     }
     catch (\CRM_Core_Exception $e) {
