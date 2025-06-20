@@ -357,7 +357,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
     // reset all the caches
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     // initialize the object once db is loaded
     \Civi::$statics = [];
@@ -697,7 +697,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   public function membershipTypeCreate(array $params = [], string $identifer = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge([
       'name' => 'General',

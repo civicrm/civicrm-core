@@ -35,9 +35,17 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
   /**
    * Cleanup ACL and System Level caches
+   *
+   * @deprecated
+   *  Deprecated Jun 2025 in favor of Civi::rebuild().
+   *     Reassess after Jun 2026.
+   *     For an extension bridging before+after, suggest guard like:
+   *       if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild(...)->execute()
+   *       else CRM_Core_BAO_Cache::resetCaches();
+   *     Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
   public static function resetCaches() {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
   /**

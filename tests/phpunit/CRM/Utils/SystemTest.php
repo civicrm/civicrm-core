@@ -291,7 +291,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', [$this, 'flushCacheClearsAssetCache_buildAsset']);
     $fakeFile = \Civi::service("asset_builder")->getPath('fakeFile.json');
 
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     $fileList = scandir(dirname($fakeFile));
     // count should be 2, just the standard . and ..

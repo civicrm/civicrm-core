@@ -450,7 +450,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    * (Actually probably some overkill at the moment.)
    */
   protected static function flushCaches() {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
     unset(Civi::$statics['CRM_Core_PseudoConstant']['groups']);
     unset(Civi::$statics['CRM_ACL_API']);
     unset(Civi::$statics['CRM_ACL_BAO_ACL']['permissioned_groups']);

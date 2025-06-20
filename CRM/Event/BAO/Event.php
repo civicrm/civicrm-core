@@ -1010,7 +1010,7 @@ WHERE civicrm_event.is_active = 1
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_event', $copyEvent->id);
     }
 
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
     CRM_Utils_Hook::copy('Event', $copyEvent, $id);
 
     return $copyEvent;

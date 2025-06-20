@@ -334,7 +334,7 @@ function civicrm_api3_custom_field_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
   $result = civicrm_api3_generic_setValue(["entity" => 'CustomField', 'params' => $params]);
   if (empty($result['is_error'])) {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
   return $result;
 }

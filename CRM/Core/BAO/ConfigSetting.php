@@ -284,7 +284,7 @@ class CRM_Core_BAO_ConfigSetting {
     $moveStatus .= ts('Template cache and upload directory have been cleared.') . '<br />';
 
     // clear all caches
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
     Civi::cache('session')->clear();
     $moveStatus .= ts('Database cache tables cleared.') . '<br />';
 

@@ -747,7 +747,7 @@ SET    version = '$version'
   public static function doIncrementalUpgradeFinish(CRM_Queue_TaskContext $ctx, $rev, $currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->setVersion($rev);
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     return TRUE;
   }

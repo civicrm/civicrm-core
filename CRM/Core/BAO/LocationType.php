@@ -122,7 +122,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
       }
     }
     // Todo: This was moved from CRM_Admin_Form_LocationType::postProcess but is probably unnecessarily broad.
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
 }

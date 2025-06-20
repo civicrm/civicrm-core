@@ -471,7 +471,7 @@ ORDER BY weight";
       CRM_Core_DAO::executeQuery($query);
       Civi::cache('navigation')->flush();
       // reset ACL and System caches
-      CRM_Core_BAO_Cache::resetCaches();
+      Civi::rebuild(['system' => TRUE])->execute();
     }
     else {
       // before inserting check if contact id exists in db

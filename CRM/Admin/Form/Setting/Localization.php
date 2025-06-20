@@ -170,7 +170,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
     Civi::cache('navigation')->clear();
     // reset ACL and System caches
-    CRM_Core_BAO_Cache::resetCaches();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     // make the site multi-lang if requested
     if (!empty($values['makeMultilingual'])) {

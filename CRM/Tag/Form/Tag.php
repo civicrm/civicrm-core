@@ -95,7 +95,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     // array contains the posted values
     // exportvalues is not used because its give value 1 of the checkbox which were checked by default,
