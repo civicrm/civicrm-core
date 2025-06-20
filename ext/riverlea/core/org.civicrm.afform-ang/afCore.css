@@ -107,7 +107,7 @@ details.af-container > *:last-of-type {
 }
 #bootstrap-theme .af-admin-edit-form-link.open button,
 #bootstrap-theme .af-admin-edit-form-link button:hover,
-#bootstrap-theme .af-admin-edit-form-link button:focus  {
+#bootstrap-theme .af-admin-edit-form-link button:focus {
   background: transparent;
   color: var(--crm-c-text);
   opacity: 1;
