@@ -143,6 +143,9 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   protected $_options = [];
 
+  /**
+   * @var array
+   */
   protected $_custom = [];
 
   /**
@@ -998,7 +1001,47 @@ class CRM_Core_DAO extends DB_DataObject {
         }
       }
     }
+    // In order to return (and eventually save) using API4 style customFields
+    // Add API4 customfields to DAO object
+    foreach ($this->getAPI4Fields($params) as $fieldName => $fieldValue) {
+      $this->$fieldName = $fieldValue;
+    }
     return $allNull;
+  }
+
+  /**
+   * Retrieves all parameter values. Custom fields are in long name format (CustomGroup.CustomField).
+   *
+   * Note: unless all values are needed, getValue() is more performant.
+   *
+   * @since 6.15
+   * @fixme: This is a copy of \Civi\Core\Event\PreEvent::getValues() - need to refactor and share
+   */
+  public function getAPI4Fields($params): array {
+    $values = $params;
+    unset($values['custom']);
+
+    // Transform any custom values with shortNames (`custom_X`) to long name.
+    foreach ($values as $key => $value) {
+      if (str_starts_with($key, 'custom_')) {
+        $customField = \CRM_Core_BAO_CustomField::getFieldByName($key);
+        if ($customField) {
+          $values[$customField['custom_group']['name'] . '.' . $customField['name']] = $this->formatCustomValue($customField, $value);
+          unset($values[$key]);
+        }
+      }
+    }
+
+    // Collect custom values from $params['custom'] and add to params as their long names.
+    foreach ($params['custom'] ?? [] as $customFieldId => $customValues) {
+      $customField = \CRM_Core_BAO_CustomField::getField($customFieldId);
+      if ($customField && $customValues) {
+        $customValue = reset($customValues);
+        $values[$customField['custom_group']['name'] . '.' . $customField['name']] = $this->formatCustomValue($customField, $customValue['value'] ?? NULL);
+      }
+    }
+
+    return $values;
   }
 
   /**
