@@ -998,6 +998,15 @@ class CRM_Core_DAO extends DB_DataObject {
         }
       }
     }
+    // In order to return (and eventually save) using API4 style customFields
+    // We need to copy them to the DAO object.
+    // @fixme: Need to load spec and parse through foreach above
+    $api4CustomFields = array_filter($params, function($key) {
+      return str_contains($key, '.');
+    }, ARRAY_FILTER_USE_KEY);
+    foreach ($api4CustomFields as $fieldName => $fieldValue) {
+      $this->$fieldName = $fieldValue;
+    }
     return $allNull;
   }
 
