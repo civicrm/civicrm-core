@@ -22,7 +22,7 @@
           <div class="crm-contact-form-block-activity_type_exclude_filter_id crm-inline-edit-field">
             {$form.activity_type_exclude_filter_id.label}<br /> {$form.activity_type_exclude_filter_id.html|crmAddClass:medium}
           </div>
-          <div>{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" hideRelativeLabel=false}</div>
+          <div class="crm-contact-form-block-activity_date_time_filter_id crm-inline-edit-field">{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" hideRelativeLabel=false}</div>
           <div class="crm-contact-form-block-activity_status_filter_id crm-inline-edit-field">
             <label for="status_id">{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
           </div>
