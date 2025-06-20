@@ -3282,4 +3282,14 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * Extensions can define new formats for relative date filter "tokens".
+   * @param string $filter - the filter token, stored in civicrm_option_value
+   * @return array|false
+   *   An array with two elements: $dates['from'] and $dates['to'], or FALSE if the hook isn't in use.
+   */
+  public static function relativeDate($filter) {
+    return self::singleton()->invoke(array('filter'), $filter, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_relativeDate');
+  }
+
 }
