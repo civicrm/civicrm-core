@@ -82,7 +82,7 @@
   display: inline-block;
   text-align: center;
   font-size: var(--crm-m2);
-  /* padding: 0;   */
+  padding: 0 0.2rem;
 }
 .crm-container #mainTabContainer ul.ui-tabs-nav a em {
   background: var(--crm-dash-tab-count-bg);
