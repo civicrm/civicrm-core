@@ -247,12 +247,6 @@ html.cms-standalone body {
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
 }
 
-/* make count badges more readable */
-.crm-container .ui-tabs ul.ui-tabs-nav a em,
-.crm-container .nav-tabs a .badge {
-  padding: 0 0.2rem;
-}
-
 /* RL has no margin-bottom so the actions ribbon touches the main contact block */
 div.crm-summary-contactname-block+.crm-actions-ribbon {
   margin-bottom: var(--crm-r1) !important;
