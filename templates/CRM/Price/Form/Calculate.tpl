@@ -8,8 +8,8 @@
  +--------------------------------------------------------------------+
 *}
 
-<div id="pricesetTotal" class="crm-section section-pricesetTotal">
-  <div id="pricelabel" class="label {if $hideTotal}hiddenElement{/if}">
+<div id="pricesetTotal" class="crm-section section-pricesetTotal{if $hideTotal} hiddenElement{/if}">
+  <div id="pricelabel" class="label">
     {if ($extends eq 'Contribution') || ($extends eq 'Membership')}
       <span id='amount_sum_label'>{ts}Total Amount{/ts}</span>
     {else}
@@ -20,7 +20,7 @@
       {/if}
     {/if}
   </div>
-  <div class="content calc-value" {if $hideTotal}style="display:none;"{/if} id="pricevalue"></div>
+  <div class="content calc-value" id="pricevalue"></div>
 </div>
 
 <script type="text/javascript">
