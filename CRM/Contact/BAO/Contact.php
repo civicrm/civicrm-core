@@ -1138,47 +1138,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Extract contact id from url for deleting contact image.
-   */
-  public static function processImage() {
-    $action = CRM_Utils_Request::retrieve('action', 'String');
-    $pcp = CRM_Utils_Request::retrieve('pcp', 'String');
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
-    // retrieve contact id in case of Profile context
-    $id = CRM_Utils_Request::retrieve('id', 'Positive');
-    $formName = $pcp ? 'CRM_PCP_Form_PCPAccount' : ($cid ? 'CRM_Contact_Form_Contact' : 'CRM_Profile_Form_Edit');
-    if ($formName == 'CRM_Profile_Form_Edit') {
-      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
-      // If the call is initiated from the profile loaded from drupal, we
-      // need to change the form name. otherwise we will get : Error: Could
-      // not find a valid session key.
-      if (str_contains($key, 'CRMProfileFormDynamic')) {
-        $formName = 'CRM_Profile_Form_Dynamic';
-      }
-    }
-    $cid = $cid ?: $id;
-    if ($action & CRM_Core_Action::DELETE) {
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
-        // $controller is not used at all but we need the CRM_Core_Controller object as in it's constructor
-        // It retrieves the qfKey from GET or POST and then passes it to CRM_Core_Key::validate the generated key and redirects to a standard error message if fails
-        $controller = new CRM_Core_Controller_Simple($formName, ts('New Contact'), NULL, TRUE, FALSE);
-
-        if (!Contact::checkAccess()
-          ->setAction('update')
-          ->addValue('id', $cid)
-          ->execute()->first()['access']) {
-          CRM_Utils_System::permissionDenied();
-        }
-        CRM_Contact_BAO_Contact::deleteContactImage($cid);
-        CRM_Core_Session::setStatus(ts('Contact image deleted successfully'), ts('Image Deleted'), 'success');
-        $session = CRM_Core_Session::singleton();
-        $toUrl = $session->popUserContext();
-        CRM_Utils_System::redirect($toUrl);
-      }
-    }
-  }
-
-  /**
    * Get contact type for a contact.
    *
    * @param int $id
