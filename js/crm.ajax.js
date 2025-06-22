@@ -362,7 +362,7 @@
   });
 
   var dialogCount = 0,
-    exclude = '[href^=#], [href^=javascript], [onclick], .no-popup, .cancel';
+    exclude = '[href^="#"], [href^=javascript], [onclick], .no-popup, .cancel';
 
   CRM.loadPage = function(url, options) {
     var settings = {
