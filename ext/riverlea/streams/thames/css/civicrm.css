@@ -35,7 +35,7 @@ html.cms-standalone body {
 .crm-container details>summary::before /* accordion8 (recommended) */,
 .crm-container .crm-accordion-header::before, /* accordion1, accordion2, accordion6 */
 .crm-container .crm-collapsible .collapsible-title::before /* accordion3 */ {
-  content: "";
+  --crm-expand-icon: '';
   border: .4rem solid transparent;
   border-left-color: var(--crm-expand-icon-color);
   position: absolute;
@@ -44,6 +44,10 @@ html.cms-standalone body {
   transform: rotate(0);
   transform-origin: .2rem 50%;
   transition: transform .25s ease;
+}
+/* fight the fixes.css */
+.crm-container .civicrm-community-messages .collapsible-title::before {
+  transform-origin: .2rem 50% !important;
 }
 /* we have to sort of re-state these rules because the specificity of the above overrules the 'open' state
  * note that a lot of non-recommended patterns use .collapsed, whereas details uses [open] - reverse logic.
