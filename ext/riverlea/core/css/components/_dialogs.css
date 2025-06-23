@@ -154,7 +154,8 @@
   position: fixed;
   top: 64px;
   right: var(--crm-r2);
-  z-index: 999999;
+  /* one less than #civicrm-menu */
+  z-index: 99998;
 }
 #crm-notification-container div.ui-notify-message-style {
   background: var(--crm-notify-background);
