@@ -57,7 +57,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
       }
       else {
         if ($userId == NULL) {
-          $user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+          $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
         }
         else {
           $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($userId);
@@ -74,7 +74,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         }
         else {
           if ($uid == NULL) {
-            $user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+            $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
           }
           else {
             $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($uid);
