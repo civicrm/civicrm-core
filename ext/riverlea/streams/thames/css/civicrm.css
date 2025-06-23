@@ -148,6 +148,10 @@ html.cms-standalone body {
 .crm-container a.button.delete:hover {
   color: var(--crm-c-red-bright);
 }
+.crm-icon-picker-button { float:none; }
+.crm-container .ui-button:not(.ui-button-icon-only).crm-icon-picker-button {
+  display: inline-flex;
+}
 
 /* DIALOGS */
 
