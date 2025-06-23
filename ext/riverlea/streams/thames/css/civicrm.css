@@ -394,48 +394,6 @@ div:has(> table .dropdown-toggle[aria-expanded="true"]) {
   padding-bottom: 20rem;
 }
 
-/* ...and adjust the individual row checkboxes to be in line
- * Ah, no we have no way to target these.
- * Would be nice if core markup identified this type of <td>
- */
-
-/* apply hanging indent to sorting buttons */
-.crm-container tr a.sorting,
-.crm-container tr a.sorting_asc,
-.crm-container tr a.sorting_desc,
-.crm-container table.dataTable thead th.sorting,
-.crm-container table.dataTable thead th.sorting_asc,
-.crm-container table.dataTable thead th.sorting_desc,
-.crm-search-display th.crm-sortable-col {
-  padding-left: calc(var(--crm-table-padding, 0) + 1ch);
-}
-.crm-container tr a.sorting::after,
-.crm-container tr a.sorting_asc::after,
-.crm-container tr a.sorting_desc::after,
-.crm-container table.dataTable thead th.sorting::after,
-.crm-container table.dataTable thead th.sorting_asc::after,
-.crm-container table.dataTable thead th.sorting_desc::after,
-.crm-search-display th.crm-sortable-col::after,
-.crm-container tr a.sorting::before,
-.crm-container tr a.sorting_asc::before,
-.crm-container tr a.sorting_desc::before,
-.crm-container table.dataTable thead th.sorting::before,
-.crm-container table.dataTable thead th.sorting_asc::before,
-.crm-container table.dataTable thead th.sorting_desc::before,
-.crm-search-display th.crm-sortable-col::before {
-  position: absolute;
-  margin-left: -1em;
-}
-
-/* ...and in searchkit, this is terribly awkward and could be fixed with a core PR to provide more classes */
-.crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
-  padding-left: 1.5ch;
-}
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
-  position: absolute;
-  margin-left: -1.5ch;
-}
-
 /* Advanced search: override searchForm.css for slightly better aligned fields */
 .advanced-search-fields {
   align-items: end;
