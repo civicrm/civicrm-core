@@ -112,6 +112,11 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
             break;
           }
 
+          if (str_contains($table, 'civicrm_value')) {
+            $contactIdClause = "AND entity_id = %3";
+            break;
+          }
+
           // allow tables to be extended by report hook query objects
           list($contactIdClause, $join) = CRM_Report_BAO_Hook::singleton()->logDiffClause($this, $table);
 
@@ -126,9 +131,6 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
               // e.g. civicrm_batch.created_id
               return [];
             }
-          }
-          if (str_contains($table, 'civicrm_value')) {
-            $contactIdClause = "AND entity_id = %3";
           }
       }
     }
