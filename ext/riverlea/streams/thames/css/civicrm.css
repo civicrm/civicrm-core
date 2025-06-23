@@ -645,3 +645,60 @@ ul.crm-quickSearch-results .ui-state-active a /* mouse,keyboard nav */ {
 ul.crm-quickSearch-results a:active {
   background: white;
 }
+
+
+/* ajax status/saving notifications */
+.crm-status-box-msg {
+  color: white;
+}
+
+.crm-status-box-outer {
+  position: fixed;
+  top: 2px;
+  right: 2px;
+  z-index: 100000;
+  background-image:none;
+  background-color: var(--crm-c-blue-dark);
+  padding: 0 1rem;
+  border-radius: 3px;
+  min-width: 8rem;
+  max-width: 13rem;
+  text-align: left;
+  --crm-c-background2: transparent;
+
+  .crm-status-box-msg {
+    color: white;
+  }
+
+  &.status-success {
+    background-color: var(--crm-c-green-dark);
+  }
+
+  &.status-error {
+    background-color: var(--crm-c-red-dark);
+  }
+}
+.crm-status-box-outer.status-start .crm-status-box-inner {
+  padding-left: 2.5ch;
+}
+.crm-status-box-outer.status-start .crm-status-box-inner::before {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: -2.5ch;
+  display: block;
+  content: '';
+  line-height: 1;
+  animation: loading-status-message 1s infinite;
+  transform-origin: center;
+  width: 1.5ch;
+  height: 1.5ch;
+  border: dashed 1px white;
+  border-radius: 2ch;
+}
+
+@keyframes loading-status-message {
+  0% { transform: translateY(-50%); }
+  100% { transform: translateY(-50%) rotateZ(360deg); }
+}
+
