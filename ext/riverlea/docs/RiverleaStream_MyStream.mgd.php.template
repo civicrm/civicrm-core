@@ -1,0 +1,45 @@
+<?php
+
+// Replace this with your extensions extensionUtil class (if unsure look in your extension's root my_extension.php file)
+// use CRM_riverlea_ExtensionUtil as E;
+
+// return [
+//   [
+//     'name' => 'RiverleaStream_MyStream',
+//     'entity' => 'RiverleaStream',
+//     'update' => 'always',
+//     'cleanup' => 'always',
+//     'params' => [
+//       'version' => 4,
+//       'values' => [
+//
+//          # Describe your stream:
+//
+//         'name' => 'my_unique_stream_name',
+//         'label' => E::ts('My Stream'),
+//         'description' => 'Describe your stream...',
+//
+//          # Set stream variables directly here:
+//
+//         'vars' => [
+//            '--crm-c-primary' => 'purple',
+//          ],
+//         'vars_dark' => [
+//            # Extra variables for dark mode
+//            '--crm-c-primary' => 'blue',
+//          ],
+//
+//          # If you want to add static css files to your stream, then uncomment
+//          # the following four lines, and create your files at
+//          #  - 'your_extension/stream/main.css'
+//          #  - 'your_extension/stream/dark.css'
+//
+//         'extension' => 'my_extension_name', # or E::SHORT_NAME if you update the extensionutils above
+//         'file_prefix' => 'stream/',
+//         'css_file' => 'main.css',
+//         'css_file_dark' => 'dark.css',
+//       ],
+//       'match' => ['name'],
+//     ],
+//   ],
+// ];
