@@ -242,14 +242,17 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     //Updating Mapping Records
     if ($this->getSubmittedValue('updateMapping')) {
       $savedMappingID = (int) $this->getSubmittedValue('mappingId');
-      foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField($savedMappingID, $i, TRUE);
+      if ($savedMappingID) {
+        foreach (array_keys($this->getColumnHeaders()) as $i) {
+          $this->saveMappingField($savedMappingID, $i, TRUE);
+        }
+        $this->setSavedMappingID($savedMappingID);
       }
-      $this->setSavedMappingID($savedMappingID);
       $this->updateUserJobMetadata('Template', ['mapping_id' => (int) $this->getSubmittedValue('mappingId')]);
     }
     //Saving Mapping Details and Records
     if ($this->getSubmittedValue('saveMapping')) {
+      // @todo - stop saving the mapping.
       $savedMappingID = Mapping::create(FALSE)->setValues([
         'name' => $this->getSubmittedValue('saveMappingName'),
         'description' => $this->getSubmittedValue('saveMappingDesc'),
@@ -346,7 +349,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected function addSavedMappingFields(): void {
     $savedMappingID = $this->getSavedMappingID();
     //to save the current mappings
-    if (!$savedMappingID) {
+    if (!$savedMappingID && !$this->getTemplateJob()) {
       $saveDetailsName = ts('Save this field mapping');
       $this->applyFilter('saveMappingName', 'trim');
       $this->add('text', 'saveMappingName', ts('Name'));
