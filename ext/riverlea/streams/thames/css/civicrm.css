@@ -467,7 +467,7 @@ html.crm-standalone  nav.breadcrumb>ol {
 }
 
 /* e.g. search buttons followed by count of matches on SK screen */
-.crm-search-display .form-inline {
+.crm-search-display .form-inline:not(th,td) {
   padding: var(--crm-padding-reg) 0;
   display: flex;
   flex-wrap: wrap;
@@ -667,4 +667,5 @@ ul.crm-quickSearch-results a:active {
   0% { transform: translateY(-50%); }
   100% { transform: translateY(-50%) rotateZ(360deg); }
 }
+
 
