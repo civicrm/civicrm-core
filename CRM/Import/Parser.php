@@ -114,7 +114,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @noinspection PhpUnhandledExceptionInspection
    */
   protected function getSubmittedValue(string $fieldName) {
-    return $this->getUserJob()['metadata']['submitted_values'][$fieldName];
+    return $this->getUserJob()['metadata']['submitted_values'][$fieldName] ?? NULL;
   }
 
   /**
@@ -209,22 +209,28 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * @param string $contactType
+   * @param string|null $contactType
    * @param string|null $prefix
    *
    * @return array[]
    * @throws \CRM_Core_Exception
    */
-  protected function getContactFields(string $contactType, ?string $prefix = ''): array {
+  protected function getContactFields(?string $contactType, ?string $prefix = ''): array {
     $contactFields = $this->getAllContactFields('');
-    $dedupeFields = $this->getDedupeFields($contactType);
     $matchText = ' ' . ts('(match to %1)', [1 => $prefix]);
-    foreach ($dedupeFields as $fieldName => $dedupeField) {
-      if (!isset($contactFields[$fieldName])) {
-        continue;
+    $contactTypes = [$contactType];
+    if (!$contactType) {
+      $contactTypes = ['Individual', 'Organization', 'Household'];
+    }
+    foreach ($contactTypes as $type) {
+      $dedupeFields = $this->getDedupeFields($type);
+      foreach ($dedupeFields as $fieldName => $dedupeField) {
+        if (!isset($contactFields[$fieldName])) {
+          continue;
+        }
+        $contactFields[$fieldName]['title'] .= $matchText;
+        $contactFields[$fieldName]['match_rule'] = $this->getDefaultRuleForContactType($type);
       }
-      $contactFields[$fieldName]['title'] .= $matchText;
-      $contactFields[$fieldName]['match_rule'] = $this->getDefaultRuleForContactType($contactType);
     }
 
     $contactFields['external_identifier']['title'] .= $matchText;
