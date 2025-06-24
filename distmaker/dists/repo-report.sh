@@ -31,7 +31,7 @@ env \
   D7DIR="$D7DIR" \
   SKPACK="$SKPACK" \
   J4PACK="$J4PACK" \
-  J5BCPACK="$J5BCPACK" \
+  J5PACKBC="$J5PACKBC" \
   WPPACK="$WPPACK" \
   php "$DM_SOURCEDIR/distmaker/utils/repo-report.php" \
   > "$REPORT"
