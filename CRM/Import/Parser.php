@@ -645,14 +645,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * The fields are keyed according to the metadata.
    *
-   * @param string $contactType
+   * @param string|null $contactType
    * @param string|null $name
    *
    * @return array
    * @noinspection PhpUnhandledExceptionInspection
    * @noinspection PhpDocMissingThrowsInspection
    */
-  public function getDedupeRule(string $contactType, ?string $name = NULL): array {
+  public function getDedupeRule(?string $contactType, ?string $name = NULL): array {
+    if (!$contactType && !$name) {
+      $name = 'unique_identifier_match';
+    }
     if (!$name) {
       $name = $this->getDefaultRuleForContactType($contactType);
     }
@@ -1846,6 +1849,20 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
       $this->dedupeRules[$name]['fields'] = $fields;
     }
+    // Contact type not specified. Return generic rules, maybe update to return
+    // Select rules - ie be able to choose a mixture to pick up by type - eg. if a
+    // row is clearly individual it could use that row.
+    $this->dedupeRules['unique_identifier_match'] = [
+      'name' => 'unique_identifier_match',
+      'threshold' => 1,
+      'title' => ts('ID or external identifier'),
+      'rule_message' => ts('Contact ID or external identfier must be provided'),
+      'fields' => [
+        'id' => 1,
+        'external_identifier' => 1,
+      ],
+      'contact_type' => NULL,
+    ];
   }
 
   /**
@@ -1957,6 +1974,13 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         ->first()['id'];
     }
     return NULL;
+  }
+
+  /**
+   * @return string
+   */
+  protected function getDefaultDedupeRule(): string {
+    return $this->getContactType() ? $this->getDedupeRule($this->getContactType())['name'] : 'unique_identifier_match';
   }
 
 }

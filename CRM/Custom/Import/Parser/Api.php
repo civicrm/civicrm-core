@@ -63,7 +63,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
         'selected' => [
           'action' => 'select',
           'contact_type' => $this->getSubmittedValue('contactType'),
-          'dedupe_rule' => $this->getDedupeRule($this->getContactType())['name'],
+          'dedupe_rule' => $this->getDefaultDedupeRule(),
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',

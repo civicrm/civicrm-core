@@ -51,7 +51,7 @@
             }
 
             entityMetadata.dedupe_rules = [];
-            if (Boolean(entityMetadata.selected) && Boolean(selected.contact_type)) {
+            if (Boolean(entityMetadata.selected)) {
               entityMetadata.dedupe_rules = $scope.getDedupeRules(selected.contact_type);
             }
 
@@ -205,6 +205,9 @@
         $scope.getDedupeRules = function (selectedEntity) {
           var dedupeRules = [];
           _.each($scope.data.dedupeRules, function (rule) {
+            if (selectedEntity === '') {
+              selectedEntity = null;
+            }
             if (rule.contact_type === selectedEntity) {
               dedupeRules.push({'id': rule.name, 'text': rule.title, 'is_default': rule.used === 'Unsupervised'});
             }

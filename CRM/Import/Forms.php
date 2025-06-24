@@ -392,12 +392,12 @@ class CRM_Import_Forms extends CRM_Core_Form {
   /**
    * Get the contact type selected for the import (on the datasource form).
    *
-   * @return string
+   * @return string|null
    *   e.g Individual, Organization, Household.
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getContactType(): string {
+  protected function getContactType(): ?string {
     return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'];
   }
 
