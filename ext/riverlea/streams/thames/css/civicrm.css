@@ -49,6 +49,11 @@ html.cms-standalone body {
 .crm-container .civicrm-community-messages .collapsible-title::before {
   transform-origin: .2rem 50% !important;
 }
+/* advanced search */
+.crm-container details.crm-accordion-settings summary::before {
+  content:'';
+}
+
 /* we have to sort of re-state these rules because the specificity of the above overrules the 'open' state
  * note that a lot of non-recommended patterns use .collapsed, whereas details uses [open] - reverse logic.
  * This covers accordion1, accordion2, accordion6.
