@@ -771,7 +771,7 @@ input.crm-form-checkbox) + label {
   margin: 0 var(--crm-m1);
   padding-left: 5px !important;
   font-size: var(--crm-m3);
-  width: 7ch;
+  width: 9ch;
 }
 .ui-datepicker-calendar thead tr {
   border-top: 1px solid var(--crm-c-gray-300);
