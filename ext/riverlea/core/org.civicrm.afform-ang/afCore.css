@@ -22,12 +22,9 @@ a.af-api4-action-idle {
 .af-container.af-layout-inline {
   flex-direction: row;
 }
-.af-container.af-layout-cols > .af-title {
-  flex: 0 0 100%;
-}
+.af-container.af-layout-cols > .af-title,
 .af-container.af-layout-inline > .af-title {
-  display: block;
-  width: 100%;
+  flex: 0 0 100%;
 }
 .afform-directive,
 af-form {
