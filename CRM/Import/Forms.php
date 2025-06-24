@@ -98,7 +98,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getUserJobSubmittedValues(): array {
-    return $this->getUserJob()['metadata']['submitted_values'];
+    return $this->getUserJob()['metadata']['submitted_values'] ?? [];
   }
 
   /**
