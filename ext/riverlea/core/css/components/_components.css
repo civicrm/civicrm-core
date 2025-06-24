@@ -183,8 +183,8 @@ table.advmultiselect {
   background-color: var(--crm-wizard-active-bg);
   color: var(--crm-wizard-active-col);
 }
-.crm-container .nav > li.active > a:hover,
-.crm-container .nav > li.active > a:focus {
+.crm_wizard__title .nav-pills > li.active > a:hover,
+.crm_wizard__title .nav-pills > li.active > a:focus {
   background-color: var(--crm-wizard-active-bg);
   color: var(--crm-wizard-active-col);
 }
