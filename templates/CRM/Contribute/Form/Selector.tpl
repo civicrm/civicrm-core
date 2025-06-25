@@ -40,8 +40,8 @@
           {if $context eq 'Search'}
             {assign var=cbName value=$row.checkbox}
             <td>{$form.$cbName.html}</td>
+            <td>{$row.contact_type}</td>
           {/if}
-          <td>{$row.contact_type}</td>
           <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
         {/if}
         <td class="crm-contribution-amount">
