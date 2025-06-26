@@ -50,7 +50,7 @@ if (getenv('J4PACK')) {
   $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla.zip";
 }
 if (getenv('J5PACKBC')) {
-  $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla5bc.zip";
+  $data['tar']['Joomla5BC'] = "civicrm-$DM_VERSION-joomla5bc.zip";
 }
 if (getenv('D7PACK')) {
   $data['tar']['Drupal'] = "civicrm-$DM_VERSION-drupal.tar.gz";
