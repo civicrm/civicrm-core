@@ -829,9 +829,9 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool
    */
   public static function migrateUtf8mb4($revert = FALSE, $patterns = [], $databaseList = NULL) {
-    $newCharSet = $revert ? 'utf8' : 'utf8mb4';
-    $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
-    $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
+    $newCharSet = $revert ? 'utf8mb3' : 'utf8mb4';
+    $newCollation = $revert ? 'utf8mb3_unicode_ci' : 'utf8mb4_unicode_ci';
+    $newBinaryCollation = $revert ? 'utf8mb3_bin' : 'utf8mb4_bin';
     $tables = [];
     $dao = new CRM_Core_DAO();
     $databases = $databaseList ?? [$dao->_database];
