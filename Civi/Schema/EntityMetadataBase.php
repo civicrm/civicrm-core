@@ -42,7 +42,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     return $field;
   }
 
-  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL, bool $isView = FALSE): ?array {
     $field = $this->getField($fieldName);
     $options = NULL;
     $hookParams = [
@@ -52,6 +52,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       'include_disabled' => $includeDisabled,
       'check_permissions' => $checkPermissions,
       'user_id' => $userId,
+      'is_view' => $isView,
     ];
     $field['pseudoconstant']['condition'] = (array) ($field['pseudoconstant']['condition'] ?? []);
     if (!empty($field['pseudoconstant']['condition_provider'])) {
