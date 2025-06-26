@@ -115,7 +115,7 @@
     {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
     {if $accessContribution and array_key_exists(0, $rows) and $rows.0.contribution_id}
-        {include file="CRM/Contribute/Form/Selector.tpl" context="Search" single=false}
+        {include file="CRM/Contribute/Form/Selector.tpl" context="dashboard" single=false}
     {/if}
     <div class="crm-submit-buttons">
       {crmPermission has='edit event participants'}
