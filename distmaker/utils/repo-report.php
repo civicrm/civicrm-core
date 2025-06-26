@@ -55,6 +55,9 @@ if (getenv('J5PACKBC')) {
 if (getenv('D7PACK')) {
   $data['tar']['Drupal'] = "civicrm-$DM_VERSION-drupal.tar.gz";
 }
+if (getenv('STANDALONEPACK')) {
+  $data['tar']['Standalone'] = "civicrm-$DM_VERSION-standalone.tar.gz";
+}
 if (getenv('WPPACK')) {
   $data['tar']['WordPress'] = "civicrm-$DM_VERSION-wordpress.zip";
 }
