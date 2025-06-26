@@ -66,4 +66,4 @@ ksort($data);
 ksort($data['tar']);
 ksort($data['git']);
 $data['rev'] = $DM_VERSION . '-' . md5(json_encode($data));
-echo json_encode($data);
+echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
