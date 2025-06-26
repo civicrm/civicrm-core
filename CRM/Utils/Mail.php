@@ -393,7 +393,7 @@ class CRM_Utils_Mail {
     }
 
     require_once 'Mail/mime.php';
-    $msg = new Mail_mime("\n");
+    $msg = new Mail_mime();
     if ($textMessage) {
       $msg->setTxtBody($textMessage);
     }
