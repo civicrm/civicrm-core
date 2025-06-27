@@ -1145,7 +1145,11 @@ AND    u.status = 1
    * CMS's drupal views expectations, if any.
    */
   public function getCRMDatabasePrefix(): string {
-    return str_replace('`', '', parent::getCRMDatabasePrefix());
+    $crmDatabaseName = parent::getCRMDatabaseName();
+    if (!empty($crmDatabaseName)) {
+      return "$crmDatabaseName.";
+    }
+    return $crmDatabaseName;
   }
 
   /**
