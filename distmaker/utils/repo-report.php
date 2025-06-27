@@ -44,7 +44,7 @@ $data = array(
 );
 
 if (getenv('BPACK')) {
-  $data['tar']['Backdrop'] = "civicrm-$DM_VERSION-backdrop-unstable.tar.gz";
+  $data['tar']['Backdrop'] = "civicrm-$DM_VERSION-backdrop.tar.gz";
 }
 if (getenv('J4PACK')) {
   $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla.zip";
