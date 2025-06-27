@@ -973,7 +973,7 @@ HTACCESS;
   public static function getImageURL($imageURL) {
     // retrieve image name from $imageURL
     $imageURL = CRM_Utils_String::unstupifyUrl($imageURL);
-    parse_str(parse_url($imageURL, PHP_URL_QUERY), $query);
+    parse_str(parse_url($imageURL, PHP_URL_QUERY) ?? '', $query);
 
     $url = NULL;
     if (!empty($query['photo'])) {
