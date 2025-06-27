@@ -2,8 +2,10 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\Util\PhpSpreadsheetUtil;
 use League\Csv\Writer;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 trait ResultDataTrait {
@@ -120,13 +122,33 @@ trait ResultDataTrait {
     // Header row
     foreach (array_values($columns) as $index => $col) {
       $sheet->setCellValue([$index + 1, 1], $col['label']);
-      $sheet->getColumnDimensionByColumn($index)->setAutoSize(TRUE);
+      $sheet->getColumnDimensionByColumn($index + 1)->setAutoSize(TRUE);
     }
 
+    global $civicrmLocale;
+    $moneyLocale = $civicrmLocale->moneyFormat ?? (\Civi::settings()->get('format_locale') ?? \CRM_Core_I18n::getLocale());
+
     foreach ($rows as $rowNum => $data) {
-      $colNum = 1;
-      foreach ($columns as $index => $col) {
-        $sheet->setCellValue([$colNum++, $rowNum + 2], $this->formatColumnValue($col, $data['columns'][$index]));
+      foreach ($columns as $colNum => $col) {
+        $value = $data['columns'][$colNum];
+        $cell = $sheet->getCell([$colNum + 1, $rowNum + 2]);
+        $cell->setValue($this->formatColumnValue($col, $value));
+
+        if ($col['dataType'] === 'Money') {
+          $numberFormatter = new \NumberFormatter($moneyLocale . '@currency=' . $value['val']['currency'], \NumberFormatter::CURRENCY);
+          $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+          $cell->getStyle()->getNumberFormat()->setFormatCode(new Currency($currencySymbol, locale: $numberFormatter->getLocale()));
+        }
+        elseif ($col['dataType'] === 'Date') {
+          $format = isset($col['format']) ? \Civi::settings()->get($col['format'])
+            : \CRM_Core_Config::singleton()->dateformatFull;
+          $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
+        }
+        elseif ($col['dataType'] === 'Timestamp') {
+          $format = isset($col['format']) ? \Civi::settings()->get($col['format'])
+            : \CRM_Core_Config::singleton()->dateformatDatetime;
+          $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
+        }
       }
     }
 
@@ -140,10 +162,25 @@ trait ResultDataTrait {
    *
    * @param array $col
    * @param array $value
-   * @return string
+   * @return scalar|null
    */
   protected function formatColumnValue(array $col, array $value) {
-    $val = $value['val'] ?? '';
+    $val = $value['val'];
+
+    if (!in_array($this->format, ['array', 'csv'], TRUE)) {
+      if ($col['rewrite']) {
+        return $val;
+      }
+
+      if ($col['dataType'] === 'Money') {
+        return $val['value'];
+      }
+
+      if (($col['dataType'] === 'Date' || $col['dataType'] === 'Timestamp') && ($val !== NULL)) {
+        return Date::stringToExcel($val);
+      }
+    }
+
     return is_array($val) ? implode(', ', $val) : $val;
   }
 
