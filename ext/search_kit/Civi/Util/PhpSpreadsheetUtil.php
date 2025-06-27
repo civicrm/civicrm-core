@@ -13,7 +13,14 @@ final class PhpSpreadsheetUtil {
    * @see https://phpspreadsheet.readthedocs.io/en/latest/topics/The%20Dating%20Game/#formatting-options
    */
   public static function crmDateFormatToFormatCode(string $format): string {
-    return strtr($format, [
+    // Drop strings like " Uhr" or " o'clock".
+    $format = preg_replace('/( (?!%)[^%\s]+)/', '', $format);
+    // Drop everything after a format character that is neither a punctuation character nor whitespace.
+    $format = preg_replace('/(%[a-zA-Z])[^\p{P}\s]+/', '$1', $format);
+    // Drop everything after a punctuation character ("%" excluded) that is not "%" or whitespace.
+    $format = preg_replace('/(?!%)([\p{P}])[^%\s]+/', '$1', $format);
+
+    return trim(strtr($format, [
       '%A' => 'dddd',
       '%a' => 'ddd',
       '%b' => 'mmm',
@@ -21,6 +28,7 @@ final class PhpSpreadsheetUtil {
       '%d' => 'dd',
       '%e' => ' d',
       '%E' => 'd',
+      // Number suffixes like "st" or "nd" are not possible.
       '%f' => '',
       '%H' => 'hh',
       '%h' => 'hh',
@@ -36,8 +44,9 @@ final class PhpSpreadsheetUtil {
       '%y' => 'yy',
       '%s' => 'ss',
       '%S' => 'ss',
+      // Timezone is not possible.
       '%Z' => '',
-    ]);
+    ]));
   }
 
 }
