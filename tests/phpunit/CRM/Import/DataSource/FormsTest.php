@@ -20,6 +20,11 @@ use Civi\Api4\UserJob;
  */
 class CRM_Import_FormsTest extends CiviUnitTestCase {
 
+  protected function setUp(): void {
+    parent::setUp();
+    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
+  }
+
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_user_job', 'civicrm_mapping', 'civicrm_mapping_field', 'civicrm_queue']);
     parent::tearDown();
