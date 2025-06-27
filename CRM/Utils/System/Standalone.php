@@ -16,6 +16,7 @@
  */
 
 use Civi\Standalone\SessionHandler;
+use Civi\Standalone\CiviCacheSessionHandler;
 
 /**
  * Standalone specific stuff goes here.
@@ -656,7 +657,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       $session_cookie_name = 'SESSCIVISOFALLBACK';
     }
     else {
-      $session_handler = new SessionHandler();
+      $session_handler = $this->getSessionHandler();
       session_set_save_handler($session_handler);
       $session_cookie_name = 'SESSCIVISO';
     }
@@ -717,6 +718,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function postContainerBoot(): void {
     $sess = \CRM_Core_Session::singleton();
     $sess->initialize();
+  }
+
+  /**
+   * @return \Civi\Standalone\SessionHandlerInterface
+   */
+  public function getSessionHandler(): SessionHandlerInterface {
+    if (CIVICRM_DB_CACHE_CLASS === 'Redis') {
+      // This class *should* work with other caching types but
+      // has only been tested for Redis.
+      return new CiviCacheSessionHandler();
+    }
+    return new SessionHandler();
   }
 
 }
