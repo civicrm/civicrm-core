@@ -2444,7 +2444,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_file WHERE id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
-    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', [
+    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE file_id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
   }
