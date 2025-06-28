@@ -122,7 +122,7 @@
       {/if}
 
       {if $action eq 2 and $accessContribution and array_key_exists(0, $rows) &&  $rows.0.contribution_id}
-      {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+      {include file="CRM/Contribute/Form/Selector.tpl" context="dashboard" single=false}
       {/if}
 
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
