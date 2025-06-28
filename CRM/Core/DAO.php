@@ -2993,7 +2993,7 @@ SELECT contact_id
     }
     $checkPermissions = (bool) ($values['check_permissions'] ?? ($context == 'create' || $context == 'search'));
     $includeDisabled = ($context == 'validate' || $context == 'get');
-    $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions);
+    $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, NULL, ($context == 'get' || $context === 'search'));
     return $options ? CRM_Core_PseudoConstant::formatArrayOptions($context, $options) : $options;
   }
 
