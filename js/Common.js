@@ -1742,7 +1742,23 @@ if (!CRM.vars) CRM.vars = {};
         }
         $(this).parent().toggleClass('collapsed');
         e.preventDefault();
+      })
+
+      // Save the state for sticky accordions
+      .on('click', 'details.crm-accordion-sticky', function(e) {
+        // Workaround to run last, otherwise the open attribute is not yet updated
+        setTimeout(() => {
+          CRM.cache.set('sticky-' + this.id, document.getElementById(this.id).hasAttribute('open'));
+        }, 0);
       });
+
+    // Expand sticky accordions
+    Array.from(document.querySelectorAll('.crm-container details.crm-accordion-sticky')).forEach((expander) => {
+      var state = CRM.cache.get('sticky-' + expander.id);
+      if (state === true || state === false) {
+        expander.toggleAttribute('open', state);
+      }
+    });
 
     $().crmtooltip();
   });
