@@ -169,6 +169,13 @@ body {
   color: var(--crm-c-text);
 }
 
+/* iFrame */
+
+body.civicrm-iframe-page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-size: 100%;
+}
+
 /* Core type */
 
 .crm-container strong,
