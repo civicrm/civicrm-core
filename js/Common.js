@@ -1742,7 +1742,27 @@ if (!CRM.vars) CRM.vars = {};
         }
         $(this).parent().toggleClass('collapsed');
         e.preventDefault();
+      })
+
+      // Save the state for sticky accordions
+      .on('click', 'details.crm-expand-sticky', function(e) {
+        // Workaround to run last, otherwise the open attribute is not yet updated
+        setTimeout(() => {
+          CRM.cache.set(this.id, document.getElementById(this.id).hasAttribute('open'));
+        }, 0);
       });
+
+    // Expand sticky accordions
+    Array.from(document.querySelectorAll('.crm-container details.crm-expand-sticky')).forEach((expander) => {
+      var state = CRM.cache.get(expander.id);
+      if (state === true) {
+        document.getElementById(expander.id).setAttribute('open', '');
+      }
+      else if (state === false) {
+        // An accordion might be open by default, and we want to close it
+        document.getElementById(expander.id).removeAttribute('open');
+      }
+    });
 
     $().crmtooltip();
   });
