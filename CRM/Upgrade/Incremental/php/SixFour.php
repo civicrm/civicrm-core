@@ -51,4 +51,22 @@ class CRM_Upgrade_Incremental_php_SixFour extends CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if (!function_exists('civi_wp')) {
+      //exit
+    }
+    elseif ($rev == '6.4.alpha1') {
+      $preUpgradeMessage .= '<p>' . ts('Beginning in CiviCRM for WordPress version 6.4.0 a setting has been added to control if a user is automatically logged in after account creation. <a %1>Details about this change</a>.', [1 => 'href="https://lab.civicrm.org/dev/wordpress/-/issues/154" target="_blank"']) . '</p>';
+    }
+  }
+
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if (!function_exists('civi_wp')) {
+      //exit
+    }
+    elseif ($rev == '6.4.alpha1') {
+      $postUpgradeMessage .= '<p>' . ts('Beginning in CiviCRM for WordPress version 6.4.0 a setting has been added to control if a user is automatically logged in after account creation. <a %1>Details about this change</a>.', [1 => 'href="https://lab.civicrm.org/dev/wordpress/-/issues/154" target="_blank"']) . '</p>';
+    }
+  }
+
 }
