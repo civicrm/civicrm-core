@@ -106,11 +106,6 @@ function civicrm_api3_attachment_create($params) {
     if (!$fileDao->find(TRUE)) {
       throw new CRM_Core_Exception("Invalid ID");
     }
-
-    $entityFileDao->file_id = $id;
-    if (!$entityFileDao->find(TRUE)) {
-      throw new CRM_Core_Exception("Cannot modify orphaned file");
-    }
   }
 
   if (!$id && !is_string($content) && !is_string($moveFile)) {
@@ -132,12 +127,17 @@ function civicrm_api3_attachment_create($params) {
   if (!$id) {
     $file['uri'] = CRM_Utils_File::makeFileName($name);
   }
+  else {
+    $entityFileDao->file_id = $id;
+    if ($entityFileDao->find(TRUE)) {
+      $entityFileDao->copyValues($entityFile);
+      $entityFileDao->file_id = $fileDao->id;
+      $entityFileDao->save();
+    }
+  }
+
   $fileDao = CRM_Core_BAO_File::create($file);
   $fileDao->find(TRUE);
-
-  $entityFileDao->copyValues($entityFile);
-  $entityFileDao->file_id = $fileDao->id;
-  $entityFileDao->save();
 
   $path = $config->customFileUploadDir . $fileDao->uri;
   if (is_string($content)) {
@@ -281,7 +281,7 @@ function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTru
   }
 
   $select = CRM_Utils_SQL_Select::from('civicrm_file cf')
-    ->join('cef', 'INNER JOIN civicrm_entity_file cef ON cf.id = cef.file_id')
+    ->join('cef', 'LEFT JOIN civicrm_entity_file cef ON cf.id = cef.file_id')
     ->select([
       'cf.id',
       'cf.uri',

@@ -327,7 +327,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       1 => [$id, 'Positive'],
     ]);
     if ($query->fetch()) {
-      if (!preg_match('/^civicrm_value_/', $query->entity_table)) {
+      if ($query->entity_table) {
         // A normal attachment directly on its entity.
         return [$query->is_valid, $query->entity_table, $query->entity_id];
       }
@@ -338,6 +338,16 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       if (isset($tblIdx[$query->entity_table])) {
         return [$query->is_valid, $tblIdx[$query->entity_table]['entity_table'], $query->entity_id];
       }
+      else {
+        foreach ($this->getCustomFields() as $customField) {
+          $entity = $customField['fk_entity'] ?? $customField['data_type'];
+          if ($entity && \Civi\Api4\Utils\CoreUtil::getRefCountTotal($entity, $id) > 0) {
+            return [$query->is_valid, \Civi\Api4\Utils\CoreUtil::getTableName($entity), $id];
+          }
+        }
+      }
+
+
       throw new \Exception('Failed to lookup entity table for custom field.');
     }
     else {
@@ -357,7 +367,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
 
   /**
    * @return array
-   *   Each item has keys 'field_name', 'table_name', 'extends', 'entity_table'
+   *   Each item has keys 'field_name', 'table_name', 'extends', 'data_type', 'fk_entity', 'entity_table'
    */
   public function getCustomFields() {
     $query = \CRM_Core_DAO::executeQuery($this->lookupCustomFieldSql);
@@ -367,6 +377,8 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
         'field_name' => $query->field_name,
         'table_name' => $query->table_name,
         'extends' => $query->extends,
+        'data_type' => $query->data_type,
+        'fk_entity' => $query->fk_entity,
         'entity_table' => CoreUtil::getTableName($query->extends),
       ];
     }
