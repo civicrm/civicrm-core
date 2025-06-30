@@ -414,13 +414,17 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testApiV4DoesNotSchedule(): void {
+    $startRecipients = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_mailing_recipients ORDER BY id')->fetchMap('id', 'id');
+
     $mailing = Mailing::create(FALSE)->setValues(['name' => 'bob', 'scheduled_date' => 'tomorrow'])->execute()->first();
     $jobs = MailingJob::get(FALSE)->execute();
     $this->assertEquals(0, $jobs->rowCount);
     MailingJob::create(FALSE)->setValues([
       'mailing_id' => $mailing['id'],
     ])->execute();
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_mailing_recipients'));
+
+    $endRecipients = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_mailing_recipients ORDER BY id')->fetchMap('id', 'id');
+    $this->assertEquals($startRecipients, $endRecipients, 'In APIv4, basic CRUD for Mailing records should not modify recipients');
   }
 
   /**
