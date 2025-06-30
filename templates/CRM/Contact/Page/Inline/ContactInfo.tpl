@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* data-edit-params to reload this info whenever relationship gets updated *}
-<div id="crm-contactinfo-content" {if $permission EQ 'edit'} class="crm-inline-edit" {/if} data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_ContactInfo"{rdelim}'>
+<div id="crm-contactinfo-content" {if $permission EQ 'edit'} class="crm-inline-edit" {/if} data-dependent-fields='["#crm-contactname-content"]' data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_ContactInfo"{rdelim}'>
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts escape='htmlattribute'}Edit info{/ts}"{/if}>
     {if $permission EQ 'edit'}
     <div class="crm-edit-help">
@@ -45,10 +45,29 @@
         <div class="crm-content crm-contact-sic_code">{$sic_code}</div>
       </div>
       {/if}
+
       <div class="crm-summary-row">
         <div class="crm-label">{ts}Contact Source{/ts}</div>
         <div class="crm-content crm-contact_source">{$source}</div>
       </div>
+
+      {if ($contact_type eq 'Organization') OR ($contact_type eq 'Household')}
+        {if !empty($is_deceased)}
+          {if !empty($deceased_date)}
+          <div class="crm-summary-row">
+            <div class="crm-label">{ts}Date Closed{/ts}</div>
+            <div class="crm-content crm-contact-deceased_date_display">
+                {$deceased_date|crmDate:$date_format}
+            </div>
+          </div>
+          {else}
+          <div class="crm-summary-row">
+            <div class="crm-label"></div>
+            <div class="crm-content crm-contact-deceased_message"><span class="font-red upper">{ts 1=$contact_type}%1 is Closed{/ts}</span></div>
+          </div>
+          {/if}
+        {/if}
+      {/if}
 
     </div>
 </div>

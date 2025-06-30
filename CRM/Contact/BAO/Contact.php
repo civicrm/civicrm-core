@@ -430,7 +430,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
         'is_deceased' => $params['is_deceased'],
         'deceased_date' => $params['deceased_date'] ?? NULL,
       ];
-      CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams, $params['contact_type']);
+      CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams);
     }
 
     return $contact;

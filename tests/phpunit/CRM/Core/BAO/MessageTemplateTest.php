@@ -904,7 +904,7 @@ emo
       '{contact.job_title}' => 'Job Title',
       '{contact.gender_id:label}' => 'Gender',
       '{contact.birth_date}' => 'Birth Date',
-      '{contact.deceased_date}' => 'Deceased Date',
+      '{contact.deceased_date}' => 'Deceased / Closed Date',
       '{contact.employer_id}' => 'Current Employer ID',
       '{contact.is_deleted:label}' => 'Contact is in Trash',
       '{contact.created_date}' => 'Created Date',
