@@ -141,13 +141,11 @@ trait ResultDataTrait {
           $cell->getStyle()->getNumberFormat()->setFormatCode(new Currency($currencySymbol, locale: $numberFormatter->getLocale()));
         }
         elseif ($col['dataType'] === 'Date') {
-          $format = isset($col['format']) ? \Civi::settings()->get($col['format'])
-            : \CRM_Core_Config::singleton()->dateformatFull;
+          $format = \Civi::settings()->get(($col['format'] ?? NULL) ?: 'dateformatFull');
           $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
         }
         elseif ($col['dataType'] === 'Timestamp') {
-          $format = isset($col['format']) ? \Civi::settings()->get($col['format'])
-            : \CRM_Core_Config::singleton()->dateformatDatetime;
+          $format = \Civi::settings()->get(($col['format'] ?? NULL) ?: 'dateformatDatetime');
           $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
         }
       }
