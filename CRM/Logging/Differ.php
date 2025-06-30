@@ -112,14 +112,25 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
             break;
           }
 
+          if (str_contains($table, 'civicrm_value')) {
+            $contactIdClause = "AND entity_id = %3";
+            break;
+          }
+
           // allow tables to be extended by report hook query objects
           list($contactIdClause, $join) = CRM_Report_BAO_Hook::singleton()->logDiffClause($this, $table);
 
           if (empty($contactIdClause)) {
-            $contactIdClause = "AND contact_id = %3";
-          }
-          if (str_contains($table, 'civicrm_value')) {
-            $contactIdClause = "AND entity_id = %3";
+            $contactTables = CRM_Core_DAO::getReferencesToContactTable();
+            if (isset($contactTables[$table]) && in_array('contact_id', $contactTables[$table], TRUE)) {
+              $contactIdClause = "AND contact_id = %3";
+            }
+            else {
+              // Avoid syntax error for nonexistent contact_id column. The
+              // real column is probably meaningless anyway in this context,
+              // e.g. civicrm_batch.created_id
+              return [];
+            }
           }
       }
     }
