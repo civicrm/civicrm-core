@@ -7,6 +7,7 @@ use League\Csv\Writer;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Currency;
 
 trait ResultDataTrait {
 
