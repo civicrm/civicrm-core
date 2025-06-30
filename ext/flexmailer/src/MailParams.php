@@ -45,7 +45,7 @@ class MailParams {
     // pass through as email headers, but there are several special-cases
     // (e.g. 'toName', 'toEmail', 'text', 'html', 'attachments', 'headers').
 
-    $message = new \Mail_mime("\n");
+    $message = new \Mail_mime();
 
     // 1. Consolidate: 'toName' and 'toEmail' should be 'To'.
     $toName = trim($mailParams['toName']);
