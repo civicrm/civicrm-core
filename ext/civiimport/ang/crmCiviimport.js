@@ -205,7 +205,7 @@
         $scope.getDedupeRules = function (selectedEntity) {
           var dedupeRules = [];
           _.each($scope.data.dedupeRules, function (rule) {
-            if (rule.contact_type === selectedEntity) {
+            if (undefined === rule.contact_type || rule.contact_type === selectedEntity) {
               dedupeRules.push({'id': rule.name, 'text': rule.title, 'is_default': rule.used === 'Unsupervised'});
             }
           });
