@@ -43,5 +43,17 @@
       <div class="crm-label">{$form.contact_source.label}</div>
       <div class="crm-content">{$form.contact_source.html}</div>
     </div>
+    {if ($contactType eq 'Organization') OR ($contactType eq 'Household')}
+    <div class="crm-summary-row">
+      <div class="crm-label"></div>
+      <div class="crm-content">{$form.is_deceased.html}{$form.is_deceased.label}</div>
+    </div>
+    <div class="crm-summary-row" id="showDeceasedDate">
+      <div class="crm-label">{$form.deceased_date.label}</div>
+      <div class="crm-content">{$form.deceased_date.html}</div>
+    </div>
+    {/if}
   </div> <!-- end of main -->
 </div>
+
+{include file="CRM/Contact/Form/ShowDeceasedDate.js.tpl"}

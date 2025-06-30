@@ -27,12 +27,25 @@
         {$form.sic_code.label|smarty:nodefaults|purify}<br/>
         {$form.sic_code.html}
       </td>
+    </tr>
+    <tr>
       {if array_key_exists('contact_sub_type', $form)}
         <td>
           {$form.contact_sub_type.label|smarty:nodefaults|purify}<br />
           {$form.contact_sub_type.html}
         </td>
       {/if}
+        <td>
+          {$form.is_deceased.label}<br />
+          {$form.is_deceased.html}
+        </td>
+        <td id="showDeceasedDate">
+          {$form.deceased_date.label}<br />
+          {$form.deceased_date.html}
+        </td>
     </tr>
   {/crmRegion}
 </table>
+
+{include file="CRM/Contact/Form/ShowDeceasedDate.js.tpl"}
+

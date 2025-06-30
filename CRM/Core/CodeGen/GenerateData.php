@@ -767,6 +767,10 @@ class CRM_Core_CodeGen_GenerateData {
       $contact->addressee_id = 2;
       $contact->addressee_display = $contact->display_name;
       $contact->hash = crc32($contact->sort_name);
+      $contact->is_deceased = $this->probability(0.1);
+      if ($contact->is_deceased && $this->probability(.7)) {
+        $contact->deceased_date = $this->randomDate();
+      }
       $this->_update($contact);
     }
   }
@@ -838,6 +842,10 @@ class CRM_Core_CodeGen_GenerateData {
       $org->display_name = $org->sort_name = $org->organization_name;
       $org->addressee_id = 3;
       $org->addressee_display = $org->display_name;
+      $org->is_deceased = $this->probability(0.1);
+      if (org->is_deceased && $this->probability(.7)) {
+        $org->deceased_date = $this->randomDate();
+      }
       $org->hash = crc32($org->sort_name);
       $this->_update($org);
     }
