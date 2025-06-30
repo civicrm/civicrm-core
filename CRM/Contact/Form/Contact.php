@@ -221,7 +221,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
         if ($defaults['is_deceased']) {
-          $displayName .= '  <span class="crm-contact-deceased">(' . ts('deceased') . ')</span>';
+          $displayName .= '  <span class="crm-contact-deceased">(' .
+            ($this->_contactType === 'Individual' ? ts('deceased') : ts('closed')) .
+            ')</span>';
         }
         $displayName = ts('Edit %1', [1 => $displayName]);
 
@@ -996,10 +998,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $params['contact_id'] = $this->_contactId;
     }
 
-    //make deceased date null when is_deceased = false
-    if ($this->_contactType == 'Individual' && !empty($this->_editOptions['Demographics']) && empty($params['is_deceased'])) {
+    //make deceased date empty when is_deceased = false
+    if (($this->_contactType == 'Individual' && !empty($this->_editOptions['Demographics']) && empty($params['is_deceased']))
+      || ((($this->_contactType == 'Organization') || ($this->_contactType == 'Household')) && empty($params['is_deceased']))) {
       $params['is_deceased'] = FALSE;
-      $params['deceased_date'] = NULL;
+      $params['deceased_date'] = '';
     }
 
     // action is taken depending upon the mode

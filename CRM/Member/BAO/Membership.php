@@ -2357,22 +2357,16 @@ WHERE {$whereClause}";
    *  - is_deceased
    *  - deceased_date
    *
-   * @param string $contactType
-   *
    * @return null|string
    *   $updateMembershipMsg string  status message for updated membership.
    */
-  public static function updateMembershipStatus($deceasedParams, $contactType) {
+  public static function updateMembershipStatus($deceasedParams) {
     $updateMembershipMsg = NULL;
     $contactId = $deceasedParams['contact_id'];
     $deceasedDate = $deceasedParams['deceased_date'];
 
     // process to set membership status to deceased for both active/inactive membership
-    if ($contactId &&
-      $contactType === 'Individual' &&
-      !empty($deceasedParams['is_deceased'])
-    ) {
-
+    if ($contactId && !empty($deceasedParams['is_deceased'])) {
       $userId = CRM_Core_Session::getLoggedInContactID() ?: $contactId;
 
       // get deceased status id

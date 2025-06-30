@@ -42,6 +42,8 @@ class CRM_Contact_Form_Edit_Household {
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addField('nick_name');
+      $form->addField('is_deceased', ['entity' => 'contact', 'label' => ts('Household is Closed')]);
+      $form->addField('deceased_date', ['entity' => 'contact', 'label' => ts('Closed Date')], FALSE, FALSE);
       $form->addField('contact_source', ['label' => ts('Contact Source')]);
     }
 

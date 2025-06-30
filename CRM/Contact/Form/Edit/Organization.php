@@ -48,6 +48,10 @@ class CRM_Contact_Form_Edit_Organization {
 
       // sic_code
       $form->addField('sic_code', ['title' => ts('SIC Code')]);
+
+      $form->addField('is_deceased', ['entity' => 'contact', 'label' => ts('Organization is Closed')]);
+      $form->addField('deceased_date', ['entity' => 'contact', 'label' => ts('Closed Date')], FALSE, FALSE);
+
       $form->addField('contact_source');
     }
 
