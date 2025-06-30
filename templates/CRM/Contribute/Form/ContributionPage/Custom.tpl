@@ -14,14 +14,16 @@
 </div>
     <table class="form-layout-compressed">
     <tr class="crm-contribution-contributionpage-custom-form-block-custom_pre_id">
-       <td class="label">{$form.custom_pre_id.label}</td>
+       <td class="label">{$form.custom_pre_id.label} {help id="contrib-profile-top"}</td>
        <td class="html-adjust">{$form.custom_pre_id.html}
-          <span class="description">{ts}Profile to be included above the billing information (but after the introductory message, amounts, and honoree section).{/ts}</span>
-          </td>
+         <a target="_blank" href="{crmURL p="civicrm/admin/uf/group" q="reset=1"}" class="crm-option-edit-link crm-hover-button" target="_blank">{icon icon="fa-wrench"}{ts}Manage Profiles{/ts}{/icon}</a>
+       </td>
     </tr>
     <tr class="crm-contribution-contributionpage-custom-form-block-custom_post_id">
-       <td class="label">{$form.custom_post_id.label}</td>
-       <td class="html-adjust">{$form.custom_post_id.html}</td>
+       <td class="label">{$form.custom_post_id.label} {help id="contrib-profile-bottom"}</td>
+       <td class="html-adjust">{$form.custom_post_id.html}
+         <a target="_blank" href="{crmURL p="civicrm/admin/uf/group" q="reset=1"}" class="crm-option-edit-link crm-hover-button" target="_blank">{icon icon="fa-wrench"}{ts}Manage Profiles{/ts}{/icon}</a>
+       </td>
     </tr>
 </table>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
