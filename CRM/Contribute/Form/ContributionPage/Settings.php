@@ -165,7 +165,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       ];
     }
 
-    $allowCoreTypes = array_merge($coreTypes, CRM_Contact_BAO_ContactType::subTypes('Organization'));
+    $allowCoreTypes = array_merge(['Organization'], CRM_Contact_BAO_ContactType::subTypes('Organization'));
     $allowSubTypes = [];
 
     $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);

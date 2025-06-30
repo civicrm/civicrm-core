@@ -61,10 +61,9 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
       $allowCoreTypes[] = 'Membership';
       $allowSubTypes['MembershipType'] = explode(',', $member['membership_types']);
     }
-    //CRM-15427
-    $this->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
-    $this->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
 
+    $this->addProfileSelector('custom_pre_id', ts('Top Profile Fields'), $allowCoreTypes, $allowSubTypes, $entities);
+    $this->addProfileSelector('custom_post_id', ts('Bottom Profile Fields'), $allowCoreTypes, $allowSubTypes, $entities);
     $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Custom', 'formRule'], $this);
 
     parent::buildQuickForm();
