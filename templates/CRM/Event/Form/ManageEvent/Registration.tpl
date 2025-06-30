@@ -14,9 +14,9 @@
   <td>
     {if $addProfileBottomAdd}{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].html}
     {else}{$form.custom_post_id_multiple[$profileBottomNum].html}{/if}
+    <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
     <span class='profile_bottom_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile" data-addtlPartc="{$addProfileBottomAdd}"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}</a></span>
-    <span class='profile_bottom_link'>&nbsp;<a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile (bottom of page){/ts}</a></span>
-    <br/><span class="profile-links"></span>
+    <p class='profile_bottom_link'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
   </td>
 {else}
 {assign var=eventID value=$id}
@@ -115,14 +115,16 @@
     </table>
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-custom_pre_id">
-        <td scope="row" class="label" width="20%">{$form.custom_pre_id.label} {help id="event-profile"}</td>
-        <td>{$form.custom_pre_id.html}</td>
+        <td class="label">{$form.custom_pre_id.label} {help id="event-profile"}</td>
+        <td class="html-adjust">{$form.custom_pre_id.html}
+          <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
+        </td>
       </tr>
       <tr id="profile_post" class="crm-event-manage-registration-form-block-custom_post_id">
-        <td scope="row" class="label" width="20%">{$form.custom_post_id.label}</td>
-        <td>{$form.custom_post_id.html}
-          <span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile (bottom of page){/ts}</a></span>
-          <br/>
+        <td class="label">{$form.custom_post_id.label} {help id="event-profile-bottom"}</td>
+        <td class="html-adjust">{$form.custom_post_id.html}
+          <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
+          <p class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
         </td>
       </tr>
 
@@ -130,22 +132,19 @@
         {foreach from=$profilePostMultiple item=profilePostId key=profilePostNum name=profilePostIdName}
           <tr id="custom_post_id_multiple_{$profilePostNum}_wrapper"
               class='crm-event-manage-registration-form-block-custom_post_multiple'>
-            <td scope="row" class="label" width="20%">{$form.custom_post_id_multiple.$profilePostNum.label}</td>
-            <td>{$form.custom_post_id_multiple.$profilePostNum.html}
-              &nbsp;
+            <td class="label">{$form.custom_post_id_multiple.$profilePostNum.label}</td>
+            <td class="html-adjust">{$form.custom_post_id_multiple.$profilePostNum.html}
               <span class='profile_bottom_link_remove'>
                 <a href="#" class="crm-hover-button crm-button-rem-profile">
                   <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}
                 </a>
               </span>
-              &nbsp;&nbsp;
-              <span class='profile_bottom_link' {if !$smarty.foreach.profilePostIdName.last} style="display: none"{/if}>
+              <p class='profile_bottom_link'{if !$smarty.foreach.profilePostIdName.last} style="display: none"{/if}>
                 <a href="#" class="crm-hover-button crm-button-add-profile">
                   <i class="crm-i fa-plus-circle" aria-hidden="true"></i>
-                  {ts}add another profile (bottom of page){/ts}
+                  {ts}add another profile{/ts}
                 </a>
-              </span>
-              <br/><span class="profile-links"></span>
+              </p>
             </td>
           </tr>
         {/foreach}
@@ -155,36 +154,33 @@
       <tr id="additional_profile_pre" class="crm-event-manage-registration-form-block-additional_custom_pre_id">
         <td scope="row" class="label" width="20%">{$form.additional_custom_pre_id.label}</td>
         <td>{$form.additional_custom_pre_id.html}
-          <span class="profile-links"></span>
+          <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
         </td>
       </tr>
       <tr id="additional_profile_post" class="crm-event-manage-registration-form-block-additional_custom_post_id">
         <td scope="row" class="label" width="20%">{$form.additional_custom_post_id.label}</td>
         <td>{$form.additional_custom_post_id.html}
-          <span class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile (bottom of page){/ts}</a></span>
-          <br/><span class="profile-links"></span>
+          <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
+          <p class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
         </td>
       </tr>
       {if $profilePostMultipleAdd}
         {foreach from=$profilePostMultipleAdd item=profilePostIdA key=profilePostNumA name=profilePostIdAName}
           <tr id='additional_custom_post_id_multiple_{$profilePostNumA}_wrapper'
               class='crm-event-manage-registration-form-block-additional_custom_post_multiple'>
-            <td scope="row" class="label"
-                width="20%">{$form.additional_custom_post_id_multiple.$profilePostNumA.label}</td>
-            <td>{$form.additional_custom_post_id_multiple.$profilePostNumA.html}
-              &nbsp;
+            <td class="label">{$form.additional_custom_post_id_multiple.$profilePostNumA.label}</td>
+            <td class="html-adjust">{$form.additional_custom_post_id_multiple.$profilePostNumA.html}
               <span class='profile_bottom_add_link_remove'>
                 <a href="#" class="crm-hover-button crm-button-rem-profile">
                   <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}
                 </a>
               </span>
-              <span class='profile_bottom_add_link' {if !$smarty.foreach.profilePostIdAName.last} style="display: none"{/if}>
+              <p class='profile_bottom_add_link'{if !$smarty.foreach.profilePostIdAName.last} style="display: none"{/if}>
                 <a href="#" class="crm-hover-button crm-button-add-profile">
                   <i class="crm-i fa-plus-circle" aria-hidden="true"></i>
-                  {ts}add another profile (bottom of page){/ts}
+                  {ts}add another profile{/ts}
                 </a>
-              </span>
-              <br/><span class="profile-links"></span>
+              </p>
             </td>
           </tr>
         {/foreach}
@@ -202,7 +198,7 @@
       <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
         <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
         <td>{$form.is_confirm_enabled.html}
-          <div class="description">{ts}Optionally hide the confirmation screen for free events.{/ts}</div>
+          <div class="description">{ts}The confirmation screen is optional for free events.{/ts}</div>
         </td>
       </tr>
     </table>
@@ -341,8 +337,8 @@ invert              = 0
 {include file="CRM/common/buildProfileLink.tpl"}
 
 <script type="text/javascript">
-{literal}    (function($, _) { // Generic Closure
-
+{literal}
+(function($, _) {
     $(".crm-submit-buttons button").click( function() {
       $(".dedupenotify .ui-notify-close").click();
     });
@@ -350,16 +346,17 @@ invert              = 0
     var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
     var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
 
-    function addBottomProfile( e ) {
+    function addBottomProfile(e) {
         var urlPath;
         e.preventDefault();
 
         var addtlPartc = $(this).data('addtlPartc');
 
-        if ($(this).closest("td").children("input").attr("name").indexOf("additional_custom_post") > -1 || addtlPartc) {
+        if ($(this).closest("td").children("select").attr("name").indexOf("additional_custom_post") > -1 || addtlPartc) {
             profileBottomCountAdd++
             urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottomAdd: 1, addProfileNumAdd: profileBottomCountAdd, snippet: 4 } ) ;
-        } else {
+        }
+        else {
             profileBottomCount++;
             urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottom: 1 , addProfileNum : profileBottomCount, snippet: 4 } ) ;
         }
@@ -371,10 +368,9 @@ invert              = 0
         $el.find(".profile_bottom_link_main, .profile_bottom_link, .profile_bottom_add_link_main").show();
     }
 
-    function removeBottomProfile( e ) {
+    function removeBottomProfile(e) {
         e.preventDefault();
-
-        $(e.target).closest('tr').hide().find('.crm-profile-selector').val('');
+        $(e.target).closest('tr').hide().find('select').val('');
         $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main,tr:visible:last .profile_bottom_add_link, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
@@ -396,8 +392,7 @@ invert              = 0
         });
     });
 
-$(function($) {
-
+  $(function($) {
     var allow_multiple = $("#is_multiple_registrations");
     if ( !allow_multiple.prop('checked') ) {
         $('#additional_profile_pre,#additional_profile_post,#id-max-additional-participants').hide();
@@ -442,9 +437,8 @@ $(function($) {
             }
         });
     });
-
-}); // END onReady
-}(CRM.$, CRM._)); //Generic Closure
+  });
+}(CRM.$, CRM._));
 {/literal}
 </script>
 {/if}
