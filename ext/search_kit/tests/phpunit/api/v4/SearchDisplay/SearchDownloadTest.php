@@ -3,6 +3,8 @@ namespace api\v4\SearchDisplay;
 
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Api4\Event;
+use Civi\Api4\OptionValue;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -175,15 +177,14 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
   /**
    * Test downloading xlsx format.
    */
-  public function testDownloadXlsx(): void {
+  public function testDownloadXlsxContact(): void {
     $cid = Contact::create(FALSE)
       ->setValues([
+        'first_name' => 'Test',
         'birth_date' => '2020-05-23',
         'do_not_email' => FALSE,
         'do_not_mail' => TRUE,
       ])->execute()->single()['id'];
-    // API doesn't allow to set created_date.
-    \CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET created_date = "2025-05-23 01:02:03" WHERE id = ' . $cid);
 
     $params = [
       'checkPermissions' => FALSE,
@@ -209,9 +210,9 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
             ],
             [
               'type' => 'field',
-              'key' => 'created_date',
-              'dataType' => 'Timestamp',
-              'label' => 'Created Date',
+              'key' => 'first_name',
+              'dataType' => 'String',
+              'label' => 'First Name',
             ],
             [
               'type' => 'field',
@@ -263,10 +264,9 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('A2')->getDataType());
       static::assertSame('General', $sheet->getCell('A2')->getStyle()->getNumberFormat()->getFormatCode());
 
-      static::assertSame('Created Date', $sheet->getCell('B1')->getValue());
-      static::assertSame(45800.043090278, $sheet->getCell('B2')->getValue());
-      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('B2')->getDataType());
-      static::assertSame('mmmm d, yyyy  h:mm AM/PM', $sheet->getCell('B2')->getStyle()->getNumberFormat()->getFormatCode());
+      static::assertSame('First Name', $sheet->getCell('B1')->getValue());
+      static::assertSame('Test', $sheet->getCell('B2')->getValue());
+      static::assertSame(DataType::TYPE_STRING, $sheet->getCell('B2')->getDataType());
 
       static::assertSame('Birth Date', $sheet->getCell('C1')->getValue());
       static::assertSame(43974.0, $sheet->getCell('C2')->getValue());
@@ -280,6 +280,122 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       static::assertSame('Do Not Mail (rewrite)', $sheet->getCell('E1')->getValue());
       static::assertSame('rewrite: 1', $sheet->getCell('E2')->getValue());
       static::assertSame(DataType::TYPE_STRING, $sheet->getCell('E2')->getDataType());
+    }
+    finally {
+      unlink($tmpFile);
+    }
+  }
+
+  /**
+   * Test downloading xlsx format.
+   */
+  public function testDownloadXlsxEvent(): void {
+    $eventTypeId = OptionValue::create(FALSE)
+      ->setValues([
+        'option_group_id.name' => 'event_type',
+        'name' => 'test',
+        'label' => 'test',
+      ])
+      ->execute()->single()['value'];
+    $eventId = Event::create(FALSE)
+      ->setValues([
+        'title' => 'test',
+        'event_type_id' => $eventTypeId,
+        'start_date' => '2020-05-23',
+        'end_date' => '2020-05-24 01:02:03',
+        'min_initial_amount' => 1.23,
+      ])->execute()->single()['id'];
+    // API doesn't allow to set created_date.
+    \CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET created_date = "2025-05-23 01:02:03" WHERE id = ' . $eventId);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'xlsx',
+      'savedSearch' => [
+        'api_entity' => 'Event',
+        'api_params' => [
+          'version' => 4,
+          'where' => [['id', '=', $eventId]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'test',
+        'settings' => [
+          'actions' => TRUE,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'dataType' => 'Integer',
+              'label' => 'Event ID',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'start_date',
+              'dataType' => 'Timestamp',
+              'label' => 'Start Date',
+              // Use default format.
+              'format' => '',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'end_date',
+              'dataType' => 'Timestamp',
+              'label' => 'End Date',
+              'format' => 'dateformatshortdate',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'min_initial_amount',
+              'dataType' => 'Money',
+              'label' => 'Minimum Initial Amount',
+            ],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    ob_start();
+    try {
+      civicrm_api4('SearchDisplay', 'download', $params);
+      static::fail();
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      // All good, we expected the api to exit
+    }
+
+    $xlsx = ob_get_clean();
+    $tmpFile = tempnam(sys_get_temp_dir(), 'SearchDownloadTestXslx');
+    try {
+      file_put_contents($tmpFile, $xlsx);
+      $reader = IOFactory::createReader('Xlsx');
+      $spreadsheet = $reader->load($tmpFile);
+      $sheet = $spreadsheet->getSheet(0);
+
+      static::assertSame(2, $sheet->getHighestRow());
+      static::assertSame('D', $sheet->getHighestColumn());
+
+      static::assertSame('Event ID', $sheet->getCell('A1')->getValue());
+      static::assertSame($eventId, $sheet->getCell('A2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('A2')->getDataType());
+      static::assertSame('General', $sheet->getCell('A2')->getStyle()->getNumberFormat()->getFormatCode());
+
+      static::assertSame('Start Date', $sheet->getCell('B1')->getValue());
+      static::assertSame(43974.0, $sheet->getCell('B2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('B2')->getDataType());
+      static::assertSame('mmmm d, yyyy  h:mm AM/PM', $sheet->getCell('B2')->getStyle()->getNumberFormat()->getFormatCode());
+
+      static::assertSame('End Date', $sheet->getCell('C1')->getValue());
+      static::assertSame(43975.043090278, $sheet->getCell('C2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('C2')->getDataType());
+      static::assertSame('mm/dd/yyyy', $sheet->getCell('C2')->getStyle()->getNumberFormat()->getFormatCode());
+
+      static::assertSame('Minimum Initial Amount', $sheet->getCell('D1')->getValue());
+      static::assertSame(1.23, $sheet->getCell('D2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('D2')->getDataType());
+      static::assertSame('[$$-en-US]#,##0.00', $sheet->getCell('D2')->getStyle()->getNumberFormat()->getFormatCode());
     }
     finally {
       unlink($tmpFile);
