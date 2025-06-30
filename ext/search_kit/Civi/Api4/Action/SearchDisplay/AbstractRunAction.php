@@ -1147,6 +1147,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $result = [
         'entity' => $field['entity'],
         'input_type' => $field['input_type'],
+        'input_attrs' => $field['input_attrs'],
         'data_type' => $field['data_type'],
         'options' => $field['options'],
         'serialize' => !empty($field['serialize']),
