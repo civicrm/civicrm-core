@@ -21,12 +21,37 @@ use Civi\Api4\Utils\CoreUtil;
  * @service
  * @internal
  */
-class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
+
+    if ($spec->getValue('contact_type') === 'Individual') {
+      $spec->getFieldByName('is_deceased')
+        ->setTitle(ts('Is Deceased'))
+        ->setLabel(ts('Deceased'));
+      $spec->getFieldByName('deceased_date')
+        ->setTitle(ts('Deceased Date'))
+        ->setLabel(ts('Deceased Date'))
+        ->setDescription(ts('Date deceased'));
+    }
+    if ($spec->getValue('contact_type') === 'Household' || $spec->getValue('contact_type') === 'Organization') {
+      $spec->getFieldByName('is_deceased')
+        ->setTitle(ts('Is Closed'))
+        ->setLabel(ts('Closed'));
+      $spec->getFieldByName('deceased_date')
+        ->setTitle(ts('Closed Date'))
+        ->setLabel(ts('Closed Date'))
+        ->setDescription(ts('Date closed or disbanded'));
+    }
+
+    // All other fields in this file are specific to the `get` action.
+    if ($spec->getAction() !== 'get') {
+      return;
+    }
+
     // Groups field
     $field = new FieldSpec('groups', $spec->getEntity(), 'Array');
     $field->setLabel(ts('In Groups'))
@@ -137,7 +162,7 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    */
   public function applies($entity, $action) {
     // Applies to 'Contact' plus pseudo-entities 'Individual', 'Organization', 'Household'
-    return CoreUtil::isContact($entity) && $action === 'get';
+    return CoreUtil::isContact($entity);
   }
 
   /**
