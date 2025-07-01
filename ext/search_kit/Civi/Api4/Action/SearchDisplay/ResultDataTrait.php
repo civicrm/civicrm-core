@@ -135,16 +135,16 @@ trait ResultDataTrait {
         $cell = $sheet->getCell([$colNum + 1, $rowNum + 2]);
         $cell->setValue($this->formatColumnValue($col, $value));
 
-        if ($col['dataType'] === 'Money') {
+        if ($value['dataType'] === 'Money') {
           $numberFormatter = new \NumberFormatter($moneyLocale . '@currency=' . $value['val']['currency'], \NumberFormatter::CURRENCY);
           $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
           $cell->getStyle()->getNumberFormat()->setFormatCode(new Currency($currencySymbol, locale: $numberFormatter->getLocale()));
         }
-        elseif ($col['dataType'] === 'Date') {
+        elseif ($value['dataType'] === 'Date') {
           $format = \Civi::settings()->get(($col['format'] ?? NULL) ?: 'dateformatFull');
           $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
         }
-        elseif ($col['dataType'] === 'Timestamp') {
+        elseif ($value['dataType'] === 'Timestamp') {
           $format = \Civi::settings()->get(($col['format'] ?? NULL) ?: 'dateformatDatetime');
           $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
         }
@@ -167,15 +167,11 @@ trait ResultDataTrait {
     $val = $value['val'];
 
     if (!in_array($this->format, ['array', 'csv'], TRUE)) {
-      if ($col['rewrite']) {
-        return $val;
-      }
-
-      if ($col['dataType'] === 'Money') {
+      if ($value['dataType'] === 'Money') {
         return $val['value'];
       }
 
-      if (($col['dataType'] === 'Date' || $col['dataType'] === 'Timestamp') && ($val !== NULL)) {
+      if (($value['dataType'] === 'Date' || $value['dataType'] === 'Timestamp') && ($val !== NULL)) {
         return Date::stringToExcel($val);
       }
     }
