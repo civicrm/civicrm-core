@@ -53,7 +53,8 @@ trait CRM_Custom_Form_CustomDataTrait {
     // Reuse the same spec-gatherer from Api4.getFields
     $spec = new \Civi\Api4\Service\Spec\RequestSpec($entity, 'create', $filters);
     $fieldFilters = Civi::service('spec_gatherer')->getCustomGroupFilters($spec);
-    if ($fieldFilters === NULL) {
+    // dev/issue#5943 : ignore rebuilding custom fields when the form is submitted for deletion
+    if ($fieldFilters === NULL || ($this->_action & CRM_Core_Action::DELETE)) {
       return;
     }
     // Api4 normally filters out multivalued groups but forms include them
