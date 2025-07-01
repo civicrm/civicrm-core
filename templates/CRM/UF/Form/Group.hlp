@@ -15,20 +15,27 @@
 {/htxt}
 
 {htxt id='id-used_for-title'}
-  {ts}Used For{/ts}
+  {ts}Expose To{/ts}
 {/htxt}
 {htxt id='id-used_for'}
 {ts}Profiles can be used in many different ways (and a single profile can be used in multiple contexts){/ts}:<br />
     <ul class="left-alignment">
-    <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Used For" checkboxes.{/ts}</li>
-    <li>{ts}Check <strong>Standalone Form or Directory</strong> if you want it to use this profile for custom forms, or contact listing and view screens (from the civicrm/profile path).{/ts}</li>
-    <li>{ts}Check <strong>Search Results</strong> to use this profile to display an alternate set of results columns for CiviCRM Basic and Advanced Search.{/ts}</li>
+    <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Exposed To" checkboxes.{/ts}</li>
+    <li>{ts}Check <strong>Standalone Form</strong> if you want it to use this profile for custom forms. If the Legacy Profiles extension is enabled, it can also be used for listings.{/ts} {ts}These features are being phased out in favor of FormBuilder and SearchKit.{/ts}</li>
+    <li>{ts}Check <strong>Advanced Search Display Columns</strong> to use this profile to display an alternate set of results columns for the Basic or Advanced Search.{/ts} {ts}The default profile can be selected under Administer > Customize Data and Screens > Search Preferences. The Advanced Search also allows users to select a different profile under the Search Settings on that form.{/ts}</li>
     {if $config->userSystem->supports_form_extensions EQ '1'}
         <li>{ts}Check <strong>User Registration</strong> if you want this Profile to be included in the New Account registration form.{/ts}</li>
         <li>{ts}Check <strong>View/Edit User Account</strong> to include it in the view and edit screens for existing user accounts.{/ts}</li>
     {/if}
     </ul>
     {docURL page="user/organising-your-data/profiles/"}
+{/htxt}
+
+{htxt id='id-used_for_extra-title'}
+  {ts}Used in Forms{/ts}
+{/htxt}
+{htxt id='id-used_for_extra'}
+  <p>{ts}Other forms or extensions that use this profile. When possible, it also lists the ID of that form.{/ts}</p>
 {/htxt}
 
 {htxt id='id-profile_weight-title'}
