@@ -105,6 +105,7 @@ class Admin {
       'NOT BETWEEN' => E::ts('Not Between'),
       'IS EMPTY' => E::ts('Is Empty'),
       'IS NOT EMPTY' => E::ts('Not Empty'),
+      'IS NOT NULL' => E::ts('Any value'),
     ];
   }
 
