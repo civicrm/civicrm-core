@@ -414,7 +414,7 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
         CRM_Core_Action::ADD => 'add',
         CRM_Core_Action::DELETE => 'delete',
       ];
-      $action = $context === 'search' ? CRM_Core_Action::VIEW : CRM_Core_Action::ADD;
+      $action = ($context === 'search' || $params['is_view']) ? CRM_Core_Action::VIEW : CRM_Core_Action::ADD;
       $cacheKey = 'available_types_' . $context;
       if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
         foreach ($options as $finTypeId => $option) {
