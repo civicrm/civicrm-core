@@ -4923,7 +4923,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       'is_deceased' => [],
       'deceased_date' => [
-        'title' => ts('Deceased Date'),
+        'title' => ts('Deceased / Closed Date'),
       ],
       'job_title' => [
         'title' => ts('Contact Job title'),
@@ -4996,7 +4996,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'type' => CRM_Utils_Type::T_DATE,
       ],
       'is_deceased' => [
-        'title' => ts('Deceased'),
+        'title' => ts('Deceased / Closed'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'default' => $defaults['deceased'] ?? 0,
       ],
@@ -5615,7 +5615,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'is_deceased' => [
-        'title' => $options['prefix_label'] . ts('Is deceased'),
+        'title' => $options['prefix_label'] . ts('Is deceased / closed'),
         'name' => 'is_deceased',
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'is_fields' => FALSE,

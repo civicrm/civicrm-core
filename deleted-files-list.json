@@ -595,6 +595,7 @@
     "Civi/Api4/Service/Spec/Provider/CaseCreationSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/CaseTypeGetSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/ContactCreationSpecProvider.php",
+    "Civi/Api4/Service/Spec/Provider/ContactGetSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/ContributionCreationSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/ContributionGetSpecProvider.php",
     "Civi/Api4/Service/Spec/Provider/ContributionRecurCreationSpecProvider.php",
