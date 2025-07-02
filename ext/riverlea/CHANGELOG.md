@@ -1,7 +1,19 @@
+1.4.6-6.4
+ - FIXED - multiuple issues on Contact Summary inline-edit resolved and improved (https://github.com/civicrm/civicrm-core/pull/32936)
+ - FIXED - multiple input-size modifiers (ie .four) that weren't loading, now do (https://github.com/civicrm/civicrm-core/pull/32942), 6.3 port
+ - FIXED - multiple issues with rendering of ol & ul lists (https://github.com/civicrm/civicrm-core/pull/32934), 6.3 port
+ - FIXED - clipping of dropdown-menus on SearchKit Table displays (https://github.com/civicrm/civicrm-core/pull/33016)
+ - FIXED - regressions of Bootstrap's btn-block and panel-body, an issue in deduper extension (https://github.com/civicrm/civicrm-core/pull/33023)
+ - FIXED - layout issues with other link on SearchKit admin table (https://github.com/civicrm/civicrm-core/pull/32975)
+ - FIXED - typo on CSS variable name preventing padding between multiple accordions (https://github.com/civicrm/civicrm-core/pull/32969)
+ - FIXED - reverted details fix that had some CMS issues (https://github.com/civicrm/civicrm-core/pull/32959)
+
 1.4.5-6.3beta
- - RESOLVED 'text-danger' in FormBuilder drop-down to cover tabset dropdown 'delete tab'.
+ - FIXED 'text-danger' in FormBuilder drop-down to cover tabset dropdown 'delete tab'.
  - CHANGED restored internal scrolling in FormBuilder for each panel to support longer forms (https://lab.civicrm.org/extensions/riverlea/-/issues/114)
  - ADDED CSS VARIABLE '--crm-panel-head-height' to handle different stream panel head / tab-bar heights for the internal scrolling calculation.
+ - FIXED - close icon on community message floating left not right (https://github.com/civicrm/civicrm-core/pull/32821)
+ - FIXED - recentres' spinning Civi logo (https://github.com/civicrm/civicrm-core/pull/32819) from 1.4.4.
 
 1.4.4-6.3alpha
  - FIXED inline checkbox regression (https://lab.civicrm.org/extensions/riverlea/-/merge_requests/51) ht @yashodha
@@ -9,6 +21,7 @@
  - FIXED invisible select2 selected item when in a dropdown (ref https://lab.civicrm.org/dev/core/-/issues/5870)
  - FIXED PrettyPrint code blocks: restored indents lost in 1.3.8-6.0alpha change.
  - FIXED ol.linenums line-numbering restored.
+ - CHANGED improved contrast of tag check-boxes (https://github.com/civicrm/civicrm-core/pull/32810).
 
 1.4.3-6.2alpha
 This release makes a series of changes to how emphasis colours (ie primary/success/info/etc) are handled across RiverLea. The main changes:
