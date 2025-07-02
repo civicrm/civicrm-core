@@ -72,6 +72,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected array $_response = [];
 
   /**
+   * Line items gathered from entities on the form - for payment processing
+   *
+   * @var array[]
+   */
+  protected array $_lineItems = [];
+
+  /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws \CRM_Core_Exception
    */
@@ -742,6 +749,22 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   public function setResponseItem(string $key, $value): void {
     $this->_response[$key] = $value;
+  }
+
+  /**
+   * Retrieve stashed line items
+   * @return array
+   */
+  public function getLineItems(): array {
+    return $this->_lineItems;
+  }
+
+  /**
+   * Stash line items from across form entities
+   * @param array $lineItem
+   */
+  public function addLineItem(array $lineItem): void {
+    $this->_lineItems[] = $lineItem;
   }
 
   /**
