@@ -65,7 +65,6 @@ return [
             [
               'type' => 'field',
               'key' => 'username',
-              'dataType' => 'String',
               'label' => E::ts('Username'),
               'sortable' => TRUE,
               'link' => [
@@ -78,21 +77,18 @@ return [
             [
               'type' => 'field',
               'key' => 'uf_name',
-              'dataType' => 'String',
               'label' => E::ts('Email'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'roles:label',
-              'dataType' => 'String',
               'label' => E::ts('Roles'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contact_id.display_name',
-              'dataType' => 'String',
               'label' => E::ts('Linked Contact'),
               'sortable' => TRUE,
               'link' => [
@@ -105,7 +101,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -113,14 +108,12 @@ return [
             [
               'type' => 'field',
               'key' => 'when_created',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Created'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'when_last_accessed',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Last Accessed'),
               'sortable' => TRUE,
             ],

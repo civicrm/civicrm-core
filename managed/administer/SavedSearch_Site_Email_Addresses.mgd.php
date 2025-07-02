@@ -61,35 +61,30 @@ return [
             [
               'type' => 'field',
               'key' => 'display_name',
-              'dataType' => 'String',
               'label' => ts('Display Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'email',
-              'dataType' => 'String',
               'label' => ts('Email'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
-              'dataType' => 'Text',
               'label' => ts('Description'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => ts('Enabled'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_default',
-              'dataType' => 'Boolean',
               'label' => ts('Default'),
               'sortable' => TRUE,
               'icons' => [

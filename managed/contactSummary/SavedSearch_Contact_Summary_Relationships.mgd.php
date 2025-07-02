@@ -143,7 +143,6 @@ return [
             [
               'type' => 'field',
               'key' => 'near_relation:label',
-              'dataType' => 'String',
               'label' => ts('Relationship'),
               'sortable' => TRUE,
               'icons' => [
@@ -156,7 +155,6 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.display_name',
-              'dataType' => 'String',
               'label' => ts('With'),
               'sortable' => TRUE,
               'icons' => [
@@ -185,7 +183,6 @@ return [
             [
               'type' => 'field',
               'key' => 'start_date',
-              'dataType' => 'Date',
               'label' => ts('Dates'),
               'sortable' => TRUE,
               'rewrite' => '[start_date] - [end_date]',
@@ -193,21 +190,18 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.address_primary.city',
-              'dataType' => 'String',
               'label' => ts('City'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.address_primary.state_province_id:label',
-              'dataType' => 'Integer',
               'label' => ts('State/Prov'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.email_primary.email',
-              'dataType' => 'String',
               'label' => ts('Email'),
               'sortable' => TRUE,
               'icons' => [
@@ -225,7 +219,6 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.phone_primary.phone',
-              'dataType' => 'String',
               'label' => ts('Phone'),
               'sortable' => TRUE,
               'icons' => [
@@ -304,7 +297,6 @@ return [
             [
               'type' => 'field',
               'key' => 'near_relation:label',
-              'dataType' => 'String',
               'label' => ts('Relationship'),
               'sortable' => TRUE,
               'icons' => [
@@ -317,7 +309,6 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.display_name',
-              'dataType' => 'String',
               'label' => ts('With'),
               'sortable' => TRUE,
               'icons' => [
@@ -346,7 +337,6 @@ return [
             [
               'type' => 'field',
               'key' => 'start_date',
-              'dataType' => 'Date',
               'label' => ts('Dates'),
               'sortable' => TRUE,
               'rewrite' => '[start_date] - [end_date]',
@@ -354,21 +344,18 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.address_primary.city',
-              'dataType' => 'String',
               'label' => ts('City'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.address_primary.state_province_id:label',
-              'dataType' => 'Integer',
               'label' => ts('State/Prov'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.email_primary.email',
-              'dataType' => 'String',
               'label' => ts('Email'),
               'sortable' => TRUE,
               'icons' => [
@@ -386,7 +373,6 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.phone_primary.phone',
-              'dataType' => 'String',
               'label' => ts('Phone'),
               'sortable' => TRUE,
               'icons' => [

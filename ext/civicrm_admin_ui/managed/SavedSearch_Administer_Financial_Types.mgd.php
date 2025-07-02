@@ -100,14 +100,12 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
-              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -115,14 +113,12 @@ return [
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_FinancialType_EntityFinancialAccount_FinancialAccount_01_name',
-              'dataType' => 'String',
               'label' => E::ts('Financial Accounts'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_deductible',
-              'dataType' => 'Boolean',
               'label' => E::ts('Tax-Deductible'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -130,7 +126,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -138,7 +133,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_reserved',
-              'dataType' => 'Boolean',
               'label' => E::ts('Reserved'),
               'sortable' => TRUE,
               'editable' => TRUE,
