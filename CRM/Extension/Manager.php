@@ -730,7 +730,6 @@ class CRM_Extension_Manager {
     if ($dao->find(TRUE)) {
       try {
         CRM_Core_BAO_Extension::deleteRecord(['id' => $dao->id]);
-        CRM_Core_Session::setStatus(ts('Selected option value has been deleted.'), ts('Deleted'), 'success');
       }
       catch (CRM_Core_Exception $e) {
         throw new CRM_Extension_Exception("Failed to remove extension entry $dao->id");
