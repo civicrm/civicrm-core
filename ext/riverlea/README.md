@@ -151,6 +151,11 @@ function ocean_civicrm_themes(&$themes) {
   );
 }
 
+If you want to include your own styles in addition to variables, you can include a civicrm.css in your subtheme in the same directory as _variables.css. However, you'll need to:
+
+1. Include the Riverlea civicrm.css in your civicrm.css: ```@import url(/path/to/your/ext/riverlea/core/css/civicrm.css);```
+2. Change the search order, as show above, to place your subtheme before ```_riverlea_core_```.
+
 ## Troubleshooting
 - Unless you really need it (e.g. applying an urgent fix, or running a test), delete the custom/ext version of RiverLea, once you are on CiviCRM 5.80 or later.
 - After removing the custom/ext RiverLea directory, the civicrm/ext version should load automatically. It may appear to be enabled, but normally you will need to disable and re-enable it before RiverLea streams appear in Display Settings.
