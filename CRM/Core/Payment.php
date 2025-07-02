@@ -2004,4 +2004,39 @@ abstract class CRM_Core_Payment {
       ];
     }
   }
+
+  /**
+   * Get a map between Api4 field keys on the contribution record and payment params
+   * used in doPayment/doCheckout
+   *
+   * This can be used to gather all required params based on just a contribution ID
+   *
+   * TODO:
+   * - what values might need casting etc?
+   * - how to handle multiple addresses or other linked records
+   *
+   * @return array map of fields on Contribution and Address entities, to expected keys
+   *   in the payment parameters ParameterBag
+
+   * @see \Civi\Api4\Action\Contribution\Pay (in afform_payment extension)
+   */
+  public function getPaymentParamFetchMap(): array {
+    return [
+      'Contribution' => [
+        'id' => 'contributionID',
+        'contact_id' => 'contactID',
+        'total_amount' => 'amount',
+        'invoice_id' => 'invoiceID',
+        'source' => 'source',
+        'currency' => 'currency',
+      ],
+      'Address' => [
+        'postal_code' => 'billingPostalCode',
+        'city' => 'billingCity',
+        'country' => 'billingCountry',
+        'street_address' => 'billingStreetAddress',
+      ],
+    ];
+  }
+
 }
