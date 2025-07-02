@@ -266,21 +266,18 @@ class EditableSearchTest extends Api4TestBase {
             [
               'key' => 'first_name',
               'label' => 'First',
-              'dataType' => 'String',
               'type' => 'field',
               'editable' => TRUE,
             ],
             [
               'key' => 'organization_name',
               'label' => 'First',
-              'dataType' => 'String',
               'type' => 'field',
               'editable' => TRUE,
             ],
             [
               'key' => 'household_name',
               'label' => 'First',
-              'dataType' => 'String',
               'type' => 'field',
               'editable' => TRUE,
             ],
@@ -371,14 +368,12 @@ class EditableSearchTest extends Api4TestBase {
             [
               'key' => 'subject',
               'label' => 'First',
-              'dataType' => 'String',
               'type' => 'field',
               'editable' => TRUE,
             ],
             [
               'key' => 'meeting_phone.sub_field',
               'label' => 'First',
-              'dataType' => 'String',
               'type' => 'field',
               'editable' => TRUE,
             ],
