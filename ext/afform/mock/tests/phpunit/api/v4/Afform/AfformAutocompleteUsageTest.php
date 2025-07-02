@@ -393,19 +393,16 @@ EOHTML;
           [
             'type' => 'field',
             'key' => 'activity_type_id:label',
-            'dataType' => 'Integer',
             'sortable' => TRUE,
           ],
           [
             'type' => 'field',
             'key' => 'Activity_ActivityContact_Contact_01.sort_name',
-            'dataType' => 'String',
             'sortable' => TRUE,
           ],
           [
             'type' => 'field',
             'key' => 'Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto:label',
-            'dataType' => 'String',
             'sortable' => TRUE,
           ],
         ],
