@@ -15,8 +15,8 @@ use Civi\Schema\SqlEntityMetadata;
 
 class AddressMetadata extends SqlEntityMetadata {
 
-  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
-    $options = parent::getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL, bool $isView = FALSE): ?array {
+    $options = parent::getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId, $isView);
     if ($fieldName == 'country_id') {
       // The general idea is call the function that does all the stuff, but it
       // wants a different format, so we convert, then merge back in the

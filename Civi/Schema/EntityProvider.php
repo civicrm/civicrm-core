@@ -78,8 +78,8 @@ final class EntityProvider {
     return $this->getMetaProvider()->getField($fieldName);
   }
 
-  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
-    return $this->getMetaProvider()->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL, bool $isView = FALSE): ?array {
+    return $this->getMetaProvider()->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId, $isView);
   }
 
   public function writeRecords(array $records): array {
