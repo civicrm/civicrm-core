@@ -156,6 +156,9 @@ class Spreadsheet extends \CRM_Import_DataSource implements DataSourceInterface 
     // Re-key data using the headers
     $sql = [];
     foreach ($dataRows as $row) {
+      // Ensure data type is string - this is consistent with other data sources and,
+      // importantly, avoids passing NULL to string functions.
+      $row = array_map('strval', $row);
       // CRM-17859 Trim non-breaking spaces from columns.
       $row = array_map([__CLASS__, 'trimWhiteSpace'], $row);
       $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
