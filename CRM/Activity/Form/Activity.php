@@ -955,7 +955,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $url = CRM_Utils_System::url('civicrm/contact/view', ['cid' => CRM_Utils_Array::first($params['target_contact_id']), 'selectedChild' => 'activity']);
       }
       else {
-        $url = CRM_Utils_System::url('civicrm/activity', ['action' => 'view', 'reset' => 1, 'id' => $this->_activityId]);
+        $url = CRM_Utils_System::url('civicrm/activity', ['action' => 'view', 'reset' => 1, 'id' => $this->_activityId, 'cid' => $params['source_contact_id']]);
       }
       CRM_Core_Session::singleton()->pushUserContext($url);
     }
