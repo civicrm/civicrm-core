@@ -15,6 +15,15 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 6.3.2
+
+Released July 1, 2025
+
+- **[Synopsis](release-notes/6.3.2.md#synopsis)**
+- **[Bugs resolved](release-notes/6.3.2.md#bugs)**
+- **[Credits](release-notes/6.3.2.md#credits)**
+- **[Feedback](release-notes/6.3.2.md#feedback)**
+
 ## CiviCRM 6.3.1
 
 Released June 5, 2025
