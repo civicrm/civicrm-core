@@ -205,31 +205,26 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => 'Contact ID',
             ],
             [
               'type' => 'field',
               'key' => 'first_name',
-              'dataType' => 'String',
               'label' => 'First Name',
             ],
             [
               'type' => 'field',
               'key' => 'birth_date',
-              'dataType' => 'Date',
               'label' => 'Birth Date',
             ],
             [
               'type' => 'field',
               'key' => 'do_not_email',
-              'dataType' => 'Boolean',
               'label' => 'Do Not Email',
             ],
             [
               'type' => 'field',
               'key' => 'do_not_mail',
-              'dataType' => 'Boolean',
               'label' => 'Do Not Mail (rewrite)',
               'rewrite' => 'rewrite: [do_not_mail]',
             ],
@@ -327,13 +322,11 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => 'Event ID',
             ],
             [
               'type' => 'field',
               'key' => 'start_date',
-              'dataType' => 'Timestamp',
               'label' => 'Start Date',
               // Use default format.
               'format' => '',
@@ -341,14 +334,12 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
             [
               'type' => 'field',
               'key' => 'end_date',
-              'dataType' => 'Timestamp',
               'label' => 'End Date',
               'format' => 'dateformatshortdate',
             ],
             [
               'type' => 'field',
               'key' => 'min_initial_amount',
-              'dataType' => 'Money',
               'label' => 'Minimum Initial Amount',
             ],
           ],
