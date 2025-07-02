@@ -99,6 +99,8 @@ function civicrm_api3_extension_upgrade() {
 /**
  * Enable an extension.
  *
+ * This is an alias for installing an extension.
+ *
  * @param array $params
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
@@ -110,14 +112,7 @@ function civicrm_api3_extension_upgrade() {
  * @return array
  */
 function civicrm_api3_extension_enable($params) {
-  $keys = _civicrm_api3_getKeys($params);
-  if (count($keys) == 0) {
-    return civicrm_api3_create_success();
-  }
-
-  $manager = CRM_Extension_System::singleton()->getManager();
-  $manager->enable($manager->findInstallRequirements($keys));
-  return civicrm_api3_create_success();
+  return civicrm_api3_extension_install($params);
 }
 
 /**
