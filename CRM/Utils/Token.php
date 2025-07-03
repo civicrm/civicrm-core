@@ -75,27 +75,6 @@ class CRM_Utils_Token {
   ];
 
   /**
-   * @deprecated
-   *   This is used by CiviMail but will be made redundant by FlexMailer.
-   * @return array
-   */
-  public static function getRequiredTokens() {
-    CRM_Core_Error::deprecatedFunctionWarning('token processor');
-    if (self::$_requiredTokens == NULL) {
-      self::$_requiredTokens = [
-        'domain.address' => ts("Domain address - displays your organization's postal address."),
-        'action.optOutUrl or action.unsubscribeUrl' => [
-          'action.optOut' => ts("'Opt out via email' - displays an email address for recipients to opt out of receiving emails from your organization."),
-          'action.optOutUrl' => ts("'Opt out via web page' - creates a link for recipients to click if they want to opt out of receiving emails from your organization. Alternatively, you can include the 'Opt out via email' token."),
-          'action.unsubscribe' => ts("'Unsubscribe via email' - displays an email address for recipients to unsubscribe from the specific mailing list used to send this message."),
-          'action.unsubscribeUrl' => ts("'Unsubscribe via web page' - creates a link for recipients to unsubscribe from the specific mailing list used to send this message. Alternatively, you can include the 'Unsubscribe via email' token or one of the Opt-out tokens."),
-        ],
-      ];
-    }
-    return self::$_requiredTokens;
-  }
-
-  /**
    * Check a string (mailing body) for required tokens.
    *
    * @param string $str
