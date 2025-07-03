@@ -65,21 +65,18 @@ return [
             [
               'type' => 'field',
               'key' => 'label',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
-              'dataType' => 'Text',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_default',
-              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
               'rewrite' => '[none]',

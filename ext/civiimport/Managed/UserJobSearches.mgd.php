@@ -80,21 +80,18 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('User Job ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'created_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Import Job Created Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'expires_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Import Job Expires Date'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -102,21 +99,18 @@ return [
             [
               'type' => 'field',
               'key' => 'end_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Job Ended Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Job Status'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'job_type:label',
-              'dataType' => 'String',
               'label' => E::ts('Job Type'),
               'sortable' => TRUE,
             ],
@@ -218,21 +212,18 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'created_id.display_name',
-              'dataType' => 'String',
               'label' => E::ts('Created By'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Import Name'),
               'sortable' => TRUE,
               'link' => [
@@ -246,14 +237,12 @@ return [
             [
               'type' => 'field',
               'key' => 'created_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Created Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'job_type:label',
-              'dataType' => 'String',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
@@ -345,21 +334,18 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'created_id.display_name',
-              'dataType' => 'String',
               'label' => E::ts('Created By'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Import Name'),
               'sortable' => TRUE,
               'link' => [
@@ -373,14 +359,12 @@ return [
             [
               'type' => 'field',
               'key' => 'created_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Created Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'expires_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Expires Date'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -388,7 +372,6 @@ return [
             [
               'type' => 'field',
               'key' => 'job_type:label',
-              'dataType' => 'String',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
