@@ -1,7 +1,5 @@
 <?php
 
-use Civi\Api4\Mapping;
-
 class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
 
   public function preProcess(): void {
@@ -10,13 +8,10 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     Civi::service('angularjs.loader')->addModules('crmCiviimport');
     $this->assignCiviimportVariables();
 
-    // @todo - remove the mapping part - once we have removed from js - tey should all have userJobs templates now.
-    $savedMappingID = (int) $this->getSavedMappingID();
-    $savedMapping = [];
-    if ($savedMappingID) {
-      $savedMapping = Mapping::get()->addWhere('id', '=', $savedMappingID)->addSelect('id', 'name', 'description')->execute()->first();
+    $templateJob = $this->getTemplateJob();
+    if ($templateJob) {
+      Civi::resources()->addVars('crmImportUi', ['savedMapping' => ['name' => substr($templateJob['name'], 7)]]);
     }
-    Civi::resources()->addVars('crmImportUi', ['savedMapping' => $savedMapping]);
   }
 
   /**
