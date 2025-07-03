@@ -359,6 +359,7 @@
   --crm-dialog-body-bg: var(--crm-c-background);
   --crm-dialog-body-padding: var(--crm-m);
 /* Dashlet */
+  --crm-dashlet-columns: 2fr 3fr;
   --crm-dashlet-border: unset;
   --crm-dashlet-bg: var(--crm-c-page-background);
   --crm-dashlet-padding: var(--crm-s2);
