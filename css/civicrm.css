@@ -2928,7 +2928,10 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .form-layout td.label,
 .crm-container form table.report .label,
 .crm-container form table label,
-.crm-container form table.report label {
+.crm-container form table.report label,
+.crm-container .form-layout-compressed tr[role="radiogroup"] td.label,
+.crm-container .form-layout tr[role="radiogroup"] td.label,
+.crm-container #customFields div.contact_panel tr[role="radiogroup"] td.label {
   color: #3e3e3e;
 }
 
