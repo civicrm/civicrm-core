@@ -250,6 +250,7 @@ return [
       'input_type' => 'Text',
       'description' => ts('actual funds transfer amount. total less fees. if processor does not report actual fee during transaction, this is set to total_amount.'),
       'add' => '1.3',
+      'readonly' => TRUE,
       'usage' => [
         'import',
         'export',
@@ -257,6 +258,7 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Net Amount'),
+        'formula' => '[total_amount] - [fee_amount]',
       ],
     ],
     'trxn_id' => [

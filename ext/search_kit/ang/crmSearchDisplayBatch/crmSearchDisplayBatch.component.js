@@ -126,7 +126,19 @@
         cancelSave();
       };
 
-      this.onChangeData = function() {
+      this.onChangeData = function(index) {
+        const rowIndex = ((this.page - 1) * this.limit) + index;
+        // Calculate any formula fields
+        this.settings.columns.forEach(function(col) {
+          const editable = ctrl.results.editable[col.key];
+          if (editable && editable.input_attrs && editable.input_attrs.formula) {
+            let formula = editable.input_attrs.formula;
+            const prefix = editable.explicit_join ? (editable.explicit_join + '.') : '';
+            formula = formula.replace(/\[/g, '(data["' + prefix);
+            formula = formula.replace(/]/g, '"] || 0)');
+            ctrl.results[rowIndex].data[col.spec.name] = $scope.$eval(formula, {data: ctrl.results[rowIndex].data});
+          }
+        });
         ctrl.unsavedChanges = true;
       };
 
