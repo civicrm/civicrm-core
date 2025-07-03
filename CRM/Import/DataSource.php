@@ -225,6 +225,9 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    * @throws \CRM_Core_Exception
    */
   public function getRowCount(array $statuses = []): int {
+    if (!$this->getTableName()) {
+      return 0;
+    }
     $this->statuses = $statuses;
     $query = 'SELECT count(*) FROM ' . $this->getTableName() . ' ' . $this->getStatusClause();
     return CRM_Core_DAO::singleValueQuery($query);
