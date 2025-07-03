@@ -55,7 +55,23 @@
       this.searchColumns = [];
 
       this.$onInit = () => {
-        this.searchColumns = this.apiParams.select.map((col) => searchMeta.fieldToColumn(col, { label: true }));
+        this.searchColumns = this.apiParams.select.map((select) => {
+          const info = searchMeta.parseExpr(select);
+          const field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {};
+          let dataType = (info.fn && info.fn.data_type) || field.data_type;
+          // hack: search kit reports option group columns as
+          // "Integer" data type - but for our purposes they
+          // shouldn't be used for numeric scales
+          if (select.includes(':label')) {
+            dataType = 'Option';
+          }
+          return {
+            type: 'field',
+            key: info.alias,
+            dataType: dataType,
+            label: searchMeta.getDefaultLabel(select),
+          };
+        });
 
         if (!this.display.settings) {
           this.display.settings = {
@@ -201,15 +217,8 @@
           return this.searchColumns.map((searchCol) => searchCol.key);
         }
 
-        return this.searchColumns.filter((searchCol) => {
-          // hack: search kit reports option group columns as
-          // "Integer" data type - but for our purposes they
-          // shouldn't be used for numeric scales
-          if (searchCol.key.includes(':label')) {
-            searchCol.dataType = 'Option';
-          }
-          return allowedTypes.includes(searchCol.dataType);
-        })
+        return this.searchColumns
+          .filter((searchCol) => allowedTypes.includes(searchCol.dataType))
           .map((searchCol) => searchCol.key);
       };
 
