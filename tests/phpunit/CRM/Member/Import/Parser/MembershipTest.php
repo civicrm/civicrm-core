@@ -363,7 +363,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $donaldDuckID = $this->individualCreate(['first_name' => 'Donald', 'last_name' => 'Duck']);
     $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Membership']);
     $membershipImporter = $this->createImportObject([
-      'Membership.contact_id',
+      'Contact.id',
       'Membership.membership_type_id',
       'Membership.start_date',
       'Membership.' . $this->getCustomFieldName('text', 4),
@@ -397,7 +397,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $mapper = [
       ['name' => 'Membership.membership_type_id'],
       ['name' => 'Membership.id'],
-      ['name' => 'Membership.contact_id'],
+      ['name' => 'Contact.id'],
       ['name' => 'Contact.external_identifier'],
       ['name' => 'Contact.email_primary.email'],
       ['name' => 'Membership.start_date'],
@@ -416,7 +416,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
   public static function requiredFields(): array {
     return [
-      'contact_id' => [['Membership.contact_id', 'Membership.membership_type_id', 'Membership.start_date']],
+      'contact_id' => [['Contact.id', 'Membership.membership_type_id', 'Membership.start_date']],
       'external_identifier' => [['Contact.external_identifier', 'Membership.membership_type_id', 'Membership.start_date']],
       'email' => [['Contact.email_primary.email', 'Membership.membership_type_id', 'Membership.start_date']],
     ];
@@ -428,7 +428,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   public function testImportCSV() :void {
     try {
       $this->importCSV('memberships_invalid.csv', [
-        ['name' => 'Membership.contact_id'],
+        ['name' => 'Contact.id'],
         ['name' => 'Membership.source'],
         ['name' => 'Membership.membership_type_id'],
         ['name' => 'Membership.start_date'],
