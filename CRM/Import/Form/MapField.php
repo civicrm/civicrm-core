@@ -305,7 +305,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       if ($this->getSubmittedValue('savedMapping')) {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if (isset($fieldMappings[$i])) {
-          if ($fieldMapping['name'] !== ts('do_not_import')) {
+          if (!empty($fieldMapping['name']) && $fieldMapping['name'] !== ts('do_not_import')) {
             $defaults["mapper[$i]"] = [$fieldMapping['name']];
           }
           else {
@@ -620,6 +620,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     $mapper = [];
     $fields = $this->getUserJob()['metadata']['import_mappings'];
     foreach ($fields as $field) {
+      if (!isset($field['name'])) {
+        continue;
+      }
       if (str_starts_with($field['name'], $entity . '.') || str_starts_with($field['name'], $this->getBaseEntity() . '.')) {
         $mapper[] = [$field['name']];
       }

@@ -1357,14 +1357,18 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       if ($mappedField['name']) {
         $fieldSpec = $this->getFieldMetadata($mappedField['name']);
         $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity_name'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
+        $fieldValue = $values[$i];
+        if ($fieldValue === '' && isset($mappedField['default_value'])) {
+          $fieldValue = $mappedField['default_value'];
+        }
         if ($entity) {
           // Split values into arrays by entity.
           // Apiv4 name is currently only set for contact, & only in cases where it would
           // be used for the dedupe rule (ie Membership import).
-          $params[$entity][$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+          $params[$entity][$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
         }
         else {
-          $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+          $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
         }
       }
     }
