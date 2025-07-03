@@ -75,50 +75,6 @@ class CRM_Utils_Token {
   ];
 
   /**
-   * Check a string (mailing body) for required tokens.
-   *
-   * @param string $str
-   *   The message.
-   *
-   * @return bool|array
-   *   true if all required tokens are found,
-   *    else an array of the missing tokens
-   *
-   * @deprecated since 5.78 will be removed around 5.90
-   */
-  public static function requiredTokens(&$str) {
-    CRM_Core_Error::deprecatedFunctionWarning('use flexmailer');
-    $requiredTokens = Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', []);
-
-    $missing = [];
-    foreach ($requiredTokens as $token => $value) {
-      if (!is_array($value)) {
-        if (!preg_match('/(^|[^\{])' . preg_quote('{' . $token . '}') . '/', $str)) {
-          $missing[$token] = $value;
-        }
-      }
-      else {
-        $present = FALSE;
-        $desc = NULL;
-        foreach ($value as $t => $d) {
-          $desc = $d;
-          if (preg_match('/(^|[^\{])' . preg_quote('{' . $t . '}') . '/', $str)) {
-            $present = TRUE;
-          }
-        }
-        if (!$present) {
-          $missing[$token] = $desc;
-        }
-      }
-    }
-
-    if (empty($missing)) {
-      return TRUE;
-    }
-    return $missing;
-  }
-
-  /**
    * Wrapper for token matching.
    *
    * @param string $type
