@@ -358,9 +358,23 @@ div.crm-inline-edit-form div.crm-clear {
   border-radius: var(--crm-roundness);
   box-shadow: var(--crm-block-shadow);
   margin-bottom: var(--crm-dash-panel-padding);
+  container-name: crm-summary-block;
+  container-type: inline-size;
 }
 .crm-contact-page .crm-summary-block .crm-summary-block {
   box-shadow: none;
+}
+@container crm-summary-block (width < 430px) {
+  /* Stacks label + input on narrower screens */
+  .crm-container .crm-summary-row {
+    flex-direction: column;
+  }
+  .crm-container .crm-summary-row .crm-label {
+    padding-bottom: var(--crm-s);
+  }
+  .crm-container .crm-summary-row .crm-content {
+    padding-top: 0;
+  }
 }
 .crm-contact-page div.crm-clear {
   padding: var(--crm-dash-block-padding);
@@ -414,8 +428,7 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
     --crm-dash-heading-inset: 0; /* resets any inset on the title/action links */
     --crm-side-tabs-width: auto; /* resets offset inline edit */
   }
-  .crm-container #mainTabContainer,
-  .crm-container div.crm-summary-row {
+  .crm-container #mainTabContainer {
     flex-direction: column;
   }
   .crm-container .crm-actions-ribbon ul#actions {
