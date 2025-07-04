@@ -25,11 +25,7 @@
       </ol></nav>
     {/if}
 
-    {if $standaloneErrors}
-      <div class="standalone-errors">
-        <ul>{$standaloneErrors}</ul>
-      </div>
-    {/if}
+    <div id="standalone-errors-wrapper"></div>
 
     {if $pageTitle}
       <div class="crm-page-title-wrapper">
@@ -60,6 +56,19 @@
         {include file="CRM/common/footer.tpl"}
       {/if}
     {/crmRegion}
+
+    {* This has to come at the bottom because the variable may not be populated until some of the templates evaluated inline above get evaluated. *}
+    {if $standaloneErrors}
+      <div class="standalone-errors">
+        <ul>{$standaloneErrors}</ul>
+      </div>
+      {literal}
+      <script type="text/javascript">
+        CRM.$("div.standalone-errors").appendTo("div#standalone-errors-wrapper");
+      </script>
+      {/literal}
+    {/if}
+
   </div>
 </body>
 </html>
