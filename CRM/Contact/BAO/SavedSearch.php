@@ -443,17 +443,19 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
 
     $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
     if (!empty($created_id)) {
-      switch($action) {
+      switch ($action) {
         case 'delete':
-          if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && CRM_Core_Permission::check('delete own search_kit') && ($userID !== (int)$created_id)) {
+          if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && CRM_Core_Permission::check('delete own search_kit') && ($userID !== (int) $created_id)) {
             $e->setAuthorized(FALSE);
           }
           break;
+
         default:
-          if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && CRM_Core_Permission::check('edit own search_kit') && ($userID !== (int)$created_id)) {
+          if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && CRM_Core_Permission::check('edit own search_kit') && ($userID !== (int) $created_id)) {
             $e->setAuthorized(FALSE);
           }
           break;
+
       }
     }
   }
