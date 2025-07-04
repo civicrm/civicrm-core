@@ -2053,7 +2053,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add a widget for selecting/editing/creating/copying a profile form
+   * Add a widget for selecting a profile form
    *
    * @param string $name
    *   HTML form-element name.
@@ -2065,23 +2065,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Only present a UFGroup if its group_type is compatible with $allowSubypes.
    * @param array $entities
    * @param bool $default
-   *   //CRM-15427.
+   *   Not used anymore.
    * @param string $usedFor
    */
   public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE, $usedFor = NULL) {
-    // Output widget
-    // FIXME: Instead of adhoc serialization, use a single json_encode()
-    CRM_UF_Page_ProfileEditor::registerProfileScripts();
-    CRM_UF_Page_ProfileEditor::registerSchemas(CRM_Utils_Array::collect('entity_type', $entities));
-    $this->add('text', $name, $label, [
-      'class' => 'crm-profile-selector',
-      // Note: client treats ';;' as equivalent to \0, and ';;' works better in HTML
-      'data-group-type' => CRM_Core_BAO_UFGroup::encodeGroupType($allowCoreTypes, $allowSubTypes, ';;'),
-      'data-entities' => json_encode($entities),
-      //CRM-15427
-      'data-default' => $default,
-      'data-usedfor' => json_encode($usedFor),
-    ]);
+    // @todo Filter by "used for"
+    $query = \Civi\Api4\UFGroup::get(TRUE)
+      ->addWhere('is_active', '=', 1);
+    if (!empty($allowCoreTypes)) {
+      $clauses = [];
+      foreach ($allowCoreTypes as $type) {
+        $clauses[] = ['group_type', 'LIKE', '%' . $type . '%'];
+      }
+      $query->addClause('OR', $clauses);
+    }
+    $profileGroups = $query->execute()->column('title', 'id');
+    $this->add('select', $name, $label, ['' => ts('- select profile -')] + $profileGroups, FALSE, ['class' => 'crm-select2 huge']);
   }
 
   /**
