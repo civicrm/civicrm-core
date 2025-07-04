@@ -1212,24 +1212,16 @@ AND    u.status = 1
       \CRM_Core_Error::deprecationMessage('CRM_Utils_System::theme called with $maintenance = TRUE - please use renderMaintenanceMessage instead');
     }
 
-    $ret = FALSE;
-
     if (!$print) {
       if ($maintenance) {
         print $this->renderMaintanceMessage($content);
         exit();
       }
-      $ret = TRUE;
+      return $content;
     }
-    $out = $content;
 
-    if ($ret) {
-      return $out;
-    }
-    else {
-      print $out;
-      return NULL;
-    }
+    print $content;
+    return NULL;
   }
 
   /**
