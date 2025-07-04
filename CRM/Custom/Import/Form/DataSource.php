@@ -110,7 +110,6 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function buildQuickForm(): void {
     parent::buildQuickForm();
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $this->getCustomGroups(), TRUE);
-    $this->addContactTypeSelector();
   }
 
   /**

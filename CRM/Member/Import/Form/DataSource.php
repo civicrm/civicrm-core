@@ -41,8 +41,6 @@ class CRM_Member_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new Membership'),
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing Membership'),
     ]);
-
-    $this->addContactTypeSelector();
   }
 
   /**

@@ -172,28 +172,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   }
 
   /**
-   * A long-winded way to add one radio element to the form.
-   */
-  protected function addContactTypeSelector() {
-    //contact types option
-    $contactTypeOptions = [];
-    if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactTypeOptions['Individual'] = ts('Individual');
-    }
-    if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactTypeOptions['Household'] = ts('Household');
-    }
-    if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactTypeOptions['Organization'] = ts('Organization');
-    }
-    $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions);
-
-    $this->setDefaults([
-      'contactType' => 'Individual',
-    ]);
-  }
-
-  /**
    * Store form values.
    *
    * @param array $names
