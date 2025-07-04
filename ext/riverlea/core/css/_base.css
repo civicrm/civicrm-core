@@ -463,6 +463,40 @@ dl dl {
 .crm-container .nowrap {
   white-space: nowrap
 }
+
+/* Flexbox utility classes */
+
+.crm-flex-align-start /* align top */ {
+  align-items: flex-start;
+}
+.crm-flex-align-center /* align middle */ {
+  align-items: center;
+}
+.crm-flex-align-end /* align bottom */ {
+  align-items: flex-end;
+}
+.crm-flex-justify-start /* align left */ {
+  justify-content: flex-start;
+}
+.crm-flex-justify-center /* align center */ {
+  justify-content: center;
+}
+.crm-flex-justify-between
+/* first/last items aligned left/right, rest spread evenly */ {
+  justify-content: space-between;
+}
+.crm-flex-justify-space-evenly
+/* space between each item & edges the same */ {
+  justify-content: space-evenly;
+}
+.crm-flex-justify-around
+/* same except edge-spacing is half */ {
+  justify-content: space-around;
+}
+.crm-flex-justify-end /* align right */ {
+  justify-content: flex-end;
+}
+
 /* Responsive  */
 
 @media (max-width: 991px) {
