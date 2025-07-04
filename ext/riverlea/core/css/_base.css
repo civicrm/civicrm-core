@@ -469,31 +469,28 @@ dl dl {
 .crm-flex-align-start /* align top */ {
   align-items: flex-start;
 }
-.crm-flex-align-center /* align middle */ {
+.crm-flex-align-center {
   align-items: center;
 }
-.crm-flex-align-end /* align bottom */ {
+.crm-flex-align-end {
   align-items: flex-end;
 }
 .crm-flex-justify-start /* align left */ {
   justify-content: flex-start;
 }
-.crm-flex-justify-center /* align center */ {
+.crm-flex-justify-center {
   justify-content: center;
 }
-.crm-flex-justify-between
-/* first/last items aligned left/right, rest spread evenly */ {
+.crm-flex-justify-between {
   justify-content: space-between;
 }
-.crm-flex-justify-space-evenly
-/* space between each item & edges the same */ {
+.crm-flex-justify-space-evenly {
   justify-content: space-evenly;
 }
-.crm-flex-justify-around
-/* same except edge-spacing is half */ {
+.crm-flex-justify-around {
   justify-content: space-around;
 }
-.crm-flex-justify-end /* align right */ {
+.crm-flex-justify-end {
   justify-content: flex-end;
 }
 
