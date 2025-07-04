@@ -917,7 +917,7 @@ AND    u.status = 1
   /**
    * @inheritdoc
    */
-  public function renderMaintenanceMode(string $content): string {
+  public function renderMaintenanceMessage(string $content): string {
     drupal_set_breadcrumb('');
     drupal_maintenance_theme();
     if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
