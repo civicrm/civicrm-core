@@ -25,28 +25,37 @@ function processDupes(cid, oid, oper, context, reloadURL) {
 
     open:function() {
        cj( '#processDupes' ).show( ).html( msg );
+       cj( '#OKButton' ).focus();
     },
 
-    buttons: {
-      "Cancel": function() {
-        cj(this).dialog("close");
-      },
-      "OK": function() {
-              saveProcessDupes( cid, oid, oper, context );
-              cj(this).dialog( 'close' );
-        if ( context == 'merge-contact' && reloadURL ) {
-                                     // redirect after a small delay
-                                     setTimeout("window.location.href = '" + reloadURL + "'", 500);
+    buttons: [
+      {
+        id: 'cancelButton',
+        text: 'Cancel',
+        click: function() {
+          cj(this).dialog('close');
         }
-        else {
-          //CRM-15113 this has the effect of causing the alert to display. Also, as they are already 'actioned' Civi sensibly returns the browser to the
-          //search screen
-          setTimeout(function(){
-            window.location.reload();
-          }, 500);
+      },
+      {
+        id: 'OKButton',
+        text: 'OK',
+        click: function() {
+          saveProcessDupes( cid, oid, oper, context );
+          cj(this).dialog( 'close' );
+          if ( context == 'merge-contact' && reloadURL ) {
+            // redirect after a small delay
+            setTimeout("window.location.href = '" + reloadURL + "'", 500);
+          }
+          else {
+            //CRM-15113 this has the effect of causing the alert to display. Also, as they are already 'actioned' Civi sensibly returns the browser to the
+            //search screen
+            setTimeout(function(){
+              window.location.reload();
+            }, 500);
+          }
         }
       }
-    }
+    ],
   });
 }
 
