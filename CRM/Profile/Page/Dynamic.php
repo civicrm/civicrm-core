@@ -361,6 +361,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
     //CRM-4131.
     $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
+    $this->assign('displayName', $displayName ?: '');
     if ($displayName) {
       $session = CRM_Core_Session::singleton();
       $config = CRM_Core_Config::singleton();
@@ -370,7 +371,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         !$config->userFrameworkFrontend
       ) {
         $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', "action=view&reset=1&cid={$this->_id}", TRUE);
-        $this->assign('displayName', $displayName);
         $displayName = "<a href=\"$contactViewUrl\">{$displayName}</a>";
       }
       $title .= ' - ' . $displayName;
