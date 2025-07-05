@@ -8,6 +8,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+use Civi\Api4\Event\AuthorizeRecordEvent;
 
 /**
  *
@@ -421,6 +422,92 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       }
     }
     return $smartGroups;
+  }
+
+  /**
+   * Check related contact access.
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
+   */
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $action = $e->getActionName();
+    if (!in_array($action, ['delete', 'update'], TRUE)) {
+      // We only care about these actions.
+      return;
+    }
+
+    $userID = $e->getUserID();
+    if (empty($userID)) {
+      $userID = CRM_Core_Session::getLoggedInContactID();
+    }
+
+    $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
+    if (!empty($created_id)) {
+      switch ($action) {
+        case 'delete':
+          if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && CRM_Core_Permission::check('delete own search_kit') && ($userID !== (int) $created_id)) {
+            $e->setAuthorized(FALSE);
+          }
+          break;
+
+        default:
+          if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && CRM_Core_Permission::check('edit own search_kit') && ($userID !== (int) $created_id)) {
+            $e->setAuthorized(FALSE);
+          }
+          break;
+
+      }
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function writeRecord(array $record): CRM_Contact_DAO_SavedSearch {
+    self::checkEditPermission($record);
+    return parent::writeRecord($record);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function deleteRecord(array $record): CRM_Contact_DAO_SavedSearch {
+    self::checkDeletePermission($record);
+    return parent::deleteRecord($record);
+  }
+
+  /**
+   * Ensure that the current user has permission to edit a SavedSearch record
+   *
+   * @param array $record
+   * @return void
+   * @throws CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function checkEditPermission(array $record): void {
+    if (!empty($record['id']) && CRM_Core_Permission::check('edit own search_kit')) {
+      $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
+      if ($created_id != CRM_Core_Session::getLoggedInContactID()) {
+        throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to edit this SavedSearch.');
+      }
+    }
+  }
+
+  /**
+   * Ensure that the current user has permission to delete a SavedSearch record
+   *
+   * @param array $record
+   * @return void
+   * @throws CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function checkDeletePermission(array $record):void {
+    if (!empty($record['id']) && CRM_Core_Permission::check('delete own search_kit')) {
+      $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
+      if ($created_id != CRM_Core_Session::getLoggedInContactID()) {
+        throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to delete this SavedSearch.');
+      }
+    }
   }
 
 }
