@@ -43,6 +43,9 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
+    // see CRM_Case_Form_CaseView::preProcess
+    $this->assign('fulltext', $context == 'fulltext' ? 'fulltext' : '');
+
     // Check for required permissions, CRM-6264.
     if ($activityId &&
       !CRM_Activity_BAO_Activity::checkPermission($activityId, CRM_Core_Action::VIEW)
