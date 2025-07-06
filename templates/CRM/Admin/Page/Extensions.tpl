@@ -66,7 +66,7 @@
     {/if}
   </div>
 
-    {include file="CRM/common/TabHeader.tpl" defaultTab="summary"}
+    {include file="CRM/common/TabHeader.tpl" defaultTab="summary" containerClasses="" listClasses=""}
 
     {* Refresh buttons *}
     {literal}

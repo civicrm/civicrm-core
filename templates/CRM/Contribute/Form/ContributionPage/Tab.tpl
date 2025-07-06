@@ -28,7 +28,7 @@
   </ul>
   <div class="clear"></div>
 </div>
-{include file="CRM/common/TabHeader.tpl"}
+{include file="CRM/common/TabHeader.tpl" containerClasses="" listClasses=""}
 
 {literal}
 <script>
