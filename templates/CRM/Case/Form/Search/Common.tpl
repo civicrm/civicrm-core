@@ -56,7 +56,7 @@
   </tr>
 
   <tr>
-    <td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='case'}</td>
+    <td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='case' tableLayout=false tagsetElementName=''}</td>
   </tr>
 
   {if !empty($caseGroupTree)}
