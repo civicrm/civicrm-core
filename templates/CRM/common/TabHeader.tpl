@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 {* enclose all tabs and its content in a block *}
-<div class="crm-block crm-content-block {$containerClasses|default:''}">
+<div class="crm-block crm-content-block {$containerClasses}">
   {if $tabHeader}
     <div id="mainTabContainer">
-      <ul class="{$listClasses|default:''}" role="tablist">
+      <ul class="{$listClasses}" role="tablist">
         {foreach from=$tabHeader key=tabName item=tabValue}
           <li id="tab_{$tabName}" role="tab" class="crm-tab-button ui-corner-all {if !$tabValue.valid}disabled{/if} {if is_numeric($tabValue.count)}crm-count-{$tabValue.count}{/if} {if $tabValue.class} {$tabValue.class}{/if}" {$tabValue.extra}>
             {if $tabValue.active}
