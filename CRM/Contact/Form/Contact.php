@@ -356,6 +356,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
     $this->assign('paramSubType', $paramSubType ?? '');
+    $this->assign('isDuplicate', 0);
   }
 
   private function preProcessLocation() {
