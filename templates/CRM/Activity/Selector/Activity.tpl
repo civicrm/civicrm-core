@@ -92,7 +92,7 @@
 
   {include file="CRM/common/pager.tpl" location="bottom"}
 
-  {include file="CRM/Case/Form/ActivityToCase.tpl" contactID=$contactId}
+  {include file="CRM/Case/Form/ActivityToCase.tpl" contactID=$contactId buildCaseActivityForm=false}
   </form>
 {else}
 

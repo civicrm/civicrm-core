@@ -268,7 +268,7 @@
 
 {/if} {* other relationship section ends *}
   {/crmRegion}
-{include file="CRM/Case/Form/ActivityToCase.tpl"}
+{include file="CRM/Case/Form/ActivityToCase.tpl" buildCaseActivityForm=false}
 
 {* pane to display / edit regular tags or tagsets for cases *}
 {crmRegion name="case-view-tags"}
