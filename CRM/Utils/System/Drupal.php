@@ -901,30 +901,23 @@ AND    u.status = 1
     if ($maintenance) {
       \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_Base::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
     }
-    $ret = FALSE;
 
     if (!$print) {
       if ($maintenance) {
         print $this->renderMaintenanceMessage($content);
         exit();
       }
-      $ret = TRUE;
+      return $content;
     }
-    $out = $content;
 
-    if ($ret) {
-      return $out;
-    }
-    else {
-      print $out;
-      return NULL;
-    }
+    print $content;
+    return NULL;
   }
 
   /**
    * @inheritdoc
    */
-  public function renderMaintenanceMode(string $content): string {
+  public function renderMaintenanceMessage(string $content): string {
     drupal_set_breadcrumb('');
     drupal_maintenance_theme();
     if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
