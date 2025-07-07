@@ -17,7 +17,7 @@
   <div class="af-gui-field-help" ng-if="propIsset('help_pre')">
     <span crm-ui-editable ng-model="getSet('help_pre')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().help_pre">{{ getProp('help_pre') }}</span>
   </div>
-  <div class="af-gui-field-input af-gui-field-input-type-{{ getProp('input_type').toLowerCase() }}" ng-include="'~/afGuiEditor/inputType/' + getProp('input_type', 'Missing') + '.html'"></div>
+  <div class="af-gui-field-input af-gui-field-input-type-{{ getProp('input_type').toLowerCase() }}" ng-include="$ctrl.getInputTypeTemplate()"></div>
   <div class="af-gui-field-help" ng-if="propIsset('help_post')">
     <span crm-ui-editable ng-model="getSet('help_post')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().help_post">{{ getProp('help_post') }}</span>
   </div>
