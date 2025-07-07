@@ -184,6 +184,11 @@ return [
               'icon' => 'fa-plus',
             ],
           ],
+          'actions_display_mode' => 'menu',
+          'cssRules' => [
+            ['disabled', 'is_active', '=', FALSE],
+          ],
+          'headerCount' => TRUE,
         ],
         'acl_bypass' => FALSE,
       ],
