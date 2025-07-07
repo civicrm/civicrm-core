@@ -1,10 +1,10 @@
 <div class="crm-chart-kit-composite-admin">
 
-  <div ng-include="'~/crmChartKit/chartKitAdminColumns.html'"></div>
+  <div ng-include="'~/crmChartKitAdmin/chartKitAdminColumns.html'"></div>
 
   <div class="crm-chart-kit-admin-presentation">
 
-    <div ng-include="'~/crmChartKit/chartKitAdminCanvas.html'"></div>
+    <div ng-include="'~/crmChartKitAdmin/chartKitAdminCanvas.html'"></div>
 
     <fieldset>
       <legend>{{:: ts('Series options') }}</legend>
@@ -22,7 +22,7 @@
           <input type="number" class="form-control" ng-model="$ctrl.display.settings.barGap" />
         </div>
       </div>
-      <div ng-include="'~/crmChartKit/chartKitAdminLegend.html'" />
+      <div ng-include="'~/crmChartKitAdmin/chartKitAdminLegend.html'" />
     </fieldset>
 
   </div>

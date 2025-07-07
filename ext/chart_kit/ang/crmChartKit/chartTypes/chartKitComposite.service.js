@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('crmChartKit').factory('chartKitComposite', () => ({
-    adminTemplate: '~/crmChartKit/chartTypes/chartKitCompositeAdmin.html',
+    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitCompositeAdmin.html',
 
     getInitialDisplaySettings: () => ({
       barWidth: 10,
