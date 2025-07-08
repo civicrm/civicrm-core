@@ -308,6 +308,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return bool
    */
   protected function isUpdateExisting(): bool {
+    if (isset($this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'])) {
+      return $this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'] === 'update';
+    }
+
     return in_array((int) $this->getSubmittedValue('onDuplicate'), [
       CRM_Import_Parser::DUPLICATE_UPDATE,
       CRM_Import_Parser::DUPLICATE_FILL,

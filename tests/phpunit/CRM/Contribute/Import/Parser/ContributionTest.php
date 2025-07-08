@@ -182,12 +182,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
 
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.payment_instrument_id' => 'Check'];
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['Contribution.contact_id' => $contactID]);
     $this->assertEquals('Check', $contribution['payment_instrument']);
 
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.payment_instrument_id' => 'not at all random'];
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['ontact_id' => $contactID, 'payment_instrument_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['payment_instrument']);
   }
@@ -201,23 +201,23 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.payment_instrument_id' => 'Check', 'Contribution.contribution_status_id' => 'Pending'];
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertEquals('Pending Label**', $contribution['contribution_status']);
 
     $this->addRandomOption('contribution_status');
     $values['Contribution.contribution_status_id'] = 'not at all random';
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['contribution_status']);
 
     $values['Contribution.contribution_status_id'] = 'just say no';
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
 
     // Per https://lab.civicrm.org/dev/core/issues/1285 it's a bit arguable but Ok we can support id...
     $values['Contribution.contribution_status_id'] = 3;
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 3], 1);
 
   }
@@ -235,7 +235,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->setDuplicateId($contactID)
       ->execute();
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.payment_instrument_id' => 'Check', 'Contribution.contribution_status_id' => 'Pending'];
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $contribution = Contribution::get()
       ->addWhere('contact_id', '=', $contactID2)
       ->execute();
@@ -400,13 +400,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.payment_instrument_id' => 'Check', 'Contribution.contribution_status_id' => 'Pending'];
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contact_id' => $contactID]);
     $this->createCustomGroupWithFieldOfType([], 'radio');
     $values['Contribution.id'] = $contribution['id'];
     $values['Contribution.' . $this->getCustomFieldName('radio', 4)] = 'Red Testing';
     unset(Civi::$statics['CRM_Core_BAO_OptionGroup']);
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
+    $this->runImport($values, 'update');
     $contribution = $this->callAPISuccess('Contribution', 'get', ['contact_id' => $contactID, $this->getCustomFieldName('radio') => 'Red Testing']);
     $this->assertEquals(5, $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
   }
@@ -425,7 +425,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'pledge_id'],
       ['name' => 'Contribution.receive_date'],
       ['name' => 'Contribution.financial_type_id'],
-    ], ['onDuplicate' => CRM_Import_Parser::NO_MATCH]);
+    ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
@@ -486,7 +486,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $customField = $this->getCustomFieldName('checkbox', 4);
     $contactID = $this->individualCreate();
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.' . $customField => 'L,V'];
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
+    $this->runImport($values, 'create');
     $initialContribution = Contribution::get()->addWhere('contact_id', '=', $contactID)
       ->addSelect($customField)
       ->execute()->first();
@@ -496,7 +496,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // Now update.
     $values['Contribution.id'] = $initialContribution['id'];
     $values['Contribution.' . $customField] = 'V';
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
+    $this->runImport($values, 'update');
 
     $updatedContribution = Contribution::get()->addWhere('id', '=', $initialContribution['id'])
       ->addSelect($customField)
@@ -573,7 +573,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('entity_id', '=', $contribution['id'])
       ->addValue('note', 'changed')
       ->execute();
-    $this->importContributionsDotCSV(['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    $this->importContributionsDotCSV([], 'update');
     $note = Note::get()
       ->addWhere('entity_id', '=', $contribution['id'])
       ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
@@ -613,9 +613,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     foreach ($data['fields'] as $field) {
       $mappings[] = ['name' => ($field === 'custom' ? 'Contact.' . $this->getCustomFieldName('text', 4) : $field)];
     }
-    $this->submitDataSourceForm('contributions.csv', ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+    $this->submitDataSourceForm('contributions.csv', []);
     $form = $this->getMapFieldForm([
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'mapper' => $this->getMapperFromFieldMappings($mappings),
       'contactType' => 'Individual',
     ]);
@@ -672,7 +671,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // It will fail in create mode as total_amount is required for create.
     $this->submitDataSourceForm('contributions.csv', $fieldMappings);
     $form = $this->getMapFieldForm([
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'contactType' => 'Individual',
     ]);
@@ -734,7 +732,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // It will fail in create mode as total_amount is required for create.
     $this->submitDataSourceForm('contributions_bad_campaign.csv', $fieldMappings);
     $form = $this->getMapFieldForm([
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'contactType' => 'Individual',
     ]);
@@ -752,11 +749,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => 'contributions_bad_campaign.csv'],
       'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'groups' => [],
     ];
     $this->submitDataSourceForm('contributions_bad_campaign.csv', $submittedValues);
     $form = $this->getMapFieldForm($submittedValues);
+    $this->updateContributionAction('update');
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertTrue($form->validate());
@@ -817,14 +814,14 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @param array $originalValues
    *
-   * @param int $onDuplicateAction
-   * @param array|null $mappings
+   * @param string $action
+   * @param array $mappings
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in.
    *
    * @throws \CRM_Core_Exception
    */
-  protected function runImport(array $originalValues, int $onDuplicateAction, array $mappings = [], ?array $fields = NULL): void {
+  protected function runImport(array $originalValues, string $action, array $mappings = [], ?array $fields = NULL): void {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
@@ -839,10 +836,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     }
     $values = array_values($originalValues);
     $parser = new CRM_Contribute_Import_Parser_Contribution();
-    $parser->setUserJobID($this->getUserJobID([
-      'onDuplicate' => $onDuplicateAction,
+    $this->userJobID = $this->getUserJobID([
       'mapper' => $mapper,
-    ]));
+    ]);
+    $parser->setUserJobID($this->userJobID);
+    $this->updateContributionAction($action);
     $parser->init();
     try {
       $parser->validateValues($values);
@@ -877,7 +875,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
           'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
-          'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
@@ -993,10 +990,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   /**
    * @param array $submittedValues
+   * @param string $action
    *
    * @return \CRM_Import_DataSource_CSV
+   * @throws \CRM_Core_Exception
    */
-  private function importContributionsDotCSV(array $submittedValues = []): CRM_Import_DataSource_CSV {
+  private function importContributionsDotCSV(array $submittedValues = [], string $action = 'create'): CRM_Import_DataSource_CSV {
     $this->importCSV('contributions.csv', [
       ['name' => 'Contact.first_name'],
       ['name' => 'Contribution.total_amount'],
@@ -1006,7 +1005,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.source'],
       ['name' => 'note'],
       ['name' => 'Contribution.trxn_id'],
-    ], $submittedValues);
+    ], $submittedValues, $action);
     return new CRM_Import_DataSource_CSV($this->userJobID);
   }
 
