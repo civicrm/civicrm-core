@@ -83,10 +83,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   protected function getAvailableFields(): array {
     $return = [];
     foreach ($this->getFields() as $name => $field) {
-      if ($name === 'id' && $this->isSkipExisting()) {
-        // Duplicates are being skipped so id matching is not available.
-        continue;
-      }
       if ($this->isUpdateExisting() && in_array($name, ['contact_id', 'email', 'contact.first_name', 'contact.last_name', 'external_identifier', 'email_primary.email'], TRUE)) {
         continue;
       }

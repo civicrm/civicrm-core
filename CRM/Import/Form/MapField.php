@@ -416,9 +416,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         // @todo stop setting 'do not import' in the first place.
         continue;
       }
-      if ($field['name'] === 'id' && $entity === $field['entity'] && !$this->isUpdateExisting()) {
-        continue;
-      }
       $childField = [
         'text' => $field['label'] ?? ($field['html']['label'] ?? $field['title']),
         'id' => $fieldName,

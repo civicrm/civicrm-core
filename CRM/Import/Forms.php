@@ -832,9 +832,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
 
   /**
    * Has the user chosen to update existing records.
+   *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function isUpdateExisting(): bool {
+    if (isset($this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'])) {
+      return $this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'] === 'update';
+    }
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_UPDATE;
   }
 
