@@ -398,7 +398,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getContactType(): ?string {
-    return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'];
+    return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'] ?? NULL;
   }
 
   /**
