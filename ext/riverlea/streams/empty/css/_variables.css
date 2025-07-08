@@ -45,10 +45,10 @@
 /* Fonts '--crm-font-' */
 /* Colour names, e.g. green, red, blue '--crm-c-' */
 /* Practical colours, e.g. background, text, link '--crm-c-' */
---crm-c-text-light: #fff;
---crm-c-text-dark: #302f35;
---crm-c-text: var(--crm-c-text-dark);
---crm-c-page-background: #fff;
+  --crm-c-text-light: #fff;
+  --crm-c-text-dark: #302f35;
+  --crm-c-text: var(--crm-c-text-dark);
+  --crm-c-page-background: #fff;
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
 /* Sizes */
 /* Type */
