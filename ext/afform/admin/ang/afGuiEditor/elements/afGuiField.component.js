@@ -231,18 +231,11 @@
         const path = propName.split('.');
         const item = path.pop();
         const localDefn = drillDown(ctrl.node.defn || {}, path);
-        console.log(ctrl.node.defn);
         if (typeof localDefn[item] !== 'undefined') {
-          if (propName === 'input_type') {
-            console.log(localDefn);
-          }
           return localDefn[item];
         }
         const fieldDefn = drillDown(ctrl.getDefn(), path);
         if (typeof fieldDefn[item] !== 'undefined') {
-          if (propName === 'input_type') {
-            console.log(fieldDefn);
-          }
           return fieldDefn[item];
         }
         return defaultValue;
