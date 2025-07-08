@@ -1953,4 +1953,114 @@ abstract class CRM_Core_Payment {
     return FALSE;
   }
 
+  /**
+   * doCheckout is an alternative to doPayment used to process afform_payments
+   *
+   * The base implementation just piggybacks on doPayment, but different payment processors
+   * will need to implement differently depending on the user flow through checkout
+   *
+   * NOTE: no Payment is created in CiviCRM in this implmentation
+   *  - for some processors this will be done later, in response to a postback from the payment
+   *    processor's infrastructure confirming the payment has been made
+   *  - some processors may want to complete the payment within doCheckout
+   *
+   * @param Civi\Payment\PropertyBag $paymentParams
+   *   params for the payment - as would be passed to doPayment. this is most commonly an array
+   *   of line items for the contribution, and some details about the contact doing the paying
+   * @param ?string $successUrl
+   *   url to take the user to after successful payment
+   * @param ?string $failUrl
+   *   url to take the user to if payment is unsuccessful
+   *
+   * @return array
+   *   response indicating the next step for the user. what form this takes is WIP,
+   *   but currently this is consumed by Contribution.pay
+   *
+   * @see \Civi\Api4\Action\Contribution\Pay
+   *  (in afform_payment extension)
+   */
+  public function doCheckout(PropertyBag &$paymentParams, ?string $successUrl, ?string $failUrl): array {
+    try {
+      $this->doPayment($paymentParams);
+
+      if ($successUrl) {
+        return [
+          'redirect' => $successUrl,
+        ];
+      }
+
+      return [];
+    }
+    catch (\Exception $e) {
+      // TODO: should we handle this here?
+      // if ($failUrl) {
+      //   return [
+      //     'is_error' => TRUE,
+      //     'message' => $e->getMessage(),
+      //     'redirect' => $failUrl,
+      //   ];
+      // }
+      return [
+        'is_error' => TRUE,
+        'message' => $e->getMessage(),
+      ];
+    }
+  }
+
+  /**
+   * @return ?string (optional) name of an angular module on afforms that use this payment processor
+   */
+  public function getAfformModule(): ?string {
+    return NULL;
+  }
+
+  /**
+   * @param $processor
+   *   configured processor record from PaymentProcessor api4
+   *
+   * @return array
+   *   config to be passed to the clientside payment block
+   *   this may include a `template` to use for the payment block element
+   *   or arbitrary things the payment processor needs - like settings or keys stored on the server
+   */
+  public function getAfformConfig(array $processor): array {
+    return [];
+  }
+
+  /**
+   * Get a map between Api4 field keys on the contribution record and payment params
+   * used in doPayment/doCheckout
+   *
+   * This can be used to gather all required params based on just a contribution ID
+   *
+   * TODO:
+   * - what values might need casting etc?
+   * - how to handle multiple addresses or other linked records
+   *
+   * @return array
+   *   map of fields on Contribution and Address entities, to expected keys
+   *   in the payment parameters ParameterBag
+   *
+   * @see \Civi\Api4\Action\Contribution\Pay
+   *   (in afform_payment extension)
+   */
+  public function getPaymentParamFetchMap(): array {
+    return [
+      'Contribution' => [
+        'id' => 'contributionID',
+        'contact_id' => 'contactID',
+        'total_amount' => 'amount',
+        'invoice_id' => 'invoiceID',
+        'source' => 'source',
+        'currency' => 'currency',
+      ],
+      'Address' => [
+        'postal_code' => 'billingPostalCode',
+        'city' => 'billingCity',
+        'country' => 'billingCountry',
+        'street_address' => 'billingStreetAddress',
+      ],
+    ];
+  }
+
 }

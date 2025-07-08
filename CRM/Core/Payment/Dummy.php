@@ -375,4 +375,15 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     return TRUE;
   }
 
+  /**
+   * @inheritdoc
+   *
+   * Dummy template (included in the afPayment module)
+   */
+  public function getAfformConfig(array $processor): array {
+    return [
+      'template' => '~/afPayment/dummy.html',
+    ];
+  }
+
 }
