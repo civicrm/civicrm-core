@@ -7,7 +7,7 @@ return [
     'ang/afCore/*/*.js',
   ],
   'css' => ['ang/afCore.css'],
-  'requires' => ['crmUi', 'crmUtil', 'api4', 'checklist-model', 'angularFileUpload'],
+  'requires' => ['crmUi', 'crmUtil', 'api4', 'checklist-model', 'angularFileUpload', 'ngSanitize'],
   'partials' => ['ang/afCore'],
   'basePages' => [],
 ];

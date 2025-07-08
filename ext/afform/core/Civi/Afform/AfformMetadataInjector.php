@@ -123,6 +123,17 @@ class AfformMetadataInjector {
     // Set template based on input_type
     $fieldInfo['template'] = FormDataModel::getInputTypeTemplate($inputType);
 
+    // Set format of DisplayOnly fields based on original input type
+    if ($inputType === 'DisplayOnly' && $fieldInfo['input_type'] === 'RichTextEditor') {
+      $fieldInfo['display_format'] = 'html';
+    }
+    if ($inputType === 'DisplayOnly' && $fieldInfo['input_type'] === 'File') {
+      $fieldInfo['display_format'] = 'file';
+    }
+    if ($inputType === 'DisplayOnly' && $fieldInfo['input_type'] === 'Url') {
+      $fieldInfo['display_format'] = 'url';
+    }
+
     // On a search form, the exposed operator requires a list of options.
     if (!empty($fieldDefn['expose_operator'])) {
       $operators = Utils::getSearchOperators();
