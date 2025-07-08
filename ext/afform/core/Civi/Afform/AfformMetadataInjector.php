@@ -115,10 +115,13 @@ class AfformMetadataInjector {
 
     // Get field defn from afform markup
     $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
-    // This is the input type set on the form (may be different from the default input type in the field spec)
+    // Uses input type set on the form if specified (else falls back to the input type in the field spec)
     $inputType = !empty($fieldDefn['input_type']) ? \CRM_Utils_JS::decode($fieldDefn['input_type']) : $fieldInfo['input_type'];
     // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
     $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
+
+    // Set template based on input_type
+    $fieldInfo['template'] = FormDataModel::getInputTypeTemplate($inputType);
 
     // On a search form, the exposed operator requires a list of options.
     if (!empty($fieldDefn['expose_operator'])) {
