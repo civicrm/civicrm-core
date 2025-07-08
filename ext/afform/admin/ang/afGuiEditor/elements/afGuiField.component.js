@@ -161,6 +161,17 @@
         return ctrl.getDefn().options || (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
       };
 
+      this.getInputTypeTemplate = () => {
+        const selectedType = $scope.getProp('input_type');
+        const meta = this.inputTypes.find((type) => type.name === selectedType);
+
+        if (!meta || !meta.admin_template) {
+          return '~/afGuiEditor/inputType/Missing.html';
+        }
+
+        return meta.admin_template;
+      };
+
       $scope.resetOptions = function() {
         delete ctrl.node.defn.options;
       };
@@ -220,11 +231,18 @@
         const path = propName.split('.');
         const item = path.pop();
         const localDefn = drillDown(ctrl.node.defn || {}, path);
+        console.log(ctrl.node.defn);
         if (typeof localDefn[item] !== 'undefined') {
+          if (propName === 'input_type') {
+            console.log(localDefn);
+          }
           return localDefn[item];
         }
         const fieldDefn = drillDown(ctrl.getDefn(), path);
         if (typeof fieldDefn[item] !== 'undefined') {
+          if (propName === 'input_type') {
+            console.log(fieldDefn);
+          }
           return fieldDefn[item];
         }
         return defaultValue;
