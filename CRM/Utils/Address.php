@@ -297,8 +297,9 @@ class CRM_Utils_Address {
       $fields['postal_code'] .= "-$fields[postal_code_suffix]";
     }
 
+    $country = $fields['country_id:label'];
     //CRM-16876 Display countries in all caps when in mailing mode.
-    if (!empty($fields['country'])) {
+    if ($country) {
       if (Civi::settings()->get('hideCountryMailingLabels')) {
         $domain = CRM_Core_BAO_Domain::getDomain();
         $domainLocation = CRM_Core_BAO_Location::getValues(['contact_id' => $domain->contact_id]);
@@ -309,11 +310,11 @@ class CRM_Utils_Address {
         }
         else {
           //Capitalization display on uppercase to contries with special characters
-          $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, 'UTF-8');
+          $fields['country'] = mb_convert_case($country, MB_CASE_UPPER, 'UTF-8');
         }
       }
       else {
-        $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, 'UTF-8');
+        $fields['country'] = mb_convert_case($country, MB_CASE_UPPER, 'UTF-8');
       }
     }
 
