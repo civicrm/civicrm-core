@@ -324,14 +324,15 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'is_base_entity' => TRUE,
         'supports_multiple' => FALSE,
         'is_required' => TRUE,
-        // For now we stick with the action selected on the DataSource page.
-        'actions' => $this->isUpdateExisting() ?
-          [['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')]] :
-          [['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')]],
-        'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
+        // For now we offer create & update, but not save.
+        'actions' => [
+          ['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')],
+          ['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')],
+        ],
+        'default_action' => 'create',
         'entity_name' => 'Contribution',
         'entity_title' => ts('Contribution'),
-        'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
+        'selected' => ['action' => 'create'],
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),

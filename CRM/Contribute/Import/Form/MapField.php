@@ -71,16 +71,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
     }
     $defaults = $this->getDefaults();
     $this->setDefaults($defaults);
-
-    $js = "<script type='text/javascript'>\n";
-    foreach ($defaults as $index => $default) {
-      //  e.g swapOptions(document.forms.MapField, 'mapper[0]', 0, 3, 'hs_mapper_0_');
-      // where 0 is the highest populated field number in the array and 3 is the maximum.
-      $js .= "swapOptions(document.forms.MapField, '$index', " . (array_key_last(array_filter($default)) ?: 0) . ", 2, 'hs_mapper_0_');\n";
-    }
-    $js .= "</script>\n";
-    $this->assign('initHideBoxes', $js);
-
     $this->addFormButtons();
   }
 
@@ -93,10 +83,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   protected function getAvailableFields(): array {
     $return = [];
     foreach ($this->getFields() as $name => $field) {
-      if ($name === 'id' && $this->isSkipExisting()) {
-        // Duplicates are being skipped so id matching is not available.
-        continue;
-      }
       if ($this->isUpdateExisting() && in_array($name, ['contact_id', 'email', 'contact.first_name', 'contact.last_name', 'external_identifier', 'email_primary.email'], TRUE)) {
         continue;
       }

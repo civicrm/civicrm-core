@@ -398,7 +398,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getContactType(): ?string {
-    return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'];
+    return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'] ?? NULL;
   }
 
   /**
@@ -451,7 +451,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       'created_id' => CRM_Core_Session::getLoggedInContactID(),
       'job_type' => $this->getUserJobType(),
       'status_id:name' => 'draft',
-      'name' => 'import_' . $this->getMappingName(),
+      'name' => 'import_' . $this->getSubmittedValue('saveMappingName'),
       'metadata' => ['submitted_values' => $this->getSubmittedValues()],
     ])->execute()->first()['id'];
   }
@@ -832,9 +832,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
 
   /**
    * Has the user chosen to update existing records.
+   *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function isUpdateExisting(): bool {
+    if (isset($this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'])) {
+      return $this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'] === 'update';
+    }
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_UPDATE;
   }
 
@@ -915,15 +920,26 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getTemplateJob(): ?array {
-    $mappingName = $this->getMappingName();
-    if (!$mappingName) {
-      return NULL;
+    $templateID = $this->templateID ?? NULL;
+    if (!$templateID && $this->getUserJobID()) {
+      $templateID = $this->getUserJob()['metadata']['template_id'] ?? NULL;
     }
-    $templateJob = UserJob::get(FALSE)
-      ->addWhere('name', '=', 'import_' . $mappingName)
-      ->addWhere('is_template', '=', TRUE)
-      ->execute()->first();
-    $this->templateID = $templateJob['id'] ?? NULL;
+
+    if ($templateID) {
+      $templateJob = UserJob::get(FALSE)
+        ->addWhere('id', '=', $templateID)
+        ->addWhere('is_template', '=', TRUE)
+        ->execute()->first();
+      $this->templateID = $templateJob['id'] ?? NULL;
+    }
+    else {
+      $mappingName = $this->getMappingName();
+      $templateJob = UserJob::get(FALSE)
+        ->addWhere('name', '=', 'import_' . $mappingName)
+        ->addWhere('is_template', '=', TRUE)
+        ->execute()->first();
+      $this->templateID = $templateJob['id'] ?? NULL;
+    }
     return $templateJob ?? NULL;
   }
 
