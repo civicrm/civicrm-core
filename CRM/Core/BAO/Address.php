@@ -362,127 +362,91 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
       return NULL;
     }
     $addresses = [];
-    $address = new CRM_Core_BAO_Address();
+    $addressApi = \Civi\Api4\Address::get(TRUE)
+      ->addSelect(
+        '*',
+        'state_province_id:abbr',
+        'state_province_id:label',
+        'location_type_id:label',
+        'country_id:label',
+        'country_id.region_id:label',
+        'county_id:label'
+      );
 
     if (empty($entityBlock['entity_table'])) {
-      $address->$fieldName = $entityBlock[$fieldName] ?? NULL;
+      if (isset($entityBlock[$fieldName])) {
+        $addressApi->addWhere($fieldName, '=', $entityBlock[$fieldName]);
+      }
     }
     else {
       $addressIds = [];
       $addressIds = self::allEntityAddress($entityBlock);
 
       if (!empty($addressIds[1])) {
-        $address->id = $addressIds[1];
+        $addressApi->addWhere('id', '=', $addressIds[1]);
       }
       else {
         return $addresses;
       }
     }
     if (isset($entityBlock['is_billing']) && $entityBlock['is_billing'] == 1) {
-      $address->orderBy('is_billing desc, id');
+      $addressApi->addOrderBy('is_billing', 'DESC');
     }
     else {
       //get primary address as a first block.
-      $address->orderBy('is_primary desc, id');
+      $addressApi->addOrderBy('is_primary', 'DESC');
     }
+    $addressApi->addOrderBy('id', 'ASC');
 
-    $address->find();
+    $addresses = (array) $addressApi->execute();
 
-    $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
     $count = 1;
-    while ($address->fetch()) {
-      // deprecate reference.
-      if ($count > 1) {
-        foreach (['state', 'state_name', 'country', 'world_region'] as $fld) {
-          if (isset($address->$fld)) {
-            unset($address->$fld);
-          }
-        }
-      }
+    foreach ($addresses as $address) {
+      // Escape all string values to prevent XSS attacks.
+      $values = array_map(function ($value) {
+        return is_string($value) ? htmlspecialchars($value) : $value;
+      }, $address);
 
-      $values = [];
-      CRM_Core_DAO::storeValues($address, $values);
+      // add state and country information: CRM-369. Also necessary for vCard format.
+      // FIXME: Longer-term, CRM_Utils_Address::format and formatVCard should use API4 field names.
+      $values['location_type'] = $address['location_type_id:label'];
+      $values['state_province_abbreviation'] = $address['state_province_id:abbr'];
+      $values['state_province'] = $values['state_province_name'] = $address['state_province_id:label'];
+      $values['country'] = $address['country_id:label'];
+      $values['world_region'] = $address['country_id.region_id:label'];
 
-      // add state and country information: CRM-369
-      if (!empty($address->location_type_id)) {
-        $values['location_type'] = $locationTypes[$address->location_type_id] ?? NULL;
-      }
-      if (!empty($address->state_province_id)) {
-        $address->state = CRM_Core_PseudoConstant::stateProvinceAbbreviation($address->state_province_id, FALSE);
-        $address->state_name = CRM_Core_PseudoConstant::stateProvince($address->state_province_id, FALSE);
-        $values['state_province_abbreviation'] = $address->state;
-        $values['state_province'] = $address->state_name;
-      }
+      self::addDisplay($values, $microformat);
 
-      if (!empty($address->country_id)) {
-        $address->country = CRM_Core_PseudoConstant::country($address->country_id);
-        $values['country'] = $address->country;
-
-        //get world region
-        $regionId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $address->country_id, 'region_id');
-        $values['world_region'] = CRM_Core_PseudoConstant::worldregion($regionId);
-      }
-
-      $address->addDisplay($microformat);
-
-      $values['display'] = $address->display;
-      $values['display_text'] = $address->display_text;
-
-      if (isset($address->master_id) && !CRM_Utils_System::isNull($address->master_id)) {
+      if ($address['master_id'] ?? FALSE) {
         $values['use_shared_address'] = 1;
       }
 
-      $addresses[$count] = $values;
-
-      //There should never be more than one primary blocks, hence set is_primary = 0 other than first
-      // Calling functions expect the key is_primary to be set, so do not unset it here!
-      if ($count > 1) {
-        $addresses[$count]['is_primary'] = 0;
-      }
-
+      $formattedAddresses[$count] = $values;
       $count++;
     }
 
-    return $addresses;
+    return $formattedAddresses;
   }
 
   /**
    * Add the formatted address to $this-> display.
    *
+   * @param array $address
+   *
    * @param bool $microformat
    *   Unexplained parameter that I've always wondered about.
    */
-  public function addDisplay($microformat = FALSE) {
-    $fields = [
-      // added this for CRM 1200
-      'address_id' => $this->id,
-      // CRM-4003
-      'address_name' => str_replace('', ' ', ($this->name ?? '')),
-      'street_address' => $this->street_address,
-      'supplemental_address_1' => $this->supplemental_address_1,
-      'supplemental_address_2' => $this->supplemental_address_2,
-      'supplemental_address_3' => $this->supplemental_address_3,
-      'city' => $this->city,
-      'state_province_name' => $this->state_name ?? "",
-      'state_province' => $this->state ?? "",
-      'postal_code' => $this->postal_code ?? "",
-      'postal_code_suffix' => $this->postal_code_suffix ?? "",
-      'country' => $this->country ?? "",
-      'world_region' => $this->world_region ?? "",
-    ];
+  private static function addDisplay(array &$address, bool $microformat = FALSE) {
+    // added this for CRM 1200
+    $address['address_id'] = $address['id'];
+    $address['county'] = $address['county_id:label'] ?? NULL;
 
-    if (isset($this->county_id) && $this->county_id) {
-      $fields['county'] = CRM_Core_PseudoConstant::county($this->county_id);
-    }
-    else {
-      $fields['county'] = NULL;
-    }
     if ($microformat) {
-      $this->display = CRM_Utils_Address::formatVCard($fields);
-      $this->display_text = CRM_Utils_Address::format($fields);
+      $address['display'] = CRM_Utils_Address::formatVCard($address);
+      $address['display_text'] = CRM_Utils_Address::format($address);
     }
     else {
-      $this->display = $this->display_text = CRM_Utils_Address::format($fields);
+      $address['display'] = $address['display_text'] = CRM_Utils_Address::format($address);
     }
   }
 
