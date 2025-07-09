@@ -1355,9 +1355,9 @@ fieldset[disabled] #bootstrap-theme .form-control {
     line-height: 54px;
   }
 }
-#bootstrap-theme .form-group {
+/* #bootstrap-theme .form-group {
   margin-bottom: 15px;
-}
+} */
 #bootstrap-theme .form-control-static {
   min-height: 34px;
   padding-top: 5px;
