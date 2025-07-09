@@ -6,6 +6,7 @@
 !/ext/afform
 !/ext/standaloneusers
 !/ext/authx
+!/ext/batch_entry
 !/ext/civigrant
 !/ext/civicrm_admin_ui
 !/ext/civicrm_search_ui
