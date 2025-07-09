@@ -211,7 +211,7 @@ class CRM_Utils_Address {
       'contact.supplemental_address_3' => $address['supplemental_address_3'] ?? '',
       'contact.city' => empty($address['city']) ? '' : "<span class=\"locality\">" . $address['city'] . "</span>",
       'contact.state_province_name' => empty($address['state_province_id:label']) ? '' : "<span class=\"region\">" . $address['state_province_id:label'] . "</span>",
-      'contact.county' => empty($address['county_id:label']) ? '' : "<span class=\"region\">" . $address['county_id:label'],
+      'contact.county' => empty($address['county_id:label']) ? '' : "<span class=\"region\">" . $address['county_id:label'] . "</span>",
       'contact.state_province' => empty($address['state_province_id:abbr']) ? '' : "<span class=\"region\">" . $address['state_province_id:abbr'] . "</span>",
       'contact.postal_code' => !$fullPostalCode ? '' : "<span class=\"postal-code\">" . $fullPostalCode . "</span>",
       'contact.country' => empty($address['country_id:label']) ? '' : "<span class=\"country-name\">" . $address['country_id:label'] . "</span>",
