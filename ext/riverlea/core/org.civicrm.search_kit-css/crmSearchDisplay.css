@@ -76,3 +76,22 @@
 .crm-contact-page .crm-search-display-pager {
   padding: 0 var(--crm-r) var(--crm-r) var(--crm-r);
 }
+/* Inline Edit */
+
+#bootstrap-theme crm-search-input .form-group { /* Fix for < 768px */
+    margin-bottom: 0;
+}
+.crm-editable-enabled:has(span.crm-search-field-value:empty)::before {
+  content: "\f303";
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
+  font-weight: 400;
+  font-size: inherit;
+  font-style: normal;
+  font-variant: normal;
+}
+.crm-editable-enabled:has(span.crm-search-field-value:empty)::after {
+  /* This is a short-term anglo-centric a11y hack for the icon added above */
+  content: 'Edit';
+  text-indent: -10000px;
+  position: absolute;
+}
