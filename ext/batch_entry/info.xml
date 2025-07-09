@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<extension key="batch_entry" type="module">
+  <file>batch_entry</file>
+  <name>Batch Data Entry</name>
+  <description>Forms to facilitate batch data entry</description>
+  <license>AGPL-3.0</license>
+  <authors>
+    <author>
+      <name>eileen</name>
+      <email>emcnaughton@wikimedia.org</email>
+      <role>Maintainer</role>
+    </author>
+  </authors>
+  <urls>
+    <url desc="Main Extension Page">https://docs.civicrm.org</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/core/-/issues</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
+  <comments></comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/BatchEntry</namespace>
+    <format>25.01.1</format>
+    <angularModule>crmBatchEntry</angularModule>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+  </mixins>
+</extension>
