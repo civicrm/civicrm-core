@@ -1173,7 +1173,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'Test Last',
       '10 Test St',
       'Test, AR 90210',
-      'US',
+      'United States',
       'Membership Information',
       'AnnualFixed',
       '************1111',
