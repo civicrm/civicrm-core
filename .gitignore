@@ -30,6 +30,7 @@
 !/ext/oembed
 !/ext/payflowpro
 !/ext/ckeditor4
+!/ext/legacybatchentry
 !/ext/legacycustomsearches
 !/ext/legacydedupefinder
 !/ext/legacyprofiles
