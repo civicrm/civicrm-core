@@ -131,6 +131,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'selected' => [
           'action' => 'select',
           'contact_type' => 'Individual',
+          'dedupe_rule' => $this->getDefaultDedupeRule(),
         ],
         'default_action' => 'select',
         'entity_name' => 'TargetContact',
@@ -144,6 +145,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
+          'dedupe_rule' => $this->getDefaultDedupeRule(),
         ],
         'default_action' => 'select',
         'entity_name' => 'SourceContact',

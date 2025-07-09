@@ -1587,13 +1587,30 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $matchIDs = [];
     $dedupeRules = $this->getDedupeRules((array) $dedupeRuleID, $params['contact_type'] ?? NULL);
     foreach ($dedupeRules as $dedupeRule) {
-      $possibleMatches = Contact::getDuplicates(FALSE)
-        ->setValues($params)
-        ->setDedupeRule($dedupeRule)
-        ->execute();
+      if ($dedupeRule === 'unique_email_match') {
+        if (empty($params['email_primary.email'])) {
+          continue;
+        }
+        // This is a pseudo-rule that works across contact type...
+        foreach (Email::get()
+          ->addWhere('email', '=', $params['email_primary.email'])
+          ->addWhere('contact_id.is_deleted', '=', FALSE)
+          // More than 10 gets a bit silly.
+          ->setLimit(10)
+          ->execute()->indexBy('contact_id') as $match) {
 
-      foreach ($possibleMatches as $possibleMatch) {
-        $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+          $matchIDs[$match['contact_id']] = $match['contact_id'];
+        }
+      }
+      else {
+        $possibleMatches = Contact::getDuplicates(FALSE)
+          ->setValues($params)
+          ->setDedupeRule($dedupeRule)
+          ->execute();
+
+        foreach ($possibleMatches as $possibleMatch) {
+          $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+        }
       }
     }
 
@@ -1864,10 +1881,21 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       'name' => 'unique_identifier_match',
       'threshold' => 1,
       'title' => ts('ID or external identifier'),
-      'rule_message' => ts('Contact ID or external identfier must be provided'),
+      'rule_message' => ts('Contact ID or external identifier must be provided'),
       'fields' => [
         'id' => 1,
         'external_identifier' => 1,
+      ],
+      'contact_type' => NULL,
+    ];
+    $this->dedupeRules['unique_email_match'] = [
+      'name' => 'unique_email_match',
+      'threshold' => 1,
+      'title' => ts('Unique email'),
+      'rule_message' => ts('Email must be provided'),
+      'fields' => [
+        'email' => 1,
+        'email_primary.email' => 1,
       ],
       'contact_type' => NULL,
     ];
