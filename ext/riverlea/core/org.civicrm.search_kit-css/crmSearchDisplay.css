@@ -78,7 +78,7 @@
 }
 /* Inline Edit */
 
-#bootstrap-theme crm-search-input .form-group { /* Fix for < 768px */
+#bootstrap-theme .crm-search-field-editable .form-group { /* Fix for < 768px */
   margin-bottom: 0;
 }
 .crm-editable-enabled:has(span.crm-search-field-value:empty)::before {
