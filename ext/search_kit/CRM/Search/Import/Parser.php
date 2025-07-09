@@ -87,6 +87,13 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
         $lineItem = $this->getEntityValues($mappedRow, $entity);
         $lineItems[] = CRM_Utils_Array::prefixKeys($lineItem, 'entity_id.');
       }
+      // Set default amount for soft credits from contribution total if not otherwise specified
+      if ($entity['entity_name'] === 'ContributionSoft' && !empty($contributionValues['total_amount'])) {
+        $softCredit = $this->getEntityValues($mappedRow, $entity);
+        if (!empty($softCredit['contact_id']) && empty($softCredit['amount'])) {
+          $mappedRow[$entity['key']]['amount'] = $contributionValues['total_amount'];
+        }
+      }
     }
     if (!$lineItems && isset($contributionValues['total_amount'])) {
       $lineItems[] = ['line_total' => $contributionValues['total_amount']];
@@ -130,7 +137,7 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
   }
 
   private function getEntityValues(array $mappedRow, array $entity): array {
-    $entityValues = array_merge($mappedRow[$entity['key']], $entity['static_values']);
+    $entityValues = array_merge($mappedRow[$entity['key']] ?? [], $entity['static_values']);
     foreach ($entity['join_values'] as $field => $joinField) {
       $joinEntity = $this->extractEntityFromFieldName($joinField);
       if (isset($mappedRow[$joinEntity][$joinField])) {

@@ -321,25 +321,34 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
           $fieldKeys['Contact Last Name'] => $lastName,
           $fieldKeys['Contact Gender'] => 2,
         ],
+        [
+          $fieldKeys['Total Amount'] => 300,
+          $fieldKeys['Financial Type'] => 1,
+          $fieldKeys['Contact First Name'] => 'Jin',
+          $fieldKeys['Contact Last Name'] => $lastName,
+          $fieldKeys['Soft Credit Contact ID'] => $softCreditContactId,
+        ],
       ],
     ]);
 
     $import = civicrm_api4($apiName, 'import');
-    $this->assertCount(2, $import);
+    $this->assertCount(3, $import);
     $this->assertEquals('IMPORTED', $import[0]['_status']);
     $this->assertEquals('IMPORTED', $import[1]['_status']);
+    $this->assertEquals('IMPORTED', $import[2]['_status']);
 
     $contributions = civicrm_api4('Contribution', 'get', [
       'select' => ['id', 'financial_type_id', 'total_amount', 'contact_id.first_name', 'contact_id.gender_id'],
       'where' => [['contact_id.last_name', '=', $lastName]],
       'orderBy' => ['id' => 'ASC'],
     ]);
-    $this->assertCount(2, $contributions);
+    $this->assertCount(3, $contributions);
 
     $this->assertEquals($import[0]['_entity_id'], $contributions[0]['id']);
     $this->assertEquals($import[1]['_entity_id'], $contributions[1]['id']);
     $this->assertEquals(100, $contributions[0]['total_amount']);
     $this->assertEquals(200, $contributions[1]['total_amount']);
+    $this->assertEquals(300, $contributions[2]['total_amount']);
     $this->assertEquals(1, $contributions[0]['financial_type_id']);
     $this->assertEquals(2, $contributions[1]['financial_type_id']);
     $this->assertEquals('Jane', $contributions[0]['contact_id.first_name']);
@@ -355,6 +364,13 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals(10, $contributionSoft['amount']);
     // This value was set in the ON clause & should have carried through
     $this->assertEquals('in_honor_of', $contributionSoft['soft_credit_type_id:name']);
+
+    $contributionSoft = civicrm_api4('ContributionSoft', 'get', [
+      'select' => ['contact_id', 'amount', 'soft_credit_type_id:name'],
+      'where' => [['contribution_id', '=', $contributions[2]['id']]],
+    ])->single();
+    // Not specified in 2nd contribution but implied by the total_amount
+    $this->assertEquals(300, $contributionSoft['amount']);
   }
 
 }
