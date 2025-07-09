@@ -78,6 +78,9 @@
 }
 /* Inline Edit */
 
+#bootstrap-theme crm-search-input .form-group { /* Fix for < 768px */
+    margin-bottom: 0;
+}
 .crm-editable-enabled:has(span.crm-search-field-value:empty)::before {
   content: "\f303";
   font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
