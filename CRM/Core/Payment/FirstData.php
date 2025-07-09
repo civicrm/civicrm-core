@@ -122,8 +122,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //  $requestFields[       ''  ]          =  $params[ 'billing_first_name'    ];
     //  $requestFields[       ''  ]          =  $params[ 'billing_middle_name'    ];
     //  $requestFields[       ''  ]          =  $params[ 'billing_last_name'  ];
-
-    //  $requestFields[       ''  ]          =  $params[ 'contributionType_name'  ];
     //  $requestFields[       ''  ]          =  $params[ 'contributionPageID'  ];
     //  $requestFields[       ''  ]          =  $params[ 'contributionType_accounting_code'  ];
     //  $requestFields[       ''  ]          =  $params['amount_level'  ];
