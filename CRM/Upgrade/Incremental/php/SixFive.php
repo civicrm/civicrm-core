@@ -67,7 +67,21 @@ class CRM_Upgrade_Incremental_php_SixFive extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_5_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Update Membership mappings', 'upgradeImportMappingFields', 'Membership');
     $this->addTask('Install legacyprofiles extension', 'installLegacyProfiles');
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext|null $context
+   * @param string $entity
+   *
+   * @return true
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function upgradeImportMappingFields($context, string $entity): bool {
+    CRM_Upgrade_Incremental_php_SixTwo::upgradeImportMappingFields($context, $entity);
+    return TRUE;
   }
 
   /**

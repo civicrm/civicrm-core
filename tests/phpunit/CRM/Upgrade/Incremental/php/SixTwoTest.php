@@ -118,6 +118,45 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
   }
 
   /**
+   * After some confusion the correct contact ID field for membership imports is Contact.id.
+   *
+   * https://github.com/civicrm/civicrm-core/pull/33110
+   *
+   * @return void
+   */
+  public function testUpdateMembershipUserJobs(): void {
+    $mapping = Mapping::create(FALSE)
+      ->setValues([
+        'name' => 'Membership import',
+        'mapping_type_id:name' => 'Import Membership',
+      ])->execute()->single();
+    $fields = [
+      'contact_id',
+      'Contact.id',
+      'Membership.contact_id',
+    ];
+
+    foreach ($fields as $index => $field) {
+      MappingField::create()
+        ->setValues(['name' => $field, 'mapping_id' => $mapping['id'], 'column_number' => $index])
+        ->execute();
+    }
+
+    CRM_Upgrade_Incremental_php_SixTwo::upgradeImportMappingFields(NULL, 'Membership');
+    $mappings = MappingField::get()
+      ->addWhere('mapping_id', '=', $mapping['id'])
+      ->execute();
+    $this->assertEquals('Contact.id', $mappings[0]['name']);
+    $this->assertEquals('Contact.id', $mappings[1]['name']);
+    $this->assertEquals('Contact.id', $mappings[2]['name']);
+
+    $templateJob = UserJob::get(FALSE)
+      ->addWhere('name', '=', 'import_Membership import')
+      ->addWhere('is_template', '=', TRUE)->execute()->single();
+    $this->assertEquals([['name' => 'Contact.id'], ['name' => 'Contact.id'], ['name' => 'Contact.id']], $templateJob['metadata']['import_mappings']);
+  }
+
+  /**
    * Checks the upgrade copes with contribution contact fields not correctly updated in 6.1.
    *
    * These fields are available in contribution import with civiimport but not other imports &
