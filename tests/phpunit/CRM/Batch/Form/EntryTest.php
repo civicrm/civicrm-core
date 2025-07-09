@@ -24,6 +24,7 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\Batch;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
@@ -43,11 +44,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * @var int
    */
   protected $organizationContactID;
-
-  /**
-   * @var int
-   */
-  protected $organizationContactID2;
 
   /**
    * @var int
@@ -114,13 +110,13 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
     $this->membershipTypeID = $membershipType['id'];
 
-    $this->organizationContactID2 = $this->organizationCreate();
+    $this->organizationCreate([], 'organization_2');
     $params = [
       'name' => 'General',
       'duration_unit' => 'year',
       'duration_interval' => 1,
       'period_type' => 'rolling',
-      'member_of_contact_id' => $this->organizationContactID2,
+      'member_of_contact_id' => $this->ids['Contact']['organization_2'],
       'domain_id' => 1,
       'financial_type_id' => 1,
       'is_active' => 1,
@@ -173,12 +169,11 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   public function testProcessMembership(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
 
-    $form = new CRM_Batch_Form_Entry();
-    $profileID = (int) $this->callAPISuccessGetValue('UFGroup', ['return' => 'id', 'name' => 'membership_batch_entry']);
-    $form->_fields = CRM_Core_BAO_UFGroup::getFields($profileID, FALSE, CRM_Core_Action::VIEW);
-
     $params = $this->getMembershipData();
-    $this->assertEquals(4500.0, $form->testProcessMembership($params));
+    $this->createTestEntity('Batch', ['name' => 'membership', 'status_id:name' => 'Open', 'type_id:name' => 'Membership', 'item_count' => 3, 'total' => 3]);
+    $this->getTestForm('CRM_Batch_Form_Entry', $params, ['id' => $this->ids['Batch']['default']])
+      ->processForm();
+
     $memberships = $this->callAPISuccess('Membership', 'get')['values'];
     $this->assertCount(3, $memberships);
 
@@ -247,10 +242,8 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * CRM-18000 - Test start_date, end_date after renewal
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMembershipRenewalDates(): void {
-    $form = new CRM_Batch_Form_Entry();
     foreach ([$this->contactID, $this->contactID2] as $contactID) {
       $membershipParams = [
         'membership_type_id' => $this->membershipTypeID2,
@@ -268,16 +261,20 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       1 => 2,
       2 => 2,
     ];
-    $params['field'][1]['membership_type'] = [0 => $this->organizationContactID2, 1 => $this->membershipTypeID2];
+    $params['field'][1]['membership_type'] = [0 => $this->ids['Contact']['organization_2'], 1 => $this->membershipTypeID2];
     $params['field'][1]['receive_date'] = date('Y-m-d');
 
     // explicitly specify start and end dates
-    $params['field'][2]['membership_type'] = [0 => $this->organizationContactID2, 1 => $this->membershipTypeID2];
+    $params['field'][2]['membership_type'] = [0 => $this->ids['Contact']['organization_2'], 1 => $this->membershipTypeID2];
     $params['field'][2]['membership_start_date'] = "2016-04-01";
     $params['field'][2]['membership_end_date'] = "2017-03-31";
-    $params['field'][2]['receive_date'] = "2016-04-01";
-
-    $this->assertEquals(3.0, $form->testProcessMembership($params));
+    $params['field'][2]['receive_date'] = '2016-04-01';
+    $this->createTestEntity('Batch', ['name' => 'membership', 'status_id:name' => 'Open', 'type_id:name' => 'Membership', 'item_count' => 3, 'total' => 3]);
+    $this->getTestForm('CRM_Batch_Form_Entry', $params, ['id' => $this->ids['Batch']['default']])
+      ->processForm();
+    $batch = Batch::get()
+      ->execute()->single();
+    $this->assertEquals(4500, $batch['total']);
     $result = $this->callAPISuccess('Membership', 'get')['values'];
 
     // renewal dates should be from current if start_date and end_date is passed as NULL
