@@ -208,6 +208,10 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         'allowFields' => ['fieldName', 'filters', 'formName', 'ids', 'input', 'page', 'values'],
         'checkRequest' => fn($request, $jwt) => ('afform:' . $jwt['afform']) === $request['formName'],
       ],
+      ';^civicrm/ajax/api4/SearchDisplay/run$;' => [
+        'allowFields' => ['return', 'savedSearch', 'display', 'sort', 'limit', 'seed', 'filters', 'afform'],
+        'checkRequest' => fn($request, $jwt) => ($jwt['afform'] === $request['afform']),
+      ],
       // It's been hypothesized that we'll also need this. Haven't seen it yet.
       // ';^civicrm/ajax/api4/Afform/getFields;' => [
       //   'allowFields' => [],
