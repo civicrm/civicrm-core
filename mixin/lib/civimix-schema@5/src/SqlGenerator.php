@@ -116,7 +116,10 @@ return new class() {
         $primaryKeys[] = "`$fieldName`";
       }
       // if we have localizable columns and we are in multilingual mode generate columns in the multilingual format.
-      if (!empty($field['localizable']) && CRM_Core_I18n::isMultilingual()) {
+      if (!Civi\Core\Container::isContainerBooted()) {
+        $definition[] = "`$fieldName` " . self::generateFieldSql($field);
+      }
+      elseif (!empty($field['localizable']) && CRM_Core_I18n::isMultilingual()) {
         $locales = CRM_Core_I18n::getMultilingual();
         foreach ($locales as $locale) {
           $definition[] = "`$fieldName_{$locale}` " . self::generateFieldSql($field);
