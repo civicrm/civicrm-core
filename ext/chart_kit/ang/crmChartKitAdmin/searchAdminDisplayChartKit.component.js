@@ -1,7 +1,7 @@
 (function (angular, $, _) {
   "use strict";
 
-  angular.module('crmChartKit').component('searchAdminDisplayChartKit', {
+  angular.module('crmChartKitAdmin').component('searchAdminDisplayChartKit', {
     bindings: {
       display: '<',
       apiEntity: '<',
@@ -11,7 +11,7 @@
       parent: '^crmSearchAdminDisplay',
       crmSearchAdmin: '^crmSearchAdmin'
     },
-    templateUrl: '~/crmChartKit/searchAdminDisplayChartKit.html',
+    templateUrl: '~/crmChartKitAdmin/searchAdminDisplayChartKit.html',
     controller: function ($scope, searchMeta, chartKitColumnConfig, chartKitChartTypes, chartKitReduceTypes) {
       const ts = $scope.ts = CRM.ts('chart_kit');
 
