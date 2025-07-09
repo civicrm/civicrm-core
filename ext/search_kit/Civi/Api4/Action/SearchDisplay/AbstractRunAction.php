@@ -290,6 +290,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $cssClass[] = 'crm-search-field-show-linebreaks';
       }
     }
+    if (!empty($out['edit'])) {
+      $cssClass[] = 'crm-search-field-editable';
+    }
     if ($cssClass) {
       $out['cssClass'] = implode(' ', $cssClass);
     }
