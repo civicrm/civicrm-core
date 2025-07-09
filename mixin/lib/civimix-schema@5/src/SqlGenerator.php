@@ -115,7 +115,16 @@ return new class() {
       if (!empty($field['primary_key'])) {
         $primaryKeys[] = "`$fieldName`";
       }
-      $definition[] = "`$fieldName` " . self::generateFieldSql($field);
+      // if we have localizable columns and we are in multilingual mode generate columns in the multilingual format.
+      if (!empty($field['localizable']) && CRM_Core_I18n::isMultilingual()) {
+        $locales = CRM_Core_I18n::getMultilingual();
+        foreach ($locales as $locale) {
+          $definition[] = "`$fieldName_{$locale}` " . self::generateFieldSql($field);
+        }
+      }
+      else {
+        $definition[] = "`$fieldName` " . self::generateFieldSql($field);
+      }
     }
     if ($primaryKeys) {
       $definition[] = 'PRIMARY KEY (' . implode(', ', $primaryKeys) . ')';
