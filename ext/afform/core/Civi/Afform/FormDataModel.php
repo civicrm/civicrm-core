@@ -250,8 +250,6 @@ class FormDataModel {
     if (!isset($field)) {
       return NULL;
     }
-    // add template based on input_type
-    $field['template'] = self::getInputTypeTemplate($field['input_type']);
 
     // Id field for selecting existing entity
     if ($field['name'] === CoreUtil::getIdFieldName($entityName)) {
@@ -279,7 +277,7 @@ class FormDataModel {
    * @param string $inputType name of input type
    * @return string path to the angular template for this input type
    */
-  protected static function getInputTypeTemplate(string $inputType): ?string {
+  public static function getInputTypeTemplate(string $inputType): ?string {
     // if afform admin is not enabled, there is no hook
     // to add custom input types so we can just use the
     // naive string concatenation
