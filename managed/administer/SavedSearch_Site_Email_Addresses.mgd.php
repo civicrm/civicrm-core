@@ -10,7 +10,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Site_Email_Addresses',
-        'label' => ts('Site Email Addresses'),
+        'label' => ts('Site From Email Addresses'),
         'api_entity' => 'SiteEmailAddress',
         'api_params' => [
           'version' => 4,
@@ -42,7 +42,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Site_Email_Addresses',
-        'label' => ts('Site Email Addresses'),
+        'label' => ts('Site From Email Addresses'),
         'saved_search_id.name' => 'Site_Email_Addresses',
         'type' => 'table',
         'settings' => [
