@@ -15,10 +15,20 @@
           {{ symbol.label }}
         </option>
       </select>
-      <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
     </div>
+  </fieldset>
+  <fieldset>
+    <div class="form-inline crm-search-admin-flex-row" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
+    <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if no results.') }}">
+      <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
+      <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
+    </div>
+  </fieldset>
+  <fieldset>
     <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
     <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
+  </fieldset>
+  <fieldset>
     <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
   </fieldset>
 </details>
