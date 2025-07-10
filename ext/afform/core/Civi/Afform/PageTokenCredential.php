@@ -133,7 +133,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
     $allowedForm = $jwt['afform'];
 
     // Afform screens are generally built around APIv4. If it's an APIv4 request, then we check whitelist for entities/actions/fields.
-    if (preg_match(';^civicrm/ajax/api4/(\w+)/(\w+);', $route, $m)) {
+    if (preg_match(';^civicrm/ajax/api4/(\w+)/(\w+)/?$;', $route, $m)) {
       $parsed = json_decode(\CRM_Utils_Request::retrieve('params', 'String'), 1);
       if (empty($parsed)) {
         \Civi::log()->warning("Malformed request. APIv4 call requires \"params\" be JSON.");
@@ -141,7 +141,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
       }
       return $this->checkAllowedApi4Call($m[1], $m[2], $parsed, $jwt);
     }
-    elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && preg_match(';^civicrm/ajax/api4/?;', $route)) {
+    elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && preg_match(';^civicrm/ajax/api4/?$;', $route)) {
       $calls = json_decode(\CRM_Utils_Request::retrieve('calls', 'String'), 1);
       if (empty($calls)) {
         \Civi::log()->warning("Malformed request. APIv4 calls requires \"calls\" be JSON.");
