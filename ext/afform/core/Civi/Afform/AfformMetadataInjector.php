@@ -206,6 +206,15 @@ class AfformMetadataInjector {
    */
   private static function fillFieldMetadata($entityNames, string $action, \DOMElement $afField):void {
     $fieldName = $afField->getAttribute('name');
+
+    // for magic munged fields like display_name,sort_name,email_primary.email
+    // we now fill with metadata for the first field. (previously they were ignored entirely)
+    // afform authors should take care that munged fields are of compatible types
+    // or strange things will happen
+    if (\str_contains($fieldName, ',')) {
+      $fieldName = explode(',', $fieldName)[0];
+    }
+
     $fieldInfo = self::getFieldMetadata($entityNames, $action, $fieldName);
     // Merge field definition data with whatever's already in the markup.
     if ($fieldInfo) {
