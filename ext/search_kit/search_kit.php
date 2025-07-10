@@ -20,18 +20,13 @@ function search_kit_civicrm_config(&$config) {
  */
 function search_kit_civicrm_permission(&$permissions) {
   $permissions['administer search_kit'] = [
-    'label' => E::ts('SearchKit: edit and delete searches'),
+    'label' => E::ts('SearchKit: edit and delete all searches'),
     'description' => E::ts('Gives non-admin users access to the SearchKit UI to create, update and delete searches and displays'),
     'implied_by' => ['administer CiviCRM data'],
   ];
-  $permissions['edit own search_kit'] = [
-    'label' => E::ts('SearchKit: edit searches that the user created'),
-    'description' => E::ts('Gives non-admin users the permission to edit their own searches and displays'),
-    'implied_by' => ['administer search_kit'],
-  ];
-  $permissions['delete own search_kit'] = [
-    'label' => E::ts('SearchKit: delete searches that the user created'),
-    'description' => E::ts('Gives non-admin users the permission to delete their own searches and displays'),
+  $permissions['manage own search_kit'] = [
+    'label' => E::ts('SearchKit: edit and delete own searches'),
+    'description' => E::ts('Gives non-admin users the permission to manage their own searches and displays'),
     'implied_by' => ['administer search_kit'],
   ];
 }

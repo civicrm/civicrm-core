@@ -106,8 +106,8 @@
       this.onPostRun.push(function(apiResults) {
         _.each(apiResults.run, function(row) {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
-          // If someone has edit own permission, we need to override and only allow if they are the owner.
-          if (!CRM.checkPerm('all CiviCRM permissions and ACLs') && CRM.checkPerm('edit own search_kit') && (CRM.config.cid !== row.data.created_id)) {
+          // If someone has manage own permission, we need to override and only allow if they are the owner.
+          if (!CRM.checkPerm('all CiviCRM permissions and ACLs') && CRM.checkPerm('manage own search_kit') && (CRM.config.cid !== row.data.created_id)) {
             row.permissionToEdit = false;
           }
 
@@ -124,11 +124,8 @@
             row.openDisplayMenu = false;
           }
 
-          row.permissionToDelete = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
-          // If someone has 'delete own search_kit' permission, we need to override and only allow if they are the owner.
-          if (!CRM.checkPerm('all CiviCRM permissions and ACLs') && CRM.checkPerm('delete own search_kit') && (CRM.config.cid !== row.data.created_id)) {
-            row.permissionToDelete = false;
-          }
+          // Implied permission that if you can edit, you should be able to delete.
+          row.permissionToDelete = row.permissionToEdit;
         });
         updateAfformCounts();
       });

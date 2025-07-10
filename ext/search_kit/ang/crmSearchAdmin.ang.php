@@ -23,7 +23,6 @@ return [
     'administer afform',
     'view debug output',
     'schedule communications',
-    'edit own search_kit',
-    'delete own search_kit',
+    'manage own search_kit',
   ],
 ];
