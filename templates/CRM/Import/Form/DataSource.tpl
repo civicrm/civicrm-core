@@ -112,6 +112,12 @@
            <td>{$form.savedMapping.html}</td>
          </tr>
        {/if}
+      {if array_key_exists('userJobTemplate', $form)}
+        <tr class="crm-import-uploadfile-form-block-userJobTemplate">
+          <td class="label"><label for="userJobTemplate">{$form.userJobTemplate.label}</label></td>
+          <td>{$form.userJobTemplate.html}</td>
+        </tr>
+      {/if}
     </table>
   </div>
   <div class="spacer"></div>

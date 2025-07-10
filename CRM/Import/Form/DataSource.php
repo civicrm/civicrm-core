@@ -113,12 +113,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
     );
 
-    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . $this->getBaseEntity());
-
-    $savedMappingElement = $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
-    if ($this->getTemplateID()) {
-      $savedMappingElement->freeze();
-    }
+    $this->addMappingSelector();
 
     //build date formats
     $this->buildAllowedDateFormats();
@@ -172,6 +167,19 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   }
 
   /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function addMappingSelector(): void {
+    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . $this->getBaseEntity());
+
+    $savedMappingElement = $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
+    if ($this->getTemplateID()) {
+      $savedMappingElement->freeze();
+    }
+  }
+
+  /**
    * A long-winded way to add one radio element to the form.
    */
   protected function addContactTypeSelector() {
@@ -208,6 +216,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * Common postProcessing.
    */
   public function postProcess() {
+    // Force template load.
+    $this->getTemplateID();
     $this->processDatasource();
     $this->controller->resetPage('MapField');
     parent::postProcess();
@@ -267,6 +277,11 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       else {
         $submittedValues = $this->getSubmittedValues();
         $fieldsToCopyOver = array_keys(array_diff_key($submittedValues, $this->submittableFields));
+        $templateID = (int) $this->getSubmittedValue('userJobTemplate');
+        if ($templateID && $templateID !== $this->getUserJob()['metadata']['template_id'] ?? NULL) {
+          $this->updateUserJobMetadata('template_id', $templateID);
+          $this->updateUserJobMetadata('import_mappings', $this->getTemplateJob()['metadata']['import_mappings']);
+        }
         if ($submittedValues['use_existing_upload']) {
           // Use the already saved value.
           $fieldsToCopyOver[] = 'dataSource';
