@@ -177,7 +177,7 @@ class ActionMapping extends \Civi\ActionSchedule\MappingBase {
     }
     $apiQuery->getSql();
     $sqlSelect = \CRM_Utils_SQL_Select::from($apiQuery->getQuery()->getFrom());
-    $sqlSelect->merge($apiQuery->getQuery(), ['joins', 'wheres']);
+    $sqlSelect->merge($apiQuery->getQuery(), ['joins', 'wheres', 'groupBys', 'havings']);
     $sqlSelect->param($defaultParams);
     $sqlSelect['casAddlCheckFrom'] = $sqlSelect->getFrom();
     $sqlSelect['casContactIdField'] = SqlExpression::convert($contactIdFieldName)->render($apiQuery);
