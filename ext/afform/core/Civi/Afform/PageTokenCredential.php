@@ -261,6 +261,10 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         'allowFields' => ['return', 'savedSearch', 'display', 'sort', 'limit', 'seed', 'filters', 'afform'],
         'checkRequest' => fn($request, $jwt) => ($jwt['afform'] === $request['afform']),
       ],
+      ';^SearchDisplay inlineEdit$;' => [
+        'allowFields' => ['return', 'savedSearch', 'display', 'sort', 'limit', 'seed', 'filters', 'afform', 'rowKey', 'values'],
+        'checkRequest' => fn($request, $jwt) => ($jwt['afform'] === $request['afform']),
+      ],
       // It's been hypothesized that we'll also need this. Haven't seen it yet.
       // ';^Afform getFields;' => [
       //   'allowFields' => [],
