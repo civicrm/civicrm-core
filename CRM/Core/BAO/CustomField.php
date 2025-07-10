@@ -1382,7 +1382,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
             'uri'
           );
           $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileID);
-          $url = CRM_Utils_System::url('civicrm/file', "reset=1&id=$fileID&eid=$contactID&fcs=$fileHash", $absolute);
+          $url = CRM_Utils_System::url('civicrm/file', "reset=1&id=$fileID&eid=$contactID&fcs=$fileHash", $absolute, NULL, TRUE, $absolute);
           $result['file_url'] = CRM_Utils_File::getFileURL($uri, $fileType, $url);
         }
       }
