@@ -168,7 +168,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
     else {
       $factoryClassName = $this->factoryClassName();
-      $JUserTable = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createTable('user', 'JTable', []);
+      $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+      $JUserTable = new \Joomla\CMS\Table\User($db);
     }
     $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
@@ -381,7 +382,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
     else {
       $factoryClassName = $this->factoryClassName();
-      $JUserTable = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createTable('user', 'JTable', []);
+      $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+      $JUserTable = new \Joomla\CMS\Table\User($db);
     }
     $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
@@ -428,7 +430,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
     else {
       $factoryClassName = $this->factoryClassName();
-      $JUserTable = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createTable('user', 'JTable', []);
+      $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+      $JUserTable = new \Joomla\CMS\Table\User($db);
     }
 
     $db = $JUserTable->getDbo();
@@ -1041,7 +1044,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
     else {
       $factoryClassName = $this->factoryClassName();
-      $JUserTable = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createTable('user', 'JTable', []);
+      $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+      $JUserTable = new \Joomla\CMS\Table\User($db);
     }
     $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
