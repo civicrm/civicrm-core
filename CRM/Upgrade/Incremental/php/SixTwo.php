@@ -257,6 +257,9 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
         return $preSixOneMappings[$mappingFieldsName];
       }
     }
+    if ($type === 'Membership' && in_array($mappingFieldsName, ['Contact.id', 'Membership.contact_id', 'contact_id'])) {
+      return 'Contact.id';
+    }
 
     if (!isset($prefixMap[$prefix])) {
       // This is a 'native' mapping, add a prefix.
