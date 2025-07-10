@@ -19,7 +19,7 @@
   <p>{ts}Select the "FROM" Email Address for this mailing from the dropdown list. Available email addresses are configurable by users with Administer CiviCRM permission. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
 {crmPermission has='administer CiviCRM'}
   {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/site_email_address"}{/capture}
-  <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a> to add or edit email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
+  <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; Site From Email Addresses</a> to add or edit email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
 {/crmPermission}
 {crmPermission not='administer CiviCRM'}
   {ts}Contact your site administrator if you need to use a "FROM" Email Address which is not in the dropdown list.{/ts}

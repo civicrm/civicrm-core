@@ -113,7 +113,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     $url = CRM_Utils_System::url('civicrm/admin/options/site_email_address',
       'reset=1'
     );
-    $status = ts("There is no valid default email address configured for the site. <a href='%1'>Configure Site Email Addresses.</a>", [1 => $url]);
+    $status = ts("There is no valid default email address configured for the site. <a href='%1'>Configure Site From Email Addresses.</a>", [1 => $url]);
     return $status;
   }
 
