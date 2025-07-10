@@ -1667,6 +1667,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $afform['searchDisplay']['fieldset'] = $key === 'form' ? [] : $fieldset;
         }
       }
+      // For security, Afform must contain the search display.
+      if (!$afform['searchDisplay']) {
+        throw new UnauthorizedException('Afform does not contain search display');
+      }
       $this->_afform = $afform;
     }
     return $this->_afform;
