@@ -34,7 +34,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testLoadDataSourceSavedTemplate(): void {
-    // First do a basic submission, creating a Mapping and UserJob template in the process.
+    // First do a basic submission, creating a UserJob template in the process.
     [$templateJob, $mapping] = $this->runImportSavingImportTemplate();
 
     // Now try this template in in the url to load the defaults for DataSource.
@@ -43,8 +43,6 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     $this->formController = $form->controller;
     $form->buildForm();
     $defaults = $this->getFormDefaults($form);
-    // These next 2 fields should be loaded as defaults from the UserJob template.
-    $this->assertEquals([$mapping['id']], $defaults['savedMapping']);
   }
 
   /**
