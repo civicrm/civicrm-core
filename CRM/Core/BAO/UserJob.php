@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Mapping;
 use Civi\Api4\Queue;
 use Civi\Api4\UserJob;
 use Civi\Core\ClassScanner;
@@ -97,12 +96,6 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
       unset($params['metadata']['MapField']['saveMapping'], $params['metadata']['MapField']['updateMapping']);
     }
 
-    // If the related mapping is deleted then delete the UserJob template
-    // This almost never happens in practice...
-    if ($event->entity === 'Mapping' && $event->action === 'delete') {
-      $mappingName = Mapping::get(FALSE)->addWhere('id', '=', $event->id)->addSelect('name')->execute()->first()['name'];
-      UserJob::delete(FALSE)->addWhere('name', '=', 'import_' . $mappingName)->execute();
-    }
     if ($event->entity === 'UserJob' && $event->action === 'delete') {
       Queue::delete(FALSE)->addWhere('name', '=', 'user_job_' . $event->id)->execute();
     }

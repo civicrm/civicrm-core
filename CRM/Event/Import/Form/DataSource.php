@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
+class CRM_Event_Import_Form_DataSource extends CRM_CiviImport_Form_DataSource {
 
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
