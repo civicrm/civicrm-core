@@ -249,14 +249,11 @@ input.crm-form-entityref {
 
 /* Inline edit */
 
-.crm-inline-edit {
-  border: var(--crm-dash-edit-border);
-  border-color: transparent;
-  background: none;
-  position: relative;
-}
-.crm-container .crm-editable-form {
+.crm-container .crm-editable-form,
+.crm-container .crm-search-field-editable form /* SK */ {
   display: flex;
+  gap: var(--crm-flex-gap);
+  flex-wrap: wrap;
 }
 .crm-container .crm-editable-form input {
   height: var(--crm-input-height);
@@ -274,12 +271,13 @@ input.crm-form-entityref {
 .crm-container .crm-editable-form [type="cancel"] {
   color: var(--crm-c-danger) !important;
 }
-/* in place edit  */
 .crm-container .crm-inline-edit,
 .crm-container .crm-editable-disabled,
 .crm-container .crm-editable-enabled {
   border: var(--crm-dash-edit-border);
   border-color: transparent;
+  background: none;
+  position: relative;
 }
 .crm-container .crm-editable-textarea-enabled {
   white-space: normal;
@@ -298,15 +296,18 @@ input.crm-form-entityref {
   display: inline-block;
   padding-right: var(--crm-s);
   min-height: var(--crm-r);
-  min-width: 3em;
 }
-.crm-container .crm-editable-enabled .crm-i {
+.crm-container .crm-editable-enabled .crm-i,
+.crm-editable-enabled:has(span.crm-search-field-value:empty) {
   opacity: .5;
 }
 .crm-container .replace-plain a:active:before,
 .crm-container .replace-plain:focus:before,
 .crm-container .replace-plain:hover:before,
-.crm-container .crm-editable-enabled:hover .crm-i {
+.crm-container .crm-editable-enabled:hover .crm-i,
+.crm-container .crm-editable-enabled:focus .crm-i,
+.crm-editable-enabled:has(span.crm-search-field-value:empty):hover,
+.crm-editable-enabled:has(span.crm-search-field-value:empty):focus {
   opacity: 1;
 }
 .crm-container .crm-editable-saving {
@@ -317,7 +318,6 @@ input.crm-form-entityref {
   margin: 0;
   padding: 0;
   width: auto !important;
-  /* position: relative; */
   overflow: visible;
   display: flex;
   gap: 0;
@@ -326,7 +326,9 @@ input.crm-form-entityref {
 .crm-editable-form > * {
   margin: 0;
 }
-.crm-editable-form input {
+.crm-container .crm-editable-form input,
+.crm-container .crm-search-field-editable input.form-control {
+  width: 100%;
   min-width: 14ch;
 }
 .crm-container .crm-editable-form button {
