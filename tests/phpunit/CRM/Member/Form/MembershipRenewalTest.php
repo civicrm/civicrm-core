@@ -95,7 +95,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     // NOTE: This will mock time for PHP. However, some values populated by MySQL ("modified_date") may leak through.
     CRM_Utils_Time::setTime('2020-08-01 01:00:00');
 
-    $this->ids['Contact']['individual'] = $this->_individualId = $this->individualCreate();
+    $this->_individualId = $this->individualCreate([], 'individual');
     $this->_paymentProcessorID = $this->processorCreate();
     $this->financialTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues');
     $this->ids['contact']['organization'] = $this->organizationCreate();
@@ -126,9 +126,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'max_related' => 10,
     ])['id'];
 
-    $this->_membershipID = $this->callAPISuccess('Membership', 'create', [
-      'contact_id' => $this->_individualId,
-      'membership_type_id' => $this->membershipTypeAnnualFixedID,
+    $this->_membershipID = $this->createTestEntity('Membership', [
+      'contact_id' => $this->ids['Contact']['individual'],
+      'membership_type_id:name' => 'AnnualFixed',
       'join_date' => '2020-04-13',
       'source' => 'original_source',
     ])['id'];
@@ -392,16 +392,15 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'minimum_fee' => 10,
     ]);
     $this->createLoggedInUser();
-    $form = $this->getForm(array_merge($this->getBaseSubmitParams(), ['is_recur' => 1, 'auto_renew' => '1']));
+    $this->getTestForm('CRM_Member_Form_MembershipRenewal',
+      array_merge($this->getBaseSubmitParams(), ['is_recur' => 1, 'auto_renew' => '1']),
+      ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default'], 'mode' => 'test'])
+      ->processForm();
 
-    $form->_contactID = $this->_individualId;
-    $form->_mode = 'test';
-
-    $form->testSubmit();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId, 'membership_type_id' => $this->membershipTypeAnnualFixedID]);
     $this->assertEquals('2020-04-13', $membership['join_date']);
     $this->assertEquals(CRM_Utils_Time::date('Y-01-01'), $membership['start_date']);
-    $nextYear = CRM_Utils_Time::date('Y') + 1;
+    $nextYear = (int) CRM_Utils_Time::date('Y') + 1;
     $this->assertEquals(CRM_Utils_Time::date($nextYear . '-01-31'), $membership['end_date']);
     $expectedStatus = (strtotime(CRM_Utils_Time::date('Y-07-14')) > CRM_Utils_Time::time()) ? 'New' : 'Current';
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $expectedStatus), $membership['status_id']);
@@ -473,11 +472,11 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test message template output.
    */
   public function testMailOutput(): void {
-    $this->mut = new CiviMailUtils($this, TRUE);
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate('membership_offline_receipt');
     $this->swapMessageTemplateForTestTemplate('membership_offline_receipt', 'text');
     $this->submitInstantCardRenewal();
-    $this->mut->checkAllMailLog([
+    $mailUtil->checkAllMailLog([
       'thanks heaps',
       'smarty:contributionID|' . $this->ids['Contribution']['live'],
       'smarty:membershipID|' . $this->ids['Membership']['live'],
