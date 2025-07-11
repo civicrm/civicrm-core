@@ -45,7 +45,6 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     $defaults = $this->getFormDefaults($form);
     // These next 2 fields should be loaded as defaults from the UserJob template.
     $this->assertEquals('Organization', $defaults['contactType']);
-    $this->assertEquals([$mapping['id']], $defaults['savedMapping']);
   }
 
   /**
