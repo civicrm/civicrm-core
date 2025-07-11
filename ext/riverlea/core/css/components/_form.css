@@ -250,7 +250,7 @@ input.crm-form-entityref {
 /* Inline edit */
 
 .crm-container .crm-editable-form,
-.crm-container form:has(> .form-inline) /* SK */ {
+.crm-container .crm-search-field-editable form /* SK */ {
   display: flex;
   gap: var(--crm-flex-gap);
   flex-wrap: wrap;
@@ -327,7 +327,7 @@ input.crm-form-entityref {
   margin: 0;
 }
 .crm-container .crm-editable-form input,
-.crm-container crm-search-display-editable input.form-control {
+.crm-container .crm-search-field-editable input.form-control {
   width: 100%;
   min-width: 14ch;
 }
