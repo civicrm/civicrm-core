@@ -42,6 +42,11 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
 
   public function onPostInstall(CRM_Extension_Info $info) {
     \Civi\Core\ClassScanner::cache('index')->flush();
+    // If we are in a multilingual site trigger a rebuild of the multilingual schema in case we have installed an entity with translatable columns.
+    if (CRM_Core_I18n::isMultilingual()) {
+      $locales = CRM_Core_I18n::getMultilingual();
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales);
+    }
   }
 
   /**
