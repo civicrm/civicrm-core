@@ -62,7 +62,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'field3' => 1,
         'field4' => [4, 5, 6],
         'field5' => 'apple',
-        'field6' => 0,
+        'field6' => 42,
       ],
       [
         'field1' => 6,
