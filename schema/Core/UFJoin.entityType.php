@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Profile Use'),
     'title_plural' => ts('Profile Uses'),
-    'description' => ts('User framework join table. This links various internal civicrm object with a profile. Initial use cases are the donation object and the user module'),
+    'description' => ts('Profile join table (formerly User Framework Join). Links various internal CiviCRM entities with a profile, such as which Contribution Pages embed a specific Profile.'),
     'log' => TRUE,
     'add' => '1.3',
   ],
