@@ -40,7 +40,7 @@
         {{ row.data.is_template ? ts('Export Template') : ts('Export Search') }}
       </a>
     </li>
-    <li ng-if="!row.data['base_module:label']" title="{{:: ts('Delete search along with any displays and forms') }}">
+    <li ng-if="!row.data['base_module:label'] && row.permissionToDelete" title="{{:: ts('Delete search along with any displays and forms') }}">
       <a href ng-click="$ctrl.deleteOrRevert(row)">
         <i class="crm-i fa-trash"></i>
         {{:: ts('Delete') }}

@@ -23,5 +23,6 @@ return [
     'administer afform',
     'view debug output',
     'schedule communications',
+    'manage own search_kit',
   ],
 ];
