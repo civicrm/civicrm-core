@@ -218,7 +218,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
     // If the entity is Individual, Organization, or Household, add the "Contact" actions
     if (CoreUtil::isContact($entity['name'])) {
-      $tasks[$entity['name']] = array_merge($tasks[$entity['name']], $tasks['Contact']);
+      $tasks[$entity['name']] = array_merge($tasks[$entity['name']], $tasks['Contact'] ?? []);
     }
 
     foreach ($tasks[$entity['name']] as $name => &$task) {
