@@ -43,7 +43,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       $params['report_id'] ??= CRM_Report_Utils_Report::getValueFromUrl();
     }
     // Fixme: Why is this even necessary?
-    if (CRM_Core_Config::singleton()->userFramework == 'Joomla') {
+    if (CRM_Core_Config::singleton()->userFramework == 'Joomla' || CRM_Core_Config::singleton()->userFramework == 'Joomla5') {
       $params['permission'] = '';
     }
 

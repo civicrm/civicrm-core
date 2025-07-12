@@ -18,7 +18,7 @@
 /**
  * Joomla specific stuff goes here.
  */
-class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+class CRM_Utils_System_Joomla5 extends CRM_Utils_System_Base {
 
   /**
    * Class constructor.
@@ -182,6 +182,24 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritdoc
+   *
+   * Joomla has a very slightly different main template
+   * from the shared CMSPrint.tpl
+   *
+   * @todo can we merge these and do away with this
+   * override? might need to update the breadcrumbs
+   * function below to match the others
+   */
+  public static function getContentTemplate($print = 0): string {
+    // I fear some callers of this function still pass FALSE rather than int
+    if (!$print) {
+      return 'CRM/common/joomla.tpl';
+    }
+    return parent::getContentTemplate($print);
+  }
+
+  /**
    * @inheritDoc
    */
   public function setTitle($title, $pageTitle = NULL) {
@@ -285,7 +303,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       // Get Itemid using JInput::get()
       $input = Joomla\CMS\Factory::getApplication()->input;
       $itemIdNum = $input->get("Itemid");
-      if ($itemIdNum && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
+      if ($itemIdNum && (!str_contains($path, 'civicrm/payment/ipn'))) {
         $Itemid = "{$separator}Itemid=" . $itemIdNum;
       }
     }
@@ -512,9 +530,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function logout() {
-    session_destroy();
-    CRM_Utils_System::setHttpHeader("Location", "index.php");
+  public function postLogoutUrl(): string {
+    return "/index.php";
   }
 
   /**
@@ -987,7 +1004,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // For Joomla CiviCRM Core files always live within the admistrator folder and $base_url is different on the frontend compared to the backend.
-    if (strpos($baseURL, 'administrator') === FALSE) {
+    if (!str_contains($baseURL, 'administrator')) {
       $userFrameworkResourceURL = $baseURL . "administrator/components/com_civicrm/civicrm/";
     }
     else {

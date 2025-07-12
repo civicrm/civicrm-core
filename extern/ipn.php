@@ -49,6 +49,7 @@ CRM_Core_Config::singleton();
 try {
   switch ($config->userFramework) {
     case 'Joomla':
+    case 'Joomla5':
       // CRM-18245
       CRM_Utils_System::loadBootStrap();
       break;
