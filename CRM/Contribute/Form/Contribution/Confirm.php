@@ -157,7 +157,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set the parameters to be passed to contribution create function.
    *
    * @param array $params
-   * @param int $financialTypeID
    * @param string $receiptDate
    * @param int $recurringContributionID
    *
@@ -165,10 +164,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   private function getContributionParams(
-    $params, $financialTypeID,
-    $receiptDate, $recurringContributionID) {
+    $params, $receiptDate, $recurringContributionID) {
     $contributionParams = [
-      'financial_type_id' => $financialTypeID,
       'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
       'tax_amount' => $params['tax_amount'] ?? NULL,
       'amount_level' => $this->getMainContributionAmountLevel(),
@@ -979,7 +976,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   - payment_type_id
    *   - thankyou_date (not all forms will set this)
    *
-   * @param CRM_Financial_DAO_FinancialType $financialType
    * @param bool $isRecur
    *   Is this recurring?
    *
@@ -994,7 +990,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params,
     $paymentProcessor,
     $contributionParams,
-    $financialType,
     $isRecur
   ) {
     $form = $this;
@@ -1012,9 +1007,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $isPledge = FALSE;
     }
 
-    // add these values for the recurringContrib function ,CRM-10188
-    $params['financial_type_id'] = $financialType->id;
-
     $contributionParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
 
     //@todo - this is being set from the form to resolve CRM-10188 - an
@@ -1031,7 +1023,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = !$isRecur ? NULL : $this->processRecurringContribution($params, [
       'contact_id' => $contactID,
-      'financial_type_id' => $financialType->id,
+      'financial_type_id' => $contributionParams['financial_type_id'],
     ]);
 
     $now = date('YmdHis');
@@ -1042,12 +1034,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (isset($params['amount'])) {
       $contributionParams = array_merge($this->getContributionParams(
-        $params, $financialType->id, $receiptDate,
+        $params, $receiptDate,
         $recurringContributionID), $contributionParams
       );
 
       $contributionParams['payment_processor'] = $paymentProcessor;
-      $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $financialType->id);
+      $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $contributionParams['financial_type_id']);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
@@ -1664,9 +1656,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   private function processSecondaryFinancialTransaction($contactID, $tempParams, $isTest, $minimumFee,
                                                    $financialTypeID): array {
-    $financialType = new CRM_Financial_DAO_FinancialType();
-    $financialType->id = $financialTypeID;
-    $financialType->find(TRUE);
     $tempParams['amount'] = $minimumFee;
     $tempParams['invoiceID'] = bin2hex(random_bytes(16));
     $isRecur = $tempParams['is_recur'] ?? NULL;
@@ -1696,6 +1685,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'campaign_id' => $tempParams['campaign_id'] ?? $this->_values['campaign_id'] ?? NULL,
       'contribution_page_id' => $this->_id,
       'source' => $tempParams['source'] ?? $tempParams['description'] ?? NULL,
+      'financial_type_id' => $financialTypeID,
     ];
     $isMonetary = !empty($this->_values['is_monetary']);
     if ($isMonetary) {
@@ -1711,7 +1701,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $tempParams,
       $tempParams['payment_processor'] ?? NULL,
       $contributionParams,
-      $financialType,
       $isRecur
     );
 
@@ -2467,7 +2456,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
-    $this->assign('is_deductible', $financialType->is_deductible);
+    $this->assign('is_deductible', $this->isDeductible($financialTypeID));
 
     // add some financial type details to the params list
     // if folks need to use it
@@ -2499,6 +2488,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'contact_id' => $contactID,
         'is_test' => $isTest,
         'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
+        'financial_type_id' => $financialTypeID,
       ];
 
       // CRM-21200: Don't overwrite contribution details during 'Pay now' payment
@@ -2530,7 +2520,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $paymentParams,
         NULL,
         $contributionParams,
-        $financialType,
         $isRecur
       );
       // CRM-13074 - create the CMSUser after the transaction is completed as it
