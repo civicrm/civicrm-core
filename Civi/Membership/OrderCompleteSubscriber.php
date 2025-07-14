@@ -73,6 +73,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
     }
 
     foreach ($memberships as $membership) {
+      $priorMembershipStatus = $membership['status_id:name'];
       $membershipParams = [
         'id' => $membership['id'],
         'contact_id' => $membership['contact_id'],
@@ -80,12 +81,6 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         'membership_type_id' => $membership['membership_type_id'],
         'membership_activity_status' => 'Completed',
       ];
-
-      $currentMembership = \CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
-        $membershipParams['membership_type_id'],
-        $membershipParams['is_test'],
-        $membershipParams['id']
-      );
 
       // CRM-8141 update the membership type with the value recorded in log when membership created/renewed
       // this picks up membership type changes during renewals
@@ -113,10 +108,13 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         // default of 1 is precautionary
         $membershipParams['num_terms'] = empty($lineItem['membership_num_terms']) ? 1 : $lineItem['membership_num_terms'];
       }
-      // @todo remove all this stuff in favour of letting the api call further down handle in
-      // (it is a duplication of what the api does).
-      $dates = [];
-      if ($currentMembership) {
+
+      if ('Pending' === $membership['status_id:name']) {
+        $membershipParams['skipStatusCal'] = '';
+      }
+      else {
+        // @todo remove all this stuff in favour of letting the api call further down handle in
+        // (it is a duplication of what the api does).
         /*
          * Fixed FOR CRM-4433
          * In BAO/Membership.php(renewMembership function), we skip the extend membership date and status
@@ -124,19 +122,14 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
          */
         // Test cover for this is in testRepeattransactionRenewMembershipOldMembership
         // Be afraid.
-        \CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeDate);
+        \CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($membership, $changeDate);
 
         // @todo - we should pass membership_type_id instead of null here but not
         // adding as not sure of testing
         $dates = \CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
           $changeDate, NULL, $membershipParams['num_terms']
         );
-        $dates['join_date'] = $currentMembership['join_date'];
-      }
-      if ('Pending' === $membership['status_id:name']) {
-        $membershipParams['skipStatusCal'] = '';
-      }
-      else {
+        $dates['join_date'] = $membership['join_date'];
         //get the status for membership.
         $calcStatus = \CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'] ?? NULL,
           $dates['end_date'] ?? NULL,
@@ -159,11 +152,10 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
       // Update activity to Completed.
       // Perhaps this should be in Membership::create? Test cover in
       // api_v3_ContributionTest.testPendingToCompleteContribution.
-      $priorMembershipStatus = $memberships[$membership['id']]['status_id'] ?? NULL;
       Activity::update(FALSE)->setValues([
         'status_id:name' => 'Completed',
         'subject' => ts('Status changed from %1 to %2'), [
-          1 => \CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $priorMembershipStatus),
+          1 => $priorMembershipStatus,
           2 => \CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']),
         ],
 

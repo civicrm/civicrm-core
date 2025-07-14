@@ -1081,7 +1081,7 @@ AND civicrm_membership.is_test = %2";
       throw new CRM_Core_Exception(ts('Oops, it looks like there is no valid membership status corresponding to the membership start and end dates for this membership. Contact the site administrator for assistance.'));
     }
 
-    if ($status['id'] !== $currentMembership['status_id']) {
+    if ((int) $status['id'] !== (int) $currentMembership['status_id']) {
       $oldStatus = $currentMembership['status_id'];
       $memberDAO = new CRM_Member_DAO_Membership();
       $memberDAO->id = $currentMembership['id'];
