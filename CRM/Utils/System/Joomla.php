@@ -748,13 +748,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       define('JDEBUG', FALSE);
     }
 
-    // Set timezone for Joomla on Cron
-    $factoryClassName = $this->factoryClassName();
-    $config = $factoryClassName::getApplication()->getConfig();
-    $timezone = $config->get('offset');
-    if ($timezone) {
-      $this->setTimeZone($timezone);
-    }
     if (version_compare(JVERSION, '4.0', '>=')) {
       if (PHP_SAPI == 'cli') {
         $this->loadJoomlaApplication('cli');
@@ -762,6 +755,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       else {
         $this->loadJoomlaApplication('admin');
       }
+    }
+
+    // Set timezone for Joomla on Cron
+    $factoryClassName = $this->factoryClassName();
+    $config = $factoryClassName::getApplication()->getConfig();
+    $timezone = $config->get('offset');
+    if ($timezone) {
+      $this->setTimeZone($timezone);
     }
 
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
@@ -1009,8 +1010,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     $userRecordUrl = NULL;
+    $factoryClassName = $this->factoryClassName();
     // if logged in user has user edit access, then allow link to other users joomla profile
-    if (JFactory::getApplication()->getIdentity()->authorise('core.edit', 'com_users')) {
+    if ($factoryClassName::getApplication()->getIdentity()->authorise('core.edit', 'com_users')) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
     }
     elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
@@ -1022,7 +1024,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function checkPermissionAddUser() {
-    if (JFactory::getApplication()->getIdentity()->authorise('core.create', 'com_users')) {
+    $factoryClassName = $this->factoryClassName();
+    if ($factoryClassName::getApplication()->getIdentity()->authorise('core.create', 'com_users')) {
       return TRUE;
     }
   }
