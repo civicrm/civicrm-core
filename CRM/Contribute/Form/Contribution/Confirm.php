@@ -40,6 +40,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   public $submitOnce = TRUE;
 
   /**
+   * @param int|null $financialTypeID
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function isDeductible(?int $financialTypeID): bool {
+    return $financialTypeID && CRM_Financial_BAO_FinancialType::getFieldValue('CRM_Financial_BAO_FinancialType', 'is_deductible', 'id', $financialTypeID);
+  }
+
+  /**
    * Previously shared code.
    *
    * @param $form
@@ -207,13 +217,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * it.
    *
    * @param array $params
-   * @param CRM_Financial_BAO_FinancialType $financialType
-   * @param bool $online
+   * @param int|null $financialTypeID
    *
-   * @return array
+   * @return float
    */
-  private function getNonDeductibleAmount($params, $financialType, $online) {
-    if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
+  private function getNonDeductibleAmount($params, ?int $financialTypeID) {
+    if ((!empty($params['non_deductible_amount']))) {
       return $params['non_deductible_amount'];
     }
     $priceSetId = $params['priceSetId'] ?? NULL;
@@ -226,12 +235,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       return $nonDeductibleAmount;
     }
     else {
-      if ($financialType->is_deductible) {
-        if ($online && isset($params['selectProduct'])) {
+      if ($this->isDeductible($financialTypeID)) {
+        if (isset($params['selectProduct'])) {
           $selectProduct = $params['selectProduct'] ?? NULL;
-        }
-        if (!$online && isset($params['product_name'][0])) {
-          $selectProduct = $params['product_name'][0];
         }
         // if there is a product - compare the value to the contribution amount
         if (isset($selectProduct) &&
@@ -1041,7 +1047,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       );
 
       $contributionParams['payment_processor'] = $paymentProcessor;
-      $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $financialType, TRUE, $form);
+      $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $financialType->id);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
