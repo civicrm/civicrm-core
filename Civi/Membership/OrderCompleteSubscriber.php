@@ -3,6 +3,7 @@ namespace Civi\Membership;
 
 use Civi\Api4\Activity;
 use Civi\Api4\LineItem;
+use Civi\Api4\Membership;
 use Civi\Api4\MembershipLog;
 use Civi\Core\Service\AutoService;
 use Civi\Core\Service\IsActiveTrait;
@@ -132,7 +133,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         );
         $dates['join_date'] = $currentMembership['join_date'];
       }
-      if ('Pending' === \CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id'])) {
+      if ('Pending' === $membership['status_id:name']) {
         $membershipParams['skipStatusCal'] = '';
       }
       else {
@@ -206,13 +207,9 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
     if (empty($membershipIDs)) {
       return [];
     }
-    // We could combine this with the MembershipPayment.get - we'd
-    // need to re-wrangle the params (here or in the calling function)
-    // as they would then me membership.contact_id, membership.is_test etc
-    return civicrm_api3('Membership', 'get', [
-      'id' => ['IN' => $membershipIDs],
-      'return' => ['id', 'contact_id', 'membership_type_id', 'is_test', 'status_id', 'end_date'],
-    ])['values'];
+    return (array) Membership::get(FALSE)->addWhere('id', 'IN', $membershipIDs)
+      ->addSelect('*', 'status_id:name')
+      ->execute();
   }
 
 }
