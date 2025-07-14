@@ -967,7 +967,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function legacyProcessMembership($customFieldsFormatted, $formDates = []): CRM_Member_DAO_Membership {
-    $updateStatusId = FALSE;
     $changeToday = NULL;
     $numRenewTerms = 1;
     $format = '%Y%m%d';
@@ -1024,14 +1023,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $ids['membership'] = $currentMembership['id'];
       }
       $memParams['membership_activity_status'] = $isPayLater ? 'Scheduled' : 'Completed';
-    }
-
-    //CRM-4555
-    //if we decided status here and want to skip status
-    //calculation in create( ); then need to pass 'skipStatusCal'.
-    if ($updateStatusId) {
-      $memParams['status_id'] = $updateStatusId;
-      $memParams['skipStatusCal'] = TRUE;
     }
 
     //since we are renewing,
