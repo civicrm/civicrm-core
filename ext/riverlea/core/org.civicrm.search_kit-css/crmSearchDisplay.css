@@ -78,8 +78,11 @@
 }
 /* Inline Edit */
 
-#bootstrap-theme .crm-search-field-editing .form-group { /* Fix for < 768px */
-  margin-bottom: 0;
+#bootstrap-theme .crm-search-field-editing .form-group,
+#bootstrap-theme .crm-search-field-editing .radio-inline,
+#bootstrap-theme .crm-search-field-editing .checkbox-inline {
+  margin-bottom: 0; /* Fix for < 768px */
+  display: flex; /* Stops wrap of radios */
 }
 .crm-editable-enabled:has(span.crm-search-field-value:empty)::before {
   content: "\f303";
@@ -94,4 +97,23 @@
   content: 'Edit';
   text-indent: -10000px;
   position: absolute;
+}
+.crm-container td.crm-search-field-editing.crm-search-col-type-field {
+  padding-block: 0; /* Removes top/bottom padding on uneditable fields */
+}
+.crm-container td.crm-search-field-editing.crm-search-field-editable,
+.crm-container .crm-search-field-editing .form-inline {
+  padding: 0;
+}
+.crm-search-display-batch span.crm-form-date-wrapper {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+#bootstrap-theme .crm-search-field-editing
+:where(input,.select2-container):where(:not(.crm-form-date,.crm-form-time,.four,.six,.eight,.twelve,.medium):not([type="checkbox"]):not([type="radio"])) {
+  width: 12ch !important /* vs inline width */;
+}
+.crm-search-display tr:has(.crm-search-field-editing) td.crm-search-ctrl-column:has(.btn-group) { /* Controls for full-row edit */
+  display: inline-table;
+  vertical-align: text-top;
 }
