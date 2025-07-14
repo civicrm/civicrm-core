@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload.
  */
-class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
+class CRM_Activity_Import_Form_DataSource extends CRM_CiviImport_Form_DataSource {
 
   /**
    * Should the text describing date formats include the time.
