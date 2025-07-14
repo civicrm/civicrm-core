@@ -1364,7 +1364,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $attributes = ['checked' => 'checked'];
         $otherContactMemberships = CRM_Member_BAO_Membership::getAllContactMembership($otherID);
         foreach ($otherContactMemberships as $membership) {
-          $mainMembership = CRM_Member_BAO_Membership::getContactMembership($mainID, $membership['membership_type_id'], FALSE);
+          $mainMembership = self::getContactMembership($mainID, $membership['membership_type_id']);
           if ($mainMembership) {
             $attributes = [];
           }
@@ -1463,6 +1463,65 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $result['other_details']['location_blocks'] = $locations['other'];
 
     return $result;
+  }
+
+  /**
+   * Return a current membership of given contact.
+   *
+   * NB: if more than one membership meets criteria, a randomly selected one is returned.
+   *
+   * @param int $contactID
+   *   Contact id.
+   * @param int $memType
+   *   Membership type, null to retrieve all types.
+   *
+   * @return array|bool
+   * @throws \CRM_Core_Exception
+   */
+  private static function getContactMembership($contactID, $memType) {
+    $dao = new CRM_Member_DAO_Membership();
+    $dao->contact_id = $contactID;
+    $dao->membership_type_id = $memType;
+    $dao->whereAdd('is_test = 0');
+    //avoid pending membership as current membership: CRM-3027
+    $statusIds = [array_search('Pending', CRM_Member_PseudoConstant::membershipStatus())];
+    // CRM-15475
+    $statusIds[] = array_search(
+      'Cancelled',
+      CRM_Member_PseudoConstant::membershipStatus(
+        NULL,
+        " name = 'Cancelled' ",
+        'name',
+        FALSE,
+        TRUE
+      )
+    );
+    $dao->whereAdd('status_id NOT IN ( ' . implode(',', $statusIds) . ')');
+
+    // order by start date to find most recent membership first, CRM-4545
+    $dao->orderBy('start_date DESC');
+
+    if ($dao->find(TRUE)) {
+      $membership = [];
+      CRM_Core_DAO::storeValues($dao, $membership);
+      $membership['is_current_member'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
+        $membership['status_id'],
+        'is_current_member', 'id'
+      );
+      $ownerMemberId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+        $membership['id'],
+        'owner_membership_id', 'id'
+      );
+      if ($ownerMemberId) {
+        $membership['id'] = $membership['membership_id'] = $ownerMemberId;
+        $membership['membership_contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+          $membership['id'],
+          'contact_id', 'id'
+        );
+      }
+      return $membership;
+    }
+    return FALSE;
   }
 
   /**
