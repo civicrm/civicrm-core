@@ -852,6 +852,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       if ($dao->id && CRM_Core_Permission::check('edit memberships')) {
         // CRM-10016, This is probably a backend renewal, and make sure we return the same membership thats being renewed.
         $dao->whereAdd();
+
+        CRM_Core_Error::deprecatedWarning('is this reachable');
       }
       else {
         unset($dao->id);
@@ -859,6 +861,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
       unset($dao->membership_type_id);
       if ($dao->find(TRUE)) {
+        CRM_Core_Error::deprecatedWarning('is this reachable');
         $membership = [];
         CRM_Core_DAO::storeValues($dao, $membership);
         $membership['is_current_member'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
