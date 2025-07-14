@@ -2636,33 +2636,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Temporary function to allow unit tests to access function being refactored away.
-   *
-   * @param int $contactID
-   * @param int $membershipTypeID
-   * @param int $membershipID
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function unitTestAccessTolegacyProcessMembership($contactID, $membershipTypeID, $membershipID = NULL) {
-    return self::legacyProcessMembership(
-      $contactID,
-      $membershipTypeID,
-      0,
-      NULL,
-      NULL,
-      NULL,
-      1,
-      $membershipID,
-      NULL,
-      NULL,
-      FALSE,
-      NULL
-    );
-  }
-
-  /**
    * Interim function for processing memberships - this is being refactored out of existence.
    *
    * @param int $contactID

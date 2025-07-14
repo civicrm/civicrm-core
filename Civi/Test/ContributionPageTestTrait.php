@@ -506,4 +506,19 @@ trait ContributionPageTestTrait {
     ];
   }
 
+  /**
+   * @param array $submittedValues
+   * @param int|null $contributionPageID
+   *   Will default to calling $this->>getContributionPageID()
+   * @param array $urlParameters
+   *
+   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   */
+  protected function submitOnlineContributionForm(array $submittedValues, ?int $contributionPageID = NULL, array $urlParameters = []): FormWrappers\EventFormParticipant|FormWrappers\EventFormOnline|FormWrapper|null {
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID ?: $this->getContributionPageID()] + $urlParameters)
+      ->addSubsequentForm('CRM_Contribute_Form_Contribution_Confirm');
+    $form->processForm();
+    return $form;
+  }
+
 }

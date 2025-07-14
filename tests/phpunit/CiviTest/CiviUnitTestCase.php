@@ -691,11 +691,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   /**
    * @param array $params
-   * @param string $identifer
+   * @param string $identifier
    *
    * @return int
    */
-  public function membershipTypeCreate(array $params = [], string $identifer = 'test'): int {
+  public function membershipTypeCreate(array $params = [], string $identifier = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
     Civi::rebuild(['tables' => TRUE])->execute();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
@@ -712,7 +712,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'visibility' => 'Public',
     ], $params);
 
-    $result = $this->createTestEntity('MembershipType', $params, $identifer);
+    $result = $this->createTestEntity('MembershipType', $params, $identifier);
 
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Utils_Cache::singleton()->flush();
