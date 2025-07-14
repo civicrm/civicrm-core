@@ -849,13 +849,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     // CRM-8141
     if ($onlySameParentOrg && $memType) {
       // see if there is a membership that has same parent as $memType but different parent than $membershipID
-      if ($dao->id && CRM_Core_Permission::check('edit memberships')) {
-        // CRM-10016, This is probably a backend renewal, and make sure we return the same membership thats being renewed.
-        $dao->whereAdd();
-      }
-      else {
-        unset($dao->id);
-      }
+      unset($dao->id);
 
       unset($dao->membership_type_id);
       if ($dao->find(TRUE)) {
