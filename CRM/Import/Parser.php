@@ -1357,7 +1357,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       if ($mappedField['name']) {
         $fieldSpec = $this->getFieldMetadata($mappedField['name']);
         $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity_name'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
-        $fieldValue = $values[$i];
+
+        // If there is no column header we are dealing with an added value mapping, do not use
+        // the database value as it will be for (e.g.) `_status`
+        $headers = $this->getUserJob()['metadata']['DataSource']['column_headers'];
+        if (array_key_exists($i, $headers) && empty($headers[$i])) {
+          $fieldValue = '';
+        }
+        else {
+          $fieldValue = $values[$i];
+        }
+
         if ($fieldValue === '' && isset($mappedField['default_value'])) {
           $fieldValue = $mappedField['default_value'];
         }
