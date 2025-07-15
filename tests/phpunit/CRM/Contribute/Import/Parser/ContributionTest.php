@@ -299,7 +299,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
       'contactType' => 'Organization',
-      'mapper' => $this->getMapperFromFieldMappings($importMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
     ];
@@ -826,19 +825,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       $fields = array_keys($originalValues);
     }
     if ($mappings) {
-      $mapper = $this->getMapperFromFieldMappings($mappings);
+      $importMappings = $this->getMapperFromFieldMappings($mappings);
     }
     else {
-      $mapper = [];
+      $importMappings = [];
       foreach ($fields as $field) {
-        $mapper[] = [$field];
+        $importMappings[] = ['name' => $field];
       }
     }
     $values = array_values($originalValues);
     $parser = new CRM_Contribute_Import_Parser_Contribution();
-    $this->userJobID = $this->getUserJobID([
-      'mapper' => $mapper,
-    ]);
+    $this->userJobID = $this->getUserJobID([], $importMappings);
     $parser->setUserJobID($this->userJobID);
     $this->updateContributionAction($action);
     $parser->init();
@@ -853,12 +850,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   /**
    * @param array $submittedValues
+   * @param array $importMappings
    *
    * @return int
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getUserJobID(array $submittedValues = []): int {
+  protected function getUserJobID(array $submittedValues = [], array $importMappings = []): int {
     $isCsv = ($submittedValues['dataSource'] ?? NULL) === 'CRM_Import_DataSource_CSV';
     if (!$isCsv && !empty($submittedValues['mapper']) && empty($submittedValues['sqlQuery'])) {
       $submittedValues['sqlQuery'] = 'SELECT ';
@@ -871,13 +869,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
-          'contactType' => 'Individual',
-          'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
-          'dedupe_rule_id' => NULL,
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
+        'import_mappings' => $importMappings,
       ],
       'status_id:name' => 'draft',
       'job_type' => 'contribution_import',

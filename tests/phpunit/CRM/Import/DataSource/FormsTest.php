@@ -146,7 +146,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    * @param string $class
    * @param array $formValues
    *
-   * @return \CRM_Core_Form
+   * @return \CRM_Import_Forms
    */
   protected function getImportForm(string $class, array $formValues = []): CRM_Core_Form {
     $formValues = array_merge($this->getDefaultValues(), $formValues);
