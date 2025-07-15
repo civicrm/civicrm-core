@@ -104,4 +104,17 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     return TRUE;
   }
 
+  /**
+   * Process the mapped fields and map it into the uploaded file
+   * preview the file and extract some summary statistics
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function postProcess(): void {
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    $parser = $this->getParser();
+    $parser->init();
+    $parser->validate();
+  }
+
 }
