@@ -51,8 +51,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
     $this->addSavedMappingFields();
 
     $this->addFormRule([
-      'CRM_Contribute_Import_Form_MapField',
-      'formRule',
+      'CRM_CiviImport_Form_MapField',
+      'validateMapping',
     ], $this);
 
     $selectColumn1 = $this->getAvailableFields();
@@ -97,35 +97,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
       $return[$name] = $field['html']['label'] ?? $field['title'];
     }
     return $return;
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @param $files
-   * @param self $self
-   *
-   * @return array|true
-   *   list of errors to be posted back to the form
-   */
-  public static function formRule($fields, $files, $self) {
-    $mapperError = [];
-    try {
-      $parser = $self->getParser();
-      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-      $mapperError = $self->validateContactFields($rule, $fields['mapper'], ['contact_id', 'external_identifier']);
-      $parser->validateMapping($fields['mapper']);
-    }
-    catch (CRM_Core_Exception $e) {
-      $mapperError[] = $e->getMessage();
-    }
-    if (!empty($mapperError)) {
-      return ['_qf_default' => implode('<br/>', $mapperError)];
-    }
-    return TRUE;
   }
 
   /**

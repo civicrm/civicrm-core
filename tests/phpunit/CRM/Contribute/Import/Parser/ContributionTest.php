@@ -57,6 +57,30 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->execute();
   }
 
+  /**
+   * Update saved userJob metadata - as the angular screen would do.
+   *
+   * @param array $mappings
+   * @param string $contactType
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function updateJobMetadata(array $mappings, string $contactType): void {
+    $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)
+      ->execute()->single()['metadata'];
+    if ($mappings) {
+      $metadata['import_mappings'] = $mappings;
+    }
+    if ($contactType) {
+      $metadata['entity_configuration']['Contact']['contact_type'] = $contactType;
+    }
+    UserJob::update()
+      ->addWhere('id', '=', $this->userJobID)
+      ->addValue('metadata', $metadata)
+      ->execute();
+  }
+
   protected function setUp(): void {
     parent::setUp();
     $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
@@ -612,11 +636,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     foreach ($data['fields'] as $field) {
       $mappings[] = ['name' => ($field === 'custom' ? 'Contact.' . $this->getCustomFieldName('text', 4) : $field)];
     }
-    $this->submitDataSourceForm('contributions.csv', []);
-    $form = $this->getMapFieldForm([
-      'mapper' => $this->getMapperFromFieldMappings($mappings),
-      'contactType' => 'Individual',
-    ]);
+    $contactType = 'Individual';
+    $this->submitDataSourceForm('contributions.csv');
+    $this->updateJobMetadata($mappings, $contactType);
+    $form = $this->getMapFieldForm();
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertEquals($data['valid'], $form->validate(), print_r($form->_errors, TRUE));
@@ -668,7 +691,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
-    $this->submitDataSourceForm('contributions.csv', $fieldMappings);
+    $this->submitDataSourceForm('contributions.csv');
+    $this->updateJobMetadata($fieldMappings, 'Individual');
     $form = $this->getMapFieldForm([
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'contactType' => 'Individual',
@@ -729,11 +753,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
-    $this->submitDataSourceForm('contributions_bad_campaign.csv', $fieldMappings);
-    $form = $this->getMapFieldForm([
-      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
-      'contactType' => 'Individual',
-    ]);
+    $this->submitDataSourceForm('contributions_bad_campaign.csv');
+    $this->updateJobMetadata($fieldMappings, 'Individual');
+    $form = $this->getMapFieldForm();
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertFalse($form->validate());
@@ -962,7 +984,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @return \CRM_Contribute_Import_Form_MapField
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
-  protected function getMapFieldForm(array $submittedValues): CRM_Contribute_Import_Form_MapField {
+  protected function getMapFieldForm(array $submittedValues = ['_qf_default' => 1]): CRM_Contribute_Import_Form_MapField {
     /** @var \CRM_Contribute_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $submittedValues);
     return $form;

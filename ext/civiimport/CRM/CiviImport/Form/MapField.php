@@ -74,4 +74,34 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     $defaults["mapper[$rowNumber]"] = [$fieldName];
   }
 
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   *
+   * @param array $files
+   * @param CRM_CiviImport_Form_MapField $self
+   *
+   * @return array|true
+   *   list of errors to be posted back to the form
+   */
+  public static function validateMapping(array $fields, array $files, CRM_CiviImport_Form_MapField $self): bool|array {
+    $mapperError = [];
+    try {
+      $parser = $self->getParser();
+      $mappings = $self->getFieldMappings();
+      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
+      $mapperError = $self->validateContactFields($rule, $mappings, ['contact_id', 'external_identifier']);
+      $parser->validateMapping($mappings);
+    }
+    catch (CRM_Core_Exception $e) {
+      $mapperError[] = $e->getMessage();
+    }
+    if (!empty($mapperError)) {
+      return ['_qf_default' => implode('<br/>', $mapperError)];
+    }
+    return TRUE;
+  }
+
 }

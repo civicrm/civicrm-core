@@ -535,7 +535,8 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       // Because api v4 style fields have a . and QuickForm multiselect js does
       // not cope with a . the quick form layer will use a double underscore
       // as a stand in (the angular layer will not)
-      $fieldName = $mapping[0];
+      // The mapping['name'] is the civiimport format - mapping[0] is being phased out.
+      $fieldName = $mapping['name'] ?? $mapping[0];
       if (str_contains($fieldName, '.')) {
         // If the field name contains a . - eg. address_primary.street_address
         // we just want the part after the .
