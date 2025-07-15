@@ -578,10 +578,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
     }
 
-    if (!empty($params['pledge_id'])) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
-        throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
-      }
+    if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
+      throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
     }
 
     // we need to check if oldest payment amount equal to contribution amount
