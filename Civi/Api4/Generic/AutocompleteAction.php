@@ -132,6 +132,11 @@ class AutocompleteAction extends AbstractAction {
 
     $entityName = $this->getEntityName();
 
+    // Get default display from system settings
+    if (!$this->display) {
+      $this->loadDefaultFromSettings();
+    }
+
     if (!$this->savedSearch) {
       $this->savedSearch = ['api_entity' => $entityName];
       // Allow the default search to be modified
@@ -304,6 +309,32 @@ class AutocompleteAction extends AbstractAction {
       return $this->key;
     }
     return $this->display['settings']['keyField'] ?? CoreUtil::getIdFieldName($entityName);
+  }
+
+  private function loadDefaultFromSettings() {
+    $entityName = $this->getEntityName();
+    try {
+      $displaySettings = \Civi::settings()->get('autocomplete_displays');
+      foreach ($displaySettings ?? [] as $setting) {
+        if (str_starts_with($setting, $entityName . ':')) {
+          $this->display = substr($setting, strlen($entityName) + 1);
+        }
+      }
+      if ($this->display) {
+        $this->display = \Civi\Api4\SearchDisplay::get(FALSE)
+          ->setSelect(['*', 'type:name'])
+          ->addWhere('name', '=', $this->display)
+          ->addWhere('type', '=', 'autocomplete')
+          ->execute()->single();
+        // Use the saved search associated with the display if not otherwise specified
+        if (!$this->savedSearch) {
+          $this->loadSavedSearch($this->display['saved_search_id']);
+        }
+      }
+    }
+    catch (\CRM_Core_Exception $e) {
+      // Search display not found
+    }
   }
 
   /**
