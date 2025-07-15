@@ -401,7 +401,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         $id = $dao->civicrm_group_contact_id;
         $values[$id]['id'] = $id;
         $values[$id]['group_id'] = $dao->group_id;
-        $values[$id]['title'] = ($public && !empty($group->group_public_title) ? $group->group_public_title : $dao->group_title);
+        $values[$id]['title'] = ($public && !empty($dao->group_public_title)) ? $dao->group_public_title : $dao->group_title;
         $values[$id]['visibility'] = $dao->visibility;
         $values[$id]['is_hidden'] = $dao->is_hidden;
         $values[$id]['saved_search_id'] = $dao->saved_search_id;
