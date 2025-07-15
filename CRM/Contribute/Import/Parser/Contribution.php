@@ -74,14 +74,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   protected function getFieldMappings(): array {
     $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
-    if (empty($mappedFields)) {
-      foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
-        $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
-        // Just for clarity since 0 is a pseudo-value
-        unset($mappedField['mapping_id']);
-        $mappedFields[] = $mappedField;
-      }
-    }
     foreach ($mappedFields as $index => $mappedField) {
       $mappedFields[$index]['column_number'] = 0;
       // This is the same data as entity_data - it is stored to the database in the contact_type field
