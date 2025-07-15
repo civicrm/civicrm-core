@@ -37,13 +37,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected $shouldSortMapperFields = TRUE;
 
   /**
-   * Column headers, if we have them
-   *
-   * @var array
-   */
-  protected $_columnHeaders;
-
-  /**
    * An array of booleans to keep track of whether a field has been used in
    * form building already.
    *
