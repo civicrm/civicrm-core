@@ -722,7 +722,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   public function validateMapping($mapping): void {
     $mappedFields = [];
     foreach ($mapping as $mappingField) {
-      $mappedFields[$mappingField[0]] = $mappingField[0];
+      // Civiimport uses MappingField['name'] - $mappingField[0] is (soft) deprecated.
+      $mappingFieldName = $mappingField['name'] ?? $mappingField[0] ?? '';
+      $mappedFields[$mappingFieldName] = $mappingFieldName;
     }
     $entity = $this->baseEntity;
     $missingFields = $this->getMissingFields($this->getRequiredFieldsForEntity($entity, $this->getActionForEntity($entity)), $mappedFields);

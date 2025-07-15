@@ -57,6 +57,30 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->execute();
   }
 
+  /**
+   * Update saved userJob metadata - as the angular screen would do.
+   *
+   * @param array $mappings
+   * @param string $contactType
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function updateJobMetadata(array $mappings, string $contactType): void {
+    $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)
+      ->execute()->single()['metadata'];
+    if ($mappings) {
+      $metadata['import_mappings'] = $mappings;
+    }
+    if ($contactType) {
+      $metadata['entity_configuration']['Contact']['contact_type'] = $contactType;
+    }
+    UserJob::update()
+      ->addWhere('id', '=', $this->userJobID)
+      ->addValue('metadata', $metadata)
+      ->execute();
+  }
+
   protected function setUp(): void {
     parent::setUp();
     $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
@@ -299,7 +323,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
       'contactType' => 'Organization',
-      'mapper' => $this->getMapperFromFieldMappings($importMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
     ];
@@ -613,11 +636,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     foreach ($data['fields'] as $field) {
       $mappings[] = ['name' => ($field === 'custom' ? 'Contact.' . $this->getCustomFieldName('text', 4) : $field)];
     }
-    $this->submitDataSourceForm('contributions.csv', []);
-    $form = $this->getMapFieldForm([
-      'mapper' => $this->getMapperFromFieldMappings($mappings),
-      'contactType' => 'Individual',
-    ]);
+    $contactType = 'Individual';
+    $this->submitDataSourceForm('contributions.csv');
+    $this->updateJobMetadata($mappings, $contactType);
+    $form = $this->getMapFieldForm();
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertEquals($data['valid'], $form->validate(), print_r($form->_errors, TRUE));
@@ -669,7 +691,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
-    $this->submitDataSourceForm('contributions.csv', $fieldMappings);
+    $this->submitDataSourceForm('contributions.csv');
+    $this->updateJobMetadata($fieldMappings, 'Individual');
     $form = $this->getMapFieldForm([
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'contactType' => 'Individual',
@@ -730,11 +753,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
-    $this->submitDataSourceForm('contributions_bad_campaign.csv', $fieldMappings);
-    $form = $this->getMapFieldForm([
-      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
-      'contactType' => 'Individual',
-    ]);
+    $this->submitDataSourceForm('contributions_bad_campaign.csv');
+    $this->updateJobMetadata($fieldMappings, 'Individual');
+    $form = $this->getMapFieldForm();
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertFalse($form->validate());
@@ -826,19 +847,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       $fields = array_keys($originalValues);
     }
     if ($mappings) {
-      $mapper = $this->getMapperFromFieldMappings($mappings);
+      $importMappings = $this->getMapperFromFieldMappings($mappings);
     }
     else {
-      $mapper = [];
+      $importMappings = [];
       foreach ($fields as $field) {
-        $mapper[] = [$field];
+        $importMappings[] = ['name' => $field];
       }
     }
     $values = array_values($originalValues);
     $parser = new CRM_Contribute_Import_Parser_Contribution();
-    $this->userJobID = $this->getUserJobID([
-      'mapper' => $mapper,
-    ]);
+    $this->userJobID = $this->getUserJobID([], $importMappings);
     $parser->setUserJobID($this->userJobID);
     $this->updateContributionAction($action);
     $parser->init();
@@ -853,12 +872,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   /**
    * @param array $submittedValues
+   * @param array $importMappings
    *
    * @return int
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getUserJobID(array $submittedValues = []): int {
+  protected function getUserJobID(array $submittedValues = [], array $importMappings = []): int {
     $isCsv = ($submittedValues['dataSource'] ?? NULL) === 'CRM_Import_DataSource_CSV';
     if (!$isCsv && !empty($submittedValues['mapper']) && empty($submittedValues['sqlQuery'])) {
       $submittedValues['sqlQuery'] = 'SELECT ';
@@ -871,13 +891,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
-          'contactType' => 'Individual',
-          'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
-          'dedupe_rule_id' => NULL,
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
+        'import_mappings' => $importMappings,
       ],
       'status_id:name' => 'draft',
       'job_type' => 'contribution_import',
@@ -966,7 +984,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @return \CRM_Contribute_Import_Form_MapField
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
-  protected function getMapFieldForm(array $submittedValues): CRM_Contribute_Import_Form_MapField {
+  protected function getMapFieldForm(array $submittedValues = ['_qf_default' => 1]): CRM_Contribute_Import_Form_MapField {
     /** @var \CRM_Contribute_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $submittedValues);
     return $form;

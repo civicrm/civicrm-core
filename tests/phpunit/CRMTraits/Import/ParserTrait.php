@@ -131,14 +131,13 @@ trait CRMTraits_Import_ParserTrait {
    * @param string $csv
    * @param array $submittedValues
    */
-  protected function submitDataSourceForm(string $csv, $submittedValues): void {
+  protected function submitDataSourceForm(string $csv, array $submittedValues = []): void {
     $reflector = new ReflectionClass(get_class($this));
     $directory = dirname($reflector->getFileName());
     $submittedValues = array_merge([
       'uploadFile' => ['name' => $directory . '/data/' . $csv],
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => 'Individual',
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
       'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
