@@ -555,11 +555,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     if (empty($params['pledge_id'])) {
       return;
     }
+    if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $params['contact_id']) {
+      throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
+    }
     // get total amount of from import fields
     $totalAmount = $params['total_amount'] ?? NULL;
-    $contributionContactID = $params['contact_id'];
-    // we need to get contact id $contributionContactID to
-    // retrieve pledge details as well as to validate pledge ID
 
     // first need to check for update mode
     if (!empty($params['id'])) {
@@ -575,12 +575,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
       else {
         throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.', CRM_Import_Parser::ERROR);
-      }
-    }
-
-    if (!empty($params['pledge_id'])) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
-        throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
       }
     }
 
