@@ -1142,12 +1142,12 @@ return [
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
-    'html_attributes' => array(
+    'html_attributes' => [
       'class' => 'crm-select2',
-    ),
-    'pseudoconstant' => array(
+    ],
+    'pseudoconstant' => [
       'callback' => 'call://themes/getAvailable',
-    ),
+    ],
     'default' => 'default',
     'add' => '5.16',
     'title' => ts('Frontend Theme'),
@@ -1167,12 +1167,12 @@ return [
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
-    'html_attributes' => array(
+    'html_attributes' => [
       'class' => 'crm-select2',
-    ),
-    'pseudoconstant' => array(
+    ],
+    'pseudoconstant' => [
       'callback' => 'call://themes/getAvailable',
-    ),
+    ],
     'default' => 'default',
     'add' => '5.16',
     'title' => ts('Backend Theme'),
