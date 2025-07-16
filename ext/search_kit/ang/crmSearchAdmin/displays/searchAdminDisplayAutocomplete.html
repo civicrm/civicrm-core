@@ -2,6 +2,12 @@
   <label for="crm-search-admin-display-label">{{:: ts('Label') }} <span class="crm-marker">*</span></label>
   <input id="crm-search-admin-display-label" type="text" class="form-control" ng-model="$ctrl.display.label" required placeholder="{{:: ts('Untitled') }}"/>
 </div>
+<div ng-if="$ctrl.isAdmin">
+  <label>
+    <input type="checkbox" ng-model="$ctrl.display.is_autocomplete_default">
+    {{:: ts('Make Default Autocomplete for %1', {1: $ctrl.parent.getMainEntity().title_plural}) }}
+  </label>
+</div>
 <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
 
 <fieldset class="crm-search-admin-edit-columns-wrapper">
