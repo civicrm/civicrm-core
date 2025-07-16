@@ -1514,6 +1514,7 @@ class CRM_Utils_Token {
           '$formValues' => 'use relevant token/s',
           '$module' => 'unknown',
           '$currency' => 'contribution.currency',
+          '$paidBy' => 'contribution.payment_instrument_id:label',
         ],
         'membership_online_receipt' => [
           '$dataArray' => ts('see default template for how to show this'),
@@ -1529,6 +1530,7 @@ class CRM_Utils_Token {
         'contribution_offline_receipt' => [
           '$totalTaxAmount' => 'contribution.tax_amount',
           '$getTaxDetails' => ts('no longer available / relevant'),
+          '$paidBy' => 'contribution.payment_instrument_id:label',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
