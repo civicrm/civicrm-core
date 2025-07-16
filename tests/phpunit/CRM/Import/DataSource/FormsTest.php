@@ -103,9 +103,9 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    * @param string $class
    * @param array $formValues
    *
-   * @return \CRM_Core_Form
+   * @return \CRM_Import_Forms
    */
-  protected function processForm(string $class, array $formValues = []): CRM_Core_Form {
+  protected function processForm(string $class, array $formValues = []): CRM_Import_Forms {
     $form = $this->getImportForm($class, $formValues);
     $form->buildForm();
     $form->mainProcess();
