@@ -203,6 +203,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       $mappedFieldData = $this->userJob['metadata']['import_mappings'][$columnNumber];
       $mappedField = array_intersect_key($mappedFieldData, array_fill_keys(['name', 'column_number', 'entity_data'], TRUE));
       $mappedField['mapping_id'] = $mappingID;
+      if (!isset($mappedField['column_number'])) {
+        $mappedField['column_number'] = $columnNumber;
+      }
     }
     else {
       $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];

@@ -19,6 +19,7 @@ use Civi\Api4\UserJob;
  * @group import
  */
 class CRM_Import_FormsTest extends CiviUnitTestCase {
+  use CRMTraits_Import_ParserTrait;
 
   protected function setUp(): void {
     parent::setUp();
@@ -35,7 +36,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    */
   public function testLoadDataSourceSavedTemplate(): void {
     // First do a basic submission, creating a UserJob template in the process.
-    [$templateJob, $mapping] = $this->runImportSavingImportTemplate();
+    [$templateJob] = $this->runImportSavingImportTemplate();
 
     // Now try this template in in the url to load the defaults for DataSource.
     $_REQUEST['template_id'] = $templateJob['id'];
@@ -56,16 +57,14 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     [, $mapping] = $this->runImportSavingImportTemplate();
     $this->formController = NULL;
 
-    $dataSourceForm = $this->processForm('CRM_Contribute_Import_Form_DataSource', [
+    $this->processForm('CRM_Contribute_Import_Form_DataSource', [
       'contactType' => 'Organization',
       'savedMapping' => 1,
     ]);
-    $userJobID = $dataSourceForm->getUserJobID();
+
     $this->processForm('CRM_Contribute_Import_Form_MapField', [
       'savedMapping' => $mapping['id'],
-      'contactType' => 'Organization',
-      'mapper' => [['Contribution.id'], ['Contribution.source']],
-    ]);
+    ], [['name' => 'Contribution.id'], ['name' => 'Contribution.source']], 'Organization');
 
     // Now we want to submit this form without updating the mapping used & make sure the mapping_id
     // is still saved in the metadata.
@@ -78,7 +77,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     $mapFieldForm = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $mapFieldValues);
     $mapFieldForm->buildForm();
 
-    $userJob = UserJob::get()->addWhere('id', '=', $userJobID)->execute()->first();
+    $userJob = UserJob::get()->addWhere('id', '=', $this->userJobID)->execute()->first();
     $this->assertEquals($mapping['id'], $userJob['metadata']['Template']['mapping_id']);
   }
 
@@ -102,14 +101,17 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
   /**
    * @param string $class
    * @param array $formValues
-   *
-   * @return \CRM_Import_Forms
+   * @param array $importMappings
+   * @param string $contactType
    */
-  protected function processForm(string $class, array $formValues = []): CRM_Import_Forms {
+  protected function processForm(string $class, array $formValues = [], array $importMappings = [], string $contactType = 'Individual'): void {
+    if ($this->userJobID && $importMappings) {
+      $this->updateJobMetadata($importMappings, $contactType);
+    }
     $form = $this->getImportForm($class, $formValues);
     $form->buildForm();
     $form->mainProcess();
-    return $form;
+    $this->userJobID = $form->getUserJobID();
   }
 
   /**
@@ -128,13 +130,10 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     ];
   }
 
-  /**
-   * @param array $submittedValues
-   */
-  protected function processContributionForms(array $submittedValues): void {
+  protected function processContributionForms(array $submittedValues, array $importMappings = []): void {
     try {
       $this->processForm('CRM_Contribute_Import_Form_DataSource', $submittedValues);
-      $this->processForm('CRM_Contribute_Import_Form_MapField', $submittedValues);
+      $this->processForm('CRM_Contribute_Import_Form_MapField', $submittedValues, $importMappings);
       $this->processForm('CRM_Contribute_Import_Form_Preview', $submittedValues);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
@@ -147,6 +146,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    * @param array $formValues
    *
    * @return \CRM_Import_Forms
+   * @throws \CRM_Core_Exception
    */
   protected function getImportForm(string $class, array $formValues = []): CRM_Core_Form {
     $formValues = array_merge($this->getDefaultValues(), $formValues);
@@ -155,13 +155,14 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
 
   /**
    * @return array
+   * @throws \CRM_Core_Exception
    */
   protected function runImportSavingImportTemplate(): array {
     $this->processContributionForms([
       'saveMapping' => 1,
       'saveMappingName' => 'mapping',
       'contactType' => 'Organization',
-    ]);
+    ], [['name' => 'Contribution.id'], ['name' => 'Contribution.source']]);
 
     // Check that a template job and a mapping have been created.
     $templateJob = UserJob::get()
