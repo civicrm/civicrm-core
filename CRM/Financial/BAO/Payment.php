@@ -404,57 +404,7 @@ class CRM_Financial_BAO_Payment {
       'paymentsComplete' => ($entities['payment']['balance'] == 0),
     ];
 
-    return self::filterUntestedTemplateVariables($templateVariables);
-  }
-
-  /**
-   * Filter out any untested variables.
-   *
-   * This just serves to highlight if any variables are added without a unit test also being added.
-   *
-   * (if hit then add a unit test for the param & add to this array).
-   *
-   * @param array $params
-   *
-   * @return array
-   */
-  public static function filterUntestedTemplateVariables($params) {
-    $testedTemplateVariables = [
-      'contactDisplayName',
-      'totalAmount',
-      'currency',
-      'amountOwed',
-      'paymentAmount',
-      'event',
-      'component',
-      'checkNumber',
-      'receive_date',
-      'paidBy',
-      'isShowLocation',
-      'isRefund',
-      'refundAmount',
-      'totalPaid',
-      'paymentsComplete',
-      'emailGreeting',
-    ];
-    // These are assigned by the payment form - they still 'get through' from the
-    // form for now without being in here but we should ideally load
-    // and assign. Note we should update the tpl to use {if $billingName}
-    // and ditch contributeMode - although it might need to be deprecated rather than removed.
-    $todoParams = [
-      'billingName',
-      'address',
-      'credit_card_type',
-      'credit_card_number',
-      'credit_card_exp_date',
-    ];
-    $filteredParams = [];
-    foreach ($testedTemplateVariables as $templateVariable) {
-      // This will cause an a-notice if any are NOT set - by design. Ensuring
-      // they are set prevents leakage.
-      $filteredParams[$templateVariable] = $params[$templateVariable];
-    }
-    return $filteredParams;
+    return $templateVariables;
   }
 
   /**
