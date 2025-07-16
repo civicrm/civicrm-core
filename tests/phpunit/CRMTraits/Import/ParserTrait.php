@@ -192,4 +192,33 @@ trait CRMTraits_Import_ParserTrait {
     ]);
   }
 
+  /**
+   * Update saved userJob metadata - as the angular screen would do.
+   *
+   * @param array $mappings
+   * @param string $contactType
+   *
+   * @return void
+   *
+   */
+  public function updateJobMetadata(array $mappings, string $contactType): void {
+    try {
+      $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)
+        ->execute()->single()['metadata'];
+      if ($mappings) {
+        $metadata['import_mappings'] = $mappings;
+      }
+      if ($contactType) {
+        $metadata['entity_configuration']['Contact']['contact_type'] = $contactType;
+      }
+      UserJob::update()
+        ->addWhere('id', '=', $this->userJobID)
+        ->addValue('metadata', $metadata)
+        ->execute();
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail('Failed to update UserJob: ' . $e->getMessage());
+    }
+  }
+
 }

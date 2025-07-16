@@ -57,30 +57,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->execute();
   }
 
-  /**
-   * Update saved userJob metadata - as the angular screen would do.
-   *
-   * @param array $mappings
-   * @param string $contactType
-   *
-   * @return void
-   * @throws \CRM_Core_Exception
-   */
-  public function updateJobMetadata(array $mappings, string $contactType): void {
-    $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)
-      ->execute()->single()['metadata'];
-    if ($mappings) {
-      $metadata['import_mappings'] = $mappings;
-    }
-    if ($contactType) {
-      $metadata['entity_configuration']['Contact']['contact_type'] = $contactType;
-    }
-    UserJob::update()
-      ->addWhere('id', '=', $this->userJobID)
-      ->addValue('metadata', $metadata)
-      ->execute();
-  }
-
   protected function setUp(): void {
     parent::setUp();
     $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
