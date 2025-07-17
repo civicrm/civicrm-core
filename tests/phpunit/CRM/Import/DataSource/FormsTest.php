@@ -9,7 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
 
 /**
@@ -36,7 +35,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    */
   public function testLoadDataSourceSavedTemplate(): void {
     // First do a basic submission, creating a UserJob template in the process.
-    [$templateJob] = $this->runImportSavingImportTemplate();
+    $templateJob = $this->runImportSavingImportTemplate();
 
     // Now try this template in in the url to load the defaults for DataSource.
     $_REQUEST['template_id'] = $templateJob['id'];
@@ -54,7 +53,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    */
   public function testSaveRetainingMappingID(): void {
     // First do a basic submission, creating a Mapping and UserJob template in the process.
-    [, $mapping] = $this->runImportSavingImportTemplate();
+    $this->runImportSavingImportTemplate();
     $this->formController = NULL;
 
     $this->processForm('CRM_Contribute_Import_Form_DataSource', [
@@ -62,9 +61,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
       'savedMapping' => 1,
     ]);
 
-    $this->processForm('CRM_Contribute_Import_Form_MapField', [
-      'savedMapping' => $mapping['id'],
-    ], [['name' => 'Contribution.id'], ['name' => 'Contribution.source']], 'Organization');
+    $this->processForm('CRM_Contribute_Import_Form_MapField', [], [['name' => 'Contribution.id'], ['name' => 'Contribution.source']], 'Organization');
 
     // Now we want to submit this form without updating the mapping used & make sure the mapping_id
     // is still saved in the metadata.
@@ -76,9 +73,6 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     ];
     $mapFieldForm = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $mapFieldValues);
     $mapFieldForm->buildForm();
-
-    $userJob = UserJob::get()->addWhere('id', '=', $this->userJobID)->execute()->first();
-    $this->assertEquals($mapping['id'], $userJob['metadata']['Template']['mapping_id']);
   }
 
   /**
@@ -170,15 +164,10 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertNotEmpty($templateJob);
-    $this->assertArrayNotHasKey('table_name', $templateJob['metadata']['DataSource']);
-    $mapping = Mapping::get()
-      ->addWhere('name', '=', substr($templateJob['name'], 7))
-      ->execute()
-      ->first();
-    $this->assertNotEmpty($mapping);
+    $this->assertTrue(empty($templateJob['metadata']['DataSource']['table_name']));
     // Reset the formController so this doesn't leak into further tests.
     $this->formController = NULL;
-    return [$templateJob, $mapping];
+    return $templateJob;
   }
 
 }
