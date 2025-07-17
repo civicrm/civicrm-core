@@ -83,9 +83,22 @@ class Download extends AbstractRunAction {
     if (($dataType === 'Date' || $dataType === 'Timestamp') && in_array($this->format, ['csv', 'xlsx', 'ods'])) {
       return $rawValue;
     }
-    else {
+
+    if (in_array($this->format, ['array', 'csv'], TRUE)) {
       return parent::formatViewValue($key, $rawValue, $data, $dataType, $format);
     }
+
+    if ($dataType === 'Money') {
+      $currencyField = $this->getCurrencyField($key);
+      $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : \Civi::settings()->get('defaultCurrency');
+
+      return [
+        'currency' => $currency,
+        'value' => $rawValue,
+      ];
+    }
+
+    return $rawValue;
   }
 
   /**

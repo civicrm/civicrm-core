@@ -197,11 +197,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $column
    * @param array $data
    * @param array $settings
-   * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
+   * @return array{dataType: ?string, val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
    */
   private function formatColumn(array $column, array $data, array $settings) {
     $column += ['rewrite' => NULL, 'label' => NULL, 'key' => '', 'type' => NULL];
-    $out = [];
+    $out = ['dataType' => NULL];
     switch ($column['type']) {
       case 'field':
       case 'html':
@@ -209,15 +209,18 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $key = str_replace('()', ':', $column['key']);
         $rawValue = $data[$key] ?? NULL;
         if (!$this->hasValue($rawValue) && isset($column['empty_value'])) {
+          $out['dataType'] = 'String';
           $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
         }
         elseif ($column['rewrite']) {
+          $out['dataType'] = 'String';
           $out['val'] = $this->rewrite($column['rewrite'], $data);
         }
         else {
-          $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
+          $out['dataType'] = $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
           $out['val'] = $this->formatViewValue($key, $rawValue, $data, $dataType, $column['format'] ?? NULL);
         }
+
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
         }
@@ -1488,7 +1491,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string $select
    * @return string|null
    */
-  private function getCurrencyField(string $select): ?string {
+  protected function getCurrencyField(string $select): ?string {
     // This function is called one or more times per row so cache the results
     if (array_key_exists($select, $this->currencyFields)) {
       return $this->currencyFields[$select];
