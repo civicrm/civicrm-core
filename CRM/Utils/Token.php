@@ -1556,6 +1556,9 @@ class CRM_Utils_Token {
           '$totalTaxAmount' => 'contribution.tax_amount',
           '$getTaxDetails' => ts('no longer available / relevant'),
           '$paidBy' => 'contribution.payment_instrument_id:label',
+          '$receive_date' => 'contribution.receive_date',
+          '$thankyou_date' => 'contribution.thankyou_date',
+          '$receipt_date' => 'contribution.receipt_date',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1618,6 +1621,8 @@ class CRM_Utils_Token {
           '$location' => 'event.location',
           '$participant.role' => 'participant.role_id:label',
           '$event.participant_role' => 'participant.role_id:label',
+          '$contactDisplayName' => 'contact.display_name',
+          '$paymentsComplete' => 'contribution.balance_amount',
         ],
         'pledge_acknowledgement' => [
           '$domain' => ts('no longer available / relevant'),
