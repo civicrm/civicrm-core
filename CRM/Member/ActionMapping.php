@@ -60,6 +60,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
       'join_date' => ts('Member Since'),
       'start_date' => ts('Membership Start Date'),
       'end_date' => ts('Membership Expiration Date'),
+      'next_sched_contribution_date' => ts('Membership Auto-renew Date'),
     ];
   }
 
@@ -89,10 +90,16 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     // Leaving this in case of legacy databases
     $query['casDateField'] = str_replace('membership_', 'e.', ($schedule->start_action_date ?? ''));
 
-    // Options currently are just 'join_date', 'start_date', and 'end_date':
-    // they need an alias
-    if (!str_starts_with($query['casDateField'], 'e.')) {
-      $query['casDateField'] = 'e.' . $query['casDateField'];
+    // Date field needs a proper alias
+    if (!(str_starts_with($query['casDateField'], 'e.') || str_starts_with($query['casDateField'], 'cr.'))) {
+      if ($query['casDateField'] == 'next_sched_contribution_date') {
+        // Alias the Auto-renew
+        $query['casDateField'] = 'cr.' . $query['casDateField'];
+      }
+      else {
+        // Otherwise alias all other Membership fields
+        $query['casDateField'] = 'e.' . $query['casDateField'];
+      }
     }
 
     // Exclude the renewals that are cancelled or failed.
