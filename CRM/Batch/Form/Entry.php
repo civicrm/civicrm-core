@@ -865,10 +865,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   protected function emailReceipt($form, &$formValues): bool {
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
-    if (!empty($formValues['payment_instrument_id'])) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
-    }
 
     // @todo - as of 5.74 module is noisy deprecated - can stop assigning around 5.80.
     $form->assign('module', 'Membership');

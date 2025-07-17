@@ -651,11 +651,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   protected function sendReceipt() {
     $receiptFrom = $this->_params['from_email_address'];
-
-    if (!empty($this->_params['payment_instrument_id'])) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      $this->_params['paidBy'] = $paymentInstrument[$this->_params['payment_instrument_id']];
-    }
     //get the group Tree
     $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $this->_id, FALSE, $this->_memType);
 
