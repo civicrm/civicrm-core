@@ -23,7 +23,7 @@
     <psr0 prefix="CRM_" path="."/>
   </classloader>
   <civix>
-    <namespace>CRM/Riverlea</namespace>
+    <namespace>CRM/riverlea</namespace>
     <format>25.01.1</format>
   </civix>
   <mixins>
