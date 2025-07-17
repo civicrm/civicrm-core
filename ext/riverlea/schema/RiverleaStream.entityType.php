@@ -1,10 +1,10 @@
 <?php
-use CRM_riverlea_ExtensionUtil as E;
+use CRM_Riverlea_ExtensionUtil as E;
 
 return [
   'name' => 'RiverleaStream',
   'table' => 'civicrm_riverlea_stream',
-  'class' => 'CRM_riverlea_DAO_RiverleaStream',
+  'class' => 'CRM_Riverlea_DAO_RiverleaStream',
   'getInfo' => fn() => [
     'title' => E::ts('RiverleaStream'),
     'title_plural' => E::ts('RiverleaStreams'),

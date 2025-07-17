@@ -1,11 +1,11 @@
 <?php
 
-use CRM_riverlea_ExtensionUtil as E;
+use CRM_Riverlea_ExtensionUtil as E;
 use Civi\Core\HookInterface;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Event\PostEvent;
 
-class CRM_riverlea_BAO_RiverleaStream extends CRM_riverlea_DAO_RiverleaStream implements HookInterface {
+class CRM_Riverlea_BAO_RiverleaStream extends CRM_Riverlea_DAO_RiverleaStream implements HookInterface {
 
   public static function self_hook_civicrm_pre(PreEvent $event): void {
     // munge label for default name

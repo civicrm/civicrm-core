@@ -9,7 +9,7 @@
  * This stub provides compatibility. It is not intended to be modified in a
  * substantive way. Property annotations may be added, but are not required.
  */
-class CRM_riverlea_DAO_RiverleaStream extends CRM_riverlea_DAO_Base {
+class CRM_Riverlea_DAO_RiverleaStream extends CRM_Riverlea_DAO_Base {
 
   /**
    * Required by older versions of CiviCRM (<5.74).

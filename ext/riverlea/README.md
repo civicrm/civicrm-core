@@ -138,7 +138,7 @@ The Customiser will provide tools to automate some of this process.
 
 2. Copy the template `*.mgd.php` from the `docs` folder of this extension into your extension's `managed` folder (create the managed folder if it doesn't exist). Remove the `.template` part so the file extension is `*.mgd.php`.
 
-3. Update the `use CRM_riverlea_ExtensionUtil` line for the equivalent from your extension.
+3. Update the `use CRM_Riverlea_ExtensionUtil` line for the equivalent from your extension.
 
 4. You can add variable declarations directly to the `vars` and `vars_dark` keys in the `*.mgd.php` file.
 

@@ -6,10 +6,10 @@
  * The ExtensionUtil class provides small stubs for accessing resources of this
  * extension.
  */
-class CRM_riverlea_ExtensionUtil {
+class CRM_Riverlea_ExtensionUtil {
   const SHORT_NAME = 'riverlea';
   const LONG_NAME = 'riverlea';
-  const CLASS_PREFIX = 'CRM_riverlea';
+  const CLASS_PREFIX = 'CRM_Riverlea';
 
   /**
    * Translate a string using the extension's domain.
@@ -87,14 +87,14 @@ class CRM_riverlea_ExtensionUtil {
 
 }
 
-use CRM_riverlea_ExtensionUtil as E;
+use CRM_Riverlea_ExtensionUtil as E;
 
 spl_autoload_register('_riverlea_civix_class_loader', TRUE, TRUE);
 
 function _riverlea_civix_class_loader($class) {
-  if ($class === 'CRM_riverlea_DAO_Base') {
+  if ($class === 'CRM_Riverlea_DAO_Base') {
     if (version_compare(CRM_Utils_System::version(), '5.74.beta', '>=')) {
-      class_alias('CRM_Core_DAO_Base', 'CRM_riverlea_DAO_Base');
+      class_alias('CRM_Core_DAO_Base', 'CRM_Riverlea_DAO_Base');
       // ^^ Materialize concrete names -- encourage IDE's to pick up on this association.
     }
     else {

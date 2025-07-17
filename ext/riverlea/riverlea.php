@@ -1,7 +1,7 @@
 <?php
 
 require_once 'riverlea.civix.php';
-use CRM_riverlea_ExtensionUtil as E;
+use CRM_Riverlea_ExtensionUtil as E;
 
 /**
  * Supply available streams to the theme hook

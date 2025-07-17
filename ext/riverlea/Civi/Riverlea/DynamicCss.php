@@ -2,7 +2,7 @@
 
 namespace Civi\Riverlea;
 
-use CRM_riverlea_ExtensionUtil as E;
+use CRM_Riverlea_ExtensionUtil as E;
 
 /**
  * This class generates a `river.css` file for Riverlea streams containing

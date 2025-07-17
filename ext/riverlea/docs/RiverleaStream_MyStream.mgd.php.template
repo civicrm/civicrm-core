@@ -1,7 +1,7 @@
 <?php
 
 // Replace this with your extensions extensionUtil class (if unsure look in your extension's root my_extension.php file)
-// use CRM_riverlea_ExtensionUtil as E;
+// use CRM_Riverlea_ExtensionUtil as E;
 
 // return [
 //   [
