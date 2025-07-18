@@ -244,6 +244,9 @@ trait DAOActionTrait {
         continue;
       }
       $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);
+      if (!$fkDao) {
+        throw new \CRM_Core_Exception('Failed to load ' . $field['fk_entity']);
+      }
       // Constrain search to the domain of the current entity
       $domainConstraint = NULL;
       if (isset($fkDao::getSupportedFields()['domain_id'])) {
