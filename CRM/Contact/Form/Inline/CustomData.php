@@ -95,6 +95,11 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
     $this->addElement('hidden', 'hidden_custom', 1);
     $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1));
     CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
+    // This form only applies to a single group so this loop always runs once
+    foreach ($this->_groupTree as $group_id => $cd_edit) {
+      $this->assign('group_id', $group_id);
+      $this->assign('cd_edit', $cd_edit);
+    }
   }
 
   /**
