@@ -65,8 +65,8 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ],
+        'import_options' => ['date_format' => CRM_Utils_Date::DATE_yyyy_mm_dd],
         'import_mappings' => [
           ['name' => 'Contact.external_identifier'],
           ['name' => 'Contribution.total_amount'],
