@@ -67,6 +67,10 @@ class RunBatch extends Run {
       if (!empty($column['key'])) {
         $key = $column['key'];
         $result->editable[$key] = $this->getEditableInfo($key);
+        // Set `required` field status based on search display settings
+        $result->editable[$key]['required'] = !empty($column['required']);
+        // Instead of using nullable from field defn, defer to `required` display setting
+        $result->editable[$key]['nullable'] = empty($column['required']);
       }
     }
   }
