@@ -35,14 +35,23 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
     $expectedTimeNY = '2001-02-02 23:05:00';
 
     $oldTz = CRM_Core_DAO::singleValueQuery('SELECT @@time_zone');
+    $oldErrMode = $GLOBALS['_PEAR_default_error_mode'];
+    $oldOptions = $GLOBALS['_PEAR_default_error_options'];
     try {
-      CRM_Core_DAO::singleValueQuery('SET @@time_zone = "Europe/Berlin"');
+      // The query will ALWAYS log the error even when the exception is caught
+      // because of CRM_Core_Error::exceptionHandler, which normally is fine
+      // but here we don't want to log the error just catch it.
+      $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
+      $GLOBALS['_PEAR_default_error_options'] = ['CRM_Utils_Check_Component_Timestamps', 'avoidLoggingError'];
+      CRM_Core_DAO::executeQuery('SET @@time_zone = "Europe/Berlin"');
       $convertedTimeDE = CRM_Core_DAO::singleValueQuery('SELECT FROM_UNIXTIME(981176700)');
     }
     catch (\Exception $e) {
       $convertedTimeDE = NULL;
     }
     finally {
+      $GLOBALS['_PEAR_default_error_mode'] = $oldErrMode;
+      $GLOBALS['_PEAR_default_error_options'] = $oldOptions;
       CRM_Core_DAO::singleValueQuery('SET @@time_zone = %1', [1 => [$oldTz, 'String']]);
     }
     $expectedTimeDE = '2001-02-03 06:05:00';
@@ -163,6 +172,16 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
       ['table' => 'civicrm_mailing_spool', 'column' => 'removed_at', 'changed' => '4.7.20', 'jira' => 'CRM-9683', 'comment' => 'date on which this job was removed.'],
       ['table' => 'civicrm_subscription_history', 'column' => 'date', 'changed' => '4.7.27', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-21157', 'comment' => 'Date of the (un)subscription'],
     ];
+  }
+
+  /**
+   * Callback for checkTimezoneAPIs() to avoid unnecessary logging.
+   *
+   * @param PEAR_ERROR $e
+   * @throws Civi\Core\DBQueryException
+   */
+  public static function avoidLoggingError($e) {
+    throw new \Civi\Core\Exception\DBQueryException('dont care', $e->getCode(), ['exception' => $e]);
   }
 
 }
