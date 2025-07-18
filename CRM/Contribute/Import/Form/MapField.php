@@ -145,32 +145,4 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
     }
   }
 
-  /**
-   * @return string[]
-   */
-  protected function getHighlightedFields(): array {
-    $highlightedFields = ['financial_type_id', 'total_amount'];
-    //CRM-2219 removing other required fields since for updating only
-    //invoice id or trxn id or contribution id is required.
-    if ($this->isUpdateExisting()) {
-      //modify field title only for update mode. CRM-3245
-      foreach (['id', 'invoice_id', 'trxn_id'] as $key) {
-        $highlightedFields[] = $key;
-      }
-    }
-    elseif ($this->isSkipExisting()) {
-      $highlightedFieldsArray = [
-        'contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    return $highlightedFields;
-  }
-
 }

@@ -149,20 +149,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
     return $this->parser;
   }
 
-  protected function getHighlightedFields(): array {
-    $highlightedFields = [];
-    $requiredFields = [
-      'activity_date_time',
-      'activity_type_id',
-      'target_contact_id',
-      'activity_subject',
-    ];
-    foreach ($requiredFields as $val) {
-      $highlightedFields[] = $val;
-    }
-    return $highlightedFields;
-  }
-
   public function getImportType(): string {
     return 'Import Activity';
   }
