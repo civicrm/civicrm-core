@@ -105,6 +105,28 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
+   * @param string $entity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateRequiredContactFields(string $entity = 'Contact'): array {
+    $mapper = [];
+    $fields = $this->getUserJob()['metadata']['import_mappings'];
+    foreach ($fields as $field) {
+      if (!isset($field['name'])) {
+        continue;
+      }
+      if (str_starts_with($field['name'], $entity . '.') || str_starts_with($field['name'], $this->getBaseEntity() . '.')) {
+        $mapper[] = [$field['name']];
+      }
+    }
+    $parser = $this->getParser();
+    $rule = $parser->getDedupeRule($this->getContactType(), $this->getUserJob()['metadata']['entity_configuration'][$entity]['dedupe_rule'] ?? NULL);
+    return $this->validateContactFields($rule, $this->getImportKeys($mapper), ['external_identifier', 'contact_id', 'id']);
+  }
+
+  /**
    * Process the mapped fields and map it into the uploaded file
    * preview the file and extract some summary statistics
    *
