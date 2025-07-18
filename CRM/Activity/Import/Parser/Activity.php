@@ -131,7 +131,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'selected' => [
           'action' => 'select',
           'contact_type' => NULL,
-          'dedupe_rule' => $this->getDefaultDedupeRule(),
+          'dedupe_rule' => 'unique_identifier_match',
         ],
         'default_action' => 'select',
         'entity_name' => 'TargetContact',

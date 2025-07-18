@@ -340,7 +340,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => 'Individual',
-          'dedupe_rule' => $this->getDefaultDedupeRule(),
+          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',
@@ -358,7 +358,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           'contact_type' => 'Individual',
           'soft_credit_type_id' => $defaultSoftCreditTypeID,
           'action' => 'ignore',
-          'dedupe_rule' => $this->getDefaultDedupeRule(),
+          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'ignore',
         'entity_name' => 'SoftCreditContact',

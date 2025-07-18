@@ -2024,11 +2024,4 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     return NULL;
   }
 
-  /**
-   * @return string
-   */
-  protected function getDefaultDedupeRule(): string {
-    return $this->getContactType() ? $this->getDedupeRule($this->getContactType())['name'] : 'unique_identifier_match';
-  }
-
 }
