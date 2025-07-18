@@ -115,45 +115,6 @@ class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   }
 
   /**
-   * Get the fields to highlight.
-   *
-   * @return array
-   */
-  protected function getHighlightedFields(): array {
-    $highlightedFields = [];
-    if ($this->isUpdateExisting()) {
-      $highlightedFieldsArray = [
-        'id',
-        'event_id',
-        'status_id',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    elseif ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_SKIP ||
-      $this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_NOCHECK
-    ) {
-      // this should be retrieved from the parser.
-      $highlightedFieldsArray = [
-        'contact_id',
-        'event_id',
-        'email',
-        'first_name',
-        'last_name',
-        'organization_name',
-        'household_name',
-        'external_identifier',
-        'status_id',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    return $highlightedFields;
-  }
-
-  /**
    * Get the mapping name per the civicrm_mapping_field.type_id option group.
    *
    * @return string

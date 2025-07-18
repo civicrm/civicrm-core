@@ -406,7 +406,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     $fields = $this->getFields();
     $entity = $this->getBaseEntity();
     $categories = $this->getImportEntities();
-    $highlightedFields = $this->getHighlightedFields();
+    $highlightedFields = $this->getParser()->getRequiredFieldsForEntity($entity, $this->getParser()->getActionForEntity($entity));
     foreach ($fields as $fieldName => $field) {
       if ($fieldName === '') {
         // @todo stop setting 'do not import' in the first place.

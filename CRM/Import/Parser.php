@@ -745,7 +745,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected function getActionForEntity(string $entity): string {
+  public function getActionForEntity(string $entity): string {
     return $this->getUserJob()['metadata']['entity_configuration'][$entity]['action'] ?? ($this->getImportEntities()[$entity]['default_action'] ?? 'select');
   }
 
@@ -781,7 +781,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return array
    */
-  private function getRequiredFieldsForEntity(string $entity, string $action): array {
+  public function getRequiredFieldsForEntity(string $entity, string $action): array {
     $entityMetadata = $this->getImportEntities()[$entity];
     if ($action === 'select') {
       // Select uses the same lookup as update.
