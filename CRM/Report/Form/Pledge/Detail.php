@@ -464,9 +464,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       foreach ($display as $key => $value) {
         $row = [];
         foreach ($this->_columnHeaders as $columnKey => $columnValue) {
-          if (array_key_exists($columnKey, $value)) {
-            $row[$columnKey] = !empty($value[$columnKey]) ? $value[$columnKey] : '';
-          }
+          $row[$columnKey] = !empty($value[$columnKey]) ? $value[$columnKey] : '';
         }
         $rows[] = $row;
       }
