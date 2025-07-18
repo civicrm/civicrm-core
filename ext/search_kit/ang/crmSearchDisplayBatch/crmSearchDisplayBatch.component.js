@@ -1,6 +1,9 @@
 (function(angular, $, _) {
   "use strict";
 
+  // Ensures each display gets a unique form name
+  let displayInstance = 0;
+
   angular.module('crmSearchDisplayBatch').component('crmSearchDisplayBatch', {
     bindings: {
       apiEntity: '@',
@@ -12,7 +15,8 @@
       totalCount: '=?'
     },
     require: {
-      afFieldset: '?^^afFieldset'
+      afFieldset: '?^^afFieldset',
+      formCtrl: '?^form',
     },
     templateUrl: '~/crmSearchDisplayBatch/crmSearchDisplayBatch.html',
     controller: function($scope, $element, $location, $interval, $q, crmApi4, searchDisplayBaseTrait, searchDisplayEditableTrait) {
@@ -21,10 +25,12 @@
       const ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayEditableTrait));
 
       let autoSaveTimer;
+      let errorNotification;
 
       // This display has no search button - results always load immediately if a userJobId is given
       this.loading = true;
       this.unsavedChanges = false;
+      this.formName = 'searchDisplayBatch' + displayInstance++;
 
       this.$onInit = function() {
         this.limit = this.settings.limit || 0;
@@ -173,7 +179,20 @@
         return this.saving;
       };
 
+      this.getFieldName = function(index, key) {
+        const rowIndex = ((this.page - 1) * this.limit) + index;
+        return 'batch-row-' + rowIndex + '-' + _.snakeCase(key);
+      };
+
+      this.isValid = function() {
+        return ctrl.formCtrl.$valid;
+      };
+
       this.doImport = function() {
+        if (!this.isValid()) {
+          this.showValidationErrors();
+          return;
+        }
         $element.block();
         this.saveRows().then(function() {
           crmApi4('SearchDisplay', 'importBatch', {
@@ -184,6 +203,46 @@
             window.location.href = result[0].url;
           });
         });
+      };
+
+      this.showValidationErrors = function() {
+        const formCtrl = this.formCtrl[this.formName];
+        let invalidRows = [];
+        let messages = [];
+        Object.keys(formCtrl).forEach(function(key) {
+          if (key.startsWith('batch-row-') && formCtrl[key].$invalid) {
+            invalidRows.push(1 + parseInt(key.split('-')[2], 10));
+          }
+        });
+        // Numeric sort
+        invalidRows.sort((a, b) => a - b);
+        invalidRows = _.uniq(invalidRows, true);
+
+        // Build messages array, grouping consecutive rows
+        let start = invalidRows[0];
+        let prev = start;
+        for (let i = 1; i <= invalidRows.length; i++) {
+          const current = invalidRows[i];
+          if (current !== prev + 1) {
+            // End of a sequence
+            if (start === prev) {
+              messages.push(_.escape(ts('Row %1', {1: start})));
+            } else {
+              messages.push(_.escape(ts('Rows %1 to %2', {1: start, 2: prev})));
+            }
+            start = current;
+          }
+          prev = current;
+        }
+
+        if (errorNotification && errorNotification.close) {
+          errorNotification.close();
+        }
+        errorNotification = CRM.alert(
+          '<ul><li>' + messages.join('</li><li>') + '</li></ul>',
+          _.escape(ts('Please complete the following:')),
+          'error'
+        );
       };
 
       this.copyCol = function(index) {

@@ -7,4 +7,5 @@
   multi="$ctrl.isMulti()"
   static-options="$ctrl.getAutocompleteStaticOptions()"
   placeholder="{{:: ts('Select') }}"
+  ng-required="!$ctrl.field.nullable || $ctrl.field.required"
 >
