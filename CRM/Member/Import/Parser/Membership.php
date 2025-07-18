@@ -85,8 +85,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
-          'contact_type' => $this->getSubmittedValue('contactType'),
-          'dedupe_rule' => $this->getDefaultDedupeRule(),
+          'contact_type' => 'Individual',
+          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',
