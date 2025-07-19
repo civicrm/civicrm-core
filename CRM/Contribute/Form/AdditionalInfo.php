@@ -409,12 +409,6 @@ class CRM_Contribute_Form_AdditionalInfo {
     list($contributorDisplayName,
       $contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
-    $form->assign('contactID', $params['contact_id']);
-    $form->assign('contributionID', $params['contribution_id']);
-
-    if (!empty($params['currency'])) {
-      $form->assign('currency', $params['currency']);
-    }
 
     if (!empty($params['receive_date'])) {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
@@ -423,12 +417,6 @@ class CRM_Contribute_Form_AdditionalInfo {
     [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'contribution_offline_receipt',
-        // @todo - IDs are being passed in multiple ways - the non-deprecated
-        // one is `modelProps`
-        // The others are probably redundant after merging https://github.com/civicrm/civicrm-core/pull/32036
-        'contactId' => $params['contact_id'],
-        'contributionId' => $params['contribution_id'],
-        'tokenContext' => ['contributionId' => (int) $params['contribution_id'], 'contactId' => $params['contact_id']],
         'from' => $params['from_email_address'],
         'toName' => $contributorDisplayName,
         'toEmail' => $contributorEmail,
