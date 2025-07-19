@@ -1,18 +1,22 @@
 <div ng-if="!$ctrl.userJobId && !$ctrl.isPreviewMode" class="crm-search-display crm-search-display-batch">
   <ul class="list-group">
-    <li class="list-group-item form-inline">
-      <div class="form-group">
-        <label class="sr-only" for="crm-create-new-batch-row-count">{{:: ts('Initial row count for new batch') }}</label>
-        <div class="input-group">
-          <input type="number" min="1" step="1" class="form-control" id="crm-create-new-batch-row-count" ng-model="$ctrl.newBatchRowCount" title="{{:: ts('Initial row count for new batch') }}">
-          <div class="input-group-addon">{{:: ts('Rows') }}</div>
+    <li class="list-group-item">
+      <fieldset>
+        <legend>{{:: ts('New Batch') }}</legend>
+        <div class="form-inline" title="{{:: ts('Initial row count for new batch') }}">
+          <label for="crm-create-new-batch-row-count">{{:: ts('Rows') }}</label>
+          <input type="number" min="1" step="1" class="form-control" required id="crm-create-new-batch-row-count" ng-model="$ctrl.newBatch.rowCount" >
         </div>
-      </div>
-      <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
-        <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
-        <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
-        {{:: ts('Start New Batch') }}
-      </button>
+        <div class="form-inline" ng-repeat="col in $ctrl.settings.columns" ng-if="col.tally.target" title="{{:: ts('Target Total') }}">
+          <label for="crm-create-new-batch-target-{{ $index }}">{{:: col.label }}</label>
+          <input type="number" class="form-control" id="crm-create-new-batch-target-{{ $index }}" ng-model="$ctrl.newBatch.targets[col.key]">
+        </div>
+        <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
+          <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
+          <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
+          {{:: ts('Start New Batch') }}
+        </button>
+      </fieldset>
     </li>
     <li class="list-group-item" ng-repeat="link in $ctrl.reportLinks">
       <a href ng-href="{{:: link.href }}">

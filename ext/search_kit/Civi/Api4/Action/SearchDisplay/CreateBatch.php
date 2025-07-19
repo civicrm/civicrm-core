@@ -44,6 +44,13 @@ class CreateBatch extends AbstractAction {
   protected $rowCount = 1;
 
   /**
+   * Set targets for tally totals
+   *
+   * @var array
+   */
+  protected $targets = [];
+
+  /**
    * @inheritDoc
    */
   public function _run(Result $result) {
@@ -82,6 +89,7 @@ class CreateBatch extends AbstractAction {
       $fieldSpec['label'] = $column['label'];
       $userJob['metadata']['DataSource']['column_headers'][] = $column['label'];
       $userJob['metadata']['DataSource']['column_specs'][$fieldSpec['name']] = $fieldSpec;
+      $userJob['metadata']['DataSource']['targets'] = $this->targets;
     }
 
     $columnSql = implode(",\n", \CRM_Import_DataSource::getStandardTrackingFields());
