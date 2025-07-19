@@ -1126,9 +1126,11 @@ DESC limit 1");
       $result = NULL;
 
       $this->_params = $formValues;
+      $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
       $contribution = civicrm_api3('Order', 'create',
         [
           'contact_id' => $this->_contributorContactID,
+          'address_id' => $contributionAddressID,
           'line_items' => $this->getLineItemForOrderApi(),
           'is_test' => $this->isTest(),
           'campaign_id' => $this->getSubmittedValue('campaign_id'),
