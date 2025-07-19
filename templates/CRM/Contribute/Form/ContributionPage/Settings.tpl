@@ -46,7 +46,9 @@
         <table class="form-layout-compressed">
           <tr class="crm-contribution-onbehalf_profile_id">
             <td class="label">{$form.onbehalf_profile_id.label}</td>
-            <td>{$form.onbehalf_profile_id.html}</td>
+            <td>{$form.onbehalf_profile_id.html}
+              <a target="_blank" href="{crmURL p="civicrm/admin/uf/group" q="reset=1"}" class="crm-option-edit-link crm-hover-button" target="_blank">{icon icon="fa-wrench"}{ts}Manage Profiles{/ts}{/icon}</a>
+            </td>
           </tr>
           <tr id="for_org_text" class="crm-contribution-contributionpage-settings-form-block-for_organization">
             <td class="label">{$form.for_organization.label} {help id="id-for_organization"}</td>
