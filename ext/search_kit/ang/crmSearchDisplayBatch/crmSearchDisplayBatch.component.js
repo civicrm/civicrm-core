@@ -214,7 +214,7 @@
               no: ts('Cancel'),
               yes: ts('Run Import'),
             },
-          });
+          }).on('crmConfirm:yes', runImport);
         } else {
           runImport();
         }
