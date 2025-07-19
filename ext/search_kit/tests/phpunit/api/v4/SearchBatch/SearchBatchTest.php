@@ -19,6 +19,18 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
   public function testMetadata(): void {
     $name = uniqid();
+
+    // Sample contact subtypes
+    $this->SaveTestRecords('ContactType', [
+      'records' => [
+        ['name' => $name . '_1', 'label' => $name . '_1'],
+        ['name' => $name . '_2', 'label' => $name . '_2'],
+      ],
+      'defaults' => [
+        'parent_id:name' => 'Individual',
+      ],
+    ]);
+
     $savedSearch = $this->createTestRecord('SavedSearch', [
       'name' => $name,
       'label' => 'the_unit_test_search',
@@ -53,6 +65,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
             'type' => 'field',
             'key' => 'first_name',
             'label' => 'Your Name',
+            'required' => TRUE,
           ],
           [
             'type' => 'field',
@@ -113,10 +126,14 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($getFields));
 
     $this->assertEquals('Your Name', $getFields['first_name']['label']);
+    $this->assertFalse($getFields['first_name']['nullable']);
     $this->assertEquals('Import field: Your Name', $getFields['first_name']['title']);
     $this->assertEquals('Integer', $getFields['gender_id']['data_type']);
     $this->assertContains('Male', $getFields['gender_id']['options']);
     $this->assertContains('Parent', $getFields['contact_sub_type']['options']);
+    $this->assertFalse($getFields['contact_sub_type']['required']);
+    $this->assertTrue($getFields['contact_sub_type']['nullable']);
+    $this->assertEquals(1, $getFields['contact_sub_type']['serialize']);
     $this->assertEquals('Date', $getFields['birth_date']['data_type']);
     $this->assertEquals('Boolean', $getFields['is_deceased']['data_type']);
     $this->assertEquals('Integer', $getFields['_id']['data_type']);
@@ -133,6 +150,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
         'gender_id' => 1,
         'birth_date' => '2019-01-01',
         'is_deceased' => FALSE,
+        'contact_sub_type' => [$name . '_1', $name . '_2'],
       ],
     ]);
 
@@ -140,6 +158,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals([1, 2, 3], $rows->column('_id'));
     $this->assertEquals(['NEW', 'NEW', 'NEW'], $rows->column('_status'));
     $this->assertNULL($rows[0]['_entity_id']);
+    $this->assertEquals([$name . '_1', $name . '_2'], $rows[2]['contact_sub_type']);
 
     $run = civicrm_api4('SearchDisplay', 'runBatch', [
       'savedSearch' => $name,
