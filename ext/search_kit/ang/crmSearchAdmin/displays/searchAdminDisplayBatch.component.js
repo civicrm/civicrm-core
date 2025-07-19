@@ -85,6 +85,12 @@
         return (fieldSpecs[key] = searchMeta.getField(key));
       };
 
+      this.onChangeTallyFn = function(col) {
+        if (col.tally.fn !== 'SUM') {
+          delete col.tally.target;
+        }
+      };
+
     }
   });
 

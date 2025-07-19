@@ -46,7 +46,10 @@
           }, 10000);
         }
         else {
-          this.newBatchRowCount = 1;
+          this.newBatch = {
+            rowCount: 1,
+            targets: {}
+          };
           this.reportLinks = [
             {
               title: ts('View My Import Batches'),
@@ -107,7 +110,8 @@
         crmApi4('SearchDisplay', 'createBatch', {
           savedSearch: this.search,
           display: this.display,
-          rowCount: this.newBatchRowCount,
+          rowCount: this.newBatch.rowCount,
+          targets: this.newBatch.targets,
         }, 0).then(function(userJob) {
           $location.search('batch', userJob.id);
           // Re-init display to switch modes from creating batch to editing batch
@@ -189,12 +193,36 @@
       };
 
       this.doImport = function() {
+        if (errorNotification && errorNotification.close) {
+          errorNotification.close();
+        }
         if (!this.isValid()) {
           this.showValidationErrors();
           return;
         }
+        const tallyMismatches = getTallyMismatches();
+        if (tallyMismatches.length) {
+          let markup = '';
+          // Run each item in array through _.escape
+          tallyMismatches.forEach((item, index, array) => {
+            markup += '<p><i class="crm-i fa-warning"></i> ' + _.escape(item) + '</p>';
+          });
+          CRM.confirm({
+            title: ts('Tally Mismatch'),
+            message: markup + '<p>' + _.escape(ts('Run import anyway?')) + '</p>',
+            options: {
+              no: ts('Cancel'),
+              yes: ts('Run Import'),
+            },
+          });
+        } else {
+          runImport();
+        }
+      };
+
+      function runImport() {
         $element.block();
-        this.saveRows().then(function() {
+        ctrl.saveRows().then(function() {
           crmApi4('SearchDisplay', 'importBatch', {
             savedSearch: ctrl.search,
             display: ctrl.display,
@@ -203,7 +231,7 @@
             window.location.href = result[0].url;
           });
         });
-      };
+      }
 
       this.showValidationErrors = function() {
         const formCtrl = this.formCtrl[this.formName];
@@ -233,10 +261,6 @@
             start = current;
           }
           prev = current;
-        }
-
-        if (errorNotification && errorNotification.close) {
-          errorNotification.close();
         }
         errorNotification = CRM.alert(
           '<ul><li>' + messages.join('</li><li>') + '</li></ul>',
@@ -275,6 +299,37 @@
         }
         return tally;
       };
+
+      this.getTallyClass = function(col) {
+        if (this.isPreviewMode) {
+          return '';
+        }
+        const tallyTarget = this.getTallyTarget(col);
+        if (tallyTarget) {
+          return this.getTally(col) == tallyTarget ? 'text-success' : 'text-danger';
+        }
+        return '';
+      };
+
+      this.getTallyTarget = function(col) {
+        if (col.tally && col.tally.fn === 'SUM' && ctrl.results && ctrl.results.editable[col.key]) {
+          return ctrl.results.editable[col.key].target;
+        }
+      };
+
+      function getTallyMismatches() {
+        const tallyMismatches = [];
+        ctrl.settings.columns.forEach(function(col) {
+          const tallyTarget = ctrl.getTallyTarget(col);
+          if (tallyTarget) {
+            const tally = ctrl.getTally(col);
+            if (tally != tallyTarget) {
+              tallyMismatches.push(ts('%1 value %2 does not match expected %3', {1: col.label, 2: tally, 3: tallyTarget}));
+            }
+          }
+        });
+        return tallyMismatches;
+      }
 
       // When inserting/deleting rows the ids will shift so cancel pending save & re-queue it
       function cancelSave() {
