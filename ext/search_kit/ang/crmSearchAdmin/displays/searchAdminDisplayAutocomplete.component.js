@@ -12,8 +12,10 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayAutocomplete.html',
     controller: function($scope, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+
+      this.isAdmin = CRM.checkPerm('administer CiviCRM');
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
