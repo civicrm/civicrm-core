@@ -15,11 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 use Civi\Api4\Membership;
+use Civi\Import\ImportParser;
 
 /**
  * class to parse membership csv files
  */
-class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
+class CRM_Member_Import_Parser_Membership extends ImportParser {
 
   /**
    * Array of metadata for all available fields.

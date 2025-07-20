@@ -15,11 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 use Civi\Api4\Participant;
+use Civi\Import\ImportParser;
 
 /**
  * class to parse membership csv files
  */
-class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
+class CRM_Event_Import_Parser_Participant extends ImportParser {
 
   protected string $baseEntity = 'Participant';
 

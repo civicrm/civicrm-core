@@ -16,11 +16,12 @@
  */
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Import\ImportParser;
 
 /**
  * Class to parse activity csv files.
  */
-class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
+class CRM_Activity_Import_Parser_Activity extends ImportParser {
 
   protected string $baseEntity = 'Activity';
 

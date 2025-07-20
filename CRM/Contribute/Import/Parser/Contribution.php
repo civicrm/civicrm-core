@@ -20,11 +20,12 @@ use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\Email;
 use Civi\Api4\Note;
+use Civi\Import\ImportParser;
 
 /**
  * Class to parse contribution csv files.
  */
-class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
+class CRM_Contribute_Import_Parser_Contribution extends ImportParser {
 
   protected $baseEntity = 'Contribution';
 

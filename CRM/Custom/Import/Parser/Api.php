@@ -1,11 +1,12 @@
 <?php
 
 use Civi\Api4\CustomValue;
+use Civi\Import\ImportParser;
 
 /**
  * Class CRM_Custom_Import_Parser_Api
  */
-class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
+class CRM_Custom_Import_Parser_Api extends ImportParser {
 
   protected string $baseEntity = 'Contact';
 
