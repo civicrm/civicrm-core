@@ -303,13 +303,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    */
   public static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
     $form->assign('receiptType', 'contribution');
-    if (!empty($params['payment_instrument_id'])) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      $params['paidBy'] = $paymentInstrument[$params['payment_instrument_id']];
-      if ($params['paidBy'] !== 'Check' && isset($params['check_number'])) {
-        unset($params['check_number']);
-      }
-    }
 
     // retrieve individual prefix value for honoree
     if (isset($params['soft_credit'])) {

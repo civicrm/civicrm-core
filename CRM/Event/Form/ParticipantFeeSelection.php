@@ -626,13 +626,6 @@ SELECT  id, html_type
     $this->assign('event', $event);
 
     if ($this->_isPaidEvent) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      if (!$this->_mode) {
-        if (isset($params['payment_instrument_id'])) {
-          $this->assign('paidBy', $paymentInstrument[$params['payment_instrument_id']] ?? NULL);
-        }
-      }
-
       $this->assign('totalAmount', $this->contributionAmt);
       $this->assign('checkNumber', $params['check_number'] ?? NULL);
     }
