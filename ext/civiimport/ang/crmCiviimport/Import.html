@@ -64,6 +64,11 @@
     </div>
   </div>
   <hr>
+  <div id="import-options">
+    <h3>{{:: ts('Import Options') }}</h3>
+    <div >{{:: ts('Date format') }}  <input class="huge" crm-ui-select='{data : dateFormats}' ng-model="userJob.metadata.import_options.date_format" /></div>
+  </div>
+  <hr>
   <div id="map-field">
     <h3>{{:: ts('Data mapping') }}</h3>
     <table class="selector">

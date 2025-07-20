@@ -51,6 +51,17 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected $savedMappingID;
 
   /**
+   * @return array
+   */
+  public function getDateFormats(): array {
+    $dateFormats = [];
+    foreach (CRM_Utils_Date::getAvailableInputFormats(TRUE) as $key => $value) {
+      $dateFormats[] = ['id' => (int) $key, 'text' => $value];
+    }
+    return $dateFormats;
+  }
+
+  /**
    * @param int $savedMappingID
    *
    * @return CRM_Import_Forms
@@ -437,6 +448,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
           'template_id' => $this->getTemplateID(),
           'Template' => ['mapping_id' => $this->getSavedMappingID()],
           'import_mappings' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_mappings'] : [],
+          'import_options' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_options'] : [],
         ],
       ])
       ->execute()
@@ -473,7 +485,11 @@ class CRM_Import_Forms extends CRM_Core_Form {
       $this->getUserJob()['metadata'],
       [$key => $data]
     );
-    $this->getUserJob()['metadata'] = $metaData;
+    if (isset($metaData['import_options']['date_format'])) {
+      // The Select is sloppy with typing.
+      $metaData['import_options']['date_format'] = (int) $metaData['import_options']['date_format'];
+    }
+    $this->userJob['metadata'] = $metaData;
     if ($this->isUpdateTemplateJob()) {
       $this->updateTemplateUserJob($metaData);
     }
@@ -914,6 +930,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       'dedupeRules' => $parser->getAllDedupeRules(),
       'userJob' => $this->getUserJob(),
       'columnHeaders' => $this->getColumnHeaders(),
+      'dateFormats' => $this->getDateFormats(),
     ]);
   }
 

@@ -945,7 +945,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       return 'invalid_import_value';
     }
     if (in_array($dataType, ['Date', 'Timestamp'], TRUE)) {
-      $value = CRM_Utils_Date::formatDate($importedValue, (int) $this->getSubmittedValue('dateFormats'));
+      $value = CRM_Utils_Date::formatDate($importedValue, (int) $this->getUserJob()['metadata']['import_options']['date_format']);
       return $value ?: 'invalid_import_value';
     }
     $options = $this->getFieldOptions($fieldName);

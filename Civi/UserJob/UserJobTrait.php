@@ -74,6 +74,9 @@ trait UserJobTrait {
         ->addWhere('id', '=', $this->getUserJobID())
         ->execute()
         ->single();
+      if (!isset($this->userJob['metadata']['import_options']['date_format'])) {
+        $this->userJob['metadata']['import_options']['date_format'] = $this->getSubmittedValue('dateFormats') ?: \CRM_Utils_Date::DATE_yyyy_mm_dd;
+      }
     }
     return $this->userJob;
   }

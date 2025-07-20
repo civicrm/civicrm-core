@@ -25,6 +25,7 @@
           $scope.data.showColumnNames = $scope.userJob.metadata.submitted_values.skipColumnHeader;
           $scope.data.savedMapping = CRM.vars.crmImportUi.savedMapping;
           $scope.mappingSaving = {updateFieldMapping: 0, newFieldMapping: 0};
+          $scope.dateFormats = CRM.vars.crmImportUi.dateFormats;
           // Used for dedupe rules select options, also for filtering available fields.
           $scope.data.dedupeRules = CRM.vars.crmImportUi.dedupeRules;
           // Used for select contact type select-options.
@@ -298,7 +299,7 @@
               default_value: importRow.defaultValue,
               // At this stage column_number is thrown away but we store it here to have it for when we change that.
               column_number: index,
-              entity_data: entityConfig
+              entity_data: entityConfig,
             });
           });
           crmApi4('UserJob', 'save', {records: [$scope.userJob]})
