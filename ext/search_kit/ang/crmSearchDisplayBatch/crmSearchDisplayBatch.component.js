@@ -34,6 +34,9 @@
 
       this.$onInit = function() {
         this.limit = this.settings.limit || 0;
+        if (errorNotification && errorNotification.close) {
+          errorNotification.close();
+        }
         // When previewing on the search admin screen, the display will be limited
         this.isPreviewMode = typeof this.search !== 'string';
         this.userJobId = this.isPreviewMode ? null : $location.search().batch;
@@ -214,7 +217,7 @@
               no: ts('Cancel'),
               yes: ts('Run Import'),
             },
-          });
+          }).on('crmConfirm:yes', runImport);
         } else {
           runImport();
         }
