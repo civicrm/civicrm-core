@@ -22,6 +22,8 @@ use CRM_Afform_ExtensionUtil as E;
  */
 class Utils {
 
+  use \Civi\Api4\Utils\AfformSaveTrait;
+
   /**
    * Sorts entities according to references to each other
    *
@@ -128,6 +130,23 @@ class Utils {
       }
     }
     return $value ?? '';
+  }
+
+  public static function initSourceTranslations() {
+    $allAfforms = \Civi::service('afform_scanner')->findFilePaths();
+    foreach ($allAfforms as $name => $path) {
+      $fullpath = array_values($path)[0] . '.aff.html';
+      $html = file_get_contents($fullpath);
+
+      // Get title.
+      $form = \Civi\Api4\Afform::get(FALSE)
+        ->addWhere('name', '=', $name)
+        ->addSelect('title')
+        ->execute()
+        ->first();
+
+      self::saveTranslations($form, $html);
+    }
   }
 
 }
