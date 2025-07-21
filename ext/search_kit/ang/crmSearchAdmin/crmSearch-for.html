@@ -23,7 +23,7 @@
       <select class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
       <input id="crm-search-add-join"
              class="form-control crm-action-menu fa-plus"
-             crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities, dropdownCss: {width: '275px'}}"
+             crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities}"
              on-crm-ui-select="$ctrl.addJoin(selection)">
     </div>
   </fieldset>
@@ -40,7 +40,7 @@
   <div class="form-inline crm-search-groupby-add">
     <input id="crm-search-add-groupBy"
            class="form-control crm-action-menu fa-plus"
-           crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy, dropdownCss: {width: '300px'}}"
+           crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy}"
            on-crm-ui-select="$ctrl.addParam('groupBy', selection)" >
   </div>
 </fieldset>
