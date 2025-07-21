@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+namespace Civi\Import;
+
 /**
  *
  * @package CRM
@@ -19,7 +21,7 @@ use Civi\Api4\Participant;
 /**
  * class to parse membership csv files
  */
-class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
+class ParticipantParser extends ImportParser {
 
   protected string $baseEntity = 'Participant';
 
@@ -46,6 +48,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
   /**
    * The initializer code, called before the processing.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function init(): void {
     unset($this->userJob);
@@ -111,7 +115,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       if (!empty($participantParams['id'])) {
         $existingParticipant = $this->checkEntityExists('Participant', $participantParams['id']);
         if (!$this->isUpdateExisting()) {
-          throw new CRM_Core_Exception(ts('%1 record found and update not selected', [1 => 'Participant']));
+          throw new \CRM_Core_Exception(ts('%1 record found and update not selected', [1 => 'Participant']));
         }
         $participantParams['contact_id'] = !empty($participantParams['contact_id']) ? (int) $participantParams['contact_id'] : $existingParticipant['contact_id'];
       }
@@ -124,7 +128,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       if (!empty($participantParams['id'])) {
         $this->checkEntityExists('Participant', $participantParams['id']);
         if (!$this->isUpdateExisting()) {
-          throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
+          throw new \CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
         }
         $newParticipant = Participant::update(FALSE)
           ->setValues($participantParams)
@@ -140,7 +144,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           ->execute()->first();
 
         if ($existingParticipant) {
-          $url = CRM_Utils_System::url('civicrm/contact/view/participant',
+          $url = \CRM_Utils_System::url('civicrm/contact/view/participant',
             "reset=1&id={$existingParticipant['id']}&cid={$existingParticipant['contact_id']}&action=view", TRUE
           );
 
@@ -152,7 +156,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         ->setValues($participantParams)
         ->execute()->first();
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       return;
     }
@@ -180,7 +184,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
             'title' => ts('Participant Note'),
             'name' => 'note',
             'headerPattern' => '/(participant.)?note$/i',
-            'data_type' => CRM_Utils_Type::T_TEXT,
+            'data_type' => \CRM_Utils_Type::T_TEXT,
             'options' => FALSE,
           ],
         ],
@@ -215,7 +219,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       $errors = array_merge($this->getInvalidValues($value, $key), $errors);
     }
     if ($errors) {
-      throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
+      throw new \CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
     }
   }
 

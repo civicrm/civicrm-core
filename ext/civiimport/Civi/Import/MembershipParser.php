@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+namespace Civi\Import;
+
 /**
  *
  * @package CRM
@@ -19,7 +21,7 @@ use Civi\Api4\Membership;
 /**
  * class to parse membership csv files
  */
-class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
+class MembershipParser extends ImportParser {
 
   /**
    * Array of metadata for all available fields.
@@ -120,7 +122,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       $errors[] = 'Required parameter missing: Status';
     }
     if ($errors) {
-      throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
+      throw new \CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
     }
   }
 
@@ -188,7 +190,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       $isOverride = $membershipParams['is_override'] ?? $existingMembership['is_override'] ?? FALSE;
 
       //to calculate dates
-      $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeID,
+      $calcDates = \CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeID,
         $joinDate,
         $startDate,
         $endDate
@@ -202,7 +204,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       if (!$isOverride) {
         $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
       }
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
+      $calcStatus = \CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
         $endDate,
         $joinDate,
         'now',
@@ -215,11 +217,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       }
       elseif (!$isOverride) {
         if (empty($calcStatus)) {
-          throw new CRM_Core_Exception('Status in import row (' . ($formatValues['status_id'] ?? '') . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.', CRM_Import_Parser::ERROR);
+          throw new \CRM_Core_Exception('Status in import row (' . ($formatValues['status_id'] ?? '') . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.', \CRM_Import_Parser::ERROR);
         }
         if ($formatted['status_id'] != $calcStatus['id']) {
           //Status Hold" is either NOT mapped or is FALSE
-          throw new CRM_Core_Exception('Status in import row (' . ($formatValues['status_id'] ?? '') . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.', CRM_Import_Parser::ERROR);
+          throw new \CRM_Core_Exception('Status in import row (' . ($formatValues['status_id'] ?? '') . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.', \CRM_Import_Parser::ERROR);
         }
       }
 
@@ -227,12 +229,12 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         ->addRecord($formatted)
         ->execute()->first();
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $newMembership['id']);
-      return CRM_Import_Parser::VALID;
+      return \CRM_Import_Parser::VALID;
 
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-      return CRM_Import_Parser::ERROR;
+      return \CRM_Import_Parser::ERROR;
     }
   }
 
@@ -254,18 +256,20 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
 
     foreach ($dates as $d) {
       if (isset($formatted[$d]) &&
-        !CRM_Utils_System::isNull($formatted[$d])
+        !\CRM_Utils_System::isNull($formatted[$d])
       ) {
-        $formatted[$d] = CRM_Utils_Date::isoToMysql($formatted[$d]);
+        $formatted[$d] = \CRM_Utils_Date::isoToMysql($formatted[$d]);
       }
       elseif (isset($calcDates[$d])) {
-        $formatted[$d] = CRM_Utils_Date::isoToMysql($calcDates[$d]);
+        $formatted[$d] = \CRM_Utils_Date::isoToMysql($calcDates[$d]);
       }
     }
   }
 
   /**
    * Set field metadata.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
@@ -278,11 +282,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   /**
    * @param string $contactType
    *
-   * @return array|mixed
+   * @return array
    * @throws \CRM_Core_Exception
    */
   protected function getImportableFields(string $contactType = 'Individual'): array {
-    $fields = Civi::cache('fields')->get('membership_importable_fields' . $contactType);
+    $fields = \Civi::cache('fields')->get('membership_importable_fields' . $contactType);
     if (!$fields) {
       $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']];
       $membershipFields = (array) Membership::getFields()
@@ -302,7 +306,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       }
 
       $fields += $this->getContactFields($this->getContactType(), 'Contact');
-      Civi::cache('fields')->set('membership_importable_fields' . $contactType, $fields);
+      \Civi::cache('fields')->set('membership_importable_fields' . $contactType, $fields);
     }
     return $fields;
   }

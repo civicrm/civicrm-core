@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\MembershipParser;
+
 /**
  * This class gets the name of the file to upload
  */
@@ -86,11 +88,11 @@ class CRM_Member_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   }
 
   /**
-   * @return \CRM_Member_Import_Parser_Membership
+   * @return \Civi\Import\MembershipParser
    */
-  protected function getParser(): CRM_Member_Import_Parser_Membership {
+  protected function getParser(): MembershipParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Member_Import_Parser_Membership();
+      $this->parser = new MembershipParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

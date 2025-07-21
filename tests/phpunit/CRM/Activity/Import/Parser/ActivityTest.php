@@ -20,6 +20,7 @@
 
 use Civi\Api4\ActivityContact;
 use Civi\Api4\UserJob;
+use Civi\Import\ActivityParser;
 
 /**
  *  Test Activity Import Parser functions
@@ -74,14 +75,14 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    *
    * @param array $fields
    *
-   * @return \CRM_Activity_Import_Parser_Activity
+   * @return \Civi\Import\ActivityParser
    */
-  protected function createImportObject(array $fields): \CRM_Activity_Import_Parser_Activity {
+  protected function createImportObject(array $fields): ActivityParser {
     $mapper = [];
     foreach ($fields as $field) {
       $mapper[] = [$field];
     }
-    $importer = new CRM_Activity_Import_Parser_Activity();
+    $importer = new ActivityParser();
     $this->userJobID = $this->getUserJobID(['mapper' => $mapper]);
     $importer->setUserJobID($this->userJobID);
     $importer->init();
