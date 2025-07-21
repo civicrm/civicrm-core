@@ -39,6 +39,8 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
    */
   private $hookCallback;
 
+  private $autocompleteRunCount = 0;
+
   /**
    * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
    *
@@ -57,6 +59,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
 
   public function setUp(): void {
     $this->hookCallback = NULL;
+    $this->autocompleteRunCount = 0;
     // Ensure MockBasicEntity gets added via above listener
     \Civi::cache('metadata')->clear();
     MockBasicEntity::delete(FALSE)->addWhere('identifier', '>', 0)->execute();
@@ -131,9 +134,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       'defaults' => ['last_name' => $lastName],
     ]);
 
-    $result = Contact::autocomplete()
-      ->setInput($lastName)
-      ->execute();
+    $result = $this->runAutocomplete('Contact', ['input' => $lastName]);
 
     // Contacts will be returned in order by sort_name
     $this->assertStringEndsWith('Both', $result[0]['label']);
@@ -208,31 +209,15 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       $sampleData[] = ['foo' => 'Test ' . $num];
     }
     MockBasicEntity::save()
-      ->setRecords($sampleData)
+      ->setRecords(array_reverse($sampleData))
       ->execute();
 
-    $result1 = MockBasicEntity::autocomplete()
-      ->setInput('est')
-      ->execute();
-    $this->assertEquals('Test 1', $result1[0]['label']);
-    $this->assertEquals(10, $result1->countFetched());
-    $this->assertEquals(11, $result1->countMatched());
-
-    $result2 = MockBasicEntity::autocomplete()
-      ->setInput('est')
-      ->setPage(2)
-      ->execute();
-    $this->assertEquals('Test 11', $result2[0]['label']);
-    $this->assertEquals(10, $result2->countFetched());
-    $this->assertEquals(11, $result2->countMatched());
-
-    $result3 = MockBasicEntity::autocomplete()
-      ->setInput('est')
-      ->setPage(3)
-      ->execute();
-    $this->assertEquals('Test 21', $result3[0]['label']);
-    $this->assertEquals(1, $result3->countFetched());
-    $this->assertEquals(1, $result3->countMatched());
+    $result = $this->runAutocomplete('MockBasicEntity', ['input' => 'est']);
+    $this->assertEquals(3, $this->autocompleteRunCount);
+    $this->assertCount(count($sampleData), $result);
+    $this->assertEquals('Test 1', $result[0]['label']);
+    $this->assertEquals('Test 11', $result[10]['label']);
+    $this->assertEquals('Test 21', $result[20]['label']);
   }
 
   public function testAutocompleteWithDifferentKey(): void {
@@ -292,33 +277,22 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->addRecord(['id' => $contacts[1]['id'], 'last_name' => "Aaaad$cid"])
       ->execute();
 
-    $page = 1;
-    $all = [];
-    do {
-      $result = Contact::autocomplete()
-        ->setPage($page++)
-        ->setInput((string) $cid)
-        ->execute();
-      $all = array_merge($all, (array) $result);
-    } while ($result->countFetched() < $result->countMatched());
-
-    // Should have iterated at least 3 times
-    $this->assertGreaterThanOrEqual(3, $page);
+    $allResults = $this->runAutocomplete('Contact', ['input' => (string) $cid]);
 
     // Exact match should be at beginning of the list
-    $this->assertEquals($cid, \CRM_Utils_Array::first($all)['id']);
-    $this->assertEquals($cid, $all[0]['id']);
+    $this->assertEquals($cid, \CRM_Utils_Array::first($allResults)['id']);
+    $this->assertEquals($cid, $allResults[0]['id']);
     // If by chance there are other matching contacts in the db, skip over them
-    foreach ($all as $i => $row) {
+    foreach ($allResults as $i => $row) {
       if ($row['id'] == $contacts[6]['id']) {
         break;
       }
     }
     // The other 4 matches should be in order
-    $this->assertEquals($contacts[6]['id'], $all[$i]['id']);
-    $this->assertEquals($contacts[14]['id'], $all[$i + 1]['id']);
-    $this->assertEquals($contacts[0]['id'], $all[$i + 2]['id']);
-    $this->assertEquals($contacts[1]['id'], $all[$i + 3]['id']);
+    $this->assertEquals($contacts[6]['id'], $allResults[$i]['id']);
+    $this->assertEquals($contacts[14]['id'], $allResults[$i + 1]['id']);
+    $this->assertEquals($contacts[0]['id'], $allResults[$i + 2]['id']);
+    $this->assertEquals($contacts[1]['id'], $allResults[$i + 3]['id']);
 
     // Ensure partial match doesn't work (end of id)
     $result = Contact::autocomplete()
@@ -355,6 +329,34 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals('Second Star', $result[0]['label']);
+  }
+
+  /**
+   * Emulates the behavior of `$.fn.crmAutocomplete` in Common.js
+   *
+   * @return array
+   */
+  public function runAutocomplete(string $entityName, array $params): array {
+    $searchField = NULL;
+    $allResults = [];
+    do {
+      $result = civicrm_api4($entityName, 'autocomplete', $params + [
+        'checkPermissions' => FALSE,
+        'searchField' => $searchField,
+        'exclude' => array_column($allResults, 'id'),
+      ]);
+      $this->autocompleteRunCount++;
+      $allResults = array_merge($allResults, (array) $result);
+      $searchField = $result->searchField;
+      $more = $result->countFetched() < $result->countMatched();
+      // If no more results for this searchField, advance to the next
+      $fieldIndex = array_search($searchField, $result->searchFields);
+      if (!$more && strlen($params['input'] ?? '') && $fieldIndex < (count($result->searchFields) - 1)) {
+        $searchField = $result->searchFields[$fieldIndex + 1];
+        $more = TRUE;
+      }
+    } while ($more);
+    return $allResults;
   }
 
 }
