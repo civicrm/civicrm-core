@@ -240,7 +240,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Search::getAutocompleteDisplays',
     ],
-    'on_change' => [
+    'post_change' => [
       'CRM_Admin_Form_Setting_Search::onChangeAutocompleteDisplays',
     ],
   ],
