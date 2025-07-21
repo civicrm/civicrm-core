@@ -127,7 +127,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertCount(1, $contributionsOfSoftContact, 'Contribution Soft not added for primary contact');
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
-    $this->assertEquals(1, $dataSource->getRowCount([ContributionParser::SOFT_CREDIT]));
+    $this->assertEquals(1, $dataSource->getRowCount([\CRM_Import_Parser::SOFT_CREDIT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
   }
 
@@ -427,7 +427,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.financial_type_id'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $this->assertEquals(1, $dataSource->getRowCount([ContributionParser::PLEDGE_PAYMENT]));
+    $this->assertEquals(1, $dataSource->getRowCount([\CRM_Import_Parser::PLEDGE_PAYMENT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->callAPISuccessGetSingle('PledgePayment', ['pledge_id' => $pledgeID, 'contribution_id' => $contribution['id']]);

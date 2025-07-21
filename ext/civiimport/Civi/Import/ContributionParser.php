@@ -53,12 +53,6 @@ class ContributionParser extends ImportParser {
   }
 
   /**
-   * Contribution-specific result codes
-   * @see CRM_Import_Parser result code constants
-   */
-  const SOFT_CREDIT = 512, SOFT_CREDIT_ERROR = 1024, PLEDGE_PAYMENT = 2048, PLEDGE_PAYMENT_ERROR = 4096;
-
-  /**
    * Get the field mappings for the import.
    *
    * @return array
@@ -458,12 +452,12 @@ class ContributionParser extends ImportParser {
       //return soft valid since we need to show how soft credits were added
       // because ? historically we did but this seems a bit obsolete.
       if (!empty($softCreditParams)) {
-        $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '', $contributionID);
+        $this->setImportStatus($rowNumber, $this->getStatus(\CRM_Import_Parser::SOFT_CREDIT), '', $contributionID);
         return;
       }
 
       // process pledge payment assoc w/ the contribution
-      $this->setImportStatus($rowNumber, $this->processPledgePayments($contributionID, $contributionParams) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), '', $contributionID);
+      $this->setImportStatus($rowNumber, $this->processPledgePayments($contributionID, $contributionParams) ? $this->getStatus(\CRM_Import_Parser::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), '', $contributionID);
       return;
 
     }
@@ -507,10 +501,10 @@ class ContributionParser extends ImportParser {
    */
   protected function getStatus($code): string {
     $errorMapping = [
-      self::SOFT_CREDIT_ERROR => 'soft_credit_error',
-      self::PLEDGE_PAYMENT_ERROR => 'pledge_payment_error',
-      self::SOFT_CREDIT => 'soft_credit_imported',
-      self::PLEDGE_PAYMENT => 'pledge_payment_imported',
+      \CRM_Import_Parser::SOFT_CREDIT_ERROR => 'soft_credit_error',
+      \CRM_Import_Parser::PLEDGE_PAYMENT_ERROR => 'pledge_payment_error',
+      \CRM_Import_Parser::SOFT_CREDIT => 'soft_credit_imported',
+      \CRM_Import_Parser::PLEDGE_PAYMENT => 'pledge_payment_imported',
       \CRM_Import_Parser::DUPLICATE => 'DUPLICATE',
       \CRM_Import_Parser::VALID => 'IMPORTED',
     ];
