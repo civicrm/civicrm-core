@@ -479,6 +479,25 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
+   * @param array $savedRecords
+   * @param array|bool $select
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function reloadResults(array $savedRecords, mixed $select = TRUE): array {
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    /** @var AbstractGetAction $get */
+    $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
+    $get
+      ->setCheckPermissions($this->getCheckPermissions())
+      ->addWhere($idField, 'IN', array_column($savedRecords, $idField));
+    if (is_array($select) && !empty($select)) {
+      $get->setSelect($select);
+    }
+    return (array) $get->execute();
+  }
+
+  /**
    * Validates required fields for actions which create a new object.
    *
    * @param $values

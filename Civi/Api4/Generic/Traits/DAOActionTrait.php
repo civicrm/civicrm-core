@@ -177,16 +177,25 @@ trait DAOActionTrait {
     // Ensure array keys start at 0
     $items = array_values($items);
 
-    foreach ($this->write($items) as $index => $dao) {
-      if (!$dao) {
-        $errMessage = sprintf('%s write operation failed', $this->getEntityName());
-        throw new \CRM_Core_Exception($errMessage);
-      }
-      $result[] = $this->baoToArray($dao, $items[$index]);
+    $daos = $this->write($items);
+
+    // Some legacy DAOs return false on error instead of throwing an exception
+    if (in_array(FALSE, $daos)) {
+      $errMessage = sprintf('%s write operation failed', $this->getEntityName());
+      throw new \CRM_Core_Exception($errMessage);
     }
 
-    \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    FormattingUtil::formatOutputValues($result, $this->entityFields());
+    if (empty($this->reload)) {
+      foreach ($daos as $index => $dao) {
+        $result[] = $this->baoToArray($dao, $items[$index]);
+      }
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
+      FormattingUtil::formatOutputValues($result, $this->entityFields());
+    }
+    else {
+      $result = $this->reloadResults($daos, $this->reload);
+    }
+
     return $result;
   }
 
