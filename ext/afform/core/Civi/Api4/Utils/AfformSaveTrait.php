@@ -58,7 +58,7 @@ trait AfformSaveTrait {
 
       // Are we multilingual.
       if (\CRM_Core_I18n::isMultiLingual()) {
-        $this->saveTranslations($item, $html);
+        self::saveTranslations($item, $html);
       }
       file_put_contents($layoutPath, $html);
       // FIXME check for writability then success. Report errors.
@@ -99,7 +99,7 @@ trait AfformSaveTrait {
    * array $form
    * string $html
    */
-  protected function saveTranslations($form, $html) {
+  protected static function saveTranslations($form, $html) {
     $strings = StringVisitor::extractStrings($form, $html);
 
     // Save the form strings.
