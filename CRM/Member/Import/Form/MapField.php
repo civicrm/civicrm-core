@@ -28,36 +28,8 @@ class CRM_Member_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   public function buildQuickForm(): void {
     $this->addSavedMappingFields();
     $this->addFormRule([__CLASS__, 'formRule'], $this);
-
-    $options = $this->getFieldOptions();
-    // Suppress non-match contact fields at the QuickForm layer as
-    // their use will only be on the angular layer.
-    foreach ($options as &$option) {
-      if ($option['is_contact']) {
-        foreach ($option['children'] as $index => $contactField) {
-          if (empty($contactField['match_rule'])) {
-            unset($option['children'][$index]);
-          }
-        }
-      }
-      else {
-        foreach ($option['children'] as $index => $membershipField) {
-          // Swap out dots for double underscores so as not to break the quick form js.
-          // We swap this back on postProcess.
-          // Arg - we need to swap out _. first as it seems some groups end in a trailing underscore,
-          // which is indistinguishable to convert back - ie ___ could be _. or ._.
-          // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
-          $name = $membershipField['id'];
-          $option['children'][$index]['id'] = $name;
-        }
-      }
-    }
-    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
-      $this->add('select2', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), $options, FALSE, ['class' => 'big', 'placeholder' => ts('- do not import -')]);
-    }
-
+    $this->addMapper();
     $this->setDefaults($this->getDefaults());
-
     $this->addFormButtons();
   }
 

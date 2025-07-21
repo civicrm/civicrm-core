@@ -15,6 +15,89 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
+   * Assign values for civiimport.
+   *
+   * I wanted to put this in the extension - but there are a lot of protected functions
+   * we would need to revisit and make public - do we want to?
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function assignCiviimportVariables(): void {
+    $contactTypes = [];
+    foreach (CRM_Contact_BAO_ContactType::basicTypeInfo() as $contactType) {
+      $contactTypes[] = ['id' => $contactType['name'], 'text' => $contactType['label']];
+    }
+    $parser = $this->getParser();
+    $this->isQuickFormMode = FALSE;
+    Civi::resources()->addVars('crmImportUi', [
+      'defaults' => $this->getDefaults(),
+      'rows' => $this->getDataRows([], 2),
+      'contactTypes' => $contactTypes,
+      'entityMetadata' => $this->getFieldOptions(),
+      'dedupeRules' => $parser->getAllDedupeRules(),
+      'userJob' => $this->getUserJob(),
+      'columnHeaders' => $this->getColumnHeaders(),
+      'dateFormats' => $this->getDateFormats(),
+    ]);
+  }
+
+  /**
+   * This transforms the lists of fields for each contact type & component
+   * into a single unified list suitable for select2.
+   *
+   * @return array
+   */
+  private function getFieldOptions(): array {
+    $fields = $this->getFields();
+    $entity = $this->getBaseEntity();
+    $categories = $this->getAvailableImportEntities();
+    $highlightedFields = $this->getParser()->getRequiredFieldsForEntity($entity, $this->getParser()->getActionForEntity($entity));
+    foreach ($fields as $fieldName => $field) {
+      if ($fieldName === '') {
+        // @todo stop setting 'do not import' in the first place.
+        continue;
+      }
+      $childField = [
+        'text' => $field['label'] ?? ($field['html']['label'] ?? $field['title']),
+        'id' => $fieldName,
+        'has_location' => !empty($field['hasLocationType']),
+        'default_value' => $field['default_value'] ?? '',
+        'contact_type' => $field['contact_type'] ?? NULL,
+        'match_rule' => $field['match_rule'] ?? NULL,
+      ];
+      if (in_array($fieldName, $highlightedFields, TRUE)) {
+        $childField['text'] .= '*';
+      }
+      $category = ($childField['has_location'] || $field['name'] === 'contact_id') ? 'Contact' : $field['entity_instance'] ?? ($field['entity'] ?? $entity);
+      if (empty($categories[$category])) {
+        $category = $entity;
+      }
+      $categories[$category]['children'][$fieldName] = $childField;
+    }
+
+    foreach ($categories as $index => $category) {
+      if (empty($category['children'])) {
+        unset($categories[$index]);
+      }
+      else {
+        $categories[$index]['children'] = array_values($category['children']);
+      }
+    }
+    return array_values($categories);
+  }
+
+  /**
+   * Get the fields available for import selection.
+   *
+   * @return array
+   *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
+   *
+   */
+  protected function getAvailableImportEntities(): array {
+    return $this->getParser()->getImportEntities();
+  }
+
+  /**
    * Use the form name to create the tpl file name.
    *
    * @return string

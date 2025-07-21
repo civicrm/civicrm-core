@@ -755,17 +755,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
-   * Get the fields available for import selection.
-   *
-   * @return array
-   *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
-   *
-   */
-  protected function getImportEntities(): array {
-    return $this->getParser()->getImportEntities();
-  }
-
-  /**
    * Get an instance of the parser class.
    *
    * @return \CRM_Contact_Import_Parser_Contact|\CRM_Contribute_Import_Parser_Contribution
@@ -905,33 +894,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
       return reset($info)['entity'];
     }
     return CRM_Core_BAO_UserJob::getTypeValue($this->getUserJobType(), 'entity');
-  }
-
-  /**
-   * Assign values for civiimport.
-   *
-   * I wanted to put this in the extension - but there are a lot of protected functions
-   * we would need to revisit and make public - do we want to?
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function assignCiviimportVariables(): void {
-    $contactTypes = [];
-    foreach (CRM_Contact_BAO_ContactType::basicTypeInfo() as $contactType) {
-      $contactTypes[] = ['id' => $contactType['name'], 'text' => $contactType['label']];
-    }
-    $parser = $this->getParser();
-    $this->isQuickFormMode = FALSE;
-    Civi::resources()->addVars('crmImportUi', [
-      'defaults' => $this->getDefaults(),
-      'rows' => $this->getDataRows([], 2),
-      'contactTypes' => $contactTypes,
-      'entityMetadata' => $this->getFieldOptions(),
-      'dedupeRules' => $parser->getAllDedupeRules(),
-      'userJob' => $this->getUserJob(),
-      'columnHeaders' => $this->getColumnHeaders(),
-      'dateFormats' => $this->getDateFormats(),
-    ]);
   }
 
   /**
