@@ -23,7 +23,7 @@ use Civi\Import\ActivityParser;
 class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
-   * @return \Civi\Import\ActivityParserq
+   * @return \Civi\Import\ActivityParser
    */
   protected function getParser(): ActivityParser {
     if (!$this->parser) {
