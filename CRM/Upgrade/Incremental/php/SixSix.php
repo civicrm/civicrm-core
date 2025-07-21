@@ -30,6 +30,12 @@ class CRM_Upgrade_Incremental_php_SixSix extends CRM_Upgrade_Incremental_Base {
   public function upgrade_6_6_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addExtensionTask('Enable Legacy Batch Entry extension', ['legacybatchentry']);
+    $this->addTask('Update localization menu item', 'updateLocalizationMenuItem');
+  }
+
+  public static function updateLocalizationMenuItem(): bool {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_navigation SET has_separator = 1 WHERE name = 'Preferred Language Options'");
+    return TRUE;
   }
 
 }
