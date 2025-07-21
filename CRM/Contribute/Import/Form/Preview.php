@@ -15,17 +15,19 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\ContributionParser;
+
 /**
  * This class previews the uploaded file and returns summary statistics.
  */
 class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
-   * @return \CRM_Contribute_Import_Parser_Contribution
+   * @return \Civi\Import\ContributionParser
    */
-  protected function getParser(): CRM_Contribute_Import_Parser_Contribution {
+  protected function getParser(): ContributionParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Contribute_Import_Parser_Contribution();
+      $this->parser = new ContributionParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

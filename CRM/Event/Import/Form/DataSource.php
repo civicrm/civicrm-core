@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\ParticipantParser;
+
 /**
  * This class gets the name of the file to upload
  */
@@ -45,11 +47,11 @@ class CRM_Event_Import_Form_DataSource extends CRM_CiviImport_Form_DataSource {
   }
 
   /**
-   * @return CRM_Event_Import_Parser_Participant
+   * @return \Civi\Import\ParticipantParser
    */
-  protected function getParser(): CRM_Event_Import_Parser_Participant {
+  protected function getParser(): ParticipantParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Event_Import_Parser_Participant();
+      $this->parser = new ParticipantParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

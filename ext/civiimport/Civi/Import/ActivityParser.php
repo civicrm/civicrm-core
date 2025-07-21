@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+namespace Civi\Import;
+
 /**
  *
  * @package CRM
@@ -16,12 +18,11 @@
  */
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
-use Civi\Import\ImportParser;
 
 /**
  * Class to parse activity csv files.
  */
-class CRM_Activity_Import_Parser_Activity extends ImportParser {
+class ActivityParser extends ImportParser {
 
   protected string $baseEntity = 'Activity';
 
@@ -49,6 +50,8 @@ class CRM_Activity_Import_Parser_Activity extends ImportParser {
 
   /**
    * The initializer code, called before the processing.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function init(): void {
     $this->setFieldMetadata();
@@ -79,16 +82,16 @@ class CRM_Activity_Import_Parser_Activity extends ImportParser {
       try {
         $activityParams['source_contact_id'] = $this->getContactID($sourceContactParams, empty($sourceContactParams['id']) ? NULL : (int) $sourceContactParams['id'], 'SourceContact', $this->getDedupeRulesForEntity('SourceContact'));
       }
-      catch (CRM_Core_Exception $e) {
+      catch (\CRM_Core_Exception $e) {
       }
       if (empty($activityParams['id']) && empty($activityParams['source_contact_id'])) {
-        $activityParams['source_contact_id'] = CRM_Core_Session::getLoggedInContactID();
+        $activityParams['source_contact_id'] = \CRM_Core_Session::getLoggedInContactID();
       }
       $newActivity = Activity::save()
         ->addRecord($activityParams)
         ->execute()->first();
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       return;
     }

@@ -1,7 +1,6 @@
 <?php
 /**
  * @file
- * File for the CRM_Custom_Import_Parser_ContributionTest class.
  */
 
 use Civi\Api4\CustomValue;

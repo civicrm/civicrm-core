@@ -57,7 +57,7 @@ abstract class ImportParser extends \CRM_Import_Parser {
    *
    * @return array
    */
-  protected function getActions(array $actions, $entity = 'Contact'): array {
+  protected function getActions(array $actions, string $entity = 'Contact'): array {
     $actionList['Contact'] = [
       'ignore' => [
         'id' => 'ignore',

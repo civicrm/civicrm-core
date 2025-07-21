@@ -1,12 +1,13 @@
 <?php
 
+namespace Civi\Import;
+
 use Civi\Api4\CustomValue;
-use Civi\Import\ImportParser;
 
 /**
- * Class CRM_Custom_Import_Parser_Api
+ * Class CustomValueParser for importing Custom Data Value.s
  */
-class CRM_Custom_Import_Parser_Api extends ImportParser {
+class CustomValueParser extends ImportParser {
 
   protected string $baseEntity = 'Contact';
 
@@ -95,19 +96,21 @@ class CRM_Custom_Import_Parser_Api extends ImportParser {
         ->execute();
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $params['entity_id']);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage(), $params['contact_id'] ?? NULL);
     }
   }
 
   /**
    * Set the import metadata.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setFieldMetadata(): void {
     if (!$this->importableFieldsMetadata) {
       $customGroupID = $this->getCustomGroupID();
       $fields = ['' => ['title' => ts('- do not import -')]];
-      $importableFields = CRM_Utils_Array::prefixKeys($this->getGroupFieldsForImport($customGroupID), $this->getGroupName() . '.');
+      $importableFields = \CRM_Utils_Array::prefixKeys($this->getGroupFieldsForImport($customGroupID), $this->getGroupName() . '.');
       $this->importableFieldsMetadata = $fields + $importableFields + $this->getContactFields($this->getContactType(), 'Contact', TRUE);
     }
   }
@@ -131,7 +134,7 @@ class CRM_Custom_Import_Parser_Api extends ImportParser {
    */
   private function getGroupFieldsForImport(int $customGroupID): array {
     $importableFields = [];
-    $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['id' => $customGroupID]);
+    $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $customGroupID]);
 
     foreach ($customGroup['fields'] as $values) {
       if ($values['data_type'] === 'File') {
@@ -145,7 +148,7 @@ class CRM_Custom_Import_Parser_Api extends ImportParser {
         'headerPattern' => '/' . preg_quote($regexp, '/') . '/i',
         'import' => 1,
         'custom_field_id' => $values['id'],
-        'type' => CRM_Core_BAO_CustomField::dataToType()[$values['data_type']],
+        'type' => \CRM_Core_BAO_CustomField::dataToType()[$values['data_type']],
         'extends' => $customGroup['extends'],
         'custom_group_id.name' => $customGroup['name'],
         'is_multiple' => $customGroup['is_multiple'],
@@ -166,14 +169,14 @@ class CRM_Custom_Import_Parser_Api extends ImportParser {
    * @return mixed
    */
   public function getGroupName(): mixed {
-    return CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->getCustomGroupID()])['name'];
+    return \CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->getCustomGroupID()])['name'];
   }
 
   /**
    * @return mixed
    */
   public function getGroupTitle(): mixed {
-    return CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->getCustomGroupID()])['title'];
+    return \CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->getCustomGroupID()])['title'];
   }
 
 }

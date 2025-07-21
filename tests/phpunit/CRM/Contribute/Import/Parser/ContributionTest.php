@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * File for the CRM_Contribute_Import_Parser_ContributionTest class.
+ * File for the \Civi\Import\ContributionParser class.
  */
 
 use Civi\Api4\Contact;
@@ -14,6 +14,7 @@ use Civi\Api4\Import;
 use Civi\Api4\Note;
 use Civi\Api4\OptionValue;
 use Civi\Api4\UserJob;
+use Civi\Import\ContributionParser;
 
 /**
  *  Test Contribution import parser.
@@ -31,7 +32,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @var string
    */
-  protected $entity = 'Contribution';
+  protected string $entity = 'Contribution';
 
   /**
    * Original value for background processing.
@@ -126,7 +127,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertCount(1, $contributionsOfSoftContact, 'Contribution Soft not added for primary contact');
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
-    $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT]));
+    $this->assertEquals(1, $dataSource->getRowCount([ContributionParser::SOFT_CREDIT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
   }
 
@@ -426,7 +427,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.financial_type_id'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT]));
+    $this->assertEquals(1, $dataSource->getRowCount([ContributionParser::PLEDGE_PAYMENT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->callAPISuccessGetSingle('PledgePayment', ['pledge_id' => $pledgeID, 'contribution_id' => $contribution['id']]);
@@ -463,7 +464,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'rule_weight' => 10,
       'rule_field' => 'phone_numeric',
     ]);
-    $parser = new CRM_Contribute_Import_Parser_Contribution();
+    $parser = new ContributionParser();
     $parser->setUserJobID($this->getUserJobID());
     $fields = $parser->getFieldsMetadata();
     $this->assertArrayHasKey('Contact.phone_primary.phone', $fields);
@@ -832,7 +833,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       }
     }
     $values = array_values($originalValues);
-    $parser = new CRM_Contribute_Import_Parser_Contribution();
+    $parser = new ContributionParser();
     $this->userJobID = $this->getUserJobID([], $importMappings);
     $parser->setUserJobID($this->userJobID);
     $this->updateContributionAction($action);
