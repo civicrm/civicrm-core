@@ -1,5 +1,5 @@
 <span title="{{:: ts('Transform field using a function') }}">
-  <input class="form-control fa-crm-formula" style="min-width: 20px" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ' ', width: 'off', dropdownCss: {width: '275px'}}" ng-change="$ctrl.selectFunction()">
+  <input class="form-control fa-crm-formula" style="min-width: 20px" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ' ', width: 'off'}" ng-change="$ctrl.selectFunction()">
 </span>
 <label ng-hide="$ctrl.mode !== 'select' && !$ctrl.fn">{{ $ctrl.fieldArg.field.label }}</label>
 

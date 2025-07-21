@@ -536,7 +536,7 @@ input.crm-form-checkbox) + label {
   color: var(--crm-c-text);
   cursor: default;
   border: var(--crm-c-divider);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-input-border-radius);
   background-clip: padding-box;
   user-select: none;
   background-color: var(--crm-form-select-bg);
@@ -567,11 +567,12 @@ input.crm-form-checkbox) + label {
 /* Select dropdown */
 
 .select2-drop.select2-drop-active.crm-container {
+  min-width: var(--crm-big-input);
   background: var(--crm-input-background);
-  border-bottom-left-radius: var(--crm-roundness);
-  border-bottom-right-radius: var(--crm-roundness);
+  border-bottom-left-radius: var(--crm-input-border-radius);
+  border-bottom-right-radius: var(--crm-input-border-radius);
   border-color: var(--crm-c-focus);
-  right: -1px;
+  border-top: 1px solid rgb(from var(--crm-c-focus) r g b / 25%);
 }
 .select2-drop.select2-drop-active.crm-container.select2-drop-above {
   border-bottom-left-radius: 0;
@@ -625,7 +626,7 @@ input.crm-form-checkbox) + label {
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
   background: var(--crm-c-background);
   border: 1px solid var(--crm-input-border-color);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-input-border-radius);
   box-sizing: border-box;
   height: var(--crm-l);
   margin-top: var(--crm-s);
@@ -855,7 +856,7 @@ input.crm-form-checkbox) + label {
   margin-top: -4px;
 }
 
-/* BS3 radio/checklbox */
+/* BS3 radio/checkbox */
 
 #bootstrap-theme .radio,
 #bootstrap-theme .checkbox {
