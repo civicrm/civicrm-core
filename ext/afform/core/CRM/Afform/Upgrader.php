@@ -6,8 +6,6 @@ use CRM_Afform_ExtensionUtil as E;
  */
 class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
 
-  use \Civi\Api4\Utils\AfformSaveTrait;
-
   /**
    * Update names of blocks and joins
    *
@@ -108,20 +106,7 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
    */
   public function upgrade_1004(): bool {
     $this->ctx->log->info('Applying update 1004 - initialize translatable afform string sources.');
-    $allAfforms = \Civi::service('afform_scanner')->findFilePaths();
-    foreach ($allAfforms as $name => $path) {
-      $fullpath = array_values($path)[0] . '.aff.html';
-      $html = file_get_contents($fullpath);
-
-      // Get title.
-      $form = \Civi\Api4\Afform::get(FALSE)
-        ->addWhere('name', '=', $name)
-        ->addSelect('title')
-        ->execute()
-        ->first();
-
-      $this->saveTranslations($form, $html);
-    }
+    \Civi\Afform\Utils::initSourceTranslations();
     return TRUE;
   }
 
