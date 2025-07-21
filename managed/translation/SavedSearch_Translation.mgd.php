@@ -28,6 +28,8 @@ foreach (\CRM_Core_I18n::getMultilingual() as $index => $langCode) {
           'select' => [
             'id',
             'source',
+            'source_key',
+            'TranslationSource_Translation_source_key_01.id',
             'TranslationSource_Translation_source_key_01.string',
             'TranslationSource_Translation_source_key_01.language:label',
           ],
