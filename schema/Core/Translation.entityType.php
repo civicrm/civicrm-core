@@ -24,7 +24,7 @@ return [
       'fields' => [
         'source_key' => TRUE,
       ],
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
     ],
   ],
   'getFields' => fn() => [
@@ -114,7 +114,7 @@ return [
       'sql_type' => 'char(22)',
       'required' => TRUE,
       'description' => ts('FIXME'),
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
       'entity_reference' => [
         'entity' => 'TranslationSource',
         'key' => 'source_key',

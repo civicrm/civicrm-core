@@ -9,14 +9,14 @@ return [
     'title_plural' => ts('Translated Source Strings'),
     'description' => ts('A source reference for strings that should be translated.'),
     'log' => TRUE,
-    'add' => '6.4.alpha1',
+    'add' => '6.6.alpha1',
   ],
   'getIndices' => fn() => [
     'index_source_key' => [
       'fields' => [
         'source_key' => TRUE,
       ],
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
     ],
   ],
   'getFields' => fn() => [
@@ -26,7 +26,7 @@ return [
       'input_type' => 'Number',
       'required' => TRUE,
       'description' => ts('Unique Source ID'),
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],
@@ -36,7 +36,7 @@ return [
       'input_type' => 'Select',
       'required' => TRUE,
       'description' => ts('Table where referenced item is stored'),
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
       /*'pseudoconstant' => [
         'callback' => ['CRM_Core_BAO_Translation', 'getEntityTables'],
       ],*/
@@ -47,7 +47,7 @@ return [
       'input_type' => 'Select',
       'required' => FALSE,
       'description' => ts('Field where referenced item is stored'),
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
       'pseudoconstant' => [
         'callback' => ['CRM_Core_BAO_Translation', 'getEntityFields'],
       ],
@@ -58,7 +58,7 @@ return [
       'input_type' => 'EntityRef',
       'required' => FALSE,
       'description' => ts('ID of the relevant entity.'),
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
       'entity_reference' => [
         'dynamic_entity' => 'entity_table',
         'key' => 'id',
@@ -69,7 +69,7 @@ return [
       'sql_type' => 'char(22)',
       'required' => TRUE,
       'description' => ts('FIXME'),
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
     ],
     'source' => [
       'title' => ts('Source Text'),
@@ -77,7 +77,7 @@ return [
       'input_type' => 'TextArea',
       'required' => TRUE,
       'description' => ts('Source text for referencing translations'),
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
     ],
     'source_key' => [
       'title' => ts('Source Key'),
@@ -85,7 +85,7 @@ return [
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('FIXME'),
-      'add' => '6.4.alpha1',
+      'add' => '6.6.alpha1',
     ],
   ],
 ];
