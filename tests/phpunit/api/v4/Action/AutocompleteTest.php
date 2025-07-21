@@ -25,6 +25,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\EntitySet;
 use Civi\Api4\SavedSearch;
+use Civi\Api4\SearchDisplay;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -64,12 +65,41 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     \Civi::cache('metadata')->clear();
     MockBasicEntity::delete(FALSE)->addWhere('identifier', '>', 0)->execute();
     \Civi::settings()->set('includeWildCardInName', 1);
+    \Civi::settings()->revert('autocomplete_displays');
     parent::setUp();
   }
 
   public function tearDown(): void {
     \Civi::settings()->revert('search_autocomplete_count');
+    \Civi::settings()->revert('autocomplete_displays');
     parent::tearDown();
+  }
+
+  public function testSetDefaultDisplay(): void {
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'api_entity' => 'Contact',
+    ]);
+    $searchDisplay = $this->createTestRecord('SearchDisplay', [
+      'saved_search_id' => $savedSearch['id'],
+      'name' => 'the_test_contact_default',
+      'type' => 'autocomplete',
+      'is_autocomplete_default' => TRUE,
+    ]);
+    $setting = \Civi::settings()->get('autocomplete_displays');
+    $this->assertEquals(['Contact:the_test_contact_default'], $setting);
+    $searchDisplay = SearchDisplay::get(FALSE)
+      ->addWhere('id', '=', $searchDisplay['id'])
+      ->addSelect('*', 'is_autocomplete_default')
+      ->execute()->single();
+    $this->assertTrue($searchDisplay['is_autocomplete_default']);
+
+    \Civi::settings()->revert('autocomplete_displays');
+
+    $searchDisplay = SearchDisplay::get(FALSE)
+      ->addWhere('id', '=', $searchDisplay['id'])
+      ->addSelect('*', 'is_autocomplete_default')
+      ->execute()->single();
+    $this->assertFalse($searchDisplay['is_autocomplete_default']);
   }
 
   public function testMockEntityAutocomplete(): void {

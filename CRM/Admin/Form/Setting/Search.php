@@ -111,24 +111,24 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * on_change callback for autocomplete_displays setting.
+   * post_change callback for autocomplete_displays setting.
    *
    * Ensures the settings only allow one display per entity and
    * verifies the mapped displays exist.
    *
-   * @param array $value
-   *   The reference to the array of autocomplete display settings in the format "entity:display".
+   * @param array $oldValue
+   * @param array $newValue
    *
    * @return void
    */
-  public static function onChangeAutocompleteDisplays(&$value): void {
-    if (!$value) {
+  public static function onChangeAutocompleteDisplays($oldValue, $newValue): void {
+    if (!$newValue) {
       return;
     }
     $mappedValue = [];
     // Explode "key:value"[] into [key => value]
     // This effectively enforces a max of one display per entity, (more than one wouldn't make any sense)
-    foreach ($value as $setting) {
+    foreach ($newValue as $setting) {
       [$entityName, $displayName] = explode(':', $setting);
       $mappedValue[$entityName] = $displayName;
     }
@@ -154,6 +154,10 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
       $mappedValue,
       array_keys($mappedValue)
     );
+    // Re-save setting. This shouldn't cause an infinite loop because the second time this condition will be false.
+    if ($newValue != $value) {
+      Civi::settings()->set('autocomplete_displays', $value);
+    }
   }
 
 }

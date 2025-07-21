@@ -28,7 +28,7 @@ class SearchDisplayCreationSpecProvider extends \Civi\Core\Service\AutoService i
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('name')->setRequired(FALSE);
 
-    $field = new FieldSpec('is_autocomplete_default', 'Boolean');
+    $field = new FieldSpec('is_autocomplete_default', 'SearchDisplay', 'Boolean');
     $field->setLabel(ts('Autocomplete Default'))
       ->setTitle(ts('Autocomplete Default'))
       ->setColumnName('name')
