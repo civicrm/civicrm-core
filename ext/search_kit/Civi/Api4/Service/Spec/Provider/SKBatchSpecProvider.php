@@ -55,7 +55,7 @@ class SKBatchSpecProvider extends AutoService implements SpecProviderInterface {
       $field->setTitle(ts('Import field') . ': ' . $column['label']);
       $field->setLabel($column['label']);
       $field->setType('Field');
-      $field->setSerialize($column['serialize']);
+      $field->setSerialize($column['serialize'] ?? NULL);
       $field->setNullable($column['nullable'] ?? TRUE);
       $field->setColumnName($column['name']);
       if (!empty($column['options'])) {
