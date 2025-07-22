@@ -757,7 +757,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
   /**
    * Get an instance of the parser class.
    *
-   * @return \CRM_Contact_Import_Parser_Contact|\CRM_Contribute_Import_Parser_Contribution
+   * @return \CRM_Contact_Import_Parser_Contact|\Civi\Import\ContributionParser
    * @throws \CRM_Core_Exception
    */
   protected function getParser() {
