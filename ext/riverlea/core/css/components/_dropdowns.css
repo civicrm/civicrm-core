@@ -416,7 +416,8 @@
   justify-content: center;
   background: var(--crm-dropdown-danger-bg);
 }
-#afGuiEditor .dropdown-menu .text-danger {
+#afGuiEditor .dropdown-menu .text-danger,
+#afGuiEditor .dropdown-menu .text-danger i.crm-i::before {
   color: var(--crm-c-danger-text);
 }
 

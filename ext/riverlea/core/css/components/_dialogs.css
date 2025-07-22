@@ -221,6 +221,7 @@
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:focus {
   background: var(--crm-notify-danger);
+  color: var(--crm-c-danger-text);
   border: 0;
 }
 
