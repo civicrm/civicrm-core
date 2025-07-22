@@ -87,7 +87,7 @@ return [
     ],
     'amount' => [
       'title' => ts('Amount'),
-      'sql_type' => 'decimal(20,2)',
+      'sql_type' => 'decimal(18,9)',
       'input_type' => NULL,
       'required' => TRUE,
       'description' => ts('Total amount of this item'),
