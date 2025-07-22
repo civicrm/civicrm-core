@@ -608,17 +608,33 @@ if (!CRM.vars) CRM.vars = {};
         ajax: {
           quietMillis: 250,
           url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
-          data: function (input, pageNum) {
+          data: function (input, page, context) {
             return {params: JSON.stringify(_.assign({
               input: input,
-              page: pageNum || 1
+              searchField: context && context.searchField || null,
+              exclude: context && context.previousIds || null,
             }, getApiParams()))};
           },
-          results: function(data) {
-            return {
-              results: data.values,
-              more: data.countMatched > data.countFetched
+          results: function(response, page, query) {
+            const data = {
+              results: response.values,
+              more: response.countMatched > response.countFetched,
+              context: query.context || {},
             };
+            // Set context for use in the data function above
+            // `searchFields` will be an array like [id, sort_name, email_primary.email]
+            // and `searchField` will be the current field searched
+            data.context.searchField = response.searchField;
+            data.context.searchFields = response.searchFields;
+            data.context.previousIds = data.context.previousIds || [];
+            data.context.previousIds.push(...data.results.map(item => item.id));
+            // If no more results for this searchField, advance to the next
+            const fieldIndex = data.context.searchFields.indexOf(data.context.searchField);
+            if (!data.more && query.term.length && response.searchField && fieldIndex < (data.context.searchFields.length - 1)) {
+              data.context.searchField = data.context.searchFields[fieldIndex + 1];
+              data.more = true;
+            }
+            return data;
           },
         },
         minimumInputLength: 1,
@@ -1734,7 +1750,23 @@ if (!CRM.vars) CRM.vars = {};
         }
         $(this).parent().toggleClass('collapsed');
         e.preventDefault();
+      })
+
+      // Save the state for sticky accordions
+      .on('click', 'details.crm-accordion-sticky', function(e) {
+        // Workaround to run last, otherwise the open attribute is not yet updated
+        setTimeout(() => {
+          CRM.cache.set('sticky-' + this.id, document.getElementById(this.id).hasAttribute('open'));
+        }, 0);
       });
+
+    // Expand sticky accordions
+    Array.from(document.querySelectorAll('.crm-container details.crm-accordion-sticky')).forEach((expander) => {
+      var state = CRM.cache.get('sticky-' + expander.id);
+      if (state === true || state === false) {
+        expander.toggleAttribute('open', state);
+      }
+    });
 
     $().crmtooltip();
   });

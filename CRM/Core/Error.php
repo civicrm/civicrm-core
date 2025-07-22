@@ -417,6 +417,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       'code' => NULL,
       'exception' => $exception,
     ];
+    if (is_a($exception, '\Civi\Core\Exception\DBQueryException')) {
+      $vars['message'] = $exception->getUserMessage();
+    }
     if (!$vars['message']) {
       $vars['message'] = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', [1 => 'https://civicrm.org/bug-reporting']);
     }
@@ -982,10 +985,24 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
-    if ($pearError instanceof DB_Error) {
-      throw new DBQueryException($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
+    $message = $pearError->getMessage();
+
+    // wrapped in case settings/log aren't available yet
+    try {
+      $messageWithDetails = $message . ' ' . $pearError->getUserInfo();
+
+      \Civi::log()->debug($messageWithDetails . "\n\n" . self::formatBacktrace($pearError->getBacktrace()));
     }
-    throw new CRM_Core_Exception($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
+    catch (\Exception $e) {
+      // well we tried
+    }
+
+    $code = $pearError->getCode();
+
+    if ($pearError instanceof DB_Error) {
+      throw new DBQueryException($message, $code, ['exception' => $pearError]);
+    }
+    throw new CRM_Core_Exception($message, $code, ['exception' => $pearError]);
   }
 
   /**

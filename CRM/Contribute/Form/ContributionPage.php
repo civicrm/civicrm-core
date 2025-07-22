@@ -144,7 +144,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
     $buttons = [
       [
-        'type' => 'next',
+        'type' => 'upload',
         'name' => ts('Save'),
         'isDefault' => TRUE,
       ],
@@ -301,49 +301,19 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $className = CRM_Utils_String::getClassName($this->_name);
 
-      //retrieve list of pages from StateMachine and find next page
-      //this is quite painful because StateMachine is full of protected variables
-      //so we have to retrieve all pages, find current page, and then retrieve next
-      $stateMachine = new CRM_Contribute_StateMachine_ContributionPage($this);
-      $states = $stateMachine->getStates();
-      $statesList = array_keys($states);
-      $currKey = array_search($className, $statesList);
-      $nextPage = (array_key_exists($currKey + 1, $statesList)) ? $statesList[$currKey + 1] : '';
-
       //unfortunately, some classes don't map to subpage names, so we alter the exceptions
-
       switch ($className) {
         case 'Contribute':
           $attributes = $this->getVar('_attributes');
           $subPage = CRM_Utils_Request::retrieveComponent($attributes);
-          if ($subPage == 'friend') {
-            $nextPage = 'custom';
-          }
-          else {
-            $nextPage = 'settings';
-          }
           break;
 
         case 'MembershipBlock':
           $subPage = 'membership';
-          $nextPage = 'thankyou';
-          break;
-
-        case 'Widget':
-          $subPage = 'widget';
-          $nextPage = 'pcp';
           break;
 
         default:
           $subPage = strtolower($className);
-          $nextPage = strtolower($nextPage);
-
-          if ($subPage == 'amount') {
-            $nextPage = 'membership';
-          }
-          elseif ($subPage == 'thankyou') {
-            $nextPage = 'friend';
-          }
           break;
       }
 
@@ -353,22 +323,10 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
       $this->postProcessHook();
 
-      if ($this->controller->getButtonName('submit') == "_qf_{$className}_next") {
+      if ($this->controller->getButtonName('upload') == "_qf_{$className}_upload") {
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute/{$subPage}",
           "action=update&reset=1&id={$this->_id}"
         ));
-      }
-      elseif ($this->controller->getButtonName('submit') == "_qf_{$className}_submit_savenext") {
-        if ($nextPage) {
-          CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute/{$nextPage}",
-            "action=update&reset=1&id={$this->_id}"
-          ));
-        }
-        else {
-          CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute",
-            "reset=1"
-          ));
-        }
       }
       else {
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute", 'reset=1'));

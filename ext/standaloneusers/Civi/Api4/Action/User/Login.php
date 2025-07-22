@@ -11,12 +11,12 @@ use Civi\Standalone\Security;
 class Login extends AbstractAction {
 
   /**
-   * Username to authenticate.
+   * Username or email to authenticate.
    *
    * @var string
    * @default NULL
    */
-  protected ?string $username = NULL;
+  protected ?string $identifier = NULL;
 
   /**
    * Password to authenticate.
@@ -100,37 +100,64 @@ class Login extends AbstractAction {
    */
   protected function passwordCheck(Result $result) {
 
-    $successUrl = '/civicrm';
+    $successUrl = '/civicrm/home';
     if (!empty($this->originalUrl) && parse_url($this->originalUrl, PHP_URL_PATH) !== '/civicrm/login') {
       // We will return to this URL on success.
       $successUrl = $this->originalUrl;
     }
 
+    // clean whitespace
+    $this->identifier = trim($this->identifier);
+
     // Check user+password
-    if (empty($this->username) || empty($this->password)) {
+    if (empty($this->identifier) || empty($this->password)) {
       $result['publicError'] = "Missing password/username";
       return;
     }
-    $security = Security::singleton();
+
+    // Check for matching user
     $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('username', '=', $this->username)
+      ->addWhere('username', '=', $this->identifier)
       ->addWhere('is_active', '=', TRUE)
-      ->addSelect('hashed_password', 'id')
+      ->addSelect('username', 'id')
       ->execute()->first();
+
+    // TODO: should login by email be behind a setting?
+    // if (!$user && \Civi::settings()->get('standaloneusers_allow_login_by_email')) {
+    if (!$user) {
+      $user = \Civi\Api4\User::get(FALSE)
+        ->addWhere('uf_name', '=', $this->identifier)
+        ->addWhere('is_active', '=', TRUE)
+        ->addSelect('username', 'id')
+        ->execute()->first();
+    }
 
     // Allow flood control (etc.) by extensions.
     $event = new LoginEvent('pre_credentials_check', $user['id'] ?? NULL);
     Civi::dispatcher()->dispatch('civi.standalone.login', $event);
+
     if ($event->stopReason) {
       $result['url'] = '/civicrm/login?' . $event->stopReason;
+      $result['publicError'] = "Invalid request";
+      return;
     }
 
-    $userID = $security->checkPassword($this->username, $this->password);
-    if (!$userID) {
-      $result['publicError'] = "Invalid credentials";
+    if (!$user) {
       // Allow monitoring of failed attempts.
-      $event = new LoginEvent('post_credentials_check', $user['id'] ?? NULL, 'wrongUserPassword');
+      $event = new LoginEvent('post_credentials_check', NULL, 'noSuchUser');
       Civi::dispatcher()->dispatch('civi.standalone.login', $event);
+
+      $result['publicError'] = "Invalid credentials";
+      return;
+    }
+
+    $userID = Security::singleton()->checkPassword($user['username'], $this->password);
+    if (!$userID) {
+      // Allow monitoring of failed attempts.
+      $event = new LoginEvent('post_credentials_check', $user['id'], 'wrongUserPassword');
+      Civi::dispatcher()->dispatch('civi.standalone.login', $event);
+
+      $result['publicError'] = "Invalid credentials";
       return;
     }
     // Password is ok. Do we have mfa configured?
@@ -156,7 +183,7 @@ class Login extends AbstractAction {
         // @todo expose the 120s timeout to config?
         \CRM_Core_Session::singleton()->set('pendingLogin', [
           'userID' => $userID,
-          'username' => $this->username,
+          'username' => $user['username'],
           'expiry' => time() + 120,
           'successUrl' => $successUrl,
         ]);

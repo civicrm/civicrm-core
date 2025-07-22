@@ -113,12 +113,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
     );
 
-    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . $this->getBaseEntity());
-
-    $savedMappingElement = $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
-    if ($this->getTemplateID()) {
-      $savedMappingElement->freeze();
-    }
+    $this->addMappingSelector();
 
     //build date formats
     $this->buildAllowedDateFormats();
@@ -172,6 +167,19 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   }
 
   /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function addMappingSelector(): void {
+    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . $this->getBaseEntity());
+
+    $savedMappingElement = $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
+    if ($this->getTemplateID()) {
+      $savedMappingElement->freeze();
+    }
+  }
+
+  /**
    * A long-winded way to add one radio element to the form.
    */
   protected function addContactTypeSelector() {
@@ -208,6 +216,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * Common postProcessing.
    */
   public function postProcess() {
+    // Force template load.
+    $this->getTemplateID();
     $this->processDatasource();
     $this->controller->resetPage('MapField');
     parent::postProcess();
@@ -239,7 +249,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       $userJobName = $userJob['name'];
       // Strip off import_ prefix from UserJob.name
       $mappingName = substr($userJobName, 7);
-      $mappingID = Mapping::get(FALSE)->addWhere('name', '=', $mappingName)->addSelect('id')->execute()->first()['id'];
+      // This mapping is deprecated but still used for Contact, Activity.
+      $mappingID = Mapping::get(FALSE)->addWhere('name', '=', $mappingName)->addSelect('id')->execute()->first()['id'] ?? NULL;
       // Unset fields that should not be copied over.
       unset($userJob['id'], $userJob['name'], $userJob['created_date'], $userJob['is_template'], $userJob['queue_id'], $userJob['start_date'], $userJob['end_date']);
       $userJob['metadata']['template_id'] = $templateID;
@@ -266,6 +277,12 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       else {
         $submittedValues = $this->getSubmittedValues();
         $fieldsToCopyOver = array_keys(array_diff_key($submittedValues, $this->submittableFields));
+        $templateID = (int) $this->getSubmittedValue('userJobTemplate');
+        if ($templateID && $templateID !== $this->getUserJob()['metadata']['template_id'] ?? NULL) {
+          $this->updateUserJobMetadata('template_id', $templateID);
+          $this->updateUserJobMetadata('import_mappings', $this->getTemplateJob()['metadata']['import_mappings']);
+          $this->updateUserJobMetadata('import_options', $this->getTemplateJob()['metadata']['import_options']);
+        }
         if ($submittedValues['use_existing_upload']) {
           // Use the already saved value.
           $fieldsToCopyOver[] = 'dataSource';

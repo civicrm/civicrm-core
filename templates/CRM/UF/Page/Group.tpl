@@ -66,7 +66,7 @@
                   <th>{ts}Description{/ts}</th>
                   <th>{ts}Type{/ts}</th>
                   <th>{ts}ID{/ts}</th>
-                  <th id="nosort">{ts}Used For{/ts}</th>
+                  <th id="nosort">{ts}Exposed To{/ts}</th>
                   <th><span class="sr-only">{ts}Actions{/ts}</span></th>
                 </tr>
               </thead>
@@ -91,12 +91,6 @@
                 {/foreach}
               </tbody>
             </table>
-
-            {if NOT ($action eq 1 or $action eq 2)}
-              <div class="crm-submit-buttons">
-                  <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
-              </div>
-            {/if}
           </div>
         </div>{* user profile*}
 
@@ -111,7 +105,7 @@
                   <th>{ts}Description{/ts}</th>
                   <th>{ts}Type{/ts}</th>
                   <th>{ts}ID{/ts}</th>
-                  <th id="nosort">{ts}Used For{/ts}</th>
+                  <th id="nosort">{ts}Exposed To{/ts}</th>
                   <th><span class="sr-only">{ts}Actions{/ts}</span></th>
                 </tr>
               </thead>
@@ -136,12 +130,6 @@
                 {/foreach}
               </tbody>
             </table>
-
-            {if NOT ($action eq 1 or $action eq 2)}
-              <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
-              </div>
-            {/if}
           </div>
         </div>{* reserved profile*}
       </div>

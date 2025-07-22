@@ -1129,7 +1129,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getActivityDateData() {
+  public static function getActivityDateData() {
     return [
       'last-year-activity' => [
         'params' => [
@@ -2063,7 +2063,7 @@ $textValue
    * Dataprovider for testTargetAssigneeVariations
    * @return array
    */
-  public function targetAndAssigneeProvider():array {
+  public static function targetAndAssigneeProvider():array {
     return [
       // Explicit index so that it's easy to see which one has failed without
       // having to finger count.

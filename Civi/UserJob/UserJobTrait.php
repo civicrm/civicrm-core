@@ -70,9 +70,13 @@ trait UserJobTrait {
   protected function getUserJob(): array {
     if (empty($this->userJob)) {
       $this->userJob = UserJob::get()
+        ->addSelect('*', 'search_display_id.name', 'search_display_id.saved_search_id.name')
         ->addWhere('id', '=', $this->getUserJobID())
         ->execute()
         ->single();
+      if (!isset($this->userJob['metadata']['import_options']['date_format'])) {
+        $this->userJob['metadata']['import_options']['date_format'] = $this->getSubmittedValue('dateFormats') ?: \CRM_Utils_Date::DATE_yyyy_mm_dd;
+      }
     }
     return $this->userJob;
   }

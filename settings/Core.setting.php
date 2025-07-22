@@ -484,6 +484,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If enabled, deleted contacts will be moved to trash (instead of being destroyed). Users with the proper permission are able to search for the deleted contacts and restore them (or delete permanently).'),
     'help_text' => NULL,
+    'validate_callback' => 'CRM_Core_BAO_Setting::validateBoolSetting',
     'settings_pages' => ['misc' => ['weight' => 20]],
   ],
   'allowPermDeleteFinancial' => [
@@ -1120,43 +1121,6 @@ return [
     'quick_form_type' => 'Select',
     'settings_pages' => ['display' => ['weight' => 320]],
   ],
-  'menubar_position' => [
-    'group_name' => 'CiviCRM Preferences',
-    'group' => 'core',
-    'name' => 'menubar_position',
-    'type' => 'String',
-    'html_type' => 'select',
-    'default' => 'over-cms-menu',
-    'add' => '5.12',
-    'title' => ts('Menubar position'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => ts('Location of the CiviCRM main menu.'),
-    'help_text' => NULL,
-    'options' => [
-      'over-cms-menu' => ts('Replace website menu'),
-      'below-cms-menu' => ts('Below website menu'),
-      'above-crm-container' => ts('Above content area'),
-      'none' => ts('None - disable menu'),
-    ],
-    'settings_pages' => ['display' => ['weight' => 800]],
-  ],
-  'menubar_color' => [
-    'group_name' => 'CiviCRM Preferences',
-    'group' => 'core',
-    'name' => 'menubar_color',
-    'type' => 'String',
-    'html_type' => 'color',
-    'default' => '#1b1b1b',
-    'add' => '5.13',
-    'title' => ts('Menubar color'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => ts('Color of the CiviCRM main menu.'),
-    'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Color::normalize',
-    'settings_pages' => ['display' => ['weight' => 820]],
-  ],
   'requestableMimeTypes' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -1178,12 +1142,12 @@ return [
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
-    'html_attributes' => array(
+    'html_attributes' => [
       'class' => 'crm-select2',
-    ),
-    'pseudoconstant' => array(
+    ],
+    'pseudoconstant' => [
       'callback' => 'call://themes/getAvailable',
-    ),
+    ],
     'default' => 'default',
     'add' => '5.16',
     'title' => ts('Frontend Theme'),
@@ -1203,12 +1167,12 @@ return [
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
-    'html_attributes' => array(
+    'html_attributes' => [
       'class' => 'crm-select2',
-    ),
-    'pseudoconstant' => array(
+    ],
+    'pseudoconstant' => [
       'callback' => 'call://themes/getAvailable',
-    ),
+    ],
     'default' => 'default',
     'add' => '5.16',
     'title' => ts('Backend Theme'),

@@ -113,8 +113,13 @@ class CRM_Upgrade_DispatchPolicy {
     // It's more restrictive, preventing interference from unexpected callpaths.
     $policies['upgrade.main'] = [
       'hook_civicrm_config' => 'run',
+
       // cleanupPermissions() in some UF's can be destructive. Running prematurely could be actively harmful.
       'hook_civicrm_permission' => 'fail',
+
+      // ManagedEntities::reconcile() can remove data. Running prematurely would be actively harmful.
+      'hook_civicrm_managed' => 'fail',
+
       'hook_civicrm_crypto' => 'drop',
       '/^hook_civicrm_(pre|post)$/' => 'drop',
       '/^hook_civicrm_/' => $strict ? 'warn-drop' : 'drop',

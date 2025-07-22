@@ -22,7 +22,7 @@ class DbUtilTest extends \CiviUnitTestCase {
    * Data provider for testParseSSL
    * @return array
    */
-  public function queryStringProvider():array {
+  public static function queryStringProvider():array {
     return [
       ['', []],
       ['new_link=true', []],

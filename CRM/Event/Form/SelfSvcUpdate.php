@@ -295,9 +295,6 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails[$this->_event_id]);
     //get default participant role.
     $eventDetails[$this->_event_id]['participant_role'] = $participantRoles[$eventDetails[$this->_event_id]['default_role_id']] ?? NULL;
-    //get the location info
-    $locParams = ['entity_id' => $this->_event_id, 'entity_table' => 'civicrm_event'];
-    $eventDetails[$this->_event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
 
     //send a 'cancelled' email to user, and cc the event's cc_confirm email
     $statusMsg = ts('Event registration for %1 has been cancelled.', [1 => $this->_contact_name]);

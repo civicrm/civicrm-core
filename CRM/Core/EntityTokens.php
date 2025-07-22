@@ -661,7 +661,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       // the space open for that.
       // Not the existing QuickForm widget has handling for the custom field
       // format based on the title using this syntax.
-      $parts = explode(': ', $field['label']);
+      $parts = explode(': ', $field['label'], 2);
       $field['title'] = "{$parts[1]} :: {$parts[0]}";
       $tokenName = 'custom_' . $field['custom_field_id'];
       $tokensMetadata[$tokenName] = $field;

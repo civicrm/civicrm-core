@@ -169,36 +169,80 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
         [, $customFieldId] = explode('_', $fieldKey);
 
         if (!empty($customFieldId) && is_numeric($customFieldId)) {
-          // Got a custom field ID
-          $customField = CRM_Core_BAO_CustomField::getField($customFieldId);
-          $label = $customField['label'];
+          // valid custom field id
+          $customFieldId = (int) $customFieldId;
 
-          // Convert dropdown and other machine values to human labels.
-          // Money is special for non-US locales because at this point it's in human format so we don't
-          // want to try to convert it.
-          $oldValue = $this->_defaults[$fieldKey] ?? '';
-          $newValue = $newCustomValue;
-          if ('Money' !== $customField['data_type']) {
-            $oldValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
-              'custom_field_id' => $customFieldId,
-              'entity_id' => $this->_entityID,
-              'custom_field_value' => $oldValue,
-            ]);
-            $oldValue = $oldValue['values'][$customFieldId]['display'];
-            $newValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
-              'custom_field_id' => $customFieldId,
-              'entity_id' => $this->_entityID,
-              'custom_field_value' => $newCustomValue,
-            ]);
-            $newValue = $newValue['values'][$customFieldId]['display'];
+          // check field exists and get meta
+          $customField = CRM_Core_BAO_CustomField::getField($customFieldId);
+
+          if ($customField) {
+            // label from custom field
+            $label = $customField['label'];
+
+            // before/after values from form
+            $oldValue = $this->_defaults[$fieldKey] ?? '';
+            $newValue = $newCustomValue;
+
+            // Convert dropdown and other machine values to human labels.
+            $oldValue = $this->formatDisplayValue($oldValue, $customFieldId, $customField['data_type']);
+            $newValue = $this->formatDisplayValue($newValue, $customFieldId, $customField['data_type']);
+
+            $formattedDetails[] = $label . ': ' . $oldValue . ' => ' . $newValue;
           }
-          $formattedDetails[] = $label . ': ' . $oldValue . ' => ' . $newValue;
+
         }
 
       }
     }
 
     return implode('<br/>', $formattedDetails);
+  }
+
+  private function formatDisplayValue(mixed $value, int $customFieldId, string $customFieldDataType): string {
+    switch ($customFieldDataType) {
+      case 'Money':
+        // Money is special for non-US locales because at this point it's in human format so we don't try
+        // want to try to convert it.
+        return $value;
+
+      case 'File':
+        // File is tricky - updating the case file reuses the same File ID.
+        // This makes saving /civicrm/file? urls meaningless as
+        // every URL will just render the latest version of the file...
+        //
+        // It also doesn't make sense to permanently save a url containing a time-limited checksum
+        //
+        // So for now we just save the filename before and after
+        //
+        // @todo consider updating the handling so new files are saved with new IDs,
+        // and then stashing the file ids somewhere that live urls can be rendered
+        // dynamically? (or is the expectation that old versions of files are totally gone forever?)
+
+        // new values come through with the whole file path in the `name` key
+        $filename = NULL;
+        if (!empty($value['name'])) {
+          $filename = basename($value['name']);
+        }
+
+        // old values come through with the filename in the `data` key
+        if (!empty($value['data'])) {
+          $filename = $value['data'];
+        }
+
+        if ($filename) {
+          // remove hash so we don't expose this
+          return CRM_Utils_File::cleanFileName($filename);
+        }
+
+        return ts('No file');
+
+      default:
+        return civicrm_api3('CustomValue', 'getdisplayvalue', [
+          'custom_field_id' => $customFieldId,
+          'entity_id' => $this->_entityID,
+          'custom_field_value' => $value,
+        ])['values'][$customFieldId]['display'];
+    }
   }
 
 }

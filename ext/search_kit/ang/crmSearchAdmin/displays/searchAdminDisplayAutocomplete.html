@@ -2,16 +2,43 @@
   <label for="crm-search-admin-display-label">{{:: ts('Label') }} <span class="crm-marker">*</span></label>
   <input id="crm-search-admin-display-label" type="text" class="form-control" ng-model="$ctrl.display.label" required placeholder="{{:: ts('Untitled') }}"/>
 </div>
+<div ng-if="$ctrl.isAdmin">
+  <label>
+    <input type="checkbox" ng-model="$ctrl.display.is_autocomplete_default">
+    {{:: ts('Make Default Autocomplete for %1', {1: $ctrl.parent.getMainEntity().title_plural}) }}
+  </label>
+</div>
+
+<fieldset>
+  <div class="crm-draggable" ng-model="$ctrl.display.settings.searchFields" ui-sortable="sortableColumnOptions">
+    <div class="form-inline" ng-repeat="field in $ctrl.display.settings.searchFields">
+      <i class="crm-i fa-arrows crm-search-move-icon"></i>
+      <label for="crm-admin-autocomplete-search-field-{{$index}}">{{:: ts('Search by') }} <i class="crm-marker" ng-show="!$index">*</i></label>
+      <input class="form-control" id="crm-admin-autocomplete-search-field-{{$index}}" ng-model="$ctrl.display.settings.searchFields[$index]" crm-ui-select="{data: $ctrl.parent.fieldsForSearch, allowClear: false}" />
+      <a href class="crm-hover-button" class="crm-hover-button" ng-show="$ctrl.display.settings.searchFields.length > 1" ng-click="$ctrl.display.settings.searchFields.splice($index, 1)" title="{{:: ts('Remove') }}">
+        <i class="crm-i fa-times"></i>
+      </a>
+    </div>
+  </div>
+  <div class="form-inline">
+    <label for="crm-admin-autocomplete-search-field-add">
+      {{ $ctrl.display.settings.searchFields.length ? ts('Also by') : ts('Search by') }}
+      <i class="crm-marker" ng-show="!$ctrl.display.settings.searchFields.length">*</i>
+    </label>
+    <input class="form-control crm-action-menu fa-plus"
+           id="crm-admin-autocomplete-search-field-add"
+           crm-ui-select="{placeholder: ts('Search field'), data: $ctrl.parent.fieldsForSearch}"
+           on-crm-ui-select="$ctrl.parent.pushSetting('searchFields', selection)" >
+  </div>
+</fieldset>
+
 <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
 
 <fieldset class="crm-search-admin-edit-columns-wrapper">
-  <legend>
-    {{:: ts('Fields') }}
-  </legend>
   <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
   <p class="help-block">
-    {{:: ts("The top-most line will be shown as the searchable title (combine multiple fields using rewrite + tokens).") }}
-    {{:: ts("Other lines will be shown below in smaller text, and will not be searchable (except for ID which is always searchable).") }}
+    {{:: ts("The top-most line will be shown as the autocomplte result title (combine multiple fields using rewrite + tokens).") }}
+    {{:: ts("Other lines will be shown below in smaller text.") }}
   </p>
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">

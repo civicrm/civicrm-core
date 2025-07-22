@@ -757,7 +757,7 @@ class CRM_Core_Permission {
       ],
       'profile listings' => [
         'label' => $prefix . ts('profile listings'),
-        'description' => ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.'),
+        'description' => ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.') . ' ' . ts('Profile listings are being phased out in favor of SearchKit/FormBuilder. They have been moved to the Legacy Profiles extension.'),
       ],
       'profile create' => [
         'label' => $prefix . ts('profile create'),

@@ -197,11 +197,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $column
    * @param array $data
    * @param array $settings
-   * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
+   * @return array{dataType: ?string, val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
    */
   private function formatColumn(array $column, array $data, array $settings) {
     $column += ['rewrite' => NULL, 'label' => NULL, 'key' => '', 'type' => NULL];
-    $out = [];
+    $out = ['dataType' => NULL];
     switch ($column['type']) {
       case 'field':
       case 'html':
@@ -209,15 +209,18 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $key = str_replace('()', ':', $column['key']);
         $rawValue = $data[$key] ?? NULL;
         if (!$this->hasValue($rawValue) && isset($column['empty_value'])) {
+          $out['dataType'] = 'String';
           $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
         }
         elseif ($column['rewrite']) {
+          $out['dataType'] = 'String';
           $out['val'] = $this->rewrite($column['rewrite'], $data);
         }
         else {
-          $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
+          $out['dataType'] = $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
           $out['val'] = $this->formatViewValue($key, $rawValue, $data, $dataType, $column['format'] ?? NULL);
         }
+
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
         }
@@ -289,6 +292,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       else {
         $cssClass[] = 'crm-search-field-show-linebreaks';
       }
+    }
+    if (!empty($out['edit'])) {
+      $cssClass[] = 'crm-search-field-editable';
     }
     if ($cssClass) {
       $out['cssClass'] = implode(' ', $cssClass);
@@ -881,7 +887,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           ],
         ]);
         $link['path'] = $getLinks[0]['path'] ?? NULL;
-        $link['conditions'] = $getLinks[0]['conditions'] ?? [];
+        $link['conditions'] = array_merge($link['conditions'], $getLinks[0]['conditions'] ?? []);
         // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
         if ($this->canAggregate($link['prefix'] . $idKey)) {
           $link['prefix'] = 'GROUP_CONCAT_' . str_replace('.', '_', $link['prefix']);
@@ -893,7 +899,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Process task links
       elseif (!$link['path'] && !empty($link['task'])) {
         $task = $this->getTask($link['task']);
-        $link['conditions'] = $task['conditions'] ?? [];
+        $link['conditions'] = array_merge($link['conditions'], $task['conditions'] ?? []);
         // Convert legacy tasks (which have a url)
         if (!empty($task['crmPopup'])) {
           $idField = CoreUtil::getIdFieldName($link['entity']);
@@ -927,7 +933,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $condition[0] = $link['prefix'] . $condition[0];
       }
     }
-    // Combine predefined link conditions with condition set in the search display
+    // Backward-compat: search displays created prior to 6.4 only supported 1 condition
     if (!empty($link['condition'])) {
       $link['conditions'][] = $link['condition'];
     }
@@ -985,9 +991,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if ($path[0] === '/' || str_contains($path, 'http://') || str_contains($path, 'https://')) {
       return $path;
     }
+
+    $flags = NULL;
     // Use absolute urls when downloading spreadsheet
-    $absolute = $this->getActionName() === 'download';
-    return \CRM_Utils_System::url($path, $query, $absolute, NULL, FALSE);
+    if ($this->getActionName() === 'download') {
+      $flags = 'a';
+    }
+    return (string) \Civi::url($path, $flags)->addQuery($query);
   }
 
   /**
@@ -1003,9 +1013,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $editable['action'] = 'update';
       $editable['record'][$editable['id_key']] = $data[$editable['id_path']];
       // Ensure field is appropriate to this entity sub-type
-      $field = $this->getField($column['key']);
       $entityValues = FormattingUtil::filterByPath($data, $editable['id_path'], $editable['id_key']);
-      if (!$this->fieldBelongsToEntity($editable['entity'], $field['name'], $entityValues)) {
+      if (!$this->fieldBelongsToEntity($editable['entity'], $editable['value_key'], $entityValues)) {
         return NULL;
       }
     }
@@ -1039,6 +1048,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       // Ensure all required values exist for create action
       $vals = array_keys(array_filter($editable['record']));
+      // Ignore pseudoconstant suffixes in field names
+      $vals = array_map(fn($v) => explode(':', $v)[0], $vals);
       $vals[] = $editable['value_key'];
       $missingRequiredFields = civicrm_api4($editable['entity'], 'getFields', [
         'action' => 'create',
@@ -1086,11 +1097,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   private function fieldBelongsToEntity($entityName, $fieldName, $entityValues, $checkPermissions = TRUE) {
     try {
-      return (bool) civicrm_api4($entityName, 'getFields', [
+      $fields = civicrm_api4($entityName, 'getFields', [
         'checkPermissions' => $checkPermissions,
         'where' => [['name', '=', $fieldName]],
         'values' => $entityValues,
-      ])->count();
+      ]);
+      return (bool) $fields->count();
     }
     catch (\CRM_Core_Exception $e) {
       return FALSE;
@@ -1108,20 +1120,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return $this->editableInfo[$key];
     }
     $getModeField = $this->getField($key);
+    $fieldName = $getModeField['name'] ?? NULL;
     // If field is an implicit join to another entity, use the original fk field
     // UNLESS it's a custom field (which the api treats the same as core fields) or a virtual join like `address_primary.city`
     if (!empty($getModeField['implicit_join']) && empty($getModeField['custom_field_id'])) {
       $baseFieldName = substr($key, 0, -1 - strlen($getModeField['name']));
       $baseField = $this->getField($baseFieldName);
+      $baseInfo = $this->getEditableInfo($baseFieldName);
+      // Implicit join to real field
       if ($baseField && !empty($baseField['fk_entity']) && $baseField['type'] === 'Field') {
-        return $this->getEditableInfo($baseFieldName);
+        return $baseInfo;
+      }
+      elseif ($getModeField) {
+        $getModeField['entity'] = $baseField['entity'];
+        $getModeField['name'] = $key;
       }
     }
     $result = NULL;
     if ($getModeField) {
       // Reload field with correct action because `$this->getField()` uses 'get' as the action
       $createModeField = civicrm_api4($getModeField['entity'], 'getFields', [
-        'where' => [['name', '=', $getModeField['name']]],
+        'select' => ['input_type', 'input_attrs', 'data_type', 'options', 'serialize', 'nullable'],
+        'where' => [['name', '=', $fieldName]],
         'checkPermissions' => empty($this->display['acl_bypass']),
         'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
         'action' => 'create',
@@ -1130,8 +1150,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $field = $createModeField + $getModeField;
       $idKey = CoreUtil::getIdFieldName($field['entity']);
       $path = (!empty($field['explicit_join']) ? $field['explicit_join'] . '.' : '');
-      // $baseFieldName is used for virtual joins e.g. email_primary.email
-      $idPath = $path . ($baseFieldName ?? $idKey);
+      $idPath = $path . $idKey;
       // Hack to support editing relationships
       if ($field['entity'] === 'RelationshipCache') {
         $field['entity'] = 'Relationship';
@@ -1140,6 +1159,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $result = [
         'entity' => $field['entity'],
         'input_type' => $field['input_type'],
+        'input_attrs' => $field['input_attrs'],
         'data_type' => $field['data_type'],
         'options' => $field['options'],
         'serialize' => !empty($field['serialize']),
@@ -1471,7 +1491,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string $select
    * @return string|null
    */
-  private function getCurrencyField(string $select): ?string {
+  protected function getCurrencyField(string $select): ?string {
     // This function is called one or more times per row so cache the results
     if (array_key_exists($select, $this->currencyFields)) {
       return $this->currencyFields[$select];

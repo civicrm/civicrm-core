@@ -55,7 +55,6 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
-              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'cssRules' => [
@@ -65,14 +64,12 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
-              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'tags:label',
-              'dataType' => 'Array',
               'label' => E::ts('Tags'),
               'sortable' => TRUE,
             ],

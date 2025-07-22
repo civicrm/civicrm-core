@@ -16,7 +16,7 @@ class CRM_Utils_TimeTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function equalCases() {
+  public static function equalCases() {
     // array(0 => $timeA, 1 => $timeB, 2 => $threshold, 3 => $expectedResult)
     $cases = [];
     $cases[] = ['2012-04-01 12:00:00', '2012-04-01 12:00:00', 0, 1];

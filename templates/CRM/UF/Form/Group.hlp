@@ -15,20 +15,27 @@
 {/htxt}
 
 {htxt id='id-used_for-title'}
-  {ts}Used For{/ts}
+  {ts}Expose To{/ts}
 {/htxt}
 {htxt id='id-used_for'}
 {ts}Profiles can be used in many different ways (and a single profile can be used in multiple contexts){/ts}:<br />
     <ul class="left-alignment">
-    <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Used For" checkboxes.{/ts}</li>
-    <li>{ts}Check <strong>Standalone Form or Directory</strong> if you want it to use this profile for custom forms, or contact listing and view screens (from the civicrm/profile path).{/ts}</li>
-    <li>{ts}Check <strong>Search Results</strong> to use this profile to display an alternate set of results columns for CiviCRM Basic and Advanced Search.{/ts}</li>
+    <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Exposed To" checkboxes.{/ts}</li>
+    <li>{ts}Check <strong>Standalone Form</strong> if you want it to use this profile for custom forms. If the Legacy Profiles extension is enabled, it can also be used for listings.{/ts} {ts}These features are being phased out in favor of FormBuilder and SearchKit.{/ts}</li>
+    <li>{ts}Check <strong>Advanced Search Display Columns</strong> to use this profile to display an alternate set of results columns for the Basic or Advanced Search.{/ts} {ts}The default profile can be selected under Administer > Customize Data and Screens > Search Preferences. The Advanced Search also allows users to select a different profile under the Search Settings on that form.{/ts}</li>
     {if $config->userSystem->supports_form_extensions EQ '1'}
         <li>{ts}Check <strong>User Registration</strong> if you want this Profile to be included in the New Account registration form.{/ts}</li>
         <li>{ts}Check <strong>View/Edit User Account</strong> to include it in the view and edit screens for existing user accounts.{/ts}</li>
     {/if}
     </ul>
     {docURL page="user/organising-your-data/profiles/"}
+{/htxt}
+
+{htxt id='id-used_for_extra-title'}
+  {ts}Used in Forms{/ts}
+{/htxt}
+{htxt id='id-used_for_extra'}
+  <p>{ts}Other forms or extensions that use this profile. When possible, it also lists the ID of that form.{/ts}</p>
 {/htxt}
 
 {htxt id='id-profile_weight-title'}
@@ -139,10 +146,13 @@
   {ts}Duplicate Matching{/ts}
 {/htxt}
 {htxt id='id-is_update_dupe'}
-  <p>{ts}If you are using the profile as a contact signup and editing form - this option controls what happens if the data matches an existing contact record. Using this option user can update the matching record or create a duplicate record or otherwise he will get a 'duplicate record' warning, and their input will not be saved. Contact matching is based on your configured 'Strict' rule for identifying duplicate contacts.{/ts} {docURL page="user/common-workflows/deduping-and-merging"}</p>
-  <p>{ts}This setting is ignored if the profile is embedded in an online contribution, membership signup or event registration form. In this case a contact match always results in the transaction being linked to the matching contact.</p>{/ts}
-  <p>{ts}In all cases, the check for an existing matching contact uses the default "Individual Strict Duplicate Matching Rule" (match on email address). If you are concerned with existing contact data being over-written by anonymous visitors, you can modify this rule to make matches less likely (or even impossible). For example, if you NEVER want anonymous input to match (i.e. always create a new contact record) - edit that rule and set the 'weight threshold' higher than 10. You will then need to run Find Duplicates periodically using a different rule, and merge any duplicate records with their associated memberships, contributions, etc.{/ts}</p>
-  <p>{ts}NOTE: If there are multiple matching contacts, the first matching record is used.{/ts}</p>
+  <p>{ts}If you are using the profile as a contact signup and editing form, this option controls what happens if the data matches an existing contact record.{/ts}</p>
+  <ul>
+    <li>{ts}<strong>No duplicate checking:</strong> saves the data as a new contact, without comparing them to existing contact records for possible duplicates.{/ts}</li>
+    <li>{ts}<strong>Update the matching contact:</strong> if a matching contact exists (using the default unsupervised rule), update the contact record.{/ts} {ts}Depending on which fields are in the profile, it can be somewhat safe to use, but it might also result in contact data being over-written by malicious visitors.{/ts} {ts}If there are multiple matching contacts, the first matching record is used.{/ts}</li>
+    <li>{ts}<strong>Issue warning and do not save:</strong> if a matching contact exists, display a warning and do not save anything.{/ts}</li>
+  </ul>
+  <p>{ts}This setting is ignored if the profile is part of an online contribution form, membership signup or event registration form. In this case a contact match always results in the transaction being linked to the matching contact using the default unsupervised rule.</p>{/ts}
 {/htxt}
 
 {htxt id='id-is_map-title'}

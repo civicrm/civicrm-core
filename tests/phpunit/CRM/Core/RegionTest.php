@@ -131,7 +131,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function esmLoaders(): array {
+  public static function esmLoaders(): array {
     return [
       ['browser'],
       ['shim-slow'],

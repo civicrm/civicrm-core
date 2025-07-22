@@ -247,7 +247,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   /**
    * Data sets for testing.
    */
-  public function querySets(): array {
+  public static function querySets(): array {
     return [
       'Empty group test' => [
         [

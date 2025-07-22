@@ -38,7 +38,7 @@
             <label ng-if="entity.is_contact && entity.selected.action !== 'ignore'">
               {{:: ts('Contact type') }}
               <input  class="big" ng-change="updateContactType(entity)"
-                crm-ui-select='{data: data.contactTypes, allowClear: false}' ng-model="entity.selected.contact_type" />
+                crm-ui-select='{data: data.contactTypes, allowClear: true, placeholder: ts("Any type")}' ng-model="entity.selected.contact_type" />
             </label>
           </div>
         </div>
@@ -46,7 +46,7 @@
       <div class="crm-grid-cell">
         <div>
           <div>
-            <label ng-if="entity.is_contact && entity.selected.action !== 'ignore' && entity.selected.contact_type">
+            <label ng-if="entity.is_contact && entity.selected.action !== 'ignore'">
               {{:: ts('Dedupe rule') }}  <input class="big" crm-ui-select='{data: getDedupeRule}' ng-model="entity.selected.dedupe_rule" />
             </label>
           </div>
@@ -64,8 +64,13 @@
     </div>
   </div>
   <hr>
+  <div id="import-options">
+    <h3>{{:: ts('Import Options') }}</h3>
+    <div >{{:: ts('Date format') }}  <input class="huge" crm-ui-select='{data : dateFormats}' ng-model="userJob.metadata.import_options.date_format" /></div>
+  </div>
+  <hr>
   <div id="map-field">
-    {{:: ts('Data mapping') }}
+    <h3>{{:: ts('Data mapping') }}</h3>
     <table class="selector">
       <tr ng-if="data.savedMapping.name" class="columnheader-dark"><th colspan="4">
         {{:: ts('Saved Field Mapping: %1', {1: data.savedMapping.name}) }}</th>

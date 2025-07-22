@@ -4,6 +4,24 @@ require_once 'civi_case.civix.php';
 use CRM_Case_ExtensionUtil as E;
 
 /**
+ * Implements hook_civicrm_scanClasses().
+ */
+function civi_case_civicrm_scanClasses(array &$classes) {
+  /**
+   * CiviCase is a CiviCRM Component. Which means it is loaded
+   * before the afform extension is enabled.
+   * And if afform is not enabled the classes under Civi\Afform\ will give a fatal error
+   * because their parent class could not be found (yet).
+   *
+   * The code below checks whether the Afform is enabled and if not it will the skip the classes under the
+   * Civi\Afform namespace.
+   */
+  $extMap = CRM_Extension_System::singleton()->getMapper();
+  $excludeRegex = $extMap->isActiveModule('afform') ? NULL : '/Afform/';
+  \Civi\Core\ClassScanner::scanFolders($classes, __DIR__ . '/', 'Civi', '\\', $excludeRegex);
+}
+
+/**
  * Implements hook_civicrm_managed().
  */
 function civi_case_civicrm_managed(&$entities, $modules) {

@@ -6,7 +6,7 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
   public function run() {
     if (CRM_Core_Config::singleton()->userSystem->isUserLoggedIn()) {
       // Already logged in.
-      CRM_Utils_System::redirect('/civicrm');
+      CRM_Utils_System::redirect('/civicrm/home?reset=1');
     }
     if (isset($_GET['justLoggedOut'])) {
       // When the user has just logged out their session is destroyed

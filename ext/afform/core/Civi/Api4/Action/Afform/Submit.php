@@ -33,7 +33,7 @@ class Submit extends AbstractProcessor {
 
   protected function processForm() {
     // preprocess submitted values
-    $entityValues = $this->preprocessSubmittedValues($this->values);
+    $this->_entityValues = $this->preprocessSubmittedValues($this->values);
 
     // get the submission information if we have submission id.
     // currently we don't support processing of already processed forms
@@ -51,7 +51,7 @@ class Submit extends AbstractProcessor {
     }
 
     // Call validation handlers
-    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this, $entityValues);
+    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this, $this->_entityValues);
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
     $errors = $event->getErrors();
     if ($errors) {
@@ -100,7 +100,7 @@ class Submit extends AbstractProcessor {
     }
 
     // process and save various enities
-    $this->processFormData($entityValues);
+    $this->processFormData($this->_entityValues);
 
     $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
     // Update submission record with entity IDs.
@@ -117,10 +117,27 @@ class Submit extends AbstractProcessor {
         ->execute();
     }
 
-    // Return ids and a token for uploading files
-    return [
-      ['token' => $this->generatePostSubmitToken()] + $this->_entityIds,
-    ];
+    // Return ids plus token for uploading files
+    foreach ($this->_entityIds as $key => $value) {
+      $this->setResponseItem($key, $value);
+    }
+
+    // todo - add only if needed?
+    $this->setResponseItem('token', $this->generatePostSubmitToken());
+
+    if (isset($this->_response['redirect']) || isset($this->_reponse['message'])) {
+      // redirect / message is already set, ignore defaults
+    }
+    elseif ($this->_afform['confirmation_type'] === 'show_confirmation_message') {
+      $message = $this->replaceTokens($this->_afform['confirmation_message']);
+      $this->setResponseItem('message', $message);
+    }
+    elseif ($this->_afform['redirect']) {
+      $redirect = $this->replaceTokens($this->_afform['redirect']);
+      $this->setResponseItem('redirect', $redirect);
+    }
+
+    return [$this->_response];
   }
 
   /**

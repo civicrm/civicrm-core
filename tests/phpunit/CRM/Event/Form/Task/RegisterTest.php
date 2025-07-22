@@ -48,7 +48,7 @@ class CRM_Event_Form_Task_RegisterTest extends CiviUnitTestCase {
     }
   }
 
-  public function participantDataProvider(): array {
+  public static function participantDataProvider(): array {
     return [
       'basic' => [
         'participant_values' => [],

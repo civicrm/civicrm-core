@@ -36,16 +36,22 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ],
         'import_mappings' => [
+          // All 3 variants of activity_date_time should wind up as 'Activity.activity_date_time'
           ['name' => 'activity_date_time'],
-          ['name' => ''],
+          ['name' => 'Activity.Activity.activity_date_time'],
+          ['name' => 'Activity.activity_date_time'],
           ['name' => 'target_contact.email_primary.email'],
           ['name' => 'source_contact.id'],
+          // Another variant of one that got a bit messaged up.
+          ['name' => 'Activity.TargetContact.id'],
         ],
       ],
       'status_id:name' => 'draft',
       'job_type' => 'activity_import',
     ];
     $userJobID = UserJob::create()->setValues($userJobParameters)->execute()->first()['id'];
+    $userJobID2 = UserJob::create()->setValues($userJobParameters + ['is_template' => TRUE, 'name' => 'template_name'])->execute()->first()['id'];
+
     CRM_Upgrade_Incremental_php_SixTwo::upgradeImportMappingFields(NULL, 'Activity');
 
     $mappings = MappingField::get()
@@ -58,21 +64,96 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
     $job = UserJob::get(FALSE)->addWhere('id', '=', $userJobID)->execute()->single();
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
-      ['name' => ''],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
       ['name' => 'TargetContact.email_primary.email'],
       ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
     ], $job['metadata']['import_mappings']);
 
     $templateJob = UserJob::get(FALSE)
-      ->addWhere('name', '=', 'import_Activity import')
-      ->addWhere('is_template', '=', TRUE)->execute()->single();
+      ->addWhere('id', 'IN', [$userJobID, $userJobID2])
+      ->execute()->indexBy('id');
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
-      ['name' => ''],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
       ['name' => 'TargetContact.email_primary.email'],
       ['name' => 'SourceContact.id'],
-    ], $templateJob['metadata']['import_mappings']);
+      ['name' => 'TargetContact.id'],
+    ], $templateJob[$userJobID]['metadata']['import_mappings']);
 
+    $this->assertEquals([
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'TargetContact.email_primary.email'],
+      ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
+    ], $templateJob[$userJobID2]['metadata']['import_mappings']);
+
+    // Now check a re-run will not double-append prefixes
+    CRM_Upgrade_Incremental_php_SixTwo::upgradeImportMappingFields(NULL, 'Activity');
+    $templateJob = UserJob::get(FALSE)
+      ->addWhere('id', 'IN', [$userJobID, $userJobID2])
+      ->execute()->indexBy('id');
+    $this->assertEquals([
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'TargetContact.email_primary.email'],
+      ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
+    ], $templateJob[$userJobID]['metadata']['import_mappings']);
+
+    $this->assertEquals([
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'TargetContact.email_primary.email'],
+      ['name' => 'SourceContact.id'],
+      ['name' => 'TargetContact.id'],
+    ], $templateJob[$userJobID2]['metadata']['import_mappings']);
+
+  }
+
+  /**
+   * After some confusion the correct contact ID field for membership imports is Contact.id.
+   *
+   * https://github.com/civicrm/civicrm-core/pull/33110
+   *
+   * @return void
+   */
+  public function testUpdateMembershipUserJobs(): void {
+    $mapping = Mapping::create(FALSE)
+      ->setValues([
+        'name' => 'Membership import',
+        'mapping_type_id:name' => 'Import Membership',
+      ])->execute()->single();
+    $fields = [
+      'contact_id',
+      'Contact.id',
+      'Membership.contact_id',
+    ];
+
+    foreach ($fields as $index => $field) {
+      MappingField::create()
+        ->setValues(['name' => $field, 'mapping_id' => $mapping['id'], 'column_number' => $index])
+        ->execute();
+    }
+
+    CRM_Upgrade_Incremental_php_SixTwo::upgradeImportMappingFields(NULL, 'Membership');
+    $mappings = MappingField::get()
+      ->addWhere('mapping_id', '=', $mapping['id'])
+      ->execute();
+    $this->assertEquals('Contact.id', $mappings[0]['name']);
+    $this->assertEquals('Contact.id', $mappings[1]['name']);
+    $this->assertEquals('Contact.id', $mappings[2]['name']);
+
+    $templateJob = UserJob::get(FALSE)
+      ->addWhere('name', '=', 'import_Membership import')
+      ->addWhere('is_template', '=', TRUE)->execute()->single();
+    $this->assertEquals([['name' => 'Contact.id'], ['name' => 'Contact.id'], ['name' => 'Contact.id']], $templateJob['metadata']['import_mappings']);
   }
 
   /**

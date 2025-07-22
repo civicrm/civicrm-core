@@ -149,6 +149,8 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'user_unique_id' => 'Unique ID (OpenID)',
           'sort_name' => 'Sort Name',
           'communication_style_id' => 'Communication Style',
+          'is_deceased' => 'Is Deceased / Closed',
+          'deceased_date' => 'Deceased / Closed Date',
         ],
       'civicrm_email' =>
         [
@@ -186,8 +188,6 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
       ],
       'Individual' => [
         'birth_date' => 'Birth Date',
-        'is_deceased' => 'Is Deceased',
-        'deceased_date' => 'Deceased Date',
         'first_name' => 'First Name',
         'formal_title' => 'Formal Title',
         'gender_id' => 'Gender',

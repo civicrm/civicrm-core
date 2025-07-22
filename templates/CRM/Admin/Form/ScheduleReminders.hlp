@@ -33,7 +33,7 @@
 {/htxt}
 
 {htxt id="id-from_name_email"}
-  {ts}You can set the FROM name and email address for this reminder in these fields. If you leave these fields blank, the default FROM name and email address for your site will be used (Administer > Communications > Site Email Addresses).{/ts}
+  {ts}You can set the FROM name and email address for this reminder in these fields. If you leave these fields blank, the default FROM name and email address for your site will be used (Administer > Communications > Site From Email Addresses).{/ts}
 {/htxt}
 
 {htxt id="filter_contact_language"}

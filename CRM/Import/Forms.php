@@ -51,6 +51,17 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected $savedMappingID;
 
   /**
+   * @return array
+   */
+  public function getDateFormats(): array {
+    $dateFormats = [];
+    foreach (CRM_Utils_Date::getAvailableInputFormats(TRUE) as $key => $value) {
+      $dateFormats[] = ['id' => (int) $key, 'text' => $value];
+    }
+    return $dateFormats;
+  }
+
+  /**
    * @param int $savedMappingID
    *
    * @return CRM_Import_Forms
@@ -98,7 +109,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getUserJobSubmittedValues(): array {
-    return $this->getUserJob()['metadata']['submitted_values'];
+    return $this->getUserJob()['metadata']['submitted_values'] ?? [];
   }
 
   /**
@@ -111,6 +122,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     'contactSubType' => 'DataSource',
     'dateFormats' => 'DataSource',
     'savedMapping' => 'DataSource',
+    'userJobTemplate' => 'DataSource',
     'dataSource' => 'DataSource',
     'use_existing_upload' => 'DataSource',
     'dedupe_rule_id' => 'DataSource',
@@ -167,7 +179,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   public function getTemplateID(): ?int {
     if ($this->templateID === NULL) {
-      $this->templateID = CRM_Utils_Request::retrieve('template_id', 'Int', $this);
+      $this->templateID = $this->getSubmittedValue('userJobTemplate') ? (int) $this->getSubmittedValue('userJobTemplate') : CRM_Utils_Request::retrieve('template_id', 'Int', $this);
       if ($this->templateID && $this->getTemplateJob()) {
         return $this->templateID;
       }
@@ -189,13 +201,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getMappingName(): string {
+    if ($this->getSubmittedValue('saveMappingName')) {
+      return $this->getSubmittedValue('saveMappingName');
+    }
     if ($this->mappingName === NULL) {
       $savedMappingID = $this->getSavedMappingID();
       if ($savedMappingID) {
         $this->mappingName = Mapping::get(FALSE)
           ->addWhere('id', '=', $savedMappingID)
           ->execute()
-          ->first()['name'];
+          ->first()['name'] ?? '';
       }
     }
     return $this->mappingName ?? '';
@@ -392,13 +407,13 @@ class CRM_Import_Forms extends CRM_Core_Form {
   /**
    * Get the contact type selected for the import (on the datasource form).
    *
-   * @return string
+   * @return string|null
    *   e.g Individual, Organization, Household.
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getContactType(): string {
-    return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'];
+  protected function getContactType(): ?string {
+    return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'] ?? NULL;
   }
 
   /**
@@ -432,6 +447,8 @@ class CRM_Import_Forms extends CRM_Core_Form {
           'submitted_values' => $this->getSubmittedValues(),
           'template_id' => $this->getTemplateID(),
           'Template' => ['mapping_id' => $this->getSavedMappingID()],
+          'import_mappings' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_mappings'] : [],
+          'import_options' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_options'] : [],
         ],
       ])
       ->execute()
@@ -458,17 +475,21 @@ class CRM_Import_Forms extends CRM_Core_Form {
 
   /**
    * @param string $key
-   * @param array $data
+   * @param array|int $data
    *
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function updateUserJobMetadata(string $key, array $data): void {
+  protected function updateUserJobMetadata(string $key, array|int $data): void {
     $metaData = array_merge(
       $this->getUserJob()['metadata'],
       [$key => $data]
     );
-    $this->getUserJob()['metadata'] = $metaData;
+    if (isset($metaData['import_options']['date_format'])) {
+      // The Select is sloppy with typing.
+      $metaData['import_options']['date_format'] = (int) $metaData['import_options']['date_format'];
+    }
+    $this->userJob['metadata'] = $metaData;
     if ($this->isUpdateTemplateJob()) {
       $this->updateTemplateUserJob($metaData);
     }
@@ -734,17 +755,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
-   * Get the fields available for import selection.
-   *
-   * @return array
-   *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
-   *
-   */
-  protected function getImportEntities(): array {
-    return $this->getParser()->getImportEntities();
-  }
-
-  /**
    * Get an instance of the parser class.
    *
    * @return \CRM_Contact_Import_Parser_Contact|\CRM_Contribute_Import_Parser_Contribution
@@ -832,9 +842,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
 
   /**
    * Has the user chosen to update existing records.
+   *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function isUpdateExisting(): bool {
+    if (isset($this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'])) {
+      return $this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'] === 'update';
+    }
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_UPDATE;
   }
 
@@ -882,32 +897,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
-   * Assign values for civiimport.
-   *
-   * I wanted to put this in the extension - but there are a lot of protected functions
-   * we would need to revisit and make public - do we want to?
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function assignCiviimportVariables(): void {
-    $contactTypes = [];
-    foreach (CRM_Contact_BAO_ContactType::basicTypeInfo() as $contactType) {
-      $contactTypes[] = ['id' => $contactType['name'], 'text' => $contactType['label']];
-    }
-    $parser = $this->getParser();
-    $this->isQuickFormMode = FALSE;
-    Civi::resources()->addVars('crmImportUi', [
-      'defaults' => $this->getDefaults(),
-      'rows' => $this->getDataRows([], 2),
-      'contactTypes' => $contactTypes,
-      'entityMetadata' => $this->getFieldOptions(),
-      'dedupeRules' => $parser->getAllDedupeRules(),
-      'userJob' => $this->getUserJob(),
-      'columnHeaders' => $this->getColumnHeaders(),
-    ]);
-  }
-
-  /**
    * Get the UserJob Template, if it exists.
    *
    * @return array|null
@@ -915,15 +904,26 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getTemplateJob(): ?array {
-    $mappingName = $this->getMappingName();
-    if (!$mappingName) {
-      return NULL;
+    $templateID = $this->templateID ?? NULL;
+    if (!$templateID && $this->getUserJobID()) {
+      $templateID = $this->getUserJob()['metadata']['template_id'] ?? NULL;
     }
-    $templateJob = UserJob::get(FALSE)
-      ->addWhere('name', '=', 'import_' . $mappingName)
-      ->addWhere('is_template', '=', TRUE)
-      ->execute()->first();
-    $this->templateID = $templateJob['id'] ?? NULL;
+
+    if ($templateID) {
+      $templateJob = UserJob::get(FALSE)
+        ->addWhere('id', '=', $templateID)
+        ->addWhere('is_template', '=', TRUE)
+        ->execute()->first();
+      $this->templateID = $templateJob['id'] ?? NULL;
+    }
+    else {
+      $mappingName = $this->getMappingName();
+      $templateJob = UserJob::get(FALSE)
+        ->addWhere('name', '=', 'import_' . $mappingName)
+        ->addWhere('is_template', '=', TRUE)
+        ->execute()->first();
+      $this->templateID = $templateJob['id'] ?? NULL;
+    }
     return $templateJob ?? NULL;
   }
 

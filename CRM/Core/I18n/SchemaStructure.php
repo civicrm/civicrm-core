@@ -28,6 +28,9 @@ class CRM_Core_I18n_SchemaStructure {
       global $civicrm_root;
       $sqlGenerator = require "$civicrm_root/mixin/lib/civimix-schema@5/src/SqlGenerator.php";
       foreach (\Civi\Schema\EntityRepository::getEntities() as $entity) {
+        if ($entity['module'] !== 'civicrm') {
+          continue;
+        }
         if (empty($entity['getFields'])) {
           continue;
         }

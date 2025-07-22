@@ -131,7 +131,6 @@ function _financialacls_civicrm_get_accounts_clause(): string {
       $clause = '= 0';
       Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()] = &$clause;
       $accounts = (array) EntityFinancialAccount::get()
-        ->addWhere('entity_table', '=', 'civicrm_financial_type')
         ->addSelect('entity_id', 'financial_account_id')
         ->addJoin('FinancialType AS financial_type', 'LEFT', [
           'entity_id',
@@ -415,7 +414,7 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
         CRM_Core_Action::ADD => 'add',
         CRM_Core_Action::DELETE => 'delete',
       ];
-      $action = $context === 'search' ? CRM_Core_Action::VIEW : CRM_Core_Action::ADD;
+      $action = ($context === 'search' || $params['is_view']) ? CRM_Core_Action::VIEW : CRM_Core_Action::ADD;
       $cacheKey = 'available_types_' . $context;
       if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
         foreach ($options as $finTypeId => $option) {

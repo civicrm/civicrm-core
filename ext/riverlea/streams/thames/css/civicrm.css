@@ -35,7 +35,7 @@ html.cms-standalone body {
 .crm-container details>summary::before /* accordion8 (recommended) */,
 .crm-container .crm-accordion-header::before, /* accordion1, accordion2, accordion6 */
 .crm-container .crm-collapsible .collapsible-title::before /* accordion3 */ {
-  content: "";
+  --crm-expand-icon: '';
   border: .4rem solid transparent;
   border-left-color: var(--crm-expand-icon-color);
   position: absolute;
@@ -45,6 +45,23 @@ html.cms-standalone body {
   transform-origin: .2rem 50%;
   transition: transform .25s ease;
 }
+/* fight the fixes.css */
+.crm-container .civicrm-community-messages .collapsible-title::before {
+  transform-origin: .2rem 50% !important;
+}
+/* advanced search */
+.crm-container details.crm-accordion-settings summary::before {
+  content: '';
+}
+/* extensions */
+.crm-container #extensions-main table.dataTable summary,
+.crm-container #extensions-addnew table.dataTable summary {
+  padding: 0 0 0 2rem !important;
+}
+.crm-container #extensions-main  details {
+  border: none;
+}
+
 /* we have to sort of re-state these rules because the specificity of the above overrules the 'open' state
  * note that a lot of non-recommended patterns use .collapsed, whereas details uses [open] - reverse logic.
  * This covers accordion1, accordion2, accordion6.
@@ -143,6 +160,12 @@ html.cms-standalone body {
 .crm-container a.button.delete-button:focus,
 .crm-container a.button.delete:hover {
   color: var(--crm-c-red-bright);
+}
+.crm-icon-picker-button {
+  float: none;
+}
+.crm-container .ui-button:not(.ui-button-icon-only).crm-icon-picker-button {
+  display: inline-flex;
 }
 
 /* DIALOGS */
@@ -245,12 +268,6 @@ html.cms-standalone body {
 
 .crm-summary-contactname-block:not(.crm-edit-ready) #crm-contactname-content {
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
-}
-
-/* make count badges more readable */
-.crm-container .ui-tabs ul.ui-tabs-nav a em,
-.crm-container .nav-tabs a .badge {
-  padding: 0 0.2rem;
 }
 
 /* RL has no margin-bottom so the actions ribbon touches the main contact block */
@@ -386,48 +403,6 @@ div:has(> table .dropdown-toggle[aria-expanded="true"]) {
   padding-bottom: 20rem;
 }
 
-/* ...and adjust the individual row checkboxes to be in line
- * Ah, no we have no way to target these.
- * Would be nice if core markup identified this type of <td>
- */
-
-/* apply hanging indent to sorting buttons */
-.crm-container tr a.sorting,
-.crm-container tr a.sorting_asc,
-.crm-container tr a.sorting_desc,
-.crm-container table.dataTable thead th.sorting,
-.crm-container table.dataTable thead th.sorting_asc,
-.crm-container table.dataTable thead th.sorting_desc,
-.crm-search-display th.crm-sortable-col {
-  padding-left: calc(var(--crm-table-padding, 0) + 1ch);
-}
-.crm-container tr a.sorting::after,
-.crm-container tr a.sorting_asc::after,
-.crm-container tr a.sorting_desc::after,
-.crm-container table.dataTable thead th.sorting::after,
-.crm-container table.dataTable thead th.sorting_asc::after,
-.crm-container table.dataTable thead th.sorting_desc::after,
-.crm-search-display th.crm-sortable-col::after,
-.crm-container tr a.sorting::before,
-.crm-container tr a.sorting_asc::before,
-.crm-container tr a.sorting_desc::before,
-.crm-container table.dataTable thead th.sorting::before,
-.crm-container table.dataTable thead th.sorting_asc::before,
-.crm-container table.dataTable thead th.sorting_desc::before,
-.crm-search-display th.crm-sortable-col::before {
-  position: absolute;
-  margin-left: -1em;
-}
-
-/* ...and in searchkit, this is terribly awkward and could be fixed with a core PR to provide more classes */
-.crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
-  padding-left: 1.5ch;
-}
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
-  position: absolute;
-  margin-left: -1.5ch;
-}
-
 /* Advanced search: override searchForm.css for slightly better aligned fields */
 .advanced-search-fields {
   align-items: end;
@@ -501,7 +476,7 @@ html.crm-standalone  nav.breadcrumb>ol {
 }
 
 /* e.g. search buttons followed by count of matches on SK screen */
-.crm-search-display .form-inline {
+.crm-search-display .form-inline:not(th,td) {
   padding: var(--crm-padding-reg) 0;
   display: flex;
   flex-wrap: wrap;
@@ -644,4 +619,64 @@ ul.crm-quickSearch-results .ui-state-active a /* mouse,keyboard nav */ {
 }
 ul.crm-quickSearch-results a:active {
   background: white;
+}
+
+
+/* ajax status/saving notifications */
+.crm-status-box-msg {
+  color: white;
+}
+
+.crm-status-box-outer {
+  position: fixed;
+  top: 2px;
+  right: 2px;
+  z-index: 100000;
+  background-image: none;
+  background-color: var(--crm-c-blue-dark);
+  padding: 0 1rem;
+  border-radius: 3px;
+  min-width: 8rem;
+  max-width: 13rem;
+  text-align: left;
+  --crm-c-background2: transparent;
+
+  .crm-status-box-msg {
+    color: white;
+  }
+
+  &.status-success {
+    background-color: var(--crm-c-green-dark);
+  }
+
+  &.status-error {
+    background-color: var(--crm-c-red-dark);
+  }
+}
+.crm-status-box-outer.status-start .crm-status-box-inner {
+  padding-left: 2.5ch;
+}
+.crm-status-box-outer.status-start .crm-status-box-inner::before {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: -2.5ch;
+  display: block;
+  content: '';
+  line-height: 1;
+  animation: loading-status-message 1s infinite;
+  transform-origin: center;
+  width: 1.5ch;
+  height: 1.5ch;
+  border: dashed 1px white;
+  border-radius: 2ch;
+}
+
+@keyframes loading-status-message {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(-50%) rotateZ(360deg);
+  }
 }

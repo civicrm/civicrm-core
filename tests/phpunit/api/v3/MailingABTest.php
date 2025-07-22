@@ -106,7 +106,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function groupPctProvider(): array {
+  public static function groupPctProvider(): array {
     // array(int $totalSize, int $groupPct, int $expectedCountA, $expectedCountB, $expectedCountC)
     $cases = [];
     $cases[] = [400, 7, 28, 28, 344];

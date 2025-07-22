@@ -45,6 +45,7 @@
       <legend>
         <i class="crm-i fa-arrows crm-search-move-icon"></i>
         {{:: $ctrl.parent.getColLabel(col) }}
+        <span class="crm-marker" ng-show="col.required">*</span>
       </legend>
       <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
         <i class="crm-i fa-ban"></i>
@@ -52,6 +53,12 @@
       <div class="form-inline crm-search-admin-flex-row">
         <label for="crm-search-admin-edit-col-{{:: $index }}">{{:: ts('Header') }}</label>
         <input id="crm-search-admin-edit-col-{{:: $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
+      </div>
+      <div class="form-inline" ng-if="col.type === 'field'">
+        <label>
+          <input type="checkbox" ng-model="col.required" >
+          {{:: ts('Required') }}
+        </label>
       </div>
       <div class="form-inline" ng-if="col.type === 'field'">
         <label>
@@ -64,12 +71,16 @@
         <label for="crm-search-admin-edit-col-footer-label-{{:: $index }}">{{:: ts('Footer') }}</label>
         <input class="form-control" id="crm-search-admin-edit-col-footer-label-{{:: $index }}" ng-model="col.tally.label" placeholder="{{:: ts('No label') }}" title="{{:: ts('Footer label') }}">
         <label for="crm-search-admin-edit-col-footer-agg-{{:: $index }}">{{:: ts('Aggregate') }}</label>
-        <select id="crm-search-admin-edit-col-footer-agg-{{:: $index }}" class="form-control" ng-model="col.tally.fn" title="{{:: ts('Footer aggregate function') }}">
+        <select id="crm-search-admin-edit-col-footer-agg-{{:: $index }}" class="form-control" ng-model="col.tally.fn" ng-change="$ctrl.onChangeTallyFn(col)" title="{{:: ts('Footer aggregate function') }}">
           <option value="">{{:: ts('None') }}</option>
           <option value="SUM">{{:: ts('Sum') }}</option>
           <option value="AVG">{{:: ts('Average') }}</option>
           <option value="COUNT">{{:: ts('Count') }}</option>
         </select>
+        <label ng-if="col.tally.fn === 'SUM'">
+          <input type="checkbox" ng-model="col.tally.target" >
+          {{:: ts('Target Total') }}
+        </label>
       </div>
     </fieldset>
   </fieldset>

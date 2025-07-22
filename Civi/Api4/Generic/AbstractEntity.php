@@ -141,68 +141,71 @@ abstract class AbstractEntity implements EntityInterface {
    */
   public static function getInfo() {
     $entityName = static::getEntityName();
-    $info = [
-      'name' => $entityName,
-      'title' => static::getEntityTitle(),
-      'title_plural' => static::getEntityTitle(TRUE),
-      'type' => [CoreUtil::stripNamespace(get_parent_class(static::class))],
-      'paths' => [],
-      'class' => static::class,
-      'primary_key' => ['id'],
-      // Entities without a @searchable annotation will default to secondary,
-      // which makes them visible in SearchKit but not at the top of the list.
-      'searchable' => 'secondary',
-    ];
-    // Add info for entities with a corresponding DAO
-    $dao = static::getDaoName();
-    if ($dao) {
-      $info['paths'] = $dao::getEntityPaths();
-      $info['primary_key'] = $dao::$_primaryKey;
-      $info['icon'] = $dao::getEntityIcon($entityName);
-      $info['label_field'] = $dao::getLabelField();
-      $info['dao'] = $dao;
-      $info['table_name'] = $dao::getTableName();
-      $info['icon_field'] = (array) ($dao::fields()['icon']['name'] ?? NULL);
-      if (method_exists($dao, 'indices')) {
-        foreach (\CRM_Utils_Array::findAll($dao::indices(FALSE), ['unique' => TRUE, 'localizable' => FALSE]) as $index) {
-          foreach ($index['field'] as $field) {
-            // Trim `field(length)` to just `field`
-            [$field] = explode('(', $field);
-            $info['match_fields'][] = $field;
+    if (!isset(\Civi::$statics[__CLASS__]['getInfo'][$entityName])) {
+      $info = [
+        'name' => $entityName,
+        'title' => static::getEntityTitle(),
+        'title_plural' => static::getEntityTitle(TRUE),
+        'type' => [CoreUtil::stripNamespace(get_parent_class(static::class))],
+        'paths' => [],
+        'class' => static::class,
+        'primary_key' => ['id'],
+        // Entities without a @searchable annotation will default to secondary,
+        // which makes them visible in SearchKit but not at the top of the list.
+        'searchable' => 'secondary',
+      ];
+      // Add info for entities with a corresponding DAO
+      $dao = static::getDaoName();
+      if ($dao) {
+        $info['paths'] = $dao::getEntityPaths();
+        $info['primary_key'] = $dao::$_primaryKey;
+        $info['icon'] = $dao::getEntityIcon($entityName);
+        $info['label_field'] = $dao::getLabelField();
+        $info['dao'] = $dao;
+        $info['table_name'] = $dao::getTableName();
+        $info['icon_field'] = (array) ($dao::fields()['icon']['name'] ?? NULL);
+        if (method_exists($dao, 'indices')) {
+          foreach (\CRM_Utils_Array::findAll($dao::indices(FALSE), ['unique' => TRUE, 'localizable' => FALSE]) as $index) {
+            foreach ($index['field'] as $field) {
+              // Trim `field(length)` to just `field`
+              [$field] = explode('(', $field);
+              $info['match_fields'][] = $field;
+            }
           }
         }
       }
-    }
-    foreach (ReflectionUtils::getTraits(static::class) as $trait) {
-      $info['type'][] = CoreUtil::stripNamespace($trait);
-    }
-    // Get DocBlock from APIv4 Entity class
-    $reflection = new \ReflectionClass(static::class);
-    $docBlock = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);
-    // Convert docblock keys to snake_case
-    foreach ($docBlock as $key => $val) {
-      $docBlock[\CRM_Utils_String::convertStringToSnakeCase($key)] = $val;
-    }
-    // Filter docblock to only declared entity fields
-    foreach (\Civi\Api4\Entity::$entityFields as $field) {
-      if (isset($docBlock[$field['name']])) {
-        $val = $docBlock[$field['name']];
-        // Convert to array if data_type == Array
-        if (isset($field['data_type']) && $field['data_type'] === 'Array' && is_string($val)) {
-          $val = \CRM_Core_DAO::unSerializeField($val, \CRM_Core_DAO::SERIALIZE_COMMA);
-        }
-        $info[$field['name']] = $val;
+      foreach (ReflectionUtils::getTraits(static::class) as $trait) {
+        $info['type'][] = CoreUtil::stripNamespace($trait);
       }
-    }
-    // search_fields defaults to label_field
-    if (empty($info['search_fields']) && !empty($info['label_field'])) {
-      $info['search_fields'] = [$info['label_field']];
-    }
-    if ($dao) {
-      $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
+      // Get DocBlock from APIv4 Entity class
+      $reflection = new \ReflectionClass(static::class);
+      $docBlock = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);
+      // Convert docblock keys to snake_case
+      foreach ($docBlock as $key => $val) {
+        $docBlock[\CRM_Utils_String::convertStringToSnakeCase($key)] = $val;
+      }
+      // Filter docblock to only declared entity fields
+      foreach (\Civi\Api4\Entity::$entityFields as $field) {
+        if (isset($docBlock[$field['name']])) {
+          $val = $docBlock[$field['name']];
+          // Convert to array if data_type == Array
+          if (isset($field['data_type']) && $field['data_type'] === 'Array' && is_string($val)) {
+            $val = \CRM_Core_DAO::unSerializeField($val, \CRM_Core_DAO::SERIALIZE_COMMA);
+          }
+          $info[$field['name']] = $val;
+        }
+      }
+      // search_fields defaults to label_field
+      if (empty($info['search_fields']) && !empty($info['label_field'])) {
+        $info['search_fields'] = [$info['label_field']];
+      }
+      if ($dao) {
+        $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
+      }
+      \Civi::$statics[__CLASS__]['getInfo'][$entityName] = $info;
     }
 
-    return $info;
+    return \Civi::$statics[__CLASS__]['getInfo'][$entityName];
   }
 
 }

@@ -15,7 +15,7 @@ class CRM_Core_Smarty_plugins_CrmMoneyTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function moneyCases() {
+  public static function moneyCases() {
     $cases = [];
     $cases[] = ['$4.00', '{assign var="amount" value="4.00"}{$amount|crmMoney:USD}'];
     $cases[] = ['€1,234.00', '{assign var="amount" value="1234.00"}{$amount|crmMoney:EUR}'];

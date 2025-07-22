@@ -87,12 +87,15 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'File':
+              if (!empty($field['id'])) {
+                self::deleteFile($field);
+              }
               if (!$field['file_id']) {
                 $value = 'null';
                 break;
               }
               $value = $field['file_id'];
-              $type = 'String';
+              $type = 'Integer';
               break;
 
             case 'Date':
@@ -698,6 +701,25 @@ AND    $cond
         $result["custom_{$id}"] = $value;
       }
       return $result;
+    }
+  }
+
+  /**
+   * Delete orphaned files from disk when updating custom file fields
+   */
+  private static function deleteFile(array $field) {
+    $sql = CRM_Utils_SQL_Select::from($field['table_name'])
+      ->select($field['column_name'])
+      ->where("id = #id", ['#id' => $field['id']])
+      ->toSQL();
+    $fileId = CRM_Core_DAO::singleValueQuery($sql);
+    if ($fileId && $fileId != ($field['file_id'] ?? NULL)) {
+      $refCount = \Civi\Api4\Utils\CoreUtil::getRefCountTotal('File', $fileId);
+      if ($refCount <= 1) {
+        \Civi\Api4\File::delete(FALSE)
+          ->addWhere('id', '=', $fileId)
+          ->execute();
+      }
     }
   }
 

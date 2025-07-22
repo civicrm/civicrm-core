@@ -71,7 +71,7 @@ class CRM_Utils_SQLTest extends CiviUnitTestCase {
    * Data provider for testIsSSLDSN
    * @return array
    */
-  public function dsnProvider():array {
+  public static function dsnProvider():array {
     return [
       ['', FALSE],
       ['mysqli://user:pass@localhost/drupal', FALSE],

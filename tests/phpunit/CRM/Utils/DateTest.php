@@ -73,6 +73,14 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       'from' => '',
       'to' => '',
     ];
+    // "first quarter" relative date filter
+    $cases['q1'] = [
+      'expectedFrom' => (new DateTime('first day of January'))->format('Ymd') . '000000',
+      'expectedTo' => (new DateTime('last day of March'))->format('Ymd') . '235959',
+      'relative' => 'q1',
+      'from' => '',
+      'to' => '',
+    ];
     return $cases;
   }
 
@@ -80,12 +88,23 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * Test that getFromTo returns the correct dates.
    */
   public function testGetFromTo(): void {
+    $this->hookClass->setHook('civicrm_relativeDate', [$this, 'hook_civicrm_relativeDate_q1']);
     $cases = $this->fromToData();
     foreach ($cases as $caseDescription => $case) {
       [$calculatedFrom, $calculatedTo] = CRM_Utils_Date::getFromTo($case['relative'], $case['from'], $case['to']);
       $this->assertEquals($case['expectedFrom'], $calculatedFrom, "Expected From failed for case $caseDescription");
       $this->assertEquals($case['expectedTo'], $calculatedTo, "Expected To failed for case $caseDescription");
     }
+  }
+
+  public function hook_civicrm_relativeDate_q1($filter) {
+    $dates = [];
+    if ($filter == 'q1') {
+      //First quarter of this year.
+      $dates['from'] = (new DateTime('January 1st'))->format('Ymd');
+      $dates['to'] = (new DateTime('March 31st'))->format('Ymd');
+    }
+    return $dates;
   }
 
   /**
@@ -295,7 +314,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * dataProvider for testRelativeToAbsoluteGeneral()
    * @return array
    */
-  public function relativeDateProvider(): array {
+  public static function relativeDateProvider(): array {
     return [
       [
         'input' => [
@@ -2688,7 +2707,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function dateDataProvider(): array {
+  public static function dateDataProvider(): array {
     return [
       // YYYY-mm-dd format - eg. 2022-10-01.
       '2022-10-01' => ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001000000'],

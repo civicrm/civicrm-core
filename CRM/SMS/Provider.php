@@ -79,9 +79,10 @@ abstract class CRM_SMS_Provider {
    * @param array $recipients
    * @param string $header
    * @param string $message
-   * @param int $dncID
+   * @param int|null $jobID
+   * @param int|null $userID
    */
-  abstract public function send($recipients, $header, $message, $dncID = NULL);
+  abstract public function send($recipients, $header, $message, $jobID = NULL, $userID = NULL);
 
   /**
    * @param int $apiMsgID
@@ -226,6 +227,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
         'details' => $message->body,
         'phone_number' => $message->from,
+        'subject' => ts("Inbound SMS from %1", [1 => $message->from]),
       ];
       if ($message->trackID) {
         $activityParams['result'] = CRM_Utils_Type::escape($message->trackID, 'String');

@@ -239,7 +239,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals('buenos dias', $x);
   }
 
-  public function getSortExamples() {
+  public static function getSortExamples() {
     $red = ['label' => 'Red', 'id' => 1, 'weight' => '90'];
     $orange = ['label' => 'Orange', 'id' => 2, 'weight' => '70'];
     $yellow = ['label' => 'Yellow', 'id' => 3, 'weight' => '10'];
@@ -327,7 +327,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     }
   }
 
-  public function getRecursiveIssetExamples() {
+  public static function getRecursiveIssetExamples() {
     return [
       [
         [[[], [0, 1, 2], []]], [0, 1, 2], TRUE,
@@ -361,7 +361,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
-  public function getRecursiveValueExamples() {
+  public static function getRecursiveValueExamples() {
     return [
       [
         [[[], [0, 1, 2], []]], [0, 1, 2], NULL, 2,
@@ -399,7 +399,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   /**
    * Get values for build test.
    */
-  public function getBuildValueExamples() {
+  public static function getBuildValueExamples() {
     return [
       [
         [], [0, 'email', 2, 'location'], [0 => ['email' => [2 => ['location' => 'llama']]]],

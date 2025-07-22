@@ -1,0 +1,217 @@
+<?php
+use CRM_CivicrmSearchUi_ExtensionUtil as E;
+
+return [
+  [
+    'name' => 'SavedSearch_CiviCRM_Reports',
+    'entity' => 'SavedSearch',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'CiviCRM_Reports',
+        'label' => E::ts('CiviCRM Reports'),
+        'api_entity' => 'ReportInstance',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'title', 'description', 'is_active'],
+          'orderBy' => [],
+          'where' => [],
+          'groupBy' => [],
+          'join' => [],
+          'having' => [],
+        ],
+      ],
+      'match' => ['name'],
+    ],
+  ],
+  [
+    'name' => 'SavedSearch_CiviCRM_Reports_SearchDisplay_CiviCRM_Reports',
+    'entity' => 'SearchDisplay',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'CiviCRM_Reports',
+        'label' => E::ts('CiviCRM Reports'),
+        'saved_search_id.name' => 'CiviCRM_Reports',
+        'type' => 'table',
+        'settings' => [
+          'description' => E::ts(NULL),
+          'sort' => [
+            ['title', 'ASC'],
+          ],
+          'limit' => 50,
+          'pager' => [],
+          'placeholder' => 5,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'title',
+              'label' => E::ts('Title'),
+              'sortable' => TRUE,
+              'rewrite' => '',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'description',
+              'label' => E::ts('Description'),
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'size' => 'btn-xs',
+              'links' => [
+                [
+                  'path' => 'civicrm/report/instance/[id]?force=1&reset=1',
+                  'icon' => '',
+                  'text' => E::ts('View Results'),
+                  'style' => 'default',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                  'conditions' => [
+                    [],
+                  ],
+                ],
+              ],
+              'type' => 'buttons',
+              'alignment' => 'text-right',
+            ],
+            [
+              'size' => 'btn-xs',
+              'links' => [
+                [
+                  'path' => 'civicrm/report/instance/[id]?reset=1&output=criteria',
+                  'icon' => 'fa-pencil',
+                  'text' => E::ts('Edit'),
+                  'style' => 'default',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                  'conditions' => [
+                    [],
+                  ],
+                ],
+              ],
+              'type' => 'buttons',
+              'alignment' => 'text-right',
+            ],
+            [
+              'text' => E::ts(''),
+              'style' => 'default',
+              'size' => 'btn-xs',
+              'icon' => 'fa-bars',
+              'links' => [
+                [
+                  'path' => 'civicrm/report/instance/[id]?reset=1&output=copy',
+                  'icon' => 'fa-external-link',
+                  'text' => E::ts('Save a Copy'),
+                  'style' => 'default',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                  'conditions' => [
+                    [],
+                  ],
+                ],
+                [
+                  'path' => 'civicrm/report/instance/[id]?reset=1&force=1&output=pdf',
+                  'icon' => 'fa-external-link',
+                  'text' => E::ts('View as PDF'),
+                  'style' => 'default',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                  'conditions' => [
+                    [],
+                  ],
+                ],
+                [
+                  'path' => 'civicrm/report/instance/[id]?reset=1&force=1&output=print',
+                  'icon' => 'fa-external-link',
+                  'text' => E::ts('Print'),
+                  'style' => 'default',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                  'conditions' => [
+                    [],
+                  ],
+                ],
+                [
+                  'path' => 'civicrm/report/instance/[id]?reset=1&force=1&output=csv',
+                  'icon' => 'fa-external-link',
+                  'text' => E::ts('Export to CSV'),
+                  'style' => 'default',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                  'conditions' => [
+                    [],
+                  ],
+                ],
+                [
+                  'task' => 'delete',
+                  'entity' => 'ReportInstance',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-trash',
+                  'text' => E::ts('Delete'),
+                  'style' => 'danger',
+                  'path' => '',
+                  'action' => '',
+                  'conditions' => [
+                    [],
+                  ],
+                ],
+              ],
+              'type' => 'menu',
+              'alignment' => 'text-right',
+              'label' => E::ts(''),
+            ],
+          ],
+          'actions' => FALSE,
+          'classes' => ['table', 'table-striped'],
+          'toolbar' => [
+            [
+              'path' => 'civicrm/report/template/list',
+              'icon' => 'fa-external-link',
+              'text' => E::ts('New Report'),
+              'style' => 'default',
+              'task' => '',
+              'entity' => '',
+              'action' => '',
+              'join' => '',
+              'target' => '',
+              'conditions' => [
+                [],
+              ],
+            ],
+          ],
+          'cssRules' => [
+            ['disabled', 'is_active', '=', FALSE],
+          ],
+        ],
+      ],
+      'match' => [
+        'saved_search_id',
+        'name',
+      ],
+    ],
+  ],
+];

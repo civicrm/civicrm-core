@@ -379,11 +379,11 @@ class CRM_Core_DAO_AllCoreTables {
    * @param string $entityName
    *   e.g. 'Activity'
    *
-   * @return string
+   * @return string|null
    *   e.g. 'civicrm_activity'
    */
-  public static function getTableForEntityName($entityName): string {
-    return self::getEntities()[$entityName]['table'];
+  public static function getTableForEntityName($entityName): ?string {
+    return self::getEntities()[$entityName]['table'] ?? NULL;
   }
 
   /**

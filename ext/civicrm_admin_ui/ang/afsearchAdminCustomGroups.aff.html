@@ -6,9 +6,9 @@
     </div>
   </div>
   <div class="af-container af-layout-inline">
-    <af-field name="title" defn="{required: false, input_attrs: {}, label: 'Group'}" />
+    <af-field name="title" defn="{required: false, input_attrs: {}, search_operator: 'CONTAINS', label: 'Group'}" />
     <af-field name="extends" defn="{input_attrs: {multiple: true}, label: 'Used For'}" />
-    <af-field name="CustomGroup_CustomField_custom_group_id_01.label" defn="{required: false, input_attrs: {}, label: 'Field'}" />
+    <af-field name="CustomGroup_CustomField_custom_group_id_01.label" defn="{required: false, input_attrs: {}, search_operator: 'CONTAINS', label: 'Field'}" />
   </div>
   <crm-search-display-table search-name="Administer_Custom_Groups" display-name="Table"></crm-search-display-table>
 </div>

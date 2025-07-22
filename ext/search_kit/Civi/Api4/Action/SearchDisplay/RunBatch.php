@@ -22,6 +22,11 @@ class RunBatch extends Run {
   protected $userJobId;
 
   /**
+   * @var array
+   */
+  private $userJob;
+
+  /**
    * Unlike the base Run action, this does not support pager, count, or tally
    * as those are all handled client-side.
    *
@@ -29,7 +34,7 @@ class RunBatch extends Run {
    * @throws \CRM_Core_Exception
    */
   protected function processResult(SearchDisplayRunResult $result) {
-    $userJob = UserJob::get(FALSE)
+    $this->userJob = UserJob::get(FALSE)
       ->addWhere('id', '=', $this->userJobId)
       ->addWhere('job_type', '=', 'search_batch_import')
       ->execute()->single();
@@ -67,6 +72,13 @@ class RunBatch extends Run {
       if (!empty($column['key'])) {
         $key = $column['key'];
         $result->editable[$key] = $this->getEditableInfo($key);
+        // Set `required` field status based on search display settings
+        $result->editable[$key]['required'] = !empty($column['required']);
+        // Instead of using nullable from field defn, defer to `required` display setting
+        $result->editable[$key]['nullable'] = empty($column['required']);
+        if (!empty($column['tally']['target'])) {
+          $result->editable[$key]['target'] = $this->userJob['metadata']['DataSource']['targets'][$key] ?? NULL;
+        }
       }
     }
   }

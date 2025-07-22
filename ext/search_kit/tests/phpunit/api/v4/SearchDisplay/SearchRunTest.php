@@ -97,31 +97,26 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'id',
               'label' => 'Contact ID',
-              'dataType' => 'Integer',
               'type' => 'field',
             ],
             [
               'key' => 'first_name',
               'label' => 'First Name',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
               'key' => 'last_name',
               'label' => 'Last Name',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
               'key' => 'contact_sub_type:label',
               'label' => 'Type',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
               'key' => 'is_deceased',
               'label' => 'Deceased',
-              'dataType' => 'Boolean',
               'type' => 'field',
             ],
           ],
@@ -285,13 +280,11 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'id',
               'label' => 'Contact ID',
-              'dataType' => 'Integer',
               'type' => 'field',
             ],
             [
               'key' => 'display_name',
               'label' => 'Display Name',
-              'dataType' => 'String',
               'type' => 'field',
               'link' => [
                 'path' => 'civicrm/test/token-[sort_name]',
@@ -358,7 +351,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'contact_id.display_name',
               'label' => 'Contact',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
@@ -435,7 +427,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'title',
               'label' => 'Title',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
@@ -506,7 +497,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'near_contact_id.display_name',
               'label' => 'Contact',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
@@ -809,13 +799,11 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
               [
                 'key' => 'id',
                 'label' => 'Contact ID',
-                'dataType' => 'Integer',
                 'type' => 'field',
               ],
               [
                 'key' => 'first_name',
                 'label' => 'First Name',
-                'dataType' => 'String',
                 'type' => 'field',
                 'link' => [
                   'entity' => 'Contact',
@@ -825,7 +813,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
               [
                 'key' => 'last_name',
                 'label' => 'Last Name',
-                'dataType' => 'String',
                 'type' => 'field',
               ],
             ],
@@ -913,19 +900,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
               [
                 'key' => 'id',
                 'label' => 'Contact ID',
-                'dataType' => 'Integer',
                 'type' => 'field',
               ],
               [
                 'key' => 'first_name',
                 'label' => 'First Name',
-                'dataType' => 'String',
                 'type' => 'field',
               ],
               [
                 'key' => 'last_name',
                 'label' => 'Last Name',
-                'dataType' => 'String',
                 'type' => 'field',
               ],
             ],
@@ -1089,7 +1073,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'first_name',
               'label' => 'First Name',
-              'dataType' => 'String',
               'type' => 'field',
             ],
           ],
@@ -1225,7 +1208,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           [
             'type' => 'field',
             'key' => 'id',
-            'dataType' => 'Integer',
             'label' => 'Contact ID',
             'sortable' => TRUE,
             'alignment' => 'text-center',
@@ -1233,7 +1215,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           [
             'type' => 'field',
             'key' => 'display_name',
-            'dataType' => 'String',
             'label' => 'Display Name',
             'sortable' => TRUE,
             'link' => [
@@ -1246,7 +1227,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           [
             'type' => 'field',
             'key' => 'GROUP_CONCAT_Contact_Email_contact_id_01_email',
-            'dataType' => 'String',
             'label' => '(List) Contact Emails: Email',
             'sortable' => TRUE,
             'alignment' => 'text-right',
@@ -1270,7 +1250,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           [
             'type' => 'field',
             'key' => 'birth_date',
-            'dataType' => 'String',
             'label' => 'Birthday',
             'sortable' => TRUE,
             'cssRules' => [
@@ -1376,7 +1355,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           [
             'type' => 'field',
             'key' => 'id',
-            'dataType' => 'Integer',
             'label' => 'Activity ID',
             'sortable' => TRUE,
             'icons' => [
@@ -1444,7 +1422,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           [
             'type' => 'field',
             'key' => 'id',
-            'dataType' => 'Integer',
             'label' => 'Contact ID',
             'sortable' => TRUE,
             'alignment' => 'text-center',
@@ -1452,7 +1429,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           [
             'type' => 'field',
             'key' => 'nick_name',
-            'dataType' => 'String',
             'label' => 'Display Name',
             'sortable' => TRUE,
             'rewrite' => '[nick_name] [last_name]',
@@ -2383,14 +2359,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => 'Contribution ID',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contact_id.sort_name',
-              'dataType' => 'String',
               'label' => 'Contact Sort Name',
               'sortable' => TRUE,
               'link' => [
@@ -2405,14 +2379,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'type' => 'field',
               'key' => 'total_amount',
-              'dataType' => 'Money',
               'label' => 'Total Amount',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'financial_type_id:label',
-              'dataType' => 'Integer',
               'label' => 'Financial Type',
               'sortable' => TRUE,
             ],
@@ -2487,7 +2459,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'first_name',
               'label' => 'First',
-              'dataType' => 'String',
               'type' => 'field',
               'icons' => [
                 ['field' => 'contact_sub_type:icon'],
@@ -2541,7 +2512,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'email',
               'label' => 'Email',
-              'dataType' => 'String',
               'type' => 'field',
             ],
           ],
@@ -2588,7 +2558,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'key' => 'first_name',
               'label' => 'First',
-              'dataType' => 'String',
               'type' => 'field',
             ],
           ],
@@ -2800,14 +2769,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => 'ID',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Note_EntityFile_File_01_file_name',
-              'dataType' => 'String',
               'label' => ts('Attachments'),
               'sortable' => TRUE,
               'link' => [

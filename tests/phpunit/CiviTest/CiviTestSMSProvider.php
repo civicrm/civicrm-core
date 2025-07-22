@@ -44,10 +44,10 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
     return self::$_singleton[$cacheKey];
   }
 
-  public function send($recipients, $header, $message, $dncID = NULL) {
+  public function send($recipients, $header, $message, $jobID = NULL, $userID = NULL) {
     $this->sentMessage = $message;
     $sid = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 16);
-    $this->createActivity($sid, $message, $header, $dncID);
+    $this->createActivity($sid, $message, $header, $jobID);
   }
 
   /**

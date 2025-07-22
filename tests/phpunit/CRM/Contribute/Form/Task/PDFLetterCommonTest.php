@@ -588,7 +588,7 @@ value=$contact_aggregate+$contribution.total_amount}
     );
   }
 
-  public function isHtmlTokenInTableCellProvider() {
+  public static function isHtmlTokenInTableCellProvider() {
     return [
 
       'simplest TRUE' => [

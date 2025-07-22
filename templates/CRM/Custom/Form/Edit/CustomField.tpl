@@ -20,8 +20,8 @@
     <td>{$formElement.html}</td>
   </tr>
 {elseif $element.options_per_line}
-  <tr class="custom_field-row {$element.element_name}-row">
-    <td class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
+  <tr class="custom_field-row {$element.element_name}-row" {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element.element_name}_group"{/if}>
+    <td class="label"{if $element.html_type === "Radio"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
     <td class="html-adjust">
 
       <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};">
@@ -40,8 +40,8 @@
     </td>
   </tr>
 {else}
-  <tr class="custom_field-row {$element.element_name}-row">
-    <td class="label">{$formElement.label}
+  <tr class="custom_field-row {$element.element_name}-row" {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element.element_name}_group"{/if}>
+    <td class="label"{if $element.html_type === "Radio"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}
       {if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}
     </td>
     <td class="html-adjust">

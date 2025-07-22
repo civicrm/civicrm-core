@@ -59,6 +59,8 @@ class CustomFileTest extends Api4TestBase {
       'file_name' => 'test123.txt',
       'content' => 'Hello World 123',
     ]);
+    $fileUri = \CRM_Core_Config::singleton()->customFileUploadDir . $file['uri'];
+    $this->assertFileExists($fileUri);
 
     Contact::update(FALSE)
       ->addWhere('id', '=', $contact['id'])
@@ -83,6 +85,14 @@ class CustomFileTest extends Api4TestBase {
       ->addValue('content', 'Hello World 456')
       ->execute();
 
+    // Update contact with no change to the file. Ensure it still exists
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue($fieldName, $file['id'])
+      ->addValue('first_name', 'Test')
+      ->execute();
+    $this->assertFileExists($fileUri);
+
     // This time use a join to fetch the file
     $result = Contact::get(FALSE)
       ->addSelect('id', "$fieldName.uri", "$fieldName.file_name", "$fieldName.url", "$fieldName.content")
@@ -93,6 +103,48 @@ class CustomFileTest extends Api4TestBase {
     $this->assertEquals('test123.txt', $result["$fieldName.file_name"]);
     $this->assertEquals('Hello World 456', $result["$fieldName.content"]);
     $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
+
+    $file2 = $this->createTestRecord('File', [
+      'mime_type' => 'text/plain',
+      'file_name' => 'test123.txt',
+      'content' => 'Hello World 1234',
+    ]);
+    $fileUri2 = \CRM_Core_Config::singleton()->customFileUploadDir . $file2['uri'];
+
+    // Update contact with a different file
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue($fieldName, $file2['id'])
+      ->execute();
+
+    // Original file should have been deleted
+    $result = File::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('id', '=', $file['id'])
+      ->execute();
+    $this->assertCount(0, $result);
+    $this->assertFileDoesNotExist($fileUri);
+
+    // Remove the file from the contact
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue($fieldName, NULL)
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id', "$fieldName.uri", "$fieldName.file_name", "$fieldName.url", "$fieldName.content")
+      ->addWhere('id', '=', $contact['id'])
+      ->execute()->single();
+    $this->assertNull($result["$fieldName.uri"]);
+    $this->assertNull($result["$fieldName.file_name"]);
+    $this->assertNull($result["$fieldName.content"]);
+
+    $result = File::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('id', '=', $file2['id'])
+      ->execute();
+    $this->assertCount(0, $result);
+    $this->assertFileDoesNotExist($fileUri2);
   }
 
   public function testMoveFile(): void {

@@ -1,19 +1,22 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchTasks').controller('crmSearchTaskMailing', function($scope, crmApi4, searchTaskBaseTrait) {
+  angular.module('crmSearchTasks').controller('crmSearchTaskMailing', function($scope, crmApi4, searchTaskBaseTrait, formatForSelect2) {
     var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
       // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
       ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait),
-      mailingId,
-      templateTypes;
+      mailingId;
 
+    this.mailing = {
+      name: '',
+      template_type: null,
+    };
     this.entityTitle = this.getEntityTitle();
 
     // This option is needed to determine whether the mailing will be handled by CiviMail or Mosaico
     crmApi4({
       templateTypes: ['Mailing', 'getFields', {
-        loadOptions: ['id'],
+        loadOptions: ['id', 'label', 'description'],
         where: [['name', '=', 'template_type']]
       }, ['options']],
       recipientCount: ['Contact', 'get', {
@@ -23,7 +26,8 @@
         groupBy: ['id']
       }]
     }).then(function(results) {
-      templateTypes = results.templateTypes[0];
+      ctrl.templateTypes = formatForSelect2(results.templateTypes[0], 'id', 'label', ['description']);
+      ctrl.mailing.template_type = ctrl.templateTypes[0].id;
       ctrl.recipientCount = results.recipientCount.count;
     });
 
@@ -36,10 +40,7 @@
         },
         chain: {
           mailing: ['Mailing', 'create', {
-            values: {
-              name: ctrl.name,
-              template_type: templateTypes[0].id
-            }
+            values: ctrl.mailing,
           }, 0],
           mailingGroup: ['MailingGroup', 'create', {
             values: {

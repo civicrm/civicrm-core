@@ -75,7 +75,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
    * multiLingual context.
    *
    */
-  public function multiLingual() {
+  public static function multiLingual() {
     return [[0], [1]];
   }
 

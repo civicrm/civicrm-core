@@ -27,7 +27,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
    */
   public function buildQuickForm(): void {
     parent::buildQuickForm();
-    $invoiceSettings = SettingsMetadata::getMetadata(['name' => ['invoice_prefix', 'tax_term', 'invoice_notes', 'invoice_due_date', 'invoice_is_email_pdf', 'invoice_due_date_period', 'tax_display_settings']], NULL, TRUE);
+    $invoiceSettings = SettingsMetadata::getMetadata(['name' => ['invoice_prefix', 'invoice_notes', 'invoice_due_date', 'invoice_is_email_pdf', 'invoice_due_date_period', 'tax_display_settings']], NULL, TRUE);
     // Let the main template file deal with the main setting & then Contribute.tpl
     // can stick the invoice settings in a div that can show-hide-toggle if invoicing is enabled.
     $this->assign('fields', $this->filterMetadataByWeight(array_diff_key($this->getSettingsMetaData(), $invoiceSettings)));

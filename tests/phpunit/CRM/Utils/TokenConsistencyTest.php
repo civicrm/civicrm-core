@@ -63,7 +63,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
   public function testCaseTokenConsistency(): void {
     $this->createLoggedInUser();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $this->createCustomGroupWithFieldOfType(['extends' => 'Case']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Case'], 'text', NULL, ['label' => 'Life Cycle: Status']);
     $tokens = CRM_Core_SelectValues::caseTokens();
     $this->assertEquals($this->getCaseTokens(), $tokens);
     $tokenString = $this->getTokenString(array_keys($this->getCaseTokens()));
@@ -145,7 +145,7 @@ case.custom_1 :' . '
       '{case.is_deleted:label}' => 'Case is in the Trash',
       '{case.created_date}' => 'Created Date',
       '{case.modified_date}' => 'Modified Date',
-      '{case.custom_1}' => 'Enter text here :: Group with field text',
+      '{case.custom_1}' => 'Life Cycle: Status :: Group with field text',
     ];
   }
 

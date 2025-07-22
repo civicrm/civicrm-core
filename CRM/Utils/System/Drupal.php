@@ -886,33 +886,44 @@ AND    u.status = 1
     return $text;
   }
 
+  public function getCRMDatabasePrefix(): string {
+    $crmDatabaseName = parent::getCRMDatabaseName();
+    if (!empty($crmDatabaseName)) {
+      return "`$crmDatabaseName`.";
+    }
+    return $crmDatabaseName;
+  }
+
   /**
    * @inheritdoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
-    $ret = FALSE;
+    if ($maintenance) {
+      \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_Base::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
+    }
 
     if (!$print) {
       if ($maintenance) {
-        drupal_set_breadcrumb('');
-        drupal_maintenance_theme();
-        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
-          CRM_Utils_System::addHTMLHead($region->render(''));
-        }
-        print theme('maintenance_page', ['content' => $content]);
+        print $this->renderMaintenanceMessage($content);
         exit();
       }
-      $ret = TRUE;
+      return $content;
     }
-    $out = $content;
 
-    if ($ret) {
-      return $out;
+    print $content;
+    return NULL;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function renderMaintenanceMessage(string $content): string {
+    drupal_set_breadcrumb('');
+    drupal_maintenance_theme();
+    if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+      $this->addHTMLHead($region->render(''));
     }
-    else {
-      print $out;
-      return NULL;
-    }
+    return theme('maintenance_page', ['content' => $content]);
   }
 
   /**

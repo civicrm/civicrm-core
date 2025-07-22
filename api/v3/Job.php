@@ -659,11 +659,11 @@ function civicrm_api3_job_cleanup($params) {
   }
 
   if ($dbCache) {
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
   }
 
   if ($memCache) {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
   if ($wordRplc) {

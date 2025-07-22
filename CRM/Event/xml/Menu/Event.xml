@@ -155,7 +155,7 @@
   </item>
   <item>
      <path>civicrm/event/participant/print</path>
-     <title>ts('PDF letter - print for participants')</title>
+     <title>PDF letter - print for participants</title>
      <page_callback>CRM_Event_Form_Task_PDF</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
   </item>

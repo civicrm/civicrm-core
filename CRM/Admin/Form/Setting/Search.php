@@ -80,4 +80,84 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     return TRUE;
   }
 
+  /**
+   * Pseudoconstant callback for autocomplete_displays setting.
+   *
+   * @return array
+   */
+  public static function getAutocompleteDisplays(): array {
+    $options = [];
+    try {
+      $displays = civicrm_api4('SearchDisplay', 'get', [
+        'checkPermissions' => FALSE,
+        'select' => ['name', 'saved_search_id.api_entity', 'label'],
+        'where' => [
+          ['type', '=', 'autocomplete'],
+        ],
+        'orderBy' => [
+          'saved_search_id.api_entity' => 'ASC',
+          'label' => 'ASC',
+        ],
+      ]);
+      foreach ($displays as $display) {
+        $entityLabel = \Civi\Api4\Utils\CoreUtil::getInfoItem($display['saved_search_id.api_entity'], 'title_plural');
+        $options[$display['saved_search_id.api_entity'] . ':' . $display['name']] = $entityLabel . ': ' . $display['label'];
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+      // Catch added in case of early bootstrap situations where SearchKit extension is not loaded.
+    }
+    return $options;
+  }
+
+  /**
+   * post_change callback for autocomplete_displays setting.
+   *
+   * Ensures the settings only allow one display per entity and
+   * verifies the mapped displays exist.
+   *
+   * @param array $oldValue
+   * @param array $newValue
+   *
+   * @return void
+   */
+  public static function onChangeAutocompleteDisplays($oldValue, $newValue): void {
+    if (!$newValue) {
+      return;
+    }
+    $mappedValue = [];
+    // Explode "key:value"[] into [key => value]
+    // This effectively enforces a max of one display per entity, (more than one wouldn't make any sense)
+    foreach ($newValue as $setting) {
+      [$entityName, $displayName] = explode(':', $setting);
+      $mappedValue[$entityName] = $displayName;
+    }
+    try {
+      // Validate that displays exist and are paired with the correct entity
+      // Any mismatches or missing displays will be rejected
+      $mappedDisplays = civicrm_api4('SearchDisplay', 'get', [
+        'checkPermissions' => FALSE,
+        'select' => ['name', 'saved_search_id.api_entity'],
+        'where' => [
+          ['type', '=', 'autocomplete'],
+          ['name', 'IN', array_values($mappedValue)],
+        ],
+      ])->column('name', 'saved_search_id.api_entity');
+      $mappedValue = array_intersect_assoc($mappedValue, $mappedDisplays);
+    }
+    catch (CRM_Core_Exception $e) {
+      // Catch added in case of early bootstrap situations where SearchKit extension is not loaded.
+    }
+    // Reformat as "key:value"[] before storing setting
+    $value = array_map(
+      fn($mappedValue, $mappedKey) => $mappedKey . ':' . $mappedValue,
+      $mappedValue,
+      array_keys($mappedValue)
+    );
+    // Re-save setting. This shouldn't cause an infinite loop because the second time this condition will be false.
+    if ($newValue != $value) {
+      Civi::settings()->set('autocomplete_displays', $value);
+    }
+  }
+
 }

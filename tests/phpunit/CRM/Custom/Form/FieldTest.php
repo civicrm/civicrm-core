@@ -27,7 +27,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
    * DataProvider for testDetermineSerializeType
    * @return array
    */
-  public function serializeDataProvider():array {
+  public static function serializeDataProvider():array {
     return [
       0 => [
         [

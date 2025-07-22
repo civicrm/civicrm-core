@@ -20,7 +20,7 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
     return \Civi\Test::headless()->installMe(__DIR__)->apply();
   }
 
-  public function getExamples() {
+  public static function getExamples() {
     $exs = [];
     $exs[] = [
       '<div/>',

@@ -24,6 +24,7 @@
         this.limit = this.settings.limit;
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
         this.seed = Date.now();
+        this.uniqueId = generateUniqueId(20);
         this.placeholders = [];
         var placeholderCount = 'placeholder' in this.settings ? this.settings.placeholder : 5;
         for (var p=0; p < placeholderCount; ++p) {
@@ -70,6 +71,15 @@
           }
         }
 
+        function generateUniqueId(length) {
+          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+          let result = "";
+          for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return result;
+        }
+
         // Popup forms in this display or surrounding Afform trigger a refresh
         $element.closest('form').on('crmPopupFormSuccess crmFormSuccess', function() {
           ctrl.rowCount = null;
@@ -103,7 +113,7 @@
               ctrl.toolbar = apiResults.run.toolbar;
               // If there are no results on initial load, open an "autoOpen" toolbar link
               ctrl.toolbar.forEach((link) => {
-                if (link.autoOpen && requestId === 1 && !ctrl.results.length) {
+                if (link.autoOpen && ctrl._runCount === 1 && !ctrl.results.length) {
                   CRM.loadForm(link.url)
                     .on('crmFormSuccess', (e, data) => {
                       ctrl.rowCount = null;

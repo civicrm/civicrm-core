@@ -42,8 +42,6 @@
         // Make this widget very compact
         width: '52px',
         containerCss: {minWidth: '52px'},
-        // Make the dropdown wider than the widget
-        dropdownCss: {width: '250px'}
       };
 
     }

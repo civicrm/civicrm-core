@@ -673,32 +673,26 @@ AND       CEF.entity_id    = %2";
       self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
       return;
     }
-    $refCount = 0;
     // Custom file field - set the custom value to NULL
     $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['table_name' => $params['entityTable']]);
     $customField = $customGroup['fields'][$params['customField']] ?? NULL;
-    if ($customField) {
-      // *SIGH* Api4 has a bug which cannot update file custom fields to NULL :(
-      //   $entityName = $customGroup['extends'] ?? NULL;
-      //   $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName('custom_' . $params['customField']);
-      //   civicrm_api4($entityName, 'update', [
-      //     'values' => [$fieldName => NULL, 'id' => $params['entityID']],
-      //     'where' => [
-      //       ['id', '=', $params['entityID']],
-      //       [$fieldName, '=', $params['fileID']],
-      //     ],
-      //   ]);
-      // TEMP HACK
-      CRM_Core_DAO::executeQuery("UPDATE `{$customGroup['table_name']}` SET {$customField['column_name']} = NULL WHERE entity_id = %1 AND {$customField['column_name']} = %2", [
-        1 => [$params['entityID'], 'Integer'],
-        2 => [$params['fileID'], 'Integer'],
+    // Api4 will also delete the file from disk if there are no other references to it
+    if ($customField && !$customGroup['is_multiple']) {
+      $entityName = $customGroup['extends'] ?? NULL;
+      $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName('custom_' . $params['customField']);
+      civicrm_api4($entityName, 'update', [
+        'values' => [$fieldName => NULL, 'id' => $params['entityID']],
+        'where' => [
+          ['id', '=', $params['entityID']],
+          [$fieldName, '=', $params['fileID']],
+        ],
       ]);
-      $refCount = CoreUtil::getRefCountTotal('File', $params['fileID']);
     }
-    // Delete file if there are no other references
-    if ($refCount === 0) {
-      \Civi\Api4\File::delete(FALSE)
-        ->addWhere('id', '=', $params['fileID'])
+    if ($customField && $customGroup['is_multiple']) {
+      \Civi\Api4\CustomValue::update($customGroup['name'])
+        ->addWhere('entity_id', '=', $params['entityID'])
+        ->addWhere($customField['name'], '=', $params['fileID'])
+        ->addValue($customField['name'], NULL)
         ->execute();
     }
   }
@@ -858,6 +852,7 @@ HEREDOC;
       'civicrm_activity' => ts('Activity'),
       'civicrm_case' => ts('Case'),
       'civicrm_note' => ts('Note'),
+      'civicrm_saved_search' => ts('Saved Search'),
     ];
   }
 

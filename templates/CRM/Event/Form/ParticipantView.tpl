@@ -45,8 +45,8 @@
         <tr class="crm-event-participantview-form-block-additionalParticipants">
             <td class="label">{ts}Also Registered by this Participant{/ts}</td>
             <td>
-                {foreach from=$additionalParticipants key=participantName item=participantURL}
-                    <a href="{$participantURL}" title="{ts escape='htmlattribute'}view additional participant{/ts}">{$participantName|escape}</a><br />
+                {foreach from=$additionalParticipants key=participantName item=participant}
+                  <a href="{$participant.url}" title="{ts escape='htmlattribute'}view additional participant{/ts}">{$participantName|escape}</a>{if $participant.status} ({$participant.status}){/if}<br />
                 {/foreach}
             </td>
         </tr>
@@ -115,7 +115,7 @@
     {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
     {if $accessContribution and array_key_exists(0, $rows) and $rows.0.contribution_id}
-        {include file="CRM/Contribute/Form/Selector.tpl" context="Search" single=true}
+        {include file="CRM/Contribute/Form/Selector.tpl" context="dashboard" single=false}
     {/if}
     <div class="crm-submit-buttons">
       {crmPermission has='edit event participants'}

@@ -129,6 +129,15 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
       }
     }
 
+    if (isset($params['preferred_communication_method']) && is_array($params['preferred_communication_method'])) {
+      if (!empty($params['preferred_communication_method']) && empty($params['preferred_communication_method'][0])) {
+        CRM_Core_Error::deprecatedWarning(' Form layer formatting should never get to the BAO');
+        CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
+        $contact->preferred_communication_method = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
+        unset($params['preferred_communication_method']);
+      }
+    }
+
     $defaults = ['source' => $params['contact_source'] ?? NULL];
     if ($params['contact_type'] === 'Organization' && isset($params['organization_name'])) {
       $defaults['display_name'] = $params['organization_name'];
@@ -421,7 +430,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
         'is_deceased' => $params['is_deceased'],
         'deceased_date' => $params['deceased_date'] ?? NULL,
       ];
-      CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams, $params['contact_type']);
+      CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams);
     }
 
     return $contact;
@@ -1138,6 +1147,15 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     // retrieve contact id in case of Profile context
     $id = CRM_Utils_Request::retrieve('id', 'Positive');
     $formName = $pcp ? 'CRM_PCP_Form_PCPAccount' : ($cid ? 'CRM_Contact_Form_Contact' : 'CRM_Profile_Form_Edit');
+    if ($formName == 'CRM_Profile_Form_Edit') {
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      // If the call is initiated from the profile loaded from drupal, we
+      // need to change the form name. otherwise we will get : Error: Could
+      // not find a valid session key.
+      if (str_contains($key, 'CRMProfileFormDynamic')) {
+        $formName = 'CRM_Profile_Form_Dynamic';
+      }
+    }
     $cid = $cid ?: $id;
     if ($action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {

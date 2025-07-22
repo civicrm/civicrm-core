@@ -88,17 +88,35 @@ details.af-container > *:last-of-type {
 }
 
 /* Admin edit links */
-.afform-directive .af-admin-edit-form-link {
-  position: absolute !important;
+#bootstrap-theme .afform-directive:has(> .af-admin-edit-form-link) .crm-search-display {
+  padding-top: 0.5rem;
+}
+#bootstrap-theme .afform-directive .af-admin-edit-form-link {
+  position: absolute;
   right: 0;
   top: 0;
-  opacity: .5;
 }
-.afform-directive .af-admin-edit-form-link.open,
-.afform-directive:hover .af-admin-edit-form-link {
+#bootstrap-theme .af-admin-edit-form-link > button {
+  background: transparent;
+  color: var(--crm-c-text);
+  border-radius: 2rem;
+  height: inherit;
+  padding: 0 !important;
+  border: 0;
+  opacity: 0.6;
+}
+#bootstrap-theme .af-admin-edit-form-link.open button,
+#bootstrap-theme .af-admin-edit-form-link button:hover,
+#bootstrap-theme .af-admin-edit-form-link button:focus {
+  background: transparent;
+  color: var(--crm-c-text);
   opacity: 1;
+  box-shadow: none !important; /* vs dropdown-toggle */
 }
-
+#bootstrap-theme .af-admin-edit-form-link > button .crm-i {
+  padding: 0;
+  border: 0;
+}
 /* Fieldset */
 
 fieldset.af-container.af-layout-inline {

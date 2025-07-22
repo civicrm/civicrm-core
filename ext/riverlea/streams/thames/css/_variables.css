@@ -207,6 +207,7 @@
   --crm-panel-background: white;
   --crm-panel-border: var(--crm-c-divider);
   --crm-panel-head-margin: 0px;
+  --crm-panel-head-height: 42px;
 }
 :root {
 /* Accordions */
@@ -412,7 +413,7 @@
   --crm-dropdown-hover-bg: var(--crm-c-blue-light); /* thames */
   --crm-dropdown-border: 0;
   --crm-dropdown-width: 23ch; /* thames */
-  --crm-dropdown-danger-bg: transparent; /* thames */
+  --crm-dropdown-danger-bg: var(--crm-c-danger); /* for delete links in dropdowns */
   --crm-dropdown-2-bg: var(--crm-c-secondary);
   --crm-dropdown-2-col: var(--crm-c-text);
   --crm-dropdown-2-padding: var(--crm-padding-small);

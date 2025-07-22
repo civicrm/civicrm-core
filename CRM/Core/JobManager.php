@@ -21,6 +21,11 @@ use Civi\Api4\Job;
 class CRM_Core_JobManager {
 
   /**
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * Jobs.
    *
    * Format is ($id => CRM_Core_ScheduledJob).
@@ -50,14 +55,21 @@ class CRM_Core_JobManager {
   public $_source = NULL;
 
   /**
+   * @param \Psr\Log\LoggerInterface|null $logger
+   */
+  public function __construct($logger = NULL) {
+    $this->logger = $logger ?: new CRM_Core_JobLogger();
+  }
+
+  /**
    * @param bool $auth
    */
   public function execute($auth = TRUE) {
 
-    $this->logEntry('Starting scheduled jobs execution');
+    $this->logger->info('Starting scheduled jobs execution', $this->createLogContext());
 
     if ($auth && !CRM_Utils_System::authenticateKey(TRUE)) {
-      $this->logEntry('Could not authenticate the site key.');
+      $this->logger->error('Could not authenticate the site key.', $this->createLogContext());
     }
     require_once 'api/api.php';
 
@@ -98,7 +110,7 @@ class CRM_Core_JobManager {
       }
     }
 
-    $this->logEntry('Finishing scheduled jobs execution.');
+    $this->logger->info('Finishing scheduled jobs execution.', $this->createLogContext());
 
     // Set last cron date for the status check
     $statusPref = [
@@ -137,12 +149,12 @@ class CRM_Core_JobManager {
       CRM_Core_BAO_Setting::isAPIJobAllowedToRun($job->apiParams);
     }
     catch (Exception $e) {
-      $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
+      $this->logger->error('Error while executing ' . $job->name . ': ' . $e->getMessage(), $this->createLogContext());
       $this->currentJob = FALSE;
       return FALSE;
     }
 
-    $this->logEntry('Starting execution of ' . $job->name);
+    $this->logger->info('Starting execution of ' . $job->name, $this->createLogContext());
     $job->saveLastRun();
 
     $singleRunParamsKey = strtolower($job->api_entity . '_' . $job->api_action);
@@ -158,12 +170,13 @@ class CRM_Core_JobManager {
     try {
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
-    catch (Exception $e) {
-      $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
+    catch (\Throwable $e) {
+      $this->logger->error('Error while executing ' . $job->name . ': ' . $e->getMessage(), $this->createLogContext());
       $result = $e;
     }
     CRM_Utils_Hook::postJob($job, $params, $result);
-    $this->logEntry('Finished execution of ' . $job->name . ' with result: ' . $this->apiResultToMessage($result));
+    $logLevel = ($result instanceof \Throwable || !empty($result['is_error'])) ? \Psr\Log\LogLevel::ERROR : \Psr\Log\LogLevel::INFO;
+    $this->logger->log($logLevel, 'Finished execution of ' . $job->name . ' with result: ' . $this->apiResultToMessage($result), $this->createLogContext());
     $this->currentJob = FALSE;
 
     // Save the job last run end date (if this doesn't get written we know the job crashed and was not caught (eg. OOM).
@@ -211,50 +224,38 @@ class CRM_Core_JobManager {
   }
 
   /**
+   * Add a log entry.
+   *
+   * NOTE: This signature has been around forever, and it's used a little bit in contrib.
+   * However, you will likely find it more meaningful to call the $logger, as in:
+   *
+   *   $this->logger->warning("Careful!", $this->createLogContext());
+   *   $this->logger->error("Uh oh!", $this->createLogContext());
+   *
    * @param string $message
+   * @deprecated
    */
   public function logEntry($message) {
-    $domainID = CRM_Core_Config::domainID();
-    $dao = new CRM_Core_DAO_JobLog();
+    $this->logger->log(Psr\Log\LogLevel::INFO, $message, $this->createLogContext());
+  }
 
-    $dao->domain_id = $domainID;
-
-    /*
-     * The description is a summary of the message.
-     * HTML tags are stripped from the message.
-     * The description is limited to 240 characters
-     * and has an ellipsis added if it is truncated.
-     */
-    $maxDescription = 240;
-    $ellipsis = " (...)";
-    $description = strip_tags($message);
-    if (strlen($description) > $maxDescription) {
-      $description = substr($description, 0, $maxDescription - strlen($ellipsis)) . $ellipsis;
-    }
-    $dao->description = $description;
-
+  private function createLogContext($init = []): array {
+    $context = $init;
     if ($this->currentJob) {
-      $dao->job_id = $this->currentJob->id;
-      $dao->name = $this->currentJob->name;
-      $dao->command = ts("Entity:") . " " . $this->currentJob->api_entity . " " . ts("Action:") . " " . $this->currentJob->api_action;
-      $data = "";
-      if (!empty($this->currentJob->parameters)) {
-        $data .= "\n\nParameters raw (from db settings): \n" . $this->currentJob->parameters;
-      }
+      $context['job'] = $this->currentJob;
       $singleRunParamsKey = strtolower($this->currentJob->api_entity . '_' . $this->currentJob->api_action);
       if (array_key_exists($singleRunParamsKey, $this->singleRunParams)) {
-        $data .= "\n\nParameters raw (" . $this->_source . "): \n" . serialize($this->singleRunParams[$singleRunParamsKey]);
-        $data .= "\n\nParameters parsed (and passed to API method): \n" . serialize($this->singleRunParams[$singleRunParamsKey]);
+        $context['singleRun']['parameters'] = $this->singleRunParams[$singleRunParamsKey];
+        $context['effective']['parameters'] = $this->singleRunParams[$singleRunParamsKey];
       }
       else {
-        $data .= "\n\nParameters parsed (and passed to API method): \n" . serialize($this->currentJob->apiParams);
+        $context['effective']['parameters'] = $this->currentJob->apiParams;
       }
-
-      $data .= "\n\nFull message: \n" . $message;
-
-      $dao->data = $data;
     }
-    $dao->save();
+    if ($this->_source) {
+      $context['source'] = $this->_source;
+    }
+    return $context;
   }
 
   /**

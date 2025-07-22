@@ -359,7 +359,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $transaction->commit();
 
     // reset the cache
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     CRM_Utils_Hook::post($op, 'CustomGroup', $group->id, $group);
 
@@ -403,7 +403,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     // reset the cache
     Civi::cache('fields')->flush();
     // reset ACL and system caches.
-    CRM_Core_BAO_Cache::resetCaches();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     if (!$is_active) {
       CRM_Core_BAO_UFField::setUFFieldStatus($id, $is_active);
@@ -2188,7 +2188,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'cg_extend_objects', 'id', 'name');
     $ogValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
     foreach ($ogValues as $ogValue) {
-      if ($ogValue['is_active']) {
+      if ($ogValue['is_active'] && \Civi\Schema\EntityRepository::tableExists($ogValue['name'])) {
         $options[$ogValue['value']] = [
           'id' => $ogValue['value'],
           'label' => $ogValue['label'],

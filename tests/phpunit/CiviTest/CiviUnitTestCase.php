@@ -311,7 +311,10 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     // Otherwise: Merely TRUNCATE and INSERT basic data
     $b = new \Civi\Test\CiviEnvBuilder('Basic Data');
-    $b->callback([\Civi\Test::data(), 'populate']);
+    $b->callback([\Civi\Test::data(), 'populate'])
+      ->callback(function ($ctx) {
+        \Civi\Test::schema()->setAutoIncrement();
+      });
     return $b;
   }
 
@@ -354,7 +357,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
     // reset all the caches
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     // initialize the object once db is loaded
     \Civi::$statics = [];
@@ -688,13 +691,13 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   /**
    * @param array $params
-   * @param string $identifer
+   * @param string $identifier
    *
    * @return int
    */
-  public function membershipTypeCreate(array $params = [], string $identifer = 'test'): int {
+  public function membershipTypeCreate(array $params = [], string $identifier = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge([
       'name' => 'General',
@@ -709,7 +712,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'visibility' => 'Public',
     ], $params);
 
-    $result = $this->createTestEntity('MembershipType', $params, $identifer);
+    $result = $this->createTestEntity('MembershipType', $params, $identifier);
 
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Utils_Cache::singleton()->flush();
@@ -1722,6 +1725,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       CRM_Core_DAO::executeQuery($sql);
     }
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
+
+    // Truncate resets the autoincrements, so re-apply separation
+    \Civi\Test::schema()->setAutoIncrement();
   }
 
   /**
@@ -2438,7 +2444,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_file WHERE id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
-    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', [
+    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE file_id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
   }
@@ -3252,7 +3258,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getThousandSeparators(): array {
+  public static function getThousandSeparators(): array {
     return [['.'], [',']];
   }
 
@@ -3261,7 +3267,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getBooleanDataProvider(): array {
+  public static function getBooleanDataProvider(): array {
     return [[TRUE], [FALSE]];
   }
 

@@ -18,7 +18,7 @@ class UtilsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface
       ->apply();
   }
 
-  public function tokenExamples(): array {
+  public static function tokenExamples(): array {
     return [
       [
         '',

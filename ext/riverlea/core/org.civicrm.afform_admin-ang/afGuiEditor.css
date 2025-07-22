@@ -20,7 +20,12 @@
 
 #afGuiEditor {
   gap: var(--crm-r);
-  height: 100% !important /* vs inline fixed height */;
+}
+#afGuiEditor-canvas,
+#afGuiEditor-palette,
+#afGuiEditor-canvas > .panel,
+#afGuiEditor-palette > .panel {
+  height: 100%; /* for scrolling panels */
 }
 #afGuiEditor .af-gui-columns {
   display: grid;
@@ -103,8 +108,9 @@
   padding: var(--crm-padding-reg);
   position: relative;
   border-top: none !important;
-  height: 100%;
+  height: calc(100% - var(--crm-panel-head-height));
   background: var(--crm-tab-bg-active);
+  overflow-y: scroll;
 }
 
 /* Edit palette (left side) */
@@ -382,6 +388,12 @@ af-gui-container > .af-gui-bar,
   left: 0;
   width: 100%;
   height: 100%;
+}
+#afGuiEditor .af-gui-markup-content {
+  /* stop markup-content-overlay growing too big and obscuring af-gui-bar */
+  position: relative;
+  /* stop editor click target shrinking too small */
+  min-height: 2rem;
 }
 #afGuiEditor .af-gui-markup-content:hover .af-gui-markup-content-overlay {
   background-color: rgba(255, 255, 255, .2);

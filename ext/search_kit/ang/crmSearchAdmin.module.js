@@ -37,7 +37,10 @@
               groupBy: ['id'],
               chain: {
                 groups: ['Group', 'get', {select: ['id', 'title', 'description', 'visibility', 'group_type', 'custom.*'], where: [['saved_search_id', '=', '$id']]}],
-                displays: ['SearchDisplay', 'get', {where: [['saved_search_id', '=', '$id']]}]
+                displays: ['SearchDisplay', 'get', {
+                  select: ['*', 'is_autocomplete_default'],
+                  where: [['saved_search_id', '=', '$id']],
+                }]
               }
             }, 0);
           }
@@ -390,12 +393,11 @@
         return label;
       }
       function fieldToColumn(fieldExpr, defaults, savedSearch) {
-        var info = parseExpr(fieldExpr),
+        const info = parseExpr(fieldExpr),
           field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {},
           values = _.merge({
             type: field.input_type === 'RichTextEditor' ? 'html' : 'field',
             key: info.alias,
-            dataType: (info.fn && info.fn.data_type) || field.data_type
           }, defaults);
         if (defaults.label === true) {
           values.label = getDefaultLabel(fieldExpr, savedSearch);

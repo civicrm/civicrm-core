@@ -747,7 +747,7 @@ SET    version = '$version'
   public static function doIncrementalUpgradeFinish(CRM_Queue_TaskContext $ctx, $rev, $currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->setVersion($rev);
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     return TRUE;
   }
@@ -778,10 +778,14 @@ SET    version = '$version'
   }
 
   public static function doRebuild(CRM_Queue_TaskContext $ctx): bool {
+    // The dispatch policy should already be set to 'upgrade.finish'.
+    // But there's one report of getting here with 'upgrade.main' (not yet reproduced).
+    $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
+
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
     $config->userSystem->flush();
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // NOTE: triggerRebuild is FALSE becaues it will run again in a moment (via fixSchemaDifferences).
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the Page. We reset later in doFinish().
 
@@ -868,7 +872,7 @@ SET    version = '$version'
     foreach ($revisions as $rev) {
       if (version_compare($currentVer, $rev) < 0) {
         $versionObject = $this->incrementalPhpObject($rev);
-        CRM_Upgrade_Incremental_General::updateMessageTemplate($preUpgradeMessage, $rev);
+        CRM_Upgrade_Incremental_General::updateMessageTemplate($preUpgradeMessage, $rev, $currentVer);
         if (is_callable([$versionObject, 'setPreUpgradeMessage'])) {
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }

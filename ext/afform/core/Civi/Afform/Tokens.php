@@ -14,6 +14,7 @@ namespace Civi\Afform;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
+use Civi\Token\TokenRow;
 use CRM_Afform_ExtensionUtil as E;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -100,7 +101,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
             if (empty($row->context['contactId'])) {
               continue;
             }
-            $url = self::createUrl($afform, $row->context['contactId']);
+            $url = self::createUrl($afform, $row->context['contactId'], self::getAfformArgsFromTokenContext($row));
             $row->format('text/plain')->tokens(static::$prefix, $afform['name'] . 'Url', $url);
             $row->format('text/html')->tokens(static::$prefix, $afform['name'] . 'Link', sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
           }
@@ -152,7 +153,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     }
     catch (CryptoException $exception) {
       \Civi::log()->warning(
-        'Civi\Afform\LegacyTokens cannot generate tokens due to crypto exception.',
+        'Civi\Afform\Tokens cannot generate tokens due to crypto exception.',
         ['exception' => $exception]);
     }
 
@@ -183,11 +184,13 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    *
    * @param array $afform
    * @param int $contactId
+   * @param array $afformArgs
+   *   Additional Args for the Afform. E.g. as case_id.
    *
    * @return string
    * @throws \Civi\Crypto\Exception\CryptoException
    */
-  public static function createUrl($afform, $contactId): string {
+  public static function createUrl($afform, $contactId, array $afformArgs = []): string {
     $expires = \CRM_Utils_Time::time() +
       (\Civi::settings()->get('checksum_timeout') * 24 * 60 * 60);
 
@@ -204,8 +207,28 @@ class Tokens extends AutoService implements EventSubscriberInterface {
       'sub' => "cid:" . $contactId,
       'scope' => static::$jwtScope,
       'afform' => $afform['name'],
+      'afformArgs' => $afformArgs,
     ]);
     return $url->addQuery(['_aff' => $bearerToken]);
+  }
+
+  /**
+   * Get Additional args from the row context.
+   *
+   * This supports args for the contact being viewed and for the case being viewed.
+   *
+   * @param \Civi\Token\TokenRow $row
+   * @return array
+   */
+  private static function getAfformArgsFromTokenContext(TokenRow $row): array {
+    $afformArgs = [];
+    if (!empty($row->context['contactId'])) {
+      $afformArgs['contact_id'] = $row->context['contactId'];
+    }
+    if (!empty($row->context['caseId'])) {
+      $afformArgs['case_id'] = $row->context['caseId'];
+    }
+    return $afformArgs;
   }
 
 }

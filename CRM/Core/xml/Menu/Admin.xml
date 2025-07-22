@@ -272,7 +272,7 @@
         stub along with the legacy redirect.
      -->
      <path>civicrm/admin/options/from_email_address</path>
-     <title>Site Email Addresses</title>
+     <title>Site From Email Addresses</title>
      <desc>List of email addresses which can be used when sending emails to contacts.</desc>
      <page_callback>CRM_Core_Page_Redirect</page_callback>
      <page_arguments>url=civicrm/admin/options/site_email_address</page_arguments>
@@ -299,7 +299,7 @@
   <item>
      <path>civicrm/admin/scheduleReminders</path>
      <title>Schedule Reminders</title>
-     <desc>Schedule Reminders.</desc>
+     <desc>Schedule Reminders</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
      <access_arguments>administer CiviCRM data</access_arguments>
      <adminGroup>Communications</adminGroup>

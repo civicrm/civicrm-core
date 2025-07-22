@@ -161,6 +161,17 @@
         return ctrl.getDefn().options || (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
       };
 
+      this.getInputTypeTemplate = () => {
+        const selectedType = $scope.getProp('input_type');
+        const meta = this.inputTypes.find((type) => type.name === selectedType);
+
+        if (!meta || !meta.admin_template) {
+          return '~/afGuiEditor/inputType/Missing.html';
+        }
+
+        return meta.admin_template;
+      };
+
       $scope.resetOptions = function() {
         delete ctrl.node.defn.options;
       };

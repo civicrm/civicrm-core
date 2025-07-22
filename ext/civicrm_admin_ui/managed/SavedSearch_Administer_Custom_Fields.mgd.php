@@ -72,35 +72,30 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'String',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'label',
-              'dataType' => 'String',
               'label' => E::ts('Field Label'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'data_type:label',
-              'dataType' => 'String',
               'label' => E::ts('Data Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'html_type:label',
-              'dataType' => 'String',
               'label' => E::ts('Input Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_required',
-              'dataType' => 'Boolean',
               'label' => E::ts('Required'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -108,7 +103,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,

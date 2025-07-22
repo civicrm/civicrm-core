@@ -283,9 +283,13 @@ class CRM_Core_SelectValues {
    */
   public static function ufGroupTypes() {
     $ufGroupType = [
-      'Profile' => ts('Standalone Form or Directory'),
-      'Search Profile' => ts('Search Views'),
+      'Profile' => ts('Standalone Form'),
+      'Search Profile' => ts('Advanced Search Display Columns'),
     ];
+
+    if (function_exists('legacyprofiles_civicrm_config')) {
+      $ufGroupType['Profile'] = ts('Standalone Form or Directory');
+    }
 
     if (CRM_Core_Config::singleton()->userSystem->supports_form_extensions) {
       $ufGroupType += CRM_Core_Config::singleton()->userSystem->getUfGroupTypes();
@@ -1320,12 +1324,12 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function permissions() {
+  public static function permissions($fieldName = NULL, $params = []) {
     $perms = $options = [];
     \CRM_Utils_Hook::permissionList($perms);
 
     foreach ($perms as $machineName => $details) {
-      if (!empty($details['is_active'])) {
+      if (!empty($details['is_active']) || !empty($params['include_disabled'])) {
         $options[$machineName] = $details['title'];
       }
     }

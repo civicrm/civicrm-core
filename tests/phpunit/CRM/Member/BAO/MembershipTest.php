@@ -12,21 +12,22 @@
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipLog;
 use Civi\Api4\MembershipStatus;
+use Civi\Test\ContributionPageTestTrait;
 
 /**
  * Class CRM_Member_BAO_MembershipTest
  * @group headless
  */
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
+  use ContributionPageTestTrait;
 
   private $_membershipStatusID;
-  private $_membershipTypeID;
 
   /**
    */
   public function setUp(): void {
     parent::setUp();
-    $this->_membershipTypeID = $this->membershipTypeCreate();
+    $this->membershipTypeCreate(['minimum_fee' => 100], 'General');
     // add a random number to avoid silly conflicts with old data
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
   }
@@ -136,7 +137,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $params = [
       'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->ids['MembershipType']['General'],
       'join_date' => date('Ymd'),
       'start_date' => date('Ymd'),
       'end_date' => date('Ymd', $year_from_now),
@@ -153,7 +154,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $params = [
       'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->ids['MembershipType']['General'],
       'join_date' => date('Ymd', $last_month),
       'start_date' => date('Ymd', $last_month),
       'end_date' => date('Ymd', $year_from_last_month),
@@ -180,7 +181,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    */
   public function testRetrieve(): void {
-    [$contactId, $membershipId] = $this->setupMembership();
+    [, $membershipId] = $this->setupMembership();
     $params = ['id' => $membershipId];
     $values = [];
     CRM_Member_BAO_Membership::retrieve($params, $values);
@@ -192,44 +193,36 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testActiveMembers(): void {
     $contactId = $this->individualCreate();
 
-    $params = [
+    $this->createTestEntity('Membership', [
       'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id:name' => 'General',
+      'status_id:name' => 'test status',
       'join_date' => date('Ymd', strtotime('2006-01-21')),
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
+    ]);
 
-    $this->callAPISuccess('Membership', 'create', $params);
-
-    $membershipId1 = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    $membershipId1 = Membership::get()->execute()->single()['id'];
 
     $params = ['id' => $membershipId1];
     $values1 = [];
     CRM_Member_BAO_Membership::retrieve($params, $values1);
     $membership = [$membershipId1 => $values1];
 
-    $params = [
+    $this->createTestEntity('Membership', [
       'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->ids['MembershipType']['General'],
       'join_date' => date('Ymd', strtotime('2006-01-21')),
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'PaySource',
       'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
+      'status_id:name' => 'Current',
+    ], 'override');
 
-    $this->callAPISuccess('Membership', 'create', $params);
-
-    $membershipId2 = $this->assertDBNotNull('CRM_Member_BAO_Membership', 'PaySource', 'id',
-      'source', 'Database check for created membership.'
-    );
+    $membershipId2 = Membership::get()->addWhere('source', '=', 'PaySource')->execute()->single()['id'];;
 
     $params = ['id' => $membershipId2];
     $values2 = [];
@@ -243,10 +236,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($activeMembers[$membershipId2]['id'], $membership[$membershipId2]['id'], 'Verify active membership record is retrieved.');
 
     $this->assertCount(0, $inActiveMembers, 'Verify No inactive membership record is retrieved.');
-
-    $this->membershipDelete($membershipId1);
-    $this->membershipDelete($membershipId2);
-    $this->contactDelete($contactId);
   }
 
   /**
@@ -268,7 +257,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    */
   public function testGetContactMembership(): void {
     [$contactId, $membershipId] = $this->setupMembership();
-    $membership = CRM_Member_BAO_Membership::getContactMembership($contactId, $this->_membershipTypeID, FALSE);
+    $membership = CRM_Member_BAO_Membership::getContactMembership($contactId, $this->ids['MembershipType']['General'], FALSE);
     $this->assertEquals($membership['id'], $membershipId, 'Verify membership record is retrieved.');
   }
 
@@ -326,7 +315,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->setupMembership();
     $yearStart = date('Y') . '0101';
     $currentDate = date('Ymd');
-    CRM_Member_BAO_Membership::getMembershipStarts($this->_membershipTypeID, $yearStart, $currentDate);
+    CRM_Member_BAO_Membership::getMembershipStarts($this->ids['MembershipType']['General'], $yearStart, $currentDate);
   }
 
   /**
@@ -339,7 +328,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->setupMembership();
     $currentDate = date('Ymd');
     $test = 0;
-    CRM_Member_BAO_Membership::getMembershipCount($this->_membershipTypeID, $currentDate, $test);
+    CRM_Member_BAO_Membership::getMembershipCount($this->ids['MembershipType']['General'], $currentDate, $test);
   }
 
   /**
@@ -350,7 +339,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $params = [
       'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->ids['MembershipType']['General'],
       'join_date' => '2006-01-21',
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
@@ -368,7 +357,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Delete related memberships.
    */
   public function testDeleteRelatedMemberships(): void {
-    [$contactId, $membershipId] = $this->setupMembership();
+    [, $membershipId] = $this->setupMembership();
     CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId);
   }
 
@@ -378,49 +367,37 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testRenewMembership(): void {
-    $contactId = $this->individualCreate();
+    $this->individualCreate();
     $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
     $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
     $params = [
       'contact_id' => $this->ids['Contact']['individual_0'],
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id:name' => 'General',
       'join_date' => $joinDate,
       'start_date' => $startDate,
       'end_date' => $endDate,
       'source' => 'Payment',
       'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
+      'status_id:name' => 'Current',
     ];
 
-    $this->callAPISuccess('Membership', 'create', $params);
+    $this->createTestEntity('Membership', $params, 'membership');
 
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
+    MembershipLog::get()->addWhere('id', '>', '0')
+      ->execute()->single();
 
-    $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
-      $membership['id'],
-      'id',
-      'membership_id',
-      'Database checked on membership log record.'
-    );
+    $this->contributionPageQuickConfigCreate();
+    $this->submitOnlineContributionForm([
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+    ] + $this->getBillingSubmitValues());
 
-    // this is a test and we dont want qfKey generation / validation
-    // easier to suppress it, than change core code
-    $config = CRM_Core_Config::singleton();
-    $config->keyDisable = TRUE;
-
-    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::unitTestAccessTolegacyProcessMembership(
-      $contactId,
-      $this->_membershipTypeID);
+    $membershipRenewed = Membership::get()->addWhere('id', '=', $this->ids['Membership']['membership'])
+      ->execute()->single();
     $endDate = date("Y-m-d", strtotime($membership['end_date'] . " +1 year"));
-
-    $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
-      $MembershipRenew->id,
-      'id',
-      'membership_id',
-      'Database checked on membership log record.'
-    );
-    $this->assertEquals($this->_membershipTypeID, $MembershipRenew->membership_type_id, 'Verify membership type is changed during renewal.');
-    $this->assertEquals($endDate, $MembershipRenew->end_date, 'Verify correct end date is calculated after membership renewal');
+    $this->assertEquals($this->ids['MembershipType']['General'], $membershipRenewed['membership_type_id'], 'Verify membership type is changed during renewal.');
+    $this->assertEquals($endDate, $membershipRenewed['end_date'], 'Verify correct end date is calculated after membership renewal');
   }
 
   /**
@@ -429,51 +406,29 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testStaleMembership(): void {
-    $statusId = 3;
-    $contactId = $this->individualCreate();
-    $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
-    $endDate = date('Ymd', strtotime($joinDate . " +1 year -1 day"));
-    $params = [
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
+    $joinDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
+
+    $this->createTestEntity('Membership', [
+      'contact_id' => $this->individualCreate(),
+      'membership_type_id:name' => 'General',
       'join_date' => $joinDate,
-      'start_date' => $startDate,
-      'end_date' => $endDate,
+      'start_date' => $joinDate,
+      'end_date' => date('Ymd', strtotime($joinDate . ' +1 year -1 day')),
       'source' => 'Payment',
-      'status_id' => $statusId,
-    ];
-
-    $this->callAPISuccess('Membership', 'create', $params);
-
-    $membership = $this->callAPISuccessGetSingle('Membership', [
-      'contact_id' => $contactId,
-      'start_date' => $startDate,
-      'join_date' => $joinDate,
-      'end_date' => $endDate,
+      'status_id:name' => 'Grace',
     ]);
 
-    $this->assertEquals($membership['status_id'], $statusId, 'Verify correct status id is calculated.');
-    $this->assertEquals($membership['membership_type_id'], $this->_membershipTypeID);
+    $membership = Membership::get()->addSelect('status_id:name')->execute()->single();
+    $this->assertEquals('Grace', $membership['status_id:name'], 'Verify correct status id is calculated.');
 
-    $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
-      $membership['id'],
-      'id',
-      'membership_id',
-      'Database checked on membership log record.'
-    );
+    $this->contributionPageQuickConfigCreate();
+    $this->submitOnlineContributionForm([
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+    ] + $this->getBillingSubmitValues(), NULL, ['mid' => $membership['id']]);
 
-    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::unitTestAccessTolegacyProcessMembership(
-      $contactId,
-      $this->_membershipTypeID,
-      1
-    );
-
-    $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
-      $MembershipRenew->id,
-      'id',
-      'membership_id',
-      'Database checked on membership log record.'
-    );
+    $membership = Membership::get()->addSelect('status_id:name')->execute()->single();
+    $this->assertEquals('Current', $membership['status_id:name'], 'Verify correct status id is calculated.');
   }
 
   /**
@@ -482,7 +437,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testUpdateAllMembershipStatusConvertExpiredOverriddenStatusToNormal(): void {
     $params = [
       'contact_id' => $this->individualCreate(),
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->ids['MembershipType']['General'],
       'join_date' => date('Ymd'),
       'start_date' => date('Ymd'),
       'end_date' => date('Ymd', strtotime('+1 year')),
@@ -525,7 +480,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testUpdateAllMembershipStatusHandleOverriddenWithEndOverrideDateEqualTodayAsExpired(): void {
     $params = [
       'contact_id' => $this->individualCreate(),
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->ids['MembershipType']['General'],
       'join_date' => date('Ymd'),
       'start_date' => date('Ymd'),
       'end_date' => date('Ymd', strtotime('+1 year')),
@@ -568,7 +523,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testUpdateAllMembershipStatusDoesNotConvertOverriddenMembershipWithoutEndOverrideDateToNormal(): void {
     $params = [
       'contact_id' => $this->individualCreate(),
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->ids['MembershipType']['General'],
       'join_date' => date('Ymd'),
       'start_date' => date('Ymd'),
       'end_date' => date('Ymd', strtotime('+1 year')),
@@ -779,7 +734,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $params = [
       'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->ids['MembershipType']['General'],
       'join_date' => date('Ymd', strtotime('2006-01-21')),
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),

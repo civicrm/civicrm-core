@@ -20,6 +20,7 @@
 
 use Civi\Api4\ActivityContact;
 use Civi\Api4\UserJob;
+use Civi\Import\ActivityParser;
 
 /**
  *  Test Activity Import Parser functions
@@ -38,6 +39,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   public function setUp():void {
     parent::setUp();
     $this->createLoggedInUser();
+    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
   }
 
   /**
@@ -73,14 +75,14 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    *
    * @param array $fields
    *
-   * @return \CRM_Activity_Import_Parser_Activity
+   * @return \Civi\Import\ActivityParser
    */
-  protected function createImportObject(array $fields): \CRM_Activity_Import_Parser_Activity {
+  protected function createImportObject(array $fields): ActivityParser {
     $mapper = [];
     foreach ($fields as $field) {
       $mapper[] = [$field];
     }
-    $importer = new CRM_Activity_Import_Parser_Activity();
+    $importer = new ActivityParser();
     $this->userJobID = $this->getUserJobID(['mapper' => $mapper]);
     $importer->setUserJobID($this->userJobID);
     $importer->init();
@@ -156,7 +158,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    * Dataprovider for some import tests.
    * @return array
    */
-  public function activityImportValidationProvider(): array {
+  public static function activityImportValidationProvider(): array {
     /**
      * Because this is a dataprovider that runs before setup, we
      * can't specify values that don't exist yet, but we're mostly
@@ -323,7 +325,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   protected function getMapperFromFieldMappings(array $mappings): array {
     $mapper = [];
     foreach ($mappings as $mapping) {
-      $mapper[] = $mapping['name'];
+      $mapper[] = [$mapping['name']];
     }
     return $mapper;
   }

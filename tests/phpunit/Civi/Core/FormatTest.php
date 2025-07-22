@@ -27,7 +27,7 @@ class FormatTest extends CiviUnitTestCase {
   /**
    * Money Locale Format Cases
    */
-  public function localeMoneyTestCases(): array {
+  public static function localeMoneyTestCases(): array {
     $cases = [];
     $cases['en_US_USD'] = [
       [

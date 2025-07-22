@@ -41,6 +41,9 @@ function crm_smarty_compatibility_get_path() {
   if ($path) {
     $path = str_replace('smarty3', 'smarty4', $path);
   }
+  else {
+    $path = \Civi::paths()->getPath('[civicrm.packages]/smarty5/Smarty.php');
+  }
   return $path;
 }
 

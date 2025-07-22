@@ -112,7 +112,7 @@ class CRM_Extension_QueueTasks {
   }
 
   public static function rebuild(CRM_Queue_TaskContext $ctx): bool {
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'sessions' => FALSE])->execute();
     // FIXME: For 6.1+:, use: Civi::rebuild(['*' => TRUE, 'sessions' => FALSE]);
     return TRUE;
   }

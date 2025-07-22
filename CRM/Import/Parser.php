@@ -36,7 +36,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   /**
    * Return codes
    */
-  const VALID = 1, WARNING = 2, ERROR = 4, CONFLICT = 8, STOP = 16, DUPLICATE = 32, MULTIPLE_DUPE = 64, NO_MATCH = 128, UNPARSED_ADDRESS_WARNING = 256;
+  const VALID = 1, WARNING = 2, ERROR = 4, CONFLICT = 8, STOP = 16, DUPLICATE = 32, MULTIPLE_DUPE = 64, NO_MATCH = 128, UNPARSED_ADDRESS_WARNING = 256, SOFT_CREDIT = 512, SOFT_CREDIT_ERROR = 1024, PLEDGE_PAYMENT = 2048, PLEDGE_PAYMENT_ERROR = 4096;
 
   /**
    * Codes for duplicate record handling
@@ -114,7 +114,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @noinspection PhpUnhandledExceptionInspection
    */
   protected function getSubmittedValue(string $fieldName) {
-    return $this->getUserJob()['metadata']['submitted_values'][$fieldName];
+    return $this->getUserJob()['metadata']['submitted_values'][$fieldName] ?? NULL;
   }
 
   /**
@@ -209,22 +209,28 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * @param string $contactType
+   * @param string|null $contactType
    * @param string|null $prefix
    *
    * @return array[]
    * @throws \CRM_Core_Exception
    */
-  protected function getContactFields(string $contactType, ?string $prefix = ''): array {
+  protected function getContactFields(?string $contactType, ?string $prefix = ''): array {
     $contactFields = $this->getAllContactFields('');
-    $dedupeFields = $this->getDedupeFields($contactType);
     $matchText = ' ' . ts('(match to %1)', [1 => $prefix]);
-    foreach ($dedupeFields as $fieldName => $dedupeField) {
-      if (!isset($contactFields[$fieldName])) {
-        continue;
+    $contactTypes = [$contactType];
+    if (!$contactType) {
+      $contactTypes = ['Individual', 'Organization', 'Household'];
+    }
+    foreach ($contactTypes as $type) {
+      $dedupeFields = $this->getDedupeFields($type);
+      foreach ($dedupeFields as $fieldName => $dedupeField) {
+        if (!isset($contactFields[$fieldName])) {
+          continue;
+        }
+        $contactFields[$fieldName]['title'] .= $matchText;
+        $contactFields[$fieldName]['match_rule'] = $this->getDefaultRuleForContactType($type);
       }
-      $contactFields[$fieldName]['title'] .= $matchText;
-      $contactFields[$fieldName]['match_rule'] = $this->getDefaultRuleForContactType($contactType);
     }
 
     $contactFields['external_identifier']['title'] .= $matchText;
@@ -302,6 +308,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return bool
    */
   protected function isUpdateExisting(): bool {
+    if (isset($this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'])) {
+      return $this->getUserJob()['metadata']['entity_configuration'][$this->getBaseEntity()]['action'] === 'update';
+    }
+
     return in_array((int) $this->getSubmittedValue('onDuplicate'), [
       CRM_Import_Parser::DUPLICATE_UPDATE,
       CRM_Import_Parser::DUPLICATE_FILL,
@@ -639,14 +649,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * The fields are keyed according to the metadata.
    *
-   * @param string $contactType
+   * @param string|null $contactType
    * @param string|null $name
    *
    * @return array
    * @noinspection PhpUnhandledExceptionInspection
    * @noinspection PhpDocMissingThrowsInspection
    */
-  public function getDedupeRule(string $contactType, ?string $name = NULL): array {
+  public function getDedupeRule(?string $contactType, ?string $name = NULL): array {
+    if (!$contactType && !$name) {
+      $name = 'unique_identifier_match';
+    }
     if (!$name) {
       $name = $this->getDefaultRuleForContactType($contactType);
     }
@@ -702,27 +715,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Validate that the mapping has the required fields.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function validateMapping($mapping): void {
-    $mappedFields = [];
-    foreach ($mapping as $mappingField) {
-      $mappedFields[$mappingField[0]] = $mappingField[0];
-    }
-    $entity = $this->baseEntity;
-    $missingFields = $this->getMissingFields($this->getRequiredFieldsForEntity($entity, $this->getActionForEntity($entity)), $mappedFields);
-    if (!empty($missingFields)) {
-      $error = [];
-      foreach ($missingFields as $missingField) {
-        $error[] = ts('Missing required field: %1', [1 => $missingField]);
-      }
-      throw new CRM_Core_Exception(implode('<br/>', $error));
-    }
-  }
-
-  /**
    * Get the import action for the given entity.
    *
    * @param string $entity
@@ -730,7 +722,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected function getActionForEntity(string $entity): string {
+  public function getActionForEntity(string $entity): string {
     return $this->getUserJob()['metadata']['entity_configuration'][$entity]['action'] ?? ($this->getImportEntities()[$entity]['default_action'] ?? 'select');
   }
 
@@ -766,7 +758,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return array
    */
-  private function getRequiredFieldsForEntity(string $entity, string $action): array {
+  public function getRequiredFieldsForEntity(string $entity, string $action): array {
     $entityMetadata = $this->getImportEntities()[$entity];
     if ($action === 'select') {
       // Select uses the same lookup as update.
@@ -930,7 +922,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       return 'invalid_import_value';
     }
     if (in_array($dataType, ['Date', 'Timestamp'], TRUE)) {
-      $value = CRM_Utils_Date::formatDate($importedValue, (int) $this->getSubmittedValue('dateFormats'));
+      $value = CRM_Utils_Date::formatDate($importedValue, (int) $this->getUserJob()['metadata']['import_options']['date_format']);
       return $value ?: 'invalid_import_value';
     }
     $options = $this->getFieldOptions($fieldName);
@@ -1351,14 +1343,28 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       if ($mappedField['name']) {
         $fieldSpec = $this->getFieldMetadata($mappedField['name']);
         $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity_name'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
+
+        // If there is no column header we are dealing with an added value mapping, do not use
+        // the database value as it will be for (e.g.) `_status`
+        $headers = $this->getUserJob()['metadata']['DataSource']['column_headers'];
+        if (array_key_exists($i, $headers) && empty($headers[$i])) {
+          $fieldValue = '';
+        }
+        else {
+          $fieldValue = $values[$i];
+        }
+
+        if ($fieldValue === '' && isset($mappedField['default_value'])) {
+          $fieldValue = $mappedField['default_value'];
+        }
         if ($entity) {
           // Split values into arrays by entity.
           // Apiv4 name is currently only set for contact, & only in cases where it would
           // be used for the dedupe rule (ie Membership import).
-          $params[$entity][$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+          $params[$entity][$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
         }
         else {
-          $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+          $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
         }
       }
     }
@@ -1570,13 +1576,30 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $matchIDs = [];
     $dedupeRules = $this->getDedupeRules((array) $dedupeRuleID, $params['contact_type'] ?? NULL);
     foreach ($dedupeRules as $dedupeRule) {
-      $possibleMatches = Contact::getDuplicates(FALSE)
-        ->setValues($params)
-        ->setDedupeRule($dedupeRule)
-        ->execute();
+      if ($dedupeRule === 'unique_email_match') {
+        if (empty($params['email_primary.email'])) {
+          continue;
+        }
+        // This is a pseudo-rule that works across contact type...
+        foreach (Email::get()
+          ->addWhere('email', '=', $params['email_primary.email'])
+          ->addWhere('contact_id.is_deleted', '=', FALSE)
+          // More than 10 gets a bit silly.
+          ->setLimit(10)
+          ->execute()->indexBy('contact_id') as $match) {
 
-      foreach ($possibleMatches as $possibleMatch) {
-        $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+          $matchIDs[$match['contact_id']] = $match['contact_id'];
+        }
+      }
+      else {
+        $possibleMatches = Contact::getDuplicates(FALSE)
+          ->setValues($params)
+          ->setDedupeRule($dedupeRule)
+          ->execute();
+
+        foreach ($possibleMatches as $possibleMatch) {
+          $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+        }
       }
     }
 
@@ -1840,6 +1863,31 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
       $this->dedupeRules[$name]['fields'] = $fields;
     }
+    // Contact type not specified. Return generic rules, maybe update to return
+    // Select rules - ie be able to choose a mixture to pick up by type - eg. if a
+    // row is clearly individual it could use that row.
+    $this->dedupeRules['unique_identifier_match'] = [
+      'name' => 'unique_identifier_match',
+      'threshold' => 1,
+      'title' => ts('ID or external identifier'),
+      'rule_message' => ts('Contact ID or external identifier must be provided'),
+      'fields' => [
+        'id' => 1,
+        'external_identifier' => 1,
+      ],
+      'contact_type' => NULL,
+    ];
+    $this->dedupeRules['unique_email_match'] = [
+      'name' => 'unique_email_match',
+      'threshold' => 1,
+      'title' => ts('Unique email'),
+      'rule_message' => ts('Email must be provided'),
+      'fields' => [
+        'email' => 1,
+        'email_primary.email' => 1,
+      ],
+      'contact_type' => NULL,
+    ];
   }
 
   /**
@@ -1895,62 +1943,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
     }
     return $array;
-  }
-
-  /**
-   * Get the actions to display in the rich UI.
-   *
-   * Filter by the input actions - e.g ['update' 'select'] will only return those keys.
-   *
-   * @param array $actions
-   * @param string $entity
-   *
-   * @return array
-   */
-  protected function getActions(array $actions, $entity = 'Contact'): array {
-    $actionList['Contact'] = [
-      'ignore' => [
-        'id' => 'ignore',
-        'text' => ts('No action'),
-        'description' => ts('Contact not altered'),
-      ],
-      'select' => [
-        'id' => 'select',
-        'text' => ts('Match existing Contact'),
-        'description' => ts('Look up existing contact. Skip row if not found'),
-      ],
-      'update' => [
-        'id' => 'update',
-        'text' => ts('Update existing Contact.'),
-        'description' => ts('Update existing Contact. Skip row if not found'),
-      ],
-      'save' => [
-        'id' => 'save',
-        'text' => ts('Update existing Contact or Create'),
-        'description' => ts('Create new contact if not found'),
-      ],
-    ];
-    return array_values(array_intersect_key($actionList[$entity], array_fill_keys($actions, TRUE)));
-  }
-
-  /**
-   * Save the contact.
-   *
-   * @param string $entity
-   * @param array $contact
-   *
-   * @return int|null
-   *
-   * @throws \Civi\API\Exception\UnauthorizedException|\CRM_Core_Exception
-   */
-  protected function saveContact(string $entity, array $contact): ?int {
-    if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])) {
-      return Contact::save()
-        ->setRecords([$contact])
-        ->execute()
-        ->first()['id'];
-    }
-    return NULL;
   }
 
 }

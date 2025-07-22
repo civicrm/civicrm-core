@@ -184,7 +184,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'componentClause' => 'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
     ]);
 
-    $this->assertEquals(array_values(array_merge($this->getBasicHeaderDefinition(FALSE), $this->getContributeHeaderDefinition())), $this->csv->getHeader());
+    $this->assertEquals(array_values(array_merge($this->getBasicHeaderDefinition(FALSE), self::getContributeHeaderDefinition())), $this->csv->getHeader());
     $this->assertCount(3, $this->csv);
     $row = $this->csv->fetchOne();
     $this->assertEquals(95, $row['Net Amount']);
@@ -252,8 +252,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Job Title' => '',
       'Gender' => 'Female',
       'Birth Date' => '',
-      'Deceased' => '',
-      'Deceased Date' => '',
+      'Deceased / Closed' => '',
+      'Deceased / Closed Date' => '',
       'Household Name' => '',
       'Organization Name' => '',
       'Sic Code' => '',
@@ -1104,8 +1104,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Job Title' => '',
       'Gender' => 'Female',
       'Birth Date' => '',
-      'Deceased' => '',
-      'Deceased Date' => '',
+      'Deceased / Closed' => '',
+      'Deceased / Closed Date' => '',
       'Household Name' => '',
       'Organization Name' => '',
       'Sic Code' => '',
@@ -1350,7 +1350,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getReasonsNotToMail(): array {
+  public static function getReasonsNotToMail(): array {
     return [
       [['is_deceased' => 1], []],
       [['do_not_mail' => 1], []],
@@ -1442,36 +1442,36 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function additionalFieldsDataProvider(): array {
+  public static function additionalFieldsDataProvider(): array {
     return [
       [
         // 0 defaults to 'contact'
         0,
-        $this->getExtraReturnProperties(),
+        self::getExtraReturnProperties(),
       ],
       [
         CRM_Export_Form_Select::ACTIVITY_EXPORT,
-        array_merge($this->getExtraReturnProperties(), $this->getActivityReturnProperties()),
+        array_merge(self::getExtraReturnProperties(), self::getActivityReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::CASE_EXPORT,
-        array_merge($this->getExtraReturnProperties(), $this->getCaseReturnProperties()),
+        array_merge(self::getExtraReturnProperties(), self::getCaseReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
-        array_merge($this->getExtraReturnProperties(), $this->getContributionReturnProperties()),
+        array_merge(self::getExtraReturnProperties(), self::getContributionReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::EVENT_EXPORT,
-        array_merge($this->getExtraReturnProperties(), $this->getEventReturnProperties()),
+        array_merge(self::getExtraReturnProperties(), self::getEventReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::MEMBER_EXPORT,
-        array_merge($this->getExtraReturnProperties(), $this->getMembershipReturnProperties()),
+        array_merge(self::getExtraReturnProperties(), self::getMembershipReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::PLEDGE_EXPORT,
-        array_merge($this->getExtraReturnProperties(), $this->getPledgeReturnProperties()),
+        array_merge(self::getExtraReturnProperties(), self::getPledgeReturnProperties()),
       ],
 
     ];
@@ -1480,35 +1480,35 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * get data for testing field metadata by query mode.
    */
-  public function allFieldsDataProvider(): array {
+  public static function allFieldsDataProvider(): array {
     return [
       [
         0,
-        $this->getBasicReturnProperties(TRUE),
+        self::getBasicReturnProperties(TRUE),
       ],
       [
         CRM_Export_Form_Select::ACTIVITY_EXPORT,
-        array_merge($this->getBasicReturnProperties(FALSE), $this->getActivityReturnProperties()),
+        array_merge(self::getBasicReturnProperties(FALSE), self::getActivityReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::CASE_EXPORT,
-        array_merge($this->getBasicReturnProperties(FALSE), $this->getCaseReturnProperties()),
+        array_merge(self::getBasicReturnProperties(FALSE), self::getCaseReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
-        array_merge($this->getBasicReturnProperties(FALSE), $this->getContributionReturnProperties()),
+        array_merge(self::getBasicReturnProperties(FALSE), self::getContributionReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::EVENT_EXPORT,
-        array_merge($this->getBasicReturnProperties(FALSE), $this->getEventReturnProperties()),
+        array_merge(self::getBasicReturnProperties(FALSE), self::getEventReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::MEMBER_EXPORT,
-        array_merge($this->getBasicReturnProperties(FALSE), $this->getMembershipReturnProperties()),
+        array_merge(self::getBasicReturnProperties(FALSE), self::getMembershipReturnProperties()),
       ],
       [
         CRM_Export_Form_Select::PLEDGE_EXPORT,
-        array_merge($this->getBasicReturnProperties(FALSE), $this->getPledgeReturnProperties()),
+        array_merge(self::getBasicReturnProperties(FALSE), self::getPledgeReturnProperties()),
       ],
     ];
   }
@@ -1516,7 +1516,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Get return properties manually added in.
    */
-  public function getExtraReturnProperties(): array {
+  public static function getExtraReturnProperties(): array {
     return [];
   }
 
@@ -1528,7 +1528,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getBasicReturnProperties($isContactMode): array {
+  protected static function getBasicReturnProperties($isContactMode): array {
     $returnProperties = [
       'id' => 1,
       'contact_type' => 1,
@@ -1627,7 +1627,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getPledgeReturnProperties(): array {
+  public static function getPledgeReturnProperties(): array {
     return [
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -1665,7 +1665,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getMembershipReturnProperties(): array {
+  public static function getMembershipReturnProperties(): array {
     return [
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -1693,7 +1693,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getEventReturnProperties(): array {
+  public static function getEventReturnProperties(): array {
     return [
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -1728,7 +1728,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getActivityReturnProperties(): array {
+  public static function getActivityReturnProperties(): array {
     return [
       'activity_id' => 1,
       'contact_type' => 1,
@@ -1759,7 +1759,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getCaseReturnProperties(): array {
+  public static function getCaseReturnProperties(): array {
     return [
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -1792,7 +1792,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getContributionReturnProperties(): array {
+  public static function getContributionReturnProperties(): array {
     return [
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -1922,12 +1922,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @todo - still being built up.
    *
    */
-  public function getAllSpecifiableReturnFields(): array {
+  public static function getAllSpecifiableReturnFields(): array {
     return [
       [
         CRM_Export_Form_Select::EVENT_EXPORT,
-        $this->getAllSpecifiableParticipantReturnFields(),
-        $this->getAllSpecifiableParticipantReturnColumns(),
+        self::getAllSpecifiableParticipantReturnFields(),
+        self::getAllSpecifiableParticipantReturnColumns(),
       ],
     ];
   }
@@ -1937,7 +1937,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getAllSpecifiableParticipantReturnColumns(): array {
+  public static function getAllSpecifiableParticipantReturnColumns(): array {
     return [
       'participant_campaign_id' => '`participant_campaign_id` varchar(64)',
       'participant_contact_id' => '`participant_contact_id` varchar(64)',
@@ -1975,7 +1975,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getAllSpecifiableParticipantReturnFields(): array {
+  public static function getAllSpecifiableParticipantReturnFields(): array {
     return [
       0 =>
         [
@@ -2166,42 +2166,42 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getSqlColumnsOutput(): array {
+  public static function getSqlColumnsOutput(): array {
     return [
       [
         0,
-        $this->getBasicSqlColumnDefinition(TRUE),
-        $this->getBasicHeaderDefinition(TRUE),
+        self::getBasicSqlColumnDefinition(TRUE),
+        self::getBasicHeaderDefinition(TRUE),
       ],
       [
         CRM_Export_Form_Select::ACTIVITY_EXPORT,
-        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getActivitySqlColumns()),
-        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getActivityHeaderDefinition()),
+        array_merge(self::getBasicSqlColumnDefinition(FALSE), self::getActivitySqlColumns()),
+        array_merge(self::getBasicHeaderDefinition(FALSE), self::getActivityHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::CASE_EXPORT,
-        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getCaseSqlColumns()),
-        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getCaseHeaderDefinition()),
+        array_merge(self::getBasicSqlColumnDefinition(FALSE), self::getCaseSqlColumns()),
+        array_merge(self::getBasicHeaderDefinition(FALSE), self::getCaseHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
-        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getContributionSqlColumns()),
-        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getContributeHeaderDefinition()),
+        array_merge(self::getBasicSqlColumnDefinition(FALSE), self::getContributionSqlColumns()),
+        array_merge(self::getBasicHeaderDefinition(FALSE), self::getContributeHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::EVENT_EXPORT,
-        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getParticipantSqlColumns()),
-        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getParticipantHeaderDefinition()),
+        array_merge(self::getBasicSqlColumnDefinition(FALSE), self::getParticipantSqlColumns()),
+        array_merge(self::getBasicHeaderDefinition(FALSE), self::getParticipantHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::MEMBER_EXPORT,
-        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getMembershipSqlColumns()),
-        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getMemberHeaderDefinition()),
+        array_merge(self::getBasicSqlColumnDefinition(FALSE), self::getMembershipSqlColumns()),
+        array_merge(self::getBasicHeaderDefinition(FALSE), self::getMemberHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::PLEDGE_EXPORT,
-        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getPledgeSqlColumns()),
-        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getPledgeHeaderDefinition()),
+        array_merge(self::getBasicSqlColumnDefinition(FALSE), self::getPledgeSqlColumns()),
+        array_merge(self::getBasicHeaderDefinition(FALSE), self::getPledgeHeaderDefinition()),
       ],
 
     ];
@@ -2214,7 +2214,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getBasicHeaderDefinition(bool $isContactExport): array {
+  protected static function getBasicHeaderDefinition(bool $isContactExport): array {
     $headers = [
       0 => 'Contact ID',
       1 => 'Contact Type',
@@ -2250,8 +2250,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       31 => 'Job Title',
       32 => 'Gender',
       33 => 'Birth Date',
-      34 => 'Deceased',
-      35 => 'Deceased Date',
+      34 => 'Deceased / Closed',
+      35 => 'Deceased / Closed Date',
       36 => 'Household Name',
       37 => 'Sic Code',
       38 => 'Unique ID (OpenID)',
@@ -2315,7 +2315,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getActivityHeaderDefinition(): array {
+  protected static function getActivityHeaderDefinition(): array {
     return [
       82 => 'Activity ID',
       83 => 'Activity Type',
@@ -2342,7 +2342,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getCaseHeaderDefinition(): array {
+  protected static function getCaseHeaderDefinition(): array {
     return [
       82 => 'Contact ID',
       83 => 'Case ID',
@@ -2370,7 +2370,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getContributeHeaderDefinition(): array {
+  protected static function getContributeHeaderDefinition(): array {
     return [
       82 => 'Financial Type Label',
       83 => 'Contribution Source',
@@ -2413,7 +2413,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getParticipantHeaderDefinition(): array {
+  protected static function getParticipantHeaderDefinition(): array {
     return [
       82 => 'Event ID',
       83 => 'Event Title',
@@ -2444,7 +2444,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getMemberHeaderDefinition(): array {
+  protected static function getMemberHeaderDefinition(): array {
     return [
       82 => 'Membership Type',
       83 => 'Test',
@@ -2468,7 +2468,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getPledgeHeaderDefinition(): array {
+  protected static function getPledgeHeaderDefinition(): array {
     return [
       82 => 'Pledge ID',
       83 => 'Total Pledged',
@@ -2504,7 +2504,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getBasicSqlColumnDefinition($isContactExport): array {
+  protected static function getBasicSqlColumnDefinition($isContactExport): array {
     $columns = [
       'civicrm_primary_id' => '`civicrm_primary_id` varchar(64)',
       'contact_type' => '`contact_type` varchar(64)',
@@ -2605,7 +2605,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getCaseSqlColumns(): array {
+  protected static function getCaseSqlColumns(): array {
     return [
       'case_start_date' => '`case_start_date` varchar(32)',
       'case_end_date' => '`case_end_date` varchar(32)',
@@ -2633,7 +2633,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getActivitySqlColumns(): array {
+  protected static function getActivitySqlColumns(): array {
     return [
       'activity_id' => '`activity_id` varchar(64)',
       'activity_type' => '`activity_type` varchar(255)',
@@ -2660,7 +2660,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getParticipantSqlColumns(): array {
+  protected static function getParticipantSqlColumns(): array {
     return [
       'event_id' => '`event_id` varchar(64)',
       'event_title' => '`event_title` varchar(255)',
@@ -2691,7 +2691,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getContributionSqlColumns(): array {
+  public static function getContributionSqlColumns(): array {
     return [
       'civicrm_primary_id' => '`civicrm_primary_id` varchar(64)',
       'contact_type' => '`contact_type` varchar(64)',
@@ -2813,7 +2813,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getPledgeSqlColumns(): array {
+  public static function getPledgeSqlColumns(): array {
     return [
       'pledge_id' => '`pledge_id` varchar(64)',
       'pledge_amount' => '`pledge_amount` varchar(32)',
@@ -2847,7 +2847,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getMembershipSqlColumns(): array {
+  public static function getMembershipSqlColumns(): array {
     return [
       'membership_type' => '`membership_type` varchar(128)',
       'member_is_test' => '`member_is_test` varchar(64)',

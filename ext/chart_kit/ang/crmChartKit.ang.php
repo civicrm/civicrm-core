@@ -1,6 +1,5 @@
 <?php
-// Base angular module declares external dependencies
-
+// Module for rendering Chart search displays
 return [
   'js' => [
     'ang/crmChartKit.js',

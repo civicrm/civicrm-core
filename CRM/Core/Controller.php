@@ -826,7 +826,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public function setDestination($url = NULL, $setToReferer = FALSE) {
     if (empty($url)) {
       if ($setToReferer) {
-        $url = $_SERVER['HTTP_REFERER'];
+        $url = $_SERVER['HTTP_REFERER'] ?? NULL;
       }
       else {
         $config = CRM_Core_Config::singleton();

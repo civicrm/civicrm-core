@@ -55,7 +55,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @var string
    */
-  protected $entity = 'Contact';
+  protected string $entity = 'Contact';
 
   /**
    * Test setup for every test.
@@ -199,7 +199,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Get international string data for testing against api calls.
    */
-  public function getInternationalStrings(): array {
+  public static function getInternationalStrings(): array {
     $invocations = [];
     $invocations[] = ['Scarabée'];
     $invocations[] = ['Iñtërnâtiônàlizætiøn'];
@@ -613,13 +613,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // Disallow edit -- because we don't have permission
     $config->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
-    $result = $this->callAPIFailure('Contact', 'create', [
-      'check_permissions' => 1,
-      'id' => $contactId,
-      'api_key' => 'defg4321',
-    ]);
-    $this->assertMatchesRegularExpression(';Permission denied to modify api key;', $result['error_message']);
-
+    if ($version === 3) {
+      $result = $this->callAPIFailure('Contact', 'create', [
+        'check_permissions' => 1,
+        'id' => $contactId,
+        'api_key' => 'defg4321',
+      ]);
+      $this->assertMatchesRegularExpression(';Permission denied to modify api key;', $result['error_message']);
+    }
+    else {
+      $this->callAPISuccess('Contact', 'create', [
+        'check_permissions' => 1,
+        'id' => $contactId,
+        'api_key' => 'defg4321',
+      ]);
+      $this->callAPISuccess('Contact', 'get', ['id' => $contactId]);
+      $this->assertEquals('abcd1234', CRM_Core_DAO::singleValueQuery(' SELECT api_key FROM civicrm_contact WHERE id = ' . $contactId));
+    }
     // Return everything -- because permissions are not being checked
     $config->userPermissionClass->permissions = [];
     $result = $this->callAPISuccess('Contact', 'create', [
@@ -1555,7 +1565,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * https://issues.civicrm.org/jira/browse/CRM-16084
    * @param int $version
    *
-   * @throws \CRM_Core_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testDirectionChainingRelationshipsCRM16084(int $version): void {
@@ -3657,7 +3666,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getPhoneStrings(): array {
+  public static function getPhoneStrings(): array {
     return [
       ['phone-Primary-1'],
       ['phone-Primary'],
@@ -4693,7 +4702,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function versionAndPrivacyOption(): array {
+  public static function versionAndPrivacyOption(): array {
     $version = [3, 4];
     $fields = ['do_not_mail', 'do_not_email', 'do_not_sms', 'is_opt_out', 'do_not_trade'];
     $tests = [];

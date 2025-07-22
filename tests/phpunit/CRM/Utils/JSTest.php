@@ -26,7 +26,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function translateExamples() {
+  public static function translateExamples() {
     $cases = [];
     $cases[] = [
       '',
@@ -113,7 +113,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedStrings, $actualStrings);
   }
 
-  public function dedupeClosureExamples() {
+  public static function dedupeClosureExamples() {
     // Each example string here is named for its body, eg the body of $a calls "a()".
     $a = "(function (angular, $, _) {\n  'use strict';\n  a();\n})(angular, CRM.$, CRM._);";
     $b = "(function(angular,$,_){\n  \"use strict\";\n  b();\n})(angular,CRM.$,CRM._);";
@@ -159,7 +159,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedOutput, implode("", $actualOutput));
   }
 
-  public function stripCommentsExamples() {
+  public static function stripCommentsExamples() {
     $cases = [];
     $cases[] = [
       "a();\n//# sourceMappingURL=../foo/bar/baz.js\nb();",

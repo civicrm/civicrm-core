@@ -771,12 +771,11 @@ return [
       ],
     ],
     'is_deceased' => [
-      'title' => ts('Deceased'),
+      'title' => ts('Deceased / Closed'),
       'sql_type' => 'boolean',
       'input_type' => 'CheckBox',
       'required' => TRUE,
       'add' => '1.1',
-      'contact_type' => 'Individual',
       'default' => FALSE,
       'usage' => [
         'import',
@@ -784,16 +783,15 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'label' => ts('Is Deceased'),
+        'label' => ts('Is Deceased / Closed'),
       ],
     ],
     'deceased_date' => [
-      'title' => ts('Deceased Date'),
+      'title' => ts('Deceased / Closed Date'),
       'sql_type' => 'date',
       'input_type' => 'Select Date',
-      'description' => ts('Date of deceased'),
+      'description' => ts('Date deceased / closed'),
       'add' => '1.5',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -801,7 +799,7 @@ return [
       ],
       'input_attrs' => [
         'format_type' => 'birth',
-        'label' => ts('Deceased Date'),
+        'label' => ts('Deceased / Closed Date'),
       ],
     ],
     'household_name' => [

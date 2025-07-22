@@ -48,14 +48,14 @@
 .crm-container .nav.nav-stacked {
   flex-direction: column;
 }
-#civicrm-menu-nav .crm-logo-sm {
+#civicrm-menu-nav #civicrm-menu .crm-logo-sm {
   background: var(--crm-svg-logo);
   background-repeat: no-repeat;
   background-size: cover;
-  width: 2.25rem;
-  height: 2.25rem;
-  margin: 0;
   background-position: center center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
 }
 .crm-container .nav.nav-pills {
   gap: var(--crm-flex-gap);

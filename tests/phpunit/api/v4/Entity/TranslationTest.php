@@ -30,7 +30,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
 
   protected $ids = [];
 
-  public function getCreateOKExamples(): array {
+  public static function getCreateOKExamples(): array {
     $es = [];
 
     $es['asDraft'] = [
@@ -57,7 +57,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
     return $es;
   }
 
-  public function getCreateBadExamples() {
+  public static function getCreateBadExamples() {
     $es = [];
 
     $es['badStatus'] = [
@@ -133,9 +133,9 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
     return $es;
   }
 
-  public function getUpdateBadExamples(): array {
-    $createOk = $this->getCreateOKExamples()['asDraft'][0];
-    $bads = $this->getCreateBadExamples();
+  public static function getUpdateBadExamples(): array {
+    $createOk = self::getCreateOKExamples()['asDraft'][0];
+    $bads = self::getCreateBadExamples();
 
     $es = [];
     foreach ($bads as $id => $bad) {

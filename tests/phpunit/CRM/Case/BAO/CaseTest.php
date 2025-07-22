@@ -855,7 +855,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
    * dataprovider for testGetCaseActivityQuery
    * @return array
    */
-  public function caseActivityQueryProvider(): array {
+  public static function caseActivityQueryProvider(): array {
     return [
       0 => [
         'input' => [

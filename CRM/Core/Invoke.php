@@ -85,7 +85,11 @@ class CRM_Core_Invoke {
     if (['civicrm', 'menu', 'rebuild'] == $args || ['civicrm', 'clearcache'] == $args) {
       // ensure that the user has a good privilege level
       if (CRM_Core_Permission::check('administer CiviCRM')) {
-        self::rebuildMenuAndCaches();
+        Civi::rebuild([
+          '*' => TRUE,
+          'triggers' => CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+          'sessions' => CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+        ])->execute();
         CRM_Core_Session::setStatus(ts('Cleared all CiviCRM caches (database, menu, templates)'), ts('Complete'), 'success');
         // exits
         return CRM_Utils_System::redirect();
@@ -215,11 +219,9 @@ class CRM_Core_Invoke {
       }
 
       $template = CRM_Core_Smarty::singleton();
-      if (!empty($item['is_public'])) {
-        $template->assign('urlIsPublic', TRUE);
-      }
-      else {
-        $template->assign('urlIsPublic', FALSE);
+
+      $template->assign('urlIsPublic', CRM_Core_Config::singleton()->userSystem->isFrontEndPage());
+      if (empty($item['is_public'])) {
         self::statusCheck($template);
       }
 

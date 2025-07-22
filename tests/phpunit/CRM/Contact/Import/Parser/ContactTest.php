@@ -1222,7 +1222,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function validateDataProvider(): array {
+  public static function validateDataProvider(): array {
     return [
       'individual_required' => [
         'csv' => 'individual_invalid_missing_name.csv',
@@ -1336,7 +1336,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function importDataProvider(): array {
+  public static function importDataProvider(): array {
     return [
       'individual_with_note.csv' => [
         'csv' => 'individual_with_note.csv',
@@ -1682,7 +1682,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function dateDataProvider(): array {
+  public static function dateDataProvider(): array {
     return [
       'type_1' => ['csv' => 'individual_dates_type1.csv', 'dateType' => CRM_Utils_Date::DATE_yyyy_mm_dd],
       'type_2' => ['csv' => 'individual_dates_type2.csv', 'dateType' => CRM_Utils_Date::DATE_mm_dd_yy],

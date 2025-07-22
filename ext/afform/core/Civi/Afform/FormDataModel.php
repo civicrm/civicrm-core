@@ -4,6 +4,7 @@ namespace Civi\Afform;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Afform;
+use Civi\AfformAdmin\AfformAdminMeta;
 use Civi\Api4\Utils\CoreUtil;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -227,7 +228,7 @@ class FormDataModel {
     if ($action === 'get' && strpos($fieldName, '.')) {
       $namesToMatch[] = substr($fieldName, 0, strrpos($fieldName, '.'));
     }
-    $select = ['name', 'label', 'input_type', 'data_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity', 'required'];
+    $select = ['name', 'label', 'input_type', 'data_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity', 'required', 'dfk_entities'];
     if ($action === 'get') {
       $select[] = 'operators';
     }
@@ -249,6 +250,7 @@ class FormDataModel {
     if (!isset($field)) {
       return NULL;
     }
+
     // Id field for selecting existing entity
     if ($field['name'] === CoreUtil::getIdFieldName($entityName)) {
       $entityTitle = CoreUtil::getInfoItem($entityName, 'title');
@@ -269,6 +271,28 @@ class FormDataModel {
       }
     }
     return $field;
+  }
+
+  /**
+   * @param string $inputType name of input type
+   * @return string path to the angular template for this input type
+   */
+  public static function getInputTypeTemplate(string $inputType): ?string {
+    // if afform admin is not enabled, there is no hook
+    // to add custom input types so we can just use the
+    // naive string concatenation
+    if (!class_exists('\\Civi\\AfformAdmin\\AfformAdminMeta')) {
+      return '~/af/fields/' . $inputType . '.html';
+    }
+
+    $inputTypes = AfformAdminMeta::getMetadata()['inputTypes'];
+
+    foreach ($inputTypes as $type) {
+      if ($type['name'] === $inputType) {
+        return $type['template'];
+      }
+    }
+    return NULL;
   }
 
   /**

@@ -10,7 +10,7 @@ namespace Civi\Authx;
  */
 class StatelessFlowsTest extends AbstractFlowsTest {
 
-  public function getStatelessExamples() {
+  public static function getStatelessExamples() {
     $exs = [];
     $exs[] = ['pass', 'param'];
     $exs[] = ['pass', 'header'];

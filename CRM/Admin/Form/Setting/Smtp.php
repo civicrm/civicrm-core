@@ -79,7 +79,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   public function postProcess() {
     // flush caches so we reload details for future requests
     // CRM-11967
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     $formValues = $this->controller->exportValues($this->_name);
 
@@ -105,7 +105,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
         if (!$domainEmailAddress || $domainEmailAddress === 'info@EXAMPLE.ORG') {
           $fixUrl = CRM_Utils_System::url('civicrm/admin/options/site_email_address');
-          CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid "Site Email Address" in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+          CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid "Site From Email Address" in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
         }
         if (!$toEmail) {
           CRM_Core_Error::statusBounce(ts('Cannot send a test email because your user record does not have a valid email address.'));

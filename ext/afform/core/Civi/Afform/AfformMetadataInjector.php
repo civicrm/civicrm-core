@@ -115,10 +115,24 @@ class AfformMetadataInjector {
 
     // Get field defn from afform markup
     $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
-    // This is the input type set on the form (may be different from the default input type in the field spec)
+    // Uses input type set on the form if specified (else falls back to the input type in the field spec)
     $inputType = !empty($fieldDefn['input_type']) ? \CRM_Utils_JS::decode($fieldDefn['input_type']) : $fieldInfo['input_type'];
     // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
     $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
+
+    // Set template based on input_type
+    $fieldInfo['template'] = FormDataModel::getInputTypeTemplate($inputType);
+
+    // Set format of DisplayOnly fields based on original input type
+    if ($inputType === 'DisplayOnly' && $fieldInfo['input_type'] === 'RichTextEditor') {
+      $fieldInfo['display_format'] = 'html';
+    }
+    if ($inputType === 'DisplayOnly' && $fieldInfo['input_type'] === 'File') {
+      $fieldInfo['display_format'] = 'file';
+    }
+    if ($inputType === 'DisplayOnly' && $fieldInfo['input_type'] === 'Url') {
+      $fieldInfo['display_format'] = 'url';
+    }
 
     // On a search form, the exposed operator requires a list of options.
     if (!empty($fieldDefn['expose_operator'])) {
@@ -142,7 +156,7 @@ class AfformMetadataInjector {
     if ($inputType === 'Select' || $inputType === 'ChainSelect') {
       $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
     }
-    elseif ($inputType === 'EntityRef' && empty($field['input_attrs']['placeholder'])) {
+    elseif ($inputType === 'EntityRef' && !empty($fieldInfo['fk_entity']) && empty($field['input_attrs']['placeholder'])) {
       $info = civicrm_api4('Entity', 'get', [
         'where' => [['name', '=', $fieldInfo['fk_entity']]],
         'checkPermissions' => FALSE,
@@ -192,6 +206,15 @@ class AfformMetadataInjector {
    */
   private static function fillFieldMetadata($entityNames, string $action, \DOMElement $afField):void {
     $fieldName = $afField->getAttribute('name');
+
+    // for magic munged fields like display_name,sort_name,email_primary.email
+    // we now fill with metadata for the first field. (previously they were ignored entirely)
+    // afform authors should take care that munged fields are of compatible types
+    // or strange things will happen
+    if (\str_contains($fieldName, ',')) {
+      $fieldName = explode(',', $fieldName)[0];
+    }
+
     $fieldInfo = self::getFieldMetadata($entityNames, $action, $fieldName);
     // Merge field definition data with whatever's already in the markup.
     if ($fieldInfo) {

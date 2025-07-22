@@ -33,19 +33,21 @@
           </tr>
         {/if}
       {/foreach}
-        <tr class="crm-uf_group-form-block-weight" >
-            <td class="label">{$form.weight.label}{if $config->userSystem->is_drupal EQ '1'} {help id='id-profile_weight' file="CRM/UF/Form/Group.hlp"}{/if}</td>
-            <td class="html-adjust">{$form.weight.html}</td>
-        </tr>
-        <tr class="crm-uf_group-form-block-help_pre" >
+        {if $uf_group_type_extra}
+          <tr class="crm-uf_group-form-block-uf_group_type_extra">
+            <td class="label">{ts}Used in Forms{/ts} {help id='id-used_for_extra' file="CRM/UF/Form/Group.hlp"}</td>
+            <td class="html-adjust">{$uf_group_type_extra}</td>
+          </tr>
+        {/if}
+        <tr class="crm-uf_group-form-block-help_pre">
             <td class="label">{$form.help_pre.label} {help id='id-help_pre' file="CRM/UF/Form/Group.hlp"} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='help_pre' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.help_pre.html}</td>
         </tr>
-        <tr class="crm-uf_group-form-block-help_post" >
+        <tr class="crm-uf_group-form-block-help_post">
             <td class="label">{$form.help_post.label} {help id='id-help_post' file="CRM/UF/Form/Group.hlp"} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='help_post' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.help_post.html}</td>
         </tr>
-        <tr class="crm-uf_group-form-block-is_active" >
+        <tr class="crm-uf_group-form-block-is_active">
             <td class="label"></td><td class="html-adjust">{$form.is_active.html} {$form.is_active.label}</td>
         </tr>
     </table>

@@ -471,7 +471,7 @@ ORDER BY weight";
       CRM_Core_DAO::executeQuery($query);
       Civi::cache('navigation')->flush();
       // reset ACL and System caches
-      CRM_Core_BAO_Cache::resetCaches();
+      Civi::rebuild(['system' => TRUE])->execute();
     }
     else {
       // before inserting check if contact id exists in db
@@ -916,28 +916,15 @@ ORDER BY weight";
             'weight' => 1,
           ],
         ];
-        if (CIVICRM_UF !== 'Standalone') {
-          $item['child'][] = [
-            'attributes' => [
-              'label' => ts('Hide Menu'),
-              'name' => 'Hide Menu',
-              'url' => '#hidemenu',
-              'icon' => 'crm-i fa-minus',
-              'weight' => 2,
-            ],
-          ];
-        }
-        else {
-          $item['child'][] = [
-            'attributes' => [
-              'label' => ts('Change Password'),
-              'name' => 'Change Password',
-              'url' => 'civicrm/admin/user/password',
-              'icon' => 'crm-i fa-keyboard',
-              'weight' => 2,
-            ],
-          ];
-        }
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('Hide Menu'),
+            'name' => 'Hide Menu',
+            'url' => '#hidemenu',
+            'icon' => 'crm-i fa-minus',
+            'weight' => 2,
+          ],
+        ];
         $item['child'][] = [
           'attributes' => [
             'label' => ts('Log out'),

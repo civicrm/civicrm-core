@@ -218,7 +218,7 @@ case $1 in
   BPACK=1
   D7PACK=1
   J4PACK=1
-  J5BCPACK=1
+  J5PACKBC=1
   WPPACK=1
   PATCHPACK=1
   STANDALONEPACK=1
@@ -324,7 +324,7 @@ if [ "$REPOREPORT" = 1 ]; then
     D7PACK="$D7PACK" \
     D7DIR="$D7DIR" \
     J4PACK="$J4PACK" \
-    J5BCPACK="$J5BCPACK" \
+    J5PACKBC="$J5PACKBC" \
     WPPACK="$WPPACK" \
     STANDALONEPACK="$STANDALONEPACK" \
     bash $P/dists/repo-report.sh

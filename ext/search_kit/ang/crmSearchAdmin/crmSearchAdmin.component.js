@@ -109,6 +109,13 @@
       this.originalSavedSearch = _.cloneDeep(this.savedSearch);
       this.groupExists = !!this.savedSearch.groups.length;
 
+      this.savedSearch.displays.forEach(function(display) {
+        // PHP json_encode() turns an empty object into []. Convert back to {}.
+        if (display.settings && Array.isArray(display.settings.pager)) {
+          display.settings.pager = {};
+        }
+      });
+
       const path = $location.path();
       // In create mode, set defaults and bind params to route for easy copy/paste
       if (path.includes('create/')) {
@@ -215,7 +222,8 @@
       _.remove(params.displays, {trashed: true});
       if (params.displays && params.displays.length) {
         fireHooks('preSaveDisplay', params.displays, apiCalls);
-        chain.displays = ['SearchDisplay', 'replace', {where: [['saved_search_id', '=', '$id']], records: params.displays}];
+        chain.amendDisplays = ['SearchDisplay', 'replace', {where: [['saved_search_id', '=', '$id']], records: params.displays}];
+        chain.displays = ['SearchDisplay', 'get', {where: [['saved_search_id', '=', '$id']], select: ['*', 'is_autocomplete_default']}];
       } else if (params.id) {
         apiCalls.deleteDisplays = ['SearchDisplay', 'delete', {where: [['saved_search_id', '=', params.id]]}];
       }

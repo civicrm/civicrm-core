@@ -11,7 +11,7 @@
   {if $action eq 4}
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
-    {if $activityTypeDescription}
+    {if $activityTypeDescription && $action neq 8}
       <div class="help">{$activityTypeDescription|purify}</div>
     {/if}
     <div class="crm-block crm-form-block crm-activity-form-block">

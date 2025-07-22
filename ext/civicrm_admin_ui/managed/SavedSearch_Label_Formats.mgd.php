@@ -67,42 +67,34 @@ return [
             [
               'type' => 'field',
               'key' => 'label',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'grouping',
-              'dataType' => 'String',
               'label' => E::ts('Grouping'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
+              'key' => 'is_reserved',
+              'label' => E::ts('Reserved'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
               'key' => 'is_default',
-              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
-              'rewrite' => '{ }',
+              'rewrite' => '[none]',
               'icons' => [
                 [
                   'icon' => 'fa-check',
                   'side' => 'left',
-                  'if' => [
-                    'is_default',
-                    '=',
-                    TRUE,
-                  ],
+                  'if' => ['is_default', '=', TRUE],
                 ],
               ],
-            ],
-            [
-              'type' => 'field',
-              'key' => 'is_reserved',
-              'dataType' => 'Boolean',
-              'label' => E::ts('Reserved'),
-              'sortable' => TRUE,
             ],
             [
               'text' => '',

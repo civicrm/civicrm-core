@@ -15,9 +15,14 @@
   </div>
 {/if}
 <table class="crm-info-panel">
-  <tr><td class="label"><a href="{$report.event_totals.links.queue}">{ts}Intended Recipients{/ts}</a></td>
-      <td>{$report.event_totals.queue}</td>
-      <td>{$report.event_totals.actionlinks.queue}</td></tr>
+  <tr><td class="label">{ts}Intended Recipients{/ts}</td>
+      <td>{$report.event_totals.recipients}</td>
+      <td></td></tr>
+  {if $report.event_totals.queue}
+    <tr><td class="label"><a href="{$report.event_totals.links.queue}">{ts}Mailings Sent{/ts}</a></td>
+        <td>{$report.event_totals.queue}</td>
+        <td>{$report.event_totals.actionlinks.queue}</td></tr>
+  {/if}
   <tr><td class="label"><a href="{$report.event_totals.links.delivered}">{ts}Successful Deliveries{/ts}</a></td>
       <td>{$report.event_totals.delivered} ({$report.event_totals.delivered_rate|string_format:"%0.2f"}%)</td>
       <td>{$report.event_totals.actionlinks.delivered}</td></tr>

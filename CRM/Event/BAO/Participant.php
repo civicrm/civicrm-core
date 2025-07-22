@@ -1006,23 +1006,33 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
    *   Id of primary participant record.
    *
    * @return array
-   *   $displayName => $viewUrl
+   *   $displayName => ['url' => $viewUrl, 'status' => $status]
+   *   status is NULL if positive, status label otherwise.
    */
   public static function getAdditionalParticipants($primaryParticipantID) {
     $additionalParticipants = [];
-    $additionalParticipantIDs = self::getAdditionalParticipantIds($primaryParticipantID);
+    $additionalParticipantIDs = self::getAdditionalParticipantIds($primaryParticipantID, FALSE);
     if (!empty($additionalParticipantIDs)) {
+      $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
       foreach ($additionalParticipantIDs as $additionalParticipantID) {
         $additionalContactID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
           $additionalParticipantID,
           'contact_id', 'id'
         );
         $additionalContactName = CRM_Contact_BAO_Contact::displayName($additionalContactID);
+        $participantCancelled = \Civi\Api4\Participant::get(TRUE)
+          ->addSelect('status_id:label')
+          ->addWhere('id', '=', $additionalParticipantID)
+          ->addWhere('status_id:name', 'NOT IN', $positiveStatuses)
+          ->execute()->first();
         $pViewURL = CRM_Utils_System::url('civicrm/contact/view/participant',
           "action=view&reset=1&id={$additionalParticipantID}&cid={$additionalContactID}"
         );
 
-        $additionalParticipants[$additionalContactName] = $pViewURL;
+        $additionalParticipants[$additionalContactName] = [
+          'url' => $pViewURL,
+          'status' => $participantCancelled['status_id:label'] ?? NULL,
+        ];
       }
     }
     return $additionalParticipants;
@@ -1202,10 +1212,6 @@ UPDATE  civicrm_participant
 
         //get default participant role.
         $eventDetails[$eventId]['participant_role'] = $participantRoles[$eventDetails[$eventId]['default_role_id']] ?? NULL;
-
-        //get the location info
-        $locParams = ['entity_id' => $eventId, 'entity_table' => 'civicrm_event'];
-        $eventDetails[$eventId]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
       }
     }
 
