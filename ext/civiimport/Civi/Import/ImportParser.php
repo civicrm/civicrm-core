@@ -12,7 +12,7 @@
 namespace Civi\Import;
 
 use Civi\Api4\Address;
-use Civi\api4\Contact;
+use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\DedupeRule;
 use Civi\Api4\DedupeRuleGroup;
