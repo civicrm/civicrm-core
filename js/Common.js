@@ -576,6 +576,17 @@ if (!CRM.vars) CRM.vars = {};
     }
     function getQuickAddLinks(paths) {
       const links = [];
+      if (paths && typeof paths === 'boolean') {
+        // Get all paths matching entity type
+        paths = CRM.config.quickAdd
+          .filter(link => {
+            if (entityName === 'Contact') {
+              return ['Individual', 'Organization', 'Household'].includes(link.entity);
+            }
+            return link.entity === entityName;
+          })
+          .map(link => link.path);
+      }
       if (paths && paths.length) {
         const apiParams = getApiParams();
         paths.forEach((path) => {

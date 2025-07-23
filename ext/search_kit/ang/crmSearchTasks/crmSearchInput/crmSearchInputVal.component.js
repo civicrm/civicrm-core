@@ -54,11 +54,16 @@
 
       const autocompleteStaticOptions = {
         Contact: ['user_contact_id'],
+        Individual: ['user_contact_id'],
         '': []
       };
 
       this.getAutocompleteStaticOptions = function() {
-        return autocompleteStaticOptions[ctrl.getFkEntity() || ''] || autocompleteStaticOptions[''];
+        // "Select current user" only make sense in a search context, so check for presence of operator
+        if (ctrl.op) {
+          return autocompleteStaticOptions[ctrl.getFkEntity() || ''] || autocompleteStaticOptions[''];
+        }
+        return autocompleteStaticOptions[''];
       };
 
       this.isMulti = function() {

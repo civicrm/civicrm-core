@@ -598,6 +598,9 @@ input.crm-form-checkbox) + label {
   border-top: 1px solid var(--crm-input-border-color);
   margin-top: var(--crm-m);
 }
+.select2-drop .crm-entityref-links a.crm-hover-button {
+  white-space: nowrap;
+}
 .crm-container .select2-results .select2-result-label {
   font-size: var(--crm-input-font-size);
   padding: var(--crm-s) var(--crm-m);
