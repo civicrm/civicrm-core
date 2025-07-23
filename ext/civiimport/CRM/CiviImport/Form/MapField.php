@@ -6,6 +6,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     parent::preProcess();
     // Add import-ui app
     Civi::service('angularjs.loader')->addModules('crmCiviimport');
+    $this->getUserJobID();
     $this->assignCiviimportVariables();
 
     $templateJob = $this->getTemplateJob();
@@ -38,6 +39,8 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
       'userJob' => $this->getUserJob(),
       'columnHeaders' => $this->getColumnHeaders(),
       'dateFormats' => $this->getDateFormats(),
+      'isTemplate' => $this->getUserJob()['is_template'],
+      'isStandalone' => !$this->controller instanceof CRM_Import_Controller,
     ]);
   }
 
