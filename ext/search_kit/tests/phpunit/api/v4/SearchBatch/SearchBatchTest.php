@@ -268,6 +268,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
             'type' => 'field',
             'key' => 'financial_type_id:label',
             'label' => 'Financial Type',
+            'default' => '1',
           ],
           [
             'type' => 'field',
@@ -307,8 +308,12 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ->execute()->single();
     $apiName = 'Import_' . $userJob['id'];
 
+    // Ensure defaults have been filled
     $rows = civicrm_api4($apiName, 'get');
     $this->assertEquals([1, 2, 3], $rows->column('_id'));
+    foreach ($rows as $row) {
+      $this->assertEquals('1', $row['financial_type_id']);
+    }
 
     $fields = civicrm_api4($apiName, 'getFields', ['loadOptions' => TRUE])->indexBy('label');
 

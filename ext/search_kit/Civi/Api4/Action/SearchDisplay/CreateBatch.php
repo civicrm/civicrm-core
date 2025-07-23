@@ -79,6 +79,7 @@ class CreateBatch extends AbstractAction {
     ];
 
     $tableColumns = [];
+    $defaultValues = [];
 
     foreach ($this->display['settings']['columns'] as $column) {
       if (empty($column['spec'])) {
@@ -87,6 +88,9 @@ class CreateBatch extends AbstractAction {
       $fieldSpec = $column['spec'];
       $tableColumns[$fieldSpec['name']] = $this->getSqlType($fieldSpec);
       $fieldSpec['label'] = $column['label'];
+      if (isset($column['default'])) {
+        $defaultValues[$fieldSpec['name']] = $column['default'];
+      }
       $userJob['metadata']['DataSource']['column_headers'][] = $column['label'];
       $userJob['metadata']['DataSource']['column_specs'][$fieldSpec['name']] = $fieldSpec;
       $userJob['metadata']['DataSource']['targets'] = $this->targets;
@@ -103,16 +107,18 @@ class CreateBatch extends AbstractAction {
     $alterSql = "ALTER TABLE `$tableName` ADD INDEX(" . implode('), ADD INDEX(', \CRM_Import_DataSource::getStandardIndices()) . ')';
     \CRM_Core_DAO::executeQuery($alterSql, [], TRUE, NULL, FALSE, FALSE);
 
-    $result[] = UserJob::create(FALSE)
+    $userJob = UserJob::create(FALSE)
       ->setValues($userJob)
       ->execute()->single();
 
-    // Add empty rows per $this->rowCount
+    // Add rows of default values per $this->rowCount
     if ($this->rowCount > 0) {
-      $values = rtrim(str_repeat("(),", $this->rowCount), ",");
-      $sql = "INSERT INTO `$tableName` () VALUES $values";
-      \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+      $apiName = 'Import_' . $userJob['id'];
+      $values = array_fill(0, $this->rowCount, $defaultValues);
+      civicrm_api4($apiName, 'save', ['records' => $values]);
     }
+
+    $result[] = $userJob;
   }
 
   private function getSqlType(array $fieldSpec) {
