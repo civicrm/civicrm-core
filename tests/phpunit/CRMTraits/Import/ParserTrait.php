@@ -33,10 +33,12 @@ trait CRMTraits_Import_ParserTrait {
    * @param array $fieldMappings
    * @param array $submittedValues
    * @param string $action
+   * @param array $entityConfiguration
    *
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = [], string $action = 'create'): void {
+  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = [], string $action = 'create', array $entityConfiguration = []): void {
     $submittedValues = array_merge([
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
@@ -55,6 +57,16 @@ trait CRMTraits_Import_ParserTrait {
       ->execute()->first()['metadata'];
     $userJobMetadata['import_mappings'] = $fieldMappings;
     $userJobMetadata['entity_configuration']['Contribution']['action'] = $action;
+    if ($entityConfiguration) {
+      foreach ($entityConfiguration as $entity => $configuration) {
+        if (isset($userJobMetadata['entity_configuration'][$entity])) {
+          $userJobMetadata['entity_configuration'][$entity] = $configuration + $userJobMetadata['entity_configuration'][$entity];
+        }
+        else {
+          $userJobMetadata['entity_configuration'][$entity] = $configuration;
+        }
+      }
+    }
     UserJob::update()
       ->addWhere('id', '=', $this->userJobID)
       ->setValues([
