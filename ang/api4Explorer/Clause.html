@@ -18,9 +18,9 @@
         </span>
       </div>
       <div ng-if="!$ctrl.conjunctions[clause[0]]" class="api4-input-group">
-        <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" ng-change="$ctrl.changeClauseField(clause, index)" />
-        <select class="form-control api4-operator" ng-model="clause[1]" ng-options="o for o in $ctrl.operators" ng-change="$ctrl.changeClauseOperator(clause)" ></select>
-        <input class="form-control" ng-model="clause[2]" api4-exp-value="{field: clause[0], op: clause[1], format: $ctrl.format}" />
+        <input class="collapsible-optgroups form-control crm-auto-width" ng-model="clause[0]" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" ng-change="$ctrl.changeClauseField(clause, index)" />
+        <select class="form-control api4-operator six" ng-model="clause[1]" ng-options="o for o in $ctrl.operators" ng-change="$ctrl.changeClauseOperator(clause)" ></select>
+        <input class="form-control crm-auto-width" ng-model="clause[2]" api4-exp-value="{field: clause[0], op: clause[1], format: $ctrl.format}" />
       </div>
       <fieldset class="clearfix" ng-if="$ctrl.conjunctions[clause[0]]">
         <crm-api4-clause clauses="clause[1]" format="{{ $ctrl.format }}" op="{{ clause[0] }}" fields="$ctrl.fields" delete-group="$ctrl.deleteRow(index)" ></crm-api4-clause>
