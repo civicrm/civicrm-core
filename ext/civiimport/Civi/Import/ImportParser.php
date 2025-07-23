@@ -312,6 +312,7 @@ abstract class ImportParser extends \CRM_Import_Parser {
       $fields = [];
       $name = $dedupeRule['name'];
       $this->dedupeRules[$name] = $dedupeRule;
+      $this->dedupeRules[$name]['title'] = $dedupeRule['title'] . ' (' . ts('Unique Match') . ')';
       $this->dedupeRules[$name]['rule_message'] = $fieldMessage = '';
       // Now we add the fields in a format like ['first_name' => 6, 'custom_8' => 9]
       // The number is the weight and we add both api three & four style fields so the
@@ -356,6 +357,9 @@ abstract class ImportParser extends \CRM_Import_Parser {
       $this->dedupeRules[$name]['rule_message'] = ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $this->dedupeRules[$name]['threshold']]) . '<br />' . ts('Or Provide Contact ID or External ID.');
 
       $this->dedupeRules[$name]['fields'] = $fields;
+      $this->dedupeRules[$name . '.first'] = $this->dedupeRules[$name];
+      $this->dedupeRules[$name . '.first']['name'] .= '.first';
+      $this->dedupeRules[$name . '.first']['title'] = str_replace('(' . ts('Unique Match') . ')', '(' . ts('First Match') . ')', $this->dedupeRules[$name . '.first']['title']);
     }
     // Contact type not specified. Return generic rules, maybe update to return
     // Select rules - ie be able to choose a mixture to pick up by type - eg. if a
