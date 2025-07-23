@@ -355,7 +355,8 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
       ];
     }
     catch (ExpiredException $e) {
-      // Not sure what we should do here?
+      // See https://github.com/civicrm/civicrm-core/pull/32986
+      \Civi::log()->error($e->getMessage() . ': This usually means you had debug mode enabled in the last 48 hours');
       return [];
     }
   }
