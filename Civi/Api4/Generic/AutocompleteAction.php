@@ -128,6 +128,10 @@ class AutocompleteAction extends AbstractAction {
    */
   private $trustedFilters = [];
 
+  private $trustedSavedSearch;
+
+  private $trustedDisplay;
+
   /**
    * List of searchable fields for this display
    *
@@ -158,6 +162,10 @@ class AutocompleteAction extends AbstractAction {
     $this->checkPermissionToLoadSearch();
 
     $entityName = $this->getEntityName();
+
+    // Load trusted overrides
+    $this->savedSearch = $this->trustedSavedSearch ?? $this->savedSearch;
+    $this->display = $this->trustedDisplay ?? $this->display;
 
     // Get default display from system settings
     if (!$this->display) {
@@ -249,10 +257,36 @@ class AutocompleteAction extends AbstractAction {
    *
    * @param string $fieldName
    * @param mixed $value
+   * return $this
    */
   public function addFilter(string $fieldName, $value) {
     $this->filters[$fieldName] = $value;
     $this->trustedFilters[$fieldName] = $value;
+    return $this;
+  }
+
+  /**
+   * Method for `civi.api.prepare` listener to override the savedSearch.
+   *
+   * @param string|array $savedSearch
+   * return $this
+   */
+  public function overrideSavedSearch(mixed $savedSearch) {
+    $this->trustedSavedSearch = $savedSearch;
+    $this->savedSearch = NULL;
+    return $this;
+  }
+
+  /**
+   * Method for `civi.api.prepare` listener to override the display.
+   *
+   * @param string|array $display
+   * return $this
+   */
+  public function overrideDisplay(mixed $display) {
+    $this->trustedDisplay = $display;
+    $this->display = NULL;
+    return $this;
   }
 
   private function getCurrentSearchField(): ?string {
