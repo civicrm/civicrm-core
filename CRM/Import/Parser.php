@@ -1507,6 +1507,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         }
       }
       else {
+        $isMatchFirst = str_ends_with($dedupeRule, '.first');
+        if ($isMatchFirst) {
+          $dedupeRule = substr($dedupeRule, 0, -6);
+        }
         $possibleMatches = Contact::getDuplicates(FALSE)
           ->setValues($params)
           ->setDedupeRule($dedupeRule)
@@ -1514,6 +1518,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
         foreach ($possibleMatches as $possibleMatch) {
           $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+          if ($isMatchFirst) {
+            return $matchIDs;
+          }
         }
       }
     }

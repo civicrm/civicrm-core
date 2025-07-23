@@ -582,6 +582,19 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test using a rule that matches the first matching contact.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportMatchFirst() :void {
+    $this->individualCreate(['email' => 'mum@example.com'], 'mum');
+    $this->individualCreate(['email' => 'mum@example.com'], 'mum2');
+    $this->importContributionsDotCSV([], 'create', ['Contact' => ['dedupe_rule' => 'IndividualUnsupervised.first']]);
+    $contribution = Contribution::get()->execute()->first();
+    $this->assertTrue(in_array($contribution['contact_id'], [$this->ids['Contact']['mum'], $this->ids['Contact']['mum2']]));
+  }
+
+  /**
    * Test whether importing a contribution using email match will match a non-primary.
    *
    * @throws \CRM_Core_Exception
@@ -986,11 +999,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   /**
    * @param array $submittedValues
    * @param string $action
+   * @param array $entityConfiguration
    *
    * @return \CRM_Import_DataSource_CSV
    * @throws \CRM_Core_Exception
    */
-  private function importContributionsDotCSV(array $submittedValues = [], string $action = 'create'): CRM_Import_DataSource_CSV {
+  private function importContributionsDotCSV(array $submittedValues = [], string $action = 'create', array $entityConfiguration = []): CRM_Import_DataSource_CSV {
     $this->importCSV('contributions.csv', [
       ['name' => 'Contact.first_name'],
       ['name' => 'Contribution.total_amount'],
@@ -1000,7 +1014,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.source'],
       ['name' => 'note'],
       ['name' => 'Contribution.trxn_id'],
-    ], $submittedValues, $action);
+    ], $submittedValues, $action, $entityConfiguration);
     return new CRM_Import_DataSource_CSV($this->userJobID);
   }
 
