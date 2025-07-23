@@ -53,14 +53,6 @@
 .api4-explorer-page i.fa-arrows {
   cursor: move;
 }
-.api4-input {
-  display: flex;
-  gap: var(--crm-m);
-  margin-bottom: var(--crm-m);
-}
-.api4-input label {
-  display: flex;
-}
 .api4-explorer-page form label {
   min-width: var(--crm-input-label-width);
 }
