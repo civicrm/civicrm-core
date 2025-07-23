@@ -110,8 +110,14 @@
   gap: 0;
 }
 #bootstrap-theme .crm-search-field-editing
-:where(input,.select2-container):where(:not(.crm-form-date,.crm-form-time,.four,.six,.eight,.twelve,.medium):not([type="checkbox"]):not([type="radio"])) {
+:where(input,.select2-container):where(:not(.crm-form-date,.crm-form-time):not([type="checkbox"]):not([type="radio"])) {
   width: 12ch !important /* vs inline width */;
+}
+#bootstrap-theme .crm-search-field-editing .crm-ajax-select {
+  width: 16ch !important /* vs inline width */;
+}
+#bootstrap-theme .crm-search-field-editing input[type=number] {
+  width: 9ch;
 }
 .crm-search-display tr:has(.crm-search-field-editing) td.crm-search-ctrl-column:has(.btn-group) { /* Controls for full-row edit */
   display: inline-table;

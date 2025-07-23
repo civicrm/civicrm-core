@@ -37,7 +37,8 @@
         placeholder = settings.timePlaceholder || $dataField.attr('time-placeholder');
         CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled']);
         $timeField
-          .addClass('crm-form-text crm-form-time')
+          .removeClass('two four eight twelve twenty medium big huge crm-auto-width')
+          .addClass('crm-form-text crm-form-time six')
           // Set default placeholder as clock icon (`fa-clock` is Unicode f017)
           .attr('placeholder', placeholder === undefined ? '\uf017' : placeholder)
           .attr('aria-label', placeholder === undefined ? ts('Time') : placeholder)

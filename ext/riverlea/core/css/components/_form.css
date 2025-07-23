@@ -289,7 +289,7 @@ select.crm-error {
   margin: 0;
 }
 .crm-container .crm-editable-form input,
-.crm-container .crm-search-field-editable input.form-control {
+.crm-container .crm-search-field-editable input.form-control:not(.crm-form-date,.crm-form-time) {
   width: 100%;
   min-width: 14ch;
 }
@@ -416,6 +416,9 @@ input.crm-form-checkbox) + label {
   margin-left: auto;
   right: var(--crm-r);
   top: auto;
+}
+.crm-container .select2-container .select2-choice > .select2-chosen {
+  margin-right: var(--crm-m2);
 }
 .crm-container .select2-container-multi .select2-choices::before,
 .crm-container .select2-container .select2-choice .select2-arrow::before {
@@ -675,7 +678,7 @@ input.crm-form-checkbox) + label {
 .crm-container input.crm-form-date,
 #bootstrap-theme input.dateplugin,
 #bootstrap-theme .input-group input.crm-form-date {
-  width: 14ch;
+  width: 12ch;
 }
 .crm-form-date-wrapper a.crm-clear-link {
   display: flex;
