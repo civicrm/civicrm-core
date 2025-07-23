@@ -8,6 +8,6 @@
     </button>
   </fieldset>
 </div>
-<input class="form-control crm-action-menu fa-plus collapsible-optgroups"
-       crm-ui-select="::{data: $ctrl.crmSearchAdmin.fieldsForSelect, placeholder: ts('Add')}"
+<input class="form-control crm-action-menu fa-plus collapsible-optgroups crm-auto-width"
+       crm-ui-select="::{data: $ctrl.crmSearchAdmin.fieldsForSelect, placeholder: ts('Add Field')}"
        on-crm-ui-select="$ctrl.crmSearchAdmin.addParam('select', selection)" >

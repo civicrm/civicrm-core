@@ -168,9 +168,6 @@
 .crm-search .ui-sortable-helper .api4-clause-badge .crm-i {
   display: inline-block;
 }
-.crm-search .api4-operator {
-  width: 235px;
-}
 .crm-search .crm-search-admin-relative .api4-clause-group-sortable {
   margin: var(--crm-r) 0;
 }
@@ -286,19 +283,10 @@ i.crm-i.crm-search-move-icon {
   padding: var(--crm-padding-reg);
   font-size: inherit;
 }
-.crm-search details label {
-  min-width: var(--crm-input-label-width);
-}
-.crm-search details label:has(~ a.helpicon) {
-  min-width: calc(var(--crm-input-label-width) - 19px);
-}
 /* Various */
 
 .crm-search .help-block.bg-warning {
   padding: var(--crm-padding-reg);
-}
-.crm-search .form-control.huge {
-  width: var(--crm-big-input);
 }
 /* Style expires_date date/time width */
 .crm-search #expires_date + input,
@@ -345,9 +333,6 @@ i.crm-i.crm-search-move-icon {
 .crm-draggable:hover > i.crm-i.crm-search-move-icon,
 .crm-draggable:hover > * > i.crm-i.crm-search-move-icon {
   opacity: 1;
-}
-.crm-search input[type=number] {
-  width: 90px;
 }
 /* For display.settings.limit field */
 .crm-search .checkbox-inline.form-control input[type=number] {
