@@ -129,6 +129,49 @@ return [
                   'task' => '',
                   'condition' => [],
                 ],
+                [
+                  'size' => 'btn-xs',
+                  'links' => [
+                    [
+                      'entity' => 'UserJob',
+                      'action' => 'view',
+                      'join' => '',
+                      'target' => 'crm-popup',
+                      'icon' => '',
+                      'text' => E::ts('View User Job'),
+                      'style' => 'default',
+                      'path' => '',
+                      'task' => '',
+                      'conditions' => [
+                        [
+                          'status_id:name',
+                          '!=',
+                          'draft',
+                        ],
+                      ],
+                    ],
+                    [
+                      'path' => 'civicrm/import_mapping?id=[id]',
+                      'icon' => 'fa-external-link',
+                      'text' => E::ts('Continue'),
+                      'style' => 'default',
+                      'conditions' => [
+                        [
+                          'status_id:name',
+                          '=',
+                          'draft',
+                        ],
+                      ],
+                      'task' => '',
+                      'entity' => '',
+                      'action' => '',
+                      'join' => '',
+                      'target' => '',
+                    ],
+                  ],
+                  'type' => 'buttons',
+                  'alignment' => 'text-right',
+                ],
               ],
               'type' => 'buttons',
               'alignment' => 'text-right',
@@ -407,6 +450,12 @@ return [
               'sortable' => TRUE,
             ],
             [
+              'type' => 'field',
+              'key' => 'status_id:label',
+              'label' => E::ts('Status'),
+              'sortable' => TRUE,
+            ],
+            [
               'size' => 'btn-xs',
               'links' => [
                 [
@@ -419,7 +468,31 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
-                  'condition' => [],
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      '!=',
+                      'draft',
+                    ],
+                  ],
+                ],
+                [
+                  'path' => 'civicrm/import_mapping?id=[id]',
+                  'icon' => 'fa-external-link',
+                  'text' => E::ts('Continue'),
+                  'style' => 'default',
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      '=',
+                      'draft',
+                    ],
+                  ],
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
                 ],
               ],
               'type' => 'buttons',
