@@ -58,7 +58,16 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
   public function getFields(): array {
     $fields = [];
     $primaryKeys = $this->getProperty('primary_keys');
-    foreach ($this->getClassName()::fields() as $uniqueName => $legacyField) {
+    $className = $this->getClassName();
+    if (isset($this->entityName)) {
+      // Make sure we always call the constructor for ECK entities
+      $class = new $className($this->entityName);
+      $daoFields = $class::fields();
+    }
+    else {
+      $daoFields = $className()::fields();
+    }
+    foreach ($daoFields as $uniqueName => $legacyField) {
       $fieldName = $legacyField['name'];
       $field = [
         'title' => $legacyField['title'] ?? $fieldName,
