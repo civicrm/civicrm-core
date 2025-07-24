@@ -26,7 +26,7 @@ namespace Civi\Api4\Generic;
  * @method array getRecords()
  * @method $this setDefaults(array $defaults) Set array of defaults.
  * @method array getDefaults()
- * @method $this setReload(bool $reload) Specify whether complete objects will be returned after saving.
+ * @method $this setReload(?array $reload) Optionally reload $ENTITIES after saving with an extra SELECT.
  * @method bool getReload()
  */
 class BasicReplaceAction extends AbstractBatchAction {
@@ -57,15 +57,15 @@ class BasicReplaceAction extends AbstractBatchAction {
   protected $defaults = [];
 
   /**
-   * Reload $ENTITIES after saving.
+   * Optionally reload $ENTITIES after saving with an extra SELECT.
    *
-   * By default this action typically returns partial records containing only the fields
-   * that were updated. Set `reload` to `true` to do an additional lookup after saving
-   * to return complete values for every $ENTITY.
+   * By default, this action typically returns partial records containing only the fields
+   * that were updated. If more is needed, set `reload` to an array of fields to SELECT
+   * (use `['*']` to select all) and they will be returned via an extra get request.
    *
-   * @var bool
+   * @var array|bool
    */
-  protected $reload = FALSE;
+  protected $reload;
 
   /**
    * @return \Civi\Api4\Result\ReplaceResult
