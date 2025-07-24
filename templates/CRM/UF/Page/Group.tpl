@@ -133,7 +133,7 @@
           </div>
         </div>{* reserved profile*}
       </div>
-      {include file="CRM/common/TabHeader.tpl"}
+      {include file="CRM/common/TabHeader.tpl" containerClasses="" listClasses=""}
     {else}
       {if $action ne 1} {* When we are adding an item, we should not display this message *}
         <div class="messages status no-popup">
