@@ -29,7 +29,8 @@
 
       // This display has no search button - results always load immediately if a userJobId is given
       this.loading = true;
-      this.unsavedChanges = false;
+      // Array of rows with unsaved changes
+      this.unsaved = [];
       this.formName = 'searchDisplayBatch' + displayInstance++;
 
       this.$onInit = function() {
@@ -37,7 +38,7 @@
         if (errorNotification && errorNotification.close) {
           errorNotification.close();
         }
-        // When previewing on the search admin screen, the display will be limited
+        // When previewing on the search admin screen, the display will be view-only
         this.isPreviewMode = typeof this.search !== 'string';
         this.userJobId = this.isPreviewMode ? null : $location.search().batch;
         // Run search if a userJobId is given. Otherwise the "Start New Batch" button will be shown.
@@ -123,26 +124,39 @@
       };
 
       this.addRows = function(rowCount) {
+        this.addingRows = true;
+        const newRows = [];
         for (let i = 0; i < rowCount; i++) {
-          let data = this.settings.columns.reduce(function (defaults, col) {
-            if ('default' in col) {
-              defaults[col.spec.name] = col.default;
-            }
-            return defaults;
-          }, {});
-          this.results.push({data: data});
+          newRows.push({});
         }
-        cancelSave();
+        crmApi4(getApiName(), 'save', {records: newRows, reload: ['*']}).then(function(savedRows) {
+          savedRows.forEach(function(row) {
+            delete row._entity_id;
+            delete row._status;
+            delete row._status_message;
+            ctrl.results.push({data: row});
+          });
+          ctrl.addingRows = false;
+        });
       };
 
       this.deleteRow = function(index) {
-        const start = (this.page - 1) * this.limit;
-        this.results.splice(start + index, 1);
-        cancelSave();
+        const rowNum = (this.page - 1) * this.limit + index;
+        const id = this.results[rowNum].data._id;
+        // Remove from unsaved array if present
+        const unsavedIndex = this.unsaved.findIndex(item => item._id === id);
+        if (unsavedIndex !== -1) {
+          this.unsaved.splice(unsavedIndex, 1);
+        }
+        crmApi4(getApiName(), 'delete', {where: [['_id', '=', id]]});
+        this.results.splice(rowNum, 1);
       };
 
-      this.onChangeData = function(index) {
-        const rowIndex = ((this.page - 1) * this.limit) + index;
+      this.onChangeData = function(row) {
+        // Add row data to unsaved array if not already present
+        if (!this.unsaved.some(item => item._id === row.data._id)) {
+          this.unsaved.push(row.data);
+        }
         // Calculate any formula fields
         this.settings.columns.forEach(function(col) {
           const editable = ctrl.results.editable[col.key];
@@ -151,37 +165,27 @@
             const prefix = editable.explicit_join ? (editable.explicit_join + '.') : '';
             formula = formula.replace(/\[/g, '(data["' + prefix);
             formula = formula.replace(/]/g, '"] || 0)');
-            ctrl.results[rowIndex].data[col.spec.name] = $scope.$eval(formula, {data: ctrl.results[rowIndex].data});
+            row.data[col.spec.name] = $scope.$eval(formula, {data: row.data});
           }
         });
-        ctrl.unsavedChanges = true;
       };
 
       this.saveRows = function() {
         if (this.saving) {
           return this.saving;
         }
-        if (!this.unsavedChanges) {
+        if (!this.unsaved.length) {
           return $q.resolve();
         }
-        this.unsavedChanges = false;
-        const apiName = 'Import_' + this.userJobId;
-        this.saving = crmApi4(apiName, 'replace', {
-          // The api requires this clause, but we actually want every row in the table
-          where: [['_id', '>', 0]],
-          records: this.results.map((row) => row.data),
+        const records = this.unsaved;
+        // Reset unsaved array to immediately start watching for new changes even before the ajax completes
+        this.unsaved = [];
+        this.saving = crmApi4(getApiName(), 'save', {
+          records: records,
         }).then(function(savedRows) {
           ctrl.saving = false;
-          if (ctrl.cancelSave) {
-            ctrl.cancelSave = false;
-            return;
-          }
-          savedRows.forEach(function(row, index) {
-            ctrl.results[index].data._id = row._id;
-          });
         }, function(error) {
           ctrl.saving = false;
-          ctrl.unsavedChanges = true;
         });
         return this.saving;
       };
@@ -275,8 +279,13 @@
       this.copyCol = function(index) {
         const fieldName = this.settings.columns[index].spec.name;
         const value = this.results[0].data[fieldName];
+        const updateValue = {};
+        updateValue[fieldName] = value;
         this.results.forEach((row) => row.data[fieldName] = value);
-        ctrl.unsavedChanges = true;
+        crmApi4(getApiName(), 'update', {
+          where: [['_id', '>', this.results[0].data._id]],
+          values: updateValue,
+        });
       };
 
       this.getTally = function(col) {
@@ -334,12 +343,8 @@
         return tallyMismatches;
       }
 
-      // When inserting/deleting rows the ids will shift so cancel pending save & re-queue it
-      function cancelSave() {
-        if (ctrl.saving) {
-          ctrl.cancelSave = true;
-        }
-        ctrl.unsavedChanges = true;
+      function getApiName() {
+        return 'Import_' + ctrl.userJobId;
       }
 
       // Override base method: add userJobId

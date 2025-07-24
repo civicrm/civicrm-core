@@ -143,6 +143,12 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $created = civicrm_api4($apiName, 'create')->single();
     $this->assertEquals(2, $created['_id']);
 
+    $created = civicrm_api4($apiName, 'get', ['where' => [['_id', '=', 2]]])->single();
+    $this->assertNull($created['first_name']);
+    $this->assertNull($created['gender_id']);
+    $this->assertNull($created['contact_sub_type']);
+    $this->assertNull($created['birth_date']);
+
     // And another
     civicrm_api4($apiName, 'create', [
       'values' => [
@@ -308,16 +314,25 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ->execute()->single();
     $apiName = 'Import_' . $userJob['id'];
 
+    $fields = civicrm_api4($apiName, 'getFields', ['loadOptions' => TRUE])->indexBy('label');
+    $fieldKeys = $fields->column('name');
+
+    // Add another
+    civicrm_api4($apiName, 'create', []);
+
+    // Add another
+    civicrm_api4($apiName, 'save', ['records' => [[]]]);
+
     // Ensure defaults have been filled
     $rows = civicrm_api4($apiName, 'get');
-    $this->assertEquals([1, 2, 3], $rows->column('_id'));
+    $this->assertEquals([1, 2, 3, 4, 5], $rows->column('_id'));
     foreach ($rows as $row) {
-      $this->assertEquals('1', $row['financial_type_id']);
+      $this->assertEquals('1', $row[$fieldKeys['Financial Type']]);
+      $this->assertNull($row[$fieldKeys['Total Amount']]);
+      $this->assertNull($row[$fieldKeys['Contact First Name']]);
+      $this->assertNull($row[$fieldKeys['Soft Credit Contact ID']]);
+      $this->assertNull($row[$fieldKeys['Soft Credit Amount']]);
     }
-
-    $fields = civicrm_api4($apiName, 'getFields', ['loadOptions' => TRUE])->indexBy('label');
-
-    $fieldKeys = $fields->column('name');
 
     $this->assertContains('Female', $fields['Contact Gender']['options']);
 
@@ -326,7 +341,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $lastName = uniqid(__FUNCTION__);
 
     // Add rows of data to import
-    civicrm_api4($apiName, 'replace', [
+    $newRows = civicrm_api4($apiName, 'replace', [
       'where' => [['_id', '>', 0]],
       'records' => [
         [
@@ -354,6 +369,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
         ],
       ],
     ]);
+    $this->assertCount(3, $newRows);
 
     $import = civicrm_api4($apiName, 'import');
     $this->assertCount(3, $import);
