@@ -99,4 +99,15 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * Upgrade 1004 - initialize form builder source to translate
+   * @see https://github.com/civicrm/civicrm-core/pull/32859
+   * @return bool
+   */
+  public function upgrade_1004(): bool {
+    $this->ctx->log->info('Applying update 1004 - initialize translatable afform string sources.');
+    \Civi\Afform\Utils::initSourceTranslations();
+    return TRUE;
+  }
+
 }

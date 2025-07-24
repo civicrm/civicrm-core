@@ -68,6 +68,10 @@ class CRM_Core_I18n_Schema {
       // CRM-21627 Updates the $dbLocale
       CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
     }
+
+    // It should probably be a dispatcher to let extension add their own
+    \Civi\Afform\Utils::initSourceTranslations();
+
   }
 
   /**
