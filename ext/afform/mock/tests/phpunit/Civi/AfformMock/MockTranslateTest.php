@@ -38,8 +38,10 @@ class MockTranslateTest extends \PHPUnit\Framework\TestCase implements \Civi\Tes
     // (2) We only want to initialize multilingual once, but useMultilingual() is non-static... so force it...
     static::$cleanL10n ??= $this->useMultilingual(['en_US' => static::EXAMPLE_LOCALE]);
 
+    \CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0');
     \CRM_Core_DAO::executeQuery('TRUNCATE TABLE civicrm_translation');
     \CRM_Core_DAO::executeQuery('TRUNCATE TABLE civicrm_translation_source');
+    \CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1');
   }
 
   public static function tearDownAfterClass(): void {
