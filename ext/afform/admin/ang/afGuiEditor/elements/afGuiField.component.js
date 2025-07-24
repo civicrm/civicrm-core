@@ -183,6 +183,9 @@
 
       function inputTypeCanBe(type) {
         var defn = ctrl.getDefn();
+        if (defn.input_type === type) {
+          return true;
+        }
         if (defn.readonly) {
           switch (type) {
             case 'DisplayOnly':
@@ -192,9 +195,6 @@
             default:
               return false;
           }
-        }
-        if (defn.input_type === type) {
-          return true;
         }
         switch (type) {
           case 'CheckBox':
