@@ -60,7 +60,7 @@ return [
       'description' => ts('ID of the relevant entity.'),
       'add' => '6.6.alpha1',
       'entity_reference' => [
-        'dynamic_entity' => 'entity_table',
+        'dynamic_entity' => 'entity',
         'key' => 'id',
       ],
     ],
