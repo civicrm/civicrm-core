@@ -79,7 +79,6 @@ class CreateBatch extends AbstractAction {
     ];
 
     $tableColumns = [];
-    $defaultValues = [];
 
     foreach ($this->display['settings']['columns'] as $column) {
       if (empty($column['spec'])) {
@@ -88,9 +87,6 @@ class CreateBatch extends AbstractAction {
       $fieldSpec = $column['spec'];
       $tableColumns[$fieldSpec['name']] = $this->getSqlType($fieldSpec);
       $fieldSpec['label'] = $column['label'];
-      if (isset($column['default'])) {
-        $defaultValues[$fieldSpec['name']] = $column['default'];
-      }
       $userJob['metadata']['DataSource']['column_headers'][] = $column['label'];
       $userJob['metadata']['DataSource']['column_specs'][$fieldSpec['name']] = $fieldSpec;
       $userJob['metadata']['DataSource']['targets'] = $this->targets;
@@ -111,10 +107,10 @@ class CreateBatch extends AbstractAction {
       ->setValues($userJob)
       ->execute()->single();
 
-    // Add rows of default values per $this->rowCount
+    // Add rows per $this->rowCount (default values will be filled in by the API)
     if ($this->rowCount > 0) {
       $apiName = 'Import_' . $userJob['id'];
-      $values = array_fill(0, $this->rowCount, $defaultValues);
+      $values = array_fill(0, $this->rowCount, []);
       civicrm_api4($apiName, 'save', ['records' => $values]);
     }
 

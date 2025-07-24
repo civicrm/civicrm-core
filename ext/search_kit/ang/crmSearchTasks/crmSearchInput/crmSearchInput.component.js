@@ -42,6 +42,10 @@
         };
 
         function formatDataType(val) {
+          // Prevent unnecessarily triggering ngChagne
+          if (val === null || val === undefined) {
+            return val;
+          }
           // Do not reformat pseudoconstant values (:name, :label, etc)
           if (ctrl.optionKey && ctrl.optionKey !== 'id') {
             return val;

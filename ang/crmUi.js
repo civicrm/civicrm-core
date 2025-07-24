@@ -80,7 +80,11 @@
         },
         link: function (scope, element, attrs, ngModel) {
           ngModel.$render = function () {
-            element.val(ngModel.$viewValue).change();
+            const viewVal = ngModel.$viewValue || '';
+            // Prevent unnecessarily triggering ngChagne
+            if (element.val() != viewVal) {
+              element.val(viewVal).change();
+            }
           };
           let settings = angular.copy(scope.crmUiDatepicker || {});
           // Set defaults to be non-restrictive
