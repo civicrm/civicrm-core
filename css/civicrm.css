@@ -3127,6 +3127,9 @@ tbody.scrollContent tr.alternateRow {
   border-top: 1px solid #d3d3d3;
   margin-top: 9px;
 }
+.select2-drop .crm-entityref-links a.crm-hover-button {
+  white-space: nowrap;
+}
 .select2-drop .crm-entityref-filters {
   margin-top: 4px;
 }

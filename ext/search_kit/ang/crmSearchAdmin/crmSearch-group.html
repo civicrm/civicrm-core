@@ -22,13 +22,11 @@
       </div>
     </div>
     <div class="form-inline">
-      <label>{{:: getField('visibility', 'Group').label }}</label>
-      <crm-search-input-val field=":: getField('visibility', 'Group')" ng-model="$ctrl.savedSearch.groups[0].visibility"></crm-search-input-val>
+      <crm-search-input field=":: getField('visibility', 'Group')" show-label="true" ng-model="$ctrl.savedSearch.groups[0].visibility"></crm-search-input>
     </div>
     <hr>
     <div class="form-inline" ng-repeat="field in getEntity('Group').fields | filter:{name: '.', entity: 'Group'}">
-      <label>{{:: field.label }}</label>
-      <crm-search-input-val field="field" ng-model="$ctrl.savedSearch.groups[0][field.name]"></crm-search-input-val>
+      <crm-search-input field="field" ng-model="$ctrl.savedSearch.groups[0][field.name]" show-label="true"></crm-search-input>
     </div>
   </div>
   <div ng-if="!getEntity('Group').optionsLoaded">
