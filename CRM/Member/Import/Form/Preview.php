@@ -28,7 +28,7 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
    *
    * @return void
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
     $this->setStatusUrl();
   }

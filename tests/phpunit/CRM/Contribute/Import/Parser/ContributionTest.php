@@ -987,12 +987,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @param array $submittedValues
    *
-   * @return \CRM_Contribute_Import_Form_Preview
+   * @return \CRM_CiviImport_Form_Generic_Preview
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
-  protected function getPreviewForm(array $submittedValues): CRM_Contribute_Import_Form_Preview {
-    /** @var CRM_Contribute_Import_Form_Preview $form */
-    $form = $this->getFormObject('CRM_Contribute_Import_Form_Preview', $submittedValues);
+  protected function getPreviewForm(array $submittedValues): CRM_CiviImport_Form_Generic_Preview {
+    /** @var CRM_CiviImport_Form_Generic_Preview $form */
+    $form = $this->getFormObject('CRM_CiviImport_Form_Generic_Preview', $submittedValues);
     return $form;
   }
 

@@ -61,12 +61,23 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
       $this->classPrefix = str_replace('_Controller', '', get_class($controller));
     }
     $this->_pages = [
-      $this->classPrefix . '_Form_DataSource' => NULL,
-      $this->classPrefix . '_Form_MapField' => NULL,
-      $this->classPrefix . '_Form_Preview' => NULL,
+      $this->getDataSourceFormName() => NULL,
+      $this->getMapFieldFormName() => NULL,
+      $this->getPreviewFormName() => NULL,
     ];
-
     $this->addSequentialPages($this->_pages);
+  }
+
+  private function getDataSourceFormName(): string {
+    return $this->classPrefix . '_Form_DataSource';
+  }
+
+  private function getMapFieldFormName(): string {
+    return $this->classPrefix . '_Form_MapField';
+  }
+
+  private function getPreviewFormName(): string {
+    return class_exists($this->classPrefix . '_Form_Preview') ? $this->classPrefix . '_Form_Preview' : 'CRM_CiviImport_Form_Generic_Preview';
   }
 
 }

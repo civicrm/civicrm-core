@@ -128,7 +128,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     try {
       $this->processForm('CRM_Contribute_Import_Form_DataSource', $submittedValues);
       $this->processForm('CRM_Contribute_Import_Form_MapField', $submittedValues, $importMappings);
-      $this->processForm('CRM_Contribute_Import_Form_Preview', $submittedValues);
+      $this->processForm('CRM_CiviImport_Form_Generic_Preview', $submittedValues);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       // We expect this to happen as it re-directs to the queue runner.

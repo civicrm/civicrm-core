@@ -15,23 +15,20 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Import\ContributionParser;
-
 /**
- * This class previews the uploaded file and returns summary statistics.
+ * This class provides a generic import Preview form.
+ *
+ * It can be loaded outside the form controller.
  */
-class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
+class CRM_CiviImport_Form_Generic_Preview extends \CRM_CiviImport_Form_Preview {
 
   /**
-   * @return \Civi\Import\ContributionParser
+   * Use the form name to create the tpl file name.
+   *
+   * @return string
    */
-  protected function getParser(): ContributionParser {
-    if (!$this->parser) {
-      $this->parser = new ContributionParser();
-      $this->parser->setUserJobID($this->getUserJobID());
-      $this->parser->init();
-    }
-    return $this->parser;
+  public function getTemplateFileName(): string {
+    return 'CRM/Import/Preview.tpl';
   }
 
 }
