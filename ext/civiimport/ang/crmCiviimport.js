@@ -310,6 +310,9 @@
                 // Just redirect to the template listing.
                 window.location.href = CRM.url('civicrm/imports/templates');
               }
+              else if ($scope.isStandalone) {
+                window.location.href = CRM.url('civicrm/import_preview', {'id' : $scope.userJob.id});
+              }
               else {
                 // Only post the form if the save succeeds.
                 document.getElementById("MapField").submit();

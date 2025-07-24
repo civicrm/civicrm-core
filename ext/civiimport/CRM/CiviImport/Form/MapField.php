@@ -40,7 +40,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
       'columnHeaders' => $this->getColumnHeaders(),
       'dateFormats' => $this->getDateFormats(),
       'isTemplate' => $this->getUserJob()['is_template'],
-      'isStandalone' => !$this->controller instanceof CRM_Import_Controller,
+      'isStandalone' => $this->isStandalone(),
     ]);
   }
 
@@ -213,16 +213,12 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
+   * Do nothing on post process.
    *
-   * @noinspection PhpUnhandledExceptionInspection
+   * The angular form has already done this work & validation is now done on preview.
    */
   public function postProcess(): void {
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    $parser = $this->getParser();
-    $parser->init();
-    $parser->validate();
   }
 
 }

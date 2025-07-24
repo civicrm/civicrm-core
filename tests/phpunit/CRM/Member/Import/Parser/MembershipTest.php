@@ -427,23 +427,18 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * Test the full form-flow import.
    */
   public function testImportCSV() :void {
-    try {
-      $this->importCSV('memberships_invalid.csv', [
-        ['name' => 'Contact.id'],
-        ['name' => 'Membership.source'],
-        ['name' => 'Membership.membership_type_id'],
-        ['name' => 'Membership.start_date'],
-        ['name' => 'do_not_import'],
-      ]);
-    }
-    catch (CRM_Core_Exception $e) {
-      $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-      $row = $dataSource->getRow();
-      $this->assertEquals('ERROR', $row['_status']);
-      $this->assertEquals('Invalid value for field(s) : Membership Type', $row['_status_message']);
-      return;
-    }
-    $this->fail('should have thrown an exception');
+    $this->importCSV('memberships_invalid.csv', [
+      ['name' => 'Contact.id'],
+      ['name' => 'Membership.source'],
+      ['name' => 'Membership.membership_type_id'],
+      ['name' => 'Membership.start_date'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Invalid value for field(s) : Membership Type', $row['_status_message']);
+    return;
   }
 
   /**

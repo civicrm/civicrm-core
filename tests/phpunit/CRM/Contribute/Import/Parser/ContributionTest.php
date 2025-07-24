@@ -189,7 +189,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.payment_instrument_id' => 'not at all random'];
     $this->runImport($values, 'create');
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['ontact_id' => $contactID, 'payment_instrument_id' => 'random']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['payment_instrument']);
   }
 
@@ -278,9 +278,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       [],
     ];
     $submittedValues = $this->doUserJobImport($importMappings);
-    $row = $this->getDataSource()->getRow();
-    // a valid status here means it has been able to incorporate the default_value.
-    $this->assertEquals('VALID', $row['_status']);
 
     $this->submitPreviewForm($submittedValues);
     $row = $this->getDataSource()->getRow();
@@ -331,6 +328,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $form->buildForm();
     $this->assertTrue($form->validate());
     $form->postProcess();
+    $form = $this->getPreviewForm($submittedValues);
+    $form->preProcess();
     return $submittedValues;
   }
 
@@ -769,6 +768,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $form->buildForm();
     $this->assertTrue($form->validate());
     $form->postProcess();
+    $form = $this->getPreviewForm($submittedValues);
+    $form->preProcess();
     $row = $this->getDataSource()->getRows()[0];
     $this->assertEquals('ERROR', $row[10]);
     $this->assertEquals('Invalid value for field(s) : Contribution Campaign', $row[11]);
