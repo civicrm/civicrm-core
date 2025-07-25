@@ -154,6 +154,9 @@ function _civicrm_api3_message_template_send_spec(&$params) {
   $params['template_params']['api.aliases'] = ['tplParams'];
   // FIXME: Type??
 
+  $params['tokenContext']['description'] = "Entity IDs to be used for tokens, using format ['entityId' => 123] for tokens {entity.something}";
+  $params['tokenContext']['title'] = 'Token Context';
+
   $params['from']['description'] = 'the From: header';
   $params['from']['title'] = 'From';
   $params['from']['type'] = CRM_Utils_Type::T_STRING;
