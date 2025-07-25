@@ -45,29 +45,6 @@ class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   }
 
   /**
-   * Set variables up before form is built.
-   *
-   * @return void
-   */
-  public function preProcess(): void {
-    parent::preProcess();
-    unset($this->_mapperFields['participant_is_test']);
-
-    if ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $remove = [
-        'participant_contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($remove as $value) {
-        unset($this->_mapperFields[$value]);
-      }
-    }
-  }
-
-  /**
    * Build the form object.
    *
    * @return void
