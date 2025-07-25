@@ -449,6 +449,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
           'Template' => ['mapping_id' => $this->getSavedMappingID()],
           'import_mappings' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_mappings'] : [],
           'import_options' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_options'] : [],
+          'base_entity' => $this->getBaseEntity(),
         ],
       ])
       ->execute()
@@ -480,7 +481,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function updateUserJobMetadata(string $key, array|int $data): void {
+  protected function updateUserJobMetadata(string $key, array|int|string $data): void {
     $metaData = array_merge(
       $this->getUserJob()['metadata'],
       [$key => $data]

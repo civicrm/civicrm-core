@@ -97,7 +97,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
    *
    */
   protected function getAvailableImportEntities(): array {
-    return $this->getParser()->getImportEntities();
+    return $this->getParser()->getAvailableImportEntities();
   }
 
   /**
@@ -219,6 +219,16 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function postProcess(): void {
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+  }
+
+  /**
+   * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function buildQuickForm(): void {
+    $this->addSavedMappingFields();
+    $this->addFormButtons();
   }
 
 }

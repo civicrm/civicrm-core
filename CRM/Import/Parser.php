@@ -674,7 +674,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return array
    */
   public function getRequiredFieldsForEntity(string $entity, string $action): array {
-    $entityMetadata = $this->getImportEntities()[$entity];
+    $entityMetadata = $this->getAvailableImportEntities()[$entity];
     if ($action === 'select') {
       // Select uses the same lookup as update.
       $action = 'update';
@@ -1058,10 +1058,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception
    */
   protected function validateParams(array $params): void {
-    if (empty($params['id']) && empty($params[$this->baseEntity]['id'])) {
-      $entityConfiguration = $this->getImportEntities()[$this->baseEntity];
+    if (empty($params['id']) && empty($params[$this->getBaseEntity()]['id'])) {
+      $entityConfiguration = $this->getAvailableImportEntities()[$this->getBaseEntity()];
       $entity = $entityConfiguration['entity_name'] ?? '';
-      $this->validateRequiredFields($this->getRequiredFields(), $params[$this->baseEntity] ?? $params, $entity);
+      $this->validateRequiredFields($this->getRequiredFields(), $params[$this->getBaseEntity()] ?? $params, $entity);
     }
     $errors = [];
     foreach ($params as $key => $value) {
@@ -1223,6 +1223,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     return [
       'Contact' => ['text' => ts('Contact Fields'), 'is_contact' => TRUE],
     ];
+  }
+
+  public function getAvailableImportEntities(): array {
+    return $this->getImportEntities();
   }
 
   /**
