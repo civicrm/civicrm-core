@@ -964,4 +964,17 @@ class CRM_Import_Forms extends CRM_Core_Form {
     return $this->savedMappingID;
   }
 
+  /**
+   * Is the form being run in standalone mode.
+   *
+   * The import historically only runs as connected QuickForm forms
+   * (using the CRM_Import_Controller) - however, the forms will now (often)
+   * load as individual forms, without the controller in standalone mode.
+   *
+   * @return bool
+   */
+  public function isStandalone(): bool {
+    return !$this->controller instanceof CRM_Import_Controller;
+  }
+
 }
