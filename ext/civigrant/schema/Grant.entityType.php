@@ -157,6 +157,7 @@ return [
       'description' => E::ts('Type of grant. Implicit FK to civicrm_option_value in grant_type option_group.'),
       'add' => '1.8',
       'usage' => [
+        'import',
         'export',
         'token',
       ],

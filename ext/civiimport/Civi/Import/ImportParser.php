@@ -399,4 +399,13 @@ abstract class ImportParser extends \CRM_Import_Parser {
     return $this->getDedupeRule($contactType)['fields'];
   }
 
+  /**
+   * Get the required fields.
+   *
+   * @return array
+   */
+  protected function getRequiredFields(): array {
+    return [[$this->getRequiredFieldsForMatch(), $this->getRequiredFieldsForCreate()]];
+  }
+
 }

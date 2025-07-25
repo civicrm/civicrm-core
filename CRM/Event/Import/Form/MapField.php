@@ -49,7 +49,7 @@ class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    *
    * @return void
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addSavedMappingFields();
     $this->addFormRule(['CRM_Event_Import_Form_MapField', 'formRule'], $this);
     $this->addMapper();
