@@ -59,7 +59,6 @@ class ContributionParser extends ImportParser {
    *   Array of arrays with each array representing a row in the datasource.
    *   The arrays hold the following keys
    *   - name - field the row maps to
-   *   - entity_data - data about the relevant entity ie ['soft_credit' => ['soft_credit_type_id => 9],
    *   In addition the following are returned but will be phased out.
    *   - contact_type - entity_data but json_encoded. Saved to civicrm_mapping_field in contact_type column
    *   - column_number = this is used for saving to civicrm_field_mapping but
@@ -72,11 +71,9 @@ class ContributionParser extends ImportParser {
     $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
     foreach ($mappedFields as $index => $mappedField) {
       $mappedFields[$index]['column_number'] = 0;
-      // This is the same data as entity_data - it is stored to the database in the contact_type field
-      // slit your eyes & squint while blinking and you can almost read that as entity_type and not
-      // hate it. Otherwise go & whinge on https://lab.civicrm.org/dev/core/-/issues/1172
-      $mappedFields[$index]['contact_type'] = !empty($mappedField['entity_data']) ? json_encode($mappedField['entity_data']) : NULL;
-      $mappedFields[$index]['soft_credit_type_id'] = !empty($mappedField['entity_data']) ? $mappedField['entity_data']['soft_credit']['soft_credit_type_id'] : NULL;
+      $entityInstance = $this->getEntityInstance($mappedField);
+      $mappedFields[$index]['contact_type'] = $entityInstance['contact_type'] ?? NULL;
+      $mappedFields[$index]['soft_credit_type_id'] = $entityInstance['soft_credit_type_id'] ?? NULL;
     }
     return $mappedFields;
   }
@@ -147,12 +144,12 @@ class ContributionParser extends ImportParser {
       $entity = $fieldSpec['entity_instance'] ?? ($fieldSpec['entity'] ?? 'Contribution');
       // If we move this to the parent we can check if the entity config 'supports_multiple'
       if ($entity === 'SoftCreditContact') {
-        $entityKey = json_encode($mappedField['entity_data']);
+        $entityKey = json_encode($this->getEntityInstance($mappedField));
         if (isset($params[$entity][$entityKey])) {
           $entityInstance = $params[$entity][$entityKey];
         }
         else {
-          $entityInstance = (array) ($mappedField['entity_data']['soft_credit']);
+          $entityInstance = (array) ($this->getEntityInstance($mappedField)['soft_credit']);
           $entityInstance['Contact']['contact_type'] = $this->getContactTypeForEntity($entity);
         }
         $entityInstance['Contact'] = array_merge($entityInstance['Contact'], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $fieldValue)]);
@@ -605,7 +602,6 @@ class ContributionParser extends ImportParser {
       'name' => $fieldMapping[0],
       'mapping_id' => $mappingID,
       'column_number' => $columnNumber,
-      'entity_data' => !empty($fieldMapping[1]) ? ['soft_credit' => ['soft_credit_type_id' => $fieldMapping[1]]] : NULL,
     ];
   }
 
@@ -627,6 +623,16 @@ class ContributionParser extends ImportParser {
         }
       }
     }
+  }
+
+  /**
+   * @param array $field
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getEntityInstance(array $field): array {
+    return $this->getUserJob()['metadata']['entity_configuration'][$field['entity_instance']];
   }
 
   /**

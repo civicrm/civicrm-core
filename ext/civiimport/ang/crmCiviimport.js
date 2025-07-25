@@ -287,21 +287,12 @@
             $scope.userJob.metadata.entity_configuration[entity.id] = entity.selected;
           });
           _.each($scope.data.importMappings, function (importRow, index) {
-            selectedEntity = $scope.getEntityForField(importRow.selectedField);
-            var entityConfig = {};
-            if (selectedEntity === 'SoftCreditContact') {
-              // For now we just hard-code this - mapping to soft_credit a bit undefined - but
-              // we are mimicking getMappingFieldFromMapperInput on the php layer.
-              // Could get it from entity_data but .... later.
-              entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity]};
-            }
 
             $scope.userJob.metadata.import_mappings.push({
               name: importRow.selectedField,
               default_value: importRow.defaultValue,
               // At this stage column_number is thrown away but we store it here to have it for when we change that.
               column_number: index,
-              entity_data: entityConfig,
             });
           });
           crmApi4('UserJob', 'save', {records: [$scope.userJob]})
