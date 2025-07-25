@@ -568,7 +568,12 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getDataRows($statuses = [], int $limit = 0): array {
     $statuses = (array) $statuses;
-    $rows = $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+    if (!empty($this->getUserJob()['is_template'])) {
+      return [];
+    }
+    else {
+      $rows = $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+    }
     $headers = $this->getColumnHeaders();
     $mappings = $this->getUserJob()['metadata']['import_mappings'] ?? [];
     foreach ($rows as &$row) {

@@ -83,4 +83,14 @@ class CRM_CiviImport_Form_DataSource extends CRM_Import_Form_DataSource {
     }
   }
 
+  public function setDefaultValues(): array {
+    $defaults = array_merge($this->dataSourceDefaults, [
+      'dataSource' => $this->getDefaultDataSource(),
+    ], $this->templateValues);
+    if ($this->templateID) {
+      $defaults['userJobTemplate'] = $this->templateID;
+    }
+    return $defaults;
+  }
+
 }

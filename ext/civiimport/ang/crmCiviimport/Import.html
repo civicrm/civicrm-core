@@ -3,12 +3,12 @@
 
 
 
-<div class="help">
+<div class="help" ng-if="!isTemplate">
   <p>{{:: ts("Review the values shown below from the first 2 rows of your import file and select the matching CiviCRM database fields from the drop-down lists in the right-hand column. Select '- do not import -' for any columns in the import file that you want ignored.") }}</p>
   <p>{{:: ts("If you think you may be importing additional data from the same data source, check 'Save this field mapping' at the bottom of the page before continuing. The saved mapping can then be easily reused the next time data is imported.") }}</p>
 </div>
 
-<div class="crm-submit-buttons">
+<div class="crm-submit-buttons" ng-if="!isTemplate">
   <button class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" ng-click="save" id="_qf_MapField_back-top"><i aria-hidden="true" class="crm-i fa-chevron-left"></i> Previous</button>
   <button class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" ng-click="save($event)" id="_qf_MapField_next-top"><i aria-hidden="true" class="crm-i fa-check"></i> Continue</button>
   <button class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" ng-click="save($event)" id="_qf_MapField_cancel-top"><i aria-hidden="true" class="crm-i fa-times"></i> Cancel</button>
@@ -112,7 +112,7 @@
   </div>
 
 </div>
-<div>
+<div ng-if="!isTemplate">
   <span ng-if="data.savedMapping.name"><input
     id="updateMapping"
     name="updateMapping"
@@ -148,8 +148,8 @@
 </div>
 
 <div class="crm-submit-buttons">
-  <button class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i aria-hidden="true" class="crm-i fa-chevron-left"></i>{{:: ts('Previous') }}</button>
-  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i aria-hidden="true" class="crm-i fa-check"></i>{{:: ts('Continue') }}</button>
-  <button class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i aria-hidden="true" class="crm-i fa-times"></i>{{:: ts('Cancel') }}</button>
+  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i aria-hidden="true" class="crm-i fa-chevron-left"></i>{{:: ts('Previous') }}</button>
+  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i aria-hidden="true" class="crm-i fa-check"></i><span ng-if="!isStandalone">{{:: ts('Continue') }}</span><span ng-if="isTemplate">{{:: ts('Save Template') }}</span><span ng-if="!isTemplate && isStandalone">{{:: ts('Continue') }}</span></button>
+  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i aria-hidden="true" class="crm-i fa-times"></i>{{:: ts('Cancel') }}</button>
 </div>
 

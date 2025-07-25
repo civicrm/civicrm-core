@@ -24,6 +24,8 @@
           $scope.userJob = CRM.vars.crmImportUi.userJob;
           $scope.data.showColumnNames = $scope.userJob.metadata.submitted_values.skipColumnHeader;
           $scope.data.savedMapping = CRM.vars.crmImportUi.savedMapping;
+          $scope.isStandalone = CRM.vars.crmImportUi.isStandalone;
+          $scope.isTemplate = CRM.vars.crmImportUi.isTemplate;
           $scope.mappingSaving = {updateFieldMapping: 0, newFieldMapping: 0};
           $scope.dateFormats = CRM.vars.crmImportUi.dateFormats;
           // Used for dedupe rules select options, also for filtering available fields.
@@ -304,12 +306,20 @@
           });
           crmApi4('UserJob', 'save', {records: [$scope.userJob]})
             .then(function(result) {
-              // Only post the form if the save succeeds.
-              document.getElementById("MapField").submit();
+              if ($scope.isTemplate) {
+                // Just redirect to the template listing.
+                window.location.href = CRM.url('civicrm/imports/templates');
+              }
+              else {
+                // Only post the form if the save succeeds.
+                document.getElementById("MapField").submit();
+              }
             },
             function(failure) {
-              // @todo add more error handling - for now, at least we waited...
-              document.getElementById("MapField").submit();
+              if (!$scope.isTemplate) {
+                // @todo add more error handling - for now, at least we waited..
+                document.getElementById("MapField").submit();
+              }
             }
           );
         });

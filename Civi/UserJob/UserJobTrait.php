@@ -36,8 +36,13 @@ trait UserJobTrait {
    * @return int|null
    */
   public function getUserJobID(): ?int {
-    if (!$this->userJobID && is_a($this, 'CRM_Core_Form') && $this->get('user_job_id')) {
-      $this->userJobID = $this->get('user_job_id');
+    if (!$this->userJobID && is_a($this, 'CRM_Core_Form')) {
+      if ($this->get('user_job_id')) {
+        $this->userJobID = $this->get('user_job_id');
+      }
+      else {
+        $this->userJobID = \CRM_Utils_Request::retrieve('id', 'Integer', $this) ?? NULL;
+      }
     }
     return $this->userJobID;
   }
