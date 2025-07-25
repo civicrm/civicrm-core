@@ -73,7 +73,7 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
   }
 
   private function getMapFieldFormName(): string {
-    return $this->classPrefix . '_Form_MapField';
+    return class_exists($this->classPrefix . '_Form_MapField') ? $this->classPrefix . '_Form_MapField' : 'CRM_CiviImport_Form_Generic_MapField';
   }
 
   private function getPreviewFormName(): string {

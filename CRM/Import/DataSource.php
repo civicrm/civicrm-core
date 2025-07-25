@@ -492,6 +492,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
       'new' => ['new', 'valid'],
       'valid' => ['valid'],
       'imported' => ['imported', 'soft_credit_imported', 'pledge_payment_imported', 'warning_unparsed_address'],
+      'unimported' => ['new', 'valid', 'error', 'invalid', 'soft_credit_error', 'pledge_payment_error', 'invalid_no_match'],
     ];
   }
 

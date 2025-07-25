@@ -1031,9 +1031,11 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   public function validate(): void {
     $dataSource = $this->getDataSourceObject();
+    $dataSource->setStatuses(['unimported']);
     while ($row = $dataSource->getRow()) {
       $this->validateRow($row);
     }
+    $dataSource->setStatuses([]);
   }
 
   /**
@@ -1351,7 +1353,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $dataSource->setLimit($limit);
 
     while ($row = $dataSource->getRow()) {
-      $parser->import($row);
+      if ($parser->validateRow($row)) {
+        $parser->import($row);
+      }
     }
     $parser->doPostImportActions();
     return TRUE;
