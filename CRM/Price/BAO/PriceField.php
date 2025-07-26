@@ -192,7 +192,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * Freeze form if the event is full.
+   * Freeze price option if full and on front end
    *
    * @param $element
    * @param $fieldOptions
@@ -200,7 +200,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return null
    */
   public static function freezeIfEnabled(&$element, $fieldOptions) {
-    if (!empty($fieldOptions['is_full'])) {
+    if ((!empty($fieldOptions['is_full'])) && CRM_Utils_System::isFrontendPage()) {
       $element->freeze();
     }
     return NULL;
@@ -439,7 +439,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           // CRM-14696 - Improve display for sold out price set options
           else {
-            $opt['id'] = 'crm_disabled_opt-' . $opt['id'];
+            if (CRM_Utils_System::isFrontendPage()) {
+              $opt['id'] = 'crm_disabled_opt-' . $opt['id'];
+            }
             $priceOptionText['label'] = $priceOptionText['label'] . ' (' . ts('Sold out') . ')';
           }
 
@@ -474,7 +476,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         // CRM-6902 - Add "max" option for a price set field
         $button = substr($qf->controller->getButtonName(), -4);
-        if (!empty($freezeOptions) && $button != 'skip') {
+        if (!empty($freezeOptions) && $button != 'skip' && CRM_Utils_System::isFrontendPage()) {
           $qf->addRule($elementName, ts('Sorry, this option is currently sold out.'), 'regex', "/" . implode('|', $allowedOptions) . "/");
         }
         break;
