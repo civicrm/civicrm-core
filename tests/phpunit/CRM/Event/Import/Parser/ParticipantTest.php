@@ -165,7 +165,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'Participant.id'],
       ['name' => 'Participant.status_id'],
       ['name' => 'Participant.' . $this->getCustomFieldName('radio', 4)],
-    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    ], [], 'update');
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);

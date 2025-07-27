@@ -112,7 +112,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.financial_type_id'],
       ['name' => 'Contact.external_identifier'],
       ['name' => 'SoftCreditContact.external_identifier', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 1]]],
-      ['name' => 'note'],
+      ['name' => 'Contribution.note'],
     ];
     $this->importCSV('contributions_amount_validate.csv', $mapping);
 
@@ -296,9 +296,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $submittedValues = [
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => 'Organization',
       'dataSource' => 'CRM_Import_DataSource_CSV',
-      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
     ];
     $this->submitDataSourceForm('soft_credit_extended.csv', $submittedValues);
     $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)->addSelect('metadata')->execute()->first()['metadata'];
@@ -314,11 +312,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
         'contact_type' => 'Individual',
         'action' => 'create',
         'dedupe_rule' => 'IndividualSupervised',
-        'entity_data' => [
-          'soft_credit' => [
-            'soft_credit_type_id' => 1,
-          ],
-        ],
+        'soft_credit_type_id' => 1,
       ],
     ];
     UserJob::update()->addWhere('id', '=', $this->userJobID)
@@ -536,7 +530,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contact.email_primary.email'],
       ['name' => 'Contact.address_primary.state_province_id'],
       ['name' => 'Contribution.source'],
-      ['name' => 'note'],
+      ['name' => 'Contribution.note'],
       [],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
@@ -1013,7 +1007,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.financial_type_id'],
       ['name' => 'Contact.email_primary.email'],
       ['name' => 'Contribution.source'],
-      ['name' => 'note'],
+      ['name' => 'Contribution.note'],
       ['name' => 'Contribution.trxn_id'],
     ], $submittedValues, $action, $entityConfiguration);
     return new CRM_Import_DataSource_CSV($this->userJobID);

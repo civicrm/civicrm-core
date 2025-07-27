@@ -55,8 +55,15 @@ trait CRMTraits_Import_ParserTrait {
     $userJobMetadata = UserJob::get()
       ->addWhere('id', '=', $this->userJobID)
       ->execute()->first()['metadata'];
+    $userJobMetadata['entity_configuration'][$userJobMetadata['base_entity']]['action'] = $action;
+    $userJobMetadata['entity_configuration']['Contact']['contact_type'] = $submittedValues['contactType'];
+    foreach ($fieldMappings as $index => $mapping) {
+      if (isset($mapping['entity_data'])) {
+        $userJobMetadata['entity_configuration']['SoftCreditContact'] = $mapping['entity_data']['soft_credit'];
+        unset($fieldMappings[$index]['entity_data']);
+      }
+    }
     $userJobMetadata['import_mappings'] = $fieldMappings;
-    $userJobMetadata['entity_configuration']['Contribution']['action'] = $action;
     if ($entityConfiguration) {
       foreach ($entityConfiguration as $entity => $configuration) {
         if (isset($userJobMetadata['entity_configuration'][$entity])) {

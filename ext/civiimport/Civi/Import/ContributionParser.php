@@ -59,7 +59,6 @@ class ContributionParser extends ImportParser {
    *   Array of arrays with each array representing a row in the datasource.
    *   The arrays hold the following keys
    *   - name - field the row maps to
-   *   - entity_data - data about the relevant entity ie ['soft_credit' => ['soft_credit_type_id => 9],
    *   In addition the following are returned but will be phased out.
    *   - contact_type - entity_data but json_encoded. Saved to civicrm_mapping_field in contact_type column
    *   - column_number = this is used for saving to civicrm_field_mapping but
@@ -69,16 +68,7 @@ class ContributionParser extends ImportParser {
    * @throws \CRM_Core_Exception
    */
   protected function getFieldMappings(): array {
-    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
-    foreach ($mappedFields as $index => $mappedField) {
-      $mappedFields[$index]['column_number'] = 0;
-      // This is the same data as entity_data - it is stored to the database in the contact_type field
-      // slit your eyes & squint while blinking and you can almost read that as entity_type and not
-      // hate it. Otherwise go & whinge on https://lab.civicrm.org/dev/core/-/issues/1172
-      $mappedFields[$index]['contact_type'] = !empty($mappedField['entity_data']) ? json_encode($mappedField['entity_data']) : NULL;
-      $mappedFields[$index]['soft_credit_type_id'] = !empty($mappedField['entity_data']) ? $mappedField['entity_data']['soft_credit']['soft_credit_type_id'] : NULL;
-    }
-    return $mappedFields;
+    return $this->getUserJob()['metadata']['import_mappings'] ?? [];
   }
 
   /**
@@ -109,10 +99,12 @@ class ContributionParser extends ImportParser {
    * @return array
    *   Parameters mapped to CiviCRM fields based on the mapping. eg.
    *   [
-   *     'total_amount' => '1230.99',
-   *     'financial_type_id' => 1,
-   *     'external_identifier' => 'abcd',
-   *     'soft_credit' => [3 => ['external_identifier' => '123', 'soft_credit_type_id' => 1]]
+   *     'Contribution' => [
+   *        'total_amount' => '1230.99',
+   *        'financial_type_id' => 1,
+   *     ],
+   *     'Contact' => ['external_identifier' => 'abcd'],
+   *     'SoftCreditContact' => ['external_identifier' => '123', 'soft_credit_type_id' => 1]
    *
    * @throws \CRM_Core_Exception
    */
@@ -135,27 +127,11 @@ class ContributionParser extends ImportParser {
       if ($fieldValue === '' && isset($mappedField['default_value'])) {
         $fieldValue = $mappedField['default_value'];
       }
-      $entity = $fieldSpec['entity_instance'] ?? ($fieldSpec['entity'] ?? 'Contribution');
-      // If we move this to the parent we can check if the entity config 'supports_multiple'
-      if ($entity === 'SoftCreditContact') {
-        $entityKey = json_encode($mappedField['entity_data']);
-        if (isset($params[$entity][$entityKey])) {
-          $entityInstance = $params[$entity][$entityKey];
-        }
-        else {
-          $entityInstance = (array) ($mappedField['entity_data']['soft_credit']);
-          $entityInstance['Contact']['contact_type'] = $this->getContactTypeForEntity($entity);
-        }
-        $entityInstance['Contact'] = array_merge($entityInstance['Contact'], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $fieldValue)]);
-        $params[$entity][$entityKey] = $entityInstance;
+      $entity = $fieldSpec['entity_instance'];
+      if (!isset($params[$entity])) {
+        $params[$entity] = $this->getEntityInstanceConfiguration($entity);
       }
-      else {
-        if ($entity === 'Contact' && !isset($params[$entity])) {
-          $params[$entity] = [];
-          $params[$entity]['contact_type'] = $this->getContactTypeForEntity($entity) ?: $this->getContactType();
-        }
-        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
-      }
+      $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
     }
     return $this->removeEmptyValues($params);
   }
@@ -222,23 +198,20 @@ class ContributionParser extends ImportParser {
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
-      $note = \CRM_Core_DAO_Note::import();
       $fields = [
         '' => [
 
           'title' => '- ' . ts('do not import') . ' -',
         ],
       ];
-      $contributionFields = (array) Contribution::getFields()
-        ->addWhere('usage', 'CONTAINS', 'import')
-        ->setAction('save')
-        ->addOrderBy('title')
-        ->execute()->indexBy('name');
-      foreach ($contributionFields + ['note' => $note['note']] as $fieldName => $field) {
+      $contributionFields = $this->getImportFieldsForEntity('Contribution');
+      $note = $this->getImportFieldsForEntity('Note');
+      foreach ($contributionFields + $note as $fieldName => $field) {
         $field['entity_instance'] = 'Contribution';
         $field['entity_prefix'] = 'Contribution.';
         $fields['Contribution.' . $fieldName] = $field;
       }
+      $fields['Contribution.note']['entity_instance'] = 'Note';
       $contactFields = $this->getContactFields($this->getContactType(), 'Contact');
       $fields['Contribution.contact_id'] = $contactFields['Contact.id'];
       $fields['Contribution.contact_id']['match_rule'] = '*';
@@ -276,6 +249,9 @@ class ContributionParser extends ImportParser {
             'entity' => 'Contribution',
             'type' => \CRM_Utils_Type::T_INT,
             'options' => FALSE,
+            // We mock this into the contribution because it as special handling
+            // coded for this field.
+            'entity_instance' => 'Contribution',
           ],
         ];
 
@@ -396,9 +372,10 @@ class ContributionParser extends ImportParser {
       $contributionParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], $contributionParams['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
 
       $softCreditParams = [];
-      foreach ($params['SoftCreditContact'] ?? [] as $index => $softCreditContact) {
+      $softCreditEntities = isset($params['SoftCreditContact']) ? [$params['SoftCreditContact']] : [];
+      foreach ($softCreditEntities as $index => $softCreditContact) {
         $softCreditParams[$index]['soft_credit_type_id'] = $softCreditContact['soft_credit_type_id'];
-        $softCreditParams[$index]['contact_id'] = $this->getContactID($softCreditContact['Contact'], !empty($softCreditContact['Contact']['id']) ? $softCreditContact['Contact']['id'] : NULL, 'SoftCreditContact', $this->getDedupeRulesForEntity('SoftCreditContact'));
+        $softCreditParams[$index]['contact_id'] = $this->getContactID($softCreditContact, !empty($softCreditContact['id']) ? $softCreditContact['id'] : NULL, 'SoftCreditContact', $this->getDedupeRulesForEntity('SoftCreditContact'));
         if (empty($softCreditParams[$index]['contact_id']) && in_array($this->getActionForEntity('SoftCreditContact'), ['update', 'select'])) {
           throw new \CRM_Core_Exception(ts('Soft Credit Contact not found'));
         }
@@ -409,12 +386,12 @@ class ContributionParser extends ImportParser {
       // From this point on we are changing stuff - the prior rows were doing lookups and exiting
       // if the lookups failed.
 
-      foreach ($params['SoftCreditContact'] ?? [] as $index => $softCreditContact) {
-        $softCreditParams[$index]['contact_id'] = $this->saveContact('SoftCreditContact', $softCreditContact['Contact']) ?: $softCreditParams[$index]['contact_id'];
+      foreach ($softCreditEntities as $index => $softCreditContact) {
+        $softCreditParams[$index]['contact_id'] = $this->saveContact('SoftCreditContact', $softCreditContact) ?: $softCreditParams[$index]['contact_id'];
       }
       $contributionParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $contributionParams['contact_id'];
 
-      if (isset($params['SoftCreditContact']) && $this->isUpdateExisting()) {
+      if ($softCreditEntities && $this->isUpdateExisting()) {
         //need to check existing soft credit contribution, CRM-3968
         $this->deleteExistingSoftCredit($contributionParams['id']);
       }
@@ -596,7 +573,6 @@ class ContributionParser extends ImportParser {
       'name' => $fieldMapping[0],
       'mapping_id' => $mappingID,
       'column_number' => $columnNumber,
-      'entity_data' => !empty($fieldMapping[1]) ? ['soft_credit' => ['soft_credit_type_id' => $fieldMapping[1]]] : NULL,
     ];
   }
 
