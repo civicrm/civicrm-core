@@ -231,7 +231,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 /* Inactive icon */
 .crm-container tr.disabled td:first-of-type::before,
 .crm-container tr:has(.disabled) td:first-of-type::before {
-  content: "\f05e";
+  content: "\f05e" / "Disabled row.";
   color: var(--crm-alert-danger-text);
   font-style: normal;
 }
