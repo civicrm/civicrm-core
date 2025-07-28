@@ -169,6 +169,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Unload a certain entity.
+   *
+   * @param array $entity
+   * @return void
+   */
+  public function unloadEntity(array $entity) {
+    unset($this->_entityIds[$entity['name']]);
+    unset($this->_entityValues[$entity['name']]);
+  }
+
+  /**
    * Fetch all data needed to display a given entity on this form
    *
    * @param array $entity
