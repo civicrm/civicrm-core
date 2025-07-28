@@ -240,6 +240,10 @@
             } else if (ctrl.settings.pager || ctrl.settings.headerCount) {
               var params = ctrl.getApiParams('row_count');
               crmApi4('SearchDisplay', apiCalls.run[1], params).then(function(result) {
+                if (requestId < ctrl._runCount) {
+                  return; // Another request started after this one
+                }
+
                 ctrl.rowCount = result.count;
               });
             }
