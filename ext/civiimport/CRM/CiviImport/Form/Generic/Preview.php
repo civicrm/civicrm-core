@@ -21,6 +21,7 @@
  * It can be loaded outside the form controller.
  */
 class CRM_CiviImport_Form_Generic_Preview extends \CRM_CiviImport_Form_Preview {
+  use CRM_CiviImport_Form_Generic_GenericTrait;
 
   /**
    * Use the form name to create the tpl file name.

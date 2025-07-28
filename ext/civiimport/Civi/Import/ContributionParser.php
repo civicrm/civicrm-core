@@ -82,15 +82,6 @@ class ContributionParser extends ImportParser {
   }
 
   /**
-   * Get the required fields.
-   *
-   * @return array
-   */
-  public function getRequiredFields(): array {
-    return [[$this->getRequiredFieldsForMatch(), $this->getRequiredFieldsForCreate()]];
-  }
-
-  /**
    * Get required fields to create a contribution.
    *
    * @return array

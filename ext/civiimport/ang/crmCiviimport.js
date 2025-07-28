@@ -39,7 +39,7 @@
           $scope.entitySelection = [];
           var entityConfiguration = $scope.userJob.metadata.entity_configuration;
           _.each($scope.data.entityMetadata, function (entityMetadata) {
-            var selected = Boolean(entityConfiguration) ? entityConfiguration[entityMetadata.entity_name] : entityMetadata.selected;
+            var selected = (Boolean(entityConfiguration) && Boolean(entityConfiguration[entityMetadata.entity_name])) ? entityConfiguration[entityMetadata.entity_name] : entityMetadata.selected;
             // If our selected action is not available then fall back to the entity default.
             // This would happen if we went back to the DataSource screen & made a change, as the
             // php layer filters on that configuration options
