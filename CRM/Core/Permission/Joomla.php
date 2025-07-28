@@ -52,14 +52,35 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     // we've not yet figured out how to bootstrap joomla, so we should
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
-      $user = JFactory::getUser($userId);
+      if (version_compare(JVERSION, '4.0', 'lt')) {
+        $user = JFactory::getUser($userId);
+      }
+      else {
+        if ($userId == NULL) {
+          $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
+        }
+        else {
+          $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($userId);
+        }
+      }
       $api_key = CRM_Utils_Request::retrieve('api_key', 'String');
 
       // If we are coming from REST we don't have a user but we do have the api_key for a user.
       if ($user->id === 0 && !is_null($api_key)) {
         $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
         $uid = ($contact_id) ? CRM_Core_BAO_UFMatch::getUFId($contact_id) : NULL;
-        $user = JFactory::getUser($uid);
+        if (version_compare(JVERSION, '4.0', 'lt')) {
+          $user = JFactory::getUser($uid);
+        }
+        else {
+          if ($uid == NULL) {
+            $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
+          }
+          else {
+            $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($uid);
+          }
+        }
+
       }
 
       return $user->authorise($translated[0], $translated[1]);
@@ -152,7 +173,12 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *   Properties of the object are Joomla-fied permission names.
    */
   private function getUserGroupPermsAssociations() {
-    $db = JFactory::getDbo();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $db = JFactory::getDbo();
+    }
+    else {
+      $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+    }
     $query = $db->getQuery(TRUE);
 
     $query
@@ -176,7 +202,12 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *   CRM_Core_Permission_Joomla->getUserGroupPermsAssociations().
    */
   private function updateGroupPermsAssociations($associations) {
-    $db = JFactory::getDbo();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $db = JFactory::getDbo();
+    }
+    else {
+      $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+    }
     $query = $db->getQuery(TRUE);
 
     $query
