@@ -26,6 +26,8 @@ input#crm-qsearch-input::placeholder {
 #crm-notification-container .ui-notify-message a.ui-notify-cross::before,
 .crm-container #crm-notification-container div.ui-notify-message h1::before,
 div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
+.crm-container tr.disabled td:first-of-type::before,
+.crm-container tr:has(.disabled) td:first-of-type::before,
 .crm-container .delete-icon,
 .crm-container span.batch-valid,
 .crm-container span.batch-invalid,
@@ -224,6 +226,14 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .delete-icon:hover::before,
 .crm-container .delete-icon:focus::before {
   color: var(--crm-icon-danger-color);
+}
+
+/* Inactive icon */
+.crm-container tr.disabled td:first-of-type::before,
+.crm-container tr:has(.disabled) td:first-of-type::before {
+  content: "\f05e";
+  color: var(--crm-alert-danger-text);
+  font-style: normal;
 }
 
 /* Jqueery UI icons (tags) */
