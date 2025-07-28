@@ -67,23 +67,52 @@ class ReflectionUtils {
    * @param string $comment
    * @return array
    */
-  public static function parseDocBlock($comment) {
+  public static function parseDocBlock(string $comment): array {
     $info = [];
     $param = NULL;
+    $bufferedVar = '';
+    $parsingVarArray = FALSE;
+
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $comment) as $num => $line) {
       if (!$num || str_contains($line, '*/')) {
         continue;
       }
+
       $line = ltrim(trim($line), '*');
       if (strlen($line) && $line[0] === ' ') {
         $line = substr($line, 1);
       }
+
+      // Continue parsing multiline array{...}
+      if ($parsingVarArray) {
+        $bufferedVar .= $line;
+        if (str_contains($line, '}')) {
+          $parsingVarArray = FALSE;
+          // Parse the full array shape now
+          $info['type'] = ['array'];
+          $info['shape'] = self::parseArrayShape($bufferedVar);
+        }
+        continue;
+      }
+
       if (str_starts_with(ltrim($line), '@')) {
         $words = explode(' ', ltrim($line, ' @'));
         $key = array_shift($words);
         $param = NULL;
+
         if ($key == 'var') {
-          $info['type'] = explode('|', strtolower($words[0]));
+          $varType = implode(' ', $words);
+          if (str_starts_with($varType, 'array{') && !str_contains($varType, '}')) {
+            $parsingVarArray = TRUE;
+            $bufferedVar = $varType;
+          }
+          elseif (str_starts_with($varType, 'array{') && str_contains($varType, '}')) {
+            $info['type'] = ['array'];
+            $info['shape'] = self::parseArrayShape($varType);
+          }
+          else {
+            $info['type'] = explode('|', strtolower($words[0]));
+          }
         }
         elseif ($key == 'return') {
           $info['return'] = explode('|', $words[0]);
@@ -117,12 +146,7 @@ class ReflectionUtils {
         $info['description'] = ucfirst($line);
       }
       elseif (!$line) {
-        if (isset($info['comment'])) {
-          $info['comment'] .= "\n";
-        }
-        else {
-          $info['comment'] = NULL;
-        }
+        $info['comment'] = isset($info['comment']) ? "{$info['comment']}\n" : NULL;
       }
       // For multi-line description.
       elseif (count($info) === 1 && isset($info['description']) && substr($info['description'], -1) !== '.') {
@@ -136,6 +160,29 @@ class ReflectionUtils {
       $info['comment'] = rtrim($info['comment']);
     }
     return $info;
+  }
+
+  protected static function parseArrayShape(string $definition): array {
+    $definition = trim($definition);
+    if (str_starts_with($definition, 'array{') && str_ends_with($definition, '}')) {
+      // remove array{ and ending }
+      $definition = substr($definition, 6, -1);
+    }
+
+    $shape = [];
+    // Splits by comma but not inside nested braces.
+    $parts = preg_split('/,(?![^\{]*\})/', $definition);
+
+    foreach ($parts as $part) {
+      if (str_contains($part, ':')) {
+        [$key, $type] = explode(':', $part, 2);
+        $key = trim($key);
+        $types = array_map('trim', explode('|', trim($type)));
+        $shape[$key] = $types;
+      }
+    }
+
+    return $shape;
   }
 
   /**
