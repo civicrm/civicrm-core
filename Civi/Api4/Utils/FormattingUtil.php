@@ -121,7 +121,7 @@ class FormattingUtil {
     }
 
     // Special handling for 'current_user' and user lookups
-    $exactMatch = [NULL, '=', '!=', '<>', 'IN', 'NOT IN'];
+    $exactMatch = [NULL, '=', '!=', '<>', 'IN', 'NOT IN', 'CONTAINS', 'NOT CONTAINS'];
     if (is_string($fk) && CoreUtil::isContact($fk) && in_array($operator, $exactMatch, TRUE)) {
       $value = self::resolveContactID($fieldSpec['name'], $value);
     }
