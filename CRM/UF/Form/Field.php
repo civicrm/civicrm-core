@@ -1031,6 +1031,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    */
   private function getLocationTypes(): array {
     $locationTypes = \Civi::entity('Address')->getOptions('location_type_id');
+    $locationTypes = array_column($locationTypes, NULL, 'id');
     $defaultLocationTypeID = CRM_Core_BAO_LocationType::getDefault()->id;
     $firstTypes = [0 => 'Primary'];
     // Make the default option show up first.
