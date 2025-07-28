@@ -56,6 +56,16 @@ abstract class ImportParser extends \CRM_Import_Parser {
   }
 
   /**
+   * @param string $entity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getEntityInstanceConfiguration(string $entity): array {
+    return $this->getUserJob()['metadata']['entity_configuration'][$entity] ?? [];
+  }
+
+  /**
    * Get the actions to display in the rich UI.
    *
    * Filter by the input actions - e.g ['update' 'select'] will only return those keys.
