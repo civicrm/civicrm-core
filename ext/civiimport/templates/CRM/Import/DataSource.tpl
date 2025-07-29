@@ -70,8 +70,6 @@
     CRM.$(function($) {
       // build data source form block
       buildDataSourceFormBlock();
-      buildSubTypes();
-      buildDedupeRules();
     });
 
     function buildDataSourceFormBlock(dataSource) {
