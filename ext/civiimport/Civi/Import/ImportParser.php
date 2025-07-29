@@ -418,4 +418,49 @@ abstract class ImportParser extends \CRM_Import_Parser {
     return [[$this->getRequiredFieldsForMatch(), $this->getRequiredFieldsForCreate()]];
   }
 
+  /**
+   * Get the row from the csv mapped to our parameters.
+   *
+   * @param array $values
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getMappedRow(array $values): array {
+    $params = [];
+    foreach ($this->getFieldMappings() as $i => $mappedField) {
+      if (!isset($mappedField['name']) || $mappedField['name'] === 'do_not_import') {
+        continue;
+      }
+      if ($mappedField['name']) {
+        $fieldSpec = $this->getFieldMetadata($mappedField['name']);
+        $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity_name'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
+
+        // If there is no column header we are dealing with an added value mapping, do not use
+        // the database value as it will be for (e.g.) `_status`
+        $headers = $this->getUserJob()['metadata']['DataSource']['column_headers'];
+        if (array_key_exists($i, $headers) && empty($headers[$i])) {
+          $fieldValue = '';
+        }
+        else {
+          $fieldValue = $values[$i];
+        }
+
+        if ($fieldValue === '' && isset($mappedField['default_value'])) {
+          $fieldValue = $mappedField['default_value'];
+        }
+        if ($entity) {
+          // Split values into arrays by entity.
+          // Apiv4 name is currently only set for contact, & only in cases where it would
+          // be used for the dedupe rule (ie Membership import).
+          $params[$entity][$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
+        }
+        else {
+          $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
+        }
+      }
+    }
+    return $params;
+  }
+
 }
