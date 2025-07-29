@@ -26,7 +26,7 @@
           $scope.data.savedMapping = CRM.vars.crmImportUi.savedMapping;
           $scope.isStandalone = CRM.vars.crmImportUi.isStandalone;
           $scope.isTemplate = CRM.vars.crmImportUi.isTemplate;
-          $scope.mappingSaving = {updateFieldMapping: 0, newFieldMapping: 0};
+          $scope.mappingSaving = {updateFieldMapping: 0, newFieldMapping: 0, newFieldMappingName: ''};
           $scope.dateFormats = CRM.vars.crmImportUi.dateFormats;
           // Used for dedupe rules select options, also for filtering available fields.
           $scope.data.dedupeRules = CRM.vars.crmImportUi.dedupeRules;
@@ -295,27 +295,62 @@
               column_number: index,
             });
           });
-          crmApi4('UserJob', 'save', {records: [$scope.userJob]})
-            .then(function(result) {
-              if ($scope.isTemplate) {
-                // Just redirect to the template listing.
-                window.location.href = CRM.url('civicrm/imports/templates');
-              }
-              else if ($scope.isStandalone) {
-                window.location.href = CRM.url('civicrm/import_preview', {'id' : $scope.userJob.id});
-              }
-              else {
-                // Only post the form if the save succeeds.
-                document.getElementById("MapField").submit();
-              }
-            },
-            function(failure) {
-              if (!$scope.isTemplate) {
-                // @todo add more error handling - for now, at least we waited..
-                document.getElementById("MapField").submit();
-              }
+          var userJobs = [];
+          if ($scope.mappingSaving.updateFieldMapping || $scope.mappingSaving.newFieldMapping) {
+            var templateJob = {
+              'is_template': 1,
+              'metadata' : $scope.userJob.metadata,
+              'job_type' : $scope.userJob.job_type,
+              'status_id:name' : 'draft',
+            };
+            if ($scope.mappingSaving.newFieldMapping) {
+              templateJob.name = 'import_' + $scope.mappingSaving.newFieldMappingName;
+              crmApi4('UserJob', 'get', {where: [['name', '=', templateJob.name]]})
+                .then(function(result) {
+                  if (result.count) {
+                    templateJob.name += '_' + new Date().toISOString().replace(/[:.]/g, '-') + '_' + Math.random().toString(36).slice(2, 5);
+                  }
+
+                  crmApi4('UserJob', 'save', {records: [templateJob]})
+                    .then(function(result) {
+                      $scope.userJob.metadata.template_id = result[0].id;
+                      userJobs.push($scope.userJob);
+                      $scope.saveJobs(userJobs);
+                    });
+                });
             }
-          );
+            else {
+              templateJob.id = $scope.userJob.metadata.template_id;
+              userJobs.push(templateJob);
+            }
+          }
+          if (!$scope.mappingSaving.newFieldMapping) {
+            userJobs.push($scope.userJob);
+            $scope.saveJobs(userJobs);
+          }
+        });
+        $scope.saveJobs = (function(jobs) {
+          crmApi4('UserJob', 'save', {records: jobs})
+            .then(function(result) {
+                if ($scope.isTemplate) {
+                  // Just redirect to the template listing.
+                  window.location.href = CRM.url('civicrm/imports/templates');
+                }
+                else if ($scope.isStandalone) {
+                  window.location.href = CRM.url('civicrm/import_preview', {'id' : $scope.userJob.id});
+                }
+                else {
+                  // Only post the form if the save succeeds.
+                  document.getElementById("MapField").submit();
+                }
+              },
+              function(failure) {
+                if (!$scope.isTemplate) {
+                  // @todo add more error handling - for now, at least we waited..
+                  document.getElementById("MapField").submit();
+                }
+              }
+            );
         });
 
         $scope.load();

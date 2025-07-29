@@ -31,21 +31,6 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
-   */
-  public function testLoadDataSourceSavedTemplate(): void {
-    // First do a basic submission, creating a UserJob template in the process.
-    $templateJob = $this->runImportSavingImportTemplate();
-
-    // Now try this template in in the url to load the defaults for DataSource.
-    $_REQUEST['template_id'] = $templateJob['id'];
-    $form = $this->getFormObject('CRM_Contribute_Import_Form_DataSource');
-    $this->formController = $form->controller;
-    $form->buildForm();
-    $defaults = $this->getFormDefaults($form);
-  }
-
-  /**
    * Test that when we Process the MapField form without updating the saved template it is still retained.
    *
    * This is important because if we use the BACK button we still want 'Update Mapping'
@@ -148,10 +133,9 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
   }
 
   /**
-   * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function runImportSavingImportTemplate(): array {
+  protected function runImportSavingImportTemplate(): void {
     $this->processContributionForms([
       'saveMapping' => 1,
       'saveMappingName' => 'mapping',
@@ -163,11 +147,9 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
       ->addWhere('is_template', '=', 1)
       ->execute()
       ->first();
-    $this->assertNotEmpty($templateJob);
     $this->assertTrue(empty($templateJob['metadata']['DataSource']['table_name']));
     // Reset the formController so this doesn't leak into further tests.
     $this->formController = NULL;
-    return $templateJob;
   }
 
 }
