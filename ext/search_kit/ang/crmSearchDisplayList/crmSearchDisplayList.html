@@ -17,5 +17,10 @@
     ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'"
     ng-style="{'list-style': $ctrl.settings.symbol}"
     ></ul>
+   <div ng-if="$ctrl.rowCount === 0" class="crm-search-display-list-no-results">
+      <p class="alert alert-info text-center">
+        {{ $ctrl.settings.noResultsText || ts('None found.') }}
+      </p>
+    </div>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>

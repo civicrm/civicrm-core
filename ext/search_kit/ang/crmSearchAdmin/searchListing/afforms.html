@@ -18,7 +18,7 @@
     <li ng-if="!row.afform_count" class="disabled">
       <a href>
         <i ng-if="!$ctrl.afforms" class="crm-i fa-spinner fa-spin"></i>
-        <em ng-if="$ctrl.afforms && !$ctrl.afforms[row.data.name]">{{:: ts('None Found') }}</em>
+        <em ng-if="$ctrl.afforms && !$ctrl.afforms[row.data.name]">{{:: ts('None found.') }}</em>
       </a>
     </li>
     <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[row.data.name]" title="{{:: $ctrl.afformAdminEnabled ? ts('Edit form') : '' }}">
