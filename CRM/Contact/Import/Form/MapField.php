@@ -287,6 +287,33 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
+   * Add the saved mapping fields to the form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function addSavedMappingFields(): void {
+    $savedMappingID = $this->getSavedMappingID();
+    //to save the current mappings
+    if (!$savedMappingID && !$this->getTemplateJob()) {
+      $saveDetailsName = ts('Save this field mapping');
+      $this->applyFilter('saveMappingName', 'trim');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    else {
+      $this->add('hidden', 'mappingId', $savedMappingID);
+
+      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
+      $saveDetailsName = ts('Save as a new field mapping');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    $this->assign('savedMappingName', $this->getMappingName());
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
+    $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
+  }
+
+  /**
    * Format custom field name.
    *
    * Combine group and field name to avoid conflict.

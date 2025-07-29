@@ -343,8 +343,11 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * Add the saved mapping fields to the form.
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 6.6 will be removed around 6.12
    */
   protected function addSavedMappingFields(): void {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - take a copy');
     $savedMappingID = $this->getSavedMappingID();
     //to save the current mappings
     if (!$savedMappingID && !$this->getTemplateJob()) {
