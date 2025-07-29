@@ -287,6 +287,18 @@ dl dl {
   color: var(--crm-c-inactive);
   opacity: 1;
 }
+.crm-container tr.disabled,
+.crm-container tr:has(td.disabled),
+.crm-container .table-striped > tbody > tr:has(td.disabled) {
+  background-color: var(--crm-c-page-background);
+}
+.crm-container tr.disabled td *:not(.btn,button),
+.crm-container td.disabled {
+  font-style: italic;
+}
+.crm-container tr.disabled td:first-of-type {
+  display: inline-flex;
+}
 
 /* BS3 type styles */
 
