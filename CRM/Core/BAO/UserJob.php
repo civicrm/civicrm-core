@@ -59,9 +59,24 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
   public static function hook_civicrm_queueStatus(CRM_Queue_Queue $queue, string $status): void {
     $userJobId = static::findUserJobId($queue->getName());
     if ($userJobId && $status === 'completed') {
+      $userJob = UserJob::get(FALSE)
+        ->addWhere('id', '=', $userJobId)->execute()->first();
+      $newStatus = 'completed';
+      $dataSource = $userJob['metadata']['submitted_values']['dataSource'] ?? NULL;
+      if ($dataSource) {
+        /* @var \CRM_Import_DataSource $dataSource */
+        $dataSource = new $dataSource();
+        $dataSource->setUserJobID($userJobId);
+        if ($dataSource->getRowCount(['new'])) {
+          $newStatus = 'incomplete';
+        }
+        elseif ($dataSource->getRowCount(['unimported'])) {
+          $newStatus = 'complete_with_errors';
+        }
+      }
       UserJob::update(FALSE)
         ->addWhere('id', '=', $userJobId)
-        ->setValues(['status_id' => 1, 'end_date' => 'now'])
+        ->setValues(['status_id:name' => $newStatus, 'end_date' => 'now'])
         ->execute();
     }
   }
@@ -187,6 +202,18 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
         'id' => 4,
         'name' => 'in_progress',
         'label' => ts('In Progress'),
+      ],
+      [
+        'id' => 5,
+        'name' => 'incomplete',
+        'label' => ts('Incomplete'),
+        'description' => ts('Processing finished but still incomplete'),
+      ],
+
+      [
+        'id' => 6,
+        'name' => 'complete_with_errors',
+        'label' => ts('Complete with Errors'),
       ],
     ];
   }

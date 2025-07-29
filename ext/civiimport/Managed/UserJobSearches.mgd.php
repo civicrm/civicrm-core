@@ -158,8 +158,8 @@ return [
                       'conditions' => [
                         [
                           'status_id:name',
-                          '=',
-                          'draft',
+                          'IN',
+                          ['draft', 'complete_with_errors', 'incomplete'],
                         ],
                       ],
                       'task' => '',
@@ -484,8 +484,8 @@ return [
                   'conditions' => [
                     [
                       'status_id:name',
-                      '=',
-                      'draft',
+                      'IN',
+                      ['draft', 'complete_with_errors', 'incomplete'],
                     ],
                   ],
                   'task' => '',
