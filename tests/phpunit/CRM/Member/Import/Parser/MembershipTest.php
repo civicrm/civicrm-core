@@ -412,7 +412,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->importCSV('membership_with_multiple_identifiers.csv', $mapper, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK, 'saveMapping' => FALSE]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
   }
 
   public static function requiredFields(): array {

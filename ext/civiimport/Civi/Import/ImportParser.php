@@ -66,6 +66,18 @@ abstract class ImportParser extends \CRM_Import_Parser {
   }
 
   /**
+   * @param string $entity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getStaticValuesForEntity(string $entity): array {
+    $staticValues = $this->getEntityInstanceConfiguration($entity);
+    unset($staticValues['action'], $staticValues['dedupe_rule']);
+    return $staticValues;
+  }
+
+  /**
    * Get the actions to display in the rich UI.
    *
    * Filter by the input actions - e.g ['update' 'select'] will only return those keys.
@@ -416,6 +428,53 @@ abstract class ImportParser extends \CRM_Import_Parser {
    */
   protected function getRequiredFields(): array {
     return [[$this->getRequiredFieldsForMatch(), $this->getRequiredFieldsForCreate()]];
+  }
+
+  /**
+   * Transform the input parameters into the form handled by the input routine.
+   *
+   * @param array $values
+   *   Input parameters as they come in from the datasource
+   *   eg. ['Bob', 'Smith', 'bob@example.org', '123-456']
+   *
+   * @return array
+   *   Parameters mapped to CiviCRM fields based on the mapping. eg.
+   *   [
+   *     'Contribution' => [
+   *        'total_amount' => '1230.99',
+   *        'financial_type_id' => 1,
+   *     ],
+   *     'Contact' => ['external_identifier' => 'abcd'],
+   *     'SoftCreditContact' => ['external_identifier' => '123', 'soft_credit_type_id' => 1]
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getMappedRow(array $values): array {
+    $params = [];
+    foreach ($this->getFieldMappings() as $i => $mappedField) {
+      if (empty($mappedField['name']) || $mappedField['name'] === 'do_not_import') {
+        continue;
+      }
+      $fieldSpec = $this->getFieldMetadata($mappedField['name']);
+      // If there is no column header we are dealing with an added value mapping, do not use
+      // the database value as it will be for (e.g.) `_status`
+      $headers = $this->getUserJob()['metadata']['DataSource']['column_headers'];
+      if (array_key_exists($i, $headers) && empty($headers[$i])) {
+        $fieldValue = '';
+      }
+      else {
+        $fieldValue = $values[$i];
+      }
+      if ($fieldValue === '' && isset($mappedField['default_value'])) {
+        $fieldValue = $mappedField['default_value'];
+      }
+      $entity = $fieldSpec['entity_instance'];
+      if (!isset($params[$entity])) {
+        $params[$entity] = $this->getStaticValuesForEntity($entity);
+      }
+      $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
+    }
+    return $this->removeEmptyValues($params);
   }
 
 }

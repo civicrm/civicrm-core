@@ -3,6 +3,12 @@
 class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
 
   public function preProcess(): void {
+    if ($this->isStandalone() && !$this->hasValidDataSource()) {
+      $job = $this->getUserJob();
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/import/' . str_replace('_import', '', $job['job_type']), [
+        'id' => $job['id'],
+      ]));
+    }
     parent::preProcess();
     // Add import-ui app
     Civi::service('angularjs.loader')->addModules('crmCiviimport');
@@ -13,6 +19,11 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     if ($templateJob) {
       Civi::resources()->addVars('crmImportUi', ['savedMapping' => ['name' => substr($templateJob['name'], 7)]]);
     }
+  }
+
+  private function hasValidDataSource(): bool {
+    $table = $this->getUserJob()['metadata']['DataSource']['table_name'] ?? '';
+    return $table && CRM_Core_DAO::checkTableExists($table);
   }
 
   /**

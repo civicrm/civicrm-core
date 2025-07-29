@@ -111,6 +111,9 @@ class CustomValueParser extends ImportParser {
       $customGroupID = $this->getCustomGroupID();
       $fields = ['' => ['title' => ts('- do not import -')]];
       $importableFields = \CRM_Utils_Array::prefixKeys($this->getGroupFieldsForImport($customGroupID), $this->getGroupName() . '.');
+      foreach ($importableFields as &$field) {
+        $field['entity_instance'] = $this->getGroupName();
+      }
       $this->importableFieldsMetadata = $fields + $importableFields + $this->getContactFields($this->getContactType(), 'Contact', TRUE);
     }
   }
