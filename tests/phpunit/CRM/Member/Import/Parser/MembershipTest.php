@@ -439,7 +439,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
     $this->assertEquals('Invalid value for field(s) : Membership Type', $row['_status_message']);
-    return;
+    $userJob = UserJob::get()
+      ->addSelect('status_id:name', 'status_id:label')
+      ->addWhere('id', '=', $this->userJobID)
+      ->execute()->single();
+    $this->assertEquals('complete_with_errors', $userJob['status_id:name']);
+    $this->assertEquals('Complete with Errors', $userJob['status_id:label']);
   }
 
   /**

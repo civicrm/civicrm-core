@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\UserJob;
 
 /**
  * This class previews the uploaded file and returns summary statistics.
@@ -117,6 +118,8 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
         'reset' => 1,
       ], FALSE, NULL, FALSE),
     ]);
+    UserJob::update()->addWhere('id', '=', $this->getUserJobID())
+      ->setValues(['status_id:name', '=', 'scheduled'])->execute();
     $runner->runAllInteractive();
   }
 
