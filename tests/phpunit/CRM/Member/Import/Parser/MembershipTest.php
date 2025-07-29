@@ -332,16 +332,17 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * @return int
    */
   protected function getUserJobID(array $submittedValues = []): int {
+    $queryFields = ['first_name'];
+    foreach (array_keys($submittedValues['mapper']) as $key) {
+      if ($key > 0) {
+        $queryFields[] = '"value_' . $key . '" AS field_' . $key;
+      }
+    }
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
-          'contactType' => 'Individual',
-          'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
-          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
-          'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-          'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
+          'sqlQuery' => 'SELECT ' . implode(', ', $queryFields) . ' FROM civicrm_contact',
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',

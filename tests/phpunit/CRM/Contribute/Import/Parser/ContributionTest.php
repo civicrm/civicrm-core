@@ -873,11 +873,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       }
       $submittedValues['sqlQuery'] .= implode(',', $submittedClauses);
     }
+    $queryFields = ['first_name'];
+    foreach (array_keys($importMappings) as $key) {
+      if ($key > 0) {
+        $queryFields[] = '"value_' . $key . '" AS field_' . $key;
+      }
+    }
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
           'dataSource' => 'CRM_Import_DataSource_SQL',
-          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
+          'sqlQuery' => 'SELECT ' . implode(', ', $queryFields) . ' FROM civicrm_contact',
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
         'import_mappings' => $importMappings,

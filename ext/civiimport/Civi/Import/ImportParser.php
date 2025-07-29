@@ -456,10 +456,10 @@ abstract class ImportParser extends \CRM_Import_Parser {
         continue;
       }
       $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-      // If there is no column header we are dealing with an added value mapping, do not use
-      // the database value as it will be for (e.g.) `_status`
-      $headers = $this->getUserJob()['metadata']['DataSource']['column_headers'];
-      if (array_key_exists($i, $headers) && empty($headers[$i])) {
+      // $values has some system fields in it. We can identify these as their index
+      // will be greater than the number_of_columns.
+      $numberOfColumns = $this->getUserJob()['metadata']['DataSource']['number_of_columns'];
+      if (($i + 1) > $numberOfColumns) {
         $fieldValue = '';
       }
       else {
