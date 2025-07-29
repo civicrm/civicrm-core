@@ -446,6 +446,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
         'metadata' => [
           'submitted_values' => $this->getSubmittedValues(),
           'template_id' => $this->getTemplateID(),
+          // @todo - this Template key is obsolete - definitely in Civiimport - probably entirely.
           'Template' => ['mapping_id' => $this->getSavedMappingID()],
           'import_mappings' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_mappings'] : [],
           'import_options' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_options'] : [],
@@ -958,6 +959,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   public function getSavedMappingID(): ?int {
     if (!$this->savedMappingID) {
+      // @todo - this Template key is obsolete - definitely in Civiimport - probably entirely.
       if (!empty($this->getUserJob()['metadata']['Template']['mapping_id'])) {
         $this->savedMappingID = $this->getUserJob()['metadata']['Template']['mapping_id'];
       }

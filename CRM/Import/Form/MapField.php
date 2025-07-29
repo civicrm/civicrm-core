@@ -244,6 +244,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         }
         $this->setSavedMappingID($savedMappingID);
       }
+      // @todo - this Template key is obsolete - definitely in Civiimport - probably entirely.
       $this->updateUserJobMetadata('Template', ['mapping_id' => (int) $this->getSubmittedValue('mappingId')]);
     }
     //Saving Mapping Details and Records
@@ -255,6 +256,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         'mapping_type_id:name' => $this->getMappingTypeName(),
       ])->execute()->first()['id'];
       $this->setSavedMappingID($savedMappingID);
+      // @todo - this Template key is obsolete - definitely in Civiimport - probably entirely.
       $this->updateUserJobMetadata('Template', ['mapping_id' => $savedMappingID]);
       foreach (array_keys($this->getColumnHeaders()) as $i) {
         $this->saveMappingField($savedMappingID, $i, FALSE);

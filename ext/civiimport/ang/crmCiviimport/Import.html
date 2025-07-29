@@ -112,7 +112,7 @@
   </div>
 
 </div>
-<div ng-if="!isTemplate">
+<div ng-if="!isTemplate && !isStandalone">
   <span ng-if="data.savedMapping.name"><input
     id="updateMapping"
     name="updateMapping"
@@ -137,11 +137,7 @@
     <table ng-show="mappingSaving.newFieldMapping" class="form-layout-compressed">
       <tr class="crm-import-maptable-form-block-saveMappingName">
         <td class="label">{{:: ts('Name') }}</td>
-        <td><input name="saveMappingName" type="text" value="" id="saveMappingName" class="crm-form-text"></td>
-      </tr>
-      <tr class="crm-import-maptable-form-block-saveMappingName">
-        <td class="label">{{:: ts('Description') }}</td>
-        <td><input name="saveMappingDescription" type="text" value="" id="saveMappingDesc" class="crm-form-text"></td>
+        <td><input name="saveMappingName" ng-model="mappingSaving.newFieldMappingName", type="text" value="" id="saveMappingName" class="crm-form-text"></td>
       </tr>
     </table>
   </div>
