@@ -154,6 +154,17 @@ WHERE  modified_date IS NULL
     ];
     CRM_Core_DAO::singleValueQuery($query, $params);
     self::flushACLContactCache();
+
+    // Rebuild the cache for the user whose action triggered the reset.
+    // There may be a better way to solve the problem, but this seems to fix
+    // the permission dropouts described in issue #2641:
+    // https://lab.civicrm.org/dev/core/-/issues/2641
+    $session = CRM_Core_Session::singleton();
+    $contactId = $session->get('userID');
+    if ($contactId !== NULL) {
+      self::build($contactId);
+    }
+
   }
 
   /**
