@@ -17,10 +17,8 @@ namespace Civi\Import;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
-use Civi\Api4\Email;
 use Civi\Api4\Note;
 
 /**
@@ -547,57 +545,6 @@ class ContributionParser extends ImportParser {
         }
       }
     }
-  }
-
-  /**
-   * Lookup matching contact.
-   *
-   * This looks up the matching contact from the contact id, external identifier
-   * or email. For the email a straight email search is done - this is equivalent
-   * to what happens on a dedupe rule lookup when the only field is 'email' - but
-   * we can't be sure the rule is 'just email' - and we are not collecting the
-   * fields for any other lookup in the case of soft credits (if we
-   * extend this function to main-contact-lookup we can handle full dedupe
-   * lookups - but note the error messages will need tweaking.
-   *
-   * @param array $params
-   *
-   * @return int
-   *   Contact ID
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function lookupMatchingContact(array $params): int {
-    $lookupField = !empty($params['contact_id']) ? 'contact_id' : (!empty($params['external_identifier']) ? 'external_identifier' : 'email');
-    if (empty($params['email'])) {
-      $contact = Contact::get(FALSE)->addSelect('id')
-        ->addWhere($lookupField === 'contact_id' ? 'id' : $lookupField, '=', $params[$lookupField])
-        ->execute();
-      if (count($contact) !== 1) {
-        throw new \CRM_Core_Exception(ts("Soft Credit %1 - %2 doesn't exist. Row was skipped.",
-          [
-            1 => $this->getFieldMetadata($lookupField),
-            2 => $params['contact_id'] ?? $params['external_identifier'],
-          ]));
-      }
-      return $contact->first()['id'];
-    }
-
-    if (!\CRM_Utils_Rule::email($params['email'])) {
-      throw new \CRM_Core_Exception(ts('Invalid email address %1 provided for Soft Credit. Row was skipped'), [1 => $params['email']]);
-    }
-    $emails = Email::get(FALSE)
-      ->addWhere('contact_id.is_deleted', '=', 0)
-      ->addWhere('contact_id.contact_type', '=', $this->getContactType())
-      ->addWhere('email', '=', $params['email'])
-      ->addSelect('contact_id')->execute();
-    if (count($emails) === 0) {
-      throw new \CRM_Core_Exception(ts("Invalid email address(doesn't exist) %1 for Soft Credit. Row was skipped", [1 => $params['email']]));
-    }
-    if (count($emails) > 1) {
-      throw new \CRM_Core_Exception(ts('Invalid email address(duplicate) %1 for Soft Credit. Row was skipped', [1 => $params['email']]));
-    }
-    return $emails->first()['contact_id'];
   }
 
   /**
