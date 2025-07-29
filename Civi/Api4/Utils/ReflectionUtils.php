@@ -73,8 +73,10 @@ class ReflectionUtils {
     $bufferedVar = '';
     $parsingVarArray = FALSE;
 
-    foreach (preg_split("/((\r?\n)|(\r\n?))/", $comment) as $num => $line) {
-      if (!$num || str_contains($line, '*/')) {
+    $lines = preg_split("/((\r?\n)|(\r\n?))/", $comment);
+
+    foreach ($lines as $num => $line) {
+      if ($num === 0 || str_contains($line, '*/')) {
         continue;
       }
 
@@ -156,6 +158,7 @@ class ReflectionUtils {
         $info['comment'] = isset($info['comment']) ? "{$info['comment']}\n$line" : $line;
       }
     }
+
     if (isset($info['comment'])) {
       $info['comment'] = rtrim($info['comment']);
     }
