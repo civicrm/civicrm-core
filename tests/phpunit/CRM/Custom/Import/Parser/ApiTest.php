@@ -33,7 +33,9 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
       ['name' => 'level.Pick_Color'],
       ['name' => 'do_not_import'],
       ['name' => 'level.test_date'],
-    ], ['multipleCustomData' => $customGroupID]);
+    ], ['multipleCustomData' => $customGroupID], 'create', [
+      'level' => [''],
+    ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
