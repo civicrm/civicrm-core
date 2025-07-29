@@ -64,51 +64,64 @@ class ReflectionUtils {
   }
 
   /**
+   * Parses a PHPDoc-style comment block into structured metadata.
+   *
+   * Supports array shapes in @param, @return, and @var, including multiline and
+   * nested array shapes.
+   *
    * @param string $comment
+   *   The PHPDoc comment block.
+   *
    * @return array
+   *   The structured parsed information.
    */
   public static function parseDocBlock(string $comment): array {
     $info = [];
     $param = NULL;
-    $bufferedVar = '';
-    $parsingVarArray = FALSE;
 
-    $lines = preg_split("/((\r?\n)|(\r\n?))/", $comment);
-
-    foreach ($lines as $num => $line) {
+    $rawLines = preg_split("/((\r?\n)|(\r\n?))/", $comment);
+    $lines = [];
+    foreach (array_keys($rawLines) as $num) {
+      // We change rawLines as we iterate so load in-loop via $num.
+      $line = $rawLines[$num];
       if ($num === 0 || str_contains($line, '*/')) {
         continue;
       }
-
-      $line = ltrim(trim($line), '*');
-      if (strlen($line) && $line[0] === ' ') {
-        $line = substr($line, 1);
-      }
-
-      // Continue parsing multiline array{...}
-      if ($parsingVarArray) {
-        $bufferedVar .= $line;
-        if (str_contains($line, '}')) {
-          $parsingVarArray = FALSE;
-          // Parse the full array shape now
-          $info['type'] = ['array'];
-          $info['shape'] = self::parseArrayShape($bufferedVar);
+      $line = self::cleanLine($line);
+      if (str_contains($line, 'array{')) {
+        // We have the start of an array shape.
+        // Count opening and closing braces to detect when shape ends.
+        $openBraces = substr_count($line, '{');
+        $closeBraces = substr_count($line, '}');
+        $nextLine = $num + 1;
+        while ($openBraces > $closeBraces) {
+          if (!array_key_exists($nextLine, $rawLines)) {
+            // If we get to the end and it is still unbalanced then just
+            // ignore the whole broken array shape.
+            $line = '*/';
+            break;
+          }
+          // Here we need to absorb as many lines as possible to capture the full array shape.
+          $line .= ' ' . self::cleanLine($rawLines[$nextLine]);
+          // Set the line we just absorbed to be skipped.
+          $rawLines[$nextLine] = '*/';
+          $openBraces = substr_count($line, '{');
+          $closeBraces = substr_count($line, '}');
+          $nextLine++;
         }
-        continue;
       }
+      $lines[] = $line;
+    }
+
+    foreach ($lines as $num => $line) {
 
       if (str_starts_with(ltrim($line), '@')) {
-        $words = explode(' ', ltrim($line, ' @'));
+        $words = preg_split('/\s+/', ltrim($line, ' @'));
         $key = array_shift($words);
         $param = NULL;
-
         if ($key == 'var') {
           $varType = implode(' ', $words);
-          if (str_starts_with($varType, 'array{') && !str_contains($varType, '}')) {
-            $parsingVarArray = TRUE;
-            $bufferedVar = $varType;
-          }
-          elseif (str_starts_with($varType, 'array{') && str_contains($varType, '}')) {
+          if (str_starts_with($varType, 'array{') && str_contains($varType, '}')) {
             $info['type'] = ['array'];
             $info['shape'] = self::parseArrayShape($varType);
           }
@@ -116,8 +129,17 @@ class ReflectionUtils {
             $info['type'] = explode('|', strtolower($words[0]));
           }
         }
-        elseif ($key == 'return') {
-          $info['return'] = explode('|', $words[0]);
+        elseif ($key === 'return') {
+          $return_type = implode(' ', $words);
+          if (str_starts_with($return_type, 'array{')) {
+            $info['return'] = [
+              'type' => ['array'],
+              'shape' => self::parseArrayShape($return_type),
+            ];
+          }
+          else {
+            $info['return'] = explode('|', $return_type);
+          }
         }
         elseif ($key == 'options') {
           $val = str_replace(', ', ',', implode(' ', $words));
@@ -127,13 +149,43 @@ class ReflectionUtils {
           $info[$key][] = implode(' ', $words);
         }
         elseif ($key == 'param' && $words) {
-          $type = $words[0][0] !== '$' ? explode('|', array_shift($words)) : NULL;
-          $param = rtrim(array_shift($words), '-:()/');
-          $info['params'][$param] = [
-            'type' => $type,
-            'description' => $words ? ltrim(implode(' ', $words), '-: ') : '',
-            'comment' => '',
-          ];
+          // Locate param name starting with $
+          $paramIndex = NULL;
+          foreach ($words as $i => $w) {
+            if (str_starts_with($w, '$')) {
+              $paramIndex = $i;
+              break;
+            }
+          }
+
+          if ($paramIndex !== NULL) {
+            $param = rtrim($words[$paramIndex], '-:()/');
+            //ltrim(implode(' ', $words), '-: ') : ''
+            $typeString = implode(' ', array_slice($words, 0, $paramIndex));
+            $description = ltrim(implode(' ', array_slice($words, $paramIndex + 1)), '-: ');
+          }
+          else {
+            // Fallback
+            $param = '$unknown';
+            $typeString = implode(' ', $words);
+            $description = '';
+          }
+          if (str_starts_with($typeString, 'array{')) {
+            $info['params'][$param] = [
+              'type' => ['array'],
+              'shape' => self::parseArrayShape($typeString),
+              'description' => $description,
+              'comment' => '',
+            ];
+          }
+          else {
+            $type = $typeString !== '' ? explode('|', strtolower($typeString)) : NULL;
+            $info['params'][$param] = [
+              'type' => $type,
+              'description' => $description,
+              'comment' => '',
+            ];
+          }
         }
         else {
           // Unrecognized annotation, but we'll duly add it to the info array
@@ -144,7 +196,7 @@ class ReflectionUtils {
       elseif ($param) {
         $info['params'][$param]['comment'] .= $line . "\n";
       }
-      elseif ($num == 1) {
+      elseif ($num === 0) {
         $info['description'] = ucfirst($line);
       }
       elseif (!$line) {
@@ -162,26 +214,74 @@ class ReflectionUtils {
     if (isset($info['comment'])) {
       $info['comment'] = rtrim($info['comment']);
     }
+
     return $info;
   }
 
+  /**
+   * Parses a complex PHPDoc array shape definition into a structured array.
+   *
+   * Supports nested array shapes using recursion.
+   *
+   * @param string $definition
+   *   The array shape definition, e.g., 'array{foo: string, bar: array{baz: int}}'.
+   *
+   * @return array
+   *   A structured representation of the array shape.
+   */
   protected static function parseArrayShape(string $definition): array {
     $definition = trim($definition);
+
     if (str_starts_with($definition, 'array{') && str_ends_with($definition, '}')) {
-      // remove array{ and ending }
+      // Remove array{ and ending }.
       $definition = substr($definition, 6, -1);
     }
 
     $shape = [];
-    // Splits by comma but not inside nested braces.
-    $parts = preg_split('/,(?![^\{]*\})/', $definition);
+    $length = strlen($definition);
+    $buffer = '';
+    $brace_level = 0;
+    $parts = [];
+
+    for ($i = 0; $i < $length; $i++) {
+      $char = $definition[$i];
+
+      if ($char === '{') {
+        $brace_level++;
+      }
+      elseif ($char === '}') {
+        $brace_level--;
+      }
+      elseif ($char === ',' && $brace_level === 0) {
+        $parts[] = trim($buffer);
+        $buffer = '';
+        continue;
+      }
+
+      $buffer .= $char;
+    }
+
+    if (trim($buffer) !== '') {
+      $parts[] = trim($buffer);
+    }
 
     foreach ($parts as $part) {
-      if (str_contains($part, ':')) {
-        [$key, $type] = explode(':', $part, 2);
-        $key = trim($key);
-        $types = array_map('trim', explode('|', trim($type)));
-        $shape[$key] = $types;
+      if (!str_contains($part, ':')) {
+        continue;
+      }
+
+      [$key, $type] = explode(':', $part, 2);
+      $key = trim($key);
+      $type = trim($type);
+
+      if (str_starts_with($type, 'array{')) {
+        $shape[$key] = [
+          'type' => ['array'],
+          'shape' => self::parseArrayShape($type),
+        ];
+      }
+      else {
+        $shape[$key] = array_map('trim', explode('|', $type));
       }
     }
 
@@ -316,6 +416,19 @@ class ReflectionUtils {
     }
 
     return $value;
+  }
+
+  /**
+   * @param string $line
+   *
+   * @return string
+   */
+  private static function cleanLine(string $line): string {
+    $line = ltrim(trim($line), '*');
+    if (strlen($line) && $line[0] === ' ') {
+      $line = substr($line, 1);
+    }
+    return $line;
   }
 
 }
