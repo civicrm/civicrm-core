@@ -69,6 +69,15 @@
     <div >{{:: ts('Date format') }}  <input class="huge" crm-ui-select='{data : dateFormats}' ng-model="userJob.metadata.import_options.date_format" /></div>
   </div>
   <hr>
+  <div id="import-actions">
+    <h3>{{:: ts('Actions') }}</h3>
+    <div >
+      {{:: ts('Entity') }}<input class="big" crm-ui-select='{data : getSelectedEntities}' ng-model="userJob.metadata.import_actions.entity" />
+      {{:: ts('Action') }}<input class="big" crm-ui-select='{data : getActions}' ng-model="userJob.metadata.import_actions.action" />
+      {{:: ts('When') }}<input class="big" crm-ui-select='{data : getConditions}' ng-model="userJob.metadata.import_actions.condition" />
+    </div>
+  </div>
+  <hr>
   <div id="map-field">
     <h3>{{:: ts('Data mapping') }}</h3>
     <table class="selector">

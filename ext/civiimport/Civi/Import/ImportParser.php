@@ -17,6 +17,7 @@ use Civi\Api4\CustomField;
 use Civi\Api4\DedupeRule;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
+use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Phone;
 
 /**
@@ -124,13 +125,31 @@ abstract class ImportParser extends \CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException|\CRM_Core_Exception
    */
   protected function saveContact(string $entity, array $contact): ?int {
-    if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])) {
-      return Contact::save()
-        ->setRecords([$contact])
-        ->execute()
+    $action = $this->getUserJob()['metadata']['import_actions'] ?? [];
+    $isApplies = isset($action['entity']) && $action['entity'] === $entity;
+    if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])
+      || $isApplies && $action['condition'] === 'always'
+    ) {
+      $api = Contact::save()
+        ->setRecords([$contact]);
+      $this->addAction($api, $action['action'], 'Contact');
+      return $api->execute()
         ->first()['id'];
     }
     return NULL;
+  }
+
+  protected function addAction(AbstractAction $api, $action, $entityType) {
+    $apiCall = $this->getBundledAction($action, $entityType)['api'] ?? NULL;
+    if ($apiCall) {
+      $api->addChain($action, $apiCall);
+    }
+  }
+
+  protected function getBundledAction($action, $entityType) {
+    $className = \CRM_Core_DAO_AllCoreTables::getDAONameForEntity($entityType);
+    $actions = $className::getBundledActions();
+    return $actions[$action] ?? [];
   }
 
   /**

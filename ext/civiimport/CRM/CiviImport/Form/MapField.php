@@ -49,6 +49,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
       'dateFormats' => $this->getDateFormats(),
       'isTemplate' => $this->getUserJob()['is_template'],
       'isStandalone' => $this->isStandalone(),
+      'bundledActions' => ['Contact' => array_values(CRM_Contact_BAO_Contact::getBundledActions())],
     ]);
   }
 
