@@ -3,7 +3,7 @@
 class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
 
   public function preProcess(): void {
-    if ($this->isStandalone() && !$this->hasValidDataSource()) {
+    if ($this->isStandalone() && !$this->getUserJob()['is_template'] && !$this->hasValidDataSource()) {
       $job = $this->getUserJob();
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/import/' . str_replace('_import', '', $job['job_type']), [
         'id' => $job['id'],
