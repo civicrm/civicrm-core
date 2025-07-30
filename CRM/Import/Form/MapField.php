@@ -343,8 +343,11 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * Add the saved mapping fields to the form.
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 6.6 will be removed around 6.12
    */
   protected function addSavedMappingFields(): void {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - take a copy');
     $savedMappingID = $this->getSavedMappingID();
     //to save the current mappings
     if (!$savedMappingID && !$this->getTemplateJob()) {
@@ -363,7 +366,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     }
     $this->assign('savedMappingName', $this->getMappingName());
     $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
-    $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
+    $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'mappingRule']);
   }
 
   /**
@@ -374,8 +377,11 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    *
    * @return array|true
    *   list of errors to be posted back to the form
+   *
+   * @deprecated since 6.6 will be removed around 6.12
    */
   public static function mappingRule($fields) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - take a copy');
     $errors = [];
     if (!empty($fields['saveMapping'])) {
       $nameField = $fields['saveMappingName'] ?? NULL;
@@ -384,7 +390,10 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       }
       else {
         $mappingTypeId = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Contact');
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, $mappingTypeId)) {
+        $mapping = new CRM_Core_DAO_Mapping();
+        $mapping->name = $nameField;
+        $mapping->mapping_type_id = $mappingTypeId;
+        if ($mapping->find(TRUE)) {
           $errors['saveMappingName'] = ts('Duplicate Import Mapping Name');
         }
       }

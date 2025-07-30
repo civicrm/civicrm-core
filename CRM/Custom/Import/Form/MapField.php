@@ -22,7 +22,6 @@ class CRM_Custom_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->addSavedMappingFields();
     $this->addFormRule([__CLASS__, 'formRule'], $this);
     $this->addMapper();
     $this->addFormButtons();

@@ -78,7 +78,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->addSavedMappingFields();
     $this->addFormRule(['CRM_Activity_Import_Form_MapField', 'formRule'], $this);
 
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
