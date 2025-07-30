@@ -976,6 +976,8 @@ COLS;
         $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[$table]) ? $this->logTableSpec[$table]['exceptions'] : [];
         // ignore modified_date changes
         $tableExceptions[] = 'modified_date';
+        // Ignore cache_fill_took column on civicrm_group.
+        $tableExceptions[] = 'cache_fill_took';
         // exceptions may be provided with or without backticks
         $excludeColumn = in_array($column, $tableExceptions) ||
           in_array(str_replace('`', '', $column), $tableExceptions);
