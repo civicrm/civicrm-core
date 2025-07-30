@@ -66,7 +66,11 @@
         </tr>
         <tr id="priceSet" class="crm-contribution-contributionpage-amount-form-block-priceSet">
             <td scope="row" class="label">{$form.price_set_id.label}</td>
-            <td>{$form.price_set_id.html} <br /><span class="description">{ts}Select a Price Set to offer more complex amount options. Otherwise, leave this empty and enter fixed contribution options below.{/ts}</span></td>
+            <td>{$form.price_set_id.html}
+              <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
+              <div class="description">{ts}Select a Price Set to offer more complex amount options. Otherwise, leave this empty and enter fixed contribution options below.{/ts}</div>
+              <div class="description">{ts}To create a new Price Set, go to <a href="{crmURL p="civicrm/admin/price" q="reset=1"}" target="_blank">Administer Price Sets</a>.{/ts}</p>
+            </td>
         </tr>
     </table>
 

@@ -277,11 +277,12 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
     $this->addSelect('price_set_id', [
       'entity' => 'PriceSet',
-      'option_url' => 'civicrm/admin/price',
       'options' => $price,
       'label' => ts('Price Set'),
       'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
+      'class' => 'crm-form-select-priceset',
     ]);
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.openRelatedConfig.js');
 
     $default = [0 => NULL];
     $this->add('hidden', 'price_field_id', '', ['id' => 'price_field_id']);

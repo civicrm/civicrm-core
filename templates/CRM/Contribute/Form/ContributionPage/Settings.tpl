@@ -46,7 +46,9 @@
         <table class="form-layout-compressed">
           <tr class="crm-contribution-onbehalf_profile_id">
             <td class="label">{$form.onbehalf_profile_id.label}</td>
-            <td>{$form.onbehalf_profile_id.html}</td>
+            <td>{$form.onbehalf_profile_id.html}
+              <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
+            </td>
           </tr>
           <tr id="for_org_text" class="crm-contribution-contributionpage-settings-form-block-for_organization">
             <td class="label">{$form.for_organization.label} {help id="id-for_organization"}</td>
