@@ -21,7 +21,12 @@
           // The defaults here are derived in the php layer from the saved mapping or the column
           // headers. The latter involves some regex.
           $scope.data.defaults = CRM.vars.crmImportUi.defaults;
+          $scope.data.bundledActions = CRM.vars.crmImportUi.bundledActions;
           $scope.userJob = CRM.vars.crmImportUi.userJob;
+          if ($scope.userJob.metadata.actions === undefined) {
+            // Yeah nah - we just hard-code them cos what else would anyone ever want.
+            $scope.userJob.metadata.actions = {'entity' : null, 'action' : null, 'condition' : 'always'};
+          }
           $scope.data.showColumnNames = $scope.userJob.metadata.submitted_values.skipColumnHeader;
           $scope.data.savedMapping = CRM.vars.crmImportUi.savedMapping;
           $scope.isStandalone = CRM.vars.crmImportUi.isStandalone;
@@ -119,6 +124,30 @@
             }
           });
           return {results: fields};
+        });
+        $scope.getSelectedEntities = (function () {
+          var entities = [];
+          _.each($scope.data.entities, function(entity) {
+            if (entity.is_contact) {
+              entities.push({ 'id': entity.id, 'name': entity.id, 'text': entity.text });
+            }
+          });
+          return {results : entities};
+        });
+
+        $scope.getActions = (function () {
+          // Currently contact is the only entity.
+          var bundledActions = $scope.data.bundledActions.Contact;
+          console.log(bundledActions);
+          return {results : bundledActions};
+        });
+
+        $scope.getConditions = (function () {
+          var conditions = [
+            {'id' : 'always', 'text' : 'Always'},
+            {'id' : 'on_multiple_match', 'text' : 'On Multiple match (note yet implemented)'},
+          ];
+          return {results : conditions};
         });
 
         /**
