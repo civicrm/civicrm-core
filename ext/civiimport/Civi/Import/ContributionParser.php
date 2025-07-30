@@ -20,6 +20,8 @@ namespace Civi\Import;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\Note;
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
 
 /**
  * Class to parse contribution csv files.
@@ -163,6 +165,12 @@ class ContributionParser extends ImportParser {
         $fields['Contribution.' . $fieldName] = $field;
       }
       $fields['Contribution.note']['entity_instance'] = 'Note';
+      foreach ($this->getImportFieldsForEntity('FinancialTrxn') as $paymentField) {
+        $paymentField['entity_name'] = 'Contribution';
+        $paymentField['entity_instance'] = 'Payment';
+        $fields['Payment.' . $paymentField['name']] = $paymentField;
+      }
+
       $contactFields = $this->getContactFields($this->getContactType(), 'Contact');
       $fields['Contribution.contact_id'] = $contactFields['Contact.id'];
       $fields['Contribution.contact_id']['match_rule'] = '*';
@@ -348,10 +356,55 @@ class ContributionParser extends ImportParser {
       }
 
       if ($contributionParams['id']) {
+        if (!empty($params['Payment'])) {
+          throw new \CRM_Core_Exception(ts('pan_truncation is mapped but not importable'));
+        }
         $contributionID = Contribution::update()->setValues($contributionParams)->execute()->first()['id'];
       }
       else {
-        $contributionID = Contribution::create()->setValues($contributionParams)->execute()->first()['id'];
+        $contributionStatus = \CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionParams['contribution_status_id'] ?? NULL) ?? 'Completed';
+        if (in_array($contributionStatus, ['Cancelled', 'Refunded', 'Chargeback'])) {
+          if (!empty($params['Payment'])) {
+            throw new \CRM_Core_Exception(ts('pan_truncation is mapped but not importable'));
+          }
+          // Unit test testContributionStatusLabel shows an issue with doing Order->Update for
+          // Cancelled - in terms of the created financial entities not passing validatePayments().
+          // We should remove this & figure out te necessary for that test to pass but in the interim
+          // let us keep the pre-order-save behaviour.
+          $contributionID = Contribution::create()->setValues($contributionParams)->execute()->first()['id'];
+        }
+        else {
+          unset($contributionParams['contribution_status_id']);
+          $contributionID = Order::create()
+            ->setContributionValues($contributionParams)
+            ->addLineItem(['line_total_inclusive' => $contributionParams['total_amount']])
+            ->execute()->first()['id'];
+          if ($contributionStatus === 'Completed') {
+            // Use values from Contribution as saved, in case the hooks changed any.
+            $contribution = Contribution::get()
+              ->addWhere('id', '=', $contributionID)
+              ->execute()->single();
+            Payment::create()
+              ->setValues(($params['Payment'] ?? []) + [
+                'contribution_id' => $contributionID,
+                'check_number' => $contribution['check_number'],
+                'payment_instrument_id' => $contribution['payment_instrument_id'],
+                'total_amount' => $contribution['total_amount'],
+                'net_amount' => $contribution['net_amount'],
+                'fee_amount' => $contribution['fee_amount'],
+                'trxn_date' => $contribution['receive_date'],
+                'trxn_id' => $contribution['trxn_id'],
+                'currency' => $contribution['currency'],
+              ])
+              ->execute();
+          }
+          elseif ($contributionStatus !== 'Pending') {
+            Contribution::update()
+              ->addWhere('id', '=', $contributionID)
+              ->setValues(['contribution_status_id:name' => $contributionStatus])
+              ->execute();
+          }
+        }
       }
 
       if (!empty($softCreditParams)) {

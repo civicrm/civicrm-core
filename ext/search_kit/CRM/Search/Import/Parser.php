@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\Contribution;
 use Civi\Api4\Order;
 use Civi\Api4\Payment;
 use Civi\Api4\Query\SqlExpression;
@@ -98,7 +99,7 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
       }
     }
     if (!$lineItems && isset($contributionValues['total_amount'])) {
-      $lineItems[] = ['line_total' => $contributionValues['total_amount']];
+      $lineItems[] = ['line_total_inclusive' => $contributionValues['total_amount']];
     }
     try {
       $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionValues['contribution_status_id'] ?? NULL);
@@ -107,6 +108,10 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
         ->setLineItems($lineItems)
         ->execute()->single();
       if ($contributionStatus === 'Completed') {
+        // Use values from Contribution as saved, in case the hooks changed any.
+        $contribution = Contribution::get()
+          ->addWhere('id', '=', $contribution['id'])
+          ->execute()->single();
         Payment::create()
           ->setValues([
             'contribution_id' => $contribution['id'],
@@ -115,6 +120,8 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
             'trxn_id' => $contribution['trxn_id'] ?? NULL,
             'trxn_date' => $contribution['receive_date'] ?? 'now',
             'payment_instrument_id' => $contribution['payment_instrument_id'],
+            'fee_amount' => $contribution['fee_amount'],
+            'currency' => $contribution['currency'],
           ])
           ->execute();
       }

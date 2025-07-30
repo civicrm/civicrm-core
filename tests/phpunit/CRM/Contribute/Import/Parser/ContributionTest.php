@@ -13,6 +13,7 @@ use Civi\Api4\Email;
 use Civi\Api4\Import;
 use Civi\Api4\Note;
 use Civi\Api4\OptionValue;
+use Civi\Api4\Payment;
 use Civi\Api4\UserJob;
 use Civi\Import\ContributionParser;
 
@@ -171,10 +172,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test payment types are passed.
+   * Test importing a payment field (pan_truncation).
    *
-   * Note that the expected result should logically be CRM_Import_Parser::valid
-   * but writing test to reflect not fix here
+   * We also check that if the total_amount is modified in a pre hook on the
+   * contribution that is reflected in the payment.
    *
    * @throws \CRM_Core_Exception
    */
@@ -191,6 +192,46 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['payment_instrument']);
+  }
+
+  /**
+   * Test payment field is imported (pan_truncation).
+   *
+   * Also test that if the amount is altered by a hook the altered amount is used
+   * to create the contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentField(): void {
+    \Civi::dispatcher()->addListener('hook_civicrm_pre', [__CLASS__, 'preHook'], 100);
+
+    $values = [
+      'Contribution.contact_id' => $this->individualCreate([], 'donor'),
+      'Contribution.total_amount' => 10,
+      'Contribution.financial_type_id' => 'Donation',
+      'Contribution.payment_instrument_id' => 'Credit Card',
+      'Payment.pan_truncation' => 567,
+    ];
+    $this->runImport($values, 'create');
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['Contribution.contact_id' => $this->ids['Contact']['donor']]);
+    $this->assertEquals('Credit Card', $contribution['payment_instrument']);
+    // Changed from 10 to 9 in the hook.
+    $this->assertEquals(9, $contribution['total_amount']);
+
+    $payment = Payment::get()
+      ->setContributionID($contribution['id'])
+      ->execute()->single();
+    $this->assertEquals(567, $payment['pan_truncation']);
+    $this->assertEquals(9, $payment['total_amount']);
+  }
+
+  public static function preHook($event): void {
+    if ($event->entity === 'Contribution' && $event->action === 'create') {
+      // Alter the amount in the hook to simulate a currency adjustment.
+      // We want to check the payment is made for the adjusted amount.
+      $line = &$event->params['line_item'][0][0];
+      $event->params['total_amount'] = $line['line_total'] = $line['line_total_inclusive'] = $line['unit_price'] = 9;
+    }
   }
 
   /**
