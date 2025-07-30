@@ -1063,7 +1063,7 @@ class CRM_Financial_BAO_Order {
         $lineItem['line_total_inclusive'] = $lineItem['line_total'];
         $lineItem['line_total'] = $lineItem['line_total_inclusive'] ? $lineItem['line_total_inclusive'] / (1 + ($lineItem['tax_rate'] / 100)) : 0;
         $lineItem['tax_amount'] = round($lineItem['line_total_inclusive'] - $lineItem['line_total'], 2);
-        // Make sure they still add up to each other afer the rounding.
+        // Make sure they still add up to each other after the rounding.
         $lineItem['line_total'] = $lineItem['line_total_inclusive'] - $lineItem['tax_amount'];
         $lineItem['qty'] = 1;
         $lineItem['unit_price'] = $lineItem['line_total'];
@@ -1237,12 +1237,20 @@ class CRM_Financial_BAO_Order {
         $lineItem['price_field_value_id'] = (int) $lineItem['price_field_value_id'];
         $lineItem = array_merge($this->getPriceFieldValueDefaults($lineItem['price_field_value_id']), $lineItem);
       }
-      if (!isset($lineItem['line_total'])) {
-        $lineItem['line_total'] = $lineItem['qty'] * $lineItem['unit_price'];
-      }
       $lineItem['tax_rate'] = $this->getTaxRate($lineItem['financial_type_id']);
-      $lineItem['tax_amount'] = ($lineItem['tax_rate'] / 100) * $lineItem['line_total'];
-      $lineItem['line_total_inclusive'] = $lineItem['tax_amount'] + $lineItem['line_total'];
+      if (isset($lineItem['line_total_inclusive'])) {
+        $lineItem['line_total'] = $lineItem['line_total_inclusive'] / (1 + ($lineItem['tax_rate'] / 100));
+        $lineItem['tax_amount'] = $lineItem['line_total_inclusive'] - $lineItem['line_total'];
+        $lineItem['qty'] = 1;
+        $lineItem['unit_price'] = $lineItem['line_total'];
+      }
+      else {
+        if (!isset($lineItem['line_total'])) {
+          $lineItem['line_total'] = $lineItem['qty'] * $lineItem['unit_price'];
+        }
+        $lineItem['tax_amount'] = ($lineItem['tax_rate'] / 100) * $lineItem['line_total'];
+        $lineItem['line_total_inclusive'] = $lineItem['tax_amount'] + $lineItem['line_total'];
+      }
     }
     if (!empty($lineItem['membership_type_id'])) {
       $lineItem['entity_table'] = 'civicrm_membership';
