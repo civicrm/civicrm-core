@@ -786,8 +786,7 @@ input.crm-form-checkbox) + label {
 
 /* JQ spinner */
 
-.crm-container .ui-spinner input,
-#crm-search-results-page-size /* SK pagination */ {
+.crm-container .ui-spinner input {
   width: 8ch;
 }
 .crm-container .ui-spinner a.ui-spinner-button {

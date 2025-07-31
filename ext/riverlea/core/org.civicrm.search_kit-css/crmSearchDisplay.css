@@ -23,9 +23,6 @@
 .crm-search-task-dialog input.ng-invalid {
   border-color: var(--crm-c-warning);
 }
-#crm-search-results-page-size {
-  width: 60px;
-}
 .crm-search-display button.dropdown-toggle {
   white-space: nowrap;
   font-size: var(--crm-font-size);
