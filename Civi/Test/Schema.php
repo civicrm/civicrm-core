@@ -250,7 +250,6 @@ class Schema {
       'civicrm_group_nesting',
       'civicrm_group_organization',
       'civicrm_im',
-      // 'civicrm_import_template_field',
       // 'civicrm_install_canary',
       // 'civicrm_job',
       // 'civicrm_job_log',
