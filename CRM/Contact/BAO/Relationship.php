@@ -837,6 +837,9 @@ WHERE  is_active = 1 AND relationship_type_id = ' . CRM_Utils_Type::escape($type
       // an array with the information about the custom value.
       foreach ($params as $value) {
         foreach ($value as $customValue) {
+          if (!empty($customValue['value']) && $customValue['type'] === 'Date') {
+            $customValue['value'] = CRM_Utils_Date::mysqlToIso($customValue['value']);
+          }
           $newValues[$customValue['custom_field_id']] = $customValue['value'];
         }
       }
