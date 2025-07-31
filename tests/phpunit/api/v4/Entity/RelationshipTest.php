@@ -199,4 +199,36 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
 
   }
 
+  public function testDuplicateRelationship() {
+    $cid = $this->saveTestRecords('Individual', ['records' => 2])->column('id');
+    $relationshipType1 = $this->createTestRecord('RelationshipType', [
+      'label_a_b' => uniqid('One'),
+      'label_b_a' => uniqid('Two'),
+      'contact_type_a' => 'Individual',
+    ])['id'];
+    $relationshipType2 = $this->createTestRecord('RelationshipType', [
+      'label_a_b' => uniqid('Three'),
+      'label_b_a' => uniqid('Four'),
+      'contact_type_b' => 'Individual',
+    ])['id'];
+
+    $origId = Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $cid[0],
+        'contact_id_b' => $cid[1],
+        'relationship_type_id' => $relationshipType1,
+      ])->execute()->single()['id'];
+
+    $saved = Relationship::save(FALSE)
+      ->setRecords([
+        ['contact_id_a' => $cid[0], 'contact_id_b' => $cid[1], 'relationship_type_id' => $relationshipType1],
+        ['contact_id_a' => $cid[0], 'contact_id_b' => $cid[1], 'relationship_type_id' => $relationshipType2],
+      ])
+      ->execute();
+
+    $this->assertArrayHasKey('duplicate_id', $saved[0]);
+    $this->assertArrayNotHasKey('duplicate_id', $saved[1]);
+    $this->assertSame($origId, $saved[0]['duplicate_id']);
+  }
+
 }

@@ -78,8 +78,21 @@
     };
 
     this.onSuccess = function(result) {
-      const added = result.batchCount;
-      const msg = added === 1 ? ts('1 case role added.') : ts('%1 case roles added.', {1: added});
+      let added = 0;
+      let duplicate = 0;
+      result.forEach(function(item) {
+        item.relationship.forEach(function(relationship) {
+          if (relationship.duplicate_id) {
+            duplicate++;
+          } else {
+            added++;
+          }
+        });
+      });
+      let msg = _.escape(added === 1 ? ts('1 case role added.') : ts('%1 case roles added.', {1: added}));
+      if (duplicate) {
+        msg += '<br>' + _.escape(duplicate === 1 ? ts('1 case role already occupied by the selected contact.') : ts('%1 case roles already occupied by the selected contact.', {1: duplicate}));
+      }
       CRM.alert(msg, ts('Saved'), 'success');
       this.close(result);
     };
