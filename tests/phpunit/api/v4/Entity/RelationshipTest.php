@@ -231,4 +231,49 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame($origId, $saved[0]['duplicate_id']);
   }
 
+  public function testDuplicateRelationshipWithCustomFields() {
+    $customGroupName = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Relationship',
+    ])['name'];
+    $customFields = $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id:name' => $customGroupName],
+      'records' => [
+        ['data_type' => 'String', 'html_type' => 'Text'],
+        ['data_type' => 'Int', 'html_type' => 'Text'],
+        ['data_type' => 'Date', 'html_type' => 'Select Date'],
+      ],
+    ]);
+    $customField1 = $customGroupName . '.' . $customFields[0]['name'];
+    $customField2 = $customGroupName . '.' . $customFields[1]['name'];
+    $customField3 = $customGroupName . '.' . $customFields[2]['name'];
+
+    $cid = $this->saveTestRecords('Individual', ['records' => 2])->column('id');
+
+    $relationshipType1 = $this->createTestRecord('RelationshipType', [
+      'label_a_b' => uniqid('TestA'),
+      'label_b_a' => uniqid('TestB'),
+    ])['id'];
+
+    $orig = Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $cid[0],
+        'contact_id_b' => $cid[1],
+        'relationship_type_id' => $relationshipType1,
+        $customField1 => 'Test1',
+        $customField2 => 1,
+        $customField3 => '2019-01-01',
+      ])->execute()->single();
+
+    // Create a duplicate and a non-duplicate relationship
+    $new = Relationship::save(FALSE)
+      ->setRecords([
+        ['contact_id_a' => $cid[0], 'contact_id_b' => $cid[1], 'relationship_type_id' => $relationshipType1, $customField1 => 'Test1', $customField2 => 1, $customField3 => '2019-01-01'],
+        ['contact_id_a' => $cid[0], 'contact_id_b' => $cid[1], 'relationship_type_id' => $relationshipType1, $customField1 => 'Test2', $customField2 => 2, $customField3 => '2019-01-02'],
+      ])
+      ->execute();
+
+    $this->assertEquals($orig['id'], $new[0]['duplicate_id']);
+    $this->assertArrayNotHasKey('duplicate_id', $new[1]);
+  }
+
 }
