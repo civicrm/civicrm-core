@@ -133,8 +133,9 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     // $manager->refresh();
 
     $localExtensionRows = $this->formatLocalExtensionRows();
+    $extensionCountByStatusType = $this->formatExtensionRowData($localExtensionRows);
     $this->assign('localExtensionRows', $localExtensionRows);
-
+    $this->assign('extensionCountByStatusType', $extensionCountByStatusType);
     $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
     $this->assign('remoteExtensionRows', $remoteExtensionRows);
 
@@ -152,6 +153,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * @return array
    */
   public function formatLocalExtensionRows() {
+    $config = CRM_Core_Config::singleton();
     $mapper = CRM_Extension_System::singleton()->getMapper();
     $manager = CRM_Extension_System::singleton()->getManager();
 
@@ -219,6 +221,16 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           $row['id']
         );
       }
+      // Determine if this is a core extension or custom extension
+      // Core extensions are in the main CiviCRM directory, custom are in extensionsDir
+      if (str_contains($row['path'], $config->extensionsDir)) {
+        // Custom extension
+        $row['is_core'] = FALSE;
+      }
+      else {
+        // Core extension
+        $row['is_core'] = TRUE;
+      }
       // Key would be better to send, but it's not an integer.  Moreover, sending the
       // values to hook_civicrm_links means that you can still get at the key
 
@@ -279,6 +291,39 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     }
 
     return $remoteExtensionRows;
+  }
+
+  /**
+   * Format extension data by status and type for summary statistics.
+   *
+   * Organizes extensions into a hierarchical structure (core/other -> status -> extensions)
+   * and counts extensions by category for display in summary sections.
+   *
+   * @param array $extensionList List of formatted extension data
+   * @return array Extension counts organized by type (core/custom) and status
+   */
+  public function formatExtensionRowData($extensionList): array {
+    $formattedData = [];
+    $extensionCountByStatusType = [
+      'core' => ['installed' => 0, 'disabled' => 0, 'uninstalled' => 0],
+      'other' => ['installed' => 0, 'disabled' => 0, 'uninstalled' => 0],
+    ];
+    // Initialize the formatted data structure by grouping extensions
+    foreach ($extensionList as $key => $extension) {
+      // Group by core vs custom, then by status
+      $formattedData[$extension['is_core'] ? 'core' : 'other'][$extension['status']][$key] = $extension;
+    }
+    //$extensionCountByStatusType = [];
+    // Count the number of extensions by status and type for summary display
+    foreach ($formattedData as $type => $extensionsByStatus) {
+      foreach ($extensionsByStatus as $status => $extensions) {
+        if (!isset($extensionCountByStatusType[$type][$status])) {
+          $extensionCountByStatusType[$type][$status] = 0;
+        }
+        $extensionCountByStatusType[$type][$status] += count($extensions);
+      }
+    }
+    return $extensionCountByStatusType;
   }
 
   /**

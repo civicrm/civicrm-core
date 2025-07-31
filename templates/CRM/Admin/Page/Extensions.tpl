@@ -26,12 +26,20 @@
 
     {include file="CRM/common/enableDisableApi.tpl"}
     {include file="CRM/common/jsortable.tpl"}
-
+    <div>
+      <input type="text" id="search_extension" placeholder="Search extensions..." oninput="filterExtensions()">
+    </div>
     <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
         <ul class="crm-extensions-tabs-list" role="tablist">
             <li id="tab_summary" role="tab" class="crm-tab-button">
-              <a href="#extensions-main" title="{ts escape='htmlattribute'}Extensions{/ts}">
-              <span> </span> {ts}Extensions{/ts}
+              <a href="#extensions-main" title="{ts escape='htmlattribute'}Core Extensions{/ts}">
+              <span> </span> {ts}Core Extensions{/ts}
+              <em>&nbsp;</em>
+              </a>
+            </li>
+            <li id="tab_other" role="tab" class="crm-tab-button">
+              <a href="#extensions-other" title="{ts escape='htmlattribute'}Other Extensions{/ts}">
+              <span> </span> {ts}Other Extensions{/ts}
               <em>&nbsp;</em>
               </a>
             </li>
@@ -44,7 +52,10 @@
         </ul>
 
         <div id="extensions-main" role="tabpanel" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
-            {include file="CRM/Admin/Page/Extensions/Main.tpl"}
+            {include file="CRM/Admin/Page/Extensions/Main.tpl" isCore=TRUE localExtensionStats=$extensionCountByStatusType.core categoryType="core"}
+        </div>
+        <div id="extensions-other" role="tabpanel" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+            {include file="CRM/Admin/Page/Extensions/Main.tpl" isCore=FALSE localExtensionStats=$extensionCountByStatusType.other categoryType="others"}
         </div>
         <div id="extensions-addnew" role="tabpanel" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
             {if $extAddNewEnabled}
@@ -87,6 +98,112 @@
         return false;
       }); // .click
     }); // onload
+
+    // Search functionality
+    function filterExtensions() {
+      const searchTerm = document.getElementById('search_extension').value.toLowerCase().trim();
+      const extensionRows = document.querySelectorAll('.extension_summary');
+      extensionRows.forEach(extensionRow => {
+        const title = extensionRow.querySelector('summary').textContent.toLowerCase();
+        extensionRow.style.display = title.includes(searchTerm) ? 'table-row' : 'none';
+      });
+    }
     </script>
+  <style>
+  .crm-container #extensions-other {
+    padding: 0;
+    border-top: 0;
+  }
+  .crm-container #extensions-other table {
+    box-shadow: none;
+    border: 0 solid transparent;
+  }
+  .crm-container #extensions-other table th {
+    background-color: var(--crm-tab-bg-active);
+    min-width: max-content;
+    white-space: nowrap; /* prevents wrapping of sort icons with oversized descriptions */
+  }
+  .crm-container #extensions-other table summary {
+    padding: 0;
+    background-color: unset;
+    color: var(--crm-c-text);
+    font-weight: unset;
+    font-family: var(--crm-font);
+  }
+  .crm-extensions-group {
+    margin-bottom: 20px;
+  }
+
+  .crm-extensions-group-header {
+    background: #f4f4f4;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    font-weight: bold;
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .crm-extensions-group-content {
+    border: 1px solid #ddd;
+    border-top: none;
+  }
+
+  .crm-extensions-subgroup {
+    margin: 0;
+  }
+
+  .crm-extensions-subgroup-header {
+    background: #fafafa;
+    padding: 6px 20px;
+    border-bottom: 1px solid #eee !important;
+    font-size: 16px;
+    font-weight: 600;
+    color: #666 !important;;
+    margin: 0;
+  }
+
+  .crm-extensions-subgroup:last-child .crm-extensions-subgroup-header {
+    border-bottom: none;
+  }
+
+  .crm-extensions-subgroup table {
+    margin: 0;
+    border: none;
+  }
+
+  .crm-extensions-subgroup .crm-extensions-subgroup-header + table {
+    border-top: none;
+  }
+
+  .crm-extensions-group.empty {
+    opacity: 0.7;
+  }
+
+  .crm-extensions-group.empty .crm-extensions-group-content {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+
+  .crm-extension-count {
+    float: right;
+    background: #666;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: normal;
+  }
+  #extensions {
+    /*
+    padding-right: 20px;
+    padding-left: 20px;
+    */
+  }
+
+  </style>
     {/literal}
 {/if}
