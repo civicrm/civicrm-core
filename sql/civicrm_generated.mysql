@@ -4037,15 +4037,6 @@ LOCK TABLES `civicrm_im` WRITE;
 UNLOCK TABLES;
 
 --
--- Dumping data for table `civicrm_import_template_field`
---
-
-LOCK TABLES `civicrm_import_template_field` WRITE;
-/*!40000 ALTER TABLE `civicrm_import_template_field` DISABLE KEYS */;
-/*!40000 ALTER TABLE `civicrm_import_template_field` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Dumping data for table `civicrm_job`
 --
 
