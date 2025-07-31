@@ -8,6 +8,10 @@ This Framework separates CiviCRM's visual/UI CSS from structural CSS, using CSS 
 
 When you enable CiviCRM, you will see these themes in your usual CiviCRM theme options on the Display Settings page, where you can also set your dark mode preferences.
 
+## Changelog
+
+Is at [Changelog.md](CHANGELOG.md).
+
 ## Version numbering
 
 RiverLea has its own version numbering: `[River Lea version]-[CiviCRM version built on]`. This means there might be simultaneously versions `1.2.1-5.81.beta` and `1.3.0-5.82.alpha`. Please ignore previous numbering patterns.
