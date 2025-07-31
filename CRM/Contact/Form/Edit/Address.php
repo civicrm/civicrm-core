@@ -357,9 +357,8 @@ class CRM_Contact_Form_Edit_Address {
       // And we can't set it to 'address_' because we want to set it in a slightly different format.
       CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 'dnc_');
 
-      $tplGroupTree = CRM_Core_Smarty::singleton()
-        ->getTemplateVars('address_groupTree');
-      $tplGroupTree = empty($tplGroupTree) ? [] : $tplGroupTree;
+      $tplVars = CRM_Core_Smarty::singleton()->getTemplateVars();
+      $tplGroupTree = empty($tplVars['address_groupTree']) ? [] : $tplVars['address_groupTree'];
 
       $form->assign('address_groupTree', $tplGroupTree + [$blockId => $groupTree]);
       // unset the temp smarty var that got created
