@@ -48,6 +48,9 @@ global $civicrm_root, $civicrm_setting, $civicrm_paths;
  * Settings for Joomla:
  *      define('CIVICRM_UF', 'Joomla');
  *
+ * Settings for Joomla5:
+ *      define('CIVICRM_UF', 'Joomla5');
+ *
  * Settings for WordPress:
  *      define('CIVICRM_UF', 'WordPress');
  *

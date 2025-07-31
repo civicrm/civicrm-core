@@ -100,7 +100,7 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
       unset($query_param['noheader']);
       unset($query_param['civiwp']);
     }
-    elseif ($config->userFramework === 'Joomla') {
+    elseif ($config->userFramework === 'Joomla' || $config->userFramework === 'Joomla5') {
       unset($query_param['option']);
     }
 
