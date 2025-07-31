@@ -22,6 +22,9 @@ trait FileSaveTrait {
       if (empty($file['id']) && !empty($file['file_name'])) {
         $file['uri'] = $this->makeFileUri($file['file_name']);
         if (!empty($file['move_file'])) {
+          if ($this->getCheckPermissions()) {
+            throw new \CRM_Core_Exception("The move_file option is only allowed in trusted operations. Set checkPermissions=0 to enable move_file.");
+          }
           $path = $this->getFilePath($file);
           if (!copy($file['move_file'], $path)) {
             throw new \CRM_Core_Exception("Cannot copy uploaded file {$file['move_file']} to $path");
