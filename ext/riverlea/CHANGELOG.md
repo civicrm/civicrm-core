@@ -1,3 +1,18 @@
+1.4.8-6.6
+ - ADDED - 9 new flexbox utility classes for use by extension devs/etc, e.g. `.crm-flex-align-start` (https://github.com/civicrm/civicrm-core/pull/33118)
+ - CHANGED - Empty stream to include all new variables / patterns (https://github.com/civicrm/civicrm-core/pull/33126)
+ - CHANGED - Improved inline edit - icon for status when empty, better wrapping, smaller input (https://github.com/civicrm/civicrm-core/pull/33152)
+ - CHANGED - Better tabular form display (width & padding), helpful for batch input (https://github.com/civicrm/civicrm-core/pull/33165)
+ - CHANGED - Select2 improvements: min-width, top-border, fixes border-radius name (https://github.com/civicrm/civicrm-core/pull/33244)
+ - FIXED - Removes colour over-ride making dropdown 'danger' links illegible (https://github.com/civicrm/civicrm-core/pull/33219)
+ - FIXED - colour contrast bugs with FormBuilder dropdown traash icon and notification link (https://github.com/civicrm/civicrm-core/pull/33245)
+ - CHANGED - differentiates Select2 placeholder text with 'inactive' colour (https://github.com/civicrm/civicrm-core/pull/33251)
+ - CHANGED - makes inactive/disabled row state clearer visually (https://github.com/civicrm/civicrm-core/pull/33278)
+
+1.4.7-6.5
+ - ADDED - fallback font for iframe pages using Minetta, was previously inheriting browser default (https://github.com/civicrm/civicrm-core/pull/33052)
+ - ADDED - improvement to display of inline FormBuilder edit dropdown button (https://github.com/civicrm/civicrm-core/pull/33024)
+
 1.4.6-6.4
  - FIXED - multiuple issues on Contact Summary inline-edit resolved and improved (https://github.com/civicrm/civicrm-core/pull/32936)
  - FIXED - multiple input-size modifiers (ie .four) that weren't loading, now do (https://github.com/civicrm/civicrm-core/pull/32942), 6.3 port
