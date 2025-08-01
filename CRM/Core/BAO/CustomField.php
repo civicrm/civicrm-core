@@ -2545,8 +2545,7 @@ WHERE      f.id IN ($ids)";
 
     //lets start w/ params.
     foreach ($params as $key => $value) {
-      $customFieldID = self::getKeyID($key);
-      $field = $customFieldID ? CRM_Core_BAO_CustomField::getField($customFieldID) : NULL;
+      $field = CRM_Core_BAO_CustomField::getFieldByName($key);
       if (!$field) {
         continue;
       }
