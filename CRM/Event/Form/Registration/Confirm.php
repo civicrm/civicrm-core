@@ -249,9 +249,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         // Setup and load the payment elements on the form
         $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['event']['payment_processor'] ?? NULL);
 
-        // assigning payLater label
-        $payLaterLabel = $this->_values['event']['pay_later_text'] ?? '';
-        $this->setPayLaterLabel($payLaterLabel);
+        $isPayLater = $this->getEventValue('is_pay_later');
+        $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
 
         $this->assign('pay_later_receipt', '');
         // @fixme These functions all seem to do similar things but take one away and the house of cards falls down..
