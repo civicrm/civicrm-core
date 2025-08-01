@@ -235,6 +235,14 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   color: var(--crm-alert-danger-text);
   font-style: normal;
 }
+.crm-container tr:has(.disabled) td:first-of-type:has(input[type='checkbox']),
+.crm-container tr.disabled td:first-of-type:has(input[type='checkbox']) {
+  /* puts checkbox first if cell has checkbox */
+  display: flex;
+  flex-direction: row-reverse;
+  gap: var(--crm-flex-gap);
+  justify-content: start;
+}
 
 /* Jqueery UI icons (tags) */
 .crm-container .jstree-wholerow-ul {
