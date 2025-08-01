@@ -1,3 +1,8 @@
+1.4.7-6.5
+ - ADDED - fallback font for iframe pages using Minetta, was previously inheriting browser default (https://github.com/civicrm/civicrm-core/pull/33052)
+ - ADDED - improvement to display of inline FormBuilder edit dropdown button (https://github.com/civicrm/civicrm-core/pull/33024)
+ - FIXED - overdue activity not listed in red/'danger' (https://github.com/civicrm/civicrm-core/pull/33028)
+
 1.4.6-6.4
  - FIXED - multiuple issues on Contact Summary inline-edit resolved and improved (https://github.com/civicrm/civicrm-core/pull/32936)
  - FIXED - multiple input-size modifiers (ie .four) that weren't loading, now do (https://github.com/civicrm/civicrm-core/pull/32942), 6.3 port
