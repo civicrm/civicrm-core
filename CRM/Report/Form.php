@@ -4161,7 +4161,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         if (array_key_exists('fields', $prop)) {
           foreach ($prop['fields'] as $fieldName => $field) {
             if (($field['dataType'] ?? NULL) === 'ContactReference') {
-              $columnName = CRM_Core_BAO_CustomField::getField(CRM_Core_BAO_CustomField::getKeyID($fieldName))['column_name'];
+              $columnName = CRM_Core_BAO_CustomField::getFieldByName($fieldName)['column_name'];
               $this->_from .= "
 LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_aliases[$table]}.{$columnName} ";
             }

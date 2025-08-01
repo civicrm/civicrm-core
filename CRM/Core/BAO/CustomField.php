@@ -599,6 +599,25 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   }
 
   /**
+   * @param string $name
+   *   Short name or long name
+   * @return array|null
+   * @throws CRM_Core_Exception
+   */
+  public static function getFieldByName(string $name): ?array {
+    // Convert long name to short name
+    if (str_contains($name, '.')) {
+      $name = self::getShortNameFromLongName($name);
+    }
+    if (empty($name) || !str_contains($name, '_')) {
+      return NULL;
+    }
+    // Get id from short name
+    [, $id] = explode('_', $name);
+    return self::getField($id);
+  }
+
+  /**
    * Converts `custom_123` to `GroupName.FieldName`.
    */
   public static function getLongNameFromShortName(string $shortName): ?string {
@@ -2526,8 +2545,7 @@ WHERE      f.id IN ($ids)";
 
     //lets start w/ params.
     foreach ($params as $key => $value) {
-      $customFieldID = self::getKeyID($key);
-      $field = $customFieldID ? CRM_Core_BAO_CustomField::getField($customFieldID) : NULL;
+      $field = CRM_Core_BAO_CustomField::getFieldByName($key);
       if (!$field) {
         continue;
       }
