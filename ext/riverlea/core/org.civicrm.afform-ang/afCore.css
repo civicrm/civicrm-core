@@ -65,6 +65,12 @@ details.af-container > *:nth-of-type(1):not(summary) {
 details.af-container > *:last-of-type {
   padding-bottom: var(--crm-m);
 }
+details.af-container.af-layout-inline {
+  flex-direction: column;
+}
+details.af-container.af-layout-inline > *:not(summary) {
+  display: inline-block;
+}
 
 /* Card style */
 .af-container-style-pane {
