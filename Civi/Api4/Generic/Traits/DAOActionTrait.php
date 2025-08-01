@@ -249,7 +249,7 @@ trait DAOActionTrait {
       }
       [$fieldName, $fkField] = explode('.', $key);
       $field = $this->entityFields()[$fieldName] ?? NULL;
-      if (!$field || empty($field['fk_entity'])) {
+      if (!$field || $field['type'] !== 'Field' || empty($field['fk_entity'])) {
         continue;
       }
       $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);

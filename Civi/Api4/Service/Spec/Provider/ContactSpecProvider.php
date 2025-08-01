@@ -47,52 +47,6 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
         ->setDescription(ts('Date closed or disbanded'));
     }
 
-    // All other fields in this file are specific to the `get` action.
-    if ($spec->getAction() !== 'get') {
-      return;
-    }
-
-    // Groups field
-    $field = new FieldSpec('groups', $spec->getEntity(), 'Array');
-    $field->setLabel(ts('In Groups'))
-      ->setTitle(ts('Groups'))
-      ->setColumnName('id')
-      ->setDescription(ts('Groups (or sub-groups of groups) to which this contact belongs'))
-      ->setType('Filter')
-      ->setInputType('Select')
-      ->setOperators(['IN', 'NOT IN'])
-      ->addSqlFilter([__CLASS__, 'getContactGroupSql'])
-      ->setSuffixes(['name', 'label'])
-      ->setOptionsCallback([__CLASS__, 'getGroupList']);
-    $spec->addFieldSpec($field);
-
-    // The following fields are specific to Individuals
-    if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
-      // Age field
-      $field = new FieldSpec('age_years', $spec->getEntity(), 'Integer');
-      $field->setLabel(ts('Age (years)'))
-        ->setTitle(ts('Age (years)'))
-        ->setColumnName('birth_date')
-        ->setInputType('Number')
-        ->setDescription(ts('Age of individual (in years)'))
-        ->setType('Extra')
-        ->setReadonly(TRUE)
-        ->setSqlRenderer([__CLASS__, 'calculateAge']);
-      $spec->addFieldSpec($field);
-
-      // Birthday field
-      $field = new FieldSpec('next_birthday', $spec->getEntity(), 'Integer');
-      $field->setLabel(ts('Next Birthday in (days)'))
-        ->setTitle(ts('Next Birthday in (days)'))
-        ->setColumnName('birth_date')
-        ->setInputType('Number')
-        ->setDescription(ts('Number of days until next birthday'))
-        ->setType('Extra')
-        ->setReadonly(TRUE)
-        ->setSqlRenderer([__CLASS__, 'calculateBirthday']);
-      $spec->addFieldSpec($field);
-    }
-
     // Address, Email, Phone, IM primary/billing virtual fields
     // This exposes the joins created by
     // \Civi\Api4\Event\Subscriber\ContactSchemaMapSubscriber::onSchemaBuild()
@@ -150,6 +104,52 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
           ->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
         $spec->addFieldSpec($field);
       }
+    }
+
+    // All other fields in this file are specific to the `get` action.
+    if ($spec->getAction() !== 'get') {
+      return;
+    }
+
+    // Groups field
+    $field = new FieldSpec('groups', $spec->getEntity(), 'Array');
+    $field->setLabel(ts('In Groups'))
+      ->setTitle(ts('Groups'))
+      ->setColumnName('id')
+      ->setDescription(ts('Groups (or sub-groups of groups) to which this contact belongs'))
+      ->setType('Filter')
+      ->setInputType('Select')
+      ->setOperators(['IN', 'NOT IN'])
+      ->addSqlFilter([__CLASS__, 'getContactGroupSql'])
+      ->setSuffixes(['name', 'label'])
+      ->setOptionsCallback([__CLASS__, 'getGroupList']);
+    $spec->addFieldSpec($field);
+
+    // The following fields are specific to Individuals
+    if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
+      // Age field
+      $field = new FieldSpec('age_years', $spec->getEntity(), 'Integer');
+      $field->setLabel(ts('Age (years)'))
+        ->setTitle(ts('Age (years)'))
+        ->setColumnName('birth_date')
+        ->setInputType('Number')
+        ->setDescription(ts('Age of individual (in years)'))
+        ->setType('Extra')
+        ->setReadonly(TRUE)
+        ->setSqlRenderer([__CLASS__, 'calculateAge']);
+      $spec->addFieldSpec($field);
+
+      // Birthday field
+      $field = new FieldSpec('next_birthday', $spec->getEntity(), 'Integer');
+      $field->setLabel(ts('Next Birthday in (days)'))
+        ->setTitle(ts('Next Birthday in (days)'))
+        ->setColumnName('birth_date')
+        ->setInputType('Number')
+        ->setDescription(ts('Number of days until next birthday'))
+        ->setType('Extra')
+        ->setReadonly(TRUE)
+        ->setSqlRenderer([__CLASS__, 'calculateBirthday']);
+      $spec->addFieldSpec($field);
     }
 
   }
