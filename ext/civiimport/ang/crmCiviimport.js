@@ -142,22 +142,24 @@
          * @type {function(*=, *): *}
          */
         function filterContactFields(fields, selection, entityFieldPrefix) {
-          var contactType = selection.contact_type;
-          var action = selection.action;
-          var rules = $scope.data.dedupeRules;
-          var dedupeRule = rules[selection.dedupe_rule];
+          const contactType = selection.contact_type;
+          const action = selection.action;
+          const rules = $scope.data.dedupeRules;
+          const dedupeRules = Object.keys(rules)
+            .filter(key => selection.dedupe_rule.includes(key))
+            .map(key => rules[key]);
           fields = fields.filter((function (field) {
             // Using replace here is safe ... for now... cos only soft credits have a prefix
             // but if we add a prefix to contact this will need updating.
-            var fieldName = field.id.replace(entityFieldPrefix, '');
+            const fieldName = field.id.replace(entityFieldPrefix, '');
             if (action === 'select' && !Boolean(field.match_rule) &&
-              (!Boolean(dedupeRule) || !Boolean(dedupeRule.fields[fieldName]))
+              (!dedupeRules.length || !dedupeRules.some(rule => Boolean(rule.fields[fieldName])))
             ) {
               // In select mode only fields used to look up the contact are returned.
               return false;
             }
             if (Boolean(contactType)) {
-              var supportedTypes = field.contact_type;
+              const supportedTypes = field.contact_type;
               return supportedTypes[contactType];
             }
             // No contact type specified, do not filter on it.
@@ -202,17 +204,22 @@
          * Get a list of dedupe rules for the entity type.
          *
          * @param selectedEntity
-         * @returns {{}}
-         *   e.g {{name: 'IndividualSupervised', 'text' : 'Name and email', 'is_default' : true}}
+         * @returns [{}]
+         *   e.g [{name: 'IndividualSupervised', 'text' : 'Name and email', 'is_default' : true}]
          */
         $scope.getDedupeRules = function (selectedEntity) {
-          var dedupeRules = [];
+          const dedupeRules = [
+            {contact_type: null, text: ts('Universal'), icon: 'fa-star', children: []},
+          ];
           _.each($scope.data.dedupeRules, function (rule) {
-            if (selectedEntity === '') {
-              selectedEntity = null;
-            }
-            if (rule.contact_type === selectedEntity) {
-              dedupeRules.push({'id': rule.name, 'text': rule.title, 'is_default': rule.used === 'Unsupervised'});
+            if (!selectedEntity || !rule.contact_type || rule.contact_type === selectedEntity) {
+              let optGroup = dedupeRules.find(group => group.contact_type === rule.contact_type);
+              if (!optGroup) {
+                const contactType = $scope.data.contactTypes.find(type => type.id === rule.contact_type);
+                optGroup = {contact_type: rule.contact_type, text: contactType.text, icon: contactType.icon, children: []};
+                dedupeRules.push(optGroup);
+              }
+              optGroup.children.push({id: rule.name, text: rule.title, is_default: rule.used === 'Unsupervised'});
             }
           });
           return dedupeRules;
@@ -378,7 +385,7 @@
      */
     $scope.updateContactType = (function(entity) {
       entity.dedupe_rules = $scope.getDedupeRules(entity.selected.contact_type);
-      entity.selected.dedupe_rule = entity.dedupe_rules[0].id;
+      entity.selected.dedupe_rule = [];
     });
   });
 })(angular, CRM.$, CRM._);

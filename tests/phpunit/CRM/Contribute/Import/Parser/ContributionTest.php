@@ -347,12 +347,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'Contact' => [
         'action' => 'create',
         'contact_type' => 'Organization',
-        'dedupe_rule' => 'OrganizationUnsupervised',
+        'dedupe_rule' => ['OrganizationUnsupervised'],
       ],
       'SoftCreditContact' => [
         'contact_type' => 'Individual',
         'action' => 'create',
-        'dedupe_rule' => 'IndividualSupervised',
+        'dedupe_rule' => ['IndividualSupervised'],
         'soft_credit_type_id' => 1,
       ],
     ];
