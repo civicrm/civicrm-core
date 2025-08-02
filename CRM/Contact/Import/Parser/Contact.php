@@ -1042,8 +1042,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return $stateProvince;
     }
     // Try to disambiguate since we likely have the country now.
+    // or it might be 'invalid_import_value'
     $possibleStates = $this->ambiguousOptions['state_province_id'][mb_strtolower($stateProvince)];
-    if ($countryID) {
+    if (is_numeric($countryID)) {
       return $this->checkStatesForCountry($countryID, $possibleStates) ?: 'invalid_import_value';
     }
     // Try the default country next.
