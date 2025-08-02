@@ -599,8 +599,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   }
 
   /**
+   * Gets custom field + group details, given either the brief identifier or the full api4 name.
+   *
+   * Does NOT fetch by `civicrm_custom_field.name` as that column is not guaranteed to be unique.
+   *
    * @param string $name
-   *   Short name or long name
+   *   Short name (custom_123) or long name (GroupName.FieldName)
+   *
+   * @see self::getShortNameFromLongName()
    * @return array|null
    * @throws CRM_Core_Exception
    */
@@ -619,6 +625,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
 
   /**
    * Converts `custom_123` to `GroupName.FieldName`.
+   *
+   * Does NOT fetch by `civicrm_custom_field.name` as that column is not guaranteed to be unique.
+   *
+   * @param string $shortName
+   *   Field id prefixed with `custom_`, e.g. `custom_123`
+   *
+   * @return string
+   *   Full name of group.field per Api4 naming convention.
    */
   public static function getLongNameFromShortName(string $shortName): ?string {
     [, $id] = explode('_', $shortName);
@@ -633,6 +647,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
 
   /**
    * Converts `GroupName.FieldName` to `custom_123`.
+   *
+   * Does NOT fetch by `civicrm_custom_field.name` as that column is not guaranteed to be unique.
+   *
+   * @param string $longName
+   *   Full name of group.field per Api4 naming convention.
+   *
+   * @return string
+   *   Field id prefixed with `custom_`, e.g. `custom_123`
    */
   public static function getShortNameFromLongName(string $longName): ?string {
     [$groupName, $fieldName] = explode('.', $longName);
