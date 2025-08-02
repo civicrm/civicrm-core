@@ -202,16 +202,13 @@
          * Get a list of dedupe rules for the entity type.
          *
          * @param selectedEntity
-         * @returns {{}}
-         *   e.g {{name: 'IndividualSupervised', 'text' : 'Name and email', 'is_default' : true}}
+         * @returns [{}]
+         *   e.g [{name: 'IndividualSupervised', 'text' : 'Name and email', 'is_default' : true}]
          */
         $scope.getDedupeRules = function (selectedEntity) {
-          var dedupeRules = [];
+          const dedupeRules = [];
           _.each($scope.data.dedupeRules, function (rule) {
-            if (selectedEntity === '') {
-              selectedEntity = null;
-            }
-            if (rule.contact_type === selectedEntity) {
+            if (!selectedEntity || rule.contact_type === selectedEntity) {
               dedupeRules.push({'id': rule.name, 'text': rule.title, 'is_default': rule.used === 'Unsupervised'});
             }
           });
@@ -378,7 +375,7 @@
      */
     $scope.updateContactType = (function(entity) {
       entity.dedupe_rules = $scope.getDedupeRules(entity.selected.contact_type);
-      entity.selected.dedupe_rule = entity.dedupe_rules[0].id;
+      entity.selected.dedupe_rule = [entity.dedupe_rules[0].id];
     });
   });
 })(angular, CRM.$, CRM._);
