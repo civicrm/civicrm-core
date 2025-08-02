@@ -27,6 +27,19 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
+  public function testBase64mbz(): void {
+    $examples = [
+      'Hello world',
+      file_get_contents(__FILE__),
+      'lic func',
+    ];
+    foreach ($examples as $raw) {
+      $encoded = CRM_Utils_String::base64mbzEncode($raw);
+      $decoded = CRM_Utils_String::base64mbzDecode($encoded);
+      $this->assertEquals($raw, $decoded);
+    }
+  }
+
   public function testStripPathChars(): void {
     $testSet = [
       '' => '',
