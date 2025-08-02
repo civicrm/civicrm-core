@@ -21,9 +21,11 @@ class CRM_Core_Key {
    *
    * Expressed as number of bytes. (Ex: 128 bits = 16 bytes)
    *
+   * Choose a length that is optimal for the HASH_ALGO.
+   *
    * @var int
    */
-  const PRIVATE_KEY_LENGTH = 16;
+  const PRIVATE_KEY_LENGTH = 32;
 
   /**
    * @var string
