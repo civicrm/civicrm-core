@@ -599,40 +599,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   }
 
   /**
-   * Gets custom field + group details, given either the brief identifier or the full api4 name.
-   *
-   * Does NOT fetch by `civicrm_custom_field.name` as that column is not guaranteed to be unique.
-   *
-   * @param string $name
-   *   Short name (custom_123) or long name (GroupName.FieldName)
-   *
-   * @see self::getShortNameFromLongName()
-   * @return array|null
-   * @throws CRM_Core_Exception
-   */
-  public static function getFieldByName(string $name): ?array {
-    // Convert long name to short name
-    if (str_contains($name, '.')) {
-      $name = self::getShortNameFromLongName($name);
-    }
-    if (empty($name) || !str_contains($name, '_')) {
-      return NULL;
-    }
-    // Get id from short name
-    [, $id] = explode('_', $name);
-    return self::getField($id);
-  }
-
-  /**
    * Converts `custom_123` to `GroupName.FieldName`.
-   *
-   * Does NOT fetch by `civicrm_custom_field.name` as that column is not guaranteed to be unique.
-   *
-   * @param string $shortName
-   *   Field id prefixed with `custom_`, e.g. `custom_123`
-   *
-   * @return string
-   *   Full name of group.field per Api4 naming convention.
    */
   public static function getLongNameFromShortName(string $shortName): ?string {
     [, $id] = explode('_', $shortName);
@@ -647,14 +614,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
 
   /**
    * Converts `GroupName.FieldName` to `custom_123`.
-   *
-   * Does NOT fetch by `civicrm_custom_field.name` as that column is not guaranteed to be unique.
-   *
-   * @param string $longName
-   *   Full name of group.field per Api4 naming convention.
-   *
-   * @return string
-   *   Field id prefixed with `custom_`, e.g. `custom_123`
    */
   public static function getShortNameFromLongName(string $longName): ?string {
     [$groupName, $fieldName] = explode('.', $longName);
@@ -2567,7 +2526,8 @@ WHERE      f.id IN ($ids)";
 
     //lets start w/ params.
     foreach ($params as $key => $value) {
-      $field = CRM_Core_BAO_CustomField::getFieldByName($key);
+      $customFieldID = self::getKeyID($key);
+      $field = $customFieldID ? CRM_Core_BAO_CustomField::getField($customFieldID) : NULL;
       if (!$field) {
         continue;
       }

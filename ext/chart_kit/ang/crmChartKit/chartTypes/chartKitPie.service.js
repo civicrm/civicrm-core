@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('crmChartKit').factory('chartKitPie', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitPieAdmin.html',
+    adminTemplate: '~/crmChartKit/chartTypes/chartKitPieAdmin.html',
 
     getAxes: () => ({
       'w': {

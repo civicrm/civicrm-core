@@ -15,14 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\API\EntityLookupTrait;
 use Civi\Api4\Contribution;
 
 /**
  * This class provides the functionality for batch entry for contributions/memberships.
  */
 class CRM_Batch_Form_Entry extends CRM_Core_Form {
-  use EntityLookupTrait;
 
   /**
    * Batch id.
@@ -179,12 +177,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $batchId = $this->getBatchID();
+    $this->_batchId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
 
     if (empty($this->_batchInfo)) {
-      $params = ['id' => $batchId];
+      $params = ['id' => $this->_batchId];
       CRM_Batch_BAO_Batch::retrieve($params, $this->_batchInfo);
 
       $this->assign('batchTotal', !empty($this->_batchInfo['total']) ? $this->_batchInfo['total'] : NULL);
@@ -227,16 +225,17 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('Profile for bulk data entry is missing.'));
     }
 
-    $this->addElement('hidden', 'batch_id', $this->getBatchID());
+    $this->addElement('hidden', 'batch_id', $this->_batchId);
 
+    $batchTypes = array_flip(CRM_Batch_DAO_Batch::buildOptions('type_id', 'validate'));
     // get the profile information
-    if ($this->getBatchValue('type_id:name') === 'Contribution') {
+    if ($this->_batchInfo['type_id'] == $batchTypes['Contribution']) {
       $this->setTitle(ts('Batch Data Entry for Contributions'));
     }
-    elseif ($this->getBatchValue('type_id:name') === 'Membership') {
+    elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
       $this->setTitle(ts('Batch Data Entry for Memberships'));
     }
-    elseif ($this->getBatchValue('type_id:name') === 'Pledge Payment') {
+    elseif ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
       $this->setTitle(ts('Batch Data Entry for Pledge Payments'));
     }
 
@@ -277,7 +276,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       ],
     ]);
 
-    $this->assign('rowCount', $this->getBatchValue('item_count') + 1);
+    $this->assign('rowCount', $this->_batchInfo['item_count'] + 1);
 
     $preserveDefaultsArray = [
       'first_name',
@@ -297,14 +296,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       ]);
 
       // special field specific to membership batch update
-      if ($this->getBatchValue('type_id:name') === 'Membership') {
+      if ($this->_batchInfo['type_id'] == 2) {
         $options = [
           1 => ts('Add Membership'),
           2 => ts('Renew Membership'),
         ];
         $this->add('select', "member_option[$rowNumber]", '', $options);
       }
-      if ($this->getBatchValue('type_id:name') === 'Pledge Payment') {
+      if ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
         $options = ['' => ts('-select-')];
         $optionTypes = [
           '1' => ts('Adjust Pledge Payment Schedule?'),
@@ -516,7 +515,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     // update batch to close status
     $paramValues = [
-      'id' => $this->getBatchID(),
+      'id' => $this->_batchId,
       // close status
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed'),
       'total' => $params['actualBatchTotal'],
@@ -865,6 +864,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   protected function emailReceipt($form, &$formValues): bool {
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
+    if (!empty($formValues['payment_instrument_id'])) {
+      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
+      $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
+    }
 
     // @todo - as of 5.74 module is noisy deprecated - can stop assigning around 5.80.
     $form->assign('module', 'Membership');
@@ -923,6 +926,39 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
+   * Function exists purely for unit testing purposes.
+   *
+   * If you feel tempted to use this in live code then it probably means there is some functionality
+   * that needs to be moved out of the form layer
+   *
+   * @param array $params
+   *
+   * @return float
+   * @throws \CRM_Core_Exception
+   */
+  public function testProcessMembership($params) {
+    return $this->processMembership($params);
+  }
+
+  /**
+   * Function exists purely for unit testing purposes.
+   *
+   * If you feel tempted to use this in live code then it probably means there is some functionality
+   * that needs to be moved out of the form layer.
+   *
+   * @deprecated since 5.82 will be removed around 5.86
+   *
+   * @param array $params
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testProcessContribution($params) {
+    return $this->processContribution($params);
+  }
+
+  /**
    * @param $customFieldsFormatted
    * @param array $formDates
    *
@@ -931,6 +967,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function legacyProcessMembership($customFieldsFormatted, $formDates = []): CRM_Member_DAO_Membership {
+    $updateStatusId = FALSE;
     $changeToday = NULL;
     $numRenewTerms = 1;
     $format = '%Y%m%d';
@@ -987,6 +1024,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $ids['membership'] = $currentMembership['id'];
       }
       $memParams['membership_activity_status'] = $isPayLater ? 'Scheduled' : 'Completed';
+    }
+
+    //CRM-4555
+    //if we decided status here and want to skip status
+    //calculation in create( ); then need to pass 'skipStatusCal'.
+    if ($updateStatusId) {
+      $memParams['status_id'] = $updateStatusId;
+      $memParams['skipStatusCal'] = TRUE;
     }
 
     //since we are renewing,
@@ -1117,46 +1162,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       }
     }
     return $return;
-  }
-
-  /**
-   * @return int
-   *
-   * @api supported for external Use.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function getBatchID(): int {
-    if (!isset($this->_batchId)) {
-      $this->_batchId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    }
-    return $this->_batchId;
-  }
-
-  /**
-   * Get the value for a field relating to the batc.
-   *
-   * All values returned in apiv4 format. Escaping may be required.
-   *
-   * @api This function will not change in a minor release and is supported for
-   * use outside of core. This annotation / external support for properties
-   * is only given where there is specific test cover.
-   *
-   * @param string $fieldName
-   *
-   * @return mixed
-   * @throws \CRM_Core_Exception
-   */
-  public function getBatchValue(string $fieldName): mixed {
-    if ($this->isDefined('Batch')) {
-      return $this->lookup('Batch', $fieldName);
-    }
-    $id = $this->getBatchID();
-    if ($id) {
-      $this->define('Batch', 'Batch', ['id' => $id]);
-      return $this->lookup('Batch', $fieldName);
-    }
-    return NULL;
   }
 
 }

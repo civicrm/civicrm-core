@@ -20,10 +20,9 @@
   <comments>A cross-CMS CiviCRM theme framework.</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
-    <psr0 prefix="CRM_" path="."/>
   </classloader>
   <civix>
-    <namespace>CRM/riverlea</namespace>
+    <namespace>CRM/Riverlea</namespace>
     <format>25.01.1</format>
   </civix>
   <mixins>
@@ -32,7 +31,5 @@
     <mixin>setting-admin@1.0.1</mixin>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
-    <mixin>entity-types-php@2.0.0</mixin>
   </mixins>
-  <upgrader>CiviMix\Schema\Riverlea\AutomaticUpgrader</upgrader>
 </extension>

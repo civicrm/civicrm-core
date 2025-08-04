@@ -94,7 +94,7 @@ class NullValueTest extends Api4TestBase implements TransactionalInterface {
 
     $saved = Activity::save(FALSE)
       ->addRecord(['id' => $activity['id'], 'subject' => NULL])
-      ->setReload(['*'])
+      ->setReload(TRUE)
       ->execute()
       ->first();
 

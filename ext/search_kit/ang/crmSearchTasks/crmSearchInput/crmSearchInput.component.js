@@ -1,9 +1,6 @@
 (function(angular, $, _) {
   "use strict";
 
-  // Ensures each searchInput instance gets a unique id
-  let searchInputInstance = 0;
-
   angular.module('crmSearchTasks').component('crmSearchInput', {
     bindings: {
       field: '<',
@@ -11,7 +8,6 @@
       format: '<',
       optionKey: '<',
       showLabel: '<',
-      name: '@',
     },
     require: {ngModel: 'ngModel'},
     templateUrl: '~/crmSearchTasks/crmSearchInput/crmSearchInput.html',
@@ -19,7 +15,7 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.domId = 'search-input-' + searchInputInstance++;
+      this.domId = 'search-input-' + Math.random().toString(36).substr(2, 9);
 
       this.$onInit = function() {
 
@@ -42,10 +38,6 @@
         };
 
         function formatDataType(val) {
-          // Prevent unnecessarily triggering ngChagne
-          if (val === null || val === undefined) {
-            return val;
-          }
           // Do not reformat pseudoconstant values (:name, :label, etc)
           if (ctrl.optionKey && ctrl.optionKey !== 'id') {
             return val;

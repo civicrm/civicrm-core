@@ -205,10 +205,7 @@ class Admin {
       $possibleColumns[$column] = "$column:label";
     }
     // Other possible relevant columns... now we're just guessing
-    //
-    // TODO: these can be specified using the @searchColumns annotation on
-    // the Api4 entity class so would probably be better to specify sensible
-    // options for core entities explicitly - which allows you to order logically too
+    $possibleColumns['financial_type_id'] = 'financial_type_id:label';
     $possibleColumns['description'] = 'description';
     // E.g. "activity_status_id"
     $possibleColumns[strtolower($entity['name']) . 'status_id'] = strtolower($entity['name']) . 'status_id:label';

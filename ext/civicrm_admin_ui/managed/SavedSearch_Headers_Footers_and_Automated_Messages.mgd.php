@@ -63,6 +63,7 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
+              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => FALSE,
               'editable' => TRUE,
@@ -70,30 +71,35 @@ return [
             [
               'type' => 'field',
               'key' => 'component_type:label',
+              'dataType' => 'String',
               'label' => E::ts('Type'),
               'sortable' => FALSE,
             ],
             [
               'type' => 'field',
               'key' => 'subject',
+              'dataType' => 'String',
               'label' => E::ts('Subject'),
               'sortable' => FALSE,
             ],
             [
               'type' => 'field',
               'key' => 'body_html',
+              'dataType' => 'Text',
               'label' => E::ts('Body HTML'),
               'sortable' => FALSE,
             ],
             [
               'type' => 'field',
               'key' => 'body_text',
+              'dataType' => 'Text',
               'label' => E::ts('Body Text'),
               'sortable' => FALSE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => FALSE,
               'icons' => [],
@@ -102,6 +108,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_default',
+              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => FALSE,
               'title' => NULL,

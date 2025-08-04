@@ -61,18 +61,21 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
+              'dataType' => 'String',
               'label' => E::ts('Date Class'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
+              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'date_format',
+              'dataType' => 'String',
               'label' => E::ts('Date Format'),
               'sortable' => TRUE,
               'rewrite' => '',
@@ -81,12 +84,14 @@ return [
             [
               'type' => 'field',
               'key' => 'start',
+              'dataType' => 'Integer',
               'label' => E::ts('Start Offset'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'end',
+              'dataType' => 'Integer',
               'label' => E::ts('End Offset'),
               'sortable' => TRUE,
             ],

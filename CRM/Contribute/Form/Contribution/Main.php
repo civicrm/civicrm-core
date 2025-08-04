@@ -22,6 +22,15 @@ use Civi\Api4\Membership;
  */
 class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_ContributionBase {
 
+  /**
+   * Define default MembershipType Id.
+   *
+   * @var int
+   *
+   * @deprecated unused
+   */
+  public $_defaultMemTypeId;
+
   public $_paymentProcessors;
 
   public $_membershipTypeValues;
@@ -678,9 +687,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $memType['current_membership'] = $membership['end_date'];
             if (!$endDate) {
               $endDate = $memType['current_membership'];
+              $this->_defaultMemTypeId = $memType['id'];
             }
             if ($memType['current_membership'] < $endDate) {
               $endDate = $memType['current_membership'];
+              $this->_defaultMemTypeId = $memType['id'];
             }
           }
           $membershipTypes[] = $memType;

@@ -20,7 +20,6 @@
 
 use Civi\Api4\ActivityContact;
 use Civi\Api4\UserJob;
-use Civi\Import\ActivityParser;
 
 /**
  *  Test Activity Import Parser functions
@@ -39,7 +38,6 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   public function setUp():void {
     parent::setUp();
     $this->createLoggedInUser();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
   }
 
   /**
@@ -75,14 +73,14 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    *
    * @param array $fields
    *
-   * @return \Civi\Import\ActivityParser
+   * @return \CRM_Activity_Import_Parser_Activity
    */
-  protected function createImportObject(array $fields): ActivityParser {
+  protected function createImportObject(array $fields): \CRM_Activity_Import_Parser_Activity {
     $mapper = [];
     foreach ($fields as $field) {
       $mapper[] = [$field];
     }
-    $importer = new ActivityParser();
+    $importer = new CRM_Activity_Import_Parser_Activity();
     $this->userJobID = $this->getUserJobID(['mapper' => $mapper]);
     $importer->setUserJobID($this->userJobID);
     $importer->init();
@@ -325,7 +323,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   protected function getMapperFromFieldMappings(array $mappings): array {
     $mapper = [];
     foreach ($mappings as $mapping) {
-      $mapper[] = [$mapping['name']];
+      $mapper[] = $mapping['name'];
     }
     return $mapper;
   }
@@ -396,19 +394,16 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    * @noinspection PhpDocMissingThrowsInspection
    */
   protected function getUserJobID(array $submittedValues = []): int {
-    $queryFields = ['first_name'];
-    foreach (array_keys($submittedValues['mapper']) as $key) {
-      if ($key > 0) {
-        $queryFields[] = '"value_' . $key . '" AS field_' . $key;
-      }
-    }
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
           'contactType' => 'Individual',
           'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
-          'sqlQuery' => 'SELECT ' . implode(', ', $queryFields) . ' FROM civicrm_contact',
+          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
+          'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+          'dedupe_rule_id' => NULL,
+          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',

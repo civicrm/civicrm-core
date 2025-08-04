@@ -3,22 +3,21 @@
 
   angular.module('crmSearchTasks').component('crmSearchInputVal', {
     bindings: {
-      op: '<',
+      field: '<',
+      'op': '<',
+      'optionKey': '<',
       labelId: '@',
     },
-    require: {
-      ngModel: 'ngModel',
-      input: '^crmSearchInput'
-    },
+    require: {ngModel: 'ngModel'},
     template: '<div class="form-group" ng-include="$ctrl.getTemplate()"></div>',
     controller: function($scope, formatForSelect2, crmApi4) {
-      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {
-        const field = getField();
-        let rendered = false;
-        this.dateRanges = CRM.crmSearchTasks.dateRanges;
+        var rendered = false,
+          field = this.field || {};
+        ctrl.dateRanges = CRM.crmSearchTasks.dateRanges;
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
@@ -48,22 +47,16 @@
       };
 
       this.getFkEntity = function() {
-        const field = getField();
-        return field.fk_entity || field.entity || null;
+        return ctrl.field ? ctrl.field.fk_entity || ctrl.field.entity : null;
       };
 
-      const autocompleteStaticOptions = {
+      var autocompleteStaticOptions = {
         Contact: ['user_contact_id'],
-        Individual: ['user_contact_id'],
         '': []
       };
 
       this.getAutocompleteStaticOptions = function() {
-        // "Select current user" only make sense in a search context, so check for presence of operator
-        if (ctrl.op) {
-          return autocompleteStaticOptions[ctrl.getFkEntity() || ''] || autocompleteStaticOptions[''];
-        }
-        return autocompleteStaticOptions[''];
+        return autocompleteStaticOptions[ctrl.getFkEntity() || ''] || autocompleteStaticOptions[''];
       };
 
       this.isMulti = function() {
@@ -73,7 +66,7 @@
         }
         // If no search operator this is an input for e.g. the bulk update action
         // Return `true` if the field is multi-valued, else `null`
-        return ctrl.input.field && (ctrl.input.field.serialize || ctrl.input.field.data_type === 'Array') ? true : null;
+        return ctrl.field && (ctrl.field.serialize || ctrl.field.data_type === 'Array') ? true : null;
       };
 
       this.changeDateType = function() {
@@ -96,7 +89,7 @@
       };
 
       this.dateUnits = function(setUnit) {
-        const vals = ctrl.value.split(' ');
+        var vals = ctrl.value.split(' ');
         if (arguments.length) {
           vals[3] = setUnit;
           ctrl.value = vals.join(' ');
@@ -106,7 +99,7 @@
       };
 
       this.dateNumber = function(setNumber) {
-        const vals = ctrl.value.split(' ');
+        var vals = ctrl.value.split(' ');
         if (arguments.length) {
           vals[2] = setNumber;
           ctrl.value = vals.join(' ');
@@ -131,7 +124,7 @@
       };
 
       this.getTemplate = function() {
-        const field = getField();
+        var field = ctrl.field || {};
 
         if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP', 'REGEXP BINARY', 'NOT REGEXP BINARY'], ctrl.op)) {
           return '~/crmSearchTasks/crmSearchInput/text.html';
@@ -176,13 +169,9 @@
       };
 
       this.getFieldOptions = function() {
-        const field = getField();
-        return {results: formatForSelect2(field.options || [], ctrl.input.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
+        var field = ctrl.field || {};
+        return {results: formatForSelect2(field.options || [], ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
       };
-
-      function getField() {
-        return ctrl.input.field || {};
-      }
 
       function isDateField(field) {
         return field.data_type === 'Date' || field.data_type === 'Timestamp';

@@ -6,7 +6,6 @@
 !/ext/afform
 !/ext/standaloneusers
 !/ext/authx
-!/ext/batch_entry
 !/ext/civigrant
 !/ext/civicrm_admin_ui
 !/ext/civicrm_search_ui
@@ -31,7 +30,6 @@
 !/ext/oembed
 !/ext/payflowpro
 !/ext/ckeditor4
-!/ext/legacybatchentry
 !/ext/legacycustomsearches
 !/ext/legacydedupefinder
 !/ext/legacyprofiles

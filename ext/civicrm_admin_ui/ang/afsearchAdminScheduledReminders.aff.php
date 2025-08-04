@@ -7,7 +7,5 @@ return [
   'description' => E::ts('Administer scheduled reminders'),
   'icon' => 'fa-list-alt',
   'server_route' => 'civicrm/admin/scheduleReminders',
-  'permission' => [
-    'administer CiviCRM data',
-  ],
+  'permission' => ['administer CiviCRM data'],
 ];

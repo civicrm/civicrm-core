@@ -238,8 +238,6 @@ class AfformAdminMeta {
         $inputTypes[] = [
           'name' => $name,
           'label' => $inputTypeLabels[$name] ?? E::ts($name),
-          'template' => '~/af/fields/' . $name . '.html',
-          'admin_template' => '~/afGuiEditor/inputType/' . $name . '.html',
         ];
       }
 

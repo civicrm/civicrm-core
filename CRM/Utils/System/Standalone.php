@@ -324,6 +324,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    if ($maintenance) {
+      \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_Base::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
+      $content = $this->renderMaintenanceMessage($content, $print);
+    }
+    print $content;
+    return NULL;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function renderMaintenanceMessage(string $content): string {
     // wrap in a minimal header
     $headerContent = CRM_Core_Region::instance('html-header', FALSE)->render('');

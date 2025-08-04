@@ -265,11 +265,4 @@ class Themes extends \Civi\Core\Service\AutoService {
     return ($cssExt === 'civicrm') ? $cssFile : "$cssExt-$cssFile";
   }
 
-  /**
-   * Clear the cache
-   */
-  public function clearCache() {
-    $this->cache->clear();
-  }
-
 }

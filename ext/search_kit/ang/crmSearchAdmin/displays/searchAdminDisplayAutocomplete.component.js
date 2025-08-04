@@ -12,10 +12,8 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayAutocomplete.html',
     controller: function($scope, searchMeta) {
-      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
-
-      this.isAdmin = CRM.checkPerm('administer CiviCRM');
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
@@ -32,18 +30,6 @@
           });
         }
         ctrl.parent.initColumns({});
-        ctrl.display.settings.searchFields = ctrl.display.settings.searchFields || [];
-        if (!ctrl.display.settings.searchFields.length) {
-          const baseEntity = searchMeta.getBaseEntity();
-          if (searchMeta.getField('id')) {
-            ctrl.display.settings.searchFields.push('id');
-          }
-          if (baseEntity.search_fields && baseEntity.search_fields.length) {
-            ctrl.display.settings.searchFields.push(...baseEntity.search_fields);
-          }
-        }
-        // Ensure array is unique
-        ctrl.display.settings.searchFields = _.uniq(ctrl.display.settings.searchFields);
       };
 
     }

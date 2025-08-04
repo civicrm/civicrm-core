@@ -24,10 +24,7 @@
           $scope.userJob = CRM.vars.crmImportUi.userJob;
           $scope.data.showColumnNames = $scope.userJob.metadata.submitted_values.skipColumnHeader;
           $scope.data.savedMapping = CRM.vars.crmImportUi.savedMapping;
-          $scope.isStandalone = CRM.vars.crmImportUi.isStandalone;
-          $scope.isTemplate = CRM.vars.crmImportUi.isTemplate;
-          $scope.mappingSaving = {updateFieldMapping: 0, newFieldMapping: 0, newFieldMappingName: ''};
-          $scope.dateFormats = CRM.vars.crmImportUi.dateFormats;
+          $scope.mappingSaving = {updateFieldMapping: 0, newFieldMapping: 0};
           // Used for dedupe rules select options, also for filtering available fields.
           $scope.data.dedupeRules = CRM.vars.crmImportUi.dedupeRules;
           // Used for select contact type select-options.
@@ -39,7 +36,7 @@
           $scope.entitySelection = [];
           var entityConfiguration = $scope.userJob.metadata.entity_configuration;
           _.each($scope.data.entityMetadata, function (entityMetadata) {
-            var selected = (Boolean(entityConfiguration) && Boolean(entityConfiguration[entityMetadata.entity_name])) ? entityConfiguration[entityMetadata.entity_name] : entityMetadata.selected;
+            var selected = Boolean(entityConfiguration) ? entityConfiguration[entityMetadata.entity_name] : entityMetadata.selected;
             // If our selected action is not available then fall back to the entity default.
             // This would happen if we went back to the DataSource screen & made a change, as the
             // php layer filters on that configuration options
@@ -54,7 +51,7 @@
             }
 
             entityMetadata.dedupe_rules = [];
-            if (Boolean(entityMetadata.selected)) {
+            if (Boolean(entityMetadata.selected) && Boolean(selected.contact_type)) {
               entityMetadata.dedupe_rules = $scope.getDedupeRules(selected.contact_type);
             }
 
@@ -208,9 +205,6 @@
         $scope.getDedupeRules = function (selectedEntity) {
           var dedupeRules = [];
           _.each($scope.data.dedupeRules, function (rule) {
-            if (selectedEntity === '') {
-              selectedEntity = null;
-            }
             if (rule.contact_type === selectedEntity) {
               dedupeRules.push({'id': rule.name, 'text': rule.title, 'is_default': rule.used === 'Unsupervised'});
             }
@@ -287,70 +281,33 @@
             $scope.userJob.metadata.entity_configuration[entity.id] = entity.selected;
           });
           _.each($scope.data.importMappings, function (importRow, index) {
+            selectedEntity = $scope.getEntityForField(importRow.selectedField);
+            var entityConfig = {};
+            if (selectedEntity === 'SoftCreditContact') {
+              // For now we just hard-code this - mapping to soft_credit a bit undefined - but
+              // we are mimicking getMappingFieldFromMapperInput on the php layer.
+              // Could get it from entity_data but .... later.
+              entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity]};
+            }
 
             $scope.userJob.metadata.import_mappings.push({
               name: importRow.selectedField,
               default_value: importRow.defaultValue,
               // At this stage column_number is thrown away but we store it here to have it for when we change that.
               column_number: index,
+              entity_data: entityConfig
             });
           });
-          var userJobs = [];
-          if ($scope.mappingSaving.updateFieldMapping || $scope.mappingSaving.newFieldMapping) {
-            var templateJob = {
-              'is_template': 1,
-              'metadata' : $scope.userJob.metadata,
-              'job_type' : $scope.userJob.job_type,
-              'status_id:name' : 'draft',
-            };
-            if ($scope.mappingSaving.newFieldMapping) {
-              templateJob.name = 'import_' + $scope.mappingSaving.newFieldMappingName;
-              crmApi4('UserJob', 'get', {where: [['name', '=', templateJob.name]]})
-                .then(function(result) {
-                  if (result.count) {
-                    templateJob.name += '_' + new Date().toISOString().replace(/[:.]/g, '-') + '_' + Math.random().toString(36).slice(2, 5);
-                  }
-
-                  crmApi4('UserJob', 'save', {records: [templateJob]})
-                    .then(function(result) {
-                      $scope.userJob.metadata.template_id = result[0].id;
-                      userJobs.push($scope.userJob);
-                      $scope.saveJobs(userJobs);
-                    });
-                });
-            }
-            else {
-              templateJob.id = $scope.userJob.metadata.template_id;
-              userJobs.push(templateJob);
-            }
-          }
-          if (!$scope.mappingSaving.newFieldMapping) {
-            userJobs.push($scope.userJob);
-            $scope.saveJobs(userJobs);
-          }
-        });
-        $scope.saveJobs = (function(jobs) {
-          crmApi4('UserJob', 'save', {records: jobs})
+          crmApi4('UserJob', 'save', {records: [$scope.userJob]})
             .then(function(result) {
-                if ($scope.isTemplate) {
-                  // Just redirect to the template listing.
-                  window.location.href = CRM.url('civicrm/imports/templates');
-                }
-                else if ($scope.isStandalone) {
-                  window.location.href = CRM.url('civicrm/import_preview', {'id' : $scope.userJob.id});
-                }
-                else {
-                  // Only post the form if the save succeeds.
-                  document.getElementById("MapField").submit();
-                }
-              },
-              function(failure) {
-                if (!$scope.isTemplate) {
-                  // @todo add more error handling - for now, at least we waited..
-                  document.getElementById("MapField").submit();
-                }
-              }
-            );
+              // Only post the form if the save succeeds.
+              document.getElementById("MapField").submit();
+            },
+            function(failure) {
+              // @todo add more error handling - for now, at least we waited...
+              document.getElementById("MapField").submit();
+            }
+          );
         });
 
         $scope.load();

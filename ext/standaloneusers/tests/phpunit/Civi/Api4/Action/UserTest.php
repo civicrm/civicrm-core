@@ -301,21 +301,21 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $updatedUser = User::update(FALSE)
       ->setValues($user)
       ->addWhere('id', '=', $user['id'])
-      ->setReload(['*'])
+      ->setReload(TRUE)
       ->execute()->first();
     $this->assertEquals($user['hashed_password'], $updatedUser['hashed_password']);
 
     // Ditto save
     User::save(FALSE)
       ->setRecords([$user])
-      ->setReload(['*'])
+      ->setReload(TRUE)
       ->execute()->first();
     $updatedUser = User::get(FALSE)->addWhere('id', '=', $user['id'])->execute()->first();
     $this->assertEquals($user['hashed_password'], $updatedUser['hashed_password']);
 
     // Test we can force saving a raw hashed password
     $updatedUser = User::update(FALSE)
-      ->setReload(['*'])
+      ->setReload(TRUE)
       ->addValue('hashed_password', '$shhh')
       ->addWhere('id', '=', $user['id'])
       ->execute()->first();
@@ -323,7 +323,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
 
     // Test we can saving a new password. (This also resets the fixture's nonadmin user's password to secret2)
     $updatedUser = User::update(FALSE)
-      ->setReload(['*'])
+      ->setReload(TRUE)
       ->addValue('password', 'secret2')
       ->addWhere('id', '=', $user['id'])
       ->execute()->first();
@@ -346,7 +346,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       ->addValue('password', 'topSecret')
       ->addWhere('id', '=', $this->nonAdminUserID)
       ->setActorPassword('secret1')
-      ->setReload(['*'])
+      ->setReload(TRUE)
       ->execute()->first();
     $this->assertNotEquals($previousHash, $updatedUser['hashed_password'], "Expected that the password was changed, but it wasn't.");
     $previousHash = $updatedUser['hashed_password'];
@@ -400,13 +400,12 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
 
     // We are allowed to update our own password if we provide the current one.
     $previousHash = $nonAdminUser['hashed_password'];
-    User::update(TRUE)
+    $updatedUser = User::update(TRUE)
       ->setActorPassword('secret2')
       ->addValue('password', 'ourNewSecret')
       ->addWhere('id', '=', $this->nonAdminUserID)
+      ->setReload(TRUE)
       ->execute()->first();
-    // `reload` option would not return hashed_password due to permissions
-    $updatedUser = User::get(FALSE)->addWhere('id', '=', $this->nonAdminUserID)->execute()->first();
     $this->assertNotEquals($previousHash, $updatedUser['hashed_password'], "Expected that the password was changed, but it wasn't.");
     $previousHash = $updatedUser['hashed_password'];
 

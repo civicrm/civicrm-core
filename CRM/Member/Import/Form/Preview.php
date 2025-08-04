@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Import\MembershipParser;
-
 /**
  * This class previews the uploaded file and returns summary
  * statistics
@@ -28,17 +26,17 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
    *
    * @return void
    */
-  public function preProcess(): void {
+  public function preProcess() {
     parent::preProcess();
     $this->setStatusUrl();
   }
 
   /**
-   * @return \Civi\Import\MembershipParser
+   * @return \CRM_Member_Import_Parser_Membership
    */
-  protected function getParser(): MembershipParser {
+  protected function getParser(): CRM_Member_Import_Parser_Membership {
     if (!$this->parser) {
-      $this->parser = new MembershipParser();
+      $this->parser = new CRM_Member_Import_Parser_Membership();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

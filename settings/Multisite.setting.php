@@ -32,7 +32,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Make CiviCRM aware of multiple domains. You should configure a domain group if enabled'),
-    'documentation_link' => ['page' => 'sysadmin/setup/multisite', 'resource' => ''],
+    'documentation_link' => ['page' => 'Multi Site Installation', 'resource' => 'wiki'],
     'help_text' => NULL,
     'settings_pages' => ['multisite' => ['weight' => 10]],
   ],
