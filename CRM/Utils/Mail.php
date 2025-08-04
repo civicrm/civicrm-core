@@ -663,7 +663,7 @@ class CRM_Utils_Mail {
   /**
    * When passed a value, returns the value if it's non-numeric.
    * If it's numeric, look up the display name and email of the corresponding
-   * contact ID in RFC822 format.
+   * email ID in RFC822 format.
    *
    * @param string|array $from
    *   civicrm_email.id or formatted "From address", eg. 12 or "Fred Bloggs" <fred@example.org>
@@ -676,11 +676,11 @@ class CRM_Utils_Mail {
       return "\"{$from['display_name']}\" <{$from['email']}>";
     }
     if (is_numeric($from)) {
-      $result = civicrm_api3('Email', 'get', [
-        'id' => $from,
-        'return' => ['contact_id.display_name', 'email'],
-        'sequential' => 1,
-      ])['values'][0];
+      $result = \Civi\Api4\Email::get(FALSE)
+        ->addSelect('contact_id.display_name', 'email')
+        ->addWhere('id', '=', $from)
+        ->execute()
+        ->first();
       $from = '"' . $result['contact_id.display_name'] . '" <' . $result['email'] . '>';
     }
     return $from;
