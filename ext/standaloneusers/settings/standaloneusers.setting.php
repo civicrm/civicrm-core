@@ -30,4 +30,14 @@ return [
     ],
     'pseudoconstant' => ['callback' => '\\Civi\\Standalone\\MFA\\Base::getMFAclasses'],
   ],
+  'standaloneusers_login_introduction_message' => [
+    'name' => 'standaloneusers_login_introduction_message',
+    'type' => 'String',
+    'title' => ts('Standlone Login Introduction Message'),
+    'description' => ts('Introduction Message for Standlone login page'),
+    'default' => '',
+    'html_type' => 'text',
+    'is_domain' => 1,
+    'is_contact' => 0,
+  ],
 ];

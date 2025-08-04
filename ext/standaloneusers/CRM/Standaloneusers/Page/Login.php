@@ -22,6 +22,7 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
 
     CRM_Utils_System::setTitle(E::ts('Log In'));
     $this->assign('pageTitle', '');
+    $this->assign('introductionMesage', Civi::settings()->get('standaloneusers_login_introduction_message') ?? '');
     $this->assign('forgottenPasswordURL', CRM_Utils_System::url('civicrm/login/password'));
     // Remove breadcrumb for login page.
     $this->assign('breadcrumb', NULL);

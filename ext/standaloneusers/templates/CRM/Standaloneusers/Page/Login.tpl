@@ -1,4 +1,9 @@
 {crmScope extensionKey="standaloneusers"}
+{if $introductionMesage}
+  <div class="standalone-login-introduction-message">
+    {$introductionMesage|purify}
+  </div>
+{/if}
 <div class="standalone-auth-form">
   <div class="standalone-auth-box">
     <form id=login-form>
