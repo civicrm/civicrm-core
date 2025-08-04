@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
 /**
  * Drupal specific stuff goes here.
  */
@@ -381,6 +383,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function permissionDenied() {
     \Drupal::service('civicrm.page_state')->setAccessDenied();
+    throw new AccessDeniedHttpException();
   }
 
   /**
@@ -1023,6 +1026,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // try to check the drupal database directly here?
       return FALSE;
     }
+  }
+
+  public function handleUnhandledException(\Throwable $e) {
+    if ($e instanceof AccessDeniedHttpException) {
+      throw $e;
+    }
+    CRM_Core_Error::handleUnhandledException($e);
   }
 
 }
