@@ -115,6 +115,10 @@ class Rebuilder {
       CRM_Core_DAO_AllCoreTables::flush();
     }
     if (!empty($targets['system'])) {
+      // flush out statics cache
+      // ? could this be bad if we flush "runOnce" type checks ?
+      Civi::$statics = [];
+
       // flush out all cache entries so we can reload new data
       // a bit aggressive, but livable for now
       CRM_Utils_Cache::singleton()->flush();
