@@ -21,7 +21,7 @@
     </div>
   </div>
   <label>{{:: ts('If') }}</label>
-  <input class="form-control collapsible-optgroups" ng-model="clause[1]" crm-ui-select="::{data: $ctrl.fields, allowClear: true, placeholder: ts('Always')}" ng-change="$ctrl.onSelectField(clause)" />
+  <input class="form-control collapsible-optgroups crm-auto-width" ng-model="clause[1]" crm-ui-select="::{data: $ctrl.fields, allowClear: true, placeholder: ts('Always')}" ng-change="$ctrl.onSelectField(clause)" />
   <crm-search-condition ng-if="clause[1]" clause="clause" field="$ctrl.getField(clause[1])" offset="2" option-key="'name'" format="$ctrl.format" class="form-group"></crm-search-condition>
   <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.item.cssRules.splice($index, 1);" title="{{:: ts('Remove style') }}">
     <i class="crm-i fa-times"></i>

@@ -201,7 +201,9 @@
 
       // Make a sql-friendly alias for this expression
       function makeAlias() {
-        var args = _.pluck(_.filter(_.filter(ctrl.args, 'value'), {type: 'field'}), 'value');
+        const args = ctrl.args
+          .filter(arg => arg.value && (arg.type === 'field' || arg.type === 'number'))
+          .map(arg => arg.value);
         return (ctrl.fnName + '_' + args.join('_')).replace(/[.:]/g, '_');
       }
 

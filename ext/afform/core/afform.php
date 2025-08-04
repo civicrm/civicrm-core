@@ -466,6 +466,7 @@ function afform_civicrm_referenceCounts($dao, &$counts) {
     ];
     try {
       $displays = civicrm_api4('SearchDisplay', 'get', [
+        'checkPermissions' => FALSE,
         'where' => [['saved_search_id', '=', $dao->id]],
       ], ['name']);
       foreach ($displays as $displayName) {

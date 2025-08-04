@@ -485,13 +485,14 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
       CRM_Import_Parser::DUPLICATE => ['duplicate'],
       CRM_Import_Parser::NO_MATCH => ['invalid_no_match'],
       CRM_Import_Parser::UNPARSED_ADDRESS_WARNING => ['warning_unparsed_address'],
-      CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT_ERROR => ['soft_credit_error'],
-      CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT => ['soft_credit_imported'],
-      CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT => ['pledge_payment_imported'],
-      CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR => ['pledge_payment_error'],
+      CRM_Import_Parser::SOFT_CREDIT_ERROR => ['soft_credit_error'],
+      CRM_Import_Parser::SOFT_CREDIT => ['soft_credit_imported'],
+      CRM_Import_Parser::PLEDGE_PAYMENT => ['pledge_payment_imported'],
+      CRM_Import_Parser::PLEDGE_PAYMENT_ERROR => ['pledge_payment_error'],
       'new' => ['new', 'valid'],
       'valid' => ['valid'],
       'imported' => ['imported', 'soft_credit_imported', 'pledge_payment_imported', 'warning_unparsed_address'],
+      'unimported' => ['new', 'valid', 'error', 'invalid', 'soft_credit_error', 'pledge_payment_error', 'invalid_no_match'],
     ];
   }
 

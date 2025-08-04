@@ -1020,6 +1020,16 @@ WHERE li.contribution_id = %1";
   protected static function getTaxAmountForLineItem(array $params): float {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $taxRate = $taxRates[$params['financial_type_id']] ?? 0;
+    if (isset($params['line_total_inclusive'])) {
+      // Pseudo-field line_total_inclusive takes precedent as it is only
+      // set when we are calculating the rounding back from the inclusive total.
+      // An alternative might be to return a passed-in tax_amount IF i
+      $lineTotalExclusive = $params['line_total_inclusive'] / (1 + ($taxRate / 100));
+      $taxAmount = round($params['line_total_inclusive'] - $lineTotalExclusive, 2);
+      if ($taxAmount === $params['tax_amount']) {
+        return $taxAmount;
+      }
+    }
     return ($taxRate / 100) * $params['line_total'];
   }
 

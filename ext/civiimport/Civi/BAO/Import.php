@@ -111,13 +111,23 @@ class Import extends CRM_Core_DAO {
 
     $tableName = self::getTableNameForUserJob($userJobID, $checkPermissions);
     CRM_Utils_Hook::pre($op, $entityName, $record['_id'] ?? NULL, $record);
-    $fields = self::getAllFields($tableName);
+    $apiName = 'Import_' . $userJobID;
+    $fields = (array) civicrm_api4($apiName, 'getFields', [
+      'checkPermissions' => $checkPermissions,
+      'action' => 'create',
+    ])->indexBy('name');
+
     $instance = new self();
     $instance->__table = $tableName;
     // Ensure fields exist before attempting to write to them
     $values = array_intersect_key($record, $fields);
-    foreach ($values as $field => $value) {
-      $instance->$field = ($value === '') ? 'null' : $value;
+    foreach ($values as $fieldName => $value) {
+      $field = $fields[$fieldName];
+      // Handle serialization (normally DAO->copyValues() would do this)
+      if (is_array($value) && !empty($field['serialize'])) {
+        $value = CRM_Core_DAO::serializeField($value, $field['serialize']);
+      }
+      $instance->$fieldName = ($value === '' || $value === NULL) ? 'null' : $value;
     }
     $instance->save();
 

@@ -222,7 +222,11 @@
       _.remove(params.displays, {trashed: true});
       if (params.displays && params.displays.length) {
         fireHooks('preSaveDisplay', params.displays, apiCalls);
-        chain.displays = ['SearchDisplay', 'replace', {where: [['saved_search_id', '=', '$id']], records: params.displays}];
+        chain.displays = ['SearchDisplay', 'replace', {
+          where: [['saved_search_id', '=', '$id']],
+          records: params.displays,
+          reload: ['*', 'is_autocomplete_default'],
+        }];
       } else if (params.id) {
         apiCalls.deleteDisplays = ['SearchDisplay', 'delete', {where: [['saved_search_id', '=', params.id]]}];
       }

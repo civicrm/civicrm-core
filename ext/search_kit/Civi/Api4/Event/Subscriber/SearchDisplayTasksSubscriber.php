@@ -46,6 +46,8 @@ class SearchDisplayTasksSubscriber extends \Civi\Core\Service\AutoService implem
   public function filterTasksForDisplay(GenericHookEvent $event): void {
     $enabledActions = $event->display['settings']['actions'] ?? NULL;
     $entityName = $event->search['api_entity'] ?? NULL;
+    // Hack to support relationships
+    $entityName = ($entityName === 'RelationshipCache') ? 'Relationship' : $entityName;
     if ($entityName && is_array($enabledActions)) {
       $event->tasks[$entityName] = array_intersect_key($event->tasks[$entityName], array_flip($enabledActions));
     }

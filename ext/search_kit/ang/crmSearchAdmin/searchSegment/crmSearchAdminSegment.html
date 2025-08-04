@@ -9,7 +9,7 @@
     <br>
     <div class="form-inline">
       <label for="search-segment-entity_name">{{:: ts('For') }} <span class="crm-marker">*</span></label>
-      <input id="search-segment-entity_name" class="form-control huge collapsible-optgroups" required ng-model="$ctrl.segment.entity_name" ng-change="$ctrl.onChangeEntity()" crm-ui-select="{allowClear: false, data: $ctrl.entitySelect, placeholder: ts('Entity')}">
+      <input id="search-segment-entity_name" class="form-control twenty collapsible-optgroups" required ng-model="$ctrl.segment.entity_name" ng-change="$ctrl.onChangeEntity()" crm-ui-select="{allowClear: false, data: $ctrl.entitySelect, placeholder: ts('Entity')}">
     </div>
     <br>
     <fieldset>
@@ -33,7 +33,7 @@
             </td>
             <td>
               <div ng-repeat="condition in item.when" class="form-inline">
-                <input class="form-control" ng-model="condition[0]" crm-ui-select="{data: $ctrl.selectFields, allowClear: false}" >
+                <input class="form-control crm-auto-width" ng-model="condition[0]" crm-ui-select="{data: $ctrl.selectFields, allowClear: false}" >
                 <crm-search-condition clause="condition" field="$ctrl.getField(condition[0])" offset="1" option-key="$ctrl.getOptionKey(condition[0])" class="form-group"></crm-search-condition>
                 <a class="crm-hover-button" ng-if="$index" ng-click="item.when.splice($index, 1)">
                   <i class="crm-i fa-times" aria-hidden="true"></i>

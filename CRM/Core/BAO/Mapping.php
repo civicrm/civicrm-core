@@ -227,8 +227,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    *   mapping Type.
    *
    * @return bool
+   *
+   * @deprecated since 6.6 will be removed around 6.12
    */
   public static function checkMapping($nameField, $mapTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - take a copy');
     $mapping = new CRM_Core_DAO_Mapping();
     $mapping->name = $nameField;
     $mapping->mapping_type_id = $mapTypeId;

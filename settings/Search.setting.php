@@ -220,6 +220,30 @@ return [
     'help_text' => NULL,
     'settings_pages' => ['search' => ['weight' => 90]],
   ],
+  'autocomplete_displays' => [
+    'group_name' => 'Search Preferences',
+    'group' => 'Search Preferences',
+    'name' => 'autocomplete_displays',
+    'type' => 'Array',
+    'html_type' => 'select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+      'multiple' => TRUE,
+    ],
+    'add' => '6.6',
+    'title' => ts('Autocomplete Search Displays'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Choose a SearchKit display for autocomplete results per entity type. Create a new autocomplete display in SearchKit and select "Make Default Autocomplete" to add it to this setting.'),
+    'help_text' => NULL,
+    'settings_pages' => ['search' => ['weight' => 100]],
+    'pseudoconstant' => [
+      'callback' => 'CRM_Admin_Form_Setting_Search::getAutocompleteDisplays',
+    ],
+    'post_change' => [
+      'CRM_Admin_Form_Setting_Search::onChangeAutocompleteDisplays',
+    ],
+  ],
   'default_pager_size' => [
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',

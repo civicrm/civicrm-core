@@ -161,6 +161,17 @@
         return ctrl.getDefn().options || (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
       };
 
+      this.getInputTypeTemplate = () => {
+        const selectedType = $scope.getProp('input_type');
+        const meta = this.inputTypes.find((type) => type.name === selectedType);
+
+        if (!meta || !meta.admin_template) {
+          return '~/afGuiEditor/inputType/Missing.html';
+        }
+
+        return meta.admin_template;
+      };
+
       $scope.resetOptions = function() {
         delete ctrl.node.defn.options;
       };
@@ -172,6 +183,9 @@
 
       function inputTypeCanBe(type) {
         var defn = ctrl.getDefn();
+        if (defn.input_type === type) {
+          return true;
+        }
         if (defn.readonly) {
           switch (type) {
             case 'DisplayOnly':
@@ -181,9 +195,6 @@
             default:
               return false;
           }
-        }
-        if (defn.input_type === type) {
-          return true;
         }
         switch (type) {
           case 'CheckBox':

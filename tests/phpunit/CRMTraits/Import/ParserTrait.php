@@ -32,10 +32,13 @@ trait CRMTraits_Import_ParserTrait {
    * @param string $csv Name of csv file.
    * @param array $fieldMappings
    * @param array $submittedValues
+   * @param string $action
+   * @param array $entityConfiguration
    *
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
+  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = [], string $action = 'create', array $entityConfiguration = []): void {
     $submittedValues = array_merge([
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
@@ -44,7 +47,6 @@ trait CRMTraits_Import_ParserTrait {
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
       'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'groups' => [],
     ], $submittedValues);
     $this->submitDataSourceForm($csv, $submittedValues);
@@ -53,7 +55,25 @@ trait CRMTraits_Import_ParserTrait {
     $userJobMetadata = UserJob::get()
       ->addWhere('id', '=', $this->userJobID)
       ->execute()->first()['metadata'];
+    $userJobMetadata['entity_configuration'][$userJobMetadata['base_entity']]['action'] = $action;
+    $userJobMetadata['entity_configuration']['Contact']['contact_type'] = $submittedValues['contactType'];
+    foreach ($fieldMappings as $index => $mapping) {
+      if (isset($mapping['entity_data'])) {
+        $userJobMetadata['entity_configuration']['SoftCreditContact'] = $mapping['entity_data']['soft_credit'];
+        unset($fieldMappings[$index]['entity_data']);
+      }
+    }
     $userJobMetadata['import_mappings'] = $fieldMappings;
+    if ($entityConfiguration) {
+      foreach ($entityConfiguration as $entity => $configuration) {
+        if (isset($userJobMetadata['entity_configuration'][$entity])) {
+          $userJobMetadata['entity_configuration'][$entity] = $configuration + $userJobMetadata['entity_configuration'][$entity];
+        }
+        else {
+          $userJobMetadata['entity_configuration'][$entity] = $configuration;
+        }
+      }
+    }
     UserJob::update()
       ->addWhere('id', '=', $this->userJobID)
       ->setValues([
@@ -130,18 +150,16 @@ trait CRMTraits_Import_ParserTrait {
    * @param string $csv
    * @param array $submittedValues
    */
-  protected function submitDataSourceForm(string $csv, $submittedValues): void {
+  protected function submitDataSourceForm(string $csv, array $submittedValues = []): void {
     $reflector = new ReflectionClass(get_class($this));
     $directory = dirname($reflector->getFileName());
     $submittedValues = array_merge([
       'uploadFile' => ['name' => $directory . '/data/' . $csv],
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => 'Individual',
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
       'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'groups' => [],
     ], $submittedValues);
     $form = $this->getDataSourceForm($submittedValues);
@@ -191,6 +209,35 @@ trait CRMTraits_Import_ParserTrait {
       'rule_table' => 'civicrm_address',
       'rule_field' => 'street_address',
     ]);
+  }
+
+  /**
+   * Update saved userJob metadata - as the angular screen would do.
+   *
+   * @param array $mappings
+   * @param string $contactType
+   *
+   * @return void
+   *
+   */
+  public function updateJobMetadata(array $mappings, string $contactType): void {
+    try {
+      $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)
+        ->execute()->single()['metadata'];
+      if ($mappings) {
+        $metadata['import_mappings'] = $mappings;
+      }
+      if ($contactType) {
+        $metadata['entity_configuration']['Contact']['contact_type'] = $contactType;
+      }
+      UserJob::update()
+        ->addWhere('id', '=', $this->userJobID)
+        ->addValue('metadata', $metadata)
+        ->execute();
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail('Failed to update UserJob: ' . $e->getMessage());
+    }
   }
 
 }

@@ -10,13 +10,13 @@
       <input type="checkbox" ng-checked="$ctrl.display.settings.limit" ng-click="$ctrl.toggleLimit()">
       <span>{{:: ts('Limit Results') }}</span>
     </label>
-    <input ng-if="$ctrl.display.settings.limit" type="number" min="1" step="1" class="form-control" ng-model="$ctrl.display.settings.limit" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChangeLimit()">
+    <input ng-if="$ctrl.display.settings.limit" type="number" min="1" step="1" class="form-control four" ng-model="$ctrl.display.settings.limit" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChangeLimit()">
   </div>
   <div class="form-group" ng-if="$ctrl.display.settings.pager">
     <label for="crm-search-admin-display-limit">
       {{:: ts('Page Size') }}
     </label>
-    <input id="crm-search-admin-display-limit" type="number" min="1" step="1" class="form-control" ng-model="$ctrl.display.settings.limit" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChangeLimit()">
+    <input id="crm-search-admin-display-limit" type="number" min="1" step="1" class="form-control four" ng-model="$ctrl.display.settings.limit" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChangeLimit()">
     <div class="checkbox-inline form-control">
       <label>
         <input type="checkbox" ng-model="$ctrl.display.settings.pager.expose_limit" >

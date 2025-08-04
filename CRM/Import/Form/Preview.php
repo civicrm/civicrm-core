@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\UserJob;
 
 /**
  * This class previews the uploaded file and returns summary statistics.
@@ -117,6 +118,8 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
         'reset' => 1,
       ], FALSE, NULL, FALSE),
     ]);
+    UserJob::update()->addWhere('id', '=', $this->getUserJobID())
+      ->setValues(['status_id:name', '=', 'scheduled'])->execute();
     $runner->runAllInteractive();
   }
 
@@ -127,23 +130,14 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   private function getButtons(): array {
-    // FIXME: This is a hack...
     // The tpl contains javascript that starts the import on form submit
     // Since our back/cancel buttons are of html type "submit" we have to prevent a form submit event when they are clicked
     // Hacking in some onclick js to make them act more like links instead of buttons
-    $path = CRM_Utils_System::currentPath();
-    $query = ['_qf_MapField_display' => 'true'];
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String');
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $query['qfKey'] = $qfKey;
-    }
-    $previousURL = CRM_Utils_System::url($path, $query, FALSE, NULL, FALSE);
-    $cancelURL = CRM_Utils_System::url($path, 'reset=1', FALSE, NULL, FALSE);
     $buttons = [
       [
         'type' => 'back',
         'name' => ts('Previous'),
-        'js' => ['onclick' => "location.href='{$previousURL}'; return false;"],
+        'js' => ['onclick' => "location.href='" . $this->getPreviousUrl() . "'; return false;"],
       ],
     ];
     if ($this->hasImportableRows()) {
@@ -157,10 +151,30 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
     $buttons[] = [
       'type' => 'cancel',
       'name' => ts('Cancel'),
-      'js' => ['onclick' => "location.href='{$cancelURL}'; return false;"],
+      'js' => ['onclick' => "location.href='" . $this->getCancelUrl() . "'; return false;"],
     ];
 
     return $buttons;
+  }
+
+  /**
+   * @return string
+   */
+  protected function getCancelURL(): string {
+    return CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1', FALSE, NULL, FALSE);
+  }
+
+  /**
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPreviousURL(): string {
+    $query = ['_qf_MapField_display' => 'true'];
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String');
+    if (CRM_Utils_Rule::qfKey($qfKey)) {
+      $query['qfKey'] = $qfKey;
+    }
+    return CRM_Utils_System::url(CRM_Utils_System::currentPath(), $query, FALSE, NULL, FALSE);
   }
 
 }

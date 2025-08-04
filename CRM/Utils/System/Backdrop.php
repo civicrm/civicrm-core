@@ -1209,33 +1209,25 @@ AND    u.status = 1
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     if ($maintenance) {
-      \CRM_Core_Error::deprecationMessage('CRM_Utils_System::theme called with $maintenance = TRUE - please use renderMaintenanceMessage instead');
+      \CRM_Core_Error::deprecatedWarning('CRM_Utils_System::theme called with $maintenance = TRUE - please use renderMaintenanceMessage instead');
     }
-
-    $ret = FALSE;
 
     if (!$print) {
       if ($maintenance) {
-        print $this->renderMaintanceMessage($content);
+        print $this->renderMaintenanceMessage($content);
         exit();
       }
-      $ret = TRUE;
+      return $content;
     }
-    $out = $content;
 
-    if ($ret) {
-      return $out;
-    }
-    else {
-      print $out;
-      return NULL;
-    }
+    print $content;
+    return NULL;
   }
 
   /**
    * @inheritdoc
    */
-  public function renderMaintanceMessage(string $content): string {
+  public function renderMaintenanceMessage(string $content): string {
     backdrop_set_breadcrumb('');
     backdrop_maintenance_theme();
     if ($region = CRM_Core_Region::instance('html-header', FALSE)) {

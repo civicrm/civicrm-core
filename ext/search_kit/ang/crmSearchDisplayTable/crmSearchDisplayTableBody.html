@@ -16,13 +16,13 @@
       </button>
     </div>
   </td>
-  <td ng-repeat="(colIndex, colData) in row.columns" ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)" title="{{:: colData.title }}" class="crm-search-col-type-{{:: $ctrl.settings.columns[colIndex].type }} {{:: $ctrl.getRowClass(row) }} {{:: colData.cssClass }}" data-field-name="{{:: $ctrl.settings.columns[colIndex].key }}">
+  <td ng-repeat="(colIndex, colData) in row.columns" ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)" title="{{:: colData.title }}" ng-class="{'crm-search-field-editing': colData.editing}" class="crm-search-col-type-{{:: $ctrl.settings.columns[colIndex].type }} {{:: $ctrl.getRowClass(row) }} {{:: colData.cssClass }}" data-field-name="{{:: $ctrl.settings.columns[colIndex].key }}">
   </td>
 </tr>
 <tr ng-if="$ctrl.rowCount === 0">
   <td colspan="{{ $ctrl.settings.columns.length + 2 }}">
     <p class="alert alert-info text-center">
-      {{ $ctrl.settings.noResultsText || ts('None Found') }}
+      {{ $ctrl.settings.noResultsText || ts('None found.') }}
     </p>
   </td>
 </tr>

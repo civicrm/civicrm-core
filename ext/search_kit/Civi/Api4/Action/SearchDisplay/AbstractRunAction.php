@@ -197,11 +197,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $column
    * @param array $data
    * @param array $settings
-   * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
+   * @return array{dataType: ?string, val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
    */
   private function formatColumn(array $column, array $data, array $settings) {
     $column += ['rewrite' => NULL, 'label' => NULL, 'key' => '', 'type' => NULL];
-    $out = [];
+    $out = ['dataType' => NULL];
     switch ($column['type']) {
       case 'field':
       case 'html':
@@ -209,15 +209,18 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $key = str_replace('()', ':', $column['key']);
         $rawValue = $data[$key] ?? NULL;
         if (!$this->hasValue($rawValue) && isset($column['empty_value'])) {
+          $out['dataType'] = 'String';
           $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
         }
         elseif ($column['rewrite']) {
+          $out['dataType'] = 'String';
           $out['val'] = $this->rewrite($column['rewrite'], $data);
         }
         else {
-          $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
+          $out['dataType'] = $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
           $out['val'] = $this->formatViewValue($key, $rawValue, $data, $dataType, $column['format'] ?? NULL);
         }
+
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
         }
@@ -289,6 +292,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       else {
         $cssClass[] = 'crm-search-field-show-linebreaks';
       }
+    }
+    if (!empty($out['edit'])) {
+      $cssClass[] = 'crm-search-field-editable';
     }
     if ($cssClass) {
       $out['cssClass'] = implode(' ', $cssClass);
@@ -1007,9 +1013,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $editable['action'] = 'update';
       $editable['record'][$editable['id_key']] = $data[$editable['id_path']];
       // Ensure field is appropriate to this entity sub-type
-      $field = $this->getField($column['key']);
       $entityValues = FormattingUtil::filterByPath($data, $editable['id_path'], $editable['id_key']);
-      if (!$this->fieldBelongsToEntity($editable['entity'], $field['name'], $entityValues)) {
+      if (!$this->fieldBelongsToEntity($editable['entity'], $editable['value_key'], $entityValues)) {
         return NULL;
       }
     }
@@ -1115,20 +1120,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return $this->editableInfo[$key];
     }
     $getModeField = $this->getField($key);
+    $fieldName = $getModeField['name'] ?? NULL;
     // If field is an implicit join to another entity, use the original fk field
     // UNLESS it's a custom field (which the api treats the same as core fields) or a virtual join like `address_primary.city`
     if (!empty($getModeField['implicit_join']) && empty($getModeField['custom_field_id'])) {
       $baseFieldName = substr($key, 0, -1 - strlen($getModeField['name']));
       $baseField = $this->getField($baseFieldName);
+      $baseInfo = $this->getEditableInfo($baseFieldName);
+      // Implicit join to real field
       if ($baseField && !empty($baseField['fk_entity']) && $baseField['type'] === 'Field') {
-        return $this->getEditableInfo($baseFieldName);
+        return $baseInfo;
+      }
+      elseif ($getModeField) {
+        $getModeField['entity'] = $baseField['entity'];
+        $getModeField['name'] = $key;
       }
     }
     $result = NULL;
     if ($getModeField) {
       // Reload field with correct action because `$this->getField()` uses 'get' as the action
       $createModeField = civicrm_api4($getModeField['entity'], 'getFields', [
-        'where' => [['name', '=', $getModeField['name']]],
+        'select' => ['input_type', 'input_attrs', 'data_type', 'options', 'serialize', 'nullable'],
+        'where' => [['name', '=', $fieldName]],
         'checkPermissions' => empty($this->display['acl_bypass']),
         'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
         'action' => 'create',
@@ -1137,8 +1150,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $field = $createModeField + $getModeField;
       $idKey = CoreUtil::getIdFieldName($field['entity']);
       $path = (!empty($field['explicit_join']) ? $field['explicit_join'] . '.' : '');
-      // $baseFieldName is used for virtual joins e.g. email_primary.email
-      $idPath = $path . ($baseFieldName ?? $idKey);
+      $idPath = $path . $idKey;
       // Hack to support editing relationships
       if ($field['entity'] === 'RelationshipCache') {
         $field['entity'] = 'Relationship';
@@ -1479,7 +1491,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string $select
    * @return string|null
    */
-  private function getCurrencyField(string $select): ?string {
+  protected function getCurrencyField(string $select): ?string {
     // This function is called one or more times per row so cache the results
     if (array_key_exists($select, $this->currencyFields)) {
       return $this->currencyFields[$select];

@@ -1,14 +1,14 @@
 <div class="form-inline">
   <label for="crm-search-main-entity">{{:: ts('Search for') }}</label>
-  <input id="crm-search-main-entity" class="form-control huge collapsible-optgroups" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: mainEntitySelect}" ng-disabled="$ctrl.savedSearch.id">
+  <input id="crm-search-main-entity" class="form-control twenty collapsible-optgroups" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: mainEntitySelect}" ng-disabled="$ctrl.savedSearch.id">
 </div>
 <div ng-if=":: $ctrl.paramExists('join')" class="crm-search-joins">
   <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join" class="crm-search-join">
     <div class="form-inline">
-      <select class="form-control" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+      <select class="form-control crm-auto-width" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" ></select>
       <div class="input-group">
         <span class="input-group-addon" title="{{:: getJoin(join[0]).defaultLabel }}"><i class="crm-i {{:: getJoin(join[0]).icon }}"></i></span>
-        <input class="form-control crm-search-join-label huge" ng-model="$ctrl.getSetJoinLabel(join[0])" ng-model-options="{getterSetter: true, updateOn: 'blur'}" placeholder="{{:: getJoin(join[0]).defaultLabel }}" title="{{:: ts('Optional label for this join') }}">
+        <input class="form-control crm-search-join-label twenty" ng-model="$ctrl.getSetJoinLabel(join[0])" ng-model-options="{getterSetter: true, updateOn: 'blur'}" placeholder="{{:: getJoin(join[0]).defaultLabel }}" title="{{:: ts('Optional label for this join') }}">
       </div>
       <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.removeJoin($index)" title="{{:: ts('Remove join') }}">
         <i class="crm-i fa-trash" aria-hidden="true"></i>
@@ -20,10 +20,10 @@
   </fieldset>
   <fieldset class="crm-search-join-add">
     <div class="form-inline">
-      <select class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+      <select class="form-control crm-auto-width" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
       <input id="crm-search-add-join"
              class="form-control crm-action-menu fa-plus"
-             crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities, dropdownCss: {width: '275px'}}"
+             crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities}"
              on-crm-ui-select="$ctrl.addJoin(selection)">
     </div>
   </fieldset>
@@ -33,14 +33,14 @@
     <label for="crm-search-groupBy-{{ $index }}">{{:: ts('Group By') }}</label>
     <crm-search-function class="form-group" expr="$ctrl.savedSearch.api_params.groupBy[$index]" mode="groupBy"></crm-search-function>
     <span ng-if="!$ctrl.hasFunction($ctrl.savedSearch.api_params.groupBy[$index])">
-          <input id="crm-search-groupBy-{{ $index }}" class="form-control huge" ng-model="$ctrl.savedSearch.api_params.groupBy[$index]" crm-ui-select="{placeholder: ' ', data: fieldsForGroupBy}" ng-change="changeGroupBy($index)" />
+          <input id="crm-search-groupBy-{{ $index }}" class="form-control crm-auto-width" ng-model="$ctrl.savedSearch.api_params.groupBy[$index]" crm-ui-select="{placeholder: ' ', data: fieldsForGroupBy}" ng-change="changeGroupBy($index)" />
         </span>
     <hr>
   </div>
   <div class="form-inline crm-search-groupby-add">
     <input id="crm-search-add-groupBy"
            class="form-control crm-action-menu fa-plus"
-           crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy, dropdownCss: {width: '300px'}}"
+           crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy}"
            on-crm-ui-select="$ctrl.addParam('groupBy', selection)" >
   </div>
 </fieldset>

@@ -25,7 +25,7 @@
         </span>
       </td>
       <td>
-        <select class="form-control" ng-model="item.target">
+        <select class="form-control crm-auto-width" ng-model="item.target">
           <option value>{{:: ts('Normal') }}</option>
           <option value="_blank">{{:: ts('New tab') }}</option>
           <option value="crm-popup">{{:: ts('Popup dialog') }}</option>
@@ -39,7 +39,7 @@
         <div class="form-inline" ng-repeat="condition in item.conditions">
           <input ng-model="condition[0]" crm-ui-select="{placeholder: ' ', data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition(item, $index)">
           <div class="form-group" ng-if="condition[0] === 'check user permission'">
-            <select class="form-control api4-operator" ng-model="condition[1]" ng-options="o.key as o.value for o in $ctrl.permissionOperators"></select>
+            <select class="form-control crm-auto-width" crm-ui-select ng-model="condition[1]" ng-options="o.key as o.value for o in $ctrl.permissionOperators"></select>
             <input class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true}" ng-model="condition[2]" ng-list>
           </div>
           <crm-search-condition class="form-group"
@@ -52,11 +52,11 @@
         </div>
         <!-- Add condition button uses a trick of ngModel that will push in a new row to the conditions array -->
         <div ng-if="item.conditions.length < 1">
-          <input ng-model="item.conditions[0][0]" crm-ui-select="{placeholder: ts('Add Condition...'), data: $ctrl.fields}">
+          <input class="form-control crm-auto-width" ng-model="item.conditions[0][0]" crm-ui-select="{placeholder: ts('Add Condition...'), data: $ctrl.fields}">
         </div>
         <!-- Subsequent Add Condition button has a different placeholder to clarify that the operator is AND -->
         <div ng-if="item.conditions.length >= 1">
-          <input ng-model="item.conditions[$ctrl.conditionCount[itemIndex]][0]" crm-ui-select="{placeholder: ts('And...'), data: $ctrl.fields}">
+          <input class="form-control crm-auto-width" ng-model="item.conditions[$ctrl.conditionCount[itemIndex]][0]" crm-ui-select="{placeholder: ts('And...'), data: $ctrl.fields}">
         </div>
       </td>
       <td>

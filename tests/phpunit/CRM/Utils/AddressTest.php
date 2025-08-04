@@ -24,7 +24,7 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
     ]);
     $addressDetails = $address['values'][$address['id']];
     $countries = CRM_Core_PseudoConstant::country();
-    $addressDetails['country'] = $countries[$addressDetails['country_id']];
+    $addressDetails['country_id:label'] = $countries[$addressDetails['country_id']];
     $formatted_address = CRM_Utils_Address::formatMailingLabel($addressDetails);
     $this->assertTrue((bool) strstr($formatted_address, 'UNITED STATES'));
   }

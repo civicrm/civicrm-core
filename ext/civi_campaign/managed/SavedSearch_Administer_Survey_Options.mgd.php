@@ -67,7 +67,6 @@ return [
             [
               'type' => 'field',
               'key' => 'label',
-              'dataType' => 'String',
               'label' => E::ts('Label'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -75,7 +74,6 @@ return [
             [
               'type' => 'field',
               'key' => 'value',
-              'dataType' => 'String',
               'label' => E::ts('Value'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -83,7 +81,6 @@ return [
             [
               'type' => 'field',
               'key' => 'filter',
-              'dataType' => 'Integer',
               'label' => E::ts('Recontact Interval'),
               'sortable' => TRUE,
               'editable' => TRUE,

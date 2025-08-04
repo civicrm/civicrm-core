@@ -1,6 +1,8 @@
 <div af-fieldset="">
   <div class="af-container af-layout-inline">
-    <af-field name="label" defn="{label: 'Field', input_attrs: {}, required: false}" />
+    <af-field name="label" defn="{label: 'Field', input_attrs: {}, search_operator: 'CONTAINS', required: false}" />
+    <af-field name="is_required" defn="{label: 'Required', input_type: 'Radio'}" />
+    <af-field name="is_active" defn="{input_type: 'Radio'}" />
   </div>
   <crm-search-display-table search-name="Administer_Custom_Fields" display-name="Table" filters="{custom_group_id: routeParams.gid}"></crm-search-display-table>
 </div>

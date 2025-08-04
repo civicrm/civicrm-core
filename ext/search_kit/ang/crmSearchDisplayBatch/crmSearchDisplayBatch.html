@@ -1,18 +1,22 @@
 <div ng-if="!$ctrl.userJobId && !$ctrl.isPreviewMode" class="crm-search-display crm-search-display-batch">
   <ul class="list-group">
-    <li class="list-group-item form-inline">
-      <div class="form-group">
-        <label class="sr-only" for="crm-create-new-batch-row-count">{{:: ts('Initial row count for new batch') }}</label>
-        <div class="input-group">
-          <input type="number" min="1" step="1" class="form-control" id="crm-create-new-batch-row-count" ng-model="$ctrl.newBatchRowCount" title="{{:: ts('Initial row count for new batch') }}">
-          <div class="input-group-addon">{{:: ts('Rows') }}</div>
+    <li class="list-group-item">
+      <fieldset>
+        <legend>{{:: ts('New Batch') }}</legend>
+        <div class="form-inline" title="{{:: ts('Initial row count for new batch') }}">
+          <label for="crm-create-new-batch-row-count">{{:: ts('Rows') }}</label>
+          <input type="number" min="1" step="1" class="form-control" required id="crm-create-new-batch-row-count" ng-model="$ctrl.newBatch.rowCount" >
         </div>
-      </div>
-      <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
-        <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
-        <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
-        {{:: ts('Start New Batch') }}
-      </button>
+        <div class="form-inline" ng-repeat="col in $ctrl.settings.columns" ng-if="col.tally.target" title="{{:: ts('Target Total') }}">
+          <label for="crm-create-new-batch-target-{{ $index }}">{{:: col.label }}</label>
+          <input type="number" class="form-control" id="crm-create-new-batch-target-{{ $index }}" ng-model="$ctrl.newBatch.targets[col.key]">
+        </div>
+        <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
+          <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
+          <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
+          {{:: ts('Start New Batch') }}
+        </button>
+      </fieldset>
     </li>
     <li class="list-group-item" ng-repeat="link in $ctrl.reportLinks">
       <a href ng-href="{{:: link.href }}">
@@ -22,14 +26,14 @@
     </li>
   </ul>
 </div>
-<div ng-if="$ctrl.userJobId || $ctrl.isPreviewMode" class="crm-search-display crm-search-display-batch">
+<div ng-if="$ctrl.userJobId || $ctrl.isPreviewMode" class="crm-search-display crm-search-display-batch" ng-form="{{:: $ctrl.formName }}">
   <div class="alert alert-info crm-search-display-description" ng-if="$ctrl.settings.description">{{:: $ctrl.settings.description }}</div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>
     <tr>
       <th>&nbsp;</th>
       <th ng-repeat="col in $ctrl.settings.columns">
-        <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
+        <span class="crm-search-display-table-column-label">{{:: col.label }}<span ng-if=":: col.required" class="crm-marker">*</span></span>
         <button type="button" ng-if="$ctrl.results.editable[col.key] && $ctrl.results.editable[col.key].input_type !== 'DisplayOnly'" class="btn btn-xs" ng-click="$ctrl.copyCol($index)" title="{{:: ts('Copy value from first row to all rows') }}">
           <i class="crm-i fa-arrows-down-to-line"></i>
         </button>
@@ -44,25 +48,26 @@
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
   <div>
     <div class="btn-group" ng-if="!$ctrl.loading">
-      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="crm-i fa-plus"></i>
+      <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="$ctrl.addingRows" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="crm-i fa-plus" ng-if="!$ctrl.addingRows"></i>
+        <i class="crm-i fa-spin fa-spinner" ng-if="$ctrl.addingRows"></i>
         {{:: ts('Add Rows...') }}
         <span class="caret"></span>
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" ng-if="!$ctrl.addingRows">
         <li><a href ng-click="$ctrl.addRows(1)" >{{:: ts('Add 1 Row') }}</a></li>
         <li ng-repeat="n in [5, 10, 25, 50, 100] track by $index">
           <a href ng-click="$ctrl.addRows(n)" >{{:: ts('Add %1 Rows', {1: n}) }}</a>
         </li>
       </ul>
     </div>
-    <button type="button" ng-if="$ctrl.userJobId" class="btn btn-primary" ng-click="$ctrl.saveRows()" ng-disabled="!$ctrl.unsavedChanges || $ctrl.saving">
-      <i ng-if="$ctrl.unsavedChanges && !$ctrl.saving" class="crm-i fa-save"></i>
-      <i ng-if="!$ctrl.unsavedChanges && !$ctrl.saving" class="crm-i fa-check"></i>
+    <button type="button" ng-if="$ctrl.userJobId" class="btn btn-primary" ng-click="$ctrl.saveRows()" ng-disabled="!$ctrl.unsaved.length || $ctrl.saving">
+      <i ng-if="$ctrl.unsaved.length && !$ctrl.saving" class="crm-i fa-save"></i>
+      <i ng-if="!$ctrl.unsaved.length && !$ctrl.saving" class="crm-i fa-check"></i>
       <i ng-if="$ctrl.saving" class="crm-i fa-spin fa-spinner"></i>
-      {{ $ctrl.unsavedChanges || $ctrl.saving ? ts('Save Changes') : ts('Changes Saved') }}
+      {{ $ctrl.unsaved.length || $ctrl.saving ? ts('Save Changes') : ts('Changes Saved') }}
     </button>
-    <button type="button" ng-if="$ctrl.userJobId" class="btn btn-primary" ng-click="$ctrl.doImport()">
+    <button type="button" ng-if="$ctrl.userJobId" class="btn btn-{{ $ctrl.isValid() ? 'success' : 'warning' }}" ng-click="$ctrl.doImport()">
       <i class="crm-i fa-download"></i>
       {{:: ts('Run Import') }}
     </button>

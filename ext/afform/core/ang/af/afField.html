@@ -3,6 +3,6 @@
   <span class="crm-marker" title="{{:: ts('Required') }}" ng-if=":: $ctrl.defn.required">*</span>
 </label>
 <p class="crm-af-field-help-pre" ng-if=":: $ctrl.defn.help_pre">{{:: $ctrl.defn.help_pre }}</p>
-<div class="crm-af-field" ng-if="!$ctrl.defn.expose_operator" ng-include="'~/af/fields/' + $ctrl.defn.input_type + '.html'"></div>
+<div class="crm-af-field" ng-if="!$ctrl.defn.expose_operator" ng-include="$ctrl.defn.template"></div>
 <div class="input-group" ng-if="$ctrl.defn.expose_operator" ng-include="'~/af/afFieldWithSearchOperator.html'"></div>
 <p class="crm-af-field-help-post" ng-if=":: $ctrl.defn.help_post">{{:: $ctrl.defn.help_post }}</p>

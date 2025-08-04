@@ -54,8 +54,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
 
     $extendedParams = self::loadExistingRelationshipDetails($params);
     // When id is specified we always want to update, so we don't need to check for duplicate relations.
-    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, (int) $extendedParams['contact_id_a'], (int) $extendedParams['contact_id_b'], $extendedParams['id'] ?? 0)) {
-      throw new CRM_Core_Exception('Duplicate Relationship');
+    if (!isset($params['id'])) {
+      $duplicateId = self::checkDuplicateRelationship($extendedParams, (int) $extendedParams['contact_id_a'], (int) $extendedParams['contact_id_b'], $extendedParams['id'] ?? 0);
+      if ($duplicateId) {
+        throw new CRM_Core_Exception(ts('Duplicate Relationship'), 'duplicate', ['duplicate_id' => $duplicateId]);
+      }
     }
     $params = $extendedParams;
     // Check if this is a "simple" disable relationship. If it is don't check the relationshipType
@@ -735,10 +738,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    * @param int $relationshipId
    *   This is relationship id for the contact.
    *
-   * @return bool
-   *   true if record exists else false
+   * @return bool|int
+   *   id if record exists else false
    */
-  public static function checkDuplicateRelationship(array $params, int $id, int $contactId = 0, int $relationshipId = 0): bool {
+  public static function checkDuplicateRelationship(array $params, int $id, int $contactId = 0, int $relationshipId = 0) {
     $relationshipTypeId = $params['relationship_type_id'] ?? NULL;
     [$type] = explode('_', $relationshipTypeId);
 
@@ -801,7 +804,7 @@ WHERE  is_active = 1 AND relationship_type_id = ' . CRM_Utils_Type::escape($type
     while ($relationship->fetch()) {
       // Check whether the custom field values are identical.
       if (self::checkDuplicateCustomFields($params['custom'] ?? [], $relationship->id)) {
-        return TRUE;
+        return (int) $relationship->id;
       }
     }
     return FALSE;
@@ -834,6 +837,9 @@ WHERE  is_active = 1 AND relationship_type_id = ' . CRM_Utils_Type::escape($type
       // an array with the information about the custom value.
       foreach ($params as $value) {
         foreach ($value as $customValue) {
+          if (!empty($customValue['value']) && $customValue['type'] === 'Date') {
+            $customValue['value'] = CRM_Utils_Date::mysqlToIso($customValue['value']);
+          }
           $newValues[$customValue['custom_field_id']] = $customValue['value'];
         }
       }
@@ -1442,8 +1448,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     foreach ($values as $cid => $details) {
       $relatedContacts = array_keys($details['relatedContacts'] ?? []);
       $mainRelatedContactId = reset($relatedContacts);
+      $relatedMemberships = $relationshipProcessor->getRelationshipMembershipsForContact((int) $cid, $params['membership_type_ids'] ?? []);
 
-      foreach ($relationshipProcessor->getRelationshipMembershipsForContact((int) $cid) as $membershipId => $membershipValues) {
+      foreach ($relatedMemberships as $membershipId => $membershipValues) {
         $membershipInherittedFromContactID = NULL;
         if (!empty($membershipValues['owner_membership_id'])) {
           // @todo - $membership already has this now.
@@ -2235,19 +2242,38 @@ SELECT count(*)
 
     // Check if relationship can be used for related memberships
     $membershipTypes = MembershipType::get(FALSE)
-      ->addSelect('relationship_type_id')
-      ->addGroupBy('relationship_type_id')
+      ->addSelect('relationship_type_id', 'id')
       ->addWhere('relationship_type_id', 'IS NOT EMPTY')
       ->execute();
+
+    $otherValidRelationshipTypes = Relationship::get(FALSE)
+      ->addSelect('relationship_type_id')
+      ->setWhere([
+        ['contact_id_a', '=', $relationship->contact_id_a],
+        ['contact_id_b', '=', $relationship->contact_id_b],
+        ['OR', [['start_date', '<=', 'now'], ['start_date', 'IS EMPTY']]],
+        ['OR', [['end_date', '>=', 'now'], ['end_date', 'IS EMPTY']]],
+        ['is_active', '=', TRUE],
+        ['relationship_type_id', '!=', $relationship->relationship_type_id],
+      ])
+      ->execute()
+      ->getArrayCopy();
+
+    $otherValidRelationshipTypeIds = !empty($otherValidRelationshipTypes) ? array_column($otherValidRelationshipTypes, 'relationship_type_id') : [];
+    $params['membership_type_ids'] = [];
+
     foreach ($membershipTypes as $membershipType) {
       // We have to loop through them because relationship_type_id is an array and we can't filter by a single
       // relationship id using API.
-      if (in_array($relationship->relationship_type_id, $membershipType['relationship_type_id'])) {
-        $relationshipIsUsedForRelatedMemberships = TRUE;
+      if (in_array($relationship->relationship_type_id, $membershipType['relationship_type_id'])
+        && empty(array_intersect($membershipType['relationship_type_id'], $otherValidRelationshipTypeIds))) {
+        $relatedMembershipsNeedsToBeUpdated = TRUE;
+        $params['membership_type_ids'][] = $membershipType['id'];
       }
     }
-    if (empty($relationshipIsUsedForRelatedMemberships)) {
-      // This relationship is not configured for any related membership types
+    if (empty($relatedMembershipsNeedsToBeUpdated)) {
+      // This relationship is not configured for any related membership types or there exists other valid relationships
+      // for related memberships.
       return;
     }
     // Call relatedMemberships to delete/add the memberships of related contacts.

@@ -9,12 +9,12 @@
       <div class="panel-heading">
         <div class="form-inline">
           <span ng-mouseenter="help('entity', paramDoc('$entity'))" ng-mouseleave="help()">
-            <input class="collapsible-optgroups form-control" ng-model="entity" ng-disabled="!entities.length" ng-class="{loading: !entities.length}" crm-ui-select="::{placeholder: ts('Entity'), data: entities, formatResultCssClass: formatResultCssClass}" />
+            <input class="collapsible-optgroups form-control twelve" ng-model="entity" ng-disabled="!entities.length" ng-class="{loading: !entities.length}" crm-ui-select="::{placeholder: ts('Entity'), data: entities, formatResultCssClass: formatResultCssClass}" />
           </span>
           <span ng-mouseenter="help('action', paramDoc('$action'))" ng-mouseleave="help()">
-            <input class="collapsible-optgroups form-control" ng-model="action" ng-disabled="!entity || !actions.length" ng-class="{loading: entity && !actions.length}" crm-ui-select="::{placeholder: ts('Action'), data: actions, formatResultCssClass: formatResultCssClass}" />
+            <input class="collapsible-optgroups form-control twelve" ng-model="action" ng-disabled="!entity || !actions.length" ng-class="{loading: entity && !actions.length}" crm-ui-select="::{placeholder: ts('Action'), data: actions, formatResultCssClass: formatResultCssClass}" />
           </span>
-          <input class="form-control api4-index" type="search" ng-model="index" ng-mouseenter="help('index', paramDoc('$index'))" ng-mouseleave="help()" placeholder="{{:: ts('Index') }}" />
+          <input class="form-control api4-index twelve" type="search" ng-model="index" ng-mouseenter="help('index', paramDoc('$index'))" ng-mouseleave="help()" placeholder="{{:: ts('Index') }}" />
           <button class="btn btn-success pull-right" crm-icon="fa-bolt" ng-disabled="!entity || !action || loading" ng-click="execute()" ng-mouseenter="help(ts('Execute'), executeDoc())" ng-mouseleave="help()">{{:: ts('Execute') }}</button>
         </div>
       </div>
@@ -43,17 +43,17 @@
           </label>
           <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="params[name] !== null"><i class="crm-i fa-times" aria-hidden="true"></i></a>
         </div>
-        <fieldset class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select">
+        <fieldset class="api4-input" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select">
           <legend>select<span class="crm-marker" ng-if="::availableParams.select.required"> *</span></legend>
           <div ng-model="params.select" ui-sortable="{axis: 'y'}">
             <div class="api4-input form-inline" ng-repeat="item in params.select track by $index" ng-show="item !== 'row_count'">
               <i class="crm-i fa-arrows" aria-hidden="true"></i>
-              <input class="form-control huge" type="text" ng-model="params.select[$index]" />
+              <input class="form-control" type="text" ng-model="params.select[$index]" />
               <a href class="crm-hover-button" title="Clear" ng-click="clearParam('select', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
             </div>
           </div>
           <div class="api4-input form-inline">
-            <input class="collapsible-optgroups form-control huge" ng-model="controls.select" crm-ui-select="{data: fieldsAndJoinsAndFunctionsAndWildcards}" placeholder="Add select" />
+            <input class="collapsible-optgroups form-control" ng-model="controls.select" crm-ui-select="{data: fieldsAndJoinsAndFunctionsAndWildcards}" placeholder="Add select" />
           </div>
         </fieldset>
         <fieldset id="api4-join-fieldset" class="api4-input form-inline" ng-mouseenter="help('join', availableParams.join)" ng-mouseleave="help()" ng-if="::availableParams.join">
@@ -64,9 +64,9 @@
                 <i class="crm-i fa-arrows"></i>
                 <input class="form-control twenty" type="text" ng-model="params.join[$index][0]" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.buildFieldList()"/>
                 <label>{{:: ts('Required:') }}</label>
-                <select class="form-control" ng-model="params.join[$index][1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+                <select class="form-control eight" ng-model="params.join[$index][1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
                 <label>{{:: ts('Using:') }}</label>
-                <select class="form-control" ng-model="params.join[$index][2]" ng-options="e.name as e.name for e in ::bridgeEntities" ng-change="$ctrl.buildFieldList()">
+                <select class="form-control twelve" ng-model="params.join[$index][2]" ng-options="e.name as e.name for e in ::bridgeEntities" ng-change="$ctrl.buildFieldList()">
                   <option value="">{{:: ts('- none -') }}</option>
                 </select>
                 <a href class="crm-hover-button" title="Clear" ng-click="clearParam('join', $index)"><i class="crm-i fa-times"></i></a>
@@ -77,7 +77,7 @@
             </fieldset>
           </div>
           <div class="api4-input form-inline">
-            <input class="collapsible-optgroups form-control huge" ng-model="controls.join" crm-ui-select="{data: entities}" placeholder="Add join" />
+            <input class="collapsible-optgroups form-control" ng-model="controls.join" crm-ui-select="{data: entities}" placeholder="Add join" />
           </div>
         </fieldset>
         <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()" ng-if="::availableParams.fields">
@@ -90,8 +90,8 @@
         </div>
         <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['string', 'int', 'float'])">
           <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
-          <input class="form-control" ng-if="::!param.options" type="{{:: (param.type[0] === 'int' || param.type[0] === 'float') && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]"/>
-          <select class="form-control" ng-if="::param.options" ng-options="o for o in ::param.options" id="api4-param-{{:: name }}" ng-model="params[name]"></select>
+          <input class="form-control twelve" ng-if="::!param.options" type="{{:: (param.type[0] === 'int' || param.type[0] === 'float') && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]"/>
+          <select class="form-control crm-auto-width" ng-if="::param.options" ng-options="o for o in ::param.options" id="api4-param-{{:: name }}" ng-model="params[name]"></select>
           <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="!!params[name]"><i class="crm-i fa-times" aria-hidden="true"></i></a>
         </div>
         <div class="api4-input" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['array', 'mixed'])">
@@ -120,12 +120,12 @@
           <div ng-model="params.groupBy" ui-sortable="{axis: 'y'}">
             <div class="api4-input form-inline" ng-repeat="item in params.groupBy track by $index">
               <i class="crm-i fa-arrows" aria-hidden="true"></i>
-              <input class="form-control huge" type="text" ng-model="params.groupBy[$index]" />
+              <input class="form-control" type="text" ng-model="params.groupBy[$index]" />
               <a href class="crm-hover-button" title="Clear" ng-click="clearParam('groupBy', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
             </div>
           </div>
           <div class="api4-input form-inline">
-            <input class="collapsible-optgroups form-control huge" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoinsAndFunctions}" placeholder="Add groupBy" />
+            <input class="collapsible-optgroups form-control" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoinsAndFunctions}" placeholder="Add groupBy" />
           </div>
         </fieldset>
         <fieldset ng-if="::availableParams.having" class="api4-clause-fieldset" ng-mouseenter="help('having', availableParams.having)" ng-mouseleave="help()">
@@ -136,8 +136,8 @@
           <div ng-model="params.orderBy" ui-sortable="{axis: 'y'}">
             <div class="api4-input form-inline" ng-repeat="clause in params.orderBy">
               <i class="crm-i fa-arrows" aria-hidden="true"></i>
-              <input class="form-control huge" type="text" ng-model="clause[0]" />
-              <select class="form-control" ng-model="clause[1]">
+              <input class="form-control" type="text" ng-model="clause[0]" />
+              <select class="form-control crm-auto-width" ng-model="clause[1]">
                 <option value="ASC">ASC</option>
                 <option value="DESC">DESC</option>
               </select>
@@ -145,7 +145,7 @@
             </div>
           </div>
           <div class="api4-input form-inline">
-            <input class="collapsible-optgroups form-control huge" ng-model="controls.orderBy" crm-ui-select="{data: fieldsAndJoinsAndFunctionsWithSuffixes}" placeholder="Add orderBy" />
+            <input class="collapsible-optgroups form-control" ng-model="controls.orderBy" crm-ui-select="{data: fieldsAndJoinsAndFunctionsWithSuffixes}" placeholder="Add orderBy" />
           </div>
         </fieldset>
         <fieldset ng-if="::availableParams.limit && availableParams.offset">
@@ -247,7 +247,7 @@
     <div class="panel explorer-result-panel panel-{{ status }}" >
       <div class="panel-heading">
         <div class="form-inline pull-right">
-          <select ng-show="selectedTab.result === 'result'" class="form-control" ng-model="$ctrl.resultFormat" ng-change="$ctrl.formatResult()">
+          <select ng-show="selectedTab.result === 'result'" class="form-control crm-auto-width" ng-model="$ctrl.resultFormat" ng-change="$ctrl.formatResult()">
             <option ng-repeat="fmt in $ctrl.resultFormats" value="{{:: fmt.name }}">
               {{:: fmt.label }}
             </option>

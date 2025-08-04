@@ -1,7 +1,7 @@
 <div class="form-inline crm-search-admin-display-sorts" ng-repeat="sort in $ctrl.display.settings.sort">
   <label for="crm-search-display-sort-{{$index}}">{{ $index ? ts('Also by') : ts('Sort by') }}</label>
-  <input id="crm-search-display-sort-{{$index}}" class="form-control huge" ng-model="sort[0]" crm-ui-select="{data: $ctrl.parent.fieldsForSort}" />
-  <select class="form-control" ng-model="sort[1]" ng-show="sort[0] !== 'RAND()'">
+  <input id="crm-search-display-sort-{{$index}}" class="form-control" ng-model="sort[0]" crm-ui-select="{data: $ctrl.parent.fieldsForSort}" />
+  <select class="form-control crm-auto-width" ng-model="sort[1]" ng-show="sort[0] !== 'RAND()'">
     <option value="ASC">{{:: ts('Ascending') }}</option>
     <option value="DESC">{{:: ts('Descending') }}</option>
   </select>
@@ -11,6 +11,6 @@
   <label for="crm-search-display-add-sort">{{ $ctrl.display.settings.sort.length ? ts('Also by') : ts('Sort by') }}</label>
   <input id="crm-search-display-add-sort"
          class="form-control crm-action-menu fa-plus"
-         crm-ui-select="{placeholder: ts('Select field'), data: $ctrl.parent.fieldsForSort, dropdownCss: {width: '300px'}}"
+         crm-ui-select="{placeholder: ts('Select field'), data: $ctrl.parent.fieldsForSort}"
          on-crm-ui-select="$ctrl.parent.pushSetting('sort', [selection, 'ASC'])" >
 </div>

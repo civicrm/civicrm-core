@@ -140,6 +140,7 @@ class Meta {
       'data_type' => $expr['dataType'],
       'suffixes' => $suffix ? ['id', $suffix] : NULL,
       'options' => FALSE,
+      'serialize' => NULL,
     ];
     $field = \CRM_Utils_Array::first($expr['fields']);
     $spec['original_field_name'] = $field['name'] ?? NULL;

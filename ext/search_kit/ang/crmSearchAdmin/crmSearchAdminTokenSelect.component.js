@@ -42,11 +42,6 @@
         data: this.getTokens,
         // The crm-action-menu icon doesn't show without a placeholder
         placeholder: ' ',
-        // Make this widget very compact
-        width: '52px',
-        containerCss: {minWidth: '52px'},
-        // Make the dropdown wider than the widget
-        dropdownCss: {width: '250px'}
       };
 
     }

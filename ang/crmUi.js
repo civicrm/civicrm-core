@@ -80,7 +80,11 @@
         },
         link: function (scope, element, attrs, ngModel) {
           ngModel.$render = function () {
-            element.val(ngModel.$viewValue).change();
+            const viewVal = ngModel.$viewValue || '';
+            // Prevent unnecessarily triggering ngChagne
+            if (element.val() != viewVal) {
+              element.val(viewVal).change();
+            }
           };
           let settings = angular.copy(scope.crmUiDatepicker || {});
           // Set defaults to be non-restrictive
@@ -811,10 +815,13 @@
           this.$onChanges = function() {
             // Timeout is to wait for `placeholder="{{ ts(...) }}"` to be resolved
             $timeout(function() {
+              // Only auto-open if there are no static options or quickAdd links
+              const autoOpen = ctrl.autoOpen &&
+                !(ctrl.staticOptions && ctrl.staticOptions.length) &&
+                !(ctrl.quickAdd === true || (ctrl.quickAdd && ctrl.quickAdd.length));
               $element.crmAutocomplete(ctrl.entity, ctrl.crmAutocompleteParams || {}, {
                 multiple: ctrl.multi,
-                // Only auto-open if there are no static options
-                minimumInputLength: ctrl.autoOpen && _.isEmpty(ctrl.staticOptions) ? 0 : 1,
+                minimumInputLength: autoOpen ? 0 : 1,
                 static: ctrl.staticOptions || [],
                 quickAdd: ctrl.quickAdd,
               });

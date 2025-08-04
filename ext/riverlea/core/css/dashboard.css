@@ -5,7 +5,7 @@
 
 #civicrm-dashboard > .crm-flex-box {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: var(--crm-dashlet-columns);
   gap: var(--crm-r);
   /* avoid total collapse else no droppable area if all widgets removed */
   min-height: var(--crm-r);

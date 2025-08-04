@@ -60,10 +60,10 @@ This is the base class.';
     $this->assertEquals("In the child class, foo has been barred.\n\n - In general, you can do nothing with it.", $doc['comment']);
   }
 
-  public static function docBlockExamples() {
+  public static function docBlockExamples(): array {
     return [
-      [
-        "/**
+      'function' => [
+        'doc_block' => "/**
           * This is a function.
           *
           * Comment.
@@ -77,7 +77,7 @@ This is the base class.';
           * @return nothing|something
           */
         ",
-        [
+        'parsed' => [
           'description' => 'This is a function.',
           'comment' => "Comment.\nIDK",
           'params' => [
@@ -97,15 +97,101 @@ This is the base class.';
           'return' => ['nothing', 'something'],
         ],
       ],
+      'property_with_options' => [
+        'doc_block' => '/**
+         * Property Array
+         *
+         * @var array{
+         *    a: string,
+         *    z: int,
+         *    x: float|string|int,
+         *    }
+         */',
+        'parsed' => [
+          'description' => 'Property Array',
+          'type' => ['array'],
+          'comment' => NULL,
+          'shape' => ['a' => ['string'], 'z' => ['int'], 'x' => ['float', 'string', 'int']],
+        ],
+      ],
+      'params_with_nested_array_shape' => [
+        'doc_block' => '/**
+           * @param array{ name: string, phone: string|null } $first
+           * @param array{
+           *   limit: int,
+           *   offset: int,
+           *   thresholds: double[],
+           *   color: array{red: int, green: int, blue: int}
+           * } $second
+           * @return array{
+           *     id: int,
+           *     name: string,
+           *     contact: array{
+           *         email: string,
+           *         phone: string|null
+           *     },
+           *     preferences: array{notifications: bool, theme: string}
+           * }
+           */',
+        'parsed' => [
+          'params' => [
+            '$first' => [
+              'type' => ['array'],
+              'shape' => ['name' => ['string'], 'phone' => ['string', 'null']],
+              'description' => '',
+              'comment' => '',
+            ],
+            '$second' => [
+              'type' => ['array'],
+              'shape' => [
+                'limit' => ['int'],
+                'offset' => ['int'],
+                'thresholds' => ['double[]'],
+                'color' => [
+                  'type' => ['array'],
+                  'shape' => [
+                    'red' => ['int'],
+                    'green' => ['int'],
+                    'blue' => ['int'],
+                  ],
+                ],
+              ],
+              'description' => '',
+              'comment' => '',
+            ],
+          ],
+          'return' => [
+            'type' => ['array'],
+            'shape' => [
+              'id' => ['int'],
+              'name' => ['string'],
+              'contact' => [
+                'type' => ['array'],
+                'shape' => [
+                  'email' => ['string'],
+                  'phone' => ['string', 'null'],
+                ],
+              ],
+              'preferences' => [
+                'type' => ['array'],
+                'shape' => [
+                  'notifications' => ['bool'],
+                  'theme' => ['string'],
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
     ];
   }
 
   /**
    * @dataProvider docBlockExamples
-   * @param $input
-   * @param $expected
+   * @param string $input
+   * @param array $expected
    */
-  public function testParseDocBlock($input, $expected) {
+  public function testParseDocBlock(string $input, array $expected) {
     $this->assertEquals($expected, ReflectionUtils::parseDocBlock($input));
   }
 

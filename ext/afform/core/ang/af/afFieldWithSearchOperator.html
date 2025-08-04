@@ -1,4 +1,4 @@
 <select class="form-control afform-search-operator" crm-ui-select ng-model="$ctrl.search_operator" ng-change="$ctrl.onChangeOperator()">
   <option ng-repeat="(name, label) in $ctrl.defn.operators" value="{{ name }}">{{ label }}</option>
 </select>
-<div class="crm-af-field" ng-include="'~/af/fields/' + $ctrl.defn.input_type + '.html'"></div>
+<div class="crm-af-field" ng-include="$ctrl.defn.template"></div>

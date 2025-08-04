@@ -19,13 +19,13 @@
   <div class="form-group crm-search-admin-field-icon" ng-if="icon.icon">
     <input required ng-model="icon.icon" crm-ui-icon-picker class="form-control crm-icon-picker">
   </div>
-  <select class="form-control" ng-model="icon.side" title="{{:: ts('Show icon on left or right side of the field') }}">
+  <select class="form-control crm-auto-width" ng-model="icon.side" title="{{:: ts('Show icon on left or right side of the field') }}">
     <option value="left">{{:: ts('Align left') }}</option>
     <option value="right">{{:: ts('Align right') }}</option>
   </select>
   <div class="form-group" ng-if="icon.if">
     <label>{{:: ts('If') }}</label>
-    <input class="form-control collapsible-optgroups" ng-model="icon.if[0]" crm-ui-select="::{data: $ctrl.fields, allowClear: true, placeholder: ts('Always')}" ng-change="$ctrl.onSelectField(icon.if)" />
+    <input class="form-control collapsible-optgroups crm-auto-width" ng-model="icon.if[0]" crm-ui-select="::{data: $ctrl.fields, allowClear: true, placeholder: ts('Always')}" ng-change="$ctrl.onSelectField(icon.if)" />
     <crm-search-condition ng-if="icon.if[0]" clause="icon.if" field="$ctrl.getField(icon.if[0])" offset="1" option-key="'name'" format="$ctrl.format" class="form-group"></crm-search-condition>
   </div>
   <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.item.icons.splice($index, 1);" title="{{:: ts('Remove icon') }}">

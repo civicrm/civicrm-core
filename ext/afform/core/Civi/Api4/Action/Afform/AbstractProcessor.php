@@ -94,6 +94,22 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     if (empty($this->_afform['submit_currently_open'])) {
       throw new UnauthorizedException(E::ts('This form is not currently open for submissions.'), ['show_detailed_error' => TRUE]);
     }
+
+    // Set args based on extra data in authx bearer token. E.g. a link to the form could contain a case id when the link
+    // is send by email from the manage case screen.
+    $session = \CRM_Core_Session::singleton();
+    $authx = $session->get('authx');
+    if ($authx && isset($authx['jwt']['afformArgs'])) {
+      // It could be that afformArgs is stdClass
+      // so this way we convert it to an array.
+      $afformOptions = json_decode(json_encode($authx['jwt']['afformArgs']), TRUE);
+      if (is_array($afformOptions)) {
+        foreach ($afformOptions as $afformOption => $afformOptionValue) {
+          $this->args[$afformOption] = $afformOptionValue;
+        }
+      }
+    }
+
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
     $this->loadEntities();
     // TODO: use _response more consistently
@@ -150,6 +166,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $event = new AfformPrefillEvent($this->_afform, $this->_formDataModel, $this, $entity['type'], $entityName, $this->_entityIds);
       \Civi::dispatcher()->dispatch('civi.afform.prefill', $event);
     }
+  }
+
+  /**
+   * Unload a certain entity.
+   *
+   * @param array $entity
+   * @return void
+   */
+  public function unloadEntity(array $entity) {
+    unset($this->_entityIds[$entity['name']]);
+    unset($this->_entityValues[$entity['name']]);
   }
 
   /**

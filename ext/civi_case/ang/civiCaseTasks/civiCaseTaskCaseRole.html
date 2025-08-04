@@ -1,0 +1,36 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="civiCaseTaskCaseRoleForm" ng-controller="civiCaseTaskCaseRole as $ctrl">
+    <div class="form-inline">
+      <label for="crm-search-task-role-relationship_type">{{:: ts('Role Type') }} <i class="crm-marker">*</i></label>
+      <input id="crm-search-task-role-relationship_type" class="form-control" ng-disabled="values.disableRelationshipSelect" ng-model="values.relationship_type" required crm-ui-select="{data: $ctrl.task.relationshipTypes, allowClear: false}" ng-change="$ctrl.onChangeRole()">
+    </div>
+    <div class="form-inline">
+      <label for="crm-search-task-role-contact_id">{{:: ts('Contact') }} <i class="crm-marker">*</i></label>
+      <input id="crm-search-task-role-contact_id" class="form-control" ng-disabled="!values.relationship_type" ng-model="values.contact_id" crm-autocomplete="$ctrl.relationshipInfo[values.relationship_type].contact_type" crm-autocomplete-params="$ctrl.autocompleteParams" required>
+    </div>
+    <div ng-if="!$ctrl.run && values.relationship_type" class="alert" ng-class="{'alert-info': $ctrl.existingCount === null, 'alert-success': $ctrl.existingCount === 0, 'alert-warning': $ctrl.existingCount}">
+      <div ng-if="$ctrl.existingCount === null">
+        <i class="crm-i fa-spinner fa-spin"></i>
+        {{:: ts('Checking...') }}
+      </div>
+      <div ng-if="$ctrl.existingCount === 0">
+        <i class="crm-i fa-check-circle"></i>
+        {{:: ts('The selected cases do not yet have this role assigned.') }}
+      </div>
+      <div ng-if="$ctrl.existingCount">
+        <i class="crm-i fa-exclamation-triangle"></i>
+        {{:: ts('%1 cases already have this role assigned.', {1: $ctrl.existingCount}) }}
+        <div class="form-inline">
+          <label><input type="radio" ng-model="values.addOrReplace" value="add" required> {{:: ts('Add extra roles') }}</label>
+          <label><input type="radio" ng-model="values.addOrReplace" value="replace" required> {{:: ts('Replace existing roles') }}</label>
+        </div>
+      </div>
+    </div>
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
+      <h5>{{:: ts('Adding roles...') }}</h5>
+      <crm-search-batch-runner entity="'CaseContact'" action="get" params="$ctrl.run" ids="$ctrl.ids" id-field="case_id" success="$ctrl.onSuccess(result)" error="$ctrl.onError()" ></crm-search-batch-runner>
+    </div>
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" />
+    <crm-dialog-button text="ts('Save')" icons="{primary: 'fa-user-plus'}" on-click="$ctrl.submit()" disabled="$ctrl.run || $ctrl.existingCount === null || !civiCaseTaskCaseRoleForm.$valid" />
+  </form>
+</div>

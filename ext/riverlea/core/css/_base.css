@@ -73,6 +73,9 @@ body {
 .crm-container table {
   border-collapse: collapse;
 }
+.crm-container input[type="checkbox"],.crm-container input[type="radio"] {
+  padding: 0;
+}
 
 /* JQueryUI resets (!important vs JQuery UI css) */
 
@@ -277,12 +280,24 @@ dl dl {
 }
 .crm-container .disabled,
 .crm-container .crm-disabled,
-.crm-container .disabled *,
+.crm-container .disabled *:not(.btn,button,i,span),
 .crm-container .cancelled,
 .crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor {
   color: var(--crm-c-inactive);
   opacity: 1;
+}
+.crm-container tr.disabled,
+.crm-container tr:has(td.disabled),
+.crm-container .table-striped > tbody > tr:has(td.disabled) {
+  background-color: var(--crm-c-page-background);
+}
+.crm-container tr.disabled td *:not(.btn,button),
+.crm-container td.disabled {
+  font-style: italic;
+}
+.crm-container tr.disabled td:first-of-type {
+  display: inline-flex;
 }
 
 /* BS3 type styles */
@@ -463,6 +478,37 @@ dl dl {
 .crm-container .nowrap {
   white-space: nowrap
 }
+
+/* Flexbox utility classes */
+
+.crm-flex-align-start /* align top */ {
+  align-items: flex-start;
+}
+.crm-flex-align-center {
+  align-items: center;
+}
+.crm-flex-align-end {
+  align-items: flex-end;
+}
+.crm-flex-justify-start /* align left */ {
+  justify-content: flex-start;
+}
+.crm-flex-justify-center {
+  justify-content: center;
+}
+.crm-flex-justify-between {
+  justify-content: space-between;
+}
+.crm-flex-justify-space-evenly {
+  justify-content: space-evenly;
+}
+.crm-flex-justify-around {
+  justify-content: space-around;
+}
+.crm-flex-justify-end {
+  justify-content: flex-end;
+}
+
 /* Responsive  */
 
 @media (max-width: 991px) {

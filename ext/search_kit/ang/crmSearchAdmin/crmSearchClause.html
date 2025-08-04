@@ -20,7 +20,7 @@
       <div ng-if="!$ctrl.conjunctions[clause[0]]" class="api4-input-group">
         <crm-search-function ng-if="$ctrl.areFunctionsAllowed(clause[0])" class="form-group" expr="clause[0]" mode="clause"></crm-search-function>
         <span ng-if="!$ctrl.hasFunction(clause[0])">
-          <input class="form-control collapsible-optgroups" ng-model="clause[0]" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" ng-change="$ctrl.changeClauseField(clause, index)" />
+          <input class="form-control collapsible-optgroups crm-auto-width" ng-model="clause[0]" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" ng-change="$ctrl.changeClauseField(clause, index)" />
         </span>
         <crm-search-condition clause="clause" field="$ctrl.getFieldOrFunction(clause[0])" fields="$ctrl.fields" offset="1" option-key="$ctrl.getOptionKey(clause[0])" format="$ctrl.format" class="form-group"></crm-search-condition>
       </div>
@@ -43,7 +43,7 @@
       </ul>
     </div>
   </div>
-  <input class="form-control collapsible-optgroups"
+  <input class="form-control collapsible-optgroups crm-auto-width"
          on-crm-ui-select="$ctrl.addClause(selection)"
          crm-ui-select="{data: $ctrl.fields, placeholder: $ctrl.placeholder || ts('Select field')}" >
 </div>

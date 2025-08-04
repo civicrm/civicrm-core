@@ -209,24 +209,10 @@ function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions
  * @throws \CRM_Core_Exception
  */
 function civiimport_civicrm_buildForm(string $formName, $form) {
-  if ($formName === 'CRM_Contribute_Import_Form_DataSource') {
-    // If we have already configured contact type on the import screen
-    // we remove it from the DataSource screen.
-    $userJobID = $form->get('user_job_id');
-    if ($userJobID) {
-      $metadata = UserJob::get()->addWhere('id', '=', $userJobID)->addSelect('metadata')->execute()->first()['metadata'];
-      $contactType = $metadata['entity_configuration']['Contact']['contact_type'] ?? NULL;
-      if ($contactType) {
-        $form->removeElement('contactType');
-      }
-    }
-  }
-
   //@todo - do for all Preview forms - just need to fix each Preview.tpl to
   // not open in new tab as they are not yet consolidated into one file.
   // (Or consolidate them now).
-  if ($formName === 'CRM_Contact_Import_Form_Summary'
-    || $formName === 'CRM_Contribute_Import_Form_Preview') {
+  if ($formName === 'CRM_Contact_Import_Form_Summary') {
     $form->assign('isOpenResultsInNewTab', TRUE);
     $form->assign('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR', FALSE));
     $form->assign('allRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID(), FALSE));

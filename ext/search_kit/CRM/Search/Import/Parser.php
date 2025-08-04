@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\Contribution;
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
 use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -87,15 +90,41 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
         $lineItem = $this->getEntityValues($mappedRow, $entity);
         $lineItems[] = CRM_Utils_Array::prefixKeys($lineItem, 'entity_id.');
       }
+      // Set default amount for soft credits from contribution total if not otherwise specified
+      if ($entity['entity_name'] === 'ContributionSoft' && !empty($contributionValues['total_amount'])) {
+        $softCredit = $this->getEntityValues($mappedRow, $entity);
+        if (!empty($softCredit['contact_id']) && empty($softCredit['amount'])) {
+          $mappedRow[$entity['key']]['amount'] = $contributionValues['total_amount'];
+        }
+      }
     }
     if (!$lineItems && isset($contributionValues['total_amount'])) {
-      $lineItems[] = ['line_total' => $contributionValues['total_amount']];
+      $lineItems[] = ['line_total_inclusive' => $contributionValues['total_amount']];
     }
     try {
-      $contribution = \Civi\Api4\Order::create()
+      $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionValues['contribution_status_id'] ?? NULL);
+      $contribution = Order::create()
         ->setContributionValues($contributionValues)
         ->setLineItems($lineItems)
         ->execute()->single();
+      if ($contributionStatus === 'Completed') {
+        // Use values from Contribution as saved, in case the hooks changed any.
+        $contribution = Contribution::get()
+          ->addWhere('id', '=', $contribution['id'])
+          ->execute()->single();
+        Payment::create()
+          ->setValues([
+            'contribution_id' => $contribution['id'],
+            'total_amount' => $contribution['total_amount'],
+            'check_number' => $contribution['check_number'] ?? NULL,
+            'trxn_id' => $contribution['trxn_id'] ?? NULL,
+            'trxn_date' => $contribution['receive_date'] ?? 'now',
+            'payment_instrument_id' => $contribution['payment_instrument_id'],
+            'fee_amount' => $contribution['fee_amount'],
+            'currency' => $contribution['currency'],
+          ])
+          ->execute();
+      }
       $mappedRow[$contributionKey]['id'] = $contribution['id'];
     }
     catch (\CRM_Core_Exception $e) {
@@ -130,7 +159,7 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
   }
 
   private function getEntityValues(array $mappedRow, array $entity): array {
-    $entityValues = array_merge($mappedRow[$entity['key']], $entity['static_values']);
+    $entityValues = array_merge($mappedRow[$entity['key']] ?? [], $entity['static_values']);
     foreach ($entity['join_values'] as $field => $joinField) {
       $joinEntity = $this->extractEntityFromFieldName($joinField);
       if (isset($mappedRow[$joinEntity][$joinField])) {

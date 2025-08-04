@@ -209,54 +209,13 @@ select.crm-error {
   min-width: auto !important /* vs front.css */;
 }
 
-/* Input size modifiers */
-
-.crm-container .two {
-  width: 3rem; /* .two is used on number inputs that need 1rem for the controls */
-}
-.crm-container .four,
-.crm-container input.four,
-.crm-container .crm-form-select.four {
-  width: 4em;
-}
-.crm-container .six,
-.crm-container input.six,
-.crm-container .crm-form-select.six {
-  width: 6em;
-}
-.crm-container .eight,
-.crm-container input.eight,
-.crm-container .crm-form-select.eight {
-  width: 8em;
-}
-.crm-container .twelve,
-.crm-container .medium,
-.crm-container input.twelve,
-.crm-container input.medium {
-  width: 12em;
-}
-.crm-container .twenty {
-  width: 20em;
-}
-.crm-container .big {
-  width: var(--crm-big-input);
-}
-.crm-container .huge,
-input.crm-form-autocomplete,
-input.crm-form-entityref {
-  width: var(--crm-huge-input);
-}
-
 /* Inline edit */
 
-.crm-inline-edit {
-  border: var(--crm-dash-edit-border);
-  border-color: transparent;
-  background: none;
-  position: relative;
-}
-.crm-container .crm-editable-form {
+.crm-container .crm-editable-form,
+.crm-container .crm-search-field-editable form /* SK */ {
   display: flex;
+  gap: var(--crm-flex-gap);
+  flex-wrap: wrap;
 }
 .crm-container .crm-editable-form input {
   height: var(--crm-input-height);
@@ -274,12 +233,13 @@ input.crm-form-entityref {
 .crm-container .crm-editable-form [type="cancel"] {
   color: var(--crm-c-danger) !important;
 }
-/* in place edit  */
 .crm-container .crm-inline-edit,
 .crm-container .crm-editable-disabled,
 .crm-container .crm-editable-enabled {
   border: var(--crm-dash-edit-border);
   border-color: transparent;
+  background: none;
+  position: relative;
 }
 .crm-container .crm-editable-textarea-enabled {
   white-space: normal;
@@ -298,15 +258,18 @@ input.crm-form-entityref {
   display: inline-block;
   padding-right: var(--crm-s);
   min-height: var(--crm-r);
-  min-width: 3em;
 }
-.crm-container .crm-editable-enabled .crm-i {
+.crm-container .crm-editable-enabled .crm-i,
+.crm-editable-enabled:has(span.crm-search-field-value:empty) {
   opacity: .5;
 }
 .crm-container .replace-plain a:active:before,
 .crm-container .replace-plain:focus:before,
 .crm-container .replace-plain:hover:before,
-.crm-container .crm-editable-enabled:hover .crm-i {
+.crm-container .crm-editable-enabled:hover .crm-i,
+.crm-container .crm-editable-enabled:focus .crm-i,
+.crm-editable-enabled:has(span.crm-search-field-value:empty):hover,
+.crm-editable-enabled:has(span.crm-search-field-value:empty):focus {
   opacity: 1;
 }
 .crm-container .crm-editable-saving {
@@ -317,7 +280,6 @@ input.crm-form-entityref {
   margin: 0;
   padding: 0;
   width: auto !important;
-  /* position: relative; */
   overflow: visible;
   display: flex;
   gap: 0;
@@ -326,7 +288,9 @@ input.crm-form-entityref {
 .crm-editable-form > * {
   margin: 0;
 }
-.crm-editable-form input {
+.crm-container .crm-editable-form input,
+.crm-container .crm-search-field-editable input.form-control:not(.crm-form-date,.crm-form-time) {
+  width: 100%;
   min-width: 14ch;
 }
 .crm-container .crm-editable-form button {
@@ -410,17 +374,15 @@ input.crm-form-checkbox) + label {
 
 /* Select2 */
 
-.crm-container .select2-container:not(.select2-container-multi,
-.collapsible-optgroups) {
-  width: auto;
+.crm-container .select2-container {
   max-width: 100%;
 }
-.crm-container .select2-container:not(.four,.six,.eight,.twelve,.medium) {
+/* Set width using !important to override the inline fixed width given by select2.js */
+.crm-container .select2-container {
   width: var(--crm-big-input) !important /* vs inline fixed width */;
 }
 .crm-container .select2-container-multi {
   min-width: 96px;
-  max-width: 100%;
 }
 .crm-container select.form-control,
 .crm-container .select2-container-multi .select2-choices,
@@ -455,6 +417,9 @@ input.crm-form-checkbox) + label {
   right: var(--crm-r);
   top: auto;
 }
+.crm-container .select2-container .select2-choice > .select2-chosen {
+  margin-right: var(--crm-m2);
+}
 .crm-container .select2-container-multi .select2-choices::before,
 .crm-container .select2-container .select2-choice .select2-arrow::before {
   font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
@@ -486,6 +451,9 @@ input.crm-form-checkbox) + label {
 }
 .crm-container .select2-default {
   color: var(--crm-input-color) !important /* vs important in select2.min.css */;
+}
+.crm-container .select2-default .select2-chosen { /* intended to target placeholder text */
+  color: var(--crm-c-inactive);
 }
 .crm-container .select2-container-multi .select2-choices .select2-search-field input.select2-default {
   color: var(--crm-input-color);
@@ -534,7 +502,7 @@ input.crm-form-checkbox) + label {
   color: var(--crm-c-text);
   cursor: default;
   border: var(--crm-c-divider);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-input-border-radius);
   background-clip: padding-box;
   user-select: none;
   background-color: var(--crm-form-select-bg);
@@ -565,11 +533,12 @@ input.crm-form-checkbox) + label {
 /* Select dropdown */
 
 .select2-drop.select2-drop-active.crm-container {
+  min-width: var(--crm-big-input);
   background: var(--crm-input-background);
-  border-bottom-left-radius: var(--crm-roundness);
-  border-bottom-right-radius: var(--crm-roundness);
+  border-bottom-left-radius: var(--crm-input-border-radius);
+  border-bottom-right-radius: var(--crm-input-border-radius);
   border-color: var(--crm-c-focus);
-  right: -1px;
+  border-top: 1px solid rgb(from var(--crm-c-focus) r g b / 25%);
 }
 .select2-drop.select2-drop-active.crm-container.select2-drop-above {
   border-bottom-left-radius: 0;
@@ -623,7 +592,7 @@ input.crm-form-checkbox) + label {
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
   background: var(--crm-c-background);
   border: 1px solid var(--crm-input-border-color);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-input-border-radius);
   box-sizing: border-box;
   height: var(--crm-l);
   margin-top: var(--crm-s);
@@ -631,6 +600,9 @@ input.crm-form-checkbox) + label {
 .select2-drop .crm-entityref-links {
   border-top: 1px solid var(--crm-input-border-color);
   margin-top: var(--crm-m);
+}
+.select2-drop .crm-entityref-links a.crm-hover-button {
+  white-space: nowrap;
 }
 .crm-container .select2-results .select2-result-label {
   font-size: var(--crm-input-font-size);
@@ -706,7 +678,7 @@ input.crm-form-checkbox) + label {
 .crm-container input.crm-form-date,
 #bootstrap-theme input.dateplugin,
 #bootstrap-theme .input-group input.crm-form-date {
-  width: 14ch;
+  width: 12ch;
 }
 .crm-form-date-wrapper a.crm-clear-link {
   display: flex;
@@ -771,7 +743,7 @@ input.crm-form-checkbox) + label {
   margin: 0 var(--crm-m1);
   padding-left: 5px !important;
   font-size: var(--crm-m3);
-  width: 7ch;
+  width: 9ch;
 }
 .ui-datepicker-calendar thead tr {
   border-top: 1px solid var(--crm-c-gray-300);
@@ -814,8 +786,7 @@ input.crm-form-checkbox) + label {
 
 /* JQ spinner */
 
-.crm-container .ui-spinner input,
-#crm-search-results-page-size /* SK pagination */ {
+.crm-container .ui-spinner input {
   width: 8ch;
 }
 .crm-container .ui-spinner a.ui-spinner-button {
@@ -853,7 +824,39 @@ input.crm-form-checkbox) + label {
   margin-top: -4px;
 }
 
-/* BS3 radio/checklbox */
+/* Input size modifiers */
+/* Must use !important to override bootstrap css and select2 inline width */
+
+.crm-container .two {
+  width: 3rem !important; /* .two is used on number inputs that need 1rem for the controls */
+}
+.crm-container .four {
+  width: 4em !important;
+}
+.crm-container .six {
+  width: 6em !important;
+}
+.crm-container .eight {
+  width: 8em !important;
+}
+.crm-container .twelve,
+.crm-container .medium {
+  width: 12em !important;
+}
+.crm-container .twenty {
+  width: 20em !important;
+}
+.crm-container .big {
+  width: var(--crm-big-input) !important;
+}
+.crm-container .huge {
+  width: var(--crm-huge-input) !important;
+}
+.crm-container .crm-auto-width {
+  width: auto !important;
+}
+
+/* BS3 radio/checkbox */
 
 #bootstrap-theme .radio,
 #bootstrap-theme .checkbox {

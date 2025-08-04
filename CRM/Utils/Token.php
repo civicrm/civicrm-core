@@ -75,71 +75,6 @@ class CRM_Utils_Token {
   ];
 
   /**
-   * @deprecated
-   *   This is used by CiviMail but will be made redundant by FlexMailer.
-   * @return array
-   */
-  public static function getRequiredTokens() {
-    CRM_Core_Error::deprecatedFunctionWarning('token processor');
-    if (self::$_requiredTokens == NULL) {
-      self::$_requiredTokens = [
-        'domain.address' => ts("Domain address - displays your organization's postal address."),
-        'action.optOutUrl or action.unsubscribeUrl' => [
-          'action.optOut' => ts("'Opt out via email' - displays an email address for recipients to opt out of receiving emails from your organization."),
-          'action.optOutUrl' => ts("'Opt out via web page' - creates a link for recipients to click if they want to opt out of receiving emails from your organization. Alternatively, you can include the 'Opt out via email' token."),
-          'action.unsubscribe' => ts("'Unsubscribe via email' - displays an email address for recipients to unsubscribe from the specific mailing list used to send this message."),
-          'action.unsubscribeUrl' => ts("'Unsubscribe via web page' - creates a link for recipients to unsubscribe from the specific mailing list used to send this message. Alternatively, you can include the 'Unsubscribe via email' token or one of the Opt-out tokens."),
-        ],
-      ];
-    }
-    return self::$_requiredTokens;
-  }
-
-  /**
-   * Check a string (mailing body) for required tokens.
-   *
-   * @param string $str
-   *   The message.
-   *
-   * @return bool|array
-   *   true if all required tokens are found,
-   *    else an array of the missing tokens
-   *
-   * @deprecated since 5.78 will be removed around 5.90
-   */
-  public static function requiredTokens(&$str) {
-    CRM_Core_Error::deprecatedFunctionWarning('use flexmailer');
-    $requiredTokens = Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', []);
-
-    $missing = [];
-    foreach ($requiredTokens as $token => $value) {
-      if (!is_array($value)) {
-        if (!preg_match('/(^|[^\{])' . preg_quote('{' . $token . '}') . '/', $str)) {
-          $missing[$token] = $value;
-        }
-      }
-      else {
-        $present = FALSE;
-        $desc = NULL;
-        foreach ($value as $t => $d) {
-          $desc = $d;
-          if (preg_match('/(^|[^\{])' . preg_quote('{' . $t . '}') . '/', $str)) {
-            $present = TRUE;
-          }
-        }
-        if (!$present) {
-          $missing[$token] = $desc;
-        }
-      }
-    }
-
-    if (empty($missing)) {
-      return TRUE;
-    }
-    return $missing;
-  }
-
-  /**
    * Wrapper for token matching.
    *
    * @param string $type
@@ -1553,6 +1488,31 @@ class CRM_Utils_Token {
         'contribution_invoice_receipt' => [
           '$display_name' => 'contact.display_name',
           '$dataArray' => ts('see default template for how to show this'),
+          '$source' => 'contribution.source',
+          '$invoice_number' => 'contribution.invoice_number',
+          '$invoice_id' => 'contribution.invoice_id',
+          '$defaultCurrency' => 'contribution.currency',
+          '$amount' => 'contribution.total_amount',
+          '$amountDue' => 'contribution.balance_amount',
+          '$amountPaid' => 'contribution.paid_amount',
+          '$invoice_date' => 'contribution.receive_date',
+          '$refundedStatusId' => 'not available',
+          '$pendingStatusId' => 'not available',
+          '$cancelledStatusId' => 'not available',
+          '$contribution_status_id' => 'contribution.contribution_status_id',
+          '$contributionStatusName' => 'contribution.contribution_status_id:name',
+          '$subTotal' => 'contribution.tax_amount',
+          '$is_pay_later' => 'contribution.is_pay_later|bool',
+          '$domain_street_address' => 'domain.street_address',
+          '$domain_city' => 'domain.city',
+          '$domain_phone' => 'domain.phone',
+          '$domain_email' => 'domain.email',
+          '$domain_supplemental_address_1' => 'domain.supplemental_address_1',
+          '$domain_supplemental_address_2' => 'domain.supplemental_address_2',
+          '$domain_supplemental_address_3' => 'domain.supplemental_address_3',
+          '$domain_postal_code' => 'domain.postal_code',
+          '$domain_state' => 'domain.state_province_id:abbr',
+          '$domain_country' => 'domain.country_id:abbr',
         ],
         'contribution_online_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1579,6 +1539,7 @@ class CRM_Utils_Token {
           '$formValues' => 'use relevant token/s',
           '$module' => 'unknown',
           '$currency' => 'contribution.currency',
+          '$paidBy' => 'contribution.payment_instrument_id:label',
         ],
         'membership_online_receipt' => [
           '$dataArray' => ts('see default template for how to show this'),
@@ -1594,6 +1555,10 @@ class CRM_Utils_Token {
         'contribution_offline_receipt' => [
           '$totalTaxAmount' => 'contribution.tax_amount',
           '$getTaxDetails' => ts('no longer available / relevant'),
+          '$paidBy' => 'contribution.payment_instrument_id:label',
+          '$receive_date' => 'contribution.receive_date',
+          '$thankyou_date' => 'contribution.thankyou_date',
+          '$receipt_date' => 'contribution.receipt_date',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1656,6 +1621,8 @@ class CRM_Utils_Token {
           '$location' => 'event.location',
           '$participant.role' => 'participant.role_id:label',
           '$event.participant_role' => 'participant.role_id:label',
+          '$contactDisplayName' => 'contact.display_name',
+          '$paymentsComplete' => 'contribution.balance_amount',
         ],
         'pledge_acknowledgement' => [
           '$domain' => ts('no longer available / relevant'),

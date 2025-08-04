@@ -6,7 +6,7 @@
   <label for="crm-search-admin-group-title">{{:: ts('Group Title') }} <span class="crm-marker">*</span></label>
   <input id="crm-search-admin-group-title" class="form-control" placeholder="{{:: ts('Untitled') }}" ng-model="$ctrl.savedSearch.groups[0].title" ng-disabled="!smartGroupColumns.length" ng-required="smartGroupColumns.length">
   <label for="api-save-search-select-column">{{:: ts('Contact Column') }}</label>
-  <input id="api-save-search-select-column" ng-model="$ctrl.savedSearch.api_params.select[0]" class="form-control huge" crm-ui-select="{data: smartGroupColumns}"/>
+  <input id="api-save-search-select-column" ng-model="$ctrl.savedSearch.api_params.select[0]" class="form-control" crm-ui-select="{data: smartGroupColumns}"/>
 </div>
 <fieldset ng-show="smartGroupColumns.length">
   <label>{{:: getField('description', 'Group').label }}</label>
@@ -22,13 +22,11 @@
       </div>
     </div>
     <div class="form-inline">
-      <label>{{:: getField('visibility', 'Group').label }}</label>
-      <crm-search-input-val field=":: getField('visibility', 'Group')" ng-model="$ctrl.savedSearch.groups[0].visibility"></crm-search-input-val>
+      <crm-search-input field=":: getField('visibility', 'Group')" show-label="true" ng-model="$ctrl.savedSearch.groups[0].visibility"></crm-search-input>
     </div>
     <hr>
     <div class="form-inline" ng-repeat="field in getEntity('Group').fields | filter:{name: '.', entity: 'Group'}">
-      <label>{{:: field.label }}</label>
-      <crm-search-input-val field="field" ng-model="$ctrl.savedSearch.groups[0][field.name]"></crm-search-input-val>
+      <crm-search-input field="field" ng-model="$ctrl.savedSearch.groups[0][field.name]" show-label="true"></crm-search-input>
     </div>
   </div>
   <div ng-if="!getEntity('Group').optionsLoaded">

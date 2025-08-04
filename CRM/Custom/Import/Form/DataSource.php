@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\CustomGroup;
+use Civi\Import\CustomValueParser;
 
 /**
  * This class gets the name of the file to upload
@@ -110,15 +111,14 @@ class CRM_Custom_Import_Form_DataSource extends CRM_CiviImport_Form_DataSource {
   public function buildQuickForm(): void {
     parent::buildQuickForm();
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $this->getCustomGroups(), TRUE);
-    $this->addContactTypeSelector();
   }
 
   /**
-   * @return CRM_Custom_Import_Parser_Api
+   * @return \Civi\Import\CustomValueParser
    */
-  protected function getParser(): CRM_Custom_Import_Parser_Api {
+  protected function getParser(): CustomValueParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Custom_Import_Parser_Api();
+      $this->parser = new CustomValueParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

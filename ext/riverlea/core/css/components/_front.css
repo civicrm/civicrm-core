@@ -128,11 +128,11 @@ af-form > fieldset > legend {
   min-width: unset;
 }
 .crm-container.crm-public input[type="radio"] {
-  margin: var(--crm-s2) var(--crm-s3) 0 0;
+  margin: 0;
   min-width: auto;
 }
 .crm-container.crm-public input[type="checkbox"] {
-  margin: var(--crm-s2) var(--crm-s3) 0 0;
+  margin: 0;
   min-width: auto;
 }
 .crm-container.crm-public .crm-checkbox-list input[type="checkbox"] {

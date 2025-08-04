@@ -193,6 +193,41 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     ], 'thousand');
   }
 
+  public function testCreateOrderWithInclusiveLineItem(): void {
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
+    $this->assertEquals(500, $order['total_amount']);
+    $this->assertEquals(0, $order['tax_amount']);
+    $this->addTaxAccountToFinancialType($order['financial_type_id']);
+    $contribution = Contribution::create()
+      ->setValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+        'total_amount' => 500,
+      ])->execute()->single();
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
+    $this->assertEquals(500, $order['total_amount']);
+    $this->assertEquals(45.45, round($order['tax_amount'], 2));
+    // There is some long-standing messiness with rounding, that is believed to require
+    // a schema change. However, it seems reasonable to expect that this
+    // should calculate the same as just passing in total_amount to the contribution
+    // at this stage - not the post test listener checks the line item totals against this.
+    $this->assertEquals($contribution['total_amount'], $order['total_amount']);
+    $this->assertEquals(round($contribution['tax_amount'], 6), round($order['tax_amount'], 6));
+  }
+
   /**
    *
    */

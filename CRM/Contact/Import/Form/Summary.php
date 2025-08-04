@@ -75,17 +75,17 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
       $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
       $this->assign('duplicateRowCount', $this->getRowCount(CRM_Import_Parser::DUPLICATE));
       $this->assign('unMatchCount', $this->getRowCount(CRM_Import_Parser::NO_MATCH));
-      $this->assign('validSoftCreditRowCount', $this->getRowCount(CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT));
-      $this->assign('invalidSoftCreditRowCount', $this->getRowCount(CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT_ERROR));
-      $this->assign('validPledgePaymentRowCount', $this->getRowCount(CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT));
-      $this->assign('invalidPledgePaymentRowCount', $this->getRowCount(CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR));
+      $this->assign('validSoftCreditRowCount', $this->getRowCount(CRM_Import_Parser::SOFT_CREDIT));
+      $this->assign('invalidSoftCreditRowCount', $this->getRowCount(CRM_Import_Parser::SOFT_CREDIT_ERROR));
+      $this->assign('validPledgePaymentRowCount', $this->getRowCount(CRM_Import_Parser::PLEDGE_PAYMENT));
+      $this->assign('invalidPledgePaymentRowCount', $this->getRowCount(CRM_Import_Parser::PLEDGE_PAYMENT_ERROR));
       $this->assign('unparsedAddressCount', $this->getRowCount(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
       $this->assign('downloadDuplicateRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::DUPLICATE));
       $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
       $this->assign('downloadMismatchRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::NO_MATCH));
       $this->assign('downloadAddressRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
-      $this->assign('downloadPledgePaymentErrorRecordsUrl', $this->getDownloadURL(CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR));
-      $this->assign('downloadSoftCreditErrorRecordsUrl', $this->getDownloadURL(CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT_ERROR));
+      $this->assign('downloadPledgePaymentErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::PLEDGE_PAYMENT_ERROR));
+      $this->assign('downloadSoftCreditErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::SOFT_CREDIT_ERROR));
       $this->assign('trackingSummary', $this->getTrackingSummary());
 
       $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);

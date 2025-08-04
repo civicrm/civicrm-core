@@ -392,7 +392,8 @@ class Container {
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
     // For each DAO that supports tokens by declaring the token class...
-    $entities = \CRM_Core_DAO_AllCoreTables::tokenClasses();
+    $entities = \CRM_Core_DAO_AllCoreTables::getClassesByProperty('token_class');
+
     foreach ($entities as $entity => $class) {
       $container->setDefinition('crm_entity_token_' . strtolower($entity), new Definition(
         $class,

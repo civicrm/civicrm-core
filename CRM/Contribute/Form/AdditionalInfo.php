@@ -303,16 +303,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    */
   public static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
     $form->assign('receiptType', 'contribution');
-    // Retrieve Financial Type Name from financial_type_id
-    $params['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-      $params['financial_type_id']);
-    if (!empty($params['payment_instrument_id'])) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      $params['paidBy'] = $paymentInstrument[$params['payment_instrument_id']];
-      if ($params['paidBy'] !== 'Check' && isset($params['check_number'])) {
-        unset($params['check_number']);
-      }
-    }
 
     // retrieve individual prefix value for honoree
     if (isset($params['soft_credit'])) {
@@ -412,12 +402,6 @@ class CRM_Contribute_Form_AdditionalInfo {
     list($contributorDisplayName,
       $contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
-    $form->assign('contactID', $params['contact_id']);
-    $form->assign('contributionID', $params['contribution_id']);
-
-    if (!empty($params['currency'])) {
-      $form->assign('currency', $params['currency']);
-    }
 
     if (!empty($params['receive_date'])) {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
@@ -426,12 +410,6 @@ class CRM_Contribute_Form_AdditionalInfo {
     [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'contribution_offline_receipt',
-        // @todo - IDs are being passed in multiple ways - the non-deprecated
-        // one is `modelProps`
-        // The others are probably redundant after merging https://github.com/civicrm/civicrm-core/pull/32036
-        'contactId' => $params['contact_id'],
-        'contributionId' => $params['contribution_id'],
-        'tokenContext' => ['contributionId' => (int) $params['contribution_id'], 'contactId' => $params['contact_id']],
         'from' => $params['from_email_address'],
         'toName' => $contributorDisplayName,
         'toEmail' => $contributorEmail,

@@ -84,7 +84,6 @@ return [
             [
               'type' => 'field',
               'key' => 'subject',
-              'dataType' => 'String',
               'label' => ts('Subject'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -92,7 +91,6 @@ return [
             [
               'type' => 'field',
               'key' => 'note',
-              'dataType' => 'Text',
               'label' => ts('Note'),
               'sortable' => TRUE,
               'show_linebreaks' => TRUE,
@@ -100,28 +98,24 @@ return [
             [
               'type' => 'field',
               'key' => 'note_date',
-              'dataType' => 'Timestamp',
               'label' => ts('Note Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'modified_date',
-              'dataType' => 'Timestamp',
               'label' => ts('Modified'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contact_id.sort_name',
-              'dataType' => 'String',
               'label' => ts('Created By'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Note_EntityFile_File_01_file_name',
-              'dataType' => 'String',
               'label' => ts('Attachments'),
               'sortable' => TRUE,
               'link' => [

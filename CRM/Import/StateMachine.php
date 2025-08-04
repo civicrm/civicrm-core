@@ -53,7 +53,11 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
       $this->classPrefix = $classPrefix;
     }
     elseif ($this->entity) {
-      $entityPath = explode('_', CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->entity));
+      $entityName = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->entity);
+      if (!$entityName) {
+        throw new CRM_Core_Exception(ts('Invalid import entity %1', [htmlentities($this->entity), 'String']));
+      }
+      $entityPath = explode('_', $entityName);
       $this->classPrefix = $entityPath[0] . '_' . $entityPath[1] . '_Import';
     }
     else {
@@ -61,12 +65,23 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
       $this->classPrefix = str_replace('_Controller', '', get_class($controller));
     }
     $this->_pages = [
-      $this->classPrefix . '_Form_DataSource' => NULL,
-      $this->classPrefix . '_Form_MapField' => NULL,
-      $this->classPrefix . '_Form_Preview' => NULL,
+      $this->getDataSourceFormName() => NULL,
+      $this->getMapFieldFormName() => NULL,
+      $this->getPreviewFormName() => NULL,
     ];
-
     $this->addSequentialPages($this->_pages);
+  }
+
+  private function getDataSourceFormName(): string {
+    return class_exists($this->classPrefix . '_Form_DataSource') ? $this->classPrefix . '_Form_DataSource' : 'CRM_CiviImport_Form_Generic_DataSource';
+  }
+
+  private function getMapFieldFormName(): string {
+    return class_exists($this->classPrefix . '_Form_MapField') ? $this->classPrefix . '_Form_MapField' : 'CRM_CiviImport_Form_Generic_MapField';
+  }
+
+  private function getPreviewFormName(): string {
+    return class_exists($this->classPrefix . '_Form_Preview') ? $this->classPrefix . '_Form_Preview' : 'CRM_CiviImport_Form_Generic_Preview';
   }
 
 }
