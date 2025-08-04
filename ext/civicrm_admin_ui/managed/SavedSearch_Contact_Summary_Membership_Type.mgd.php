@@ -71,30 +71,35 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
+              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'period_type:label',
+              'dataType' => 'String',
               'label' => E::ts('Period'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'fixed_period_start_day',
+              'dataType' => 'Integer',
               'label' => E::ts('Fixed Start'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'minimum_fee',
+              'dataType' => 'Money',
               'label' => E::ts('Minimum Fee'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'duration_interval',
+              'dataType' => 'Integer',
               'label' => E::ts('Duration'),
               'sortable' => TRUE,
               'rewrite' => '[duration_interval] [duration_unit:label]',
@@ -102,6 +107,7 @@ return [
             [
               'type' => 'field',
               'key' => 'visibility:label',
+              'dataType' => 'String',
               'label' => E::ts('Visibility'),
               'sortable' => TRUE,
             ],

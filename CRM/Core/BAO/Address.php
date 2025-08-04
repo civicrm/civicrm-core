@@ -1032,13 +1032,13 @@ SELECT is_primary,
    */
   public static function mergeSameAddress(&$rows) {
     $uniqueAddress = [];
-    foreach ($rows as $rowID => $row) {
+    foreach (array_keys($rows) as $rowID) {
       // load complete address as array key
       $address = trim((string) $rows[$rowID]['street_address'])
         . trim((string) $rows[$rowID]['city'])
-        . trim((string) ($row['state_province_id:label'] ?? ''))
+        . trim((string) $rows[$rowID]['state_province'])
         . trim((string) $rows[$rowID]['postal_code'])
-        . trim((string) $row['country_id:label'] ?? '');
+        . trim((string) $rows[$rowID]['country']);
       if (isset($rows[$rowID]['last_name'])) {
         $name = $rows[$rowID]['last_name'];
       }

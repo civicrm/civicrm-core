@@ -19,18 +19,6 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
   public function testMetadata(): void {
     $name = uniqid();
-
-    // Sample contact subtypes
-    $this->SaveTestRecords('ContactType', [
-      'records' => [
-        ['name' => $name . '_1', 'label' => $name . '_1'],
-        ['name' => $name . '_2', 'label' => $name . '_2'],
-      ],
-      'defaults' => [
-        'parent_id:name' => 'Individual',
-      ],
-    ]);
-
     $savedSearch = $this->createTestRecord('SavedSearch', [
       'name' => $name,
       'label' => 'the_unit_test_search',
@@ -65,7 +53,6 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
             'type' => 'field',
             'key' => 'first_name',
             'label' => 'Your Name',
-            'required' => TRUE,
           ],
           [
             'type' => 'field',
@@ -126,14 +113,10 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($getFields));
 
     $this->assertEquals('Your Name', $getFields['first_name']['label']);
-    $this->assertFalse($getFields['first_name']['nullable']);
     $this->assertEquals('Import field: Your Name', $getFields['first_name']['title']);
     $this->assertEquals('Integer', $getFields['gender_id']['data_type']);
     $this->assertContains('Male', $getFields['gender_id']['options']);
     $this->assertContains('Parent', $getFields['contact_sub_type']['options']);
-    $this->assertFalse($getFields['contact_sub_type']['required']);
-    $this->assertTrue($getFields['contact_sub_type']['nullable']);
-    $this->assertEquals(1, $getFields['contact_sub_type']['serialize']);
     $this->assertEquals('Date', $getFields['birth_date']['data_type']);
     $this->assertEquals('Boolean', $getFields['is_deceased']['data_type']);
     $this->assertEquals('Integer', $getFields['_id']['data_type']);
@@ -143,12 +126,6 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $created = civicrm_api4($apiName, 'create')->single();
     $this->assertEquals(2, $created['_id']);
 
-    $created = civicrm_api4($apiName, 'get', ['where' => [['_id', '=', 2]]])->single();
-    $this->assertNull($created['first_name']);
-    $this->assertNull($created['gender_id']);
-    $this->assertNull($created['contact_sub_type']);
-    $this->assertNull($created['birth_date']);
-
     // And another
     civicrm_api4($apiName, 'create', [
       'values' => [
@@ -156,7 +133,6 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
         'gender_id' => 1,
         'birth_date' => '2019-01-01',
         'is_deceased' => FALSE,
-        'contact_sub_type' => [$name . '_1', $name . '_2'],
       ],
     ]);
 
@@ -164,7 +140,6 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals([1, 2, 3], $rows->column('_id'));
     $this->assertEquals(['NEW', 'NEW', 'NEW'], $rows->column('_status'));
     $this->assertNULL($rows[0]['_entity_id']);
-    $this->assertEquals([$name . '_1', $name . '_2'], $rows[2]['contact_sub_type']);
 
     $run = civicrm_api4('SearchDisplay', 'runBatch', [
       'savedSearch' => $name,
@@ -274,7 +249,6 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
             'type' => 'field',
             'key' => 'financial_type_id:label',
             'label' => 'Financial Type',
-            'default' => '1',
           ],
           [
             'type' => 'field',
@@ -314,25 +288,12 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ->execute()->single();
     $apiName = 'Import_' . $userJob['id'];
 
-    $fields = civicrm_api4($apiName, 'getFields', ['loadOptions' => TRUE])->indexBy('label');
-    $fieldKeys = $fields->column('name');
-
-    // Add another
-    civicrm_api4($apiName, 'create', []);
-
-    // Add another
-    civicrm_api4($apiName, 'save', ['records' => [[]]]);
-
-    // Ensure defaults have been filled
     $rows = civicrm_api4($apiName, 'get');
-    $this->assertEquals([1, 2, 3, 4, 5], $rows->column('_id'));
-    foreach ($rows as $row) {
-      $this->assertEquals('1', $row[$fieldKeys['Financial Type']]);
-      $this->assertNull($row[$fieldKeys['Total Amount']]);
-      $this->assertNull($row[$fieldKeys['Contact First Name']]);
-      $this->assertNull($row[$fieldKeys['Soft Credit Contact ID']]);
-      $this->assertNull($row[$fieldKeys['Soft Credit Amount']]);
-    }
+    $this->assertEquals([1, 2, 3], $rows->column('_id'));
+
+    $fields = civicrm_api4($apiName, 'getFields', ['loadOptions' => TRUE])->indexBy('label');
+
+    $fieldKeys = $fields->column('name');
 
     $this->assertContains('Female', $fields['Contact Gender']['options']);
 
@@ -341,7 +302,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $lastName = uniqid(__FUNCTION__);
 
     // Add rows of data to import
-    $newRows = civicrm_api4($apiName, 'replace', [
+    civicrm_api4($apiName, 'replace', [
       'where' => [['_id', '>', 0]],
       'records' => [
         [
@@ -360,35 +321,25 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
           $fieldKeys['Contact Last Name'] => $lastName,
           $fieldKeys['Contact Gender'] => 2,
         ],
-        [
-          $fieldKeys['Total Amount'] => 300,
-          $fieldKeys['Financial Type'] => 1,
-          $fieldKeys['Contact First Name'] => 'Jin',
-          $fieldKeys['Contact Last Name'] => $lastName,
-          $fieldKeys['Soft Credit Contact ID'] => $softCreditContactId,
-        ],
       ],
     ]);
-    $this->assertCount(3, $newRows);
 
     $import = civicrm_api4($apiName, 'import');
-    $this->assertCount(3, $import);
+    $this->assertCount(2, $import);
     $this->assertEquals('IMPORTED', $import[0]['_status']);
     $this->assertEquals('IMPORTED', $import[1]['_status']);
-    $this->assertEquals('IMPORTED', $import[2]['_status']);
 
     $contributions = civicrm_api4('Contribution', 'get', [
       'select' => ['id', 'financial_type_id', 'total_amount', 'contact_id.first_name', 'contact_id.gender_id'],
       'where' => [['contact_id.last_name', '=', $lastName]],
       'orderBy' => ['id' => 'ASC'],
     ]);
-    $this->assertCount(3, $contributions);
+    $this->assertCount(2, $contributions);
 
     $this->assertEquals($import[0]['_entity_id'], $contributions[0]['id']);
     $this->assertEquals($import[1]['_entity_id'], $contributions[1]['id']);
     $this->assertEquals(100, $contributions[0]['total_amount']);
     $this->assertEquals(200, $contributions[1]['total_amount']);
-    $this->assertEquals(300, $contributions[2]['total_amount']);
     $this->assertEquals(1, $contributions[0]['financial_type_id']);
     $this->assertEquals(2, $contributions[1]['financial_type_id']);
     $this->assertEquals('Jane', $contributions[0]['contact_id.first_name']);
@@ -404,13 +355,6 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals(10, $contributionSoft['amount']);
     // This value was set in the ON clause & should have carried through
     $this->assertEquals('in_honor_of', $contributionSoft['soft_credit_type_id:name']);
-
-    $contributionSoft = civicrm_api4('ContributionSoft', 'get', [
-      'select' => ['contact_id', 'amount', 'soft_credit_type_id:name'],
-      'where' => [['contribution_id', '=', $contributions[2]['id']]],
-    ])->single();
-    // Not specified in 2nd contribution but implied by the total_amount
-    $this->assertEquals(300, $contributionSoft['amount']);
   }
 
 }

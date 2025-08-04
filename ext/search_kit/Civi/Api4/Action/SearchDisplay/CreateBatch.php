@@ -44,13 +44,6 @@ class CreateBatch extends AbstractAction {
   protected $rowCount = 1;
 
   /**
-   * Set targets for tally totals
-   *
-   * @var array
-   */
-  protected $targets = [];
-
-  /**
    * @inheritDoc
    */
   public function _run(Result $result) {
@@ -89,7 +82,6 @@ class CreateBatch extends AbstractAction {
       $fieldSpec['label'] = $column['label'];
       $userJob['metadata']['DataSource']['column_headers'][] = $column['label'];
       $userJob['metadata']['DataSource']['column_specs'][$fieldSpec['name']] = $fieldSpec;
-      $userJob['metadata']['DataSource']['targets'] = $this->targets;
     }
 
     $columnSql = implode(",\n", \CRM_Import_DataSource::getStandardTrackingFields());
@@ -103,18 +95,16 @@ class CreateBatch extends AbstractAction {
     $alterSql = "ALTER TABLE `$tableName` ADD INDEX(" . implode('), ADD INDEX(', \CRM_Import_DataSource::getStandardIndices()) . ')';
     \CRM_Core_DAO::executeQuery($alterSql, [], TRUE, NULL, FALSE, FALSE);
 
-    $userJob = UserJob::create(FALSE)
+    $result[] = UserJob::create(FALSE)
       ->setValues($userJob)
       ->execute()->single();
 
-    // Add rows per $this->rowCount (default values will be filled in by the API)
+    // Add empty rows per $this->rowCount
     if ($this->rowCount > 0) {
-      $apiName = 'Import_' . $userJob['id'];
-      $values = array_fill(0, $this->rowCount, []);
-      civicrm_api4($apiName, 'save', ['records' => $values]);
+      $values = rtrim(str_repeat("(),", $this->rowCount), ",");
+      $sql = "INSERT INTO `$tableName` () VALUES $values";
+      \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
     }
-
-    $result[] = $userJob;
   }
 
   private function getSqlType(array $fieldSpec) {

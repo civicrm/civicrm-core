@@ -84,13 +84,10 @@
   background: var(--crm-dialog-body-bg);
   color: var(--crm-c-text);
   height: auto !important;
-  margin: var(--crm-dialog-padding) 0;
+  margin: var(--crm-dialog-padding) 0 calc(var(--crm-btn-height) + var(--crm-m) + var(--crm-m));
   position: static;
   z-index: 1;
   padding: var(--crm-dialog-body-padding);
-}
-.crm-container.ui-dialog .ui-dialog-content:has(.ui-dialog-buttonpane) {
-  margin-bottom: calc(var(--crm-btn-height) + var(--crm-m) + var(--crm-m));
 }
 .crm-container.ui-dialog .ui-dialog-content .crm-container {
   background: var(--crm-dialog-bg);
@@ -157,8 +154,7 @@
   position: fixed;
   top: 64px;
   right: var(--crm-r2);
-  /* one less than #civicrm-menu */
-  z-index: 99998;
+  z-index: 999999;
 }
 #crm-notification-container div.ui-notify-message-style {
   background: var(--crm-notify-background);
@@ -225,7 +221,6 @@
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:focus {
   background: var(--crm-notify-danger);
-  color: var(--crm-c-danger-text);
   border: 0;
 }
 

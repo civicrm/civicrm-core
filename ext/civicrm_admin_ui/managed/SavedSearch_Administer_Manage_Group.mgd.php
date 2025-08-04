@@ -101,6 +101,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'rewrite' => '',
@@ -110,6 +111,7 @@ return [
             [
               'type' => 'field',
               'key' => 'frontend_title',
+              'dataType' => 'String',
               'label' => E::ts('Public Title'),
               'sortable' => TRUE,
               'rewrite' => '',
@@ -118,6 +120,7 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
+              'dataType' => 'Text',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -125,6 +128,7 @@ return [
             [
               'type' => 'field',
               'key' => 'created_id.display_name',
+              'dataType' => 'String',
               'label' => E::ts('Created By'),
               'sortable' => TRUE,
               'link' => [
@@ -139,6 +143,7 @@ return [
             [
               'type' => 'field',
               'key' => 'group_type:label',
+              'dataType' => 'String',
               'label' => E::ts('Group Type'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -146,6 +151,7 @@ return [
             [
               'type' => 'field',
               'key' => 'visibility:label',
+              'dataType' => 'String',
               'label' => E::ts('Visibility'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -153,6 +159,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -160,6 +167,7 @@ return [
             [
               'type' => 'field',
               'key' => 'COUNT_Group_GroupContact_Contact_01_display_name',
+              'dataType' => 'Integer',
               'label' => E::ts('Count'),
               'sortable' => TRUE,
               'rewrite' => '{if "[saved_search_id]"}{else}[COUNT_Group_GroupContact_Contact_01_display_name]{/if}',

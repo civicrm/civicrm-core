@@ -4,7 +4,7 @@
   // common renderer for line/bar/area charts, which will stack by default
   // (compare with composite chart, where each column can be line/bar/area )
   angular.module('crmChartKit').factory('chartKitStack', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitStackAdmin.html',
+    adminTemplate: '~/crmChartKit/chartTypes/chartKitStackAdmin.html',
 
     getInitialDisplaySettings: () => ({}),
 

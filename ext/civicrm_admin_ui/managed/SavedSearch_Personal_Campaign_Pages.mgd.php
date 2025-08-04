@@ -99,6 +99,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Page Title'),
               'sortable' => TRUE,
               'link' => [
@@ -112,6 +113,7 @@ return [
             [
               'type' => 'field',
               'key' => 'PCP_Contact_contact_id_01.sort_name',
+              'dataType' => 'String',
               'label' => E::ts('Supporter'),
               'sortable' => TRUE,
               'link' => [
@@ -126,6 +128,7 @@ return [
             [
               'type' => 'field',
               'key' => 'IFNULL_PCP_ContributionPage_page_id_01_title_PCP_Event_page_id_01_title',
+              'dataType' => 'String',
               'label' => E::ts('Contribution Page/Event'),
               'sortable' => TRUE,
               'rewrite' => '',
@@ -133,12 +136,14 @@ return [
             [
               'type' => 'field',
               'key' => 'PCP_ContributionPage_page_id_01.start_date',
+              'dataType' => 'Timestamp',
               'label' => E::ts('Start Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'PCP_ContributionPage_page_id_01.end_date',
+              'dataType' => 'Timestamp',
               'label' => E::ts('End Date'),
               'sortable' => TRUE,
               'empty_value' => '(ongoing)',
@@ -146,6 +151,7 @@ return [
             [
               'type' => 'field',
               'key' => 'status_id:label',
+              'dataType' => 'Integer',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],

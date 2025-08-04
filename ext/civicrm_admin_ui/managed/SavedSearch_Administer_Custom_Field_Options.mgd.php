@@ -65,6 +65,7 @@ return [
             [
               'type' => 'field',
               'key' => 'label',
+              'dataType' => 'String',
               'label' => E::ts('Option Label'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -72,12 +73,14 @@ return [
             [
               'type' => 'field',
               'key' => 'value',
+              'dataType' => 'String',
               'label' => E::ts('Option Value'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
+              'dataType' => 'Text',
               'label' => E::ts('Option Description'),
               'sortable' => TRUE,
               'show_linebreaks' => FALSE,

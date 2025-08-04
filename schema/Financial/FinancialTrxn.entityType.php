@@ -120,7 +120,9 @@ return [
       'add' => '1.3',
       'default' => NULL,
       'usage' => [
+        'import',
         'export',
+        'duplicate_matching',
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
@@ -140,7 +142,9 @@ return [
       'add' => '4.7',
       'default' => FALSE,
       'usage' => [
+        'import',
         'export',
+        'duplicate_matching',
       ],
     ],
     'trxn_id' => [
@@ -167,7 +171,9 @@ return [
       'description' => ts('pseudo FK to civicrm_option_value of contribution_status_id option_group'),
       'add' => '4.3',
       'usage' => [
+        'import',
         'export',
+        'duplicate_matching',
       ],
       'pseudoconstant' => [
         'option_group_name' => 'contribution_status',
@@ -235,9 +241,6 @@ return [
       'unique_name' => 'financial_trxn_pan_truncation',
       'input_attrs' => [
         'size' => '4',
-      ],
-      'usage' => [
-        'import',
       ],
     ],
     'order_reference' => [

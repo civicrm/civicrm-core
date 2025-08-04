@@ -201,7 +201,7 @@
         <td>
           <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
 
-            {if {contribution.address_id.display|boolean}}
+            {if !empty($billingName)}
               <tr>
                 <th {$headerStyle}>
                   {ts}Billing Address{/ts}
@@ -209,8 +209,8 @@
               </tr>
               <tr>
                 <td {$labelStyle}>
-                  {contribution.address_id.name}<br/>
-                  {contribution.address_id.display}
+                  {$billingName}<br/>
+                  {$address}
                 </td>
               </tr>
             {/if}

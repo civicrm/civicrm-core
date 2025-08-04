@@ -63,18 +63,21 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
+              'dataType' => 'String',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'page_id.frontend_title',
+              'dataType' => 'String',
               'label' => E::ts('Campaign'),
               'sortable' => TRUE,
             ],

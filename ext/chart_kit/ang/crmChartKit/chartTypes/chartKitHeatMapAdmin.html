@@ -1,0 +1,22 @@
+<div class="crm-chart-kit-pie-admin">
+
+  <div ng-include="'~/crmChartKit/chartKitAdminColumns.html'"></div>
+
+  <div class="crm-chart-kit-admin-presentation">
+
+    <div ng-include="'~/crmChartKit/chartKitAdminCanvas.html'"></div>
+
+    <fieldset>
+      <legend>{{:: ts('Heat map options') }}</legend>
+      <div class="form-inline">
+        <label>{{:: ts('Color Min') }}</label>
+        <input type="color" class="form-control" ng-model="$ctrl.display.settings.colorScaleMin">
+      </div>
+      <div class="form-inline">
+        <label>{{:: ts('Color Max') }}</label>
+        <input type="color" class="form-control" ng-model="$ctrl.display.settings.colorScaleMax">
+      </div>
+
+    </fieldset>
+
+</div>

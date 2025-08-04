@@ -86,6 +86,7 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
+              'dataType' => 'String',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
               'editable' => FALSE,
@@ -93,6 +94,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Profile Title'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -100,6 +102,7 @@ return [
             [
               'type' => 'field',
               'key' => 'frontend_title',
+              'dataType' => 'String',
               'label' => E::ts('Public Title'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -107,12 +110,14 @@ return [
             [
               'type' => 'field',
               'key' => 'created_id.display_name',
+              'dataType' => 'String',
               'label' => E::ts('Created By'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
+              'dataType' => 'Text',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -120,12 +125,14 @@ return [
             [
               'type' => 'field',
               'key' => 'group_type',
+              'dataType' => 'String',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -133,6 +140,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_reserved',
+              'dataType' => 'Boolean',
               'label' => E::ts('Reserved'),
               'sortable' => TRUE,
               'rewrite' => '[none]',

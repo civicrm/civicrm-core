@@ -645,6 +645,7 @@
         });
         paletteFieldCollection.sync = function(method, model, options) {
           if (!options) options = {};
+          // console.log(method, model, options);
           switch (method) {
             case 'read':
               var success = options.success;

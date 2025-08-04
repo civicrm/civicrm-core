@@ -1011,12 +1011,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected function processContact(array $params, bool $isMainContact): ?int {
     $contactID = $this->lookupContactID($params, $isMainContact);
     if ($contactID && !empty($params['contact_sub_type'])) {
-      try {
-        $contactSubType = $this->getExistingContactValue($contactID, 'contact_sub_type');
-      }
-      catch (CRM_Core_Exception $e) {
-        $contactSubType = [];
-      }
+      $contactSubType = $this->getExistingContactValue($contactID, 'contact_sub_type');
       if (!empty($contactSubType) && $contactSubType[0] !== $params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isAllowEdit($contactID, $contactSubType[0])) {
         throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
       }

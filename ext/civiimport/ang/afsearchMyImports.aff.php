@@ -5,7 +5,6 @@ return [
   'type' => 'search',
   'title' => E::ts('My Imports'),
   'server_route' => 'civicrm/imports/my-listing',
-  'icon' => 'fa-file-import',
   'permission' => ['access CiviCRM'],
   'navigation' => [
     'parent' => 'Reports',

@@ -691,11 +691,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   /**
    * @param array $params
-   * @param string $identifier
+   * @param string $identifer
    *
    * @return int
    */
-  public function membershipTypeCreate(array $params = [], string $identifier = 'test'): int {
+  public function membershipTypeCreate(array $params = [], string $identifer = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
     Civi::rebuild(['tables' => TRUE])->execute();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
@@ -712,7 +712,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'visibility' => 'Public',
     ], $params);
 
-    $result = $this->createTestEntity('MembershipType', $params, $identifier);
+    $result = $this->createTestEntity('MembershipType', $params, $identifer);
 
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Utils_Cache::singleton()->flush();
@@ -3126,7 +3126,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
       case 'CRM_Contribute_Import_Form_DataSource':
       case 'CRM_Contribute_Import_Form_MapField':
-      case 'CRM_CiviImport_Form_Generic_Preview':
+      case 'CRM_Contribute_Import_Form_Preview':
         if ($this->formController) {
           // Add to the existing form controller.
           $form->controller = $this->formController;
@@ -3181,7 +3181,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
       case 'CRM_Custom_Import_Form_DataSource':
       case 'CRM_Custom_Import_Form_MapField':
-      case 'CRM_CiviImport_Form_Generic_Preview':
+      case 'CRM_Custom_Import_Form_Preview':
         $form->controller = new CRM_Import_Controller('import custom data', ['class_prefix' => 'CRM_Custom_Import']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.

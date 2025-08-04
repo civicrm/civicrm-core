@@ -576,17 +576,6 @@ if (!CRM.vars) CRM.vars = {};
     }
     function getQuickAddLinks(paths) {
       const links = [];
-      if (paths && typeof paths === 'boolean') {
-        // Get all paths matching entity type
-        paths = CRM.config.quickAdd
-          .filter(link => {
-            if (entityName === 'Contact') {
-              return ['Individual', 'Organization', 'Household'].includes(link.entity);
-            }
-            return link.entity === entityName;
-          })
-          .map(link => link.path);
-      }
       if (paths && paths.length) {
         const apiParams = getApiParams();
         paths.forEach((path) => {
@@ -619,31 +608,23 @@ if (!CRM.vars) CRM.vars = {};
         ajax: {
           quietMillis: 250,
           url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
-          data: function (input, page, context) {
+          data: function (input, pageNum) {
             return {params: JSON.stringify(_.assign({
               input: input,
-              searchField: context && context.searchField || null,
-              exclude: context && context.previousIds || null,
+              page: pageNum || 1
             }, getApiParams()))};
           },
           results: function(response, page, query) {
             const data = {
               results: response.values,
               more: response.countMatched > response.countFetched,
-              context: query.context || {},
             };
-            // Set context for use in the data function above
-            // `searchFields` will be an array like [id, sort_name, email_primary.email]
-            // and `searchField` will be the current field searched
-            data.context.searchField = response.searchField;
-            data.context.searchFields = response.searchFields;
-            data.context.previousIds = data.context.previousIds || [];
-            data.context.previousIds.push(...data.results.map(item => item.id));
-            // If no more results for this searchField, advance to the next
-            const fieldIndex = data.context.searchFields.indexOf(data.context.searchField);
-            if (!data.more && query.term.length && response.searchField && fieldIndex < (data.context.searchFields.length - 1)) {
-              data.context.searchField = data.context.searchFields[fieldIndex + 1];
-              data.more = true;
+            if (!data.results.length && data.more) {
+              data.results.push({
+                id: '',
+                label: ts('ID %1 not found.', {1: query.term}),
+                disabled: true,
+              });
             }
             return data;
           },

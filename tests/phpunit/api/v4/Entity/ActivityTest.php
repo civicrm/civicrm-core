@@ -29,14 +29,11 @@ use Civi\Test\TransactionalInterface;
 class ActivityTest extends Api4TestBase implements TransactionalInterface {
 
   public function testActivityContactVirtualFields(): void {
-    $c = $this->saveTestRecords('Contact', ['records' => 4])->column('id');
-    $uid = $this->createLoggedInUser();
+    $c = $this->saveTestRecords('Contact', ['records' => 5])->column('id');
 
     $sourceContactId = $c[2];
     $targetContactIds = [$c[0], $c[1]];
-    // Ensure the 'user_contact_id' placeholder works for both read & write
-    $assigneeContactIds = [$c[3], 'user_contact_id'];
-    $expectedAssigneeContactIds = [$c[3], $uid];
+    $assigneeContactIds = [$c[3], $c[4]];
 
     // Test that we can write to and read from the virtual fields.
     $activityID = $this->createTestRecord('Activity', [
@@ -47,7 +44,7 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
 
     $activity = Activity::get(FALSE)
       ->addSelect('source_contact_id', 'target_contact_id', 'assignee_contact_id')
-      ->addWhere('target_contact_id', 'CONTAINS', $targetContactIds)
+      ->addWhere('id', '=', $activityID)
       ->execute()->first();
     $this->assertEquals($sourceContactId, $activity['source_contact_id']);
     $this->assertEquals($targetContactIds, $activity['target_contact_id']);
@@ -63,11 +60,11 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     // Affirm that assignee_contact_id was set and other fields remain unchanged
     $activity = Activity::get(FALSE)
       ->addSelect('source_contact_id', 'target_contact_id', 'assignee_contact_id')
-      ->addWhere('assignee_contact_id', 'CONTAINS', $assigneeContactIds)
+      ->addWhere('id', '=', $activityID)
       ->execute()->single();
     $this->assertEquals($sourceContactId, $activity['source_contact_id']);
     $this->assertEquals($targetContactIds, $activity['target_contact_id']);
-    $this->assertEquals($expectedAssigneeContactIds, $activity['assignee_contact_id']);
+    $this->assertEquals($assigneeContactIds, $activity['assignee_contact_id']);
 
     // Sanity check for https://lab.civicrm.org/dev/core/-/issues/1428
     // Updating nothing should change nothing.
@@ -88,7 +85,7 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('1234', $contactGet['activity.subject']);
     $this->assertEquals($sourceContactId, $contactGet['activity.source_contact_id']);
     $this->assertEquals($targetContactIds, $contactGet['activity.target_contact_id']);
-    $this->assertEquals($expectedAssigneeContactIds, $contactGet['activity.assignee_contact_id']);
+    $this->assertEquals($assigneeContactIds, $contactGet['activity.assignee_contact_id']);
   }
 
   public function testAllowedActivityTypes(): void {

@@ -74,6 +74,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -81,6 +82,7 @@ return [
             [
               'type' => 'field',
               'key' => 'mapping_id:label',
+              'dataType' => 'String',
               'label' => E::ts('Used For'),
               'sortable' => TRUE,
               'rewrite' => '[mapping_id:label] - [entity_value:label]',
@@ -88,6 +90,7 @@ return [
             [
               'type' => 'field',
               'key' => 'absolute_date',
+              'dataType' => 'Date',
               'label' => E::ts('When'),
               'sortable' => TRUE,
               'empty_value' => '[start_action_offset] [start_action_unit:label] [start_action_condition] [start_action_date:label]',
@@ -95,18 +98,21 @@ return [
             [
               'type' => 'field',
               'key' => 'entity_status:label',
+              'dataType' => 'String',
               'label' => E::ts('While'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_repeat',
+              'dataType' => 'Boolean',
               'label' => E::ts('Repeat'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -184,11 +190,6 @@ return [
               'icon' => 'fa-plus',
             ],
           ],
-          'actions_display_mode' => 'menu',
-          'cssRules' => [
-            ['disabled', 'is_active', '=', FALSE],
-          ],
-          'headerCount' => TRUE,
         ],
         'acl_bypass' => FALSE,
       ],

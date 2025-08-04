@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Import\ContributionParser;
-
 /**
  *
  * @package CRM
@@ -36,14 +34,20 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_CiviImport_Form_DataSour
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+
+    $this->addRadio('onDuplicate', ts('Import mode'), [
+      CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new contributions'),
+      CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing contributions'),
+    ]);
+    $this->addContactTypeSelector();
   }
 
   /**
-   * @return \Civi\Import\ContributionParser
+   * @return \CRM_Contribute_Import_Parser_Contribution
    */
-  protected function getParser(): ContributionParser {
+  protected function getParser(): CRM_Contribute_Import_Parser_Contribution {
     if (!$this->parser) {
-      $this->parser = new ContributionParser();
+      $this->parser = new CRM_Contribute_Import_Parser_Contribution();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

@@ -75,6 +75,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -82,6 +83,7 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
+              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -89,6 +91,7 @@ return [
             [
               'type' => 'field',
               'key' => 'start_date',
+              'dataType' => 'Date',
               'label' => E::ts('Start Date'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -96,6 +99,7 @@ return [
             [
               'type' => 'field',
               'key' => 'end_date',
+              'dataType' => 'Date',
               'label' => E::ts('End Date'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -103,6 +107,7 @@ return [
             [
               'type' => 'field',
               'key' => 'campaign_type_id:label',
+              'dataType' => 'String',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -110,6 +115,7 @@ return [
             [
               'type' => 'field',
               'key' => 'status_id:label',
+              'dataType' => 'String',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -117,6 +123,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
             ],

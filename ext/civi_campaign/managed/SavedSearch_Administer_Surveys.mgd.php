@@ -79,6 +79,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -86,6 +87,7 @@ return [
             [
               'type' => 'field',
               'key' => 'campaign_id:label',
+              'dataType' => 'Integer',
               'label' => E::ts('Survey'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -93,6 +95,7 @@ return [
             [
               'type' => 'field',
               'key' => 'activity_type_id:label',
+              'dataType' => 'Integer',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -106,6 +109,7 @@ return [
             [
               'type' => 'field',
               'key' => 'release_frequency',
+              'dataType' => 'Integer',
               'label' => E::ts('Release Frequency'),
               'sortable' => TRUE,
               'empty_value' => '',
@@ -114,18 +118,21 @@ return [
             [
               'type' => 'field',
               'key' => 'default_number_of_contacts',
+              'dataType' => 'Integer',
               'label' => E::ts('Reserve Each Time'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'max_number_of_contacts',
+              'dataType' => 'Integer',
               'label' => E::ts('Total Reserve'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'result_id:label',
+              'dataType' => 'Integer',
               'label' => E::ts('Result Set'),
               'sortable' => TRUE,
               'link' => [
@@ -149,6 +156,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_default',
+              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
               'rewrite' => ' ',
@@ -167,6 +175,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
             ],

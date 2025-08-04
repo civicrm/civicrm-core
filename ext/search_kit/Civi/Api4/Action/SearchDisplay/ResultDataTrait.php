@@ -2,12 +2,9 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
-use Civi\Util\PhpSpreadsheetUtil;
 use League\Csv\Writer;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Currency;
 
 trait ResultDataTrait {
 
@@ -123,31 +120,13 @@ trait ResultDataTrait {
     // Header row
     foreach (array_values($columns) as $index => $col) {
       $sheet->setCellValue([$index + 1, 1], $col['label']);
-      $sheet->getColumnDimensionByColumn($index + 1)->setAutoSize(TRUE);
+      $sheet->getColumnDimensionByColumn($index)->setAutoSize(TRUE);
     }
 
-    global $civicrmLocale;
-    $moneyLocale = $civicrmLocale->moneyFormat ?? (\Civi::settings()->get('format_locale') ?? \CRM_Core_I18n::getLocale());
-
     foreach ($rows as $rowNum => $data) {
-      foreach ($columns as $colNum => $col) {
-        $value = $data['columns'][$colNum];
-        $cell = $sheet->getCell([$colNum + 1, $rowNum + 2]);
-        $cell->setValue($this->formatColumnValue($col, $value));
-
-        if ($value['dataType'] === 'Money') {
-          $numberFormatter = new \NumberFormatter($moneyLocale . '@currency=' . $value['val']['currency'], \NumberFormatter::CURRENCY);
-          $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
-          $cell->getStyle()->getNumberFormat()->setFormatCode(new Currency($currencySymbol, locale: $numberFormatter->getLocale()));
-        }
-        elseif ($value['dataType'] === 'Date') {
-          $format = \Civi::settings()->get(($col['format'] ?? NULL) ?: 'dateformatFull');
-          $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
-        }
-        elseif ($value['dataType'] === 'Timestamp') {
-          $format = \Civi::settings()->get(($col['format'] ?? NULL) ?: 'dateformatDatetime');
-          $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
-        }
+      $colNum = 1;
+      foreach ($columns as $index => $col) {
+        $sheet->setCellValue([$colNum++, $rowNum + 2], $this->formatColumnValue($col, $data['columns'][$index]));
       }
     }
 
@@ -161,21 +140,10 @@ trait ResultDataTrait {
    *
    * @param array $col
    * @param array $value
-   * @return scalar|null
+   * @return string
    */
   protected function formatColumnValue(array $col, array $value) {
-    $val = $value['val'];
-
-    if (!in_array($this->format, ['array', 'csv'], TRUE)) {
-      if ($value['dataType'] === 'Money') {
-        return $val['value'];
-      }
-
-      if (($value['dataType'] === 'Date' || $value['dataType'] === 'Timestamp') && ($val !== NULL)) {
-        return Date::stringToExcel($val);
-      }
-    }
-
+    $val = $value['val'] ?? '';
     return is_array($val) ? implode(', ', $val) : $val;
   }
 

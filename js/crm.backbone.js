@@ -190,6 +190,7 @@
       },
       _saved_onchange: function(model, options) {
         if (options.parse) return;
+        // console.log('change', model.changedAttributes(), model.previousAttributes());
         this.setModified();
       },
       setModified: function() {

@@ -79,6 +79,7 @@ return [
             [
               'type' => 'html',
               'key' => 'name',
+              'dataType' => 'String',
               'label' => E::ts('Job'),
               'sortable' => TRUE,
               'cssRules' => [
@@ -94,6 +95,7 @@ return [
             [
               'type' => 'field',
               'key' => 'run_frequency:label',
+              'dataType' => 'String',
               'label' => E::ts('Frequency'),
               'sortable' => TRUE,
               'cssRules' => [
@@ -108,6 +110,7 @@ return [
             [
               'type' => 'field',
               'key' => 'last_run',
+              'dataType' => 'Timestamp',
               'label' => E::ts('Last Run'),
               'sortable' => TRUE,
               'cssRules' => [
@@ -122,6 +125,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -137,6 +141,7 @@ return [
             [
               'type' => 'field',
               'key' => 'api_entity',
+              'dataType' => 'String',
               'label' => E::ts('API'),
               'sortable' => TRUE,
               'cssRules' => [

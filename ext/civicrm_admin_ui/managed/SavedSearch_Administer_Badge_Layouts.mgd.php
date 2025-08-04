@@ -56,6 +56,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -63,6 +64,7 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
+              'dataType' => 'Text',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -70,6 +72,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -77,6 +80,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_default',
+              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
               'rewrite' => '[none]',

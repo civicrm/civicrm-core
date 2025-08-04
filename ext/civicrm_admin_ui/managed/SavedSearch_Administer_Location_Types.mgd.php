@@ -77,6 +77,7 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
+              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
               'title' => E::ts('Location Type ID: [id]'),
@@ -84,6 +85,7 @@ return [
             [
               'type' => 'field',
               'key' => 'display_name',
+              'dataType' => 'String',
               'label' => E::ts('Display Name'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -91,6 +93,7 @@ return [
             [
               'type' => 'field',
               'key' => 'vcard_name',
+              'dataType' => 'String',
               'label' => E::ts('vCard'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -98,6 +101,7 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
+              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -105,6 +109,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -112,6 +117,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_default',
+              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
               'rewrite' => '[none]',

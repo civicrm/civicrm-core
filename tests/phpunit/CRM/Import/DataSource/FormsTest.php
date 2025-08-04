@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
 
 /**
@@ -18,7 +19,6 @@ use Civi\Api4\UserJob;
  * @group import
  */
 class CRM_Import_FormsTest extends CiviUnitTestCase {
-  use CRMTraits_Import_ParserTrait;
 
   protected function setUp(): void {
     parent::setUp();
@@ -31,6 +31,23 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
   }
 
   /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testLoadDataSourceSavedTemplate(): void {
+    // First do a basic submission, creating a Mapping and UserJob template in the process.
+    [$templateJob, $mapping] = $this->runImportSavingImportTemplate();
+
+    // Now try this template in in the url to load the defaults for DataSource.
+    $_REQUEST['template_id'] = $templateJob['id'];
+    $form = $this->getFormObject('CRM_Contribute_Import_Form_DataSource');
+    $this->formController = $form->controller;
+    $form->buildForm();
+    $defaults = $this->getFormDefaults($form);
+    // These next 2 fields should be loaded as defaults from the UserJob template.
+    $this->assertEquals('Organization', $defaults['contactType']);
+  }
+
+  /**
    * Test that when we Process the MapField form without updating the saved template it is still retained.
    *
    * This is important because if we use the BACK button we still want 'Update Mapping'
@@ -38,15 +55,19 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    */
   public function testSaveRetainingMappingID(): void {
     // First do a basic submission, creating a Mapping and UserJob template in the process.
-    $this->runImportSavingImportTemplate();
+    [, $mapping] = $this->runImportSavingImportTemplate();
     $this->formController = NULL;
 
-    $this->processForm('CRM_Contribute_Import_Form_DataSource', [
+    $dataSourceForm = $this->processForm('CRM_Contribute_Import_Form_DataSource', [
       'contactType' => 'Organization',
       'savedMapping' => 1,
     ]);
-
-    $this->processForm('CRM_Contribute_Import_Form_MapField', [], [['name' => 'Contribution.id'], ['name' => 'Contribution.source']], 'Organization');
+    $userJobID = $dataSourceForm->getUserJobID();
+    $this->processForm('CRM_Contribute_Import_Form_MapField', [
+      'savedMapping' => $mapping['id'],
+      'contactType' => 'Organization',
+      'mapper' => [['Contribution.id'], ['Contribution.source']],
+    ]);
 
     // Now we want to submit this form without updating the mapping used & make sure the mapping_id
     // is still saved in the metadata.
@@ -58,6 +79,9 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     ];
     $mapFieldForm = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $mapFieldValues);
     $mapFieldForm->buildForm();
+
+    $userJob = UserJob::get()->addWhere('id', '=', $userJobID)->execute()->first();
+    $this->assertEquals($mapping['id'], $userJob['metadata']['Template']['mapping_id']);
   }
 
   /**
@@ -80,17 +104,14 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
   /**
    * @param string $class
    * @param array $formValues
-   * @param array $importMappings
-   * @param string $contactType
+   *
+   * @return \CRM_Core_Form
    */
-  protected function processForm(string $class, array $formValues = [], array $importMappings = [], string $contactType = 'Individual'): void {
-    if ($this->userJobID && $importMappings) {
-      $this->updateJobMetadata($importMappings, $contactType);
-    }
+  protected function processForm(string $class, array $formValues = []): CRM_Core_Form {
     $form = $this->getImportForm($class, $formValues);
     $form->buildForm();
     $form->mainProcess();
-    $this->userJobID = $form->getUserJobID();
+    return $form;
   }
 
   /**
@@ -109,11 +130,14 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     ];
   }
 
-  protected function processContributionForms(array $submittedValues, array $importMappings = []): void {
+  /**
+   * @param array $submittedValues
+   */
+  protected function processContributionForms(array $submittedValues): void {
     try {
       $this->processForm('CRM_Contribute_Import_Form_DataSource', $submittedValues);
-      $this->processForm('CRM_Contribute_Import_Form_MapField', $submittedValues, $importMappings);
-      $this->processForm('CRM_CiviImport_Form_Generic_Preview', $submittedValues);
+      $this->processForm('CRM_Contribute_Import_Form_MapField', $submittedValues);
+      $this->processForm('CRM_Contribute_Import_Form_Preview', $submittedValues);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       // We expect this to happen as it re-directs to the queue runner.
@@ -124,8 +148,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
    * @param string $class
    * @param array $formValues
    *
-   * @return \CRM_Import_Forms
-   * @throws \CRM_Core_Exception
+   * @return \CRM_Core_Form
    */
   protected function getImportForm(string $class, array $formValues = []): CRM_Core_Form {
     $formValues = array_merge($this->getDefaultValues(), $formValues);
@@ -133,23 +156,30 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * @return array
    */
-  protected function runImportSavingImportTemplate(): void {
+  protected function runImportSavingImportTemplate(): array {
     $this->processContributionForms([
       'saveMapping' => 1,
       'saveMappingName' => 'mapping',
       'contactType' => 'Organization',
-    ], [['name' => 'Contribution.id'], ['name' => 'Contribution.source']]);
+    ]);
 
     // Check that a template job and a mapping have been created.
     $templateJob = UserJob::get()
       ->addWhere('is_template', '=', 1)
       ->execute()
       ->first();
-    $this->assertTrue(empty($templateJob['metadata']['DataSource']['table_name']));
+    $this->assertNotEmpty($templateJob);
+    $this->assertArrayNotHasKey('table_name', $templateJob['metadata']['DataSource']);
+    $mapping = Mapping::get()
+      ->addWhere('name', '=', substr($templateJob['name'], 7))
+      ->execute()
+      ->first();
+    $this->assertNotEmpty($mapping);
     // Reset the formController so this doesn't leak into further tests.
     $this->formController = NULL;
+    return [$templateJob, $mapping];
   }
 
 }

@@ -70,6 +70,7 @@ return [
             [
               'type' => 'field',
               'key' => 'label_a_b',
+              'dataType' => 'String',
               'label' => E::ts('Relationship A to B'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -77,6 +78,7 @@ return [
             [
               'type' => 'field',
               'key' => 'label_b_a',
+              'dataType' => 'String',
               'label' => E::ts('Relationship B to A'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -84,18 +86,21 @@ return [
             [
               'type' => 'field',
               'key' => 'contact_type_a:label',
+              'dataType' => 'String',
               'label' => E::ts('Contact Type A'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contact_type_b:label',
+              'dataType' => 'String',
               'label' => E::ts('Contact Type B'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,

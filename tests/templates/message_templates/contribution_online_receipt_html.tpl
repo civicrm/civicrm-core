@@ -79,6 +79,7 @@
   {if !empty($isBillingAddressRequiredForPayLater)}
   isBillingAddressRequiredForPayLater:::{$isBillingAddressRequiredForPayLater}
   {/if}
+  billingName:::{$billingName}
   address:::{$address}
   {if !empty($credit_card_type)}
   credit_card_type:::{$credit_card_type}

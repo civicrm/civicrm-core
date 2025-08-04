@@ -36,13 +36,8 @@ trait UserJobTrait {
    * @return int|null
    */
   public function getUserJobID(): ?int {
-    if (!$this->userJobID && is_a($this, 'CRM_Core_Form')) {
-      if ($this->get('user_job_id')) {
-        $this->userJobID = $this->get('user_job_id');
-      }
-      else {
-        $this->userJobID = \CRM_Utils_Request::retrieve('id', 'Integer', $this) ?? NULL;
-      }
+    if (!$this->userJobID && is_a($this, 'CRM_Core_Form') && $this->get('user_job_id')) {
+      $this->userJobID = $this->get('user_job_id');
     }
     return $this->userJobID;
   }
@@ -79,9 +74,6 @@ trait UserJobTrait {
         ->addWhere('id', '=', $this->getUserJobID())
         ->execute()
         ->single();
-      if (!isset($this->userJob['metadata']['import_options']['date_format'])) {
-        $this->userJob['metadata']['import_options']['date_format'] = $this->getSubmittedValue('dateFormats') ?: \CRM_Utils_Date::DATE_yyyy_mm_dd;
-      }
     }
     return $this->userJob;
   }

@@ -66,18 +66,21 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
+              'dataType' => 'Integer',
               'label' => ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'label',
+              'dataType' => 'String',
               'label' => ts('Label'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'name',
+              'dataType' => 'String',
               'label' => ts('Token String'),
               'sortable' => TRUE,
               'rewrite' => '{ldelim}site.[name]{rdelim}',
@@ -85,12 +88,14 @@ return [
             [
               'type' => 'field',
               'key' => 'is_reserved',
+              'dataType' => 'Boolean',
               'label' => ts('Reserved'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => ts('Enabled'),
               'sortable' => TRUE,
               'cssRules' => [],

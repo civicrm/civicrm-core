@@ -67,6 +67,7 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
+              'dataType' => 'String',
               'label' => E::ts('Product Name'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -74,6 +75,7 @@ return [
             [
               'type' => 'field',
               'key' => 'sku',
+              'dataType' => 'String',
               'label' => E::ts('SKU'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -81,6 +83,7 @@ return [
             [
               'type' => 'field',
               'key' => 'price',
+              'dataType' => 'Money',
               'label' => E::ts('Price'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -88,6 +91,7 @@ return [
             [
               'type' => 'field',
               'key' => 'min_contribution',
+              'dataType' => 'Money',
               'label' => E::ts('Minimum Contribution'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -95,6 +99,7 @@ return [
             [
               'type' => 'field',
               'key' => 'cost',
+              'dataType' => 'Money',
               'label' => E::ts('Cost'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -102,6 +107,7 @@ return [
             [
               'type' => 'field',
               'key' => 'financial_type_id:label',
+              'dataType' => 'Integer',
               'label' => E::ts('Financial Type'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -109,6 +115,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
+              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,

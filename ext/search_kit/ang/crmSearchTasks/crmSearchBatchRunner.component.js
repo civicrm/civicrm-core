@@ -15,15 +15,13 @@
     },
     templateUrl: '~/crmSearchTasks/crmSearchBatchRunner.html',
     controller: function($scope, $timeout, $interval, crmApi4) {
-      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
-      const ctrl = this;
-
-      let currentBatch = 0;
-      let totalBatches;
-      let processedCount = 0;
-      let countMatched = 0;
-      let incrementer;
-      let batchResult;
+      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+        ctrl = this,
+        currentBatch = 0,
+        totalBatches,
+        processedCount = 0,
+        countMatched = 0,
+        incrementer;
 
       this.progress = 0;
 
@@ -80,18 +78,11 @@
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
             processedCount += result.countFetched;
             countMatched += (result.countMatched || result.count);
-            // Gather all results into one super collection
-            if (batchResult) {
-              batchResult.push(...result);
-            } else {
-              batchResult = result;
-            }
             if (ctrl.last >= ctrl.ids.length) {
               $timeout(function() {
-                // Return a complete record of all batches
-                batchResult.batchCount = processedCount;
-                batchResult.countMatched = countMatched;
-                ctrl.success({result: batchResult});
+                result.batchCount = processedCount;
+                result.countMatched = countMatched;
+                ctrl.success({result: result});
               }, 500);
             } else {
               runBatch();

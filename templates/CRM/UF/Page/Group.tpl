@@ -66,7 +66,7 @@
                   <th>{ts}Description{/ts}</th>
                   <th>{ts}Type{/ts}</th>
                   <th>{ts}ID{/ts}</th>
-                  <th id="nosort">{ts}Exposed To{/ts}</th>
+                  <th id="nosort">{ts}Used For{/ts}</th>
                   <th><span class="sr-only">{ts}Actions{/ts}</span></th>
                 </tr>
               </thead>
@@ -105,7 +105,7 @@
                   <th>{ts}Description{/ts}</th>
                   <th>{ts}Type{/ts}</th>
                   <th>{ts}ID{/ts}</th>
-                  <th id="nosort">{ts}Exposed To{/ts}</th>
+                  <th id="nosort">{ts}Used For{/ts}</th>
                   <th><span class="sr-only">{ts}Actions{/ts}</span></th>
                 </tr>
               </thead>

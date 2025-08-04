@@ -156,6 +156,7 @@ foreach ($importEntities as $importEntity) {
             [
               'type' => 'field',
               'key' => '_status',
+              'dataType' => 'String',
               'label' => 'Row status',
               'sortable' => TRUE,
               'link' => [
@@ -170,6 +171,7 @@ foreach ($importEntities as $importEntity) {
             [
               'type' => 'field',
               'key' => 'COUNT_id',
+              'dataType' => 'Integer',
               'label' => E::ts('Number of rows'),
               'sortable' => TRUE,
             ],

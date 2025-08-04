@@ -465,7 +465,7 @@ abstract class Api4Query {
       $operator = str_replace('EMPTY', 'NULL', $operator);
       // For strings & numbers, create an OR grouping of empty value OR null
       if (in_array($field['data_type'] ?? NULL, ['String', 'Integer', 'Float', 'Boolean'], TRUE)) {
-        $emptyVal = ($field['data_type'] === 'String' || $field['serialize']) ? '""' : '0';
+        $emptyVal = $field['data_type'] === 'String' ? '""' : '0';
         $isEmptyClause = $operator === 'IS NULL' ? "= $emptyVal OR" : "<> $emptyVal AND";
         return "($fieldAlias $isEmptyClause $fieldAlias $operator)";
       }

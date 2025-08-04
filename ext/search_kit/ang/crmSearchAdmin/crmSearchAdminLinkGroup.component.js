@@ -54,7 +54,8 @@
       };
 
       this.sortableOptions = {
-        containment: $element.children('table').first(),
+        containment: $element,
+        axis: 'y',
         helper: function(e, ui) {
           // Prevent table row width from changing during drag
           ui.children().each(function() {

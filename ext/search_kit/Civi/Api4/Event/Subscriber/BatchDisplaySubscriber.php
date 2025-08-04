@@ -67,9 +67,6 @@ class BatchDisplaySubscriber extends AutoService implements EventSubscriberInter
         if (in_array($column['spec']['name'], $columnNames)) {
           $column['spec']['name'] .= $i;
         }
-        $column['spec']['required'] = !empty($column['required']);
-        $column['spec']['nullable'] = empty($column['required']);
-        $column['spec']['api_default'] = $column['default'] ?? NULL;
         $columnNames[] = $column['spec']['name'];
       }
       // Redundant with spec and less-reliable

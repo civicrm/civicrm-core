@@ -58,15 +58,15 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     $this->createUserJobTable();
     $userJobParameters = [
       'metadata' => [
-        'DataSource' => ['table_name' => 'abc', 'number_of_columns' => 5, 'column_headers' => ['External Identifier', 'Amount Given', 'Contribution Date', 'Financial Type', 'In honor']],
+        'DataSource' => ['table_name' => 'abc', 'column_headers' => ['External Identifier', 'Amount Given', 'Contribution Date', 'Financial Type', 'In honor']],
         'submitted_values' => [
           'contactType' => 'Individual',
           'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
+          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ],
-        'import_options' => ['date_format' => CRM_Utils_Date::DATE_yyyy_mm_dd],
         'import_mappings' => [
           ['name' => 'Contact.external_identifier'],
           ['name' => 'Contribution.total_amount'],

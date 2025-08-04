@@ -50,6 +50,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'rewrite' => '',
@@ -57,6 +58,7 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
+              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,

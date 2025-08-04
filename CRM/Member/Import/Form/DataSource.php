@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Import\MembershipParser;
-
 /**
  *
  * @package CRM
@@ -43,14 +41,16 @@ class CRM_Member_Import_Form_DataSource extends CRM_CiviImport_Form_DataSource {
       CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new Membership'),
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing Membership'),
     ]);
+
+    $this->addContactTypeSelector();
   }
 
   /**
-   * @return \Civi\Import\MembershipParser
+   * @return \CRM_Member_Import_Parser_Membership
    */
-  protected function getParser(): MembershipParser {
+  protected function getParser(): CRM_Member_Import_Parser_Membership {
     if (!$this->parser) {
-      $this->parser = new MembershipParser();
+      $this->parser = new CRM_Member_Import_Parser_Membership();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

@@ -14,7 +14,7 @@ namespace Civi\Api4;
  * Contribution entity.
  *
  * @searchable primary
- * @searchFields receive_date,contact_id.sort_name,total_amount,financial_type_id:label,contribution_status_id:label
+ * @searchFields contact_id.sort_name,total_amount
  * @since 5.19
  * @package Civi\Api4
  */
