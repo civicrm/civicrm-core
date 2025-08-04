@@ -74,6 +74,7 @@ return [
               'sortable' => TRUE,
             ],
             [
+              'label' => E::ts('Actions'),
               'size' => 'btn-xs',
               'links' => [
                 [
@@ -87,6 +88,7 @@ return [
                   'action' => '',
                   'join' => '',
                   'target' => '',
+                  'conditions' => [],
                 ],
                 [
                   'path' => '[server_route]',
@@ -99,10 +101,11 @@ return [
                   'action' => '',
                   'join' => '',
                   'target' => '',
+                  'conditions' => [],
                 ],
               ],
               'type' => 'buttons',
-              'alignment' => 'text-right',
+              'alignment' => 'text-center',
             ],
           ],
           'actions' => FALSE,
