@@ -50,24 +50,6 @@ diff -ruN DB/mysqli.php DB/mysqli.php
 +    }
 +
 +    // }}}
- 
- }
- 
-diff -ruN DB/mysql.php DB/mysql.php
---- DB/mysql.php	2020-04-20 05:45:59.000000000 +1000
-+++ DB/mysql.php	2020-08-01 14:48:58.276132870 +1000
-@@ -1021,6 +1024,14 @@
-     }
- 
-     // }}}
-+    // {{{ lastInsertId()
-+
-+    function lastInsertId()
-+    {
-+        return mysql_insert_id($this->connection);
-+    }
-+
-+    // }}}
 
  }
 
