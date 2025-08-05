@@ -502,14 +502,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   box-shadow: none;
   background: var(--crm-tab-bg-active);
 }
-/* Include profile (contribtuion page and events  */
-.crm-contribution-contributionpage-custom-form-block-custom_pre_id td.html-adjust > div > div,
-.crm-contribution-contributionpage-custom-form-block-custom_post_id td.html-adjust > div > div,
-.crm-event-manage-registration-form-block-custom_pre_id td > div > div,
-.crm-event-manage-registration-form-block-custom_post_id td > div > div {
-  display: flex;
-  gap: var(--crm-s);
-}
 /* Event dashboard */
 .CRM_Event_Form_Search .button {
   float: left;

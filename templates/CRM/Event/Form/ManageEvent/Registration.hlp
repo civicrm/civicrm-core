@@ -36,6 +36,12 @@
         {ts 1=$docLinkCustom 2=$docLinkProfile}Refer to the online documentation for more details on creating %1 and %2.{/ts}
 </p>
 {/htxt}
+{htxt id="event-profile-bottom-title"}
+  {ts}Bottom Profile Fields{/ts}
+{/htxt}
+{htxt id="event-profile-bottom"}
+  {ts}Profile to be included at the bottom of the form, before the submit button.{/ts}
+{/htxt}
 {htxt id="id-link_text-title"}
   {ts}Registration Link{/ts}
 {/htxt}

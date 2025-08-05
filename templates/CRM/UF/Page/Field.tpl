@@ -25,6 +25,9 @@
       </div>
     {/if}
     <div id="field_page">
+      {if $uf_group_type_extra}
+        <p>{ts}Used in Forms{/ts} {help id='id-used_for_extra' file="CRM/UF/Form/Group.hlp"}<br>{$uf_group_type_extra}</p>
+      {/if}
       {strip}
       {* handle enable/disable actions*}
       {include file="CRM/common/enableDisableApi.tpl"}
