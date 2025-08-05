@@ -21,9 +21,11 @@ class CRM_Core_Key {
    *
    * Expressed as number of bytes. (Ex: 128 bits = 16 bytes)
    *
+   * Choose a length that is optimal for the HASH_ALGO.
+   *
    * @var int
    */
-  const PRIVATE_KEY_LENGTH = 16;
+  const PRIVATE_KEY_LENGTH = 32;
 
   /**
    * @var string
@@ -32,10 +34,10 @@ class CRM_Core_Key {
   const HASH_ALGO = 'sha256';
 
   /**
-   * The minimum length of a generated signature/digest (expressed in base36 digits).
+   * The minimum length of a generated signature/digest (base64_mbz(hmac(sha256...)).
    * @var int
    */
-  const HASH_LENGTH = 25;
+  const HASH_LENGTH = 42;
 
   public static $_key = NULL;
 
@@ -159,8 +161,8 @@ class CRM_Core_Key {
     // The "prefix" gives some advisory details to help with debugging.
     $prefix = preg_replace('/[^a-zA-Z0-9]/', '', $name);
     // Note: Unsure why $sessionID is included, but it's always been there, and it doesn't seem harmful.
-    return $prefix . base_convert(hash_hmac(self::HASH_ALGO, $sessionID . $delim . $name, $privateKey), 16, 36);
-
+    $hmac = hash_hmac(self::HASH_ALGO, $sessionID . $delim . $name, $privateKey, TRUE);
+    return $prefix . CRM_Utils_String::base64mbzEncode($hmac);
   }
 
 }
