@@ -1,15 +1,6 @@
 diff -ruN DB/common.php DB/common.php
 --- DB/common.php	2020-04-20 05:45:59.000000000 +1000
 +++ DB/common.php	2020-08-01 14:46:53.146175149 +1000
-@@ -147,7 +147,7 @@
-      */
-     function __construct()
-     {
--        $this->PEAR('DB_Error');
-+        parent::__construct('DB_Error');
-     }
-
-     // }}}
 @@ -1150,7 +1147,22 @@
       */
      function modifyQuery($query)
@@ -107,21 +98,9 @@ diff -ruN DB/mysql.php DB/mysql.php
 +    }
 +
 +    // }}}
- 
+
  }
- 
-diff -ruN DB/storage.php DB/storage.php
---- DB/storage.php   2020-04-20 05:45:59.000000000 +1000
-+++ DB/storage.php       2020-08-01 15:24:40.814621336 +1000
-@@ -96,7 +96,7 @@
-      */
-     function __construct($table, $keycolumn, &$dbh, $validator = null)
-     {
--        $this->PEAR('DB_Error');
-+        parent::__construct('DB_Error');
-         $this->_table = $table;
-         $this->_keycolumn = $keycolumn;
-         $this->_dbh = $dbh;
+
 diff -ruN DB.php DB.php
 --- DB.php	2020-04-20 05:45:59.000000000 +1000
 +++ DB.php	2020-08-01 14:43:45.338870953 +1000
