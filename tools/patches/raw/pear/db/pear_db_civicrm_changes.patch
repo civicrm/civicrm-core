@@ -23,38 +23,8 @@ diff -ruN DB/common.php DB/common.php
 +        // CRM-20445 ends.
 +        return $e->query;
      }
- 
+
      // }}}
-@@ -1882,7 +1894,7 @@
-      *
-      * @see PEAR_Error
-      */
--    function &raiseError($code = DB_ERROR, $mode = null, $options = null,
-+    function raiseError($code = DB_ERROR, $mode = null, $options = null,
-                          $userinfo = null, $nativecode = null, $dummy1 = null,
-                          $dummy2 = null)
-     {
-@@ -2255,6 +2267,20 @@
-     }
- 
-     // }}}
-+    // {{{ lastInsertId()
-+
-+   /**
-+    * Get the most recently inserted Id
-+    *
-+    * @throws RuntimeException
-+    */
-+    function lastInsertId()
-+    {
-+        throw new \RuntimeException("Not implemented: " . get_class($this) . '::lastInsertId');
-+    }
-+
-+    // }}}
-+
- }
- 
- /*
 diff -ruN DB/mysqli.php DB/mysqli.php
 --- DB/mysqli.php	2020-04-20 05:45:59.000000000 +1000
 +++ DB/mysqli.php	2020-08-01 14:51:11.871272253 +1000
