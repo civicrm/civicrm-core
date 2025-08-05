@@ -27,7 +27,7 @@
     {include file="CRM/common/enableDisableApi.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     <div>
-      <input type="text" id="search_extension" placeholder="Search extensions..." oninput="filterExtensions()">
+      <input type="text" id="search_extension" placeholder="🔍{ts escape='htmlattribute'}Search extensions{/ts}" oninput="filterExtensions()">
     </div>
     <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
         <ul class="crm-extensions-tabs-list" role="tablist">
@@ -110,6 +110,13 @@
     }
     </script>
   <style>
+  #search_extension {
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    width: 250px;
+  }
   .crm-container #extensions-other {
     padding: 0;
     border-top: 0;
