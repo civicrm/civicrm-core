@@ -12,7 +12,7 @@
   </td>
   <td class="crm-extension-meta">
     {foreach from=$row.authors item=author}
-      {$author.name}{if !$author@last}, {/if}
+      {$author.name|escape}{if !$author@last}, {/if}
     {/foreach}
   </td>
   <td class="crm-extensions-version right">{$row.version|escape}
