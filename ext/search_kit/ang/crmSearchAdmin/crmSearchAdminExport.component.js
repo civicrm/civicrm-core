@@ -78,9 +78,36 @@
       };
 
       this.copyToClipboard = function() {
-        document.getElementById('crm-search-admin-export-output-code').select();
-        document.execCommand('copy');
-        ctrl.copied = true;
+        const textElement = document.getElementById('crm-search-admin-export-output-code');
+
+        function copyWithClipboardApi() {
+          navigator.clipboard.writeText(textElement.value)
+            .then(() => {
+              $scope.$evalAsync(() => {
+                ctrl.copied = true;
+              });
+            })
+            .catch(error => {
+              $scope.$evalAsync(legacyCopy);
+            });
+        }
+
+        function legacyCopy() {
+          textElement.select();
+          document.execCommand('copy');
+          ctrl.copied = true;
+        }
+
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            copyWithClipboardApi();
+          } else {
+            legacyCopy();
+          }
+        } catch (error) {
+          console.error('Failed to copy text: ', error);
+          ctrl.copied = false;
+        }
       };
     }
   });
