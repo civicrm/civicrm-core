@@ -280,7 +280,7 @@ dl dl {
 }
 .crm-container .disabled,
 .crm-container .crm-disabled,
-.crm-container .disabled *:not(.btn,button,i,span),
+.crm-container .disabled *:not(.btn,button,i,span,a),
 .crm-container .cancelled,
 .crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor {
@@ -292,7 +292,7 @@ dl dl {
 .crm-container .table-striped > tbody > tr:has(td.disabled) {
   background-color: var(--crm-c-page-background);
 }
-.crm-container tr.disabled td *:not(.btn,button),
+.crm-container tr.disabled td *:not(.btn,button,i,a),
 .crm-container td.disabled {
   font-style: italic;
 }
