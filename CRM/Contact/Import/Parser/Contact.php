@@ -1304,4 +1304,28 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     ];
   }
 
+  /**
+   * Get the dedupe rules to use to lookup a contact.
+   *
+   * @param array $dedupeRuleIDs
+   * @param string|array|null $contact_type
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDedupeRules(array $dedupeRuleIDs, $contact_type) {
+    $dedupeRules = [];
+    if (!empty($dedupeRuleIDs)) {
+      foreach ($dedupeRuleIDs as $dedupeRuleID) {
+        $dedupeRules[] = is_numeric($dedupeRuleID) ? $this->getDedupeRuleName($dedupeRuleID) : $dedupeRuleID;
+      }
+      return $dedupeRules;
+    }
+    $contactTypes = $contact_type ? (array) $contact_type : CRM_Contact_BAO_ContactType::basicTypes();
+    foreach ($contactTypes as $contactType) {
+      $dedupeRules[] = $this->getDefaultRuleForContactType($contactType);
+    }
+    return $dedupeRules;
+  }
+
 }
