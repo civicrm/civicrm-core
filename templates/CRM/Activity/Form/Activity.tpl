@@ -253,7 +253,7 @@
   {/if}
   {if $action eq 4 and $context != 'case' and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
     <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts escape='htmlattribute'}File On Case{/ts}"><span><i class="crm-i fa-clipboard" aria-hidden="true"></i> {ts}File on Case{/ts}</span></a>
-    {include file="CRM/Case/Form/ActivityToCase.tpl"}
+    {include file="CRM/Case/Form/ActivityToCase.tpl" buildCaseActivityForm=false}
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>

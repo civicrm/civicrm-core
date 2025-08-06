@@ -233,6 +233,9 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       $this, FALSE, 'browse'
     );
 
+    // ensure assigned
+    $this->assign('priceField', []);
+
     if ($this->_sid) {
       $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid);
       $this->assign('usedBy', $usedBy);
