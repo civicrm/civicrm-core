@@ -30,6 +30,8 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
           'title' => ts('Completed Contribution') . ' : ' . $currency,
           'tags' => $workflow === 'contribution_offline_receipt' ? ['phpunit', 'preview'] : ['preview'],
           'workflow' => $workflow,
+          // If there are no non-quick-config we have no show line items example.
+          'is_show_line_items' => $this->getNonQuickConfigPriceSet() ? TRUE : FALSE,
         ];
       }
       yield [
@@ -37,7 +39,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         'title' => ts('Partially Paid Contribution') . ' : ' . $currency,
         'tags' => ['preview'],
         'workflow' => $workflow,
-        'is_show_line_items' => TRUE,
+        'is_show_line_items' => $this->getNonQuickConfigPriceSet() ? TRUE : FALSE,
         'contribution_params' => ['contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid')],
       ];
       $priceSet = $this->getNonQuickConfigPriceSet();
