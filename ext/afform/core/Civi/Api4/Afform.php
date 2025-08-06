@@ -165,6 +165,7 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'requires',
           'title' => E::ts('Requires'),
           'data_type' => 'Array',
+          'description' => 'Angular module dependencies; calculated at runtime',
         ],
         [
           'name' => 'entity_type',
