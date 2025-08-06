@@ -24,4 +24,16 @@ trait CRM_CiviImport_Form_Generic_GenericTrait {
     return CRM_Utils_String::convertStringToCamel(implode('_', $pathArguments));
   }
 
+  /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    if ($this->getUserJobID()) {
+      return (string) $this->getUserJob()['job_type'];
+    }
+    return 'import_generic';
+  }
+
 }

@@ -22,5 +22,6 @@
  */
 class CRM_CiviImport_Form_Generic_MapField extends \CRM_CiviImport_Form_MapField {
   use CRM_CiviImport_Form_Generic_GenericTrait;
+  use \Civi\UserJob\UserJobTrait;
 
 }
