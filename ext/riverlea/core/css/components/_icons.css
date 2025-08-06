@@ -236,7 +236,6 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container tr.disabled td.crm-search-ctrl-column::after,
 .crm-container tr:has(.disabled) td.crm-search-ctrl-column::after {
   content: "\f05e" / "Disabled row.";
-  color: var(--crm-alert-danger-text);
   font-style: normal;
 }
 
