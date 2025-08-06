@@ -70,6 +70,7 @@ class Rebuilder {
       'tables' => TRUE,
       'sessions' => TRUE,
       'metadata' => TRUE,
+      'statics' => TRUE,
       'system' => TRUE,
       'userjob' => TRUE,
       'menu' => TRUE,
@@ -109,6 +110,9 @@ class Rebuilder {
     }
     if (!empty($targets['sessions'])) {
       Civi::cache('session')->clear();
+    }
+    if (!empty($targets['statics'])) {
+      Civi::$statics = [];
     }
     if (!empty($targets['metadata'])) {
       Civi::cache('metadata')->clear();
