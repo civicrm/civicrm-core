@@ -139,7 +139,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'do_not_trade' => 'Do Not Trade',
           'email_greeting_custom' => 'Email Greeting Custom',
           'external_identifier' => 'External Identifier',
-          'image_URL' => 'Image',
+          'image_URL' => 'Image URL',
           'legal_identifier' => 'Legal Identifier',
           'nick_name' => 'Nickname',
           'is_opt_out' => 'Is Opt Out',
