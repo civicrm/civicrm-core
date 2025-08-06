@@ -322,6 +322,8 @@ class Authenticator extends AutoService implements HookInterface {
     \CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
       [1 => [$tgt->contactId, 'Integer']]
     );
+    // Re-set the timezone incase the User System supports user records overriding the system timezone.
+    \CRM_Core_Config::singleton()->userSystem->setTimeZone();
   }
 
   /**
