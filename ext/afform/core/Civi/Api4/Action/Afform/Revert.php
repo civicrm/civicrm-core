@@ -54,6 +54,11 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
       \CRM_Afform_AfformScanner::LAYOUT_FILE,
     ];
 
+    // Check permissions to Revert
+    if (\CRM_Core_Permission::check('manage own afform') && (empty($item['created_id']) || $item['created_id'] !== \CRM_Core_Session::getLoggedInContactID())) {
+      throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this afform.');
+    }
+
     foreach ($files as $file) {
       $metaPath = $scanner->createSiteLocalPath($item['name'], $file);
       if (file_exists($metaPath)) {
@@ -84,7 +89,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
    * @return string[]
    */
   protected function getSelect() {
-    return ['name', 'title', 'placement', 'server_route'];
+    return ['name', 'title', 'placement', 'server_route', 'created_id'];
   }
 
 }

@@ -12,4 +12,8 @@ return [
   'settingsFactory' => ['Civi\AfformAdmin\AfformAdminMeta', 'getAdminSettings'],
   'basePages' => ['civicrm/admin/afform'],
   'bundles' => ['bootstrap3'],
+  'permissions' => [
+    'administer afform',
+    'manage own afform'
+  ],
 ];

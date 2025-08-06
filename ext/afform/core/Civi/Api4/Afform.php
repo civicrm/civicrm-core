@@ -308,6 +308,18 @@ class Afform extends Generic\AbstractEntity {
           'title' => E::ts('Confirmation Message'),
           'input_type' => 'Text',
         ],
+        [
+          'name' => 'created_id',
+          'title' => ts('Created By Contact ID'),
+          'data_type' => 'Integer',
+          'fk_entity' => 'Contact',
+          'fk_column' => 'id',
+          'input_type' => 'EntityRef',
+          'label' => ts('Created By'),
+          'default_value' => NULL,
+          'readonly' => TRUE,
+          'required' => FALSE,
+        ],
       ];
       // Calculated fields returned by get action
       if ($self->getAction() === 'get') {
