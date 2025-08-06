@@ -187,6 +187,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
 
     $this->assign('ufField', $ufField);
     $this->assign('legacyprofiles', function_exists('legacyprofiles_civicrm_config'));
+    $this->assign('uf_group_type_extra', CRM_Core_BAO_UFGroup::getProfileUsedByString($this->_gid));
 
     // retrieve showBestResult from session
     $session = CRM_Core_Session::singleton();

@@ -89,7 +89,7 @@
   z-index: 1;
   padding: var(--crm-dialog-body-padding);
 }
-.crm-container.ui-dialog .ui-dialog-content:has(.ui-dialog-buttonpane) {
+.crm-container.ui-dialog:has(.ui-dialog-buttonpane) .ui-dialog-content {
   margin-bottom: calc(var(--crm-btn-height) + var(--crm-m) + var(--crm-m));
 }
 .crm-container.ui-dialog .ui-dialog-content .crm-container {

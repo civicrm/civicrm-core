@@ -197,6 +197,20 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           ],
         ];
       }
+      $tasks[$entity['name']]['contact.relationship'] = [
+        'title' => E::ts('Add Relationship'),
+        'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskRelationship.html'],
+        'icon' => 'fa-user-plus',
+        'module' => 'crmSearchTasks',
+        // Initial values can be set via `hook_civicrm_searchKitTasks`
+        // @var array{contact_id: array, relationship_type: string, disableRelationshipSelect: bool, description: string, start_date: string, end_date: string}
+        'values' => [],
+        'relationshipTypes' => [],
+      ];
+      // In search mode, load relationship types enabled in case roles
+      if (!empty($this->savedSearch)) {
+        $tasks[$entity['name']]['contact.relationship']['relationshipTypes'] = $this->getRelationshipTypes($this->savedSearch);
+      }
     }
 
     // Call `hook_civicrm_searchKitTasks` which serves 3 purposes:
@@ -288,6 +302,75 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'data_type' => 'Array',
       ],
     ];
+  }
+
+  private function getRelationshipTypes(array $savedSearch): array {
+    $types = [];
+    $where = [];
+    // If this search is limited to certain contact types we can restrict side_a
+    if ($savedSearch['api_entity'] !== 'Contact') {
+      $where[] = ['contact_type_a', '=', $savedSearch['api_entity']];
+    }
+    else {
+      // Contact type might be specified in the WHERE clause
+      foreach ($savedSearch['api_params']['where'] ?? [] as $clause) {
+        if (in_array($clause[0], ['contact_type', 'contact_type:name'], TRUE) && in_array($clause[1], ['=', 'IN'], TRUE) && !empty($clause[2]) && empty($clause[3])) {
+          $clause[0] = str_replace('contact_type', 'contact_type_a', $clause[0]);
+          $where[] = $clause;
+        }
+      }
+    }
+    // UNION query to fetch both sides of each relationship type (for non-symmetrical relationships)
+    $relationshipTypes = civicrm_api4('EntitySet', 'get', [
+      'select' => ['key', 'label_a_b', 'description', 'contact_type', 'contact_sub_type_b'],
+      'sets' => [
+        [
+          'UNION ALL', 'RelationshipType', 'get', [
+            'select' => [
+              'CONCAT(id, "_a_b") AS key',
+              'label_a_b',
+              'description',
+              'IFNULL(contact_type_b, "Contact") AS contact_type',
+              'contact_sub_type_b',
+              'name_b_a',
+              'contact_type_a',
+            ],
+            'where' => [
+              ['is_active', '=', TRUE],
+            ],
+          ],
+        ],
+        [
+          'UNION ALL', 'RelationshipType', 'get', [
+            'select' => [
+              'CONCAT(id, "_b_a") AS key',
+              'label_b_a',
+              'description',
+              'IFNULL(contact_type_a, "Contact") AS contact_type',
+              'contact_sub_type_a',
+              'name_a_b',
+              'contact_type_b',
+            ],
+            'where' => [
+              ['is_active', '=', TRUE],
+              ['label_a_b', '!=', 'label_b_a', TRUE],
+            ],
+          ],
+        ],
+      ],
+      'orderBy' => ['label_a_b' => 'ASC'],
+      'where' => $where,
+    ]);
+    foreach ($relationshipTypes as $relationshipType) {
+      $types[] = [
+        'id' => $relationshipType['key'],
+        'text' => $relationshipType['label_a_b'],
+        'description' => $relationshipType['description'],
+        'contact_type' => $relationshipType['contact_type'],
+        'contact_sub_type' => $relationshipType['contact_sub_type_b'],
+      ];
+    }
+    return $types;
   }
 
 }

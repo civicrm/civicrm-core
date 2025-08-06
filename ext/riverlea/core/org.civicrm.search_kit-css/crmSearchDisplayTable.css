@@ -33,7 +33,7 @@ table.crm-sticky-header > thead > tr {
   display: table-cell;
 }
 td.crm-search-col-type-buttons.text-right {
-  flex-direction: row-reverse;
+  justify-content: end;
 }
 #bootstrap-theme th.crm-search-result-select button.btn {
   background: transparent;

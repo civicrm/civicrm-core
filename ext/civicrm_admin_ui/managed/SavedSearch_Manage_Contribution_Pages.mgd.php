@@ -85,28 +85,12 @@ return [
               'key' => 'title',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
             ],
             [
               'type' => 'field',
               'key' => 'id',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
             ],
             [
               'type' => 'field',
@@ -114,28 +98,12 @@ return [
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
             ],
             [
               'type' => 'field',
               'key' => 'financial_type_id:label',
               'label' => E::ts('Financial Type'),
               'sortable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
             ],
             [
               'text' => E::ts('Links'),
@@ -249,7 +217,14 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'button' => NULL,
+          'cssRules' => [
+            [
+              'disabled',
+              'is_active',
+              '=',
+              FALSE,
+            ],
+          ],
         ],
         'acl_bypass' => FALSE,
       ],

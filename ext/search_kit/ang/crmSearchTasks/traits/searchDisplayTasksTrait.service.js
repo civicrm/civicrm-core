@@ -54,10 +54,8 @@
           displayCtrl: displayCtrl,
           taskManager: mngr,
           entityInfo: mngr.entityInfo,
-          taskTitle: task.title,
           isLink: isLink,
           task: _.cloneDeep(task),
-          apiBatch: _.cloneDeep(task.apiBatch)
         };
         // If task uses a crmPopup form
         if (task.crmPopup) {

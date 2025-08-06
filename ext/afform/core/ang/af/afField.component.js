@@ -307,7 +307,7 @@
         }
         if (ctrl.defn.data_type === 'Date' || ctrl.defn.data_type === 'Timestamp') {
           try {
-            return CRM.formatDate(value, null, ctrl.defn.data_type === 'Timestamp');
+            return CRM.utils.formatDate(value, null, ctrl.defn.data_type === 'Timestamp');
           } catch (e) {
             return '';
           }

@@ -280,7 +280,7 @@ dl dl {
 }
 .crm-container .disabled,
 .crm-container .crm-disabled,
-.crm-container .disabled *,
+.crm-container .disabled *:not(.btn,button,i,span),
 .crm-container .cancelled,
 .crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor {

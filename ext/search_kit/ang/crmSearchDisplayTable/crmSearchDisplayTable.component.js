@@ -44,8 +44,7 @@
 
         if (ctrl.settings.draggable) {
           ctrl.draggableOptions = {
-            containment: $element,
-            direction: 'vertical',
+            containment: $element.children('div').first(),
             handle: '.crm-draggable',
             forcePlaceholderSize: true,
             helper: function(e, ui) {

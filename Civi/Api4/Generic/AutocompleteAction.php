@@ -250,6 +250,7 @@ class AutocompleteAction extends AbstractAction {
     $result->searchField = $this->searchField ?? end($this->searchFields);
     // All search fields - allows js client to advance to the next one
     $result->searchFields = $this->searchFields;
+    $result->debug = $apiResult->debug;
   }
 
   /**
@@ -455,6 +456,7 @@ class AutocompleteAction extends AbstractAction {
       ->setDisplay($this->display)
       ->setFilters($filters)
       ->setReturn($returnPage)
+      ->setDebug($this->getDebug())
       ->execute();
     return $apiResult;
   }

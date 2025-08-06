@@ -90,7 +90,10 @@
             <tr class="crm-event-manage-fee-form-block-price_set_id">
                <td class="label">{$form.price_set_id.label}</td>
                <td>{$form.price_set_id.html}
-                 <div class="description">{ts}Select a Price Set to offer multiple individually priced options for event registrants. Otherwise, leave this empty and enter fixed fee levels below.{/ts}</div></td>
+                 <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
+                 <div class="description">{ts}Select a Price Set to offer multiple individually priced options for event registrants. Otherwise, leave this empty and enter fixed fee levels below.{/ts}</div>
+                 <div class="description">{ts}To create a new Price Set, go to <a href="{crmURL p="civicrm/admin/price" q="reset=1"}" target="_blank">Administer Price Sets</a>.{/ts}</p>
+               </td>
             </tr>
       </table>
 

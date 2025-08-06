@@ -1,0 +1,21 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="crmSearchTaskRelationshipForm" ng-controller="crmSearchTaskRelationship as $ctrl">
+    <div class="form-inline">
+      <label for="crm-search-task-relationship-relationship_type">{{:: ts('Relationship Type') }} <i class="crm-marker">*</i></label>
+      <input id="crm-search-task-relationship-relationship_type" class="form-control" ng-disabled="values.disableRelationshipSelect" ng-model="values.relationship_type" required crm-ui-select="{data: $ctrl.task.relationshipTypes, allowClear: false}" ng-change="$ctrl.onChangeRelationship()">
+    </div>
+    <div class="form-inline">
+      <label for="crm-search-task-relationship-contact_id">{{:: ts('Contact') }} <i class="crm-marker">*</i></label>
+      <input id="crm-search-task-relationship-contact_id" class="form-control" ng-disabled="!values.relationship_type" ng-model="values.contact_id" crm-autocomplete="$ctrl.relationshipInfo[values.relationship_type].contact_type" crm-autocomplete-params="$ctrl.autocompleteParams" required>
+    </div>
+    <div class="form-inline" ng-repeat="field in $ctrl.relationshipFields">
+      <crm-search-input ng-model="values[field.name]" field="field" show-label="true"></crm-search-input>
+    </div>
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
+      <h5>{{:: ts('Adding relationships...') }}</h5>
+      <crm-search-batch-runner entity="'Relationship'" action="save" params="$ctrl.run" ids="$ctrl.ids" id-field="{{:: $ctrl.idField }}" success="$ctrl.onSuccess(result)" error="$ctrl.onError()" ></crm-search-batch-runner>
+    </div>
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run || !$ctrl.relationshipFields" />
+    <crm-dialog-button text="ts('Save')" icons="{primary: 'fa-user-plus'}" on-click="$ctrl.submit()" disabled="$ctrl.run || !crmSearchTaskRelationshipForm.$valid" />
+  </form>
+</div>

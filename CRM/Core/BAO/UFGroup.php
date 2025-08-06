@@ -2965,17 +2965,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return string
    * @throws CRM_Core_Exception
+   *
+   * @deprecated in CiviCRM 6.6
    */
   public static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $groupTypeExpr = '';
     if ($coreTypes) {
       $groupTypeExpr .= implode(',', $coreTypes);
     }
     if ($subTypes) {
-      //CRM-15427 Allow Multiple subtype filtering
-      //if (count($subTypes) > 1) {
-      //throw new CRM_Core_Exception("Multiple subtype filtering is not currently supported by widget.");
-      //}
       foreach ($subTypes as $subType => $subTypeIds) {
         $groupTypeExpr .= $delim . $subType . ':' . implode(':', $subTypeIds);
       }
@@ -3495,6 +3494,53 @@ SELECT  group_id
       }
     }
     return $value;
+  }
+
+  /**
+   * Returns a string describing which forms/modules are using a given profile
+   * Ex: Used in Forms: CiviContribute (1, 3, 5), CiviEvent (40, 42, 55, 123 and XX more)
+   *
+   * @return string|null
+   */
+  public static function getProfileUsedByString($profileID) {
+    $otherModules = \Civi\Api4\UFJoin::get(TRUE)
+      ->addWhere('uf_group_id', '=', $profileID)
+      ->addWhere('module', '!=', 'Profile')
+      ->addOrderBy('entity_id', 'ASC')
+      ->execute();
+    if (empty($otherModules)) {
+      return NULL;
+    }
+    $otherModulesTranslations = [
+      'on_behalf' => ts('On Behalf Of Organization'),
+      'User Account' => ts('User Account'),
+      'User Registration' => ts('User Registration'),
+      'CiviContribute' => ts('CiviContribute'),
+      'CiviEvent' => ts('CiviEvent'),
+      'CiviEvent_Additional' => ts('CiviEvent Additional Participant'),
+    ];
+    $modulesByComponent = [];
+    foreach ($otherModules as $join) {
+      $modulesByComponent[$join['module']][] = $join['entity_id'];
+    }
+    $modulesByComponentReformat = [];
+    foreach ($modulesByComponent as $key => $vals) {
+      $count = count($vals);
+      // Specific use-case for User Registration, Search Profile, etc, which will
+      // return an empty vals[0], so it would display "User Registration ()"
+      if ($count == 1 && empty($vals[0])) {
+        $modulesByComponentReformat[] = $otherModulesTranslations[$key] ?? $key;
+      }
+      elseif ($count > 7) {
+        // Keep only 5 and say "and X more"
+        $vals = array_slice($vals, 0, 5);
+        $modulesByComponentReformat[] = ($otherModulesTranslations[$key] ?? $key) . ' (' . implode(', ', $vals) . ' ' . ts('and %count more', ['count' => $count - 5, 'plural' => 'and %count more']) . ')';
+      }
+      else {
+        $modulesByComponentReformat[] = ($otherModulesTranslations[$key] ?? $key) . ' (' . implode(', ', $vals) . ')';
+      }
+    }
+    return implode(', ', $modulesByComponentReformat);
   }
 
 }

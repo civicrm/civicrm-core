@@ -46,6 +46,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       'records' => [
         ['first_name' => 'A', 'last_name' => 'Aaa', 'email_primary.email' => 'a@a.a', 'address_primary.city' => 'A Town'],
         ['first_name' => 'B', 'last_name' => 'Bbb', 'email_primary.email' => 'b@b.b', 'address_primary.city' => 'B Town'],
+        ['email_primary.email' => 'c@c.c'],
       ],
     ]);
     $result = Contact::autocomplete(FALSE)
@@ -57,6 +58,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals('Aaa, A', $result[$contacts[0]['id']]['label']);
     $this->assertEquals('a@a.a', $result[$contacts[0]['id']]['description'][0]);
     $this->assertArrayNotHasKey($contacts[1]['id'], $result);
+    $this->assertArrayNotHasKey($contacts[2]['id'], $result);
 
     // Name + city
     Setting::set(FALSE)
@@ -73,6 +75,20 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals('b@b.b', $result[$contacts[1]['id']]['description'][0]);
     $this->assertEquals('B Town', $result[$contacts[1]['id']]['description'][1]);
     $this->assertArrayNotHasKey($contacts[0]['id'], $result);
+    $this->assertArrayNotHasKey($contacts[2]['id'], $result);
+
+    $result = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('c@c.c')
+      ->setDebug(TRUE)
+      ->execute();
+
+    // Contact email is identical to the display name. Ensure only 1 result is returned.
+    $this->assertCount(1, $result);
+    $this->assertStringContainsString('UNION DISTINCT', $result->debug['sql'][0]);
+    $this->assertEquals('c@c.c', $result[0]['label']);
+    $this->assertEquals('c@c.c', $result[0]['description'][0]);
   }
 
   public function testQuicksearchAutocompleteWithMultiRecordCustomField(): void {

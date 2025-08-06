@@ -7,6 +7,7 @@
       // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
       ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait);
 
+    this.apiBatch = $scope.apiBatch = this.task.apiBatch;
     this.entityTitle = this.getEntityTitle();
 
     // If no selectable fields or confirmation message, skip straight to processing
@@ -38,7 +39,7 @@
       if (result.action === 'inlineEdit') {
         CRM.status(ts('Saved'));
       } else {
-        CRM.alert(ts(ctrl.apiBatch.successMsg, {1: result.batchCount, 2: entityTitle}), ts('%1 Complete', {1: ctrl.taskTitle}), 'success');
+        CRM.alert(ts(ctrl.apiBatch.successMsg, {1: result.batchCount, 2: entityTitle}), ts('%1 Complete', {1: ctrl.task.title}), 'success');
       }
       this.close(result);
     };

@@ -1,5 +1,6 @@
 <label ng-if="$ctrl.showLabel && $ctrl.field.label" for="{{:: $ctrl.domId }}">
   {{ $ctrl.field.label }}
+  <span class="crm-marker" ng-if="!$ctrl.field.nullable || $ctrl.field.required">*</span>
 </label>
 <div ng-switch="$ctrl.op || ''" class="form-group" ng-form="{{ $ctrl.name || '' }}">
 
