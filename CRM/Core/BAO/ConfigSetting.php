@@ -82,7 +82,7 @@ class CRM_Core_BAO_ConfigSetting {
 
     //we are initializing config, really can't use, CRM-7863
     $urlVar = 'q';
-    if (defined('CIVICRM_UF') && CIVICRM_UF == 'Joomla') {
+    if (defined('CIVICRM_UF') && (CIVICRM_UF == 'Joomla' || CIVICRM_UF == 'Joomla5')) {
       $urlVar = 'task';
     }
 
