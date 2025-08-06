@@ -55,7 +55,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
     ];
 
     // Check permissions to Revert
-    if (\CRM_Core_Permission::check('manage own afform') && (empty($item['created_id']) || $item['created_id'] !== \CRM_Core_Session::getLoggedInContactID())) {
+    if ($this->getCheckPermissions() && \CRM_Core_Permission::check('manage own afform') && (empty($item['created_id']) || $item['created_id'] !== \CRM_Core_Session::getLoggedInContactID())) {
       throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this afform.');
     }
 
@@ -89,7 +89,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
    * @return string[]
    */
   protected function getSelect() {
-    return ['name', 'title', 'placement', 'server_route', 'created_id'];
+    return ['name', 'title', 'placement', 'server_route', 'created_id', 'check_permission'];
   }
 
 }
