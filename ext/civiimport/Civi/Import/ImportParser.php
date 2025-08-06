@@ -594,17 +594,10 @@ abstract class ImportParser extends \CRM_Import_Parser {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function getDedupeRules(array $dedupeRuleIDs, $contact_type) {
+  protected function getDedupeRules(array $dedupeRuleIDs) {
     $dedupeRules = [];
-    if (!empty($dedupeRuleIDs)) {
-      foreach ($dedupeRuleIDs as $dedupeRuleID) {
-        $dedupeRules[] = is_numeric($dedupeRuleID) ? $this->getDedupeRuleName($dedupeRuleID) : $dedupeRuleID;
-      }
-      return $dedupeRules;
-    }
-    $contactTypes = $contact_type ? (array) $contact_type : \CRM_Contact_BAO_ContactType::basicTypes();
-    foreach ($contactTypes as $contactType) {
-      $dedupeRules[] = $this->getDefaultRuleForContactType($contactType);
+    foreach ($dedupeRuleIDs as $dedupeRuleID) {
+      $dedupeRules[] = is_numeric($dedupeRuleID) ? $this->getDedupeRuleName($dedupeRuleID) : $dedupeRuleID;
     }
     return $dedupeRules;
   }
