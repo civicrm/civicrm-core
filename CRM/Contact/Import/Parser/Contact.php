@@ -586,6 +586,82 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
+   * Get contacts that match the input parameters, using a dedupe rule.
+   *
+   * @param array $params
+   * @param int|null|array $dedupeRuleID
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPossibleMatchesByDedupeRule(array $params, $dedupeRuleID = NULL): array {
+    foreach (['email', 'address', 'phone', 'im'] as $locationEntity) {
+      if (array_key_exists($locationEntity, $params)) {
+        // Prefer primary
+        if (array_key_exists('Primary', $params[$locationEntity])) {
+          $locationParams = $params[$locationEntity]['Primary'];
+        }
+        else {
+          // Chose the first one - at least they can manipulate the order.
+          $locationParams = reset($params[$locationEntity]);
+        }
+        foreach ($locationParams as $key => $locationParam) {
+          // Even though we might not be using 'primary' we 'pretend' here
+          // since the apiv4 code expects that...
+          $params[$locationEntity . '_primary' . '.' . $key] = $locationParam;
+        }
+        unset($params[$locationEntity]);
+      }
+    }
+    foreach ($params as $key => $value) {
+      if (str_starts_with($key, 'custom_')) {
+        $params[CRM_Core_BAO_CustomField::getLongNameFromShortName($key)] = $value;
+        unset($params[$key]);
+      }
+    }
+
+    $matchIDs = [];
+    $dedupeRules = $this->getDedupeRules((array) $dedupeRuleID, $params['contact_type'] ?? NULL);
+    foreach ($dedupeRules as $dedupeRule) {
+      if ($dedupeRule === 'unique_email_match') {
+        if (empty($params['email_primary.email'])) {
+          continue;
+        }
+        // This is a pseudo-rule that works across contact type...
+        foreach (\Civi\Api4\Email::get()
+          ->addWhere('email', '=', $params['email_primary.email'])
+          ->addWhere('contact_id.is_deleted', '=', FALSE)
+          // More than 10 gets a bit silly.
+          ->setLimit(10)
+          ->execute()->indexBy('contact_id') as $match) {
+
+          $matchIDs[$match['contact_id']] = $match['contact_id'];
+        }
+      }
+      else {
+        $isMatchFirst = str_ends_with($dedupeRule, '.first');
+        if ($isMatchFirst) {
+          $dedupeRule = substr($dedupeRule, 0, -6);
+        }
+        $possibleMatches = \Civi\Api4\Contact::getDuplicates(FALSE)
+          ->setValues($params)
+          ->setDedupeRule($dedupeRule)
+          ->execute();
+
+        foreach ($possibleMatches as $possibleMatch) {
+          $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+          if ($isMatchFirst) {
+            return $matchIDs;
+          }
+        }
+      }
+    }
+
+    return $matchIDs;
+  }
+
+  /**
    * Fill in the primary location.
    *
    * If the contact has a primary address we update it. Otherwise

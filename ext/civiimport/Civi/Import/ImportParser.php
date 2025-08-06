@@ -477,4 +477,112 @@ abstract class ImportParser extends \CRM_Import_Parser {
     return $this->removeEmptyValues($params);
   }
 
+  /**
+   * Get the contact ID for the imported row.
+   *
+   * If we have a contact ID we check it is valid and, if there is also
+   * an external identifier we check it does not conflict.
+   *
+   * Failing those we try a dedupe lookup.
+   *
+   * @param array $contactParams
+   * @param int|null $contactID
+   * @param string $entity
+   *   Entity, as described in getImportEntities.
+   * @param array|null $dedupeRules
+   *   Dedupe rules to apply (will default to unsupervised rule)
+   *
+   * @return int|null
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactID(array $contactParams, ?int $contactID, string $entity, ?array $dedupeRules = NULL): ?int {
+    $contactType = $contactParams['contact_type'] ?? NULL;
+    if ($contactID) {
+      $this->validateContactID($contactID, $contactType);
+    }
+    if (!empty($contactParams['external_identifier'])) {
+      $contactID = $this->lookupExternalIdentifier($contactParams['external_identifier'], $contactType, $contactID ?? NULL);
+    }
+    if (!$contactID) {
+      $action = $this->getActionForEntity($entity);
+      $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams, $dedupeRules);
+      if (count($possibleMatches) === 1) {
+        $contactID = array_key_first($possibleMatches);
+      }
+      elseif (count($possibleMatches) > 1) {
+        throw new \CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $possibleMatches));
+      }
+      elseif (!in_array($action, ['create', 'ignore', 'save'], TRUE)) {
+        throw new \CRM_Core_Exception(ts('No matching %1 found', [$entity, 'String']));
+      }
+    }
+    if ($contactID && !isset($contactParams['is_deleted']) && $this->getExistingContactValue($contactID, 'is_deleted')) {
+      // The contact may have been merged since the contact ID was determined (common in cases where
+      // a list of contacts is exported and the some time later imported with augmented data.
+      // As long as is_deleted is not set (ie the importer is not trying to undelete the contact) we can
+      // use the merged to contact instead, if exists.
+      // Note using checkPermissions = FALSE as currently this requires administer CiviCRM
+      // but potentially reviewing that.
+      $result = Contact::getMergedTo(FALSE)
+        ->setContactId($contactID)
+        ->execute()->first();
+      if ($result) {
+        $contactID = $result['id'];
+      }
+    }
+    return $contactID;
+  }
+
+  /**
+   * Get contacts that match the input parameters, using a dedupe rule.
+   *
+   * @param array $params
+   * @param int|null|array $dedupeRuleID
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPossibleMatchesByDedupeRule(array $params, $dedupeRuleID = NULL): array {
+    $matchIDs = [];
+    $dedupeRules = $this->getDedupeRules((array) $dedupeRuleID, $params['contact_type'] ?? NULL);
+    foreach ($dedupeRules as $dedupeRule) {
+      if ($dedupeRule === 'unique_email_match') {
+        if (empty($params['email_primary.email'])) {
+          continue;
+        }
+        // This is a pseudo-rule that works across contact type...
+        foreach (Email::get()
+          ->addWhere('email', '=', $params['email_primary.email'])
+          ->addWhere('contact_id.is_deleted', '=', FALSE)
+          // More than 10 gets a bit silly.
+          ->setLimit(10)
+          ->execute()->indexBy('contact_id') as $match) {
+
+          $matchIDs[$match['contact_id']] = $match['contact_id'];
+        }
+      }
+      else {
+        $isMatchFirst = str_ends_with($dedupeRule, '.first');
+        if ($isMatchFirst) {
+          $dedupeRule = substr($dedupeRule, 0, -6);
+        }
+        $possibleMatches = Contact::getDuplicates(FALSE)
+          ->setValues($params)
+          ->setDedupeRule($dedupeRule)
+          ->execute();
+
+        foreach ($possibleMatches as $possibleMatch) {
+          $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+          if ($isMatchFirst) {
+            return $matchIDs;
+          }
+        }
+      }
+    }
+
+    return $matchIDs;
+  }
+
 }
