@@ -43,8 +43,10 @@ trait AfformSaveTrait {
 
     // Check if updating or creating
     if ($orig) {
+      // Get user as we need to check for Test user
+      $user_id = \CRM_Core_Session::getLoggedInContactID();
       // We have an existing afform, so we need to check `manage own afform` permissions
-      if ($this->getCheckPermissions() && \CRM_Core_Permission::check('manage own afform') && (empty($item['created_id']) || $item['created_id'] !== \CRM_Core_Session::getLoggedInContactID())) {
+      if ($this->getCheckPermissions() && !empty($user_id) && \CRM_Core_Permission::check('manage own afform') && (empty($item['created_id']) || $item['created_id'] !== $user_id)) {
         throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this afform.');
       }
     } else {

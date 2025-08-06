@@ -53,9 +53,11 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
       \CRM_Afform_AfformScanner::METADATA_JSON,
       \CRM_Afform_AfformScanner::LAYOUT_FILE,
     ];
+    // Get user as we need to check for Test user
+    $user_id = \CRM_Core_Session::getLoggedInContactID();
 
     // Check permissions to Revert
-    if ($this->getCheckPermissions() && \CRM_Core_Permission::check('manage own afform') && (empty($item['created_id']) || $item['created_id'] !== \CRM_Core_Session::getLoggedInContactID())) {
+    if ($this->getCheckPermissions() && !empty($user_id) && \CRM_Core_Permission::check('manage own afform') && (empty($item['created_id']) || $item['created_id'] !== $user_id)) {
       throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this afform.');
     }
 
