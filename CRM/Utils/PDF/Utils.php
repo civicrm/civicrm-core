@@ -168,6 +168,7 @@ class CRM_Utils_PDF_Utils {
    */
   public static function _html2pdf_weasyprint($html, $output, $fileName) {
     $weasyprint = new Pontedilana\PhpWeasyPrint\Pdf(\Civi::settings()->get('weasyprint_path'));
+    $weasyprint->setTimeout((int) ini_get('max_execution_time'));
     $pdf = $weasyprint->getOutputFromHtml($html);
     if ($output) {
       return $pdf;
