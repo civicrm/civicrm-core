@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomValue;
+use Civi\Api4\IM;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 use Civi\Api4\Activity;
@@ -180,6 +181,69 @@ class CreateCustomValueTest extends Api4TestBase {
         'MyActivityFields.activity_select_field' => [],
       ])
       ->execute();
+  }
+
+  public function testCustomFieldDefaultsGetWrittenOnCreate(): void {
+    $contactID = $this->createTestRecord('Contact')['id'];
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'IMCustom',
+      'extends' => 'IM',
+    ]);
+
+    $optionValues = ['o' => 'Orange', 'p' => 'Purple', 'c' => 'Crimson'];
+    $customSelectFieldDefault = 'p';
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id:name', 'IMCustom')
+      ->addValue('label', 'Select Field')
+      ->addValue('name', 'im_select_field')
+      ->addValue('data_type', 'String')
+      ->addValue('html_type', 'Select')
+      ->addValue('option_values', $optionValues)
+      ->addValue('default_value', $customSelectFieldDefault)
+      ->execute();
+
+    $customBoolFieldDefault = FALSE;
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id:name', 'IMCustom')
+      ->addValue('label', 'Yes/No Field')
+      ->addValue('name', 'im_boolean_field')
+      ->addValue('data_type', 'Boolean')
+      ->addValue('html_type', 'Radio')
+      ->addValue('default_value', $customBoolFieldDefault)
+      ->execute();
+
+    $coreFieldDefault = IM::getFields(TRUE)
+      ->addWhere('name', '=', 'is_billing')
+      ->addSelect('default_value')
+      ->execute()->single()['default_value'];
+
+    // No custom field values given to Create action
+    $result = IM::create()
+      ->addValue('contact_id', $contactID)
+      ->addValue('location_type_id:name', 'Home')
+      ->addChain('created_im', \Civi\Api4\IM::get()
+        ->addSelect('is_billing', 'custom.*')
+        ->addWhere('id', '=', '$id')
+      )
+      ->execute()->single()['created_im'][0];
+
+    self::assertEquals($coreFieldDefault, $result['is_billing']);
+    self::assertEquals($customSelectFieldDefault, $result['IMCustom.im_select_field']);
+    self::assertEquals($customBoolFieldDefault, $result['IMCustom.im_boolean_field']);
+
+    // One custom field value given to Create action, the other left blank
+    $result = IM::create()
+      ->addValue('contact_id', $contactID)
+      ->addValue('location_type_id:name', 'Home')
+      ->addValue('IMCustom.im_select_field', 'c')
+      ->addChain('created_im', \Civi\Api4\IM::get()
+        ->addSelect('custom.*')
+        ->addWhere('id', '=', '$id')
+      )
+      ->execute()->single()['created_im'][0];
+
+    self::assertEquals('c', $result['IMCustom.im_select_field']);
+    self::assertEquals($customBoolFieldDefault, $result['IMCustom.im_boolean_field']);
   }
 
 }
