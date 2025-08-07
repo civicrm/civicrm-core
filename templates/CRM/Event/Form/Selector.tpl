@@ -48,7 +48,7 @@
     </td>
     <td class="crm-participant-participant_fee_level">
       {assign var="participant_id" value=$row.participant_id}
-      {if array_key_exists($participant_id, $lineItems)}
+      {if !empty($lineItems) && array_key_exists($participant_id, $lineItems)}
         {foreach from=$lineItems.$participant_id item=line name=lineItemsIter}
           {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if}: {$line.qty}
           {if ! $smarty.foreach.lineItemsIter.last}<br />{/if}
