@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
+
 /**
  *
  * @package CRM
@@ -315,6 +318,18 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, 'ContributionPage');
 
     $dao = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
+
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $dao->id, NULL);
+    if (!empty($priceSetId) && CRM_Price_BAO_PriceSet::isQuickConfig($priceSetId)) {
+      $priceFieldIds = PriceField::get(FALSE)
+        ->addWhere('price_set_id', '=', $priceSetId)
+        ->execute()
+        ->column('id');
+      PriceFieldValue::update(FALSE)
+        ->addValue('financial_type_id', $params['financial_type_id'])
+        ->addWhere('price_field_id', 'IN', $priceFieldIds)
+        ->execute();
+    }
 
     $ufJoinParams = [
       'is_organization' => [
