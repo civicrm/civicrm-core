@@ -1,15 +1,6 @@
 diff -ruN DB/common.php DB/common.php
 --- DB/common.php	2020-04-20 05:45:59.000000000 +1000
 +++ DB/common.php	2020-08-01 14:46:53.146175149 +1000
-@@ -147,7 +147,7 @@
-      */
-     function __construct()
-     {
--        $this->PEAR('DB_Error');
-+        parent::__construct('DB_Error');
-     }
-
-     // }}}
 @@ -1150,7 +1147,22 @@
       */
      function modifyQuery($query)
@@ -32,38 +23,8 @@ diff -ruN DB/common.php DB/common.php
 +        // CRM-20445 ends.
 +        return $e->query;
      }
- 
+
      // }}}
-@@ -1882,7 +1894,7 @@
-      *
-      * @see PEAR_Error
-      */
--    function &raiseError($code = DB_ERROR, $mode = null, $options = null,
-+    function raiseError($code = DB_ERROR, $mode = null, $options = null,
-                          $userinfo = null, $nativecode = null, $dummy1 = null,
-                          $dummy2 = null)
-     {
-@@ -2255,6 +2267,20 @@
-     }
- 
-     // }}}
-+    // {{{ lastInsertId()
-+
-+   /**
-+    * Get the most recently inserted Id
-+    *
-+    * @throws RuntimeException
-+    */
-+    function lastInsertId()
-+    {
-+        throw new \RuntimeException("Not implemented: " . get_class($this) . '::lastInsertId');
-+    }
-+
-+    // }}}
-+
- }
- 
- /*
 diff -ruN DB/mysqli.php DB/mysqli.php
 --- DB/mysqli.php	2020-04-20 05:45:59.000000000 +1000
 +++ DB/mysqli.php	2020-08-01 14:51:11.871272253 +1000
@@ -89,39 +50,9 @@ diff -ruN DB/mysqli.php DB/mysqli.php
 +    }
 +
 +    // }}}
- 
+
  }
- 
-diff -ruN DB/mysql.php DB/mysql.php
---- DB/mysql.php	2020-04-20 05:45:59.000000000 +1000
-+++ DB/mysql.php	2020-08-01 14:48:58.276132870 +1000
-@@ -1021,6 +1024,14 @@
-     }
- 
-     // }}}
-+    // {{{ lastInsertId()
-+
-+    function lastInsertId()
-+    {
-+        return mysql_insert_id($this->connection);
-+    }
-+
-+    // }}}
- 
- }
- 
-diff -ruN DB/storage.php DB/storage.php
---- DB/storage.php   2020-04-20 05:45:59.000000000 +1000
-+++ DB/storage.php       2020-08-01 15:24:40.814621336 +1000
-@@ -96,7 +96,7 @@
-      */
-     function __construct($table, $keycolumn, &$dbh, $validator = null)
-     {
--        $this->PEAR('DB_Error');
-+        parent::__construct('DB_Error');
-         $this->_table = $table;
-         $this->_keycolumn = $keycolumn;
-         $this->_dbh = $dbh;
+
 diff -ruN DB.php DB.php
 --- DB.php	2020-04-20 05:45:59.000000000 +1000
 +++ DB.php	2020-08-01 14:43:45.338870953 +1000

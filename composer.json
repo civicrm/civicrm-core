@@ -99,7 +99,7 @@
     "typo3/phar-stream-wrapper": "^3.0 || ^4.0",
     "brick/money": "~0.5",
     "pear/mail_mime": "~1.10",
-    "pear/db": "~1.12.1",
+    "pear/db": "~1.12.2",
     "civicrm/composer-compile-lib": "~0.6 || ~1.0",
     "ezyang/htmlpurifier": "^4.13",
     "phpoffice/phpspreadsheet": "^1.18 || ^2",
@@ -292,7 +292,7 @@
       },
       "pear/db": {
         "Ensure that error messages about MySQL-SSL connections are reported": "https://download.civicrm.org/patches/a6e31a769218801fb1fb3d679ff72d3d8a7c5637d3bb7b78680cd7809552e0c6/mysqli-ssl.patch",
-        "Apply CiviCRM Customisations for the pear:db package": "https://download.civicrm.org/patches/83a3d0dd9f8e555a474ee433c453ff741a4dedf1983bad8b3566136e90f9c46b/pear_db_civicrm_changes.patch"
+        "Apply CiviCRM Customisations for the pear:db package": "https://download.civicrm.org/patches/47e125fec0c789b095880fa65c6037210b01179290d5727b22b70fa77333496b/pear_db_civicrm_changes.patch"
       },
       "pear/mail": {
         "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://download.civicrm.org/patches/00da3cfcfe0d24420665f3015a5d3ea72dc331a52636f009883892ed3c7fbf84/pear-mail.patch"
