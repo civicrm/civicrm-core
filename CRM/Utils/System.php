@@ -25,7 +25,7 @@ use GuzzleHttp\Psr7\Response;
  * FIXME: This is a massive and random collection that could be split into smaller services
  *
  * @method static array getCMSPermissionsUrlParams() Return the CMS-specific url for its permissions page.
- * @method static mixed permissionDenied() Show access denied screen.
+ * @method static void getCMSPermissionsUrlParams() Immediately stop script execution and display a 401 "Access Denied" page.
  * @method static string getContentTemplate(int|string $print = 0) Get the template path to render whole content.
  * @method static mixed logout() Log out the current user.
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
@@ -64,6 +64,23 @@ class CRM_Utils_System {
   public static function __callStatic($name, $arguments) {
     $userSystem = CRM_Core_Config::singleton()->userSystem;
     return call_user_func_array([$userSystem, $name], $arguments);
+  }
+
+  /**
+   * Respond that permission has been denied.
+   *
+   * @return never
+   *   NOTE: The keyword "never" introduced in PHP 8.1+.
+   *   This is a soft docblock, so we can use it anyway.
+   * @throws \CRM_Core_Exception
+   */
+  public static function permissionDenied() {
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
+    $userSystem->permissionDenied();
+    // The UF-drivers might emit an exception, send a redirect, or print a message.
+    // They sometimes terminate - but not always. Let's ensure that the
+    // termination is consistent.
+    return CRM_Utils_System::civiExit();
   }
 
   /**
@@ -482,9 +499,9 @@ class CRM_Utils_System {
    *   Page title (if different) - may include html
    */
   public static function setTitle($title, $pageTitle = NULL) {
-    self::$title = $title;
+    self::$title = $title = strip_tags($title ?: '');
     $config = CRM_Core_Config::singleton();
-    return $config->userSystem->setTitle(CRM_Utils_String::purifyHtml($title), CRM_Utils_String::purifyHtml($pageTitle));
+    return $config->userSystem->setTitle($title, CRM_Utils_String::purifyHtml($pageTitle));
   }
 
   /**
