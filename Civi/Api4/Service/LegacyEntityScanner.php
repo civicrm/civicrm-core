@@ -5,6 +5,7 @@ namespace Civi\Api4\Service;
 use Civi\Core\Service\AutoSubscriber;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Api4\Generic\EntityInterface;
+use CRM_Extension_Info;
 
 /**
  * This provides transitional support for extensions that provide Api4 Entities without
@@ -19,11 +20,21 @@ class LegacyEntityScanner extends AutoSubscriber {
 
   public static function getSubscribedEvents(): array {
     return [
-      'civi.api4.entityTypes' => 'getEntitiesFromClasses',
+      'civi.api4.entityTypes' => 'addEntities',
     ];
   }
 
-  public function getEntitiesFromClasses(GenericHookEvent $e): void {
+  public function addEntities(GenericHookEvent $e): void {
+    foreach (self::getEntitiesFromClasses() as $info) {
+      if (!isset($e->entities[$info['name']])) {
+        $e->entities[$info['name']] = $info;
+      }
+    }
+  }
+
+  protected static function getEntitiesFromClasses(): array {
+    $infos = [];
+
     $classNames = static::findClasses('Civi\Api4');
     foreach ($classNames as $className) {
       if (!class_exists($className)) {
@@ -34,11 +45,10 @@ class LegacyEntityScanner extends AutoSubscriber {
         // not an Api4 entity
         continue;
       }
-      $info = $className::getInfo();
-      if (!isset($e->entities[$info['name']])) {
-        $e->entities[$info['name']] = $info;
-      }
+      $infos[] = $className::getInfo();
     }
+
+    return $infos;
   }
 
   /**
@@ -63,8 +73,8 @@ class LegacyEntityScanner extends AutoSubscriber {
 
     $namespace = \CRM_Utils_File::addTrailingSlash($namespace, '\\');
 
-    // can we exclude extensions with scan classes enabled?
-    $locations = array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath');
+    // get file paths to extensions WITHOUT scan classes
+    $locations = self::getExtensionFoldersToScan();
 
     foreach ($locations as $location) {
       $path = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
@@ -75,6 +85,36 @@ class LegacyEntityScanner extends AutoSubscriber {
       }
     }
     return $classes;
+  }
+
+  /**
+   * Get file paths for extensions WITHOUT scan classes
+   * @return array
+   */
+  protected static function getExtensionFoldersToScan(): array {
+    // get file paths to extensions WITHOUT scan classes
+    $locations = [];
+
+    $mapper = \CRM_Extension_System::singleton()->getMapper();
+    $active = $mapper->getActiveModuleFiles();
+    $infos = $mapper->getAllInfos();
+
+    foreach ($active as $ext) {
+      $info = $infos[$ext['fullName']];
+      if (!self::hasScanClasses($info)) {
+        $locations[] = $ext['filePath'];
+      }
+    }
+    return $locations;
+  }
+
+  private static function hasScanClasses(CRM_Extension_Info $info): bool {
+    foreach ($info->mixins as $mixin) {
+      if (\str_starts_with($mixin, 'scan-classes@')) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }
