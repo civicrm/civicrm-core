@@ -15,6 +15,16 @@
   <compatibility>
     <ver>4.1</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>This is a new, undeveloped module</comments>
   <civix>
     <namespace>CRM/Demoqueue</namespace>
