@@ -1230,7 +1230,8 @@ class CRM_Core_DAO extends DB_DataObject {
     if (!empty($record[$idField])) {
       return;
     }
-    foreach ($entity->getFields() as $fieldName => $field) {
+    $fields = $entity->getFields() + $entity->getCustomFields();
+    foreach ($fields as $fieldName => $field) {
       if (!empty($field['default_fallback'])) {
         $field += ['default_callback' => [__CLASS__, 'getDefaultFallbackValues']];
       }
