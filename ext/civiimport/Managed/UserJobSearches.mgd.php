@@ -127,7 +127,13 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
-                  'condition' => [],
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      '!=',
+                      'draft',
+                    ],
+                  ],
                 ],
                 [
                   'size' => 'btn-xs',
@@ -159,7 +165,16 @@ return [
                         [
                           'status_id:name',
                           'IN',
-                          ['draft', 'complete_with_errors', 'incomplete'],
+                          [
+                            'draft',
+                            'complete_with_errors',
+                            'incomplete',
+                          ],
+                        ],
+                        [
+                          'job_type:name',
+                          '!=',
+                          'contact_import',
                         ],
                       ],
                       'task' => '',
@@ -485,7 +500,16 @@ return [
                     [
                       'status_id:name',
                       'IN',
-                      ['draft', 'complete_with_errors', 'incomplete'],
+                      [
+                        'draft',
+                        'complete_with_errors',
+                        'incomplete',
+                      ],
+                    ],
+                    [
+                      'job_type:name',
+                      '!=',
+                      'contact_import',
                     ],
                   ],
                   'task' => '',
