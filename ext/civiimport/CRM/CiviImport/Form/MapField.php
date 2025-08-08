@@ -185,7 +185,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     try {
       $parser = $self->getParser();
       $mappings = $self->getFieldMappings();
-      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
+      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'][0] ?? NULL);
       $mapperError = $self->validateContactFields($rule, $mappings, ['contact_id', 'external_identifier']);
       $parser->validateMapping($mappings);
     }
