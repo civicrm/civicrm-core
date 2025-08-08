@@ -82,7 +82,7 @@ class AfformAccessSubscriber extends AutoService implements EventSubscriberInter
    */
   protected function checkAccess($apiRequest, $afform, $user_id) {
     // Check permissions to Revert
-    if ($apiRequest->getCheckPermissions() && !\CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && \CRM_Core_Permission::check('manage own afform') && (empty($afform['created_id']) || $afform['created_id'] !== $user_id)) {
+    if ($apiRequest->getCheckPermissions() && !\CRM_Core_Permission::check('administer afform') && \CRM_Core_Permission::check('manage own afform') && (empty($afform['created_id']) || $afform['created_id'] !== $user_id)) {
       return FALSE;
     }
     return TRUE;

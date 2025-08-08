@@ -33,10 +33,10 @@
       // Check for ownership and correct permission
       if (afform.created_id) {
         // Permission, manage own afform, is to only manage afform's the user created
-        if (!CRM.checkPerm('all CiviCRM permissions and ACLs') && CRM.checkPerm('manage own afform') && (CRM.config.cid !== afform.created_id)) {
-          afform.can_manage = false;
+        if (CRM.checkPerm('manage own afform') && (CRM.config.cid === afform.created_id)) {
+          afform.can_manage = true;
         }
-      } else if (!CRM.checkPerm('all CiviCRM permissions and ACLs') && CRM.checkPerm('manage own afform')) {
+      } else if (CRM.checkPerm('manage own afform')) {
         // No created_id, so user doesn't have permission to manage.
         afform.can_manage = false;
       }

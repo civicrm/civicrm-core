@@ -178,7 +178,7 @@ function _afform_hook_civicrm_angularModules($e) {
       ],
       // Permissions needed for conditionally displaying edit-links
       'permissions' => [
-        'administer afform',
+        'manage own afform',
         'administer search_kit',
         'all CiviCRM permissions and ACLs',
       ],
@@ -322,7 +322,7 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
       // Check authx token
       isset($data['jwt']['scope'], $data['flow']) && $data['jwt']['scope'] === 'afform' && $data['flow'] === 'afformpage'
       // Allow admins to edit forms without requiring a token
-      || CRM_Core_Permission::check('administer afform');
+      || CRM_Core_Permission::check('manage own afform');
   }
 }
 
@@ -552,7 +552,7 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
         ],
       ],
       'conditions' => [
-        ['check user permission', '=', ['administer afform']],
+        ['check user permission', '=', ['manage own afform']],
       ],
       'confirmMsg' => E::ts('Confirm processing %1 %2.'),
       'runMsg' => E::ts('Processing %1 %2...'),

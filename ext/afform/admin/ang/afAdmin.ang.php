@@ -13,7 +13,6 @@ return [
   'basePages' => ['civicrm/admin/afform'],
   'bundles' => ['bootstrap3'],
   'permissions' => [
-    'all CiviCRM permissions and ACLs',
     'administer afform',
     'manage own afform',
   ],
