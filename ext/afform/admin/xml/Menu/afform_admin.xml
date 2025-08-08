@@ -3,6 +3,6 @@
   <item>
     <path>civicrm/admin/afform</path>
     <page_callback>CRM_AfformAdmin_Page_Base</page_callback>
-    <access_arguments>administer afform</access_arguments>
+    <access_arguments>manage own afform</access_arguments>
   </item>
 </menu>

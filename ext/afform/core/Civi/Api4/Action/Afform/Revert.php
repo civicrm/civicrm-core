@@ -84,7 +84,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
    * @return string[]
    */
   protected function getSelect() {
-    return ['name', 'title', 'placement', 'server_route'];
+    return ['name', 'title', 'placement', 'server_route', 'created_id'];
   }
 
 }

@@ -119,9 +119,9 @@
         {{:: afform.tags.join(', ') }}
       </td>
       <td class="text-right">
-        <a ng-if="afform.type !== 'system'" ng-href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
+        <a ng-if="afform.type !== 'system' && afform.can_manage" ng-href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
         <a ng-if="afform.type !== 'system'" ng-href="#/clone/{{:: afform.name }}" class="btn btn-xs btn-secondary">{{:: ts('Clone') }}</a>
-        <a href ng-if="afform.has_local" class="btn btn-xs btn-{{ afform.has_base ? 'warning' : 'danger' }}" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
+        <a href ng-if="afform.has_local && afform.can_manage" class="btn btn-xs btn-{{ afform.has_base ? 'warning' : 'danger' }}" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
           {{ afform.has_base ? ts('Revert') : ts('Delete') }}
         </a>
       </td>
