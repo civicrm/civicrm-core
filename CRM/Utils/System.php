@@ -25,7 +25,6 @@ use GuzzleHttp\Psr7\Response;
  * FIXME: This is a massive and random collection that could be split into smaller services
  *
  * @method static array getCMSPermissionsUrlParams() Return the CMS-specific url for its permissions page.
- * @method static void getCMSPermissionsUrlParams() Immediately stop script execution and display a 401 "Access Denied" page.
  * @method static string getContentTemplate(int|string $print = 0) Get the template path to render whole content.
  * @method static mixed logout() Log out the current user.
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
