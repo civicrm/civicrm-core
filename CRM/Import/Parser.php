@@ -584,22 +584,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Get the dedupe rule name.
-   *
-   * @param int $id
-   *
-   * @return string
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getDedupeRuleName(int $id): string {
-    return DedupeRuleGroup::get(FALSE)
-      ->addWhere('id', '=', $id)
-      ->addSelect('name')
-      ->execute()->first()['name'];
-  }
-
-  /**
    * Validate that the field requirements are met in the params.
    *
    * @param array $requiredFields
