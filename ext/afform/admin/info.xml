@@ -14,7 +14,7 @@
   </urls>
   <releaseDate>[civicrm.releaseDate]</releaseDate>
   <version>[civicrm.version]</version>
-  <develStage>beta</develStage>
+  <develStage>stable</develStage>
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
