@@ -1329,4 +1329,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     return $dedupeRules;
   }
 
+  /**
+   * Get the dedupe rule name.
+   *
+   * @param int $id
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDedupeRuleName(int $id): string {
+    return DedupeRuleGroup::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->addSelect('name')
+      ->execute()->first()['name'];
+  }
+
 }
