@@ -35,10 +35,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   private function assignCiviimportVariables(): void {
-    $contactTypes = [];
-    foreach (CRM_Contact_BAO_ContactType::basicTypeInfo() as $contactType) {
-      $contactTypes[] = ['id' => $contactType['name'], 'text' => $contactType['label']];
-    }
+    $contactTypes = CRM_Utils_Array::formatForSelect2(CRM_Contact_BAO_ContactType::basicTypeInfo(), 'name', 'label');
     $parser = $this->getParser();
     $this->isQuickFormMode = FALSE;
     Civi::resources()->addVars('crmImportUi', [
@@ -188,7 +185,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     try {
       $parser = $self->getParser();
       $mappings = $self->getFieldMappings();
-      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
+      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'][0] ?? NULL);
       $mapperError = $self->validateContactFields($rule, $mappings, ['contact_id', 'external_identifier']);
       $parser->validateMapping($mappings);
     }

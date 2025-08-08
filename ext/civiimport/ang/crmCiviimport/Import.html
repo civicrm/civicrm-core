@@ -47,7 +47,7 @@
         <div>
           <div>
             <label ng-if="entity.is_contact && entity.selected.action !== 'ignore'">
-              {{:: ts('Dedupe rule') }}  <input class="big" crm-ui-select='{data: getDedupeRule}' ng-model="entity.selected.dedupe_rule" />
+              {{:: ts('Dedupe rule') }}  <input class="big" crm-ui-select='{data: getDedupeRule, multiple: true}' ng-model="entity.selected.dedupe_rule" placeholder="{{:: data.dedupeRules.unique_identifier_match.title }}" ng-list />
             </label>
           </div>
         </div>

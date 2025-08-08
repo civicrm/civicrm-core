@@ -135,7 +135,7 @@ class ActivityParser extends ImportParser {
         'selected' => [
           'action' => 'select',
           'contact_type' => NULL,
-          'dedupe_rule' => 'unique_identifier_match',
+          'dedupe_rule' => ['unique_identifier_match'],
         ],
         'default_action' => 'select',
         'entity_name' => 'TargetContact',

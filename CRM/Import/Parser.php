@@ -1468,4 +1468,25 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     return $array;
   }
 
+  /**
+   * Given an array of contact values, figure out the contact type.
+   *
+   * @param array $values
+   * @return string
+   */
+  protected function guessContactType(array $values): string {
+    if (!empty($values['contact_type'])) {
+      return $values['contact_type'];
+    }
+    $contactFields = \Civi::entity('Contact')->getFields();
+    foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+      foreach ($contactFields as $fieldName => $field) {
+        if (($field['contact_type'] ?? NULL) === $contactType && !empty($values[$fieldName])) {
+          return $contactType;
+        }
+      }
+    }
+    return 'Individual';
+  }
+
 }
