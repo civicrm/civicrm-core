@@ -3869,7 +3869,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
     $statesByName = array_flip(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE));
-    $customFieldValues = [
+    $contact1CustomFieldValues = [
       $fileField => $file['id'],
       $linkField => 'https://example.org',
       $dateField => '2018-01-01 17:10:56',
@@ -3881,20 +3881,37 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $multiStateField => [$statesByName['Victoria'], $statesByName['Tasmania']],
       $booleanStateField => 1,
     ];
+    $customFieldKeys = array_keys($contact1CustomFieldValues);
     $this->callAPISuccess('Contact', 'create', array_merge([
       'id' => $contact1,
-    ], $customFieldValues));
+    ], $contact1CustomFieldValues));
 
     $contact2 = $this->individualCreate();
+    // Merge will run in 'safe' mode by default. We set up the two contacts to
+    // have no 'conflicts' -- for each field, the value is either NULL on
+    // contact 2, or the same as the value on contact 1.
+    $contact2CustomFieldValues = array_fill_keys($customFieldKeys, NULL);
+    $contact2CustomFieldValues[$linkField] = $contact1CustomFieldValues[$linkField];
+    $contact2CustomFieldValues[$dateField] = $contact1CustomFieldValues[$dateField];
+    $this->callAPISuccess('Contact', 'create', array_merge([
+      'id' => $contact2,
+    ], $contact2CustomFieldValues));
+
     $this->callAPISuccess('contact', 'merge', [
       'to_keep_id' => $contact2,
       'to_remove_id' => $contact1,
       'auto_flip' => FALSE,
     ]);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => array_keys($customFieldValues)]);
+
+    $contact1IsDeletedAfterMerge = $this->callAPISuccessGetValue('Contact', [
+      'return' => "contact_is_deleted",
+      'id' => $contact1,
+    ]);
+    $this->assertEquals(TRUE, $contact1IsDeletedAfterMerge);
+    $mergedContact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => $customFieldKeys]);
     $this->assertEquals($contact2, CRM_Core_DAO::singleValueQuery('SELECT entity_id FROM civicrm_entity_file WHERE file_id = ' . $file['id']));
-    foreach ($customFieldValues as $key => $value) {
-      $this->assertEquals($value, $contact[$key]);
+    foreach ($customFieldKeys as $key) {
+      $this->assertEquals($contact1CustomFieldValues[$key], $mergedContact[$key]);
     }
   }
 
