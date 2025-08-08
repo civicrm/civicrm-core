@@ -30,9 +30,11 @@
          <td width="100%"><label>{if $sms eq 1}{ts}SMS Status{/ts}{else}{ts}Mailing Status{/ts}{/if}</label><br />
            <div class="listing-box" style="height: auto">
              {foreach from=$form.mailing_status item="mailing_status_val"}
-               <div class="{cycle values="odd-row,even-row"}">
-                 {$mailing_status_val.html}
-               </div>
+              <div class="{cycle values="odd-row,even-row"}">
+                {if is_array($mailing_status_val) and array_key_exists('html', $mailing_status_val)}
+                  {$mailing_status_val.html}
+                {/if}
+              </div>
             {/foreach}
             <div class="{cycle values="odd-row,even-row"}">
               {$form.status_unscheduled.html}

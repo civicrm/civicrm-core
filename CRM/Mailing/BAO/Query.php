@@ -123,11 +123,6 @@ class CRM_Mailing_BAO_Query {
       $query->_tables['civicrm_campaign'] = 1;
     }
 
-    if ($query->_mode & CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
-      // base table is contact, so join recipients to it
-      $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients']
-        = " INNER JOIN civicrm_mailing_recipients ON civicrm_mailing_recipients.contact_id = contact_a.id ";
-    }
   }
 
   /**
@@ -254,6 +249,8 @@ class CRM_Mailing_BAO_Query {
   public static function whereClauseSingle(&$values, &$query) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
 
+    $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
+
     switch ($name) {
       case 'mailing_id':
         $selectedMailings = array_flip($value);
@@ -269,7 +266,6 @@ class CRM_Mailing_BAO_Query {
 
         $query->_qill[$grouping][] = "Mailing Name $op \"$selectedMailings\"";
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
-        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         return;
 
       case 'mailing_name':
@@ -282,7 +278,6 @@ class CRM_Mailing_BAO_Query {
         $query->_where[$grouping][] = "civicrm_mailing.name $op '$value'";
         $query->_qill[$grouping][] = "Mailing Namename $op \"$value\"";
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
-        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         return;
 
       case 'mailing_date':
@@ -323,7 +318,7 @@ class CRM_Mailing_BAO_Query {
         $values = [$name, $op, $value, $grouping, $wildcard];
         $daoOptions = Civi::entity('MailingEventBounce')->getOptions('bounce_type_id');
         $options = [];
-        foreach ($daoOptions as $option)  {
+        foreach ($daoOptions as $option) {
           $options[$option['id']] = $option['label'];
         }
         self::mailingEventQueryBuilder($query, $values,
@@ -400,7 +395,6 @@ class CRM_Mailing_BAO_Query {
         [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Mailing_DAO_Mailing', $name, $value, $op);
         $query->_qill[$grouping][] = ts('Campaign %1 %2', [1 => $op, 2 => $value]);
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
-        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         return;
     }
   }
@@ -436,7 +430,7 @@ class CRM_Mailing_BAO_Query {
 
     $daoOptions = Civi::entity('MailingEventBounce')->getOptions('bounce_type_id');
     $mailingBounceTypes = [];
-    foreach ($daoOptions as $option)  {
+    foreach ($daoOptions as $option) {
       $mailingBounceTypes[$option['id']] = $option['label'];
     }
     $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE,
@@ -510,7 +504,6 @@ class CRM_Mailing_BAO_Query {
 
     $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
     $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
-    $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
     $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
   }
 
