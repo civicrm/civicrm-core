@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Generic\Traits;
 
+use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
@@ -160,6 +161,9 @@ trait DAOActionTrait {
         $entityId = FormattingUtil::resolveContactID($idField, $entityId);
       }
       FormattingUtil::formatWriteParams($item, $this->entityFields());
+      if (!$entityId) {
+        self::ensureCustomFieldDefaultsAreWrittenOnCreate($item);
+      }
       $this->formatCustomParams($item, $entityId);
 
       if (!$entityId) {
@@ -278,6 +282,29 @@ trait DAOActionTrait {
         $record[$fieldName] = \CRM_Core_DAO::getFieldValue($fkDao, $value, 'id', $fkField);
       }
       unset($record[$key]);
+    }
+  }
+
+  protected function ensureCustomFieldDefaultsAreWrittenOnCreate(array &$record): void {
+    $specFilters = $record;
+    // The following lines are adapted from \CRM_Custom_Form_CustomDataTrait::addCustomDataFieldsToForm
+    // Reuse the same spec-gatherer from Api4.getFields
+    $spec = new RequestSpec($this->getEntityName(), 'create', $specFilters);
+    $fieldFilters = \Civi::service('spec_gatherer')->getCustomGroupFilters($spec);
+    if ($fieldFilters === NULL) {
+      return;
+    }
+    $customGroups = \CRM_Core_BAO_CustomGroup::getAll($fieldFilters);
+
+    foreach ($customGroups as $customGroup) {
+      foreach ($customGroup['fields'] as $field) {
+        $fieldName = "{$customGroup['name']}.{$field['name']}";
+        if (isset($field['default_value']) && !isset($record[$fieldName])) {
+          $record[$fieldName] = $field['default_value'];
+          // Setting the value for one field in the group will ensure that all get written
+          break;
+        }
+      }
     }
   }
 
