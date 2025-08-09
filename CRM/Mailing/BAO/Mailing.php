@@ -1131,6 +1131,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // If we are scheduling vai Mailing.create then also update the status to scheduled.
     if (empty($params['skip_legacy_scheduling']) && !empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
       $mailing->status = 'Scheduled';
+      $mailing->save();
     }
     if (!empty($params['search_id']) && !empty($params['group_id'])) {
       $mg->reset();
@@ -2239,9 +2240,9 @@ AND    e.id NOT IN ( SELECT email_id FROM civicrm_mailing_recipients mr WHERE ma
 
     if (empty($list)) {
       $query = "
-SELECT civicrm_mailing.id, civicrm_mailing.name, civicrm_mailing_job.end_date
+SELECT civicrm_mailing.id, civicrm_mailing.name, civicrm_mailing.end_date
 FROM   civicrm_mailing
-INNER JOIN civicrm_mailing_job ON civicrm_mailing.id = civicrm_mailing_job.mailing_id {$where}
+{$where}
 ORDER BY civicrm_mailing.id DESC";
       $mailing = CRM_Core_DAO::executeQuery($query);
 
