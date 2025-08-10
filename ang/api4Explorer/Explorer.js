@@ -549,9 +549,6 @@
             if (name === 'limit' && $scope.action === 'get') {
               defaultVal = 25;
             }
-            if (name === 'debug') {
-              defaultVal = true;
-            }
             if (name === 'values') {
               defaultVal = defaultValues(defaultVal);
             }
@@ -705,7 +702,6 @@
         index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index),
         result = 'result';
       if ($scope.entity && $scope.action) {
-        delete params.debug;
         if (action.slice(0, 3) === 'get') {
           var args = getEntity(entity).class_args || [];
           result = args[0] ? _.camelCase(args[0]) : entity;
@@ -966,8 +962,11 @@
     $scope.execute = function() {
       $scope.status = 'info';
       $scope.loading = true;
+      const apiParams = getParams();
+      // This is the Api Explorer, so we always want debug info available
+      apiParams.debug = true;
       $http.post(CRM.url('civicrm/ajax/api4/' + $scope.entity + '/' + $scope.action, {
-        params: angular.toJson(getParams()),
+        params: angular.toJson(apiParams),
         index: isInt($scope.index) ? +$scope.index : parseYaml($scope.index)
       }), null, {
         headers: {
