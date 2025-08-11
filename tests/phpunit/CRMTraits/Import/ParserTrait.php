@@ -55,7 +55,7 @@ trait CRMTraits_Import_ParserTrait {
       ->execute()->first()['metadata'];
     $userJobMetadata['entity_configuration'][$userJobMetadata['base_entity']]['action'] = $action;
     $userJobMetadata['entity_configuration']['Contact']['contact_type'] = $submittedValues['contactType'] ?? 'Individual';
-    $userJobMetadata['entity_configuration']['Contact']['dedupe_rule'] = ['IndividualSupervised'];
+    $userJobMetadata['entity_configuration']['Contact']['dedupe_rule'] = ['IndividualUnsupervised'];
     foreach ($fieldMappings as $index => $mapping) {
       if (isset($mapping['entity_data'])) {
         $userJobMetadata['entity_configuration']['SoftCreditContact'] = $mapping['entity_data']['soft_credit'];
