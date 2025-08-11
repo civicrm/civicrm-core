@@ -42,11 +42,9 @@ trait CRMTraits_Import_ParserTrait {
     $submittedValues = array_merge([
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => 'Individual',
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
-      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'groups' => [],
     ], $submittedValues);
     $this->submitDataSourceForm($csv, $submittedValues);
@@ -56,7 +54,8 @@ trait CRMTraits_Import_ParserTrait {
       ->addWhere('id', '=', $this->userJobID)
       ->execute()->first()['metadata'];
     $userJobMetadata['entity_configuration'][$userJobMetadata['base_entity']]['action'] = $action;
-    $userJobMetadata['entity_configuration']['Contact']['contact_type'] = $submittedValues['contactType'];
+    $userJobMetadata['entity_configuration']['Contact']['contact_type'] = $submittedValues['contactType'] ?? 'Individual';
+    $userJobMetadata['entity_configuration']['Contact']['dedupe_rule'] = ['IndividualSupervised'];
     foreach ($fieldMappings as $index => $mapping) {
       if (isset($mapping['entity_data'])) {
         $userJobMetadata['entity_configuration']['SoftCreditContact'] = $mapping['entity_data']['soft_credit'];
@@ -81,7 +80,7 @@ trait CRMTraits_Import_ParserTrait {
       ])
       ->execute();
     $form->buildForm();
-    $this->assertTrue($form->validate());
+    $this->assertTrue($form->validate(), 'Form failed to validate that the fields submitted met the dedupe rule requirements');
     $form->postProcess();
     $this->submitPreviewForm($submittedValues);
   }
