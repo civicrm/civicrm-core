@@ -80,7 +80,7 @@ trait CRMTraits_Import_ParserTrait {
       ])
       ->execute();
     $form->buildForm();
-    $this->assertTrue($form->validate(), 'Form failed to validate that the fields submitted met the dedupe rule requirements');
+    $this->assertTrue($form->validate(), 'Form failed to validate that the fields submitted met the form / dedupe rule requirements ' . print_r($form->_errors, TRUE));
     $form->postProcess();
     $this->submitPreviewForm($submittedValues);
   }
