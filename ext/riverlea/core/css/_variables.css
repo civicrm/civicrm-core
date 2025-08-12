@@ -4,6 +4,7 @@
 ****************************/
 
 :root {
+  --crm-release: '1.4.7-6.5';
   --crm-version: 'v' var(--crm-release);
 /* Fonts */
   --crm-system-fonts: unset;
