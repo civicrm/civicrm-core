@@ -1,8 +1,0 @@
-/* Civi CSS Framework (civicrm.css), the core CSS to make Civi UI behave
-   coherently in a neutral, clean, responsive and accessible way with as little
-   css as possible. For dev purposes each components is its own file, these
-   can be merged later. */
-
-@import url(components/_accordion.css); @import url(components/_alerts.css); @import url(components/_buttons.css); @import url(components/_form.css); @import url(components/_icons.css); @import url(components/_nav.css); @import url(components/_tabs.css); @import url(components/_dropdowns.css); @import url(components/_tables.css); @import url(components/_dialogs.css); @import url(components/_page.css); @import url(components/_components.css); @import url(components/_front.css); :root {
-  --crm-release: '1.4.7-6.5';
-}
