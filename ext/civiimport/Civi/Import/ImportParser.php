@@ -302,7 +302,8 @@ abstract class ImportParser extends \CRM_Import_Parser {
       $name = $this->getDefaultRuleForContactType($contactType);
     }
     if (empty($this->dedupeRules[$name])) {
-      $where = [['name', '=', $name]];
+      $canonicalName = str_ends_with($name, '.first') ? substr($name, 0, -6) : $name;
+      $where = [['name', '=', $canonicalName]];
       $this->loadRules($where);
     }
     return $this->dedupeRules[$name];
