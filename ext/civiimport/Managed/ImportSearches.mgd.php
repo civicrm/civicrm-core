@@ -50,37 +50,7 @@ foreach ($importEntities as $importEntity) {
       ],
     ],
   ];
-  $managedEntities[] = [
-    'name' => 'SavedSearch_Import_Summary' . $importEntity['user_job_id'],
-    'entity' => 'SavedSearch',
-    'cleanup' => 'always',
-    'update' => 'unmodified',
-    'params' => [
-      'version' => 4,
-      'values' => [
-        'name' => 'Import_Summary' . '_' . $importEntity['user_job_id'],
-        'label' => E::ts('Import Summary') . ' ' . $importEntity['description'],
-        'api_entity' => 'Import' . '_' . $importEntity['user_job_id'],
-        'api_params' => [
-          'version' => 4,
-          'select' => ['_status', 'COUNT(_id) AS COUNT__id'],
-          'orderBy' => [],
-          'where' => [],
-          'groupBy' => ['_status'],
-          'join' => [],
-          'having' => [],
-        ],
-        'expires_date' => $importEntity['expires_date'],
-        'created_date' => $importEntity['created_date'],
-        'created_id' => $importEntity['created_id'],
-        'description' => ts('Temporary import data'),
-        'mapping_id' => NULL,
-      ],
-      'match' => [
-        'name',
-      ],
-    ],
-  ];
+
   $columns = [];
   foreach ($fields as $field) {
     $columns[] = [
@@ -118,62 +88,6 @@ foreach ($importEntities as $importEntity) {
           ],
           'sort' => [],
           'columns' => $columns,
-        ],
-        'acl_bypass' => FALSE,
-      ],
-      'match' => [
-        'name',
-        'saved_search_id',
-      ],
-    ],
-  ];
-
-  $managedEntities[] = [
-    'name' => 'SavedSearchDisplay_Import_Summary' . $importEntity['user_job_id'],
-    'entity' => 'SearchDisplay',
-    'cleanup' => 'always',
-    'update' => 'unmodified',
-    'params' => [
-      'version' => 4,
-      'values' => [
-        'name' => 'Import_Summary' . '_' . $importEntity['user_job_id'],
-        'label' => E::ts('Import Summary') . ' ' . $importEntity['user_job_id'] . $createdBy,
-        'saved_search_id.name' => 'Import_Summary' . '_' . $importEntity['user_job_id'],
-        'type' => 'table',
-        'settings' => [
-          'actions' => FALSE,
-          'limit' => 40,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
-          'pager' => [
-            'show_count' => TRUE,
-            'expose_limit' => TRUE,
-          ],
-          'sort' => [],
-          'columns' => [
-            [
-              'type' => 'field',
-              'key' => '_status',
-              'label' => 'Row status',
-              'sortable' => TRUE,
-              'link' => [
-                'path' => 'civicrm/search#/display/Import_' . $importEntity['user_job_id'] . '/Import_' . $importEntity['user_job_id'] . '?_status=[_status]',
-                'entity' => '',
-                'action' => '',
-                'join' => '',
-                'target' => '',
-              ],
-              'rewrite' => '[_status]',
-            ],
-            [
-              'type' => 'field',
-              'key' => 'COUNT_id',
-              'label' => E::ts('Number of rows'),
-              'sortable' => TRUE,
-            ],
-          ],
         ],
         'acl_bypass' => FALSE,
       ],

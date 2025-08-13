@@ -785,9 +785,6 @@ SET    version = '$version'
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
     $config->userSystem->flush();
 
-    // In upcoming version, this should be replaced by a more general reset
-    Civi::$statics['Civi\Api4\Generic\AbstractEntity']['getInfo'] = [];
-
     Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // NOTE: triggerRebuild is FALSE becaues it will run again in a moment (via fixSchemaDifferences).
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the Page. We reset later in doFinish().
