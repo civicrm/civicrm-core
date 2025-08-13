@@ -431,7 +431,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
       if (isset($address->master_id) && !CRM_Utils_System::isNull($address->master_id)) {
         $values['use_shared_address'] = 1;
       }
-
+      // Ensure that for Event Info at least that geo_code array keys are always returned even if NULL in the database;
+      if (!array_key_exists('geo_code_1', $values)) {
+        $values['geo_code_1'] = NULL;
+        $values['geo_code_2'] = NULL;
+      }
       $addresses[$count] = $values;
 
       //There should never be more than one primary blocks, hence set is_primary = 0 other than first
