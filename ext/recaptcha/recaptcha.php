@@ -45,7 +45,7 @@ function recaptcha_civicrm_buildForm($formName, &$form) {
       $helpText = E::ts(
           'reCAPTCHA is a free service that helps prevent automated abuse of your site. To use it on public-facing CiviCRM forms: sign up at <a href="%1" target="_blank">Google\'s reCaptcha site</a>; enter the provided public and private keys here; then enable reCAPTCHA under Advanced Settings in any Profile.',
           [
-            1 => 'https://www.google.com/recaptcha',
+            1 => 'https://www.google.com/recaptcha/admin',
           ]
         )
         . '<br/><strong>' . E::ts('Only the reCAPTCHA v2 checkbox type is supported.') . '</strong>';
