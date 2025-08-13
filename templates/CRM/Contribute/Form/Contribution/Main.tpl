@@ -278,7 +278,7 @@
       </fieldset>
     {/if}
 
-    {include file="CRM/Core/BillingBlockWrapper.tpl"}
+    {include file="CRM/Core/BillingBlockWrapper.tpl" showPaymentOnConfirm=false}
 
     <div class="crm-public-form-item crm-group custom_post_profile-group">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}

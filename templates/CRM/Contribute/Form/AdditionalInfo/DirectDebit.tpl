@@ -9,6 +9,6 @@
 *}
 {* this template is used for adding Credit Cart and billing details *}
 <div id="id-directDebit" class="section-shown">
-  {include file='CRM/Core/BillingBlockWrapper.tpl'}
+  {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=false}
 </div>
 {include file="CRM/Contribute/Form/AdditionalInfo/Payment.tpl"}

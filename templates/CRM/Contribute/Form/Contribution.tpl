@@ -253,7 +253,7 @@
     {/if}
 
     {if !$isUsePaymentBlock}
-      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+      {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=false}
     {/if}
 
     <!-- start of soft credit -->

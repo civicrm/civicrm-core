@@ -131,7 +131,7 @@
     {/if}
 
     {if !$suppressPaymentBlock && !$showPaymentOnConfirm}
-      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+      {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=$showPaymentOnConfirm}
     {/if}
 
     <div class="crm-public-form-item crm-section custom_post-section">
