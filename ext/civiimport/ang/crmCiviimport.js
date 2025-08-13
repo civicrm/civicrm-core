@@ -23,9 +23,8 @@
           $scope.data.defaults = CRM.vars.crmImportUi.defaults;
           $scope.data.bundledActions = CRM.vars.crmImportUi.bundledActions;
           $scope.userJob = CRM.vars.crmImportUi.userJob;
-          if ($scope.userJob.metadata.actions === undefined) {
-            // Yeah nah - we just hard-code them cos what else would anyone ever want.
-            $scope.userJob.metadata.actions = {'entity' : null, 'action' : null, 'condition' : 'always'};
+          if ($scope.userJob.metadata.bundled_actions === undefined) {
+            $scope.userJob.metadata.bundled_actions = [];
           }
           $scope.data.showColumnNames = $scope.userJob.metadata.submitted_values.skipColumnHeader;
           $scope.data.savedMapping = CRM.vars.crmImportUi.savedMapping;
@@ -125,29 +124,61 @@
           });
           return {results: fields};
         });
-        $scope.getSelectedEntities = (function () {
-          var entities = [];
+
+        $scope.getEntitiesWithBundledActions = function() {
+          const entities = [];
           _.each($scope.data.entities, function(entity) {
-            if (entity.entity_type === 'Contact') {
-              entities.push({ 'id': entity.id, 'name': entity.id, 'text': entity.text });
+            if ($scope.data.bundledActions[entity.entity_type]) {
+              entities.push({id: entity.id, name: entity.id, text: entity.text});
             }
           });
           return {results : entities};
-        });
+        };
 
-        $scope.getActions = (function () {
-          // Currently contact is the only entity.
-          var bundledActions = $scope.data.bundledActions.Contact;
-          return {results : bundledActions};
-        });
+        $scope.getBundledActionsForEntity = function(entityName) {
+          const entityType = $scope.data.entities[entityName].entity_type;
+          return function() {
+            const actions = [];
+            const categorizedActions = {};
 
-        $scope.getConditions = (function () {
-          var conditions = [
-            {'id' : 'always', 'text' : 'Always'},
-            {'id' : 'on_multiple_match', 'text' : 'On Multiple match (note yet implemented)'},
+            // Group actions by category
+            Object.entries($scope.data.bundledActions[entityType]).forEach(([key, action]) => {
+              if (!categorizedActions[action.category]) {
+                categorizedActions[action.category] = [];
+              }
+              categorizedActions[action.category].push({
+                id: key,
+                text: action.label
+              });
+            });
+
+            // Transform into Select2 format with categories as groups
+            Object.entries(categorizedActions).forEach(([category, categoryActions]) => {
+              actions.push({
+                text: category,
+                children: categoryActions
+              });
+            });
+
+            return {results: actions};
+          };
+        };
+
+        $scope.getBundledActionConditions = function() {
+          const conditions = [
+            {id : 'always', text: ts('Always')},
+            {id : 'on_multiple_match', text: ts('On multiple match')},
           ];
           return {results : conditions};
-        });
+        };
+
+        $scope.addBundledAction = function(entityType) {
+          $scope.userJob.metadata.bundled_actions.push({entity: entityType, action: null, condition: 'always'});
+        };
+
+        $scope.removeAction = function(index) {
+          $scope.userJob.metadata.bundled_actions.splice(index, 1);
+        };
 
         /**
          * Filter the fields available for the entity based on form selections.

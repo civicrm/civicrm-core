@@ -1294,47 +1294,6 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Get bundled actions.
-   *
-   * A bundled action is a configured api call. It needs to be created in a secure way
-   * as it can the be offered up to the caller to be attached to (e.g.) an import, possibly under different
-   * permissions.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  public static function getBundledActions(): array {
-    $className = CRM_Core_DAO_AllCoreTables::getCanonicalClassName(static::class);
-    if ($className === 'CRM_Core_DAO') {
-      throw new CRM_Core_Exception('Function deleteRecord must be called on a subclass of CRM_Core_DAO');
-    }
-    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
-    // The theory would be to fire off a listener here but for now let's just populate with some
-    // actions for contact (only)
-    $actions = [];
-    if ($entityName === 'Contact') {
-      // for now we check permissions so this always runs as the logged in user ....
-      // Tags, send workflow messages are also ones that could be added
-      // programmatically.
-      foreach (\Civi\Api4\Group::get()->execute() as $group) {
-        $actions['add_to_group.' . $group['name']] = [
-          'id' => 'add_to_group.' . $group['name'],
-          'name' => 'Add to group ' . $group['title'],
-          'text' => ts('Add to group %1', [1 => $group['title']]),
-          'api' => \Civi\Api4\GroupContact::save()
-            ->addRecord([
-              'status' => 'Added',
-              'group_id' => $group['id'],
-              'contact_id' => '$id',
-            ])->setMatch(['contact_id', 'group_id']),
-        ];
-      }
-    }
-    return $actions;
-  }
-
-  /**
    * Gets the names of all enabled schema tables.
    *
    * - Includes tables from core, components & enabled extensions.

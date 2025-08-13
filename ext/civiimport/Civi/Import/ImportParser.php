@@ -19,6 +19,7 @@ use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Phone;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  *
@@ -125,14 +126,17 @@ abstract class ImportParser extends \CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException|\CRM_Core_Exception
    */
   protected function saveContact(string $entity, array $contact): ?int {
-    $action = $this->getUserJob()['metadata']['import_actions'] ?? [];
-    $isApplies = isset($action['entity']) && $action['entity'] === $entity;
-    if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])
-      || $isApplies && $action['condition'] === 'always'
-    ) {
+    if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])) {
       $api = Contact::save()
         ->setRecords([$contact]);
-      $this->addAction($api, $action['action'], 'Contact');
+    }
+    $bundledActions = $this->getUserJob()['metadata']['bundled_actions'] ?? [];
+    foreach ($bundledActions as $action) {
+      $isApplies = isset($action['entity']) && $action['entity'] === $entity;
+      // FIXME: Evaluate action condition
+      if ($isApplies && $action['condition'] === 'always') {
+        $this->addAction($api, $action['action'], 'Contact');
+      }
       return $api->execute()
         ->first()['id'];
     }
@@ -146,10 +150,19 @@ abstract class ImportParser extends \CRM_Import_Parser {
     }
   }
 
-  protected function getBundledAction($action, $entityType) {
-    $className = \CRM_Core_DAO_AllCoreTables::getDAONameForEntity($entityType);
-    $actions = $className::getBundledActions();
-    return $actions[$action] ?? [];
+  protected function getBundledAction($action, $entityType): ?array {
+    $actions = self::getBundledActions();
+    return $actions[$entityType][$action] ?? NULL;
+  }
+
+  public static function getBundledActions(): array {
+    if (!isset(\Civi::$statics['civi.import.bundledActions'])) {
+      \Civi::$statics['civi.import.bundledActions'] = [];
+      $hookParams = ['actions' => &\Civi::$statics['civi.import.bundledActions']];
+      $event = GenericHookEvent::create($hookParams);
+      \Civi::dispatcher()->dispatch('civi.import.bundledActions', $event);
+    }
+    return \Civi::$statics['civi.import.bundledActions'];
   }
 
   /**

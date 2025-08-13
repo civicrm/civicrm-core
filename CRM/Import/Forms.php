@@ -450,7 +450,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
           'Template' => ['mapping_id' => $this->getSavedMappingID()],
           'import_mappings' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_mappings'] : [],
           'import_options' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_options'] : [],
-          'import_actions' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_actions'] : ['action' => NULL, 'entity' => NULL, 'condition' => NULL],
+          'bundled_actions' => $this->getTemplateJob() ? ($this->getTemplateJob()['metadata']['bundled_actions'] ?? []) : [],
           'base_entity' => $this->getBaseEntity(),
         ],
       ])
