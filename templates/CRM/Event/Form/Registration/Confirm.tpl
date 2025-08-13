@@ -93,7 +93,7 @@
       </fieldset>
     {/if}
     {if $totalAmount > 0}
-      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+      {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=$showPaymentOnConfirm}
     {/if}
     {literal}<script>function calculateTotalFee() { return {/literal}{$totalAmount}{literal} }</script>{/literal}
     </div>

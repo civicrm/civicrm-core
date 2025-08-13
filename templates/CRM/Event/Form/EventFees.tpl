@@ -86,7 +86,7 @@
 {/if}
 
 {if $isShowBillingBlock}
-  {include file='CRM/Core/BillingBlockWrapper.tpl'}
+  {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=false}
 {/if}
 
 {if ($email OR $batchEmail) and $outBound_option != 2}

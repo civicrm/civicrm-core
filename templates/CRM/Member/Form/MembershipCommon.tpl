@@ -51,7 +51,7 @@
 
         <tr class="crm-membership-form-block-billing">
           <td colspan="2">
-            {include file='CRM/Core/BillingBlockWrapper.tpl'}
+            {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=false}
           </td>
         </tr>
       </table>
@@ -105,7 +105,7 @@
   </tr>
   <tr class="crm-membership-form-block-billing">
     <td colspan="2">
-      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+      {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=false}
     </td>
   </tr>
 {/if}

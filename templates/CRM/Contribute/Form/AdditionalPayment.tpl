@@ -102,7 +102,7 @@
         </table>
       </div>
       {/if}
-      {include file='CRM/Core/BillingBlockWrapper.tpl' currency=false}
+      {include file='CRM/Core/BillingBlockWrapper.tpl' currency=false showPaymentOnConfirm=false}
     </details>
 
     {include file="CRM/common/customDataBlock.tpl" customDataType='FinancialTrxn'}
