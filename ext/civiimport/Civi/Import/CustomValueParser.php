@@ -38,10 +38,11 @@ class CustomValueParser extends ImportParser {
    * @return array
    */
   public function getImportEntities() : array {
+    $groupName = $this->getGroupName();
     return [
-      $this->getGroupName() => [
+      $groupName => [
         'text' => ts('Custom Fields'),
-        'is_contact' => FALSE,
+        'entity_type' => "Custom_$groupName",
         'required_fields_update' => [],
         'required_fields_create' => [],
         'is_base_entity' => TRUE,
@@ -50,14 +51,14 @@ class CustomValueParser extends ImportParser {
         // For now we stick with the action selected on the DataSource page.
         'actions' => [['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')]],
         'default_action' => 'create',
-        'entity_name' => $this->getGroupName(),
+        'entity_name' => $groupName,
         'entity_title' => $this->getGroupTitle(),
         'entity_field_prefix' => '',
         'selected' => ['action' => 'create'],
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'entity_field_prefix' => 'Contact.',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,

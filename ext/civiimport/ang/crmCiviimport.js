@@ -67,7 +67,7 @@
               id: entityMetadata.entity_name,
               text: entityMetadata.entity_title,
               actions: entityMetadata.actions,
-              is_contact: Boolean(entityMetadata.is_contact),
+              entity_type: entityMetadata.entity_type,
               entity_data: entityMetadata.entity_data,
               dedupe_rules: entityMetadata.dedupe_rules,
             });
@@ -119,7 +119,7 @@
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
               availableEntity = _.clone(entity);
-              availableEntity.children = filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_name + '.');
+              availableEntity.children = filterEntityFields(entity.entity_type, entity.children, selected, entity.entity_name + '.');
               fields.push(availableEntity);
             }
           });
@@ -128,7 +128,7 @@
         $scope.getSelectedEntities = (function () {
           var entities = [];
           _.each($scope.data.entities, function(entity) {
-            if (entity.is_contact) {
+            if (entity.entity_type === 'Contact') {
               entities.push({ 'id': entity.id, 'name': entity.id, 'text': entity.text });
             }
           });
@@ -138,7 +138,6 @@
         $scope.getActions = (function () {
           // Currently contact is the only entity.
           var bundledActions = $scope.data.bundledActions.Contact;
-          console.log(bundledActions);
           return {results : bundledActions};
         });
 
@@ -158,8 +157,8 @@
          *
          * @type {(function(*=, *=, *=, *=): (*))|*}
          */
-        function filterEntityFields(isContact, fields, selection, entityFieldPrefix) {
-          if (isContact) {
+        function filterEntityFields(entityType, fields, selection, entityFieldPrefix) {
+          if (entityType === 'Contact') {
             return filterContactFields(fields, selection, entityFieldPrefix);
           }
           return fields;
