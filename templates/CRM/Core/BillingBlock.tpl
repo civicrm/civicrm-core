@@ -49,7 +49,7 @@
     {/if}
   {/if}
   {if $billingDetailsFields && $paymentProcessor.payment_processor_type neq 'PayPal_Express'}
-    {if $profileAddressFields && !$ccid}
+    {if $profileAddressFields && !$ccid && !$showPaymentOnConfirm}
       <input type="checkbox" id="billingcheckbox" value="0">
       <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>
     {/if}
