@@ -215,11 +215,11 @@ trait CRMTraits_Import_ParserTrait {
    *
    * @param array $mappings
    * @param string $contactType
+   * @param array|null $dedupeRules
    *
    * @return void
-   *
    */
-  public function updateJobMetadata(array $mappings, string $contactType): void {
+  public function updateJobMetadata(array $mappings, string $contactType, ?array $dedupeRules = NULL): void {
     try {
       $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)
         ->execute()->single()['metadata'];
@@ -228,6 +228,9 @@ trait CRMTraits_Import_ParserTrait {
       }
       if ($contactType) {
         $metadata['entity_configuration']['Contact']['contact_type'] = $contactType;
+      }
+      if ($dedupeRules) {
+        $metadata['entity_configuration']['Contact']['dedupe_rule'] = $dedupeRules;
       }
       UserJob::update()
         ->addWhere('id', '=', $this->userJobID)

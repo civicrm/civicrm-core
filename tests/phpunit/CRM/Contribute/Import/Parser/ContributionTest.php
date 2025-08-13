@@ -662,7 +662,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     }
     $contactType = 'Individual';
     $this->submitDataSourceForm('contributions.csv');
-    $this->updateJobMetadata($mappings, $contactType);
+    $this->updateJobMetadata($mappings, $contactType, ['IndividualUnsupervised']);
     $form = $this->getMapFieldForm();
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
@@ -716,7 +716,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
     $this->submitDataSourceForm('contributions.csv');
-    $this->updateJobMetadata($fieldMappings, 'Individual');
+    $this->updateJobMetadata($fieldMappings, 'Individual', ['IndividualUnsupervised']);
     $form = $this->getMapFieldForm([
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'contactType' => 'Individual',
