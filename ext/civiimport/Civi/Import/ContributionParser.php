@@ -266,7 +266,7 @@ class ContributionParser extends ImportParser {
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => 'Individual',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',
@@ -284,7 +284,7 @@ class ContributionParser extends ImportParser {
           'contact_type' => 'Individual',
           'soft_credit_type_id' => $defaultSoftCreditTypeID,
           'action' => 'ignore',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'ignore',
         'entity_name' => 'SoftCreditContact',
@@ -331,10 +331,11 @@ class ContributionParser extends ImportParser {
       $contributionParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], $contributionParams['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
 
       $softCreditParams = [];
-      $softCreditEntities = isset($params['SoftCreditContact']) ? [$params['SoftCreditContact']] : [];
+      // A hook could have change it to be an array of arrays.
+      $softCreditEntities = isset($params['SoftCreditContact']['soft_credit_type_id']) ? [$params['SoftCreditContact']] : $params['SoftCreditContact'] ?? [];
       foreach ($softCreditEntities as $index => $softCreditContact) {
         $softCreditParams[$index]['soft_credit_type_id'] = $softCreditContact['soft_credit_type_id'];
-        $softCreditParams[$index]['contact_id'] = $this->getContactID($softCreditContact, !empty($softCreditContact['id']) ? $softCreditContact['id'] : NULL, 'SoftCreditContact', $this->getDedupeRulesForEntity('SoftCreditContact'));
+        $softCreditEntities[$index]['id'] = $this->getContactID($softCreditContact, !empty($softCreditContact['id']) ? $softCreditContact['id'] : NULL, 'SoftCreditContact', $this->getDedupeRulesForEntity('SoftCreditContact'));
         if (empty($softCreditParams[$index]['contact_id']) && in_array($this->getActionForEntity('SoftCreditContact'), ['update', 'select'])) {
           throw new \CRM_Core_Exception(ts('Soft Credit Contact not found'));
         }
@@ -346,7 +347,7 @@ class ContributionParser extends ImportParser {
       // if the lookups failed.
 
       foreach ($softCreditEntities as $index => $softCreditContact) {
-        $softCreditParams[$index]['contact_id'] = $this->saveContact('SoftCreditContact', $softCreditContact) ?: $softCreditParams[$index]['contact_id'];
+        $softCreditParams[$index]['contact_id'] = $this->saveContact('SoftCreditContact', $softCreditContact) ?: $softCreditContact['id'];
       }
       $contributionParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $contributionParams['contact_id'];
 

@@ -302,7 +302,8 @@ abstract class ImportParser extends \CRM_Import_Parser {
       $name = $this->getDefaultRuleForContactType($contactType);
     }
     if (empty($this->dedupeRules[$name])) {
-      $where = [['name', '=', $name]];
+      $canonicalName = str_ends_with($name, '.first') ? substr($name, 0, -6) : $name;
+      $where = [['name', '=', $canonicalName]];
       $this->loadRules($where);
     }
     return $this->dedupeRules[$name];
@@ -538,15 +539,15 @@ abstract class ImportParser extends \CRM_Import_Parser {
    * Get contacts that match the input parameters, using a dedupe rule.
    *
    * @param array $params
-   * @param int|null|array $dedupeRuleID
+   * @param int|null|array $dedupeRuleNames
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getPossibleMatchesByDedupeRule(array $params, $dedupeRuleID = NULL): array {
+  protected function getPossibleMatchesByDedupeRule(array $params, ?array $dedupeRuleNames = NULL): array {
     $matchIDs = [];
-    $dedupeRules = $this->getDedupeRules((array) $dedupeRuleID, $params['contact_type'] ?? NULL);
+    $dedupeRules = $this->getDedupeRules($dedupeRuleNames, $this->guessContactType($params));
     foreach ($dedupeRules as $dedupeRule) {
       if ($dedupeRule === 'unique_email_match') {
         if (empty($params['email_primary.email'])) {
@@ -563,7 +564,7 @@ abstract class ImportParser extends \CRM_Import_Parser {
           $matchIDs[$match['contact_id']] = $match['contact_id'];
         }
       }
-      else {
+      elseif ($dedupeRule !== 'unique_identifier_match') {
         $isMatchFirst = str_ends_with($dedupeRule, '.first');
         if ($isMatchFirst) {
           $dedupeRule = substr($dedupeRule, 0, -6);
@@ -588,23 +589,25 @@ abstract class ImportParser extends \CRM_Import_Parser {
   /**
    * Get the dedupe rules to use to lookup a contact.
    *
-   * @param array $dedupeRuleIDs
-   * @param string|array|null $contact_type
+   * @param array|null $dedupeRuleNames
+   * @param string $contact_type
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function getDedupeRules(array $dedupeRuleIDs, $contact_type) {
+  protected function getDedupeRules(?array $dedupeRuleNames, string $contact_type) {
     $dedupeRules = [];
-    if (!empty($dedupeRuleIDs)) {
-      foreach ($dedupeRuleIDs as $dedupeRuleID) {
-        $dedupeRules[] = is_numeric($dedupeRuleID) ? $this->getDedupeRuleName($dedupeRuleID) : $dedupeRuleID;
+    if (!empty($dedupeRuleNames)) {
+      foreach ($dedupeRuleNames as $dedupeRuleName) {
+        $ruleInfo = $this->getDedupeRule($contact_type, $dedupeRuleName);
+        if (!$ruleInfo['contact_type'] || $contact_type === $ruleInfo['contact_type']) {
+          $dedupeRules[] = $dedupeRuleName;
+        }
       }
       return $dedupeRules;
     }
-    $contactTypes = $contact_type ? (array) $contact_type : \CRM_Contact_BAO_ContactType::basicTypes();
-    foreach ($contactTypes as $contactType) {
-      $dedupeRules[] = $this->getDefaultRuleForContactType($contactType);
+    if (empty($dedupeRules)) {
+      $dedupeRules[] = 'unique_identifier_match';
     }
     return $dedupeRules;
   }
