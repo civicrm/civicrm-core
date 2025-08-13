@@ -183,6 +183,9 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
   public static function validateMapping(array $fields, array $files, CRM_CiviImport_Form_MapField $self): bool|array {
     $mapperError = [];
     try {
+      $parser = $self->getParser();
+      $mappings = $self->getFieldMappings();
+      $parser->validateMapping($mappings);
       $mapperError = $self->getMissingContactFields('Contact', $self->getFieldMappings());
     }
     catch (CRM_Core_Exception $e) {

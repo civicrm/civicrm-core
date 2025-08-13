@@ -346,10 +346,10 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
       ['name' => 'Activity.location'],
       ['name' => 'Activity.subject'],
       ['name' => 'do_not_import'],
-    ]);
+    ], [], 'create', ['TargetContact' => ['dedupe_rule' => ['unique_email_match'], 'contact_type' => NULL]]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
     $this->callAPISuccessGetSingle('Activity', ['priority_id' => 'Urgent']);
   }
 

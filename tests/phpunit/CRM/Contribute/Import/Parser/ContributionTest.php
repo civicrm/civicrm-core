@@ -145,10 +145,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'external_identifier' => 'ext-1',
       'contact_type' => 'Individual',
     ]);
-    $softCreditContactID = $this->individualCreate([
+    $softCreditContactID = $this->organizationCreate([
       'organization_name' => 'The firm',
       'external_identifier' => 'ext-2',
-      'email' => 'the-firm@example.com',
+      'email_primary.email' => 'the-firm@example.com',
       'contact_type' => 'Organization',
     ]);
 
@@ -161,7 +161,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contact.email_primary.email'],
       ['name' => 'SoftCreditContact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 1]]],
     ];
-    $this->importCSV('contributions_amount_validate.csv', $mapping);
+    $this->importCSV('contributions_amount_validate.csv', $mapping, [], 'create', ['SoftCreditContact' => ['dedupe_rule' => ['OrganizationUnsupervised'], 'contact_type' => 'Organization', 'action' => 'save']]);
 
     $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $mainContactID)->execute();
     // Although there are 2 rows in the csv, 1 should fail each time due to conflicting money formats.
