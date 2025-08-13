@@ -167,7 +167,7 @@
         $scope.getBundledActionConditions = function() {
           const conditions = [
             {id : 'always', text: ts('Always')},
-            {id : 'on_multiple_match', text: ts('On multiple match')},
+            {id : 'on_multiple_match', text: ts('On multiple match (with first match dedupe rule)')},
           ];
           return {results : conditions};
         };

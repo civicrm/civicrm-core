@@ -80,6 +80,26 @@ abstract class ImportParser extends \CRM_Import_Parser {
   }
 
   /**
+   * @param string $entity
+   * @param string $condition
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getApplicableBundledActions(string $entity, string $condition): array {
+    $allActions = $this->getUserJob()['metadata']['bundled_actions'] ?? [];
+    $bundledActions = [];
+    foreach ($allActions as $action) {
+      $isApplies = isset($action['entity']) && $action['entity'] === $entity;
+      // FIXME: Evaluate action condition
+      if ($isApplies && $action['condition'] === $condition) {
+        $bundledActions[] = $action;
+      }
+    }
+    return $bundledActions;
+  }
+
+  /**
    * Get the actions to display in the rich UI.
    *
    * Filter by the input actions - e.g ['update' 'select'] will only return those keys.
@@ -126,17 +146,21 @@ abstract class ImportParser extends \CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException|\CRM_Core_Exception
    */
   protected function saveContact(string $entity, array $contact): ?int {
+    $api = NULL;
     if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])) {
       $api = Contact::save()
         ->setRecords([$contact]);
     }
-    $bundledActions = $this->getUserJob()['metadata']['bundled_actions'] ?? [];
+
+    $bundledActions = $this->getApplicableBundledActions($entity, 'always');
     foreach ($bundledActions as $action) {
-      $isApplies = isset($action['entity']) && $action['entity'] === $entity;
-      // FIXME: Evaluate action condition
-      if ($isApplies && $action['condition'] === 'always') {
-        $this->addAction($api, $action['action'], 'Contact');
+      if (!$api) {
+        $api = Contact::get()
+          ->addWhere('id', '=', $contact['id']);
       }
+      $this->addAction($api, $action['action'], 'Contact');
+    }
+    if ($api) {
       return $api->execute()
         ->first()['id'];
     }
@@ -539,7 +563,7 @@ abstract class ImportParser extends \CRM_Import_Parser {
     }
     if (!$contactID) {
       $action = $this->getActionForEntity($entity);
-      $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams, $dedupeRules);
+      $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams, $dedupeRules, $entity);
       if (count($possibleMatches) === 1) {
         $contactID = array_key_first($possibleMatches);
       }
@@ -572,12 +596,13 @@ abstract class ImportParser extends \CRM_Import_Parser {
    *
    * @param array $params
    * @param int|null|array $dedupeRuleNames
+   * @param string $entity
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getPossibleMatchesByDedupeRule(array $params, ?array $dedupeRuleNames = NULL): array {
+  protected function getPossibleMatchesByDedupeRule(array $params, ?array $dedupeRuleNames, string $entity): array {
     $matchIDs = [];
     $dedupeRules = $this->getDedupeRules($dedupeRuleNames, $this->guessContactType($params));
     foreach ($dedupeRules as $dedupeRule) {
@@ -609,6 +634,19 @@ abstract class ImportParser extends \CRM_Import_Parser {
         foreach ($possibleMatches as $possibleMatch) {
           $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
           if ($isMatchFirst) {
+            if (count($possibleMatches) > 1) {
+              // Here is where the action kicks in - more than one was found so put them in a group.
+              $bundledActions = $this->getApplicableBundledActions($entity, 'on_multiple_match');
+              $api = NULL;
+              foreach ($bundledActions as $action) {
+                $api = Contact::get()
+                  ->addWhere('id', 'IN', $matchIDs);
+                $this->addAction($api, $action['action'], 'Contact');
+              }
+              if ($api) {
+                $api->execute();
+              }
+            }
             return $matchIDs;
           }
         }
