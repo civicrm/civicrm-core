@@ -65,7 +65,7 @@ class ParticipantParser extends ImportParser {
     return [
       'Participant' => [
         'text' => ts('Participant Fields'),
-        'is_contact' => FALSE,
+        'entity_type' => 'Participant',
         'required_fields_update' => $this->getRequiredFieldsForMatch(),
         'required_fields_create' => $this->getRequiredFieldsForCreate(),
         'is_base_entity' => TRUE,
@@ -82,7 +82,7 @@ class ParticipantParser extends ImportParser {
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),

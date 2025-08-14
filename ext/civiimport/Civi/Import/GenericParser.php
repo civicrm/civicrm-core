@@ -114,7 +114,7 @@ class GenericParser extends ImportParser {
       $entities['Contact'] = [
         'text' => ts('Contact Fields'),
         'unique_fields' => ['external_identifier', 'id'],
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [

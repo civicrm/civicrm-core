@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Import\ImportParser;
+
 class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
 
   public function preProcess(): void {
@@ -49,6 +51,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
       'dateFormats' => $this->getDateFormats(),
       'isTemplate' => $this->getUserJob()['is_template'],
       'isStandalone' => $this->isStandalone(),
+      'bundledActions' => ImportParser::getBundledActions(),
     ]);
   }
 
