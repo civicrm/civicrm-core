@@ -16,11 +16,11 @@
  */
 
 /**
- * This class generates form components for case activity.
+ * This class generates form components for case actions.
  */
-class CRM_Case_Form_Case extends CRM_Core_Form {
+class CRM_Case_Form_Case extends CRM_Core_Form implements CRM_Case_Form_CaseFormInterface {
   use CRM_Custom_Form_CustomDataTrait;
-  use CRM_Case_Form_CaseFormTrait;
+  use CRM_Case_Form_CaseLookupTrait;
 
   /**
    * The context
