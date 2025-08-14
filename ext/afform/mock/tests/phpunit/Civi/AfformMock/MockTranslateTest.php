@@ -139,8 +139,14 @@ class MockTranslateTest extends \PHPUnit\Framework\TestCase implements \Civi\Tes
       $sourceId = $getSource->single()['id'];
     }
     else {
+      $sourceKey = \CRM_Core_BAO_TranslationSource::createGuid($original);
       $createSource = \Civi\Api4\TranslationSource::create(FALSE)
-        ->setValues(['source' => $original])
+        ->setValues([
+          'source' => $original,
+          'source_key' => $sourceKey,
+          'entity' => 'afform',
+          'context_key' => \CRM_Core_BAO_TranslationSource::createGuid(':::afform'),
+        ])
         ->execute();
       $sourceId = $createSource->single()['id'];
     }
@@ -148,14 +154,12 @@ class MockTranslateTest extends \PHPUnit\Framework\TestCase implements \Civi\Tes
     $record = [
       'status_id' => 1,
       'language' => $language,
-      'entity_table' => 'civicrm_translation_source',
-      'entity_field' => 'source',
-      'entity_id' => $sourceId,
       'string' => $translated,
+      'source_key' => $sourceKey,
     ];
     \Civi\Api4\Translation::save(FALSE)
       ->addRecord($record)
-      ->setMatch(['entity_table', 'entity_field', 'entity_id', 'status_id', 'language'])
+      ->setMatch(['source_key', 'entity_table', 'entity_field', 'entity_id', 'status_id', 'language'])
       ->execute();
   }
 
