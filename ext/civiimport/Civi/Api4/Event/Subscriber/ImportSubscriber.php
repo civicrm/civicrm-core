@@ -45,6 +45,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
       'civi.api.authorize' => [['onApiAuthorize', Events::W_EARLY]],
       'api.schema_map.build' => 'on_schema_map_build',
+      'civi.import.bundledActions' => 'getBundledActions',
     ];
   }
 
@@ -215,6 +216,23 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       ->selectRowCount()
       ->execute()
       ->count();
+  }
+
+  public function getBundledActions(GenericHookEvent $event): void {
+    // for now we check permissions so this always runs as the logged in user ....
+    // Tags, send workflow messages are also ones that could be added..
+    foreach (\Civi\Api4\Group::get()->execute() as $group) {
+      $event->actions['Contact']['add_to_group.' . $group['name']] = [
+        'category' => E::ts('Add to group'),
+        'label' => ts('Add to %1', [1 => $group['title']]),
+        'api' => \Civi\Api4\GroupContact::save()
+          ->addRecord([
+            'status' => 'Added',
+            'group_id' => $group['id'],
+            'contact_id' => '$id',
+          ])->setMatch(['contact_id', 'group_id']),
+      ];
+    }
   }
 
 }

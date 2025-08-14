@@ -35,7 +35,7 @@
       <div class="crm-grid-cell">
         <div>
           <div>
-            <label ng-if="entity.is_contact && entity.selected.action !== 'ignore'">
+            <label ng-if="entity.entity_type === 'Contact' && entity.selected.action !== 'ignore'">
               {{:: ts('Contact type') }}
               <input  class="big" ng-change="updateContactType(entity)"
                 crm-ui-select='{data: data.contactTypes, allowClear: true, placeholder: ts("Any type")}' ng-model="entity.selected.contact_type" />
@@ -46,7 +46,7 @@
       <div class="crm-grid-cell">
         <div>
           <div>
-            <label ng-if="entity.is_contact && entity.selected.action !== 'ignore'">
+            <label ng-if="entity.entity_type === 'Contact' && entity.selected.action !== 'ignore'">
               {{:: ts('Dedupe rule') }}  <input class="big" crm-ui-select='{data: getDedupeRule, multiple: true}' ng-model="entity.selected.dedupe_rule" placeholder="{{:: data.dedupeRules.unique_identifier_match.title }}" ng-list />
             </label>
           </div>
@@ -67,6 +67,25 @@
   <div id="import-options">
     <h3>{{:: ts('Import Options') }}</h3>
     <div >{{:: ts('Date format') }}  <input class="huge" crm-ui-select='{data : dateFormats}' ng-model="userJob.metadata.import_options.date_format" /></div>
+  </div>
+  <hr>
+  <div id="import-actions">
+    <h3>{{:: ts('Actions') }}</h3>
+    <div ng-repeat="actionItem in userJob.metadata.bundled_actions">
+      <label for="action-item-entity-{{ $index }}">{{:: ts('Entity') }}</label>
+      <input class="big" id="action-item-entity-{{ $index }}" crm-ui-select='{data: getEntitiesWithBundledActions, allowClear: false}' ng-model="actionItem.entity" />
+      <label for="action-item-action-{{ $index }}">{{:: ts('Action') }}</label>
+      <input class="big" id="action-item-action-{{ $index }}" crm-ui-select='{data: getBundledActionsForEntity(actionItem.entity), allowClear: false}' ng-model="actionItem.action" />
+      <label for="action-item-when-{{ $index }}">{{:: ts('When') }}</label>
+      <input class="big" id="action-item-when-{{ $index }}" crm-ui-select='{data: getBundledActionConditions, allowClear: false}' ng-model="actionItem.condition" />
+      <a href class="crm-hover-button" ng-click="removeAction($index)">
+        <i class="crm-i fa-x"></i>
+      </a>
+    </div>
+    <div>
+      <label for="action-items-add-new">{{:: ts('Add Action') }}</label>
+      <input class="big" id="action-items-add-new" crm-ui-select='{data: getEntitiesWithBundledActions}' on-crm-ui-select="addBundledAction(selection)" />
+    </div>
   </div>
   <hr>
   <div id="map-field">

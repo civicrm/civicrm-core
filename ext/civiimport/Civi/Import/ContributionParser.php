@@ -255,12 +255,13 @@ class ContributionParser extends ImportParser {
         'default_action' => 'create',
         'entity_name' => 'Contribution',
         'entity_title' => ts('Contribution'),
+        'entity_type' => 'Contribution',
         'selected' => ['action' => 'create'],
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
         'unique_fields' => ['external_identifier', 'id'],
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
@@ -277,7 +278,7 @@ class ContributionParser extends ImportParser {
         // It turns out there is actually currently no limit - you can import multiple of the same type.
         'supports_multiple' => TRUE,
         'unique_fields' => ['external_identifier', 'id'],
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'is_required' => FALSE,
         'actions' => array_merge([['id' => 'ignore', 'text' => ts('Do not import')]], $this->getActions(['select', 'update', 'save'])),
         'selected' => [
