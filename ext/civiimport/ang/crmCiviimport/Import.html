@@ -15,7 +15,8 @@
 </div>
 
 <div class="crm-block crm-form-block crm-import-mappings-form-block">
-  <div id="crm-import-entities" class="columnheader"><h3>{{:: ts('Import to') }}</h3>
+  <div id="crm-import-entities" class="columnheader">
+    <h3><i class="crm-i fa-cloud-arrow-up"></i> &nbsp; {{:: ts('Import to') }}</h3>
 
     <div ng-repeat="(entityName, entity) in data.entities track by entity.id"
          ng-class-odd="'odd-row'"
@@ -25,29 +26,31 @@
     >
        <div class="crm-grid-cell labels">
         <div>
-          <div>{{ entity.text }}
+          <div>
             <label>
-              <input class="big" crm-ui-select='{data: entity.actions}' ng-model="entity.selected.action" ng-disabled="entity.actions.length < 2"/>
+              {{:: entity.text }}
+              <input class="big" id="crm-import-entity-action" crm-ui-select='{data: entity.actions}' ng-model="entity.selected.action" ng-disabled="entity.actions.length &lt; 2">
             </label>
           </div>
         </div>
       </div>
       <div class="crm-grid-cell">
         <div>
-          <div>
-            <label ng-if="entity.entity_type === 'Contact' && entity.selected.action !== 'ignore'">
+          <div ng-if="entity.entity_type === 'Contact' && entity.selected.action !== 'ignore'">
+            <label>
               {{:: ts('Contact type') }}
-              <input  class="big" ng-change="updateContactType(entity)"
-                crm-ui-select='{data: data.contactTypes, allowClear: true, placeholder: ts("Any type")}' ng-model="entity.selected.contact_type" />
+              <input class="big" ng-change="updateContactType(entity)"
+                crm-ui-select='{data: data.contactTypes, allowClear: true, placeholder: ts("Any type")}' ng-model="entity.selected.contact_type" >
             </label>
           </div>
         </div>
       </div>
       <div class="crm-grid-cell">
         <div>
-          <div>
-            <label ng-if="entity.entity_type === 'Contact' && entity.selected.action !== 'ignore'">
-              {{:: ts('Dedupe rule') }}  <input class="big" crm-ui-select='{data: getDedupeRule, multiple: true}' ng-model="entity.selected.dedupe_rule" placeholder="{{:: data.dedupeRules.unique_identifier_match.title }}" ng-list />
+          <div ng-if="entity.entity_type === 'Contact' && entity.selected.action !== 'ignore'">
+            <label>
+              {{:: ts('Dedupe rule') }}
+              <input class="big" crm-ui-select='{data: getDedupeRule, multiple: true}' ng-model="entity.selected.dedupe_rule" placeholder="{{:: data.dedupeRules.unique_identifier_match.title }}" ng-list >
             </label>
           </div>
         </div>
@@ -56,7 +59,8 @@
         <div ng-if="entity.entity_data && entity.selected.action !== 'ignore'">
           <div ng-repeat="(fieldName, entityField) in entity.entity_data">
             <label>
-              {{ entityField.title }}  <input  class="big" crm-ui-select='{data: entityField.options, required : entityField.is_required}' ng-model="entity.selected[fieldName]"/>
+              {{:: entityField.title }}
+              <input class="big" crm-ui-select='{data: entityField.options, required : entityField.is_required}' ng-model="entity.selected[fieldName]">
             </label>
           </div>
         </div>
@@ -65,31 +69,38 @@
   </div>
   <hr>
   <div id="import-options">
-    <h3>{{:: ts('Import Options') }}</h3>
-    <div >{{:: ts('Date format') }}  <input class="huge" crm-ui-select='{data : dateFormats}' ng-model="userJob.metadata.import_options.date_format" /></div>
+    <h3><i class="crm-i fa-gear"></i> &nbsp; {{:: ts('Import Options') }}</h3>
+    <div>
+      <label>
+        {{:: ts('Date format') }}
+        <input class="huge" crm-ui-select='{data: dateFormats}' ng-model="userJob.metadata.import_options.date_format" >
+      </label>
+    </div>
   </div>
   <hr>
   <div id="import-actions">
-    <h3>{{:: ts('Actions') }}</h3>
+    <h3><i class="crm-i fa-circle-play"></i> &nbsp; {{:: ts('Actions') }}</h3>
     <div ng-repeat="actionItem in userJob.metadata.bundled_actions">
-      <label for="action-item-entity-{{ $index }}">{{:: ts('Entity') }}</label>
+      <label for="action-item-entity-{{ $index }}">{{:: ts('For') }}</label>
       <input class="big" id="action-item-entity-{{ $index }}" crm-ui-select='{data: getEntitiesWithBundledActions, allowClear: false}' ng-model="actionItem.entity" />
       <label for="action-item-action-{{ $index }}">{{:: ts('Action') }}</label>
       <input class="big" id="action-item-action-{{ $index }}" crm-ui-select='{data: getBundledActionsForEntity(actionItem.entity), allowClear: false}' ng-model="actionItem.action" />
       <label for="action-item-when-{{ $index }}">{{:: ts('When') }}</label>
       <input class="big" id="action-item-when-{{ $index }}" crm-ui-select='{data: getBundledActionConditions, allowClear: false}' ng-model="actionItem.condition" />
-      <a href class="crm-hover-button" ng-click="removeAction($index)">
+      <a href class="crm-hover-button" ng-click="removeAction($index)" title="{{:: ts('Remove') }}">
         <i class="crm-i fa-x"></i>
       </a>
     </div>
     <div>
-      <label for="action-items-add-new">{{:: ts('Add Action') }}</label>
-      <input class="big" id="action-items-add-new" crm-ui-select='{data: getEntitiesWithBundledActions}' on-crm-ui-select="addBundledAction(selection)" />
+      <label>
+        {{:: ts('Add Action') }}
+        <input class="crm-action-menu fa-plus twelve" crm-ui-select='{data: getEntitiesWithBundledActions}' on-crm-ui-select="addBundledAction(selection)" placeholder="{{:: ts('For...') }}">
+      </label>
     </div>
   </div>
   <hr>
   <div id="map-field">
-    <h3>{{:: ts('Data mapping') }}</h3>
+    <h3><i class="crm-i fa-table"></i> &nbsp; {{:: ts('Data mapping') }}</h3>
     <table class="selector">
       <tr ng-if="data.savedMapping.name" class="columnheader-dark"><th colspan="4">
         {{:: ts('Saved Field Mapping: %1', {1: data.savedMapping.name}) }}</th>
