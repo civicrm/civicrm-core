@@ -19,7 +19,8 @@ use Civi\Api4\CaseContact;
 /**
  * This class assigns the current case to another client.
  */
-class CRM_Case_Form_DeleteClient extends CRM_Core_Form {
+class CRM_Case_Form_DeleteClient extends CRM_Core_Form implements CRM_Case_Form_CaseFormInterface {
+  use CRM_Case_Form_CaseLookupTrait;
 
   /**
    * case ID
@@ -44,7 +45,6 @@ class CRM_Case_Form_DeleteClient extends CRM_Core_Form {
    */
   public function preProcess() {
     $this->cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $this->id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->returnContactId  = CRM_Utils_Request::retrieve('rcid', 'Positive', $this, TRUE);
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
@@ -122,6 +122,13 @@ class CRM_Case_Form_DeleteClient extends CRM_Core_Form {
     );
     CRM_Utils_System::redirect($url);
 
+  }
+
+  public function getCaseID(): ?int {
+    if (!isset($this->id)) {
+      $this->id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    }
+    return $this->id;
   }
 
 }
