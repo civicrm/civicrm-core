@@ -274,7 +274,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
-    $this->_params['amount'] = $this->get('amount');
+    $this->_params['amount'] = $this->getSubmittedValue('total_amount');
     if (isset($this->_params['amount'])) {
       $this->setFormAmountFields($this->getPriceSetID());
     }
@@ -2213,7 +2213,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
       }
-      $paymentParams['amount'] = $this->getMainContributionAmount();
+      $paymentParams['amount'] = $this->_params['amount'];
       $paymentParams['line_item'] = [$this->getPriceSetID() => $this->getMainContributionLineItems()];
       $result = $this->processConfirm($paymentParams,
         $contactID,
