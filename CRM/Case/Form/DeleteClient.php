@@ -20,7 +20,6 @@ use Civi\Api4\CaseContact;
  * This class assigns the current case to another client.
  */
 class CRM_Case_Form_DeleteClient extends CRM_Core_Form implements CRM_Case_Form_CaseFormInterface {
-  use CRM_Case_Form_CaseLookupTrait;
 
   /**
    * case ID
@@ -44,13 +43,14 @@ class CRM_Case_Form_DeleteClient extends CRM_Core_Form implements CRM_Case_Form_
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
+    $this->assign('id', $this->getCaseID());
+
     $this->cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->returnContactId  = CRM_Utils_Request::retrieve('rcid', 'Positive', $this, TRUE);
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     //get current client name.
     $this->assign('currentClientName', CRM_Contact_BAO_Contact::displayName($this->cid));
-    $this->assign('id', $this->id);
 
     //set the context.
     $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$this->cid}&selectedChild=case");
@@ -71,7 +71,7 @@ class CRM_Case_Form_DeleteClient extends CRM_Core_Form implements CRM_Case_Form_
     }
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
-    $caseContacts = CaseContact::get()->addWhere('case_id', '=', $this->id)->execute();
+    $caseContacts = CaseContact::get()->addWhere('case_id', '=', $this->getCaseID())->execute();
     if (count($caseContacts) === 1) {
       CRM_Core_Error::statusBounce(ts('Cannot Remove Client from case as is the only client on the case'), $url);
     }
@@ -81,7 +81,7 @@ class CRM_Case_Form_DeleteClient extends CRM_Core_Form implements CRM_Case_Form_
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->add('hidden', 'id', $this->id);
+    $this->add('hidden', 'id', $this->getCaseID());
     $this->add('hidden', 'contact_id', $this->cid);
     $this->addButtons([
       [
@@ -124,9 +124,9 @@ class CRM_Case_Form_DeleteClient extends CRM_Core_Form implements CRM_Case_Form_
 
   }
 
-  public function getCaseID(): ?int {
+  public function getCaseID(): int {
     if (!isset($this->id)) {
-      $this->id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      $this->id = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     }
     return $this->id;
   }
