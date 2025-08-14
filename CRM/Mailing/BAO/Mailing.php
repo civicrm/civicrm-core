@@ -1081,6 +1081,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'status' => 'Draft',
         'start_date' => NULL,
         'end_date' => NULL,
+        'unsubscribe_mode' => Civi::settings()->get('default_oneclick_unsubscribe_mode'),
       ];
       if (CRM_Utils_System::isNull($params['sms_provider_id'] ?? NULL)) {
         $defaults['header_id'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
@@ -1913,6 +1914,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $params['status'] ??= 'Draft';
       $params['start_date'] ??= 'null';
       $params['end_date'] ??= 'null';
+      $params['unsubscribe_mode'] ??= Civi::settings()->get('default_oneclick_unsubscribe_mode');
     }
     if ($event->action === 'delete' && $event->id) {
       // Delete all file attachments
