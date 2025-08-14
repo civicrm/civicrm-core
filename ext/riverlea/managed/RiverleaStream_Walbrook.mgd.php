@@ -16,7 +16,7 @@ return [
         'label' => E::ts('Walbrook'),
         'is_reserved' => TRUE,
         'extension' => E::SHORT_NAME,
-        'file_prefix' => 'streams/walbrook/css/',
+        'file_prefix' => 'streams/walbrook/',
         'css_file' => '_variables.css',
         'css_file_dark' => '_dark.css',
         'vars' => [],
