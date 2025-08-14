@@ -643,7 +643,11 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'groups' => ['include' => [$groupID]],
       'scheduled_date' => 'now',
     ];
-    $this->callAPISuccess('Mailing', 'create', $params);
+    $mailing = $this->callAPISuccess('Mailing', 'create', $params);
+    $this->assertEquals('Scheduled', $mailing['values'][$mailing['id']]['status']);
+    // Query from the DB as the problem was that the DB was not being updated but the mailing object returned by the API was
+    $mailingStatus = CRM_Core_DAO::singleValueQuery("SELECT status FROM civicrm_mailing WHERE id = %1", [1 => [$mailing['id'], 'Positive']]);
+    $this->assertEquals('Scheduled', $mailingStatus);
   }
 
   /**
