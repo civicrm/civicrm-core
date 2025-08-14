@@ -25,7 +25,7 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
   }
 
   public function testGetIndividualFields():void {
-    $individualFields = \Civi\AfformAdmin\AfformAdminMeta::getFields('Individual');
+    $individualFields = \Civi\AfformAdmin\AfformAdminMeta::getFields('Individual', []);
 
     // Ensure the "Existing Contact" `id` field exists
     $this->assertEquals('Existing Individual', $individualFields['id']['label']);
@@ -33,7 +33,7 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
   }
 
   public function testGetLocBlockFields():void {
-    $fields = \Civi\AfformAdmin\AfformAdminMeta::getFields('LocBlock');
+    $fields = \Civi\AfformAdmin\AfformAdminMeta::getFields('LocBlock', []);
 
     // Ensure the "Existing" `id` field exists
     $this->assertEquals('Existing Location', $fields['id']['label']);
