@@ -143,6 +143,10 @@
         if (ctrl.fieldDefn.options) {
           return ctrl.fieldDefn.options;
         }
+        return this.getOriginalOptions();
+      };
+
+      this.getOriginalOptions = function() {
         if (ctrl.getDefn().input_type === 'EntityRef') {
           // Build a list of all entities in this form that can be referenced by this field.
           var newOptions = _.map(ctrl.editor.getEntities({type: ctrl.getDefn().fk_entity}), function(entity) {
