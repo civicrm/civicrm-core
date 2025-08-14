@@ -66,9 +66,9 @@ return [
     ],
     'context_key' => [
       'title' => ts('Context Key'),
-      'sql_type' => 'char(22)',
+      'sql_type' => 'char(22) CHARACTER SET ascii',
       'required' => TRUE,
-      'description' => ts('FIXME'),
+      'description' => ts('hash(entity_name,entity_id,entity_field,entity)'),
       'add' => '6.6.alpha1',
     ],
     'source' => [
@@ -81,10 +81,10 @@ return [
     ],
     'source_key' => [
       'title' => ts('Source Key'),
-      'sql_type' => 'char(22)',
+      'sql_type' => 'char(22) CHARACTER SET ascii',
       'input_type' => 'Text',
       'required' => TRUE,
-      'description' => ts('FIXME'),
+      'description' => ts('hash(source)'),
       'add' => '6.6.alpha1',
     ],
   ],
