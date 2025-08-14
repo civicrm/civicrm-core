@@ -4,7 +4,6 @@ namespace Civi\Api4\Utils;
 
 use Civi\Afform\StringVisitor;
 use Civi\Api4\TranslationSource;
-use Civi\Api4\Afform;
 use Civi\Afform\Utils;
 
 /**
