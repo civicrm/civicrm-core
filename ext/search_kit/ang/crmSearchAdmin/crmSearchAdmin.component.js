@@ -35,7 +35,7 @@
     $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Compose'});
 
     this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
-    this.afformAdminEnabled = CRM.checkPerm('administer afform') &&
+    this.afformAdminEnabled = CRM.checkPerm('manage own afform') &&
       'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
     this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
     this.searchDisplayPath = CRM.url('civicrm/search');

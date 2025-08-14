@@ -49,7 +49,7 @@ class AfformAdminInjector extends AutoSubscriber {
               'url' => \CRM_Utils_System::url('civicrm/admin/afform', NULL, FALSE, "/edit/{$afform['name']}", TRUE, FALSE, TRUE),
               'text' => E::ts('Edit %1 in FormBuilder', [1 => "<em>{$afform['title']}</em>"]),
               'icon' => 'fa-pencil',
-              'permission' => 'administer afform',
+              'permission' => 'manage own afform',
             ],
           ];
           if ($afform['search_displays']) {
