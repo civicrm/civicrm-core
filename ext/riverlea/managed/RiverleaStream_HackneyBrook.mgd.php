@@ -16,7 +16,7 @@ return [
         'description' => 'named after the Hackney Brook, a tributary of the River Lea that ran through Finsbury Park',
         'is_reserved' => TRUE,
         'extension' => E::SHORT_NAME,
-        'file_prefix' => 'streams/hackneybrook/css/',
+        'file_prefix' => 'streams/hackneybrook/',
         'css_file' => '_variables.css',
         'css_file_dark' => '_dark.css',
         'vars' => [],
