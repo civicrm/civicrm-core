@@ -45,8 +45,8 @@
   <civicrm_email id="101" contact_id="110" location_type_id="1" email="test06@civicrm.org" is_primary="1" is_billing="0" on_hold="0" is_bulkmail="0" signature_text="" signature_html=""/>
   <civicrm_email id="102" contact_id="111" location_type_id="1" email="test07@civicrm.org" is_primary="1" is_billing="0" on_hold="0" is_bulkmail="0" signature_text="" signature_html=""/>
   <civicrm_email id="103" contact_id="112" location_type_id="1" email="test08@civicrm.org" is_primary="1" is_billing="0" on_hold="0" is_bulkmail="0" signature_text="" signature_html=""/>
-  <civicrm_mailing id="14" domain_id="1" header_id="1" footer_id="2" reply_id="8" unsubscribe_id="5" resubscribe_id="6" optout_id="7" name="First Mailing Events" from_name="FIXME" from_email="info@cividev.yook.civicrm.org" replyto_email="info@cividev.yook.civicrm.org" subject="Hello {contact.display_name}" body_text="" body_html="&lt;p&gt;&#13;&#10;&#9;Hello {contact.display_name},&lt;/p&gt;&#13;&#10;&lt;p&gt;&#13;&#10;&#9;You should check &lt;a href=&quot;http://drupal.org&quot;&gt;drupal.org&lt;/a&gt; and &lt;a href=&quot;http://civicrm.org&quot;&gt;civicrm.org&lt;/a&gt;.&lt;/p&gt;&#13;&#10;" url_tracking="1" forward_replies="0" auto_responder="0" open_tracking="1" is_completed="1" override_verp="0" created_id="102" created_date="2011-05-26 13:03:50" scheduled_id="102" scheduled_date="2011-05-25 13:06:08" approver_id="102" approval_date="2011-05-25 13:06:08" approval_status_id="1" approval_note="" is_archived="0" visibility="User and User Admin Only" />
-  <civicrm_mailing id="15" domain_id="1" header_id="1" footer_id="2" reply_id="8" unsubscribe_id="5" resubscribe_id="6" optout_id="7" name="Second Test Mailing Events" from_name="FIXME" from_email="info@cividev.yook.civicrm.org" replyto_email="info@cividev.yook.civicrm.org" subject="Hello again, {contact.display_name}" body_text="" body_html="&lt;p&gt;&#13;&#10;&#9;Hello {contact.display_name},&lt;/p&gt;&#13;&#10;&lt;p&gt;&#13;&#10;&#9;You should check &lt;a href=&quot;http://drupal.org&quot;&gt;drupal.org&lt;/a&gt; and &lt;a href=&quot;http://civicrm.org&quot;&gt;civicrm.org&lt;/a&gt;.&lt;/p&gt;&#13;&#10;" url_tracking="1" forward_replies="0" auto_responder="0" open_tracking="1" is_completed="1" override_verp="0" created_id="102" created_date="2011-05-26 13:08:05" scheduled_id="102" scheduled_date="2011-05-26 13:08:46" approver_id="102" approval_date="2011-05-26 13:08:46" approval_status_id="1" approval_note="" is_archived="0" visibility="User and User Admin Only" />
+  <civicrm_mailing id="14" domain_id="1" header_id="1" footer_id="2" reply_id="8" unsubscribe_id="5" resubscribe_id="6" optout_id="7" name="First Mailing Events" from_name="FIXME" from_email="info@cividev.yook.civicrm.org" replyto_email="info@cividev.yook.civicrm.org" subject="Hello {contact.display_name}" body_text="" body_html="&lt;p&gt;&#13;&#10;&#9;Hello {contact.display_name},&lt;/p&gt;&#13;&#10;&lt;p&gt;&#13;&#10;&#9;You should check &lt;a href=&quot;http://drupal.org&quot;&gt;drupal.org&lt;/a&gt; and &lt;a href=&quot;http://civicrm.org&quot;&gt;civicrm.org&lt;/a&gt;.&lt;/p&gt;&#13;&#10;" url_tracking="1" forward_replies="0" auto_responder="0" open_tracking="1" is_completed="1" override_verp="0" created_id="102" created_date="2011-05-26 13:03:50" scheduled_id="102" scheduled_date="2011-05-25 13:06:08" approver_id="102" approval_date="2011-05-25 13:06:08" approval_status_id="1" approval_note="" is_archived="0" visibility="User and User Admin Only" start_date="2011-05-25 13:06:34" status="Complete" end_date="2011-05-25 13:06:35" />
+  <civicrm_mailing id="15" domain_id="1" header_id="1" footer_id="2" reply_id="8" unsubscribe_id="5" resubscribe_id="6" optout_id="7" name="Second Test Mailing Events" from_name="FIXME" from_email="info@cividev.yook.civicrm.org" replyto_email="info@cividev.yook.civicrm.org" subject="Hello again, {contact.display_name}" body_text="" body_html="&lt;p&gt;&#13;&#10;&#9;Hello {contact.display_name},&lt;/p&gt;&#13;&#10;&lt;p&gt;&#13;&#10;&#9;You should check &lt;a href=&quot;http://drupal.org&quot;&gt;drupal.org&lt;/a&gt; and &lt;a href=&quot;http://civicrm.org&quot;&gt;civicrm.org&lt;/a&gt;.&lt;/p&gt;&#13;&#10;" url_tracking="1" forward_replies="0" auto_responder="0" open_tracking="1" is_completed="1" override_verp="0" created_id="102" created_date="2011-05-26 13:08:05" scheduled_id="102" scheduled_date="2011-05-26 13:08:46" approver_id="102" approval_date="2011-05-26 13:08:46" approval_status_id="1" approval_note="" is_archived="0" visibility="User and User Admin Only" start_date="2011-05-26 13:08:49"  status="Complete" end_date="2011-05-26 13:08:51"/>
   <civicrm_mailing_recipients id="1" mailing_id="14" email_id="96" contact_id="105"/>
   <civicrm_mailing_recipients id="2" mailing_id="14" email_id="93" contact_id="102"/>
   <civicrm_mailing_recipients id="3" mailing_id="14" email_id="94" contact_id="103"/>
@@ -72,23 +72,23 @@
   <civicrm_mailing_trackable_url id="13" url="http://civicrm.org" mailing_id="14"/>
   <civicrm_mailing_trackable_url id="14" url="http://drupal.org" mailing_id="15"/>
   <civicrm_mailing_trackable_url id="15" url="http://civicrm.org" mailing_id="15"/>
-  <civicrm_mailing_event_queue id="44" job_id="24" email_id="93" contact_id="102" hash="07705f3169d0fc84"/>
-  <civicrm_mailing_event_queue id="45" job_id="24" email_id="94" contact_id="103" hash="8f6d859e31948f31"/>
-  <civicrm_mailing_event_queue id="46" job_id="24" email_id="95" contact_id="104" hash="e9694c902fafa150"/>
-  <civicrm_mailing_event_queue id="47" job_id="24" email_id="96" contact_id="105" hash="96a8f2de0d12ddf4"/>
-  <civicrm_mailing_event_queue id="48" job_id="24" email_id="99" contact_id="108" hash="a3e9c35a0f8b8cf9"/>
-  <civicrm_mailing_event_queue id="49" job_id="24" email_id="100" contact_id="109" hash="a32756fa40596d57"/>
-  <civicrm_mailing_event_queue id="50" job_id="24" email_id="101" contact_id="110" hash="20d8df8676546473"/>
-  <civicrm_mailing_event_queue id="51" job_id="24" email_id="102" contact_id="111" hash="2a2ea3816a403ccd"/>
-  <civicrm_mailing_event_queue id="52" job_id="24" email_id="103" contact_id="112" hash="d429695899514370"/>
-  <civicrm_mailing_event_queue id="53" job_id="26" email_id="93" contact_id="102" hash="98c5893b97ff170a"/>
-  <civicrm_mailing_event_queue id="54" job_id="26" email_id="94" contact_id="103" hash="0ad8d95c73f56332"/>
-  <civicrm_mailing_event_queue id="55" job_id="26" email_id="95" contact_id="104" hash="15035deafe89f4b0"/>
-  <civicrm_mailing_event_queue id="56" job_id="26" email_id="99" contact_id="108" hash="c7df7cc740a7c105"/>
-  <civicrm_mailing_event_queue id="57" job_id="26" email_id="100" contact_id="109" hash="c81c306117ca7fbd"/>
-  <civicrm_mailing_event_queue id="58" job_id="26" email_id="101" contact_id="110" hash="a9ae5b99441f1dda"/>
-  <civicrm_mailing_event_queue id="59" job_id="26" email_id="102" contact_id="111" hash="32fbff2a4814bb77"/>
-  <civicrm_mailing_event_queue id="60" job_id="26" email_id="103" contact_id="112" hash="bcd3cfd309c8c117"/>
+  <civicrm_mailing_event_queue id="44" job_id="24" email_id="93" contact_id="102" hash="07705f3169d0fc84" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="45" job_id="24" email_id="94" contact_id="103" hash="8f6d859e31948f31" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="46" job_id="24" email_id="95" contact_id="104" hash="e9694c902fafa150" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="47" job_id="24" email_id="96" contact_id="105" hash="96a8f2de0d12ddf4" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="48" job_id="24" email_id="99" contact_id="108" hash="a3e9c35a0f8b8cf9" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="49" job_id="24" email_id="100" contact_id="109" hash="a32756fa40596d57" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="50" job_id="24" email_id="101" contact_id="110" hash="20d8df8676546473" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="51" job_id="24" email_id="102" contact_id="111" hash="2a2ea3816a403ccd" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="52" job_id="24" email_id="103" contact_id="112" hash="d429695899514370" mailing_id="14"/>
+  <civicrm_mailing_event_queue id="53" job_id="26" email_id="93" contact_id="102" hash="98c5893b97ff170a" mailing_id="15"/>
+  <civicrm_mailing_event_queue id="54" job_id="26" email_id="94" contact_id="103" hash="0ad8d95c73f56332" mailing_id="15"/>
+  <civicrm_mailing_event_queue id="55" job_id="26" email_id="95" contact_id="104" hash="15035deafe89f4b0" mailing_id="15"/>
+  <civicrm_mailing_event_queue id="56" job_id="26" email_id="99" contact_id="108" hash="c7df7cc740a7c105" mailing_id="15"/>
+  <civicrm_mailing_event_queue id="57" job_id="26" email_id="100" contact_id="109" hash="c81c306117ca7fbd" mailing_id="15"/>
+  <civicrm_mailing_event_queue id="58" job_id="26" email_id="101" contact_id="110" hash="a9ae5b99441f1dda" mailing_id="15"/>
+  <civicrm_mailing_event_queue id="59" job_id="26" email_id="102" contact_id="111" hash="32fbff2a4814bb77" mailing_id="15"/>
+  <civicrm_mailing_event_queue id="60" job_id="26" email_id="103" contact_id="112" hash="bcd3cfd309c8c117" mailing_id="15"/>
   <civicrm_mailing_event_bounce id="2" event_queue_id="47" bounce_type_id="6" bounce_reason="Unknown bounce type: Could not parse bounce email" time_stamp="2011-05-25 13:06:57"/>
   <civicrm_mailing_event_delivered id="44" event_queue_id="44" time_stamp="2011-05-25 13:06:34"/>
   <civicrm_mailing_event_delivered id="45" event_queue_id="45" time_stamp="2011-05-25 13:06:34"/>

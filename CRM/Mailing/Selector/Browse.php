@@ -200,7 +200,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
     $query = "
    SELECT  COUNT( DISTINCT $mailing.id ) as count
      FROM  $mailing
-LEFT JOIN  $job ON ( $mailing.id = $job.mailing_id AND civicrm_mailing_job.is_test = 0 AND civicrm_mailing_job.parent_id IS NULL )
 LEFT JOIN  civicrm_contact createdContact   ON ( $mailing.created_id   = createdContact.id )
 LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = scheduledContact.id )
     WHERE  $whereClause";
@@ -517,8 +516,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $dateClause1[] = 'civicrm_mailing.created_date >= %2';
       }
       else {
-        $dateClause1[] = 'civicrm_mailing_job.start_date >= %2';
-        $dateClause2[] = 'civicrm_mailing_job.scheduled_date >= %2';
+        $dateClause1[] = 'civicrm_mailing.start_date >= %2';
+        $dateClause2[] = 'civicrm_mailing.scheduled_date >= %2';
       }
       $params[2] = [$from, 'String'];
     }
@@ -529,8 +528,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $dateClause1[] = ' civicrm_mailing.created_date <= %3 ';
       }
       else {
-        $dateClause1[] = 'civicrm_mailing_job.start_date <= %3';
-        $dateClause2[] = 'civicrm_mailing_job.scheduled_date <= %3';
+        $dateClause1[] = 'civicrm_mailing.start_date <= %3';
+        $dateClause2[] = 'civicrm_mailing.scheduled_date <= %3';
       }
       $params[3] = [$to, 'String'];
     }
@@ -578,8 +577,9 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $statusClauses[] = "civicrm_mailing.scheduled_id IS NULL";
     }
     if (!empty($mailingStatus)) {
-      $statusClauses[] = "civicrm_mailing_job.status IN ('" . implode("', '", array_keys($mailingStatus)) . "')";
+      $statusClauses[] = "civicrm_mailing.status IN ('" . implode("', '", array_keys($mailingStatus)) . "')";
     }
+
     if (!empty($statusClauses)) {
       $clauses[] = "(" . implode(' OR ', $statusClauses) . ")";
     }
@@ -650,7 +650,6 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     $query = "
 SELECT DISTINCT UPPER(LEFT(name, 1)) as sort_name
 FROM civicrm_mailing
-LEFT JOIN civicrm_mailing_job ON (civicrm_mailing_job.mailing_id = civicrm_mailing.id)
 LEFT JOIN civicrm_contact createdContact ON ( civicrm_mailing.created_id = createdContact.id )
 LEFT JOIN civicrm_contact scheduledContact ON ( civicrm_mailing.scheduled_id = scheduledContact.id )
 WHERE $whereClause
