@@ -48,7 +48,7 @@
     </table>
   {/if}
 
-  {include file="CRM/Contact/Form/Edit/Address.tpl" blockId=1}
+  {include file="CRM/Contact/Form/Edit/Address.tpl" blockId=1 masterAddress='' parseStreetAddress='' className='CRM_Event_Form_ManageEvent_Location'}
   <table class="form-layout-compressed">
     <tr>
       <td>{$form.email.1.email.label}</td>
