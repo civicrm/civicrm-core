@@ -66,6 +66,9 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
 
     CRM_Utils_Hook::post($op, 'StatusPreference', $statusPreference->id, $statusPreference);
 
+    // Clear the static cache of the CRM_Utils_Check so that the newly created message is available.
+    unset(\Civi::$statics['CRM_Utils_Check']);
+
     return $statusPreference;
   }
 
