@@ -293,6 +293,10 @@ trait SavedSearchInspectorTrait {
     foreach ($fieldNames as $fieldName) {
       $field = $this->getField($fieldName);
       $dataType = $field['data_type'] ?? NULL;
+      if (empty($field)) {
+        $expr = $this->getSelectExpression($fieldName);
+        $dataType = $expr['dataType'] ?? NULL;
+      }
       $operators = array_values($field['operators'] ?? []) ?: CoreUtil::getOperators();
       // Array is either associative `OP => VAL` or sequential `IN (...)`
       if (is_array($value)) {
