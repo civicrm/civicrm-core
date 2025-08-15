@@ -1836,6 +1836,7 @@ class CRM_Utils_System {
         '{baseUrl}' => $config->userFrameworkBaseURL,
         '{lang}' => $tsLocale,
         '{co}' => $config->defaultContactCountry ?? '',
+        '{t}' => time(),
       ];
       return strtr($url, array_map('urlencode', $vars));
     }
