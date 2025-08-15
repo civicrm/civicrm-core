@@ -3,9 +3,11 @@
 use Civi\API\EntityLookupTrait;
 
 /**
- * Trait implements functions to retrieve activity related values.
+ * A wrapper around EntityLookupTrait for case forms
+ *
+ * Your form must implement CaseFormInterface.
  */
-trait CRM_Case_Form_CaseFormTrait {
+trait CRM_Case_Form_CaseLookupTrait {
 
   use EntityLookupTrait;
 
@@ -33,19 +35,6 @@ trait CRM_Case_Form_CaseFormTrait {
       return $this->lookup('Case', $fieldName);
     }
     return NULL;
-  }
-
-  /**
-   * Get the selected Case ID.
-   *
-   * @api This function will not change in a minor release and is supported for
-   * use outside of core. This annotation / external support for properties
-   * is only given where there is specific test cover.
-   *
-   * @noinspection PhpUnhandledExceptionInspection
-   */
-  public function getCaseID(): ?int {
-    throw new CRM_Core_Exception('`getCaseID` must be implemented');
   }
 
 }
