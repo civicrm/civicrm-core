@@ -96,11 +96,13 @@ class AfformAdminMeta {
   }
 
   /**
-   * @param $entityName
+   * @param string $entityName
+   * @param array $searchDisplays
    * @param array $params
+   *
    * @return array
    */
-  public static function getFields($entityName, $params = []) {
+  public static function getFields(string $entityName, array $searchDisplays, array $params = []) {
     $params += [
       'checkPermissions' => FALSE,
       'loadOptions' => ['id', 'label'],
@@ -124,6 +126,25 @@ class AfformAdminMeta {
       $params['where'][] = ['fk_entity', 'IS NULL'];
     }
     $fields = (array) civicrm_api4($entityName, 'getFields', $params);
+    // Each EntitySet instance has a different set of fields.
+    // Just use fields from the SearchDisplay.
+    if (($entityName === 'EntitySet') && isset($searchDisplays)) {
+      foreach ($searchDisplays as $display) {
+        if ($display['saved_search_id.api_entity'] === 'EntitySet') {
+          $entitySetGet = \Civi\API\Request::create(
+            'EntitySet', 'get', ['version' => 4] + $display['saved_search_id.api_params']);
+          $entitySetQuery = new \Civi\Api4\Query\Api4EntitySetQuery($entitySetGet);
+          $entitySetQuery->getSql();
+          foreach ($display["saved_search_id.api_params"]["select"] as $expr) {
+            $entitySetFields[$expr] = $entitySetQuery->getField($expr);
+            $entitySetFields[$expr]['label'] ??= $entitySetFields[$expr]['title'] ?? $entitySetFields[$expr]['name'];
+            $entitySetFields[$expr]['name'] = $expr;
+            $entitySetFields[$expr]['entity'] = NULL;
+          }
+        }
+      }
+      $fields = array_merge($fields, array_values($entitySetFields));
+    }
     // Add implicit joins to search fields
     if ($params['action'] === 'get') {
       foreach (array_reverse($fields, TRUE) as $index => $field) {
