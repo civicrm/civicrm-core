@@ -239,7 +239,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       unset($params['tests']);
       $createdField = $this->callAPISuccess('customField', 'create', $params);
       foreach ($field['tests'] as $expected => $input) {
-        $this->assertEquals($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
+        $this->assertSame($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
       }
     }
 
