@@ -14,11 +14,11 @@
         $scope.options = JSON.parse(angular.toJson(ctrl.field.getOptions()));
         const optionKeys = $scope.options.map(option => option.id);
         // Original options
-        const originalOptions = JSON.parse(angular.toJson(ctrl.field.getDefn().options || []));
+        const originalOptions = JSON.parse(angular.toJson(ctrl.field.getOriginalOptions()));
         // Original options that are not in the current set (if customized)
         $scope.deletedOptions = originalOptions.filter(item => !optionKeys.includes(item.id));
         // Deleted options have no label so fetch original
-        $scope.originalLabels = (ctrl.field.getDefn().options || []).reduce((originalLabels, item) => {
+        $scope.originalLabels = originalOptions.reduce((originalLabels, item) => {
           originalLabels[item.id] = item.label;
           return originalLabels;
         }, {});
