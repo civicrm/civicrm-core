@@ -137,8 +137,9 @@ class Login extends AbstractAction {
     Civi::dispatcher()->dispatch('civi.standalone.login', $event);
 
     if ($event->stopReason) {
+      # note: if providing a stop reason through civi.standalone.login listener
+      # you should probably provide user feedback on /civicrm/login?[mystopreason]
       $result['url'] = '/civicrm/login?' . $event->stopReason;
-      $result['publicError'] = "Invalid request";
       return;
     }
 
