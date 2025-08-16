@@ -1206,7 +1206,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
             $customFormat = implode(" ", $customTimeFormat);
           }
         }
-        $display = CRM_Utils_Date::processDate($value, NULL, FALSE, $customFormat);
+        if ($value !== '') {
+          $display = CRM_Utils_Date::processDate($value, NULL, FALSE, $customFormat);
+        }
         break;
 
       case 'File':
