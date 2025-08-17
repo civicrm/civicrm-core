@@ -31,6 +31,12 @@
         }
       }
 
+      if (settings.chartOrderColIndex) {
+        if (!settings.columns[settings.chartOrderColIndex].isOrder) {
+          settings.columns[settings.chartOrderColIndex].isOrder = true;
+          updated = true;
+        }
+      }
 
       if (updated) {
         CRM.alert(ts("Please resave charts in SearchKit to avoid this message"), ts("Deprecated chart settings detected"));
