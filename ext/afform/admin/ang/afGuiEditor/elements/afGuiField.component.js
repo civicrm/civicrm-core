@@ -25,6 +25,7 @@
       ];
 
       let entityRefOptions = [];
+      let searchJoins = null;
 
       $scope.editingOptions = false;
 
@@ -465,6 +466,23 @@
 
       this.setEditingOptions = function(val) {
         $scope.editingOptions = val;
+      };
+
+      this.getSearchJoins = function() {
+        if (Array.isArray(searchJoins)) {
+          return searchJoins;
+        }
+        searchJoins = [];
+        const searchDisplay = ctrl.container.getSearchDisplay();
+        if (searchDisplay) {
+          Object.keys(searchDisplay['saved_search_id.form_values'].join).forEach((joinName) => {
+            searchJoins.push({
+              id: joinName,
+              text: searchDisplay['saved_search_id.form_values'].join[joinName],
+            });
+          });
+        }
+        return searchJoins;
       };
 
       // Returns a reference to a path n-levels deep within an object

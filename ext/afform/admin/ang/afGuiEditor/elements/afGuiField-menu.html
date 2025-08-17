@@ -145,6 +145,13 @@
       <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
     </select>
   </div>
+  <div class="af-gui-field-select-in-dropdown" ng-if="$ctrl.getSearchJoins().length">
+    <label>{{:: ts('Filter by:') }}</label>
+    <select class="form-control" ng-model="getSet('join_clause')" ng-model-options="{getterSetter: true}" title="{{:: ts('Apply this filter to the entire search or just one joined entity.') }}">
+      <option value="">{{:: ts('Entire Search') }}</option>
+      <option ng-repeat="join in $ctrl.getSearchJoins()" value="{{:: join.id }}">{{:: join.text }}</option>
+    </select>
+  </div>
 </li>
 
 <li af-gui-conditional-menu="$ctrl.node" ng-if="$ctrl.editor.getEntities().length"></li>

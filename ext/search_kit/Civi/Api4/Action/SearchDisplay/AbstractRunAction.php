@@ -1294,7 +1294,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Allow all filters that are included in SELECT clause or are fields on the Afform.
     $fieldFilters = $this->getAfformFilterFields();
     $directiveFilters = $this->getAfformDirectiveFilters();
-    $allowedFilters = array_merge($this->getSelectAliases(), $fieldFilters, $directiveFilters);
+    $allowedFilters = array_merge($this->getSelectAliases(), array_keys($fieldFilters), $directiveFilters);
 
     // Ignore empty strings
     $filters = array_filter($this->filters, [$this, 'hasValue']);
@@ -1312,7 +1312,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     foreach ($filters as $key => $value) {
       $fieldNames = explode(',', $key);
       if (in_array($key, $allowedFilters, TRUE) || !array_diff($fieldNames, $allowedFilters)) {
-        $this->applyFilter($fieldNames, $value);
+        $this->applyFilter($fieldNames, $value, $fieldFilters);
       }
     }
     // After adding filters, set filter labels
@@ -1634,7 +1634,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return array_column(\CRM_Utils_Array::findAll(
         $afform['searchDisplay']['fieldset'],
         ['#tag' => 'af-field']
-      ), 'name');
+      ), NULL, 'name');
     }
     return [];
   }

@@ -260,8 +260,11 @@ trait SavedSearchInspectorTrait {
    * @param string|array $fieldName
    *   If multiple field names are given they will be combined in an OR clause
    * @param mixed $value
+   *   Filter value
+   * @param array|null $formFields
+   *   Afform filters
    */
-  protected function applyFilter($fieldName, $value) {
+  protected function applyFilter($fieldName, $value, ?array $formFields = NULL) {
     // Global setting determines if % wildcard should be added to both sides (default) or only the end of a search string
     $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
 
@@ -273,6 +276,14 @@ trait SavedSearchInspectorTrait {
     if (!$field) {
       $this->_apiParams += ['having' => []];
       $clause =& $this->_apiParams['having'];
+    }
+    // If form filter specified a target join
+    elseif (!empty($formFields[$fieldName]['defn']['join_clause'])) {
+      foreach ($this->_apiParams['join'] ?? [] as $idx => $join) {
+        if ((explode(' AS ', $join[0])[1] ?? '') === $formFields[$fieldName]['defn']['join_clause']) {
+          $clause =& $this->_apiParams['join'][$idx];
+        }
+      }
     }
     // If field belongs to an EXCLUDE join, it should be added as a join condition
     else {
