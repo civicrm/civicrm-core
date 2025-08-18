@@ -177,6 +177,29 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     }
   }
 
+  public function testHttpOneClickOptout(): void {
+    // Send an example mail-blast. We'll read the `List-Unsubscribe` links from each message.
+    $allMessages = $this->runMailingSuccess([
+      'subject' => 'Yellow Unsubmarine',
+      'body_text' => 'In the {domain.address} where I was born, lived a man who sailed to sea',
+      'unsubscribe_mode' => 'opt-out',
+    ]);
+    foreach ($allMessages as $k => $message) {
+      $urls = array_map(
+        fn($s) => trim($s, '<>'),
+        preg_split('/[,\s]+/', $message->headers['List-Unsubscribe'][0])
+      );
+      $mailUrl = CRM_Utils_Array::first(preg_grep('/^mailto/', $urls));
+      $webUrl = CRM_Utils_Array::first(preg_grep('/^http/', $urls));
+      $sep = preg_quote(Civi::settings()->get('verpSeparator'), ';');
+      $matches = [];
+      if (!preg_match(";^mailto:[^>]*o{$sep}(\d+){$sep}(\d+){$sep}(\w*)@(.+)$;", $mailUrl, $matches)) {
+        $this->fail('Mailing URL should have been replaced to an opt out');
+      }
+      $this->assertMatchesRegularExpression(';civicrm/mailing/optout;', $webUrl);
+    }
+  }
+
   /**
    * Generate a fully-formatted mailing (with body_text content).
    */

@@ -114,7 +114,8 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
 
   private function replaceUnsubscribeWithOptOut($listUnsubscribeEmail): string {
     $sep = Civi::settings()->get('verpSeparator');
-    return str_replace('u' . $sep, 'o' . $sep, $listUnsubscribeEmail);
+    $pregSep = preg_quote(Civi::settings()->get('verpSeparator'), ';');
+    return preg_replace(";u{$pregSep}(\d+){$pregSep}(\d+){$pregSep}(\w*);", "o{$sep}$1{$sep}$2{$sep}$3", $listUnsubscribeEmail);
   }
 
 }
