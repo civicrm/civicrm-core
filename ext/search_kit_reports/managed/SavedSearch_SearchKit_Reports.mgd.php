@@ -46,7 +46,7 @@ return [
         'saved_search_id.name' => 'SearchKit_Reports',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts(''),
+          'description' => '',
           'sort' => [],
           'limit' => 50,
           'pager' => [],

@@ -104,7 +104,7 @@ return [
               'alignment' => 'text-right',
             ],
             [
-              'text' => E::ts(''),
+              'text' => '',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
@@ -182,7 +182,7 @@ return [
               ],
               'type' => 'menu',
               'alignment' => 'text-right',
-              'label' => E::ts(''),
+              'label' => '',
             ],
           ],
           'actions' => FALSE,

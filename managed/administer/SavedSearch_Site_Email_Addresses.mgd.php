@@ -97,7 +97,7 @@ return [
               'rewrite' => ' ',
             ],
             [
-              'text' => ts(''),
+              'text' => '',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',

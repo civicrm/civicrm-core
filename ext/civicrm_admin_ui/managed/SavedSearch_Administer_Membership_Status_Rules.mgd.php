@@ -52,7 +52,7 @@ return [
         'saved_search_id.name' => 'Administer_Membership_Status_Rules',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts(''),
+          'description' => '',
           'sort' => [],
           'limit' => 50,
           'pager' => [
@@ -120,7 +120,7 @@ return [
               'sortable' => TRUE,
             ],
             [
-              'text' => E::ts(''),
+              'text' => '',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',

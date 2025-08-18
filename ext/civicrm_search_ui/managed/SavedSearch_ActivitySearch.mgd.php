@@ -186,7 +186,7 @@ return [
               'sortable' => TRUE,
             ],
             [
-              'text' => E::ts(''),
+              'text' => '',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
