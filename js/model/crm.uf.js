@@ -379,7 +379,7 @@
   CRM.UF.UFEntityModel = CRM.Backbone.Model.extend({
     schema: {
       'id': {
-        // title: ts(''),
+        // title: '',
         type: 'Number'
       },
       'entity_name': {
@@ -480,30 +480,30 @@
     },
     schema: {
       'id': {
-        // title: ts(''),
+        // title: '',
         type: 'Number'
       },
       'name': {
-        // title: ts(''),
+        // title: '',
         type: 'Text'
       },
       'title': {
         title: ts('Profile Name'),
-        help: ts(''),
+        help: '',
         type: 'Text',
         editorAttrs: {maxlength: 64},
         validators: ['required']
       },
       'frontend_title': {
         title: ts('Public Title'),
-        help: ts(''),
+        help: '',
         type: 'Text',
         editorAttrs: {maxlength: 64},
         validators: []
       },
       'group_type': {
         // For a description of group_type, see CRM_Core_BAO_UFGroup::updateGroupTypes
-        // title: ts(''),
+        // title: '',
         type: 'Text'
       },
       'add_captcha': {
@@ -533,11 +533,11 @@
         type: 'Text'
       },
       'created_date': {
-        //title: ts(''),
+        //title: '',
         type: 'Text'// FIXME
       },
       'created_id': {
-        //title: ts(''),
+        //title: '',
         type: 'Number'
       },
       'help_post': {
@@ -582,7 +582,7 @@
         options: YESNO // FIXME
       },
       'is_reserved': {
-        // title: ts(''),
+        // title: '',
         type: 'Select',
         options: YESNO
       },
