@@ -1,0 +1,9 @@
+{
+  "title": "Beeceptor Mock OAuth 2.0 Server",
+  "options": {
+    "urlAuthorize": "https://oauth-mock.mock.beeceptor.com/oauth/authorize",
+    "urlAccessToken": "https://oauth-mock.mock.beeceptor.com/oauth/token/google",
+    "urlResourceOwnerDetails": "https://oauth-mock.mock.beeceptor.com/userinfo/google",
+    "scopes": ["read"]
+  }
+}
