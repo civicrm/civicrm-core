@@ -18,6 +18,13 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
     ];
   }
 
+  public static function unsubscribeModes(): array {
+    return [
+      'unsubscribe' => ts('Unsubscribe'),
+      'opt-out' => ts('Opt Out'),
+    ];
+  }
+
   public static function getSubscribedEvents() {
     return [
       '&hook_civicrm_alterMailParams' => ['alterMailParams', 1000],
@@ -43,9 +50,7 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
     }
 
     $methods = Civi::settings()->get('civimail_unsubscribe_methods');
-    if ($methods === ['mailto']) {
-      return;
-    }
+    $mode = Civi::settings()->get('default_oneclick_unsubscribe_mode');
 
     $sep = preg_quote(Civi::settings()->get('verpSeparator'), ';');
     $regex = ";^<mailto:[^>]*u{$sep}(\d+){$sep}(\d+){$sep}(\w*)@(.+)>$;";
@@ -53,6 +58,23 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
       // This can happen when generating a preview of a mailing or bots
       // crawling public mailings with invalid checkums
       return;
+    }
+
+    $mailing_unsubscribe_mode = CRM_Core_DAO::singleValueQuery("SELECT m.unsubscribe_mode
+      FROM civicrm_mailing_event_queue mq
+      INNER JOIN civicrm_mailing m ON m.id = mq.mailing_id
+      WHERE mq.id = %1", [1 => [$m[2], 'Positive']]);
+    if ($mailing_unsubscribe_mode !== $mode) {
+      $mode = $mailing_unsubscribe_mode;
+    }
+    if ($methods === ['mailto']) {
+      if ($mode === 'unsubscribe') {
+        return;
+      }
+      else {
+        $params['List-Unsubscribe'] = $this->replaceUnsubscribeWithOptOut($params['List-Unsubscribe']);
+        return;
+      }
     }
 
     if ($this->urlFlags === NULL) {
@@ -66,10 +88,16 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
 
     $listUnsubscribe = [];
     if (in_array('mailto', $methods)) {
-      $listUnsubscribe[] = $params['List-Unsubscribe'];
+      $listUnsubscribe[] = ($mode === 'unsubscribe' ? $params['List-Unsubscribe'] : $this->replaceUnsubscribeWithOptOut($params['List-Unsubscribe']));
     }
     if (array_intersect(['http', 'oneclick'], $methods)) {
-      $listUnsubscribe[] = '<' . Civi::url('frontend://civicrm/mailing/unsubscribe', $this->urlFlags)->addQuery([
+      if ($mode === 'unsubscribe') {
+        $url = 'frontend://civicrm/mailing/unsubscribe';
+      }
+      else {
+        $url = 'frontend://civicrm/mailing/optout';
+      }
+      $listUnsubscribe[] = '<' . Civi::url($url, $this->urlFlags)->addQuery([
         'reset' => 1,
         'jid' => $m[1],
         'qid' => $m[2],
@@ -82,6 +110,12 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
     }
     $params['headers']['List-Unsubscribe'] = implode(', ', $listUnsubscribe);
     unset($params['List-Unsubscribe']);
+  }
+
+  private function replaceUnsubscribeWithOptOut($listUnsubscribeEmail): string {
+    $sep = Civi::settings()->get('verpSeparator');
+    $pregSep = preg_quote(Civi::settings()->get('verpSeparator'), ';');
+    return preg_replace(";u{$pregSep}(\d+){$pregSep}(\d+){$pregSep}(\w*);", "o{$sep}$1{$sep}$2{$sep}$3", $listUnsubscribeEmail);
   }
 
 }

@@ -389,4 +389,25 @@ return [
     'help_text' => ts('CiviMail records email sent at the frequency you specify. If you set it to 1, it will update the database every time it sends an email. This ensures that emails are not resent if the batch job fails, but this may cause a performance hit, particularly for large jobs.'),
     'settings_pages' => ['mail' => ['weight' => 60]],
   ],
+  'default_oneclick_unsubscribe_mode' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'default_oneclick_unsubscribe_mode',
+    'type' => 'String',
+    'html_type' => 'select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+    ],
+    'default' => 'unsubscribe',
+    'add' => '6.7',
+    'title' => ts('Default One Click Unsubscribe Mode'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts("This sets the default One Click unsubscribe mode for any new mailings created") . $unsubLearnMore,
+    'help_text' => NULL,
+    'pseudoconstant' => [
+      'callback' => 'CRM_Mailing_Service_ListUnsubscribe::unsubscribeModes',
+    ],
+    'settings_pages' => ['mail' => ['weight' => 70]],
+  ],
 ];
