@@ -337,7 +337,7 @@ class ContributionParser extends ImportParser {
       foreach ($softCreditEntities as $index => $softCreditContact) {
         $softCreditParams[$index]['soft_credit_type_id'] = $softCreditContact['soft_credit_type_id'];
         $softCreditEntities[$index]['id'] = $this->getContactID($softCreditContact, !empty($softCreditContact['id']) ? $softCreditContact['id'] : NULL, 'SoftCreditContact', $this->getDedupeRulesForEntity('SoftCreditContact'));
-        if (empty($softCreditParams[$index]['contact_id']) && in_array($this->getActionForEntity('SoftCreditContact'), ['update', 'select'])) {
+        if (empty($softCreditEntities[$index]['id']) && in_array($this->getActionForEntity('SoftCreditContact'), ['update', 'select'])) {
           throw new \CRM_Core_Exception(ts('Soft Credit Contact not found'));
         }
       }
