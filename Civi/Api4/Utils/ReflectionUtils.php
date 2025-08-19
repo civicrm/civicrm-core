@@ -78,144 +78,146 @@ class ReflectionUtils {
   public static function parseDocBlock(string $comment): array {
     $info = [];
     $param = NULL;
-
-    $rawLines = preg_split("/((\r?\n)|(\r\n?))/", $comment);
-    $lines = [];
-    foreach (array_keys($rawLines) as $num) {
-      // We change rawLines as we iterate so load in-loop via $num.
-      $line = $rawLines[$num];
-      if ($num === 0 || str_contains($line, '*/')) {
-        continue;
-      }
-      $line = self::cleanLine($line);
-      if (str_contains($line, 'array{')) {
-        // We have the start of an array shape.
-        // Count opening and closing braces to detect when shape ends.
-        $openBraces = substr_count($line, '{');
-        $closeBraces = substr_count($line, '}');
-        $nextLine = $num + 1;
-        while ($openBraces > $closeBraces) {
-          if (!array_key_exists($nextLine, $rawLines)) {
-            // If we get to the end and it is still unbalanced then just
-            // ignore the whole broken array shape.
-            $line = '*/';
-            break;
-          }
-          // Here we need to absorb as many lines as possible to capture the full array shape.
-          $line .= ' ' . self::cleanLine($rawLines[$nextLine]);
-          // Set the line we just absorbed to be skipped.
-          $rawLines[$nextLine] = '*/';
+    $key = __FUNCTION__ . md5($comment);
+    if (!isset(\Civi::$statics[__CLASS__][$key])) {
+      $rawLines = preg_split("/((\r?\n)|(\r\n?))/", $comment);
+      $lines = [];
+      foreach (array_keys($rawLines) as $num) {
+        // We change rawLines as we iterate so load in-loop via $num.
+        $line = $rawLines[$num];
+        if ($num === 0 || str_contains($line, '*/')) {
+          continue;
+        }
+        $line = self::cleanLine($line);
+        if (str_contains($line, 'array{')) {
+          // We have the start of an array shape.
+          // Count opening and closing braces to detect when shape ends.
           $openBraces = substr_count($line, '{');
           $closeBraces = substr_count($line, '}');
-          $nextLine++;
-        }
-      }
-      $lines[] = $line;
-    }
-
-    foreach ($lines as $num => $line) {
-
-      if (str_starts_with(ltrim($line), '@')) {
-        $words = preg_split('/\s+/', ltrim($line, ' @'));
-        $key = array_shift($words);
-        $param = NULL;
-        if ($key == 'var') {
-          $varType = implode(' ', $words);
-          if (str_starts_with($varType, 'array{') && str_contains($varType, '}')) {
-            $info['type'] = ['array'];
-            $info['shape'] = self::parseArrayShape($varType);
-          }
-          else {
-            $info['type'] = explode('|', strtolower($words[0]));
-          }
-        }
-        elseif ($key === 'return') {
-          $return_type = implode(' ', $words);
-          if (str_starts_with($return_type, 'array{')) {
-            $info['return'] = [
-              'type' => ['array'],
-              'shape' => self::parseArrayShape($return_type),
-            ];
-          }
-          else {
-            $info['return'] = explode('|', $return_type);
-          }
-        }
-        elseif ($key == 'options') {
-          $val = str_replace(', ', ',', implode(' ', $words));
-          $info[$key] = explode(',', $val);
-        }
-        elseif ($key == 'throws' || $key == 'see') {
-          $info[$key][] = implode(' ', $words);
-        }
-        elseif ($key == 'param' && $words) {
-          // Locate param name starting with $
-          $paramIndex = NULL;
-          foreach ($words as $i => $w) {
-            if (str_starts_with($w, '$')) {
-              $paramIndex = $i;
+          $nextLine = $num + 1;
+          while ($openBraces > $closeBraces) {
+            if (!array_key_exists($nextLine, $rawLines)) {
+              // If we get to the end and it is still unbalanced then just
+              // ignore the whole broken array shape.
+              $line = '*/';
               break;
             }
+            // Here we need to absorb as many lines as possible to capture the full array shape.
+            $line .= ' ' . self::cleanLine($rawLines[$nextLine]);
+            // Set the line we just absorbed to be skipped.
+            $rawLines[$nextLine] = '*/';
+            $openBraces = substr_count($line, '{');
+            $closeBraces = substr_count($line, '}');
+            $nextLine++;
           }
+        }
+        $lines[] = $line;
+      }
 
-          if ($paramIndex !== NULL) {
-            $param = rtrim($words[$paramIndex], '-:()/');
-            //ltrim(implode(' ', $words), '-: ') : ''
-            $typeString = implode(' ', array_slice($words, 0, $paramIndex));
-            $description = ltrim(implode(' ', array_slice($words, $paramIndex + 1)), '-: ');
+      foreach ($lines as $num => $line) {
+        if (str_starts_with(ltrim($line), '@')) {
+          $words = preg_split('/\s+/', ltrim($line, ' @'));
+          $key = array_shift($words);
+          $param = NULL;
+          if ($key == 'var') {
+            $varType = implode(' ', $words);
+            if (str_starts_with($varType, 'array{') && str_contains($varType, '}')) {
+              $info['type'] = ['array'];
+              $info['shape'] = self::parseArrayShape($varType);
+            }
+            else {
+              $info['type'] = explode('|', strtolower($words[0]));
+            }
+          }
+          elseif ($key === 'return') {
+            $return_type = implode(' ', $words);
+            if (str_starts_with($return_type, 'array{')) {
+              $info['return'] = [
+                'type' => ['array'],
+                'shape' => self::parseArrayShape($return_type),
+              ];
+            }
+            else {
+              $info['return'] = explode('|', $return_type);
+            }
+          }
+          elseif ($key == 'options') {
+            $val = str_replace(', ', ',', implode(' ', $words));
+            $info[$key] = explode(',', $val);
+          }
+          elseif ($key == 'throws' || $key == 'see') {
+            $info[$key][] = implode(' ', $words);
+          }
+          elseif ($key == 'param' && $words) {
+            // Locate param name starting with $
+            $paramIndex = NULL;
+            foreach ($words as $i => $w) {
+              if (str_starts_with($w, '$')) {
+                $paramIndex = $i;
+                break;
+              }
+            }
+
+            if ($paramIndex !== NULL) {
+              $param = rtrim($words[$paramIndex], '-:()/');
+              //ltrim(implode(' ', $words), '-: ') : ''
+              $typeString = implode(' ', array_slice($words, 0, $paramIndex));
+              $description = ltrim(implode(' ', array_slice($words, $paramIndex + 1)), '-: ');
+            }
+            else {
+              // Fallback
+              $param = '$unknown';
+              $typeString = implode(' ', $words);
+              $description = '';
+            }
+            if (str_starts_with($typeString, 'array{')) {
+              $info['params'][$param] = [
+                'type' => ['array'],
+                'shape' => self::parseArrayShape($typeString),
+                'description' => $description,
+                'comment' => '',
+              ];
+            }
+            else {
+              $type = $typeString !== '' ? explode('|', strtolower($typeString)) : NULL;
+              $info['params'][$param] = [
+                'type' => $type,
+                'description' => $description,
+                'comment' => '',
+              ];
+            }
           }
           else {
-            // Fallback
-            $param = '$unknown';
-            $typeString = implode(' ', $words);
-            $description = '';
+            // Unrecognized annotation, but we'll duly add it to the info array
+            $val = implode(' ', $words);
+            $info[$key] = strlen($val) ? $val : TRUE;
           }
-          if (str_starts_with($typeString, 'array{')) {
-            $info['params'][$param] = [
-              'type' => ['array'],
-              'shape' => self::parseArrayShape($typeString),
-              'description' => $description,
-              'comment' => '',
-            ];
-          }
-          else {
-            $type = $typeString !== '' ? explode('|', strtolower($typeString)) : NULL;
-            $info['params'][$param] = [
-              'type' => $type,
-              'description' => $description,
-              'comment' => '',
-            ];
-          }
+        }
+        elseif ($param) {
+          $info['params'][$param]['comment'] .= $line . "\n";
+        }
+        elseif ($num === 0) {
+          $info['description'] = ucfirst($line);
+        }
+        elseif (!$line) {
+          $info['comment'] = isset($info['comment']) ? "{$info['comment']}\n" : NULL;
+        }
+        // For multi-line description.
+        elseif (count($info) === 1 && isset($info['description']) && substr($info['description'], -1) !== '.') {
+          $info['description'] .= ' ' . $line;
         }
         else {
-          // Unrecognized annotation, but we'll duly add it to the info array
-          $val = implode(' ', $words);
-          $info[$key] = strlen($val) ? $val : TRUE;
+          $info['comment'] = isset($info['comment']) ? "{$info['comment']}\n$line" : $line;
         }
       }
-      elseif ($param) {
-        $info['params'][$param]['comment'] .= $line . "\n";
+
+      if (isset($info['comment'])) {
+        $info['comment'] = rtrim($info['comment']);
       }
-      elseif ($num === 0) {
-        $info['description'] = ucfirst($line);
-      }
-      elseif (!$line) {
-        $info['comment'] = isset($info['comment']) ? "{$info['comment']}\n" : NULL;
-      }
-      // For multi-line description.
-      elseif (count($info) === 1 && isset($info['description']) && substr($info['description'], -1) !== '.') {
-        $info['description'] .= ' ' . $line;
-      }
-      else {
-        $info['comment'] = isset($info['comment']) ? "{$info['comment']}\n$line" : $line;
-      }
+      \Civi::$statics[__CLASS__][$key] = $info;
     }
 
-    if (isset($info['comment'])) {
-      $info['comment'] = rtrim($info['comment']);
-    }
-
-    return $info;
+    return \Civi::$statics[__CLASS__][$key];
   }
 
   /**
