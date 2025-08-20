@@ -21,7 +21,7 @@ return [
     // Note the super permission "all CiviCRM permissions and ACLs" is used in the JS layer to determine if users can create search displays that bypass ACLs
     'all CiviCRM permissions and ACLs',
     'administer CiviCRM',
-    'administer afform',
+    'manage own afform',
     'view debug output',
     'schedule communications',
     'manage own search_kit',
