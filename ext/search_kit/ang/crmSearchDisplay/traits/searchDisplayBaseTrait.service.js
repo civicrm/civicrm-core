@@ -302,6 +302,10 @@
       getFieldTemplate: function(colIndex, colData) {
         let colType = this.columns[colIndex].type;
         if (colType === 'include') {
+          // Throw exception if path doesn't start with '~/'
+          if (/^~\/.+/.test(this.columns[colIndex].path) === false) {
+            throw 'Invalid path for include column: "' + this.columns[colIndex].path + '"';
+          }
           return this.columns[colIndex].path;
         }
         if (colType === 'field') {
