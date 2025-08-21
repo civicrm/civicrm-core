@@ -176,7 +176,7 @@ class MembershipParser extends ImportParser {
         $existingMembership = $this->checkEntityExists('Membership', $membershipParams['id']);
         $membershipParams['contact_id'] = !empty($membershipParams['contact_id']) ? (int) $membershipParams['contact_id'] : $existingMembership['contact_id'];
       }
-      $membershipParams['contact_id'] = $this->getContactID($contactParams, $membershipParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      $membershipParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($contactParams, $membershipParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
       $membershipParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $membershipParams['contact_id'];
       $formatted = $formatValues = $membershipParams;
       // don't add to recent items, CRM-4399
