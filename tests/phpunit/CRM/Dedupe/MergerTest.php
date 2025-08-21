@@ -377,6 +377,34 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test function that gets duplicate pairs.
+   *
+   * It turns out there are 2 code paths retrieving this data so my initial
+   * focus is on ensuring they match.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isReverse
+   */
+  public function testGetMatchesModifiedDate(bool $isReverse): void {
+    $this->setupMatchData();
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET modified_date = "2020-04-09" WHERE id = ' . $this->ids['Contact']['mickey_1']);
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'check_permissions' => TRUE,
+      'criteria' => ['where' => [['modified_date', 'BETWEEN', ['2020-01-01', '2020-09-01']]]],
+    ])['values'];
+    $this->assertCount(1, $pairs);
+    $this->callAPISuccess('Contact', 'delete', ['id' => ($isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])]);
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'check_permissions' => TRUE,
+      'criteria' => ['Contact' => ['id' => ['>' => 1]]],
+    ])['values'];
+    $this->assertCount(1, $pairs);
+  }
+
+  /**
    * Test that location type is ignored when deduping by postal address.
    *
    * @throws \CRM_Core_Exception
