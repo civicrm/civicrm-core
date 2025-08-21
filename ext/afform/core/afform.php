@@ -179,7 +179,7 @@ function _afform_hook_civicrm_angularModules($e) {
       // Permissions needed for conditionally displaying edit-links
       'permissions' => [
         'manage own afform',
-        'administer search_kit',
+        'manage own search_kit',
         'all CiviCRM permissions and ACLs',
       ],
     ];

@@ -12,7 +12,7 @@ class SearchSegment extends Generic\DAOEntity {
 
   public static function permissions() {
     $permissions = parent::permissions();
-    $permissions['default'] = ['administer search_kit'];
+    $permissions['default'] = ['manage own search_kit'];
     return $permissions;
   }
 

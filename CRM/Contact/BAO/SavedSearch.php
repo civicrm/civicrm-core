@@ -443,7 +443,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
 
     $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
     if (!empty($created_id)) {
-      if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && CRM_Core_Permission::check('manage own search_kit') && ($userID !== (int) $created_id)) {
+      if (!CRM_Core_Permission::check('administer search_kit') && CRM_Core_Permission::check('manage own search_kit') && ($userID !== (int) $created_id)) {
         $e->setAuthorized(FALSE);
       }
     }
@@ -478,7 +478,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function checkManageOwnPermission(array $record): void {
-    if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && !empty($record['id']) && CRM_Core_Permission::check('manage own search_kit')) {
+    if (!CRM_Core_Permission::check('administer search_kit') && !empty($record['id']) && CRM_Core_Permission::check('manage own search_kit')) {
       $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
       if ($created_id != CRM_Core_Session::getLoggedInContactID()) {
         throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this SavedSearch.');
