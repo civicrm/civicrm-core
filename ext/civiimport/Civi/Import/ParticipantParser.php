@@ -120,7 +120,7 @@ class ParticipantParser extends ImportParser {
         $participantParams['contact_id'] = !empty($participantParams['contact_id']) ? (int) $participantParams['contact_id'] : $existingParticipant['contact_id'];
       }
 
-      $participantParams['contact_id'] = $this->getContactID($contactParams, $participantParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      $participantParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($contactParams, $participantParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
       $participantParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $participantParams['contact_id'];
       // don't add to recent items, CRM-4399
       $participantParams['skipRecentView'] = TRUE;
