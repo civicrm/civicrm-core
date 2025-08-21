@@ -53,37 +53,46 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'name' => 'FlexMailer',
       'file' => 'flexmailer',
     ],
+    // Insert component-extensions initially disabled. They'll be enabled by InstallComponents.civi-setup.php.
     [
       'full_name' => 'civi_campaign',
       'name' => 'CiviCampaign',
+      'is_active' => 0,
     ],
     [
       'full_name' => 'civi_case',
       'name' => 'CiviCase',
+      'is_active' => 0,
     ],
     [
       'full_name' => 'civi_contribute',
       'name' => 'CiviContribute',
+      'is_active' => 0,
     ],
     [
       'full_name' => 'civi_event',
       'name' => 'CiviEvent',
+      'is_active' => 0,
     ],
     [
       'full_name' => 'civi_mail',
       'name' => 'CiviMail',
+      'is_active' => 0,
     ],
     [
       'full_name' => 'civi_member',
       'name' => 'CiviMember',
+      'is_active' => 0,
     ],
     [
       'full_name' => 'civi_pledge',
       'name' => 'CiviPledge',
+      'is_active' => 0,
     ],
     [
       'full_name' => 'civi_report',
       'name' => 'CiviReport',
+      'is_active' => 0,
     ],
     [
       'full_name' => 'legacybatchentry',
