@@ -50,13 +50,12 @@
             option-key="'name'">
           </crm-search-condition>
         </div>
-        <!-- Add condition button uses a trick of ngModel that will push in a new row to the conditions array -->
         <div ng-if="item.conditions.length < 1">
-          <input class="form-control crm-auto-width" ng-model="item.conditions[0][0]" crm-ui-select="{placeholder: ts('Add Condition...'), data: $ctrl.fields}">
+          <input class="form-control crm-auto-width" on-crm-ui-select="$ctrl.addCondition(item, selection)" crm-ui-select="{placeholder: ts('Add Condition...'), data: $ctrl.fields}">
         </div>
         <!-- Subsequent Add Condition button has a different placeholder to clarify that the operator is AND -->
         <div ng-if="item.conditions.length >= 1">
-          <input class="form-control crm-auto-width" ng-model="item.conditions[$ctrl.conditionCount[itemIndex]][0]" crm-ui-select="{placeholder: ts('And...'), data: $ctrl.fields}">
+          <input class="form-control crm-auto-width" on-crm-ui-select="$ctrl.addCondition(item, selection)" crm-ui-select="{placeholder: ts('And...'), data: $ctrl.fields}">
         </div>
       </td>
       <td>
