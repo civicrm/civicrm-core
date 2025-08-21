@@ -45,6 +45,10 @@
         return {results: permissionField.concat(selectFields)};
       };
 
+      this.addCondition = function(item, selection) {
+        item.conditions.push([selection, '=']);
+      };
+
       this.onChangeCondition = function(item, index) {
         if (item.conditions[index][0]) {
           item.conditions[index][1] = '=';
