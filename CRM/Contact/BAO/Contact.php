@@ -753,14 +753,22 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @throws \CRM_Core_Exception
    */
   protected static function contactTrash(CRM_Contact_DAO_Contact $contact): bool {
-    $updateParams = [
+    $updateParams = $preHookUpdateParams = [
       'id' => $contact->id,
       'is_deleted' => 1,
     ];
     CRM_Utils_Hook::pre('edit', $contact->contact_type, $contact->id, $updateParams);
-
+    // Do a direct update query - the legacy behaviour blocked mysql
+    // from managing modified_date.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET is_deleted = %1 WHERE id = %2', [
+      1 => [$updateParams['is_deleted'], 'Integer'],
+      2 => [$updateParams['id'], 'Integer'],
+    ]);
     $contact->copyValues($updateParams);
-    $contact->save();
+    if ($updateParams !== $preHookUpdateParams) {
+      // Do legacy behaviour.
+      $contact->save();
+    }
     CRM_Core_BAO_Log::register($contact->id, 'civicrm_contact', $contact->id);
 
     CRM_Utils_Hook::post('edit', $contact->contact_type, $contact->id, $contact);
