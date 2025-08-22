@@ -185,6 +185,7 @@ body.wp-admin .crm-container input[type="checkbox"],
 body.wp-admin .crm-container input[type="radio"] {
   appearance: none;
   border-radius: var(--crm-s);
+  border-color: #8c8f94 /* reset to WP default border col */;
   background: #fff;
   height: var(--crm-r);
   width: var(--crm-r);
