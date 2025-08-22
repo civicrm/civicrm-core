@@ -2,6 +2,8 @@
 
 namespace Civi\Schema;
 
+use Civi\Core\Event\GenericHookEvent;
+
 class EntityTest extends \CiviUnitTestCase {
 
   public function testGetMeta(): void {
@@ -26,6 +28,9 @@ class EntityTest extends \CiviUnitTestCase {
   }
 
   public function testGetFields(): void {
+    $dispatcher = \Civi::service('dispatcher');
+    $dispatcher->addListener('civi.entity.fields::Activity', [$this, 'onActivityFields']);
+
     $entity = \Civi::entity('Activity');
 
     $fields = $entity->getFields();
@@ -45,6 +50,16 @@ class EntityTest extends \CiviUnitTestCase {
     $this->assertTrue($fields['modified_date']['readonly']);
     $this->assertFalse($fields['is_deleted']['default']);
     $this->assertTrue(empty($fields['is_deleted']['localizable']));
+
+    // Test hook alterations
+    $this->assertSame('Altered ID Title', $fields['id']['title']);
+    // Ensure it also works with getField
+    $this->assertSame('Altered ID Title', $entity->getField('id')['title']);
+  }
+
+  public function onActivityFields(GenericHookEvent $event): void {
+    $this->assertSame('Activity', $event->entity);
+    $event->fields['id']['title'] = 'Altered ID Title';
   }
 
 }

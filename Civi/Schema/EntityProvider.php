@@ -11,6 +11,9 @@
 
 namespace Civi\Schema;
 
+use Civi;
+use Civi\Core\Event\GenericHookEvent;
+
 final class EntityProvider {
 
   /**
@@ -44,7 +47,17 @@ final class EntityProvider {
    *   Ex: ['field_1' => ['title' => ..., 'sqlType' => ...]]
    */
   public function getFields(): array {
-    return $this->getMetaProvider()->getFields();
+    if (!isset(Civi::$statics['civi.entity.fields'][$this->entityName])) {
+      Civi::$statics['civi.entity.fields'][$this->entityName] = $this->getMetaProvider()->getFields();
+      $hookParams = [
+        'entity' => $this->entityName,
+        'fields' => &Civi::$statics['civi.entity.fields'][$this->entityName],
+      ];
+      $event = GenericHookEvent::create($hookParams);
+      Civi::service('dispatcher')->dispatch('civi.entity.fields', $event);
+      Civi::service('dispatcher')->dispatch("civi.entity.fields::$this->entityName", $event);
+    }
+    return Civi::$statics['civi.entity.fields'][$this->entityName];
   }
 
   public function getCustomFields(array $customGroupFilters = []): array {
