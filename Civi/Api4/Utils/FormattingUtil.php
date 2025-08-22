@@ -146,6 +146,15 @@ class FormattingUtil {
       case 'Date':
         $value = self::formatDateValue('Ymd', $value, $operator, $index);
         break;
+
+      case 'Boolean':
+        if ($operator === 'CONTAINS' || $operator === 'NOT CONTAINS') {
+          // When the operator is Contains and the data type is a boolean and the value is false
+          // it results in an empty string. So we hard code here the true value to 1 and the false value to 0.
+          // So that the SQL becomes LIKE '%1%' OR LIKE '%0%'
+          $value = $value ? '1' : '0';
+        }
+        break;
     }
 
     $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
