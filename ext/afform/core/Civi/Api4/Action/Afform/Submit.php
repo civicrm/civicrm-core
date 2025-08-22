@@ -408,6 +408,25 @@ class Submit extends AbstractProcessor {
   }
 
   /**
+   * Handle multiple activity target/assignee ids submitted as comma-separated lists
+   *
+   * @param \Civi\Afform\Event\AfformSubmitEvent $event
+   */
+  public static function preprocessActivity(AfformSubmitEvent $event): void {
+    if ($event->getEntityType() !== 'Activity') {
+      return;
+    }
+    foreach ($event->records as $index => $activity) {
+      foreach (['target_contact_id', 'assignee_contact_id'] as $fieldName) {
+        $field = &$event->records[$index]['fields'][$fieldName];
+        if (isset($field) && !is_array($field)) {
+          $field = explode(',', $field);
+        }
+      }
+    }
+  }
+
+  /**
    * Check if contact(s) meet the minimum requirements to be created (name and/or email).
    *
    * This requires a function because simple required fields validation won't work
