@@ -3,7 +3,8 @@
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="{$config->resourceBase}i/logo_lg.png" >
+   {crmSetting var="favicon" name="standalone_favicon"}
+  <link rel="icon" type="image/png" href="{if $favicon}{$favicon}{else}{$config->resourceBase}i/logo_lg.png{/if}" >
 
   {crmRegion name='html-header'}
   {/crmRegion}
