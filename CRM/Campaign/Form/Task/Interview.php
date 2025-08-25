@@ -123,7 +123,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     if (!empty($this->_contactIds) && $orderClause) {
       $clause = 'contact_a.id IN ( ' . implode(',', $this->_contactIds) . ' ) ';
       $sql = "
-SELECT contact_a.id
+SELECT DISTINCT(contact_a.id)
 FROM civicrm_contact contact_a
 LEFT JOIN civicrm_address ON contact_a.id = civicrm_address.contact_id
 WHERE {$clause}
