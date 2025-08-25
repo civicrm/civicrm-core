@@ -32,7 +32,7 @@ class AfformAdminInjector extends AutoSubscriber {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
-   * @see CRM_Utils_Hook::alterAngular()
+   * @see afCoreDirective.checkLinkPerm
    */
   public static function preprocess($e) {
     $changeSet = \Civi\Angular\ChangeSet::create('afformAdmin')
@@ -41,7 +41,7 @@ class AfformAdminInjector extends AutoSubscriber {
           // Inject gear menu with edit links which will be shown if the user has permission
           $afform = Afform::get(FALSE)
             ->addWhere('module_name', '=', basename($path, '.aff.html'))
-            ->addSelect('name', 'search_displays', 'title')
+            ->addSelect('name', 'search_displays', 'title', 'created_id')
             ->execute()->single();
           // Create a link to edit the form, plus all embedded SavedSearches
           $links = [
@@ -50,6 +50,7 @@ class AfformAdminInjector extends AutoSubscriber {
               'text' => E::ts('Edit %1 in FormBuilder', [1 => "<em>{$afform['title']}</em>"]),
               'icon' => 'fa-pencil',
               'permission' => 'manage own afform',
+              'created_id' => $afform['created_id'] ?: 'null',
             ],
           ];
           if ($afform['search_displays']) {
@@ -59,7 +60,7 @@ class AfformAdminInjector extends AutoSubscriber {
             }
             $savedSearches = SavedSearch::get(FALSE)
               ->addWhere('name', 'IN', $searchNames)
-              ->addSelect('id', 'label', 'COUNT(permissioned_display.id) AS is_locked')
+              ->addSelect('id', 'label', 'created_id', 'COUNT(permissioned_display.id) AS is_locked')
               ->addGroupBy('id')
               ->addJoin('SearchDisplay AS permissioned_display', 'LEFT', ['id', '=', 'permissioned_display.saved_search_id'], ['permissioned_display.acl_bypass', '=', TRUE])
               ->execute();
@@ -69,14 +70,15 @@ class AfformAdminInjector extends AutoSubscriber {
                 'text' => E::ts('Edit %1 in SearchKit', [1 => "<em>{$savedSearch['label']}</em>"]),
                 'icon' => 'fa-search-plus',
                 // Saved Searches with "bypass_permission" displays are locked to non-super-admins
-                'permission' => $savedSearch['is_locked'] ? 'all CiviCRM permissions and ACLs' : 'administer search_kit',
+                'permission' => $savedSearch['is_locked'] ? 'all CiviCRM permissions and ACLs' : 'manage own search_kit',
+                'created_id' => $savedSearch['created_id'] ?: 'null',
               ];
             }
           }
           $linksMarkup = '';
           foreach ($links as $link) {
             $linksMarkup .= <<<HTML
-              <li ng-if="checkPerm('{$link['permission']}')">
+              <li ng-if="checkLinkPerm('{$link['permission']}', {$link['created_id']})">
                 <a href="{$link['url']}" target="_blank">
                   <i class="crm-i fa-fw {$link['icon']}"></i> {$link['text']}
                 </a>
@@ -84,7 +86,7 @@ class AfformAdminInjector extends AutoSubscriber {
             HTML;
           }
           $editMenu = <<<HTML
-            <div class="pull-right btn-group af-admin-edit-form-link" ng-if="checkPerm('{$links[0]['permission']}')">
+            <div class="pull-right btn-group af-admin-edit-form-link" ng-if="checkLinkPerm('{$links[0]['permission']}', {$links[0]['created_id']})">
               <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="crm-i fa-gear"></i> <span class="caret"></span><span class="sr-only">{{:: ts('Configure')}}</span>
               </button>
