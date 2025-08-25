@@ -21,6 +21,12 @@
 class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
 
   /**
+   * The prefix for CiviCRM-related permissions in Joomla, when
+   * saving into the `#__assets` table for example.
+   */
+  const CIVICRM_PERMISSION_PREFIX = 'civicrm.';
+
+  /**
    * Given a permission string, check for access requirements
    *
    * @param string $str
@@ -117,7 +123,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
 
       case NULL:
-        return ['civicrm.' . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm'];
+        return [self::CIVICRM_PERMISSION_PREFIX . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm'];
 
       default:
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
@@ -154,7 +160,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     $associations = $this->getUserGroupPermsAssociations();
     $cmsPermsHaveGoneStale = FALSE;
     foreach (array_keys(get_object_vars($associations)) as $permName) {
-      if (!in_array($permName, $translatedPerms)) {
+      if (str_starts_with($permName, self::CIVICRM_PERMISSION_PREFIX) && !in_array($permName, $translatedPerms)) {
         unset($associations->$permName);
         $cmsPermsHaveGoneStale = TRUE;
       }
