@@ -228,7 +228,7 @@ class FormDataModel {
     if ($action === 'get' && strpos($fieldName, '.')) {
       $namesToMatch[] = substr($fieldName, 0, strrpos($fieldName, '.'));
     }
-    $select = ['name', 'label', 'input_type', 'data_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity', 'required', 'dfk_entities'];
+    $select = ['name', 'label', 'input_type', 'data_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity', 'required', 'dfk_entities', 'serialize'];
     if ($action === 'get') {
       $select[] = 'operators';
     }
