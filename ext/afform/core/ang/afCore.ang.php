@@ -10,4 +10,13 @@ return [
   'requires' => ['crmUi', 'crmUtil', 'api4', 'checklist-model', 'angularFileUpload', 'ngSanitize'],
   'partials' => ['ang/afCore'],
   'basePages' => [],
+  // Permissions needed for conditionally displaying edit-links
+  // See: \Civi\AfformAdmin\AfformAdminInjector and afCoreDirective.checkLinkPerm
+  'permissions' => [
+    'administer afform',
+    'manage own afform',
+    'administer search_kit',
+    'manage own search_kit',
+    'all CiviCRM permissions and ACLs',
+  ],
 ];
