@@ -3,6 +3,7 @@
 namespace Civi\Core;
 
 use Civi\Core\Exception\UnknownAssetException;
+use Firebase\JWT\ExpiredException;
 
 /**
  * Class AssetBuilder
@@ -352,6 +353,11 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
         'mimeType' => 'text/plain',
         'content' => $e->getMessage(),
       ];
+    }
+    catch (ExpiredException $e) {
+      // See https://github.com/civicrm/civicrm-core/pull/32986
+      \Civi::log()->error($e->getMessage() . ': This usually means you had debug mode enabled in the last 48 hours');
+      return [];
     }
   }
 
