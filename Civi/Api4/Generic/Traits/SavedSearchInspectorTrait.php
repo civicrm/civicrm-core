@@ -260,8 +260,11 @@ trait SavedSearchInspectorTrait {
    * @param string|array $fieldName
    *   If multiple field names are given they will be combined in an OR clause
    * @param mixed $value
+   *   Filter value
+   * @param array|null $formFields
+   *   Afform filters
    */
-  protected function applyFilter($fieldName, $value) {
+  protected function applyFilter($fieldName, $value, ?array $formFields = NULL) {
     // Global setting determines if % wildcard should be added to both sides (default) or only the end of a search string
     $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
 
@@ -273,6 +276,14 @@ trait SavedSearchInspectorTrait {
     if (!$field) {
       $this->_apiParams += ['having' => []];
       $clause =& $this->_apiParams['having'];
+    }
+    // If form filter specified a target join
+    elseif (!empty($formFields[$fieldName]['defn']['join_clause'])) {
+      foreach ($this->_apiParams['join'] ?? [] as $idx => $join) {
+        if ((explode(' AS ', $join[0])[1] ?? '') === $formFields[$fieldName]['defn']['join_clause']) {
+          $clause =& $this->_apiParams['join'][$idx];
+        }
+      }
     }
     // If field belongs to an EXCLUDE join, it should be added as a join condition
     else {
@@ -302,14 +313,14 @@ trait SavedSearchInspectorTrait {
           // Use IN for regular fields
           if (empty($field['serialize'])) {
             $op = in_array('IN', $operators, TRUE) ? 'IN' : $operators[0];
-            $filterClauses[] = [$fieldName, $op, $value];
+            $filterClauses[] = [$fieldName, $op, $value, FALSE];
           }
           // Use an OR group of CONTAINS for array fields
           else {
             $op = in_array('CONTAINS', $operators, TRUE) ? 'CONTAINS' : $operators[0];
             $orGroup = [];
             foreach ($value as $val) {
-              $orGroup[] = [$fieldName, $op, $val];
+              $orGroup[] = [$fieldName, $op, $val, FALSE];
             }
             $filterClauses[] = ['OR', $orGroup];
           }
@@ -324,23 +335,23 @@ trait SavedSearchInspectorTrait {
         }
       }
       elseif (!empty($field['serialize']) && in_array('CONTAINS', $operators, TRUE)) {
-        $filterClauses[] = [$fieldName, 'CONTAINS', $value];
+        $filterClauses[] = [$fieldName, 'CONTAINS', $value, FALSE];
       }
       elseif ((!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) && in_array('=', $operators, TRUE)) {
-        $filterClauses[] = [$fieldName, '=', $value];
+        $filterClauses[] = [$fieldName, '=', $value, FALSE];
       }
       elseif ($prefixWithWildcard && in_array('CONTAINS', $operators, TRUE)) {
-        $filterClauses[] = [$fieldName, 'CONTAINS', $value];
+        $filterClauses[] = [$fieldName, 'CONTAINS', $value, FALSE];
       }
       elseif (in_array('LIKE', $operators, TRUE)) {
-        $filterClauses[] = [$fieldName, 'LIKE', $value . '%'];
+        $filterClauses[] = [$fieldName, 'LIKE', $value . '%', FALSE];
       }
       elseif (in_array('IN', $operators, TRUE)) {
-        $filterClauses[] = [$fieldName, 'IN', (array) $value];
+        $filterClauses[] = [$fieldName, 'IN', (array) $value, FALSE];
       }
       else {
         $op = in_array('=', $operators, TRUE) ? '=' : $operators[0];
-        $filterClauses[] = [$fieldName, $op, $value];
+        $filterClauses[] = [$fieldName, $op, $value, FALSE];
       }
     }
     // Single field
