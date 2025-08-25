@@ -61,7 +61,7 @@ class InlineEdit extends Run {
   public function updateExistingRow(): void {
     // Apply rowKey to filters
     $entityName = $this->savedSearch['api_entity'];
-    $keyName = $filterKey = CoreUtil::getIdFieldName($entityName);
+    $keyName = $filterKey = $this->getRowKeyName();
     // Hack to support relationships
     if ($entityName === 'RelationshipCache') {
       $filterKey = 'relationship_id';

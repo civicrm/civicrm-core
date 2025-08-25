@@ -651,4 +651,130 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertSame([1, 2, 3, 4, 5], $weights);
   }
 
+  public function testEditWithGroupBy(): void {
+    $lastName = uniqid();
+    $cid = $this->saveTestRecords('Contact', [
+      'records' => 5,
+      'defaults' => ['last_name' => $lastName],
+    ])->column('id');
+
+    $acts = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['target_contact_id' => [$cid[0], $cid[1]]],
+        ['target_contact_id' => [$cid[1], $cid[2]]],
+        ['target_contact_id' => [$cid[3]]],
+      ],
+      'defaults' => ['subject' => 'Original Subject', 'status_id' => 1],
+    ])->column('id');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'COUNT(id) AS COUNT_id',
+            'GROUP_CONCAT(DISTINCT sort_name) AS GROUP_CONCAT_sort_name',
+            'Contact_ActivityContact_Activity_01.subject',
+            'Contact_ActivityContact_Activity_01.status_id:label',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['Contact_ActivityContact_Activity_01.id', 'IN', $acts],
+          ],
+          'groupBy' => [
+            'Contact_ActivityContact_Activity_01.id',
+          ],
+          'join' => [
+            [
+              'Activity AS Contact_ActivityContact_Activity_01',
+              'INNER',
+              'ActivityContact',
+              [
+                'id',
+                '=',
+                'Contact_ActivityContact_Activity_01.contact_id',
+              ],
+              [
+                'Contact_ActivityContact_Activity_01.record_type_id:name',
+                '=',
+                '"Activity Targets"',
+              ],
+            ],
+          ],
+          'having' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'settings' => [
+          'sort' => [
+            [
+              'id',
+              'ASC',
+            ],
+          ],
+          'limit' => 50,
+          'pager' => [],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'COUNT_id',
+              'label' => '(Count) Contact ID',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'GROUP_CONCAT_sort_name',
+              'label' => '(List) Sort Name',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'Contact_ActivityContact_Activity_01.subject',
+              'label' => 'Contact Activities: Subject',
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'Contact_ActivityContact_Activity_01.status_id:label',
+              'label' => 'Contact Activities: Activity Status',
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+          ],
+          'actions' => TRUE,
+          'classes' => [
+            'table',
+            'table-striped',
+          ],
+          'actions_display_mode' => 'menu',
+        ],
+        'acl_bypass' => FALSE,
+      ],
+    ];
+
+    $edit = civicrm_api4('SearchDisplay', 'inlineEdit', $params + [
+      'rowKey' => $acts[0],
+      'values' => ['Contact_ActivityContact_Activity_01.subject' => 'Edited Subject 1'],
+    ]);
+    $edit = civicrm_api4('SearchDisplay', 'inlineEdit', $params + [
+      'rowKey' => $acts[1],
+      'values' => ['Contact_ActivityContact_Activity_01.subject' => 'Edited Subject 2', 'Contact_ActivityContact_Activity_01.status_id:label' => 2],
+    ]);
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params + ['return' => 'page:1']);
+    $this->assertCount(3, $result);
+    $this->assertSame($acts, $result->column('key'));
+    $this->assertSame('Edited Subject 1', $result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame('Edited Subject 2', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame('Original Subject', $result[2]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame(1, $result[0]['data']['Contact_ActivityContact_Activity_01.status_id']);
+    $this->assertSame(2, $result[1]['data']['Contact_ActivityContact_Activity_01.status_id']);
+    $this->assertSame(1, $result[2]['data']['Contact_ActivityContact_Activity_01.status_id']);
+
+  }
+
 }

@@ -139,7 +139,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function formatResult(iterable $result): array {
     $rows = [];
-    $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+    $keyName = $this->getRowKeyName();
     if ($this->savedSearch['api_entity'] === 'RelationshipCache') {
       $keyName = 'relationship_id';
     }
@@ -1847,6 +1847,20 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $values;
+  }
+
+  protected function getRowKeyName(): string {
+    // If grouping by a primary key, use that field
+    $groupBy = $this->savedSearch['api_params']['groupBy'] ?? [];
+    foreach ($groupBy as $fieldName) {
+      $field = $this->getField($fieldName);
+      if ($field && (CoreUtil::getIdFieldName($field['entity']) === $field['name'])) {
+        return $fieldName;
+      }
+    }
+    // Use primary key of main entity
+    $entityName = $this->savedSearch['api_entity'];
+    return CoreUtil::getIdFieldName($entityName);
   }
 
   /**
