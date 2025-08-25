@@ -758,6 +758,11 @@ input.crm-form-checkbox) + label {
   opacity: 1;
   padding: var(--crm-s);
 }
+#ui-datepicker-div .ui-state-default,
+#ui-datepicker-div .ui-widget-content .ui-state-default {
+  color: var(--crm-c-text);
+  text-align: center;
+}
 #ui-datepicker-div .ui-datepicker-calendar .ui-state-disabled {
   opacity: 0.35;
 }
