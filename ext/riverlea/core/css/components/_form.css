@@ -687,91 +687,85 @@ input.crm-form-checkbox) + label {
 .crm-container input.crm-placeholder-icon {
   padding-right: var(--crm-m);
 }
-.ui-datepicker,
-.ui-datepicker * {
+#ui-datepicker-div,
+#ui-datepicker-div * {
   border-radius: 0;
   font-family: var(--crm-font);
   height: unset;
 }
-.ui-datepicker {
-  background: var(--crm-input-background) !important;
+#ui-datepicker-div {
+  background: var(--crm-input-background);
   border-radius: 0;
   box-shadow: var(--crm-popup-shadow);
   min-width: 30ch;
   padding: var(--crm-m1);
   width: auto;
-  z-index: 100003 !important; /* vs menubar for datepickers in modals */
+  z-index: 100003; /* vs menubar for datepickers in modals */
 }
-.ui-datepicker .ui-datepicker-header {
+#ui-datepicker-div .ui-datepicker-header {
   border: 0;
   margin-bottom: var(--crm-s);
 }
-.ui-datepicker :not(b) {
-  background: none !important;
-  border: 0 solid transparent !important;
+#ui-datepicker-div :not(b) {
+  background: none;
+  border: 0 solid transparent;
 }
-.ui-datepicker .ui-datepicker-header .ui-datepicker-prev,
-.ui-datepicker .ui-datepicker-header .ui-datepicker-next {
+#ui-datepicker-div :is(.ui-datepicker-prev,.ui-datepicker-next) {
   border-radius: var(--crm-roundness);
-  box-shadow: none !important;
+  box-shadow: none;
   cursor: var(--crm-hover-clickable);
   text-align: center;
   top: var(--crm-s3);
   border: 0 solid transparent;
 }
-.ui-datepicker-next.ui-corner-all:hover,
-.ui-datepicker-prev.ui-corner-all:hover {
-  background: var(--crm-c-gray-100) !important;
+#ui-datepicker-div :is(.ui-datepicker-prev,.ui-datepicker-next):hover {
+  background: var(--crm-c-gray-100);
   border: 0 solid transparent;
 }
-.ui-datepicker .ui-datepicker-header .ui-datepicker-prev::before,
-.ui-datepicker .ui-datepicker-header .ui-datepicker-next::before {
+#ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next)::before {
   font-family: "FontAwesome";
   color: var(--crm-c-text);
   font-size: var(--crm-small-font-size);
   line-height: var(--crm-l);
   padding: 0;
 }
-.ui-datepicker .ui-datepicker-prev::before {
+#ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next):hover::before {
+  color: var(--crm-c-text-dark);
+}
+#ui-datepicker-div .ui-datepicker-prev::before {
   content: "";
 }
-.ui-datepicker .ui-datepicker-next::before {
+#ui-datepicker-div .ui-datepicker-next::before {
   content: "";
 }
-.ui-datepicker .ui-datepicker-header select {
+#ui-datepicker-div .ui-datepicker-header select {
   font-family: var(--crm-font);
   margin: 0 var(--crm-m1);
-  padding-left: 5px !important;
+  padding-left: 5px;
   font-size: var(--crm-m3);
   width: 9ch;
 }
-.ui-datepicker-calendar thead tr {
-  border-top: 1px solid var(--crm-c-gray-300);
-}
-.ui-datepicker-calendar thead th {
+#ui-datepicker-div .ui-datepicker-calendar thead th {
   color: var(--crm-c-text);
   font-size: var(--crm-small-font-size);
 }
-.ui-datepicker-calendar tr {
+#ui-datepicker-div .ui-datepicker-calendar tr {
   border-bottom: none;
 }
-.ui-datepicker-calendar [data-handler],
-.ui-datepicker-calendar .ui-state-disabled {
+#ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) {
   border: 0;
   font-size: var(--crm-small-font-size);
   opacity: 1;
   padding: var(--crm-s);
 }
-.ui-datepicker-calendar .ui-state-disabled {
+#ui-datepicker-div .ui-datepicker-calendar .ui-state-disabled {
   opacity: 0.35;
 }
-.ui-datepicker-calendar [data-handler] .ui-state-active,
-.ui-datepicker-calendar .ui-state-disabled .ui-state-active {
-  background-color: var(--crm-c-primary) !important;
-  color: var(--crm-c-primary-text) !important;
+#ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) .ui-state-active {
+  background-color: var(--crm-c-primary);
+  color: var(--crm-c-primary-text);
 }
-.ui-datepicker-calendar [data-handler] a,
-.ui-datepicker-calendar .ui-state-disabled a {
+#ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) a {
   border: 0;
   border-radius: 20px;
   cursor: var(--crm-hover-clickable);
@@ -779,9 +773,9 @@ input.crm-form-checkbox) + label {
   text-align: center;
   color: var(--crm-c-text);
 }
-.ui-datepicker-today a {
-  background: var(--crm-c-gray-100) !important /* vs other bg */;
-  border-radius: var(--crm-roundness);
+#ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-today a {
+  background: var(--crm-c-gray-100);
+  color: var(--crm-c-text-dark);
 }
 
 /* JQ spinner */
