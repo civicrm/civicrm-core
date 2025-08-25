@@ -24,6 +24,8 @@ use Civi\Api4\Email;
 
 /**
  * @group headless
+ * @deprecated
+ * Note: `fields_callback` is now deprecated in favor of the `civi.entity.fields` event.
  */
 class FieldsCallbackTest extends Api4TestBase {
 

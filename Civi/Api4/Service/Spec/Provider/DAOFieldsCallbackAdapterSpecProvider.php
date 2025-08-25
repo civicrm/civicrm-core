@@ -23,6 +23,8 @@ use Civi\Schema\EntityRepository;
 /**
  * Legacy adapter for the DAO `fields_callback` quasi-hook
  *
+ * Note: `fields_callback` is now deprecated in favor of the `civi.entity.fields` event.
+ *
  * @service
  * @internal
  */
