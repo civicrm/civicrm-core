@@ -579,6 +579,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $markupWithJoinClause = <<<HTML
       <div af-fieldset="">
         <af-field name="Contact_ActivityContact_Activity_01.status_id" defn="{input_attrs: {multiple: true}, join_clause: 'Contact_ActivityContact_Activity_01'}" />
+        <af-field name="Contact_ActivityContact_Activity_01.subject" defn="{join_clause: 'Contact_ActivityContact_Activity_01'}" />
         <crm-search-display-table search-name="Contacts_and_activities" display-name=""></crm-search-display-table>
       </div>
       HTML;
@@ -586,6 +587,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $markupWithoutJoinClause = <<<HTML
       <div af-fieldset="">
         <af-field name="Contact_ActivityContact_Activity_01.status_id" defn="{input_attrs: {multiple: true}, join_clause: ''}" />
+        <af-field name="Contact_ActivityContact_Activity_01.subject" />
         <crm-search-display-table search-name="Contacts_and_activities" display-name=""></crm-search-display-table>
       </div>
       HTML;
@@ -614,13 +616,13 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       'return' => 'page:1',
       'savedSearch' => 'Contacts_and_activities',
       'afform' => 'TestAfformWithSearch',
-      'filters' => [
-        'Contact_ActivityContact_Activity_01.status_id' => [2],
-      ],
+      'filters' => [],
       'sort' => [['id', 'ASC']],
       'debug' => TRUE,
     ];
 
+    // Test with join clause: status_id filter
+    $params['filters'] = ['Contact_ActivityContact_Activity_01.status_id' => [2]];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(5, $result);
     $this->assertNull($result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
@@ -629,11 +631,23 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertNull($result[3]['data']['Contact_ActivityContact_Activity_01.subject']);
     $this->assertNull($result[4]['data']['Contact_ActivityContact_Activity_01.subject']);
 
+    // Test with join clause: subject filter
+    $params['filters'] = ['Contact_ActivityContact_Activity_01.subject' => 'Activity 2'];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(5, $result);
+    $this->assertNull($result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertEquals('Activity 2', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertNull($result[2]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertNull($result[3]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertNull($result[4]['data']['Contact_ActivityContact_Activity_01.subject']);
+
     Afform::update(FALSE)
       ->addWhere('name', '=', 'TestAfformWithSearch')
       ->addValue('layout', $markupWithoutJoinClause)
       ->execute();
 
+    // Test without join clause: status_id filter
+    $params['filters'] = ['Contact_ActivityContact_Activity_01.status_id' => [2]];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
     $this->assertEquals('Activity 2', $result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
