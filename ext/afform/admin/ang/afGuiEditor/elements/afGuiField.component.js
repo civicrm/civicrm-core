@@ -13,17 +13,20 @@
       container: '^^afGuiContainer'
     },
     controller: function($scope, afGui, $timeout) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
-        ctrl = this,
-        entityRefOptions = [],
-        singleElement = [''],
-        // When search-by-range is enabled the second element gets a suffix for some properties like "placeholder2"
-        rangeElements = ['', '2'],
-        dateRangeElements = ['1', '2'],
-        yesNo = [
-          {id: true, label: ts('Yes')},
-          {id: false, label: ts('No')}
-        ];
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+      const ctrl = this;
+      const singleElement = [''];
+      // When search-by-range is enabled the second element gets a suffix for some properties like "placeholder2"
+      const rangeElements = ['', '2'];
+      const dateRangeElements = ['1', '2'];
+      const yesNo = [
+        {id: true, label: ts('Yes')},
+        {id: false, label: ts('No')}
+      ];
+
+      let entityRefOptions = [];
+      let searchJoins = null;
+
       $scope.editingOptions = false;
 
       this.$onInit = function() {
@@ -33,7 +36,7 @@
           if (inputTypeCanBe(type.name)) {
             // Change labels for EntityRef fields
             if (ctrl.getDefn().input_type === 'EntityRef') {
-              var entity = ctrl.getFkEntity();
+              const entity = ctrl.getFkEntity();
               if (entity && type.name === 'EntityRef') {
                 type.label = ts('Autocomplete %1', {1: entity.label});
               }
@@ -65,10 +68,11 @@
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
         }
+        this.isMultiFieldFilter = ctrl.node.name.includes(',');
       };
 
       this.getFkEntity = function() {
-        var fkEntity = ctrl.getDefn().fk_entity;
+        const fkEntity = ctrl.getDefn().fk_entity;
         return ctrl.editor.meta.entities[fkEntity];
       };
 
@@ -80,7 +84,7 @@
         // Range search only makes sense for search display forms
         return this.isSearch() &&
           // Hack for postal code which is not stored as a number but can act like one
-          (ctrl.node.name.substr(-11) === 'postal_code' || (
+          (ctrl.getFieldName().substr(-11) === 'postal_code' || (
             // Multiselects cannot use range search
             !ctrl.getDefn().input_attrs.multiple &&
             // DataType & inputType must make sense for a range
@@ -104,11 +108,11 @@
 
       // Returns the original field definition from metadata
       this.getDefn = function() {
-        var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
+        let defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.getFieldName()), ctrl.getFieldName());
         // Calc fields are specific to a search display, not part of the schema
         if (!defn && ctrl.container.getSearchDisplay()) {
-          var searchDisplay = ctrl.container.getSearchDisplay();
-          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.node.name});
+          const searchDisplay = ctrl.container.getSearchDisplay();
+          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.getFieldName()});
         }
         defn = defn || {
           label: ts('Untitled'),
@@ -120,9 +124,14 @@
         return defn;
       };
 
+      this.getFieldName = function() {
+        // Search filters can contain multiple field names joined by a comma. Return the first as the primary.
+        return ctrl.node.name.split(',')[0];
+      };
+
       // Get the api entity this field belongs to
       this.getEntity = function() {
-        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.node.name));
+        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.getFieldName()));
       };
 
       $scope.getOriginalLabel = function() {
@@ -135,7 +144,7 @@
       };
 
       $scope.hasOptions = function() {
-        var inputType = $scope.getProp('input_type');
+        const inputType = $scope.getProp('input_type');
         return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
 
@@ -149,7 +158,7 @@
       this.getOriginalOptions = function() {
         if (ctrl.getDefn().input_type === 'EntityRef') {
           // Build a list of all entities in this form that can be referenced by this field.
-          var newOptions = _.map(ctrl.editor.getEntities({type: ctrl.getDefn().fk_entity}), function(entity) {
+          const newOptions = _.map(ctrl.editor.getEntities({type: ctrl.getDefn().fk_entity}), (entity) => {
             return {id: entity.name, label: entity.label};
           }, []);
           // Store it in a stable variable for the sake of ng-repeat
@@ -186,7 +195,7 @@
       };
 
       function inputTypeCanBe(type) {
-        var defn = ctrl.getDefn();
+        const defn = ctrl.getDefn();
         if (defn.input_type === type) {
           return true;
         }
@@ -247,7 +256,7 @@
 
       // Checks for a value in either the local field defn or the base defn
       $scope.propIsset = function(propName) {
-        var val = $scope.getProp(propName);
+        const val = $scope.getProp(propName);
         return !(typeof val === 'undefined' || val === null);
       };
 
@@ -261,14 +270,14 @@
       };
 
       $scope.toggleMultiple = function() {
-        var newVal = getSet('input_attrs.multiple', !getSet('input_attrs.multiple'));
+        const newVal = getSet('input_attrs.multiple', !getSet('input_attrs.multiple'));
         if (newVal && getSet('search_range')) {
           getSet('search_range', false);
         }
       };
 
       $scope.toggleSearchRange = function() {
-        var newVal = getSet('search_range', !getSet('search_range'));
+        const newVal = getSet('search_range', !getSet('search_range'));
         if (newVal && getSet('input_attrs.multiple')) {
           getSet('input_attrs.multiple', false);
         }
@@ -363,10 +372,20 @@
         return Math.abs(this.defaultDateOffset()) !== 1;
       };
 
-      $scope.defaultValueContains = function(val) {
-        var defaultVal = getSet('afform_default');
-        return defaultVal === val || (_.isArray(defaultVal) && _.includes(defaultVal, val));
+      this.toggleMultiFieldFilter = function() {
+        this.isMultiFieldFilter = !this.isMultiFieldFilter;
+        if (!this.isMultiFieldFilter) {
+          this.node.name = this.getFieldName();
+        }
       };
+
+      this.getSearchFilterFields = function() {
+        return afGui.getSearchDisplayFields(ctrl.container.getSearchDisplay(), _.noop, [ctrl.getFieldName()]);
+      };
+
+      $scope.defaultValueContains = function(val) {
+        const defaultVal = getSet('afform_default');
+        return defaultVal === val || (Array.isArray(defaultVal) && defaultVal.includes(val));      };
 
       $scope.toggleDefaultValueItem = function(val) {
         if (defaultValueShouldBeArray()) {
@@ -375,7 +394,7 @@
             ctrl.node.defn.afform_default = [];
           }
           if (_.includes(ctrl.node.defn.afform_default, val)) {
-            var newVal = _.without(ctrl.node.defn.afform_default, val);
+            const newVal = _.without(ctrl.node.defn.afform_default, val);
             getSet('afform_default', newVal.length ? newVal : undefined);
             ctrl.hasDefaultValue = !!newVal.length;
           } else {
@@ -416,7 +435,7 @@
       // Getter/setter callback
       function getSet(propName, val) {
         if (arguments.length > 1) {
-          var path = propName.split('.'),
+          const path = propName.split('.'),
             item = path.pop(),
             localDefn = drillDown(ctrl.node, ['defn'].concat(path)),
             fieldDefn = drillDown(ctrl.getDefn(), path);
@@ -466,10 +485,27 @@
         $scope.editingOptions = val;
       };
 
+      this.getSearchJoins = function() {
+        if (Array.isArray(searchJoins)) {
+          return searchJoins;
+        }
+        searchJoins = [];
+        const searchDisplay = ctrl.container.getSearchDisplay();
+        if (searchDisplay) {
+          Object.keys(searchDisplay['saved_search_id.form_values'].join).forEach((joinName) => {
+            searchJoins.push({
+              id: joinName,
+              text: searchDisplay['saved_search_id.form_values'].join[joinName],
+            });
+          });
+        }
+        return searchJoins;
+      };
+
       // Returns a reference to a path n-levels deep within an object
       function drillDown(parent, path) {
-        var container = parent;
-        _.each(path, function(level) {
+        let container = parent;
+        path.forEach((level) => {
           container[level] = container[level] || {};
           container = container[level];
         });
@@ -483,7 +519,7 @@
 
       // Recursively clears out empty arrays and objects
       function clearOut(parent, path) {
-        var item;
+        let item;
         while (path.length && _.every(drillDown(parent, path), isEmpty)) {
           item = path.pop();
           delete drillDown(parent, path)[item];
