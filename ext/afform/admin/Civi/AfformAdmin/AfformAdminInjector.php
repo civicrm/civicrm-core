@@ -69,7 +69,7 @@ class AfformAdminInjector extends AutoSubscriber {
                 'text' => E::ts('Edit %1 in SearchKit', [1 => "<em>{$savedSearch['label']}</em>"]),
                 'icon' => 'fa-search-plus',
                 // Saved Searches with "bypass_permission" displays are locked to non-super-admins
-                'permission' => $savedSearch['is_locked'] ? 'all CiviCRM permissions and ACLs' : 'administer search_kit',
+                'permission' => $savedSearch['is_locked'] ? 'all CiviCRM permissions and ACLs' : 'manage own search_kit',
               ];
             }
           }
