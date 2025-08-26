@@ -22,18 +22,9 @@ table.crm-sticky-header > thead > tr {
 }
 
 /* Afform tables */
-.crm-container td.crm-search-col-type-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--crm-s);
-}
-.crm-container td.crm-search-col-type-buttons:has(span:only-child),
-.crm-container td.crm-search-col-type-buttons:has(> .btn:only-child) {
-  /* when button column has only one button, turn cell back to table cell to vertically center */
-  display: table-cell;
-}
-td.crm-search-col-type-buttons.text-right {
-  justify-content: end;
+#bootstrap-theme td.crm-search-col-type-buttons {
+  padding: var(--crm-table-padding) calc(var(--crm-table-padding) - var(--crm-s)) calc(var(--crm-table-padding) - var(--crm-s)) var(--crm-table-padding);
+  --crm-btn-margin: 0 var(--crm-s) var(--crm-s) 0;
 }
 #bootstrap-theme th.crm-search-result-select button.btn {
   background: transparent;
