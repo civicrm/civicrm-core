@@ -455,7 +455,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @inheritDoc
    */
   public static function writeRecord(array $record): CRM_Contact_DAO_SavedSearch {
-    if (!empty($record['check_permission'])) {
+    if (!empty($record['check_permission']) && !CRM_Core_Permission::check('administer search_kit') && !empty($record['id'])) {
       self::checkManageOwnPermission($record, CRM_Core_Session::getLoggedInContactID());
     }
     return parent::writeRecord($record);
@@ -465,7 +465,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @inheritDoc
    */
   public static function deleteRecord(array $record): CRM_Contact_DAO_SavedSearch {
-    if (!empty($record['check_permission'])) {
+    if (!empty($record['check_permission']) && !CRM_Core_Permission::check('administer search_kit')) {
       self::checkManageOwnPermission($record, CRM_Core_Session::getLoggedInContactID());
     }
     return parent::deleteRecord($record);
