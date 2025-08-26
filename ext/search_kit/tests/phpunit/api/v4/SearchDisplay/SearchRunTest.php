@@ -3010,4 +3010,34 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('Two', $result[0]['columns'][3]['val']);
   }
 
+  public function testManageOwn(): void {
+    $config = \CRM_Core_Config::singleton();
+    $savedSearch = \Civi\Api4\SavedSearch::create(FALSE)
+      ->addValue('name', 'Test Search')
+      ->addValue('api_entity', 'Contact')
+      ->addValue('api_params', [
+        'version' => 4,
+        'select' => ['id', 'sort_name', 'contact_type:label', 'contact_sub_type:label'],
+        'orderBy' => [],
+        'where' => [['contact_type:name', '=', 'Individual']],
+      ])
+      ->addValue('created_id', 1)
+      ->addValue('modified_id', 1)
+      ->execute()->first();
+    $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit'];
+    $this->createLoggedInUser();
+
+    $error = '';
+    try {
+      $result = \Civi\Api4\SavedSearch::update(TRUE)
+        ->addValue('label', 'Update Test Search')
+        ->addWhere('id', '=', $savedSearch['id'])
+        ->execute();
+    }
+    catch(UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+  }
+
 }
