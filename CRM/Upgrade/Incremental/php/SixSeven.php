@@ -30,6 +30,20 @@ class CRM_Upgrade_Incremental_php_SixSeven extends CRM_Upgrade_Incremental_Base 
   public function upgrade_6_7_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Create TranslationSource table', 'createEntityTable', '6.7.alpha1.TranslationSource.entityType.php');
+    $this->addTask('Create Translation.source_key column', 'alterSchemaField', 'Translation', 'source_key', [
+      'title' => ts('Source Key'),
+      'input_type' => 'Text',
+      'sql_type' => 'char(22) CHARACTER SET ascii',
+      'required' => FALSE,
+      'description' => ts('Alternate FK when using translation_source instead of entity_table / entity_id'),
+      'add' => '6.7.alpha1',
+      'entity_reference' => [
+        'entity' => 'TranslationSource',
+        'key' => 'source_key',
+        'on_delete' => 'CASCADE',
+      ],
+    ]);
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_translation.index_source_key']), 'addIndex', 'civicrm_translation', 'source_key');
     $this->addTask('Update localization menu item', 'updateLocalizationMenuItem');
     $this->addTask('Add unsubscribe mode column to civicrm mailing', 'alterSchemaField', 'Mailing', 'unsubscribe_mode', [
       'title' => ts('One Click Unsubscribe Mode'),
