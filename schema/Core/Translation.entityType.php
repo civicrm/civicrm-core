@@ -24,7 +24,7 @@ return [
       'fields' => [
         'source_key' => TRUE,
       ],
-      'add' => '6.6.alpha1',
+      'add' => '6.7.alpha1',
     ],
   ],
   'getFields' => fn() => [
@@ -114,7 +114,7 @@ return [
       'sql_type' => 'char(22) CHARACTER SET ascii',
       'required' => FALSE,
       'description' => ts('Alternate FK when using translation_source instead of entity_table / entity_id'),
-      'add' => '6.6.alpha1',
+      'add' => '6.7.alpha1',
       'entity_reference' => [
         'entity' => 'TranslationSource',
         'key' => 'source_key',

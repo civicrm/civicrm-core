@@ -29,6 +29,8 @@ class CRM_Upgrade_Incremental_php_SixSeven extends CRM_Upgrade_Incremental_Base 
    */
   public function upgrade_6_7_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Create TranslationSource table', 'createEntityTable', '6.7.alpha1.TranslationSource.entityType.php');
+    $this->addTask('Update localization menu item', 'updateLocalizationMenuItem');
     $this->addTask('Add unsubscribe mode column to civicrm mailing', 'alterSchemaField', 'Mailing', 'unsubscribe_mode', [
       'title' => ts('One Click Unsubscribe Mode'),
       'sql_type' => 'varchar(70)',
@@ -45,6 +47,11 @@ class CRM_Upgrade_Incremental_php_SixSeven extends CRM_Upgrade_Incremental_Base 
       'required' => TRUE,
     ]);
     $this->addTask('Populate Unsubscribe mode column on civicrm_mailing', 'populateUnsubscribeMode');
+  }
+
+  public static function updateLocalizationMenuItem(): bool {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_navigation SET has_separator = 1 WHERE name = 'Preferred Language Options'");
+    return TRUE;
   }
 
   public static function populateUnsubscribeMode(): bool {
