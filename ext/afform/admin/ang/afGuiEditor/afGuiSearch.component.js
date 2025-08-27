@@ -131,12 +131,12 @@
           const joinInfo = join[0].split(' AS ');
           const entity = afGui.getEntity(joinInfo[0]);
           const bridgeEntity = afGui.getEntity(join[2]);
-          const defaultLabel = entity.label + countEntity(entity.entity);
-          const formValues = ctrl.display.settings['saved_search_id.form_values'] || {};
+          // Form values contain join aliases; defaults are filled in by Civi\Api4\Action\Afform\LoadAdminData()
+          const formValues = ctrl.display.settings['saved_search_id.form_values'];
           entities.push({
             name: entity.entity,
             prefix: joinInfo[1] + '.',
-            label: (formValues && formValues.join && formValues.join[joinInfo[1]]) || defaultLabel,
+            label: formValues.join[joinInfo[1]],
             fields: entity.fields,
           });
           if (bridgeEntity) {
