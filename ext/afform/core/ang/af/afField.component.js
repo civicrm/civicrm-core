@@ -297,7 +297,7 @@
       };
 
       ctrl.getDisplayValue = function(value) {
-        if (value === undefined || value === null || value === '') {
+        if (value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length)) {
           return '';
         }
         if (fieldOptions) {
@@ -312,8 +312,25 @@
             return '';
           }
         }
-        if (ctrl.defn.fk_entity) {
-          // TODO: EntityRef fields
+        if (ctrl.fkEntity) {
+          // EntityRef fields: fetch label via API if not already present
+          // This is async, so we return a placeholder and update later
+          const ids = Array.isArray(value) ? value : [value];
+          if (!ctrl._entityLabels) {
+            ctrl._entityLabels = {};
+          }
+          // Call autocomplete api
+          if (!(ids.join() in ctrl._entityLabels)) {
+            ctrl._entityLabels[ids.join()] = null;
+            const params = ctrl.getAutocompleteParams();
+            params.ids = ids;
+            crmApi4(ctrl.fkEntity, 'autocomplete', params)
+              .then(function(result) {
+                // Join all labels
+                ctrl._entityLabels[ids.join()] = result.map((item) => item.label).join(', ');
+              });
+          }
+          return ctrl._entityLabels[ids.join()] || ts('Loading...');
         }
         return value;
       };
