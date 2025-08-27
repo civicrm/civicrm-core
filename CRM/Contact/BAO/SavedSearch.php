@@ -425,7 +425,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
   }
 
   /**
-   * Check related contact access.
+   * Check SavedSearch access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
@@ -442,11 +442,9 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
     }
 
     try {
-      // Make sure we have a user ID to compare against
-      $userID = $e->getUserID() ?? CRM_Core_Session::getLoggedInContactID();
-      self::checkManageOwnPermission($record, $userID);
+      self::checkManageOwnPermission($record, $e->getUserID());
     }
-    catch (CRM_Core_Exception) {
+    catch (\Civi\API\Exception\UnauthorizedException) {
       $e->setAuthorized(FALSE);
     }
   }

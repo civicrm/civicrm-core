@@ -3093,14 +3093,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     }
     $this->assertStringContainsString('permission', $error);
 
-    $this->userLogout();
     $config->userPermissionClass->permissions = [
       'access CiviCRM',
       'administer search_kit',
     ];
 
     // Make sure a `administer search_kit` user can edit any SavedSearch record using API4.
-    $error = '';
     try {
       $result = \Civi\Api4\SavedSearch::update(TRUE)
         ->addValue('label', 'Update Test Search')
@@ -3108,12 +3106,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
         ->execute();
     }
     catch (UnauthorizedException $e) {
-      $error = $e->getMessage();
+      $this->fail();
     }
-    $this->assertStringNotContainsString('failed', $error);
 
     // Make sure a `administer search_kit` user can edit any SavedSearch using BAO.
-    $error = '';
     try {
       \CRM_Contact_BAO_SavedSearch::writeRecord([
         'check_permission' => TRUE,
@@ -3122,24 +3118,20 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ]);
     }
     catch (UnauthorizedException $e) {
-      $error = $e->getMessage();
+      $this->fail();
     }
-    $this->assertStringNotContainsString('permission', $error);
 
     // Make sure a `administer search_kit` user can delete any SavedSearch record using API4.
-    $error = '';
     try {
       $result = \Civi\Api4\SavedSearch::delete(TRUE)
         ->addWhere('id', '=', $savedSearchAPI['id'])
         ->execute();
     }
     catch (UnauthorizedException $e) {
-      $error = $e->getMessage();
+      $this->fail();
     }
-    $this->assertStringNotContainsString('failed', $error);
 
     // Make sure a `administer search_kit` user can delete any SavedSearch using BAO.
-    $error = '';
     try {
       \CRM_Contact_BAO_SavedSearch::deleteRecord([
         'check_permission' => TRUE,
@@ -3147,9 +3139,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ]);
     }
     catch (UnauthorizedException $e) {
-      $error = $e->getMessage();
+      $this->fail();
     }
-    $this->assertStringNotContainsString('permission', $error);
   }
 
 }
