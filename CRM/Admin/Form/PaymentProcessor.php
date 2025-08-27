@@ -420,11 +420,16 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @throws \CRM_Core_Exception
    */
   public function updatePaymentProcessor($values, $domainID, $test) {
-    if ($test) {
-      foreach (['user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject'] as $field) {
-        $values[$field] = empty($values["test_{$field}"]) ? ($values[$field] ?? NULL) : $values["test_{$field}"];
+    // The $values array has mixed the fields for two different entities (eg "user_name"/"password" and "test_user_name"/"test_password").
+    //  We are going to call APIv4 PaymentProcessor.save() for -one- side only (live XOR test). Get the APIv4 fields we need.
+    $dualFields = ['user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject'];
+    foreach ($dualFields as $field) {
+      if ($test) {
+        $values[$field] = $values["test_$field"];
       }
+      unset($values["test_$field"]);
     }
+
     if (!empty($values['accept_credit_cards'])) {
       $creditCards = [];
       $accptedCards = array_keys($values['accept_credit_cards']);
