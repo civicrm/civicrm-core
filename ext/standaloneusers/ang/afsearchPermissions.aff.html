@@ -1,6 +1,6 @@
 <div af-fieldset="">
   <div class="af-container af-layout-inline">
-    <af-field name="title" defn="{label: false, input_attrs: {placeholder: ts('Search Permissions')}}" />
+    <af-field name="title,name,description" defn="{label: false, search_operator: 'CONTAINS', input_attrs: {placeholder: ts('Search Permissions')}}" />
   </div>
   <crm-search-display-table search-name="Permissions" display-name="Permissions_Table_1"></crm-search-display-table>
 </div>
