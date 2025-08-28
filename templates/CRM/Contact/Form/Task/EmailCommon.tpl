@@ -15,10 +15,12 @@
 </summary>
  <div class="crm-accordion-body">
   <div class="helpIcon" id="helphtml">
-    <input class="crm-token-selector big" data-field="html_message" />
+    <label class="sr-only" for="token-html">{ts}HTML message tokens{/ts}</label>
+    <input id="token-html" class="crm-token-selector big" data-field="html_message" />
     {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp"}
   </div>
   <div class="clear"></div>
+    <span class="sr-only">{$form.html_message.label}</span>
     <div class='html'>
       {$form.html_message.html}<br />
     </div>
@@ -32,10 +34,12 @@
 </summary>
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helptext">
-     <input class="crm-token-selector big" data-field="text_message" />
+     <label class="sr-only" for="token-text">{ts}Text message tokens{/ts}</label>
+     <input id="token-text" class="crm-token-selector big" data-field="text_message" />
      {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
    </div>
     <div class='text'>
+      <span class="sr-only">{$form.text_message.label}</span>
       {$form.text_message.html}<br />
     </div>
   </div>
