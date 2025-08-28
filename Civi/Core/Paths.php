@@ -266,4 +266,36 @@ class Paths {
     return $value;
   }
 
+  /**
+   * Helper to get the resolved value of a path setting
+   *
+   * @param string $settingKey the name of the setting e.g. extensionsDir
+   * @return string final value with any variables resolved
+   */
+  public function getSettingPath(string $settingKey): string {
+    $settingValue = \Civi::settings()->get($settingKey);
+
+    return $this->getPath($settingValue);
+  }
+
+  /**
+   * Helper to get the resolved value of a url setting
+   *
+   * @param string $settingKey the name of the setting e.g. extensionsURL
+   * @param string $preferFormat
+   *   The preferred format ('absolute', 'relative').
+   *   The result data may not meet the preference -- if the setting
+   *   refers to an external domain, then the result will be
+   *   absolute (regardless of preference).
+   * @param bool|null $ssl
+   *   NULL to autodetect. TRUE to force to SSL.
+   *
+   * @return string final value with any variables resolved
+   */
+  public function getSettingUrl(string $settingKey, string $preferFormat = 'relative', ?bool $ssl = NULL): string {
+    $settingValue = \Civi::settings()->get($settingKey);
+
+    return $this->getUrl($settingValue, $preferFormat, $ssl);
+  }
+
 }
