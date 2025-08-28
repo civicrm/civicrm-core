@@ -44,7 +44,7 @@ class CRM_Core_Form_Tag {
     $tagset = [];
     $form->_entityTagValues ??= [];
     // Initialize isTagset tpl var if it hasn't been initialized already
-    $isTagset = $form->getTemplateVars('isTagset');
+    $isTagset = $form->getTemplateVars()['isTagset'] ?? FALSE;
     $form->assign('isTagset', (bool) $isTagset);
     $mode = NULL;
 
@@ -91,7 +91,7 @@ class CRM_Core_Form_Tag {
       $form->_tagsetInfo = $tagset;
       $form->assign("tagsetType", $mode);
       // Merge this tagset info with possibly existing info in the template
-      $tagsetInfo = (array) $form->getTemplateVars("tagsetInfo");
+      $tagsetInfo = (array) ($form->getTemplateVars()['tagsetInfo'] ?? []);
       if (empty($tagsetInfo[$mode])) {
         $tagsetInfo[$mode] = [];
       }
