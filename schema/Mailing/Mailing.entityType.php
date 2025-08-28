@@ -399,6 +399,7 @@ return [
       ],
       'readonly' => TRUE,
       'add' => 5.76,
+      'unique_name' => 'mailing_start_date',
     ],
     'end_date' => [
       'sql_type' => 'timestamp',
