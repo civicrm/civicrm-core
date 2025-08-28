@@ -85,7 +85,7 @@ class CRM_Core_Config_Runtime {
     $this->userFrameworkClass = 'CRM_Utils_System_' . CIVICRM_UF;
     $this->userHookClass = 'CRM_Utils_Hook_' . CIVICRM_UF;
 
-    if (CIVICRM_UF == 'Joomla') {
+    if (CIVICRM_UF == 'Joomla' || CIVICRM_UF == 'Joomla5') {
       $this->userFrameworkURLVar = 'task';
     }
 

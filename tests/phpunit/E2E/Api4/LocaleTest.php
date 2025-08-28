@@ -33,6 +33,7 @@ class LocaleTest extends \CiviEndToEndTestCase {
         break;
 
       case 'Joomla':
+      case 'Joola5':
         // FIXME: In CRM_Utils_System_Joomla, the setUFLocale and getUFLocale are not fully implemented.
         // FIXME: In buildkit.git:app/config/joomla-*, it does not enable any languages.
         $results[] = ['*SKIP*', NULL, NULL, NULL, NULL];

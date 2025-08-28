@@ -64,7 +64,7 @@
       <td>{$form.drilldown_id.html}</td>
     </tr>
     {/if}
-    {if $config->userFramework neq 'Joomla'}
+    {if $config->userFramework neq 'Joomla' && $config->userFramework neq 'Joomla5'}
       <tr class="crm-report-instanceForm-form-block-permission">
         <td class="report-label" width="20%">{$form.permission.label} {help id="id-report_perms" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
         <td>{$form.permission.html|crmAddClass:huge}</td>

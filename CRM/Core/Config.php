@@ -427,7 +427,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       // note: do not re-initialize config here, since this function is part of
       // config initialization itself
       $urlVar = 'q';
-      if (defined('CIVICRM_UF') && CIVICRM_UF == 'Joomla') {
+      if (defined('CIVICRM_UF') && (CIVICRM_UF == 'Joomla' || CIVICRM_UF == 'Joomla5')) {
         $urlVar = 'task';
       }
 

@@ -723,7 +723,7 @@ abstract class CRM_Utils_System_Base {
     $filesURL = NULL;
     $filesPath = NULL;
 
-    if ($config->userFramework == 'Joomla') {
+    if ($config->userFramework == 'Joomla' or $config->userFramework == 'Joomla5') {
       // gross hack
       // we need to remove the administrator/ from the end
       $tempURL = str_replace("/administrator/", "/", $baseURL);
