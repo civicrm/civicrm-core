@@ -1,0 +1,17 @@
+<af-form ctrl="afform">
+  <af-entity type="User" name="User1" label="User 1" actions="{create: false, update: true}" security="RBAC" url-autofill="1" data="{}" />
+  <div class="af-markup">
+    <p><a href="/civicrm/my-account">My Account</a></p>
+  </div>
+  <fieldset af-fieldset="User1" class="af-container" af-title="Account info">
+    <div class="af-markup"></div>
+    <af-field name="username" />
+    <af-field name="uf_name" defn="{help_pre: 'Email used for password resets.', input_attrs: {placeholder: 'Leave blank to use the primary email from the selected contact'}}" />
+    <af-field name="timezone" defn="{help_pre: 'Set the timezone of the user. Date and times will be shown in this timezone. You can also leave it empty to use the default system timezone (which is a server setting).', input_attrs: {placeholder: 'Server default timezone'}}" />
+    <af-field name="language" defn="{help_pre: 'Set the user interface language of this user. You can also leave it empty to use the default system language.', input_attrs: {placeholder: 'System default language'}}" />
+    <div class="af-container af-container-style-pane">
+      <af-field name="roles" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
