@@ -58,6 +58,9 @@ class FieldsCallbackTest extends Api4TestBase {
     // Check modified fields
     $this->assertEquals('Test ID Title', $getFields['id']['title']);
     $this->assertTrue($getFields['email']['readonly']);
+    $this->assertEquals('Test Primary Title', $getFields['is_primary']['title']);
+    // Default should not have been affected simply by changing the title
+    $this->assertNull($getFields['is_primary']['default_value']);
   }
 
   /**
@@ -79,6 +82,7 @@ class FieldsCallbackTest extends Api4TestBase {
       ];
       // Test modifying some fields
       $fields['id']['title'] = 'Test ID Title';
+      $fields['is_primary']['title'] = 'Test Primary Title';
       $fields['email']['readonly'] = TRUE;
     };
   }
