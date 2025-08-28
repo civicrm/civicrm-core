@@ -71,4 +71,12 @@ interface AuthxInterface {
    */
   public function getCurrentUserId();
 
+  /**
+   * Determine the user status, if is blocked or not.
+   *
+   * @param int|string $userId
+   * @return int|NULL
+   */
+  public function getUserIsBlocked($userId);
+
 }
