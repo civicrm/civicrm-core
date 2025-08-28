@@ -379,6 +379,7 @@ class CRM_Core_I18n {
     unset($params['raw']);
 
     if (!isset($params['skip_translation'])) {
+
       if (!empty($domain)) {
         // It might be prettier to cast to an array, but this is high-traffic stuff.
         if (is_array($domain)) {
@@ -419,6 +420,7 @@ class CRM_Core_I18n {
    * @return string
    */
   protected function crm_translate_raw($text, $domain, $count, $plural, $context) {
+
     // gettext domain for extensions
     $domain_changed = FALSE;
     if (!empty($domain) && $this->_phpgettext) {
@@ -449,6 +451,11 @@ class CRM_Core_I18n {
       $search = array_keys($stringTable['enabled']['wildcardMatch']);
       $replace = array_values($stringTable['enabled']['wildcardMatch']);
       $text = str_replace($search, $replace, $text);
+    }
+
+    $tsTable = $this->getTranslationReplacements();
+    if (isset($tsTable[$text])) {
+      $text = $tsTable[$text];
     }
 
     // dont translate if we've done exactMatch already
@@ -791,6 +798,26 @@ class CRM_Core_I18n {
       }
     }
     return Civi::$statics[__CLASS__][$replacementsLocale];
+  }
+
+  private function getTranslationReplacements() {
+    if (defined('CIVI_SETUP') || isset(Civi\Test::$statics['testPreInstall'])) {
+      return [];
+    }
+
+    // FIXME: Is there a constant we can reference instead of hardcoding en_US?
+    $replacementsLocale = $this->locale ?: 'en_US';
+    // temporary to avoid collision with word replacements
+    $translationReplacement = 'tr-' . $replacementsLocale;
+    if ((!isset(Civi::$statics[__CLASS__]) || !array_key_exists($translationReplacement, Civi::$statics[__CLASS__]))) {
+      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
+        Civi::$statics[__CLASS__][$translationReplacement] = CRM_Core_BAO_TranslationSource::getTranslationSources($replacementsLocale);
+      }
+      else {
+        Civi::$statics[__CLASS__][$translationReplacement] = [];
+      }
+    }
+    return Civi::$statics[__CLASS__][$translationReplacement];
   }
 
 }

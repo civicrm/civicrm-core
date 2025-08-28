@@ -325,7 +325,7 @@ VALUES
     ( @domainID, 'civicrm/admin/setting/localization?reset=1',          '{ts escape="sql" skip="true"}Languages, Currency, Locations{/ts}', 'Languages, Currency, Locations',   'administer CiviCRM', '', @locallastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/setting/preferences/address?reset=1',   '{ts escape="sql" skip="true"}Address Settings{/ts}',               'Address Settings',                 'administer CiviCRM', '', @locallastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/admin/setting/date?reset=1',                  '{ts escape="sql" skip="true"}Date Formats{/ts}',                   'Date Formats',                     'administer CiviCRM', '', @locallastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/admin/options/languages?reset=1', '{ts escape="sql" skip="true"}Preferred Language Options{/ts}', 'Preferred Language Options',       'administer CiviCRM', '', @locallastID, '1', NULL, 4 );
+    ( @domainID, 'civicrm/admin/options/languages?reset=1', '{ts escape="sql" skip="true"}Preferred Language Options{/ts}', 'Preferred Language Options',       'administer CiviCRM', '', @locallastID, '1', 1, 4 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
