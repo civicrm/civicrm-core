@@ -35,6 +35,10 @@ function main($argv) {
       build();
       break;
 
+    case 'validate':
+      validate();
+      break;
+
     // case 'download':
     //   downloadPatches();
     //   break;
@@ -72,6 +76,7 @@ COMMANDS:
   use-local    Update composer.json with a list of patch files, with local paths.
   use-remote   Update composer.json with a list of patch files, with remote URLs.
   build        Create a dist/ tree that can be published to CDN.
+  validate     Assert that the patch-list in composer.json is suitable for redistribution.
 
 
 EOHELP;
@@ -97,9 +102,9 @@ function useLocal(): void {
 }
 
 /**
- * Update `composer.json` with a list of remote patch-URLs.
+ * @return array
  */
-function useRemote(): void {
+function createRemotePatchList(): array {
   $patches = [];
   foreach (scanRawPatches() as $entry) {
     [$vendor, $package, $patchFile, $desc] = $entry;
@@ -110,11 +115,41 @@ function useRemote(): void {
     $patches[$packageKey][$desc] = $url;
   }
   sortPatches($patches);
+  return $patches;
+}
+
+/**
+ * Update `composer.json` with a list of remote patch-URLs.
+ */
+function useRemote(): void {
+  $patches = createRemotePatchList();
 
   $composer = readComposer();
   $composer['extra']['patches'] = $patches;
   writeComposer($composer);
   echo "Update composer.json with remote patch-URLs.\n";
+}
+
+/**
+ * Assert that `composer.json` has the right list of remote patch-URLs.
+ * @return void
+ */
+function validate(): void {
+  $expectPatches = createRemotePatchList();
+
+  $composer = readComposer();
+  $actualPatches = $composer['extra']['patches'];
+  sortPatches($actualPatches);
+
+  $expectPatchesJson = PrettyJsonEncoder::encode($expectPatches);
+  $actualPatchesJson = PrettyJsonEncoder::encode($actualPatches);
+
+  if ($expectPatchesJson !== $actualPatchesJson) {
+    echo "The composer.json has an incorrent list of patches.\n";
+    echo "EXPECTED: $expectPatchesJson\n\n";
+    echo "ACTUAL: $expectPatchesJson\n\n";
+    exit(1);
+  }
 }
 
 /**
