@@ -47,17 +47,19 @@ final class EntityProvider {
    *   Ex: ['field_1' => ['title' => ..., 'sqlType' => ...]]
    */
   public function getFields(): array {
-    if (!isset(Civi::$statics['civi.entity.fields'][$this->entityName])) {
-      Civi::$statics['civi.entity.fields'][$this->entityName] = $this->getMetaProvider()->getFields();
+    $locale = \CRM_Core_I18N::getLocale();
+    $cacheKey = $locale . ' ' . $this->entityName;
+    if (!isset(Civi::$statics['civi.entity.fields'][$cacheKey])) {
+      Civi::$statics['civi.entity.fields'][$cacheKey] = $this->getMetaProvider()->getFields();
       $hookParams = [
         'entity' => $this->entityName,
-        'fields' => &Civi::$statics['civi.entity.fields'][$this->entityName],
+        'fields' => &Civi::$statics['civi.entity.fields'][$cacheKey],
       ];
       $event = GenericHookEvent::create($hookParams);
       Civi::service('dispatcher')->dispatch('civi.entity.fields', $event);
       Civi::service('dispatcher')->dispatch("civi.entity.fields::$this->entityName", $event);
     }
-    return Civi::$statics['civi.entity.fields'][$this->entityName];
+    return Civi::$statics['civi.entity.fields'][$cacheKey];
   }
 
   public function getCustomFields(array $customGroupFilters = []): array {
