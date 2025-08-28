@@ -27,7 +27,7 @@
       <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};">
         {foreach name=outer key=key item=item from=$formElement}
           {if is_array($item) && array_key_exists('html', $item)}
-            <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
+            {$formElement.$key.html}
           {/if}
         {/foreach}
       </div>
@@ -45,7 +45,8 @@
       {if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$formElement.textLabel}{/if}
     </td>
     <td class="html-adjust">
-      {$formElement.html}&nbsp;
+      {if $element.html_type === "CheckBox" || $element.html_type === "Radio"}<div class="crm-multiple-checkbox-radio-options">{/if}
+      {$formElement.html}
       {if $element.data_type eq 'File'}
         {if array_key_exists('element_value', $element) && $element.element_value.data}
           <div class="crm-attachment-wrapper crm-entity" id="file_{$element.element_name}">
@@ -75,6 +76,7 @@
           {include file="CRM/Custom/Form/ContactReference.tpl"}
         {/if}
       {/if}
+      {if $element.html_type === "CheckBox" || $element.html_type === "Radio"}</div>{/if}
     </td>
   </tr>
 {/if}

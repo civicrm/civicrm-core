@@ -321,30 +321,32 @@ input.crm-form-checkbox + label,
   height: auto;
   box-shadow: none;
 }
-/* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
+/* Checkbox/radio fields with n-per-line. */
 .crm-container .crm-multiple-checkbox-radio-options {
-  --gap: 1em;
-  --checkbox-width: 2em;
+  --crm-gap: 0.5em;
+  --crm-checkbox-width: 1.5em;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gap);
+  gap: var(--crm-gap);
 }
-/* Reset checkbox width when its rendered as text '(x)' in confirmation screens /dev/core/-/issues/5550 */
+/* Reset checkbox width when its rendered as text '(x)' in confirmations */
 .crm-container.crm-public .crm-profile-view .crm-option-label-pair {
-  --checkbox-width: auto;
+  --crm-checkbox-width: auto;
 }
 /* Override more general styling */
 .crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
 input.crm-form-checkbox) + label {
-  margin-left: 0;
+  margin: 0 !important /* vs L309 */;
+  padding: 0;
+  white-space: initial;
 }
 .crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
   display: grid;
-  grid-template-columns: var(--checkbox-width) 1fr;
+  grid-template-columns: var(--crm-checkbox-width) 1fr;
   align-items: baseline;
 }
 .crm-container .crm-multiple-checkbox-radio-options.crm-options-per-line .crm-option-label-pair {
-  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--gap)) / var(--crm-opts-per-line));
+  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--crm-gap)) / var(--crm-opts-per-line));
 }
 /* Slider */
 .crm-container .ui-slider {
