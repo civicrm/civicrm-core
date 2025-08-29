@@ -451,9 +451,13 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    *
    * @return string
    */
-  public static function getCaseActivityCountQuery($type, $userID, $condition = NULL) {
+  public static function getCaseCountQuery($allCases, $type, $userID, $condition = NULL) {
+    if ($allCases && $type == 'any') {
+      return "SELECT COUNT(*) FROM civicrm_case WHERE is_deleted = 0";
+    }
     return sprintf(" SELECT COUNT(*) FROM (%s) temp ", self::getCaseActivityQuery($type, $userID, $condition));
   }
+
 
   /**
    * @param string $type
@@ -622,7 +626,7 @@ HERESQL;
     }
     $condition = implode(' AND ', $whereClauses);
 
-    Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
+    Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseCountQuery($allCases, $type, $userID, $condition));
     if ($getCount) {
       return $totalCount;
     }
