@@ -182,10 +182,10 @@ body.civicrm-iframe-page {
 
 /* Core type */
 
-.crm-container p:first-of-type {
+.crm-container p:first-child {
   margin-top: 0;
 }
-.crm-container p:last-of-type {
+.crm-container p:last-child {
   margin-bottom: 0;
 }
 .crm-container strong,
