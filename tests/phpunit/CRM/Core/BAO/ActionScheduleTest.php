@@ -1811,7 +1811,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ],
     ]);
 
-
     // Create Reminder to send to normal memberships only.
     $this->createScheduleFromFixtures('sched_membership_end_2month', [
       'entity_value' => $membership['membership_type_id'],
