@@ -3,15 +3,15 @@
   af-api4-ctrl="listCtrl">
 
   <div ng-if="apiData.result.length == 0">
-    {{ts('There are no clients!')}}
+    There are no clients!
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>{{ts('ID')}}</th>
-        <th>{{ts('Provider')}}</th>
-        <th>{{ts('GUID')}}</th>
+        <th>ID</th>
+        <th>Provider</th>
+        <th>GUID</th>
         <th></th>
       </tr>
     </thead>
@@ -25,19 +25,19 @@
       <td>
       <!--
         <a af-api4-action="['Afform', 'revert', {where: [['name','=', availClient.name]]}]"
-           af-api4-start-msg="ts('Reverting...')"
-           af-api4-success-msg="ts('Reverted')"
+           af-api4-start-msg="'Reverting...'"
+           af-api4-success-msg="'Reverted'"
            af-api4-success="listCtrl.refresh()"
            class="btn btn-xs btn-default"
            ng-if="availClient.has_local && availClient.has_base"
-          >{{ts('Revert')}}</a>
+          >Revert</a>
           -->
         <a af-api4-action="['OAuthClient', 'delete', {where: [['id','=', availClient.id]]}]"
-           af-api4-start-msg="ts('Deleting...')"
-           af-api4-success-msg="ts('Deleted')"
+           af-api4-start-msg="'Deleting...'"
+           af-api4-success-msg="'Deleted'"
            af-api4-success="listCtrl.refresh()"
            class="btn btn-xs btn-default"
-        >{{ts('Delete')}}</a>
+        >Delete</a>
       </td>
     </tr>
     </tbody>

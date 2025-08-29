@@ -3,16 +3,16 @@
   af-api4-ctrl="listCtrl">
 
   <div ng-if="apiData.result.length == 0">
-    {{ts('There are no forms! Tell Aristotle!')}}
+    There are no forms! Tell Aristotle!
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>{{ts('Name')}}</th>
-        <th>{{ts('Title')}}</th>
-        <th>{{ts('Server Route')}}</th>
-        <th>{{ts('Frontend?')}}</th>
+        <th>Name</th>
+        <th>Title</th>
+        <th>Server Route</th>
+        <th>Frontend?</th>
         <th></th>
       </tr>
     </thead>
@@ -27,23 +27,23 @@
           <code>{{availForm.server_route}}</code>
         </a>
       </td>
-      <td>{{availForm.is_public ? ts('Frontend') : ts('Backend')}}</td>
+      <td>{{availForm.is_public ? 'Frontend' : 'Backend'}}</td>
       <td>
-        <!--<a ng-click="crmStatus({start: ts('Reverting...'), success: ts('Reverted')}, crmApi4('Afform', 'revert', {where: [['name', '=', availForm.name]]}))">{{ts('Revert')}}</a>-->
+        <!--<a ng-click="crmStatus({start: 'Reverting...', success: 'Reverted'}, crmApi4('Afform', 'revert', {where: [['name', '=', availForm.name]]}))">Revert</a>-->
         <a af-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
-           af-api4-start-msg="ts('Reverting...')"
-           af-api4-success-msg="ts('Reverted')"
+           af-api4-start-msg="'Reverting...'"
+           af-api4-success-msg="'Reverted'"
            af-api4-success="listCtrl.refresh()"
            class="btn btn-xs btn-default"
            ng-if="availForm.has_local && availForm.has_base"
-          >{{ts('Revert')}}</a>
+          >Revert</a>
         <a af-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
-           af-api4-start-msg="ts('Deleting...')"
-           af-api4-success-msg="ts('Deleted')"
+           af-api4-start-msg="'Deleting...'"
+           af-api4-success-msg="'Deleted'"
            af-api4-success="listCtrl.refresh()"
            class="btn btn-xs btn-default"
            ng-if="availForm.has_local && !availForm.has_base"
-        >{{ts('Delete')}}</a>
+        >Delete</a>
       </td>
     </tr>
     </tbody>
