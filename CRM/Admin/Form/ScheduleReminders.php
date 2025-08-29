@@ -255,6 +255,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     else {
       unset($errors['absolute_date']);
+      if (($values['start_action_date'] == 'next_sched_contribution_date') && (!in_array('2', $values['entity_status']) || count($values['entity_status']) != 1)) {
+        $errors['start_action_date'] = ts('Membership Auto-Renewal Date can only work with Auto-renewal Memberships');
+      }
     }
 
     return $errors ?: TRUE;
