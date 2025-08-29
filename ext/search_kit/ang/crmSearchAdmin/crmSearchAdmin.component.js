@@ -598,6 +598,9 @@
 
     // Is a column eligible to use an aggregate function?
     this.canAggregate = function(col) {
+      if (!ctrl.paramExists('groupBy')) {
+        return false;
+      }
       // If the query does not use grouping, it's always allowed
       if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
         return true;

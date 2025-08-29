@@ -115,7 +115,7 @@
           if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
             // In addition to aggregate functions, also permit a function used in the groupBy clause
-            ctrl.crmSearchAdmin.savedSearch.api_params.groupBy.forEach(function(fieldStr) {
+            (ctrl.crmSearchAdmin.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
               if (fieldStr.includes(ctrl.fieldArg.field.name) && fieldStr.includes('(')) {
                 let fieldExpr = searchMeta.parseExpr(fieldStr);
                 let field = _.findWhere(fieldExpr.args, {type: 'field'});
