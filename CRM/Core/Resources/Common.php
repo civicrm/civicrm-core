@@ -148,6 +148,7 @@ class CRM_Core_Resources_Common {
     $settings = [
       'config' => [
         'isFrontend' => $config->userFrameworkFrontend,
+        'includeWildCardInName' => $config->includeWildCardInName,
       ],
     ];
     // Disable profile creation if user lacks permission
