@@ -235,6 +235,10 @@
         if (typeof value === 'string' && ctrl.isMultiple()) {
           value = value.split(',');
         }
+        // Support "Select Current User" default
+        if (ctrl.defn.input_type === 'EntityRef' && ['Contact', 'Individual'].includes(ctrl.fkEntity) && value === 'user_contact_id') {
+          value = CRM.config.cid;
+        }
         // correct the value type
         if (ctrl.defn.input_type !== 'DisplayOnly') {
           value = correctValueType(value, ctrl.defn.data_type);
