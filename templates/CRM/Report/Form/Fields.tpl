@@ -58,6 +58,13 @@
         tabSettings.active = $('.civireport-criteria').index($('.civireport-criteria:has(".crm-error")')[0]);
       }
       $("#mainTabContainer").tabs(tabSettings);
+      // When clicking the header, toggle collapsed state
+      $('#mainTabContainer > ul.ui-widget-header').click(function(e) {
+        if ($(e.target).is('ul.ui-widget-header')) {
+          const activeTab = $('#mainTabContainer').tabs('option', 'active');
+          $('#mainTabContainer').tabs('option', 'active', activeTab === false ? 0 : false);
+        }
+      });
     });
 
   </script>

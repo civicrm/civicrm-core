@@ -331,7 +331,12 @@ trait SavedSearchInspectorTrait {
           foreach ($value as $operator => $val) {
             $andGroup[] = [$fieldName, $operator, $val];
           }
-          $filterClauses[] = ['AND', $andGroup];
+          if (count($andGroup) === 1) {
+            $filterClauses[] = $andGroup[0];
+          }
+          elseif (count($andGroup) > 1) {
+            $filterClauses[] = ['AND', $andGroup];
+          }
         }
       }
       elseif (!empty($field['serialize']) && in_array('CONTAINS', $operators, TRUE)) {
