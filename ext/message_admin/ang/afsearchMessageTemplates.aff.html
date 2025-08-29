@@ -1,10 +1,10 @@
 <af-tabset url-arg="selectedChild" remember-selection="true">
 
   <!-- The form opens for any of the three edit permissions; each tab needs one that can edit its own templates. -->
-  <af-tab name="user" title="{{:: ts('User-Driven Messages') }}" ng-if=":: checkLinkPerm('edit message templates') || checkLinkPerm('edit user-driven message templates')">
+  <af-tab name="user" title="User-Driven Messages" ng-if=":: checkLinkPerm('edit message templates') || checkLinkPerm('edit user-driven message templates')">
     <div af-fieldset="">
       <div class="help">
-        <p>{{:: ts('Message templates allow you to easily create similar emails or letters on a recurring basis. Messages used for membership renewal reminders, as well as event and activity related reminders should be created via Schedule Reminders.') }}</p>
+        <p>Message templates allow you to easily create similar emails or letters on a recurring basis. Messages used for membership renewal reminders, as well as event and activity related reminders should be created via Schedule Reminders.</p>
       </div>
       <div class="af-container af-layout-inline">
         <af-field name="keyword" defn="{label: false, search_operator: 'CONTAINS', input_attrs: {placeholder: 'Filter by title or subject'}}" />
@@ -15,10 +15,10 @@
     </div>
   </af-tab>
 
-  <af-tab name="workflow" title="{{:: ts('System Workflow Messages') }}" ng-if=":: checkLinkPerm('edit message templates') || checkLinkPerm('edit system workflow message templates')">
+  <af-tab name="workflow" title="System Workflow Messages" ng-if=":: checkLinkPerm('edit message templates') || checkLinkPerm('edit system workflow message templates')">
     <div af-fieldset="">
       <div class="help">
-        <p>{{:: ts('System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.') }}</p>
+        <p>System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.</p>
       </div>
       <div class="af-container af-layout-inline">
         <af-field name="msg_title" defn="{label: false, search_operator: 'CONTAINS', input_attrs: {placeholder: 'Filter by title'}}" />

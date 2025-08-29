@@ -2,7 +2,7 @@
 
 <div class="help">
   <p>
-    {{ts('CiviCRM may be configured as a client that interacts with remote web-services, such as Google Mail or Microsoft Exchange. Please choose the type of web-service you wish to connect to:')}}
+    CiviCRM may be configured as a client that interacts with remote web-services, such as Google Mail or Microsoft Exchange. Please choose the type of web-service you wish to connect to:
   </p>
 
   <!--
@@ -13,9 +13,9 @@
 <table>
   <thead>
   <tr>
-    <th>{{ts('Name')}}</th>
-    <th>{{ts('Title')}}</th>
-    <th>{{ts('Clients')}}</th>
+    <th>Name</th>
+    <th>Title</th>
+    <th>Clients</th>
   </tr>
   </thead>
   <tbody>
@@ -27,10 +27,10 @@
       <a ng-href="#!/?provider={{provider.name}}">{{provider.title}}</a>
     </td>
     <td>
-      <span ng-if="!provider.client_count" class="crm-oauth-no-clients">{{ts('None')}}</span>
+      <span ng-if="!provider.client_count" class="crm-oauth-no-clients">None</span>
       <span ng-if="provider.client_count">{{provider.client_count}}</span>
       <span ng-if="provider.client_count > provider.active_client_count">
-        ({{ts('%1 disabled', {1: provider.client_count - provider.active_client_count})}})
+        ({{provider.client_count - provider.active_client_count}} disabled)
       </span>
     </td>
   </tr>
