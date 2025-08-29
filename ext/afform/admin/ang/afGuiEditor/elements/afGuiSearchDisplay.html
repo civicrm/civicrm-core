@@ -1,7 +1,7 @@
 <div class="af-gui-bar">
   <div class="form-inline">
     <span>{{:: $ctrl.display['saved_search_id.label'] }}: {{:: $ctrl.display.label }}</span>
-    <div class="btn-group pull-right" af-gui-menu>
+    <div class="btn-group pull-right" af-gui-menu ng-if="$ctrl.editUrl">
       <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
         <span><i class="crm-i fa-gear"></i></span>
       </button>

@@ -399,7 +399,7 @@ trait SavedSearchInspectorTrait {
   protected function checkPermissionToLoadSearch() {
     if (
       (is_array($this->savedSearch) || (isset($this->display) && is_array($this->display))) && $this->checkPermissions &&
-      !\CRM_Core_Permission::check('administer search_kit')
+      !\CRM_Core_Permission::check('manage own search_kit')
     ) {
       throw new UnauthorizedException('Access denied');
     }

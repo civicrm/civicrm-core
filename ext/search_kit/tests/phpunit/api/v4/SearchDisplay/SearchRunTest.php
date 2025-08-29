@@ -3010,4 +3010,137 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('Two', $result[0]['columns'][3]['val']);
   }
 
+  public function testManageOwn(): void {
+    $config = \CRM_Core_Config::singleton();
+    $savedSearchAPI = \Civi\Api4\SavedSearch::create(FALSE)
+      ->addValue('name', ' API Test Search')
+      ->addValue('api_entity', 'Contact')
+      ->addValue('api_params', [
+        'version' => 4,
+        'select' => [
+          'id',
+          'sort_name',
+          'contact_type:label',
+          'contact_sub_type:label',
+        ],
+        'orderBy' => [],
+        'where' => [['contact_type:name', '=', 'Individual']],
+      ])
+      ->addValue('created_id', 1)
+      ->addValue('modified_id', 1)
+      ->execute()->first();
+    $savedSearchBAO = \CRM_Contact_BAO_SavedSearch::writeRecord([
+      'check_permission' => FALSE,
+      'name' => 'BAO Test Search',
+      'created_id' => 1,
+      'modified_id' => 1,
+    ]);
+    $config->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'manage own search_kit',
+    ];
+    $this->createLoggedInUser();
+
+    // Make sure a `manage own search_kit` user can't edit a SavedSearch owned by someone else using API4.
+    $error = '';
+    try {
+      $result = \Civi\Api4\SavedSearch::update(TRUE)
+        ->addValue('label', 'Update API Test Search')
+        ->addWhere('id', '=', $savedSearchAPI['id'])
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+
+    // Make sure a `manage own search_kit` user can't edit a SavedSearch owned by someone else using BAO.
+    $error = '';
+    try {
+      \CRM_Contact_BAO_SavedSearch::writeRecord([
+        'check_permission' => TRUE,
+        'label' => 'Update BAO Test Search',
+        'id' => $savedSearchBAO->id,
+      ]);
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('permission', $error);
+
+    // Make sure a `manage own search_kit` user can't delete a SavedSearch owned by someone else using API4.
+    $error = '';
+    try {
+      $result = \Civi\Api4\SavedSearch::delete(TRUE)
+        ->addWhere('id', '=', $savedSearchAPI['id'])
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+
+    // Make sure a `manage own search_kit` user can't delete a SavedSearch owned by someone else using BAO.
+    $error = '';
+    try {
+      \CRM_Contact_BAO_SavedSearch::deleteRecord([
+        'check_permission' => TRUE,
+        'id' => $savedSearchBAO->id,
+      ]);
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('permission', $error);
+
+    $config->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'administer search_kit',
+    ];
+
+    // Make sure a `administer search_kit` user can edit any SavedSearch record using API4.
+    try {
+      $result = \Civi\Api4\SavedSearch::update(TRUE)
+        ->addValue('label', 'Update Test Search')
+        ->addWhere('id', '=', $savedSearchAPI['id'])
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $this->fail();
+    }
+
+    // Make sure a `administer search_kit` user can edit any SavedSearch using BAO.
+    try {
+      \CRM_Contact_BAO_SavedSearch::writeRecord([
+        'check_permission' => TRUE,
+        'label' => 'Update BAO Test Search',
+        'id' => $savedSearchBAO->id,
+      ]);
+    }
+    catch (UnauthorizedException $e) {
+      $this->fail();
+    }
+
+    // Make sure a `administer search_kit` user can delete any SavedSearch record using API4.
+    try {
+      $result = \Civi\Api4\SavedSearch::delete(TRUE)
+        ->addWhere('id', '=', $savedSearchAPI['id'])
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $this->fail();
+    }
+
+    // Make sure a `administer search_kit` user can delete any SavedSearch using BAO.
+    try {
+      \CRM_Contact_BAO_SavedSearch::deleteRecord([
+        'check_permission' => TRUE,
+        'id' => $savedSearchBAO->id,
+      ]);
+    }
+    catch (UnauthorizedException $e) {
+      $this->fail();
+    }
+  }
+
 }

@@ -31,7 +31,7 @@ class SearchKitSubscriber extends \Civi\Core\Service\AutoService implements Even
   }
 
   /**
-   * Alters APIv4 permissions to allow users with 'administer search_kit' to create/delete a SavedSearch
+   * Alters APIv4 permissions to allow users with 'manage own search_kit' to create/delete a SavedSearch
    *
    * @param \Civi\API\Event\AuthorizeEvent $event
    *   API authorization event.
@@ -40,7 +40,7 @@ class SearchKitSubscriber extends \Civi\Core\Service\AutoService implements Even
     /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] == 4 && $apiRequest->getEntityName() === 'SavedSearch') {
-      if (\CRM_Core_Permission::check('administer search_kit')) {
+      if (\CRM_Core_Permission::check('manage own search_kit')) {
         $event->authorize();
         $event->stopPropagation();
       }
