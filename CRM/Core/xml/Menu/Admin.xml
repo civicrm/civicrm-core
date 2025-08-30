@@ -661,6 +661,11 @@
      <weight>9000</weight>
   </item>
   <item>
+    <path>civicrm/ajax/initiator</path>
+    <page_callback>Civi\Connect\Page\Initiator::initiate</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
     <path>civicrm/ajax/navmenu</path>
     <page_callback>CRM_Admin_Page_AJAX::navMenu</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
