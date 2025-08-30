@@ -48,10 +48,8 @@ class Initiators {
    *
    * @var array
    *     - title: string
-   *     - callback: the function which starts the setup process.
-   *        It will receive two inputs, the $initiator record and the $context.
-   *        The function is expected to return an array{url:string} for the config screen.
-   *        Signature: function(array $initiator, array $context): array
+   *     - render: callback to generate the UI widget
+   *        Signature: function(CRM_Core_Region $region, array $context, array $initiator):
    *     - name: string (COMPUTED; same as array-key)
    *     - url: string (COMPUTED; HTTP address for this initiator)
    *     - is_default: bool (COMPUTED)

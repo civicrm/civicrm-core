@@ -3031,9 +3031,8 @@ abstract class CRM_Utils_Hook {
    * @param array $available
    *   List of available actions. Each item has a symbolic-key, and it has the properties:
    *     - title: string
-   *     - callback: string|array, the function which starts the setup process.
-   *        The function is expected to identify JS resources to load
-   *        Signature: function(array $context, array $initiator, CRM_Core_Resources_CollectionAdderInterface $resources): array
+   *     - render: callable, the function which renders the initiator buttons
+   *        Signature: function(CRM_Core_Region $region, array $context, array $initiator):
    * @param string|null $default
    *
    * @return mixed

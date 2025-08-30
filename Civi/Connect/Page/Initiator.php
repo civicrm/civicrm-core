@@ -13,6 +13,8 @@ namespace Civi\Connect\Page;
 class Initiator {
 
   public static function initiate() {
+    throw new \RuntimeException("Phasing out?");
+
     $rawJwt = \CRM_Utils_Request::retrieve('jwt', 'String');
     $jwt = \Civi::service('crypto.jwt')->decode($rawJwt);
     if (empty($jwt['initiator']) || !isset($jwt['initiatorContext'])) {
