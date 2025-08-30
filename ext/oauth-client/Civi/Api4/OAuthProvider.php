@@ -60,6 +60,10 @@ class OAuthProvider extends Generic\AbstractEntity {
           'name' => 'options',
         ],
         [
+          'name' => 'tags',
+          'data_type' => 'Array',
+        ],
+        [
           'name' => 'contactTemplate',
         ],
         [
