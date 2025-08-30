@@ -236,6 +236,41 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     }
 
     $this->addFormRule(['CRM_Admin_Form_PaymentProcessor', 'formRule']);
+
+    $keyValue = fn($kCol, $vCol, $rows) => array_combine(array_column($rows, $kCol), array_column($rows, $vCol));
+
+    $typeName = $this->_paymentProcessorDAO->name;
+    $liveInitiators = \Civi\Connect\Initiators::create([
+      'for' => 'PaymentProcessor',
+      'is_test' => FALSE,
+      'payment_processor_type' => $typeName,
+      'payment_processor_id' => $this->_id,
+    ]);
+    if (!empty($liveInitiators->available)) {
+      $el = $this->add('select', 'live_initiator', ts('Initiator'), $keyValue('url', 'title', $liveInitiators->available), FALSE, ['class' => 'crm-select2']);
+      // The "value" here is just a default action -- not really a field to store.
+      $el->setValue($liveInitiators->get($liveInitiators->default)['url']);
+    }
+
+    if ($this->_id) {
+      $testId = CRM_Core_DAO::singleValueQuery('
+      SELECT test_p.id FROM civicrm_payment_processor test_p
+      INNER JOIN civicrm_payment_processor live_p ON test_p.name = live_p.name AND test_p.domain_id = live_p.domain_id
+      WHERE live_p.id = %1
+      LIMIT 1
+    ', [1 => [$this->_id, 'Positive']]);
+      $testInitiators = \Civi\Connect\Initiators::create([
+        'for' => 'PaymentProcessor',
+        'is_test' => TRUE,
+        'payment_processor_type' => $typeName,
+        'payment_processor_id' => $testId,
+      ]);
+      if (!empty($testInitiators->available)) {
+        $el = $this->add('select', 'test_initiator', ts('Initiator'), $keyValue('url', 'title', $testInitiators->available), FALSE, ['class' => 'crm-select2']);
+        // The "value" here is just a default action -- not really a field to store.
+        $el->setValue($testInitiators->get($testInitiators->default)['url']);
+      }
+    }
   }
 
   /**
@@ -403,11 +438,12 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if ($errors) {
       CRM_Core_Session::setStatus($errors, ts('Payment processor configuration invalid'), 'error');
       Civi::log()->error('Payment processor configuration invalid: ' . $errors);
-      CRM_Core_Session::singleton()->pushUserContext($this->getRefreshURL());
+      // CRM_Core_Session::singleton()->pushUserContext($this->getRefreshURL());
     }
     else {
       CRM_Core_Session::setStatus(ts('Payment processor %1 has been saved.', [1 => "<em>{$values['title']}</em>"]), ts('Saved'), 'success');
     }
+    CRM_Core_Session::singleton()->pushUserContext($this->getRefreshURL());
   }
 
   /**
