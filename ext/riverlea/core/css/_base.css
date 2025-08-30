@@ -58,9 +58,10 @@ body {
   list-style: none;
 }
 /* Restores list styles for rich text output to UA stylesheet definition */
-.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body) :is(ol,ul) {
+.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body,.crm-search-col-type-html,.af-markup) :is(ol,ul) {
   list-style: revert;
   padding: revert;
+  margin: revert;
 }
 /* For images to not be able to exceed their container */
 .crm-container img {
@@ -181,6 +182,12 @@ body.civicrm-iframe-page {
 
 /* Core type */
 
+.crm-container p:first-child {
+  margin-top: 0;
+}
+.crm-container p:last-child {
+  margin-bottom: 0;
+}
 .crm-container strong,
 .crm-container b,
 .crm-container .bold,
