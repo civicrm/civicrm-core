@@ -408,11 +408,17 @@
             return false;
           }
         }
-        // Form redirects to Advanced Search, which does not automatically search with wildcards,
-        // aside from contact name.
-        // To get comparable results, append wildcard to the search term.
-        else if (searchkey !== 'sort_name' && searchkey !== 'id') {
-          $('#crm-qsearch-input').val(searchValue + '%');
+        // Form redirects to Advanced Search, which does not automatically
+        // search with wildcards, aside from contact name and a few other
+        // fields. To get comparable results, append and possible prepend
+        // wildcard to the search term.
+        else if (searchkey !== 'id') {
+          if (CRM.config.includeWildCardInName == 1) {
+            $('#crm-qsearch-input').val('%' + searchValue + '%');
+          }
+          else {
+            $('#crm-qsearch-input').val(searchValue + '%');
+          }
         }
       });
       $('#civicrm-menu').on('show.smapi', function(e, menu) {
