@@ -47,6 +47,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
         ['first_name' => 'A', 'last_name' => 'Aaa', 'email_primary.email' => 'a@a.a', 'address_primary.city' => 'A Town'],
         ['first_name' => 'B', 'last_name' => 'Bbb', 'email_primary.email' => 'b@b.b', 'address_primary.city' => 'B Town'],
         ['email_primary.email' => 'c@c.c'],
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'is_deleted' => TRUE],
       ],
     ]);
     $result = Contact::autocomplete(FALSE)
@@ -57,8 +58,11 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
     $this->assertEquals('Aaa, A', $result[$contacts[0]['id']]['label']);
     $this->assertEquals('a@a.a', $result[$contacts[0]['id']]['description'][0]);
+    // Non-matching contacts should not be included
     $this->assertArrayNotHasKey($contacts[1]['id'], $result);
     $this->assertArrayNotHasKey($contacts[2]['id'], $result);
+    // Deleted contact should not be included
+    $this->assertArrayNotHasKey($contacts[3]['id'], $result);
 
     // Name + city
     Setting::set(FALSE)
