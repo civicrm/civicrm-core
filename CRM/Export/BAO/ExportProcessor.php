@@ -1453,6 +1453,11 @@ class CRM_Export_BAO_ExportProcessor {
           return "`$fieldName` varchar(64)";
 
         case CRM_Utils_Type::T_STRING:
+          // dev/issue#6073 : The exported comma-separated checkbox labels sometimes exceed the maximum length set for the field.
+          //To accommodate this, we are increasing the column type to TEXT.
+          if (CRM_Core_BAO_CustomField::isSerialized($fieldSpec)) {
+            return "`$fieldName` text";
+          }
           if (isset($fieldSpec['maxlength'])) {
             return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
