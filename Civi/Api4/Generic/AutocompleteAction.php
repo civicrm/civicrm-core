@@ -15,6 +15,7 @@ namespace Civi\Api4\Generic;
 use Civi\Api4\Result\SearchDisplayRunResult;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
+use CRM_Utils_API_HTMLInputCoder as HTMLInputCoder;
 
 /**
  * Retrieve $ENTITIES for an autocomplete form field.
@@ -191,6 +192,7 @@ class AutocompleteAction extends AbstractAction {
 
     $keyField = $this->getKeyField();
     $displayFields = $this->getDisplayFields();
+    $htmlFields = array_column(array_filter($this->display['settings']['columns'], fn($item) => $item['type'] === 'html'), 'key');
     $this->augmentSelectClause($keyField, $displayFields);
 
     // Render mode: fetch by id
@@ -225,6 +227,7 @@ class AutocompleteAction extends AbstractAction {
       }
     }
 
+    $hic = HTMLInputCoder::singleton();
     foreach ($apiResult as $row) {
       $item = [
         'id' => $row['data'][$keyField],
@@ -237,6 +240,9 @@ class AutocompleteAction extends AbstractAction {
       }
       foreach ($this->display['settings']['extra'] ?? [] as $name => $key) {
         $item[$key] = $row['data'][$name] ?? $item[$key] ?? NULL;
+      }
+      foreach ($htmlFields as $col) {
+        $hic->decodeOutput($item[$col]);
       }
       $result[] = $item;
     }
@@ -312,7 +318,7 @@ class AutocompleteAction extends AbstractAction {
   private function getDisplayFields() {
     $fields = [];
     foreach ($this->display['settings']['columns'] as $column) {
-      if ($column['type'] === 'field') {
+      if ($column['type'] === 'field' || $column['type'] === 'html') {
         $fields[] = $column['key'];
       }
       if (!empty($column['rewrite'])) {
@@ -446,7 +452,7 @@ class AutocompleteAction extends AbstractAction {
     $filters = $this->filters;
     // If in search mode (not fetching by id) add main search term as filter
     if ($returnPage) {
-      $filters[$this->getCurrentSearchField()] = $this->input;
+      $filters[$this->getCurrentSearchField()] = HTMLInputCoder::singleton()->encodeValue($this->input);
     }
     if ($this->exclude) {
       $this->savedSearch['api_params']['where'][] = [$this->getKeyField(), 'NOT IN', $this->exclude];

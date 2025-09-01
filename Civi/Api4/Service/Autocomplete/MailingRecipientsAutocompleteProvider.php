@@ -139,7 +139,7 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
       ],
       'columns' => [
         [
-          'type' => 'field',
+          'type' => 'html',
           'key' => 'label',
           'empty_value' => '(' . ts('no name') . ')',
           'icons' => [
