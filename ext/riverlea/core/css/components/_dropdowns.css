@@ -157,15 +157,23 @@
   background-color: var(--crm-dropdown-hover-bg);
 }
 
-/* Tooltip - used on the contact dashboard but no-where else? */
+/* Tooltip - contact dashboard/contact search */
 
+.crm-container .crm-tooltip-active {
+  position: relative;
+}
 .crm-container .crm-tooltip-wrapper {
   position: absolute;
-  z-index: 10000;
+  z-index: 100;
   background: none;
   padding-bottom: 0;
-  margin: -12px;
+  margin-left: -12px;
+  bottom: 0;
   display: none;
+}
+.crm-container .crm-tooltip-down .crm-tooltip-wrapper {
+  top: 0;
+  bottom: unset;
 }
 .crm-container .crm-summary-display_name .crm-tooltip-wrapper {
   margin: -10px -5px;
@@ -178,7 +186,16 @@
   background: var(--crm-c-background);
   border-radius: var(--crm-roundness);
 }
-.crm-container .crm-tooltip-wrapper::before {
+.crm-container .crm-tooltip-active:not(.crm-tooltip-down) .crm-tooltip-wrapper::after {
+  border-top: 10px solid var(--crm-c-background);
+  border-left: 10px solid rgba(0,0,0,0);
+  border-right: 10px solid rgba(0,0,0,0);
+  content: "";
+  left: var(--crm-m2);
+  position: relative;
+  bottom: -7px;
+}
+.crm-container .crm-tooltip-active.crm-tooltip-down .crm-tooltip-wrapper::before {
   border-bottom: 10px solid var(--crm-c-background2);
   border-left: 10px solid rgba(0,0,0,0);
   border-right: 10px solid rgba(0,0,0,0);
