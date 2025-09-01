@@ -285,6 +285,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($column['alignment'])) {
       $cssClass[] = $column['alignment'];
     }
+    if (!empty($column['nowrap'])) {
+      $cssClass[] = 'nowrap';
+    }
     if (!empty($column['show_linebreaks'])) {
       if ($column['type'] === 'html') {
         $out['val'] = nl2br($out['val']);

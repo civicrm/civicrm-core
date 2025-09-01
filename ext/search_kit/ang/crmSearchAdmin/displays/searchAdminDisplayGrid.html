@@ -31,8 +31,16 @@
       </button>
       <details>
         <summary> {{ $ctrl.parent.getColLabel(col) }}</summary>
-        <div class="form-inline" title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
-          <label><input type="checkbox" ng-model="col.break"> {{:: ts('New Line') }}</label>
+        <div class="form-inline">
+          <label title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
+            <input type="checkbox" ng-model="col.break">
+            {{:: ts('New Line') }}
+          </label>
+          &nbsp;
+          <label title="{{:: ts('Disable line breaks to keep contents inline') }}">
+            <input type="checkbox" ng-model="col.nowrap" >
+            {{:: ts('Prevent Wrapping') }}
+          </label>
         </div>
         <div class="form-inline crm-search-admin-flex-row">
           <label>

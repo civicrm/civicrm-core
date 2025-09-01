@@ -2,7 +2,7 @@
   <label for="crm-search-admin-col-size-{{$index}}">
     {{:: ts('Button Size') }}
   </label>
-  <select id="crm-search-admin-col-size-{{$index}}" class="form-control" ng-model="col.size">
+  <select id="crm-search-admin-col-size-{{$index}}" class="form-control crm-auto-width" ng-model="col.size">
     <option value="btn-lg">{{:: ts('Large') }}</option>
     <option value="">{{:: ts('Regular') }}</option>
     <option value="btn-sm">{{:: ts('Small') }}</option>
