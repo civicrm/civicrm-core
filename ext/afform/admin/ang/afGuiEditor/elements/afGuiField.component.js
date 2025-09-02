@@ -68,6 +68,7 @@
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
         }
+        this.isMultiFieldFilter = ctrl.node.name.includes(',');
       };
 
       this.getFkEntity = function() {
@@ -83,7 +84,7 @@
         // Range search only makes sense for search display forms
         return this.isSearch() &&
           // Hack for postal code which is not stored as a number but can act like one
-          (ctrl.node.name.substr(-11) === 'postal_code' || (
+          (ctrl.getFieldName().substr(-11) === 'postal_code' || (
             // Multiselects cannot use range search
             !ctrl.getDefn().input_attrs.multiple &&
             // DataType & inputType must make sense for a range
@@ -107,11 +108,11 @@
 
       // Returns the original field definition from metadata
       this.getDefn = function() {
-        let defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
+        let defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.getFieldName()), ctrl.getFieldName());
         // Calc fields are specific to a search display, not part of the schema
         if (!defn && ctrl.container.getSearchDisplay()) {
           const searchDisplay = ctrl.container.getSearchDisplay();
-          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.node.name});
+          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.getFieldName()});
         }
         defn = defn || {
           label: ts('Untitled'),
@@ -123,9 +124,14 @@
         return defn;
       };
 
+      this.getFieldName = function() {
+        // Search filters can contain multiple field names joined by a comma. Return the first as the primary.
+        return ctrl.node.name.split(',')[0];
+      };
+
       // Get the api entity this field belongs to
       this.getEntity = function() {
-        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.node.name));
+        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.getFieldName()));
       };
 
       $scope.getOriginalLabel = function() {
@@ -364,6 +370,17 @@
 
       this.defaultDatePlural = function() {
         return Math.abs(this.defaultDateOffset()) !== 1;
+      };
+
+      this.toggleMultiFieldFilter = function() {
+        this.isMultiFieldFilter = !this.isMultiFieldFilter;
+        if (!this.isMultiFieldFilter) {
+          this.node.name = this.getFieldName();
+        }
+      };
+
+      this.getSearchFilterFields = function() {
+        return afGui.getSearchDisplayFields(ctrl.container.getSearchDisplay(), _.noop, [ctrl.getFieldName()]);
       };
 
       $scope.defaultValueContains = function(val) {
