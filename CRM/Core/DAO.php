@@ -2817,7 +2817,14 @@ SELECT contact_id
         // Exclude references to other columns
         $coreReference->getTargetKey() === 'id'
       ) {
-        $contactReferences[$coreReference->getReferenceTable()][] = $coreReference->getReferenceKey();
+        $referenceTable = $coreReference->getReferenceTable();
+        $referenceKey = $coreReference->getReferenceKey();
+        if (!(
+          array_key_exists($referenceTable, $contactReferences) &&
+          in_array($referenceKey, $contactReferences[$referenceTable])
+        )) {
+          $contactReferences[$referenceTable][] = $referenceKey;
+        }
       }
     }
     self::appendCustomTablesExtendingContacts($contactReferences);
