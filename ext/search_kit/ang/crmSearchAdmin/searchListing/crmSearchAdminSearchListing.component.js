@@ -98,9 +98,14 @@
 
       // Get the names of in-use filters
       function getActiveFilters() {
-        return _.keys(_.pick(ctrl.filters, function(val) {
-          return val !== null && (_.includes(['boolean', 'number'], typeof val) || val.length);
-        }));
+        return Object.keys(ctrl.filters).filter(key => {
+          let val = ctrl.filters[key];
+          if (typeof val === 'object' && val.hasOwnProperty('CONTAINS')) {
+            val = val.CONTAINS;
+          }
+          return val !== null &&
+            (['boolean', 'number'].includes(typeof val) || val.length);
+        });
       }
 
       this.onPostRun.push(function(apiResults) {

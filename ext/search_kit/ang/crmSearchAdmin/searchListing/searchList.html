@@ -61,8 +61,8 @@
 
   <div role="tabpanel" ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name">
     <div class="form-inline">
-      <input class="form-control" type="search" ng-model="tab.filters.label" placeholder="{{:: ts('Filter by label...') }}">
-      <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name']" placeholder="{{:: ts('Filter by author...') }}">
+      <input class="form-control" type="search" ng-model="tab.filters.label.CONTAINS" placeholder="{{:: ts('Filter by label...') }}">
+      <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name'].CONTAINS" placeholder="{{:: ts('Filter by author...') }}">
       <span ng-if="tab.name === 'packaged'">
         <input class="form-control" ng-model="tab.filters.base_module" ng-list crm-ui-select="{multiple: true, data: $ctrl.modules, placeholder: ts('Filter by package...')}">
       </span>
