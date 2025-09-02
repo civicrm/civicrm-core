@@ -563,7 +563,7 @@ trait CRMTraits_Custom_CustomDataTrait {
           'label' => 'Pick Shade',
           'html_type' => 'CheckBox',
           'data_type' => 'String',
-          'text_length' => '',
+          'text_length' => 10,
           'default_value' => '',
           'option_values' => [
             [
