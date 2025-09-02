@@ -732,6 +732,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->getCustomFieldName('select_string') => 'blah',
       'api.Address.create' => ['location_type_id' => 'Billing', 'city' => 'Waipu'],
       $this->getCustomFieldName('link') => $longUrl,
+      $this->getCustomFieldName('checkbox') => ['L', 'P', 'M', 'V'],
     ]);
     $selectedFields = [
       ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
@@ -739,6 +740,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['name' => $this->getCustomFieldName('country')],
       ['name' => $this->getCustomFieldName('select_string')],
       ['name' => $this->getCustomFieldName('link')],
+      ['name' => $this->getCustomFieldName('checkbox')],
     ];
 
     $this->doExportTest([
@@ -751,6 +753,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
     $this->assertEquals($longString, $row['Pick Color']);
     $this->assertEquals($longUrl, $row['test_link']);
+    $this->assertEquals("Lilac, Purple", $row['Pick Shade']);
   }
 
   /**
