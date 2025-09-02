@@ -26,7 +26,7 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @throws Exception
    */
-  public static function create($customParams, $parentOperation = NULL) {
+  private static function create($customParams, $parentOperation = NULL) {
     if (empty($customParams) ||
       !is_array($customParams)
     ) {
