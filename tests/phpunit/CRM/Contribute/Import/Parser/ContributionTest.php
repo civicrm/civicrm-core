@@ -145,10 +145,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'external_identifier' => 'ext-1',
       'contact_type' => 'Individual',
     ]);
-    $softCreditContactID = $this->individualCreate([
+    $softCreditContactID = $this->organizationCreate([
       'organization_name' => 'The firm',
       'external_identifier' => 'ext-2',
-      'email' => 'the-firm@example.com',
+      'email_primary.email' => 'the-firm@example.com',
       'contact_type' => 'Organization',
     ]);
 
@@ -161,7 +161,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contact.email_primary.email'],
       ['name' => 'SoftCreditContact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 1]]],
     ];
-    $this->importCSV('contributions_amount_validate.csv', $mapping);
+    $this->importCSV('contributions_amount_validate.csv', $mapping, [], 'create', ['SoftCreditContact' => ['dedupe_rule' => ['OrganizationUnsupervised'], 'contact_type' => 'Organization', 'action' => 'save']]);
 
     $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $mainContactID)->execute();
     // Although there are 2 rows in the csv, 1 should fail each time due to conflicting money formats.
@@ -347,12 +347,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'Contact' => [
         'action' => 'create',
         'contact_type' => 'Organization',
-        'dedupe_rule' => 'OrganizationUnsupervised',
+        'dedupe_rule' => ['OrganizationUnsupervised'],
       ],
       'SoftCreditContact' => [
         'contact_type' => 'Individual',
         'action' => 'create',
-        'dedupe_rule' => 'IndividualSupervised',
+        'dedupe_rule' => ['IndividualSupervised'],
         'soft_credit_type_id' => 1,
       ],
     ];
@@ -461,7 +461,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.financial_type_id'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $this->assertEquals(1, $dataSource->getRowCount([\CRM_Import_Parser::PLEDGE_PAYMENT]));
+    $this->assertEquals(1, $dataSource->getRowCount([\CRM_Import_Parser::PLEDGE_PAYMENT]), $dataSource->getRow()['_status_message']);
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->callAPISuccessGetSingle('PledgePayment', ['pledge_id' => $pledgeID, 'contribution_id' => $contribution['id']]);
@@ -662,7 +662,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     }
     $contactType = 'Individual';
     $this->submitDataSourceForm('contributions.csv');
-    $this->updateJobMetadata($mappings, $contactType);
+    $this->updateJobMetadata($mappings, $contactType, ['IndividualUnsupervised']);
     $form = $this->getMapFieldForm();
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
@@ -716,7 +716,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
     $this->submitDataSourceForm('contributions.csv');
-    $this->updateJobMetadata($fieldMappings, 'Individual');
+    $this->updateJobMetadata($fieldMappings, 'Individual', ['IndividualUnsupervised']);
     $form = $this->getMapFieldForm([
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'contactType' => 'Individual',

@@ -110,6 +110,15 @@ abstract class Api4Query {
     return FALSE;
   }
 
+  protected function isDistinctUnion(): bool {
+    foreach ($this->api->getSets() as $set) {
+      if ($set[0] === 'UNION DISTINCT') {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
   /**
    * Add LIMIT to query
    *

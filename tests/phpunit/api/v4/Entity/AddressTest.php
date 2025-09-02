@@ -48,14 +48,14 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('contact_id', $cid)
       ->addValue('location_type_id', 1)
       ->addValue('city', 'Somewhere')
-      ->execute();
+      ->execute()->single();
 
     $a2 = Address::create(FALSE)
       ->addValue('is_primary', TRUE)
       ->addValue('contact_id', $cid)
       ->addValue('location_type_id', 2)
       ->addValue('city', 'Elsewhere')
-      ->execute();
+      ->execute()->single();
 
     $addresses = Address::get(FALSE)
       ->addWhere('contact_id', '=', $cid)
@@ -64,6 +64,12 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertFalse($addresses[0]['is_primary']);
     $this->assertTrue($addresses[1]['is_primary']);
+
+    $contact = Contact::get(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addSelect('address_primary')
+      ->execute()->single();
+    $this->assertEquals($a2['id'], $contact['address_primary']);
   }
 
   public function testSearchProximity(): void {

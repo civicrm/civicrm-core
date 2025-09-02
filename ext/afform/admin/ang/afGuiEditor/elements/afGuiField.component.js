@@ -186,7 +186,7 @@
         if (defn.input_type === type) {
           return true;
         }
-        if (defn.readonly) {
+        if (defn.readonly && !ctrl.isSearch()) {
           switch (type) {
             case 'DisplayOnly':
             case 'Hidden':

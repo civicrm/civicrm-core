@@ -145,11 +145,12 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     $this->assign('isQuick', $this->isQuickConfig());
     $this->addSelect('price_set_id', [
       'entity' => 'PriceSet',
-      'option_url' => 'civicrm/admin/price',
       'options' => $price,
       'label' => ts('Price Set'),
       'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
+      'class' => 'crm-form-select-priceset',
     ]);
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.openRelatedConfig.js');
 
     //CiviPledge fields.
     if (CRM_Core_Component::isEnabled('CiviPledge')) {

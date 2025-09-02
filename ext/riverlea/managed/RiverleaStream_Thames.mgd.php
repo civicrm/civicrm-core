@@ -16,7 +16,7 @@ return [
         'label' => E::ts('Thames'),
         'is_reserved' => TRUE,
         'extension' => E::SHORT_NAME,
-        'file_prefix' => 'streams/thames/css/',
+        'file_prefix' => 'streams/thames/',
         'css_file' => '_variables.css',
         'css_file_dark' => '_dark.css',
         'vars' => [],

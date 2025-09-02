@@ -513,9 +513,8 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
       // Should fail required fields missing
-      $this->assertCount(2, $e->getErrorData()['validation']);
-      $this->assertEquals('First Name is a required field.', $e->getErrorData()['validation'][0]);
-      $this->assertEquals('Email is a required field.', $e->getErrorData()['validation'][1]);
+      $this->assertStringContainsString('First Name is a required field', $e->getMessage());
+      $this->assertStringContainsString('Email is a required field', $e->getMessage());
     }
 
   }
@@ -551,8 +550,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
       // Should fail required fields missing
-      $this->assertCount(1, $e->getErrorData()['validation']);
-      $this->assertEquals('Last Name has a max length of 20.', $e->getErrorData()['validation'][0]);
+      $this->assertEquals('Last Name has a max length of 20.', $e->getMessage());
     }
   }
 
@@ -585,8 +583,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
       // Should fail required fields missing
-      $this->assertCount(1, $e->getErrorData()['validation']);
-      $this->assertEquals('Email is a required field.', $e->getErrorData()['validation'][0]);
+      $this->assertEquals('Email is a required field.', $e->getMessage());
     }
 
   }

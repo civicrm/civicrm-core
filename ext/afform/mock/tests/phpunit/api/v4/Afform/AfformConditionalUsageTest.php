@@ -45,7 +45,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
     }
-    $this->assertStringContainsString('Validation Error', $e->getMessage());
+    $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
 
     // Conditional field shown: this will fail validation
     $submission = [
@@ -59,7 +59,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
     }
-    $this->assertStringContainsString('Validation Error', $e->getMessage());
+    $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
 
     // Conditional field hidden: this will pass validation
     $submission = [
@@ -119,7 +119,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
     }
-    $this->assertStringContainsString('Validation Error', $e->getMessage());
+    $this->assertStringContainsString('Email is a required field.', $e->getMessage());
 
     // Conditional field hidden: this will pass validation
     $submission = [

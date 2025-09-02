@@ -157,10 +157,22 @@ class ContactJoinTest extends Api4TestBase {
   }
 
   public function testUpdateDeletePrimaryAndBilling(): void {
+    $billingPhone = $this->createTestRecord('Phone', [
+      'phone' => '54321',
+    ]);
     $contact = $this->createTestRecord('Contact', [
       'phone_primary.phone' => '12345',
-      'phone_billing.phone' => '54321',
+      'phone_billing' => $billingPhone['id'],
     ]);
+    // Ensure billing phone was assigned to contact
+    $contactGet = Contact::get(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addSelect('phone_primary.phone', 'phone_billing.phone')
+      ->execute()->single();
+    $this->assertEquals('12345', $contactGet['phone_primary.phone']);
+    $this->assertEquals('54321', $contactGet['phone_billing.phone']);
+    $billingPhone = $this->getTestRecord('Phone', $billingPhone['id']);
+    $this->assertTrue($billingPhone['is_billing']);
     Contact::update(FALSE)
       ->addValue('id', $contact['id'])
       // Delete primary phone, update billing phone

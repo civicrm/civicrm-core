@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eeca511da0a9751434265fcfb6a7b487",
+    "content-hash": "269c5286f133d79ba6ca3523d9aaeef8",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2127,16 +2127,16 @@
         },
         {
             "name": "pear/db",
-            "version": "v1.12.1",
+            "version": "v1.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/DB.git",
-                "reference": "403775906ed8bb25505cefdee49885de181862da"
+                "reference": "f6cf9399683e1bdc408bdeeaf12fec2f78140896"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/DB/zipball/403775906ed8bb25505cefdee49885de181862da",
-                "reference": "403775906ed8bb25505cefdee49885de181862da",
+                "url": "https://api.github.com/repos/pear/DB/zipball/f6cf9399683e1bdc408bdeeaf12fec2f78140896",
+                "reference": "f6cf9399683e1bdc408bdeeaf12fec2f78140896",
                 "shasum": ""
             },
             "require": {
@@ -2187,7 +2187,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=DB",
                 "source": "https://github.com/pear/DB"
             },
-            "time": "2024-01-17T08:06:35+00:00"
+            "time": "2024-04-15T21:14:06+00:00"
         },
         {
             "name": "pear/log",
@@ -2704,20 +2704,20 @@
         },
         {
             "name": "phpoffice/phpspreadsheet",
-            "version": "1.29.9",
+            "version": "1.30.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-                "reference": "ffb47b639649fc9c8a6fa67977a27b756592ed85"
+                "reference": "2f39286e0136673778b7a142b3f0d141e43d1714"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/ffb47b639649fc9c8a6fa67977a27b756592ed85",
-                "reference": "ffb47b639649fc9c8a6fa67977a27b756592ed85",
+                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/2f39286e0136673778b7a142b3f0d141e43d1714",
+                "reference": "2f39286e0136673778b7a142b3f0d141e43d1714",
                 "shasum": ""
             },
             "require": {
-                "composer/pcre": "^3.3",
+                "composer/pcre": "^1||^2||^3",
                 "ext-ctype": "*",
                 "ext-dom": "*",
                 "ext-fileinfo": "*",
@@ -2804,9 +2804,9 @@
             ],
             "support": {
                 "issues": "https://github.com/PHPOffice/PhpSpreadsheet/issues",
-                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/1.29.9"
+                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/1.30.0"
             },
-            "time": "2025-01-26T04:55:00+00:00"
+            "time": "2025-08-10T06:28:02+00:00"
         },
         {
             "name": "phpoffice/phpword",
@@ -5959,7 +5959,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -5975,7 +5975,7 @@
         "ext-xml": "*",
         "composer-runtime-api": "~2.0"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "8.0.0"
     },

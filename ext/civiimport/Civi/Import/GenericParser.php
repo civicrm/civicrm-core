@@ -114,13 +114,13 @@ class GenericParser extends ImportParser {
       $entities['Contact'] = [
         'text' => ts('Contact Fields'),
         'unique_fields' => ['external_identifier', 'id'],
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => 'Individual',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',

@@ -64,7 +64,7 @@ class MembershipParser extends ImportParser {
     return [
       'Membership' => [
         'text' => ts('Membership Fields'),
-        'is_contact' => FALSE,
+        'entity_type' => 'Membership',
         'required_fields_update' => $this->getRequiredFieldsForMatch(),
         'required_fields_create' => $this->getRequiredFieldsForCreate(),
         'is_base_entity' => TRUE,
@@ -81,14 +81,14 @@ class MembershipParser extends ImportParser {
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => 'Individual',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',
@@ -176,7 +176,7 @@ class MembershipParser extends ImportParser {
         $existingMembership = $this->checkEntityExists('Membership', $membershipParams['id']);
         $membershipParams['contact_id'] = !empty($membershipParams['contact_id']) ? (int) $membershipParams['contact_id'] : $existingMembership['contact_id'];
       }
-      $membershipParams['contact_id'] = $this->getContactID($contactParams, $membershipParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      $membershipParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($contactParams, $membershipParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
       $membershipParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $membershipParams['contact_id'];
       $formatted = $formatValues = $membershipParams;
       // don't add to recent items, CRM-4399

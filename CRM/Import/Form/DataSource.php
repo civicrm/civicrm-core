@@ -283,6 +283,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
           $this->updateUserJobMetadata('template_id', $templateID);
           $this->updateUserJobMetadata('import_mappings', $this->getTemplateJob()['metadata']['import_mappings']);
           $this->updateUserJobMetadata('import_options', $this->getTemplateJob()['metadata']['import_options']);
+          $this->updateUserJobMetadata('bundled_actions', $this->getTemplateJob()['metadata']['bundled_actions']);
         }
         if ($submittedValues['use_existing_upload']) {
           // Use the already saved value.

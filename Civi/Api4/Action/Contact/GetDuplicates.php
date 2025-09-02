@@ -87,7 +87,7 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
     $this->formatDedupeParams($item, $dedupeParams);
 
     foreach (\CRM_Contact_BAO_Contact::findDuplicates($dedupeParams) as $id) {
-      $result[] = ['id' => $id];
+      $result[] = ['id' => (int) $id];
     }
   }
 

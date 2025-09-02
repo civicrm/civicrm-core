@@ -19,6 +19,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
   /**
    * Register profile scripts.
+   *
+   * @deprecated since 6.5 by dev/core#4349 and PR#33076 but still used by Contact Layout Summary Editor
    */
   public static function registerProfileScripts() {
     static $loaded = FALSE;
