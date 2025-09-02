@@ -86,7 +86,8 @@ class SpecFormatter {
       }
       $field->setSuffixes($suffixes);
     }
-    $field->setReadonly(!empty($data['readonly']));
+    // Primary keys are also considered readonly, since they cannot be changed
+    $field->setReadonly(!empty($data['readonly']) || !empty($data['primary_key']));
     if (isset($data['usage'])) {
       $field->setUsage($data['usage']);
     }
