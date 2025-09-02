@@ -5,6 +5,7 @@ namespace Civi\Api4\Generic\Traits;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
+use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\Query\SqlField;
@@ -145,17 +146,18 @@ trait SavedSearchInspectorTrait {
   /**
    * Returns a Query object for the search entity, or FALSE if it doesn't have a DAO
    *
-   * @return \Civi\Api4\Query\Api4SelectQuery|bool
+   * @return \Civi\Api4\Query\Api4SelectQuery|null
    */
-  private function getQuery() {
+  private function getQuery():? Api4SelectQuery {
     if (!isset($this->_selectQuery) && !empty($this->savedSearch['api_entity'])) {
       if (!CoreUtil::isType($this->savedSearch['api_entity'], 'DAOEntity')) {
-        return $this->_selectQuery = FALSE;
+        $this->_selectQuery = FALSE;
+        return NULL;
       }
       $api = Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params']);
-      $this->_selectQuery = new \Civi\Api4\Query\Api4SelectQuery($api);
+      $this->_selectQuery = new Api4SelectQuery($api);
     }
-    return $this->_selectQuery;
+    return $this->_selectQuery ?: NULL;
   }
 
   /**
@@ -302,16 +304,27 @@ trait SavedSearchInspectorTrait {
     $filterClauses = [];
 
     foreach ($fieldNames as $fieldName) {
-      $field = $this->getField($fieldName);
-      $dataType = $field['data_type'] ?? NULL;
-      $operators = array_values($field['operators'] ?? []) ?: CoreUtil::getOperators();
+      // If the filter is an alias, it needs to be fetched from the select clause
+      $selectExpr = $this->getSelectExpression($fieldName);
+      // Else parse the expression directly
+      $expr = $selectExpr['expr'] ?? SqlExpression::convert($fieldName);
+      $dataType = $expr->getRenderedDataType($this->getQuery());
+      $operators = CoreUtil::getOperators();
+      if (is_a($expr, SqlField::class)) {
+        $field = $this->getField($fieldName);
+        $operators = array_values($field['operators'] ?? []) ?: CoreUtil::getOperators();
+        $options = $field['options'] ?? NULL;
+      }
+      elseif (is_a($expr, SqlFunction::class)) {
+        $options = $expr->getOptions();
+      }
       // Array is either associative `OP => VAL` or sequential `IN (...)`
       if (is_array($value)) {
         $value = array_filter($value, [$this, 'hasValue']);
         // If array does not contain operators as keys, assume array of values
         if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
           // Use IN for regular fields
-          if (empty($field['serialize'])) {
+          if ($dataType !== 'Array') {
             $op = in_array('IN', $operators, TRUE) ? 'IN' : $operators[0];
             $filterClauses[] = [$fieldName, $op, $value, FALSE];
           }
@@ -339,10 +352,10 @@ trait SavedSearchInspectorTrait {
           }
         }
       }
-      elseif (!empty($field['serialize']) && in_array('CONTAINS', $operators, TRUE)) {
+      elseif ($dataType === 'Array' && in_array('CONTAINS', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'CONTAINS', $value, FALSE];
       }
-      elseif ((!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) && in_array('=', $operators, TRUE)) {
+      elseif ((!empty($options) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) && in_array('=', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, '=', $value, FALSE];
       }
       elseif ($prefixWithWildcard && in_array('CONTAINS', $operators, TRUE)) {
