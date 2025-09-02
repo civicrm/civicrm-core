@@ -550,7 +550,9 @@ class CRM_Core_BAO_CustomValueTable {
           ));
         }
 
+        $entity = CRM_Core_BAO_CustomGroup::getEntityFromExtends($fieldInfo['custom_group']['extends']);
         $cvParam = [
+          'entity_table' => CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity),
           'entity_id' => $params['entityID'],
           'value' => $fieldValue['value'],
           'type' => $dataType,
