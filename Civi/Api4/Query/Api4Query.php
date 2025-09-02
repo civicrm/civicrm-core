@@ -64,6 +64,8 @@ abstract class Api4Query {
     $this->api = $api;
   }
 
+  abstract public function getField(string $expr):? array;
+
   /**
    * Builds main final sql statement after initialization.
    *
@@ -328,7 +330,7 @@ abstract class Api4Query {
           $expr = $this->getExpression($this->selectAliases[$fieldAlias], ['SqlFunction']);
           $fauxField = [
             'name' => NULL,
-            'data_type' => $expr->getRenderedDataType($this->apiFieldSpec),
+            'data_type' => $expr->getRenderedDataType($this),
           ];
           FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
         }

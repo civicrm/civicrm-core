@@ -3143,4 +3143,73 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
+  public function testRunWithBooleanFunctionFilters(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $cids = $this->saveTestRecords('Individual', [
+      'records' => [
+        [],
+        [],
+        ['phone_primary.phone' => '1234567890'],
+        ['phone_primary.phone' => '2345678900'],
+      ],
+      'defaults' => ['last_name' => $lastName],
+    ])->column('id');
+
+    $params = [
+      'display' => NULL,
+      'savedSearch' => [
+        'api_entity' => 'Individual',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'last_name',
+            'Contact_Phone_contact_id_01.phone',
+            'ISNOTNULL(Contact_Phone_contact_id_01.id) AS notnull',
+          ],
+          'where' => [],
+          'groupBy' => [],
+          'join' => [
+            [
+              'Phone AS Contact_Phone_contact_id_01',
+              'LEFT',
+              [
+                'id',
+                '=',
+                'Contact_Phone_contact_id_01.contact_id',
+              ],
+              [
+                'Contact_Phone_contact_id_01.is_primary',
+                '=',
+                TRUE,
+              ],
+            ],
+          ],
+          'having' => [],
+        ],
+      ],
+      'sort' => [
+        ['id', 'ASC'],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params + [
+      'filters' => ['last_name' => $lastName],
+    ]);
+    $this->assertCount(4, $result);
+    $this->assertEquals($cids, $result->column('key'));
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params + [
+      'filters' => ['last_name' => $lastName, 'notnull' => TRUE],
+    ]);
+    $this->assertCount(2, $result);
+    $this->assertEquals([$cids[2], $cids[3]], $result->column('key'));
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params + [
+      'filters' => ['last_name' => $lastName, 'notnull' => FALSE],
+    ]);
+    $this->assertCount(2, $result);
+    $this->assertEquals([$cids[0], $cids[1]], $result->column('key'));
+  }
+
 }
