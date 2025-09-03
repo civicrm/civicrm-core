@@ -29,6 +29,8 @@ class CRM_OAuth_Hook {
    *         - clientCredential: Permissions required to add token with client-credential flow
    *         Permissions will be checked via CRM_Core_Permission::check(). They may be strings or arrays.
    *         NOTE: For more info about supported actions+permissions, review Civi\Api4\OAuthClient::permissions().
+   *     - templates: array, list of templates that can be filled-in whenever a token is generated. Keyed by template-name.
+   *         - PaymentProcessor: List of properties to set on `PaymentProcessor` (civicrm_payment_processor) after receiving a token
    */
   public static function oauthProviders(array &$providers): void {
     $event = GenericHookEvent::create([
