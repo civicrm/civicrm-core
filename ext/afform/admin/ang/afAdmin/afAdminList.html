@@ -39,7 +39,7 @@
 
   <table class="table table-striped">
     <thead>
-    <tr>
+    <tr class="nowrap">
       <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('title')">
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'title'"></i>
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'title'"></i>
