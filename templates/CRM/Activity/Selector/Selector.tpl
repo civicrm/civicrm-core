@@ -87,4 +87,4 @@
     {/foreach}
   </style>
 </div>
-{include file="CRM/Case/Form/ActivityToCase.tpl" contactID=$contactId}
+{include file="CRM/Case/Form/ActivityToCase.tpl" contactID=$contactId buildCaseActivityForm=false}

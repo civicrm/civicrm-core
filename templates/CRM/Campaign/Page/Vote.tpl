@@ -15,7 +15,7 @@
    {* build the ajax search and voters reserve interface here *}
    {include file='CRM/Campaign/Form/Gotv.tpl'}
 {elseif $tabHeader}
-  {include file="CRM/common/TabHeader.tpl"}
+  {include file="CRM/common/TabHeader.tpl" containerClasses="" listClasses=""}
   <script type="text/javascript">
     {* very crude refresh of tabs - fixme: use datatable native refresh method *}
     {literal}
