@@ -27,6 +27,8 @@ use Civi\OAuth\OAuthException;
  * @method string getLandingUrl()
  * @method $this setPrompt(string $prompt)
  * @method string getPrompt()
+ * @method $this setTtl(int $ttl)
+ * @method int getTtl()
  *
  * @link https://tools.ietf.org/html/rfc6749#section-4.1
  */
@@ -52,6 +54,14 @@ class AuthorizationCode extends AbstractGrantAction {
   protected $prompt = NULL;
 
   /**
+   * How long we will wait for the user return. After this time, the stored "state" is lost.
+   *
+   * @var int
+   *  Duration, in seconds
+   */
+  protected $ttl = 3600;
+
+  /**
    * Tee-up the authorization request.
    *
    * @param \Civi\Api4\Generic\Result $result
@@ -68,7 +78,8 @@ class AuthorizationCode extends AbstractGrantAction {
     $scopes = $this->getScopes() ?: $this->callProtected($provider, 'getDefaultScopes');
 
     $stateId = \CRM_OAuth_Page_Return::storeState([
-      'time' => \CRM_Utils_Time::getTimeRaw(),
+      'time' => \CRM_Utils_Time::time(),
+      'ttl' => $this->getTtl(),
       'clientId' => $this->getClientDef()['id'],
       'landingUrl' => $this->getLandingUrl(),
       'storage' => $this->getStorage(),

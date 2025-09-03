@@ -3,7 +3,7 @@ use CRM_OAuth_ExtensionUtil as E;
 
 class CRM_OAuth_Page_Return extends CRM_Core_Page {
 
-  const TTL = 3600;
+  const LEGACY_TTL = 3600;
 
   public function run() {
     $json = function ($d) {
@@ -79,7 +79,8 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
     if (PHP_SAPI === 'cli') {
       // CLI doesn't have a real session, so we can't defend as deeply. However,
       // it's also quite uncommon to run authorizationCode in CLI.
-      \Civi::cache('session')->set('OAuthStates_' . $stateId, $stateData, self::TTL);
+      $ttl = $stateData['ttl'] ?? self::LEGACY_TTL;
+      \Civi::cache('session')->set('OAuthStates_' . $stateId, $stateData, $ttl);
       return 'c_' . $stateId;
     }
     else {
@@ -113,7 +114,8 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
         throw new \Civi\OAuth\OAuthException("OAuth: Received invalid or expired state");
     }
 
-    if (!isset($state['time']) || $state['time'] + self::TTL < CRM_Utils_Time::getTimeRaw()) {
+    $ttl = $state['ttl'] ?? self::LEGACY_TTL;
+    if (!isset($state['time']) || $state['time'] + $ttl < CRM_Utils_Time::time()) {
       throw new \Civi\OAuth\OAuthException("OAuth: Received invalid or expired state");
     }
 
