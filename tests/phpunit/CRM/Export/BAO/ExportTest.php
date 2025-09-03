@@ -717,7 +717,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportCustomData(): void {
     $this->setUpContactExportData();
-    $this->createCustomGroupWithFieldsOfAllTypes();
+    $this->createCustomGroupWithFieldsOfAllTypes([], ['select_string' => ['text_length' => '100'], ['checkbox' => ['text_length' => 10]]]);
     $longString = 'Blah';
     for ($i = 0; $i < 70; $i++) {
       $longString .= 'Blah';
