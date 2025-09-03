@@ -2,6 +2,8 @@
 
 namespace Civi\OAuth;
 
+use Civi\Api4\OAuthClient;
+use Civi\Api4\OAuthProvider;
 use CRM_OAuth_ExtensionUtil as E;
 use Civi\Core\Service\AutoService;
 
@@ -21,6 +23,37 @@ use Civi\Core\Service\AutoService;
  * @service oauth_client.templates
  */
 class OAuthTemplates extends AutoService {
+
+  /**
+   * Determine which (if any) template is available for a given client.
+   *
+   * TODO: Support contact and mail-settings. Migrate 'contactTemplate' and 'mailSettingsTemplate' to generic 'templates'.
+   *
+   * @param int $clientId
+   *   Local ID of the OAuthClient
+   * @param string $template
+   *   Symbolic name of the template.
+   * @return array|null
+   */
+  public function getByClientId(int $clientId, string $template): ?array {
+    $client = OAuthClient::get(FALSE)
+      ->addWhere('id', '=', $clientId)
+      ->addSelect('provider')
+      ->execute()->first();
+    if (!$client) {
+      return NULL;
+    }
+
+    $provider = OAuthProvider::get(FALSE)
+      ->addWhere('name', '=', $client['provider'])
+      ->addSelect('templates')
+      ->execute()->first();
+    if (!$provider) {
+      return NULL;
+    }
+
+    return $provider['templates'][$template] ?? NULL;
+  }
 
   /**
    * Evaluate an array and interpolating bits of data.
