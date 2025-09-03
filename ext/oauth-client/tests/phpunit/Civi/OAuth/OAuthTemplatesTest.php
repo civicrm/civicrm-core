@@ -1,5 +1,7 @@
 <?php
 
+namespace Civi\OAuth;
+
 use CRM_OAuth_ExtensionUtil as E;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
@@ -10,7 +12,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class CRM_OAuth_MailSetupTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
+class OAuthTemplatesTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
 
   public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
@@ -77,7 +79,9 @@ class CRM_OAuth_MailSetupTest extends \PHPUnit\Framework\TestCase implements Hea
       'password' => '',
       'is_ssl' => TRUE,
     ];
-    $actual = \CRM_OAuth_MailSetup::evalArrayTemplate($vars['provider']['mailSettingsTemplate'], $vars);
+
+    $instance = \Civi::service('oauth_client.templates');
+    $actual = $instance->evaluate($vars['provider']['mailSettingsTemplate'], $vars);
     $this->assertEquals($expected, $actual);
     $this->assertTrue($actual['localpart'] === NULL);
   }
