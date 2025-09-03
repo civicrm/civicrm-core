@@ -514,6 +514,6 @@ dl dl {
 @media (max-width: 991px) {
   .crm-container .crm-flex-box,
   .api4-input /* sections/api4-explorer */ {
-    flex-direction: column;
+    flex-flow: column;
   }
 }
