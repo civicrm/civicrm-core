@@ -176,7 +176,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
             $label = $customField['label'];
 
             // before/after values from form
-            $oldValue = $this->_defaults[$fieldKey] ?? '';
+            $oldValue = $this->_defaults[$fieldKey] ?? NULL;
             $newValue = $newCustomValue;
 
             // Convert dropdown and other machine values to human labels.
