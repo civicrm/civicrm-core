@@ -57,6 +57,14 @@ class CRM_OAuth_MailSetup {
   }
 
   /**
+   * @deprecated
+   * @see Civi\OAuth\OAuthTemplates::evaluate()
+   */
+  public static function evalArrayTemplate($template, $vars) {
+    return Civi::service('oauth_client.templates')->evaluate($template, $vars);
+  }
+
+  /**
    * When the user returns with a token, we add a new record to
    * civicrm_mail_settings with defaults and redirect to the edit screen.
    *
@@ -95,52 +103,6 @@ class CRM_OAuth_MailSetup {
       'id' => $mailSettings['id'],
       'reset' => 1,
     ], TRUE, NULL, FALSE);
-  }
-
-  /**
-   * @param array $template
-   *   List of key-value expressions.
-   *   Ex: ['name' => '{{person.first}} {{person.last}}']
-   *   Expressions begin with the dotted-name of a variable.
-   *   Optionally, the value may be piped through other functions
-   * @param array $vars
-   *   Array tree of data to interpolate.
-   * @return array
-   *   The template array, with '{{...}}' expressions evaluated.
-   */
-  public static function evalArrayTemplate($template, $vars) {
-    $filters = [
-      'getMailDomain' => function($v) {
-        $parts = explode('@', $v);
-        return $parts[1] ?? NULL;
-      },
-      'getMailUser' => function($v) {
-        $parts = explode('@', $v);
-        return $parts[0] ?? NULL;
-      },
-    ];
-
-    $lookupVars = function($m) use ($vars, $filters) {
-      $parts = explode('|', $m[1]);
-      $value = (string) CRM_Utils_Array::pathGet($vars, explode('.', array_shift($parts)));
-      foreach ($parts as $part) {
-        if (isset($filters[$part])) {
-          $value = $filters[$part]($value);
-        }
-        else {
-          $value = NULL;
-        }
-      }
-      return $value;
-    };
-
-    $values = [];
-    foreach ($template as $key => $value) {
-      $values[$key] = is_string($value)
-        ? preg_replace_callback(';{{([a-zA-Z0-9_\.\|]+)}};', $lookupVars, $value)
-        : $value;
-    }
-    return $values;
   }
 
   /**
