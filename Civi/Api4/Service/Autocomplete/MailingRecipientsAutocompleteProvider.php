@@ -54,13 +54,13 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
     $mode = explode('_', $e->fieldName)[1];
     $e->savedSearch['api_params'] = [
       'version' => 4,
-      'select' => ['key', 'label', 'description', 'type', 'icon', 'date', '(is_hidden = 1) AS locked'],
+      'select' => ['key', 'value', 'description', 'type', 'icon', 'date', '(is_hidden = 1) AS locked'],
       'sets' => [
         [
           'UNION ALL', 'Group', 'get', [
             'select' => [
               'CONCAT("groups_", id) AS key',
-              'IF(is_hidden, "' . ts('Search Results') . '", title) AS label',
+              'IF(is_hidden, "' . ts('Search Results') . '", title) AS value',
               'description',
               '"group" AS entity',
               'NULL AS type',
@@ -131,7 +131,7 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
     $e->display['settings'] = [
       'sort' => [
         ['entity', 'ASC'],
-        ['label', 'ASC'],
+        ['value', 'ASC'],
       ],
       'keyField' => 'key',
       'extra' => [
@@ -140,7 +140,7 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
       'columns' => [
         [
           'type' => 'field',
-          'key' => 'label',
+          'key' => 'value',
           'empty_value' => '(' . ts('no name') . ')',
           'icons' => [
             [
