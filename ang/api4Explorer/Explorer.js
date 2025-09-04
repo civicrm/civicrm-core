@@ -5,8 +5,6 @@
   const schema = CRM.vars.api4.schema;
   // Cache list of entities
   const entities = [];
-  // Cache list of actions
-  let actions = [];
   // Field options
   const fieldOptions = {};
   // Api params
@@ -24,7 +22,7 @@
     const ts = $scope.ts = CRM.ts();
     const ctrl = $scope.$ctrl = this;
     $scope.entities = entities;
-    $scope.actions = actions;
+    $scope.actions = [];
     $scope.fields = [];
     $scope.havingOptions = [];
     $scope.fieldsAndJoins = [];
@@ -160,15 +158,20 @@
 
     // Replaces contents of fieldList array with current fields formatted for select2
     function getFieldList(fieldList, action, addPseudoconstant, addWriteJoins) {
-      let fieldInfo = _.cloneDeep(_.findWhere(getEntity().actions, {name: action}).fields);
       fieldList.length = 0;
-      if (addPseudoconstant) {
-        addPseudoconstants(fieldInfo);
+      const entityInfo = getEntity();
+      const actionInfo = _.findWhere(entityInfo.actions, {name: action});
+      // Avoid crash before metadata has been fetched
+      if (actionInfo) {
+        const fieldInfo = _.cloneDeep(actionInfo.fields);
+        if (addPseudoconstant) {
+          addPseudoconstants(fieldInfo);
+        }
+        if (addWriteJoins) {
+          addWriteJoinFields(fieldInfo);
+        }
+        formatForSelect2(fieldInfo, fieldList, 'name', ['description', 'required', 'default_value']);
       }
-      if (addWriteJoins) {
-        addWriteJoinFields(fieldInfo);
-      }
-      formatForSelect2(fieldInfo, fieldList, 'name', ['description', 'required', 'default_value']);
     }
 
     // Note: this function expects fieldList to be select2-formatted already
@@ -481,7 +484,7 @@
     }
 
     this.buildFieldList = function() {
-      const actionInfo = _.findWhere(actions, {id: $scope.action});
+      const actionInfo = _.findWhere($scope.actions, {id: $scope.action});
       getFieldList($scope.fields, $scope.action);
       getFieldList($scope.fieldsAndJoins, $scope.action, true);
       getFieldList($scope.fieldsAndJoinsAndFunctions, $scope.action);
@@ -524,11 +527,10 @@
 
     function selectAction() {
       $scope.action = $routeParams.api4action;
-      if (!actions.length) {
-        formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params', 'deprecated']);
-      }
+      $scope.actions.length = 0;
+      formatForSelect2(getEntity().actions, $scope.actions, 'name', ['description', 'params', 'deprecated']);
       if ($scope.action) {
-        const actionInfo = _.findWhere(actions, {id: $scope.action});
+        const actionInfo = _.findWhere($scope.actions, {id: $scope.action});
         _.each(actionInfo.params, function (param, name) {
           let format,
             defaultVal = _.cloneDeep(param.default);
@@ -1105,7 +1107,7 @@
 
     if (!$scope.entity) {
       setHelp(ts('APIv4 Explorer'), {description: docs.description, comment: docs.comment, see: docs.see});
-    } else if (!actions.length && !getEntity().actions) {
+    } else if (!getEntity().actions) {
       fetchMeta();
     } else {
       selectAction();
@@ -1118,8 +1120,6 @@
     // Update route when changing entity
     $scope.$watch('entity', function(newVal, oldVal) {
       if (oldVal !== newVal) {
-        // Flush actions cache to re-fetch for new entity
-        actions = [];
         $location.url('/explorer/' + newVal);
       }
     });
