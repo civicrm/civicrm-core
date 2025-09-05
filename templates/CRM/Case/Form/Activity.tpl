@@ -96,7 +96,7 @@
                 <tr class="crm-case-activity-form-block-assignee_contact_id">
                   <td class="label">
                     {$form.assignee_contact_id.label}
-                    {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label file="CRM/Activity/Form/Activity"}{/edit}
+                    {edit}{help id="assignee_contact_id" file="CRM/Activity/Form/Activity"}{/edit}
                   </td>
                   <td>{$form.assignee_contact_id.html}
                     {if $activityAssigneeNotification}
