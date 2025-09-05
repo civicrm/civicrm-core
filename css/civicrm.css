@@ -3393,6 +3393,7 @@ span.crm-select-item-color {
 .crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
 input.crm-form-checkbox) + label {
   margin-left: 0;
+  white-space: initial;
 }
 .crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
   display: grid;
