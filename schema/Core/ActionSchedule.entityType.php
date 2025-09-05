@@ -119,7 +119,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('Start Action Offset'),
       ],
     ],
@@ -194,7 +194,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('Repetition Frequency Interval'),
       ],
     ],
@@ -220,7 +220,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('End Frequency Interval'),
       ],
     ],
