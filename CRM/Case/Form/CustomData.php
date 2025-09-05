@@ -176,7 +176,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
             $label = $customField['label'];
 
             // before/after values from form
-            $oldValue = $this->_defaults[$fieldKey] ?? NULL;
+            $oldValue = $this->_defaults[$fieldKey] ?? '';
             $newValue = $newCustomValue;
 
             // Convert dropdown and other machine values to human labels.
@@ -194,7 +194,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     return implode('<br/>', $formattedDetails);
   }
 
-  private function formatDisplayValue(mixed $value, int $customFieldId, string $customFieldDataType): string {
+  private function formatDisplayValue(mixed $value, int $customFieldId, string $customFieldDataType): string|null {
     switch ($customFieldDataType) {
       case 'Money':
         // Money is special for non-US locales because at this point it's in human format so we don't try
