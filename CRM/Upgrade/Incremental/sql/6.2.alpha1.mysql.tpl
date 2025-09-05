@@ -37,7 +37,7 @@ UPDATE civicrm_address
 SET state_province_id = @nordjylland
 WHERE state_province_id IN (
 SELECT id FROM civicrm_state_province
-WHERE name IN ('North Jutland', 'Ribe')
+WHERE name IN ('North Jutland')
 AND country_id = @country_id
 );
 
@@ -53,7 +53,7 @@ UPDATE civicrm_address
 SET state_province_id = @syddanmark
 WHERE state_province_id IN (
 SELECT id FROM civicrm_state_province
-WHERE name IN ('Fyn', 'South Jutland', 'Vejle')
+WHERE name IN ('Fyn', 'Ribe', 'South Jutland', 'Vejle')
 AND country_id = @country_id
 );
 
