@@ -36,18 +36,17 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       'frontend_title' => ['name' => 'frontend_title', 'required' => TRUE],
       'description' => [
         'name' => 'description',
-        'help' => ['id' => 'id-description', 'file' => 'CRM/UF/Form/Group.hlp'],
+        'help' => ['id' => 'id-description'],
       ],
       'uf_group_type' => [
         'name' => 'uf_group_type',
         'not-auto-addable' => TRUE,
-        'help' => ['id' => 'id-used_for', 'file' => 'CRM/UF/Form/Group.hlp'],
+        'help' => ['id' => 'id-used_for'],
       ],
       'cancel_button_text' => [
         'name' => 'cancel_button_text',
         'help' => [
           'id' => 'id-cancel_button_text',
-          'file' => 'CRM/UF/Form/Group.hlp',
         ],
         'class' => 'cancel_button_section',
       ],
@@ -55,7 +54,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         'name' => 'submit_button_text',
         'help' => [
           'id' => 'id-submit_button_text',
-          'file' => 'CRM/UF/Form/Group.hlp',
         ],
         'class' => '',
       ],
