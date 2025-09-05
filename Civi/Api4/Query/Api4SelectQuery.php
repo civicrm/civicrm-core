@@ -394,11 +394,11 @@ class Api4SelectQuery extends Api4Query {
    * @param bool $strict
    *   In strict mode, this will throw an exception if the field doesn't exist
    *
-   * @return array|bool|null
+   * @return array|null
    * @throws \CRM_Core_Exception
    * @throws UnauthorizedException
    */
-  public function getField($expr, $strict = FALSE) {
+  public function getField(string $expr, bool $strict = FALSE):? array {
     // If the expression contains a pseudoconstant filter like activity_type_id:label,
     // strip it to look up the base field name, then add the field:filter key to apiFieldSpec
     $col = strpos($expr, ':');
@@ -420,7 +420,7 @@ class Api4SelectQuery extends Api4Query {
     if ($field) {
       $this->apiFieldSpec[$expr] = $field;
     }
-    return $field;
+    return $field ?: NULL;
   }
 
   public function getFieldSibling(array $field, string $siblingFieldName) {
