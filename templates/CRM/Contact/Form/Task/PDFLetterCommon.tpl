@@ -13,7 +13,7 @@
     <tr>
       <td class="label-left">
         {$form.template.label}
-        {help id="template" title=$form.template.label file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
+        {help id="template" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
       </td>
       <td>
         {$form.template.html} {ts}OR{/ts} {$form.document_file.html}

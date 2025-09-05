@@ -69,7 +69,7 @@
   <tr class="crm-activity-form-block-assignee_contact_id">
       <td class="label">
         {$form.assignee_contact_id.label}
-        {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label}{/edit}
+        {edit}{help id="assignee_contact_id"}{/edit}
       </td>
       <td>
         {$form.assignee_contact_id.html}
