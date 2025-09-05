@@ -64,10 +64,6 @@ class CryptoJwt extends AutoService {
   public function decode($token, $keyTag = 'SIGN') {
     // TODO: Circa mid-2024, make a hard-requirement on firebase/php-jwt v5.5+.
     // Then we can remove this guard and simplify the `$keysByAlg` stuff.
-    $useKeyObj = class_exists(Key::class);
-    if (!$useKeyObj) {
-      \CRM_Core_Error::deprecatedWarning('Using deprecated version of firebase/php-jwt. Upgrade to 6.x+.');
-    }
     $keyRows = $this->getRegistry()->findKeysByTag($keyTag);
 
     // We want to call JWT::decode(), but there's a slight mismatch -- the
@@ -82,13 +78,13 @@ class CryptoJwt extends AutoService {
     foreach ($keyRows as $key) {
       if ($alg = $this->suiteToAlg($key['suite'])) {
         // Currently, registry only has symmetric keys in $key['key']. For public key-pairs, might need to change.
-        $keysByAlg[$alg][$key['id']] = ($useKeyObj ? new Key($key['key'], $alg) : $key['key']);
+        $keysByAlg[$alg][$key['id']] = new Key($key['key'], $alg);
       }
     }
 
     foreach ($keysByAlg as $alg => $keys) {
       try {
-        return ($useKeyObj ? (array) JWT::decode($token, $keys) : (array) JWT::decode($token, $keys, [$alg]));
+        return (array) JWT::decode($token, $keys);
       }
       catch (\UnexpectedValueException $e) {
         // Depending on the error, we might able to try other algos
