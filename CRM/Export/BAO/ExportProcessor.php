@@ -1442,6 +1442,12 @@ class CRM_Export_BAO_ExportProcessor {
     // tests will fail on the enotices until they all are & then all the 'else'
     // below can go.
     $fieldSpec = $queryFields[$columnName] ?? [];
+    if (empty($fieldSpec['html_type']) && !empty($fieldSpec['html'])) {
+      $fieldSpec['html_type'] = $fieldSpec['html']['type'];
+    }
+    elseif (empty($fieldSpec['html_type'])) {
+      $fieldSpec['html_type'] = '';
+    }
     $type = $fieldSpec['type'] ?? ($fieldSpec['data_type'] ?? '');
     // set the sql columns
     if ($type) {
@@ -1456,6 +1462,11 @@ class CRM_Export_BAO_ExportProcessor {
           return "`$fieldName` varchar(64)";
 
         case CRM_Utils_Type::T_STRING:
+          // dev/issue#6073 : The exported comma-separated checkbox labels sometimes exceed the maximum length set for the field.
+          //To accommodate this, we are increasing the column type to TEXT.
+          if (CRM_Core_BAO_CustomField::isSerialized($fieldSpec)) {
+            return "`$fieldName` text";
+          }
           if (isset($fieldSpec['maxlength'])) {
             return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
