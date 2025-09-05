@@ -140,9 +140,14 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    $('#financial_type_id').change( function() {
-      CRM.buildCustomData('ContributionPage', $('#financial_type_id').val(), false, false, false, false, false, false);
+    const $form = $('form.{/literal}{$form.formClass}{literal}');
+    $('#financial_type_id', $form).change(function() {
+      CRM.buildCustomData('ContributionPage', $(this).val(), false, false, false, false, false, false);
     });
+    const $elements = $('input[name=frontend_title], input[name=title]', $form);
+    if ($elements.length === 2) {
+      CRM.utils.syncFields($elements.first(), $elements.last());
+    }
   });
 </script>
 {/literal}

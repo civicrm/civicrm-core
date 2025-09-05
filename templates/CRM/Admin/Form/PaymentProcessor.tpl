@@ -147,13 +147,18 @@
   <script type="text/javascript">
   {literal}
     CRM.$(function($) {
-      $('#payment_processor_type_id').change(function() {
+      const $form = $('form.{/literal}{$form.formClass}{literal}');
+      $('#payment_processor_type_id', $form).change(function() {
         var url = {/literal}"{$refreshURL}"{literal} + "&pp=" + $(this).val();
-        $(this).closest('form').attr('data-warn-changes', 'false')
+        $form.attr('data-warn-changes', 'false')
           // Ajax refresh (works in a popup or full-screen)
           .closest('.crm-ajax-container, #crm-main-content-wrapper')
           .crmSnippet({url: url}).crmSnippet('refresh');
       });
+      const $elements = $('input[name=frontend_title], input[name=title]', $form);
+      if ($elements.length === 2) {
+        CRM.utils.syncFields($elements.first(), $elements.last());
+      }
     });
   {/literal}
   </script>
