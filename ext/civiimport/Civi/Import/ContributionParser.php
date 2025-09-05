@@ -398,6 +398,7 @@ class ContributionParser extends ImportParser {
                 'trxn_id' => $contribution['trxn_id'],
                 'currency' => $contribution['currency'],
               ])
+              ->setNotificationForCompleteOrder(FALSE)
               ->execute();
           }
           elseif ($contributionStatus !== 'Pending') {
