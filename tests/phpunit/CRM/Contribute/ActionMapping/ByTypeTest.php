@@ -442,7 +442,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
         'source' => 'Contribution Source',
         'amount_level' => 'Amount Label',
         'contribution_recur_id' => 'Recurring Contribution ID',
-        'is_test:label' => 'Test',
+        'is_test:label' => 'Test Mode',
         'is_pay_later:label' => 'Is Pay Later',
         'contribution_status_id:label' => 'Contribution Status',
         'address_id' => 'Address ID',

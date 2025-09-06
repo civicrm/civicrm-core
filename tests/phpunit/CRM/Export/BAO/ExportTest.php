@@ -2391,7 +2391,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       98 => 'Currency',
       99 => 'Cancellation / Refund Reason',
       100 => 'Receipt Date',
-      101 => 'Test',
+      101 => 'Test Mode',
       102 => 'Is Pay Later',
       103 => 'Contribution Status',
       104 => 'Recurring Contribution ID',
