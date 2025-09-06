@@ -155,6 +155,10 @@ class CRM_Core_Block {
           'region' => $config->userSystem->getDefaultBlockLocation(),
         ],
       ];
+      // This block requires the legacycustomsearches extension
+      if (!self::checkExtensionEnabled('legacycustomsearches')) {
+        unset(self::$_properties[self::FULLTEXT_SEARCH]);
+      }
 
       ksort(self::$_properties);
     }
@@ -537,6 +541,10 @@ class CRM_Core_Block {
         return NULL;
       }
     }
+    // This block requires the legacycustomsearches extension
+    if ($id == self::FULLTEXT_SEARCH && !self::checkExtensionEnabled('legacycustomsearches')) {
+      return NULL;
+    }
 
     self::setTemplateValues($id);
 
@@ -587,6 +595,15 @@ class CRM_Core_Block {
     }
 
     return $template->fetch('CRM/Block/' . $fileName);
+  }
+
+  private static function checkExtensionEnabled(string $key): bool {
+    $extension = \Civi\Api4\Extension::get(FALSE)
+      ->addWhere('key', '=', $key)
+      ->addWhere('status', '=', 'installed')
+      ->selectRowCount()
+      ->execute();
+    return (bool) $extension->count();
   }
 
 }
