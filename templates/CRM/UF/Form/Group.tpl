@@ -58,3 +58,14 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {include file="CRM/common/showHide.tpl"}
+{literal}
+<script type="text/javascript">
+  CRM.$(function($) {
+    const $form = $('form.{/literal}{$form.formClass}{literal}');
+    const $elements = $('input[name=frontend_title], input[name=title]', $form);
+    if ($elements.length === 2) {
+      CRM.utils.syncFields($elements.first(), $elements.last());
+    }
+  });
+</script>
+{/literal}

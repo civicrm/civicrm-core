@@ -112,6 +112,14 @@
     cj('input[type=checkbox][name="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     cj('label[for="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     {/literal}{/if}{literal}
+
+    CRM.$(function($) {
+      const $form = $('form.{/literal}{$form.formClass}{literal}');
+      const $elements = $('input[name=frontend_title], input[name=title]', $form);
+      if ($elements.length === 2) {
+        CRM.utils.syncFields($elements.first(), $elements.last());
+      }
+    });
   </script>
   {/literal}
 </div>

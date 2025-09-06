@@ -2002,6 +2002,31 @@ if (!CRM.vars) CRM.vars = {};
     return len ? name.substring(0, len) : name;
   };
 
+  CRM.utils.syncFields = function (sourceSelector, targetSelector) {
+    // Ensure selectors are valid
+    const $source = $(sourceSelector);
+    const $target = $(targetSelector);
+
+    if (!$source.length || !$target.length) {
+      console.warn('CRM.syncFields - one or both selectors not found:', sourceSelector, targetSelector);
+      return;
+    }
+
+    // Initialize the last known value
+    $source.data('lastValue', $source.val());
+
+    $source.on('input', function() {
+      const sourceValue = $(this).val();
+      const targetValue = $target.val();
+
+      // Only update target if it currently matches source's previous value
+      if ($source.data('lastValue') === targetValue) {
+        $target.val(sourceValue);
+      }
+      $source.data('lastValue', sourceValue);
+    });
+  };
+
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
   $.ajaxPrefilter(function(s) {
     if (s.crossDomain) {
