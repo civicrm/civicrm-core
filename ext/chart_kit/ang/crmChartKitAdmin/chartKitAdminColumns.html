@@ -11,7 +11,7 @@
           {{:: ts('Field') }} <span class="crm-marker">*</span>
         </label>
 
-        <select name="chart-kit-field-column-{{:: col.index }}" required crm-ui-select class="form-control huge"
+        <select name="chart-kit-field-column-{{:: col.index }}" class="form-control huge" crm-ui-select required
           ng-model="$ctrl.display.settings.columns[col.index].key"
           ng-change="$ctrl.onColumnSearchColumnChange(col.index)">
           <option ng-repeat="colOption in $ctrl.getColumnConfigOptionDetails(col, 'searchColumn')"
@@ -30,8 +30,8 @@
         <label>
           {{:: ts('Color') }}
         </label>
-        <input ng-if="axis.colorType === 'one-per-column'" type="color"
-          ng-model="$ctrl.display.settings.columns[col.index].color" class="form-control" />
+        <input type="color" class="form-control" ng-if="axis.colorType === 'one-per-column'"
+          ng-model="$ctrl.display.settings.columns[col.index].color" />
       </div>
       <div class="form-inline crm-chart-kit-column-series-type"
         ng-if="$ctrl.getColumnConfigOptionDetails(col, 'seriesType').length > 1">
@@ -59,7 +59,7 @@
         <div class="form-inline" ng-if="col.dataLabelType && (col.dataLabelType != 'none')">
           <label>{{:: ts('Include column label') }}</label>
           <input type="checkbox" class="form-control"
-            ng-model="$ctrl.display.settings.columns[col.index].dataLabelColumnPrefix">
+            ng-model="$ctrl.display.settings.columns[col.index].dataLabelColumnPrefix" />
         </div>
       </div>
       </details>
@@ -96,7 +96,7 @@
             </option>
           </select>
         </div>
-        <div class="form-inline crm-chart-kit- axis-reduce-type"
+        <div class="form-inline crm-chart-kit-axis-reduce-type"
           ng-if="$ctrl.getColumnConfigOptionDetails(col, 'reduceType').length > 1">
           <label>
             {{:: ts('Stat Type')}}
