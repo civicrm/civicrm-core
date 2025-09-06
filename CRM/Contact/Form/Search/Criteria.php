@@ -203,7 +203,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     $form->addElement('select',
       'privacy_operator',
-      ts('Operator'),
+      ts('Multiple Privacy Options'),
       [
         'OR' => ts('OR'),
         'AND' => ts('AND'),
