@@ -467,37 +467,6 @@ class CRM_Core_Block {
   }
 
   /**
-   * Create the list of mail urls for the application and format is as a block.
-   */
-  private static function setTemplateMailValues() {
-    static $shortCuts = NULL;
-
-    if (!($shortCuts)) {
-      $shortCuts = [
-        [
-          'path' => 'civicrm/mailing/send',
-          'query' => 'reset=1',
-          'title' => ts('Send Mailing'),
-        ],
-        [
-          'path' => 'civicrm/mailing/browse',
-          'query' => 'reset=1',
-          'title' => ts('Browse Sent Mailings'),
-        ],
-      ];
-    }
-
-    $values = [];
-    foreach ($shortCuts as $short) {
-      $value = [];
-      $value['url'] = CRM_Utils_System::url($short['path'], $short['query']);
-      $value['title'] = $short['title'];
-      $values[] = $value;
-    }
-    self::setProperty(self::MAIL, 'templateValues', ['shortCuts' => $values]);
-  }
-
-  /**
    * Create the event blocks for upcoming events.
    */
   private static function setTemplateEventValues() {
