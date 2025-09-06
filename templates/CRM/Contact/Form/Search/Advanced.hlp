@@ -23,18 +23,12 @@
     <p>{ts}If you've changed search criteria for this 'smart group' and want to save your changes, select <strong>Group - update smart group</strong> from the '- more actions -' drop-down menu{/ts}</p>
 {/htxt}
 
-{htxt id="id-privacy-title"}
-{ts}Privacy Options{/ts}
-{/htxt}
-{htxt id="id-privacy"}
+{htxt id="privacy_toggle"}
     <p>{ts}Contacts with any of the checked privacy options are EXCLUDED from your search results by default. EXAMPLE: If you select 'Do not phone', and search for contacts with an address in a specific city - then contacts in that city who have 'Do not phone' selected as a privacy option will be excluded from the search results.{/ts}</p>
     <p>{ts}If you want to FIND (include) contacts with a particular privacy option set, then click the 'Include' radio button.{/ts}</p>
 {/htxt}
 
-{htxt id="privacy-operator-title"}
-{ts}Multiple Privacy Options{/ts}
-{/htxt}
-{htxt id="privacy-operator"}
+{htxt id="privacy_operator"}
     <p>{ts}If you select multiple privacy options, your choices are combined with OR statements by default. EXAMPLE: If you select 'Do not phone' and 'Do not email', results will include contacts who have either or both preferences. If you want to return only contacts with both preferences, select the AND operator.{/ts}</p>
 {/htxt}
 
