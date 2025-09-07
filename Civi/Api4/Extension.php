@@ -25,22 +25,8 @@ class Extension extends Generic\AbstractEntity {
    * @return Generic\BasicGetAction
    */
   public static function get($checkPermissions = TRUE) {
-    return (new Generic\BasicGetAction(__CLASS__, __FUNCTION__, function($action) {
-      $statuses = \CRM_Extension_System::singleton()->getManager()->getStatuses();
-      $mapper = \CRM_Extension_System::singleton()->getMapper();
-      $result = [];
-      foreach ($statuses as $key => $status) {
-        try {
-          $obj = $mapper->keyToInfo($key);
-          $info = \CRM_Extension_System::createExtendedInfo($obj);
-          $result[] = $info;
-        }
-        catch (\CRM_Extension_Exception $ex) {
-          \Civi::log()->error(sprintf('Failed to read extension (%s). Please refresh the extension list.', $key));
-        }
-      }
-      return $result;
-    }))->setCheckPermissions($checkPermissions);
+    return (new Action\Extension\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
