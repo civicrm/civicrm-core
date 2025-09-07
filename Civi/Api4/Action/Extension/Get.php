@@ -21,6 +21,17 @@ class Get extends BasicGetAction {
 
   protected function getRecords() {
     $statuses = \CRM_Extension_System::singleton()->getManager()->getStatuses();
+
+    // Optimize if specific statuses or keys are requested
+    $whereKey = $this->_itemsToGet('key');
+    $whereStatus = $this->_itemsToGet('status');
+    if ($whereKey) {
+      $statuses = array_intersect_key($statuses, array_flip($whereKey));
+    }
+    if ($whereStatus) {
+      $statuses = array_intersect($statuses, $whereStatus);
+    }
+
     $mapper = \CRM_Extension_System::singleton()->getMapper();
     $result = [];
     foreach ($statuses as $key => $status) {
