@@ -176,6 +176,7 @@ trait CRMTraits_Custom_CustomDataTrait {
     $ids['multi_state'] = (int) $this->createMultiStateCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['multi_state'] ?? [])))['id'];
     $ids['boolean'] = (int) $this->createBooleanCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['boolean'] ?? [])))['id'];
     $ids['checkbox'] = (int) $this->createStringCheckboxCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['checkbox'] ?? [])))['id'];
+    $ids['radio'] = (int) $this->createIntegerRadioCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['radio'] ?? [])))['id'];
     return $ids;
   }
 
