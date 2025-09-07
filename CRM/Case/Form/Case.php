@@ -125,8 +125,11 @@ class CRM_Case_Form_Case extends CRM_Core_Form implements CRM_Case_Form_CaseForm
       $this->_action = CRM_Core_Action::ADD;
     }
 
-    // retrieve case ID from the request params
+    // Since we return early when action is DELETE, we need to retrieve the
+    // case ID from the request params now so it can be set in the session,
+    // since it isn't present in the url on POST when not using popups.
     $this->getCaseID();
+
     $this->_currentlyViewedContactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     if ($this->_action & CRM_Core_Action::ADD && !$this->_currentlyViewedContactId) {
