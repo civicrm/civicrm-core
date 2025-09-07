@@ -21,7 +21,7 @@ use Civi\Api4\Utils\FormattingUtil;
  *
  * @method $this setNotificationForPayment(bool $notificationForPayment) Set whether to disable Notification for Payment
  * @method bool getNotificationForPayment() Get notificationForPayment Param
- * @method $this setnotificationForCompleteOrder(bool $notificationForCompleteOrder) Set whether to disable Notification on complete order
+ * @method $this setNotificationForCompleteOrder(bool $notificationForCompleteOrder) Set whether to disable Notification on complete order
  * @method bool getNotificationForCompleteOrder() Get notificationForCompleteOrder Param
  * @method $this setDisableActionsOnCompleteOrder(bool $disableActionsOnCompleteOrder) Set whether to disable actions on complete order
  * @method bool getDisableActionsOnCompleteOrder() Get disableActionsOnCompleteOrder Param
