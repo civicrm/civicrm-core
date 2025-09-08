@@ -208,6 +208,10 @@
 #crm-notification-container div.ui-notify-message .notify-content :is(p,ul,ol) {
   color: var(--crm-notify-col);
 }
+#crm-notification-container div.ui-notify-message .notify-content :is(ul,ol) {
+  padding-left: var(--crm-r2);
+  margin-block: var(--crm-m);
+}
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:focus {
