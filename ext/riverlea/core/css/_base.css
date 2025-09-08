@@ -297,7 +297,7 @@ dl dl {
 .crm-container td.disabled {
   font-style: italic;
 }
-.crm-container tr.disabled td:first-of-type {
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label) {
   display: inline-flex;
 }
 
