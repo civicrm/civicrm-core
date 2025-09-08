@@ -309,8 +309,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddStyle"}{/crmRegion}');
     $expected = ""
-      . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n"
-      . "<style type=\"text/css\">\nbody { text-color: black; }\n</style>\n";
+      . "<style>\nbody { background: black; }\n</style>\n"
+      . "<style>\nbody { text-color: black; }\n</style>\n";
     $this->assertEquals($expected, $actual);
   }
 

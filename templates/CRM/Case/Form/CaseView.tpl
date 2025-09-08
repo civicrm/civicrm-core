@@ -332,7 +332,7 @@
 {/if} {* view related cases if end *}
 </div>
 {literal}
-<style type="text/css">
+<style>
   .crm-case-caseview-case_subject span.crm-editable {
     padding-right: 32px;
     position: relative;
