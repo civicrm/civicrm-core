@@ -204,21 +204,8 @@
   float: left;
   margin: 0;
 }
-#crm-notification-container div.ui-notify-message-style {
-  color: var(--crm-notify-col);
-}
-#crm-notification-container div.ui-notify-message .notify-content ul,
-#crm-notification-container div.ui-notify-message .alert.notify-content ul {
-  margin: 0 var(--crm-r);
-  padding: var(--crm-m) 0 var(--crm-m) var(--crm-m);
-  color: var(--crm-notify-col);
-  list-style: unset;
-}
-#crm-notification-container div.ui-notify-message .notify-content ul li,
-#crm-notification-container div.ui-notify-message.alert .notify-content ul li {
-  color: var(--crm-notify-col);
-}
-#crm-notification-container div.ui-notify-message .notify-content p {
+#crm-notification-container div.ui-notify-message-style,
+#crm-notification-container div.ui-notify-message .notify-content :is(p,ul,ol) {
   color: var(--crm-notify-col);
 }
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
