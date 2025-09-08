@@ -52,7 +52,7 @@ body {
   list-style: none;
 }
 /* Restores list styles for rich text output to UA stylesheet definition */
-.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body,.crm-search-col-type-html,.af-markup) :is(ol,ul) {
+.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body,.crm-search-col-type-html,.af-markup,.notify-content) :is(ol,ul) {
   list-style: revert;
   padding: revert;
   margin: revert;
