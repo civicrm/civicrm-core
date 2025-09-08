@@ -89,7 +89,7 @@ class CRM_Utils_PDF_Utils {
   <head>
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
     <style>@page { margin: {$t}{$metric} {$r}{$metric} {$b}{$metric} {$l}{$metric};$css_page_size }</style>
-    <style type=\"text/css\">@import url(" . CRM_Core_Config::singleton()->userFrameworkResourceURL . "css/print.css);</style>
+    <style>@import url(" . CRM_Core_Config::singleton()->userFrameworkResourceURL . "css/print.css);</style>
     {$htmlHeader}
   </head>
   <body>

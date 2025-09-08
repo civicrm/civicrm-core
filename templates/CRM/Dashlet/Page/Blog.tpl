@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {strip}{literal}
-<style type="text/css">
+<style>
   #civicrm-news-feed {
     border: 0 none;
     font-family: inherit; // Stops JQueryUI's attempt to make this section Verdana

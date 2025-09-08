@@ -364,7 +364,7 @@
     });
   })(CRM.$, CRM._);
 </script>
-<style type="text/css">
+<style>
   div.tag-tree-wrapper {
     position: relative;
     min-height: 250px;

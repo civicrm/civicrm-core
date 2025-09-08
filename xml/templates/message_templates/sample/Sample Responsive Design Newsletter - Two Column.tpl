@@ -2,7 +2,7 @@
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title></title>
-  <style type="text/css">
+  <style>
      {literal}
      img {height: auto !important;}
      /* Client-specific Styles */

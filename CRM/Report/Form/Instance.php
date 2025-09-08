@@ -217,7 +217,7 @@ class CRM_Report_Form_Instance {
   <head>
     <title>CiviCRM Report</title>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-    <style type=\"text/css\">@import url({$userFrameworkResourceURL}css/print.css);</style>
+    <style>@import url({$userFrameworkResourceURL}css/print.css);</style>
     {$htmlHeader}
   </head>
   <body><div id=\"crm-container\">";
