@@ -961,6 +961,7 @@ emo
       '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
       '{site.message_header}' => 'Message Header',
+      '{contact.custom_14}' => 'Integer radio :: Custom Group',
     ];
   }
 
@@ -1339,6 +1340,7 @@ checksum |cs=' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 sage_header |<div><!-- This content comes from the site message header token--></div>
+custom_14 |100
 ';
   }
 
