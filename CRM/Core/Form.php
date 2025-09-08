@@ -2237,7 +2237,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       Civi::log()->warning('addCurrency: Currency ' . $defaultCurrency . ' is disabled but still in use!');
       $currencies[$defaultCurrency] = $defaultCurrency;
     }
-    $options = ['class' => 'crm-select2 eight'];
+    $options = ['class' => 'crm-select2 crm-auto-width'];
     if (!$required) {
       $currencies = ['' => ''] + $currencies;
       $options['placeholder'] = ts('- none -');
