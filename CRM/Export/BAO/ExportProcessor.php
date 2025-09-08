@@ -1450,8 +1450,16 @@ class CRM_Export_BAO_ExportProcessor {
     if ($type) {
       switch ($type) {
         case CRM_Utils_Type::T_INT:
-        case CRM_Utils_Type::T_BOOLEAN:
+          if (str_ends_with($fieldName, '_id')) {
+            return "`$fieldName` varchar(64)";
+          }
+
           return "`$fieldName` text";
+
+        case CRM_Utils_Type::T_BOOLEAN:
+          // some of those will be exported as a (localisable) string
+          // @see https://lab.civicrm.org/dev/core/-/issues/2164
+          return "`$fieldName` varchar(64)";
 
         case CRM_Utils_Type::T_STRING:
           // dev/issue#6073 : The exported comma-separated checkbox labels sometimes exceed the maximum length set for the field.
