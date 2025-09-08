@@ -75,19 +75,19 @@ class CryptoJwt extends AutoService {
     try {
       return (array) JWT::decode($token, $jwtKeys);
     }
-    catch (\UnexpectedValueException $e) {
-      // Depending on the error, we might able to try other algos
+    catch (\UnexpectedValueException | \LogicException $e) {
+      // Convert to satisfy `@throws CryptoException` and historical messaging.
       if (
         !preg_match(';unable to lookup correct key;', $e->getMessage())
         &&
         !preg_match(';Signature verification failed;', $e->getMessage())
       ) {
-        // Keep our signature independent of the implementation.
-        throw new CryptoException(get_class($e) . ': ' . $e->getMessage());
+        throw new CryptoException(get_class($e) . ': ' . $e->getMessage(), 0, [], $e);
+      }
+      else {
+        throw new CryptoException('Signature verification failed', 0, [], $e);
       }
     }
-
-    throw new CryptoException('Signature verification failed');
   }
 
   /**
