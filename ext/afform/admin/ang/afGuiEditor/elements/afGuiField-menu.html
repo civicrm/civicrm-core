@@ -18,6 +18,13 @@
     <input id="{{:: $ctrl.getFieldName() }}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
   </form>
 </li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'Number'">
+  <div ng-click="$event.stopPropagation()" class="form-inline">
+    <input type="number" class="form-control four" ng-model="getSet('input_attrs.min')" ng-model-options="{getterSetter: true}" title="{{:: ts('Minimum value') }}" placeholder="{{:: ts('Min') }}">
+    -
+    <input type="number" class="form-control four" ng-model="getSet('input_attrs.max')" ng-model-options="{getterSetter: true}" title="{{:: ts('Maximum value') }}" placeholder="{{:: ts('Max') }}">
+  </div>
+</li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Number' && $ctrl.fieldDefn.data_type === 'Float'">
   <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Decimal places:') }}</label>
