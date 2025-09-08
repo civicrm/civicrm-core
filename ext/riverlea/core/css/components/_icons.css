@@ -30,6 +30,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container td.disabled:first-of-type:not(.crm-search-ctrl-column)::before,
 .crm-container tr.disabled td.crm-search-ctrl-column::after,
 .crm-container td.disabled.crm-search-ctrl-column::after,
+.crm-container tr.disabled td.crm-extensions-status::before,
 .crm-container .delete-icon,
 .crm-container span.batch-valid,
 .crm-container span.batch-invalid,
@@ -231,9 +232,10 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 
 /* Inactive icon */
-.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container tr.disabled > td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label)::before,
 .crm-container td.disabled:first-of-type:not(.crm-search-ctrl-column)::before,
 .crm-container tr.disabled td.crm-search-ctrl-column::after,
+.crm-container tr.disabled td.crm-extensions-status::before,
 .crm-container td.disabled.crm-search-ctrl-column::after {
   content: "\f05e" / "Disabled row.";
   font-style: normal;
