@@ -36,7 +36,7 @@
   {if !empty($element.options_per_line)}
         {assign var="element_name" value=$element.element_name}
         <tr class="custom-field-row {$element_name}-row" {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element_name}_group"{/if}>
-         <td class="label"{if $element.html_type === "Radio"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
+         <td class="label"{if $element.html_type === "Radio"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel}{/if}</td>
          <td>
             {assign var="count" value=1}
                 <table class="form-layout-compressed">
@@ -62,7 +62,7 @@
         {capture assign="name"}{if !empty($element.name)}{$element.name}{/if}{/capture}
         {capture assign="element_name"}{if !empty($element.element_name)}{$element.element_name}{/if}{/capture}
         <tr class="custom-field-row {$element_name}-row"  {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element_name}_group"{/if}>
-          <td class="label">{if $element.html_type === "Radio"}<span id="{$element_name}_group">{$element.label}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
+          <td class="label">{if $element.html_type === "Radio"}<span id="{$element_name}_group">{$element.label}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel}{/if}</td>
         <td>
           {$form.$element_name.html}&nbsp;
       {if $element.html_type eq 'Autocomplete-Select'}
