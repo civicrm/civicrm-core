@@ -156,6 +156,11 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             default:
+              // An empty value should be stored as NULL
+              if (!isset($value) || $value === '') {
+                $type = 'Timestamp';
+                $value = NULL;
+              }
               break;
           }
           if ($value === 'null') {
