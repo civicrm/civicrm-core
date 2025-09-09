@@ -7,19 +7,13 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-basic-criteria-title"}
-  {ts}Search{/ts}
-{/htxt}
-{htxt id="id-basic-criteria"}
+{htxt id="basic-criteria"}
     {capture assign=amt}{500|crmMoney}{/capture}
     <p>{ts}Find contacts by partial or full name or email, type of contact, group, and/or tag. You can then view or edit contact details, print a contact list, or use the <strong>- more actions -</strong> drop down list to assign tags, add contacts to groups, create smart groups, export contact data to a spreadsheet, and more.{/ts}</p>
     <p>{ts 1=$amt}Click <strong>Advanced Search</strong> to search by address, demographics, custom fields, notes, and/or relationships. If you are using CiviContribute, CiviEvent or CiviMember - you can also search based on information stored by these components. For example - you can find all contacts who live in a specific city AND have contributed at least %1 within the past 6 months.{/ts}</p>
 {/htxt}
 
-{htxt id="id-smog-criteria-title"}
-  {ts}Group Search{/ts}
-{/htxt}
-{htxt id="id-smog-criteria"}
+{htxt id="smog-criteria"}
     <p>{ts 1=$params.group_title|smarty:nodefaults|escape}Contacts in the <strong>%1</strong> group are listed below.{/ts}
       <ul>
         <li>{ts}Use 'Find Contacts within this Group' to search for specific contacts.{/ts}</li>
@@ -28,23 +22,14 @@
     </p>
 {/htxt}
 
-{htxt id="id-amtg-criteria-title"}
-  {ts}Add to Group{/ts}
-{/htxt}
-{htxt id="id-amtg-criteria"}
+{htxt id="amtg-criteria"}
     {ts 1=$params.group_title|smarty:nodefaults|escape}Use this Search form to find contacts. Mark the contacts you want to add to this group. Then click 'Add Contacts to %1'.{/ts}
 {/htxt}
 
-{htxt id="id-edit-smartGroup-title"}
-  {ts}Edit Smart Group{/ts}
-{/htxt}
-{htxt id="id-edit-smartGroup"}
+{htxt id="edit-smartGroup"}
     {ts}Click this button if you want to view and or modify the search criteria used to define the members of this smart group.{/ts}
 {/htxt}
 
-{htxt id="id-add-to-smartGroup-title"}
-  {ts}Add to Smart Group{/ts}
-{/htxt}
-{htxt id="id-add-to-smartGroup"}
+{htxt id="add-to-smartGroup"}
     {ts}You can also add contacts to a smart group directly - regardless of whether they meet the smart group search criteria. For example, you might have a smart group for constituents who live in a certain locality, AND might have a few constituents who want to stay informed about events in that locality even though they no longer live there. Click this button to add contacts directly to this smart group.{/ts}
 {/htxt}
