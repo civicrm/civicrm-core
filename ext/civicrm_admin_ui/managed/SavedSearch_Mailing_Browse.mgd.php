@@ -17,13 +17,12 @@ $columns = [
   ],
   [
     'type' => 'field',
-    'key' => 'Mailing_MailingJob_mailing_id_01.status:label',
+    'key' => 'status:label',
     'dataType' => 'String',
     'label' => E::ts('Status'),
     'sortable' => TRUE,
     'icons' => [],
     'cssRules' => [],
-    'empty_value' => E::ts('Draft'),
   ],
 ];
 
@@ -113,9 +112,9 @@ $columns = array_merge($columns, [
         'style' => 'default',
         'path' => '',
         'condition' => [
-          'is_draft',
+          'status',
           '=',
-          TRUE,
+          'Draft',
         ],
       ],
       [
@@ -123,7 +122,7 @@ $columns = array_merge($columns, [
         'text' => E::ts('Copy'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:name',
+          'status:name',
           'NOT IN',
           ['Paused', 'Scheduled', 'Running'],
         ],
@@ -149,7 +148,7 @@ $columns = array_merge($columns, [
         'text' => E::ts('Resume'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:name',
+          'status:name',
           '=',
           'Paused',
         ],
@@ -164,7 +163,7 @@ $columns = array_merge($columns, [
         'text' => E::ts('Cancel'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:name',
+          'status:name',
           'IN',
           ['Scheduled', 'Running'],
         ],
@@ -190,7 +189,7 @@ $columns = array_merge($columns, [
         'text' => E::ts('Pause'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:name',
+          'status:name',
           'IN',
           ['Scheduled', 'Running'],
         ],
@@ -205,7 +204,7 @@ $columns = array_merge($columns, [
         'text' => E::ts('Cancel'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:name',
+          'status:name',
           '=',
           'Paused',
         ],
@@ -254,7 +253,7 @@ return [
             'Mailing_MailingJob_mailing_id_01.scheduled_date',
             'Mailing_MailingJob_mailing_id_01.start_date',
             'Mailing_MailingJob_mailing_id_01.end_date',
-            'Mailing_MailingJob_mailing_id_01.status:label',
+            'status:label',
           ],
           'orderBy' => [],
           'where' => [
@@ -313,19 +312,19 @@ return [
           'cssRules' => [
             [
               'bg-warning',
-              'Mailing_MailingJob_mailing_id_01.status:name',
+              'status:name',
               '=',
               'Paused',
             ],
             [
               'disabled',
-              'Mailing_MailingJob_mailing_id_01.status:name',
+              'status:name',
               '=',
               'Canceled',
             ],
             [
               'bg-success',
-              'Mailing_MailingJob_mailing_id_01.status:name',
+              'status:name',
               'IN',
               ['Scheduled', 'Running'],
             ],

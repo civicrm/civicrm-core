@@ -96,10 +96,10 @@ function _civicrm_admin_ui_alter_mailing_navigation(&$navigationItems) {
   foreach ($navigationItems as &$navigationItem) {
     if (!empty($navigationItem['attributes']['url'])) {
       if (str_starts_with($navigationItem['attributes']['url'], 'civicrm/mailing/browse/scheduled')) {
-        $navigationItem['attributes']['url'] = 'civicrm/mailing#?is_archived=0&is_draft=0';
+        $navigationItem['attributes']['url'] = 'civicrm/mailing#?is_archived=0&status=Scheduled,Running,Complete,Paused,Canceled';
       }
       if (str_starts_with($navigationItem['attributes']['url'], 'civicrm/mailing/browse/unscheduled')) {
-        $navigationItem['attributes']['url'] = 'civicrm/mailing#?is_archived=0&is_draft=1';
+        $navigationItem['attributes']['url'] = 'civicrm/mailing#?is_archived=0&status=Draft';
       }
       if (str_starts_with($navigationItem['attributes']['url'], 'civicrm/mailing/browse/archived')) {
         $navigationItem['attributes']['url'] = 'civicrm/mailing#?is_archived=1';
