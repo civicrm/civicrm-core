@@ -101,7 +101,7 @@
                 <td>{$form.pinnedContactCountries.html|smarty:nodefaults}</td>
             </tr>
            <tr class="crm-localization-form-block-defaultContactStateProvince">
-                <td class="label">{$form.defaultContactStateProvince.label} {help id='defaultContactCountry' title=$form.defaultContactStateProvince.label}</td>
+                <td class="label">{$form.defaultContactStateProvince.label} {help id='defaultContactCountry' title=$form.defaultContactStateProvince.textLabel}</td>
                 <td>{$form.defaultContactStateProvince.html}</td>
             </tr>
             <tr class="crm-localization-form-block-countryLimit">
