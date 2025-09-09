@@ -1,0 +1,10 @@
+<div af-fieldset="">
+  <div class="af-container af-layout-inline">
+    <af-field name="name" />
+    <af-field name="created_date" defn="{input_type: 'Select', search_range: true}" />
+    <af-field name="created_id.display_name,scheduled_id.display_name" defn="{label: 'Created or Sent by', input_attrs: {}, input_type: 'Text'}" />
+    <af-field name="status" defn="{input_attrs: {multiple: true}}" />
+    <af-field name="is_archived" defn="{input_type: 'Radio'}"/>
+  </div>
+  <crm-search-display-table search-name="Mailings_Browse" display-name="Mailings_Table"></crm-search-display-table>
+</div>
