@@ -3,16 +3,16 @@ use CRM_Standaloneusers_ExtensionUtil as E;
 
 return [
   [
-    'name' => 'SavedSearch_My_account',
+    'name' => 'SavedSearch_My_Account',
     'entity' => 'SavedSearch',
     'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'My_account',
-        'label' => E::ts('My account'),
-        'api_entity' => 'UFMatch',
+        'name' => 'My_Account',
+        'label' => E::ts('My Account'),
+        'api_entity' => 'User',
         'api_params' => [
           'version' => 4,
           'select' => [
@@ -20,6 +20,9 @@ return [
             'contact_id',
             'contact_id.display_name',
             'uf_name',
+            'username',
+            'timezone',
+            'language:label',
           ],
           'orderBy' => [],
           'where' => [
@@ -32,12 +35,12 @@ return [
           'groupBy' => [],
           'join' => [
             [
-              'Contact AS UFMatch_Contact_contact_id_01',
+              'Contact AS User_Contact_contact_id_01',
               'LEFT',
               [
                 'contact_id',
                 '=',
-                'UFMatch_Contact_contact_id_01.id',
+                'User_Contact_contact_id_01.id',
               ],
             ],
           ],
@@ -48,16 +51,16 @@ return [
     ],
   ],
   [
-    'name' => 'SavedSearch_My_account_SearchDisplay_My_account',
+    'name' => 'SavedSearch_My_Account_SearchDisplay_My_Account',
     'entity' => 'SearchDisplay',
     'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'My_account',
-        'label' => E::ts('My account'),
-        'saved_search_id.name' => 'My_account',
+        'name' => 'My_Account',
+        'label' => E::ts('My Account'),
+        'saved_search_id.name' => 'My_Account',
         'type' => 'grid',
         'settings' => [
           'colno' => '2',
@@ -68,7 +71,6 @@ return [
             [
               'type' => 'field',
               'key' => 'contact_id.display_name',
-              'dataType' => 'String',
               'label' => E::ts('Contact'),
               'link' => [
                 'path' => '',
@@ -82,18 +84,38 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'uf_name',
-              'dataType' => 'String',
+              'key' => 'username',
               'label' => E::ts('Username'),
               'break' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'uf_name',
+              'label' => E::ts('Password Reset Email'),
+              'break' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'timezone',
+              'label' => E::ts('Timezone'),
+              'break' => TRUE,
+              'empty' => E::ts('System default'),
+            ],
+            [
+              'type' => 'field',
+              'key' => 'language:label',
+              'label' => E::ts('Language'),
+              'break' => TRUE,
+              'empty' => E::ts('System default'),
             ],
             [
               'size' => '',
               'links' => [
                 [
-                  'path' => '/civicrm/user/edit#?User1=[uf_id]',
-                  'icon' => 'fa-key',
-                  'text' => E::ts('Update account'),
+                  'path' => '/civicrm/my-account/edit#?User1=[uf_id]',
+                  'icon' => 'fa-user',
+                  'text' => E::ts('Update Account'),
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -103,16 +125,16 @@ return [
                   'target' => '',
                 ],
                 [
-                  'path' => '/civicrm/admin/user/password',
+                  'path' => '/civicrm/my-account/password',
                   'icon' => 'fa-keyboard',
-                  'text' => E::ts('Update password'),
+                  'text' => E::ts('Change Password'),
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
                   'entity' => '',
                   'action' => '',
                   'join' => '',
-                  'target' => '',
+                  'target' => 'crm-popup',
                 ],
               ],
               'type' => 'buttons',
