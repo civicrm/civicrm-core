@@ -67,8 +67,7 @@
 
       <details id="msg_html_section" class="crm-accordion-bold crm-html_email-accordion " open>
         <summary>
-          {ts}HTML Format{/ts}
-          {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
+          {ts}Message Body{/ts}
         </summary>
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helphtml">
