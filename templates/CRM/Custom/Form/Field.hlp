@@ -7,6 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-in_selector"}
+{htxt id='in_selector'}
   {ts}Display in Table controls which columns are included in the listing of custom data records. If your custom data set has a large number of fields, uncheck this box to exclude less important fields from the listing. All fields will still be included when viewing a single record. You may also want to exclude Note type fields from the table listing.{/ts}
 {/htxt}
