@@ -20,7 +20,7 @@ class ProcessErrorException extends \RuntimeException {
     $this->stderr = $stderr;
     $this->exit = $exit;
     if (empty($message)) {
-      $message = ProcessHelper::formatOutput($cmd, $stdout, $stdout, $exit);
+      $message = ProcessHelper::formatOutput($cmd, $stdout, $stderr, $exit);
     }
     parent::__construct($message, $code, $previous);
   }
