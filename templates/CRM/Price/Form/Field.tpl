@@ -95,7 +95,7 @@
   <div id="price-block" {if $action eq 2 && $form.html_type.value.0 eq 'Text'} class="show-block" {else} class="hiddenElement" {/if}>
     <table class="form-layout">
       <tr class="crm-price-field-form-block-price">
-        <td class="label">{$form.price.label|smarty:nodefaults} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span> {help id="id-negative"}</td>
+        <td class="label">{$form.price.label|smarty:nodefaults} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span> {help id="price"}</td>
         <td>{$form.price.html}</td>
       </tr>
       <tr class="crm-price-field-form-block-non-deductible-amount">
@@ -197,7 +197,7 @@
       <td>&nbsp;{$form.is_required.html}</td>
     </tr>
     <tr class="crm-price-field-form-block-visibility_id">
-      <td class="label">{$form.visibility_id.label} {help id="id-visibility"}</td>
+      <td class="label">{$form.visibility_id.label} {help id="visibility_id"}</td>
       <td>&nbsp;{$form.visibility_id.html}</td>
     </tr>
     <tr class="crm-price-field-form-block-is_active">
