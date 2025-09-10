@@ -22,7 +22,7 @@
 {assign var=eventID value=$id}
   <div class="help">
     {ts}If you want to provide an Online Registration page for this event, check the first box below and then complete the fields on this form.{/ts}
-    {help id="id-event-reg"}
+    {help id="is_online_registration"}
   </div>
 <div class="crm-block crm-form-block crm-event-manage-registration-form-block">
 
@@ -41,7 +41,7 @@
   <tr class="crm-event-manage-registration-form-block-registration_link_text">
     <td scope="row" class="label"
         width="20%">{$form.registration_link_text.label} <span class="crm-marker">*</span>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if}</td>
-    <td>{$form.registration_link_text.html} {help id="id-link_text"}</td>
+    <td>{$form.registration_link_text.html} {help id="link_text"}</td>
   </tr>
   {if !$isTemplate}
     <tr class="crm-event-manage-registration-form-block-registration_start_date">
@@ -55,24 +55,24 @@
   {/if}
   <tr class="crm-event-manage-registration-form-block-is_multiple_registrations">
     <td scope="row" class="label" width="20%">{$form.is_multiple_registrations.label}</td>
-    <td>{$form.is_multiple_registrations.html} {help id="id-allow_multiple"}</td>
+    <td>{$form.is_multiple_registrations.html} {help id="is_multiple_registrations"}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-maximum_additional_participants" id="id-max-additional-participants">
     <td scope="row" class="label" width="20%">{$form.max_additional_participants.label}</td>
-    <td>{$form.max_additional_participants.html} {help id="id-max_additional"}</td>
+    <td>{$form.max_additional_participants.html} {help id="max_additional_participants"}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-allow_same_participant_emails">
     <td scope="row" class="label" width="20%">{$form.allow_same_participant_emails.label}</td>
-    <td>{$form.allow_same_participant_emails.html} {help id="id-allow_same_email"}</td>
+    <td>{$form.allow_same_participant_emails.html} {help id="allow_same_participant_emails"}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-dedupe_rule_group_id">
     <td scope="row" class="label" width="20%">{$form.dedupe_rule_group_id.label}</td>
-    <td>{$form.dedupe_rule_group_id.html} {help id="id-dedupe_rule_group_id"}</td>
+    <td>{$form.dedupe_rule_group_id.html} {help id="dedupe_rule_group_id"}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-requires_approval">
     {if !empty($form.requires_approval)}
       <td scope="row" class="label" width="20%">{$form.requires_approval.label}</td>
-      <td>{$form.requires_approval.html} {help id="id-requires_approval"}</td>
+      <td>{$form.requires_approval.html} {help id="requires_approval"}</td>
     {/if}
   </tr>
   <tr id="id-approval-text" class="crm-event-manage-registration-form-block-approval_req_text">
@@ -84,15 +84,15 @@
   </tr>
   <tr class="crm-event-manage-registration-form-block-expiration_time">
     <td scope="row" class="label" width="20%">{$form.expiration_time.label}</td>
-    <td>{$form.expiration_time.html|crmAddClass:four} {help id="id-expiration_time"}</td>
+    <td>{$form.expiration_time.html|crmAddClass:four} {help id="expiration_time"}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-selfcancelxfer">
     <td scope="row" class="label" width="20%">{$form.allow_selfcancelxfer.label}</td>
-    <td>{$form.allow_selfcancelxfer.html} {help id="id-allow_selfcancelxfer"}</td>
+    <td>{$form.allow_selfcancelxfer.html} {help id="allow_selfcancelxfer"}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-selfcancelxfer_time">
     <td scope="row" class="label" width="20%">{$form.selfcancelxfer_time.label}</td>
-    <td>{$form.selfcancelxfer_time.html|crmAddClass:four} {help id="id-selfcancelxfer_time"}</td>
+    <td>{$form.selfcancelxfer_time.html|crmAddClass:four} {help id="selfcancelxfer_time"}</td>
   </tr>
 </table>
 <div class="spacer"></div>
@@ -115,13 +115,13 @@
     </table>
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-custom_pre_id">
-        <td class="label">{$form.custom_pre_id.label} {help id="event-profile"}</td>
+        <td class="label">{$form.custom_pre_id.label} {help id="custom_pre_id"}</td>
         <td class="html-adjust">{$form.custom_pre_id.html}
           <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
         </td>
       </tr>
       <tr id="profile_post" class="crm-event-manage-registration-form-block-custom_post_id">
-        <td class="label">{$form.custom_post_id.label} {help id="event-profile-bottom"}</td>
+        <td class="label">{$form.custom_post_id.label} {help id="custom_post_id"}</td>
         <td class="html-adjust">{$form.custom_post_id.html}
           <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
           <p class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
@@ -254,7 +254,7 @@
   <div class="crm-accordion-wrapper">
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_email_confirm">
-        <td scope="row" class="label" width="20%">{$form.is_email_confirm.label} {help id="id-is_email_confirm"}</td>
+        <td scope="row" class="label" width="20%">{$form.is_email_confirm.label} {help id="is_email_confirm"}</td>
         <td>{$form.is_email_confirm.html}</td>
       </tr>
     </table>
@@ -279,11 +279,11 @@
           <td>{$form.confirm_from_email.html}</td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-cc_confirm">
-          <td scope="row" class="label" width="20%">{$form.cc_confirm.label} {help id="id-cc_confirm"}</td>
+          <td scope="row" class="label" width="20%">{$form.cc_confirm.label} {help id="cc_confirm"}</td>
           <td>{$form.cc_confirm.html}</td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-bcc_confirm">
-          <td scope="row" class="label" width="20%">{$form.bcc_confirm.label} {help id="id-bcc_confirm"}</td>
+          <td scope="row" class="label" width="20%">{$form.bcc_confirm.label} {help id="bcc_confirm"}</td>
           <td>{$form.bcc_confirm.html}</td>
         </tr>
       </table>
