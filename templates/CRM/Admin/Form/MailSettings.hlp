@@ -21,10 +21,10 @@
   <p>{ts}If the email subject contains a valid Case ID or Case hash, the email will be filed against the case.{/ts}</p>
 {/htxt}
 
-{htxt id="id-activity_type_id"}
+{htxt id='activity_type_id'}
   {ts}The default activity type is Inbound Email, a special type that can only be edited by users with a specific permission to help prevent details of inbound emails from being changed, but you can also use your own activity type as well, bearing in mind that these activities can be edited as usual.{/ts}
 {/htxt}
 
-{htxt id="id-activity_source"}
+{htxt id='activity_source'}
   {ts}An activity can only have one source contact, so if you choose a field that can have more than one email (To, CC or BCC), only the first email will be used.{/ts}
 {/htxt}

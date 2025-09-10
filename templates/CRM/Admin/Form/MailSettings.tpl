@@ -55,13 +55,13 @@
 
       <tr class="crm-mail-settings-form-block-is_contact_creation_disabled_if_no_match"><td class="label">&nbsp;</td><td>{$form.is_contact_creation_disabled_if_no_match.html}{$form.is_contact_creation_disabled_if_no_match.label} {help id='is_contact_creation_disabled_if_no_match'}</td></tr>
 
-      <tr class="crm-mail-settings-form-block-activity_type_id"><td class="label">{$form.activity_type_id.label} {help id='id-activity_type_id'}</td><td>{$form.activity_type_id.html}</td></tr>
+      <tr class="crm-mail-settings-form-block-activity_type_id"><td class="label">{$form.activity_type_id.label} {help id='activity_type_id'}</td><td>{$form.activity_type_id.html}</td></tr>
 
       <tr class="crm-mail-settings-form-block-activity_status"><td class="label">{$form.activity_status.label}</td><td>{$form.activity_status.html}</td></tr>
 
       {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-mail-settings-form-block-campaign_id"}
 
-      <tr class="crm-mail-settings-form-block-activity_source"><td class="label">{$form.activity_source.label} {help id='id-activity_source'}</td><td>{$form.activity_source.html}</td></tr>
+      <tr class="crm-mail-settings-form-block-activity_source"><td class="label">{$form.activity_source.label} {help id='activity_source'}</td><td>{$form.activity_source.html}</td></tr>
       <tr class="crm-mail-settings-form-block-activity_targets"><td class="label">{$form.activity_targets.label}</td><td>{$form.activity_targets.html}</td></tr>
       <tr class="crm-mail-settings-form-block-activity_assignees"><td class="label">{$form.activity_assignees.label}</td><td>{$form.activity_assignees.html}</td></tr>
 
