@@ -7,10 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-provider-title"}
-{ts}Provider{/ts}
-{/htxt}
-{htxt id="id-provider"}
+
+{htxt id='sms_provider_id'}
 <p>{ts}By default, CiviCRM uses the provider which are set active and the default provider is selected. User with administer CiviCRM permission can add a new Provider{/ts}</p>
 {if $params.isAdmin}
     {capture assign="fromConfig"}{crmURL p="civicrm/admin/sms/provider" q="reset=1"}{/capture}
@@ -42,7 +40,7 @@
 
 {/htxt} 
 
-{htxt id="id-count-text"}
+{htxt id='sms_text_message'}
 <p>{ts}A single SMS message is typically 160 characters in length. If you want to send a message that is longer than 160 characters, it is split into multiple segments.{/ts}</p>
 <p>{ts}The cost of sending SMS message is typically <em>per segment</em>.{/ts}</p>
 <p>{ts}Certain characters like emoji or curly quotes can shorten the segment size to 96 characters, increasing the cost per message.{/ts}</p>
