@@ -15,7 +15,7 @@
 {ts}If you are using the CiviMail component to send mailings to contacts, this field provides additional control over which email address is used. By default, CiviMail sends mail to each contact's preferred email address. If the contact has multiple locations, then the preferred email of the primary location is used. However, if the contact prefers to have CiviMail ('bulk') mailings set to an alternate email address - check the 'Use for Bulk Mailings' box next to that email address.{/ts}
 {/htxt}
 
-{htxt id="id-optOut"}
+{htxt id='is_opt_out'}
 {ts}This option is designed to be set by the contact themselves when they don't want to receive bulk email from your organization (they set it using the opt-out action from a CiviMail mailing).   Please think before changing it, as it will override the preference they have set.{/ts}
 {/htxt}
 
@@ -26,17 +26,11 @@
 {ts}This flag is most commonly used to mark an email address that is bouncing. If you are using the CiviMail component, emails that bounce excessively are automatically placed on hold and mailings are not sent to this address as long as it is marked hold. You can also set (or unset) this option manually - but remember that emails will not be sent to this address as long as it is marked 'On Hold'.{/ts}
 {/htxt}
 
-{htxt id="id-preferred_communication_method-title"}
-  {ts}Preferred Communication{/ts}
-{/htxt}
-{htxt id="id-preferred_communication_method"}
+{htxt id="preferred_communication_method"}
 {ts}Select the preferred method(s) of communicating with this contact.{/ts}
 {/htxt}
 
-{htxt id="id-privacy-title"}
-  {ts}Privacy{/ts}
-{/htxt}
-{htxt id="id-privacy"}
+{htxt id="privacy"}
 {ts}Select the appropriate Privacy Options.{/ts}
 <p>{ts}Contacts with 'Do not email' will be excluded from receiving CiviMail mailings, and the Send Email activity will be disabled for them. However they will still receive email for contribution receipts and event registration confirmations.{/ts}</p>
 <p>{ts}Contacts with 'Do not SMS' will be excluded from receiving Bulk SMS messages, and the Send SMS activity will be disabled.{/ts}</p>
@@ -58,18 +52,12 @@
 <p>{ts}Set this organization as the current employer for this individual. Note: will disable any existing employer relationship for this individual.{/ts}</p>
 {/htxt}
 
-{htxt id="id-communication_style-title"}
-  {ts}Communication Style{/ts}
-{/htxt}
-{htxt id="id-communication_style"}
+{htxt id="communication_style"}
 <p>{ts}Choose how you communicate with this contact, e.g. on formal or familiar terms.{/ts}</p>
 <p>{ts}Depending on the CiviCRM setup, email and postal greetings (see below) may be automatically adapted accordingly; or the information can be used in other ways.{/ts}</p>
 {/htxt}
 
-{htxt id="id-greeting-title"}
-  {ts}Greeting{/ts}
-{/htxt}
-{htxt id="id-greeting"}
+{htxt id="greeting"}
 {capture assign=docLink}{docURL page="user/common-workflows/tokens-and-mail-merge"}{/capture}
 <p>{ts}Use the greeting/address options to determine how you would like the contact's salutation and name displayed for different communication methods. When you send an email or export a list of records to a .csv file for mail merging, the greeting and addressee fields will reflect your preferences.{/ts}</p>
 <p>{ts 1=$docLink}You may also create a customized greeting and use field tokens to insert fields of your choice. For more information on available tokens, see the online documentation %1.{/ts}</p>
