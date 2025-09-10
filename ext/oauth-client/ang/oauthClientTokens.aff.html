@@ -27,6 +27,14 @@
            target="_blank"
         >{{ts('Inspect')}}</a>
 
+        <a class="btn btn-default"
+           ng-disabled="!token.refresh_token"
+           af-api4-action="['OAuthSysToken', 'refresh', {where: [['id', '=', token.id]]}]"
+           af-api4-start-msg="ts('Refreshing...')"
+           af-api4-success-msg="ts('Refreshed')"
+           af-api4-success="tokens.refresh()"
+        >{{ts('Refresh')}}</a>
+
         <a class="btn btn-danger"
            af-api4-action="['OAuthSysToken', 'delete', {where: [['id', '=', token.id]]}]"
            af-api4-start-msg="ts('Deleting...')"
