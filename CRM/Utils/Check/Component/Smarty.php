@@ -46,6 +46,16 @@ class CRM_Utils_Check_Component_Smarty extends CRM_Utils_Check_Component {
         'fa-lock'
       );
     }
+    if ($pathSetting) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__ . '_unnecessary_define',
+        '<p>' . (ts('This site settings currently are manually overriding the default smarty version with the same version as the current default 5.')) . '</P>'
+        . '<p>' . (ts('It is recommended to remove the override as it may cause issues in the future')),
+        ts('Unnecessary Smarty Version Override'),
+        LogLevel::NOTICE,
+        'fa-lock',
+      );
+    }
     return $messages;
   }
 
