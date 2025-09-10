@@ -105,7 +105,7 @@
             </td>
           </tr>
           <tr class="crm-pledge-form-block-financial_type_id">
-            <td class="label">{$form.financial_type_id.label} {help id='id-financial_type_id' file="CRM/Pledge/Form/Pledge.hlp"}
+            <td class="label">{$form.financial_type_id.label} {help id='financial_type_id' file="CRM/Pledge/Form/Pledge.hlp"}
 </td>
             <td>{$form.financial_type_id.html}</td>
           </tr>
@@ -115,7 +115,7 @@
       campaignTrClass="crm-pledge-form-block-campaign_id"}
 
           <tr class="crm-pledge-form-block-contribution_page_id">
-            <td class="label">{$form.contribution_page_id.label} {help id='id-contribution_page_id' file="CRM/Pledge/Form/Pledge.hlp"}</td>
+            <td class="label">{$form.contribution_page_id.label} {help id='contribution_page_id' file="CRM/Pledge/Form/Pledge.hlp"}</td>
             <td>{$form.contribution_page_id.html}</td>
           </tr>
 
