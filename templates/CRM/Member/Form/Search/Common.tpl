@@ -26,7 +26,7 @@
   </td>
 </tr>
 <tr>
-  <td>{$form.member_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} {$form.member_test.html}
+  <td>{$form.member_test.label} {help id="is_test" file="CRM/Contact/Form/Search/Advanced" title=$form.member_test.textLabel} {$form.member_test.html}
   </td>
   <td>
     {$form.member_is_primary.label} {help id="member_is_primary" file="CRM/Member/Form/Search.hlp"} {$form.member_is_primary.html}
