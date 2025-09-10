@@ -11,7 +11,7 @@
     <h3>{ts}Mailing Labels{/ts}</h3>
         <table class="form-layout">
         <tr class="crm-preferences-address-form-block-mailing_format">
-            <td class="label">{$form.mailing_format.label}<br />{help id='label-tokens'}</td>
+            <td class="label">{$form.mailing_format.label}<br />{help id='mailing_format'}</td>
             <td>
               <div class="helpIcon" id="helphtml">
                 <input class="crm-token-selector big" data-field="mailing_format" />
@@ -35,7 +35,7 @@
     <h3>{ts}Address Display{/ts}</h3>
         <table class="form-layout">
           <tr class="crm-preferences-address-form-block-address_format">
-              <td class="label">{$form.address_format.label}<br />{help id='address-tokens'}</td>
+              <td class="label">{$form.address_format.label}<br />{help id='address_format'}</td>
               <td>
               <div class="helpIcon" id="helphtml">
                 <input class="crm-token-selector big" data-field="address_format" />
