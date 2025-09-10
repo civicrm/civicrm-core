@@ -293,7 +293,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <style>@page { margin: 0.75in 0.75in 0.75in 0.75in; }</style>
-    <style type="text/css">@import url(' . CRM_Core_Config::singleton()->userFrameworkResourceURL . 'css/print.css);</style>
+    <style>@import url(' . CRM_Core_Config::singleton()->userFrameworkResourceURL . 'css/print.css);</style>
 ' . "    \n" . '  </head>
   <body>
     <div id="crm-container">

@@ -143,7 +143,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
 
         case 'style':
           if (!$allowCmsOverride || !$cms->addStyle($snippet['style'], $this->_name)) {
-            $html .= sprintf("<style type=\"text/css\">\n%s\n</style>\n", $snippet['style']);
+            $html .= sprintf("<style>\n%s\n</style>\n", $snippet['style']);
           }
           break;
 

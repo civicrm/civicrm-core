@@ -76,7 +76,7 @@
       })(CRM.$, CRM._);
     </script>
   {/literal}
-  <style type="text/css">
+  <style>
     {crmAPI var='statuses' entity='OptionValue' action='get' return="color,value" option_limit=0 option_group_id="activity_status"}
     {foreach from=$statuses.values item=status}
       {if !empty($status.color)}
