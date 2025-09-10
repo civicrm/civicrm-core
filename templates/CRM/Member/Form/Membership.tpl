@@ -144,7 +144,7 @@
         </tr>
         {if !$membershipMode}
           <tr>
-            <td class="label">{$form.is_override.label} {help id="id-status-override"}</td>
+            <td class="label">{$form.is_override.label} {help id="is_override"}</td>
             <td>
               <span id="is-override">{$form.is_override.html}</span>
               <span id="status-override-end-date">{$form.status_override_end_date.html}</span>
