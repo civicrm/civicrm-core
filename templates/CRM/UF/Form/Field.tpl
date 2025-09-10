@@ -16,7 +16,7 @@
 {else}
   <table class="form-layout-compressed">
     <tr class="crm-uf-field-form-block-field_name">
-      <td class="label">{$form.field_name.label} {help id='field_name_0'}</td>
+      <td class="label">{$form.field_name.label} {help id='field_name'}</td>
       <td>{$form.field_name.html nofilter}<br />
         <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
     </tr>
@@ -51,11 +51,11 @@
       </tr>
     {/if}
     <tr class="crm-uf-field-form-block-help_pre">
-      <td class="label">{$form.help_pre.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_field' field='help_pre' id=$fieldId}{/if} {help id='help'}</td>
+      <td class="label">{$form.help_pre.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_field' field='help_pre' id=$fieldId}{/if} {help id='help_pre'}</td>
       <td>{$form.help_pre.html}</td>
     </tr>
     <tr class="crm-uf-field-form-block-help_post">
-      <td class="label">{$form.help_post.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_field' field='help_post' id=$fieldId}{/if} {help id='help'}</td>
+      <td class="label">{$form.help_post.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_field' field='help_post' id=$fieldId}{/if} {help id='help_pre' title=$form.help_post.textLabel}</td>
       <td>{$form.help_post.html}</td>
     </tr>
     <tr class="crm-uf-field-form-block-weight">

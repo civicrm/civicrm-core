@@ -7,9 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='profile_overview-title'}
-  {ts}About Profiles{/ts}
-{/htxt}
+
 {htxt id='profile_overview'}
     <p>{ts}Profiles may be linked to specific modules, accessed via built-in CiviCRM URLs, or embedded into any web page using the HTML Form Snippet feature. Examples include:{/ts}</p>
     <ul class="indented">
@@ -29,9 +27,7 @@
     <p>{docURL page="user/the-user-interface/profiles"}</p>
 {/htxt}
 
-{htxt id='standalone-title'}
-  {ts}Form Snippet{/ts}
-{/htxt}
+
 {htxt id='standalone'}
     <p>{ts}The HTML Form Snippet code will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on your website where you want to collect contact information.{/ts}</p>
     <p>{ts}By changing the relative URLs included in the snippet to absolute URLs (e.g. change "/sites/all/modules/civicrm/bower_components/jquery/dist/jquery.min.js?r=dXCgD" to "https://yourdomain.com/sites/all/modules/civicrm/bower_components/jquery/dist/jquery.min.js?r=dXCgD") you will be able to use the snippet on any website.{/ts}</p>
