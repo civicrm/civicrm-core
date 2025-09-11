@@ -22,14 +22,14 @@
   <table class="form-layout">
     <tr  class="crm-contribution-contributionpage-pcp-form-block-target_entity_type">
         <td class="label">{$form.target_entity_type.label} <span class="crm-marker"> *</span></td>
-        <td>{$form.target_entity_type.html} {help id="id-target_entity_type"}</td>
+        <td>{$form.target_entity_type.html} {help id="target_entity_type"}</td>
     </tr>
   </table>
   <div id="pcpDetailFields" {if $form.target_entity_type.value[0] == 'event'} style="display:none;"{/if}>
     <table class="form-layout">
       <tr class="crm-contribution-contributionpage-pcp-form-block-target_entity_id" id="pcpDetailFields">
           <td class="label">{$form.target_entity_id.label} <span class="crm-marker"> *</span></td>
-          <td>{$form.target_entity_id.html} {help id="id-target_entity_id"}</td>
+          <td>{$form.target_entity_id.html} {help id="target_entity_id"}</td>
       </tr>
     </table>
   </div>
@@ -38,15 +38,15 @@
   <table class="form-layout">
      <tr class="crm-contribution-contributionpage-pcp-form-block-is_approval_needed">
         <td class="label">{$form.is_approval_needed.label}</td>
-        <td>{$form.is_approval_needed.html} {help id="id-approval_needed"}</td>
+        <td>{$form.is_approval_needed.html} {help id="is_approval_needed"}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-notify_email">
         <td class="label">{$form.notify_email.label}</td>
-        <td>{$form.notify_email.html} {help id="id-notify"}</td>
+        <td>{$form.notify_email.html} {help id="notify_email"}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-supporter_profile_id">
         <td class="label">{$form.supporter_profile_id.label} <span class="crm-marker"> *</span></td>
-        <td>{$form.supporter_profile_id.html} {help id="id-supporter_profile"}</td>
+        <td>{$form.supporter_profile_id.html} {help id="supporter_profile_id"}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-owner_notify_id">
         <td class="label">{$form.owner_notify_id.label}</td>
@@ -54,16 +54,16 @@
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-is_tellfriend_enabled">
         <td class="label">{$form.is_tellfriend_enabled.label}</td>
-        <td>{$form.is_tellfriend_enabled.html} {help id="id-is_tellfriend"}</td>
+        <td>{$form.is_tellfriend_enabled.html} {help id="is_tellfriend_enabled"}</td>
      </tr>
      <tr id="tflimit" class="crm-contribution-contributionpage-pcp-form-block-tellfriend_limit">
         <td class="label">{$form.tellfriend_limit.label}</td>
-        <td>{$form.tellfriend_limit.html|crmAddClass:four} {help id="id-tellfriend_limit"}</td>
+        <td>{$form.tellfriend_limit.html|crmAddClass:four} {help id="tellfriend_limit"}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-link_text">
         <td class="label">{$form.link_text.label}</td>
         <td>
-          {$form.link_text.html|crmAddClass:huge} {help id="id-link_text"}<br />
+          {$form.link_text.html|crmAddClass:huge} {help id="link_text"}<br />
           <span class="description">
             {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
               {ts}You can also place additional links (or menu items) allowing constituents to create their own fundraising pages using the following URL:{/ts}<br />
