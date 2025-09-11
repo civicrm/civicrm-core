@@ -1,6 +1,6 @@
 <?php
 
-use CRM_SearchKitReports_ExtensionUtil as E;
+use CRM_CivicrmSearchUi_ExtensionUtil as E;
 
 // Option for Afform.placement field
 return [

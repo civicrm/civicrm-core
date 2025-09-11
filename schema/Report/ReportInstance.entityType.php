@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_report_instance',
   'class' => 'CRM_Report_DAO_ReportInstance',
   'getInfo' => fn() => [
-    'title' => ts('Report'),
-    'title_plural' => ts('Reports'),
+    'title' => ts('Report Instance'),
+    'title_plural' => ts('Report Instances'),
     'description' => ts('Users can save their report instance and put in a cron tab etc.'),
     'add' => '2.2',
     'icon' => 'fa-bar-chart',
@@ -54,9 +54,12 @@ return [
       'title' => ts('Report template ID'),
       'sql_type' => 'varchar(512)',
       'input_type' => 'Select',
-      'required' => TRUE,
+      'required' => FALSE,
       'description' => ts('FK to civicrm_option_value for the report template'),
       'add' => '2.2',
+      'pseudoconstant' => [
+        'option_group_name' => 'report_template',
+      ],
     ],
     'name' => [
       'title' => ts('Report instance Name'),
