@@ -63,7 +63,8 @@ function smarty_function_help($params, $smarty) {
     if (str_contains($fieldID, '-')) {
       $fieldID = str_replace('-', '_', preg_replace('/^id-/', '', $fieldID));
     }
-    $helpTextTitle = $tplVars['form'][$fieldID]['textLabel'] ?? '';
+    // Use fieldTitle... fall back to pageTitle if nothing else
+    $helpTextTitle = $tplVars['form'][$fieldID]['textLabel'] ?? $tplVars['docTitle'] ?? $tplVars['pageTitle'] ?? '';
   }
 
   $class = "helpicon";

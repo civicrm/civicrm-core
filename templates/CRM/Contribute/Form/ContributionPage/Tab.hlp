@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-configure-contrib-pages-title"}
-  {ts}Contribution Page Configuration{/ts}
-{/htxt}
 {htxt id="id-configure-contrib-pages"}
 <table>
 <tr>

@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="manage_groups-title"}
-  {ts}Groups{/ts}
-{/htxt}
 {htxt id="manage_groups"}
     <p>{ts}Use Groups to organize contacts (e.g. these contacts are part of our 'Steering Committee'). You can also create <strong>smart groups</strong> based on contact characteristics (e.g. this group consists of all people in our database who live in a specific locality).{/ts} {docURL page="user/organising-your-data/groups-and-tags"}</p>
     <p>{ts}You can add contacts to a group from any set of search results (or when viewing an individual contact). You can also allow contacts to sign themselves up for certain groups by setting the group visibility to 'Public Pages' (use the <strong>Settings</strong> link), and including the <strong>Groups</strong> element in your CiviCRM Profile.{/ts} {docURL page="user/the-user-interface/profiles"}</p>

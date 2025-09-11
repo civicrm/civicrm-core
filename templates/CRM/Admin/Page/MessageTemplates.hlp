@@ -11,9 +11,6 @@
 {capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
 {capture assign=schedRemURL}{crmURL p='civicrm/admin/scheduleReminders' q="reset=1"}{/capture}
 {capture assign=upgradeTemplatesDocLink}{docURL page="sysadmin/upgrade/#updating-system-workflow-message-templates"}{/capture}
-{htxt id="id-intro-title"}
-  {ts}Message Templates{/ts}
-{/htxt}
 {htxt id="id-intro"}
 <p>
   {ts}Templates allow you to save and re-use messages with layouts. You can use them when sending email or letters to one or more contacts. If you are using CiviMail for enewsletters, newsletter templates take care of the layout so authors can focus on content.</p>{/ts}

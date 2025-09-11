@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-pcp_intro_help-title"}
-  {ts}Personal Campaign Pages{/ts}
-{/htxt}
 {htxt id="id-pcp_intro_help"}
 {ts}Personal Campaign Pages provide your constituents with the ability to promote this event or a related fundraising effort. When Personal Campaign Pages are enabled constituents will see a link after registering for this event which invites them to create their own page to promote the event (or promote a related online contribution page). Event registration fees (or contributions) from people who come in through a Personal Campaign Page are recorded as "soft credits" for the supporter who created that campaign page.{/ts}
 {/htxt}
@@ -22,7 +19,7 @@
 {htxt id="notify_email"}
 <p>{ts}Notification will be sent to this email address whenever a Personal Campaign Page linked to this event is either created or updated. The notification will include links to view the campaign page as well as the contact record of the creator of the page.{/ts}</p>
 <p>{ts}If you want Administrator of your organization to receive each PCP Notification receipt, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org) First Email will be sent to PCP user for support.{/ts}</p>
-{/htxt}   
+{/htxt}
 
 {htxt id="supporter_profile_id"}
 {capture assign="createProfileURL"}{crmURL p="civicrm/admin/uf/group" q="reset=1"}{/capture}
