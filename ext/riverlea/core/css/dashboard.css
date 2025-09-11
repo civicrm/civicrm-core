@@ -107,7 +107,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 }
 .crm-container .crm-inactive-dashlet {
   display: inline-block;
-  width: 230px;
+  width: 340px;
   height: var(--crm-xxl);
   margin: 10px;
   box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
@@ -120,7 +120,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   border-radius: var(--crm-dashlet-radius) var(--crm-dashlet-radius) 0 0;
 }
 .crm-container .crm-inactive-dashlet .crm-dashlet-header h3 {
-  font-size: 100%;
+  font-size: 75%;
   padding-left: var(--crm-s1);
 }
 #civicrm-dashboard .ui-sortable-placeholder {
