@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-trans_id"}
+{htxt id='trxn_id'}
 {ts}Unique payment ID for this transaction. The Payment Processor's transaction ID will be automatically stored here on online contributions.{/ts} {ts}For offline contributions you can record a bank transfer ID or other identifier if applicable.{/ts}
 {/htxt}
 {htxt id="payment_instrument_id"}

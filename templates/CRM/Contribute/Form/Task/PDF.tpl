@@ -27,7 +27,7 @@
     <td>{$form.output.pdf_receipt.html}</td>
   </tr>
   <tr id="selectPdfFormat" style="display: none;">
-    <td>{$form.pdf_format_id.html} {$form.pdf_format_id.label} {help id="id-contribution-receipt" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
+    <td>{$form.pdf_format_id.html} {$form.pdf_format_id.label} {help id="pdf_format_id" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
   </tr>
   <tr>
     <td>{$form.receipt_update.html} {$form.receipt_update.label}</td>
