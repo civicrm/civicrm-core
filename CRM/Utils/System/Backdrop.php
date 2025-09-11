@@ -696,8 +696,10 @@ AND    u.status = 1
    * @inheritDoc
    */
   public function cmsSitePath() {
-    $cmsSitePath = realpath(BACKDROP_ROOT . '/' . conf_path());
-    return $cmsSitePath;
+    if (defined('BACKDROP_ROOT')) {
+      $cmsSitePath = realpath(BACKDROP_ROOT . '/' . conf_path());
+      return $cmsSitePath;
+    }
   }
 
   /**
