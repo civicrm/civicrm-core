@@ -30,7 +30,7 @@ if (!defined('CIVI_SETUP')) {
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
     $object = new \CRM_Utils_System_Backdrop();
-    $cmsPath = $object->cmsRootPath();
+    $cmsPath = $object->cmsSitePath();
 
     // Compute settingsPath.
     $model->settingsPath = $cmsPath . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
