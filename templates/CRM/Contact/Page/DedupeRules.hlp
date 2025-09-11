@@ -28,12 +28,3 @@
   <p>{ts}You can configure any number of additional 'General' rules to provide other criteria to scan for possible duplicates.{/ts}</p>
   <p>{$docLink}</p>
 {/htxt}
-
-{htxt id="id-rule-used-title"}
-  {ts}Rule Usage{/ts}
-{/htxt}
-{htxt id="id-rule-used"}
-<p>{ts}The 'Unsupervised' rule for each contact type is automatically used when new contacts are created through online registrations including Events, Membership, Contributions and Profile pages. They are also selected by default when you Import contacts. They are generally configured with a narrow definition of what constitutes a duplicate.{/ts}</p>
-<p>{ts}The 'Supervised' rule for each contact type is automatically used to check for possible duplicates when contacts are added or edited via the user interface. Supervised Rules should be configured with a broader definition of what constitutes a duplicate.{/ts}</p>
-<p>{ts}You can only configure one 'Unsupervised' and one 'Supervised' rule for each contact type, but you can configure any number of additional 'General' rules to provide other criteria to scan for possible duplicates.{/ts}</p>
-{/htxt}
