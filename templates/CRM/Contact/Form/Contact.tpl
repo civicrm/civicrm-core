@@ -47,7 +47,11 @@
               </td>
               {if $contactId}
                 <td>
-                  <label for="internal_identifier_display">{ts}Contact ID{/ts} {help id="id-contact-id"}</label><br />
+                  <label for="internal_identifier_display">
+                    {capture assign="contactIdLabel"}{ts}Contact ID{/ts}{/capture}
+                    {$contactIdLabel}
+                    {help id="contact_id" title=$contactIdLabel}
+                  </label><br />
                   <input id="internal_identifier_display" type="text" class="crm-form-text six" size="6" readonly="readonly" value="{$contactId}">
                 </td>
               {/if}
