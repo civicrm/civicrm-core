@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='id-advanced-intro-title'}
-{ts}Advanced Search{/ts}
-{/htxt}
 {htxt id='id-advanced-intro'}
   <p>{ts}Use <strong>&#37;</strong> wildcard(s) for partial matches. EXAMPLE: Enter 'Volunteer&#37;' as your Activity Type to match any activity whose type is 'Volunteer' + any other words (e.g. Volunteer for Open House).{/ts}</p>
   <p>{ts}When multiple options are selected within a search field the selections are combined using <strong>OR</strong> criteria (e.g. selecting both 'Group A' and 'Group B' will find contacts who are either in 'Group A' OR 'Group B' or in both).</p>

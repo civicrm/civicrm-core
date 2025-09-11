@@ -8,9 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign=docLink}{docURL page="user/common-workflows/deduping-and-merging"}{/capture}
-{htxt id="id-dedupe-intro-title"}
-  {ts}Duplicate Contacts{/ts}
-{/htxt}
+
 {htxt id="id-dedupe-intro"}
   <p>{ts}Manage the rules used to identify potentially duplicate contact records. Scan for duplicates using a selected rule and merge duplicate contact data as needed. Click <strong>Edit Rule</strong> to review or modify the rules for each type of contact. You will generally want to maintain both 'Supervised' and 'Unsupervised' rules for each contact type.{/ts}</p>
   <p>{ts}The 'Unsupervised' rule for each contact type is automatically used when new contacts are created through online registrations including Events, Membership, Contributions and Profile pages. They are also selected by default when you Import contacts. They are generally configured with a narrow definition of what constitutes a duplicate.{/ts}</p>

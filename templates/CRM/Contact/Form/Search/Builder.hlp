@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="builder-intro-title"}
-{ts}Search Builder{/ts}
-{/htxt}
 {htxt id="builder-intro"}
 {capture assign=docUrlText}{ts}Search documentation in the User Guide{/ts}{/capture}
 {capture assign=docLink}{docURL page="user/the-user-interface/searching" text=$docUrlText}{/capture}

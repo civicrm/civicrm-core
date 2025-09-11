@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-intro-title"}
-  {ts}Widget{/ts}
-{/htxt}
 {htxt id="id-intro"}
 <p>{ts}Enabling a widget for this contribution page allows you and your supporters to easily promote a fund-raising campaign by embedding a chunk of dynamic content in any web page. CiviContribute widgets display real-time progress toward your fund-raising goals, and include a 'Contribute' button which links people directly to the associated online contribution page.{/ts}</p>
 <p>{ts}Use the form below to configure a Widget Title (with optional logo), your contribute button text, a short description of this fund-raising campaign, and a link to your organizations home page (for folks who want to learn more). You can also modify the default color-scheme by expanding the 'Edit Widget Colors' section of the form.{/ts}</p>

@@ -13,8 +13,7 @@
   </p>
   <p>
     {ts}You may configure these settings using absolute URLs or URL variables.{/ts}
-    {capture assign='helpTitle'}{ts}URL Variables{/ts}{/capture}
-    {help id='id-url_vars' title=$helpTitle}
+    {help id='id-url_vars'}
   </p>
 </div>
 <div class="crm-block crm-form-block crm-url-form-block">
