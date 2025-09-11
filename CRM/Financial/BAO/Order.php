@@ -1600,7 +1600,10 @@ class CRM_Financial_BAO_Order {
       // Nothing to save.
       return $entityValues['id'];
     }
-    return civicrm_api4($entity, 'save', ['records' => [$entityValues]])->first()['id'];
+    return civicrm_api4($entity, 'save', [
+      'records' => [$entityValues],
+      'checkPermissions' => FALSE,
+    ])->first()['id'];
   }
 
   public function getExistingContributionID(): ?int {
