@@ -54,7 +54,7 @@ return [
       'title' => ts('Report template ID'),
       'sql_type' => 'varchar(512)',
       'input_type' => 'Select',
-      'required' => FALSE,
+      'required' => TRUE,
       'description' => ts('FK to civicrm_option_value for the report template'),
       'add' => '2.2',
       'pseudoconstant' => [
