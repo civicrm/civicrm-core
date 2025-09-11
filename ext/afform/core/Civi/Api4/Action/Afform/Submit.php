@@ -462,7 +462,7 @@ class Submit extends AbstractProcessor {
       catch (\CRM_Core_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
         // intentionally left blank. Other times it's a real error the user should know about.
-        \Civi::log('afform')->debug('Silently ignoring exception in Afform processGenericEntity call for "' . $event->getEntityName() . '". Message: ' . $e->getMessage());
+        \Civi::log('afform')->debug('Afform: ' . $event->getAfform()['name'] . ': Silently ignoring exception on submit in processGenericEntity call for "' . $event->getEntityName() . '". Message: ' . $e->getMessage());
       }
     }
   }
