@@ -57,17 +57,11 @@
     <p>{ts}By definition a relationship is active if any of these conditions occurs: (1) Start Date <= Current Date <= End Date (2) Start Date <= Current Date and End Date is not defined (3) Start Date is not defined and Current Date <= End Date{/ts}</p>
 {/htxt}
 
-{htxt id="id-all-tags-title"}
-{ts}Tags{/ts}
-{/htxt}
-{htxt id="id-all-tags"}
+{htxt id="tag_search"}
     <p>{ts}Find records with tags (regular or tagset tag) which contain a complete or partial word or phrase. EXAMPLE: If you have several tags that contain the word 'Donor', you can find contacts tagged with any of them by entering 'Donor' in this field.{/ts}</p>
 {/htxt}
 
-{htxt id="id-all-tag-types-title"}
-{ts}Include Tags on Other Types of Records{/ts}
-{/htxt}
-{htxt id="id-all-tag-types"}
+{htxt id="all_tag_types"}
   <p>{ts}Check this box if you want to search for tagged activities or cases (in addition to contact records).{/ts}</p>
 {/htxt}
 
