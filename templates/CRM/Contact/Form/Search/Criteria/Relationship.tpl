@@ -33,7 +33,7 @@
          {$form.relation_permission.html}
       </td>
       <td>
-        {$form.relation_target_group.label} {help id="id-relationship-target-group" file="CRM/Contact/Form/Search/Advanced.hlp"}<br />
+        {$form.relation_target_group.label} {help id="relation_target_group" file="CRM/Contact/Form/Search/Advanced.hlp"}<br />
         {$form.relation_target_group.html|crmAddClass:huge}
       </td>
     </tr>

@@ -32,31 +32,23 @@
     <p>{ts}If you select multiple privacy options, your choices are combined with OR statements by default. EXAMPLE: If you select 'Do not phone' and 'Do not email', results will include contacts who have either or both preferences. If you want to return only contacts with both preferences, select the AND operator.{/ts}</p>
 {/htxt}
 
-{htxt id="id-display-results-title"}
-{ts}Results Display{/ts}
-{/htxt}
-{htxt id="id-display-results"}
+
+{htxt id='component_mode'}
     <p>{ts}Advanced Search returns your results as Contact records by default. However, you may want to get another record type instead. For example, you may want to see all the Activity records which match your search criteria.{/ts}</p>
 {/htxt}
 
-{htxt id="id-search-views-title"}
-{ts}Display Columns{/ts}
-{/htxt}
-{htxt id="id-search-views"}
+
+{htxt id='uf_group_id'}
     <p>{ts}If you are displaying the search results as contacts, you can modify the columns displayed by creating a Profile containing a different set of contact fields and then selecting that Profile here. For example you may want to include columns for Gender and Date of Birth, while eliminating Country.{/ts} {docURL page="user/organising-your-data/profiles"}</p>
 {/htxt}
 
-{htxt id="id-search-operator-title"}
-{ts}Search Operator{/ts}
-{/htxt}
-{htxt id="id-search-operator"}
+
+{htxt id='operator'}
     <p>{ts}Determines whether your criteria are combined with AND statements, or combined with OR statements. For example, you may want to find all individuals who are in the Volunteers group AND who have a Volunteer Training activity recorded for them. In this case use the AND operator. If you need to find everyone who is in the Volunteers group OR has a Volunteer Training activity recorded, use the OR operator.{/ts}</p>
 {/htxt}
 
-{htxt id="id-relationship-target-group-title"}
-{ts}Target Contact Group{/ts}
-{/htxt}
-{htxt id="id-relationship-target-group"}
+
+{htxt id='relation_target_group'}
     <p>{ts}Use this filter to limit search results to relationships where the related contacts are part of a specific group or groups. For example, you might want to find all individuals who are employees ('Employee of' relationship type) of organizations which are in your 'Corporate Sponsors' group.{/ts}</p>
 {/htxt}
 

@@ -40,7 +40,7 @@
       <div class="crm-block crm-form-block">
     <table class="form-layout-compressed">
       <tr>
-        <td class="label-left">{$form.format_id.label} {help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
+        <td class="label-left">{$form.format_id.label} {help id="format_id" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
         <td>{$form.format_id.html}</td>
       </tr>
       <tr>
@@ -92,7 +92,7 @@
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helphtml">
      <input class="crm-token-selector big" data-field="html_message" />
-     {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp"}
+     {help id="html_message" file="CRM/Contact/Form/Task/Email.hlp"}
    </div>
     <div class="clear"></div>
     <div class='html'>

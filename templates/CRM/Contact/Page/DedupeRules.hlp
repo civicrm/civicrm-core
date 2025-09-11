@@ -19,10 +19,7 @@
   <p>{$docLink}</p>
 {/htxt}
 
-{htxt id="id-rules-title"}
-  {ts}Duplicate Rules{/ts}
-{/htxt}
-{htxt id="id-rules"}
+{htxt id="configure-rules"}
   <p>{ts}Configure up to five fields to evaluate when searching for 'suspected' duplicate contact records. For each field, set a numeric <strong>Weight</strong> which determines the relative importance of a match on that field.{/ts}</p>
   <p>{ts}You can also set a <strong>Length</strong> value which determines how many characters in the field should be compared.{/ts}</p>
   <p>{ts}EXAMPLE: If you set a length of 8 on 'Street Address', then '101 Delaplane Ave.' would match '101 Delaplain St.' because the first 8 characters are the same. If Length is left blank, then the comparison is done on the entire field value.{/ts}</p>

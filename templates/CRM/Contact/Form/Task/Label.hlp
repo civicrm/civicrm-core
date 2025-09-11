@@ -24,10 +24,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-select-label-title"}
-  {ts}Label Formats{/ts}
-{/htxt}
-{htxt id="id-select-label"}
+
+{htxt id='label_name'}
   <p>{ts}Select a label format from the dropdown list.{/ts}</p>
   {capture assign="mailingLabelURL"}href="{crmURL p='civicrm/admin/labelFormats' q='reset=1'}"{/capture}
   <p>{ts 1=$mailingLabelURL}Go to <strong><a %1>Administer CiviCRM &raquo; Communications &raquo; Label Page Formats</a></strong> to add or edit labels or set the default label format.{/ts}</p>

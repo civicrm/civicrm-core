@@ -22,7 +22,7 @@
     <tr class="crm-contactEmail-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>
-         {$form.to.html} {help id="id-to_email" file="CRM/Contact/Form/Task/Email.hlp"}
+         {$form.to.html} {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
     <tr class="crm-contactEmail-form-block-cc_id" {if empty($form.cc_id.value)}style="display:none;"{/if}>
@@ -60,7 +60,7 @@
        <td>
          {$form.subject.html|crmAddClass:huge}&nbsp;
          <input class="crm-token-selector big" data-field="subject" />
-         {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+         {help id="subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
   {* CRM-15984 --add campaign to email activities *}
