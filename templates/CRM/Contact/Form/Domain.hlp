@@ -7,10 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="domain-name-title"}
-{ts}Domain Name{/ts}
-{/htxt}
-{htxt id="domain-name"}
+
+{htxt id='name'}
 {ts 1='&#123;domain.name&#125;'}Enter the name of the organization or entity which owns this CiviCRM domain. Use the %1 token to include this value in mailing content. It is used in the default Opt-out Message.{/ts}
 {/htxt}
 
