@@ -7,6 +7,9 @@ use Civi\Test\RemoteTestFunction;
 /**
  * Check that common syntax evaluates as expected on different versions of Smarty.
  *
+ * TIP: Every example is flagged as "PORTABLE" or "NOT PORTABLE". To get a summary,
+ * run: `grep PORTABLE tests/phpunit/E2E/Core/SmartyConsistencyTest.php`
+ *
  * @package E2E\Core
  * @group e2e
  */
@@ -23,7 +26,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
   }
 
   public function testPortable() {
-    // Observe: {$string nofilter} IS portable
+    // PORTABLE: {$string nofilter}
     $this->check('Dragon {$name nofilter}!',
       ['name' => 'Run & Hide'],
       [
@@ -34,7 +37,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ]
     );
 
-    // Observe: {$string|escape nofilter} IS portable
+    // PORTABLE: {$string|escape nofilter}
     $this->check(
       'Dragon {$name|escape nofilter}',
       ['name' => 'Run & Hide'],
@@ -46,9 +49,21 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ]
     );
 
-    // Observe: {$object|@json_encode nofilter} IS portable
+    // PORTABLE: {$object|@json_encode nofilter}
     $this->check(
       'var dragon = {$contact|@json_encode nofilter};',
+      ['contact' => ['name' => 'Run & Hide']],
+      [
+        '2_plain' => 'var dragon = {"name":"Run & Hide"};',
+        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
+        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
+        '5_auto' => 'var dragon = {"name":"Run & Hide"};',
+      ]
+    );
+
+    // PORTABLE: {$object|@json nofilter}
+    $this->check(
+      'var dragon = {$contact|@json nofilter};',
       ['contact' => ['name' => 'Run & Hide']],
       [
         '2_plain' => 'var dragon = {"name":"Run & Hide"};',
@@ -60,7 +75,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
   }
 
   public function testNonPortable() {
-    // Observe: {$string} is NOT portable
+    // NOT PORTABLE: {$string}
     $this->check('Dragon {$name}!',
       ['name' => 'Run & Hide'],
       [
@@ -71,7 +86,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ]
     );
 
-    // Observe: {$string|smarty:nodefaults} is NOT portable
+    // NOT PORTABLE: {$string|smarty:nodefaults}
     $this->check(
       'Dragon {$name|smarty:nodefaults}',
       ['name' => 'Run & Hide'],
@@ -83,7 +98,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ]
     );
 
-    // Observe: {$data|@json_encode} IS NOT portable.
+    // NOT PORTABLE: {$data|@json_encode}
     $this->check(
       'var dragon = {$contact|@json_encode};',
       ['contact' => ['name' => 'Run & Hide']],
@@ -95,7 +110,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ]
     );
 
-    // Observe: {$data|json_encode nofilter} is NOT portable
+    // NOT PORTABLE: {$data|json_encode nofilter}
     $this->check(
       'var dragon = {$contact|json_encode nofilter};',
       ['contact' => ['name' => 'Run & Hide']],
@@ -104,6 +119,30 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
         '4_plain' => 'var dragon = {"name":"Run & Hide"};',
         '5_plain' => 'var dragon = {"name":"Run & Hide"};',
         '5_auto' => 'var dragon = {"name":"Run & Hide"};',
+      ]
+    );
+
+    // NOT PORTABLE: {$data|json nofilter}
+    $this->check(
+      'var dragon = {$contact|json nofilter};',
+      ['contact' => ['name' => 'Run & Hide']],
+      [
+        '2_plain' => 'var dragon = Array;', /* outlier */
+        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
+        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
+        '5_auto' => 'var dragon = {"name":"Run & Hide"};',
+      ]
+    );
+
+    // NOT PORTABLE: {$data|@json|smarty:nodefaults}
+    $this->check(
+      'var dragon = {$contact|@json|smarty:nodefaults};',
+      ['contact' => ['name' => 'Run & Hide']],
+      [
+        '2_plain' => 'var dragon = {"name":"Run & Hide"};',
+        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
+        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
+        '5_auto' => 'var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};', /* outlier */
       ]
     );
   }
