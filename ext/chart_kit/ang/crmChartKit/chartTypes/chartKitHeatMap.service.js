@@ -49,18 +49,18 @@
       displayCtrl.chart
         .dimension(displayCtrl.dimension)
         .group(displayCtrl.group)
-        .keyAccessor(displayCtrl.getValueAccessor(colColumn), colColumn.label)
-        .colsLabel((d) => displayCtrl.renderDataValue(d[0], colColumn))
+        .keyAccessor((d) => colColumn.valueAccessor(d), colColumn.label)
+        .colsLabel((d) => colColumn.renderValue(d[0]))
         .colOrdering((a, b) => d3.ascending(a[0], b[0]))
-        .valueAccessor(displayCtrl.getValueAccessor(rowColumn), rowColumn.label)
-        .rowsLabel((d) => displayCtrl.renderDataValue(d[0], rowColumn))
+        .valueAccessor((d) => rowColumn.valueAccessor(d), rowColumn.label)
+        .rowsLabel((d) => rowColumn.renderValue(d[0]))
         .rowOrdering((a, b) => {
-          return d3.ascending(displayCtrl.renderDataValue(a, rowColumn), displayCtrl.renderDataValue(b, rowColumn));
+          return d3.ascending(rowColumn.renderValue(a), rowColumn.renderValue(b));
         });
 
       // set up color scale
       displayCtrl.chart
-        .colorAccessor(displayCtrl.getValueAccessor(colorColumn))
+        .colorAccessor((d) => colorColumn.valueAccessor(d))
         .calculateColorDomain();
       const colorScale = d3.scaleLinear(displayCtrl.chart.colorDomain(), [displayCtrl.settings.colorScaleMin, displayCtrl.settings.colorScaleMax]);
       displayCtrl.chart.colors(colorScale);
@@ -93,7 +93,7 @@
           });
 
           // assign the text content
-          boxGroups.select('.heat-box-label').text((d) => displayCtrl.renderDataLabel(d, displayCtrl.dataPointLabelMask('label')(d)).replaceAll('\n', ' - '));
+          boxGroups.select('.heat-box-label').text((d) => displayCtrl.renderDataLabel(d, 'label').replaceAll('\n', ' - '));
         });
     }
   }));

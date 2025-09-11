@@ -5,13 +5,13 @@
   <fieldset ng-repeat="(axisKey, axis) in $ctrl.getAxes()">
     <legend>{{:: axis.label }}</legend>
 
-    <fieldset ng-repeat="col in $ctrl.getAxisColumnSlots(axisKey)">
+    <fieldset ng-repeat="col in $ctrl.getColumnsForAxis(axisKey)">
       <div class="form-inline crm-chart-kit-axis-column-selector">
         <label>
           {{:: ts('Field') }} <span class="crm-marker">*</span>
         </label>
 
-        <select name="chart-kit-field-column-{{:: col.index }}" class="form-control huge" crm-ui-select required
+        <select name="chart-kit-field-column-{{:: col.name }}" class="form-control huge" crm-ui-select required
           ng-model="$ctrl.display.settings.columns[col.index].key"
           ng-change="$ctrl.onColumnSearchColumnChange(col.index)">
           <option ng-repeat="colOption in $ctrl.getColumnConfigOptionDetails(col, 'searchColumn')"
@@ -141,14 +141,19 @@
           <input type="checkbox" ng-model="col.useRightAxis" />
         </div>
       </details>
-      <button class="btn btn-sm btn-secondary-outline" ng-if="axis.multiColumn"
-        ng-click="$ctrl.removeColumn(col.index)">
+      <button class="btn btn-sm btn-secondary-outline"
+        ng-if="axis.multiColumn || !axis.prepopulate"
+        ng-click="$ctrl.removeColumn(col.index)"
+        >
         <i class="crm-i fa-minus" />
         {{:: ts('Remove field') }}
       </button>
     </fieldset>
 
-    <button class="btn btn-default" ng-if="axis.multiColumn" ng-click="$ctrl.initColumn(axisKey)">
+    <button class="btn btn-default"
+      ng-if="axis.multiColumn || !$ctrl.getAxisColumnSlots(axisKey).length"
+      ng-click="$ctrl.initColumn(axisKey)"
+      >
       <i class="crm-i fa-plus" />
       {{:: ts('Add field') }}
     </button>
