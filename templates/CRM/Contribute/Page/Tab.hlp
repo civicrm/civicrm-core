@@ -7,30 +7,21 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-contrib_source-title"}
-  {ts}Source{/ts}
-{/htxt}
-{htxt id="id-contrib_source"}
+
+{htxt id='source'}
 {ts}Optional identifier for the contribution source (campaign name, event, mailer, etc.).{/ts}
 {/htxt}
 
-{htxt id="id-total_amount-title"}
-  {ts}Total Amount{/ts}
-{/htxt}
-{htxt id="id-total_amount"}
+{htxt id="total_amount"}
 {ts 1='target="_blank" href="https://civicrm.org/extensions/line-item-editor"'}You are not allowed to change the total amount as it will lead to incorrect line item entries. You can either delete or recreate or install <a %1>Line Item Editor</a>.{/ts}
 {/htxt}
 
-{htxt id="id-financial_type-title"}
-  {ts}Financial Type{/ts}
-{/htxt}
-{htxt id="id-financial_type"}
+
+{htxt id='financial_type_id'}
 {ts}Select the appropriate financial type for this transaction.{/ts}
 {/htxt}
 
-{htxt id="payment_instrument_id-title"}
-  {ts}Payment Method{/ts}
-{/htxt}
+
 {htxt id="payment_instrument_id"}
   <p>
     {ts}Choose the method by which this transaction was paid.{/ts}
@@ -40,16 +31,11 @@
 
 {/htxt}
 
-{htxt id="id-trans_id-title"}
-  {ts}Transaction ID{/ts}
-{/htxt}
-{htxt id="id-trans_id"}
+
+{htxt id='trxn_id'}
 {ts}Unique payment ID for this transaction. The Payment Processor's transaction ID will be automatically stored here on online contributions.{/ts} {ts}For offline contributions you can record a bank transfer ID or other identifier if applicable.{/ts}
 {/htxt}
 
-{htxt id="id-soft_credit-title"}
-  {ts}Soft Credit{/ts}
-{/htxt}
 {htxt id="id-soft_credit"}
 <p>
 {ts}Use to indicate that a contact has a relationship with the actual donor and / or was indirectly responsible for the contribution. For example, if one family member makes a large contribution - it is often useful to record a Soft Credit for the other family member(s). You can record a soft credit while adding or editing a contribution record from this tab.{/ts}
@@ -59,10 +45,7 @@
 </p>
 {/htxt}
 
-{htxt id="id-pcp-title"}
-  {ts}Personal Campaign Page{/ts}
-{/htxt}
-{htxt id="id-pcp"}
+{htxt id="pcp_made_through_id"}
 <p>
 {ts}Use this section to indicate that the contribution came in via a constituent's Personal Campaign Page (PCP), OR should be credited to that PCP post facto.{/ts}
 </p>
@@ -71,9 +54,6 @@
 </p>
 {/htxt}
 
-{htxt id="adjust-payment-amount-title"}
-  {ts}Payment Amount{/ts}
-{/htxt}
 {htxt id="adjust-payment-amount"}
 {ts}If you enter a payment which is different than the scheduled amount, choose one of these options:{/ts}
 <p>

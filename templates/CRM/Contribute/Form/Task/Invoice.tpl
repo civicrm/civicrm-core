@@ -41,7 +41,7 @@
     </td>
   </tr>
   <tr class="crm-email-element">
-    <td class="label">{$form.email_comment.label} {help id="id-email_comment"}</td>
+    <td class="label">{$form.email_comment.label} {help id="email_comment"}</td>
     <td>{$form.email_comment.html}</td>
   </tr>
   {if $selectedOutput ne 'email'}

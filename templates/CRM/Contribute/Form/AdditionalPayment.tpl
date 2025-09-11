@@ -93,7 +93,7 @@
           </tr>
           <tr class="crm-payment-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
+            <td>{$form.trxn_id.html} {help id="trxn_id"}</td>
           </tr>
           <tr class="crm-payment-form-block-fee_amount">
             <td class="label">{$form.fee_amount.label}</td>
