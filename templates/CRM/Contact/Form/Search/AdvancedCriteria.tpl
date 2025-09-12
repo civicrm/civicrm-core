@@ -78,9 +78,13 @@ CRM.$(function($) {
 
 {if $context EQ 'smog' || $context EQ 'amtg' || !empty($savedSearch)}
   <h3>
-    {if $context EQ 'smog'}{ts}Find Contacts within this Group{/ts}
-    {elseif $context EQ 'amtg'}{ts}Find Contacts to Add to this Group{/ts}
-    {elseif !empty($savedSearch)}{ts 1=$savedSearch.name}%1 Smart Group Criteria{/ts} &nbsp; {help id='id-advanced-smart'}
+    {if $context EQ 'smog'}
+      {ts}Find Contacts within this Group{/ts}
+    {elseif $context EQ 'amtg'}
+      {ts}Find Contacts to Add to this Group{/ts}
+    {elseif !empty($savedSearch)}
+      {ts 1=$savedSearch.name}%1 Smart Group Criteria{/ts}
+      {capture assign='helpTitle'}{ts}Smart Group{/ts}{/capture}{help id='id-advanced-smart' title=$helpTitle}
     {/if}
   </h3>
 {/if}
