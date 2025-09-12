@@ -28,3 +28,7 @@
 {htxt id='activity_source'}
   {ts}An activity can only have one source contact, so if you choose a field that can have more than one email (To, CC or BCC), only the first email will be used.{/ts}
 {/htxt}
+
+{htxt id="return_path"}
+{ts}Use this field if you need to populate the <code>Return-Path</code> mail header element with a fixed value (e.g., <code>myuser@example.org</code>). Enter a fully qualified email address which belongs to a valid SMTP account in your domain. This address will not be seen by 'typical' email clients. Consult with your SMTP provider what address to put in here so that the SMTP server accepts outgoing mail from CiviMail. If this field is left blank, the <code>From</code> email address will be used as the <code>Return-Path</code>.{/ts}
+{/htxt}
