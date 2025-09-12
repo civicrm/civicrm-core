@@ -36,7 +36,7 @@
       <tr class="crm-mail-settings-form-block-domain"><td class="label">{$form.domain.label}</td><td>{$form.domain.html}</td></tr>
       <tr><td class="label">&nbsp;</td><td class="description">{ts}Email address domain (the part after @).{/ts}</td></tr>
 
-      <tr class="crm-mail-settings-form-block-return_path"><td class="label">{$form.return_path.label}</td><td>{$form.return_path.html}</td><tr>
+      <tr class="crm-mail-settings-form-block-return_path"><td class="label">{$form.return_path.label} {help id='return_path'}</td><td>{$form.return_path.html}</td><tr>
       <tr><td class="label">&nbsp;</td><td class="description">{ts}Contents of the Return-Path header.{/ts}</td></tr>
 
       <tr class="crm-mail-settings-form-block-protocol"><td class="label">{$form.protocol.label}</td><td>{$form.protocol.html}</td></tr>
