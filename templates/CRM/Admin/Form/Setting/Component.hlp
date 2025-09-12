@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="components-title"}
-  {ts}Components{/ts}
-{/htxt}
 {htxt id="components"}
 <p>{ts}These optional components give you more tools to connect with and engage your supporters.{/ts}</p>
 <p>{ts}<strong>CiviContribute</strong> - An online fundraising and donor management component which enables you to track and manage contributions to your organization. It also allows you to quickly and easily create customized web pages to accept online donations.{/ts} {docURL page="user/contributions/what-is-civicontribute"}</p>

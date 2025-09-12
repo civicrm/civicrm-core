@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-disabled_statuses-title"}
-  {ts}Disabled Statuses{/ts}
-{/htxt}
 {htxt id="id-disabled_statuses"}
 <p><strong>{ts}Waitlisting Statuses{/ts}</strong><br />
 {ts}To enable event waitlist management the following statuses must be enabled:{/ts} <strong>{ts}On waitlist{/ts}</strong>, <strong>{ts}Pending from waitlist{/ts}</strong>. {ts}Once these statuses are enabled, the event Info and Settings screen will have controls to enable (and configure) waitlisting.{/ts}</p>
