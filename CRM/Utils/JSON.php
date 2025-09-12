@@ -21,6 +21,18 @@
 class CRM_Utils_JSON {
 
   /**
+   * Safely encodes a variable that will be printed inside a `<script>` tag.
+   *
+   * See https://lab.civicrm.org/dev/core/-/issues/6080
+   *
+   * @param mixed $input
+   * @return int|string
+   */
+  public static function encodeScriptVar($input) {
+    return json_encode($input, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES);
+  }
+
+  /**
    * Output json to the client.
    * @param mixed $input
    */
