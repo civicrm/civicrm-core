@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {*common template for compose sms*}
-
+{capture assign='tokenTitle'}{ts}Tokens{/ts}{/capture}
 <details class="crm-accordion-bold crm-plaint_text_sms-accordion " open>
 <summary>
   {$form.sms_text_message.label}
@@ -17,7 +17,7 @@
  <div><span id="char-count-message"></span> <span id="char-count-help">{help id="sms_text_message" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}</span></div>
    <div class="helpIcon" id="helptext">
      <input class="crm-token-selector big" data-field="sms_text_message" />
-     {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}
+     {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp" title=$tokenTitle}
    </div>
     <div class='text'>
   {$form.sms_text_message.html}<br />

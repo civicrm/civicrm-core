@@ -8,6 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/scheduling reminders.  *}
+{capture assign='tokenTitle'}{ts}Tokens{/ts}{/capture}
 <div class="crm-block crm-form-block crm-scheduleReminder-form-block">
     {if $action eq 8}
       <div class="messages status no-popup">
@@ -139,7 +140,7 @@
               <td>
                   {$form.subject.html|crmAddClass:huge}
                 <input class="crm-token-selector big" data-field="subject" />
-                  {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp"}
+                  {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
               </td>
             </tr>
           </table>

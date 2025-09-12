@@ -8,6 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {*common template for compose PDF letters*}
+{capture assign='tokenTitle'}{ts}Tokens{/ts}{/capture}
 {if !empty($form.template.html)}
 <table class="form-layout-compressed">
     <tr>
@@ -92,7 +93,7 @@
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helphtml">
      <input class="crm-token-selector big" data-field="html_message" />
-     {help id="html_message" file="CRM/Contact/Form/Task/Email.hlp"}
+     {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
    </div>
     <div class="clear"></div>
     <div class='html'>
