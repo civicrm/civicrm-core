@@ -94,7 +94,7 @@
             </tr>
           {/if}
         </table>
-       {if $participantId and $hasPayment}
+       {if $participantId and $hasPayment && $accessCiviContribute}
         <table class='form-layout'>
           <tr>
             <td class='label'>{ts}Fees{/ts}</td>

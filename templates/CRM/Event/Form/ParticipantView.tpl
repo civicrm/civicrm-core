@@ -109,7 +109,7 @@
       <div class="messages status no-popup">{icon icon="fa-info-circle"}{/icon} {ts}Note:{/ts} {$rec|escape|nl2br}</div>
     {/if}
   {/foreach}
-    {if $participantId and $hasPayment}
+    {if $participantId and $hasPayment and $accessCiviContribute}
       <div id="payment-info"></div>
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
     {/if}
