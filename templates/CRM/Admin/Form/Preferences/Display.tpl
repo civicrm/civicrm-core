@@ -89,12 +89,12 @@
         </tr>
       {elseif $fieldSpec.name eq 'user_dashboard_options'}
         <tr class="crm-preferences-display-form-block-user_dashboard_options">
-          <td class="label">{$form.user_dashboard_options.label}</td>
+          <td class="label">{$form.user_dashboard_options.label}{help id="user_dashboard_options"}</td>
           <td>
             <ul class="crm-checkbox-list">
               <li>
                 {$form.user_dashboard_options.html}
-                <span style="position: absolute; right: 5px; bottom: 3px;"> {help id="id-invoices_id"}</span>
+                <span > </span>
               </li>
             </ul>
             <div class="description">

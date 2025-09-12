@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="editor-id-id-title"}
-  {ts}WYSIWYG Editor{/ts}
-{/htxt}
 {htxt id="editor-id-id"}
   <p>
     {ts}A "WYSIWYG" (What You See Is What You Get) is a rich-text editor, like a mini word-processor, for editing HTML content in CiviCRM.{/ts}
@@ -21,10 +18,7 @@
   </ul>
 {/htxt}
 
-{htxt id="id-invoices_id-title"}
-  {ts}Invoices / Credit Notes{/ts}
-{/htxt}
-{htxt id="id-invoices_id"}
+{htxt id="user_dashboard_options"}
   {capture assign=invoiceURL}{crmURL p='civicrm/admin/setting/preferences/contribute' q="reset=1"}{/capture}
   {ts 1=$invoiceURL}In order to enable logged in users to download invoices and credit notes from the dashboard, please first enable CiviCRM invoicing functionality <a href='%1'>Administer > CiviContribute > CiviContribute Component Settings</a>{/ts}
 {/htxt}
@@ -37,9 +31,6 @@
   </p>
 {/capture}
 
-{htxt id="theme-backend-id-title"}
-  {ts}Backend Theme{/ts}
-{/htxt}
 {htxt id="theme-backend-id"}
   {$themeDefn}
   <p>
@@ -48,9 +39,6 @@
   {$themeAdv}
 {/htxt}
 
-{htxt id="theme-frontend-id-title"}
-  {ts}Frontend Theme{/ts}
-{/htxt}
 {htxt id="theme-frontend-id"}
   {$themeDefn}
   <p>
