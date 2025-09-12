@@ -7,18 +7,13 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-event-reg-title"}
-  {ts}Event Registration{/ts}
-{/htxt}
-{htxt id="id-event-reg"}
+{htxt id="is_online_registration"}
 {capture assign=ppUrl}{crmURL p='civicrm/admin/paymentProcessor' q="reset=1"}{/capture}
 {ts 1=$ppUrl}If you want to provide an Online Registration page for this event, check the first box below and then complete the fields on this form. You can offer online registration for both Paid and Free events. Paid events require that you have configured a <a href="%1">payment processor</a> for your site.{/ts}
 {ts}You may also configure events to require administrative approval prior to participants completing the registration process. To enable this feature you must first enable the Participant Statuses used by the approval work-flow (Administer » CiviEvent » Participant Statuses). Then reload this form and check 'Require participant approval?'.{/ts}
 {/htxt}
-{htxt id="event-profile-title"}
-  {ts}Profile{/ts}
-{/htxt}
-{htxt id="event-profile"}
+
+{htxt id='custom_pre_id'}
 <p>{ts}If you want collect additional information during event registration, you will need to configure one or more CiviCRM Profiles - which are collections of standard or custom fields. For event registration, you often want to collect an email address and / or participants' first and last names. You may also need to collect additional information specific to a person's <strong>participation</strong> in an Event. Examples include meal and/or volunteer preferences.{/ts}</p>
 <p>{ts}If you haven't already configured custom fields and a profile for this, you can save this screen without selecting a Profile, complete the steps below and then return to <strong>Manage Events</strong> and select your new profile.{/ts}
         <ol>
@@ -36,88 +31,59 @@
         {ts 1=$docLinkCustom 2=$docLinkProfile}Refer to the online documentation for more details on creating %1 and %2.{/ts}
 </p>
 {/htxt}
-{htxt id="event-profile-bottom-title"}
-  {ts}Bottom Profile Fields{/ts}
-{/htxt}
-{htxt id="event-profile-bottom"}
+
+{htxt id='custom_post_id'}
   {ts}Profile to be included at the bottom of the form, before the submit button.{/ts}
 {/htxt}
-{htxt id="id-link_text-title"}
-  {ts}Registration Link{/ts}
-{/htxt}
-{htxt id="id-link_text"}
+
+{htxt id="link_text"}
 {ts}Display text for link from Event Information to Event Registration pages (e.g. 'Register Now!').{/ts}
 {/htxt}
-{htxt id="id-allow_multiple-title"}
-  {ts}Multiple Participants{/ts}
-{/htxt}
-{htxt id="id-allow_multiple"}
+
+{htxt id='is_multiple_registrations'}
 <p>{ts}Check this box to allow users to register themselves AND additional participants for an event. When this feature is enabled, users have the option to specify the number of additional participants they are registering for. If this is a paid event, they can select a different event fee for each participant and will be charged the total of those fees. If a profile is included, they will complete the profile information for each participant.{/ts}</p>
 <p>{ts}You can use different profile for the person who is registering than for "Additional Participants". For example, you may want to require an email address from the person entering the registration while not requiring (or even requesting) emails for additional participants (i.e. their "guests").{/ts}</p>
 {/htxt}
-{htxt id="id-max_additional-title"}
-  {ts}Maximum Additional Participants{/ts}
-{/htxt}
-{htxt id="id-max_additional"}
+
+{htxt id='max_additional_participants'}
   <p>{ts}Limit the number of additional participants that can be registered in a single booking.{/ts}</p>
   <p>{ts}Eg: if you choose '2' then the lead booker can bring 2 guests; there would be a limit of 3 participants in total per booking.{/ts}</p>
 {/htxt}
-{htxt id="id-allow_same_email-title"}
-  {ts}Allow Shared Email{/ts}
-{/htxt}
-{htxt id="id-allow_same_email"}
+
+{htxt id='allow_same_participant_emails'}
 <p>{ts}Check this box to allow a user to register multiple participants using the same email address. Alternatively, if you want additional participants to be registered <strong>without requiring an email address to be entered for each person</strong> - check the "Register multiple participants" option, AND include a profile in this registration form which <strong>includes First Name and Last Name fields</strong>.{/ts}</p>
 <p>{ts}Checking this box will also allow the <strong>same contact to register for this event multiple times</strong>, which is otherwise not possible.{/ts}</p>
 {/htxt}
-{htxt id="id-dedupe_rule_group_id-title"}
-  {ts}Duplicate Matching Rule{/ts}
-{/htxt}
-{htxt id="id-dedupe_rule_group_id"}
+
+{htxt id='dedupe_rule_group_id'}
 <p>{ts}By default, your event will use the Unsupervised duplicate matching rule to match participants in anonymous registrations with existing individuals. You may select another rule to use for this event instead. Make sure that your included profile(s) contain the fields needed by your matching rule.{/ts}</p>
 {/htxt}
-{htxt id="id-requires_approval-title"}
-  {ts}Require Approval{/ts}
-{/htxt}
-{htxt id="id-requires_approval"}
+
+{htxt id='requires_approval'}
 {ts}Check this box to require administrative approval for all the participants who self-register, prior to being able to complete the registration process. Participants will be placed in 'Awaiting Approval' status. You can review and approve participants from 'Find Participants' - select the 'Participant status - change' task. Approved participants will move to 'Pending from approval' status, and will be sent an email with a link to complete their registration (including paying event fees - if any). {/ts}
 {/htxt}
-{htxt id="id-expiration_time-title"}
-  {ts}Time Limit{/ts}
-{/htxt}
-{htxt id="id-expiration_time"}
+
+{htxt id='expiration_time'}
 {ts}Time limit <strong>in hours</strong> for confirming/finishing registration by participants with any of the pending statuses. Enter 0 (or leave empty) to disable this feature.{/ts}
 {/htxt}
-{htxt id="id-allow_selfcancelxfer-title"}
-  {ts}Allow Self-service Cancellation or Transfer?{/ts}
-{/htxt}
-{htxt id="id-allow_selfcancelxfer"}
+
+{htxt id='allow_selfcancelxfer'}
   <p>{ts}Check this box if you want to allow registered participants to either cancel their registration OR transfer it to another participant. If this feature is enabled, event confirmation emails will include a link to a Cancel or Transfer form.{/ts}</p>
   <p>{ts}<strong>Automated refunds for cancellations are NOT currently supported.</strong> Participants who have paid for an event will be notified that cancellations are not refundable.{/ts}</p>
 {/htxt}
-{htxt id="id-selfcancelxfer_time-title"}
-  {ts}Cancellation or Transfer Time Limit{/ts}
-{/htxt}
-{htxt id="id-selfcancelxfer_time"}
+
+{htxt id='selfcancelxfer_time'}
   {ts}Number of hours prior to event start date to allow self-service cancellation or transfer. Enter a negative number of hours to allow cancellation after the event starts. Enter 0 (or leave empty) to allow cancellation or transfer up until the event has started.{/ts}
 {/htxt}
 
-{htxt id="id-is_email_confirm-title"}
-  {ts}Send Confirmation Email?{/ts}
-{/htxt}
-{htxt id="id-is_email_confirm"}
+{htxt id="is_email_confirm"}
   {ts}Do you want a registration confirmation email sent automatically to the user? This email includes event date(s), location and contact information. For paid events, this email is also a receipt for their payment.{/ts}
 {/htxt}
 
-{htxt id="id-cc_confirm-title"}
-  {ts}CC Confirmation To{/ts}
-{/htxt}
-{htxt id="id-cc_confirm"}
+{htxt id="cc_confirm"}
   {ts}You can notify event organizers of each online registration by specifying one or more email addresses to receive a carbon copy (cc). Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}
 {/htxt}
 
-{htxt id="id-bcc_confirm-title"}
-  {ts}BCC Confirmation To{/ts}
-{/htxt}
-{htxt id="id-bcc_confirm"}
+{htxt id="bcc_confirm"}
   {ts}You may specify one or more email addresses to receive a blind carbon copy (bcc) of the confirmation email. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}
 {/htxt}

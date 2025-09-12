@@ -56,7 +56,7 @@
             </td>
           </tr>
           <tr class="crm-localization-form-block-defaultCurrency">
-            <td class="label">{$form.defaultCurrency.label} {help id='defaultCurrency' title=$form.defaultCurrency.label}</td>
+            <td class="label">{$form.defaultCurrency.label} {help id='defaultCurrency'}</td>
             <td>{$form.defaultCurrency.html}</td>
           </tr>
           <tr class="crm-localization-form-block-format_locale">
@@ -77,19 +77,19 @@
                 <td>{$form.currencyLimit.html|smarty:nodefaults}</td>
             </tr>
             <tr class="crm-localization-form-block-moneyformat">
-                <td class="label">{$form.moneyformat.label} {help id='moneyformat' title=$form.moneyformat.label}</td>
+                <td class="label">{$form.moneyformat.label} {help id='moneyformat'}</td>
                 <td>{$form.moneyformat.html}</td>
             </tr>
             <tr class="crm-localization-form-block-customTranslateFunction">
-                <td class="label">{$form.customTranslateFunction.label} {help id='customTranslateFunction' title=$form.customTranslateFunction.label}</td>
+                <td class="label">{$form.customTranslateFunction.label} {help id='customTranslateFunction'}</td>
                 <td>{$form.customTranslateFunction.html}</td>
             </tr>
             <tr class="crm-localization-form-block-legacyEncoding">
-                <td class="label">{$form.legacyEncoding.label} {help id='legacyEncoding' title=$form.legacyEncoding.label}</td>
+                <td class="label">{$form.legacyEncoding.label} {help id='legacyEncoding'}</td>
                 <td>{$form.legacyEncoding.html}</td>
             </tr>
             <tr class="crm-localization-form-block-fieldSeparator">
-                <td class="label">{$form.fieldSeparator.label} {help id='fieldSeparator' title=$form.fieldSeparator.label}</td>
+                <td class="label">{$form.fieldSeparator.label} {help id='fieldSeparator'}</td>
                 <td>{$form.fieldSeparator.html}</td>
             </tr>
         </table>
@@ -97,19 +97,19 @@
         <table class="form-layout-compressed">
             {include file='CRM/Admin/Form/Setting/SettingField.tpl' setting_name='defaultContactCountry' fieldSpec=$settings_fields.defaultContactCountry}
             <tr class="crm-localization-form-block-pinnedContactCountries">
-                <td class="label">{$form.pinnedContactCountries.label} {help id='pinnedContactCountries' title=$form.pinnedContactCountries.label}</td>
+                <td class="label">{$form.pinnedContactCountries.label} {help id='pinnedContactCountries'}</td>
                 <td>{$form.pinnedContactCountries.html|smarty:nodefaults}</td>
             </tr>
            <tr class="crm-localization-form-block-defaultContactStateProvince">
-                <td class="label">{$form.defaultContactStateProvince.label} {help id='defaultContactCountry' title=$form.defaultContactStateProvince.label}</td>
+                <td class="label">{$form.defaultContactStateProvince.label} {help id='defaultContactCountry' title=$form.defaultContactStateProvince.textLabel}</td>
                 <td>{$form.defaultContactStateProvince.html}</td>
             </tr>
             <tr class="crm-localization-form-block-countryLimit">
-                <td class="label">{$form.countryLimit.label} {help id='countryLimit' title=$form.countryLimit.label}</td>
+                <td class="label">{$form.countryLimit.label} {help id='countryLimit'}</td>
                 <td>{$form.countryLimit.html|smarty:nodefaults}</td>
             </tr>
             <tr class="crm-localization-form-block-provinceLimit">
-                <td class="label">{$form.provinceLimit.label} {help id='provinceLimit' title=$form.provinceLimit.label}</td>
+                <td class="label">{$form.provinceLimit.label} {help id='provinceLimit'}</td>
                 <td>{$form.provinceLimit.html|smarty:nodefaults}</td>
             </tr>
         </table>

@@ -15,13 +15,13 @@
 </div>
     <table class="form-layout-compressed">
     <tr class="crm-contribution-contributionpage-custom-form-block-custom_pre_id">
-       <td class="label">{$form.custom_pre_id.label} {help id="contrib-profile-top"}</td>
+       <td class="label">{$form.custom_pre_id.label} {help id="custom_pre_id"}</td>
        <td class="html-adjust">{$form.custom_pre_id.html}
          <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
        </td>
     </tr>
     <tr class="crm-contribution-contributionpage-custom-form-block-custom_post_id">
-       <td class="label">{$form.custom_post_id.label} {help id="contrib-profile-bottom"}</td>
+       <td class="label">{$form.custom_post_id.label} {help id="custom_post_id"}</td>
        <td class="html-adjust">{$form.custom_post_id.html}
          <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
        </td>

@@ -45,7 +45,9 @@
 {if call_user_func(array('CRM_Core_Permission','access'), 'CiviMember')}
         <option value="Membership">{ts}Memberships{/ts}</option>
 {/if}
-    </select> {help id="id-fullText" file="CRM/Contact/Form/Search/Custom/FullText.hlp"}
+    </select>
+    {capture assign='helpTitle'}{ts}Full Text Search{/ts}{/capture}
+    {help id="id-fullText" file="CRM/Contact/Form/Search/Custom/FullText.hlp" title=$helpTitle}
     <div class="crm-submit-buttons"><button type="submit" name="submit" id="fulltext_submit" class="crm-button crm-form-submit" onclick='submitForm();'>{ts}Search{/ts}</button></div>
     </form>
 </div>

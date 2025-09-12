@@ -203,7 +203,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     $form->addElement('select',
       'privacy_operator',
-      ts('Operator'),
+      ts('Multiple Privacy Options'),
       [
         'OR' => ts('OR'),
         'AND' => ts('AND'),
@@ -315,7 +315,7 @@ class CRM_Contact_Form_Search_Criteria {
     }
     $fields = array_merge(self::getBasicSearchFields(), $searchFields);
     foreach ($fields as $index => $field) {
-      $fields[$index] = array_merge(['class' => '', 'is_custom' => FALSE, 'template' => '', 'help' => '', 'description' => ''], $field);
+      $fields[$index] = array_merge(['class' => '', 'is_custom' => FALSE, 'template' => '', 'description' => ''], $field);
     }
     $form->assign('basicSearchFields', $fields);
   }
@@ -340,7 +340,7 @@ class CRM_Contact_Form_Search_Criteria {
       'tag_types_text' => ['name' => 'tag_types_text'],
       'tag_search' => [
         'name' => 'tag_search',
-        'help' => ['id' => 'id-all-tags', 'file' => NULL],
+        'help' => ['id' => 'tag_search'],
       ],
       'tag_set' => [
         'name' => 'tag_set',
@@ -350,7 +350,7 @@ class CRM_Contact_Form_Search_Criteria {
       'all_tag_types' => [
         'name' => 'all_tag_types',
         'class' => 'search-field__span-3 search-field__checkbox',
-        'help' => ['id' => 'id-all-tag-types', 'file' => NULL],
+        'help' => ['id' => 'all_tag_types'],
       ],
       'phone_numeric' => [
         'name' => 'phone_numeric',
@@ -369,17 +369,17 @@ class CRM_Contact_Form_Search_Criteria {
       ],
       'contact_source' => [
         'name' => 'contact_source',
-        'help' => ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact'],
+        'help' => ['id' => 'contact_source', 'file' => 'CRM/Contact/Form/Contact'],
       ],
       'job_title' => ['name' => 'job_title'],
       'preferred_language' => ['name' => 'preferred_language'],
       'contact_id' => [
         'name' => 'id',
-        'help' => ['id' => 'id-contact-id', 'file' => 'CRM/Contact/Form/Contact'],
+        'help' => ['id' => 'contact_id', 'file' => 'CRM/Contact/Form/Contact'],
       ],
       'external_identifier' => [
         'name' => 'external_identifier',
-        'help' => ['id' => 'id-external-id', 'file' => 'CRM/Contact/Form/Contact'],
+        'help' => ['id' => 'external_identifier', 'file' => 'CRM/Contact/Form/Contact'],
       ],
       'uf_user' => [
         'name' => 'uf_user',

@@ -20,7 +20,7 @@
 <table class="form-layout">
     <tr class="crm-url-form-block-userFrameworkResourceURL">
         <td class="label">
-            {$form.userFrameworkResourceURL.label} {help id='id-resource_url'}
+            {$form.userFrameworkResourceURL.label} {help id='userFrameworkResourceURL'}
         </td>
         <td>
             {$form.userFrameworkResourceURL.html|crmAddClass:'huge40'}
@@ -28,7 +28,7 @@
     </tr>
     <tr class="crm-url-form-block-imageUploadURL">
         <td class="label">
-            {$form.imageUploadURL.label} {help id='id-image_url'}
+            {$form.imageUploadURL.label} {help id='imageUploadURL'}
         </td>
         <td>
             {$form.imageUploadURL.html|crmAddClass:'huge40'}
@@ -36,7 +36,7 @@
     </tr>
     <tr class="crm-url-form-block-customCSSURL">
         <td class="label">
-            {$form.customCSSURL.label} {help id='id-css_url'}
+            {$form.customCSSURL.label} {help id='customCSSURL'}
         </td>
         <td>
             {$form.customCSSURL.html|crmAddClass:'huge40'}
@@ -44,7 +44,7 @@
     </tr>
     <tr class="crm-url-form-block-disable_core_css">
         <td class="label">
-            {$form.disable_core_css.label} {help id='id-css_url'}
+            {$form.disable_core_css.label} {help id='customCSSURL'}
         </td>
         <td>
             {$form.disable_core_css.html}<br />
@@ -53,7 +53,7 @@
     </tr>
     <tr class="crm-url-form-block-extensionsURL">
         <td class="label">
-            {$form.extensionsURL.label} {help id='id-extensions_url'}
+            {$form.extensionsURL.label} {help id='extensionsURL'}
         </td>
         <td>
             {$form.extensionsURL.html|crmAddClass:'huge40'}
@@ -61,7 +61,7 @@
     </tr>
     <tr class="crm-url-form-block-enableSSL">
         <td class="label">
-            {$form.enableSSL.label} {help id='id-enable_ssl'}
+            {$form.enableSSL.label} {help id='enableSSL'}
         </td>
         <td>
             {$form.enableSSL.html}
@@ -70,7 +70,7 @@
     </tr>
     <tr class="crm-url-form-block-verifySSL">
         <td class="label">
-            {$form.verifySSL.label} {help id='id-verify_ssl'}
+            {$form.verifySSL.label} {help id='verifySSL'}
         </td>
         <td>
             {$form.verifySSL.html}<br/>
@@ -79,7 +79,7 @@
     </tr>
     <tr class="crm-url-form-block-defaultExternUrl">
         <td class="label">
-            {$form.defaultExternUrl.label} {help id='id-defaultExternUrl'}
+            {$form.defaultExternUrl.label} {help id='defaultExternUrl'}
         </td>
         <td>
             {$form.defaultExternUrl.html}<br/>

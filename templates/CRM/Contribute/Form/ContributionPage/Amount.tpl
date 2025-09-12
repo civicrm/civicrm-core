@@ -22,7 +22,7 @@
     {/if}
     <table class="form-layout-compressed">
         <tr class="crm-contribution-contributionpage-amount-form-block-is_monetary">
-            <td scope="row" class="label" width="20%">{$form.is_monetary.label} {help id="id-is_monetary"}</td>
+            <td scope="row" class="label" width="20%">{$form.is_monetary.label} {help id="is_monetary"}</td>
             <td>{$form.is_monetary.html}</td>
         </tr>
         <tr class="crm-contribution-contributionpage-amount-form-block-currency"><td scope="row" class="label" width="20%">{$form.currency.label}</td>
@@ -48,20 +48,20 @@
                     <td scope="row" class="label">
                         {$form.pay_later_receipt.label}
                         <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span>
-                        {help id="id-pay_later_receipt"}
+                        {help id="pay_later_receipt"}
                         {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_receipt' id=$contributionPageID}{/if}
                     </td>
                     <td>{$form.pay_later_receipt.html|crmAddClass:big}</td>
                 </tr>
                 <tr>
-                    <td scope="row" class="label">{$form.is_billing_required.label} {help id="id-is_billing_required"}</td>
+                    <td scope="row" class="label">{$form.is_billing_required.label} {help id="is_billing_required"}</td>
                     <td>{$form.is_billing_required.html}</td>
                 </tr>
             </table>
             </td>
         </tr>
         <tr class="crm-contribution-contributionpage-amount-form-block-amount_block_is_active">
-          <td scope="row" class="label">{$form.amount_block_is_active.label} {help id="id-amount_block_is_active"}</td>
+          <td scope="row" class="label">{$form.amount_block_is_active.label} {help id="amount_block_is_active"}</td>
           <td>{$form.amount_block_is_active.html}</td>
         </tr>
         <tr id="priceSet" class="crm-contribution-contributionpage-amount-form-block-priceSet">
@@ -79,7 +79,7 @@
 
 
   {if $recurringPaymentProcessor}
-        <tr id="recurringContribution" class="crm-contribution-form-block-is_recur"><td scope="row" class="label" width="20%">{$form.is_recur.label} {help id="id-is_recur"}</td>
+        <tr id="recurringContribution" class="crm-contribution-form-block-is_recur"><td scope="row" class="label" width="20%">{$form.is_recur.label} {help id="is_recur"}</td>
                <td>{$form.is_recur.html}</td>
         </tr>
         <tr id="recurFields" class="crm-contribution-form-block-recurFields"><td>&nbsp;</td>
@@ -114,7 +114,7 @@
         <table class="form-layout-compressed">
             {* handle CiviPledge fields *}
             {if $civiPledge}
-            <tr class="crm-contribution-form-block-is_pledge_active"><td scope="row" class="label" width="20%">{$form.is_pledge_active.label} {help id="id-is_pledge_active"}</td>
+            <tr class="crm-contribution-form-block-is_pledge_active"><td scope="row" class="label" width="20%">{$form.is_pledge_active.label} {help id="is_pledge_active"}</td>
                 <td>{$form.is_pledge_active.html}</td>
             </tr>
             <tr id="pledgeFields" class="crm-contribution-form-block-pledgeFields"><td></td><td>
@@ -168,7 +168,7 @@
         <td>{$form.amount_label.html}</td>
       </tr>
             <tr class="crm-contribution-form-block-is_allow_other_amount">
-                <td scope="row" class="label" width="20%">{$form.is_allow_other_amount.label} {help id="id-is_allow_other_amount"}</td>
+                <td scope="row" class="label" width="20%">{$form.is_allow_other_amount.label} {help id="is_allow_other_amount"}</td>
                 <td>{$form.is_allow_other_amount.html}</td>
             </tr>
 

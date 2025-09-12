@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="acl_financial_type-title"}
-  {ts}Access Control by Financial Type{/ts}
-{/htxt}
 {htxt id="acl_financial_type"}
 <p>{ts}Enabling Access Control by Financial Types is only required if you need users in one role to access some financial transactions but not ones with certain financial types.</p>
 <p>For example, Planned Giving bequests may be highly confidential and not appropriate for staff organizing events to see, even though they need to be able to administer the payments for ticket purchases.</p>

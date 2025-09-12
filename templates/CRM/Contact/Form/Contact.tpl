@@ -39,15 +39,19 @@
           </table>
           <table class="crm-section contact_source-section form-layout-compressed">
             <tr class="last-row">
-              <td>{$form.contact_source.label} {help id="id-source"}<br />
+              <td>{$form.contact_source.label} {help id="contact_source"}<br />
                 {$form.contact_source.html|crmAddClass:twenty}
               </td>
-              <td>{$form.external_identifier.label}&nbsp;{help id="id-external-id"}<br />
+              <td>{$form.external_identifier.label}&nbsp;{help id="external_identifier"}<br />
                 {$form.external_identifier.html}
               </td>
               {if $contactId}
                 <td>
-                  <label for="internal_identifier_display">{ts}Contact ID{/ts} {help id="id-contact-id"}</label><br />
+                  <label for="internal_identifier_display">
+                    {capture assign="contactIdLabel"}{ts}Contact ID{/ts}{/capture}
+                    {$contactIdLabel}
+                    {help id="contact_id" title=$contactIdLabel}
+                  </label><br />
                   <input id="internal_identifier_display" type="text" class="crm-form-text six" size="6" readonly="readonly" value="{$contactId}">
                 </td>
               {/if}
@@ -56,7 +60,7 @@
           <table class="image_URL-section form-layout-compressed">
             <tr>
               <td>
-                {$form.image_URL.label}&nbsp;&nbsp;{help id="id-upload-image" file="CRM/Contact/Form/Contact.hlp"}<br />
+                {$form.image_URL.label}&nbsp;&nbsp;{help id="image_URL" file="CRM/Contact/Form/Contact.hlp"}<br />
                 {$form.image_URL.html|crmAddClass:twenty}
                 {if !empty($imageURL)}
                 {include file="CRM/Contact/Page/ContactImage.tpl"}

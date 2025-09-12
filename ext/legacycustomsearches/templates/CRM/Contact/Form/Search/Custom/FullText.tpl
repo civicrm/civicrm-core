@@ -21,7 +21,7 @@
             {$form.table.label}
             {$form.table.html}
           </td>
-          <td>{$form.buttons.html} {help id="id-fullText"}</td>
+          <td>{$form.buttons.html} {help id="id-fullText" title=$form.text.textLabel}</td>
         </tr>
       </table>
     </div>

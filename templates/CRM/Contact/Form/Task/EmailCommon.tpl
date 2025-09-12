@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {*common template for compose mail*}
-
+{capture assign='tokenTitle'}{ts}Tokens{/ts}{/capture}
 <details class="crm-accordion-bold crm-html_email-accordion " open>
 <summary>
   {ts}Message Body{/ts}
@@ -16,7 +16,7 @@
  <div class="crm-accordion-body">
   <div class="helpIcon" id="helphtml">
     <input class="crm-token-selector big" data-field="html_message" />
-    {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp"}
+    {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
   </div>
   <div class="clear"></div>
     <div class='html'>
@@ -28,12 +28,12 @@
 <details class="crm-accordion-bold crm-plaint_text_email-accordion">
 <summary>
   {ts}Plain-Text Format{/ts}
-  {help id="id-message-plain" file="CRM/Contact/Form/Task/Email.hlp"}
+  {help id="text_message" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
 </summary>
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helptext">
      <input class="crm-token-selector big" data-field="text_message" />
-     {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
+     {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
    </div>
     <div class='text'>
       {$form.text_message.html}<br />

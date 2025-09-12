@@ -10,7 +10,7 @@
 <h3>{ts 1=$contactTypes.$contact_type}Matching Rule for %1 Contacts{/ts}</h3>
 <div class="crm-block crm-form-block crm-dedupe-rules-form-block">
     <div class="help">
-        {ts}Configure up to five fields to evaluate when searching for 'suspected' duplicate contact records.{/ts} {help id="id-rules"}
+        {ts}Configure up to five fields to evaluate when searching for 'suspected' duplicate contact records.{/ts} {help id="configure-rules"}
     </div>
   <table class="form-layout">
      <tr class="crm-dedupe-rules-form-block-title">

@@ -47,14 +47,20 @@
 
     {if !empty($form.group_type)}
       <tr class="crm-group-form-block-group_type">
-        <td class="label">{$form.group_type.label}</td>
-        <td>{$form.group_type.html} {help id="id-group-type" file="CRM/Group/Page/Group.hlp"}</td>
+        <td class="label">
+          {$form.group_type.label}
+          {help id="group_type" file="CRM/Group/Page/Group.hlp"}
+        </td>
+        <td>{$form.group_type.html}</td>
       </tr>
     {/if}
 
     <tr class="crm-group-form-block-visibility">
-      <td class="label">{$form.visibility.label}</td>
-      <td>{$form.visibility.html|crmAddClass:huge} {help id="id-group-visibility" file="CRM/Group/Page/Group.hlp"}</td>
+      <td class="label">
+        {$form.visibility.label}
+        {help id="visibility" file="CRM/Group/Page/Group.hlp"}
+      </td>
+      <td>{$form.visibility.html|crmAddClass:huge}</td>
     </tr>
 
     <tr class="crm-group-form-block-isReserved">

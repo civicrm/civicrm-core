@@ -262,16 +262,16 @@
       </label>
 
       <div id="api-join" class="crm-form-block">
-        <h4>{ts}Join on:{/ts} {help id='api-join'}</h4>
+        <h4>{ts}Join on:{/ts}</h4>
         <div></div>
       </div>
 
       <table id="api-params-table">
         <thead style="display: none;">
           <tr>
-            <th>{ts}Name{/ts} {help id='param-name'}</th>
-            <th>{ts}Operator{/ts} {help id='param-op'}</th>
-            <th>{ts}Value{/ts} {help id='param-value'}</th>
+            <th>{ts}Name{/ts}</th>
+            <th>{ts}Operator{/ts}</th>
+            <th>{ts}Value{/ts}</th>
           </tr>
         </thead>
         <tbody id="api-params"></tbody>
@@ -280,7 +280,6 @@
         <a href="#" class="crm-hover-button" id="api-params-add"><i class="crm-i fa-plus" aria-hidden="true"></i> {ts}Add Parameter{/ts}</a>
         <a href="#" class="crm-hover-button" id="api-option-add"><i class="crm-i fa-cog" aria-hidden="true"></i> {ts}Add Option{/ts}</a>
         <a href="#" class="crm-hover-button" id="api-chain-add"><i class="crm-i fa-link" aria-hidden="true"></i> {ts}Chain API Call{/ts}</a>
-        {help id="api-chain"}
       </div>
       <div id="api-generated-wraper">
         <table id="api-generated" border=1>

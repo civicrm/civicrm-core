@@ -71,7 +71,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       'period_type' => [
         'name' => 'period_type',
         'description' => ts("Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date."),
-        'help' => ['id' => 'period-type', 'file' => "CRM/Member/Page/MembershipType.hlp"],
+        'help' => ['id' => 'period_type', 'file' => "CRM/Member/Page/MembershipType"],
         'required' => TRUE,
       ],
       'fixed_period_start_day' => [

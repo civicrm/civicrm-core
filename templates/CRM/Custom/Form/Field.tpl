@@ -40,7 +40,7 @@
     {if array_key_exists('in_selector', $form)}
       <tr class='crm-custom-field-form-block-in_selector'>
         <td class='label'>{$form.in_selector.label}</td>
-        <td class='html-adjust'>{$form.in_selector.html} {help id="id-in_selector"}</td>
+        <td class='html-adjust'>{$form.in_selector.html} {help id="in_selector"}</td>
       </tr>
     {/if}
     <tr class="crm-custom-field-form-block-text_length"  id="textLength">

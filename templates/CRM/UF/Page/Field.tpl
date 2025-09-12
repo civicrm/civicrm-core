@@ -26,7 +26,11 @@
     {/if}
     <div id="field_page">
       {if $uf_group_type_extra}
-        <p>{ts}Used in Forms{/ts} {help id='id-used_for_extra' file="CRM/UF/Form/Group.hlp"}<br>{$uf_group_type_extra}</p>
+        <p>
+          {capture assign='helpTitle'}{ts}Used in Forms{/ts}{/capture}
+          {$helpTitle} {help id='used-for-extra' title=$helpTitle file="CRM/UF/Form/Group.hlp"}<br>
+          {$uf_group_type_extra}
+        </p>
       {/if}
       {strip}
       {* handle enable/disable actions*}

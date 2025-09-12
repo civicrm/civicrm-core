@@ -36,24 +36,24 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       'frontend_title' => ['name' => 'frontend_title', 'required' => TRUE],
       'description' => [
         'name' => 'description',
-        'help' => ['id' => 'id-description'],
+        'help' => ['id' => 'description'],
       ],
       'uf_group_type' => [
         'name' => 'uf_group_type',
         'not-auto-addable' => TRUE,
-        'help' => ['id' => 'id-used_for'],
+        'help' => ['id' => 'uf_group_type'],
       ],
       'cancel_button_text' => [
         'name' => 'cancel_button_text',
         'help' => [
-          'id' => 'id-cancel_button_text',
+          'id' => 'cancel_button_text',
         ],
         'class' => 'cancel_button_section',
       ],
       'submit_button_text' => [
         'name' => 'submit_button_text',
         'help' => [
-          'id' => 'id-submit_button_text',
+          'id' => 'submit_button_text',
         ],
         'class' => '',
       ],

@@ -12,7 +12,7 @@
   <table class="form-layout-compressed">
     <tr>
       <td>
-      {$form.name.label}{help id="domain-name"}<br />
+      {$form.name.label}{help id="name"}<br />
       {$form.name.html}
       <br /><span class="description">{ts}The name of the organization or entity which owns this CiviCRM site or domain. This is the default organization contact record.{/ts}</span>
     </td>

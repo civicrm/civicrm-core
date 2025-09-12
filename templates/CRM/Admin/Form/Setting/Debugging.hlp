@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="debug-enabled-id-title"}
-  {ts}Debugging{/ts}
-{/htxt}
 {htxt id="debug-enabled-id"}
 <p>{ts}Set this value to <strong>Yes</strong> if you want to use one of CiviCRM's debugging tools.{/ts} <strong>{ts}This feature should NOT be enabled for production sites.{/ts}</strong></p>
 <p>
@@ -23,9 +20,6 @@
 </p>
 {/htxt}
 
-{htxt id="userFrameworkLogging-id-title"}
-  {ts}Logging{/ts}
-{/htxt}
 {htxt id="userFrameworkLogging-id"}
 <p>{ts}Set this value to <strong>Yes</strong> if you want CiviCRM error/debugging messages the appear in your CMS' error log.{/ts}</strong></p>
 <p>{ts}In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled){/ts}</p>
