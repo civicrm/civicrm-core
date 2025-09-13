@@ -16,7 +16,7 @@
  */
 
 /**
- *
+ * Joomla specific stuff goes here.
  */
 class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
 
@@ -62,7 +62,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         $user = JFactory::getUser($userId);
       }
       else {
-        if ($userId == NULL) {
+        if ($userId === NULL) {
           $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
         }
         else {
@@ -79,14 +79,13 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
           $user = JFactory::getUser($uid);
         }
         else {
-          if ($uid == NULL) {
+          if ($uid === NULL) {
             $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
           }
           else {
             $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($uid);
           }
         }
-
       }
 
       return $user->authorise($translated[0], $translated[1]);
