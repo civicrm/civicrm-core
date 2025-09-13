@@ -149,6 +149,7 @@ return [
     'is_contact' => 0,
     'description' => ts('When CiviMail is enabled and a profile uses the "Add to Group" setting, users who complete the profile form will receive a confirmation email. They must respond (opt-in) before they are added to the group.'),
     'help_text' => NULL,
+    'settings_pages' => ['mailing' => ['weight' => 10]],
   ],
   'disable_mandatory_tokens_check' => [
     'group_name' => 'Mailing Preferences',
