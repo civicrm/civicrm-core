@@ -43,7 +43,7 @@
           {$form.email.$blockId.signature_html.label}<br/>{$form.email.$blockId.signature_html.html}<br/>
           {$form.email.$blockId.signature_text.label}<br/>{$form.email.$blockId.signature_text.html}
         </div>
-      </div>
+      </details>
     {/if}
   </td>
   <td align="center">{$form.email.$blockId.on_hold.html}</td>
