@@ -17,7 +17,7 @@
     {else}{assign var="accessKey" value=""}
     {/if}
     {if array_key_exists('icon', $linkButton) && $linkButton.icon}
-      {capture assign=icon}<i class="crm-i {$linkButton.icon}" aria-hidden="true"></i> {/capture}
+      {capture assign=icon}<i class="crm-i {$linkButton.icon}" role="img" aria-hidden="true"></i> {/capture}
     {else}{assign var="icon" value=""}
     {/if}
     {if array_key_exists('ref', $linkButton) && $linkButton.ref}

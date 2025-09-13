@@ -65,7 +65,7 @@
         {/section}
       </table>
       <div id="optionFieldLink" class="add-remove-link">
-        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another column{/ts}</a>
+        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" role="img" aria-hidden="true"></i> {ts}another column{/ts}</a>
       </div>
 
       <script type="text/javascript">
@@ -313,7 +313,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
         if (interview.errors[error]) errorList =  errorList + '<li>' + interview.errors[error] + '</li>';
       }
       if ( errorList ) {
-        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i> {/literal}{ts escape='js'}Please correct the following errors in the survey fields below:{/ts}{literal}<ul>' + errorList + '</ul>';
+        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red" role="img" aria-hidden="true"></i> {/literal}{ts escape='js'}Please correct the following errors in the survey fields below:{/ts}{literal}<ul>' + errorList + '</ul>';
         CRM.$('#responseErrors').show( ).html(allErrors);
       }
     }

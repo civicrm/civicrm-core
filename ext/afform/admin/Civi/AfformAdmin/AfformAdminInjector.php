@@ -92,7 +92,7 @@ class AfformAdminInjector extends AutoSubscriber {
             $linksMarkup .= <<<HTML
               <li ng-if="checkLinkPerm('{$link['permission']}', {$link['created_id']})">
                 <a href="{$link['url']}" target="_blank">
-                  <i class="crm-i fa-fw {$link['icon']}"></i> {$link['text']}
+                  <i class="crm-i fa-fw {$link['icon']}" role="img" aria-hidden="true"></i> {$link['text']}
                 </a>
               </li>
             HTML;
@@ -100,7 +100,7 @@ class AfformAdminInjector extends AutoSubscriber {
           $editMenu = <<<HTML
             <div class="pull-right btn-group af-admin-edit-form-link" ng-if="checkLinkPerm('{$links[0]['permission']}', {$links[0]['created_id']})">
               <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="crm-i fa-gear"></i> <span class="caret"></span><span class="sr-only">{{:: ts('Configure')}}</span>
+                <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> <span class="caret"></span><span class="sr-only">{{:: ts('Configure')}}</span>
               </button>
               <ul class="dropdown-menu">$linksMarkup</ul>
             </div>

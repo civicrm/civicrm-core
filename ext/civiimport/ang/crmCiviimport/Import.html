@@ -9,14 +9,14 @@
 </div>
 
 <div class="crm-submit-buttons" ng-if="!isTemplate">
-  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i aria-hidden="true" class="crm-i fa-chevron-left"></i>{{:: ts('Previous') }}</button>
-  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i aria-hidden="true" class="crm-i fa-check"></i><span ng-if="!isStandalone">{{:: ts('Continue') }}</span><span ng-if="isTemplate">{{:: ts('Save Template') }}</span><span ng-if="!isTemplate && isStandalone">{{:: ts('Continue') }}</span></button>
-  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i aria-hidden="true" class="crm-i fa-times"></i>{{:: ts('Cancel') }}</button>
+  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i>{{:: ts('Previous') }}</button>
+  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i class="crm-i fa-check" role="img" aria-hidden="true"></i><span ng-if="!isStandalone">{{:: ts('Continue') }}</span><span ng-if="isTemplate">{{:: ts('Save Template') }}</span><span ng-if="!isTemplate && isStandalone">{{:: ts('Continue') }}</span></button>
+  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i class="crm-i fa-times" role="img" aria-hidden="true"></i>{{:: ts('Cancel') }}</button>
 </div>
 
 <div class="crm-block crm-form-block crm-import-mappings-form-block">
   <div id="crm-import-entities" class="columnheader">
-    <h3><i class="crm-i fa-cloud-arrow-up"></i> &nbsp; {{:: ts('Import to') }}</h3>
+    <h3><i class="crm-i fa-cloud-arrow-up" role="img" aria-hidden="true"></i> &nbsp; {{:: ts('Import to') }}</h3>
 
     <div ng-repeat="(entityName, entity) in data.entities track by entity.id"
          ng-class-odd="'odd-row'"
@@ -69,7 +69,7 @@
   </div>
   <hr>
   <div id="import-options">
-    <h3><i class="crm-i fa-gear"></i> &nbsp; {{:: ts('Import Options') }}</h3>
+    <h3><i class="crm-i fa-gear" role="img" aria-hidden="true"></i> &nbsp; {{:: ts('Import Options') }}</h3>
     <div>
       <label>
         {{:: ts('Date format') }}
@@ -79,7 +79,7 @@
   </div>
   <hr>
   <div id="import-actions">
-    <h3><i class="crm-i fa-circle-play"></i> &nbsp; {{:: ts('Actions') }}</h3>
+    <h3><i class="crm-i fa-circle-play" role="img" aria-hidden="true"></i> &nbsp; {{:: ts('Actions') }}</h3>
     <div ng-repeat="actionItem in userJob.metadata.bundled_actions">
       <label for="action-item-entity-{{ $index }}">{{:: ts('For') }}</label>
       <input class="big" id="action-item-entity-{{ $index }}" crm-ui-select='{data: getEntitiesWithBundledActions, allowClear: false}' ng-model="actionItem.entity" />
@@ -88,7 +88,7 @@
       <label for="action-item-when-{{ $index }}">{{:: ts('When') }}</label>
       <input class="big" id="action-item-when-{{ $index }}" crm-ui-select='{data: getBundledActionConditions, allowClear: false}' ng-model="actionItem.condition" />
       <a href class="crm-hover-button" ng-click="removeAction($index)" title="{{:: ts('Remove') }}">
-        <i class="crm-i fa-x"></i>
+        <i class="crm-i fa-x" role="img" aria-hidden="true"></i>
       </a>
     </div>
     <div>
@@ -100,7 +100,7 @@
   </div>
   <hr>
   <div id="map-field">
-    <h3><i class="crm-i fa-table"></i> &nbsp; {{:: ts('Data mapping') }}</h3>
+    <h3><i class="crm-i fa-table" role="img" aria-hidden="true"></i> &nbsp; {{:: ts('Data mapping') }}</h3>
     <table class="selector">
       <tr ng-if="data.savedMapping.name" class="columnheader-dark"><th colspan="4">
         {{:: ts('Saved Field Mapping: %1', {1: data.savedMapping.name}) }}</th>
@@ -138,7 +138,7 @@
         </td>
       </tr>
     </table>
-    <button ng-click="addRow()" type="button" class="crm-button"><i aria-hidden="true" class="crm-i fa-plus"></i>{{:: ts('Add Row') }}</button>
+    <button ng-click="addRow()" type="button" class="crm-button"><i class="crm-i fa-plus" role="img" aria-hidden="true"></i>{{:: ts('Add Row') }}</button>
   </div>
 
 </div>
@@ -174,8 +174,8 @@
 </div>
 
 <div class="crm-submit-buttons">
-  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i aria-hidden="true" class="crm-i fa-chevron-left"></i>{{:: ts('Previous') }}</button>
-  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i aria-hidden="true" class="crm-i fa-check"></i><span ng-if="!isStandalone">{{:: ts('Continue') }}</span><span ng-if="isTemplate">{{:: ts('Save Template') }}</span><span ng-if="!isTemplate && isStandalone">{{:: ts('Continue') }}</span></button>
-  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i aria-hidden="true" class="crm-i fa-times"></i>{{:: ts('Cancel') }}</button>
+  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i>{{:: ts('Previous') }}</button>
+  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i class="crm-i fa-check" role="img" aria-hidden="true"></i><span ng-if="!isStandalone">{{:: ts('Continue') }}</span><span ng-if="isTemplate">{{:: ts('Save Template') }}</span><span ng-if="!isTemplate && isStandalone">{{:: ts('Continue') }}</span></button>
+  <button ng-if="!isStandalone" class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i class="crm-i fa-times" role="img" aria-hidden="true"></i>{{:: ts('Cancel') }}</button>
 </div>
 

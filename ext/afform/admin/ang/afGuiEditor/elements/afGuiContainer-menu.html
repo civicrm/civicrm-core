@@ -12,7 +12,7 @@
 <li ng-if="isRepeatable()" ng-click="$event.stopPropagation()">
   <div class="af-gui-field-select-in-dropdown form-inline">
     <label ng-click="$ctrl.toggleRepeat()">
-      <i class="crm-i fa-{{ $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'check-' : '' }}square-o"></i>
+      <i class="crm-i fa-{{ $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
       {{:: ts('Repeat') }}
     </label>
     <span ng-style="{visibility: $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'visible' : 'hidden'}">
@@ -26,7 +26,7 @@
     {{:: ts('Layout:') }}
     <div class="btn-group btn-group-sm" role="group">
       <button type="button" class="btn btn-default" ng-class="{active: opt === getLayout()}" ng-repeat="(opt, label) in layouts" ng-click="setLayout(opt)" title="{{ label }}">
-        <i class="af-gui-layout-icon {{ opt }}"></i>
+        <i class="af-gui-layout-icon {{ opt }}" role="img" aria-hidden="true"></i>
       </button>
     </div>
   </div>
@@ -50,4 +50,4 @@
 <li af-gui-conditional-menu="$ctrl.node" ng-if="$ctrl.editor.getEntities().length"></li>
 
 <li role="separator" class="divider"></li>
-<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash"></i> {{ !block ? ts('Remove container') : ts('Remove block') }}</span></a></li>
+<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {{ !block ? ts('Remove container') : ts('Remove block') }}</span></a></li>

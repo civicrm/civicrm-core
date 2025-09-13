@@ -2,7 +2,7 @@
   <div class="form-inline pull-right">
     <div class="btn-group pull-right" af-gui-menu>
       <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
-        <span><i class="crm-i fa-gear"></i></span>
+        <span><i class="crm-i fa-gear" role="img" aria-hidden="true"></i></span>
       </button>
       <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiButton-menu.html'"></ul>
     </div>
@@ -10,7 +10,7 @@
 </div>
 <button type="button" class="btn {{ getSetStyle() }}" disabled>
   <span class="crm-editable-enabled" ng-click="pickIcon()" >
-    <i class="crm-i {{ $ctrl.node['crm-icon'] }}"></i>
+    <i class="crm-i {{ $ctrl.node['crm-icon'] }}" role="img" aria-hidden="true"></i>
   </span>
   <span crm-ui-editable ng-model="$ctrl.node['#children'][0]['#text']" >
     {{ $ctrl.node['#children'][0]['#text'] }}

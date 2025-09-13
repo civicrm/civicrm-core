@@ -10,11 +10,11 @@
         <th class="crm-search-result-select" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.settings.actions">
         </th>
         <th ng-repeat="item in $ctrl.search.api_params.select" ng-click="$ctrl.setSort($ctrl.settings.columns[$index], $event)" title="{{$index || !$ctrl.crmSearchAdmin.groupExists ? ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).') : ts('Column reserved for smart group.')}}">
-          <i ng-if=":: $ctrl.isSortable($ctrl.settings.columns[$index])" class="crm-i {{ $ctrl.getSort($ctrl.settings.columns[$index]) }}"></i>
+          <i ng-if=":: $ctrl.isSortable($ctrl.settings.columns[$index])" class="crm-i {{ $ctrl.getSort($ctrl.settings.columns[$index]) }}" role="img" aria-hidden="true"></i>
           <span ng-class="{'crm-draggable': $index || !$ctrl.crmSearchAdmin.groupExists}">{{ getColumnLabel($index) }}</span>
           <span ng-switch="$index || !$ctrl.crmSearchAdmin.groupExists ? 'sortable' : 'locked'">
-            <i ng-switch-when="locked" class="crm-i fa-lock" aria-hidden="true"></i>
-            <a href ng-switch-default class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="removeColumn($index); $event.stopPropagation();"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+            <i ng-switch-when="locked" class="crm-i fa-lock" role="img" aria-hidden="true"></i>
+            <a href ng-switch-default class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="removeColumn($index); $event.stopPropagation();"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
           </span>
         </th>
         <th class="form-inline text-right">

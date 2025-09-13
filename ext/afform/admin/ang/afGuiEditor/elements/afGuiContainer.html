@@ -10,16 +10,16 @@
       <af-gui-container-multi-toggle ng-if="!ctrl.loading && ($ctrl.join || $ctrl.node['af-repeat']) && isRepeatable()" entity="$ctrl.getFieldEntityType()" class="btn-group"></af-gui-container-multi-toggle>
       <div class="btn-group" af-gui-menu>
         <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
-          <span><i class="crm-i fa-gear"></i></span>
+          <span><i class="crm-i fa-gear" role="img" aria-hidden="true"></i></span>
         </button>
         <ul class="dropdown-menu dropdown-menu-right" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/' + ($ctrl.node['af-fieldset'] === '' ? 'afGuiSearchContainer' : 'afGuiContainer') + '-menu.html'"></ul>
       </div>
     </div>
   </div>
-  <div ng-if="$ctrl.loading"><i class="crm-i fa-spin fa-spinner"></i></div>
+  <div ng-if="$ctrl.loading"><i class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i></div>
 </div>
 <label class="af-gui-node-title af-gui-container-title af-gui-text-h3" ng-if="$ctrl.node['#tag'] && $ctrl.node['#tag'] !== 'af-tab' && !block" title="{{:: ts('Container title') }}">
-  <i class="crm-i {{ $ctrl.getCollapsibleIcon() }}"></i>
+  <i class="crm-i {{ $ctrl.getCollapsibleIcon() }}" role="img" aria-hidden="true"></i>
   <span placeholder="{{:: ts('No title') }}" crm-ui-editable ng-model="$ctrl.getSetTitle" ng-model-options="{getterSetter: true}"></span>
 </label>
 <div ng-if="!$ctrl.loading" ui-sortable="$ctrl.sortableOptions" ui-sortable-update="$ctrl.editor.onDrop" ng-model="getSetChildren" ng-model-options="{getterSetter: true}" class="af-gui-layout {{ getLayout() }}">
@@ -42,7 +42,7 @@
 <div ng-if="$ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === ''" class="af-gui-button">
   <button type="button" class="btn btn-xs btn-primary disabled">
     <span class="crm-editable-enabled" ng-click="pickAddIcon()" >
-      <i class="crm-i {{ $ctrl.node['add-icon'] || 'fa-plus' }}"></i>
+      <i class="crm-i {{ $ctrl.node['add-icon'] || 'fa-plus' }}" role="img" aria-hidden="true"></i>
     </span>
     <span crm-ui-editable ng-model="$ctrl.node['af-repeat']">{{ $ctrl.node['af-repeat'] }}</span>
   </button>
@@ -50,7 +50,7 @@
 <div ng-if="$ctrl.node['af-copy'] || $ctrl.node['af-copy'] === ''" class="af-gui-button">
   <button type="button" class="btn btn-xs btn-primary disabled">
     <span class="crm-editable-enabled" ng-click="pickCopyIcon()" >
-      <i class="crm-i {{ $ctrl.node['copy-icon'] || 'fa-copy' }}"></i>
+      <i class="crm-i {{ $ctrl.node['copy-icon'] || 'fa-copy' }}" role="img" aria-hidden="true"></i>
     </span>
     <span crm-ui-editable ng-model="$ctrl.node['af-copy']">{{ $ctrl.node['af-copy'] }}</span>
   </button>

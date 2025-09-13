@@ -32,7 +32,7 @@
         <a href="{$advSearchURL}">{ts}Advanced Search{/ts}</a><br />
     {/if}
   </div>
-  <a href="#" class="crm-selection-reset crm-hover-button float-right"><i class="crm-i fa-times-circle-o" aria-hidden="true"></i> {ts}Reset all selections{/ts}</a>
+  <a href="#" class="crm-selection-reset crm-hover-button float-right"><i class="crm-i fa-times-circle-o" role="img" aria-hidden="true"></i> {ts}Reset all selections{/ts}</a>
   <table class="form-layout-compressed">
     {if !empty($savedSearch.name)}
       <tr>

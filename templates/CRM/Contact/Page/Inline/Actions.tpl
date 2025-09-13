@@ -25,7 +25,7 @@
                 {if !empty($row.href) or !empty($row.tab)}
                 <li class="crm-contact-{$row.ref}">
                   <a href="{if !empty($row.href)}{$row.href}{if strstr($row.href, '?')}&cid={$contactId}{/if}{else}#{/if}" title="{$row.title|escape}" data-tab="{$row.tab}" {if !empty($row.class)}class="{$row.class}"{/if}>
-                    <span><i {if !empty($row.icon)}class="{$row.icon}"{/if}></i> {$row.title}</span>
+                    <span><i {if !empty($row.icon)}class="{$row.icon}"{/if} role="img" aria-hidden="true"></i> {$row.title}</span>
                   </a>
                 </li>
                 {/if}

@@ -16,7 +16,7 @@
     {* Add button for donor to create their own Personal Campaign page *}
     {if $linkText}
    <div class="crm-section create_pcp_link-section">
-        <a href="{$linkTextUrl}" title="{$linkText|escape}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$linkText}</span></a>
+        <a href="{$linkTextUrl}" title="{$linkText|escape}" class="button"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {$linkText}</span></a>
     </div><br /><br />
     {/if}
 

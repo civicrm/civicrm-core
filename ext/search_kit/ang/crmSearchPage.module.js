@@ -12,7 +12,7 @@
           '<form id="bootstrap-theme">' +
           // Edit link for authorized users
           '  <div class="pull-right btn-group" ng-if="$ctrl.editLink">' +
-          '    <a class="btn btn-sm" ng-href="{{:: $ctrl.editLink }}"><i class="crm-i fa-pencil"></i> {{:: ts("Edit Search") }}</a>' +
+          '    <a class="btn btn-sm" ng-href="{{:: $ctrl.editLink }}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {{:: ts("Edit Search") }}</a>' +
           '  </div>' +
           // Dynamic template generates the directive for each display type
           // @see \Civi\Search\Display::getPartials()

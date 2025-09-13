@@ -26,7 +26,7 @@
       <a href="#" onclick="html_code.profile.select(); return false;" class="button"><span>{ts}Select HTML Code{/ts}</span></a>
     </div>
     <div class="action-link">
-      &nbsp; <a href="{crmURL p='civicrm/admin/uf/group' q="reset=1"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i>  {ts}Back to Profile Listings{/ts}</a>
+      &nbsp; <a href="{crmURL p='civicrm/admin/uf/group' q="reset=1"}"><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i>  {ts}Back to Profile Listings{/ts}</a>
     </div>
   </form>
 
@@ -38,7 +38,7 @@
   <div class="crm-content-block crm-block">
     {if NOT ($action eq 1 or $action eq 2)}
       <div class="crm-submit-buttons">
-          <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
+          <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
       </div>
     {/if}
     {if $rows}

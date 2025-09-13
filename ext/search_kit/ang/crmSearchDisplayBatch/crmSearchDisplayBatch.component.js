@@ -212,7 +212,7 @@
           let markup = '';
           // Run each item in array through _.escape
           tallyMismatches.forEach((item, index, array) => {
-            markup += '<p><i class="crm-i fa-warning"></i> ' + _.escape(item) + '</p>';
+            markup += '<p><i class="crm-i fa-warning" role="img" aria-hidden="true"></i> ' + _.escape(item) + '</p>';
           });
           CRM.confirm({
             title: ts('Tally Mismatch'),

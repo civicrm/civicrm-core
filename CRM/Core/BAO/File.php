@@ -730,7 +730,7 @@ AND       CEF.entity_id    = %2";
         ) {
           $file_url[$fileID] = <<<HEREDOC
               <a href="$url" class="crm-image-popup" title="$title">
-                <i class="crm-i fa-file-image-o" aria-hidden="true"></i>
+                <i class="crm-i fa-file-image-o" role="img" aria-hidden="true"></i>
               </a>
 HEREDOC;
         }
@@ -738,7 +738,7 @@ HEREDOC;
         else {
           $file_url[$fileID] = <<<HEREDOC
               <a href="$url" title="$title">
-                <i class="crm-i fa-paperclip" aria-hidden="true"></i>
+                <i class="crm-i fa-paperclip" role="img" aria-hidden="true"></i>
               </a>
 HEREDOC;
         }

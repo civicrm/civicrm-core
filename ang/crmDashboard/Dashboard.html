@@ -2,7 +2,7 @@
   <fieldset class="crm-inactive-dashlet-fieldset">
     <legend>
       <a href class="crm-hover-button" ng-click="$ctrl.toggleInactive()">
-        <i class="crm-i fa-{{ $ctrl.showInactive ? 'minus' : 'plus' }}" aria-hidden="true"></i>
+        <i class="crm-i fa-{{ $ctrl.showInactive ? 'minus' : 'plus' }}" role="img" aria-hidden="true"></i>
         {{ $ctrl.inactive.length === 1 ? ts('1 Available Dashlet') : ts('%1 Available Dashlets', {1: $ctrl.inactive.length}) }}
       </a>
       <input ng-if="$ctrl.showInactive" class="crm-form-text" ng-model="$ctrl.filterInactive" type="search" placeholder="{{:: ts('Filter by title...') }}">

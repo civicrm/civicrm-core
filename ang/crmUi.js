@@ -1087,7 +1087,7 @@
           }
           if (attrs.crmIcon) {
             if (attrs.crmIcon.substring(0,3) == 'fa-') {
-              $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" aria-hidden="true"></i> ');
+              $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" role="img" aria-hidden="true"></i> ');
             }
             else {
               $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
@@ -1230,7 +1230,7 @@
     // set a custom title (i.e., it has an initial title of "CiviCRM"). See the
     // global variables pageTitleHTML and documentTitle.
     // Example (same title for both): <h1 crm-page-title>{{ts('Hello')}}</h1>
-    // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag" aria-hidden="true"></i>{{ts('Hello')}}</h1>
+    // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag" role="img" aria-hidden="true"></i>{{ts('Hello')}}</h1>
     .directive('crmPageTitle', function($timeout) {
       return {
         scope: {

@@ -5,7 +5,7 @@
   <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
   <div class="messages warning no-popup collapse">
     <p>
-      <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+      <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>
       <strong>{{:: ts('Bootstrap theme not found.') }}</strong>
     </p>
     <p>{{:: ts('This screen may not work correctly without a bootstrap-based theme such as Shoreditch installed.') }}</p>
@@ -19,7 +19,7 @@
       <div class="crm-flex-1 form-inline">
         <div class="btn-group">
           <button type="button" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" crm-confirm="$ctrl.confirmSave()" on-yes="$ctrl.save()">
-            <i class="crm-i" ng-class="{'fa-check': status !== 'saving', 'fa-spin fa-spinner': status === 'saving'}"></i>
+            <i class="crm-i" ng-class="{'fa-check': status !== 'saving', 'fa-spin fa-spinner': status === 'saving'}" role="img" aria-hidden="true"></i>
             <span ng-if="status === 'saved'">{{:: ts('Saved') }}</span>
             <span ng-if="status === 'unsaved'">{{:: ts('Save') }}</span>
             <span ng-if="status === 'saving'">{{:: ts('Saving...') }}</span>
@@ -30,31 +30,31 @@
 
           <div class="btn-group" ng-if="$ctrl.afformEnabled && $ctrl.savedSearch.id && !$ctrl.savedSearch.is_template">
             <button type="button" ng-click="$ctrl.openAfformMenu = true;" class="btn dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="crm-i fa-list-alt"></i>
+              <i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i>
               {{ ($ctrl.afformCount !== undefined) ? ($ctrl.afformCount === 1 ? ts('1 Form') : ts('%1 Forms', {1: $ctrl.afformCount})) : ts('Forms...') }}
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openAfformMenu">
               <li ng-if=":: $ctrl.afformAdminEnabled">
                 <a target="_blank" ng-href="{{:: $ctrl.afformPath + '#/create/search/' + $ctrl.savedSearch.name }}">
-                  <i class="fa fa-plus"></i> {{:: ts('Create form for search results table') }}
+                  <i class="fa fa-plus" role="img" aria-hidden="true"></i> {{:: ts('Create form for search results table') }}
                 </a>
               </li>
               <li ng-repeat="display in $ctrl.savedSearch.displays" ng-if="$ctrl.afformAdminEnabled && display.id">
                 <a target="_blank" ng-href="{{:: $ctrl.afformPath + '#/create/search/' + $ctrl.savedSearch.name + '.' + display.name }}">
-                  <i class="fa fa-plus"></i> {{:: ts('Create form for %1', {1: display.label}) }}
+                  <i class="fa fa-plus" role="img" aria-hidden="true"></i> {{:: ts('Create form for %1', {1: display.label}) }}
                 </a>
               </li>
               <li class="divider" role="separator" ng-if="$ctrl.afformAdminEnabled && $ctrl.afforms.length">
               </li>
               <li ng-if="!$ctrl.afforms" class="disabled">
                 <a href>
-                  <i class="crm-i fa-spinner fa-spin"></i>
+                  <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
                 </a>
               </li>
               <li ng-repeat="afform in $ctrl.afforms" title="{{:: $ctrl.afformAdminEnabled ? ts('Edit form') : '' }}">
                 <a target="_blank" ng-href="{{:: afform.link }}">
-                  <i class="crm-i {{:: $ctrl.afformAdminEnabled ? 'fa-pencil-square-o' : 'fa-list-alt' }}"></i>
+                  <i class="crm-i {{:: $ctrl.afformAdminEnabled ? 'fa-pencil-square-o' : 'fa-list-alt' }}" role="img" aria-hidden="true"></i>
                   {{:: afform.title }}
                 </a>
               </li>
@@ -63,7 +63,7 @@
 
           <div class="btn-group crm-search-admin-links" ng-if="$ctrl.savedSearch.id">
             <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search results table') }}">
-              <i class="crm-i fa-external-link"></i>
+              <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
               {{:: ts('View Results') }}
             </a>
             <button type="button" ng-click="$ctrl.openDisplayMenu = true;" class="btn btn-primary-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -73,13 +73,13 @@
             <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openDisplayMenu">
               <li title="{{:: ts('View search results table') }}">
                 <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank">
-                  <i class="crm-i fa-table"></i>
+                  <i class="crm-i fa-table" role="img" aria-hidden="true"></i>
                   {{:: ts('Search results table') }}
                 </a>
               </li>
               <li ng-repeat="display in $ctrl.savedSearch.displays" ng-if="$ctrl.displayIsViewable(display)" ng-class="{disabled: display.acl_bypass}" title="{{:: display.acl_bypass ? ts('Display has permissions disabled') : ts('View display') }}">
                 <a ng-href="{{ display.acl_bypass ? '' : $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name + '/' + display.name }}" target="_blank">
-                  <i class="crm-i {{ display.acl_bypass ? 'fa-unlock' : $ctrl.displayTypes[display.type].icon }}"></i>
+                  <i class="crm-i {{ display.acl_bypass ? 'fa-unlock' : $ctrl.displayTypes[display.type].icon }}" role="img" aria-hidden="true"></i>
                   {{ display.label }}
                 </a>
               </li>

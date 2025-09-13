@@ -243,7 +243,7 @@
             e.preventDefault();
             CRM.menubar.togglePosition();
           })
-          .append('<li id="crm-menubar-toggle-position"><a href="#toggle-position" title="' + ts('Adjust menu position') + '"><i class="crm-i fa-arrow-up" aria-hidden="true"></i></a>');
+          .append('<li id="crm-menubar-toggle-position"><a href="#toggle-position" title="' + ts('Adjust menu position') + '"><i class="crm-i fa-arrow-up" role="img" aria-hidden="true"></i></a>');
         CRM.menubar.position = CRM.cache.get('menubarPosition', CRM.menubar.position);
       }
       $('body').addClass('crm-menubar-visible crm-menubar-' + CRM.menubar.position);
@@ -504,7 +504,7 @@
         '<li <%= attr("li", item) %>>' +
           '<a <%= attr("a", item) %>>' +
             '<% if (item.icon) { %>' +
-              '<i class="<%- item.icon %>"></i>' +
+              '<i class="<%- item.icon %>" role="img" aria-hidden="true"></i>' +
             '<% } %>' +
             '<% if (item.label) { %>' +
               '<span><%- item.label %></span>' +

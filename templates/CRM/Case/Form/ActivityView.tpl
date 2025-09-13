@@ -35,9 +35,9 @@
             {if $smarty.foreach.report.first AND ( $activityID OR $parentID OR $latestRevisionID )} {* Add a cell to first row with links to prior revision listing and Prompted by (parent) as appropriate *}
               <td>{$row.value}</td>
               <td style="padding-right: 50px; text-align: right; font-size: .9em;">
-                {if $activityID}<a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid=$activityID&revs=1"}"><i class="crm-i fa-history" aria-hidden="true"></i> {ts}List all revisions{/ts}</a>{if !$latestRevisionID}<br />{ts}(this is the current revision){/ts}{/if}<br />{/if}
-                {if $latestRevisionID}<a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid=$latestRevisionID"}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View current revision{/ts}</a><br /><span style="color: red;">{ts}(this is not the current revision){/ts}</span><br />{/if}
-                {if $parentID}<a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid=$parentID"}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Prompted by{/ts}</a>{/if}
+                {if $activityID}<a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid=$activityID&revs=1"}"><i class="crm-i fa-history" role="img" aria-hidden="true"></i> {ts}List all revisions{/ts}</a>{if !$latestRevisionID}<br />{ts}(this is the current revision){/ts}{/if}<br />{/if}
+                {if $latestRevisionID}<a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid=$latestRevisionID"}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View current revision{/ts}</a><br /><span style="color: red;">{ts}(this is not the current revision){/ts}</span><br />{/if}
+                {if $parentID}<a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid=$parentID"}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Prompted by{/ts}</a>{/if}
               </td>
             {else}
               <td colspan="2">

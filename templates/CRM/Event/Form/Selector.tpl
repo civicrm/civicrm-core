@@ -73,11 +73,11 @@
 {if $limit and $pager->_totalItems GT $limit}
   {if $context EQ 'event_dashboard'}
     <tr class="even-row">
-    <td colspan="10"><a href="{crmURL p='civicrm/event/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more event participants{/ts}...</a></td></tr>
+    <td colspan="10"><a href="{crmURL p='civicrm/event/search' q='reset=1'}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Find more event participants{/ts}...</a></td></tr>
     </tr>
   {elseif $context eq 'participant'}
     <tr class="even-row">
-    <td colspan="7"><a href="{crmURL p='civicrm/contact/view' q="reset=1&force=1&selectedChild=participant&cid=$contactId"}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all events for this contact{/ts}...</a></td></tr>
+    <td colspan="7"><a href="{crmURL p='civicrm/contact/view' q="reset=1&force=1&selectedChild=participant&cid=$contactId"}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View all events for this contact{/ts}...</a></td></tr>
     </tr>
   {/if}
 {/if}

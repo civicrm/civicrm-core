@@ -2,7 +2,7 @@
   <ul role="tablist" class="crm-tab-list">
     <li ng-repeat="tab in tabs" role="tab" class="ui-corner-all crm-tab-button crm-count-{{tab.count}}">
       <a ng-href="#{{tab.id}}">
-        <i ng-if="tab.crmIcon" class="crm-i {{tab.crmIcon}}" aria-hidden="true"></i>
+        <i ng-if="tab.crmIcon" class="crm-i {{tab.crmIcon}}" role="img" aria-hidden="true"></i>
         {{tab.$parent.$eval(tab.crmTitle)}}
         <em ng-if="tab.count">{{tab.count}}</em>
       </a>

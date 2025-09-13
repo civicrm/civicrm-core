@@ -32,11 +32,11 @@
     <div class="crm-submit-buttons">
         {if call_user_func(array('CRM_Core_Permission','check'), 'edit grants')}
             {assign var='urlParams' value="reset=1&id=$id&action=update"}
-            <a class="button" href="{crmURL p='civicrm/grant/add' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
+            <a class="button" href="{crmURL p='civicrm/grant/add' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
         {/if}
         {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviGrant')}
             {assign var='urlParams' value="reset=1&id=$id&action=delete"}
-            <a class="button" href="{crmURL p='civicrm/grant/add' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
+            <a class="button" href="{crmURL p='civicrm/grant/add' q=$urlParams}"><span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
         {/if}
     </div>
 </div>

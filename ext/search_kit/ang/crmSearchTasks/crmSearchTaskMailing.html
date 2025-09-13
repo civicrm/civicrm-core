@@ -12,19 +12,19 @@
     </div>
     <div ng-if="!$ctrl.run" class="alert" ng-class="{'alert-success': $ctrl.recipientCount === $ctrl.ids.length, 'alert-danger': $ctrl.recipientCount === 0, 'alert-warning': $ctrl.recipientCount !== 0 && $ctrl.recipientCount &lt; $ctrl.ids.length}">
       <div ng-if="!$ctrl.recipientCount && $ctrl.recipientCount !== 0">
-        <i class="crm-i fa-spinner fa-spin"></i>
+        <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
         {{:: ts('Checking recipients...') }}
       </div>
       <div ng-if="$ctrl.recipientCount === 0">
-        <i class="crm-i fa-exclamation-triangle"></i>
+        <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>
         {{:: ts('None of the selected contacts are eligible to receive mailings (due to lack of email address or unsubscribe status).') }}
       </div>
       <div ng-if="$ctrl.recipientCount && $ctrl.recipientCount &lt; $ctrl.ids.length">
-        <i class="crm-i fa-exclamation-triangle"></i>
+        <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>
         {{:: ts('%1 of the selected contacts cannot receive mailings (due to lack of email address or unsubscribe status).', {1: $ctrl.ids.length - $ctrl.recipientCount}) }}
       </div>
       <div ng-if="$ctrl.recipientCount === $ctrl.ids.length">
-        <i class="crm-i fa-check-circle"></i>
+        <i class="crm-i fa-check-circle" role="img" aria-hidden="true"></i>
         {{:: ts('All of the selected contacts have active email addresses.') }}
       </div>
     </div>

@@ -23,23 +23,23 @@
 <table>
   <tr>
     {if $config->userFramework == 'Standalone'}
-      <td class="nowrap"><a href="{$ufAccessURL|smarty:nodefaults}" id="adminAccess"><i class="crm-i fa-chevron-right fa-fw" aria-hidden="true"></i>{ts}User Roles{/ts}</a></td>
+      <td class="nowrap"><a href="{$ufAccessURL|smarty:nodefaults}" id="adminAccess"><i class="crm-i fa-chevron-right fa-fw" role="img" aria-hidden="true"></i>{ts}User Roles{/ts}</a></td>
     {else}
-      <td class="nowrap"><a href="{$ufAccessURL|smarty:nodefaults}" {$jAccessParams} id="adminAccess"><i class="crm-i fa-chevron-right fa-fw" aria-hidden="true"></i> {ts 1=$config->userFramework}%1 Permissions{/ts}</a></td>
+      <td class="nowrap"><a href="{$ufAccessURL|smarty:nodefaults}" {$jAccessParams} id="adminAccess"><i class="crm-i fa-chevron-right fa-fw" role="img" aria-hidden="true"></i> {ts 1=$config->userFramework}%1 Permissions{/ts}</a></td>
     {/if}
     <td>{ts}Grant access to CiviCRM components and other CiviCRM permissions.{/ts}</td>
   </tr>
   <tr><td colspan="2" class="separator"><strong>{ts}Use following steps if you need to control View and/or Edit permissions for specific contact groups, specific profiles or specific custom data fields.{/ts}</strong></td></tr>
   <tr>
-    <td class="nowrap"><a href="{crmURL p='civicrm/admin/options/acl_role' q="reset=1"}" id="editACLRoles"><i class="crm-i fa-users fa-fw" aria-hidden="true"></i> {ts}1. Manage Roles{/ts}</a></td>
+    <td class="nowrap"><a href="{crmURL p='civicrm/admin/options/acl_role' q="reset=1"}" id="editACLRoles"><i class="crm-i fa-users fa-fw" role="img" aria-hidden="true"></i> {ts}1. Manage Roles{/ts}</a></td>
     <td>{ts}Each CiviCRM ACL Role is assigned a set of permissions. Use this link to create or edit the different roles needed for your site.{/ts}</td>
   </tr>
   <tr>
-    <td class="nowrap"><a href="{crmURL p='civicrm/acl/entityrole' q="reset=1"}" id="editRoleAssignments"><i class="crm-i fa-user-plus fa-fw" aria-hidden="true"></i> {ts}2. Assign Users to CiviCRM ACL Roles{/ts}</a></td>
+    <td class="nowrap"><a href="{crmURL p='civicrm/acl/entityrole' q="reset=1"}" id="editRoleAssignments"><i class="crm-i fa-user-plus fa-fw" role="img" aria-hidden="true"></i> {ts}2. Assign Users to CiviCRM ACL Roles{/ts}</a></td>
     <td>{ts}Once you have defined CiviCRM ACL Roles and granted ACLs to those Roles, use this link to assign users to role(s).{/ts}</td>
   </tr>
   <tr>
-    <td class="nowrap"><a href="{crmURL p='civicrm/acl' q="reset=1"}" id="editACLs"><i class="crm-i fa-id-card-o fa-fw" aria-hidden="true"></i> {ts}3. Manage ACLs{/ts}</a></td>
+    <td class="nowrap"><a href="{crmURL p='civicrm/acl' q="reset=1"}" id="editACLs"><i class="crm-i fa-id-card-o fa-fw" role="img" aria-hidden="true"></i> {ts}3. Manage ACLs{/ts}</a></td>
     <td>{ts}ACLs define permission to do an operation on a set of data, and grant that permission to a CiviCRM ACL Role. Use this link to create or edit the ACLs for your site.{/ts}</td>
   </tr>
 </table>

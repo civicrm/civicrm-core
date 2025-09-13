@@ -6,24 +6,24 @@
   <ul class="dropdown-menu" ng-if=":: row.openAfformMenu">
     <li ng-if="::$ctrl.afformAdminEnabled">
       <a target="_blank" ng-href="{{:: $ctrl.afformPath + '#/create/search/' + row.data.name }}">
-        <i class="fa fa-plus"></i> {{:: ts('Create form for search results table') }}
+        <i class="fa fa-plus" role="img" aria-hidden="true"></i> {{:: ts('Create form for search results table') }}
       </a>
     </li>
     <li ng-repeat="display_name in row.data.display_name" ng-if="::$ctrl.afformAdminEnabled">
       <a target="_blank" ng-href="{{:: $ctrl.afformPath + '#/create/search/' + row.data.name + '.' + display_name }}">
-        <i class="fa fa-plus"></i> {{:: ts('Create form for %1', {1: row.data.display_label[$index]}) }}
+        <i class="fa fa-plus" role="img" aria-hidden="true"></i> {{:: ts('Create form for %1', {1: row.data.display_label[$index]}) }}
       </a>
     </li>
     <li class="divider" role="separator" ng-if="::$ctrl.afformAdminEnabled"></li>
     <li ng-if="!row.afform_count" class="disabled">
       <a href>
-        <i ng-if="!$ctrl.afforms" class="crm-i fa-spinner fa-spin"></i>
+        <i ng-if="!$ctrl.afforms" class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
         <em ng-if="$ctrl.afforms && !$ctrl.afforms[row.data.name]">{{:: ts('None found.') }}</em>
       </a>
     </li>
     <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[row.data.name]" title="{{:: $ctrl.afformAdminEnabled ? ts('Edit form') : '' }}">
       <a target="_blank" ng-href="{{:: afform.link }}">
-        <i class="crm-i {{:: $ctrl.afformAdminEnabled ? 'fa-pencil-square-o' : 'fa-list-alt' }}"></i>
+        <i class="crm-i {{:: $ctrl.afformAdminEnabled ? 'fa-pencil-square-o' : 'fa-list-alt' }}" role="img" aria-hidden="true"></i>
         {{:: afform.title }}
       </a>
     </li>

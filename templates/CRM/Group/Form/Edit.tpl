@@ -101,10 +101,10 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if $action neq 1}
     <div class="action-link">
-      <a {$crmURL|smarty:nodefaults}><i class="crm-i fa-users" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
+      <a {$crmURL|smarty:nodefaults}><i class="crm-i fa-users" role="img" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
       {if $editSmartGroupURL}
         <br />
-        <a class="no-popup" href="{$editSmartGroupURL|smarty:nodefaults}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
+        <a class="no-popup" href="{$editSmartGroupURL|smarty:nodefaults}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
       {/if}
     </div>
   {/if}

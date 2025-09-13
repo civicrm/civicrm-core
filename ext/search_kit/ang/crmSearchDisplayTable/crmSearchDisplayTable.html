@@ -13,7 +13,7 @@
           <span class="sr-only">{{:: ts('Bulk row actions')}}</span>
         </th>
         <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.getHeaderClass(col) }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
-          <i ng-if=":: $ctrl.isSortable(col)" class="crm-i crm-search-table-column-sort-icon {{ $ctrl.getSort(col) }}"></i>
+          <i ng-if=":: $ctrl.isSortable(col)" class="crm-i crm-search-table-column-sort-icon {{ $ctrl.getSort(col) }}" role="img" aria-hidden="true"></i>
           <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
         </th>
       </tr>
