@@ -50,6 +50,7 @@ return [
     'description' => ts('Absolute URL of the location where the civicrm module or component has been installed.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
+    'settings_pages' => ['url' => ['weight' => 0]],
   ],
   'imageUploadURL' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
@@ -67,6 +68,7 @@ return [
     'description' => ts('URL of the location for uploaded image files.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
+    'settings_pages' => ['url' => ['weight' => 10]],
   ],
   'customCSSURL' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
@@ -84,6 +86,7 @@ return [
     'description' => ts('You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
+    'settings_pages' => ['url' => ['weight' => 20]],
   ],
   'extensionsURL' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
@@ -103,5 +106,6 @@ return [
     'validate_callback' => 'CRM_Utils_Rule::urlish',
     'is_env_loadable' => TRUE,
     'global_name' => 'CIVICRM_SETTING_EXTENSIONS_URL',
+    'settings_pages' => ['url' => ['weight' => 40]],
   ],
 ];

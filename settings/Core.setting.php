@@ -286,6 +286,7 @@ return [
       'standalone' => ts('Prefer standalone scripts'),
       'router' => ts('Prefer normal router'),
     ],
+    'settings_pages' => ['url' => ['weight' => 70]],
   ],
   'activity_assignee_notification' => [
     'group_name' => 'CiviCRM Preferences',
@@ -772,6 +773,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If disabled, outbound web-service requests will allow unverified, insecure HTTPS connections'),
     'help_text' => ts('Unless you are absolutely unable to configure your server to check the SSL certificate of the remote server you should leave this set to Yes'),
+    'settings_pages' => ['url' => ['weight' => 60]],
   ],
   'enableSSL' => [
     'group_name' => 'CiviCRM Preferences',
@@ -786,6 +788,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If enabled, inbound HTTP requests for sensitive pages will be redirected to HTTPS.'),
     'help_text' => ts('If enabled, inbound HTTP requests for sensitive pages will be redirected to HTTPS.'),
+    'settings_pages' => ['url' => ['weight' => 50]],
   ],
   'wpBasePage' => [
     'group_name' => 'CiviCRM Preferences',
@@ -830,6 +833,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Prevent the stylesheet "civicrm.css" from being loaded.'),
     'help_text' => NULL,
+    'settings_pages' => ['url' => ['weight' => 30]],
   ],
   'empoweredBy' => [
     'group_name' => 'CiviCRM Preferences',
