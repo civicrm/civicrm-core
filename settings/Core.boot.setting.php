@@ -57,6 +57,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::getComponentSelectValues',
     ],
+    'settings_pages' => ['component' => ['weight' => 0]],
   ],
   'domain' => [
     'group_name' => 'CiviCRM Preferences',
