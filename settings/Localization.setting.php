@@ -36,6 +36,7 @@ return [
     ],
     'default' => NULL,
     'title' => ts('Custom Translate Function'),
+    'settings_pages' => ['localization' => ['weight' => 110]],
   ],
   'monetaryThousandSeparator' => [
     'group_name' => 'Localization Preferences',
@@ -53,6 +54,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['localization' => ['weight' => 80]],
   ],
   'monetaryDecimalPoint' => [
     'group_name' => 'Localization Preferences',
@@ -70,6 +72,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['localization' => ['weight' => 90]],
   ],
   'moneyformat' => [
     'group_name' => 'Localization Preferences',
@@ -84,6 +87,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['localization' => ['weight' => 100]],
   ],
   'moneyvalueformat' => [
     'group_name' => 'Localization Preferences',
@@ -122,6 +126,7 @@ return [
     'on_change' => [
       'CRM_Admin_Form_Setting_Localization::onChangeDefaultCurrency',
     ],
+    'settings_pages' => ['localization' => ['weight' => 60]],
   ],
   'defaultContactCountry' => [
     'group_name' => 'Localization Preferences',
@@ -143,6 +148,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
     ],
+    'settings_pages' => ['localization' => ['weight' => 140]],
   ],
   'defaultContactStateProvince' => [
     'add' => '4.7',
@@ -165,6 +171,7 @@ return [
     'default' => NULL,
     'title' => ts('Default State/Province'),
     'description' => ts('This value is selected by default when adding a new contact address.'),
+    'settings_pages' => ['localization' => ['weight' => 160]],
   ],
   'countryLimit' => [
     'group_name' => 'Localization Preferences',
@@ -187,6 +194,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
     ],
+    'settings_pages' => ['localization' => ['weight' => 170]],
   ],
   'provinceLimit' => [
     'group_name' => 'Localization Preferences',
@@ -209,6 +217,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
     ],
+    'settings_pages' => ['localization' => ['weight' => 180]],
   ],
   'inheritLocale' => [
     'group_name' => 'Localization Preferences',
@@ -223,6 +232,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'description' => ts('If Yes, the initial session language will be set by the CMS, which can later be changed if using the CiviCRM language switcher.'),
+    'settings_pages' => ['localization' => ['weight' => 20]],
   ],
   'dateformatDatetime' => [
     'group_name' => 'Localization Preferences',
@@ -237,6 +247,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['date' => ['weight' => 0]],
   ],
   'dateformatFull' => [
     'group_name' => 'Localization Preferences',
@@ -251,6 +262,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['date' => ['weight' => 10]],
   ],
   'dateformatPartial' => [
     'group_name' => 'Localization Preferences',
@@ -265,6 +277,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['date' => ['weight' => 20]],
   ],
   'dateformatTime' => [
     'add' => '4.7',
@@ -283,6 +296,7 @@ return [
     ],
     'default' => '%l:%M %P',
     'title' => ts('Date Format: Time Only'),
+    'settings_pages' => ['date' => ['weight' => 40]],
   ],
   'dateformatYear' => [
     'add' => '4.7',
@@ -301,6 +315,7 @@ return [
     ],
     'default' => '%Y',
     'title' => ts('Date Format: Year Only'),
+    'settings_pages' => ['date' => ['weight' => 30]],
   ],
   'dateformatFinancialBatch' => [
     'add' => '4.7',
@@ -319,6 +334,7 @@ return [
     ],
     'default' => '%m/%d/%Y',
     'title' => ts('Date Format: Financial Batch'),
+    'settings_pages' => ['date' => ['weight' => 50]],
   ],
   'dateformatshortdate' => [
     'add' => '4.7',
@@ -337,6 +353,7 @@ return [
     ],
     'default' => '%m/%d/%Y',
     'title' => ts('Date Format: Short date Month Day Year'),
+    'settings_pages' => ['date' => ['weight' => 60]],
   ],
   'dateInputFormat' => [
     'add' => '4.7',
@@ -354,6 +371,7 @@ return [
     ],
     'default' => 'mm/dd/yy',
     'title' => ts('Date Input Format'),
+    'settings_pages' => ['date' => ['weight' => 70]],
   ],
   'fieldSeparator' => [
     'add' => '4.7',
@@ -373,6 +391,7 @@ return [
     'default' => ',',
     'title' => ts('Import / Export Field Separator'),
     'description' => ts('Global CSV separator character. Modify this setting to enable import and export of different kinds of CSV files (for example: \',\' \';\' \':\' \'|\' ).'),
+    'settings_pages' => ['localization' => ['weight' => 130]],
   ],
   'fiscalYearStart' => [
     'add' => '4.7',
@@ -387,6 +406,7 @@ return [
     'html_type' => 'MonthDay',
     'default' => ['M' => 1, 'd' => 1],
     'title' => ts('Fiscal Year Start'),
+    'settings_pages' => ['date' => ['weight' => 100]],
   ],
   'languageLimit' => [
     'group_name' => 'Localization Preferences',
@@ -422,6 +442,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'description' => ts('If Yes, the system will allow processing data in locales which are not fully supported. (Some tokens or resources may unavailable or substituted from other locales.)'),
+    'settings_pages' => ['localization' => ['weight' => 50]],
   ],
   'format_locale' => [
     'group_name' => 'Localization Preferences',
@@ -443,6 +464,7 @@ return [
       'callback' => 'CRM_Core_I18n::getFormatLocales',
     ],
     'description' => ts('Locale to use when formatting money (and in future dates). This replaces thousandsSeparator & decimalSeparator & moneyFormat settings.'),
+    'settings_pages' => ['localization' => ['weight' => 70]],
   ],
   'uiLanguages' => [
     'group_name' => 'Localization Preferences',
@@ -464,6 +486,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Core_I18n::languages',
     ],
+    'settings_pages' => ['localization' => ['weight' => 30]],
   ],
   'lcMessages' => [
     'group_name' => 'Localization Preferences',
@@ -487,6 +510,7 @@ return [
     'on_change' => [
       'CRM_Admin_Form_Setting_Localization::onChangeLcMessages',
     ],
+    'settings_pages' => ['localization' => ['weight' => 0]],
   ],
   'legacyEncoding' => [
     'add' => '4.7',
@@ -506,6 +530,7 @@ return [
     'default' => 'Windows-1252',
     'title' => ts('Legacy Encoding'),
     'description' => ts('If import files are NOT encoded as UTF-8, specify an alternate character encoding for these files. The default of Windows-1252 will work for Excel-created .CSV files on many computers.'),
+    'settings_pages' => ['localization' => ['weight' => 120]],
   ],
   'timeInputFormat' => [
     'add' => '4.7',
@@ -526,6 +551,7 @@ return [
     'on_change' => [
       'CRM_Core_BAO_PreferencesDate::onChangeSetting',
     ],
+    'settings_pages' => ['date' => ['weight' => 80]],
   ],
   'weekBegins' => [
     'group_name' => 'Localization Preferences',
@@ -543,6 +569,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'settings_pages' => ['date' => ['weight' => 90]],
   ],
   'contact_default_language' => [
     'group_name' => 'Localization Preferences',
@@ -565,6 +592,7 @@ return [
     'description' => ts('Default language (if any) for contact records.'),
     'help_text' => 'If a contact is created with no language this setting will determine the language data (if any) to save.'
     . 'You may or may not wish to make an assumption here about whether it matches the site language',
+    'settings_pages' => ['localization' => ['weight' => 40]],
   ],
   'pinnedContactCountries' => [
     'group_name' => 'Localization Preferences',
@@ -588,5 +616,6 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
     ],
+    'settings_pages' => ['localization' => ['weight' => 150]],
   ],
 ];

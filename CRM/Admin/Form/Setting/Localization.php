@@ -24,36 +24,6 @@ use Civi\Api4\OptionValue;
 class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
   /**
-   * Subset of settings on the page as defined using the legacy method.
-   *
-   * @var array
-   *
-   * @deprecated - do not add new settings here - the page to display
-   * settings on should be defined in the setting metadata.
-   */
-  protected $_settings = [
-    // @todo remove these, define any not yet defined in the setting metadata.
-    'contact_default_language' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'countryLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'customTranslateFunction' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'defaultContactCountry' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'pinnedContactCountries' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'defaultContactStateProvince' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'defaultCurrency' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'fieldSeparator' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'inheritLocale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'lcMessages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'legacyEncoding' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'partial_locales' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'format_locale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'monetaryThousandSeparator' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'monetaryDecimalPoint' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'moneyformat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'provinceLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'uiLanguages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-  ];
-
-  /**
    * Build the form object.
    */
   public function buildQuickForm() {

@@ -286,6 +286,7 @@ return [
       'standalone' => ts('Prefer standalone scripts'),
       'router' => ts('Prefer normal router'),
     ],
+    'settings_pages' => ['url' => ['weight' => 70]],
   ],
   'activity_assignee_notification' => [
     'group_name' => 'CiviCRM Preferences',
@@ -643,7 +644,7 @@ return [
     'title' => ts('Path to weasyprint executable'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('<a href="%1">weasyprint is an alternative utility for generating PDFs</a> which is a successor to the discontinued wkhtmltopdf. Your system administrator will need to download and install this utility, and enter the executable path here.', [1 => 'https://weasyprint.org/']),
     'help_text' => NULL,
     'settings_pages' => ['misc' => ['weight' => 90]],
   ],
@@ -663,7 +664,7 @@ return [
     'title' => ts('Path to wkhtmltopdf executable'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('<a href="%1">wkhtmltopdf is a now-discontinued utility for generating PDFs</a>. See weasyprint for an updated alternative.', [1 => 'https://wkhtmltopdf.org/']),
     'help_text' => NULL,
     'settings_pages' => ['misc' => ['weight' => 95]],
   ],
@@ -772,6 +773,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If disabled, outbound web-service requests will allow unverified, insecure HTTPS connections'),
     'help_text' => ts('Unless you are absolutely unable to configure your server to check the SSL certificate of the remote server you should leave this set to Yes'),
+    'settings_pages' => ['url' => ['weight' => 60]],
   ],
   'enableSSL' => [
     'group_name' => 'CiviCRM Preferences',
@@ -786,6 +788,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If enabled, inbound HTTP requests for sensitive pages will be redirected to HTTPS.'),
     'help_text' => ts('If enabled, inbound HTTP requests for sensitive pages will be redirected to HTTPS.'),
+    'settings_pages' => ['url' => ['weight' => 50]],
   ],
   'wpBasePage' => [
     'group_name' => 'CiviCRM Preferences',
@@ -800,7 +803,8 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('If set, CiviCRM will use this setting as the base url.'),
-    'help_text' => ts('By default, CiviCRM will generate front-facing pages using the home page at http://wp/ as its base. If you want to use a different template for CiviCRM pages, set the path here.'),
+    'help_text' => ts('By default, CiviCRM will generate front-facing pages using the home page as its base. If you want to use a different template for CiviCRM pages, set the path here.'),
+    'settings_pages' => ['uf' => ['weight' => 10]],
   ],
   'secondDegRelPermissions' => [
     'group_name' => 'CiviCRM Preferences',
@@ -830,6 +834,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Prevent the stylesheet "civicrm.css" from being loaded.'),
     'help_text' => NULL,
+    'settings_pages' => ['url' => ['weight' => 30]],
   ],
   'empoweredBy' => [
     'group_name' => 'CiviCRM Preferences',
@@ -929,6 +934,7 @@ return [
     'default' => 'users',
     'title' => ts('CMS Users Table Name'),
     'description' => '',
+    'settings_pages' => ['uf' => ['weight' => 0]],
   ],
   'wpLoadPhp' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1009,6 +1015,7 @@ return [
     'html_attributes' => [
       'multiple' => 1,
       'class' => 'crm-select2',
+      'placeholder' => ts('All'),
     ],
     'default' => '',
     'add' => '4.7',
@@ -1084,6 +1091,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If enabled, then CMS email id will be synchronised with CiviCRM contacts\'s primary email.'),
     'help_text' => NULL,
+    'settings_pages' => ['uf' => ['weight' => 20]],
   ],
   'preserve_activity_tab_filter' => [
     'group_name' => 'CiviCRM Preferences',
