@@ -21,16 +21,6 @@
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
   /**
-   * Subset of settings on the page as defined using the legacy method.
-   *
-   * @var array
-   *
-   * @deprecated - do not add new settings here - the page to display
-   * settings on should be defined in the setting metadata.
-   */
-  protected $_settings = [];
-
-  /**
    * Build the form object.
    */
   public function buildQuickForm() {
