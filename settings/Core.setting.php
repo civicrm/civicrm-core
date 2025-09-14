@@ -803,7 +803,8 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('If set, CiviCRM will use this setting as the base url.'),
-    'help_text' => ts('By default, CiviCRM will generate front-facing pages using the home page at http://wp/ as its base. If you want to use a different template for CiviCRM pages, set the path here.'),
+    'help_text' => ts('By default, CiviCRM will generate front-facing pages using the home page as its base. If you want to use a different template for CiviCRM pages, set the path here.'),
+    'settings_pages' => ['uf' => ['weight' => 10]],
   ],
   'secondDegRelPermissions' => [
     'group_name' => 'CiviCRM Preferences',
@@ -933,6 +934,7 @@ return [
     'default' => 'users',
     'title' => ts('CMS Users Table Name'),
     'description' => '',
+    'settings_pages' => ['uf' => ['weight' => 0]],
   ],
   'wpLoadPhp' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1089,6 +1091,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If enabled, then CMS email id will be synchronised with CiviCRM contacts\'s primary email.'),
     'help_text' => NULL,
+    'settings_pages' => ['uf' => ['weight' => 20]],
   ],
   'preserve_activity_tab_filter' => [
     'group_name' => 'CiviCRM Preferences',

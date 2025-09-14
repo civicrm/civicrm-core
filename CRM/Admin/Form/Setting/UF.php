@@ -20,40 +20,29 @@
  */
 class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
-  protected $_uf = NULL;
-
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
-    $this->_uf = $config->userFramework;
-    $this->_settings['syncCMSEmail'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
-
-    $this->assign('wpBasePageEnabled', FALSE);
-    $this->assign('userFrameworkUsersTableNameEnabled', FALSE);
-    $this->assign('viewsIntegration', FALSE);
-
     $this->setTitle(
-      ts('Settings - %1 Integration', [1 => $this->_uf])
+      ts('Settings - %1 Integration', [1 => $config->userFramework])
     );
 
-    if ($config->userSystem->canSetBasePage()) {
-      $this->_settings['wpBasePage'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
-      $this->assign('wpBasePageEnabled', TRUE);
-    }
+    parent::buildQuickForm();
 
-    if ($config->userSystem->hasUsersTable()) {
-      $this->_settings['userFrameworkUsersTableName'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
-      $this->assign('userFrameworkUsersTableNameEnabled', TRUE);
+    // Conditionally remove settings that don't apply to the current UF.
+    $settingMetaData = $this->getSettingsMetaData();
+    if (!$config->userSystem->hasUsersTable()) {
+      unset($settingMetaData['userFrameworkUsersTableName']);
     }
+    if (!$config->userSystem->canSetBasePage()) {
+      unset($settingMetaData['wpBasePage']);
+    }
+    $this->assign('settings_fields', $settingMetaData);
 
     $viewsIntegration = $config->userSystem->viewsIntegration();
-    if ($viewsIntegration) {
-      $this->assign('viewsIntegration', $viewsIntegration);
-    }
-
-    parent::buildQuickForm();
+    $this->assign('viewsIntegration', $viewsIntegration);
   }
 
 }
