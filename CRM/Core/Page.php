@@ -522,13 +522,17 @@ class CRM_Core_Page {
     $classes[] = $icon;
     $attribs['class'] = implode(' ', array_unique($classes));
 
-    $standardAttribs = ['aria-hidden' => 'true'];
+    $standardAttribs = [
+      'role' => 'img',
+      'aria-hidden' => 'true',
+    ];
     if ($text === NULL || $text === '') {
       $sr = '';
     }
     else {
       $standardAttribs['title'] = $text;
-      $sr = "<span class=\"sr-only\">$text</span>";
+      $srText = htmlspecialchars($text, ENT_NOQUOTES);
+      $sr = "<span class=\"sr-only\">$srText</span>";
     }
 
     // Assemble attribs
