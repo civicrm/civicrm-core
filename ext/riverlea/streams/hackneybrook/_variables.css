@@ -23,7 +23,7 @@
 /* Emphasis colours */
   --crm-c-primary: var(--crm-c-gray-025);
   --crm-c-primary-text: var(--crm-c-text);
-  --crm-c-primary-hover-text: var(--crm-c-text);
+  --crm-c-primary-hover-text: var(--crm-c-primary-text);
   --crm-c-primary-on-page-bg: var(--crm-c-gray-800);
   --crm-c-secondary: var(--crm-c-gray-025);
   --crm-c-secondary-text: var(--crm-c-text);
@@ -39,15 +39,15 @@
   --crm-btn-icon-spacing: var(--crm-m1);
   --crm-btn-icon-size: var(--crm-btn-height);
   --crm-btn-cancel-bg: var(--crm-c-primary);
-  --crm-btn-cancel-text: var(--crm-c-text);
+  --crm-btn-cancel-text: var(--crm-c-primary-text);
   --crm-btn-info-bg: var(--crm-c-primary);
-  --crm-btn-info-text: var(--crm-c-text);
+  --crm-btn-info-text: var(--crm-c-primary-text);
   --crm-btn-warning-bg: var(--crm-c-primary);
-  --crm-btn-warning-text: var(--crm-c-text);
+  --crm-btn-warning-text: var(--crm-c-primary-text);
   --crm-btn-success-bg: var(--crm-c-primary);
-  --crm-btn-success-text: var(--crm-c-text);
+  --crm-btn-success-text: var(--crm-c-primary-text);
   --crm-btn-danger-bg: var(--crm-c-primary);
-  --crm-btn-danger-text: var(--crm-c-text);
+  --crm-btn-danger-text: var(--crm-c-primary-text);
   --crm-btn-icon-bg: rgba(256,256,256,0.25);
   --crm-btn-icon-border: var(--crm-btn-border);
   --crm-btn-icon-padding: 0px;
