@@ -412,7 +412,7 @@
         // search with wildcards, aside from contact name and a few other
         // fields. To get comparable results, append and possible prepend
         // wildcard to the search term.
-        else if (searchkey !== 'id') {
+        else if (searchkey !== 'id' && searchkey !== 'external_identifier') {
           if (CRM.config.includeWildCardInName == 1) {
             $('#crm-qsearch-input').val('%' + searchValue + '%');
           }
