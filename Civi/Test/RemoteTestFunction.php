@@ -3,6 +3,7 @@
 namespace Civi\Test;
 
 use Civi\Schema\Traits\MagicGetterSetterTrait;
+use Civi\Test\Exception\ProcessErrorException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Laravel\SerializableClosure\Support\ReflectionClosure;
@@ -381,6 +382,8 @@ class RemoteTestFunction {
 
       protected array $env;
 
+      protected ?string $lastStdErr = NULL;
+
       public function __construct(array $env) {
         $this->env = $env;
       }
@@ -409,10 +412,19 @@ class RemoteTestFunction {
         $cmdParts[] = escapeshellarg($php);
         $cmd = implode(' ', $cmdParts);
 
-        $output = ProcessHelper::runOk($cmd);
-        $result = \CRM_Core_Page_RemoteTestFunction::convertArrayToResponse(json_decode($output, TRUE));
+        ProcessHelper::run($cmd, $stdout, $stderr, $exit);
+        $this->lastStdErr = $stderr;
+        if ($exit !== 0) {
+          throw new ProcessErrorException($cmd, $stdout, $stderr, $exit);
+        }
+
+        $result = \CRM_Core_Page_RemoteTestFunction::convertArrayToResponse(json_decode($stdout, TRUE));
         @unlink($requestFile); /* Keep until successful. Useful for debugging. */
         return $result;
+      }
+
+      public function getLastStdErr(): ?string {
+        return $this->lastStdErr;
       }
 
     };
