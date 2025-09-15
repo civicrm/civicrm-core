@@ -83,22 +83,22 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
     $this->check('Dragon {$name}!',
       ['name' => 'Run & Hide'],
       [
-        '2_plain' => 'Dragon Run & Hide!',
-        '4_plain' => 'Dragon Run & Hide!',
-        '5_plain' => 'Dragon Run & Hide!',
-        '5_auto' => 'Dragon Run &amp; Hide!', /* outlier */
+        '2_plain' => ['Dragon Run & Hide!'],
+        '4_plain' => ['Dragon Run & Hide!'],
+        '5_plain' => ['Dragon Run & Hide!'],
+        '5_auto' => ['Dragon Run &amp; Hide!'], /* outlier */
       ]
     );
 
     // NOT PORTABLE: {$string|smarty:nodefaults}
     $this->check(
-      'Dragon {$name|smarty:nodefaults}',
+      'Dragon {$name|smarty:nodefaults}!',
       ['name' => 'Run & Hide'],
       [
-        '2_plain' => 'Dragon Run & Hide',
-        '4_plain' => 'Dragon Run & Hide',
-        '5_plain' => 'Dragon Run & Hide',
-        '5_auto' => 'Dragon Run &amp; Hide', /* outlier */
+        '2_plain' => ['Dragon Run & Hide!'],
+        '4_plain' => ['Dragon Run & Hide!'],
+        '5_plain' => ['Dragon Run & Hide!'],
+        '5_auto' => ['Dragon Run &amp; Hide!'], /* outlier */
       ]
     );
 
@@ -107,10 +107,10 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       'var dragon = {$contact|@json_encode};',
       ['contact' => ['name' => 'Run & Hide']],
       [
-        '2_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_auto' => 'var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};', /* outlier */
+        '2_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '4_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '5_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '5_auto' => ['var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};'], /* outlier */
       ]
     );
 
@@ -119,10 +119,10 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       'var dragon = {$contact|json_encode nofilter};',
       ['contact' => ['name' => 'Run & Hide']],
       [
-        '2_plain' => 'var dragon = Array;', /* outlier */
-        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_auto' => 'var dragon = {"name":"Run & Hide"};',
+        '2_plain' => ['var dragon = Array;', '/Array to string conversion/'], /* outlier */
+        '4_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '5_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '5_auto' => ['var dragon = {"name":"Run & Hide"};'],
       ]
     );
 
@@ -131,10 +131,10 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       'var dragon = {$contact|json nofilter};',
       ['contact' => ['name' => 'Run & Hide']],
       [
-        '2_plain' => 'var dragon = Array;', /* outlier */
-        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_auto' => 'var dragon = {"name":"Run & Hide"};',
+        '2_plain' => ['var dragon = Array;', '/Array to string conversion/'], /* outlier */
+        '4_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '5_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '5_auto' => ['var dragon = {"name":"Run & Hide"};'],
       ]
     );
 
@@ -143,10 +143,10 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       'var dragon = {$contact|@json|smarty:nodefaults};',
       ['contact' => ['name' => 'Run & Hide']],
       [
-        '2_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_auto' => 'var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};', /* outlier */
+        '2_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '4_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '5_plain' => ['var dragon = {"name":"Run & Hide"};'],
+        '5_auto' => ['var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};'], /* outlier */
       ]
     );
   }
@@ -160,11 +160,14 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
    *   The template we wish to evaluate.
    * @param array $vars
    *   Any Smarty variables to include.
-   * @return string
+   * @return array
+   *   Tuple: [0 => string $rendered, 1 => string $warnings]
    */
-  protected function render(string $version, string $template, array $vars = []): string {
+  protected function render(string $version, string $template, array $vars = []): array {
     [$expectVer] = explode('_', $version);
-    return $this->smarty[$version]->execute([$expectVer, $template, $vars]);
+    $rendered = $this->smarty[$version]->execute([$expectVer, $template, $vars]);
+    $warnings = $this->smarty[$version]->getClient()->getLastStdErr();
+    return [$rendered, $warnings];
   }
 
   /**
@@ -173,15 +176,38 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
    * @param string $template
    * @param array $vars
    * @param array $versions
+   *   List of versions and their expected output.
+   *   For ordinary/successful output, use `[string $expectedOutput]`.
+   *   For unusual output with expected warnings, use `[string $expectedOutput, string $expectedWarningRegex]`.
+   *   Ex: [
+   *     '2_auto' => ['Hello world']
+   *     '3_auto' => ['Hello world']
+   *     '4_auto' => ['Hello world', '/Warning: foobar was deprecated in v4.5.6/'],
+   *   ];
+   *
    * @return void
    */
   protected function check(string $template, array $vars, array $versions): void {
+    $expectResults = [];
     $actualResults = [];
     foreach ($versions as $version => $expectResult) {
-      $result = $this->render($version, $template, $vars);
-      $actualResults[$version] = $result;
+      $expectRendered = $expectResult[0];
+      $expectWarnings = $expectResult[1] ?? NULL;
+      $expectResults[$version] = $expectRendered;
+
+      [$actualRendered, $actualWarnings] = $this->render($version, $template, $vars);
+      if (!$expectWarnings && !$actualWarnings) {
+        // OK
+      }
+      elseif ($expectWarnings && preg_match($expectWarnings, $actualWarnings)) {
+        // OK
+      }
+      else {
+        $actualRendered .= "\n$actualWarnings";
+      }
+      $actualResults[$version] = $actualRendered;
     }
-    $this->assertEquals($versions, $actualResults, "Test Smarty template: {$template}");
+    $this->assertEquals($expectResults, $actualResults, "Test Smarty template: {$template}");
   }
 
   /**
@@ -195,10 +221,10 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
    */
   protected function checkPortable(string $template, array $vars, string $expect): void {
     $this->check($template, $vars, [
-      '2_plain' => $expect,
-      '4_plain' => $expect,
-      '5_plain' => $expect,
-      '5_auto' => $expect,
+      '2_plain' => [$expect, NULL],
+      '4_plain' => [$expect, NULL],
+      '5_plain' => [$expect, NULL],
+      '5_auto' => [$expect, NULL],
     ]);
   }
 
