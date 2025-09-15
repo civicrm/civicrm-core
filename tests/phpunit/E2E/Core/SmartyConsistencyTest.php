@@ -51,6 +51,31 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['contact' => ['name' => 'Run & Hide']],
       'var dragon = {"name":"Run & Hide"};'
     );
+
+    // PORTABLE: {if isset($variable)}
+    // PORTABLE: {if empty($variable)}
+    $this->checkPortable(
+    // PORTABLE: isset($variable)
+      '{if isset($known)}isset-known=yes{/if}, '
+      . '{if isset($unknown)}isset-unknown=yes{/if}, '
+      . '{if empty($known)}empty-known=yes{/if}, '
+      . '{if empty($unknown)}empty-unknown=yes{/if}',
+      ['known' => 'yes'],
+      'isset-known=yes, , , empty-unknown=yes'
+    );
+
+    // PORTABLE: {if isset($array.field)}
+    // PORTABLE: {if empty($array.field)}
+    $this->checkPortable(
+    // PORTABLE: isset($variable)
+      '{if isset($array.known)}isset-known=yes{/if}, '
+      . '{if isset($array.unknown)}isset-unknown=yes{/if}, '
+      . '{if empty($array.known)}empty-known=yes{/if}, '
+      . '{if empty($array.unknown)}empty-unknown=yes{/if}',
+      ['array' => ['known' => 'yes']],
+      'isset-known=yes, , , empty-unknown=yes'
+    );
+
   }
 
   public function testNonPortable() {
