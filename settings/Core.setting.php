@@ -73,7 +73,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Select the sections that should be included in the Basic and Advanced Search forms. EXAMPLE: If you don\'t track Relationships - then you do not need this section included in the advanced search form. Simplify the form by un-checking this option.'),
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
-    'settings_pages' => ['display' => ['weight' => 160]],
+    'settings_pages' => ['search' => ['weight' => 160]],
   ],
   'user_dashboard_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -198,7 +198,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If disabled, CiviCRM will not automatically dismiss any alerts after 10 seconds.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 210]],
+    'settings_pages' => ['display' => ['weight' => 610]],
   ],
   'editor_id' => [
     'group_name' => 'CiviCRM Preferences',
@@ -849,7 +849,7 @@ return [
     'is_contact' => 0,
     'description' => ts('When enabled, "empowered by CiviCRM" is displayed at the bottom of public forms.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 35]],
+    'settings_pages' => ['display' => ['weight' => 35]],
   ],
   'logging_no_trigger_permission' => [
     'add' => '4.7',
