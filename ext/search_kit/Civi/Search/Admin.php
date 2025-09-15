@@ -58,6 +58,10 @@ class Admin {
         ->execute(),
       'myName' => \CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
       'dateFormats' => self::getDateFormats(),
+      'numberAttributes' => [
+        \NumberFormatter::MAX_FRACTION_DIGITS => E::ts('Max Decimal Places'),
+        \NumberFormatter::MIN_FRACTION_DIGITS => E::ts('Min Decimal Places'),
+      ],
     ];
     $perms = \Civi\Api4\Permission::get()
       ->addWhere('group', 'IN', ['civicrm', 'cms'])
