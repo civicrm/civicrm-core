@@ -12,12 +12,12 @@ class CRM_Core_PageTest extends CiviUnitTestCase {
    * @return array
    */
   public static function iconTestData() {
-    // first item is icon, text, condition, and attribs, second is expected markup
+    // First item is expected markup, second is php params and third is equivalent smarty syntax for the same params
     return [
       [
-        '<i aria-hidden="true" title="We have a winner" class="crm-i fa-trophy"></i><span class="sr-only">We have a winner</span>',
-        ['fa-trophy', 'We have a winner', TRUE, []],
-        '{icon icon="fa-trophy"}We have a winner{/icon}',
+        '<i role="img" aria-hidden="true" title="Test 1 &amp; 2" class="crm-i fa-trophy"></i><span class="sr-only">Test 1 &amp; 2</span>',
+        ['fa-trophy', 'Test 1 & 2', TRUE, []],
+        '{icon icon="fa-trophy"}Test 1 & 2{/icon}',
       ],
       [
         '',
@@ -25,27 +25,27 @@ class CRM_Core_PageTest extends CiviUnitTestCase {
         '{icon icon="fa-trophy" condition=0}We have a winner{/icon}',
       ],
       [
-        '<i aria-hidden="true" title="Favorite" class="action-icon test-icon crm-i fa-heart"></i><span class="sr-only">Favorite</span>',
-        ['fa-heart', 'Favorite', TRUE, ['class' => 'action-icon test-icon']],
-        '{icon icon="fa-heart" class="action-icon test-icon"}Favorite{/icon}',
+        '<i role="img" aria-hidden="true" title="Favorite &lt;3" class="action-icon test-icon crm-i fa-heart"></i><span class="sr-only">Favorite &lt;3</span>',
+        ['fa-heart', 'Favorite <3', TRUE, ['class' => 'action-icon test-icon']],
+        '{icon icon="fa-heart" class="action-icon test-icon"}Favorite <3{/icon}',
       ],
       [
-        '<i aria-hidden="true" title="I &quot;choo-choo&quot; choose you" class="crm-i fa-train"></i><span class="sr-only">I "choo-choo" choose you</span>',
+        '<i role="img" aria-hidden="true" title="I &quot;choo-choo&quot; choose you" class="crm-i fa-train"></i><span class="sr-only">I "choo-choo" choose you</span>',
         ['fa-train', 'I "choo-choo" choose you', TRUE, []],
         '{icon icon="fa-train"}I "choo-choo" choose you{/icon}',
       ],
       [
-        '<i aria-hidden="true" class="crm-i fa-trash"></i><span class="sr-only">Trash</span>',
+        '<i role="img" aria-hidden="true" class="crm-i fa-trash"></i><span class="sr-only">Trash</span>',
         ['fa-trash', 'Trash', TRUE, ['title' => '']],
         '{icon icon="fa-trash" title=""}Trash{/icon}',
       ],
       [
-        '<i title="It\'s bedtime" class="crm-i fa-bed"></i><span class="sr-only">It\'s bedtime</span>',
+        '<i role="img" title="It\'s bedtime" class="crm-i fa-bed"></i><span class="sr-only">It\'s bedtime</span>',
         ['fa-bed', "It's bedtime", TRUE, ['aria-hidden' => '']],
         // Ye olde Smarty 2 doesn't support hyphenated function parameters
       ],
       [
-        '<i aria-hidden="true" class="crm-i fa-snowflake-o"></i>',
+        '<i role="img" aria-hidden="true" class="crm-i fa-snowflake-o"></i>',
         ['fa-snowflake-o', NULL, TRUE, []],
         '{icon icon="fa-snowflake-o"}{/icon}',
       ],
