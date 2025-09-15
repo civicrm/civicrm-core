@@ -27,50 +27,29 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
 
   public function testPortable() {
     // PORTABLE: {$string nofilter}
-    $this->check('Dragon {$name nofilter}!',
+    $this->checkPortable('Dragon {$name nofilter}!',
       ['name' => 'Run & Hide'],
-      [
-        '2_plain' => 'Dragon Run & Hide!',
-        '4_plain' => 'Dragon Run & Hide!',
-        '5_plain' => 'Dragon Run & Hide!',
-        '5_auto' => 'Dragon Run & Hide!',
-      ]
+      'Dragon Run & Hide!'
     );
 
     // PORTABLE: {$string|escape nofilter}
-    $this->check(
-      'Dragon {$name|escape nofilter}',
+    $this->checkPortable('Dragon {$name|escape nofilter}',
       ['name' => 'Run & Hide'],
-      [
-        '2_plain' => 'Dragon Run &amp; Hide',
-        '4_plain' => 'Dragon Run &amp; Hide',
-        '5_plain' => 'Dragon Run &amp; Hide',
-        '5_auto' => 'Dragon Run &amp; Hide',
-      ]
+      'Dragon Run &amp; Hide'
     );
 
     // PORTABLE: {$object|@json_encode nofilter}
-    $this->check(
+    $this->checkPortable(
       'var dragon = {$contact|@json_encode nofilter};',
       ['contact' => ['name' => 'Run & Hide']],
-      [
-        '2_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_auto' => 'var dragon = {"name":"Run & Hide"};',
-      ]
+      'var dragon = {"name":"Run & Hide"};'
     );
 
     // PORTABLE: {$object|@json nofilter}
-    $this->check(
+    $this->checkPortable(
       'var dragon = {$contact|@json nofilter};',
       ['contact' => ['name' => 'Run & Hide']],
-      [
-        '2_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '4_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_plain' => 'var dragon = {"name":"Run & Hide"};',
-        '5_auto' => 'var dragon = {"name":"Run & Hide"};',
-      ]
+      'var dragon = {"name":"Run & Hide"};'
     );
   }
 
@@ -172,10 +151,30 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
    * @return void
    */
   protected function check(string $template, array $vars, array $versions): void {
+    $actualResults = [];
     foreach ($versions as $version => $expectResult) {
       $result = $this->render($version, $template, $vars);
-      $this->assertEquals($expectResult, $result, "Test Smarty v{$version} with template: {$template}");
+      $actualResults[$version] = $result;
     }
+    $this->assertEquals($versions, $actualResults, "Test Smarty template: {$template}");
+  }
+
+  /**
+   * Render a smarty template across several versions. All versions should yield
+   * the same output.
+   *
+   * @param string $template
+   * @param array $vars
+   * @param string $expect
+   * @return void
+   */
+  protected function checkPortable(string $template, array $vars, string $expect): void {
+    $this->check($template, $vars, [
+      '2_plain' => $expect,
+      '4_plain' => $expect,
+      '5_plain' => $expect,
+      '5_auto' => $expect,
+    ]);
   }
 
   /**
