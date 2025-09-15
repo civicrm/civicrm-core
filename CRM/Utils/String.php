@@ -679,6 +679,9 @@ class CRM_Utils_String {
       if (!empty($def)) {
         $def->addElement('figcaption', 'Block', 'Flow', 'Common');
         $def->addElement('figure', 'Block', 'Optional: (figcaption, Flow) | (Flow, figcaption) | Flow', 'Common');
+        // Allow `<summary>` and `<details>`
+        $def->addElement('details', 'Block', 'Flow', 'Common');
+        $def->addElement('summary', 'Inline', 'Inline', 'Common');
       }
       $_filter = new HTMLPurifier($config);
     }
