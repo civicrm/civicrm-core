@@ -76,9 +76,69 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       'isset-known=yes, , , empty-unknown=yes'
     );
 
+    // PORTABLE: {if $x === null}
+    $this->checkPortable(
+      '{if $x === null}x=null{/if}, '
+      . '{if $x !== null}x!=null{/if}, '
+      . '{if $y !== null}y!=null{/if}',
+      ['x' => NULL, 'y' => '100'],
+      "x=null, , y!=null"
+    );
+
+    // PORTABLE: {elseif} and {else if}
+    $this->checkPortable(
+      '{if $x == 1}one{elseif $x == 2}two{else}three{/if}',
+      ['x' => 2],
+      "two"
+    );
+
+    // PORTABLE: {if count ( $wizard.steps ) > 5}
+    $this->checkPortable(
+      '{if count ( $wizard.steps ) > 5}true{/if}',
+      ['wizard' => ['steps' => [1, 2, 3, 4, 5, 6]]],
+      'true'
+    );
+  }
+
+  public function testInvalid(): void {
+    // INVALID: {if $x === NULL}
+    $this->checkRegex(
+      '{if $x === NULL}x=null{/if}',
+      ['x' => NULL],
+      [
+        '2_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+        '4_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+        '5_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+        '5_auto' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+      ]
+    );
   }
 
   public function testNonPortable() {
+    // NOT PORTABLE: {else if}
+    $this->checkRegex(
+      '{if $x == 1}one{else if $x == 2}two{else}three{/if}',
+      ['x' => 2],
+      [
+        '2_plain' => ['/EXCEPTION: Message was not parsed due to invalid smarty syntax/'], /* outlier */
+        '4_plain' => ['/^two$/'],
+        '5_plain' => ['/^two$/'],
+        '5_auto' => ['/^two$/'],
+      ]
+    );
+
+    // NOT PORTABLE: {\n$name} (whitespace at start of expression)
+    $this->check(
+      "Hello {\$name}. Goodbye {\n\$name}.",
+      ['name' => 'Bob'],
+      [
+        '2_plain' => ["Hello Bob. Goodbye Bob."], /* outlier */
+        '4_plain' => ["Hello Bob. Goodbye {\n\$name}."],
+        '5_plain' => ["Hello Bob. Goodbye {\n\$name}."],
+        '5_auto' => ["Hello Bob. Goodbye {\n\$name}."],
+      ]
+    );
+
     // NOT PORTABLE: {$string}
     $this->check('Dragon {$name}!',
       ['name' => 'Run & Hide'],
@@ -206,6 +266,52 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
         $actualRendered .= "\n$actualWarnings";
       }
       $actualResults[$version] = $actualRendered;
+    }
+    $this->assertEquals($expectResults, $actualResults, "Test Smarty template: {$template}");
+  }
+
+  /**
+   * Render a Smarty template across several versions. Compare results.
+   *
+   * @param string $template
+   * @param array $vars
+   * @param array $versions
+   *   List of versions and their expected output.
+   *   For ordinary/successful output, use `[string $expectedOutput]`.
+   *   For unusual output with expected warnings, use `[string $expectedOutput, string $expectedWarningRegex]`.
+   *   Ex: [
+   *     '2_auto' => ['Hello world']
+   *     '3_auto' => ['Hello world']
+   *     '4_auto' => ['Hello world', '/Warning: foobar was deprecated in v4.5.6/'],
+   *   ];
+   *
+   * @return void
+   */
+  protected function checkRegex(string $template, array $vars, array $versions): void {
+    $expectResults = [];
+    $actualResults = [];
+    foreach ($versions as $version => $expectResult) {
+      $expectRenderedPattern = $expectResult[0];
+      $expectWarnings = $expectResult[1] ?? NULL;
+      $expectResults[$version] = 'MATCH: ' . $expectRenderedPattern;
+
+      [$actualRendered, $actualWarnings] = $this->render($version, $template, $vars);
+      if (!$expectWarnings && !$actualWarnings) {
+        // OK
+      }
+      elseif ($expectWarnings && preg_match($expectWarnings, $actualWarnings)) {
+        // OK
+      }
+      else {
+        $actualRendered .= "\n$actualWarnings";
+      }
+      if (preg_match($expectRenderedPattern, $actualRendered)) {
+        $actualResults[$version] = 'MATCH: ' . $expectRenderedPattern;
+      }
+      else {
+        $actualResults[$version] = 'NOT MATCH: ' . $expectRenderedPattern . "\n" . $actualRendered;
+      }
+
     }
     $this->assertEquals($expectResults, $actualResults, "Test Smarty template: {$template}");
   }
