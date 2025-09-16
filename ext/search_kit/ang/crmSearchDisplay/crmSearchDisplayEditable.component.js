@@ -14,6 +14,7 @@
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
     controller: function($scope, $element, crmApi4, crmStatus) {
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
       const ctrl = this;
       let initialValue;
       let editableInfo;
