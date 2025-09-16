@@ -85,6 +85,15 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       "x=null, , y!=null"
     );
 
+    // PORTABLE: {if $x === true}
+    $this->checkPortable(
+      '{if $x === true}x=true{/if}, '
+      . '{if $x !== true}x!=true{/if}, '
+      . '{if $y !== true}y!=true{/if}',
+      ['x' => TRUE, 'y' => 'FALSE'],
+      "x=true, , y!=true"
+    );
+
     // PORTABLE: {elseif} and {else if}
     $this->checkPortable(
       '{if $x == 1}one{elseif $x == 2}two{else}three{/if}',
@@ -104,6 +113,18 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
     // INVALID: {if $x === NULL}
     $this->checkRegex(
       '{if $x === NULL}x=null{/if}',
+      ['x' => NULL],
+      [
+        '2_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+        '4_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+        '5_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+        '5_auto' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+      ]
+    );
+
+    // INVALID: {if $x === TRUE}
+    $this->checkRegex(
+      '{if $x === TRUE}x=true{/if}',
       ['x' => NULL],
       [
         '2_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
