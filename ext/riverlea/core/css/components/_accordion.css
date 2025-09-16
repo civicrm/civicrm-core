@@ -8,7 +8,6 @@
   list-style: none;
   cursor: var(--crm-hover-clickable);
   font-size: var(--crm-font-size);
-  font-family: var(--crm-expand-header-font);
   font-weight: var(--crm-expand-header-weight);
   color: var(--crm-c-text);
   border-radius: var(--crm-expand-radius);
@@ -63,7 +62,6 @@
   border: var(--crm-expand-header-border);
   border-width: var(--crm-expand-header-border-width);
   font-weight: var(--crm-expand-header-weight);
-  font-family: var(--crm-expand-header-font);
 }
 .crm-container .crm-accordion-bold > summary a {
   color: var(--crm-expand-header-color);
@@ -90,7 +88,6 @@
   background-color: var(--crm-expand2-body-bg);
 }
 .crm-container .crm-accordion-light > summary {
-  font-family: var(--crm-expand2-header-font);
   font-weight: var(--crm-expand2-header-weight);
   background-color: var(--crm-expand2-header-bg);
   color: var(--crm-expand2-header-color);

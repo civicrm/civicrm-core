@@ -230,7 +230,6 @@
   font-size: var(--crm-r1);
   padding: var(--crm-m2) var(--crm-r1);
   font-weight: bold;
-  font-family: var(--crm-font-bold);
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr:nth-child(2) > td {
   border-top: var(--crm-c-divider) !important;
@@ -359,7 +358,6 @@
   padding: var(--crm-dropdown-padding);
   white-space: nowrap;
   color: var(--crm-dropdown-col);
-  font-family: var(--crm-font-bold);
   font-weight: bold;
   padding: var(--crm-m) var(--crm-xs) var(--crm-xs) !important;
   border-bottom: 1px solid var(--crm-dropdown-col);

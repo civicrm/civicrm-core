@@ -134,7 +134,6 @@ table.advmultiselect {
   color: var(--crm-c-text);
   display: inline-block;
   font-weight: bold;
-  font-family: var(--crm-font-bold);
   line-height: var(--crm-wizard-height);
   padding: 0 var(--crm-l) 0 var(--crm-xl);
   position: relative;
@@ -437,7 +436,6 @@ p.crm-upgrade-large-text {
 p.crm-upgrade-large-text:first-of-type {
   font-size: var(--crm-r1);
   color: var(--crm-alert-success-text);
-  font-family: var(--crm-font-bold);
   font-weight: bold;
 }
 .crm-success-flex {
@@ -512,7 +510,6 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   font-size: var(--crm-font-size);
   color: var(--crm-c-text-light);
   font-weight: bold;
-  font-family: var(--crm-font-bold);
   text-align: center;
   background: var(--crm-c-background2);
 }

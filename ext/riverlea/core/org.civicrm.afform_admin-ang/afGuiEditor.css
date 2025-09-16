@@ -479,7 +479,6 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-gui-text-h5,
 #afGuiEditor .af-gui-text-h6 {
   font-weight: bold;
-  font-family: var(--crm-font-bold);
 }
 #afGuiEditor.af-gui-editing-content .panel-heading,
 #afGuiEditor.af-gui-editing-content .af-gui-element,

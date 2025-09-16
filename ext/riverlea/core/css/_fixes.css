@@ -128,7 +128,6 @@ a.crm-expand-row:focus {
   background-color: var(--crm-expand-header-bg-active);
 }
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header {
-  font-family: var(--crm-expand2-header-font);
   font-weight: var(--crm-expand2-header-weight);
   background-color: var(--crm-expand2-header-bg);
   color: var(--crm-expand2-header-color);
@@ -436,8 +435,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   top: 0;;
 }
 .crm-container .tag-tree-wrapper div.tag-info .tdl {
-  font-weight: var(--crm-bold-weight);
-  font-family: var(--crm-font-bold);
+  font-weight: bold;
   color: var(--crm-c-text);
 }
 .crm-container .tag-tree-wrapper div.tag-info .crm-submit-buttons {
@@ -555,8 +553,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   color: inherit;
 }
 #api-generated caption {
-  font-weight: var(--crm-bold-weight);
-  font-family: var(--crm-font-bold);
+  font-weight: bold;
 }
 #api-generated tr td:first-of-type {
   width: var(--crm-input-label-width);

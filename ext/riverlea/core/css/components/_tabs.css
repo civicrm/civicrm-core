@@ -59,7 +59,6 @@
   color: var(--crm-tab-col);
   padding: var(--crm-tab-padding);
   font-weight: var(--crm-tab-weight);
-  font-family: var(--crm-tab-font);
   font-size: var(--crm-font-size);
   line-height: var(--crm-r1);
   text-decoration: none;

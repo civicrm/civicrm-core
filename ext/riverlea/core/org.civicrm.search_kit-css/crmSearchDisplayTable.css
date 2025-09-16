@@ -18,7 +18,6 @@ table.crm-sticky-header > thead > tr {
 }
 .crm-search-display.crm-search-display-table tfoot > tr > td {
   font-weight: bold;
-  font-family: var(--crm-font-bold);
 }
 
 /* Afform tables */
