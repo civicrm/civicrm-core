@@ -156,7 +156,7 @@ class StyleLoader implements \Symfony\Component\EventDispatcher\EventSubscriberI
     $stream = \Civi::service('themes')->getActiveThemeKey();
 
     // we add the stream modified date to asset params as a cache buster
-    $streamMeta = self::getAvailableStreamMeta()[$stream] ?? [];
+    $streamMeta = $this->getAvailableStreamMeta()[$stream] ?? [];
     $streamModified = $streamMeta['modified_date'] ?? NULL;
 
     return [
