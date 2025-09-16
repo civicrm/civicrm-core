@@ -13,7 +13,7 @@
     </button>
     <ul class="dropdown-menu" ng-if="$ctrl.menuOpen">
       <li ng-if="!$ctrl.allTasks" class="disabled">
-        <a href><i class="crm-i fa-spinner fa-spin"></i></a>
+        <a href><i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i></a>
       </li>
       <li ng-repeat="task in $ctrl.allTasks">
         <a href ng-click="$ctrl.toggleTask(task.name); $event.stopPropagation()">

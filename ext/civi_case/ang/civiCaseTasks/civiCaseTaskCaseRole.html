@@ -10,15 +10,15 @@
     </div>
     <div ng-if="!$ctrl.run && values.relationship_type" class="alert" ng-class="{'alert-info': $ctrl.existingCount === null, 'alert-success': $ctrl.existingCount === 0, 'alert-warning': $ctrl.existingCount}">
       <div ng-if="$ctrl.existingCount === null">
-        <i class="crm-i fa-spinner fa-spin"></i>
+        <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
         {{:: ts('Checking...') }}
       </div>
       <div ng-if="$ctrl.existingCount === 0">
-        <i class="crm-i fa-check-circle"></i>
+        <i class="crm-i fa-check-circle" role="img" aria-hidden="true"></i>
         {{:: ts('The selected cases do not yet have this role assigned.') }}
       </div>
       <div ng-if="$ctrl.existingCount">
-        <i class="crm-i fa-exclamation-triangle"></i>
+        <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>
         {{:: ts('%1 cases already have this role assigned.', {1: $ctrl.existingCount}) }}
         <div class="form-inline">
           <label><input type="radio" ng-model="values.addOrReplace" value="add" required> {{:: ts('Add extra roles') }}</label>

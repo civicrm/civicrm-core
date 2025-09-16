@@ -15,8 +15,8 @@
     {if $addProfileBottomAdd}{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].html}
     {else}{$form.custom_post_id_multiple[$profileBottomNum].html}{/if}
     <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
-    <span class='profile_bottom_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile" data-addtlPartc="{$addProfileBottomAdd}"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}</a></span>
-    <p class='profile_bottom_link'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
+    <span class='profile_bottom_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile" data-addtlPartc="{$addProfileBottomAdd}"><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}remove profile{/ts}</a></span>
+    <p class='profile_bottom_link'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
   </td>
 {else}
 {assign var=eventID value=$id}
@@ -124,7 +124,7 @@
         <td class="label">{$form.custom_post_id.label} {help id="custom_post_id"}</td>
         <td class="html-adjust">{$form.custom_post_id.html}
           <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
-          <p class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
+          <p class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
         </td>
       </tr>
 
@@ -136,12 +136,12 @@
             <td class="html-adjust">{$form.custom_post_id_multiple.$profilePostNum.html}
               <span class='profile_bottom_link_remove'>
                 <a href="#" class="crm-hover-button crm-button-rem-profile">
-                  <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}
+                  <i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}remove profile{/ts}
                 </a>
               </span>
               <p class='profile_bottom_link'{if !$smarty.foreach.profilePostIdName.last} style="display: none"{/if}>
                 <a href="#" class="crm-hover-button crm-button-add-profile">
-                  <i class="crm-i fa-plus-circle" aria-hidden="true"></i>
+                  <i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i>
                   {ts}add another profile{/ts}
                 </a>
               </p>
@@ -161,7 +161,7 @@
         <td scope="row" class="label" width="20%">{$form.additional_custom_post_id.label}</td>
         <td>{$form.additional_custom_post_id.html}
           <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
-          <p class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
+          <p class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
         </td>
       </tr>
       {if $profilePostMultipleAdd}
@@ -172,12 +172,12 @@
             <td class="html-adjust">{$form.additional_custom_post_id_multiple.$profilePostNumA.html}
               <span class='profile_bottom_add_link_remove'>
                 <a href="#" class="crm-hover-button crm-button-rem-profile">
-                  <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}
+                  <i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}remove profile{/ts}
                 </a>
               </span>
               <p class='profile_bottom_add_link'{if !$smarty.foreach.profilePostIdAName.last} style="display: none"{/if}>
                 <a href="#" class="crm-hover-button crm-button-add-profile">
-                  <i class="crm-i fa-plus-circle" aria-hidden="true"></i>
+                  <i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i>
                   {ts}add another profile{/ts}
                 </a>
               </p>

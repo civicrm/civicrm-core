@@ -22,7 +22,7 @@
         {else}
           {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
         {/if}
-        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card event registration{/ts}</a>
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}submit credit card event registration{/ts}</a>
       </div>
     {/if}
     <div class="view-content">

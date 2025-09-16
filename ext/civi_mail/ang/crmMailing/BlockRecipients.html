@@ -1,7 +1,7 @@
 <div ng-controller="EditRecipCtrl" class="crm-mailing-recipients-row">
-  <i class="crm-i fa-plus-square-o"></i>
+  <i class="crm-i fa-plus-square-o" role="img" aria-hidden="true"></i>
   <crm-mailing-recipients-autocomplete ng-if="mailing" crm-recipients="mailing.recipients" crm-mailing-id="mailing.id" crm-mode="include"></crm-mailing-recipients-autocomplete>
-  <i class="crm-i fa-minus-square-o"></i>
+  <i class="crm-i fa-minus-square-o" role="img" aria-hidden="true"></i>
   <crm-mailing-recipients-autocomplete ng-if="mailing" crm-recipients="mailing.recipients" crm-mailing-id="mailing.id" crm-mode="exclude"></crm-mailing-recipients-autocomplete>
     <a crm-icon="fa-wrench" ng-click="editOptions(mailing)" class="crm-hover-button" title="{{:: ts('Edit Recipient Options') }}"></a>
     <div ng-style="{display: permitRecipientRebuild ? '' : 'inline-block'}">

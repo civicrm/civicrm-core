@@ -12,11 +12,11 @@
 <fieldset>
   <div class="crm-draggable" ng-model="$ctrl.display.settings.searchFields" ui-sortable="sortableColumnOptions">
     <div class="form-inline" ng-repeat="field in $ctrl.display.settings.searchFields">
-      <i class="crm-i fa-arrows crm-search-move-icon"></i>
+      <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
       <label for="crm-admin-autocomplete-search-field-{{$index}}">{{:: ts('Search by') }} <i class="crm-marker" ng-show="!$index">*</i></label>
       <input class="form-control" id="crm-admin-autocomplete-search-field-{{$index}}" ng-model="$ctrl.display.settings.searchFields[$index]" crm-ui-select="{data: $ctrl.parent.fieldsForSearch, allowClear: false}" />
       <a href class="crm-hover-button" class="crm-hover-button" ng-show="$ctrl.display.settings.searchFields.length > 1" ng-click="$ctrl.display.settings.searchFields.splice($index, 1)" title="{{:: ts('Remove') }}">
-        <i class="crm-i fa-times"></i>
+        <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
       </a>
     </div>
   </div>
@@ -43,11 +43,11 @@
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>
-        <i class="crm-i fa-arrows crm-search-move-icon"></i>
+        <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
         {{ $index ? ts('Description %1:', {1: $index}) : ts('Title:') }} {{ $ctrl.parent.getColLabel(col) }}
       </legend>
       <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
-        <i class="crm-i fa-ban"></i>
+        <i class="crm-i fa-ban" role="img" aria-hidden="true"></i>
       </button>
       <div class="form-inline crm-search-admin-flex-row">
         <label title="{{:: ts('Text to display if the field contents are empty.') }}">

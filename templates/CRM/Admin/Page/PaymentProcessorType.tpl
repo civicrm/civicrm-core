@@ -45,7 +45,7 @@
 
         {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a class="button" href="{crmURL q="action=add&reset=1"}" id="newPaymentProcessor"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}New Payment Processor{/ts}</a>
+          <a class="button" href="{crmURL q="action=add&reset=1"}" id="newPaymentProcessor"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}New Payment Processor{/ts}</a>
           {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
         </div>
         {/if}

@@ -1,18 +1,18 @@
 <tr ng-repeat="(rowIndex, row) in $ctrl.results" data-entity-id="{{:: row.key }}" ng-if="!row.hidden">
   <td ng-if=":: $ctrl.hasExtraFirstColumn()" class="crm-search-ctrl-column {{:: $ctrl.getRowClass(row) }}">
     <span ng-if=":: $ctrl.settings.draggable" class="crm-draggable" title="{{:: ts('Drag to reposition') }}">
-      <i class="crm-i fa-arrows-v"></i>
+      <i class="crm-i fa-arrows-v" role="img" aria-hidden="true"></i>
     </span>
     <input ng-if=":: $ctrl.settings.actions" type="checkbox" ng-checked="$ctrl.isRowSelected(row)" ng-click="$ctrl.toggleRow(row, $event)" ng-disabled="!!$ctrl.loadingAllRows">
     <crm-search-display-toggle-collapse ng-if=":: $ctrl.settings.collapsible" default-collapsed="$ctrl.settings.collapsible" rows="$ctrl.results" row-index="rowIndex"></crm-search-display-toggle-collapse>
     <div class="btn-group" ng-if="$ctrl.settings.editableRow.full && $ctrl.editing === row.key">
       <button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.saveEditing(row)">
         <span class="sr-only">{{:: ts('Save') }}</span>
-        <i class="crm-i fa-check"></i>
+        <i class="crm-i fa-check" role="img" aria-hidden="true"></i>
       </button>
       <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.cancelEditing(row)">
         <span class="sr-only">{{:: ts('Cancel') }}</span>
-        <i class="crm-i fa-times"></i>
+        <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
       </button>
     </div>
   </td>

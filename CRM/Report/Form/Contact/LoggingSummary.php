@@ -342,7 +342,7 @@ LEFT  JOIN civicrm_contact altered_by_contact_civireport
     $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
     $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
     $hoverTitle = ts('View details for this update');
-    $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><i class=\"crm-i fa-list-alt\"></i></a>&nbsp;<a title='{$hoverTitle}' href='{$url2}'>" . $row['log_civicrm_entity_log_action'] . '</a>';
+    $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><i class=\"crm-i fa-list-alt\" role=\"img\" aria-hidden=\"true\"></i></a>&nbsp;<a title='{$hoverTitle}' href='{$url2}'>" . $row['log_civicrm_entity_log_action'] . '</a>';
     return $row;
   }
 

@@ -32,7 +32,7 @@
     @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
   </style>
 {/if}
-<div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
+<div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red" role="img" aria-hidden="true"></i>
     <div class="crm-section crm-error-message">{$message|escape}</div>
     {if !empty($error.message) && $message != $error.message}
         <hr style="solid 1px" />

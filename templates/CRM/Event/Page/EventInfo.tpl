@@ -12,7 +12,7 @@
 {if $registerClosed}
 <div class="spacer"></div>
 <div class="messages status no-popup">
-  <i class="crm-i fa-info-circle" aria-hidden="true"></i>&nbsp;
+  <i class="crm-i fa-info-circle" role="img" aria-hidden="true"></i>&nbsp;
   {if $registerStartDate}
     {ts 1=$registerStartDate|crmDate}Registration will open on %1{/ts}
   {else}

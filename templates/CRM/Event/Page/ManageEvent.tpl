@@ -16,7 +16,7 @@
 
 <div class="action-link">
   <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button crm-popup">
-    <span><i class="crm-i fa-calendar-plus-o" aria-hidden="true"></i> {ts}Add Event{/ts}</span>
+    <span><i class="crm-i fa-calendar-plus-o" role="img" aria-hidden="true"></i> {ts}Add Event{/ts}</span>
   </a>
   <div class="clear"></div>
 </div>

@@ -3,33 +3,33 @@
     <ul id="afGuiEditor-palette-tabs" role="tablist" class="nav nav-tabs">
       <li role="tab" class="fluid-width-tab" ng-class="{active: selectedEntityName === null}" title="{{:: ts('Form Settings') }}">
         <a href ng-click="editor.selectEntity(null)">
-          <i class="crm-i fa-gear"></i>
+          <i class="crm-i fa-gear" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Form Settings') }}</span>
         </a>
       </li>
       <li role="tab" ng-repeat="entity in entities" class="fluid-width-tab" ng-class="{active: selectedEntityName === entity.name}" title="{{ entity.label }}">
         <a href ng-click="editor.selectEntity(entity.name); editor.scrollToEntity(entity.name);">
-          <i class="crm-i {{:: editor.getEntityDefn(entity).icon }}"></i>
+          <i class="crm-i {{:: editor.getEntityDefn(entity).icon }}" role="img" aria-hidden="true"></i>
           <span ng-if="!entity.loading && editor.allowEntityConfig && selectedEntityName === entity.name" crm-ui-editable ng-model="entity.label" ng-change="editor.adjustTabWidths()">{{ entity.label }}</span>
           <span ng-if="!entity.loading && !(editor.allowEntityConfig && selectedEntityName === entity.name)">{{ entity.label }}</span>
-          <i ng-if="entity.loading" class="crm-i fa-spin fa-spinner"></i>
+          <i ng-if="entity.loading" class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i>
         </a>
       </li>
       <li role="tab" ng-repeat="(key, display) in editor.searchDisplays" class="fluid-width-tab" ng-class="{active: selectedEntityName === key}" title="{{ display.label }}">
         <a href ng-click="display.settings && editor.selectEntity(key)">
-          <i ng-if="display.settings" class="crm-i {{:: display.settings['type:icon'] }}"></i>
-          <i ng-if="!display.settings" class="crm-i fa-spin fa-spinner"></i>
+          <i ng-if="display.settings" class="crm-i {{:: display.settings['type:icon'] }}" role="img" aria-hidden="true"></i>
+          <i ng-if="!display.settings" class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i>
           <span>{{ display.settings.label }}</span>
         </a>
       </li>
       <li role="tab" class="dropdown" ng-if="editor.allowEntityConfig" title="{{:: ts('Add Entity') }}" af-gui-menu>
         <a href class="dropdown-toggle" data-toggle="dropdown">
-          <i class="crm-i fa-plus"></i>
+          <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
         </a>
         <ul class="dropdown-menu" ng-if="menu.open">
           <li ng-repeat="(entityName, entity) in editor.meta.entities" ng-if="entity.defaults">
             <a href ng-click="editor.addEntity(entityName, true)">
-              <i class="crm-i {{:: entity.icon }}"></i>
+              <i class="crm-i {{:: entity.icon }}" role="img" aria-hidden="true"></i>
               {{:: entity.label }}
             </a>
           </li>
@@ -37,17 +37,17 @@
       </li>
       <li role="tab" class="dropdown" ng-if="editor.getFormType() === 'search'" title="{{:: ts('Add Search') }}" af-gui-menu>
         <a href class="dropdown-toggle" data-toggle="dropdown" ng-click="editor.getSearchDisplaySelector();">
-          <i class="crm-i fa-plus"></i>
+          <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
         </a>
         <ul class="dropdown-menu" ng-if="menu.open">
           <li ng-class="{disabled: !editor.searchOptions || !editor.searchOptions.length}">
             <input ng-if="editor.searchOptions && editor.searchOptions.length" type="search" class="form-control" placeholder="&#x1f50d;" ng-model="searchDisplayListFilter.label">
-            <a href ng-if="!editor.searchOptions"><i class="crm-i fa-spinner fa-spin"></i></a>
+            <a href ng-if="!editor.searchOptions"><i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i></a>
             <a href ng-if="editor.searchOptions && !editor.searchOptions.length">{{:: ts('None Found') }}</a>
           </li>
           <li ng-repeat="link in editor.searchOptions | filter:searchDisplayListFilter" class="{{:: link.class }}">
             <a href ng-click="editor.addSearchDisplay(link)">
-              <i class="crm-i {{:: link.icon }}"></i>
+              <i class="crm-i {{:: link.icon }}" role="img" aria-hidden="true"></i>
               {{:: link.label }}
             </a>
           </li>

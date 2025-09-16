@@ -52,7 +52,7 @@
         {else}
           {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
         {/if}
-        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card contribution{/ts}</a>
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}submit credit card contribution{/ts}</a>
       </div>
     {/if}
       {if !empty($isOnline)}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
@@ -152,7 +152,7 @@
             <td>
               {if !$isUsePaymentBlock && $contactId && $contribution_status_id eq 2 && $contribID && $contributionMode EQ null}
                 {capture assign=payNowLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=update&id=`$contribID`&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
-                <a class="open-inline action-item crm-hover-button" href="{$payNowLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Pay with Credit Card{/ts}</a>
+                <a class="open-inline action-item crm-hover-button" href="{$payNowLink}"><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}Pay with Credit Card{/ts}</a>
               {/if}
             </td>
           </tr>

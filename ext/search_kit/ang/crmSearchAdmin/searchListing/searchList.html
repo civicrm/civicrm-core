@@ -5,13 +5,13 @@
   <div class="crm-search-nav-tabs">
     <ul role="tablist" class="nav nav-tabs">
       <li ng-repeat="tab in $ctrl.tabs" role="tab" ng-class="{active: $ctrl.tab === tab.name}">
-        <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{:: tab.icon }}"></i>
+        <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{:: tab.icon }}" role="img" aria-hidden="true"></i>
           {{:: tab.title }}
           <span class="badge">{{ tab.rowCount }}</span>
         </a>
       </li>
       <li role="tab" ng-class="{active: $ctrl.tab === 'segment'}">
-        <a href ng-click="$ctrl.tab = 'segment'"><i class="crm-i fa-object-group"></i>
+        <a href ng-click="$ctrl.tab = 'segment'"><i class="crm-i fa-object-group" role="img" aria-hidden="true"></i>
           {{:: ts('Data Segmentation') }}
           <span class="badge">{{ $ctrl.searchSegmentCount }}</span>
         </a>
@@ -19,7 +19,7 @@
     </ul>
     <div class="btn-group" ng-if="$ctrl.tab !== 'segment'">
       <a class="btn btn-primary" ng-href="#/create/Contact?is_template={{ $ctrl.tab === 'template' ? 1 : 0}}" >
-        <i class="crm-i fa-plus"></i>
+        <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
         {{ $ctrl.tab === 'template' ? ts('New Template') : ts('New Search') }}
       </a>
       <button type="button" ng-click="$ctrl.getPrimaryEntities()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -28,7 +28,7 @@
       <ul class="dropdown-menu dropdown-menu-right">
         <li ng-repeat="entity in $ctrl.primaryEntities">
           <a ng-href="#/create/{{ entity.name }}?is_template={{ $ctrl.tab === 'template' ? 1 : 0}}">
-            <i class="crm-i {{:: entity.icon }}"></i>
+            <i class="crm-i {{:: entity.icon }}" role="img" aria-hidden="true"></i>
             {{:: entity.title_plural }}
           </a>
         </li>
@@ -39,7 +39,7 @@
     </div>
     <div class="btn-group" ng-if="$ctrl.tab === 'segment'">
       <a class="btn btn-primary" href title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">
-        <i class="crm-i fa-plus"></i>
+        <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
         {{:: ts('New Data Segment') }}
       </a>
       <button type="button" ng-click="$ctrl.getPrimaryEntities()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -48,7 +48,7 @@
       <ul class="dropdown-menu dropdown-menu-right">
         <li ng-repeat="entity in $ctrl.primaryEntities">
           <a href title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html" popup-data="{entity_name: entity.name}">
-            <i class="crm-i {{:: entity.icon }}"></i>
+            <i class="crm-i {{:: entity.icon }}" role="img" aria-hidden="true"></i>
             {{:: entity.title_plural }}
           </a>
         </li>
@@ -71,7 +71,7 @@
         <input class="form-control" ng-model="tab.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
       </span>
       <a class="btn btn-secondary btn-sm pull-right" ng-if="tab.name === 'custom'" href crm-dialog-popup="crmSearchAdminImport" popup-tpl="~/crmSearchAdmin/searchListing/import.html">
-        <i class="crm-i fa-upload"></i>
+        <i class="crm-i fa-upload" role="img" aria-hidden="true"></i>
         {{:: ts('Import') }}
       </a>
     </div>

@@ -5,7 +5,7 @@
     <option value="ASC">{{:: ts('Ascending') }}</option>
     <option value="DESC">{{:: ts('Descending') }}</option>
   </select>
-  <a href class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="$ctrl.display.settings.sort.splice($index, 1)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+  <a href class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="$ctrl.display.settings.sort.splice($index, 1)"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
 </div>
 <div class="form-inline crm-search-admin-display-sort-add">
   <label for="crm-search-display-add-sort">{{ $ctrl.display.settings.sort.length ? ts('Also by') : ts('Sort by') }}</label>

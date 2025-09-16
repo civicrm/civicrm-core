@@ -3,7 +3,7 @@
     <span>{{:: ts('Tab Set') }}</span>
     <div class="btn-group pull-right" af-gui-menu>
       <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
-        <span><i class="crm-i fa-gear"></i></span>
+        <span><i class="crm-i fa-gear" role="img" aria-hidden="true"></i></span>
       </button>
       <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiTabset-menu.html'"></ul>
     </div>
@@ -12,11 +12,11 @@
 <ul class="nav nav-tabs" role="tablist">
   <li ng-repeat="(tabIndex, tab) in $ctrl.node['#children']" role="tab" class="dropdown" ng-class="{active: tabIndex === $ctrl.selectedTab}">
     <a href ng-click="$ctrl.selectTab(tabIndex)">
-      <i class="crm-i {{ tab.icon }}" ng-if="tab.icon"></i>
+      <i class="crm-i {{ tab.icon }}" ng-if="tab.icon" role="img" aria-hidden="true"></i>
       {{ tab['title'] }}
       <button class="btn btn-default btn-xs af-gui-add-element-button" data-tab-id="{{ tabIndex }}" ng-click="$ctrl.getSearchDisplays(tabIndex)">
         <span>
-          <i class="crm-i fa-gear"></i>
+          <i class="crm-i fa-gear" role="img" aria-hidden="true"></i>
         </span>
       </button>
     </a>
