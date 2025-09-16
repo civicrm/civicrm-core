@@ -19,5 +19,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class SiteToken extends Generic\DAOEntity {
+  use Generic\Traits\ManagedEntity;
 
 }
