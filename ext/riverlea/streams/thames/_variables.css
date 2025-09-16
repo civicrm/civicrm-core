@@ -17,11 +17,6 @@
 /* FONTS */
 /* --crm-system-fonts:; */
   --crm-font: Lato, sans-serif;
-/* --crm-font-bold:Lato; */
-  --crm-bold-weight: bold;
-/* --crm-font-italic:; */
-  --crm-italic-style: italic;
-/* --crm-font-bold-italic:; */
 }
 :root {
 /* COLOUR NAMES */
@@ -223,8 +218,7 @@
   --crm-expand-header-bg-active: var(--crm-c-blue-overlay); /* thames */
   --crm-expand-header-color: var(--crm-c-blue-darker); /* thames */
   --crm-expand-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem; /* thames */
-  --crm-expand-header-weight: var(--crm-bold-weight);
-  --crm-expand-header-font: var(--crm-font-bold);
+  --crm-expand-header-weight: bold;
   --crm-expand-header-border: unset;/*var(--crm-c-divider);*/ /* thames */
   --crm-expand-header-border-width: unset; /*0 0 1px 0*/; /* thames */
   --crm-expand-border: unset; /* thames */
@@ -236,7 +230,6 @@
   --crm-expand2-header-bg: transparent;
   --crm-expand2-header-bg-active: var(--crm-c-background-2);
   --crm-expand2-header-weight: normal;
-  --crm-expand2-header-font: unset;
   --crm-expand2-header-color: var(--crm-c-text);
   --crm-expand2-header-border: unset;
   --crm-expand2-header-border-width: unset;
@@ -309,7 +302,6 @@
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m); /* thames todo check */
   --crm-tab-col: var(--crm-c-text);
   --crm-tab-weight: normal;
-  --crm-tab-font: unset;
   --crm-tab-count-bg: var(--crm-c-info-text);
   --crm-tab-count-col: var(--crm-c-info);
   --crm-tab-roundness: var(--crm-r-3) var(--crm-r-3) 0 0;

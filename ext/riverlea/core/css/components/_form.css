@@ -111,7 +111,6 @@
 }
 .crm-container fieldset legend {
   font-weight: bold;
-  font-family: var(--crm-font-bold);
   padding-inline: var(--crm-s);
   color: var(--crm-c-text);
 }
@@ -616,7 +615,6 @@ input.crm-form-checkbox) + label {
 }
 .select2-results li.select2-result-with-children > .select2-result-label {
   font-weight: bold;
-  font-family: var(--crm-font-bold);
   background: var(--crm-c-background3);
   padding: var(--crm-s);
 }

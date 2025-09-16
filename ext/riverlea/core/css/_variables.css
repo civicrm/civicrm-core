@@ -9,9 +9,6 @@
 /* Fonts */
   --crm-system-fonts: unset;
   --crm-font: unset;
-  --crm-font-bold: unset;
-  --crm-font-italic: unset;
-  --crm-font-bold-italic: unset;
 /* Colour names */
   --crm-c-darkest: #0a0a0a;
   --crm-c-gray-900: #2f2f2e;
@@ -208,7 +205,6 @@
   --crm-expand-header-color: var(--crm-c-secondary-text);
   --crm-expand-header-padding: var(--crm-s) var(--crm-m);
   --crm-expand-header-weight: bold;
-  --crm-expand-header-font: var(--crm-font-bold);
   --crm-expand-header-border: var(--crm-c-divider);
   --crm-expand-header-border-width: 0 0 1px 0;
   --crm-expand-border: var(--crm-c-divider);
@@ -220,7 +216,6 @@
   --crm-expand2-header-bg: unset;
   --crm-expand2-header-bg-active: var(--crm-c-background-2);
   --crm-expand2-header-weight: normal;
-  --crm-expand2-header-font: unset;
   --crm-expand2-header-color: var(--crm-c-text);
   --crm-expand2-header-border: unset;
   --crm-expand2-header-border-width: unset;
@@ -292,7 +287,6 @@
   --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
   --crm-tab-col: var(--crm-c-text);
   --crm-tab-weight: normal;
-  --crm-tab-font: unset;
   --crm-tab-count-bg: var(--crm-c-info-text);
   --crm-tab-count-col: var(--crm-c-info);
   --crm-tab-roundness: var(--crm-roundness);

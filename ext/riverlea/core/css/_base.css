@@ -186,17 +186,14 @@ body.civicrm-iframe-page {
 .crm-container b,
 .crm-container .bold,
 .crm-container .font-bold {
-  font-family: var(--crm-font-bold);
   font-weight: bold;
 }
 .crm-container em,
 .crm-container .font-italic {
-  font-family: var(--crm-font-italic);
   font-style: italic;
 }
 .crm-container strong em,
 .crm-container em strong {
-  font-family: var(--crm-font-bold-italic);
   font-weight: bold;
   font-style: italic;
 }
@@ -210,7 +207,6 @@ body.civicrm-iframe-page {
 #bootstrap-theme h3 {
   background-color: var(--crm-heading-bg);
   font-size: var(--crm-r1);
-  font-family: var(--crm-font-bold);
   font-weight: bold;
   color: var(--crm-heading-col);
   padding: var(--crm-heading-padding);
@@ -294,7 +290,8 @@ dl dl {
   background-color: var(--crm-c-page-background);
 }
 .crm-container tr.disabled td *:not(.btn,button,i,a),
-.crm-container td.disabled {
+.crm-container td.disabled,
+.crm-container #extensions-main table tr.disabled td {
   font-style: italic;
 }
 .crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label) {
