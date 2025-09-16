@@ -135,18 +135,12 @@ class StyleLoader implements \Symfony\Component\EventDispatcher\EventSubscriberI
     $streams = \Civi::$statics['riverlea_streams'] ?? NULL;
 
     if (is_null($streams)) {
-      try {
-        $streams = (array) \Civi\Api4\RiverleaStream::get(FALSE)
-          ->addSelect('name', 'label', 'extension', 'file_prefix', 'parent_id', 'id', 'modified_date')
-          ->execute()
-          ->indexBy('name');
+      $streams = (array) \Civi\Api4\RiverleaStream::get(FALSE)
+        ->addSelect('name', 'label', 'extension', 'file_prefix', 'parent_id', 'id', 'modified_date')
+        ->execute()
+        ->indexBy('name');
 
-        \Civi::$statics['riverlea_streams'] = $streams;
-      }
-      catch (\CRM_Core_Exception $e) {
-        \Civi::log()->warning('Error loading Riverlea stream meta');
-        return [];
-      }
+      \Civi::$statics['riverlea_streams'] = $streams;
     }
 
     return $streams;
@@ -156,7 +150,7 @@ class StyleLoader implements \Symfony\Component\EventDispatcher\EventSubscriberI
     $stream = \Civi::service('themes')->getActiveThemeKey();
 
     // we add the stream modified date to asset params as a cache buster
-    $streamMeta = self::getAvailableStreamMeta()[$stream] ?? [];
+    $streamMeta = $this->getAvailableStreamMeta()[$stream] ?? [];
     $streamModified = $streamMeta['modified_date'] ?? NULL;
 
     return [
