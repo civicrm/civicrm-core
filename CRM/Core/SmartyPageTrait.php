@@ -148,6 +148,7 @@ trait CRM_Core_SmartyPageTrait {
    * @return array
    */
   public function get_template_vars($name = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('getTemplateVars');
     return $this->getTemplateVars($name);
   }
 
