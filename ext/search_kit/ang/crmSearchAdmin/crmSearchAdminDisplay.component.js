@@ -202,24 +202,9 @@
         }
       };
 
-      // Because angular dropdowns must be a by-reference variable
-      const suffixOptionCache = {};
-
       this.getSuffixOptions = function(col) {
-        let expr = ctrl.getExprFromSelect(col.key),
-          info = searchMeta.parseExpr(expr);
-        if (!info.fn && info.args[0] && info.args[0].field && info.args[0].field.suffixes) {
-          let cacheKey = info.args[0].field.suffixes.join();
-          if (!(cacheKey in suffixOptionCache)) {
-            suffixOptionCache[cacheKey] = Object.keys(CRM.crmSearchAdmin.optionAttributes)
-              .filter(key => info.args[0].field.suffixes.includes(key))
-              .reduce((filteredOptions, key) => {
-                filteredOptions[key] = CRM.crmSearchAdmin.optionAttributes[key];
-                return filteredOptions;
-              }, {});
-          }
-          return suffixOptionCache[cacheKey];
-        }
+        let expr = ctrl.getExprFromSelect(col.key);
+        return ctrl.crmSearchAdmin.getSuffixOptions(expr);
       };
 
       function getSetSuffix(index, val) {

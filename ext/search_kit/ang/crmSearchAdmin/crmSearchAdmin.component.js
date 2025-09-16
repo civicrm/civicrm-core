@@ -357,6 +357,25 @@
       }
     };
 
+    // Because angular dropdowns must be a by-reference variable
+    const suffixOptionCache = {};
+
+    this.getSuffixOptions = function(expr) {
+      const info = searchMeta.parseExpr(expr);
+      if (!info.fn && info.args[0] && info.args[0].field && info.args[0].field.suffixes) {
+        let cacheKey = info.args[0].field.suffixes.join();
+        if (!(cacheKey in suffixOptionCache)) {
+          suffixOptionCache[cacheKey] = Object.keys(CRM.crmSearchAdmin.optionAttributes)
+            .filter(key => info.args[0].field.suffixes.includes(key))
+            .reduce((filteredOptions, key) => {
+              filteredOptions[key] = CRM.crmSearchAdmin.optionAttributes[key];
+              return filteredOptions;
+            }, {});
+        }
+        return suffixOptionCache[cacheKey];
+      }
+    };
+
     function addNum(name, num) {
       return name + (num < 10 ? '_0' : '_') + num;
     }
