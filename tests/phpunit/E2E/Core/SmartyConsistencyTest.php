@@ -109,33 +109,31 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
     );
   }
 
-  public function testInvalid(): void {
-    // INVALID: {if $x === NULL}
+  public function testNonPortable() {
+    // NOT PORTABLE: {if $x === NULL} (*legal in TPL files but not in TPL strings*}
     $this->checkRegex(
       '{if $x === NULL}x=null{/if}',
       ['x' => NULL],
       [
-        '2_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
-        '4_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
-        '5_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
-        '5_auto' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+        '2_plain' => ['/^EXCEPTION.*\(secure mode\) .*NULL.* not allowed/'],
+        '4_plain' => ['/^EXCEPTION.*access to constants not permitted/'],
+        '5_plain' => ['/^EXCEPTION.*access to constants not permitted/'],
+        '5_auto' => ['/^EXCEPTION.*access to constants not permitted/'],
       ]
     );
 
-    // INVALID: {if $x === TRUE}
+    // NOT PORTABLE: {if $x === TRUE} (*legal in TPL files but not in TPL strings*}
     $this->checkRegex(
       '{if $x === TRUE}x=true{/if}',
       ['x' => NULL],
       [
-        '2_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
-        '4_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
-        '5_plain' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
-        '5_auto' => ['/^EXCEPTION: Message was not parsed due to invalid smarty syntax/'],
+        '2_plain' => ['/^EXCEPTION.*\(secure mode\) .*TRUE.* not allowed/'],
+        '4_plain' => ['/^EXCEPTION.*access to constants not permitted/'],
+        '5_plain' => ['/^EXCEPTION.*access to constants not permitted/'],
+        '5_auto' => ['/^EXCEPTION.*access to constants not permitted/'],
       ]
     );
-  }
 
-  public function testNonPortable() {
     // NOT PORTABLE: {else if}
     $this->checkRegex(
       '{if $x == 1}one{else if $x == 2}two{else}three{/if}',
