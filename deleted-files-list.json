@@ -1029,7 +1029,6 @@
     "ext/oembed/templates/oembed-basic-page.tpl",
     "ext/payflowpro/images/*",
     "ext/recaptcha/xml/*",
-    "ext/riverlea/Civi/riverlea/*",
     "ext/riverlea/core/css/_bootstrap3.css",
     "ext/riverlea/core/org.civicrm.afform_core-ang/*",
     "ext/riverlea/fa/*",
