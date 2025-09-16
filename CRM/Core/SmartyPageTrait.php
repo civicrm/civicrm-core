@@ -62,6 +62,16 @@ trait CRM_Core_SmartyPageTrait {
   }
 
   /**
+   * Encodes and assigns a variable that will be printed inside a `<script>` tag.
+   *
+   * @param string $var
+   * @param mixed $value
+   */
+  public function assignScriptVar(string $var, $value): void {
+    $this->assign($var, CRM_Utils_JSON::encodeScriptVar($value));
+  }
+
+  /**
    * Get the value/s assigned to the Template Engine (Smarty).
    *
    * @param string|null $name
