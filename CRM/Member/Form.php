@@ -302,7 +302,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $this->addPaymentProcessorSelect(TRUE, FALSE, TRUE);
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->getDefaultPaymentInstrumentId());
-    $this->assign('recurProcessor', json_encode($this->_recurPaymentProcessors));
+    $this->assignScriptVar('recurProcessor', $this->_recurPaymentProcessors);
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
     $this->assign('allowAutoRenew', $this->_mode && !empty($this->_recurPaymentProcessors));
@@ -321,7 +321,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       );
 
     }
-    $this->assign('autoRenewOptions', json_encode($this->membershipTypeRenewalStatus));
+    $this->assignScriptVar('autoRenewOptions', $this->membershipTypeRenewalStatus);
 
     if ($this->_action & CRM_Core_Action::RENEW) {
       $this->addButtons([

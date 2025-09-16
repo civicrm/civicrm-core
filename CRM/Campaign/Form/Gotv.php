@@ -54,7 +54,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
     }
     $this->assign('force', $this->_force);
     $this->assign('votingTab', $this->_votingTab);
-    $this->assign('searchParams', json_encode($this->get('searchParams')));
+    $this->assignScriptVar('searchParams', $this->get('searchParams'));
     $this->assign('buildSelector', $this->_search);
     $this->assign('searchVoterFor', $this->_searchVoterFor);
     $this->set('searchVoterFor', $this->_searchVoterFor);
@@ -96,7 +96,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
       $this->_searchParams[$name] = $name;
     }
     $this->set('searchParams', $this->_searchParams);
-    $this->assign('searchParams', json_encode($this->_searchParams));
+    $this->assignScriptVar('searchParams', $this->_searchParams);
 
     $defaults = [];
 

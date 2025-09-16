@@ -258,7 +258,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'allow_same_participant_emails',
       ts('Allow same email and multiple registrations?')
     );
-    $this->assign('ruleFields', json_encode($ruleFields));
+    $this->assignScriptVar('ruleFields', $ruleFields);
 
     $dedupeRules = [
       '' => ts('- Unsupervised rule -'),

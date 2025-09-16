@@ -286,7 +286,7 @@ class CRM_Contact_Form_Edit_Address {
             }
           }
         }
-        $form->assign('allAddressFieldValues', json_encode($addressValues));
+        $form->assignScriptVar('allAddressFieldValues', $addressValues);
 
         //hack to handle show/hide address fields.
         $parsedAddress = [];

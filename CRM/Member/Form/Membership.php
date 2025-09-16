@@ -438,7 +438,7 @@ DESC limit 1");
       ];
     }
 
-    $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
+    $this->assignScriptVar('allMembershipInfo', $allMembershipInfo);
 
     // show organization by default, if only one organization in
     // the list

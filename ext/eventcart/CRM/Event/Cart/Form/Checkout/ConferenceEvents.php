@@ -93,7 +93,7 @@ EOS;
     $this->assign('mer_participant', $this->main_participant);
     $this->assign('events_by_slot', $this->events_by_slot);
     $this->assign('slot_fields', $slot_fields);
-    $this->assign('session_options', json_encode($session_options));
+    $this->assignScriptVar('session_options', $session_options);
 
     $buttons = [];
     $buttons[] = [

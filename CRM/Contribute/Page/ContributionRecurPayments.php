@@ -62,7 +62,7 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
 
     if (count($relatedContributions) > 0) {
       $this->assign('contributionsCount', count($relatedContributions));
-      $this->assign('relatedContributions', json_encode($relatedContributions));
+      $this->assignScriptVar('relatedContributions', $relatedContributions);
     }
   }
 

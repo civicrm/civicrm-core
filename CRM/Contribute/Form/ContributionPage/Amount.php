@@ -98,7 +98,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     if (count($recurringPaymentProcessor)) {
       $this->assign('recurringPaymentProcessor', $recurringPaymentProcessor);
     }
-    $this->assign('futurePaymentProcessor', json_encode($futurePaymentProcessor ?? [], TRUE));
+    $this->assignScriptVar('futurePaymentProcessor', $futurePaymentProcessor ?? []);
     if (count($paymentProcessor)) {
       $this->assign('paymentProcessor', $paymentProcessor);
     }

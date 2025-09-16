@@ -187,11 +187,11 @@ WHERE {$clause}
     $this->filterVoterIds();
     $this->assign('votingTab', $this->_votingTab);
     $this->assign('componentIds', $this->_contactIds);
-    $this->assign('componentIdsJson', json_encode($this->_contactIds));
+    $this->assignScriptVar('componentIdsJson', $this->_contactIds);
     $this->assign('voterDetails', $voterDetails);
     $this->assign('readOnlyFields', $readOnlyFields);
     $this->assign('interviewerId', $this->_interviewerId);
-    $this->assign('surveyActivityIds', json_encode($activityIds));
+    $this->assignScriptVar('surveyActivityIds', $activityIds);
     $this->assign('allowAjaxReleaseButton', $this->_allowAjaxReleaseButton);
 
     //get the survey values.

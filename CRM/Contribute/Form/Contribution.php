@@ -608,8 +608,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $allPanes = [];
 
     //tax rate from financialType
-    $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
-    $this->assign('currencies', json_encode(CRM_Core_OptionGroup::values('currencies_enabled')));
+    $this->assignScriptVar('taxRates', CRM_Core_PseudoConstant::getTaxRates());
+    $this->assignScriptVar('currencies', CRM_Core_OptionGroup::values('currencies_enabled'));
 
     // build price set form.
     $buildPriceSet = FALSE;

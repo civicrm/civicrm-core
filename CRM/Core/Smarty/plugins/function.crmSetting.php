@@ -40,7 +40,7 @@ function smarty_function_crmSetting($params, &$smarty) {
     return is_numeric($result) ? $result : json_encode($result);
   }
   if (!empty($params['json'])) {
-    $smarty->assign($params["var"], json_encode($result));
+    $smarty->assignScriptVar($params["var"], $result);
   }
   else {
     $smarty->assign($params["var"], $result);

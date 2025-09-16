@@ -30,7 +30,7 @@ trait CRM_Financial_Form_SalesTaxTrait {
    * Assign sales tax rates to the template.
    */
   public function assignSalesTaxRates() {
-    $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
+    $this->assignScriptVar('taxRates', CRM_Core_PseudoConstant::getTaxRates());
   }
 
   /**

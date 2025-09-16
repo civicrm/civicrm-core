@@ -278,7 +278,7 @@ class CRM_Utils_Chart {
         // assign chart data to template
         $template = CRM_Core_Smarty::singleton();
         $template->assign('uniqueId', $uniqueId);
-        $template->assign("chartData", json_encode($theChart ?? []));
+        $template->assignScriptVar("chartData", $theChart ?? []);
       }
     }
 

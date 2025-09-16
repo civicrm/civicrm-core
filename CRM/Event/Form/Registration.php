@@ -2115,7 +2115,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $elementJS[$fee['amount_id']] = $totalAmountJs;
         }
       }
-      $form->assign('eventFeeBlockValues', json_encode($eventFeeBlockValues));
+      $form->assignScriptVar('eventFeeBlockValues', $eventFeeBlockValues);
 
       $form->_defaults['amount'] = $form->_values['event']['default_fee_id'] ?? NULL;
       $element = &$form->addRadio('amount', ts('Event Fee(s)'), $elements, [], '<br />', FALSE, $elementJS);

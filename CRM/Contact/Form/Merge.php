@@ -225,8 +225,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
       $this->addElement('checkbox', 'toggleSelect', NULL, NULL, ['class' => 'select-rows']);
 
-      $this->assign('mainLocBlock', json_encode($rowsElementsAndInfo['main_details']['location_blocks']));
-      $this->assign('locationBlockInfo', json_encode(CRM_Dedupe_Merger::getLocationBlockInfo()));
+      $this->assignScriptVar('mainLocBlock', $rowsElementsAndInfo['main_details']['location_blocks']);
+      $this->assignScriptVar('locationBlockInfo', CRM_Dedupe_Merger::getLocationBlockInfo());
       $this->assign('mainContactTypeIcon', CRM_Contact_BAO_Contact_Utils::getImage($contacts[$this->_cid]['contact_sub_type'] ?: $contacts[$this->_cid]['contact_type'],
         FALSE,
         $this->_cid

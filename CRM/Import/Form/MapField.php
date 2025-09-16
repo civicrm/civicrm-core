@@ -62,7 +62,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     $this->addExpectedSmartyVariables(['highlightedRelFields', 'initHideBoxes']);
     $this->assign('columnNames', $this->getColumnHeaders());
     $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader') || $this->getSubmittedValue('dataSource') !== 'CRM_Import_DataSource');
-    $this->assign('highlightedFields', json_encode($this->getHighlightedFields()));
+    $this->assignScriptVar('highlightedFields', $this->getHighlightedFields());
     $this->assign('dataValues', array_values($this->getDataRows([], 2)));
     $this->_mapperFields = $this->getAvailableFields();
     $fieldMappings = $this->getFieldMappings();

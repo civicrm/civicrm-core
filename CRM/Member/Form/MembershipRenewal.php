@@ -296,7 +296,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
     }
 
-    $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
+    $this->assignScriptVar('allMembershipInfo', $allMembershipInfo);
 
     if ($this->_memType) {
       $this->assign('orgName', $selMemTypeOrg[$this->allMembershipTypeDetails[$this->_memType]['member_of_contact_id']]);

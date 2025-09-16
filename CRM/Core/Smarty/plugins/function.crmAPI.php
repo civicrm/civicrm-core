@@ -45,7 +45,7 @@ function smarty_function_crmAPI($params, &$smarty) {
     return json_encode($result);
   }
   if (!empty($params['json'])) {
-    $smarty->assign($var, json_encode($result));
+    $smarty->assignScriptVar($var, $result);
   }
   else {
     $smarty->assign($var, $result);

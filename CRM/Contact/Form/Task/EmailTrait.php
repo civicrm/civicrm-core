@@ -231,7 +231,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       }
     }
 
-    $this->assign('toContact', json_encode($toArray));
+    $this->assignScriptVar('toContact', $toArray);
 
     $this->assign('suppressedEmails', count($this->suppressedEmails));
 

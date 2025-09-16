@@ -692,7 +692,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->assign('renewal_mode', $this->contactHasRenewableMembership());
       $this->assign('membershipTypes', $membershipTypes);
       $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
-      $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
+      $this->assignScriptVar('autoRenewMembershipTypeOptions', $autoRenewMembershipTypeOptions);
       //give preference to user submitted auto_renew value.
       $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted());
       $this->assign('takeUserSubmittedAutoRenew', $takeUserSubmittedAutoRenew);

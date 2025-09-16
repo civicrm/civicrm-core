@@ -787,7 +787,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           'organization_name',
           'email',
         ]);
-      $this->assign('ruleFields', json_encode($ruleFields));
+      $this->assignScriptVar('ruleFields', $ruleFields);
     }
 
     // build Custom data if Custom data present in edit option
@@ -885,7 +885,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         trim($this->_values['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR)
       );
     }
-    $this->assign('oldSubtypes', json_encode($this->_oldSubtypes));
+    $this->assignScriptVar('oldSubtypes', $this->_oldSubtypes);
 
     $this->addButtons($buttons);
   }
