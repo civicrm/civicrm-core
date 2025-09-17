@@ -230,6 +230,29 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
     );
   }
 
+  public function testBlockParamFilters(): void {
+    // PORTABLE: {block param=$x|filter}
+    $this->checkPortable(
+      '{ts 1=$x|escape}hello %1{/ts}',
+      ['x' => '&'],
+      'hello &amp;'
+    );
+
+    // PORTABLE: {block 1=$x|filter_a 2=$x|filter_b 3=$x|filter_c}
+    $this->checkPortable(
+      implode('', [
+        '{ts',
+        ' 1=$x|escape',
+        ' 2=$x|escape:"url"',
+        ' 3=$x|escape:html',
+        ' 4=$x|escape|escape:url',
+        '}hello %1 - %2 - %3 - %4{/ts}',
+      ]),
+      ['x' => '&'],
+      'hello &amp; - %26 - &amp; - %26amp%3B'
+    );
+  }
+
   public function testPurifyInteractions(): void {
     // Old code with `|smarty:nodefaults` is sometimes combined with `|purify`. What does it mean? What's the replacemnet?
     // The tests here show that:
