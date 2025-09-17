@@ -29,7 +29,7 @@ class CRM_Utils_JSON {
    * @return int|string
    */
   public static function encodeScriptVar($input) {
-    return json_encode($input, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES);
+    return json_encode($input, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   }
 
   /**
@@ -41,7 +41,7 @@ class CRM_Utils_JSON {
       throw new CRM_Core_Exception_PrematureExitException('civiExit called', $input);
     }
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-    echo json_encode($input);
+    echo json_encode($input, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     CRM_Utils_System::civiExit();
   }
 
