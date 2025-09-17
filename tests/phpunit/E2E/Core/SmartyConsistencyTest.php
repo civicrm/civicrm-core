@@ -230,6 +230,66 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
     );
   }
 
+  public function testPurifyInteractions(): void {
+    // Old code with `|smarty:nodefaults` is sometimes combined with `|purify`. What does it mean? What's the replacemnet?
+    // The tests here show that:
+    // 1. "purify" has its own escaping.
+    // 2. To prevent double-escaping, "|purify" should be paired with "nofilter" (or, previously, "|smarty:nodefaults").
+    // 3. To prevent double-escaping, "|purify" should NOT be paired with "|escape".
+    // 4. For an expression with a modifier-sequence, it doesn't matter where `|smarty:nodefaults` is
+    //    placed. It acts as a general signal about the overall expression (not a liver filter).
+
+    // To test the behavior of different notations, we choose a string with a mix of good text (e.g. "Alice"),
+    // fixable text (e.g. "&"), bad-text (e.g. "<script>..."), and pre-escaped text ("&lt;script&gt;...").
+
+    // NOT PORTABLE: {$name|smarty:nodefaults|purify}
+    $this->check(
+      'Hello {$name|smarty:nodefaults|purify}',
+      ['name' => 'Alice & Bob <script>alert</script> & Carol &lt;script&gt;confirm&lt;/script&gt;'],
+      [
+        '2_plain' => ['Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'],
+        '4_plain' => ['Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'],
+        '5_plain' => ['Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'],
+        '5_auto' => ['Hello Alice &amp;amp; Bob  &amp;amp; Carol &amp;lt;script&amp;gt;confirm&amp;lt;/script&amp;gt;'], /* outlier */
+      ]
+    );
+
+    // NOT PORTABLE: {$name|purify}
+    $this->check(
+      'Hello {$name|purify}',
+      ['name' => 'Alice & Bob <script>alert</script> & Carol &lt;script&gt;confirm&lt;/script&gt;'],
+      [
+        '2_plain' => ['Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'],
+        '4_plain' => ['Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'],
+        '5_plain' => ['Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'],
+        '5_auto' => ['Hello Alice &amp;amp; Bob  &amp;amp; Carol &amp;lt;script&amp;gt;confirm&amp;lt;/script&amp;gt;'], /* outlier */
+      ]
+    );
+
+    // PORTABLE: {$name|purify nofilter}
+    $this->checkPortable(
+      'Hello {$name|purify nofilter}',
+      ['name' => 'Alice & Bob <script>alert</script> & Carol &lt;script&gt;confirm&lt;/script&gt;'],
+      'Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'
+    );
+
+    // PORTABLE-WARN: {$name|purify|escape nofilter} (*but you probably don't want this*)
+    // Note that "purify" does its own escaping, so this is doubly escaped.
+    $this->checkPortable(
+      'Hello {$name|purify|escape nofilter}',
+      ['name' => 'Alice & Bob <script>alert</script> & Carol &lt;script&gt;confirm&lt;/script&gt;'],
+      'Hello Alice &amp;amp; Bob  &amp;amp; Carol &amp;lt;script&amp;gt;confirm&amp;lt;/script&amp;gt;'
+    );
+
+    // PORTABLE-WARN: {$name|escape|purify nofilter} (*but you probably don't want this*)
+    // Note that "purify" does its own escaping, so this is doubly escaped.
+    $this->checkPortable(
+      'Hello {$name|purify|escape nofilter}',
+      ['name' => 'Alice & Bob <script>alert</script> & Carol &lt;script&gt;confirm&lt;/script&gt;'],
+      'Hello Alice &amp;amp; Bob  &amp;amp; Carol &amp;lt;script&amp;gt;confirm&amp;lt;/script&amp;gt;'
+    );
+  }
+
   /**
    * Render a Smarty template.
    *
