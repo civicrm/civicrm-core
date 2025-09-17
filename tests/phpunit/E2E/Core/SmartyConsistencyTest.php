@@ -230,6 +230,68 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
     );
   }
 
+  public function testSpacing(): void {
+    // PORTABLE: {$name|escape:"html" nofilter}
+    $this->checkPortable(
+      'hello {$name|escape:"html" nofilter}',
+      ['name' => '&'],
+      'hello &amp;'
+    );
+
+    // PORTABLE: {$name|escape : "html" nofilter}
+    $this->checkPortable(
+      'hello {$name|escape : "html" nofilter}',
+      ['name' => '&'],
+      'hello &amp;'
+    );
+
+    // NOT PORTABLE: {$name | escape:"html" nofilter}
+    $this->checkRegex(
+      'hello {$name | escape:"html" nofilter}',
+      ['name' => '&'],
+      [
+        '2_plain' => ['/hello &/'], /* outlier */
+        '4_plain' => ['/^EXCEPTION/'],
+        '5_plain' => ['/^EXCEPTION/'],
+        '5_auto' => ['/^EXCEPTION/'],
+      ],
+    );
+
+    // PORTABLE: {block key=bareword}
+    $this->checkPortable(
+      '{ts 1=Alice}Hello %1{/ts}',
+      [],
+      'Hello Alice'
+    );
+
+    // PORTABLE: {block key="String"}
+    $this->checkPortable(
+      '{ts 1="Alice"}Hello %1{/ts}',
+      [],
+      'Hello Alice'
+    );
+
+    // PORTABLE: {block key = "String" }
+    $this->checkPortable(
+      '{ts 1 = "Alice" }Hello %1{/ts}',
+      [],
+      'Hello Alice'
+    );
+
+    // PORTABLE: {block key1 = $value|modifiers key2 = $value|modifiers}
+    $this->checkPortable(
+      '{ts 1 = $name|escape:"html" 2 = $name|escape:"url"}Hello %1 %2{/ts}',
+      ['name' => '&'],
+      'Hello &amp; %26'
+    );
+
+    // INVALID: {block key = $value | modifiers}
+    $this->checkInvalid(
+      '{ts 1 = $name | escape:"html" }Hello %1{/ts}',
+      ['name' => '&'],
+    );
+  }
+
   public function testBlockParamFilters(): void {
     // PORTABLE: {block param=$x|filter}
     $this->checkPortable(
@@ -433,6 +495,15 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       '4_plain' => [$expect, NULL],
       '5_plain' => [$expect, NULL],
       '5_auto' => [$expect, NULL],
+    ]);
+  }
+
+  protected function checkInvalid(string $template, array $vars, string $expectRegex = '/EXCEPTION: Message was not parsed due to invalid smarty syntax/'): void {
+    $this->checkRegex($template, $vars, [
+      '2_plain' => [$expectRegex],
+      '4_plain' => [$expectRegex],
+      '5_plain' => [$expectRegex],
+      '5_auto' => [$expectRegex],
     ]);
   }
 
