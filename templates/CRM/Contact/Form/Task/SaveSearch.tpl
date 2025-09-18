@@ -27,17 +27,17 @@
   </div>
   <table class="form-layout-compressed">
     <tr class="crm-contact-task-createsmartgroup-form-block-title">
-      <td class="label">{$form.title.label}</td>
-      <td>{$form.title.html}</td>
+      <td class="label">{$form.title.label nofilter}</td>
+      <td>{$form.title.html nofilter}</td>
     </tr>
     <tr class="crm-contact-task-createsmartgroup-form-block-description">
-      <td class="label">{$form.description.label}</td>
-      <td>{$form.description.html}</td>
+      <td class="label">{$form.description.label nofilter}</td>
+      <td>{$form.description.html nofilter}</td>
     </tr>
     {if !empty($form.group_type)}
       <tr class="crm-contact-task-createsmartgroup-form-block-group_type">
-        <td class="label">{$form.group_type.label}</td>
-        <td>{$form.group_type.html}</td>
+        <td class="label">{$form.group_type.label nofilter}</td>
+        <td>{$form.group_type.html nofilter}</td>
       </tr>
       <tr>
         <td colspan=2>{include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Group' customDataSubType=false cid=false}</td>

@@ -20,7 +20,7 @@
   </div>
   <div class="clear"></div>
     <div class='html'>
-      {$form.html_message.html}<br />
+      {$form.html_message.html nofilter}<br />
     </div>
   </div>
 </details>
@@ -36,24 +36,24 @@
      {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
    </div>
     <div class='text'>
-      {$form.text_message.html}<br />
+      {$form.text_message.html nofilter}<br />
     </div>
   </div>
 </details>
 
 <div id="editMessageDetails">
   <div id="updateDetails" >
-    {if array_key_exists('updateTemplate', $form)}{$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}{/if}
+    {if array_key_exists('updateTemplate', $form)}{$form.updateTemplate.html nofilter}&nbsp;{$form.updateTemplate.label nofilter}{/if}
   </div>
   <div>
-    {if array_key_exists('saveTemplate', $form)}{$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}{/if}
+    {if array_key_exists('saveTemplate', $form)}{$form.saveTemplate.html nofilter}&nbsp;{$form.saveTemplate.label nofilter}{/if}
   </div>
 </div>
 
 <div id="saveDetails" class="section">
   {if array_key_exists('saveTemplateName', $form)}
-    <div class="label">{$form.saveTemplateName.label}</div>
-    <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
+    <div class="label">{$form.saveTemplateName.label nofilter}</div>
+    <div class="content">{$form.saveTemplateName.html|crmAddClass:huge nofilter}</div>
   {/if}
 </div>
 

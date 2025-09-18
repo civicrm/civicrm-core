@@ -20,15 +20,15 @@
                 <tr><td><label>{$sort_name}</label></td></tr>
             {else} {* action = add *}
                 <tr class="crm-contact-task-addto{$contactType}-form-block-relationship_type_id">
-                    <td>{$form.relationship_type_id.label}</td>
-                    <td>{$form.relationship_type_id.html}</td>
+                    <td>{$form.relationship_type_id.label nofilter}</td>
+                    <td>{$form.relationship_type_id.html nofilter}</td>
                 </tr>
                 <tr><td></td></tr>
                 <tr class="crm-contact-task-addto{$contactType}-form-block-name">
-                    <td>{$form.name.label}</td>
-                    <td>{$form.name.html}</td>
+                    <td>{$form.name.label nofilter}</td>
+                    <td>{$form.name.html nofilter}</td>
                 </tr>
-                <tr><td></td><td>{$form.$refresh.html}&nbsp;&nbsp;{$form.$cancel.html}</td></tr>
+                <tr><td></td><td>{$form.$refresh.html nofilter}&nbsp;&nbsp;{$form.$cancel.html nofilter}</td></tr>
      </table>
          {if $searchDone} {* Search button clicked *}
              {if $searchCount}
@@ -49,7 +49,7 @@
                         </tr>
                         {foreach from=$searchRows item=row}
                         <tr class="{cycle values="odd-row,even-row"}">
-                            <td>{$form.contact_check[$row.id].html}</td>
+                            <td>{$form.contact_check[$row.id].html nofilter}</td>
                             <td>{$row.type} {$row.name}</td>
                             <td>{$row.city}</td>
                             <td>{$row.state}</td>

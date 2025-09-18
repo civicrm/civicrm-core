@@ -12,14 +12,14 @@
     {if $form.group_id.value}
        <tr class="crm-contact-task-addtogroup-form-block-group_id">
           <td class="label">{ts}Group{/ts}</td>
-          <td>{$form.group_id.html}</td>
+          <td>{$form.group_id.html nofilter}</td>
        </tr>
     {else}
-        <tr><td>{$form.group_option.html}</td></tr>
+        <tr><td>{$form.group_option.html nofilter}</td></tr>
         <tr id="id_existing_group">
             <td>
                 <table class="form-layout">
-                <tr><td class="label">{$form.group_id.label}<span class="crm-marker">*</span></td><td>{$form.group_id.html}</td></tr>
+                <tr><td class="label">{$form.group_id.label nofilter}<span class="crm-marker">*</span></td><td>{$form.group_id.html nofilter}</td></tr>
                 </table>
             </td>
         </tr>
@@ -27,16 +27,16 @@
             <td>
                 <table class="form-layout">
                 <tr class="crm-contact-task-addtogroup-form-block-title">
-                   <td class="label">{$form.title.label}<span class="crm-marker">*</span></td>
-                   <td>{$form.title.html}</td>
+                   <td class="label">{$form.title.label nofilter}<span class="crm-marker">*</span></td>
+                   <td>{$form.title.html nofilter}</td>
                 <tr>
                 <tr class="crm-contact-task-addtogroup-form-block-description">
-                   <td class="label">{$form.description.label}</td>
-                   <td>{$form.description.html}</td></tr>
+                   <td class="label">{$form.description.label nofilter}</td>
+                   <td>{$form.description.html nofilter}</td></tr>
                 {if !empty($form.group_type)}
                 <tr class="crm-contact-task-addtogroup-form-block-group_type">
-        <td class="label">{$form.group_type.label}</td>
-                    <td>{$form.group_type.html}</td>
+        <td class="label">{$form.group_type.label nofilter}</td>
+                    <td>{$form.group_type.html nofilter}</td>
                 </tr>
                 {/if}
                 <tr>

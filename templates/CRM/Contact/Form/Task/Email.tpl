@@ -17,29 +17,29 @@
 
 <table class="form-layout-compressed">
   <tr id="selectEmailFrom" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
-    <td class="label">{$form.from_email_address.label}</td>
+    <td class="label">{$form.from_email_address.label nofilter}</td>
     <td>
-      {$form.from_email_address.html}
+      {$form.from_email_address.html nofilter}
       {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$tokenTitle}
     </td>
   </tr>
     <tr class="crm-contactEmail-form-block-recipient">
-       <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
+       <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label nofilter}{/if}</td>
        <td>
-         {$form.to.html} {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}
+         {$form.to.html nofilter} {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
     <tr class="crm-contactEmail-form-block-cc_id" {if empty($form.cc_id.value)}style="display:none;"{/if}>
-      <td class="label">{$form.cc_id.label}</td>
+      <td class="label">{$form.cc_id.label nofilter}</td>
       <td>
-        {$form.cc_id.html}
+        {$form.cc_id.html nofilter}
         <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts escape='htmlattribute'}Clear{/ts}" href="#"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
       </td>
     </tr>
     <tr class="crm-contactEmail-form-block-bcc_id" {if empty($form.bcc_id.value)}style="display:none;"{/if}>
-      <td class="label">{$form.bcc_id.label}</td>
+      <td class="label">{$form.bcc_id.label nofilter}</td>
       <td>
-        {$form.bcc_id.html}
+        {$form.bcc_id.html nofilter}
         <a class="crm-hover-button clear-cc-link" rel="bcc_id" title="{ts escape='htmlattribute'}Clear{/ts}" href="#"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
       </td>
     </tr>
@@ -55,14 +55,14 @@
 
 {if $emailTask}
     <tr class="crm-contactEmail-form-block-template">
-        <td class="label">{$form.template.label}</td>
-        <td>{$form.template.html}</td>
+        <td class="label">{$form.template.label nofilter}</td>
+        <td>{$form.template.html nofilter}</td>
     </tr>
 {/if}
     <tr class="crm-contactEmail-form-block-subject">
-       <td class="label">{$form.subject.label}</td>
+       <td class="label">{$form.subject.label nofilter}</td>
        <td>
-         {$form.subject.html|crmAddClass:huge}&nbsp;
+         {$form.subject.html|crmAddClass:huge nofilter}&nbsp;
          <input class="crm-token-selector big" data-field="subject" />
          {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
        </td>
@@ -88,7 +88,7 @@
 
 {literal}
 CRM.$(function($) {
-  var $form = $("form.{/literal}{$form.formClass}{literal}");
+  var $form = $("form.{/literal}{$form.formClass nofilter}{literal}");
 
   $('.add-cc-link', $form).click(function(e) {
     e.preventDefault();

@@ -10,7 +10,7 @@
 <div class="crm-form-block crm-block crm-contact-task-addtodonot-form-block">
   <h3>{ts}Communication Preferences{/ts}</h3>
   <table class="form-layout-compressed">
-    <tr><td>{$form.actionTypeOption.html}</td></tr>
+    <tr><td>{$form.actionTypeOption.html nofilter}</td></tr>
     <tr class="crm-contact-task-addtodonot-form-block-pref">
         <td>
             <div class="listing-box">

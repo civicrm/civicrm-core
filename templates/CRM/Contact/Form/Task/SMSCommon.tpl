@@ -11,7 +11,7 @@
 {capture assign='tokenTitle'}{ts}Tokens{/ts}{/capture}
 <details class="crm-accordion-bold crm-plaint_text_sms-accordion " open>
 <summary>
-  {$form.sms_text_message.label}
+  {$form.sms_text_message.label nofilter}
   </summary>
  <div class="crm-accordion-body">
  <div><span id="char-count-message"></span> <span id="char-count-help">{help id="sms_text_message" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}</span></div>
@@ -20,23 +20,23 @@
      {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp" title=$tokenTitle}
    </div>
     <div class='text'>
-  {$form.sms_text_message.html}<br />
+  {$form.sms_text_message.html nofilter}<br />
     </div>
   </div>
 </details>
 <div id="SMSeditMessageDetails" class="section">
   <div id="SMSupdateDetails" class="section" >
-    {if array_key_exists('SMSupdateTemplate', $form)}{$form.SMSupdateTemplate.html}&nbsp;{$form.SMSupdateTemplate.label}{/if}
+    {if array_key_exists('SMSupdateTemplate', $form)}{$form.SMSupdateTemplate.html nofilter}&nbsp;{$form.SMSupdateTemplate.label nofilter}{/if}
   </div>
   <div class="section">
-    {if array_key_exists('SMSsaveTemplate', $form)}{$form.SMSsaveTemplate.html}&nbsp;{$form.SMSsaveTemplate.label}{/if}
+    {if array_key_exists('SMSsaveTemplate', $form)}{$form.SMSsaveTemplate.html nofilter}&nbsp;{$form.SMSsaveTemplate.label nofilter}{/if}
   </div>
 </div>
 
 <div id="SMSsaveDetails" class="section">
   {if array_key_exists('SMSsaveTemplateName', $form)}
-    <div class="label">{$form.SMSsaveTemplateName.label}</div>
-    <div class="content">{$form.SMSsaveTemplateName.html|crmAddClass:huge}</div>
+    <div class="label">{$form.SMSsaveTemplateName.label nofilter}</div>
+    <div class="content">{$form.SMSsaveTemplateName.html|crmAddClass:huge nofilter}</div>
   {/if}
 </div>
 
