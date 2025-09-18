@@ -32,7 +32,7 @@
 {/if}
 
 <tr id="Email_Block_{$blockId}">
-  <td>{$form.email.$blockId.email.html|crmAddClass:email}&nbsp;{$form.email.$blockId.location_type_id.html}
+  <td>{$form.email.$blockId.email.html|crmAddClass:email nofilter}&nbsp;{$form.email.$blockId.location_type_id.html nofilter}
     {if $isAddSignatureFields}
       <div class="clear"></div>
       <details class="email-signature crm-accordion-light">
@@ -40,16 +40,16 @@
           {ts}Signature{/ts}
         </summary>
         <div id="signatureBlock{$blockId}" class="crm-accordion-body">
-          {$form.email.$blockId.signature_html.label}<br/>{$form.email.$blockId.signature_html.html}<br/>
-          {$form.email.$blockId.signature_text.label}<br/>{$form.email.$blockId.signature_text.html}
+          {$form.email.$blockId.signature_html.label nofilter}<br/>{$form.email.$blockId.signature_html.html nofilter}<br/>
+          {$form.email.$blockId.signature_text.label nofilter}<br/>{$form.email.$blockId.signature_text.html nofilter}
         </div>
       </details>
     {/if}
   </td>
-  <td align="center">{$form.email.$blockId.on_hold.html}</td>
-  <td align="center" id="Email-Bulkmail-html" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html}</td>
+  <td align="center">{$form.email.$blockId.on_hold.html nofilter}</td>
+  <td align="center" id="Email-Bulkmail-html" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html nofilter}</td>
   <td align="center" id="Email-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>
-    {$form.email.$blockId.is_primary.1.html}
+    {$form.email.$blockId.is_primary.1.html nofilter}
   </td>
   {if $blockId gt 1}
     <td>

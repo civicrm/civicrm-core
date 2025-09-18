@@ -24,8 +24,8 @@
 {/if}
 
 <tr id="Website_Block_{$blockId}">
-    <td>{$form.website.$blockId.url.html|crmAddClass:url}&nbsp;</td>
-    <td>{$form.website.$blockId.website_type_id.html}</td>
+    <td>{$form.website.$blockId.url.html|crmAddClass:url nofilter}&nbsp;</td>
+    <td>{$form.website.$blockId.website_type_id.html nofilter}</td>
     {if $blockId gt 1}
       <td colspan="3"><a href="#" title="{ts escape='htmlattribute'}Delete Website Block{/ts}" onClick="removeBlock('Website','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
     {/if}

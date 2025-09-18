@@ -10,7 +10,7 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      var $form = $('form.{/literal}{$form.formClass}{literal}');
+      var $form = $('form.{/literal}{$form.formClass nofilter}{literal}');
       function triggerCustomValueCommsFields() {
         var fldName = $(this).attr('id');
         if ($(this).val() == 4) {

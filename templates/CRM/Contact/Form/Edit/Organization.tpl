@@ -12,36 +12,36 @@
   {crmRegion name="contact-form-edit-organization"}
     <tr>
       <td>
-        {$form.organization_name.label|smarty:nodefaults|purify}<br/>
-        {$form.organization_name.html}
+        {$form.organization_name.label|purify nofilter}<br/>
+        {$form.organization_name.html nofilter}
       </td>
       <td>
-        {$form.legal_name.label|smarty:nodefaults|purify}<br/>
-        {$form.legal_name.html}
+        {$form.legal_name.label|purify nofilter}<br/>
+        {$form.legal_name.html nofilter}
       </td>
       <td>
-        {$form.nick_name.label|smarty:nodefaults|purify}<br/>
-        {$form.nick_name.html}
+        {$form.nick_name.label|purify nofilter}<br/>
+        {$form.nick_name.html nofilter}
       </td>
       <td>
-        {$form.sic_code.label|smarty:nodefaults|purify}<br/>
-        {$form.sic_code.html}
+        {$form.sic_code.label|purify nofilter}<br/>
+        {$form.sic_code.html nofilter}
       </td>
     </tr>
     <tr>
       {if array_key_exists('contact_sub_type', $form)}
         <td>
-          {$form.contact_sub_type.label|smarty:nodefaults|purify}<br />
-          {$form.contact_sub_type.html}
+          {$form.contact_sub_type.label|purify nofilter}<br />
+          {$form.contact_sub_type.html nofilter}
         </td>
       {/if}
         <td>
-          {$form.is_deceased.label}<br />
-          {$form.is_deceased.html}
+          {$form.is_deceased.label nofilter}<br />
+          {$form.is_deceased.html nofilter}
         </td>
         <td id="showDeceasedDate">
-          {$form.deceased_date.label}<br />
-          {$form.deceased_date.html}
+          {$form.deceased_date.label nofilter}<br />
+          {$form.deceased_date.html nofilter}
         </td>
     </tr>
   {/crmRegion}

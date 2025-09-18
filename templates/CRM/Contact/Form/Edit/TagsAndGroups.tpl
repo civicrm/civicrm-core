@@ -17,8 +17,8 @@
         <td>
           {if $form.tag}
             <div class="crm-section tag-section">
-              {if !empty($title)}{$form.tag.label}<br>{/if}
-              {$form.tag.html}
+              {if !empty($title)}{$form.tag.label nofilter}<br>{/if}
+              {$form.tag.html nofilter}
             </div>
           {/if}
           {if $context NEQ 'profile'}
@@ -30,13 +30,13 @@
           <td>
             {if $groupElementType eq 'select'}
               <div class="crm-section group-section">
-              {if $title}{$form.group.label}<br>{/if}
-              {$form.group.html}
+              {if $title}{$form.group.label nofilter}<br>{/if}
+              {$form.group.html nofilter}
             </div>
             {else}
               {foreach key=key item=item from=$tagGroup.group}
                 <div class="group-wrapper">
-                  {$form.group.$key.html}
+                  {$form.group.$key.html nofilter}
                     {if $item.description}
                     <div class="description">{$item.description}</div>
                   {/if}
