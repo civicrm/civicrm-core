@@ -1,6 +1,8 @@
 <span ng-repeat="link in colData.links">
   <a target="{{:: link.target }}" ng-attr-href="{{ link.url || '' }}" title="{{:: link.title }}" class="{{:: link.style }}" ng-click="$ctrl.onClickLink(link, row.key, $event)">
     <i ng-if="colData.icons.left[$index]" class="crm-i {{:: colData.icons.left[$index] }}" role="img" aria-hidden="true"></i>
-    {{:: link.text }}<i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}"> </i></a><span ng-if="!$last">,
-  </span>
+    {{:: link.text }}
+    <i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"> </i>
+  </a>
+  <span ng-if="!$last">,</span>
 </span>

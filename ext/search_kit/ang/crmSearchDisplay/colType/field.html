@@ -6,7 +6,7 @@
 <span ng-if=":: $ctrl.isArray(colData.val)">
   <span ng-repeat="val in colData.val track by $index">
     <i ng-if=":: colData.icons.left[$index]" class="crm-i {{:: colData.icons.left[$index] }}" role="img" aria-hidden="true"></i>
-      <span class="crm-search-field-value">{{:: val }}</span><i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}"> </i><span ng-if="!$last">,
+      <span class="crm-search-field-value">{{:: val }}</span><i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i><span ng-if="!$last">,
     </span>
   </span>
 </span>
