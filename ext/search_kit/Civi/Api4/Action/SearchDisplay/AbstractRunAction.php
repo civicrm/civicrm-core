@@ -139,7 +139,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function formatResult(iterable $result): array {
     $rows = [];
-    $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+    $keyName = $this->getRowKeyName();
     if ($this->savedSearch['api_entity'] === 'RelationshipCache') {
       $keyName = 'relationship_id';
     }
@@ -284,6 +284,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     if (!empty($column['alignment'])) {
       $cssClass[] = $column['alignment'];
+    }
+    if (!empty($column['nowrap'])) {
+      $cssClass[] = 'nowrap';
     }
     if (!empty($column['show_linebreaks'])) {
       if ($column['type'] === 'html') {
@@ -1294,7 +1297,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Allow all filters that are included in SELECT clause or are fields on the Afform.
     $fieldFilters = $this->getAfformFilterFields();
     $directiveFilters = $this->getAfformDirectiveFilters();
-    $allowedFilters = array_merge($this->getSelectAliases(), $fieldFilters, $directiveFilters);
+    $allowedFilters = array_merge($this->getSelectAliases(), array_keys($fieldFilters), $directiveFilters);
 
     // Ignore empty strings
     $filters = array_filter($this->filters, [$this, 'hasValue']);
@@ -1312,7 +1315,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     foreach ($filters as $key => $value) {
       $fieldNames = explode(',', $key);
       if (in_array($key, $allowedFilters, TRUE) || !array_diff($fieldNames, $allowedFilters)) {
-        $this->applyFilter($fieldNames, $value);
+        $this->applyFilter($fieldNames, $value, $fieldFilters);
       }
     }
     // After adding filters, set filter labels
@@ -1634,7 +1637,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return array_column(\CRM_Utils_Array::findAll(
         $afform['searchDisplay']['fieldset'],
         ['#tag' => 'af-field']
-      ), 'name');
+      ), NULL, 'name');
     }
     return [];
   }
@@ -1847,6 +1850,20 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $values;
+  }
+
+  protected function getRowKeyName(): string {
+    // If grouping by a primary key, use that field
+    $groupBy = $this->savedSearch['api_params']['groupBy'] ?? [];
+    foreach ($groupBy as $fieldName) {
+      $field = $this->getField($fieldName);
+      if ($field && (CoreUtil::getIdFieldName($field['entity']) === $field['name'])) {
+        return $fieldName;
+      }
+    }
+    // Use primary key of main entity
+    $entityName = $this->savedSearch['api_entity'];
+    return CoreUtil::getIdFieldName($entityName);
   }
 
   /**

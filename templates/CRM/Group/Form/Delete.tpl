@@ -14,7 +14,7 @@
     <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
     {ts 1=$title}Are you sure you want to delete the group %1?{/ts}<br /><br />
-    {if $count !== NULL}
+    {if $count !== null}
         {ts count=$count plural='This group currently has %count members in it.'}This group currently has one member in it.{/ts}
     {/if}
 

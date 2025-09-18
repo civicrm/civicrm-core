@@ -4,7 +4,7 @@
 </legend>
 <div class="btn-group btn-group-xs" ng-if=":: $ctrl.hasParent">
   <button type="button" class="btn btn-danger-outline" ng-click="$ctrl.deleteGroup()" title="{{:: ts('Remove group') }}">
-    <i class="crm-i fa-trash" aria-hidden="true"></i>
+    <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
   </button>
 </div>
 <div class="api4-clause-group-sortable" ng-model="$ctrl.clauses" ui-sortable="$ctrl.sortOptions">
@@ -14,7 +14,7 @@
         <span class="badge badge-info">
           <span ng-if="index === ($ctrl.skip || 0) && !$ctrl.hasParent">{{ $ctrl.label }}</span>
           <span ng-if="index &gt; ($ctrl.skip || 0) || $ctrl.hasParent">{{ $ctrl.conjunctions[$ctrl.op] }}</span>
-          <i class="crm-i fa-arrows" aria-hidden="true"></i>
+          <i class="crm-i fa-arrows" role="img" aria-hidden="true"></i>
         </span>
       </div>
       <div ng-if="!$ctrl.conjunctions[clause[0]]" class="api4-input-group">

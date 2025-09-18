@@ -16,11 +16,11 @@
  */
 
 /**
- * This class generates form components for case activity.
+ * This class generates form components for case actions.
  */
-class CRM_Case_Form_Case extends CRM_Core_Form {
+class CRM_Case_Form_Case extends CRM_Core_Form implements CRM_Case_Form_CaseFormInterface {
   use CRM_Custom_Form_CustomDataTrait;
-  use CRM_Case_Form_CaseFormTrait;
+  use CRM_Case_Form_CaseLookupTrait;
 
   /**
    * The context
@@ -112,7 +112,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * @return int|null
    */
   public function getEntityId() {
-    return $this->_caseId;
+    return $this->getCaseID();
   }
 
   /**
@@ -125,7 +125,10 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $this->_action = CRM_Core_Action::ADD;
     }
 
-    $this->_caseId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    // Since we return early when action is DELETE, we need to retrieve the
+    // case ID from the request params now so it can be set in the session,
+    // since it isn't present in the url on POST when not using popups.
+    $this->getCaseID();
 
     $this->_currentlyViewedContactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -146,7 +149,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       return TRUE;
     }
 
-    if (!$this->_caseId) {
+    if (!$this->getCaseID()) {
       $caseAttributes = [
         'case_type_id' => ts('Case Type'),
         'status_id' => ts('Case Status'),
@@ -237,6 +240,13 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $this->_caseId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     }
     return $this->_caseId;
+  }
+
+  /**
+   * Used to set case ID  in submit
+   */
+  protected function setCaseID(int $id): void {
+    $this->_caseId = $id;
   }
 
   /**
@@ -372,7 +382,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $params['details'] = $params['activity_details'];
     }
     $caseObj = CRM_Case_BAO_Case::create($params);
-    $this->_caseId = $params['case_id'] = $caseObj->id;
+    $this->setCaseID($caseObj->id);
+    $params['case_id'] = $this->getCaseID();
     // unset any ids, custom data
     unset($params['id'], $params['custom']);
 
@@ -387,16 +398,16 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
         $tagParams[$tag] = 1;
       }
     }
-    CRM_Core_BAO_EntityTag::create($tagParams, 'civicrm_case', $caseObj->id);
+    CRM_Core_BAO_EntityTag::create($tagParams, 'civicrm_case', $this->getCaseID());
 
     //save free tags
     if (isset($params['case_taglist']) && !empty($params['case_taglist'])) {
-      CRM_Core_Form_Tag::postProcess($params['case_taglist'], $caseObj->id, 'civicrm_case', $this);
+      CRM_Core_Form_Tag::postProcess($params['case_taglist'], $this->getCaseID(), 'civicrm_case', $this);
     }
 
     // user context
     $url = CRM_Utils_System::url('civicrm/contact/view/case',
-      "reset=1&action=view&cid={$this->_currentlyViewedContactId}&id={$caseObj->id}"
+      "reset=1&action=view&cid={$this->_currentlyViewedContactId}&id={$this->getCaseID()}"
     );
     CRM_Core_Session::singleton()->pushUserContext($url);
 
@@ -427,7 +438,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $caseDelete = CRM_Case_BAO_Case::deleteCase($this->_caseId, TRUE);
+      $caseDelete = CRM_Case_BAO_Case::deleteCase($this->getCaseID(), TRUE);
       if ($caseDelete) {
         CRM_Core_Session::setStatus(ts('You can view and / or restore deleted cases by checking the "Deleted Cases" option under Find Cases.'), ts('Case Deleted'), 'success');
       }
@@ -435,7 +446,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
 
     if ($this->_action & CRM_Core_Action::RENEW) {
-      $caseRestore = CRM_Case_BAO_Case::restoreCase($this->_caseId);
+      $caseRestore = CRM_Case_BAO_Case::restoreCase($this->getCaseID());
       if ($caseRestore) {
         CRM_Core_Session::setStatus(ts('The selected case has been restored.'), ts('Restored'), 'success');
       }

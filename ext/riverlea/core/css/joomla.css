@@ -45,7 +45,7 @@ body.admin.com_civicrm .modal-dialog {
   pointer-events: all;
 }
 
-/* Joomla 4 - body.com_civicrm.layout-default */
+/* Joomla - body.com_civicrm.layout-default */
 
 body.admin.com_civicrm.layout-default {
   --crm-page-padding: 1rem;
@@ -72,4 +72,10 @@ body.com_civicm.layout-default .table tbody a:not(.badge):not(.btn):not(.dropdow
 }
 .table tbody a:not(.badge):not(.btn):not(.dropdown-item) {
   text-decoration: none; /* Reset theme */
+}
+body.com_civicm #bootstrap-theme .bg-secondary {
+  background-color: var(--crm-c-secondary) !important; /* vs !important bg colour in Atum theme */
+}
+body.com_civicrm.layout-default table .crm-sticky-header {
+  --crm-menubar-bottom: 0;
 }

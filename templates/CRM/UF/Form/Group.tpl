@@ -35,16 +35,19 @@
       {/foreach}
         {if $uf_group_type_extra}
           <tr class="crm-uf_group-form-block-uf_group_type_extra">
-            <td class="label">{ts}Used in Forms{/ts} {help id='id-used_for_extra' file="CRM/UF/Form/Group.hlp"}</td>
+            <td class="label">
+              {capture assign='helpTitle'}{ts}Used in Forms{/ts}{/capture}
+              {$helpTitle} {help id='used-for-extra' title=$helpTitle file="CRM/UF/Form/Group.hlp"}
+            </td>
             <td class="html-adjust">{$uf_group_type_extra}</td>
           </tr>
         {/if}
         <tr class="crm-uf_group-form-block-help_pre">
-            <td class="label">{$form.help_pre.label} {help id='id-help_pre' file="CRM/UF/Form/Group.hlp"} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='help_pre' id=$gid}{/if}</td>
+            <td class="label">{$form.help_pre.label} {help id='help_pre' file="CRM/UF/Form/Group.hlp"} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='help_pre' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.help_pre.html}</td>
         </tr>
         <tr class="crm-uf_group-form-block-help_post">
-            <td class="label">{$form.help_post.label} {help id='id-help_post' file="CRM/UF/Form/Group.hlp"} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='help_post' id=$gid}{/if}</td>
+            <td class="label">{$form.help_post.label} {help id='help_post' file="CRM/UF/Form/Group.hlp"} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='help_post' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.help_post.html}</td>
         </tr>
         <tr class="crm-uf_group-form-block-is_active">
@@ -58,3 +61,14 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {include file="CRM/common/showHide.tpl"}
+{literal}
+<script type="text/javascript">
+  CRM.$(function($) {
+    const $form = $('form.{/literal}{$form.formClass}{literal}');
+    const $elements = $('input[name=frontend_title], input[name=title]', $form);
+    if ($elements.length === 2) {
+      CRM.utils.syncFields($elements.first(), $elements.last());
+    }
+  });
+</script>
+{/literal}

@@ -3,5 +3,5 @@
   {{:: opt.label }}
 </label>
 	<a ng-if="!$ctrl.defn.required" class="crm-hover-button" title="{{:: ts('Clear') }}" ng-show="!!dataProvider.getFieldData()[$ctrl.fieldName] || dataProvider.getFieldData()[$ctrl.fieldName] === false || dataProvider.getFieldData()[$ctrl.fieldName] === 0" ng-click="dataProvider.getFieldData()[$ctrl.fieldName] = null" aria-label="{{:: ts('Clear') }}">
-  <i class="crm-i fa-times" aria-hidden="true"></i>
+  <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
 </a>

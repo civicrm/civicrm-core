@@ -26,10 +26,10 @@
   </td>
 </tr>
 <tr>
-  <td>{$form.member_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} {$form.member_test.html}
+  <td>{$form.member_test.label} {help id="is_test" file="CRM/Contact/Form/Search/Advanced" title=$form.member_test.textLabel} {$form.member_test.html}
   </td>
   <td>
-    {$form.member_is_primary.label} {help id="id-member_is_primary" file="CRM/Member/Form/Search.hlp"} {$form.member_is_primary.html}
+    {$form.member_is_primary.label} {help id="member_is_primary" file="CRM/Member/Form/Search.hlp"} {$form.member_is_primary.html}
   </td>
 </tr>
 <tr><td><label>{$form.membership_id.label}</label> {$form.membership_id.html}</td>
@@ -39,12 +39,12 @@
   <td>
     {if !empty($form.member_auto_renew)}
       <label>{$form.member_auto_renew.label}</label>
-      {help id="id-member_auto_renew" file="CRM/Member/Form/Search.hlp"}
+      {help id="member_auto_renew" file="CRM/Member/Form/Search.hlp"}
       <br/>
       {$form.member_auto_renew.html}
     {/if}
   </td>
-  <td>{$form.member_is_override.label} {help id="id-member_is_override" file="CRM/Member/Form/Search.hlp"} {$form.member_is_override.html}</td>
+  <td>{$form.member_is_override.label} {help id="member_is_override" file="CRM/Member/Form/Search.hlp"} {$form.member_is_override.html}</td>
 </tr>
 <tr>
   {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="membership_join_date" to='' from='' colspan='2' class='' hideRelativeLabel=0}

@@ -134,7 +134,7 @@ class Api4EntitySetQuery extends Api4Query {
    * @param string $expr
    * @return array|null
    */
-  public function getField($expr) {
+  public function getField(string $expr):? array {
     $col = strpos($expr, ':');
     $fieldName = $col ? substr($expr, 0, $col) : $expr;
     return $this->apiFieldSpec[$fieldName] ?? NULL;

@@ -7,31 +7,23 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-mailing_name-title"}
-  {ts}Mailing Name{/ts}
-{/htxt}
-{htxt id="id-mailing_name"}
+
+{htxt id='mailing_name'}
 {ts}Find mailings by mailing name. You can enter a partial or complete name.{/ts}
 {/htxt}
 
-{htxt id="id-create_sort_name-title"}
-  {ts}Mailing Sender{/ts}
-{/htxt}
-{htxt id="id-create_sort_name"}
+
+{htxt id='sort_name'}
 {ts}Find mailings by the name of the person who created or sent them. You can enter a complete OR partial name (last name, first name format).{/ts}
 {/htxt}
 
-{htxt id="is_archived-title"}
-  {ts}Archived{/ts}
-{/htxt}
+
 {htxt id="is_archived"}
   {ts}This field is disabled when searching for Draft/Unscheduled mailings.{/ts}
 {/htxt}
 
-{htxt id="id-language-title"}
-  {ts}Language{/ts}
-{/htxt}
-{htxt id="id-language"}
+
+{htxt id='language'}
   {ts}Find mailing by language.{/ts}
 {/htxt}
 

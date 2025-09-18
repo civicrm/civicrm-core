@@ -159,7 +159,7 @@
     {else}
       {$report.mailing.body_text|mb_truncate:100|escape|nl2br}
       <br />
-      <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
+      <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
     {/if}
   </td>
 </tr>
@@ -169,7 +169,7 @@
 <tr>
   <td class="label nowrap">{ts}HTML Message{/ts}</td>
   <td>
-    <a class="crm-popup" href='{$htmlViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a>
+    <a class="crm-popup" href='{$htmlViewURL}'><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View complete message{/ts}</a>
   </td>
 </tr>
 {/if}
@@ -214,5 +214,5 @@
 </table>
 </fieldset>
 <div class="action-link">
-    <a href="{$backUrl}" ><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {$backUrlTitle}</a>
+    <a href="{$backUrl}" ><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> {$backUrlTitle}</a>
 </div>

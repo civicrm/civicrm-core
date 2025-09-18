@@ -18,7 +18,7 @@
   </div>
 </div>
 <p ng-if="$ctrl.isDataMode('table') && $ctrl.display.id">
-  <i class="crm-i fa-clock-o"></i>
+  <i class="crm-i fa-clock-o" role="img" aria-hidden="true"></i>
   <strong ng-if="$ctrl.display._refresh_date">{{:: ts('Last refreshed: %1. Click "Save" to refresh now.', {1: $ctrl.display._refresh_date}) }}</strong>
   <strong ng-if="!$ctrl.display._refresh_date">{{:: ts('Checking last refresh date...') }}</strong>
 </p>
@@ -52,7 +52,7 @@
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>
-        <i class="crm-i fa-arrows crm-search-move-icon"></i>
+        <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
         {{ $ctrl.parent.getColLabel(col) }}
       </legend>
       <div class="form-inline crm-search-admin-flex-row">
@@ -65,7 +65,7 @@
         <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Label') }}</label>
         <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
         <button type="button" class="btn-xs" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
-          <i class="crm-i fa-ban"></i>
+          <i class="crm-i fa-ban" role="img" aria-hidden="true"></i>
         </button>
       </div>
     </fieldset>

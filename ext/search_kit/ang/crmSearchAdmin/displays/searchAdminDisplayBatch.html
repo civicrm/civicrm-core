@@ -43,12 +43,12 @@
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>
-        <i class="crm-i fa-arrows crm-search-move-icon"></i>
+        <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
         {{:: $ctrl.parent.getColLabel(col) }}
         <span class="crm-marker" ng-show="col.required">*</span>
       </legend>
       <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
-        <i class="crm-i fa-ban"></i>
+        <i class="crm-i fa-ban" role="img" aria-hidden="true"></i>
       </button>
       <div class="form-inline crm-search-admin-flex-row">
         <label for="crm-search-admin-edit-col-{{:: $index }}">{{:: ts('Header') }}</label>

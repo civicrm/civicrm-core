@@ -23,7 +23,8 @@
        </td>
       {if array_key_exists('postal_code_suffix', $form.address.$blockId)}
           <td>
-            {$form.address.$blockId.postal_code_suffix.label} {help id="id-postal-code-suffix" file="CRM/Contact/Form/Contact.hlp"}<br/>
+            {$form.address.$blockId.postal_code_suffix.label}
+            {help id="id-postal-code-suffix" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.postal_code_suffix.textLabel}<br/>
             {$form.address.$blockId.postal_code_suffix.html}
           <td>
       {/if}

@@ -7,12 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-fullText-title"}
-Full Text Search
-{/htxt}
 {htxt id="id-fullText"}
 <p>
 {ts}You can search for records containing a word or phrase in any text field - including name and email fields, notes, activity subject and descriptions, as well as any searchable custom text and note fields. Narrow your search by selecting a specific table / type of record. Wildcards are automatically added to your search term. Searches are NOT case-sensitive.{/ts}
 </p>
-<p>{ts}EXAMPLE: You can enter <em>fiesta</em>, and get a match on a contact with a note containing <em>Fall Fiesta</em>{/ts}</p> 
+<p>{ts}EXAMPLE: You can enter <em>fiesta</em>, and get a match on a contact with a note containing <em>Fall Fiesta</em>{/ts}</p>
 {/htxt}

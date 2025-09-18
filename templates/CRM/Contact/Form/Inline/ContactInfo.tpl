@@ -15,7 +15,7 @@
   <div class="crm-clear">
     {if $contactType eq 'Individual'}
     <div class="crm-summary-row">
-      <div class="crm-label">{$form.employer_id.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}</div>
+      <div class="crm-label">{$form.employer_id.label}&nbsp;{help id="employer_id" file="CRM/Contact/Form/Contact"}</div>
       <div class="crm-content">
         {$form.employer_id.html|crmAddClass:big}
       </div>

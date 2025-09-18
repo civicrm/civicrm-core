@@ -62,7 +62,7 @@
     {* Dashboard only lists 10 most recent pledges. *}
     {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit}
         <tr class="even-row">
-            <td colspan="10"><a href="{crmURL p='civicrm/pledge/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more pledges{/ts}... </a></td>
+            <td colspan="10"><a href="{crmURL p='civicrm/pledge/search' q='reset=1'}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Find more pledges{/ts}... </a></td>
         </tr>
     {/if}
 

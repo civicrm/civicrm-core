@@ -452,6 +452,19 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => '',
       'subject' => 'subject sched_membership_absolute_date',
     ];
+    $this->fixtures['sched_on_membership_autorenew_before_end_date'] = [
+      'title' => 'sched_on_membership_autorenew_before_end_date',
+      'body_html' => '<p>Your membership will auto-renew tomorrow</p>',
+      'body_text' => 'Your membership will auto-renew tomorrow hooray',
+      'is_active' => 1,
+      'mapping_id' => 4,
+      'record_activity' => 1,
+      'start_action_condition' => 'before',
+      'start_action_date' => 'next_sched_contribution_date',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject send reminder on sched_on_membership_autorenew_before_end_date',
+    ];
 
     $this->fixtures['sched_contact_birth_day_yesterday'] = [
       'title' => 'sched_contact_birth_day_yesterday',
@@ -1759,6 +1772,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'amount' => '100',
       'contribution_status_id' => 2,
       'start_date' => '2012-03-15 00:00:00',
+      'next_sched_contribution_date' => '2012-04-15 00:00:00',
       'currency' => 'USD',
       'frequency_unit' => 'month',
     ]);
@@ -1776,8 +1790,23 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // end_date=2012-06-15 ; schedule is 2 month after end_date
     $this->assertCronRuns([
       [
-        // Only active auto-renew contact shiould receive the reminder.
+        // Only active auto-renew contact should receive the reminder.
         'time' => '2012-08-15 01:00:00',
+        'recipients' => [['test-activerenew@example.com']],
+      ],
+    ]);
+
+    // Create Reminder to send to Auto-Renew membership 1 day before 2012-04-15 00:00:00
+    $this->createScheduleFromFixtures('sched_on_membership_autorenew_before_end_date', [
+      'entity_value' => $membership['membership_type_id'],
+      'entity_status' => 2,
+    ]);
+
+    // Schedule is 1 day before next_sched_contribution_date
+    $this->assertCronRuns([
+      [
+        // Only active auto-renew contact should receive the reminder.
+        'time' => '2012-04-14 00:00:00',
         'recipients' => [['test-activerenew@example.com']],
       ],
     ]);
@@ -1796,6 +1825,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => [['test-member@example.com'], ['test-cancelrenew@example.com']],
       ],
     ]);
+
   }
 
   /**

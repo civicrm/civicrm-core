@@ -24,8 +24,14 @@
         </span>
       {/if}
     </td>
-    <td>{ts}On Hold?{/ts}</td>
-    <td>{ts}Bulk Mailings?{/ts}</td>
+    <td>
+      {capture assign='colTitle'}{ts}On Hold?{/ts}{/capture}{$colTitle}
+      {help id="id-onhold" file="CRM/Contact/Form/Contact.hlp" title=$colTitle}
+    </td>
+    <td>
+      {capture assign='colTitle'}{ts}Bulk Mailings?{/ts}{/capture}{$colTitle}
+      {help id="id-bulkmail" file="CRM/Contact/Form/Contact.hlp" title=$colTitle}
+    </td>
     <td>{ts}Primary?{/ts}</td>
     <td>&nbsp;</td>
   </tr>

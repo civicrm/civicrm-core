@@ -41,7 +41,7 @@
     $('#_qf_Export_next').click(function(){
       $(this).hide();
       {/literal}{capture assign=tsdone}{ts}Done{/ts}{/capture}{literal}
-      $('#_qf_Export_cancel').html('<i aria-hidden="true" class="crm-i fa-check"></i> {/literal}{$tsdone|escape}{literal}');
+      $('#_qf_Export_cancel').html('<i class="crm-i fa-check" role="img" aria-hidden="true"></i> {/literal}{$tsdone|escape}{literal}');
     });
   });
 </script>

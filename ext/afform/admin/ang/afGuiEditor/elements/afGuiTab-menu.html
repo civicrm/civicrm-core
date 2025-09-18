@@ -5,7 +5,7 @@
 </li>
 <li>
   <a href ng-click="$ctrl.pickIcon(tab)">
-    <i class="crm-i fa-icons"></i> {{:: ts('Choose icon') }}
+    <i class="crm-i fa-icons" role="img" aria-hidden="true"></i> {{:: ts('Choose icon') }}
   </a>
 </li>
 <li ng-if="$ctrl.searchDisplays[tabIndex].length">
@@ -19,4 +19,4 @@
 </li>
 
 <li role="separator" class="divider"></li>
-<li><a href ng-click="$ctrl.deleteTab(tabIndex)"><span class="text-danger"><i class="crm-i fa-trash"></i> {{:: ts('Delete tab') }}</span></a></li>
+<li><a href ng-click="$ctrl.deleteTab(tabIndex)"><span class="text-danger"><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {{:: ts('Delete tab') }}</span></a></li>

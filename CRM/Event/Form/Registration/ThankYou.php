@@ -176,7 +176,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
           );
         }
         $extensionHtml[] = '<div id="tell-a-friend" class="crm-section tell_friend_link-section">
-            <a href="' . htmlentities($friendURL) . '" title="' . htmlentities($friendText) . '" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> ' . CRM_Utils_String::purifyHTML($friendText) . '</span></a>
+            <a href="' . htmlentities($friendURL) . '" title="' . htmlentities($friendText) . '" class="button"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> ' . CRM_Utils_String::purifyHTML($friendText) . '</span></a>
        </div><br /><br />';
       }
     }

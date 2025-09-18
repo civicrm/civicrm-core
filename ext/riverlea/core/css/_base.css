@@ -1,10 +1,4 @@
 /******************
-   VARIABLES
-*******************/
-
-@import url(_variables.css); /* default variables */
-
-/******************
    RESETS
 *******************/
 
@@ -58,9 +52,10 @@ body {
   list-style: none;
 }
 /* Restores list styles for rich text output to UA stylesheet definition */
-.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body) :is(ol,ul) {
+.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body,.crm-search-col-type-html,.af-markup,.notify-content) :is(ol,ul) {
   list-style: revert;
   padding: revert;
+  margin: revert;
 }
 /* For images to not be able to exceed their container */
 .crm-container img {
@@ -181,21 +176,24 @@ body.civicrm-iframe-page {
 
 /* Core type */
 
+.crm-container p:first-child {
+  margin-top: 0;
+}
+.crm-container p:last-child {
+  margin-bottom: 0;
+}
 .crm-container strong,
 .crm-container b,
 .crm-container .bold,
 .crm-container .font-bold {
-  font-family: var(--crm-font-bold);
   font-weight: bold;
 }
 .crm-container em,
 .crm-container .font-italic {
-  font-family: var(--crm-font-italic);
   font-style: italic;
 }
 .crm-container strong em,
 .crm-container em strong {
-  font-family: var(--crm-font-bold-italic);
   font-weight: bold;
   font-style: italic;
 }
@@ -209,7 +207,6 @@ body.civicrm-iframe-page {
 #bootstrap-theme h3 {
   background-color: var(--crm-heading-bg);
   font-size: var(--crm-r1);
-  font-family: var(--crm-font-bold);
   font-weight: bold;
   color: var(--crm-heading-col);
   padding: var(--crm-heading-padding);
@@ -293,10 +290,11 @@ dl dl {
   background-color: var(--crm-c-page-background);
 }
 .crm-container tr.disabled td *:not(.btn,button,i,a),
-.crm-container td.disabled {
+.crm-container td.disabled,
+.crm-container #extensions-main table tr.disabled td {
   font-style: italic;
 }
-.crm-container tr.disabled td:first-of-type {
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label) {
   display: inline-flex;
 }
 
@@ -514,6 +512,6 @@ dl dl {
 @media (max-width: 991px) {
   .crm-container .crm-flex-box,
   .api4-input /* sections/api4-explorer */ {
-    flex-direction: column;
+    flex-flow: column;
   }
 }

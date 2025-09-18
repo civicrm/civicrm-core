@@ -3,7 +3,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title></title>
 
-  <style type="text/css">
+  <style>
     {literal}
     /* Client-specific Styles */
     #outlook a {padding:0;} /* Force Outlook to provide a "view in browser" menu link. */

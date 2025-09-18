@@ -1,5 +1,5 @@
 <tr>
-  <td><i class="crm-i fa-calculator"></i></td>
+  <td><i class="crm-i fa-calculator" role="img" aria-hidden="true"></i></td>
   <td ng-repeat="col in $ctrl.settings.columns" class="crm-search-batch-tally-total {{ $ctrl.getTallyClass(col) }}">
     <label ng-if="col.tally.label">{{:: col.tally.label }}</label>
     <span ng-if="col.tally.fn">

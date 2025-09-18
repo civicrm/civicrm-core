@@ -24,7 +24,7 @@
               {/if}
             </td>
           {else}
-            <td class="label">{$form.$htmlField.label}&nbsp;{if $htmlField eq 'acl_financial_type'}{help id="$htmlField"}{/if}</td>
+            <td class="label">{$form.$htmlField.label}&nbsp;{if $htmlField eq 'acl_financial_type'}{help id="$htmlField" title=$form.$htmlField.textLabel}{/if}</td>
             <td>
               {$form.$htmlField.html}
               {if $fieldSpec.description}

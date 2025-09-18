@@ -500,6 +500,10 @@ class CRM_Utils_Weight {
       CRM_Core_DAO::executeQuery($query, $params);
     }
 
+    // This function is on its way out because the civicrm_admin_ui extension is replacing legacy screens that use it,
+    // but some sortable items like Custom Fields get cached in metadata so let's clear that now:
+    Civi::cache('metadata')->clear();
+
     self::fixOrderOutput($url);
   }
 

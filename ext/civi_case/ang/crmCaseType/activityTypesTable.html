@@ -15,10 +15,10 @@ Required vars: caseType
   <tbody ui-sortable ng-model="caseType.definition.activityTypes">
   <tr ng-repeat="activityType in caseType.definition.activityTypes">
     <td>
-      <i class="crm-i fa-arrows grip-n-drag" aria-hidden="true"></i>
+      <i class="crm-i fa-arrows grip-n-drag" role="img" aria-hidden="true"></i>
     </td>
     <td>
-      <i class="crm-i {{ activityTypes[activityType.name].icon }}" aria-hidden="true"></i>
+      <i class="crm-i {{ activityTypes[activityType.name].icon }}" role="img" aria-hidden="true"></i>
       {{ activityTypes[activityType.name].label }}
     </td>
     <td>

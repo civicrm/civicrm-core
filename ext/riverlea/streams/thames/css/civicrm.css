@@ -1,8 +1,3 @@
-@import url(../../../core/css/_base.css); /* resets and civi wide styles */
-@import url(../../../core/css/_cms.css); /* CMS-specific hacks/workarounds */
-@import url(../../../core/css/_core.css); /* components and utility classes */
-@import url(../../../core/css/_fixes.css); /* deprecated-Civi handling, hacks/workarounds. one day this will go. */
-
 /* Only affect body colour in standalone */
 html.cms-standalone body {
   background-color: var(--crm-c-page-background);
@@ -495,9 +490,7 @@ html.crm-standalone  nav.breadcrumb>ol {
   border-radius: 1rem;
   animation: thames-spinner 1s infinite;
 }
-.fa-spin {
-  animation: none; /* placing animation on an odd-shaped item is a PITA for getting it 100% centred. */
-}
+
 /* Spinner for notifications .status-start notifications e.g. loading/saving. */
 .crm-status-box-outer.status-start .crm-status-box-inner {
   /* Allow space for spinner.*/

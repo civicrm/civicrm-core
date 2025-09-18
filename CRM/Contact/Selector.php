@@ -310,7 +310,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           }
           elseif ($value['key'] === 'note') {
             $url = 'civicrm/note';
-            $qs = "reset=1&action=add&entity_table=civicrm_contact&entity_id='%%id%%{$extraParams}";
+            $qs = "reset=1&action=add&entity_table=civicrm_contact&entity_id=%%id%%{$extraParams}";
           }
 
           self::$_links[$counter++] = [

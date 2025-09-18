@@ -8,7 +8,7 @@
   <ul class="dropdown-menu" ng-if=":: row.openDisplayMenu">
     <li ng-repeat="display_name in row.data.display_name" ng-class="{disabled: row.data.display_acl_bypass[$index]}" title="{{:: row.data.display_acl_bypass[$index] ? ts('Display has permissions disabled') : ts('View display') }}">
       <a ng-href="{{:: row.data.display_acl_bypass[$index] ? '' : $ctrl.searchDisplayPath + '#/display/' + row.data.name + '/' + display_name }}" target="_blank">
-        <i class="crm-i {{:: row.data.display_icon[$index] }}"></i>
+        <i class="crm-i {{:: row.data.display_icon[$index] }}" role="img" aria-hidden="true"></i>
         {{:: row.data.display_label[$index] }}
       </a>
     </li>

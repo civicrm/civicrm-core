@@ -59,7 +59,6 @@
   color: var(--crm-tab-col);
   padding: var(--crm-tab-padding);
   font-weight: var(--crm-tab-weight);
-  font-family: var(--crm-tab-font);
   font-size: var(--crm-font-size);
   line-height: var(--crm-r1);
   text-decoration: none;
@@ -146,6 +145,7 @@
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li {
   background: var(--crm-dash-tab-bg);
   margin: var(--crm-dash-tab-hang);
+  word-break: break-word;
 }
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li .ui-tabs-anchor {
   display: grid;

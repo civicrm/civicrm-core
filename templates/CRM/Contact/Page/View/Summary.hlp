@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-next-prev-buttons-title"}
-  {ts}Navigation{/ts}
-{/htxt}
 {htxt id="id-next-prev-buttons"}
   {ts}Next/Previous buttons are not available for searches which are sorted by email, phone or address fields.{/ts}
 {/htxt}

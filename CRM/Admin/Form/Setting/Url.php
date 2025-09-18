@@ -21,26 +21,6 @@
 class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
 
   /**
-   * Subset of settings on the page as defined using the legacy method.
-   *
-   * @var array
-   *
-   * @deprecated - do not add new settings here - the page to display
-   * settings on should be defined in the setting metadata.
-   */
-  protected $_settings = [
-    // @todo remove these, define any not yet defined in the setting metadata.
-    'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'defaultExternUrl' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'enableSSL' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'verifySSL' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'userFrameworkResourceURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
-    'imageUploadURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
-    'customCSSURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
-    'extensionsURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
-  ];
-
-  /**
    * Build the form object.
    */
   public function buildQuickForm() {

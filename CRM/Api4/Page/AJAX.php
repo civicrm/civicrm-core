@@ -192,7 +192,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
   private function returnJSON(array $response): void {
     http_response_code($this->httpResponseCode);
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-    echo json_encode($response);
+    echo json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     CRM_Utils_System::civiExit();
   }
 

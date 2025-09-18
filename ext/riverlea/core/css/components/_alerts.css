@@ -90,7 +90,6 @@
   line-height: 1;
   color: var(--crm-c-darkest) !important;
   text-shadow: 0 1px 0 #fff;
-  font-family: var(--crm-font-bold);
   font-weight: bold;
   opacity: .2;
 }

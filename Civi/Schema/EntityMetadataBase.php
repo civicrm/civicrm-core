@@ -31,19 +31,8 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     return EntityRepository::getEntity($this->entityName);
   }
 
-  public function getField(string $fieldName): ?array {
-    $field = $this->getFields()[$fieldName] ?? NULL;
-    // If not a core field, may be a custom field
-    if (!$field && str_contains($fieldName, '.')) {
-      [$customGroupName] = explode('.', $fieldName);
-      // Include disabled custom fields so that getOptions handles them consistently
-      $field = $this->getCustomFields(['name' => $customGroupName, 'is_active' => NULL])[$fieldName] ?? NULL;
-    }
-    return $field;
-  }
-
   public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL, bool $isView = FALSE): ?array {
-    $field = $this->getField($fieldName);
+    $field = \Civi::entity($this->entityName)->getField($fieldName);
     $options = NULL;
     $hookParams = [
       'entity' => $this->entityName,

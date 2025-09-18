@@ -18,7 +18,6 @@
   background-color: var(--crm-table-header-bg);
   border-bottom: var(--crm-table-header-bottom);
   color: var(--crm-table-header-col);
-  font-family: var(--crm-font-bold);
   font-weight: bold;
   padding: var(--crm-table-padding);
   text-align: left;

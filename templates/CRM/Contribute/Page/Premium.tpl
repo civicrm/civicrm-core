@@ -43,7 +43,7 @@
     </div>
     {if $products}
       <div class="action-link">
-        <a href="{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Offer Another Premium on this Contribution Page{/ts}</a>
+        <a href="{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Offer Another Premium on this Contribution Page{/ts}</a>
       </div>
     {/if}
 </div>

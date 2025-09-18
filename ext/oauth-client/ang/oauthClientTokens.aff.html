@@ -23,7 +23,7 @@
       <div class="btn-group">
         <a class="btn btn-default"
            ng-if="token.access_token"
-           ng-href="{{crmUrl('civicrm/admin/oauth-jwt-debug#!/', {id: token.id})}}"
+           ng-href="{{crmUrl('civicrm/admin/oauth-jwt-debug')}}#?id={{token.id|encodeURIComponent}}"
            target="_blank"
         >{{ts('Inspect')}}</a>
 

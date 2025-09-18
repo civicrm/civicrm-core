@@ -7,17 +7,12 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='id-description-title'}
-  {ts}Help Description{/ts}
-{/htxt}
-{htxt id='id-description'}
+{htxt id='description'}
   {ts}Explanatory text for profile.{/ts}
 {/htxt}
 
-{htxt id='id-used_for-title'}
-  {ts}Expose To{/ts}
-{/htxt}
-{htxt id='id-used_for'}
+
+{htxt id='uf_group_type'}
 {ts}Profiles can be used in many different ways (and a single profile can be used in multiple contexts){/ts}:<br />
     <ul class="left-alignment">
     <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Exposed To" checkboxes.{/ts}</li>
@@ -31,94 +26,67 @@
     {docURL page="user/organising-your-data/profiles/"}
 {/htxt}
 
-{htxt id='id-used_for_extra-title'}
-  {ts}Used in Forms{/ts}
-{/htxt}
-{htxt id='id-used_for_extra'}
+
+{htxt id='used-for-extra'}
   <p>{ts}Other forms or extensions that use this profile. When possible, it also lists the ID of that form.{/ts}</p>
 {/htxt}
 
-{htxt id='id-profile_weight-title'}
-  {ts}Weight{/ts}
-{/htxt}
-{htxt id='id-profile_weight'}
+{htxt id='weight'}
 {ts}Weight controls the order in which profiles are presented when more than one profile is included in User Registration or My Account screens. Enter a positive or negative integer - lower numbers are displayed ahead of higher numbers.{/ts}
 {/htxt}
 
-{htxt id='id-help_pre-title'}
-  {ts}Help Pre-Form{/ts}
-{/htxt}
-{htxt id='id-help_pre'}
+
+{htxt id='help_pre'}
 {ts}Explanatory text displayed at the beginning of the form.{/ts}{ts}Note that this help text is displayed on profile create/edit screens only.{/ts}
 {/htxt}
 
-{htxt id='id-help_post-title'}
-  {ts}Help Post-Form{/ts}
-{/htxt}
-{htxt id='id-help_post'}
+
+{htxt id='help_post'}
 {ts}Explanatory text displayed at the end of the form.{/ts}{ts}Note that this help text is displayed on profile create/edit screens only.{/ts}
 {/htxt}
 
-{htxt id='id-limit_group-title'}
-  {ts}Limit Group{/ts}
-{/htxt}
-{htxt id='id-limit_group'}
+
+{htxt id='group'}
 {ts}Select a group if you are using this profile for search and listings, AND you want to limit the listings to members of a specific group.{/ts}
 {/htxt}
 
-{htxt id='id-add_group-title'}
-  {ts}Add to Group{/ts}
-{/htxt}
-{htxt id='id-add_group'}
+
+{htxt id='add_contact_to_group'}
 {ts}Select a group if you want contacts to be automatically added to that group when the profile is submitted.{/ts}
 {/htxt}
 
-{htxt id='id-notify_email-title'}
-  {ts}Notify Email{/ts}
-{/htxt}
-{htxt id='id-notify_email'}
+
+{htxt id='notify'}
 {ts}If you want member(s) of your organization to receive a notification email whenever this Profile form is used to enter or update contact information, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org). The first email address listed will be used as the FROM address in the notifications.{/ts}
 {/htxt}
 
-{htxt id='id-post_url-title'}
-  {ts}Redirect{/ts}
-{/htxt}
-{htxt id='id-post_url'}
+
+{htxt id='post_url'}
 {ts}If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL after they've submitted the form, you can also use contact tokens in URL - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed with a generic status message - 'Your contact information has been saved.'{/ts}
 {/htxt}
 
-{htxt id='id-add_cancel_button-title'}
-  {ts}Add Cancel Button{/ts}
-{/htxt}
-{htxt id='id-add_cancel_button'}
+
+{htxt id='add_cancel_button'}
 {ts}Enable/Disable this checkbox to add/remove cancel button on the profile form.{/ts}
 {/htxt}
 
-{htxt id='id-cancel_url-title'}
-  {ts}Cancel Redirect{/ts}
-{/htxt}
-{htxt id='id-cancel_url'}
+
+{htxt id='cancel_url'}
 {ts}If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL if they click the Cancel button - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed.{/ts}
 {/htxt}
 
-{htxt id='id-cancel_button_text-title'}
-  {ts}Cancel Button Text{/ts}
-{/htxt}
-{htxt id='id-cancel_button_text'}
+
+{htxt id='cancel_button_text'}
   {ts}Override the default button text for the cancel button for this profile{/ts}
 {/htxt}
 
-{htxt id='id-submit_button_text-title'}
-  {ts}Submit Button Text{/ts}
-{/htxt}
-{htxt id='id-submit_button_text'}
+
+{htxt id='submit_button_text'}
   {ts}Override the default button text for the submit button for this profile{/ts}
 {/htxt}
 
-{htxt id='id-add_captcha-title'}
-  {ts}reCaptcha{/ts}
-{/htxt}
-{htxt id='id-add_captcha'}
+
+{htxt id='add_captcha'}
 {capture assign="miscURL"}href="{crmURL p="civicrm/admin/setting/recaptcha" q="reset=1"}"{/capture}
 <p>{ts}When reCAPTCHA is enabled for a profile form, anonymous users are required to read an image with letters and numbers and enter the value in a field. This helps prevent abuse by automated scripts.{/ts}</p>
 <p>{ts 1="href='https://www.google.com/recaptcha' target='_blank'" 2=$miscURL}To use reCAPTCHA you must sign up at <a %1>Google's reCaptcha site</a> to get your public and private keys. Then enter both keys in <a %2>Administer CiviCRM &raquo; System Settings &raquo; reCAPTCHA settings</a>.{/ts}</p>
@@ -128,10 +96,8 @@
 {/if}
 {/htxt}
 
-{htxt id='id-is_cms_user-title'}
-  {ts}Account Creation{/ts}
-{/htxt}
-{htxt id='id-is_cms_user'}
+
+{htxt id='is_cms_user'}
 {ts 1=$config->userFramework}If you are using this profile as a contact signup form, using it in an online contribution page OR an event registration page, anonymous users will be given the option to create a %1 User Account as part of completing the form.{/ts}
 {if $config->userSystem->is_drupal EQ '1'}
     {ts}This feature requires your Drupal User Settings to allow 'visitors to create accounts' (with or without administrator approval). The 'Email Verification' option may be enabled or disabled.{/ts}
@@ -142,10 +108,8 @@
  {ts}In addition, you must include a Primary Email Address field in the profile.{/ts}
 {/htxt}
 
-{htxt id='id-is_update_dupe-title'}
-  {ts}Duplicate Matching{/ts}
-{/htxt}
-{htxt id='id-is_update_dupe'}
+
+{htxt id='is_update_dupe'}
   <p>{ts}If you are using the profile as a contact signup and editing form, this option controls what happens if the data matches an existing contact record.{/ts}</p>
   <ul>
     <li>{ts}<strong>No duplicate checking:</strong> saves the data as a new contact, without comparing them to existing contact records for possible duplicates.{/ts}</li>
@@ -155,31 +119,23 @@
   <p>{ts}This setting is ignored if the profile is part of an online contribution form, membership signup or event registration form. In this case a contact match always results in the transaction being linked to the matching contact using the default unsupervised rule.</p>{/ts}
 {/htxt}
 
-{htxt id='id-is_map-title'}
-  {ts}Map Link{/ts}
-{/htxt}
-{htxt id='id-is_map'}
+
+{htxt id='is_map'}
   {ts}If enabled, a Map link is included on the profile listings rows and detail screens for any contacts whose records include sufficient location data for your mapping provider.{/ts}
 {/htxt}
 
-{htxt id='id-is_edit_link-title'}
-  {ts}Edit Link{/ts}
-{/htxt}
-{htxt id='id-is_edit_link'}
+
+{htxt id='is_edit_link'}
   {ts}Check this box if you want to include a link in the listings to Edit profile fields. Only users with permission to edit the contact will see this link.{/ts}
 {/htxt}
 
-{htxt id='id-is_uf_link-title'}
-  {ts}User Link{/ts}
-{/htxt}
-{htxt id='id-is_uf_link'}
+
+{htxt id='is_uf_link'}
   {ts 1=$config->userFramework}Check this box if you want to include a link in the listings to view contacts' %1 user account information (e.g. their 'My Account' page). This link will only be included for contacts who have a user account on your website.{/ts}
 {/htxt}
 
-{htxt id='id-is_proximity_search-title'}
-  {ts}Proximity Search{/ts}
-{/htxt}
-{htxt id='id-is_proximity_search'}
+
+{htxt id='is_proximity_search'}
 <p>
   {ts}If you are using this profile as a search form, you can choose to include proximity searching. When enabled, a proximity search block will be added to the search criteria. This block will contain fields to set the proximity start address, and a field to set a 'Radius' (distance from that address).{/ts}
 </p>

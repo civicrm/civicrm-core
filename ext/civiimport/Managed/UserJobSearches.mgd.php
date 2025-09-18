@@ -27,6 +27,8 @@ return [
             'end_date',
             'status_id:label',
             'job_type:label',
+            'UserJob_SearchDisplay_search_display_id_01.name',
+            'UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.name',
           ],
           'orderBy' => [],
           'where' => [
@@ -47,7 +49,26 @@ return [
             ],
           ],
           'groupBy' => [],
-          'join' => [],
+          'join' => [
+            [
+              'SearchDisplay AS UserJob_SearchDisplay_search_display_id_01',
+              'LEFT',
+              [
+                'search_display_id',
+                '=',
+                'UserJob_SearchDisplay_search_display_id_01.id',
+              ],
+            ],
+            [
+              'SavedSearch AS UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01',
+              'LEFT',
+              [
+                'UserJob_SearchDisplay_search_display_id_01.saved_search_id',
+                '=',
+                'UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.id',
+              ],
+            ],
+          ],
           'having' => [],
         ],
         'expires_date' => NULL,
@@ -136,56 +157,61 @@ return [
                   ],
                 ],
                 [
-                  'size' => 'btn-xs',
-                  'links' => [
+                  'path' => 'civicrm/import_mapping?id=[id]',
+                  'icon' => '',
+                  'text' => E::ts('Continue'),
+                  'style' => 'default',
+                  'conditions' => [
                     [
-                      'entity' => 'UserJob',
-                      'action' => 'view',
-                      'join' => '',
-                      'target' => 'crm-popup',
-                      'icon' => '',
-                      'text' => E::ts('View User Job'),
-                      'style' => 'default',
-                      'path' => '',
-                      'task' => '',
-                      'conditions' => [
-                        [
-                          'status_id:name',
-                          '!=',
-                          'draft',
-                        ],
+                      'status_id:name',
+                      'IN',
+                      [
+                        'draft',
+                        'complete_with_errors',
+                        'incomplete',
                       ],
                     ],
                     [
-                      'path' => 'civicrm/import_mapping?id=[id]',
-                      'icon' => 'fa-external-link',
-                      'text' => E::ts('Continue'),
-                      'style' => 'default',
-                      'conditions' => [
-                        [
-                          'status_id:name',
-                          'IN',
-                          [
-                            'draft',
-                            'complete_with_errors',
-                            'incomplete',
-                          ],
-                        ],
-                        [
-                          'job_type:name',
-                          '!=',
-                          'contact_import',
-                        ],
+                      'job_type:name',
+                      'NOT IN',
+                      [
+                        'contact_import',
+                        'search_batch_import',
                       ],
-                      'task' => '',
-                      'entity' => '',
-                      'action' => '',
-                      'join' => '',
-                      'target' => '',
                     ],
                   ],
-                  'type' => 'buttons',
-                  'alignment' => 'text-right',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                ],
+                [
+                  'path' => 'civicrm/search#/display/[UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.name]/[UserJob_SearchDisplay_search_display_id_01.name]?batch=[id]',
+                  'icon' => '',
+                  'text' => E::ts('Continue'),
+                  'style' => 'default',
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      'IN',
+                      [
+                        'draft',
+                        'complete_with_errors',
+                        'incomplete',
+                      ],
+                    ],
+                    [
+                      'job_type:name',
+                      '=',
+                      'search_batch_import',
+                    ],
+                  ],
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
                 ],
               ],
               'type' => 'buttons',
@@ -375,6 +401,8 @@ return [
             'end_date',
             'expires_date',
             'status_id:label',
+            'UserJob_SearchDisplay_search_display_id_01.name',
+            'UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.name',
           ],
           'orderBy' => [],
           'where' => [
@@ -390,7 +418,26 @@ return [
             ],
           ],
           'groupBy' => [],
-          'join' => [],
+          'join' => [
+            [
+              'SearchDisplay AS UserJob_SearchDisplay_search_display_id_01',
+              'LEFT',
+              [
+                'search_display_id',
+                '=',
+                'UserJob_SearchDisplay_search_display_id_01.id',
+              ],
+            ],
+            [
+              'SavedSearch AS UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01',
+              'LEFT',
+              [
+                'UserJob_SearchDisplay_search_display_id_01.saved_search_id',
+                '=',
+                'UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.id',
+              ],
+            ],
+          ],
           'having' => [],
         ],
         'expires_date' => NULL,
@@ -493,7 +540,7 @@ return [
                 ],
                 [
                   'path' => 'civicrm/import_mapping?id=[id]',
-                  'icon' => 'fa-external-link',
+                  'icon' => '',
                   'text' => E::ts('Continue'),
                   'style' => 'default',
                   'conditions' => [
@@ -508,8 +555,38 @@ return [
                     ],
                     [
                       'job_type:name',
-                      '!=',
-                      'contact_import',
+                      'NOT IN',
+                      [
+                        'contact_import',
+                        'search_batch_import',
+                      ],
+                    ],
+                  ],
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                ],
+                [
+                  'path' => 'civicrm/search#/display/[UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.name]/[UserJob_SearchDisplay_search_display_id_01.name]?batch=[id]',
+                  'icon' => '',
+                  'text' => E::ts('Continue'),
+                  'style' => 'default',
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      'IN',
+                      [
+                        'draft',
+                        'complete_with_errors',
+                        'incomplete',
+                      ],
+                    ],
+                    [
+                      'job_type:name',
+                      '=',
+                      'search_batch_import',
                     ],
                   ],
                   'task' => '',

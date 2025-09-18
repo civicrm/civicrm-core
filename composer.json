@@ -59,7 +59,7 @@
     "ext-xml": "*",
     "composer-runtime-api": "~2.0",
     "dompdf/dompdf": "~2.0.4|| ~3.0",
-    "firebase/php-jwt": ">=3 <7",
+    "firebase/php-jwt": ">=6.0 <7",
     "rubobaquero/phpquery": "^0.9.15",
     "symfony/config": "~4.4 || ~5.4 || ~6.0 || ~7.0",
     "symfony/polyfill-iconv": "~1.0",

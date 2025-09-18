@@ -41,7 +41,9 @@ details.af-collapsible > .af-title::before,
 .crm-container .crm-collapsible .collapsible-title::before,
 .crm-container a.crm-expand-row:not(.expanded)::before,
 .crm-container .civicrm-community-messages .crm-collapsible .collapsible-title::before,
-.crm-container .show-children.collapsed::before {
+.crm-container .show-children.collapsed::before,
+/* For jQuery ui collapsible tabs in CiviReport */
+.crm-container .ui-tabs-collapsible > ul.ui-tabs-nav::before {
   font-size: var(--crm-font-size);
   font-style: normal;
   text-rendering: auto;
@@ -61,7 +63,8 @@ details.af-collapsible.af-collapsed > .af-title::before,
 .crm-container a.collapsed:not(.expanded)::before,
 .crm-container a.crm-expand-row::before,
 .crm-container .crm-collapsible.collapsed .collapsible-title::before,
-.crm-container .civicrm-community-messages .crm-collapsible.collapsed .collapsible-title::before {
+.crm-container .civicrm-community-messages .crm-collapsible.collapsed .collapsible-title::before,
+.crm-container .ui-tabs-collapsible > ul.ui-tabs-nav::before {
   transform: none;
   transform-origin: center center;
   transition: var(--crm-expand-transition);
@@ -75,7 +78,8 @@ details.af-collapsible[open] > .af-title::before,
 .crm-container a.expanded::before,
 .crm-container a.crm-expand-row.expanded::before,
 .crm-container .civicrm-community-messages .crm-collapsible .collapsible-title::before,
-.crm-container .show-children.expanded::before {
+.crm-container .show-children.expanded::before,
+.crm-container .ui-tabs-collapsible > ul.ui-tabs-nav:has(li.ui-tabs-active)::before {
   content: var(--crm-expand-icon);
   transform: var(--crm-expand-transform);
   transform-origin: center center;
@@ -124,7 +128,6 @@ a.crm-expand-row:focus {
   background-color: var(--crm-expand-header-bg-active);
 }
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header {
-  font-family: var(--crm-expand2-header-font);
   font-weight: var(--crm-expand2-header-weight);
   background-color: var(--crm-expand2-header-bg);
   color: var(--crm-expand2-header-color);
@@ -432,8 +435,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   top: 0;;
 }
 .crm-container .tag-tree-wrapper div.tag-info .tdl {
-  font-weight: var(--crm-bold-weight);
-  font-family: var(--crm-font-bold);
+  font-weight: bold;
   color: var(--crm-c-text);
 }
 .crm-container .tag-tree-wrapper div.tag-info .crm-submit-buttons {
@@ -551,8 +553,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   color: inherit;
 }
 #api-generated caption {
-  font-weight: var(--crm-bold-weight);
-  font-family: var(--crm-font-bold);
+  font-weight: bold;
 }
 #api-generated tr td:first-of-type {
   width: var(--crm-input-label-width);

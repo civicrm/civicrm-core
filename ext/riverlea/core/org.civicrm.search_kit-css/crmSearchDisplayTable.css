@@ -18,22 +18,15 @@ table.crm-sticky-header > thead > tr {
 }
 .crm-search-display.crm-search-display-table tfoot > tr > td {
   font-weight: bold;
-  font-family: var(--crm-font-bold);
 }
 
 /* Afform tables */
-.crm-container td.crm-search-col-type-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--crm-s);
+#bootstrap-theme td.crm-search-col-type-buttons {
+  padding: var(--crm-table-padding) calc(var(--crm-table-padding) - var(--crm-s)) calc(var(--crm-table-padding) - var(--crm-s)) var(--crm-table-padding);
+  --crm-btn-margin: 0 var(--crm-s) var(--crm-s) 0;
 }
-.crm-container td.crm-search-col-type-buttons:has(span:only-child),
-.crm-container td.crm-search-col-type-buttons:has(> .btn:only-child) {
-  /* when button column has only one button, turn cell back to table cell to vertically center */
-  display: table-cell;
-}
-td.crm-search-col-type-buttons.text-right {
-  justify-content: end;
+#bootstrap-theme td:is(.crm-search-col-type-buttons,.crm-search-col-type-menu) {
+  width: 1px; /* shrinks cell to width of button/menu */
 }
 #bootstrap-theme th.crm-search-result-select button.btn {
   background: transparent;
@@ -53,4 +46,68 @@ td.crm-search-col-type-buttons.text-right {
 .crm-search-display-table table {
   border: var(--crm-table-outside-border);
   box-shadow: var(--crm-block-shadow);
+}
+
+/* Nested styling for hierarchical rows */
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-row {
+  position: relative;
+}
+#bootstrap-theme .crm-search-display-table crm-search-display-toggle-collapse {
+  position: relative;
+  z-index: 1;
+}
+
+/* Depth >= 1 */
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-child:first-child:not(.crm-search-ctrl-column), #bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-child {
+  padding-left: 2.5rem;
+}
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-child:first-child:not(.crm-search-ctrl-column):before,
+#bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-child:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  width: 1rem;
+  height: 50%;
+  border-bottom: 2px dotted currentColor;
+  border-left: 2px dotted currentColor;
+}
+#bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-1 crm-search-display-toggle-collapse {
+  left: 1.5rem;
+}
+/* Depth = 2 */
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-2:first-child:not(.crm-search-ctrl-column),
+#bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-2 {
+  padding-left: 4rem;
+}
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-2:first-child:not(.crm-search-ctrl-column):before,
+#bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-2:before {
+  left: 2.5rem;
+}
+#bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-2 crm-search-display-toggle-collapse {
+  left: 3rem;
+}
+/* Depth = 3 */
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-3:first-child:not(.crm-search-ctrl-column),
+#bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-3 {
+  padding-left: 5.5rem;
+}
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-3:first-child:not(.crm-search-ctrl-column):before,
+#bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-3:before {
+  left: 4rem;
+}
+#bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-3 crm-search-display-toggle-collapse {
+  left: 4.5rem;
+}
+/* Depth = 4 */
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-4:first-child:not(.crm-search-ctrl-column),
+#bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-4 {
+  padding-left: 7rem;
+}
+#bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-4:first-child:not(.crm-search-ctrl-column):before,
+#bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-4:before {
+  left: 5.5rem;
+}
+#bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-4 crm-search-display-toggle-collapse {
+  left: 6rem;
 }

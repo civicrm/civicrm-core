@@ -34,7 +34,7 @@
         {if $paymentProcessor}
          <table id="paymentProcessor" class="form-layout">
              <tr class="crm-event-manage-fee-form-block-payment_processor">
-                <td class="label">{$form.payment_processor.label} {help id="id-payment_processor"}</td>
+                <td class="label">{$form.payment_processor.label} {help id="payment_processor"}</td>
               <td>{$form.payment_processor.html}</td>
              </tr>
          </table>
@@ -53,7 +53,7 @@
                 <table id="payLaterOptions" class="form-layout">
                     <tr class="crm-event-manage-fee-form-block-pay_later_text">
                        <td class="label">{$form.pay_later_text.label}
-                         <span class="crm-marker"> *</span> {help id="id-pay-later-text"}</td>
+                         <span class="crm-marker"> *</span> {help id="pay_later_text"}</td>
                        <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='pay_later_text' id=$id}{/if}
                          {$form.pay_later_text.html|crmAddClass:big}
                        </td>
@@ -65,7 +65,7 @@
                        </td>
                     </tr>
                     <tr>
-                       <td class="label">{$form.is_billing_required.label} {help id="id-is_billing_required"}</td>
+                       <td class="label">{$form.is_billing_required.label} {help id="is_billing_required"}</td>
                        <td>{$form.is_billing_required.html}</td>
                     </tr>
                 </table>
@@ -81,7 +81,7 @@
                </td>
             </tr>
             <tr class="crm-event-manage-fee-form-block-financial_type_id">
-               <td class="label">{$form.financial_type_id.label}<span class="crm-marker"> *</span> {help id="id-financial_type_id"}</td>
+               <td class="label">{$form.financial_type_id.label}<span class="crm-marker"> *</span> {help id="financial_type_id"}</td>
                <td>{$form.financial_type_id.html}</td>
             </tr>
         </table>
@@ -118,7 +118,7 @@
          <table class="form-layout">
              <tr class="crm-event-manage-fee-form-block-is_discount">
                 <td class="label">{$form.is_discount.label}</td>
-                <td>{$form.is_discount.html} {help id="id-is-discount"}</td>
+                <td>{$form.is_discount.html} {help id="is_discount"}</td>
              </tr>
          </table>
     </div>
@@ -145,7 +145,7 @@
     {/section}
     </table>
         <div id="discountLink" class="add-remove-link">
-           <a onclick="showHideDiscountRow( 'discount', true);return false;" id="discountLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another discount set{/ts}</a>
+           <a onclick="showHideDiscountRow( 'discount', true);return false;" id="discountLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" role="img" aria-hidden="true"></i> {ts}another discount set{/ts}</a>
         </div>
         {$form._qf_Fee_submit.html}
 

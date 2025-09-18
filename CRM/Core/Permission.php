@@ -1410,6 +1410,11 @@ class CRM_Core_Permission {
         'access CiviCRM',
         ['access CiviMail', 'schedule mailings'],
       ],
+      'gettokens' => [
+        'access CiviCRM',
+        [...$civiMailBasePerms, 'edit message templates'],
+        // FIXME: When there's an API that provides tokens for a MessageTemplate, these permissions can be re-tightened.
+      ],
       'default' => [
         'access CiviCRM',
         $civiMailBasePerms,

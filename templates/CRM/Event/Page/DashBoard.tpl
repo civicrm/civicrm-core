@@ -12,8 +12,8 @@
 {capture assign=configPagesURL}{crmURL p="civicrm/event/manage" q="reset=1"}{/capture}
 
 {if $eventSummary.total_events}
-    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list" aria-hidden="true"></i> {ts}Manage Events{/ts}</span></a>
-    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o" aria-hidden="true"></i> {ts}New Event{/ts}</span></a>
+    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list" role="img" aria-hidden="true"></i> {ts}Manage Events{/ts}</span></a>
+    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o" role="img" aria-hidden="true"></i> {ts}New Event{/ts}</span></a>
     <div class="clear">&nbsp;</div>
     <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
       {help id="id-event-intro"}
@@ -89,7 +89,7 @@
       {if $actionColumn}
         <td class="crm-event-isMap">
           {if $values.isMap}
-            <a href="{$values.isMap}" title="{ts escape='htmlattribute'}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
+            <a href="{$values.isMap}" title="{ts escape='htmlattribute'}Map event location{/ts}"><i class="crm-i fa-map-marker" role="img" aria-hidden="true"></i> {ts}Map{/ts}</a>
             &nbsp;|&nbsp;
           {/if}
           {if $values.configure}
@@ -120,7 +120,7 @@
     </tbody>
     </table>
     {if $eventSummary.total_events GT 10}
-     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Browse more events{/ts}...</a></div>
+     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Browse more events{/ts}...</a></div>
     {/if}
 {else}
     <br />

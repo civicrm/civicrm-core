@@ -90,7 +90,7 @@
       this.refreshAfterTask = function(result, ids) {
         displayCtrl.selectedRows = [];
         displayCtrl.allRowsSelected = false;
-        if (ids && result.action === 'inlineEdit' && ids.length === 1) {
+        if (result && ids && result.action === 'inlineEdit' && ids.length === 1) {
           displayCtrl.refreshAfterEditing(result, ids[0]);
         }
         else {

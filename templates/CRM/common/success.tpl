@@ -17,7 +17,7 @@
       <form method="post">
         {if $preUpgradeMessage}
           <div class="crm-success-flex">
-            <div><i class="crm-i fa-warning"></i></span></div>
+            <div><i class="crm-i fa-warning" role="img" aria-hidden="true"></i></span></div>
             <div class="crm-upgrade-large-text"><strong>{ts}Warning{/ts}</strong></div>
           </div>
           {$preUpgradeMessage}
@@ -28,7 +28,7 @@
         <input type="hidden" name="action" value="begin" />
         <div class="crm-submit-buttons">
           <button type="submit" class="crm-button crm-form-submit"  name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" >
-            <i class="crm-i fa-rocket" aria-hidden="true"></i>
+            <i class="crm-i fa-rocket" role="img" aria-hidden="true"></i>
             {ts}Upgrade Now{/ts}
           </button>
         </div>
@@ -41,7 +41,7 @@
          <p class="crm-upgrade-large-text">{ts 1=$newVersion}Thank you for upgrading to %1.{/ts}</p>
          <p class="crm-upgrade-large-text">{ts 1="href='https://civicrm.org/core-team' target='_blank'" 2="href='https://civicrm.org/contributors' target='_blank'" 3="href='https://civicrm.org/civicrm/contribute/transact?reset=1&id=47&src=ug' target='_blank'"}This release was made possible by the <a %1>CiviCRM Core Team</a> and an <a %2>incredible group of CiviCRM Contributors</a>. We are committed to keeping CiviCRM free and open, forever. We depend on your support to help make that happen. <a %3>Support us by making a small donation today</a>.{/ts}</p>
         <div class="crm-success-flex">
-          <div style="margin: 0 10px;"><i class="crm-i fa-check" aria-hidden="true"></i></div>
+          <div style="margin: 0 10px;"><i class="crm-i fa-check" role="img" aria-hidden="true"></i></div>
           <div>{$message}</div>
         </div>
         <div>

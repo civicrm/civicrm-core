@@ -32,6 +32,7 @@ require_once 'HTML/QuickForm/Action/Direct.php';
  * Class CRM_Core_Controller
  */
 class CRM_Core_Controller extends HTML_QuickForm_Controller {
+  use CRM_Core_SmartyPageTrait;
 
   /**
    * The title associated with this controller.
@@ -105,13 +106,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @var string
    */
   public $_QFResponseType = 'html';
-
-  /**
-   * Cache the smarty template for efficiency reasons.
-   *
-   * @var CRM_Core_Smarty
-   */
-  static protected $_template;
 
   /**
    * Cache the session for efficiency reasons.
@@ -577,73 +571,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public function addWizardStyle(&$wizard) {
     $wizard['style'] = [
       'barClass' => '',
-      'stepPrefixCurrent' => '<i class="crm-i fa-chevron-right" aria-hidden="true"></i> ',
-      'stepPrefixPast' => '<i class="crm-i fa-check" aria-hidden="true"></i> ',
+      'stepPrefixCurrent' => '<i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> ',
+      'stepPrefixPast' => '<i class="crm-i fa-check" role="img" aria-hidden="true"></i> ',
       'stepPrefixFuture' => ' ',
       'subStepPrefixCurrent' => '&nbsp;&nbsp;',
       'subStepPrefixPast' => '&nbsp;&nbsp;',
       'subStepPrefixFuture' => '&nbsp;&nbsp;',
       'showTitle' => 1,
     ];
-  }
-
-  /**
-   * Assign value to name in template.
-   *
-   * @param string $var
-   * @param mixed $value
-   *   Value of variable.
-   */
-  public function assign($var, $value = NULL) {
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Assign value to name in template by reference.
-   *
-   * @param string $var
-   * @param mixed $value
-   *   (reference) value of variable.
-   *
-   * @deprecated since 5.72 will be removed around 5.84
-   */
-  public function assign_by_ref($var, &$value) {
-    CRM_Core_Error::deprecatedFunctionWarning('assign');
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Appends values to template variables.
-   *
-   * @param array|string $tpl_var the template variable name(s)
-   * @param mixed $value
-   *   The value to append.
-   * @param bool $merge
-   */
-  public function append($tpl_var, $value = NULL, $merge = FALSE) {
-    self::$_template->append($tpl_var, $value, $merge);
-  }
-
-  /**
-   * Returns an array containing template variables.
-   *
-   * @deprecated since 5.69 will be removed around 5.93. use getTemplateVars.
-   *
-   * @param string $name
-   *
-   * @return array
-   */
-  public function get_template_vars($name = NULL) {
-    return $this->getTemplateVars($name);
-  }
-
-  /**
-   * Get the value/s assigned to the Template Engine (Smarty).
-   *
-   * @param string|null $name
-   */
-  public function getTemplateVars($name = NULL) {
-    return self::$_template->getTemplateVars($name);
   }
 
   /**

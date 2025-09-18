@@ -7,10 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="payment_instrument-title"}
-  {ts}Payment Method{/ts}
-{/htxt}
-{htxt id="payment_instrument"}
+
+{htxt id='payment_instrument_id'}
 <p>
   {ts}If you specify a payment method then this batch will be limited to exporting only transactions paid with that method.{/ts}
 </p>
@@ -19,9 +17,7 @@
 </p>
 {/htxt}
 
-{htxt id="item_count-title"}
-  {ts}Number of Transactions{/ts}
-{/htxt}
+
 {htxt id="item_count"}
 <p>
   {ts}If you know in advance the number of transactions in this batch, you may specify it now.{/ts}
@@ -31,9 +27,7 @@
 </p>
 {/htxt}
 
-{htxt id="total-title"}
-  {ts}Total Amount{/ts}
-{/htxt}
+
 {htxt id="total"}
 <p>
   {ts}If you know in advance the total amount in this batch, you may specify it now.{/ts}

@@ -187,7 +187,7 @@
         {if $includeCancelButton}
           <a class="button cancel" href="{$cancelURL}">
             <span>
-              <i class="crm-i fa-times" aria-hidden="true"></i>
+              <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
               {$cancelButtonText}
             </span>
           </a>

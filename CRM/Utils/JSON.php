@@ -21,6 +21,18 @@
 class CRM_Utils_JSON {
 
   /**
+   * Safely encodes a variable that will be printed inside a `<script>` tag.
+   *
+   * See https://lab.civicrm.org/dev/core/-/issues/6080
+   *
+   * @param mixed $input
+   * @return int|string
+   */
+  public static function encodeScriptVar($input) {
+    return json_encode($input, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  }
+
+  /**
    * Output json to the client.
    * @param mixed $input
    */
@@ -29,7 +41,7 @@ class CRM_Utils_JSON {
       throw new CRM_Core_Exception_PrematureExitException('civiExit called', $input);
     }
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-    echo json_encode($input);
+    echo json_encode($input, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     CRM_Utils_System::civiExit();
   }
 

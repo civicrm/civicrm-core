@@ -32,6 +32,9 @@ class AfformAdminInjector extends AutoSubscriber {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
+   *
+   * This injects static html to render a small admin-only menu at the top corner of each form.
+   * Permissions are checked client-side.
    * @see afCoreDirective.checkLinkPerm
    */
   public static function preprocess($e) {
@@ -41,7 +44,7 @@ class AfformAdminInjector extends AutoSubscriber {
           // Inject gear menu with edit links which will be shown if the user has permission
           $afform = Afform::get(FALSE)
             ->addWhere('module_name', '=', basename($path, '.aff.html'))
-            ->addSelect('name', 'search_displays', 'title', 'created_id')
+            ->addSelect('name', 'search_displays', 'title', 'created_id', 'type', 'create_submission')
             ->execute()->single();
           // Create a link to edit the form, plus all embedded SavedSearches
           $links = [
@@ -53,6 +56,15 @@ class AfformAdminInjector extends AutoSubscriber {
               'created_id' => $afform['created_id'] ?: 'null',
             ],
           ];
+          if ($afform['type'] === 'form' && $afform['create_submission']) {
+            $links[] = [
+              'url' => \CRM_Utils_System::url('civicrm/admin/afform/submissions', NULL, FALSE, "/?name={$afform['name']}", TRUE, FALSE, TRUE),
+              'text' => E::ts('View Submissions'),
+              'icon' => 'fa-list',
+              'permission' => 'manage own afform',
+              'created_id' => $afform['created_id'] ?: 'null',
+            ];
+          }
           if ($afform['search_displays']) {
             $searchNames = [];
             foreach ($afform['search_displays'] as $searchAndDisplayName) {
@@ -80,7 +92,7 @@ class AfformAdminInjector extends AutoSubscriber {
             $linksMarkup .= <<<HTML
               <li ng-if="checkLinkPerm('{$link['permission']}', {$link['created_id']})">
                 <a href="{$link['url']}" target="_blank">
-                  <i class="crm-i fa-fw {$link['icon']}"></i> {$link['text']}
+                  <i class="crm-i fa-fw {$link['icon']}" role="img" aria-hidden="true"></i> {$link['text']}
                 </a>
               </li>
             HTML;
@@ -88,7 +100,7 @@ class AfformAdminInjector extends AutoSubscriber {
           $editMenu = <<<HTML
             <div class="pull-right btn-group af-admin-edit-form-link" ng-if="checkLinkPerm('{$links[0]['permission']}', {$links[0]['created_id']})">
               <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="crm-i fa-gear"></i> <span class="caret"></span><span class="sr-only">{{:: ts('Configure')}}</span>
+                <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> <span class="caret"></span><span class="sr-only">{{:: ts('Configure')}}</span>
               </button>
               <ul class="dropdown-menu">$linksMarkup</ul>
             </div>

@@ -65,6 +65,24 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
+   * Get Url to view user record.
+   *
+   * @param int $contactID
+   *   Contact ID.
+   *
+   * @return string|null
+   */
+  public function getUserRecordUrl($contactID) {
+    if (CRM_Core_Permission::check('cms:administer users')) {
+      $uid = (int) CRM_Core_BAO_UFMatch::getUFId($contactID);
+      if ($uid) {
+        return (string) Civi::url("backend://civicrm/admin/user#User=[uid]")->addVars(compact('uid'));
+      }
+    }
+    return NULL;
+  }
+
+  /**
    * @inheritdoc
    *
    * In Standalone the UF is CiviCRM, so we're never
@@ -645,13 +663,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     }
     else {
       $session_cookie_name = 'SESSCIVISO';
-    }
-    if (ini_get('session.save_handler') === 'redis') {
-      // We'll just use the default, take no action.
-    }
-    else {
-      $session_handler = new SessionHandler();
-      session_set_save_handler($session_handler);
+
+      if (ini_get('session.save_handler') === 'redis') {
+        // We'll just use the default, take no action.
+      }
+      else {
+        $session_handler = new SessionHandler();
+        session_set_save_handler($session_handler);
+      }
     }
 
     // session lifetime in seconds (default = 24 minutes)

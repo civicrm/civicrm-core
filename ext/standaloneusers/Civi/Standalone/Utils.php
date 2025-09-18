@@ -20,17 +20,16 @@ class Utils {
       // remove hide menu
       $item['child'] = array_filter($item['child'], fn ($subitem) => ($subitem['attributes']['name'] !== 'Hide Menu'));
 
-      // add change password
+      // Add My Account.
       $item['child'][] = [
         'attributes' => [
-          'label' => ts('Change Password'),
-          'name' => 'Change Password',
-          'url' => 'civicrm/admin/user/password?reset=1',
-          'icon' => 'crm-i fa-keyboard',
+          'label' => ts('My Account'),
+          'name' => 'My Account',
+          'url' => 'civicrm/my-account',
+          'icon' => 'crm-i fa-user',
           'weight' => 2,
         ],
       ];
-
       return;
 
     }

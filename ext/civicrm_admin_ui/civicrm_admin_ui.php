@@ -1,9 +1,7 @@
 <?php
 
 require_once 'civicrm_admin_ui.civix.php';
-// phpcs:disable
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
-// phpcs:enable
 
 /**
  * Implements hook_civicrm_config().
@@ -81,5 +79,34 @@ function civicrm_admin_ui_civicrm_managed(&$entities, $modules) {
   foreach ($records as $record) {
     $record['module'] = E::LONG_NAME;
     $entities[] = $record;
+  }
+}
+
+function civicrm_admin_ui_civicrm_alterMenu(&$menuItems) {
+  // For SavedSearch_Mailings_Browse
+  unset($menuItems['civicrm/mailing/browse/scheduled'], $menuItems['civicrm/mailing/browse/unscheduled'], $menuItems['civicrm/mailing/browse/archived']);
+}
+
+function civicrm_admin_ui_civicrm_navigationMenu(&$navigationItems) {
+  // For SavedSearch_Mailings_Browse
+  _civicrm_admin_ui_alter_mailing_navigation($navigationItems);
+}
+
+function _civicrm_admin_ui_alter_mailing_navigation(&$navigationItems) {
+  foreach ($navigationItems as &$navigationItem) {
+    if (!empty($navigationItem['attributes']['url'])) {
+      if (str_starts_with($navigationItem['attributes']['url'], 'civicrm/mailing/browse/scheduled')) {
+        $navigationItem['attributes']['url'] = 'civicrm/mailing#?is_archived=0&status=Scheduled,Running,Complete,Paused,Canceled';
+      }
+      if (str_starts_with($navigationItem['attributes']['url'], 'civicrm/mailing/browse/unscheduled')) {
+        $navigationItem['attributes']['url'] = 'civicrm/mailing#?is_archived=0&status=Draft';
+      }
+      if (str_starts_with($navigationItem['attributes']['url'], 'civicrm/mailing/browse/archived')) {
+        $navigationItem['attributes']['url'] = 'civicrm/mailing#?is_archived=1';
+      }
+    }
+    if (!empty($navigationItem['child'])) {
+      _civicrm_admin_ui_alter_mailing_navigation($navigationItem['child']);
+    }
   }
 }

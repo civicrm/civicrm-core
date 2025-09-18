@@ -8,26 +8,19 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign=tokentext}{ts}Find out more about CiviCRM Tokens{/ts}{/capture}
-{htxt id="id-to_email-title"}
-  {ts}To Address{/ts}
-{/htxt}
-{htxt id="id-to_email"}
+
+{htxt id='to'}
 <p>{ts}Contacts in the "To" field will each receive one copy of this email, with any tokens respectively filled for their contact record.{/ts}</p>
 <p>{ts}"To" recipients will not see which other "To" recipients received an email, but they will see the list of "Cc" recipients.{/ts}</p>
 <p>{ts}Any contacts in the "Cc" or "Bcc" fields will receive a copy, one for each "To" email, but with the tokens filled for the "To" contact.{/ts}</p>
 {/htxt}
 
-{htxt id="id-token-subject-title"}
-  {ts}Subject Tokens{/ts}
-{/htxt}
-{htxt id="id-token-subject"}
+
+{htxt id='id-token-subject'}
 <p>{ts}Use a token in the Subject when you are sending mail to a number of recipients and want to include their name and / or other values from their contact record automatically in the subject line.{/ts}</p>
 <p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
 {/htxt}
 
-{htxt id="id-token-text-title"}
-  {ts}Tokens{/ts}
-{/htxt}
 {htxt id="id-token-text"}
 <p>{ts}Use tokens when you are sending mail to a number of recipients, and want to include their name and / or other values from their contact record automatically within your message.{/ts}</p>
 <p>{ts 1='&#123;contact.first_name&#125;'}EXAMPLE: If you want your message to begin with "Dear " followed by the recipient's first name, you can use the %1 token in your message. <em>Dear %1</em>{/ts}</p>
@@ -38,10 +31,8 @@ be an equal sign and a number (=12). The number (12 in this example) is the id o
 <p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
 {/htxt}
 
-{htxt id="id-token-html-title"}
-  {ts}Message Tokens{/ts}
-{/htxt}
-{htxt id="id-token-html"}
+
+{htxt id='id-token-html'}
 <p>{ts}Use tokens when you are sending mail or generating PDF letters for a number of recipients, and want to include their name and / or other values from their contact record automatically within your message.{/ts}</p>
 <p>{ts 1='&#123;contact.first_name&#125;'}EXAMPLE: If you want your message to begin with "Dear " followed by the recipient's first name, you can use the %1 token in your message. <em>Dear %1</em>{/ts}</p>
 <p>{ts}Place your cursor within the Message box where you want to the token to be inserted. Then click the &quot;Insert Tokens&quot; link in the upper right corner of the message box to see a list of available tokens. Insert the token by clicking the desired token name in the list (for example, click &quot;First Name&quot;).{/ts}</p>
@@ -51,10 +42,7 @@ be an equal sign and a number (=12). The number (12 in this example) is the id o
 <p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
 {/htxt}
 
-{htxt id="id-message-plain-title"}
-  {ts}Message Plain Text{/ts}
-{/htxt}
-{htxt id="id-message-plain"}
+{htxt id="text_message"}
 <p>{ts}Configuring a plain text version of a message is optional will be removed from CiviCRM in a future version.{/ts}</p>
 <p>{ts}If the text version is blank one will be automatically generated from the HTML content.{/ts}</p>
 {capture assign=plainText}{ts}Find out more about including a plain text version{/ts}{/capture}

@@ -675,7 +675,7 @@
       });
       var form1 = CRM.loadForm(url)
         .on('crmFormLoad', function() {
-          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle" aria-hidden="true"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
+          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle" role="img" aria-hidden="true"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
         });
     },
     onChangeIsDuplicate: function(model, value, options) {

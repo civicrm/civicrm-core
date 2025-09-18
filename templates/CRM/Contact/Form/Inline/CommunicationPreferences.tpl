@@ -18,7 +18,7 @@
       {foreach key=key item=item from=$commPreference}
       <div class="crm-summary-row">
         <div class="crm-label">{$form.$key.label}
-          {help id="id-$key" file="CRM/Contact/Form/Contact.hlp"}
+          {help id=$key file="CRM/Contact/Form/Contact.hlp"}
         </div>
         <div class="crm-content">
           {foreach key=k item=i from=$item}
@@ -29,7 +29,7 @@
       {if $key eq 'privacy'}
       <div class="crm-summary-row">
         <div class="crm-label">&nbsp;</div>
-        <div class="crm-content">{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" title=$form.is_opt_out.label file="CRM/Contact/Form/Contact.hlp"}
+        <div class="crm-content">{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="is_opt_out" file="CRM/Contact/Form/Contact.hlp"}
         </div>
       </div>
       {/if}
@@ -46,7 +46,7 @@
       {if !empty($form.communication_style_id)}
       <div class="crm-summary-row">
         <div class="crm-label">
-          {$form.communication_style_id.label} {help id="id-communication_style" file="CRM/Contact/Form/Contact.hlp"}
+          {$form.communication_style_id.label} {help id="communication_style" file="CRM/Contact/Form/Contact.hlp"}
         </div>
         <div class="crm-content">
           {$form.communication_style_id.html}

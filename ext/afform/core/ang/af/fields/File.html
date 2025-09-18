@@ -1,14 +1,14 @@
 <span ng-if="dataProvider.getFieldData()[$ctrl.fieldName].id">
   <a ng-if="dataProvider.getFieldData()[$ctrl.fieldName].url" ng-href="{{:: dataProvider.getFieldData()[$ctrl.fieldName].url }}">
-    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
+    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}" role="img" aria-hidden="true"></i>
     {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
   </a>
   <span ng-if="!dataProvider.getFieldData()[$ctrl.fieldName].url">
-    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
+    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}" role="img" aria-hidden="true"></i>
     {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
   </span>
   <a class="crm-hover-button" title="{{:: ts('Replace') }}" ng-click="dataProvider.getFieldData()[$ctrl.fieldName].id = null">
-    <i class="crm-i fa-times" aria-hidden="true"></i>
+    <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
   </a>
 </span>
 <input type="file" nv-file-select

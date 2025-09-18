@@ -10,14 +10,14 @@
 {* template for handling share address functionality*}
 <tr>
   <td>
-    {$form.address.$blockId.use_shared_address.html}{$form.address.$blockId.use_shared_address.label} {help id="id-sharedAddress" file="CRM/Contact/Form/Contact.hlp"}
+    {$form.address.$blockId.use_shared_address.html}{$form.address.$blockId.use_shared_address.label} {help id="id-sharedAddress" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.use_shared_address.textLabel}
     <div id="shared-address-{$blockId}" class="form-layout-compressed">
       {$form.address.$blockId.master_contact_id.label}
       {$form.address.$blockId.master_contact_id.html}
       <div class="shared-address-add-relationship" style="display: none;">
         {$form.address.$blockId.add_relationship.html}
         {$form.address.$blockId.add_relationship.label}
-        <span class="employer">{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}</span>
+        <span class="employer">{help id="add_relationship" file="CRM/Contact/Form/Contact" title=$form.address.$blockId.add_relationship.textLabel}</span>
       </div>
       <div class="shared-address-list">
         {if !empty($sharedAddresses.$blockId.shared_address_display)}

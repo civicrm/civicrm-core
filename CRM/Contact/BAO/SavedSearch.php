@@ -425,10 +425,15 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
   }
 
   /**
-   * Check related contact access.
+   * Check SavedSearch access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    if (CRM_Core_Permission::check('administer search_kit')) {
+      // User has  access to manage all records.
+      return;
+    }
+
     $record = $e->getRecord();
     $action = $e->getActionName();
     if (!in_array($action, ['delete', 'update'], TRUE)) {
@@ -436,16 +441,11 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       return;
     }
 
-    $userID = $e->getUserID();
-    if (empty($userID)) {
-      $userID = CRM_Core_Session::getLoggedInContactID();
+    try {
+      self::checkManageOwnPermission($record, $e->getUserID());
     }
-
-    $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
-    if (!empty($created_id)) {
-      if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && CRM_Core_Permission::check('manage own search_kit') && ($userID !== (int) $created_id)) {
-        $e->setAuthorized(FALSE);
-      }
+    catch (\Civi\API\Exception\UnauthorizedException) {
+      $e->setAuthorized(FALSE);
     }
   }
 
@@ -453,8 +453,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @inheritDoc
    */
   public static function writeRecord(array $record): CRM_Contact_DAO_SavedSearch {
-    if (!empty($record['check_permission'])) {
-      self::checkManageOwnPermission($record);
+    if (!empty($record['check_permission']) && !CRM_Core_Permission::check('administer search_kit') && !empty($record['id'])) {
+      self::checkManageOwnPermission($record, CRM_Core_Session::getLoggedInContactID());
     }
     return parent::writeRecord($record);
   }
@@ -463,8 +463,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @inheritDoc
    */
   public static function deleteRecord(array $record): CRM_Contact_DAO_SavedSearch {
-    if (!empty($record['check_permission'])) {
-      self::checkManageOwnPermission($record);
+    if (!empty($record['check_permission']) && !CRM_Core_Permission::check('administer search_kit')) {
+      self::checkManageOwnPermission($record, CRM_Core_Session::getLoggedInContactID());
     }
     return parent::deleteRecord($record);
   }
@@ -472,17 +472,30 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
   /**
    * Ensure that the current user has permission to manage their own SavedSearch records.
    *
-   * @param array $record
+   * @param array $record The record in which the permission is to be checked.
+   * @param int $userID The user ID to check permissions against.
    * @return void
    * @throws CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function checkManageOwnPermission(array $record): void {
-    if (!CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && !empty($record['id']) && CRM_Core_Permission::check('manage own search_kit')) {
-      $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
-      if ($created_id != CRM_Core_Session::getLoggedInContactID()) {
+  public static function checkManageOwnPermission(array $record, int $userID): void {
+    // If user doesn't have base permission, block action.
+    if (!CRM_Core_Permission::check('manage own search_kit')) {
+      throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this SavedSearch.');
+    }
+
+    $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
+    // When we have a created_id, we need to compare against user to see if they are the owner.
+    if (!empty($created_id)) {
+
+      // IDs must match in order to manage.
+      if ($userID !== (int) $created_id) {
         throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this SavedSearch.');
       }
+    }
+    else {
+      // No created_id and user can't manage all records, so block access.
+      throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this SavedSearch.');
     }
   }
 

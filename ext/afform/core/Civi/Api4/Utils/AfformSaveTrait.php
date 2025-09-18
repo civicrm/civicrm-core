@@ -2,17 +2,22 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\Afform\StringVisitor;
+use Civi\Api4\TranslationSource;
 use Civi\Afform\Utils;
-use CRM_Afform_ExtensionUtil as E;
 
 /**
- * Class AfformSaveTrait
+ * Class AfformSaveTrait.
+ *
  * @package Civi\Api4\Action\Afform
  */
 trait AfformSaveTrait {
 
   use AfformFormatTrait;
 
+  /**
+   *
+   */
   protected function writeRecord($item) {
     /** @var \CRM_Afform_AfformScanner $scanner */
     $scanner = \Civi::service('afform_scanner');
@@ -33,7 +38,13 @@ trait AfformSaveTrait {
     if (isset($item['layout'])) {
       $layoutPath = $scanner->createSiteLocalPath($item['name'], 'aff.html');
       \CRM_Utils_File::createDir(dirname($layoutPath));
-      file_put_contents($layoutPath, $this->convertInputToHtml($item['layout']));
+      $html = $this->convertInputToHtml($item['layout']);
+
+      // Are we multilingual.
+      if (\CRM_Core_I18n::isMultiLingual()) {
+        self::saveTranslations($item, $html);
+      }
+      file_put_contents($layoutPath, $html);
       // FIXME check for writability then success. Report errors.
     }
 
@@ -45,7 +56,7 @@ trait AfformSaveTrait {
     if (!empty($meta)) {
       $metaPath = $scanner->createSiteLocalPath($item['name'], \CRM_Afform_AfformScanner::METADATA_JSON);
       \CRM_Utils_File::createDir(dirname($metaPath));
-      // Add eof newline to make files git-friendly
+      // Add eof newline to make files git-friendly.
       file_put_contents($metaPath, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
       // FIXME check for writability then success. Report errors.
     }
@@ -53,9 +64,9 @@ trait AfformSaveTrait {
     // We may have changed list of files covered by the cache.
     _afform_clear();
 
-    // If the dashlet or navigation setting changed, managed entities must be reconciled
+    // If the dashlet or navigation setting changed, managed entities must be reconciled.
     if (Utils::shouldReconcileManaged($item, $orig ?? [])) {
-      \CRM_Core_ManagedEntities::singleton()->reconcile(E::LONG_NAME);
+      \CRM_Core_ManagedEntities::singleton()->reconcile(\CRM_Afform_ExtensionUtil::LONG_NAME);
     }
 
     if (Utils::shouldClearMenuCache($item, $orig ?? [])) {
@@ -98,6 +109,32 @@ trait AfformSaveTrait {
       $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->setAction('create')->addSelect('name')->execute()->column('name');
       unset($fields[array_search('layout', $fields)]);
       $orig = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->setSelect($fields)->execute()->first();
+    }
+  }
+
+  /**
+   * Save Translation Strings from Form to database
+   * array $form
+   * string $html
+   */
+  protected static function saveTranslations($form, $html) {
+    $strings = StringVisitor::extractStrings($form, $html);
+
+    // Save the form strings.
+    if (!empty($strings)) {
+      // Create context hash (for now we just record the entity)
+      $context_key = \CRM_Core_BAO_TranslationSource::createGuid(':::afform');
+
+      // Build the array for the table.
+      $records = [];
+      foreach ($strings as $value) {
+        $source_key = \CRM_Core_BAO_TranslationSource::createGuid($value);
+        $records[] = ['source' => $value, 'source_key' => $source_key, 'context_key' => $context_key, 'entity' => 'afform'];
+      }
+      TranslationSource::save(FALSE)
+        ->setRecords($records)
+        ->setMatch(['source_key'])
+        ->execute();
     }
   }
 

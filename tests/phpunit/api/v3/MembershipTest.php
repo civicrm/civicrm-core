@@ -43,6 +43,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
+    $this->hookClass->setHook('civicrm_custom', [$this, 'hook_custom']);
     $this->_contactID = $this->individualCreate();
     $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->ids['Contact']['individual_0']]);
     $this->_membershipTypeID2 = $this->membershipTypeCreate([
@@ -1538,6 +1539,12 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2009-12-21', $result['end_date']);
     $this->assertEquals('Payment', $result['source']);
+  }
+
+  public function hook_custom($op, $groupID, $entityID, &$params) {
+    foreach ($params as $field) {
+      $this->assertTrue(array_key_exists('entity_table', $field));
+    }
   }
 
 }

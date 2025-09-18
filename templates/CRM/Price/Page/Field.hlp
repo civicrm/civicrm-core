@@ -7,53 +7,31 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-negative-title"}
-  {ts}Negative Amounts{/ts}
-{/htxt}
-{htxt id="id-negative"}
+{htxt id="price"}
     {ts}You may enter a negative amount value if the field or option is being used to discount the total price. Use a price of 1 and Display Amount off (unchecked) to allow a user to enter a contribution amount in a Text / Numeric Quantity field.{/ts}
 {/htxt}
 
-{htxt id="id-negative-options-title"}
-  {ts}Negative Options{/ts}
-{/htxt}
-{htxt id="id-negative-options"}
-    {ts}You may enter a negative amount value if the field or option is being used to discount the total price.{/ts}
-{/htxt}
-
-{htxt id="id-visibility-options-title"}
-  {ts}Visibility per Option{/ts}
-{/htxt}
-{htxt id="id-visibility-options"}
+{htxt id='visibility-options'}
   {ts}Select between Admin/Public for each option. 'Public' will show the option to all users accessing the price set. Use 'Admin' to limit the option to users with the 'CiviEvent: edit event participants’ permission (when viewing the field via the event registration pages) or the ‘CiviContribute: edit contributions’ permission (when accessing the field through a contribution page).{/ts}
 {/htxt}
 
-{htxt id="id-participant-count-title"}
-  {ts}Participant Count{/ts}
-{/htxt}
-{htxt id="id-participant-count"}
+
+{htxt id='count'}
     <p>{ts}Enter a value here if you want to increment the number of registered participants per unit against the maximum number of participants allowed for this event. For example, if this price field is for a table at a fundraiser which seats eight people, you would set Participant Count to 8.{/ts}</p>
     <p>{ts}If you do not want this option to increment the participant count for the event you can still restrict how many times this particular option can be chosen.  Leave this field empty and enter a value in the adjacent Max Participants box.  For example, if you leave this empty and set the adjacent Max Participant = 20, only 20 registrants can choose this option before it becomes unavailable to online registrants.{/ts}</p>
 {/htxt}
 
-{htxt id="id-participant-max-title"}
-  {ts}Participant Limit{/ts}
-{/htxt}
-{htxt id="id-participant-max"}
+
+{htxt id='max_value'}
     {ts}If you want to limit the number of participants who can chose this option, enter that number here. This limit is separate from the maximum number of participants allowed to register for the event (you can set that number from Configure Event > Info and Settings). {/ts}
 {/htxt}
 
-{htxt id="id-visibility-title"}
-  {ts}Visibility{/ts}
-{/htxt}
-{htxt id="id-visibility"}
+
+{htxt id='visibility_id'}
   {ts}Fields with 'Public' visibility will be displayed on your Event Information page AND will be available in the online registration (self-service) form. For some events you may want to allow staff to select special options with special pricing and / or discounts (using negative price set field values). Select 'Admin' visibility for these Price Fields. They will only be included when staff or volunteers are registering participants from the back-office 'Register Event Participants' screen. If the parent price field visibility is ‘Public’ then it should be possible to set individual price options as 'Admin', but it should have at least one 'Public' option. If the parent price field visibility is 'Admin', then all the price field options should be set to 'Admin', including any new options added to the form.{/ts}
 {/htxt}
 
-{htxt id="id-member-price-options-title"}
-  {ts}Price Options{/ts}
-{/htxt}
-{htxt id="id-member-price-options"}
+{htxt id="member-price-options"}
     <p>
     {ts}Create an option row for each membership type you want to offer as a choice. The option Label and Amount columns will be automatically filled with the selected membership type name and associated fee. However you can over-ride these values as needed. For example, you can create an option for a special discount on a particular membership.{/ts}
     </p>
@@ -85,16 +63,11 @@
     </p>
 {/htxt}
 
-{htxt id="id-membership-type-title"}
-  {ts}Membership Type{/ts}
-{/htxt}
-{htxt id="id-membership-type"}
+{htxt id="membership-type"}
     {ts}If you select a membership type, a membership will be created or renewed when users select this option. Leave this column blank for non-membership options (e.g. magazine subscription).{/ts}
 {/htxt}
 
-{htxt id="description-title"}
-  {ts}Description{/ts}
-{/htxt}
+
 {htxt id="description"}
     {ts}Description is not shown publicly.{/ts}
 {/htxt}

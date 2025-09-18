@@ -200,10 +200,10 @@
     var $row = $('tr:last-child', '#api-params');
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
-        return '<i class="crm-i fa-link" aria-hidden="true"></i> API ' +
+        return '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> API ' +
           ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
       },
-      placeholder: '<i class="crm-i fa-link" aria-hidden="true"></i> ' + ts('Entity'),
+      placeholder: '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> ' + ts('Entity'),
       allowClear: false,
       escapeMarkup: function(m) {return m;}
     })
@@ -662,7 +662,7 @@
         .addClass('crm-error')
         .css('width', '82%')
         .attr('title', msg)
-        .before('<i class="crm-i fa-exclamation-triangle crm-i-red" title="'+msg+'" aria-hidden="true"></i> ')
+        .before('<i class="crm-i fa-exclamation-triangle crm-i-red" title="'+msg+'" role="img" aria-hidden="true"></i> ')
         .tooltip();
     }
   }

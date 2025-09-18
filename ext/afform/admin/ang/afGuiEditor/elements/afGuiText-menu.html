@@ -10,7 +10,7 @@
   <div class="af-gui-field-select-in-dropdown">
     <div class="btn-group btn-group-sm" role="group">
       <button type="button" class="btn btn-default" ng-class="{active: opt === getAlign()}" ng-repeat="(opt, label) in alignments" ng-click="setAlign(opt)" title="{{ label }}">
-        <i class="crm-i fa-{{ opt.replace('text', 'align') }}" ></i>
+        <i class="crm-i fa-{{ opt.replace('text', 'align') }}"  role="img" aria-hidden="true"></i>
       </button>
     </div>
   </div>
@@ -27,5 +27,5 @@
 
 <li role="separator" class="divider"></li>
 <li>
-  <a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash"></i> {{:: ts('Delete this text') }}</span></a>
+  <a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {{:: ts('Delete this text') }}</span></a>
 </li>

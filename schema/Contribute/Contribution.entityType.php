@@ -428,7 +428,7 @@ return [
       ],
     ],
     'is_test' => [
-      'title' => ts('Test'),
+      'title' => ts('Test Mode'),
       'sql_type' => 'boolean',
       'input_type' => 'CheckBox',
       'required' => TRUE,

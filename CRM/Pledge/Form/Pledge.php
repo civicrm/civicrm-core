@@ -202,11 +202,11 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     $this->add('hidden', 'hidden_PaymentReminders', 1);
-    $this->add('text', 'initial_reminder_day', ts('Send Initial Reminder'), ['size' => 3]);
+    $this->add('number', 'initial_reminder_day', ts('Send Initial Reminder'), ['class' => 'four']);
     $this->addRule('initial_reminder_day', ts('Please enter a valid reminder day.'), 'positiveInteger');
-    $this->add('text', 'max_reminders', ts('Send up to'), ['size' => 3]);
+    $this->add('number', 'max_reminders', ts('Send up to'), ['class' => 'four']);
     $this->addRule('max_reminders', ts('Please enter a valid No. of reminders.'), 'positiveInteger');
-    $this->add('text', 'additional_reminder_day', ts('Send additional reminders'), ['size' => 3]);
+    $this->add('number', 'additional_reminder_day', ts('Send additional reminders'), ['class' => 'four']);
     $this->addRule('additional_reminder_day', ts('Please enter a valid additional reminder day.'), 'positiveInteger');
 
     $this->assign('allPanes', $allPanes);
@@ -240,7 +240,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->addRule('installments', ts('Please enter a valid number of installments.'), 'positiveInteger');
 
     $frequencyInterval = $this->add('number', 'frequency_interval', ts('every'),
-      $attributes['pledge_frequency_interval'], TRUE
+      ['class' => 'four'], TRUE
     );
     $this->addRule('frequency_interval', ts('Please enter a number for frequency (e.g. every "3" months).'), 'positiveInteger');
 
@@ -256,14 +256,14 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       ['class' => 'crm-select2 eight']
     );
 
-    $frequencyDay = $this->add('number', 'frequency_day', ts('Payments are due on the'), $attributes['frequency_day'], TRUE);
+    $frequencyDay = $this->add('number', 'frequency_day', ts('Payments are due on the'), ['class' => 'six'], TRUE);
     $this->addRule('frequency_day', ts('Please enter a valid payment due day.'), 'positiveInteger');
 
     $this->add('text', 'eachPaymentAmount', ts('each'), [
-      'size' => 10,
+      // Fixme: add CSS for readonly fields
       'style' => 'background-color:#EBECE4',
-      // WTF, preserved because its inexplicable
-      0 => 'READONLY',
+      'class' => 'six',
+      'readonly' => 'readonly',
     ]);
 
     // add various dates

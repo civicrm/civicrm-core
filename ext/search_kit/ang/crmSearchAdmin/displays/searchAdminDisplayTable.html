@@ -110,9 +110,9 @@
   <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
-      <i class="crm-i fa-arrows crm-search-move-icon"></i>
+      <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
       <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
-        <i class="crm-i fa-ban"></i>
+        <i class="crm-i fa-ban" role="img" aria-hidden="true"></i>
       </button>
       <details>
         <summary>{{ $ctrl.parent.getColLabel(col) }}</summary>
@@ -121,12 +121,19 @@
           <input id="crm-search-admin-edit-header-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
         </div>
         <div class="form-inline">
-          <label>{{:: ts('Alignment') }}</label>
-          <select ng-model="col.alignment" class="form-control crm-auto-width">
-            <option value="">{{:: ts('Left') }}</option>
-            <option value="text-center">{{:: ts('Center') }}</option>
-            <option value="text-right">{{:: ts('Right') }}</option>
-          </select>
+          <label>
+            {{:: ts('Alignment') }}
+            <select ng-model="col.alignment" class="form-control crm-auto-width">
+              <option value="">{{:: ts('Left') }}</option>
+              <option value="text-center">{{:: ts('Center') }}</option>
+              <option value="text-right">{{:: ts('Right') }}</option>
+            </select>
+          </label>
+          &nbsp;
+          <label title="{{:: ts('Disable line breaks to keep contents inline') }}">
+            <input type="checkbox" ng-model="col.nowrap" >
+            {{:: ts('Prevent Wrapping') }}
+          </label>
         </div>
         <div class="form-inline" ng-if="$ctrl.parent.canBeSortable(col)">
           <label title="{{:: ts('Allow user to click on header to sort table by this column') }}">

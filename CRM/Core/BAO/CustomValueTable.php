@@ -26,7 +26,7 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @throws Exception
    */
-  public static function create($customParams, $parentOperation = NULL) {
+  private static function create($customParams, $parentOperation = NULL) {
     if (empty($customParams) ||
       !is_array($customParams)
     ) {
@@ -550,7 +550,9 @@ class CRM_Core_BAO_CustomValueTable {
           ));
         }
 
+        $entity = CRM_Core_BAO_CustomGroup::getEntityFromExtends($fieldInfo['custom_group']['extends']);
         $cvParam = [
+          'entity_table' => CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity),
           'entity_id' => $params['entityID'],
           'value' => $fieldValue['value'],
           'type' => $dataType,

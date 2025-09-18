@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-status_change-title"}
-  {ts}Participant Status{/ts}
-{/htxt}
 {htxt id="id-status_change"}
 <p><strong>{ts}Enabling Waitlisting and Registration Approval{/ts}</strong><br />
 {ts}This screen is particularly useful for managing events with Waitlisting and / or Registration Approval features enabled. In order to use these features you must first enable the related Participant Statuses (Administer &raquo; CiviEvent &raquo; Participant Statuses).{/ts}</p>

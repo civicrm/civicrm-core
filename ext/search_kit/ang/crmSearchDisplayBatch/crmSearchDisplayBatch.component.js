@@ -57,14 +57,14 @@
           this.reportLinks = [
             {
               title: ts('View My Import Batches'),
-              href: CRM.url('civicrm/imports/my-listing'),
+              href: CRM.url('civicrm/imports/my-listing#/?job_type=search_batch_import'),
               icon: 'fa-user-tag',
             },
           ];
           if (CRM.checkPerm('administer queues')) {
             this.reportLinks.push({
               title: ts('View All Import Batches'),
-              href: CRM.url('civicrm/imports/all-imports'),
+              href: CRM.url('civicrm/imports/all-imports#/?job_type=search_batch_import'),
               icon: 'fa-list-alt',
             });
           }
@@ -212,7 +212,7 @@
           let markup = '';
           // Run each item in array through _.escape
           tallyMismatches.forEach((item, index, array) => {
-            markup += '<p><i class="crm-i fa-warning"></i> ' + _.escape(item) + '</p>';
+            markup += '<p><i class="crm-i fa-warning" role="img" aria-hidden="true"></i> ' + _.escape(item) + '</p>';
           });
           CRM.confirm({
             title: ts('Tally Mismatch'),

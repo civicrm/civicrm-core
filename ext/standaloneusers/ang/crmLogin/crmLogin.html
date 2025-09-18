@@ -1,0 +1,20 @@
+<div ng-if="$ctrl.loading" class="crm-login crm-login-loading">
+  <div class="sr-only">{{:: ts('Loading...') }}</div>
+  <div class="crm-loading-spinner"></div>
+</div>
+<div ng-if="!$ctrl.loading" class="crm-login">
+  <form ng-submit="$ctrl.attemptLogin()">
+    <div class="input-wrapper">
+      <label for="usernameInput" class="form-label">{{:: ts('Username') }}</label>
+      <input type="text" class="form-control crm-form-text" id="usernameInput" ng-model="$ctrl.identifier" required />
+    </div>
+    <div class="input-wrapper">
+      <label for="passwordInput" class="form-label">{{:: ts('Password') }}</label>
+      <input type="password" class="form-control crm-form-text" id="passwordInput" ng-model="$ctrl.password" required />
+    </div>
+    <div class="login-or-forgot">
+      <a href="{{:: $ctrl.forgottenPasswordUrl }}">{{:: ts('Forgotten password?') }}</a>
+      <button type="submit" class="btn btn-primary crm-button">{{:: ts('Log In') }}</button>
+    </div>
+  </form>
+</div>

@@ -14,4 +14,3 @@
   <a href="%1"><strong>Site Email Addresses</strong></a>.  This applies to actions such as "Send Email", "Email Invoice" and "Send Receipt". If this setting
   is disabled then only the system configured Site Email addresses will be available for selection.{/ts}
 {/htxt}
-

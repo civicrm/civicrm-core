@@ -1,12 +1,12 @@
 <div class="btn-group">
   <button type="button" class="btn dropdown-toggle btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="crm-i fa-plus-square-o"></i>
+    <i class="crm-i fa-plus-square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Add/Remove Fields') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
     <li ng-repeat="item in $ctrl.parent.savedSearch.api_params.select track by $index">
       <a href ng-click="$ctrl.parent.toggleColumn(item); $event.stopPropagation()">
-        <i class="crm-i fa-{{ $ctrl.parent.columnExists(item) ? 'check-' : '' }}square-o"></i>
+        <i class="crm-i fa-{{ $ctrl.parent.columnExists(item) ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
         {{ $ctrl.parent.getFieldLabel(item) }}
       </a>
     </li>
@@ -14,13 +14,13 @@
 </div>
 <div class="btn-group" ng-if="$ctrl.getColTypes">
   <button type="button" class="btn dropdown-toggle btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="crm-i fa-link"></i>
+    <i class="crm-i fa-link" role="img" aria-hidden="true"></i>
     {{:: ts('Add Links, etc.') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
     <li ng-repeat="(type, col) in $ctrl.getColTypes()">
       <a href ng-click="$ctrl.parent.addCol(type)">
-        <i class="crm-i {{:: col.icon }}"></i>
+        <i class="crm-i {{:: col.icon }}" role="img" aria-hidden="true"></i>
         {{:: col.label }}
       </a>
     </li>

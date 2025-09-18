@@ -16,9 +16,8 @@
           {include file=$fieldSpec.template}
         {else}
           {$field.label}
-          {if !empty($fieldSpec.help)}
-            {assign var=help value=$fieldSpec.help}
-            {help id=$help.id file=$help.file}
+          {if array_key_exists('help', $fieldSpec) && $fieldSpec.help}
+            {help values=$fieldSpec.help title=$field.textLabel}
           {/if}
           <br />
           {$field.html}

@@ -271,6 +271,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     parent::preProcess();
     $this->assign('feeBlockPaid', FALSE);
 
+    $this->assign('accessCiviContribute', CRM_Core_Permission::access('CiviContribute'));
+
     // @todo eliminate this duplication.
     $this->_contactId = $this->getContactID();
     $this->_eID = CRM_Utils_Request::retrieve('eid', 'Positive', $this);

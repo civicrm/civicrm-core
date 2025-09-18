@@ -64,6 +64,8 @@ abstract class Api4Query {
     $this->api = $api;
   }
 
+  abstract public function getField(string $expr):? array;
+
   /**
    * Builds main final sql statement after initialization.
    *
@@ -286,32 +288,16 @@ abstract class Api4Query {
   public function composeClause(array $clause, string $type, int $depth) {
     $field = NULL;
     // Pad array for unary operators
-    [$expr, $operator, $value] = array_pad($clause, 3, NULL);
-    $isExpression = $clause[3] ?? FALSE;
+    [$expr, $operator, $value, $isExpression] = array_pad($clause, 4, NULL);
+    // isExpression defaults to FALSE in WHERE & HAVING clauses, and defaults to TRUE in ON clauses
+    $isExpression ??= ($type === 'ON');
     if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
       throw new \CRM_Core_Exception('Illegal operator');
     }
     $fieldAlias = NULL;
 
-    // For WHERE clause, expr must be the name of a field.
-    if ($type === 'WHERE' && !$isExpression) {
-      $expr = $this->getExpression($expr, ['SqlField', 'SqlFunction', 'SqlEquation']);
-      if ($expr->getType() === 'SqlField') {
-        $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
-        $field = $this->getField($fieldName, TRUE);
-        FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
-      }
-      elseif ($expr->getType() === 'SqlFunction') {
-        $fauxField = [
-          'name' => NULL,
-          'data_type' => $expr::getDataType(),
-        ];
-        FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
-      }
-      $fieldAlias = $expr->render($this);
-    }
     // For HAVING, expr must be an item in the SELECT clause
-    elseif ($type === 'HAVING') {
+    if ($type === 'HAVING') {
       // Expr references a fieldName or alias
       if (isset($this->selectAliases[$expr])) {
         $fieldAlias = $expr;
@@ -344,7 +330,7 @@ abstract class Api4Query {
           $expr = $this->getExpression($this->selectAliases[$fieldAlias], ['SqlFunction']);
           $fauxField = [
             'name' => NULL,
-            'data_type' => $expr->getRenderedDataType($this->apiFieldSpec),
+            'data_type' => $expr->getRenderedDataType($this),
           ];
           FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
         }
@@ -370,7 +356,28 @@ abstract class Api4Query {
         return sprintf('%s %s `%s`', $fieldAlias, $operator, $targetField);
       }
     }
-    elseif ($type === 'ON' || ($type === 'WHERE' && $isExpression)) {
+
+    // $isExpression is usually FALSE for WHERE clauses unless explicitly enabled by 4th param
+    elseif (!$isExpression) {
+      // 1st param is always treated as a sql expression
+      $expr = $this->getExpression($expr, ['SqlField', 'SqlFunction', 'SqlEquation']);
+      if ($expr->getType() === 'SqlField') {
+        $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
+        $field = $this->getField($fieldName, TRUE);
+        FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
+      }
+      elseif ($expr->getType() === 'SqlFunction') {
+        $fauxField = [
+          'name' => NULL,
+          'data_type' => $expr::getDataType(),
+        ];
+        FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
+      }
+      $fieldAlias = $expr->render($this);
+    }
+
+    // $isExpression is usually TRUE for ON clauses unless explicitly disabled by 4th param
+    elseif ($isExpression) {
       $expr = $this->getExpression($expr);
       $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
       $fieldAlias = $expr->render($this);

@@ -12,10 +12,7 @@
       when adding help specific to "New Cases". *}
 
 
-{htxt id="id-details-title"}
-  {ts}Details{/ts}
-{/htxt}
-{htxt id="id-details"}
+{htxt id='activity_details'}
 {if !empty($params.activityTypeFile) && $params.activityTypeFile EQ 'OpenCase'}
     <ul>
     <li>{ts}Introduce yourself and your role within our organization.{/ts}</li>
@@ -30,19 +27,15 @@
 {/if}
 {/htxt}
 
-{htxt id="id-activity_subject-title"}
-  {ts}Title{/ts}
-{/htxt}
-{htxt id="id-activity_subject"}
+
+{htxt id='activity_subject'}
 {if !empty($params.activityTypeFile) && $params.activityTypeFile EQ 'OpenCase'}
   {ts}Provide a one-line summary of what this case is about.{/ts}
 {/if}
 {/htxt}
 
-{htxt id="id-case_type-title"}
-  {ts}Case Type{/ts}
-{/htxt}
-{htxt id="id-case_type"}
+
+{htxt id='case_type_id'}
 {if !empty($params.activityTypeFile) && $params.activityTypeFile EQ 'OpenCase'}
   {ts}Offer the appropriate service from the list. If the service requires coordination, contact the Director.{/ts}
 {/if}

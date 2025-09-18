@@ -7,10 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-auto_renew-title"}
-  {ts}Auto Renew{/ts}
-{/htxt}
-{htxt id="id-auto_renew"}
+{htxt id="auto_renew"}
   <p>{ts}A recurring payment (subscription) request will be submitted to the selected payment processor. If the request is successful, this membership will be automatically renewed on the last day of the membership period until the recurring payment is cancelled. Membership payment receipt emails will include a link for the member to cancel the auto-renewal.{/ts}</p>
   {if $params.action eq 2}
     <p>{ts}To cancel automatic renewal:{/ts}</p>

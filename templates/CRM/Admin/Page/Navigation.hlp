@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-navigation-title"}
-  {ts}Navigation Menu{/ts}
-{/htxt}
 {htxt id="id-navigation"}
 <p>
   {ts}This screen shows the current CiviCRM navigation menu for your site - viewed as a 'tree'. The top-level menu items are listed vertically. Click the triangle to the left of any top-level item ('branch') to expand it and see the menu items underneath it. Remember that some menu items shown here will not be displayed in the live menu bar which appears at the top of each CiviCRM screen. Users will only see menu items which they have permissions for, and menu items associated with disabled components will also be hidden.{/ts}

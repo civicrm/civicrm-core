@@ -20,7 +20,7 @@
                af-gui-field-value="getField($ctrl.getEntityType(), fieldName)"
                ng-model="$ctrl.entity.data[fieldName]" />
         <a href ng-click="removeValue($ctrl.entity, fieldName)">
-          <i class="crm-i fa-times"></i>
+          <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
         </a>
       </div>
     </div>
@@ -67,7 +67,7 @@
 </form>
 
 <a ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig" href ng-click="$ctrl.editor.removeEntity($ctrl.entity.name)" class="btn btn-sm btn-danger-outline af-gui-remove-entity" title="{{ ts('Remove %1', {1: getMeta().label}) }}">
-  <i class="crm-i fa-trash"></i>
+  <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
 </a>
 
 <fieldset ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig">

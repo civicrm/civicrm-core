@@ -470,8 +470,8 @@ class AutocompleteAction extends AbstractAction {
     if (!strlen($this->input) || \CRM_Utils_Rule::integer($this->input)) {
       return TRUE;
     }
-    $currentSearchField = $this->getField($this->getCurrentSearchField());
-    return $currentSearchField['data_type'] !== 'Integer';
+    $currentSearchField = $this->getField($this->getCurrentSearchField())['data_type'] ?? '';
+    return $currentSearchField !== 'Integer';
   }
 
 }

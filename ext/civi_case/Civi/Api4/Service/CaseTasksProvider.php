@@ -12,7 +12,7 @@
 namespace Civi\Api4\Service;
 
 use Civi\Api4\CaseType;
-use CRM_Mailing_ExtensionUtil as E;
+use CRM_Case_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
 /**

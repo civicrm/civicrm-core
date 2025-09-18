@@ -1,5 +1,5 @@
 <li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
-  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Type:') }}</label>
     <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
       <option ng-repeat="type in $ctrl.inputTypes" value="{{ type.name }}">{{ type.label }}</option>
@@ -8,18 +8,18 @@
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Date' && $ctrl.getDefn().input_attrs.time">
   <a href ng-click="toggleAttr('input_attrs.time'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Input date + time') }}">
-    <i class="crm-i fa-{{ getProp('input_attrs.time') ? 'check-' : '' }}square-o"></i>
+    <i class="crm-i fa-{{ getProp('input_attrs.time') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Show Time') }}
   </a>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Text' || $ctrl.fieldDefn.input_type === 'TextArea'">
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
-    <label for="{{:: $ctrl.node.name}}-maxlength">{{:: ts('Max Length:') }}</label>
-    <input id="{{:: $ctrl.node.name}}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
+    <label for="{{:: $ctrl.getFieldName() }}-maxlength">{{:: ts('Max Length:') }}</label>
+    <input id="{{:: $ctrl.getFieldName() }}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
   </form>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Number' && $ctrl.fieldDefn.data_type === 'Float'">
-  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Decimal places:') }}</label>
     <select class="form-control" ng-model="getSet('input_attrs.step')" ng-model-options="{getterSetter: true}" title="{{:: ts('Decimal places') }}">
       <option ng-value="1">0</option>
@@ -36,17 +36,17 @@
   </div>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'" title="{{:: ts('Use a saved search to filter the autocomplete results') }}">
-  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <input placeholder="{{:: ts('Saved Search') }}" class="form-control" crm-autocomplete="'SavedSearch'" crm-autocomplete-params="{key: 'name', filters: {api_entity: $ctrl.fieldDefn.fk_entity}, formName: 'afformAdmin', fieldName: 'autocompleteSavedSearch'}" auto-open="true" ng-model="getSet('saved_search')" ng-model-options="{getterSetter: true}" ng-change="getSet('search_display')(null)">
   </div>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef' && $ctrl.fieldDefn.saved_search" title="{{:: ts('Use a saved search to filter the autocomplete results') }}">
-  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <input placeholder="{{:: ts('Default Display') }}" class="form-control" crm-autocomplete="'SearchDisplay'" crm-autocomplete-params="{key: 'name', filters: {'saved_search_id.name': $ctrl.fieldDefn.saved_search}, formName: 'afformAdmin', fieldName: 'autocompleteDisplay'}" auto-open="true" ng-model="getSet('search_display')" ng-model-options="{getterSetter: true}">
   </div>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'" title="{{:: ts('Should permissions be checked when autocompleting existing entities') }}">
-  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <input crm-ui-select="{data: $ctrl.editor.securityModes}" ng-model="getSet('security')" ng-model-options="{getterSetter: true}" class="form-control">
   </div>
 </li>
@@ -57,19 +57,19 @@
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'">
   <a href ng-click="toggleAttr('input_attrs.autoOpen'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show autocomplete results without typing') }}">
-    <i class="crm-i fa-{{ getProp('input_attrs.autoOpen') ? 'check-' : '' }}square-o"></i>
+    <i class="crm-i fa-{{ getProp('input_attrs.autoOpen') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Auto Open') }}
   </a>
 </li>
 <li>
   <a href ng-click="toggleAttr('required'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Require this field') }}">
-    <i class="crm-i fa-{{ getProp('required') ? 'check-' : '' }}square-o"></i>
+    <i class="crm-i fa-{{ getProp('required') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Required') }}
   </a>
 </li>
 <li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
   <a href ng-click="toggleDefaultValue(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Pre-fill this field with a value') }}">
-    <i class="crm-i fa-{{ $ctrl.hasDefaultValue ? 'check-' : '' }}square-o"></i>
+    <i class="crm-i fa-{{ $ctrl.hasDefaultValue ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Default value') }}
   </a>
 </li>
@@ -100,38 +100,47 @@
 </li>
 <li>
   <a href ng-click="toggleLabel(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show field label') }}">
-    <i class="crm-i fa-{{ $ctrl.node.defn.label === false ? '' : 'check-' }}square-o"></i>
+    <i class="crm-i fa-{{ $ctrl.node.defn.label === false ? '' : 'check-' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Label') }}
   </a>
 </li>
 <li>
   <a href ng-click="toggleHelp('pre'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show help text above this field') }}">
-    <i class="crm-i fa-{{ propIsset('help_pre') ? 'check-' : '' }}square-o"></i>
+    <i class="crm-i fa-{{ propIsset('help_pre') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Pre help text') }}
   </a>
 </li>
 <li>
   <a href ng-click="toggleHelp('post'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show help text below this field') }}">
-    <i class="crm-i fa-{{ propIsset('help_post') ? 'check-' : '' }}square-o" ></i>
+    <i class="crm-i fa-{{ propIsset('help_post') ? 'check-' : '' }}square-o"  role="img" aria-hidden="true"></i>
     {{:: ts('Post help text') }}
   </a>
 </li>
 
-<li role="separator" class="divider" ng-if="$ctrl.canBeRange() || $ctrl.canBeMultiple()"></li>
+<li role="separator" class="divider" ng-if="$ctrl.isSearch()"></li>
 <li ng-if="$ctrl.canBeMultiple()" ng-click="$event.stopPropagation()">
   <a href ng-click="toggleMultiple()" title="{{:: ts('Search multiple values') }}">
-    <i class="crm-i fa-{{ !$ctrl.node.defn.input_attrs.multiple ? '' : 'check-' }}square-o"></i>
+    <i class="crm-i fa-{{ !$ctrl.node.defn.input_attrs.multiple ? '' : 'check-' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Multi-Select') }}
   </a>
 </li>
 <li ng-if="$ctrl.canBeRange()" ng-click="$event.stopPropagation()">
   <a href ng-click="toggleSearchRange()" title="{{:: ts('Search between low & high values') }}">
-    <i class="crm-i fa-{{ !$ctrl.node.defn.search_range ? '' : 'check-' }}square-o"></i>
+    <i class="crm-i fa-{{ !$ctrl.node.defn.search_range ? '' : 'check-' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Search by range') }}
   </a>
 </li>
 <li ng-if="$ctrl.isSearch()" ng-click="$event.stopPropagation()">
-  <div href class="af-gui-field-select-in-dropdown">
+  <a href ng-click="$ctrl.toggleMultiFieldFilter(); $event.target.blur();" title="{{:: ts('Filter search results based on multiple fields') }}">
+    <i class="crm-i fa-{{ !$ctrl.isMultiFieldFilter ? '' : 'check-' }}square-o" role="img" aria-hidden="true"></i>
+    {{:: ts('Combine multiple fields') }}
+  </a>
+  <div class="af-gui-field-select-in-dropdown" ng-if="$ctrl.isMultiFieldFilter">
+    <input crm-ui-select="{data: $ctrl.getSearchFilterFields, multiple: true}" ng-model="$ctrl.node.name" class="form-control" title="{{:: ts('Filter search results based on multiple fields') }}">
+  </div>
+</li>
+<li ng-if="$ctrl.isSearch()" ng-click="$event.stopPropagation()">
+  <div class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Operator:') }}</label>
     <select class="form-control" ng-model="getSetOperator" ng-model-options="{getterSetter: true}" title="{{:: ts('Set the search operator for this field or allow the user to select it on the form') }}">
       <option value="">{{:: ts('Auto') }}</option>
@@ -139,10 +148,17 @@
       <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
     </select>
   </div>
-  <div href class="af-gui-field-select-in-dropdown" ng-if="$ctrl.getSet('expose_operator')">
+  <div class="af-gui-field-select-in-dropdown" ng-if="$ctrl.getSet('expose_operator')">
     <label>{{:: ts('Default:') }}</label>
     <select class="form-control" ng-model="getSet('search_operator')" ng-model-options="{getterSetter: true}" title="{{:: ts('Default search operator for the user to select') }}">
       <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
+    </select>
+  </div>
+  <div class="af-gui-field-select-in-dropdown" ng-if="$ctrl.getSearchJoins().length">
+    <label>{{:: ts('Filter by:') }}</label>
+    <select class="form-control" ng-model="getSet('join_clause')" ng-model-options="{getterSetter: true}" title="{{:: ts('Apply this filter to the entire search or just one joined entity.') }}">
+      <option value="">{{:: ts('Entire Search') }}</option>
+      <option ng-repeat="join in $ctrl.getSearchJoins()" value="{{:: join.id }}">{{:: join.text }}</option>
     </select>
   </div>
 </li>
@@ -152,13 +168,13 @@
 <li role="separator" class="divider" ng-if="hasOptions()"></li>
 <li ng-if="hasOptions()" ng-click="$event.stopPropagation()">
   <a href ng-click="resetOptions()" title="{{:: ts('Reset the option list for this field') }}">
-    <i class="crm-i fa-{{ $ctrl.node.defn.options ? '' : 'check-' }}circle-o"></i>
+    <i class="crm-i fa-{{ $ctrl.node.defn.options ? '' : 'check-' }}circle-o" role="img" aria-hidden="true"></i>
     {{:: ts('Default option list') }}
   </a>
 </li>
 <li ng-if="hasOptions()">
   <a href ng-click="editOptions()" title="{{:: ts('Customize the option list for this field') }}">
-    <i class="crm-i fa-{{ !$ctrl.node.defn.options ? '' : 'check-' }}circle-o"></i>
+    <i class="crm-i fa-{{ !$ctrl.node.defn.options ? '' : 'check-' }}circle-o" role="img" aria-hidden="true"></i>
     {{:: ts('Customize options') }}
   </a>
 </li>
@@ -166,6 +182,6 @@
 <li role="separator" class="divider"></li>
 <li>
   <a href ng-click="$ctrl.deleteThis()" title="{{:: ts('Remove field from form') }}">
-    <span class="text-danger"><i class="crm-i fa-trash"></i> {{:: ts('Remove field') }}</span>
+    <span class="text-danger"><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {{:: ts('Remove field') }}</span>
   </a>
 </li>

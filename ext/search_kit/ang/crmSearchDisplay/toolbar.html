@@ -1,17 +1,17 @@
 <div class="btn-group" ng-repeat="link in $ctrl.toolbar">
   <a ng-if="link.url" ng-href="{{:: link.url }}" class="btn btn-{{:: link.style }}" target="{{:: link.target }}">
-    <i ng-if="link.icon" class="crm-i {{:: link.icon }}"></i>
+    <i ng-if="link.icon" class="crm-i {{:: link.icon }}" role="img" aria-hidden="true"></i>
     {{:: link.text }}
   </a>
   <button ng-if="link.children" type="button" class="btn btn-{{:: link.style }} dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i ng-if="link.icon" class="crm-i {{:: link.icon }}"></i>
+    <i ng-if="link.icon" class="crm-i {{:: link.icon }}" role="img" aria-hidden="true"></i>
     {{:: link.text  }}
     <span class="caret"></span>
   </button>
   <ul ng-if="link.children" class="dropdown-menu dropdown-menu-right">
     <li ng-repeat="child in link.children">
       <a ng-href="{{:: child.url }}" target="{{:: child.target }}">
-        <i ng-if="child.icon" class="crm-i {{:: child.icon }}"></i>
+        <i ng-if="child.icon" class="crm-i {{:: child.icon }}" role="img" aria-hidden="true"></i>
         {{:: child.text }}
       </a>
     </li>

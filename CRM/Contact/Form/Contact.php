@@ -18,10 +18,6 @@
 /**
  * This class generates form components generic to all the contact types.
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
@@ -333,11 +329,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       // However, if they are not present in the element index they will
       // not be available from `$this->getSubmittedValue()` in post process.
       // We do not have to set defaults or otherwise render - just add to the element index.
-      $this->addCustomDataFieldsToForm('Contact', array_filter([
+      $this->addCustomDataFieldsToForm('Contact', [
         'id' => $this->getContactID(),
         'contact_type' => $this->_contactType,
         'contact_sub_type' => $this->getSubmittedValue('contact_sub_type'),
-      ]));
+      ]);
     }
 
     // execute preProcess dynamically by js else execute normal preProcess

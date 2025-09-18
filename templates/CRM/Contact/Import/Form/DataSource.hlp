@@ -7,28 +7,22 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='contact-type-title'}
-  {ts}Contact Type{/ts}
-{/htxt}
-{htxt id='contact-type'}
+
+{htxt id='contactType'}
   <p>{ts}Select <strong>Individual</strong> for Contact Type if each record in your file represents an individual person - even if the file also contains related Organization data (e.g. Employer Name, Employer Address, etc.).{/ts}</p>
   <p>{ts}Select <strong>Organization</strong> or <strong>Household</strong> if each record in your file represents a contact of that type.{/ts}</p>
   <p>{ts}<strong>Importing Contact Subtypes</strong> - If your file contains a mix of "subtypes" belonging to a built-in type, select the built-in ("parent") type here. You will then be able to map a Contact Subtype field from your file which sets the subtype for each row. EXAMPLE: If you are importing a mixture of Individuals who are "Students" and "Parents" and "Staff" subtypes, select "Individual" here AND include a column in your import file which contains the subtype for each row.{/ts}</p>
   <p>{ts}If all records in the file belong to the same subtype, then select that subtype from the "Subtype" field. All records will be automatically assigned to that subtype. In this case you do NOT need to include a Subtype column in the file.{/ts}</p>
 {/htxt}
 
-{htxt id='contact-sub-type-title'}
-  {ts}Sub-Type{/ts}
-{/htxt}
-{htxt id='contact-sub-type'}
+
+{htxt id='contactSubType'}
 <p>{ts}Select a specific Contact Subtype here ONLY if all you want all records in this import to be assigned to that subtype. EXAMPLE: If all records are of the <strong>Student</strong>, select that subtype here and it will be assigned to all import records.{/ts}</p>
 <p>{ts}Do NOT select a Contact Subtype if your import file contains a mixture of subtypes. In that case, select the built-in ("parent") type, and make sure you'll file includes include a column which sets the subtype for each row.{/ts}</p>
 {/htxt}
 
-{htxt id='dupes-title'}
-  {ts}Duplicate Matching{/ts}
-{/htxt}
-{htxt id='dupes'}
+
+{htxt id='onDuplicate'}
   <p>
     {ts}If a contact in the import file appears to be a duplicate of an existing CiviCRM contact...{/ts}
   </p>
@@ -51,10 +45,7 @@
   </p>
 {/htxt}
 
-{htxt id='data-source-selection-title'}
-  {ts}Data Source{/ts}
-{/htxt}
-{htxt id='data-source-selection'}
+{htxt id='dataSource'}
   <p>
     {ts}Select the source of the imported data. By default the following choices are possible:{/ts}
     <table>
@@ -68,17 +59,11 @@
   </p>
 {/htxt}
 
-{htxt id='id-dedupe_rule-title'}
-  {ts}Dedupe Rule{/ts}
-{/htxt}
-{htxt id='id-dedupe_rule'}
+{htxt id='dedupe_rule_id'}
   {ts}If you have selected one of the dedupe options besides "no duplicate checking," CiviCRM will use a predefined dedupe rule to determine possible matches for your imported records. Existing dedupe rules may be reviewed, and new rules created, by visiting Contacts > Manage Duplicates.{/ts}
   {ts}When selecting a dedupe rule, be sure to choose one that includes fields contained in your import file. Also be aware that the update and fill options could have significant impact on your existing data. You should define and select a rule that is strict enough to ensure there are no false positive matches.{/ts}
 {/htxt}
 
-{htxt id='id-fieldSeparator-title'}
-  {ts}Field Separator{/ts}
-{/htxt}
-{htxt id='id-fieldSeparator'}
+{htxt id='fieldSeparator'}
   {ts}Enter the character used to separate data columns in your import file. By default, the field will populate with the separator defined in your global settings. Common values include a comma, semicolon, or pipe character. To import a tab separated file, enter "tab" (without quotes) in the field.{/ts}
 {/htxt}

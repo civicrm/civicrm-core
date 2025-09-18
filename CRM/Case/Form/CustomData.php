@@ -17,12 +17,15 @@
 
 /**
  * This class generates form components for custom data
- *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
  */
-class CRM_Case_Form_CustomData extends CRM_Core_Form {
+class CRM_Case_Form_CustomData extends CRM_Core_Form implements CRM_Case_Form_CaseFormInterface {
+
+  public function getCaseID(): int {
+    if (!isset($this->_entityID)) {
+      $this->_entityID = (int) CRM_Utils_Request::retrieve('entityID', 'Positive', $this, TRUE);
+    }
+    return $this->_entityID;
+  }
 
   /**
    * The entity id, used when editing/creating custom data
@@ -53,7 +56,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    */
   public function preProcess(): void {
     $groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
-    $this->_entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', $this, TRUE);
+    $this->getCaseID();
     $this->_subTypeID = CRM_Utils_Request::retrieve('subType', 'Positive', $this, TRUE);
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
 

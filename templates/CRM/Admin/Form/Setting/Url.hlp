@@ -7,56 +7,44 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='id-enable_ssl-title'}
-  {ts}Force SSL{/ts}
-{/htxt}
-{htxt id='id-enable_ssl'}
+
+{htxt id='enableSSL'}
 <p>{ts}This setting forces a redirect of all online contribution / member / event and CiviCRM administrator page requests to SSL secured URLs (https).{/ts}</p>
 <p>{ts}If you use a payment processor service where credit card and billing information is collected <strong>on your site</strong> it is strongly recommended that you create or obtain an <strong>SSL certificate</strong> and configure your webserver to support SSL connections. Consult your hosting provider or web-server documentation for more information on obtaining and installing SSL certificates.{/ts}</p>
 <p>{ts}Once you have your certificate installed, test that is working by navigating to one of your online contribution pages and changing the URL prefix from 'http://' to 'https://'. If your browser loads the page and indicates a valid security certificate - then you can change this setting to <strong>Yes</strong> and CiviCRM will automatically redirect requests for all online contribution / member / event / admin pages to the corresponding SSL secured URLs.{/ts}</p>
 {/htxt}
 
-{htxt id='id-verify_ssl-title'}
-  {ts}Verify SSL Certificates{/ts}
-{/htxt}
-{htxt id='id-verify_ssl'}
+
+{htxt id='verifySSL'}
 <p>{ts}This setting will verify the SSL certificates received when making secure HTTPS connections to payment processors.{/ts}</p>
 <p>{ts}For example, in order to process a payment through Authorize.net, CiviCRM must make a request to https://secure2.authorize.net/gateway/transact.dll. Using https to connect to secure2.authorize.net insures that the connection is encrypted, but it's possible that CiviCRM is actually connecting to an attacker and the attacker is connecting to secure2.authorize.net.{/ts}</p>
 <p>{ts}Verifying the SSL certificate helps confirm that CiviCRM is securely communicating directly to payment processors.{/ts}</p>
 {/htxt}
 
-{htxt id='id-resource_url-title'}
-  {ts}Resource URL{/ts}
-{/htxt}
-{htxt id='id-resource_url'}
+
+{htxt id='userFrameworkResourceURL'}
 {ts}Location where the civicrm module or component has been installed.{/ts}
 {ts}By default, your CiviCRM Resource URL should be:{/ts} <strong>{ts}[civicrm.root]/{/ts}</strong>
 {/htxt}
 
-{htxt id='id-image_url-title'}
-  {ts}Image URL{/ts}
-{/htxt}
-{htxt id='id-image_url'}
+
+{htxt id='imageUploadURL'}
 {ts}URL of the location for uploaded image files.{/ts}
 {/htxt}
 
-{htxt id='id-extensions_url-title'}
-  {ts}Extensions URL{/ts}
-{/htxt}
-{htxt id='id-extensions_url'}
+
+{htxt id='extensionsURL'}
 {ts}Base URL for extension resources (images, stylesheets, etc).{/ts}<br/>
 {capture assign=civicrmAdminSettingPath}{crmURL p="civicrm/admin/setting/path" q="reset=1"}{/capture}
 {ts 1=$civicrmAdminSettingPath 2=$config->extensionsDir}This should match the <a href="%1">"CiviCRM Extensions Directory"</a> ("%2").{/ts}
 {/htxt}
 
-{htxt id='id-css_url-title'}
-  {ts}Customizing CSS{/ts}
-{/htxt}
-{htxt id='id-css_url'}
+
+{htxt id='customCSSURL'}
 <p>{ts}You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.{/ts}</p>
 {/htxt}
 
-{htxt id='id-defaultExternUrl'}
+{htxt id='defaultExternUrl'}
 <p>{ts}CiviCRM generates callback URLs for external services.{/ts}</p>
 <p>{ts}Some callback URLs are being migrated to a different style. During the transition, you may indicate a preferred style, such as:{/ts}</p>
 <ul>
@@ -67,7 +55,6 @@
 {/htxt}
 
 {htxt id='id-url_vars'}
-{ts}URL Variables{/ts}
   <table>
     <tbody>
     <tr>

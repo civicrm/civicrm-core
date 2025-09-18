@@ -65,7 +65,7 @@ CRM.$(function($) {
     var body = $('.crm-accordion-body.' + id);
     if (header.length > 0 && body.length > 0 && !body.html()) {
       body.html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Loading{/ts}{literal}...</span></div>');
-      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='htmlattribute'}Remove from search criteria{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>{literal}');
+      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='htmlattribute'}Remove from search criteria{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>{literal}');
       header.addClass('active');
       CRM.loadPage(url, {target: body, block: false});
     }
@@ -78,9 +78,13 @@ CRM.$(function($) {
 
 {if $context EQ 'smog' || $context EQ 'amtg' || !empty($savedSearch)}
   <h3>
-    {if $context EQ 'smog'}{ts}Find Contacts within this Group{/ts}
-    {elseif $context EQ 'amtg'}{ts}Find Contacts to Add to this Group{/ts}
-    {elseif !empty($savedSearch)}{ts 1=$savedSearch.name}%1 Smart Group Criteria{/ts} &nbsp; {help id='id-advanced-smart'}
+    {if $context EQ 'smog'}
+      {ts}Find Contacts within this Group{/ts}
+    {elseif $context EQ 'amtg'}
+      {ts}Find Contacts to Add to this Group{/ts}
+    {elseif !empty($savedSearch)}
+      {ts 1=$savedSearch.name}%1 Smart Group Criteria{/ts}
+      {capture assign='helpTitle'}{ts}Smart Group{/ts}{/capture}{help id='id-advanced-smart' title=$helpTitle}
     {/if}
   </h3>
 {/if}
@@ -102,7 +106,7 @@ CRM.$(function($) {
       <div class="float-right">
         <span class="crm-submit-buttons reset-advanced-search">
           <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button crm-inline-button" title="{ts escape='htmlattribute'}Clear all search criteria{/ts}">
-            <i class="crm-i fa-undo" aria-hidden="true"></i>
+            <i class="crm-i fa-undo" role="img" aria-hidden="true"></i>
             &nbsp;{ts}Reset Form{/ts}
           </a>
         </span>

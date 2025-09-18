@@ -19,17 +19,20 @@
     {if $action eq 256}
         <a href="{$advSearchURL}">{ts}Advanced Search{/ts}</a><br />
         {if $context eq 'smog'}
-            {help id="id-smog-criteria" group_title=$group.title}
+            {capture assign='helpTitle'}{ts}Group Search{/ts}{/capture}
+            {help id="smog-criteria" title=$helpTitle group_title=$group.title}
         {elseif $context eq 'amtg'}
-            {help id="id-amtg-criteria" group_title=$group.title}
+          {capture assign='helpTitle'}{ts}Add to Group{/ts}{/capture}
+            {help id="amtg-criteria" title=$helpTitle group_title=$group.title}
         {else}
-            {help id="id-basic-criteria"}
+            {capture assign='helpTitle'}{ts}Search{/ts}{/capture}
+            {help id="basic-criteria" title=$helpTitle}
         {/if}
     {elseif $action eq 8192}
         <a href="{$advSearchURL}">{ts}Advanced Search{/ts}</a><br />
     {/if}
   </div>
-  <a href="#" class="crm-selection-reset crm-hover-button float-right"><i class="crm-i fa-times-circle-o" aria-hidden="true"></i> {ts}Reset all selections{/ts}</a>
+  <a href="#" class="crm-selection-reset crm-hover-button float-right"><i class="crm-i fa-times-circle-o" role="img" aria-hidden="true"></i> {ts}Reset all selections{/ts}</a>
   <table class="form-layout-compressed">
     {if !empty($savedSearch.name)}
       <tr>

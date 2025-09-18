@@ -138,9 +138,9 @@
       link: function(scope, element, attrs) {
         element.addClass('crm-editable crm-editable-enabled');
         var titleLabel = $(element).find('span');
-        var penIcon = $('<i class="crm-i fa-pencil crm-editable-placeholder" aria-hidden="true"></i>').prependTo(element);
-        var saveButton = $('<button type="button"><i class="crm-i fa-check" aria-hidden="true"></i></button>').appendTo(element);
-        var cancelButton = $('<button type="cancel"><i class="crm-i fa-times" aria-hidden="true"></i></button>').appendTo(element);
+        var penIcon = $('<i class="crm-i fa-pencil crm-editable-placeholder" role="img" aria-hidden="true"></i>').prependTo(element);
+        var saveButton = $('<button type="button"><i class="crm-i fa-check" role="img" aria-hidden="true"></i></button>').appendTo(element);
+        var cancelButton = $('<button type="cancel"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></button>').appendTo(element);
         $('button', element).wrapAll('<div class="crm-editable-form" style="display:none" />');
         var buttons = $('.crm-editable-form', element);
         titleLabel.on('click', startEditMode);

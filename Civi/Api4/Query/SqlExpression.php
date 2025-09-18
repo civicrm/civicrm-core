@@ -228,6 +228,10 @@ abstract class SqlExpression {
     return static::$dataType;
   }
 
+  public function getRenderedDataType(?Api4Query $query):? string {
+    return static::getDataType();
+  }
+
   /**
    * Shift a keyword off the beginning of the argument string and return it.
    *

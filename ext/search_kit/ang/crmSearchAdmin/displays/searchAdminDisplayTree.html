@@ -52,14 +52,22 @@
   <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
-      <i class="crm-i fa-arrows crm-search-move-icon"></i>
+      <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
       <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
-        <i class="crm-i fa-ban"></i>
+        <i class="crm-i fa-ban" role="img" aria-hidden="true"></i>
       </button>
       <details>
         <summary> {{ $ctrl.parent.getColLabel(col) }}</summary>
-        <div class="form-inline" title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
-          <label><input type="checkbox" ng-model="col.break"> {{:: ts('New Line') }}</label>
+        <div class="form-inline">
+          <label title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
+            <input type="checkbox" ng-model="col.break">
+            {{:: ts('New Line') }}
+          </label>
+          &nbsp;
+          <label title="{{:: ts('Disable line breaks to keep contents inline') }}">
+            <input type="checkbox" ng-model="col.nowrap" >
+            {{:: ts('Prevent Wrapping') }}
+          </label>
         </div>
         <div class="form-inline crm-search-admin-flex-row">
           <label>

@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-contactSubtype-intro-title"}
-  {ts}Contact Types{/ts}
-{/htxt}
 {htxt id="id-contactSubtype-intro"}
 {ts}CiviCRM comes with 3 basic (built-in) contact types: Individual, Household, and Organization. You can create additional contact types based on these basic types to further differentiate contacts (for example you might create Student, Parent, Staff, and /or Volunteer "subtypes" from the basic Individual type...). You can also re-name the built-in types. Contact subtypes are especially useful when you need to collect and display different sets of custom data for different types of contacts.{/ts}
 {/htxt}

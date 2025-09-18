@@ -235,24 +235,6 @@ if (!defined('CIVICRM_UF_BASEURL')) {
   define('CIVICRM_UF_BASEURL', '%%baseURL%%');
 }
 
-/**
- * Specify a Smarty autoload file.
- *
- * Smarty5 is the version of Smarty we are in the process of adopting. To enable it
- * un-comment the line describing the path. Note that this will become always enabled in
- * the near future - this opt-in setting is transitional.
- */
-if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
-  // If not set we should default the Smarty version to Smarty5 which is our stable version.
-  // This will not work for all composer-based installs @todo.
-  if (is_dir($civicrm_root . '/packages')) {
-    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty5/Smarty.php');
-  }
-  elseif (is_dir($civicrm_root . '/../civicrm-packages')) {
-    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty5/Smarty.php');
-  }
-}
-
 if (!defined('CIVICRM_DEDUPE_OPTIMIZER')) {
   // This is a temporary define to allow us to phase in improved dedupe queries
   // with some degree of caution. If you set this to TRUE

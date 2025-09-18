@@ -100,7 +100,7 @@
         {{:: ts('Additional contexts in which the form can be embedded.') }}
       </p>
       <p class="text-warning" ng-if="!editor.afform.server_route && editor.placementRequiresServerRoute()">
-        <i class="crm-i fa-exclamation-triangle"></i>{{ ts('%1 placement requires a page route.', {1: editor.placementRequiresServerRoute()}) }}
+        <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>{{ ts('%1 placement requires a page route.', {1: editor.placementRequiresServerRoute()}) }}
       </p>
     </div>
 

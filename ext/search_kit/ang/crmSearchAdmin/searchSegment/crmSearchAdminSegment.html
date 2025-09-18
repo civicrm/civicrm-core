@@ -26,7 +26,7 @@
         <tbody ui-sortable="$ctrl.sortableOptions" ng-model="$ctrl.segment.items">
           <tr ng-repeat="item in $ctrl.segment.items">
             <td class="crm-draggable">
-              <i class="crm-i fa-arrows crm-search-move-icon"></i>
+              <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
             </td>
             <td>
               <input class="form-control" ng-model="item.label" required>
@@ -36,12 +36,12 @@
                 <input class="form-control crm-auto-width" ng-model="condition[0]" crm-ui-select="{data: $ctrl.selectFields, allowClear: false}" >
                 <crm-search-condition clause="condition" field="$ctrl.getField(condition[0])" offset="1" option-key="$ctrl.getOptionKey(condition[0])" class="form-group"></crm-search-condition>
                 <a class="crm-hover-button" ng-if="$index" ng-click="item.when.splice($index, 1)">
-                  <i class="crm-i fa-times" aria-hidden="true"></i>
+                  <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
                 </a>
               </div>
               <div ng-if="item.when && item.when.length">
                 <button class="btn btn-xs btn-secondary" ng-click="$ctrl.addCondition(item)">
-                  <i class="crm-i fa-plus"></i>
+                  <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
                   {{:: ts('Add Condition') }}
                 </button>
               </div>
@@ -51,7 +51,7 @@
             </td>
             <td class="text-right">
               <button type="button" class="btn btn-xs btn-danger" ng-click="$ctrl.segment.items.splice($index, 1)">
-                <i class="crm-i fa-trash"></i>
+                <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
               </button>
             </td>
           </tr>
@@ -60,11 +60,11 @@
           <tr>
             <td colspan="4">
               <button class="btn btn-sm btn-primary" ng-click="$ctrl.addItem(true)">
-                <i class="crm-i fa-plus"></i>
+                <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
                 {{:: ts('Add Item') }}
               </button>
               <button class="btn btn-sm btn-primary" ng-click="$ctrl.addItem(false)" ng-if="!$ctrl.hasDefault()">
-                <i class="crm-i fa-plus"></i>
+                <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
                 {{:: ts('Default Item') }}
               </button>
             </td>

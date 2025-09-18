@@ -2,7 +2,7 @@
   <div class="form-inline pull-right">
     <div class="btn-group pull-right" af-gui-menu>
       <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
-        <span><i class="crm-i fa-gear"></i></span>
+        <span><i class="crm-i fa-gear" role="img" aria-hidden="true"></i></span>
       </button>
       <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiMarkup-menu.html'"></ul>
     </div>
@@ -17,11 +17,11 @@
     <h4 class="pull-left">{{:: ts('Editing content') }}</h4>
     <div class="btn-group-sm pull-right">
       <button type="button" class="btn btn-default" ng-click="close()">
-        <i class="crm-i fa-times-circle"></i>
+        <i class="crm-i fa-times-circle" role="img" aria-hidden="true"></i>
         {{:: ts('Cancel') }}
       </button>
       <button type="button" class="btn btn-success" ng-click="save()">
-        <i class="crm-i fa-check-circle"></i>
+        <i class="crm-i fa-check-circle" role="img" aria-hidden="true"></i>
         {{:: ts('Done') }}
       </button>
     </div>

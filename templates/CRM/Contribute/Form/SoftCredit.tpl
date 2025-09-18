@@ -28,7 +28,7 @@
   {/section}
   <tr>
     <td>
-      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}another soft credit{/ts}</a>
+      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}another soft credit{/ts}</a>
     </td>
   </tr>
 </table>

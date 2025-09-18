@@ -264,16 +264,25 @@ class CRM_Core_JobManager {
    * @return string
    */
   private function apiResultToMessage($apiResult) {
-    $status = ($apiResult['is_error'] ?? FALSE) ? ts('Failure') : ts('Success');
-    $msg = $apiResult['error_message'] ?? 'empty error_message!';
-    $vals = $apiResult['values'] ?? 'empty values!';
+    if ($apiResult instanceof \Throwable) {
+      $status = ts('Failure');
+      $msg = $apiResult->getMessage();
+      $vals = 'empty values!';
+      $is_error = TRUE;
+    }
+    else {
+      $status = ($apiResult['is_error'] ?? FALSE) ? ts('Failure') : ts('Success');
+      $msg = $apiResult['error_message'] ?? 'empty error_message!';
+      $vals = $apiResult['values'] ?? 'empty values!';
+      $is_error = ($apiResult['is_error'] ?? FALSE);
+    }
     if (is_array($msg)) {
       $msg = serialize($msg);
     }
     if (is_array($vals)) {
       $vals = serialize($vals);
     }
-    $message = ($apiResult['is_error'] ?? FALSE) ? ', Error message: ' . $msg : " (" . $vals . ")";
+    $message = $is_error ? ', Error message: ' . $msg : " (" . $vals . ")";
     return $status . $message;
   }
 

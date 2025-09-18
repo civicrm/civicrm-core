@@ -3,11 +3,11 @@
   <div class="form-inline crm-search-display-editable-buttons" ng-if="!$ctrl.isFullRowMode">
     <button type="submit" ng-disabled="!crmSearchDisplayEditableForm.$valid" ng-click="$ctrl.save()" class="btn btn-xs btn-success">
       <span class="sr-only">{{:: ts('Save') }}</span>
-      <i class="crm-i fa-check"></i>
+      <i class="crm-i fa-check" role="img" aria-hidden="true"></i>
     </button>
     <button type="button" ng-click="$ctrl.cancel()" class="btn btn-xs btn-danger">
       <span class="sr-only">{{:: ts('Cancel') }}</span>
-      <i class="crm-i fa-times"></i>
+      <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
     </button>
   </div>
 </form>

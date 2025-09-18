@@ -24,7 +24,7 @@
   <input class="form-control collapsible-optgroups crm-auto-width" ng-model="clause[1]" crm-ui-select="::{data: $ctrl.fields, allowClear: true, placeholder: ts('Always')}" ng-change="$ctrl.onSelectField(clause)" />
   <crm-search-condition ng-if="clause[1]" clause="clause" field="$ctrl.getField(clause[1])" offset="2" option-key="'name'" format="$ctrl.format" class="form-group"></crm-search-condition>
   <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.item.cssRules.splice($index, 1);" title="{{:: ts('Remove style') }}">
-    <i class="crm-i fa-times"></i>
+    <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
   </button>
 </div>
 <div class="form-inline" ng-if="$ctrl.showMore()" title="{{:: ts('Set background color or text style based on a field value') }}">

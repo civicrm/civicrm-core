@@ -24,7 +24,7 @@
           <td>
             <a
               href="{crmURL p="civicrm/contact/view/cd/edit" q="tableId=`$contactId`&cid=`$contactId`&groupID=`$groupId`&action=update&reset=1"}"
-              class="button" style="margin-left: 6px;"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts 1=$cd_edit.title}Edit %1{/ts}</span></a><br/><br/>
+              class="button" style="margin-left: 6px;"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts 1=$cd_edit.title}Edit %1{/ts}</span></a><br/><br/>
           </td>
         </tr>
       {/if}
@@ -43,7 +43,7 @@
                   <a href="#" class="crm-hover-button crm-custom-value-del"
                      data-post='{ldelim}"valueID": "{$cvID}", "groupID": "{$customGroupId}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'
                      title="{ts escape='htmlattribute' 1=$cd_edit.title|cat:" `$rowCount`"}Delete %1{/ts}">
-                    <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}
+                    <i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete{/ts}
                   </a>
                 </div>
               {/if}

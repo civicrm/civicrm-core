@@ -57,6 +57,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       if (empty($event_in_cart->participants)) {
         $participant_params = [
+          'cart_id' => $this->cart->id,
           'event_id' => $event_in_cart->event_id,
           'contact_id' => self::find_or_create_contact(),
         ];

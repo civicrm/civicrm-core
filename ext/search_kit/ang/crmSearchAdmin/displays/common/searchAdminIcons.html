@@ -29,7 +29,7 @@
     <crm-search-condition ng-if="icon.if[0]" clause="icon.if" field="$ctrl.getField(icon.if[0])" offset="1" option-key="'name'" format="$ctrl.format" class="form-group"></crm-search-condition>
   </div>
   <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.item.icons.splice($index, 1);" title="{{:: ts('Remove icon') }}">
-    <i class="crm-i fa-times"></i>
+    <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
   </button>
 </div>
 <div class="form-inline" title="{{:: ts('Add icon(s) to this column') }}">

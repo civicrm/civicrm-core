@@ -72,7 +72,7 @@ class CRM_Contact_BAO_Contact_Utils {
     if (!empty($typeInfo['icon'])) {
       // do not add title since it hides contact name
       $title = $addProfileOverlay ? '' : htmlspecialchars($typeInfo['label']);
-      $imageInfo['image'] = '<i class="crm-i fa-fw ' . $typeInfo['icon'] . '" title="' . $title . '"></i>';
+      $imageInfo['image'] = '<i class="crm-i fa-fw ' . $typeInfo['icon'] . '" title="' . $title . '" role="img" aria-hidden="true"></i>';
     }
 
     if ($addProfileOverlay) {

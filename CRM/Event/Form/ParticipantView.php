@@ -50,6 +50,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       CRM_Event_BAO_Participant::fixEventLevel($values[$participantID]['fee_level']);
     }
 
+    $this->assign('accessCiviContribute', CRM_Core_Permission::access('CiviContribute'));
     $this->assign('contactId', $contactID);
     $this->assign('participantId', $participantID);
 

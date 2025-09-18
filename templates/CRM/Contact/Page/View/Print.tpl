@@ -9,7 +9,7 @@
 *}
 {* Contact Summary template to print contact information *}
 {literal}
-<style type="text/css" media="screen, print">
+<style media="screen, print">
 <!--
   #crm-container div {
     font-size: 12px;

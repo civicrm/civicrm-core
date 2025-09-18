@@ -26,10 +26,10 @@
     <div class="action-link">
         {* dev/core#4808 profile listings are being phased out, but extensions can still set this *}
         {if $listingURL}
-            <a href="{$listingURL}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Listings{/ts}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="{$listingURL}"><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> {ts}Back to Listings{/ts}</a>&nbsp;&nbsp;&nbsp;&nbsp;
         {/if}
         {if $mapURL}
-            <a href="{$mapURL}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map Primary Address{/ts}</a>
+            <a href="{$mapURL}"><i class="crm-i fa-map-marker" role="img" aria-hidden="true"></i> {ts}Map Primary Address{/ts}</a>
         {/if}
     </div>
 {/if}

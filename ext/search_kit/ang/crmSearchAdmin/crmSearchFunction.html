@@ -12,13 +12,13 @@
   <div class="input-group" ng-if="arg !== $ctrl.fieldArg" title="{{ $ctrl.getParam($index).label }}">
     <div class="input-group-btn">
       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="crm-i {{ $ctrl.exprTypesByName[arg.type].icon }}"></i>
+        <i class="crm-i {{ $ctrl.exprTypesByName[arg.type].icon }}" role="img" aria-hidden="true"></i>
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu">
         <li ng-repeat="exprInfo in $ctrl.sqlExprTypes" ng-if="$ctrl.getParam($parent.$index).must_be.indexOf(exprInfo.type) >= 0">
           <a href ng-click="$ctrl.changeArgType(arg, exprInfo)">
-            <i class="crm-i fa-fw {{ exprInfo.icon }}"></i>
+            <i class="crm-i fa-fw {{ exprInfo.icon }}" role="img" aria-hidden="true"></i>
             {{ exprInfo.label }}
           </a>
         </li>
@@ -37,12 +37,12 @@
 </div>
 <div class="btn-group" ng-if="$ctrl.canAddArg()">
   <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="crm-i fa-plus"></i> <span class="caret"></span>
+    <i class="crm-i fa-plus" role="img" aria-hidden="true"></i> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
     <li ng-repeat="exprInfo in $ctrl.sqlExprTypes" ng-if="$ctrl.getParam($ctrl.args.length).must_be.indexOf(exprInfo.type) >= 0">
       <a href ng-click="$ctrl.addArg(exprInfo.type)">
-        <i class="crm-i fa-fw {{:: exprInfo.icon }}"></i>
+        <i class="crm-i fa-fw {{:: exprInfo.icon }}" role="img" aria-hidden="true"></i>
         {{:: exprInfo.label }}
       </a>
     </li>

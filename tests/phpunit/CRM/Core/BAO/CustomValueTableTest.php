@@ -6,9 +6,15 @@
  */
 class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->hookClass->setHook('civicrm_custom', [$this, 'hook_custom']);
+  }
+
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_file', 'civicrm_entity_file'], TRUE);
     parent::tearDown();
+    $this->hookClass->reset();
   }
 
   /**
@@ -270,6 +276,12 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     $this->assertEquals($params['custom_' . $customField['id'] . '_-1'], $result['custom_' . $customField['id']]);
     $this->assertEquals($params['entityID'], $result['entityID']);
+  }
+
+  public function hook_custom($op, $groupID, $entityID, &$params) {
+    foreach ($params as $field) {
+      $this->assertTrue(array_key_exists('entity_table', $field));
+    }
   }
 
 }

@@ -16,7 +16,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
   {crmRegion name='html-header' allowCmsOverride=0}{/crmRegion}
-  <style type="text/css" media="print">@import url({$config->resourceBase}css/print.css);</style>
+  <style media="print">@import url({$config->resourceBase}css/print.css);</style>
 </head>
 
 <body>

@@ -1,10 +1,10 @@
 <div ng-model="$ctrl.select" ui-sortable="$ctrl.sortableOptions">
   <fieldset ng-repeat="col in $ctrl.select" class="crm-draggable">
-    <i class="crm-i fa-arrows crm-search-move-icon"></i>
-    <crm-search-function ng-if="!col.isPseudoField" class="form-inline" mode="select" expr="col.key"></crm-search-function>
-    <label ng-if="col.isPseudoField">{{:: col.label }}</label>
+    <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
+    <crm-search-function ng-if="!col.isPseudoField && $ctrl.crmSearchAdmin.paramExists('groupBy')" class="form-inline" mode="select" expr="col.key"></crm-search-function>
+    <label ng-if="col.isPseudoField || !$ctrl.crmSearchAdmin.paramExists('groupBy')">{{:: col.label }}</label>
     <button type="button" class="btn btn-xs pull-right" ng-if="$ctrl.select.length > 1" ng-click="$ctrl.crmSearchAdmin.clearParam('select', $index)" title="{{:: ts('Remove') }}">
-      <i class="crm-i fa-times"></i>
+      <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
     </button>
   </fieldset>
 </div>

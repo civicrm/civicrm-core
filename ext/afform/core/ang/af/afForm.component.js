@@ -471,7 +471,7 @@
         const buttons = getDraftButtons();
         $.each(buttons, function(index, button) {
           $(button).text(text).attr('disabled', true);
-          $(button).prepend('<i class="crm-i ' + icon + '" aria-hidden="true"></i> ');
+          $(button).prepend('<i class="crm-i ' + icon + '" role="img" aria-hidden="true"></i> ');
         });
       }
 
@@ -481,7 +481,7 @@
           const initialState = saveDraftButtons[index] || saveDraftButtons[0];
           $(button).text(initialState.text).attr('disabled', false);
           if (initialState.icon) {
-            $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" aria-hidden="true"></i> ');
+            $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" role="img" aria-hidden="true"></i> ');
           }
         });
       }

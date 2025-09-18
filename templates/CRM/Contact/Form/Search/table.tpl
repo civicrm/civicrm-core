@@ -25,7 +25,7 @@
                 {$form.value[$x][$i].html|crmAddClass:'required'}
               </span>
               {if $i gt 0 or $x gt 1}
-                &nbsp;<a href="#" class="crm-reset-builder-row crm-hover-button" title="{ts escape='htmlattribute'}Remove this row{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+                &nbsp;<a href="#" class="crm-reset-builder-row crm-hover-button" title="{ts escape='htmlattribute'}Remove this row{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
               {/if}
             </td>
           </tr>

@@ -1,29 +1,29 @@
 <af-tabset>
-  <af-tab title="{{:: ts('Campaigns') }}">
+  <af-tab title="Campaigns">
     <div af-fieldset>
       <fieldset class="af-container af-layout-inline">
-        <af-field name="title,description" defn="{label: false, data_type: 'String', input_type: 'Text', name: 'title', input_attrs: {placeholder: ts('Filter by title/description')}}" />
-        <af-field name="campaign_type_id" defn="{input_attrs: {multiple: true, placeholder: ts('Filter by type')}, label: false}" />
-        <af-field name="status_id" defn="{input_attrs: {multiple: true, placeholder: ts('Filter by status')}, label: false}" />
+        <af-field name="title,description" defn="{input_attrs: {placeholder: 'Filter by title/description'}, label: false}" />
+        <af-field name="campaign_type_id" defn="{input_attrs: {multiple: true, placeholder: 'Filter by type'}, label: false}" />
+        <af-field name="status_id" defn="{input_attrs: {multiple: true, placeholder: 'Filter by status'}, label: false}" />
       </fieldset>
       <crm-search-display-table search-name="Administer_Campaigns" display-name="Campaigns_Table" total-count="$parent.count"></crm-search-display-table>
     </div>
   </af-tab>
-  <af-tab title="{{:: ts('Surveys') }}">
+  <af-tab title="Surveys">
     <div af-fieldset>
       <fieldset class="af-container af-layout-inline">
-        <af-field name="title" defn="{label: false, input_attrs: {placeholder: ts('Filter by title')}}" />
-        <af-field name="activity_type_id" defn="{input_attrs: {multiple: true, placeholder: ts('Filter by type')}, label: false}" />
-        <af-field name="campaign_id" defn="{label: false, input_attrs: {placeholder: ts('Filter by campaign'), autoOpen: true}}" />
+        <af-field name="title" defn="{label: false, input_attrs: {placeholder: 'Filter by title'}}" />
+        <af-field name="activity_type_id" defn="{input_attrs: {multiple: true, placeholder: 'Filter by type'}, label: false}" />
+        <af-field name="campaign_id" defn="{label: false, input_attrs: {placeholder: 'Filter by campaign', autoOpen: true}}" />
       </fieldset>
       <crm-search-display-table search-name="Administer_Surveys" display-name="Surveys_Table" total-count="$parent.count"></crm-search-display-table>
     </div>
   </af-tab>
-  <af-tab title="{{:: ts('Petitions') }}">
+  <af-tab title="Petitions">
     <div af-fieldset>
       <fieldset class="af-container af-layout-inline">
-        <af-field name="title" defn="{label: false, input_attrs: {placeholder: ts('Filter by title')}}" />
-        <af-field name="campaign_id" defn="{label: false, input_attrs: {placeholder: ts('Filter by campaign'), autoOpen: true}}" />
+        <af-field name="title" defn="{label: false, input_attrs: {placeholder: 'Filter by title'}}" />
+        <af-field name="campaign_id" defn="{label: false, input_attrs: {placeholder: 'Filter by campaign', autoOpen: true}}" />
       </fieldset>
       <crm-search-display-table search-name="Administer_Petitions" display-name="Petitions_Table" total-count="$parent.count"></crm-search-display-table>
     </div>

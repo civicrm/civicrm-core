@@ -62,48 +62,32 @@ class CryptoJwt extends AutoService {
    * @throws CryptoException
    */
   public function decode($token, $keyTag = 'SIGN') {
-    // TODO: Circa mid-2024, make a hard-requirement on firebase/php-jwt v5.5+.
-    // Then we can remove this guard and simplify the `$keysByAlg` stuff.
-    $useKeyObj = class_exists(Key::class);
-    if (!$useKeyObj) {
-      \CRM_Core_Error::deprecatedWarning('Using deprecated version of firebase/php-jwt. Upgrade to 6.x+.');
-    }
     $keyRows = $this->getRegistry()->findKeysByTag($keyTag);
 
-    // We want to call JWT::decode(), but there's a slight mismatch -- the
-    // registry contains whitelisted permutations of ($key,$alg), but
-    // JWT::decode() accepts all permutations ($keys x $algs).
-
-    // Grouping by alg will give proper granularity and also produces one
-    // call to JWT::decode() in typical usage.
-
-    // Defn: $keysByAlg[$alg][$keyId] === $keyData
-    $keysByAlg = [];
+    $jwtKeys = [];
     foreach ($keyRows as $key) {
       if ($alg = $this->suiteToAlg($key['suite'])) {
         // Currently, registry only has symmetric keys in $key['key']. For public key-pairs, might need to change.
-        $keysByAlg[$alg][$key['id']] = ($useKeyObj ? new Key($key['key'], $alg) : $key['key']);
+        $jwtKeys[$key['id']] = new Key($key['key'], $alg);
       }
     }
 
-    foreach ($keysByAlg as $alg => $keys) {
-      try {
-        return ($useKeyObj ? (array) JWT::decode($token, $keys) : (array) JWT::decode($token, $keys, [$alg]));
+    try {
+      return (array) JWT::decode($token, $jwtKeys);
+    }
+    catch (\UnexpectedValueException | \LogicException $e) {
+      // Convert to satisfy `@throws CryptoException` and historical messaging.
+      if (
+        !preg_match(';unable to lookup correct key;', $e->getMessage())
+        &&
+        !preg_match(';Signature verification failed;', $e->getMessage())
+      ) {
+        throw new CryptoException(get_class($e) . ': ' . $e->getMessage(), 0, [], $e);
       }
-      catch (\UnexpectedValueException $e) {
-        // Depending on the error, we might able to try other algos
-        if (
-          !preg_match(';unable to lookup correct key;', $e->getMessage())
-          &&
-          !preg_match(';Signature verification failed;', $e->getMessage())
-        ) {
-          // Keep our signature independent of the implementation.
-          throw new CryptoException(get_class($e) . ': ' . $e->getMessage());
-        }
+      else {
+        throw new CryptoException('Signature verification failed', 0, [], $e);
       }
     }
-
-    throw new CryptoException('Signature verification failed');
   }
 
   /**

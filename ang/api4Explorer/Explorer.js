@@ -1,15 +1,14 @@
-(function(angular, $, _, undefined) {
+(function(angular, $, _) {
+  "use strict";
 
   // Schema metadata
-  var schema = CRM.vars.api4.schema;
+  const schema = CRM.vars.api4.schema;
   // Cache list of entities
-  var entities = [];
-  // Cache list of actions
-  var actions = [];
+  const entities = [];
   // Field options
-  var fieldOptions = {};
+  const fieldOptions = {};
   // Api params
-  var params;
+  let params;
 
   angular.module('api4Explorer').config(function($routeProvider) {
     $routeProvider.when('/explorer/:api4entity?/:api4action?', {
@@ -20,10 +19,10 @@
   });
 
   angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4) {
-    var ts = $scope.ts = CRM.ts(),
-      ctrl = $scope.$ctrl = this;
+    const ts = $scope.ts = CRM.ts();
+    const ctrl = $scope.$ctrl = this;
     $scope.entities = entities;
-    $scope.actions = actions;
+    $scope.actions = [];
     $scope.fields = [];
     $scope.havingOptions = [];
     $scope.fieldsAndJoins = [];
@@ -39,10 +38,9 @@
       viewDebugOutput: CRM.checkPerm('view debug output'),
     };
     marked.setOptions({highlight: prettyPrintOne});
-    var getMetaParams = {},
-      objectParams = {orderBy: 'ASC', values: '', defaults: '', chain: ['Entity', '', '{}']},
-      docs = CRM.vars.api4.docs,
-      response,
+    const objectParams = {orderBy: 'ASC', values: '', defaults: '', chain: ['Entity', '', '{}']};
+    const docs = CRM.vars.api4.docs;
+    let response,
       helpTitle = '',
       helpContent = {};
     $scope.helpTitle = '';
@@ -117,8 +115,8 @@
 
     // Copy text to the clipboard
     this.copyCode = function(domId) {
-      var node = document.getElementById(domId);
-      var range = document.createRange();
+      const node = document.getElementById(domId);
+      const range = document.createRange();
       range.selectNode(node);
       window.getSelection().removeAllRanges();
       window.getSelection().addRange(range);
@@ -134,7 +132,7 @@
     }
 
     function pluralize(str) {
-      var lastLetter = str[str.length - 1],
+      const lastLetter = str[str.length - 1],
         lastTwo = str[str.length - 2] + lastLetter;
       if (lastLetter === 's' || lastLetter === 'x' || lastTwo === 'ch') {
         return str + 'es';
@@ -148,8 +146,8 @@
     // Reformat an existing array of objects for compatibility with select2
     function formatForSelect2(input, container, key, extra, prefix) {
       _.each(input, function(item) {
-        var id = (prefix || '') + item[key];
-        var formatted = {id: id, text: id};
+        const id = (prefix || '') + item[key];
+        let formatted = {id: id, text: id};
         if (extra) {
           _.merge(formatted, _.pick(item, extra));
         }
@@ -160,27 +158,32 @@
 
     // Replaces contents of fieldList array with current fields formatted for select2
     function getFieldList(fieldList, action, addPseudoconstant, addWriteJoins) {
-      var fieldInfo = _.cloneDeep(_.findWhere(getEntity().actions, {name: action}).fields);
       fieldList.length = 0;
-      if (addPseudoconstant) {
-        addPseudoconstants(fieldInfo);
+      const entityInfo = getEntity();
+      const actionInfo = _.findWhere(entityInfo.actions, {name: action});
+      // Avoid crash before metadata has been fetched
+      if (actionInfo) {
+        const fieldInfo = _.cloneDeep(actionInfo.fields);
+        if (addPseudoconstant) {
+          addPseudoconstants(fieldInfo);
+        }
+        if (addWriteJoins) {
+          addWriteJoinFields(fieldInfo);
+        }
+        formatForSelect2(fieldInfo, fieldList, 'name', ['description', 'required', 'default_value']);
       }
-      if (addWriteJoins) {
-        addWriteJoinFields(fieldInfo);
-      }
-      formatForSelect2(fieldInfo, fieldList, 'name', ['description', 'required', 'default_value']);
     }
 
     // Note: this function expects fieldList to be select2-formatted already
     function addJoins(fieldList, addWildcard, addPseudoconstant) {
       // Add entities specified by the join param
       _.each(getExplicitJoins(), function(join) {
-        var wildCard = addWildcard ? [{id: join.alias + '.*', text: join.alias + '.*', 'description': 'All core ' + join.entity + ' fields'}] : [],
+        let wildCard = addWildcard ? [{id: join.alias + '.*', text: join.alias + '.*', 'description': 'All core ' + join.entity + ' fields'}] : [],
           joinFields = _.cloneDeep(entityFields(join.entity));
         if (joinFields) {
           // Add fields from bridge entity
           if (join.bridge) {
-            var bridgeFields = _.cloneDeep(entityFields(join.bridge)),
+            let bridgeFields = _.cloneDeep(entityFields(join.bridge)),
               bridgeEntity = getEntity(join.bridge),
               joinFieldNames = _.pluck(joinFields, 'name'),
               // Check if this is a symmetric bridge e.g. RelationshipCache joins Contact to Contact
@@ -210,7 +213,7 @@
       // Add implicit joins based on schema links
       _.each(entityFields($scope.entity, $scope.action), function(field) {
         if (field.fk_entity) {
-          var linkFields = _.cloneDeep(entityFields(field.fk_entity)),
+          let linkFields = _.cloneDeep(entityFields(field.fk_entity)),
             wildCard = addWildcard ? [{id: field.name + '.*', text: field.name + '.*', 'description': 'All core ' + field.fk_entity + ' fields'}] : [];
           if (addPseudoconstant) {
             addPseudoconstants(linkFields);
@@ -226,11 +229,11 @@
 
     // Note: this function transforms a raw list a-la getFields; not a select2-formatted list
     function addPseudoconstants(fieldList) {
-      var optionFields = _.filter(fieldList, 'options');
+      let optionFields = _.filter(fieldList, 'options');
       _.each(optionFields, function(field) {
-        var pos = _.findIndex(fieldList, {name: field.name}) + 1;
+        let pos = _.findIndex(fieldList, {name: field.name}) + 1;
         _.each(field.suffixes, function(suffix) {
-          var newField = _.cloneDeep(field);
+          let newField = _.cloneDeep(field);
           newField.name += ':' + suffix;
           fieldList.splice(pos, 0, newField);
         });
@@ -241,9 +244,9 @@
     // Note: this function transforms a raw list a-la getFields; not a select2-formatted list
     function addWriteJoinFields(fieldList) {
       _.eachRight(fieldList, function(field, pos) {
-        var fkNameField = field.fk_entity && getField('name', field.fk_entity, $scope.action);
+        const fkNameField = field.fk_entity && getField('name', field.fk_entity, $scope.action);
         if (fkNameField) {
-          var newField = _.cloneDeep(fkNameField);
+          const newField = _.cloneDeep(fkNameField);
           newField.name = field.name + '.' + newField.name;
           fieldList.splice(pos, 0, newField);
         }
@@ -270,21 +273,21 @@
     function formatHelp(rawContent) {
       function formatRefs(see) {
         _.each(see, function(ref, idx) {
-          var match = ref.match(/^(\\Civi\\Api4\\)?([a-zA-Z]+)$/);
+          const match = ref.match(/^(\\Civi\\Api4\\)?([a-zA-Z]+)$/);
           if (match) {
             ref = '#/explorer/' + match[2];
           }
           // Link to php classes on GitHub.
           // Fixme: Only works for files in the core repo
           if (ref[0] === '\\' || ref.indexOf('Civi\\') === 0 || ref.indexOf('CRM_') === 0) {
-            var classFunction = _.trim(ref, '\\').split('::'),
+            let classFunction = _.trim(ref, '\\').split('::'),
               replacement = new RegExp(classFunction[0].indexOf('CRM_') === 0 ? '_' : '\\\\', 'g');
             ref = 'https://github.com/civicrm/civicrm-core/blob/master/' + classFunction[0].replace(replacement, '/') + '.php';
           }
           see[idx] = '<a target="' + (ref[0] === '#' ? '_self' : '_blank') + '" href="' + ref + '">' + see[idx] + '</a>';
         });
       }
-      var formatted = _.cloneDeep(rawContent);
+      const formatted = _.cloneDeep(rawContent);
       if (formatted.description) {
         formatted.description = marked(formatted.description);
       }
@@ -296,11 +299,11 @@
     }
 
     $scope.fieldHelp = function(fieldName) {
-      var field = getField(fieldName, $scope.entity, $scope.action);
+      const field = getField(fieldName, $scope.entity, $scope.action);
       if (!field) {
         return;
       }
-      var info = {
+      const info = {
         description: field.description,
         type: field.data_type
       };
@@ -318,11 +321,11 @@
     // Returns field list for write params (values, defaults)
     $scope.fieldList = function(param) {
       return function() {
-        var fields = [];
+        const fields = [];
         getFieldList(fields, $scope.action === 'getFields' ? ($scope.params.action || 'get') : $scope.action, true, true);
         // Disable fields that are already in use
         _.each($scope.params[param] || [], function(val) {
-          var usedField = val[0].replace(/[:.]name/, '');
+          const usedField = val[0].replace(/[:.]name/, '');
           (_.findWhere(fields, {id: usedField}) || {}).disabled = true;
           (_.findWhere(fields, {id: usedField + ':name'}) || {}).disabled = true;
           (_.findWhere(fields, {id: usedField + '.name'}) || {}).disabled = true;
@@ -352,7 +355,7 @@
       if (_.isEmpty($scope.availableParams)) {
         return;
       }
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having', 'join', 'sets'];
+      const specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having', 'join', 'sets'];
       if ($scope.availableParams.limit && $scope.availableParams.offset) {
         specialParams.push('limit', 'offset');
       }
@@ -367,7 +370,7 @@
     };
 
     $scope.selectRowCount = function() {
-      var index = params.select.indexOf('row_count');
+      const index = params.select.indexOf('row_count');
       if (index < 0) {
         $scope.params.select.push('row_count');
       } else {
@@ -394,16 +397,16 @@
 
     // Get name of entity given join alias
     function entityNameFromAlias(alias) {
-      var joins = getExplicitJoins(),
-        entity = $scope.entity,
+      const joins = getExplicitJoins(),
         path = alias.split('.');
+      let entity = $scope.entity;
       // First check explicit joins
       if (joins[alias]) {
         return joins[alias].entity;
       }
       // Then lookup implicit joins
-      _.each(path, function(node) {
-        var field = getField(node, entity, $scope.action);
+      path.forEach(function(node) {
+        const field = getField(node, entity, $scope.action);
         if (!field || !field.fk_entity) {
           return false;
         }
@@ -414,7 +417,7 @@
 
     // Get all params that have been set
     function getParams() {
-      var params = {};
+      const params = {};
       _.each($scope.params, function(param, key) {
         if (param != $scope.availableParams[key].default && !(typeof param === 'object' && _.isEmpty(param))) {
           if (_.contains($scope.availableParams[key].type, 'array') && (typeof objectParams[key] === 'undefined')) {
@@ -436,11 +439,11 @@
       });
       _.each(objectParams, function(defaultVal, key) {
         if (params[key]) {
-          var newParam = {};
+          const newParam = {};
           _.each(params[key], function(item) {
-            var val = _.cloneDeep(item[1]);
+            let val = _.cloneDeep(item[1]);
             // Remove blank items from "chain" array
-            if (_.isArray(val)) {
+            if (Array.isArray(val)) {
               _.eachRight(item[1], function(v) {
                 if (v) {
                   return false;
@@ -461,17 +464,18 @@
         return input;
       }
       // Return literal quoted string without removing quotes - for the sake of JOIN ON clauses
-      if (_.isString(input) && input[0] === input[input.length - 1] && _.includes(["'", '"'], input[0])) {
+      if ((typeof input === 'string') && input[0] === input[input.length - 1] && ["'", '"'].includes(input[0])) {
         return input;
       }
-      if (_.isObject(input) || _.isArray(input)) {
+      if (typeof input === 'object') {
+        // Could be an object or an array
         _.each(input, function(item, index) {
           input[index] = parseYaml(item);
         });
         return input;
       }
       try {
-        var output = (input === '>') ? '>' : jsyaml.safeLoad(input);
+        let output = (input === '>') ? '>' : jsyaml.safeLoad(input);
         // We don't want dates parsed to js objects
         return _.isDate(output) ? input : output;
       } catch (e) {
@@ -480,7 +484,7 @@
     }
 
     this.buildFieldList = function() {
-      var actionInfo = _.findWhere(actions, {id: $scope.action});
+      const actionInfo = _.findWhere($scope.actions, {id: $scope.action});
       getFieldList($scope.fields, $scope.action);
       getFieldList($scope.fieldsAndJoins, $scope.action, true);
       getFieldList($scope.fieldsAndJoinsAndFunctions, $scope.action);
@@ -490,7 +494,7 @@
         addJoins($scope.fieldsAndJoins);
         // SQL functions are supported if HAVING is
         if (actionInfo.params.having) {
-          var functions = {
+          const functions = {
             text: ts('FUNCTION'),
             description: ts('Calculate result of a SQL function'),
             children: _.transform(CRM.vars.api4.functions, function(result, fn) {
@@ -523,13 +527,12 @@
 
     function selectAction() {
       $scope.action = $routeParams.api4action;
-      if (!actions.length) {
-        formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params', 'deprecated']);
-      }
+      $scope.actions.length = 0;
+      formatForSelect2(getEntity().actions, $scope.actions, 'name', ['description', 'params', 'deprecated']);
       if ($scope.action) {
-        var actionInfo = _.findWhere(actions, {id: $scope.action});
+        const actionInfo = _.findWhere($scope.actions, {id: $scope.action});
         _.each(actionInfo.params, function (param, name) {
-          var format,
+          let format,
             defaultVal = _.cloneDeep(param.default);
           if (param.type) {
             switch (param.type[0]) {
@@ -584,14 +587,14 @@
           if (name === 'select' && actionInfo.params.having) {
             $scope.$watchCollection('params.select', function(newSelect) {
               // Ignore row_count, it can't be used in HAVING clause
-              var select = _.without(newSelect, 'row_count');
+              let select = _.without(newSelect, 'row_count');
               $scope.havingOptions.length = 0;
               // An empty select is an implicit *
               if (!select.length) {
                 select.push('*');
               }
               _.each(select, function(item) {
-                var joinEntity,
+                let joinEntity,
                   pieces = item.split(' AS '),
                   alias = _.trim(pieces[pieces.length - 1]).replace(':label', ':name');
                 // Expand wildcards
@@ -599,7 +602,7 @@
                   if (alias.length > 1) {
                     joinEntity = entityNameFromAlias(alias.slice(0, -2));
                   }
-                  var fieldList = _.filter(getEntity(joinEntity).fields, {custom_field_id: null});
+                  let fieldList = _.filter(getEntity(joinEntity).fields, {custom_field_id: null});
                   formatForSelect2(fieldList, $scope.havingOptions, 'name', ['description', 'required', 'default_value'], alias.slice(0, -1));
                 }
                 else {
@@ -610,7 +613,7 @@
           }
           if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select' || name === 'join' || name === 'sets') {
             $scope.$watch('controls.' + name, function(value) {
-              var field = value;
+              let field = value;
               $timeout(function() {
                 if (field) {
                   if (name === 'join') {
@@ -618,15 +621,15 @@
                     ctrl.buildFieldList();
                   }
                   else if (name === 'sets') {
-                    var select = $scope.params.select && $scope.params.select.length ? $scope.params.select : ['id'];
+                    let select = $scope.params.select && $scope.params.select.length ? $scope.params.select : ['id'];
                     $scope.params[name].push(['UNION ALL', field, 'get', '{select: [' + select.join(', ') + '], where: []}']);
                   }
                   else if (typeof objectParams[name] === 'undefined') {
                     $scope.params[name].push(field);
                   } else {
-                    var defaultOp = _.cloneDeep(objectParams[name]);
+                    let defaultOp = _.cloneDeep(objectParams[name]);
                     if (name === 'chain') {
-                      var num = $scope.params.chain.length;
+                      const num = $scope.params.chain.length;
                       defaultOp[0] = field;
                       field = 'name_me_' + num;
                     }
@@ -645,7 +648,7 @@
     }
 
     function describeSqlFn(params) {
-      var desc = ' ';
+      let desc = ' ';
       _.each(params, function(param) {
         desc += ' ';
         if (param.name) {
@@ -667,7 +670,7 @@
     }
 
     function defaultValues(defaultVal) {
-      _.each($scope.fields, function(field) {
+      $scope.fields.forEach((field) => {
         if (field.required) {
           defaultVal.push([field.id, '']);
         }
@@ -679,7 +682,7 @@
       if (typeof value === 'undefined') {
         return '';
       }
-      var str = JSON.stringify(value).replace(/,/g, ', ');
+      let str = JSON.stringify(value).replace(/,/g, ', ');
       if (trim) {
         str = str.slice(1, -1);
       }
@@ -695,7 +698,7 @@
     }
 
     function writeCode() {
-      var code = {},
+      let code = {},
         entity = $scope.entity,
         action = $scope.action,
         params = getParams(),
@@ -703,11 +706,11 @@
         result = 'result';
       if ($scope.entity && $scope.action) {
         if (action.slice(0, 3) === 'get') {
-          var args = getEntity(entity).class_args || [];
+          let args = getEntity(entity).class_args || [];
           result = args[0] ? _.camelCase(args[0]) : entity;
           result = lcfirst(action.replace(/s$/, '').slice(3) || result);
         }
-        var results = lcfirst(_.isNumber(index) ? result : pluralize(result)),
+        let results = lcfirst((typeof index === 'number') ? result : pluralize(result)),
           paramCount = _.size(params),
           i = 0;
 
@@ -715,7 +718,7 @@
           case 'js':
           case 'ang':
             // Write javascript
-            var js = "'" + entity + "', '" + action + "', {";
+            let js = "'" + entity + "', '" + action + "', {";
             _.each(params, function(param, key) {
               js += "\n  " + key + ': ' + stringify(param) +
                 (++i < paramCount ? ',' : '');
@@ -735,7 +738,7 @@
 
           case 'php':
             // Always shows implicit true permissions check for PHP
-            params.checkPermissions = (params.checkPermissions === false) ? false : true;
+            params.checkPermissions = (params.checkPermissions !== false);
             // Write php code
             code.php = '$' + results + " = civicrm_api4('" + entity + "', '" + action + "', [";
             _.each(params, function(param, key) {
@@ -779,7 +782,7 @@
 
             // Cli code using short syntax
             code.short = 'cv api4 ' + entity + '.' + action;
-            var limitSet = false;
+            let limitSet = false;
             _.each(params, function(param, key) {
               switch (true) {
                 case (key === 'select' && !_.includes(param.join(), ' ')):
@@ -817,14 +820,14 @@
             break;
 
           case 'rest':
-            var restUrl = CRM.vars.api4.restUrl
+            let restUrl = CRM.vars.api4.restUrl
               .replace('CRMAPI4ENTITY', entity)
               .replace('CRMAPI4ACTION', action);
-            var cleanUrl;
+            let cleanUrl;
             if (CRM.vars.api4.restUrl.endsWith('/CRMAPI4ENTITY/CRMAPI4ACTION')) {
               cleanUrl = CRM.vars.api4.restUrl.replace('/CRMAPI4ENTITY/CRMAPI4ACTION', '/');
             }
-            var restCred = 'Bearer MY_API_KEY';
+            let restCred = 'Bearer MY_API_KEY';
 
             // CURL
             code.curl =
@@ -837,7 +840,7 @@
             }
             code.curl += "'";
 
-            var queryParams = "['params' => json_encode($params)" +
+            let queryParams = "['params' => json_encode($params)" +
               ((typeof index === 'number') ? ", 'index' => " + JSON.stringify(index) : '') +
               ((index && typeof index !== 'number') ? ", 'index' => json_encode(" + phpFormat(index) + ')' : '') +
               "]";
@@ -880,16 +883,16 @@
 
     // Format oop params
     function formatOOP(entity, action, params, indent) {
-      var info = getEntity(entity),
+      const info = getEntity(entity),
         arrayParams = ['groupBy', 'records'],
         newLine = "\n" + _.repeat(' ', indent),
-        code = '\\' + info.class + '::' + action + '(',
         args = _.cloneDeep(info.class_args || []);
+      let code = '\\' + info.class + '::' + action + '(';
       // Always shows implicit true permissions check for PHP
-      args.push((params.checkPermissions === false) ? false : true);
+      args.push(params.checkPermissions !== false);
       code += _.map(args, phpFormat).join(', ') + ')';
       _.each(params, function(param, key) {
-        var val = '';
+        let val = '';
         if (typeof objectParams[key] !== 'undefined' && key !== 'chain') {
           _.each(param, function(item, index) {
             val = phpFormat(index) + ', ' + phpFormat(item, 2 + indent);
@@ -940,20 +943,20 @@
     }
 
     function isInt(value) {
-      if (_.isFinite(value)) {
+      if (typeof value == 'number') {
         return true;
       }
-      if (!_.isString(value)) {
+      if (typeof value !== 'string') {
         return false;
       }
       return /^-{0,1}\d+$/.test(value);
     }
 
     function formatMeta(resp) {
-      var ret = '';
+      let ret = '';
       _.each(resp, function(val, key) {
         if (key !== 'values' && !_.isPlainObject(val) && !_.isFunction(val)) {
-          ret += (ret.length ? ', ' : '') + key + ': ' + (_.isArray(val) ? '[' + val + ']' : val);
+          ret += (ret.length ? ', ' : '') + key + ': ' + (Array.isArray(val) ? '[' + val + ']' : val);
         }
       });
       return prettyPrintOne(_.escape(ret));
@@ -1000,12 +1003,12 @@
       $scope.result = [formatMeta(response.meta)];
       switch (ctrl.resultFormat) {
         case 'json':
-          $scope.result.push(prettyPrintOne((_.isArray(response.values) ? '(' + response.values.length + ') ' : '') + _.escape(JSON.stringify(response.values, null, 2)), 'js', 1));
+          $scope.result.push(prettyPrintOne((Array.isArray(response.values) ? '(' + response.values.length + ') ' : '') + _.escape(JSON.stringify(response.values, null, 2)), 'js', 1));
           break;
 
         case 'php':
           // Fields marked 'localizable' in the schema should get wrapped in ts() for the php format
-          var localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
+          let localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
           // More field names that probably should be translated
           localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
           $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php', 1));
@@ -1014,7 +1017,7 @@
     };
 
     function debugFormat(data) {
-      var debug = data.debug ? prettyPrintOne(_.escape(JSON.stringify(data.debug, null, 2)).replace(/\\n/g, "\n")) : null;
+      const debug = data.debug ? prettyPrintOne(_.escape(JSON.stringify(data.debug, null, 2)).replace(/\\n/g, "\n")) : null;
       delete data.debug;
       return debug;
     }
@@ -1029,9 +1032,9 @@
       if (val === null || val === true || val === false) {
         return JSON.stringify(val).toUpperCase();
       }
-      var indentChild = indentChildren ? indent + indentChildren : null;
+      let indentChild = indentChildren ? indent + indentChildren : null;
       indent = (typeof indent === 'number') ? _.repeat(' ', indent) : (indent || '');
-      var ret = '',
+      let ret = '',
         baseLine = indent ? indent.slice(0, -2) : '',
         newLine = indent ? '\n' : '',
         trailingComma = indent ? ',' : '';
@@ -1040,18 +1043,18 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          var ts = localizable && localizable.includes(k) && _.isString(v)  && v.length ? 'E::ts(' : '';
-          var leadingComma = !ret ? '' : (newLine ? ',' : ', ');
+          let ts = localizable && localizable.includes(k) && _.isString(v)  && v.length ? 'E::ts(' : '';
+          let leadingComma = !ret ? '' : (newLine ? ',' : ', ');
           ret += leadingComma + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
-      if ($.isArray(val)) {
+      if (Array.isArray(val)) {
         if (!val.length) {
           return '[]';
         }
         $.each(val, function(k, v) {
-          var leadingComma = !ret ? '' : (newLine ? ',' : ', ');
+          let leadingComma = !ret ? '' : (newLine ? ',' : ', ');
           ret += leadingComma + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
@@ -1078,6 +1081,9 @@
     }
 
     function fetchMeta() {
+      const getMetaParams = {
+        actions: [$scope.entity, 'getActions', {chain: {fields: [$scope.entity, 'getFields', {action: '$name'}]}}]
+      };
       crmApi4(getMetaParams)
         .then(function(data) {
           if (data.actions) {
@@ -1089,7 +1095,7 @@
 
     // Help for an entity with no action selected
     function showEntityHelp(entityName) {
-      var entityInfo = getEntity(entityName);
+      const entityInfo = getEntity(entityName);
       setHelp($scope.entity, {
         description: entityInfo.description,
         comment: entityInfo.comment,
@@ -1101,8 +1107,7 @@
 
     if (!$scope.entity) {
       setHelp(ts('APIv4 Explorer'), {description: docs.description, comment: docs.comment, see: docs.see});
-    } else if (!actions.length && !getEntity().actions) {
-      getMetaParams.actions = [$scope.entity, 'getActions', {chain: {fields: [$scope.entity, 'getFields', {action: '$name'}]}}];
+    } else if (!getEntity().actions) {
       fetchMeta();
     } else {
       selectAction();
@@ -1115,8 +1120,6 @@
     // Update route when changing entity
     $scope.$watch('entity', function(newVal, oldVal) {
       if (oldVal !== newVal) {
-        // Flush actions cache to re-fetch for new entity
-        actions = [];
         $location.url('/explorer/' + newVal);
       }
     });
@@ -1135,7 +1138,7 @@
     };
 
     $scope.executeDoc = function() {
-      var doc = {
+      const doc = {
         description: ts('Runs API call on the CiviCRM database.'),
         comment: ts('Results and debugging info will be displayed below.')
       };
@@ -1166,7 +1169,7 @@
     },
     templateUrl: '~/api4Explorer/Clause.html',
     controller: function ($scope, $element, $timeout) {
-      var ts = $scope.ts = CRM.ts(),
+      const ts = $scope.ts = CRM.ts(),
         ctrl = this;
       this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
       this.operators = CRM.vars.api4.operators;
@@ -1194,7 +1197,7 @@
 
       // Indent clause while dragging between nested groups
       function onSortOver(event, ui) {
-        var offset = 0;
+        let offset = 0;
         if (ui.sender) {
           offset = $(ui.placeholder).offset().left - $(ui.sender).offset().left;
         }
@@ -1242,13 +1245,13 @@
       },
       require: 'ngModel',
       link: function (scope, element, attrs, ctrl) {
-        var ts = scope.ts = CRM.ts(),
-          multi = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], scope.data.op),
+        const ts = scope.ts = CRM.ts(),
           entity = $routeParams.api4entity,
           action = scope.data.action || $routeParams.api4action;
+        let multi = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], scope.data.op);
 
         function destroyWidget() {
-          var $el = $(element);
+          let $el = $(element);
           if ($el.is('.crm-form-date-wrapper .crm-hidden-date')) {
             $el.crmDatepicker('destroy');
           }
@@ -1263,7 +1266,7 @@
         }
 
         function makeWidget(field, op) {
-          var $el = $(element),
+          const $el = $(element),
             inputType = field.input_type,
             dataType = field.data_type;
           if (!op) {
@@ -1281,10 +1284,10 @@
             }
           } else if (_.includes(['=', '!=', '<>', 'IN', 'NOT IN'], op) && (field.fk_entity || field.options || dataType === 'Boolean')) {
            if (field.options) {
-              var id = field.pseudoconstant || 'id';
+              let id = field.pseudoconstant || 'id';
               $el.addClass('loading').attr('placeholder', ts('- select -')).crmSelect2({multiple: multi, separator: "\u0001", data: [{id: '', text: ''}]});
               loadFieldOptions(field.entity || entity).then(function(data) {
-                var options = _.transform(data[field.name].options, function(options, opt) {
+                let options = _.transform(data[field.name].options, function(options, opt) {
                   options.push({id: opt[id], text: opt.label, description: opt.description, color: opt.color, icon: opt.icon});
                 }, []);
                 $el.removeClass('loading').crmSelect2({data: options, multiple: multi, separator: "\u0001"});
@@ -1320,15 +1323,15 @@
         }
 
         // Copied from ng-list but applied conditionally if field is multi-valued
-        var parseList = function(viewValue) {
+        let parseList = function(viewValue) {
           // If the viewValue is invalid (say required but empty) it will be `undefined`
-          if (_.isUndefined(viewValue)) return;
+          if (typeof viewValue === 'undefined') return;
 
           if (!multi || !isSelect2()) {
             return viewValue;
           }
 
-          var list = [];
+          let list = [];
 
           if (viewValue) {
             _.each(viewValue.split("\u0001"), function(value) {
@@ -1342,7 +1345,7 @@
         // Copied from ng-list
         ctrl.$parsers.push(parseList);
         ctrl.$formatters.push(function(value) {
-          return _.isArray(value) ? value.join(', ') : value;
+          return Array.isArray(value) ? value.join(', ') : value;
         });
 
         // Copied from ng-list
@@ -1352,7 +1355,7 @@
 
         scope.$watchCollection('data', function(data) {
           destroyWidget();
-          var field = getField(data.field, entity, action);
+          let field = getField(data.field, entity, action);
           if (field && data.format !== 'plain') {
             makeWidget(field, data.op);
           }
@@ -1371,7 +1374,7 @@
       },
       templateUrl: '~/api4Explorer/Chain.html',
       link: function (scope, element, attrs) {
-        var ts = scope.ts = CRM.ts();
+        const ts = scope.ts = CRM.ts();
 
         function changeEntity(newEntity, oldEntity) {
           // When clearing entity remove this chain
@@ -1402,7 +1405,7 @@
 
         // Set default params when choosing action
         function changeAction(newAction, oldAction) {
-          var link;
+          let link;
           // Prepopulate links
           if (newAction && newAction !== oldAction) {
             // Clear index
@@ -1451,7 +1454,7 @@
     },
     templateUrl: '~/api4Explorer/Set.html',
     controller: function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
       $scope.$watch('$ctrl.set[1]', function(entity) {
         if (!entity) {
@@ -1466,7 +1469,7 @@
   }
 
   function entityFields(entityName, action) {
-    var entity = getEntity(entityName);
+    const entity = getEntity(entityName);
     if (entity && action && entity.actions) {
       return _.findWhere(entity.actions, {name: action}).fields;
     }
@@ -1477,7 +1480,7 @@
     return _.transform(params.join, function(joins, join) {
       // Fix capitalization of AS
       join[0] = join[0].replace(/ as /i, ' AS ');
-      var j = join[0].split(' AS '),
+      let j = join[0].split(' AS '),
         joinEntity = _.trim(j[0]),
         joinAlias = _.trim(j[1]) || joinEntity.toLowerCase();
       joins[joinAlias] = {
@@ -1490,10 +1493,10 @@
   }
 
   function getField(fieldName, entity, action) {
-    var suffix = fieldName.split(':')[1];
+    let suffix = fieldName.split(':')[1];
     fieldName = fieldName.split(':')[0];
-    var fieldNames = fieldName.split('.');
-    var field = _.cloneDeep(get(entity, fieldNames));
+    let fieldNames = fieldName.split('.');
+    let field = _.cloneDeep(get(entity, fieldNames));
     if (field && suffix) {
       field.pseudoconstant = suffix;
     }
@@ -1508,11 +1511,11 @@
       if (fieldNames.length === 1) {
         return _.findWhere(entityFields(entity, action), {name: fieldNames[0]});
       }
-      var comboName = _.findWhere(entityFields(entity, action), {name: fieldNames[0] + '.' + fieldNames[1]});
+      let comboName = _.findWhere(entityFields(entity, action), {name: fieldNames[0] + '.' + fieldNames[1]});
       if (comboName) {
         return comboName;
       }
-      var linkName = fieldNames.shift(),
+      let linkName = fieldNames.shift(),
         join = getExplicitJoins()[linkName],
         newEntity = join ? join.entity : _.findWhere(entityFields(entity, action), {name: linkName}).fk_entity;
       return get(newEntity, fieldNames);

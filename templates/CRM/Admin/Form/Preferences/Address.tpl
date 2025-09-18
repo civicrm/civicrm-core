@@ -7,15 +7,16 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{capture assign='tokenTitle'}{ts}Tokens{/ts}{/capture}
 <div class="crm-block crm-form-block crm-preferences-address-form-block">
     <h3>{ts}Mailing Labels{/ts}</h3>
         <table class="form-layout">
         <tr class="crm-preferences-address-form-block-mailing_format">
-            <td class="label">{$form.mailing_format.label}<br />{help id='label-tokens'}</td>
+            <td class="label">{$form.mailing_format.label}<br />{help id='mailing_format'}</td>
             <td>
               <div class="helpIcon" id="helphtml">
                 <input class="crm-token-selector big" data-field="mailing_format" />
-                {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
+                {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
               </div>
                 {$form.mailing_format.html|crmAddClass:huge12}<br />
                 <span class="description">{ts}Content and format for mailing labels.{/ts}<br />
@@ -35,11 +36,11 @@
     <h3>{ts}Address Display{/ts}</h3>
         <table class="form-layout">
           <tr class="crm-preferences-address-form-block-address_format">
-              <td class="label">{$form.address_format.label}<br />{help id='address-tokens'}</td>
+              <td class="label">{$form.address_format.label}<br />{help id='address_format'}</td>
               <td>
               <div class="helpIcon" id="helphtml">
                 <input class="crm-token-selector big" data-field="address_format" />
-                {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
+                {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
               </div>
                 {$form.address_format.html|crmAddClass:huge12}<br />
                 <span class="description">{ts}Format for displaying addresses in the Contact Summary and Event Information screens.{/ts}<br />{ts 1="&#123;contact.state_province&#125;" 2="&#123;contact.state_province_name&#125;"}Use %1 for state/province abbreviation or %2 for state province name.{/ts}</span>

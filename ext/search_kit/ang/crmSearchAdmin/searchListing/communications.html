@@ -5,14 +5,14 @@
   <ul class="dropdown-menu" ng-if=":: row.openScheduleMenu">
     <li ng-repeat="schedule_id in row.data.schedule_id" title="{{:: ts('Edit Scheduled Communication') }}">
       <a ng-href="{{ crmUrl('civicrm/admin/scheduleReminders/edit?reset=1&action=update&mapping_id=saved_search&id=' + schedule_id + '&entity_value=' + row.data.id) }}" target="crm-popup">
-        <i class="crm-i fa-pencil"></i>
+        <i class="crm-i fa-pencil" role="img" aria-hidden="true"></i>
         {{ row.data.schedule_title[$index] }}
       </a>
     </li>
     <li class="divider" role="separator"></li>
     <li title="{{:: ts('Add Scheduled Communication') }}">
       <a ng-href="{{ crmUrl('civicrm/admin/scheduleReminders/edit?reset=1&action=add&mapping_id=saved_search&entity_value=' + row.data.id) }}" target="crm-popup">
-        <i class="crm-i fa-plus"></i>
+        <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
         {{:: ts('New Communication') }}
       </a>
     </li>

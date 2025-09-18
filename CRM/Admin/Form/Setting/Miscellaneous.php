@@ -37,18 +37,24 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   public function buildQuickForm() {
     $this->setTitle(ts('Misc (Undelete, PDFs, Limits, Logging, etc.)'));
 
-    $this->assign('validTriggerPermission', CRM_Core_DAO::checkTriggerViewPermission(FALSE));
-    // dev/core#1812 Assign multilingual status.
-    $this->assign('isMultilingual', CRM_Core_I18n::isMultilingual());
-
     $this->addFormRule(['CRM_Admin_Form_Setting_Miscellaneous', 'formRule'], $this);
 
     parent::buildQuickForm();
+
     $settingMetaData = $this->getSettingsMetaData();
-    unset($settingMetaData['logging']);
-    unset($settingMetaData['weasyprint_path']);
-    unset($settingMetaData['wkhtmltopdfPath']);
+
+    // Disable logging field if system does not meet requirements
+    if (CRM_Core_I18n::isMultilingual()) {
+      $settingMetaData['logging']['description'] = ts('Logging is not supported in multilingual environments.');
+      $this->freeze('logging');
+    }
+    elseif (!CRM_Core_DAO::checkTriggerViewPermission(FALSE)) {
+      $settingMetaData['logging']['description'] = ts("In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.");
+      $this->freeze('logging');
+    }
+
     $this->assign('settings_fields', $settingMetaData);
+
     $this->addRule('checksum_timeout', ts('Value should be a positive number'), 'positiveInteger');
   }
 
