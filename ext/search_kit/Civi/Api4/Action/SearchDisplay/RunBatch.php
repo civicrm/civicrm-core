@@ -71,7 +71,7 @@ class RunBatch extends Run {
     foreach ($this->display['settings']['columns'] as $column) {
       if (!empty($column['key'])) {
         $key = $column['key'];
-        $result->editable[$key] = $this->getEditableInfo($key);
+        $result->editable[$key] = $this->getEditableInfo($column);
         // Set `required` field status based on search display settings
         $result->editable[$key]['required'] = !empty($column['required']);
         // Instead of using nullable from field defn, defer to `required` display setting

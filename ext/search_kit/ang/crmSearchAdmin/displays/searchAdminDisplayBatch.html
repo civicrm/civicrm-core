@@ -60,6 +60,13 @@
           {{:: ts('Required') }}
         </label>
       </div>
+      <div class="form-inline" ng-if="$ctrl.getField(col.key).data_type === 'Timestamp'">
+        <label for="crm-search-admin-edit-date-format-{{ $index }}">{{:: ts('Input Format') }}</label>
+        <select id="crm-search-admin-edit-date-format-{{ $index }}" class="form-control" ng-model="col.format" title="{{:: ts('Input Format') }}">
+          <option value="">{{:: ts('Date and Time') }}</option>
+          <option value="dateformatFull">{{:: ts('Date Only') }}</option>
+        </select>
+      </div>
       <div class="form-inline" ng-if="col.type === 'field'">
         <label>
           <input type="checkbox" ng-click="$ctrl.toggleDefault(col)" ng-checked="$ctrl.hasDefault(col)" >
