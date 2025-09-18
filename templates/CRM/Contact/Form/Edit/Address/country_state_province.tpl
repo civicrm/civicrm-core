@@ -12,14 +12,14 @@
 <tr>
    {if !empty($form.address.$blockId.country_id)}
      <td>
-        {$form.address.$blockId.country_id.label}<br />
-        {$form.address.$blockId.country_id.html}
+        {$form.address.$blockId.country_id.label nofilter}<br />
+        {$form.address.$blockId.country_id.html nofilter}
      </td>
    {/if}
    {if !empty($form.address.$blockId.state_province_id)}
      <td>
-        {$form.address.$blockId.state_province_id.label}<br />
-        {$form.address.$blockId.state_province_id.html}
+        {$form.address.$blockId.state_province_id.label nofilter}<br />
+        {$form.address.$blockId.state_province_id.html nofilter}
      </td>
    {/if}
    <td colspan="2">&nbsp;&nbsp;</td>

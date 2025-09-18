@@ -10,9 +10,9 @@
 {if !empty($form.address.$blockId.street_address)}
    <tr id="streetAddress_{$blockId}">
      <td colspan="2">
-       {$form.address.$blockId.street_address.label}
+       {$form.address.$blockId.street_address.label nofilter}
        {help id="id-street-address" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.street_address.textLabel}<br />
-       {$form.address.$blockId.street_address.html}
+       {$form.address.$blockId.street_address.html nofilter}
        {if $parseStreetAddress eq 1 && ($action eq 1 || $action eq 2)}
           &nbsp;&nbsp;<a href="#" title="{ts escape='htmlattribute'}Edit Address Elements{/ts}" onClick="processAddressFields( 'addressElements' , '{$blockId}', 1 );return false;">{ts}Edit Address Elements{/ts}</a>
           {help id="id-edit-street-elements" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.street_address.textLabel}
@@ -23,18 +23,18 @@
   {if $parseStreetAddress eq 1 && ($action eq 1 || $action eq 2)}
     <tr id="addressElements_{$blockId}" class=hiddenElement>
       <td>
-         {$form.address.$blockId.street_number.label}<br />
-         {$form.address.$blockId.street_number.html}
+         {$form.address.$blockId.street_number.label nofilter}<br />
+         {$form.address.$blockId.street_number.html nofilter}
        </td>
 
       <td>
-         {$form.address.$blockId.street_name.label}<br />
-         {$form.address.$blockId.street_name.html}<br />
+         {$form.address.$blockId.street_name.label nofilter}<br />
+         {$form.address.$blockId.street_name.html nofilter}<br />
       </td>
 
       <td colspan="2">
-        {$form.address.$blockId.street_unit.label}<br />
-        {$form.address.$blockId.street_unit.html}
+        {$form.address.$blockId.street_unit.label nofilter}<br />
+        {$form.address.$blockId.street_unit.html nofilter}
         <a href="#" title="{ts escape='htmlattribute'}Edit Street Address{/ts}" onClick="processAddressFields( 'streetAddress', '{$blockId}', 1 );return false;">{ts}Edit Complete Street Address{/ts}</a>
         {help id="id-edit-complete-street" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.street_address.textLabel}
       </td>

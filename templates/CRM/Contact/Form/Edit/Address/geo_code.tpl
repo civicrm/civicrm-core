@@ -10,16 +10,16 @@
 {if array_key_exists('geo_code_1', $form.address.$blockId) && array_key_exists('geo_code_2', $form.address.$blockId)}
   <tr>
     <td colspan="2">
-      {$form.address.$blockId.geo_code_1.label},&nbsp;{$form.address.$blockId.geo_code_2.label}
+      {$form.address.$blockId.geo_code_1.label nofilter},&nbsp;{$form.address.$blockId.geo_code_2.label nofilter}
       {help id="id-geo-code" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.geo_code_1.textLabel}<br />
-      {$form.address.$blockId.geo_code_1.html},&nbsp;{$form.address.$blockId.geo_code_2.html}<br />
+      {$form.address.$blockId.geo_code_1.html nofilter},&nbsp;{$form.address.$blockId.geo_code_2.html nofilter}<br />
     </td>
   </tr>
   {if array_key_exists('manual_geo_code', $form.address.$blockId)}
     <tr>
       <td colspan="2">
-        {$form.address.$blockId.manual_geo_code.html}
-        {$form.address.$blockId.manual_geo_code.label}
+        {$form.address.$blockId.manual_geo_code.html nofilter}
+        {$form.address.$blockId.manual_geo_code.label nofilter}
         {help id="id-geo-code-override" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.manual_geo_code.textLabel}
       </td>
     </tr>
