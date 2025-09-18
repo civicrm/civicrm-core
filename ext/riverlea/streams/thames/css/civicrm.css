@@ -490,9 +490,7 @@ html.crm-standalone  nav.breadcrumb>ol {
   border-radius: 1rem;
   animation: thames-spinner 1s infinite;
 }
-.fa-spin {
-  animation: none; /* placing animation on an odd-shaped item is a PITA for getting it 100% centred. */
-}
+
 /* Spinner for notifications .status-start notifications e.g. loading/saving. */
 .crm-status-box-outer.status-start .crm-status-box-inner {
   /* Allow space for spinner.*/
