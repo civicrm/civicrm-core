@@ -91,7 +91,7 @@
     CRM.$(function($) {
 
       {/literal}
-        var $form = $({if empty($form.formClass)}'#crm-main-content-wrapper'{else}'form.{$form.formClass}'{/if});
+        var $form = $({if empty($form.formClass)}'#crm-main-content-wrapper'{else}'form.{$form.formClass nofilter}'{/if});
         var currentLocation = {$pager->_response.currentLocation|json_encode};
       {literal}
 
