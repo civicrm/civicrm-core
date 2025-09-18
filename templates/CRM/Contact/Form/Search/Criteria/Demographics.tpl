@@ -22,8 +22,8 @@
     </tr>
     <tr>
       <td>
-        {$form.is_deceased.label}<br />
-        {$form.is_deceased.html}
+        {$form.is_deceased.label nofilter}<br />
+        {$form.is_deceased.html nofilter}
       </td>
     </tr>
     <tr>
@@ -31,8 +31,8 @@
     </tr>
     <tr>
       <td>
-        {$form.gender_id.label}<br />
-        {$form.gender_id.html}
+        {$form.gender_id.label nofilter}<br />
+        {$form.gender_id.html nofilter}
       </td>
     </tr>
   </table>

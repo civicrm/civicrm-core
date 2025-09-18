@@ -1,16 +1,16 @@
 <table class="form-layout-compressed">
   <tr>
     <td colspan="2">
-      {$form.privacy_toggle.html} {help id="privacy_toggle"}
+      {$form.privacy_toggle.html nofilter} {help id="privacy_toggle"}
     </td>
   </tr>
   <tr>
     <td>
-      {$form.privacy_options.html}
+      {$form.privacy_options.html nofilter}
     </td>
     <td style="vertical-align:middle">
       <div id="privacy-operator-wrapper">
-        {$form.privacy_operator.html} {help id="privacy_operator"}
+        {$form.privacy_operator.html nofilter} {help id="privacy_operator"}
       </div>
     </td>
   </tr>

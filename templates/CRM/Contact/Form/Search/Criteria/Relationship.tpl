@@ -11,13 +11,13 @@
   <table class="form-layout">
     <tr>
       <td>
-        {$form.relation_type_id.label}<br />
-        {$form.relation_type_id.html}
+        {$form.relation_type_id.label nofilter}<br />
+        {$form.relation_type_id.html nofilter}
       </td>
       <td>
          <div>
-           {$form.relation_target_name.label}<br />
-           {$form.relation_target_name.html|crmAddClass:huge}
+           {$form.relation_target_name.label nofilter}<br />
+           {$form.relation_target_name.html|crmAddClass:huge nofilter}
             <div class="description font-italic">
                 {ts}Complete OR partial contact name.{/ts}
             </div>
@@ -26,21 +26,21 @@
     </tr>
     <tr>
       <td>
-         {$form.relation_status.label}<br />
-         {$form.relation_status.html}
+         {$form.relation_status.label nofilter}<br />
+         {$form.relation_status.html nofilter}
          </p>
-         {$form.relation_permission.label}<br />
-         {$form.relation_permission.html}
+         {$form.relation_permission.label nofilter}<br />
+         {$form.relation_permission.html nofilter}
       </td>
       <td>
-        {$form.relation_target_group.label} {help id="relation_target_group" file="CRM/Contact/Form/Search/Advanced.hlp"}<br />
-        {$form.relation_target_group.html|crmAddClass:huge}
+        {$form.relation_target_group.label nofilter} {help id="relation_target_group" file="CRM/Contact/Form/Search/Advanced.hlp"}<br />
+        {$form.relation_target_group.html|crmAddClass:huge nofilter}
       </td>
     </tr>
     <tr>
       <td colspan="2">
-        {$form.relation_description.label}<br />
-        {$form.relation_description.html}
+        {$form.relation_description.label nofilter}<br />
+        {$form.relation_description.html nofilter}
       </td>
     </tr>
     <tr>
