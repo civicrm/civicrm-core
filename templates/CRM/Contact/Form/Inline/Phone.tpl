@@ -30,10 +30,10 @@
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
       <tr data-entity='phone' data-block-number={$blockId} id="Phone_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
-        <td>{$form.phone.$blockId.phone.html}<span class="crm-phone-ext"> {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</span></td>
-        <td>{$form.phone.$blockId.location_type_id.html}</td>
-        <td>{$form.phone.$blockId.phone_type_id.html}</td>
-        <td align="center" class="crm-phone-is_primary">{$form.phone.$blockId.is_primary.1.html}</td>
+        <td>{$form.phone.$blockId.phone.html nofilter}<span class="crm-phone-ext"> {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four nofilter}&nbsp;</span></td>
+        <td>{$form.phone.$blockId.location_type_id.html nofilter}</td>
+        <td>{$form.phone.$blockId.phone_type_id.html nofilter}</td>
+        <td align="center" class="crm-phone-is_primary">{$form.phone.$blockId.is_primary.1.html nofilter}</td>
         <td>
           {if $blockId gt 1}
             <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete phone{/ts}"><span class="icon delete-icon"></span></a>

@@ -16,46 +16,46 @@
     {if $contactType eq 'Individual'}
       {if !empty($form.prefix_id)}
         <div class="crm-inline-edit-field">
-          {$form.prefix_id.label}<br/>
-          {$form.prefix_id.html}
+          {$form.prefix_id.label nofilter}<br/>
+          {$form.prefix_id.html nofilter}
         </div>
       {/if}
       {if !empty($form.formal_title)}
         <div class="crm-inline-edit-field">
-          {$form.formal_title.label}<br/>
-          {$form.formal_title.html}
+          {$form.formal_title.label nofilter}<br/>
+          {$form.formal_title.html nofilter}
         </div>
       {/if}
       {if !empty($form.first_name)}
         <div class="crm-inline-edit-field">
-          {$form.first_name.label}<br />
-          {$form.first_name.html}
+          {$form.first_name.label nofilter}<br />
+          {$form.first_name.html nofilter}
         </div>
       {/if}
       {if !empty($form.middle_name)}
         <div class="crm-inline-edit-field">
-          {$form.middle_name.label}<br />
-          {$form.middle_name.html}
+          {$form.middle_name.label nofilter}<br />
+          {$form.middle_name.html nofilter}
         </div>
       {/if}
       {if !empty($form.last_name)}
         <div class="crm-inline-edit-field">
-          {$form.last_name.label}<br />
-          {$form.last_name.html}
+          {$form.last_name.label nofilter}<br />
+          {$form.last_name.html nofilter}
         </div>
       {/if}
       {if !empty($form.suffix_id)}
         <div class="crm-inline-edit-field">
-          {$form.suffix_id.label}<br/>
-          {$form.suffix_id.html}
+          {$form.suffix_id.label nofilter}<br/>
+          {$form.suffix_id.html nofilter}
         </div>
       {/if}
     {elseif $contactType eq 'Organization'}
-      <div class="crm-inline-edit-field">{$form.organization_name.label}&nbsp;
-      {$form.organization_name.html}</div>
+      <div class="crm-inline-edit-field">{$form.organization_name.label nofilter}&nbsp;
+      {$form.organization_name.html nofilter}</div>
     {elseif $contactType eq 'Household'}
-      <div class="crm-inline-edit-field">{$form.household_name.label}&nbsp;
-      {$form.household_name.html}</div>
+      <div class="crm-inline-edit-field">{$form.household_name.label nofilter}&nbsp;
+      {$form.household_name.html nofilter}</div>
     {/if}
   {/crmRegion}
 </div>

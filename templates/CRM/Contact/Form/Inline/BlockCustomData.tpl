@@ -13,10 +13,10 @@
 {if array_key_exists($blockId, $customFields)}
   {foreach item='custom_field' from=$customFields.$blockId key='custom_field_name'}
     <tr class="crm-block-entity-{$entity}-{$blockId} {if $blockId gt $actualBlockCount}hiddenElement{/if}">
-      <td colspan="5">{$form.$entity.$blockId.$custom_field_name.label}</td>
+      <td colspan="5">{$form.$entity.$blockId.$custom_field_name.label nofilter}</td>
     </tr>
     <tr class="crm-block-entity-{$entity}-{$blockId} {if $blockId gt $actualBlockCount}hiddenElement{/if}">
-      <td colspan="5">{$form.$entity.$blockId.$custom_field_name.html}</td>
+      <td colspan="5">{$form.$entity.$blockId.$custom_field_name.html nofilter}</td>
     </tr>
   {/foreach}
 {/if}

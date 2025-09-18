@@ -23,14 +23,14 @@
      <tr>
         <td>
            <span class="crm-address-element location_type_id-address-element">
-            {$form.address.$blockId.location_type_id.label}&nbsp;{$form.address.$blockId.location_type_id.html}
+            {$form.address.$blockId.location_type_id.label nofilter}&nbsp;{$form.address.$blockId.location_type_id.html nofilter}
             </span>
         </td>
      </tr>
      <tr>
         <td>
-           <span class="crm-address-element is_primary-address-element">{$form.address.$blockId.is_primary.html}</span>
-           <span class="crm-address-element is_billing-address-element">{$form.address.$blockId.is_billing.html}</span>
+           <span class="crm-address-element is_primary-address-element">{$form.address.$blockId.is_primary.html nofilter}</span>
+           <span class="crm-address-element is_billing-address-element">{$form.address.$blockId.is_billing.html nofilter}</span>
         </td>
      </tr>
 
