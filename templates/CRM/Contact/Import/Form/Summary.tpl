@@ -78,7 +78,7 @@
       <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
-          <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" role="img" aria-hidden="true"></i> {ts}See Errors{/ts}</a></div>
+          <div class="action-link"><a href="{$downloadErrorRecordsUrl nofilter}"><i class="crm-i fa-download" role="img" aria-hidden="true"></i> {ts}See Errors{/ts}</a></div>
         </td>
       </tr>
     {/if}

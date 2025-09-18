@@ -10,8 +10,8 @@
 <h3>{ts}Upload CSV File{/ts}</h3>
   <table class="form-layout">
     <tr>
-        <td class="label">{$form.uploadFile.label}</td>
-        <td>{$form.uploadFile.html}<br />
+        <td class="label">{$form.uploadFile.label nofilter}</td>
+        <td>{$form.uploadFile.html nofilter}<br />
             <div class="description">
               {ts}File format must be comma-separated-values (CSV). File must be UTF8 encoded if it contains special characters (e.g. accented letters, etc.).{/ts}<br />
               {ts 1=$uploadSize}Maximum Upload File Size: %1 MB{/ts}
@@ -20,11 +20,11 @@
     </tr>
     <tr>
         <td></td>
-        <td>{$form.skipColumnHeader.html} {$form.skipColumnHeader.label}</td>
+        <td>{$form.skipColumnHeader.html nofilter} {$form.skipColumnHeader.label nofilter}</td>
     </tr>
     <tr class="crm-import-datasource-form-block-fieldSeparator">
-      <td class="label">{$form.fieldSeparator.label} {help id='fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
-      <td>{$form.fieldSeparator.html}</td>
+      <td class="label">{$form.fieldSeparator.label nofilter} {help id='fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+      <td>{$form.fieldSeparator.html nofilter}</td>
     </tr>
   </table>
 
