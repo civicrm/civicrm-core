@@ -290,11 +290,6 @@
 #bootstrap-theme .btn-secondary.dropdown-toggle:focus {
   background: var(--crm-c-secondary-hover);
 }
-.crm-container .crm-search-display button.dropdown-toggle:not(.btn-default):not(.btn-secondary),
-#bootstrap-theme .crm-search-display th .btn-group .btn {
-  background-color: var(--crm-c-background4);
-  color: var(--crm-c-text);
-}
 
 /* BS3 Button groups and dropdowns  */
 

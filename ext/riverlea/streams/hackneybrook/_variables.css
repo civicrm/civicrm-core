@@ -51,8 +51,6 @@
   --crm-btn-icon-bg: rgba(256,256,256,0.25);
   --crm-btn-icon-border: var(--crm-btn-border);
   --crm-btn-icon-padding: 0px;
-  /* Tables */
-  --crm-table-outside-border: var(--crm-c-divider);
   /* Accordions */
   /* .crm-accordion-bold */
   --crm-expand-header-bg: var(--crm-c-gray-200);

@@ -80,7 +80,6 @@
   --crm-btn-small-padding: var(--crm-s1) var(--crm-m1);
   --crm-btn-height: 40px;
 /* Tables */
-  --crm-table-outside-border: var(--crm-c-divider);
   --crm-table-background: var(--crm-c-background);
   --crm-table-header-bottom: var(--crm-c-divider);
   --crm-table-header-bg: var(--crm-c-background);
