@@ -26,6 +26,7 @@ class CRM_Utils_Check_Component_Smarty extends CRM_Utils_Check_Component {
   public function checkSmartyVersion(): array {
     $messages = [];
     $settingNames = ['CIVICRM_SMARTY_AUTOLOAD_PATH', 'CIVICRM_SMARTY3_AUTOLOAD_PATH'];
+    $pathSetting = '';
     foreach ($settingNames as $settingName) {
       if (CRM_Utils_Constant::value($settingName)) {
         $pathSetting = CRM_Utils_Constant::value($settingName);
