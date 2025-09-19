@@ -45,7 +45,14 @@
         final: (f, total) => f / total,
         add: (p, v) => p + v,
         sub: (p, v) => p - v,
-        start: () => 0
+        start: () => 0,
+        // note: percentage reducers dont support data render currently
+        // though it could be used instead of floor to allow configurable
+        // decimal places for percentage?
+        render: (v, dataRender) => {
+          const percentage = Math.floor(100 * v);
+          return `${percentage}%`;
+          }
       },
       {
         key: "percentage_count",
@@ -53,7 +60,12 @@
         final: (f, total) => f / total,
         add: (p, v) => p + 1,
         sub: (p, v) => p - 1,
-        start: () => 0
+        start: () => 0,
+        // note: percentage reducers dont support data render currently (see above)
+        render: (v, dataRender) => {
+          const percentage = Math.floor(100 * v);
+          return `${percentage}%`;
+        }
       },
       {
         key: 'list',
@@ -66,7 +78,14 @@
           return p;
         },
         sub: (p, v) => p.filter((x) => x != v),
-        start: () => []
+        start: () => [],
+        // apply the dataRender to each coordinate, then join
+        render: (v, dataRender) => {
+          if (!v.map) {
+            return dataRender(v);
+          }
+          return v.map((item) => dataRender(item)).join(', ');
+        },
       }
     ];
   });
