@@ -50,12 +50,12 @@
   --crm-c-divider: 1px solid var(--crm-c-gray-300);
   --crm-c-page-background: #fff; /* background to page body */
   --crm-c-background: #f4f4ed; /* background to page header, often form block & dialog bg */
-  --crm-c-background2: var(--crm-c-gray-050); /* 2-5 = progressively darker backgrounds */
+  --crm-c-background2: var(--crm-c-gray-050); /* 2-4 = progressively darker backgrounds */
   --crm-c-background3: var(--crm-c-gray-100);
   --crm-c-background4: var(--crm-c-gray-200);
-  --crm-c-background5: var(--crm-c-gray-700);
   --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
-  --crm-c-code-background: var(--crm-c-background2); /* background for code regions */
+  --crm-c-code-background: var(--crm-c-background2); /* for code regions */
+  --crm-c-code-border: 1px solid var(--crm-c-background4);
   --crm-c-focus: var(--crm-c-blue-dark);
   --crm-c-inactive: #696969;
 /* Emphasis colours */
@@ -162,7 +162,7 @@
   --crm-btn-icon-padding: var(--crm-btn-padding-block);
   --crm-btn-margin: 0; /* used to add padding block between multiple stacked buttons */
 /* Tables */
-  --crm-table-outside-border: 1px solid var(--crm-c-background3);
+  --crm-table-outside-border: var(--crm-c-divider);
   --crm-table-background: var(--crm-c-page-background);
   --crm-table-row-border: var(--crm-c-divider);
   --crm-table-column-border: 0 solid transparent;
@@ -245,6 +245,7 @@
   --crm-form-block-background: var(--crm-c-background);
   --crm-form-block-padding: var(--crm-m);
   --crm-form-block-border-radius: var(--crm-roundness);
+  --crm-form-block-header: var(--crm-c-gray-700);
   --crm-input-background: var(--crm-c-page-background);
   --crm-input-background-image: linear-gradient(top, #eee 1%, #fff 15%);
   --crm-input-color: var(--crm-c-text);
@@ -404,6 +405,8 @@
   --crm-icon-success-color: inherit;
   --crm-icon-warning-color: inherit;
   --crm-icon-info-color: inherit;
+/* Form Builder UI */
+  --crm-fb-header-bg: var(--crm-c-background3);
 /* Wizard */
   --crm-wizard-width: fit-content;
   --crm-wizard-margin: 0.5rem auto;

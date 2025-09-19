@@ -3395,17 +3395,16 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme a.label:hover,
 #bootstrap-theme a.label:focus {
-  color: var(--crm-c-text-light);
   text-decoration: none;
   cursor: var(--crm-hover-clickable);
 }
 #bootstrap-theme .label-default {
-  background-color: var(--crm-c-text);
+  background: var(--crm-c-darkest);
   color: var(--crm-c-text-light);
 }
 #bootstrap-theme .label-default[href]:hover,
 #bootstrap-theme .label-default[href]:focus {
-  background-color: var(--crm-c-background4);
+  background: color-mix(in srgb, var(--crm-c-darkest) 87.5%, #fff 12.5%);
 }
 #bootstrap-theme .label-primary {
   background: var(--crm-c-primary);
@@ -3421,7 +3420,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-success[href]:hover,
 #bootstrap-theme .label-success[href]:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-success);
+  background: color-mix(in srgb, var(--crm-c-success) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label-info {
   background: var(--crm-c-info);
@@ -3429,7 +3428,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-info[href]:hover,
 #bootstrap-theme .label-info[href]:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-info);
+  background: color-mix(in srgb, var(--crm-c-info) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label-warning {
   background: var(--crm-c-warning);
@@ -3437,7 +3436,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-warning[href]:hover,
 #bootstrap-theme .label-warning[href]:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-warning);
+  background: color-mix(in srgb, var(--crm-c-warning) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label-danger {
   background: var(--crm-c-danger);
@@ -3445,10 +3444,10 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-danger[href]:hover,
 #bootstrap-theme .label-danger[href]:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
+  background: color-mix(in srgb, var(--crm-c-danger) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label i.crm-i {
-  color: inherit; /* resets icons inside lables to use the label text colour */
+  color: inherit; /* resets icons inside labels to use the label text colour */
 }
 
 /* Panels */

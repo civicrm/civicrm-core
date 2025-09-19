@@ -65,7 +65,6 @@
   --crm-c-background2: var(--crm-c-gray-050); /* 2-5 = progressively darker backgrounds*/
   --crm-c-background3: var(--crm-c-gray-100);
   --crm-c-background4: var(--crm-c-gray-200);
-  --crm-c-background5: var(--crm-c-gray-700);
   --crm-c-drag-background: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
   --crm-c-code-background: var(--crm-c-blue-overlay2); /* background for code regions */
   --crm-c-focus: var(--crm-c-blue-dark);

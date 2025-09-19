@@ -162,7 +162,7 @@ select.crm-form-multiselect {
   border: 1px solid var(--crm-c-darkest);
 }
 .crm-container .replace-plain {
-  background-color: var(--crm-c-background3);
+  background-color: var(--crm-input-background);
   min-width: var(--crm-huge-input);
 }
 input.crm-form-text:focus,
@@ -348,11 +348,16 @@ input.crm-form-checkbox) + label {
 }
 /* Slider */
 .crm-container .ui-slider {
-  background: var(--crm-c-background4);
+  background: var(--crm-input-background);
+  border: 1px solid var(--crm-input-border-color);
 }
 .crm-container .ui-slider .ui-slider-handle {
+  border: var(--crm-btn-border);
+  background: var(--crm-c-secondary);
+}
+.crm-container .ui-slider .ui-slider-range {
   border: 0;
-  background: var(--crm-c-background5);
+  border-radius: 0;
 }
 
 /* Input types */
