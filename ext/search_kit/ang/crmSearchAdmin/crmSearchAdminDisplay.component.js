@@ -80,6 +80,7 @@
       };
 
       this.dateFormats = CRM.crmSearchAdmin.dateFormats;
+      this.numberAttributes = CRM.crmSearchAdmin.numberAttributes;
 
       // Drag-n-drop settings for reordering columns
       this.sortableOptions = {

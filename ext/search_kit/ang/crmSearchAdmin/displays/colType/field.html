@@ -24,6 +24,12 @@
     <option ng-repeat="(k, v) in $ctrl.parent.dateFormats" value="{{k}}">{{ v }}</option>
   </select>
 </div>
+<div class="form-inline" ng-if="$ctrl.parent.getDataType(col.key) === 'Float'">
+  <label ng-repeat="(key, label) in $ctrl.parent.numberAttributes">
+    {{:: label }}
+    <input type="number" class="form-control four" ng-model="col.format[key]">
+  </label>
+</div>
 <div class="form-inline crm-search-admin-flex-row" >
   <label title="{{:: ts('Display as clickable link') }}" >
     <input type="checkbox" ng-checked="col.link" ng-click="$ctrl.parent.toggleLink(col)" >
