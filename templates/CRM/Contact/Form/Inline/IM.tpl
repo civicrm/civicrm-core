@@ -30,10 +30,10 @@
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
     <tr data-entity='im' data-block-number={$blockId} id="IM_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
-        <td>{$form.im.$blockId.name.html}&nbsp;</td>
-        <td>{$form.im.$blockId.location_type_id.html}</td>
-        <td>{$form.im.$blockId.provider_id.html}</td>
-        <td align="center" class="crm-im-is_primary">{$form.im.$blockId.is_primary.1.html}</td>
+        <td>{$form.im.$blockId.name.html nofilter}&nbsp;</td>
+        <td>{$form.im.$blockId.location_type_id.html nofilter}</td>
+        <td>{$form.im.$blockId.provider_id.html nofilter}</td>
+        <td align="center" class="crm-im-is_primary">{$form.im.$blockId.is_primary.1.html nofilter}</td>
         <td>
           {if $blockId gt 1}
             <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete IM{/ts}"><span class="icon delete-icon"></span></a>

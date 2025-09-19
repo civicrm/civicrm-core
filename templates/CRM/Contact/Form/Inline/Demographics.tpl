@@ -14,26 +14,26 @@
 
   <div class="crm-clear">
     <div class="crm-summary-row">
-      <div class="crm-label">{$form.gender_id.label}</div>
-      <div class="crm-content">{$form.gender_id.html}</div>
+      <div class="crm-label">{$form.gender_id.label nofilter}</div>
+      <div class="crm-content">{$form.gender_id.html nofilter}</div>
     </div>
     <div class="crm-summary-row">
-      <div class="crm-label">{$form.birth_date.label}</div>
+      <div class="crm-label">{$form.birth_date.label nofilter}</div>
       <div class="crm-content">
-        {$form.birth_date.html}
+        {$form.birth_date.html nofilter}
       </div>
     </div>
     <div class="crm-summary-row">
       <div class="crm-label">&nbsp;</div>
       <div class="crm-content">
-        {$form.is_deceased.html}
-        {$form.is_deceased.label}
+        {$form.is_deceased.html nofilter}
+        {$form.is_deceased.label nofilter}
       </div>
     </div>
     <div class="crm-summary-row" id="showDeceasedDate">
-      <div class="crm-label crm-deceased-date">{$form.deceased_date.label}</div>
+      <div class="crm-label crm-deceased-date">{$form.deceased_date.label nofilter}</div>
       <div class="crm-content crm-deceased-date">
-        {$form.deceased_date.html}
+        {$form.deceased_date.html nofilter}
       </div>
     </div>
   </div>

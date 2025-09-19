@@ -39,7 +39,7 @@
       <tr class="error"><td class="label crm-grid-cell">{ts}Rows with Errors{/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
-          <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" role="img" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
+          <div class="action-link"><a href="{$downloadErrorRecordsUrl nofilter}"><i class="crm-i fa-download" role="img" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
         </td>
       </tr>
     {/if}
@@ -63,16 +63,16 @@
  <div class="crm-accordion-body">
             <table class="form-layout-compressed">
              <tr>
-               <td class="description label">{$form.newGroupName.label}</td>
-               <td>{$form.newGroupName.html}</td>
+               <td class="description label">{$form.newGroupName.label nofilter}</td>
+               <td>{$form.newGroupName.html nofilter}</td>
              </tr>
              <tr>
-               <td class="description label">{$form.newGroupDesc.label}</td>
-               <td>{$form.newGroupDesc.html}</td>
+               <td class="description label">{$form.newGroupDesc.label nofilter}</td>
+               <td>{$form.newGroupDesc.html nofilter}</td>
              </tr>
              <tr>
-               <td class="description label">{$form.newGroupType.label}</td>
-               <td>{$form.newGroupType.html}</td>
+               <td class="description label">{$form.newGroupType.label nofilter}</td>
+               <td>{$form.newGroupType.html nofilter}</td>
              </tr>
             </table>
  </div>
@@ -83,12 +83,12 @@
 
 <details id="existing-groups" class="crm-accordion-bold crm-existing_group-accordion" {if !empty($form.groups)}open{/if}>
  <summary>
-  {$form.groups.label}
+  {$form.groups.label nofilter}
  </summary>
  <div class="crm-accordion-body">
 
         <div class="form-item">
-        <table><tr><td style="width: 14em;"></td><td>{$form.groups.html}</td></tr></table>
+        <table><tr><td style="width: 14em;"></td><td>{$form.groups.html nofilter}</td></tr></table>
         </div>
  </div>
 </details>
@@ -104,12 +104,12 @@
   <div class="form-item">
   <table class="form-layout-compressed">
            <tr>
-               <td class="description label">{$form.newTagName.label}</td>
-              <td>{$form.newTagName.html}</td>
+               <td class="description label">{$form.newTagName.label nofilter}</td>
+              <td>{$form.newTagName.html nofilter}</td>
            </tr>
            <tr>
-        <td class="description label">{$form.newTagDesc.label}</td>
-              <td>{$form.newTagDesc.html}</td>
+        <td class="description label">{$form.newTagDesc.label nofilter}</td>
+              <td>{$form.newTagDesc.html nofilter}</td>
            </tr>
         </table>
     </div>
@@ -126,7 +126,7 @@
         <table class="form-layout-compressed">
             <tr><td style="width: 14em;"></td>
              <td class="listing-box" style="margin-bottom: 0em; width: 15em;">
-               {$form.tag.html}
+               {$form.tag.html nofilter}
             </td>
           </tr>
         </table>

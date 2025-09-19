@@ -13,21 +13,21 @@
 <table class="form-layout-compressed">
     <tr>
       <td class="label-left">
-        {$form.template.label}
+        {$form.template.label nofilter}
         {help id="template" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
       </td>
       <td>
-        {$form.template.html} {ts}OR{/ts} {$form.document_file.html}
+        {$form.template.html nofilter} {ts}OR{/ts} {$form.document_file.html nofilter}
       </td>
     </tr>
     <tr>
-      <td class="label-left">{$form.subject.label}</td>
-      <td>{$form.subject.html}</td>
+      <td class="label-left">{$form.subject.label nofilter}</td>
+      <td>{$form.subject.html nofilter}</td>
     </tr>
     {if !empty($form.campaign_id)}
     <tr>
-      <td class="label-left">{$form.campaign_id.label}</td>
-      <td>{$form.campaign_id.html}</td>
+      <td class="label-left">{$form.campaign_id.label nofilter}</td>
+      <td>{$form.campaign_id.html nofilter}</td>
     </tr>
     {/if}
 </table>
@@ -41,15 +41,15 @@
       <div class="crm-block crm-form-block">
     <table class="form-layout-compressed">
       <tr>
-        <td class="label-left">{$form.format_id.label} {help id="format_id" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
-        <td>{$form.format_id.html}</td>
+        <td class="label-left">{$form.format_id.label nofilter} {help id="format_id" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
+        <td>{$form.format_id.html nofilter}</td>
       </tr>
       <tr>
-        <td class="label-left">{$form.paper_size.label}</td><td>{$form.paper_size.html}</td>
-        <td class="label-left">{$form.orientation.label}</td><td>{$form.orientation.html}</td>
+        <td class="label-left">{$form.paper_size.label nofilter}</td><td>{$form.paper_size.html nofilter}</td>
+        <td class="label-left">{$form.orientation.label nofilter}</td><td>{$form.orientation.html nofilter}</td>
       </tr>
       <tr>
-        <td class="label-left">{$form.metric.label}</td><td>{$form.metric.html}</td>
+        <td class="label-left">{$form.metric.label nofilter}</td><td>{$form.metric.html nofilter}</td>
         <td colspan="2">&nbsp;</td>
       </tr>
       <tr>
@@ -57,12 +57,12 @@
         <td colspan="2">&nbsp;</td>
       </tr>
       <tr>
-        <td class="label-left">{$form.margin_top.label}</td><td>{$form.margin_top.html}</td>
-        <td class="label-left">{$form.margin_bottom.label}</td><td>{$form.margin_bottom.html}</td>
+        <td class="label-left">{$form.margin_top.label nofilter}</td><td>{$form.margin_top.html nofilter}</td>
+        <td class="label-left">{$form.margin_bottom.label nofilter}</td><td>{$form.margin_bottom.html nofilter}</td>
       </tr>
       <tr>
-        <td class="label-left">{$form.margin_left.label}</td><td>{$form.margin_left.html}</td>
-        <td class="label-left">{$form.margin_right.label}</td><td>{$form.margin_right.html}</td>
+        <td class="label-left">{$form.margin_left.label nofilter}</td><td>{$form.margin_left.html nofilter}</td>
+        <td class="label-left">{$form.margin_right.label nofilter}</td><td>{$form.margin_right.html nofilter}</td>
       </tr>
       {* CRM-15883 Suppressing stationery until switch from DOMPDF.
       <tr>
@@ -71,8 +71,8 @@
       </tr>
       *}
     </table>
-        <div id="bindFormat">{$form.bind_format.html}&nbsp;{$form.bind_format.label}</div>
-        <div id="updateFormat" style="display: none">{$form.update_format.html}&nbsp;{$form.update_format.label}</div>
+        <div id="bindFormat">{$form.bind_format.html nofilter}&nbsp;{$form.bind_format.label nofilter}</div>
+        <div id="updateFormat" style="display: none">{$form.update_format.html nofilter}&nbsp;{$form.update_format.label nofilter}</div>
       </div>
   </div>
 </details>
@@ -88,7 +88,7 @@
 
 <details class="crm-accordion-bold crm-html_email-accordion " open>
 <summary>
-    {$form.html_message.label}
+    {$form.html_message.label nofilter}
 </summary>
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helphtml">
@@ -97,22 +97,22 @@
    </div>
     <div class="clear"></div>
     <div class='html'>
-  {$form.html_message.html}<br />
+  {$form.html_message.html nofilter}<br />
     </div>
 
 <div id="editMessageDetails">
     <div id="updateDetails" >
-      {if array_key_exists('updateTemplate', $form)}{$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}{/if}
+      {if array_key_exists('updateTemplate', $form)}{$form.updateTemplate.html nofilter}&nbsp;{$form.updateTemplate.label nofilter}{/if}
     </div>
     <div>
-      {if array_key_exists('saveTemplate', $form)}{$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}{/if}
+      {if array_key_exists('saveTemplate', $form)}{$form.saveTemplate.html nofilter}&nbsp;{$form.saveTemplate.label nofilter}{/if}
     </div>
 </div>
 
 <div id="saveDetails" class="section">
   {if array_key_exists('saveTemplateName', $form)}
-    <div class="label">{$form.saveTemplateName.label}</div>
-    <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
+    <div class="label">{$form.saveTemplateName.label nofilter}</div>
+    <div class="content">{$form.saveTemplateName.html|crmAddClass:huge nofilter}</div>
   {/if}
 </div>
 
@@ -121,8 +121,8 @@
 
 <table class="form-layout-compressed">
   <tr>
-    <td class="label-left">{$form.document_type.label}</td>
-    <td>{$form.document_type.html}</td>
+    <td class="label-left">{$form.document_type.label nofilter}</td>
+    <td>{$form.document_type.html nofilter}</td>
   </tr>
 </table>
 
@@ -131,7 +131,7 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  var $form = $('form.{/literal}{$form.formClass}{literal}');
+  var $form = $('form.{/literal}{$form.formClass nofilter}{literal}');
 
   {/literal}{if $form.formName eq 'PDF'}{literal}
     $('.crm-document-accordion').hide();

@@ -310,7 +310,7 @@
       var is_selected = CRM.$('.crm-dedupe-select-all').prop('checked') ? 1 : 0;
     }
 
-    var cacheKey = {/literal}'{$cacheKey|escape}'{literal};
+    var cacheKey = {/literal}'{$cacheKey|escape nofilter}'{literal};
 
     var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
 

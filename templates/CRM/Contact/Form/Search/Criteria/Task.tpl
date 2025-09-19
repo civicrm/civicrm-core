@@ -12,16 +12,16 @@
     <table class="form-layout">
          <tr>
             <td class="label">
-                {$form.task_id.label}
+                {$form.task_id.label nofilter}
             </td>
             <td>
-                {$form.task_id.html}
+                {$form.task_id.html nofilter}
             </td>
             <td class="label">
-                {$form.task_status_id.label}
+                {$form.task_status_id.label nofilter}
             </td>
             <td>
-                {$form.task_status_id.html}
+                {$form.task_status_id.html nofilter}
             </td>
         </tr>
       </table>

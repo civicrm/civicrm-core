@@ -10,9 +10,9 @@
 {if !empty($form.address.$blockId.supplemental_address_1)}
   <tr>
      <td colspan="2">
-         {$form.address.$blockId.supplemental_address_1.label}
+         {$form.address.$blockId.supplemental_address_1.label nofilter}
          {help id="id-supplemental-address" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.supplemental_address_1.textLabel}<br />
-         {$form.address.$blockId.supplemental_address_1.html}
+         {$form.address.$blockId.supplemental_address_1.html nofilter}
      </td>
   </tr>
 {/if}

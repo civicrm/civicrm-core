@@ -18,19 +18,19 @@
     <table class="form-layout-compressed" >
         {if array_key_exists('communication_style_id', $form)}
           <tr><td colspan='4'>
-            <span class="label">{$form.communication_style_id.label} {help id="communication_style" file="CRM/Contact/Form/Contact.hlp"}</span>
-            <span class="value">{$form.communication_style_id.html}</span>
+            <span class="label">{$form.communication_style_id.label nofilter} {help id="communication_style" file="CRM/Contact/Form/Contact.hlp"}</span>
+            <span class="value">{$form.communication_style_id.html nofilter}</span>
           </td><tr>
         {/if}
         <tr>
           {if array_key_exists('email_greeting_id', $form)}
-            <td>{$form.email_greeting_id.label}</td>
+            <td>{$form.email_greeting_id.label nofilter}</td>
           {/if}
           {if array_key_exists('postal_greeting_id', $form)}
-            <td>{$form.postal_greeting_id.label}</td>
+            <td>{$form.postal_greeting_id.label nofilter}</td>
           {/if}
           {if array_key_exists('addressee_id', $form)}
-            <td>{$form.addressee_id.label}</td>
+            <td>{$form.addressee_id.label nofilter}</td>
           {/if}
           {if array_key_exists('email_greeting_id', $form) OR array_key_exists('postal_greeting_id', $form) OR array_key_exists('addressee_id', $form)}
             {capture assign='helpTitle'}{ts}Greeting{/ts}{/capture}
@@ -40,7 +40,7 @@
         <tr>
             {if array_key_exists('email_greeting_id', $form)}
                 <td>
-                    <span id="email_greeting" {if !empty($email_greeting_display) and $action eq 2} class="hiddenElement"{/if}>{$form.email_greeting_id.html|crmAddClass:big}</span>
+                    <span id="email_greeting" {if !empty($email_greeting_display) and $action eq 2} class="hiddenElement"{/if}>{$form.email_greeting_id.html|crmAddClass:big nofilter}</span>
                     {if !empty($email_greeting_display) and $action eq 2}
                       <div data-id="email_greeting" class="replace-plain" title="{ts escape='htmlattribute'}Click to edit{/ts}">
                         {$email_greeting_display}
@@ -50,7 +50,7 @@
             {/if}
             {if array_key_exists('postal_greeting_id', $form)}
                 <td>
-                    <span id="postal_greeting" {if !empty($postal_greeting_display) and $action eq 2} class="hiddenElement"{/if}>{$form.postal_greeting_id.html|crmAddClass:big}</span>
+                    <span id="postal_greeting" {if !empty($postal_greeting_display) and $action eq 2} class="hiddenElement"{/if}>{$form.postal_greeting_id.html|crmAddClass:big nofilter}</span>
                     {if !empty($postal_greeting_display) and $action eq 2}
                       <div data-id="postal_greeting" class="replace-plain" title="{ts escape='htmlattribute'}Click to edit{/ts}">
                         {$postal_greeting_display}
@@ -60,7 +60,7 @@
             {/if}
             {if array_key_exists('addressee_id', $form)}
                 <td>
-                    <span id="addressee" {if !empty($addressee_display) and $action eq 2} class="hiddenElement"{/if}>{$form.addressee_id.html|crmAddClass:big}</span>
+                    <span id="addressee" {if !empty($addressee_display) and $action eq 2} class="hiddenElement"{/if}>{$form.addressee_id.html|crmAddClass:big nofilter}</span>
                     {if !empty($addressee_display) and $action eq 2}
                       <div data-id="addressee" class="replace-plain" title="{ts escape='htmlattribute'}Click to edit{/ts}">
                         {$addressee_display}
@@ -71,40 +71,40 @@
         </tr>
         <tr id="greetings1" class="hiddenElement">
           {if array_key_exists('email_greeting_custom', $form)}
-            <td><span id="email_greeting_id_label" class="hiddenElement">{$form.email_greeting_custom.label}</span></td>
+            <td><span id="email_greeting_id_label" class="hiddenElement">{$form.email_greeting_custom.label nofilter}</span></td>
           {/if}
           {if array_key_exists('postal_greeting_custom', $form)}
-            <td><span id="postal_greeting_id_label" class="hiddenElement">{$form.postal_greeting_custom.label}</span></td>
+            <td><span id="postal_greeting_id_label" class="hiddenElement">{$form.postal_greeting_custom.label nofilter}</span></td>
           {/if}
           {if array_key_exists('addressee_custom', $form)}
-            <td><span id="addressee_id_label" class="hiddenElement">{$form.addressee_custom.label}</span></td>
+            <td><span id="addressee_id_label" class="hiddenElement">{$form.addressee_custom.label nofilter}</span></td>
           {/if}
         </tr>
         <tr id="greetings2" class="hiddenElement">
           {if array_key_exists('email_greeting_custom', $form)}
-            <td><span id="email_greeting_id_html" class="hiddenElement">{$form.email_greeting_custom.html|crmAddClass:big}</span></td>
+            <td><span id="email_greeting_id_html" class="hiddenElement">{$form.email_greeting_custom.html|crmAddClass:big nofilter}</span></td>
           {/if}
            {if array_key_exists('postal_greeting_custom', $form)}
-            <td><span id="postal_greeting_id_html" class="hiddenElement">{$form.postal_greeting_custom.html|crmAddClass:big}</span></td>
+            <td><span id="postal_greeting_id_html" class="hiddenElement">{$form.postal_greeting_custom.html|crmAddClass:big nofilter}</span></td>
           {/if}
           {if array_key_exists('addressee_custom', $form)}
-            <td><span id="addressee_id_html" class="hiddenElement">{$form.addressee_custom.html|crmAddClass:big}</span></td>
+            <td><span id="addressee_id_html" class="hiddenElement">{$form.addressee_custom.html|crmAddClass:big nofilter}</span></td>
           {/if}
         </tr>
         <tr>
           {foreach key=key item=item from=$commPreference}
             <td>
-              <br/><span class="label">{$form.$key.label}</span> {help id=$key file="CRM/Contact/Form/Contact.hlp"}
-              <br/>{$form.$key.html}
+              <br/><span class="label">{$form.$key.label nofilter}</span> {help id=$key file="CRM/Contact/Form/Contact.hlp"}
+              <br/>{$form.$key.html nofilter}
             </td>
           {/foreach}
           <td>
-            <br/><span class="label">{$form.preferred_language.label}</span>
-            <br/>{$form.preferred_language.html}
+            <br/><span class="label">{$form.preferred_language.label nofilter}</span>
+            <br/>{$form.preferred_language.html nofilter}
           </td>
         </tr>
         <tr>
-          <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="is_opt_out" file="CRM/Contact/Form/Contact.hlp"}</td>
+          <td>{$form.is_opt_out.html nofilter} {$form.is_opt_out.label nofilter} {help id="is_opt_out" file="CRM/Contact/Form/Contact.hlp"}</td>
         </tr>
     </table>
  </div>

@@ -12,20 +12,20 @@
 <tr>
     {if !empty($form.address.$blockId.city)}
        <td>
-          {$form.address.$blockId.city.label}<br />
-          {$form.address.$blockId.city.html}
+          {$form.address.$blockId.city.label nofilter}<br />
+          {$form.address.$blockId.city.html nofilter}
        </td>
     {/if}
     {if !empty($form.address.$blockId.postal_code)}
        <td>
-          {$form.address.$blockId.postal_code.label}<br />
-          {$form.address.$blockId.postal_code.html}
+          {$form.address.$blockId.postal_code.label nofilter}<br />
+          {$form.address.$blockId.postal_code.html nofilter}
        </td>
       {if array_key_exists('postal_code_suffix', $form.address.$blockId)}
           <td>
-            {$form.address.$blockId.postal_code_suffix.label}
+            {$form.address.$blockId.postal_code_suffix.label nofilter}
             {help id="id-postal-code-suffix" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.postal_code_suffix.textLabel}<br/>
-            {$form.address.$blockId.postal_code_suffix.html}
+            {$form.address.$blockId.postal_code_suffix.html nofilter}
           <td>
       {/if}
     {/if}

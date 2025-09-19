@@ -10,8 +10,8 @@
 {if !empty($form.address.$blockId.supplemental_address_3)}
    <tr>
       <td colspan="2">
-          {$form.address.$blockId.supplemental_address_3.label}<br />
-          {$form.address.$blockId.supplemental_address_3.html}
+          {$form.address.$blockId.supplemental_address_3.label nofilter}<br />
+          {$form.address.$blockId.supplemental_address_3.html nofilter}
       </td>
    </tr>
 {/if}

@@ -5,7 +5,7 @@
     </span>
   </label>
   <br/>
-  {$form.group.html}
+  {$form.group.html nofilter}
 </div>
 <div id='grouptypeselect'>
   <label>
@@ -15,7 +15,7 @@
     </span>
   </label>
   <br/>
-  {$form.group_type.html}
+  {$form.group_type.html nofilter}
   {literal}
     <script type="text/javascript">
       CRM.$(function ($) {

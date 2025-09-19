@@ -27,10 +27,10 @@
     <div class="crm-accordion-body">
         <div class="crm-section sort_name-section">
           <div class="label">
-            {$form.sort_name.label}
+            {$form.sort_name.label nofilter}
           </div>
           <div class="content">
-            {$form.sort_name.html}
+            {$form.sort_name.html nofilter}
           </div>
           <div class="clear"></div>
         </div>
@@ -38,10 +38,10 @@
         {if !empty($form.contact_type)}
           <div class="crm-section contact_type-section">
             <div class="label">
-              {$form.contact_type.label}
+              {$form.contact_type.label nofilter}
             </div>
               <div class="content">
-                {$form.contact_type.html}
+                {$form.contact_type.html nofilter}
               </div>
               <div class="clear"></div>
           </div>
@@ -51,16 +51,16 @@
         <div class="crm-section group_selection-section">
           <div class="label">
             {if $context EQ 'smog'}
-              {$form.group_contact_status.label}
+              {$form.group_contact_status.label nofilter}
             {else}
-              {$form.group.label}
+              {$form.group.label nofilter}
             {/if}
           </div>
           <div class="content">
             {if $context EQ 'smog'}
-              {$form.group_contact_status.html}
+              {$form.group_contact_status.html nofilter}
             {else}
-              {$form.group.html|crmAddClass:big}
+              {$form.group.html|crmAddClass:big nofilter}
             {/if}
           </div>
           <div class="clear"></div>
@@ -70,10 +70,10 @@
         {if !empty($form.tag)}
             <div class="crm-section tag-section">
               <div class="label">
-                {$form.tag.label}
+                {$form.tag.label nofilter}
               </div>
               <div class="content">
-                {$form.tag.html|crmAddClass:medium}
+                {$form.tag.html|crmAddClass:medium nofilter}
               </div>
               <div class="clear"></div>
             </div>

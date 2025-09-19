@@ -15,12 +15,12 @@
   <div class="crm-accordion-body" id="notesBlock">
    <table class="form-layout-compressed">
      <tr>
-       <td colspan=3>{$form.subject.label}<br  >
-        {$form.subject.html}</td>
+       <td colspan=3>{$form.subject.label nofilter}<br  >
+        {$form.subject.html nofilter}</td>
      </tr>
      <tr>
-       <td colspan=3>{$form.note.label}<br />
-        {$form.note.html}
+       <td colspan=3>{$form.note.label nofilter}<br />
+        {$form.note.html nofilter}
        </td>
      </tr>
    </table>

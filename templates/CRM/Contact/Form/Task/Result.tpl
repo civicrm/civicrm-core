@@ -11,7 +11,7 @@
 
 <div class="crm-submit-buttons">
     <p>
-    {$form.buttons.html}
+    {$form.buttons.html nofilter}
     </p>
 </div>
 

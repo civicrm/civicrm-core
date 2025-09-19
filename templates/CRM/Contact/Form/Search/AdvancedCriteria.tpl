@@ -38,7 +38,7 @@ CRM.$(function($) {
     return false;
   });
   // TODO: Why are the modes numeric? If they used the string there would be no need for this map
-  var modes = {/literal}{$component_mappings|smarty:nodefaults}{literal};
+  var modes = {/literal}{$component_mappings nofilter}{literal};
   // Handle change of results mode
   $('#component_mode').change(function() {
     // Reset task dropdown
