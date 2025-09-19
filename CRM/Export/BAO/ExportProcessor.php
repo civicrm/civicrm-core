@@ -1450,7 +1450,9 @@ class CRM_Export_BAO_ExportProcessor {
     if ($type) {
       switch ($type) {
         case CRM_Utils_Type::T_INT:
-          if (str_ends_with($fieldName, '_id')) {
+          if (!empty($fieldSpec['is_pseudofield_for']) || (
+              !empty($fieldSpec['pseudoconstant']) && (array_intersect(array_keys($fieldSpec['pseudoconstant']), ['table', 'optionGroupName']))
+          )) {
             return "`$fieldName` varchar(64)";
           }
 
