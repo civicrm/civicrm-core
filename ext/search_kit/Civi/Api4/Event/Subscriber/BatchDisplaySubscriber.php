@@ -54,6 +54,11 @@ class BatchDisplaySubscriber extends AutoService implements EventSubscriberInter
     }
     $savedSearchID = $event->params['saved_search_id'] ?? \CRM_Core_DAO::getFieldValue('CRM_Search_DAO_SearchDisplay', $event->id, 'saved_search_id');
     $this->loadSavedSearch($savedSearchID);
+
+    // Reload search with permissions force-disabled; this process does not depend on user permissions
+    $this->savedSearch['api_params']['checkPermissions'] = FALSE;
+    $this->loadSavedSearch();
+
     $pseudoFields = array_column(AbstractRunAction::getPseudoFields(), 'name');
     $columnNames = [];
     foreach ($newSettings['columns'] as $i => &$column) {
