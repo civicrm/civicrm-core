@@ -7,7 +7,7 @@
 /* Backdrop - html.admin-bar */
 
 html.admin-bar body {
-  background-color: var(--crm-c-page-background);
+  background-color: var(--crm-c-page-bg);
 }
 html.admin-bar .crm-container {
   --crm-page-padding: 0;
@@ -38,13 +38,13 @@ body.page-civicrm .crm-container div.status {
 /* D8+ */
 body.page-civicrm header.content-header {
   margin-bottom: 0;
-  background-color: var(--crm-c-background);
+  background-color: var(--crm-c-container-bg);
 }
 body.page-civicrm main.page-content {
   margin-top: 0;
 }
 body.page-civicrm header + div.layout-container {
-  background-color: var(--crm-c-page-background) !important;
+  background-color: var(--crm-c-page-bg) !important;
   margin: 0 !important; /* use of important vs some themes */
 }
 body.page-civicrm .button {

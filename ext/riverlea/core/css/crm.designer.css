@@ -56,7 +56,7 @@
 .crm-designer-row-placeholder {
   border: 1px dashed gray;
   cursor: move;
-  background-color: var(--crm-c-background);
+  background-color: var(--crm-c-container-bg);
 }
 .crm-designer-palette .crm-designer-palette-field.disabled a,
 .crm-designer-open .crm-designer-row:hover {

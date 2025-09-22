@@ -495,7 +495,7 @@
   left: auto;
 }
 #bootstrap-theme .btn-group .btn + .btn.dropdown-toggle {
-  border-left: 1px solid var(--crm-c-page-background);
+  border-left: 1px solid var(--crm-table-background);
 }
 
 /* Icons (for ease, include .button & .ui-button icons) */

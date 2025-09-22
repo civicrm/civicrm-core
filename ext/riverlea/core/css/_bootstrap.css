@@ -1782,7 +1782,7 @@ fieldset[disabled] #bootstrap-theme .btn-link {
 #bootstrap-theme .btn-link[disabled]:focus,
 fieldset[disabled] #bootstrap-theme .btn-link:hover,
 fieldset[disabled] #bootstrap-theme .btn-link:focus {
-  color: var(--crm-c-gray-800);
+  color: var(--crm-c-inactive);
   text-decoration: none;
 }
 #bootstrap-theme .input-group-addon {
