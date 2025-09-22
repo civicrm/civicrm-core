@@ -8,7 +8,7 @@
   --crm-version: 'Walbrook, v' var(--crm-release);
 /* Fonts */
   --crm-system-fonts: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
-  --crm-font: "Civitype", "Open Sans", var(--crm-system-fonts);
+  --crm-font: "Inter", "Open Sans", var(--crm-system-fonts);
 /* Colour names */
   --crm-c-gray-900: #222831;
   --crm-c-gray-800: #393a3f;
