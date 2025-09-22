@@ -112,11 +112,13 @@ class CRM_Utils_Number {
    *
    * @param string $amount
    * @param string $locale
+   * @param int[] $attributes
+   *   Options passed to NumberFormatter::setAttribute
+   *   see https://www.php.net/manual/en/class.numberformatter.php#intl.numberformatter-constants.unumberformatattribute
    *
    * @return string
-   * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
-  public static function formatLocaleNumeric(string $amount, $locale = NULL): string {
+  public static function  formatLocaleNumeric(string $amount, $locale = NULL, array $attributes = []): string {
     if ($amount === "") {
       CRM_Core_Error::deprecatedWarning('Passing an empty string for amount is deprecated.');
       return $amount;
@@ -125,6 +127,11 @@ class CRM_Utils_Number {
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
     $formatter->setSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryDecimalPoint);
     $formatter->setSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryThousandSeparator);
+
+    foreach ($attributes as $key => $value) {
+      $formatter->setAttribute($key, (int) $value);
+    }
+
     return $formatter->format($amount);
   }
 

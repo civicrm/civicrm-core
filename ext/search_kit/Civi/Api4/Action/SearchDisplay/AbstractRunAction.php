@@ -1251,7 +1251,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param mixed $rawValue
    * @param array $data
    * @param string $dataType
-   * @param string|null $format
+   * @param string|array|null $format
    * @return array|string
    */
   protected function formatViewValue(string $key, $rawValue, $data, $dataType, $format = NULL) {
@@ -1284,7 +1284,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         break;
 
       case 'Float':
-        $formatted = \CRM_Utils_Number::formatLocaleNumeric($rawValue);
+        $format = $format ?: [];
+        // Ignore null values in format array
+        $format = array_filter($format, 'is_int');
+        $formatted = \CRM_Utils_Number::formatLocaleNumeric($rawValue, NULL, $format);
         break;
 
       case 'Date':
