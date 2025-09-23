@@ -254,7 +254,12 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'submit_limit',
-          'title' => E::ts('Maximum Submissions'),
+          'title' => E::ts('Max Submissions (total)'),
+          'data_type' => 'Integer',
+        ],
+        [
+          'name' => 'submit_limit_per_user',
+          'title' => E::ts('Max Submissions (per user)'),
           'data_type' => 'Integer',
         ],
         [
