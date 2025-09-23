@@ -113,6 +113,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       $afformSubmissions = \Civi\Api4\AfformSubmission::get(FALSE)
         ->addSelect('afform_name', 'COUNT(id) AS count', 'MAX(submission_date) AS date')
         ->addWhere('afform_name', 'IN', array_keys($afforms))
+        ->addWhere('status_id:name', '!=', 'Draft')
         ->addGroupBy('afform_name')
         ->execute()->indexBy('afform_name');
       foreach ($afforms as $name => $record) {
