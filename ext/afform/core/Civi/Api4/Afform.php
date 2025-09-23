@@ -350,6 +350,14 @@ class Afform extends Generic\AbstractEntity {
           'readonly' => TRUE,
         ];
         $fields[] = [
+          'name' => 'user_submission_count',
+          'type' => 'Extra',
+          'data_type' => 'Integer',
+          'input_type' => 'Number',
+          'description' => 'Number of submission records for the current user',
+          'readonly' => TRUE,
+        ];
+        $fields[] = [
           'name' => 'submission_date',
           'type' => 'Extra',
           'data_type' => 'Timestamp',
