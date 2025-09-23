@@ -305,4 +305,51 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
   }
 
+  public function testAddressFieldQuickSearch(): void {
+    // Enable Address fields in quick search
+    Setting::set(FALSE)
+      ->addValue('includeNickNameInName', FALSE)
+      ->addValue('includeEmailInName', TRUE)
+      ->addValue('contact_autocomplete_options', [1, 2, 4, 5, 6])
+      ->execute();
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        [
+          'first_name' => 'Robert',
+          'last_name' => 'AttestXYZsmith',
+          'email_primary.email' => 'bob@example.com',
+          'address_primary.street_address' => '1270 Marigold Lane',
+          'address_priamry.state_prvoince_id:abbr' => 'FL',
+          'address_primary.country_id:abbr' => 'US',
+        ],
+        [
+          'first_name' => 'William',
+          'last_name' => 'TestXYZsmithson',
+          'email_primary.email' => 'bill@example.com',
+          'address_primary.street_address' => '1100 Marigold Lane',
+          'address_priamry.state_prvoince_id:abbr' => 'FL',
+          'address_primary.country_id:abbr' => 'US',
+        ],
+        [
+          'first_name' => 'Mary',
+          'last_name' => 'TestXYZblacksmith',
+          'email_primary.email' => 'mary@example.com',
+          'address_primary.street_address' => '1100 Marigold Lane',
+          'address_priamry.state_prvoince_id:abbr' => 'FL',
+          'address_primary.country_id:abbr' => 'US',
+        ],
+      ],
+    ]);
+    $result = Contact::autocomplete()
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('testXYZsmith')
+      ->execute();
+    $this->assertCount(2, $result);
+    $this->assertEquals('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
+    $this->assertEquals('bob@example.com', $result[$contacts[0]['id']]['description'][0]);
+    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
+
+  }
+
 }
