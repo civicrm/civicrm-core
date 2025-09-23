@@ -109,7 +109,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     }
 
     // Fetch submission aggregates in bulk
-    if ($afforms && $this->_isFieldSelected('submission_count', 'submission_date', 'submit_currently_open')) {
+    if ($afforms && $this->_isFieldSelected('submission_count', 'submission_date', 'user_submission_count', 'submit_currently_open')) {
       $userContactId = \CRM_Core_Session::getLoggedInContactID();
       $afformSubmissions = \Civi\Api4\AfformSubmission::get(FALSE)
         ->addSelect('afform_name', 'COUNT(id) AS count', 'MAX(submission_date) AS date')
@@ -123,14 +123,17 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         $afforms[$name]['submit_currently_open'] = ($record['submit_enabled'] ?? TRUE) && (empty($record['submit_limit']) || $record['submit_limit'] > $afforms[$name]['submission_count']);
 
         // Check per-user submission limit
-        if ($this->getCheckPermissions() && !empty($afforms[$name]['submit_limit_per_user']) && $afforms[$name]['submit_currently_open'] && $userContactId) {
+        if ($userContactId && ($this->_isFieldSelected('user_submission_count') || (!empty($afforms[$name]['submit_limit_per_user']) && $afforms[$name]['submit_currently_open']))) {
           $userSubmissions = \Civi\Api4\AfformSubmission::get(FALSE)
             ->addWhere('afform_name', '=', $name)
             ->addWhere('contact_id', '=', $userContactId)
             ->addWhere('status_id:name', '!=', 'Draft')
             ->selectRowCount()
             ->execute();
-          $afforms[$name]['submit_currently_open'] = $userSubmissions->countMatched() < $afforms[$name]['submit_limit_per_user'];
+          $afforms[$name]['user_submission_count'] = $userSubmissions->countMatched();
+          if (!empty($afforms[$name]['submit_limit_per_user']) && $afforms[$name]['submit_currently_open']) {
+            $afforms[$name]['submit_currently_open'] = $userSubmissions->countMatched() < $afforms[$name]['submit_limit_per_user'];
+          }
         }
       }
     }
