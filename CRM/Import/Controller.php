@@ -42,8 +42,7 @@ class CRM_Import_Controller extends CRM_Core_Controller {
     }
     else {
       $pathArguments = explode('/', (CRM_Utils_System::currentPath() ?: ''));
-      unset($pathArguments[0], $pathArguments[1]);
-      $entity = implode('', $pathArguments);
+      $entity = $pathArguments[2] ?? '';
       // For backwards compatibility, allow snake_case entity name
       if ($entity === (mb_strtolower($entity, "UTF-8"))) {
         $entity = CRM_Utils_String::convertStringToCamel($entity);
