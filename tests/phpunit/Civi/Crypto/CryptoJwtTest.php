@@ -17,6 +17,9 @@ use Firebase\JWT\JWT;
 
 /**
  * Test major use-cases of the 'crypto.token' service.
+ *
+ * @group headless
+ * @group crypto
  */
 class CryptoJwtTest extends \CiviUnitTestCase {
 
