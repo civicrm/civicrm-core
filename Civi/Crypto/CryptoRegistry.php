@@ -196,7 +196,12 @@ class CryptoRegistry extends AutoService {
     }
 
     if (!isset($options['id'])) {
-      $options['id'] = \CRM_Utils_String::base64UrlEncode(sha1($options['suite'] . chr(0) . $options['key'], TRUE));
+      $identifyingPart = match($options['suite']) {
+        'jwt-eddsa-keypair' => 'jwt-eddsa-*' . chr(0) . sodium_crypto_sign_publickey($options['key']),
+        'jwt-eddsa-public' => 'jwt-eddsa-*' . chr(0) . $options['key'],
+        default => $options['suite'] . chr(0) . $options['key'],
+      };
+      $options['id'] = \CRM_Utils_String::base64UrlEncode(sha1($identifyingPart, TRUE));
     }
     // Manual key IDs should be validated.
     elseif (!$this->isValidKeyId($options['id'])) {

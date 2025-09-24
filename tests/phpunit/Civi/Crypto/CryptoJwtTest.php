@@ -55,6 +55,47 @@ class CryptoJwtTest extends \CiviUnitTestCase {
     }
   }
 
+  /**
+   * If you register a public-key (*without* a corresponding private key)... can you still validate signatures?
+   *
+   * @return void
+   * @throws \Civi\Crypto\Exception\CryptoException
+   * @throws \SodiumException
+   */
+  public function testPublicKeyVerify(): void {
+    /** @var \Civi\Crypto\CryptoRegistry $registry */
+    $registry = \Civi::service('crypto.registry');
+    /** @var \Civi\Crypto\CryptoJwt $cryptoJwt */
+    $cryptoJwt = \Civi::service('crypto.jwt');
+
+    $keyPair = sodium_crypto_sign_keypair();
+    $publicKey = sodium_crypto_sign_publickey($keyPair);
+
+    // First, we use the key-pair to generate signature...
+    $registeredKeyPair = $registry->addKey([
+      'suite' => 'jwt-eddsa-keypair',
+      'key' => $keyPair,
+    ]);
+    $enc = $cryptoJwt->encode([
+      'exp' => \CRM_Utils_Time::time() + 600,
+      'sub' => 'me',
+      'tags' => ['ASYMMETRIC-EXAMPLE'],
+    ], $registeredKeyPair['id']);
+    $this->assertTrue(is_string($enc) && !empty($enc), 'CryptoJwt::encode() should return valid string');
+    $registry->removeKey($registeredKeyPair['id']);
+
+    // Now, we use the public-key (only) to validate signature...
+    $registeredPublicKey = $registry->addKey([
+      'suite' => 'jwt-eddsa-public',
+      'key' => $publicKey,
+      'tags' => ['ASYMMETRIC-EXAMPLE'],
+    ]);
+    $dec = $cryptoJwt->decode($enc, 'ASYMMETRIC-EXAMPLE');
+    $this->assertTrue(is_array($dec) && !empty($dec));
+    $this->assertEquals('me', $dec['sub']);
+    $this->assertEquals($registeredPublicKey['id'], $registeredKeyPair['id'], 'Keypair and public-key should default to same KID.');
+  }
+
   public function getMixKeyExamples() {
     return [
       ['SIGN-TEST', 'SIGN-TEST', TRUE],
