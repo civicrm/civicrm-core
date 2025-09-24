@@ -11,6 +11,7 @@
 
 
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Handle requests for civicrm/dev/rtf
@@ -94,6 +95,30 @@ class CRM_Core_Page_RemoteTestFunction extends CRM_Core_Page {
         }
       },
     ];
+  }
+
+  public static function convertResponseToArray($response) {
+    if ($response instanceof ResponseInterface) {
+      return [
+        'code' => $response->getStatusCode(),
+        'body' => $response->getBody()->getContents(),
+        'headers' => $response->getHeaders(),
+      ];
+    }
+    elseif (is_string($response)) {
+      return [
+        'code' => 200,
+        'body' => "<html><body>$response</body></html>",
+        'headers' => ['Content-Type' => 'text/html'],
+      ];
+    }
+    else {
+      throw new \RuntimeException("Unrecognized response type: " . gettype($response));
+    }
+  }
+
+  public static function convertArrayToResponse(array $array): ResponseInterface {
+    return new Response($array['code'], $array['headers'], $array['body']);
   }
 
 }
