@@ -33,6 +33,10 @@ class Admin {
    * @throws \CRM_Core_Exception
    */
   public static function getAdminSettings():array {
+    if (!\CRM_Core_Permission::check('administer CiviCRM')) {
+      return [];
+    }
+
     $schema = self::getSchema();
     $data = [
       'schema' => self::addImplicitFKFields($schema),
