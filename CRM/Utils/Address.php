@@ -188,7 +188,7 @@ class CRM_Utils_Address {
     $legacyFieldConversions = [
       'address_name' => 'name',
       'state' => 'state_province_id:label',
-      'state_province_name' => 'state_province_id:abbr',
+      'state_province_name' => 'state_province_id:label',
       'state_province' => 'state_province_id:abbr',
       'county' => 'county_id:label',
       'country' => 'country_id:label',
