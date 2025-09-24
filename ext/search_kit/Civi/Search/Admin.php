@@ -33,6 +33,10 @@ class Admin {
    * @throws \CRM_Core_Exception
    */
   public static function getAdminSettings():array {
+    // Check minimum permission needed to reach this
+    if (!\CRM_Core_Permission::check('manage own search_kit')) {
+      return [];
+    }
     $schema = self::getSchema();
     $data = [
       'schema' => self::addImplicitFKFields($schema),
