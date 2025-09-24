@@ -118,6 +118,7 @@ class Api4EntitySetQuery extends Api4Query {
       $this->addSpecField($alias, [
         'sql_name' => "`$alias`",
         'entity' => $field['entity'] ?? NULL,
+        'name' => $field['name'] ?? $alias,
         'data_type' => $field['data_type'] ?? $expr::getDataType(),
       ]);
     }

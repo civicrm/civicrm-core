@@ -172,11 +172,11 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
 
     $result = EntitySet::get(FALSE)
       ->addSelect('id', 'name', 'label', 'parent_id:name', 'is_parent')
-      ->addSet('UNION ALL', ContactType::get()
+      ->addSet('UNION DISTINCT', ContactType::get()
         ->addSelect('*', 'TRUE AS is_parent')
         ->addWhere('name', '=', 'Household')
       )
-      ->addSet('UNION ALL', ContactType::get()
+      ->addSet('UNION DISTINCT', ContactType::get()
         ->addSelect('*', 'FALSE AS is_parent')
         ->addWhere('id', '=', $subType['id'])
       )
