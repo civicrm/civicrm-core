@@ -350,14 +350,16 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
    *
    * @param array $entityBlock
    *   Associated array of fields.
-   * @param bool $microformat
-   *   If microformat output is required.
+   * @param bool $useMarkup
+   *   If TRUE, then `$this->display` will be filled with an address summary -- using markup.
+   *   If FALSE, then `$this->display` will be filled with an address summary -- using plain-text.
+   *   NOTE: Regardless of the flag, `$this->display_text` will have an address summary -- using plain-text.
    * @param int|string $fieldName conditional field name
    *
    * @return array
    *   array with address fields
    */
-  public static function &getValues($entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
+  public static function &getValues($entityBlock, $useMarkup = FALSE, $fieldName = 'contact_id') {
     if (empty($entityBlock)) {
       return NULL;
     }
@@ -423,7 +425,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
         $values['world_region'] = CRM_Core_PseudoConstant::worldregion($regionId);
       }
 
-      $address->addDisplay($microformat);
+      $address->addDisplay($useMarkup);
 
       $values['display'] = $address->display;
       $values['display_text'] = $address->display_text;
@@ -453,10 +455,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
   /**
    * Add the formatted address to $this-> display.
    *
-   * @param bool $microformat
-   *   Unexplained parameter that I've always wondered about.
+   * @param bool $useMarkup
+   *   If TRUE, then `$this->display` will be filled with an address summary -- using markup.
+   *   If FALSE, then `$this->display` will be filled with an address summary -- using plain-text.
+   *   NOTE: Regardless of the flag, `$this->display_text` will have an address summary -- using plain-text.
    */
-  public function addDisplay($microformat = FALSE) {
+  public function addDisplay($useMarkup = FALSE) {
     $fields = [
       // added this for CRM 1200
       'address_id' => $this->id,
@@ -481,7 +485,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
     else {
       $fields['county'] = NULL;
     }
-    if ($microformat) {
+    if ($useMarkup) {
       $this->display = CRM_Utils_Address::formatVCard($fields);
       $this->display_text = CRM_Utils_Address::format($fields);
     }
