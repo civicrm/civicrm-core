@@ -1181,7 +1181,7 @@ if (!CRM.vars) CRM.vars = {};
         }
       }
       var $icon = $(submitButton).siblings('.crm-i').add('.crm-i, .ui-icon', submitButton);
-      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-pulse');
+      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-spin');
     }
   }
 
