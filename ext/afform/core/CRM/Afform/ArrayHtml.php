@@ -32,6 +32,7 @@ class CRM_Afform_ArrayHtml {
       'type' => 'text',
       'security' => 'text',
       'actions' => 'js',
+      'behavior' => 'js',
     ],
     'af-field' => [
       '#selfClose' => TRUE,
@@ -330,6 +331,9 @@ class CRM_Afform_ArrayHtml {
         return $mixedAttrValue;
 
       case 'js':
+        if (is_string($mixedAttrValue)) {
+          $mixedAttrValue = json_decode($mixedAttrValue, TRUE);
+        }
         $v = CRM_Utils_JS::writeObject($mixedAttrValue, TRUE);
         return $v;
 
