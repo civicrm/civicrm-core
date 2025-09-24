@@ -20,6 +20,8 @@
  */
 class CRM_Pledge_Task extends CRM_Core_Task {
 
+  const PDF_THANKYOU = 403;
+
   public static $objectType = 'pledge';
 
   /**
@@ -36,6 +38,16 @@ class CRM_Pledge_Task extends CRM_Core_Task {
           'title' => ts('Delete pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
+        ],
+        self::PDF_THANKYOU => [
+          'title' => ts('Pledge Letters - print or email'),
+          'class' => 'CRM_Pledge_Form_Task_PDFLetter',
+          'result' => FALSE,
+          'url' => 'civicrm/pledge/task?reset=1&task=letter',
+          'key' => 'letter',
+          'name' => ts('Send Letter'),
+          'is_single_mode' => TRUE,
+          'title_single_mode' => ts('Pledge Letters - print or email'),
         ],
         self::TASK_PRINT => [
           'title' => ts('Print selected rows'),
