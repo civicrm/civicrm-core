@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Grant;
+
 /**
  * Class for grant form task actions.
  * FIXME: This needs refactoring to properly inherit from CRM_Core_Form_Task and share more functions.
@@ -41,14 +43,17 @@ class CRM_Grant_Form_Task extends CRM_Core_Form_Task {
 
     $values = $form->getSearchFormValues();
 
-    $form->_task = $values['task'];
-    $tasks = CRM_Grant_Task::tasks();
-    if (!array_key_exists($form->_task, $tasks)) {
-      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-    }
+    $form->_task = $values['task'] ?? NULL;
 
     $ids = $form->getSelectedIDs($values);
 
+    // This gets IDs if the action was initiated from SearchKit.
+    if (!$ids) {
+      $idString = $form->controller->get('id');
+      $ids = $idString ? explode(',', $idString) : NULL;
+    }
+
+    // We're in a normal search, "All X records" is selected.
     if (!$ids) {
       $queryParams = $form->get('queryParams');
       $sortOrder = NULL;
@@ -109,6 +114,38 @@ class CRM_Grant_Form_Task extends CRM_Core_Form_Task {
         'name' => ts('Cancel'),
       ],
     ]);
+  }
+
+  /**
+   * Get the rows form the search, keyed to make the token processor happy.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRows(): array {
+    if (empty($this->rows)) {
+      // checkPermissions set to false - in case form is bypassing in some way.
+      $grants = Grant::get(FALSE)
+        ->addWhere('id', 'IN', $this->_grantIds)
+        ->setSelect(['id', 'contact_id'])->execute();
+      foreach ($grants as $grant) {
+        $this->rows[] = [
+          'contact_id' => $grant['contact_id'],
+          'grant_id' => $grant['id'],
+          'schema' => [
+            'contactId' => $grant['contact_id'],
+            'grantId' => $grant['id'],
+          ],
+        ];
+      }
+    }
+    return $this->rows;
+  }
+
+  /**
+   * Get the token processor schema required to list any tokens for this task.
+   */
+  public function getTokenSchema(): array {
+    return ['grantId', 'contactId'];
   }
 
 }
