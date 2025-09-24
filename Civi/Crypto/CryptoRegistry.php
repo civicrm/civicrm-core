@@ -167,6 +167,29 @@ class CryptoRegistry extends AutoService {
       'weight' => 0,
     ];
     $options = array_merge($defaults, $options);
+    return $this->addKey($options);
+  }
+
+  /**
+   * @param string|array $options
+   *   Additional options:
+   *     - key: string, a representation of the key as binary
+   *     - suite: string, ex: 'aes-cbc' or ''jwt-eddsa-keypair''
+   *     - tags: string[]
+   *     - weight: int, default 0
+   *     - id: string, a unique identifier for this key. (default: fingerprint the key+suite)
+   *
+   * @return array
+   *   The full key record. (Same format as $options)
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  public function addKey($options) {
+    if (empty($options['suite'])) {
+      throw new CryptoException("addKey(): Must specify a suite");
+    }
+
+    $defaults = ['weight' => 0];
+    $options = array_merge($defaults, $options);
 
     if (!isset($options['key'])) {
       throw new CryptoException("Missing crypto key");
@@ -182,6 +205,10 @@ class CryptoRegistry extends AutoService {
 
     $this->keys[$options['id']] = $options;
     return $options;
+  }
+
+  public function removeKey(string $id): void {
+    unset($this->keys[$id]);
   }
 
   /**
