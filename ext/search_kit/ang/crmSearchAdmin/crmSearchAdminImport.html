@@ -4,7 +4,7 @@
     {{:: ts('Search configuration copied from the "Export" action can be pasted here.') }}
   </div>
   <div class="alert alert-info" ng-if="$ctrl.checking || $ctrl.running">
-    <i class="crm-i fa-spinner fa-pulse" role="img" aria-hidden="true"></i>
+    <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
     {{ $ctrl.checking ? ts('Checking input...') : ts('Importing Saved Search...') }}
   </div>
   <div class="alert alert-danger" ng-if="$ctrl.error">
