@@ -787,13 +787,15 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param array $defaults
    *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
-   * @param bool $microformat
-   *   Deprecated value
+   * @param bool $useAddressMarkup
+   *   (DEPRECATED) If TRUE, the contact's primary address will be
+   *   returned with a formatted (HTML) blob.
    *
    * @return CRM_Contact_BAO_Contact
+   *
    */
-  public static function &retrieve(&$params, &$defaults = [], $microformat = FALSE) {
-    if ($microformat) {
+  public static function &retrieve(&$params, &$defaults = [], $useAddressMarkup = FALSE) {
+    if ($useAddressMarkup) {
       CRM_Core_Error::deprecatedWarning('microformat is deprecated in CRM_Contact_BAO_Contact::retrieve');
     }
     if (array_key_exists('contact_id', $params)) {
@@ -811,7 +813,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $contact->email = $defaults['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $params['contact_id']]);
     $contact->openid = $defaults['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $params['contact_id']]);
     $contact->phone = $defaults['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $params['contact_id']]);
-    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], $microformat);
+    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], $useAddressMarkup);
     $contact->website = CRM_Core_BAO_Website::getValues($params, $defaults);
 
     if (!isset($params['noNotes'])) {
