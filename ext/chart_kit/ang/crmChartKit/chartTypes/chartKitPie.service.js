@@ -30,12 +30,11 @@
 
     showLegend: (displayCtrl) => (displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
 
-    // for pie chart the legend is showing column values, which benefit from rendering
+    // the legend is cross product of column values from w columns
     legendTextAccessor: (displayCtrl) => ((d) =>
       (d.name === 'Others') ?
-        ts('Others') :
-        displayCtrl.getColumnsForAxis('w').map((col) => displayCtrl.renderColumnValue(d.data, col)).join(' - ')
-    ),
+      ts('Others') :
+      displayCtrl.getColumnsForAxis('w').map((col) => col.renderedValueAccessor(d)).join(' - ')),
 
     getInitialDisplaySettings: () => ({
       showLegend: 'left',
