@@ -58,6 +58,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
   public function getMixKeyExamples() {
     return [
       ['SIGN-TEST', 'SIGN-TEST', TRUE],
+      ['SIGN-TEST-EDDSA', 'SIGN-TEST-EDDSA', TRUE],
       ['sign-key-0', 'SIGN-TEST', TRUE],
       ['sign-key-1', 'SIGN-TEST', TRUE],
       ['sign-key-alt', 'SIGN-TEST', FALSE],
