@@ -15,6 +15,9 @@ use Civi\Crypto\Exception\CryptoException;
 
 /**
  * Test major use-cases of the 'crypto.registry' service.
+ *
+ * @group headless
+ * @group crypto
  */
 class CryptoRegistryTest extends \CiviUnitTestCase {
 
