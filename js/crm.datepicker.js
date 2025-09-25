@@ -73,6 +73,13 @@
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
+          settings.onSelect = function (dateText, inst) {
+            if (settings.time !== false) {
+              $timeField.focus();
+            } else {
+              $(this).focus();
+            }
+          };
           $dateField.addClass('crm-form-date').datepicker(settings);
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
