@@ -1,0 +1,11 @@
+<div af-fieldset="">
+  <div class="af-container af-layout-inline">
+    <af-field name="type" />
+    <af-field name="title" />
+    <af-field name="description" />
+    <af-field name="primary_entities" defn="{search_operator: 'CONTAINS',input_attrs: {multiple: true}}" />
+    <af-field name="tags" defn="{search_operator: 'CONTAINS', input_attrs: {}, label: 'Tag'}" />
+    <af-field name="extension" defn="{input_attrs: {multiple: true}}" />
+  </div>
+  <crm-search-display-table search-name="Reports" display-name="Reports"></crm-search-display-table>
+</div>
