@@ -20,9 +20,9 @@
 {/if}
 
 <tr id="OpenID_Block_{$blockId}">
-    <td>{$form.openid.$blockId.openid.html|crmAddClass:twenty}&nbsp;</td>
-    <td>{$form.openid.$blockId.location_type_id.html}</td>
-    <td align="center" id="OpenID-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>{$form.openid.$blockId.is_primary.1.html}</td>
+    <td>{$form.openid.$blockId.openid.html|crmAddClass:twenty nofilter}&nbsp;</td>
+    <td>{$form.openid.$blockId.location_type_id.html nofilter}</td>
+    <td align="center" id="OpenID-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>{$form.openid.$blockId.is_primary.1.html nofilter}</td>
     {if $blockId gt 1}
     <td><a href="#" title="{ts escape='htmlattribute'}Delete OpenID Block{/ts}" onClick="removeBlock('OpenID','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
     {/if}

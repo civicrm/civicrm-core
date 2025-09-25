@@ -12,8 +12,8 @@
     <tr>
       <td>
         <div id="streetAddress" class="crm-field-wrapper">
-          {$form.street_address.label}<br />
-          {$form.street_address.html|crmAddClass:big}
+          {$form.street_address.label nofilter}<br />
+          {$form.street_address.html|crmAddClass:big nofilter}
           {if $parseStreetAddress}
             <div>
               <a href="#" title="{ts escape='htmlattribute'}Use Address Elements{/ts}" rel="addressElements" class="address-elements-toggle">{ts}Use Address Elements{/ts}</a>
@@ -23,9 +23,9 @@
         {if $parseStreetAddress}
         <div id="addressElements" class="crm-field-wrapper" style="display: none;">
           <table class="crm-block crm-form-block advanced-search-address-elements">
-            <tr><td>{$form.street_number.label}<br />{$form.street_number.html}<br /><span class="description nowrap">{ts}or ODD / EVEN{/ts}</td>
-              <td>{$form.street_name.label}<br />{$form.street_name.html}</td>
-              <td>{$form.street_unit.label}<br />{$form.street_unit.html|crmAddClass:four}</td>
+            <tr><td>{$form.street_number.label nofilter}<br />{$form.street_number.html nofilter}<br /><span class="description nowrap">{ts}or ODD / EVEN{/ts}</td>
+              <td>{$form.street_name.label nofilter}<br />{$form.street_name.html nofilter}</td>
+              <td>{$form.street_unit.label nofilter}<br />{$form.street_unit.html|crmAddClass:four nofilter}</td>
             </tr>
             <tr>
               <td colspan="3"><a href="#" title="{ts escape='htmlattribute'}Use Complete Address{/ts}" rel="streetAddress" class="address-elements-toggle">{ts}Use Street Address{/ts}</a></td>
@@ -34,60 +34,60 @@
         </div>
         {/if}
         <div class="crm-field-wrapper">
-          {$form.supplemental_address_1.label}<br />
-          {$form.supplemental_address_1.html}
+          {$form.supplemental_address_1.label nofilter}<br />
+          {$form.supplemental_address_1.html nofilter}
         </div>
         <div class="crm-field-wrapper">
-          {$form.supplemental_address_2.label}<br />
-          {$form.supplemental_address_2.html}
+          {$form.supplemental_address_2.label nofilter}<br />
+          {$form.supplemental_address_2.html nofilter}
         </div>
         <div class="crm-field-wrapper">
-          {$form.supplemental_address_3.label}<br />
-          {$form.supplemental_address_3.html}
+          {$form.supplemental_address_3.label nofilter}<br />
+          {$form.supplemental_address_3.html nofilter}
         </div>
         <div class="crm-field-wrapper">
-          {$form.city.label}<br />
-          {$form.city.html}
+          {$form.city.label nofilter}<br />
+          {$form.city.html nofilter}
         </div>
         <div class="crm-field-wrapper">
-          {$form.country.label}<br />
-          {$form.country.html}
+          {$form.country.label nofilter}<br />
+          {$form.country.html nofilter}
         </div>
         <div class="crm-field-wrapper">
-          {$form.state_province.label}<br />
-          {$form.state_province.html}
+          {$form.state_province.label nofilter}<br />
+          {$form.state_province.html nofilter}
         </div>
         <div class="crm-field-wrapper">
-          {$form.county.label}<br />
-          {$form.county.html}
+          {$form.county.label nofilter}<br />
+          {$form.county.html nofilter}
         </div>
         <div class="crm-field-wrapper">
-          {$form.world_region.label}<br />
-          {$form.world_region.html}
+          {$form.world_region.label nofilter}<br />
+          {$form.world_region.html nofilter}
         </div>
       </td>
 
       <td>
         <div class="crm-field-wrapper">
-          <div>{$form.location_type.label} {help id="location_type"}</div>
-          {$form.location_type.html}
+          <div>{$form.location_type.label nofilter} {help id="location_type"}</div>
+          {$form.location_type.html nofilter}
         </div>
         {if !empty($form.address_name.html)}
           <div class="crm-field-wrapper">
-            {$form.address_name.label}<br />
-            {$form.address_name.html}
+            {$form.address_name.label nofilter}<br />
+            {$form.address_name.html nofilter}
           </div>
         {/if}
         {if !empty($form.postal_code.html)}
           <div class="crm-field-wrapper">
-            {$form.postal_code.label}
+            {$form.postal_code.label nofilter}
             <input type="checkbox" id="postal-code-range-toggle" value="1"/>
             <label for="postal-code-range-toggle">{ts}Range{/ts}</label><br />
             <div class="postal_code-wrapper">
-              {$form.postal_code.html}
+              {$form.postal_code.html nofilter}
             </div>
             <div class="postal_code_range-wrapper" style="display: none;">
-              {$form.postal_code_low.html}&nbsp;-&nbsp;{$form.postal_code_high.html}
+              {$form.postal_code_low.html nofilter}&nbsp;-&nbsp;{$form.postal_code_high.html nofilter}
             </div>
           </div>
           <script type="text/javascript">
@@ -111,8 +111,8 @@
         {/if}
         {if !empty($form.prox_distance.html)}
           <div class="crm-field-wrapper">
-            {$form.prox_distance.label}<br />
-            {$form.prox_distance.html}&nbsp;{$form.prox_distance_unit.html}
+            {$form.prox_distance.label nofilter}<br />
+            {$form.prox_distance.html nofilter}&nbsp;{$form.prox_distance_unit.html nofilter}
           </div>
         {/if}
       </td>

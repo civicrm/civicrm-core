@@ -1,10 +1,10 @@
 <div id="sortnameselect">
   <label>{ts}Name{/ts} <span class="description">(<a href="#" id='searchbyindivflds'>{ts}search by individual name fields{/ts}</a>)</span></label><br />
-  {$form.sort_name.html}
+  {$form.sort_name.html nofilter}
 </div>
 <div id="indivfldselect">
   <label>{ts}First/Last Name{/ts}<span class="description"> (<a href="#" id='searchbysortname'>{ts}search by full name{/ts}</a>)</span></label><br />
-  {$form.first_name.html} {$form.last_name.html}
+  {$form.first_name.html nofilter} {$form.last_name.html nofilter}
 </div>
 
 {literal}

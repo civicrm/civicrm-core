@@ -24,7 +24,7 @@
         {include file="CRM/Contact/Form/Search/table.tpl"}
         <div class="clear"></div>
         <div id="crm-submit-buttons" class="crm-submit-buttons">
-          {$form.buttons.html}
+          {$form.buttons.html nofilter}
         </div>
       </div>
     </div>
@@ -56,5 +56,5 @@
 {/if}
 </div>
 {/if}
-{$initHideBoxes|smarty:nodefaults}
+{$initHideBoxes nofilter}
 {include file="CRM/Form/validate.tpl"}

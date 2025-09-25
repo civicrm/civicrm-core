@@ -49,9 +49,9 @@
     <td> {ts}Select Records{/ts}:</td>
     <td class="nowrap">
       {assign var="checked" value=$selectedContactIds|@count}
-      {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural="All %count records"}The found record{/ts}</label>
+      {$form.radio_ts.ts_all.html nofilter} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural="All %count records"}The found record{/ts}</label>
       {if $pager->_totalItems > 1}
-        &nbsp; {$form.radio_ts.ts_sel.html} <label for="{$ts_sel_id}">{ts 1="<span>$checked</span>"}%1 Selected records only{/ts}</label>
+        &nbsp; {$form.radio_ts.ts_sel.html nofilter} <label for="{$ts_sel_id}">{ts 1="<span>$checked</span>"}%1 Selected records only{/ts}</label>
       {/if}
     </td>
   </tr>
@@ -59,19 +59,19 @@
     <td colspan="2">
      {* Hide export button in 'Add Members to Group' context. *}
      {if $context NEQ 'amtg'}
-        {$form.task.html}
+        {$form.task.html nofilter}
      {/if}
      {if $action eq 512}
-       {$form.$actionButtonName.html}
+       {$form.$actionButtonName.html nofilter}
      {elseif $action eq 8192}
        {* todo - just use action button name per above  - test *}
-       {$form._qf_Builder_next_action.html}&nbsp;&nbsp;
+       {$form._qf_Builder_next_action.html nofilter}&nbsp;&nbsp;
      {elseif $action eq 16384}
        {* todo - just use action button name per above - test *}
-       {$form._qf_Custom_next_action.html}&nbsp;&nbsp;
+       {$form._qf_Custom_next_action.html nofilter}&nbsp;&nbsp;
      {else}
        {* todo - just use action button name per above  - test *}
-       {$form._qf_Basic_next_action.html}
+       {$form._qf_Basic_next_action.html nofilter}
      {/if}
      </td>
   </tr>

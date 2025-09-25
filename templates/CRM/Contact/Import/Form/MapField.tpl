@@ -40,6 +40,6 @@
  {/literal}
 
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
- {$initHideBoxes|smarty:nodefaults}
+ {$initHideBoxes nofilter}
 
 </div>

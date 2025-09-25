@@ -1,17 +1,17 @@
 <tr>
   <td>
-    {$form.sort_name.label}
+    {$form.sort_name.label nofilter}
     <br>
-    {$form.sort_name.html|crmAddClass:'twenty'}
+    {$form.sort_name.html|crmAddClass:'twenty' nofilter}
   </td>
-  <td>{$form.buttons.html}</td>
+  <td>{$form.buttons.html nofilter}</td>
 </tr>
 <tr>
   {if !empty($form.contact_tags)}
     <td>
-      <label>{$form.contact_tags.label}</label>
+      <label>{$form.contact_tags.label nofilter}</label>
       <br>
-      {$form.contact_tags.html}
+      {$form.contact_tags.html nofilter}
     </td>
   {else}
     <td>&nbsp;</td>
@@ -19,9 +19,9 @@
 
   {if !empty($form.group)}
     <td>
-      <label>{$form.group.label}</label>
+      <label>{$form.group.label nofilter}</label>
       <br>
-      {$form.group.html}
+      {$form.group.html nofilter}
     </td>
   {else}
     <td>&nbsp;</td>
@@ -29,13 +29,13 @@
 </tr>
 <tr class="crm-event-search-form-block-deleted_contacts">
   <td>
-    {$form.contact_type.label}
+    {$form.contact_type.label nofilter}
     <br>
-    {$form.contact_type.html}
+    {$form.contact_type.html nofilter}
   </td>
   <td>
     {if !empty($form.deleted_contacts)}
-      {$form.deleted_contacts.html}&nbsp;&nbsp;{$form.deleted_contacts.label}
+      {$form.deleted_contacts.html nofilter}&nbsp;&nbsp;{$form.deleted_contacts.label nofilter}
     {/if}
   </td>
 </tr>

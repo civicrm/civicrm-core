@@ -25,13 +25,13 @@
   </tr>
 {/if}
 <tr id="Phone_Block_{$blockId}">
-  <td>{$form.phone.$blockId.phone.html}<span class="crm-phone-ext">{ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</span></td>
+  <td>{$form.phone.$blockId.phone.html nofilter}<span class="crm-phone-ext">{ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four nofilter}&nbsp;</span></td>
   {if $className eq 'CRM_Contact_Form_Contact'}
-  <td>{$form.phone.$blockId.location_type_id.html}</td>
+  <td>{$form.phone.$blockId.location_type_id.html nofilter}</td>
   {/if}
-  <td colspan="2">{$form.phone.$blockId.phone_type_id.html}</td>
+  <td colspan="2">{$form.phone.$blockId.phone_type_id.html nofilter}</td>
   {if $className eq 'CRM_Contact_Form_Contact'}
-    <td align="center" id="Phone-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>{$form.phone.$blockId.is_primary.1.html}</td>
+    <td align="center" id="Phone-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>{$form.phone.$blockId.is_primary.1.html nofilter}</td>
   {/if}
   {if $blockId gt 1}
     <td><a href="#" title="{ts escape='htmlattribute'}Delete Phone Block{/ts}" onClick="removeBlock('Phone','{$blockId}'); return false;">{ts}delete{/ts}</a></td>

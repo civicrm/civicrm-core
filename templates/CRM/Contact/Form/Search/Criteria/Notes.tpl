@@ -11,12 +11,12 @@
   <table class="form-layout">
     <tr>
       <td>
-        {$form.note.label}<br />
-        {$form.note.html}
+        {$form.note.label nofilter}<br />
+        {$form.note.html nofilter}
       </td>
       <td>
-        {$form.note_option.label}<br />
-        {$form.note_option.html}
+        {$form.note_option.label nofilter}<br />
+        {$form.note_option.html nofilter}
       </td>
     </tr>
   </table>

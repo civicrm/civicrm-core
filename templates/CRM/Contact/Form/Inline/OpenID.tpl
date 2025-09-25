@@ -31,9 +31,9 @@
   {section name='i' start=1 loop=$totalBlocks}
   {assign var='blockId' value=$smarty.section.i.index}
   <tr data-entity='openid' data-block-number={$blockId} id="OpenID_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
-    <td>{$form.openid.$blockId.openid.html|crmAddClass:twenty}&nbsp;</td>
-    <td>{$form.openid.$blockId.location_type_id.html}</td>
-    <td align="center" id="OpenID-Primary-html" class="crm-openid-is_primary">{$form.openid.$blockId.is_primary.1.html}</td>
+    <td>{$form.openid.$blockId.openid.html|crmAddClass:twenty nofilter}&nbsp;</td>
+    <td>{$form.openid.$blockId.location_type_id.html nofilter}</td>
+    <td align="center" id="OpenID-Primary-html" class="crm-openid-is_primary">{$form.openid.$blockId.is_primary.1.html nofilter}</td>
     <td>
       {if $blockId gt 1}
         <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete OpenID{/ts}"><span class="icon delete-icon"></span></a>

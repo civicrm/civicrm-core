@@ -19,10 +19,10 @@
           {assign var="i" value=$smarty.section.cols.index}
           <tr>
             <td class="form-item even-row">
-              {$form.mapper[$x][$i].html}
-              {$form.operator[$x][$i].html|crmAddClass:'required'}&nbsp;&nbsp;
+              {$form.mapper[$x][$i].html nofilter}
+              {$form.operator[$x][$i].html|crmAddClass:'required' nofilter}&nbsp;&nbsp;
               <span class="crm-search-value" id="crm_search_value_{$x}_{$i}">
-                {$form.value[$x][$i].html|crmAddClass:'required'}
+                {$form.value[$x][$i].html|crmAddClass:'required' nofilter}
               </span>
               {if $i gt 0 or $x gt 1}
                 &nbsp;<a href="#" class="crm-reset-builder-row crm-hover-button" title="{ts escape='htmlattribute'}Remove this row{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
@@ -33,12 +33,12 @@
 
         <tr class="crm-search-builder-add-row">
           <td class="form-item even-row underline-effect">
-            {$form.addMore[$x].html}
+            {$form.addMore[$x].html nofilter}
           </td>
         </tr>
       </table>
     </div>
   {/section}
-  <h3 class="crm-search-builder-add-block underline-effect">{$form.addBlock.html}</h3>
+  <h3 class="crm-search-builder-add-block underline-effect">{$form.addBlock.html nofilter}</h3>
 {/strip}
 </div>

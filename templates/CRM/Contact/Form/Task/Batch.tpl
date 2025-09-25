@@ -46,7 +46,7 @@
               {foreach name=optionOuter key=optionKey item=optionItem from=$form.field.$cid.$n}
                 {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
                 {if is_array($optionItem) && array_key_exists('html', $optionItem)}
-                  <td class="labels font-light">{$form.field.$cid.$n.$optionKey.html}</td>
+                  <td class="labels font-light">{$form.field.$cid.$n.$optionKey.html nofilter}</td>
                   {if $count == $field.options_per_line}
                   </tr>
                   <tr>
@@ -63,19 +63,19 @@
       {elseif $n|substr:0:5 eq 'phone'}
         <td class="compressed">
           {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}
-          {$form.field.$cid.$n.html}
+          {$form.field.$cid.$n.html nofilter}
           {if $form.field.$cid.$phone_ext_field.html}
-            &nbsp;{$form.field.$cid.$phone_ext_field.html}
+            &nbsp;{$form.field.$cid.$phone_ext_field.html nofilter}
           {/if}
         </td>
       {else}
-        <td class="compressed">{$form.field.$cid.$n.html}</td>
+        <td class="compressed">{$form.field.$cid.$n.html nofilter}</td>
       {/if}
     {/foreach}
   {/foreach}
   </tr>
   </table>
-{if $fields}{$form._qf_BatchUpdateProfile_refresh.html}{/if} &nbsp;<div class="crm-submit-buttons">{$form.buttons.html}</div>
+{if $fields}{$form._qf_BatchUpdateProfile_refresh.html nofilter}{/if} &nbsp;<div class="crm-submit-buttons">{$form.buttons.html nofilter}</div>
 
 </div>
 

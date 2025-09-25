@@ -13,23 +13,23 @@
   </summary>
   <div id="demographics" class="crm-accordion-body">
   <div class="form-item">
-        <span class="label">{$form.gender_id.label}</span>
+        <span class="label">{$form.gender_id.label nofilter}</span>
 
   <span class="value">
-        {$form.gender_id.html}
+        {$form.gender_id.html nofilter}
         </span>
   </div>
   <div class="form-item">
-        <span class="label">{$form.birth_date.label}</span>
-        <span class="fields">{$form.birth_date.html}</span>
+        <span class="label">{$form.birth_date.label nofilter}</span>
+        <span class="fields">{$form.birth_date.html nofilter}</span>
   </div>
   <div class="form-item">
-       {$form.is_deceased.html}
-       {$form.is_deceased.label}
+       {$form.is_deceased.html nofilter}
+       {$form.is_deceased.label nofilter}
   </div>
   <div id="showDeceasedDate" class="form-item">
-       <span class="label">{$form.deceased_date.label}</span>
-       <span class="fields">{$form.deceased_date.html}</span>
+       <span class="label">{$form.deceased_date.label nofilter}</span>
+       <span class="fields">{$form.deceased_date.html nofilter}</span>
   </div>
  </div>
 </details>

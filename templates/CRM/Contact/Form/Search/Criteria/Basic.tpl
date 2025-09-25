@@ -11,7 +11,7 @@
   {foreach from=$basicSearchFields item=fieldSpec}
     {assign var=field value=$form[$fieldSpec.name]}
     {if $field && !in_array($fieldSpec.name, array('first_name', 'last_name'))}
-      <div class="search-field {if !empty($fieldSpec.class)}{$fieldSpec.class|escape}{/if}">
+      <div class="search-field {if !empty($fieldSpec.class)}{$fieldSpec.class|escape nofilter}{/if}">
         {if !empty($fieldSpec.template)}
           {include file=$fieldSpec.template}
         {else}
@@ -34,7 +34,7 @@
   {/foreach}
   {if !empty($form.deleted_contacts)}
     <div class="search-field">
-      {$form.deleted_contacts.html} {$form.deleted_contacts.label}
+      {$form.deleted_contacts.html nofilter} {$form.deleted_contacts.label nofilter}
     </div>
   {/if}
 </div>

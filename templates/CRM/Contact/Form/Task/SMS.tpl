@@ -26,24 +26,24 @@
 
 <table class="form-layout-compressed">
     <tr class="crm-contactProvider-form-block-Provider">
-       <td class="label">{$form.sms_provider_id.label}</td>
-       <td>{$form.sms_provider_id.html} {help id="sms_provider_id" file="CRM/Contact/Form/Task/SMS.hlp"}</td>
+       <td class="label">{$form.sms_provider_id.label nofilter}</td>
+       <td>{$form.sms_provider_id.html nofilter} {help id="sms_provider_id" file="CRM/Contact/Form/Task/SMS.hlp"}</td>
     </tr>
     <tr class="crm-contactsms-form-block-recipient">
-       <td class="label">{$form.to.label}</td>
-       <td>{$form.to.html}
+       <td class="label">{$form.to.label nofilter}</td>
+       <td>{$form.to.html nofilter}
     <div class="spacer"></div>
       </td>
      </tr>
-   <tr><td class="label">{$form.activity_subject.label}</td>
-        <td class="value">{$form.activity_subject.html}</td>
+   <tr><td class="label">{$form.activity_subject.label nofilter}</td>
+        <td class="value">{$form.activity_subject.html nofilter}</td>
    </tr>
 
 
 {if array_key_exists('SMStemplate', $form)}
     <tr class="crm-contactPhone-form-block-template">
-        <td class="label">{$form.SMStemplate.label}</td>
-        <td>{$form.SMStemplate.html}</td>
+        <td class="label">{$form.SMStemplate.label nofilter}</td>
+        <td>{$form.SMStemplate.html nofilter}</td>
     </tr>
 {/if}
 
