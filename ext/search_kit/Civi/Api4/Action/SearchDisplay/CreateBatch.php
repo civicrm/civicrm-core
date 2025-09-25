@@ -51,6 +51,13 @@ class CreateBatch extends AbstractAction {
   protected $targets = [];
 
   /**
+   * Label for the batch
+   *
+   * @var string
+   */
+  protected $label;
+
+  /**
    * @inheritDoc
    */
   public function _run(Result $result) {
@@ -64,6 +71,7 @@ class CreateBatch extends AbstractAction {
     \CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS `$tableName`");
 
     $userJob = [
+      'label' => $this->label,
       'job_type' => 'search_batch_import',
       'status_id:name' => 'draft',
       'is_template' => FALSE,
