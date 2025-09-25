@@ -116,6 +116,7 @@
           display: this.display,
           rowCount: this.newBatch.rowCount,
           targets: this.newBatch.targets,
+          label: this.newBatch.label,
         }, 0).then(function(userJob) {
           $location.search('batch', userJob.id);
           // Re-init display to switch modes from creating batch to editing batch
