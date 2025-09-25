@@ -26,7 +26,9 @@ Required vars: caseType
         </a>
         <span class="crm-i fa-trash" title="{{:: ts('Remove') }}"
           ng-hide="activitySet.name == 'standard_timeline'"
-          ng-click="removeItem(caseType.definition.activitySets, activitySet)"></span>
+          ng-click="removeItem(caseType.definition.activitySets, activitySet)"
+          role="img" aria-hidden="true">
+        </span>
         <!-- Weird spacing:
         <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activitySets, activitySet)">
           <span class="crm-i fa-trash" title="Remove">Remove</span>

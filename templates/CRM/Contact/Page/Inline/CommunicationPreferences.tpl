@@ -12,7 +12,7 @@
   <div class="crm-clear crm-inline-block-content"{if $permission EQ 'edit'} title="{ts escape='htmlattribute'}Edit communication preferences{/ts}"{/if}>
     {if $permission EQ 'edit'}
     <div class="crm-edit-help">
-      <span class="crm-i fa-pencil" aria-hidden="true"></span> {ts}Edit communication preferences{/ts}
+      <span class="crm-i fa-pencil" role="img" aria-hidden="true"></span> {ts}Edit communication preferences{/ts}
     </div>
     {/if}
     <div class="crm-summary-row">
