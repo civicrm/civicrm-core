@@ -918,6 +918,15 @@ ORDER BY weight";
         ];
         $item['child'][] = [
           'attributes' => [
+            'label' => ts('View My Contact'),
+            'name' => 'CiviCRM Dashboard',
+            'url' => 'civicrm/contact/view?cid=' . CRM_Core_Session::getLoggedInContactID() . '&reset=1',
+            'icon' => 'crm-i fa-user',
+            'weight' => 1,
+          ],
+        ];
+        $item['child'][] = [
+          'attributes' => [
             'label' => ts('Hide Menu'),
             'name' => 'Hide Menu',
             'url' => '#hidemenu',
