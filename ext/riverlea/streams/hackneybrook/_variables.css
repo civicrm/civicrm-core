@@ -108,7 +108,7 @@
   --crm-dialog-header-size: var(--crm-r);
   --crm-dialog-header-padding: var(--crm-s) var(--crm-m1) var(--crm-s) var(--crm-m2);
   --crm-dialog-header-radius: var(--crm-dialog-radius) var(--crm-dialog-radius) 0 0;
-  --crm-dialog-body-bg: var(--crm-c-lowest-contrast-bg);
+  --crm-dialog-body-bg: var(--crm-c-layer0-bg);
   --crm-dialog-body-padding: var(--crm-r);
   /* Dashlet */
   --crm-dashlet-border: var(--crm-c-divider);
@@ -117,14 +117,14 @@
   --crm-dashlet-tabs-border: 3px solid #fff;
   --crm-dashlet-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
   /* Button dropdowns */
-  --crm-dropdown-bg: var(--crm-c-lowest-contrast-bg);
+  --crm-dropdown-bg: var(--crm-c-layer0-bg);
   --crm-dropdown-col: var(--crm-c-text);
   --crm-dropdown-hover-bg: var(--crm-c-secondary-hover);
   --crm-dropdown-border: var(--crm-btn-border);
   --crm-dropdown-width: 180px;
   --crm-dropdown-2-bg: var(--crm-c-layer2-bg);
   /* Notifications */
-  --crm-notify-background: rgb(0,0,0);
+  --crm-notify-bg: rgb(0,0,0);
   --crm-notify-padding: 10px 10px 15px 15px;
   --crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: 0;

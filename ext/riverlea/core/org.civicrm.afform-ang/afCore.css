@@ -74,7 +74,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 
 /* Card style */
 .af-container-style-pane {
-  background-color: var(--crm-form-block-background);
+  background-color: var(--crm-form-block-bg);
   border-radius: var(--crm-form-block-border-radius);
   box-shadow: var(--crm-form-block-box-shadow);
   position: relative;

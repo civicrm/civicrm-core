@@ -174,7 +174,7 @@
 /* Tab: Select Fields */
 
 .crm-search fieldset.crm-draggable {
-  background-color: var(--crm-c-drag-background);
+  background-color: var(--crm-c-drag-bg);
   border-radius: var(--crm-roundness);
   border: 0 solid transparent;
 }

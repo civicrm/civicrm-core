@@ -53,7 +53,7 @@
 
 1.4.3-6.2alpha
 This release makes a series of changes to how emphasis colours (ie primary/success/info/etc) are handled across RiverLea. The main changes:
- - ADDED - alert border colours are auto-generated using `hsl(from var(--crm-alert-background-X) h s calc(l - Y))`
+ - ADDED - alert border colours are auto-generated using `hsl(from var(--crm-alert-bg-X) h s calc(l - Y))`
  - ADDED - notification icon colours are auto-generated using `hsl(from var(--crm-c-X) h s calc(l + Y))`
  - ADDED auto primary/secondary hover darken cols via HSL.
  - CHANGED - 'crm-c-alert' to 'crm-c-danger' (https://github.com/civicrm/civicrm-core/pull/32409)
@@ -315,7 +315,7 @@ https://lab.civicrm.org/extensions/riverlea/-/issues/90
 1.1.6 / 5.80.5
  - FIXED - reset checkbox margin in checkbox lists (that shrunk the checkbox size)
  - FIXED - changed td.label to table-cell to address sizing inconsistencies (#68)
- - CHANGED - apply `--crm-c-page-background` to WordPress body, not only .crm-container (#77)
+ - CHANGED - apply `--crm-c-page-bg` to WordPress body, not only .crm-container (#77)
  - FIXED - right column inline edit on contact dashboard was positioned left (#76)
 
 1.1.5 / 5.80.4
@@ -445,7 +445,7 @@ https://lab.civicrm.org/extensions/riverlea/-/issues/90
  - CHANGED readme.
  - REMOVED border from form builder fieldset
  - CHANGED Hackney button icon background to tint to support button colouring
- - CHANGED Minetta tab body and active state to another value than --crm-page-background
+ - CHANGED Minetta tab body and active state to another value than --crm-page-bg
 
 1.0.0beta2
  - ADDED padding to FormBuilder dashlets
@@ -743,7 +743,7 @@ https://lab.civicrm.org/extensions/riverlea/-/issues/90
  - ADDED visible version-numbering to support development
  - FIXED many issues. Adds on-screen commit-version-numbering.
  - NEW CSS VARIBLES:
-    added: --crm-c-code-background
+    added: --crm-c-code-bg
     added: --crm-dash-image-size
     added: --crm-dash-image-radius
     added: --crm-dash-image-justify

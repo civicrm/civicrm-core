@@ -533,7 +533,7 @@ af-gui-container > .af-gui-bar,
 /* Rules for Conditional dialog */
 .af-gui-conditional-dialog fieldset {
   padding: 6px;
-  border-top: 1px solid var(--crm-c-drag-background);
+  border-top: 1px solid var(--crm-c-drag-bg);
   margin-top: 10px;
   margin-bottom: 10px;
   position: relative;

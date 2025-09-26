@@ -36,9 +36,9 @@
   --crm-c-link: var(--crm-c-blue-darker);
   --crm-c-link-hover: #004370;
   --crm-c-page-bg: #e8eef0;
-  --crm-c-container-bg: var(--crm-c-lowest-contrast-bg);
-  --crm-c-drag-background: var(--crm-c-gray-200); /* background for drag/drop regions, select2 highlight */
-  --crm-c-code-background: var(--crm-c-layer2-bg); /* bg for code blocks */
+  --crm-c-container-bg: var(--crm-c-layer0-bg);
+  --crm-c-drag-bg: var(--crm-c-gray-200); /* background for drag/drop regions, select2 highlight */
+  --crm-c-code-bg: var(--crm-c-layer2-bg); /* bg for code blocks */
 /* Emphasis colours */
   --crm-c-primary: var(--crm-c-blue-dark);
   --crm-c-secondary: var(--crm-c-purple);
@@ -80,7 +80,7 @@
   --crm-btn-small-padding: var(--crm-s1) var(--crm-m1);
   --crm-btn-height: 40px;
 /* Tables */
-  --crm-table-row-bg:  var(--crm-c-lowest-contrast-bg);
+  --crm-table-row-bg:  var(--crm-c-layer0-bg);
   --crm-table-row-hover: var(--crm-c-gray-200);
   --crm-table-sort-col: var(--crm-c-gray-500);
   --crm-table-nested-padding: 0 0 var(--crm-r) 0;
@@ -120,7 +120,7 @@
 /* Form */
   --crm-form-block-padding: var(--crm-r);
   --crm-form-block-border-radius: 0;
-  --crm-input-background-image: none;
+  --crm-input-bg-image: none;
   --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: #c2cfd8;
   --crm-input-border-radius: var(--crm-roundness);
@@ -137,7 +137,7 @@
   --crm-tabs-padding: var(--crm-m) var(--crm-m) 0 var(--crm-m);
   --crm-tabs-border: var(--crm-c-divider);
   --crm-tab-roundness: 2px 2px 0 0;
-  --crm-tab-bg-hover:  var(--crm-c-lowest-contrast-bg);
+  --crm-tab-bg-hover:  var(--crm-c-layer0-bg);
   --crm-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m);
   --crm-tab-weight: bold;
@@ -194,7 +194,7 @@
   --crm-dashlet-header-padding: var(--crm-padding-reg);
   --crm-dashlet-tabs-border: var(--crm-tabs-border);
 /* Notifications */
-  --crm-notify-background: var(--crm-c-lowest-contrast-bg);
+  --crm-notify-bg: var(--crm-c-layer0-bg);
   --crm-notify-col: var(--crm-c-text);
   --crm-notify-accent-border: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-danger: #d02e2e;
