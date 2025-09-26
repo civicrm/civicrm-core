@@ -7,7 +7,7 @@
 /* Backdrop - html.admin-bar */
 
 html.admin-bar body {
-  background-color: var(--crm-c-page-background);
+  background-color: var(--crm-c-page-bg);
 }
 html.admin-bar .crm-container {
   --crm-page-padding: 0;
@@ -38,13 +38,13 @@ body.page-civicrm .crm-container div.status {
 /* D8+ */
 body.page-civicrm header.content-header {
   margin-bottom: 0;
-  background-color: var(--crm-c-background);
+  background-color: var(--crm-c-container-bg);
 }
 body.page-civicrm main.page-content {
   margin-top: 0;
 }
 body.page-civicrm header + div.layout-container {
-  background-color: var(--crm-c-page-background) !important;
+  background-color: var(--crm-c-page-bg) !important;
   margin: 0 !important; /* use of important vs some themes */
 }
 body.page-civicrm .button {
@@ -59,7 +59,7 @@ body.page-civicrm #squeeze #crm-container,
 .region-sidebar-first .block-civicrm {
   padding: 0;
   --crm-page-padding: 0;
-  --crm-c-page-background: transparent;
+  --crm-c-page-bg: transparent;
   --crm-input-label-width: 12em;
 }
 body.page-civicrm #squeeze .crm-container ul li:not(.ui-tab) {
@@ -69,7 +69,7 @@ body.page-civicrm #squeeze .crm-container ul li:not(.ui-tab) {
 
 /* D7 Seven */
 body.page-civicrm > #branding {
-  background-color: var(--crm-c-page-background);
+  background-color: var(--crm-c-page-bg);
 }
 body.page-civicrm > #branding + #page {
   --crm-page-padding: 0.5rem 1.25rem;
@@ -130,7 +130,7 @@ body.page-civicrm .page-content:has(#block-claro-content) {
 /* Bootstrap 4 */
 body.page-civicrm main > .container:has(#block-bootstrap4-content) {
   max-width: 100%;
-  background: var(--crm-c-page-background);
+  background: var(--crm-c-page-bg);
 }
 
 /******************
@@ -138,7 +138,7 @@ body.page-civicrm main > .container:has(#block-bootstrap4-content) {
 *******************/
 
 body.toplevel_page_CiviCRM.wp-admin {
-  background: var(--crm-c-page-background);
+  background: var(--crm-c-page-bg);
 }
 body.toplevel_page_CiviCRM #wpcontent {
   padding-left: 0; /* resets WP padding */
@@ -208,8 +208,8 @@ html.crm-standalone body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif; /* Adds fallback for base font */
 }
 html.crm-standalone #crm-container:has(.standalone-auth-form) {
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
 }
 html.crm-standalone .standalone-auth-box {
-  background: var(--crm-c-page-background);
+  background: var(--crm-c-page-bg);
 }

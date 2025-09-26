@@ -138,7 +138,7 @@ select.crm-form-select,
 .ui-datepicker .ui-datepicker-header select {
   transition: var(--crm-input-active-ani);
   font-size: var(--crm-input-font-size);
-  background-color: var(--crm-input-background);
+  background-color: var(--crm-input-bg);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   color: var(--crm-input-color);
@@ -162,7 +162,7 @@ select.crm-form-multiselect {
   border: 1px solid var(--crm-c-darkest);
 }
 .crm-container .replace-plain {
-  background-color: var(--crm-c-background3);
+  background-color: var(--crm-input-bg);
   min-width: var(--crm-huge-input);
 }
 input.crm-form-text:focus,
@@ -348,11 +348,16 @@ input.crm-form-checkbox) + label {
 }
 /* Slider */
 .crm-container .ui-slider {
-  background: var(--crm-c-background4);
+  background: var(--crm-input-bg);
+  border: 1px solid var(--crm-input-border-color);
 }
 .crm-container .ui-slider .ui-slider-handle {
+  border: var(--crm-btn-border);
+  background: var(--crm-c-secondary);
+}
+.crm-container .ui-slider .ui-slider-range {
   border: 0;
-  background: var(--crm-c-background5);
+  border-radius: 0;
 }
 
 /* Input types */
@@ -386,7 +391,7 @@ input.crm-form-checkbox) + label {
 .crm-container select.form-control,
 .crm-container .select2-container-multi .select2-choices,
 .crm-container .select2-container .select2-choice {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border: 1px solid var(--crm-input-border-color);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
@@ -459,22 +464,22 @@ input.crm-form-checkbox) + label {
 }
 .select2-container-disabled a {
   box-shadow: none;
-  background: var(--crm-c-page-background);
+  background: var(--crm-c-layer1-bg);
 }
 .select2-container-disabled .select2-arrow {
   background: transparent;
 }
 .crm-container .select2-container.select2-container-disabled .select2-choice {
-  background-color: var(--crm-c-background);
+  background-color: var(--crm-c-container-bg);
   border: 1px dotted var(--crm-c-inactive);
   cursor: default;
 }
 .select2-container.select2-container-disabled .select2-choice .select2-arrow {
   border-left: 0;
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
 }
 .select2-results .select2-disabled {
-  background: var(--crm-c-background2);
+  background: var(--crm-c-layer1-bg);
   cursor: not-allowed;
 }
 .select2-results .select2-disabled > * {
@@ -533,7 +538,7 @@ input.crm-form-checkbox) + label {
 
 .select2-drop.select2-drop-active.crm-container {
   min-width: var(--crm-big-input);
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border-bottom-left-radius: var(--crm-input-border-radius);
   border-bottom-right-radius: var(--crm-input-border-radius);
   border-color: var(--crm-c-focus);
@@ -582,14 +587,14 @@ input.crm-form-checkbox) + label {
 .select2-results .select2-no-results,
 .select2-results .select2-searching,
 .select2-results .select2-selection-limit {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
 }
 .select2-drop.select2-drop-active.crm-container .select2-results .select2-highlighted {
-  background: var(--crm-c-drag-background);
+  background: var(--crm-c-drag-bg);
 }
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
   border: 1px solid var(--crm-input-border-color);
   border-radius: var(--crm-input-border-radius);
   box-sizing: border-box;
@@ -615,7 +620,7 @@ input.crm-form-checkbox) + label {
 }
 .select2-results li.select2-result-with-children > .select2-result-label {
   font-weight: bold;
-  background: var(--crm-c-background3);
+  background: var(--crm-c-layout2-bg);
   padding: var(--crm-s);
 }
 .crm-container .crm-select2-row-description p {
@@ -692,7 +697,7 @@ input.crm-form-checkbox) + label {
   height: unset;
 }
 #ui-datepicker-div {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border-radius: 0;
   box-shadow: var(--crm-popup-shadow);
   min-width: 30ch;
@@ -722,7 +727,7 @@ input.crm-form-checkbox) + label {
 }
 #ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next)::before {
   font-family: "FontAwesome";
-  color: var(--crm-c-text);
+  color: var(--text);
   font-size: var(--crm-small-font-size);
   line-height: var(--crm-l);
   padding: 0;

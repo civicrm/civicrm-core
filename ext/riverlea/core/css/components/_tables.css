@@ -1,7 +1,7 @@
 .crm-container table:not(.crm-inline-edit-form,
 .crm-table-group-summary) {
   border: var(--crm-table-outside-border);
-  background: var(--crm-table-background);
+  background: var(--crm-table-bg);
   box-shadow: var(--crm-block-shadow);
   margin: 0 0 var(--crm-r);
   border-collapse: collapse;
@@ -24,70 +24,7 @@
 }
 .crm-container table:not(thead) tr {
   border-bottom: var(--crm-table-row-border);
-  background-color: transparent;
-}
-.crm-container .odd-row,
-.crm-container .odd,
-tbody.scrollContent,
-.crm-container table.dataTable.stripe tbody tr.odd,
-.crm-container table.dataTable.display tbody tr.odd {
-  background-color: var(--crm-table-odd-row);
-}
-.crm-container table.dataTable.hover tbody tr.odd:hover,
-.crm-container table.dataTable.display tbody tr.odd:hover,
-.crm-container table.row-highlight tr:hover,
-.crm-container .crm-row-selected,
-.crm-container .odd-row:hover,
-.crm-container .odd:hover {
-  background-color: var(--crm-table-odd-hover);
-}
-table.dataTable.display tbody tr.odd > .sorting_1,
-table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-table-odd-row);
-}
-.crm-container .even-row,
-.crm-container .even,
-tbody.scrollContent tr.alternateRow {
-  background-color: var(--crm-table-even-row);
-}
-.crm-container table.dataTable.hover tbody tr.even:hover,
-.crm-container table.dataTable.display tbody tr.even:hover,
-.crm-container table.row-highlight tr.even-row:hover,
-.crm-container table.row-highlight tr.even:hover,
-.crm-container .even-row.crm-row-selected,
-.crm-container .even.crm-row-selected ,
-.crm-container .even-row:hover,
-.crm-container .even:hover,
-tbody.scrollContent tr.alternateRow:hover {
-  background-color: var(--crm-table-even-hover);
-}
-table.dataTable.display tbody tr.even > .sorting_1,
-table.dataTable.order-column.stripe tbody tr.even > .sorting_1 {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-table-even-row);
-}
-.crm-container .extension-installed {
-  background: var(--crm-alert-success-bg);
-  color: var(--crm-alert-success-text);
-}
-.crm-container .extension-installed summary {
-  color: var(--crm-alert-success-text);
-}
-table.dataTable.display tbody tr.extension-installed.odd {
-  background: linear-gradient(to top,rgba(256,256,256,0.2),rgba(256,256,256,0.2)) var(--crm-alert-success-bg);
-}
-table.dataTable.display tbody tr.extension-installed.even:hover {
-  background: linear-gradient(to top,rgba(256,256,256,0.05),rgba(256,256,256,0.05)) var(--crm-alert-success-bg);
-}
-table.dataTable.display tbody tr.extension-installed.odd:hover {
-  background: linear-gradient(to top,rgba(256,256,256,0.25),rgba(256,256,256,0.25)) var(--crm-alert-success-bg);
-}
-table.dataTable.display tbody tr.extension-installed.odd > .sorting_1,
-table.dataTable.order-column.stripe tbody tr.extension-installed.odd > .sorting_1 {
-  background: var(--crm-alert-success-bg) !important;
-}
-table.dataTable.display tbody tr.extension-installed.even > .sorting_1,
-table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting_1 {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.05)) var(--crm-alert-success-bg);
+  background-color: var(--crm-table-row-bg);
 }
 .crm-container td,
 .crm-container table.dataTable thead td {
@@ -165,33 +102,16 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 }
 
 /* Data Tables */
-.crm-container .dataTables_wrapper .dataTables_length,
-.crm-container .dataTables_wrapper .dataTables_filter,
-.crm-container .dataTables_wrapper .dataTables_info,
-.crm-container .dataTables_wrapper .dataTables_processing,
-.crm-container .dataTables_wrapper .dataTables_paginate {
-  color: var(--crm-c-text) !important;
-}
-.crm-container .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
-.crm-container .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
-.crm-container .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+.crm-container .dataTables_wrapper :is(.dataTables_length,.dataTables_filter,.dataTables_info,.dataTables_processing,.dataTables_paginate),
+.crm-container .dataTables_wrapper .dataTables_paginate :is(.paginate_button.disabled,.paginate_button.disabled:hover,.paginate_button.disabled:active) {
   color: var(--crm-c-text) !important; /* vs jqueery.dataTables.css */
 }
 
 /* Nested table */
-.crm-container .crm-child-row tr:first-child {
-  border: 1px solid var(--crm-c-page-background);
-}
-.crm-container .crm-child-row {
-  border-top: 1px solid var(--crm-c-gray-400);
-  border-bottom: 1px solid var(--crm-c-gray-025);
-}
+
 .crm-container .crm-child-row table {
   box-shadow: none;
   border: var(--crm-table-nested-border);
-}
-.crm-container .crm-child-row th {
-  opacity: 0.7;
 }
 .crm-container .crm-child-row > td:has(table) {
   padding: var(--crm-table-nested-padding);
@@ -205,21 +125,13 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 }
 
 /* Nested, inset table - groups page */
-tbody .crm-row-child {
-  border-top: 1px solid var(--crm-c-gray-400);
-}
-tbody .crm-row-child ~ .crm-row-child {
-  border-top: 0;
-}
-tbody .crm-row-child:not(:has(~ .crm-row-child)) {
-  border-bottom: 1px solid var(--crm-c-gray-025);
-}
+
 tbody .crm-row-child td {
   box-shadow: inset 0 10px 8px -10px rgba(0,0,0,.15);
   background: var(--crm-table-inset-bg);
 }
 tbody .crm-row-child:hover td {
-  background: var(--crm-table-odd-hover);
+  background: color-mix(in srgb, var(--crm-table-inset-bg) 95%, #000 5%);
   cursor: var(--crm-hover-clickable);
 }
 tbody .crm-row-child ~ .crm-row-child td {
@@ -233,7 +145,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container table.form-layout-compressed {
   width: var(--crm-table-compressed-width);
   border: var(--crm-table-outside-border);
-  background: var(--crm-table-background);
+  background: var(--crm-table-bg);
   box-shadow: var(--crm-block-shadow);
   margin: var(--crm-m) 0 var(--crm-l);
 }
@@ -243,8 +155,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   padding: var(--crm-table-padding);
 }
 .crm-container .crm-form-block > .form-layout-compressed {
-  /* handles double box/border issue when table is in a form block,
-    e.g. civicrm/member/add?reset=1&action=add&context=standalone */
+  /* handles double box/border issue when table is in a form block */
   box-shadow: none;
   border: 0 solid transparent;
   background: transparent;
@@ -253,7 +164,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 /* Advance search compressed table */
 #search-status table.form-layout-compressed {
   border: 0;
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
   width: 100%;
   border: 0;
   padding: var(--crm-padding-reg);
@@ -277,12 +188,11 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 .crm-container table.report td {
   border: var(--crm-table-row-border);
-  background-color: var(--crm-table-even-row);
+  background-color: var(--crm-table-alternate-row);
 }
 .crm-container tr.columnheader-dark th {
-  background-color: var(--crm-c-gray-700);
+  background-color: var(--crm-c-dark-bg);
   color: var(--crm-c-text-light);
-  border: 1px solid var(--crm-c-gray-800);
 }
 
 /* Batch entry table */
@@ -290,7 +200,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   display: table;
   border-collapse: collapse;
   border: var(--crm-table-outside-border);
-  background-color: var(--crm-table-background);
+  background-color: var(--crm-table-bg);
 }
 .crm-container .crm-grid-row,
 .crm-container .crm-grid-header {
@@ -316,8 +226,52 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 /* Pay later table (nested inside another table) */
 
 .crm-container table#payLater table#payLaterOptions.form-layout {
-  border: 1px solid #dedede;
-  background: var(--crm-c-page-background);
+  border: var(--c-crm-table-nested-border);
+  background: var(--crm-c-table-bg);
+}
+
+/* Striped rows */
+
+tbody.scrollContent:has(.alternateRow),
+.crm-container table:has(.odd-row,.even-row),
+.crm-container table.dataTable tbody,
+.crm-container .table-striped > tbody {
+  --crm-striped-bg: var(--crm-table-row-bg);
+}
+.crm-container table.dataTable:is(.stripe,.display) tbody tr.odd:not(.disabled),
+.crm-container table tbody:has(.odd,.even,.even-row,.odd-row) tr:not(.disabled),
+.crm-container .table-striped > tbody > tr:not(.disabled) {
+  background-color: var(--crm-striped-bg) !important;
+}
+.crm-container table.dataTable:is(.stripe,.display) tbody tr.even:not(.disabled),
+tbody.scrollContent tr.alternateRow:not(.disabled),
+.crm-container .table-striped > tbody > tr:nth-of-type(2n):not(.disabled) {
+  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-bg) 0%, (--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
+}
+.crm-container table.dataTable.hover tbody tr.odd:hover,
+.crm-container table.dataTable.display tbody tr.odd:hover,
+.crm-container table.row-highlight tr:hover,
+.crm-container .crm-row-selected,
+.crm-container .odd-row:hover,
+.crm-container .odd:hover,
+.crm-container .table-striped > tbody > tr:hover {
+  --crm-striped-bg: var(--crm-table-row-hover);
+}
+.crm-container table.dataTable.hover tbody tr.even:hover,
+.crm-container table.dataTable.display tbody tr.even:hover,
+.crm-container table.row-highlight tr.even-row:hover,
+.crm-container table.row-highlight tr.even:hover,
+.crm-container .even-row.crm-row-selected,
+.crm-container .even.crm-row-selected ,
+.crm-container .even-row:hover,
+.crm-container .even:hover,
+tbody.scrollContent tr.alternateRow:hover,
+.crm-container .table-striped > tbody > tr:nth-of-type(2n):hover {
+  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-hover) 100%, #000 6%);
+}
+.crm-container table.dataTable.display tbody tr > .sorting_1,
+.crm-container table.dataTable.order-column.stripe tbody tr > .sorting_1 {
+  background-color: color-mix(in srgb, var(--crm-striped-bg) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix)) !important;
 }
 
 /* Table bg colours */
@@ -327,75 +281,30 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   max-width: 100%;
   margin-bottom: var(--crm-r1);
 }
-.crm-container .table > thead > tr > th,
-.crm-container .table > thead > tr > td,
-.crm-container .table > tbody > tr > th,
-.crm-container .table > tbody > tr > td,
-.crm-container .table > tfoot > tr > th,
-.crm-container .table > tfoot > tr > td {
+.crm-container .table > :is(thead,tbody,tfoot) > tr > :is(th,td) {
   padding: var(--crm-table-padding);
-}
-.crm-container .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
-  padding-inline: 0.5em;
 }
 .crm-container .table > tbody + tbody {
   border-top: var(--crm-table-header-bottom);
 }
-.crm-container .table-condensed > thead > tr > th,
-.crm-container .table-condensed > thead > tr > td,
-.crm-container .table-condensed > tbody > tr > th,
-.crm-container .table-condensed > tbody > tr > td,
-.crm-container .table-condensed > tfoot > tr > th,
-.crm-container .table-condensed > tfoot > tr > td {
+.crm-container .table-condensed > :is(thead,tbody,tfoot) > tr > :is(th,td) {
   padding: var(--crm-s1);
 }
 .crm-container .table-bordered {
   border: var(--crm-table-outside-border);
 }
-.crm-container .table-bordered > thead > tr > th,
-.crm-container .table-bordered > thead > tr > td,
-.crm-container .table-bordered > tbody > tr > th,
-.crm-container .table-bordered > tbody > tr > td,
-.crm-container .table-bordered > tfoot > tr > th,
-.crm-container .table-bordered > tfoot > tr > td {
+.crm-container .table-bordered > :is(thead,tbody,tfoot) > tr > :is(th,td) {
   border: var(--crm-table-outside-border);
 }
 .crm-container .table-bordered > thead > tr > th,
 .crm-container .table-bordered > thead > tr > td {
   border-bottom-width: 2px;
 }
-.crm-container .table-striped > tbody > tr {
-  background-color: var(--crm-table-even-row);
-}
-.crm-container .table-striped > tbody > tr:nth-of-type(2n+1) {
-  background-color: var(--crm-table-odd-row);
-}
-.crm-container .table-striped > tbody > tr:hover {
-  background-color: var(--crm-table-even-hover);
-}
-.crm-container .table-striped > tbody > tr:nth-of-type(2n+1):hover {
-  background-color: var(--crm-table-odd-hover);
-}
-.crm-container .table > thead > tr > td.active,
-.crm-container .table > thead > tr > th.active,
-.crm-container .table > thead > tr.active > td,
-.crm-container .table > thead > tr.active > th,
-.crm-container .table > tbody > tr > td.active,
-.crm-container .table > tbody > tr > th.active,
-.crm-container .table > tbody > tr.active > td,
-.crm-container .table > tbody > tr.active > th,
-.crm-container .table > tfoot > tr > td.active,
-.crm-container .table > tfoot > tr > th.active,
-.crm-container .table > tfoot > tr.active > td,
-.crm-container .table > tfoot > tr.active > th {
-  background-color: var(--crm-table-odd-row);
-}
-.crm-container .table-hover > tbody > tr > td.active:hover,
-.crm-container .table-hover > tbody > tr > th.active:hover,
-.crm-container .table-hover > tbody > tr.active:hover > td,
-.crm-container .table-hover > tbody > tr:hover > .active,
-.crm-container .table-hover > tbody > tr.active:hover > th {
-  background-color: var(--crm-table-odd-hover);
+.crm-container .table > :is(thead,tbody,tfoot) > :is(tr > td.active,tr > th.active,tr.active > td,tr.active > th) {
+  background-color: var(--crm-table-row-bg);
+}*/
+.crm-container .table-hover > tbody > :is(tr > td.active:hover,th.active:hover,tr.active:hover > td,tr:hover > .active,tr.active:hover > th) {
+  background-color: var(--crm-table-row-hover);
 }
 .crm-container .table td.success,
 .crm-container .table th.success,
@@ -486,39 +395,19 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   .crm-container .table-responsive > .table {
     margin-bottom: 0;
   }
-  .crm-container .table-responsive > .table > thead > tr > th,
-  .crm-container .table-responsive > .table > thead > tr > td,
-  .crm-container .table-responsive > .table > tbody > tr > th,
-  .crm-container .table-responsive > .table > tbody > tr > td,
-  .crm-container .table-responsive > .table > tfoot > tr > th,
-  .crm-container .table-responsive > .table > tfoot > tr > td,
-  .crm-container th,
-  .crm-container td {
+  .crm-container .table-responsive > .table > :is(thead,tbody,tfoot) > tr > :is(th,td) {
     white-space: nowrap;
   }
   .crm-container .table-responsive > .table-bordered {
     border: 0;
   }
-  .crm-container .table-responsive > .table-bordered > thead > tr > th:first-child,
-  .crm-container .table-responsive > .table-bordered > thead > tr > td:first-child,
-  .crm-container .table-responsive > .table-bordered > tbody > tr > th:first-child,
-  .crm-container .table-responsive > .table-bordered > tbody > tr > td:first-child,
-  .crm-container .table-responsive > .table-bordered > tfoot > tr > th:first-child,
-  .crm-container .table-responsive > .table-bordered > tfoot > tr > td:first-child {
+  .crm-container .table-responsive > .table-bordered > :is(thead,tbody,tfoot) > tr > :is(th,td):first-child {
     border-left: 0;
   }
-  .crm-container .table-responsive > .table-bordered > thead > tr > th:last-child,
-  .crm-container .table-responsive > .table-bordered > thead > tr > td:last-child,
-  .crm-container .table-responsive > .table-bordered > tbody > tr > th:last-child,
-  .crm-container .table-responsive > .table-bordered > tbody > tr > td:last-child,
-  .crm-container .table-responsive > .table-bordered > tfoot > tr > th:last-child,
-  .crm-container .table-responsive > .table-bordered > tfoot > tr > td:last-child {
+  .crm-container .table-responsive > .table-bordered > :is(thead,tbody,tfoot) > tr > :is(th,td):last-child {
     border-right: 0;
   }
-  .crm-container .table-responsive > .table-bordered > tbody > tr:last-child > th,
-  .crm-container .table-responsive > .table-bordered > tbody > tr:last-child > td,
-  .crm-container .table-responsive > .table-bordered > tfoot > tr:last-child > th,
-  .crm-container .table-responsive > .table-bordered > tfoot > tr:last-child > td {
+  .crm-container .table-responsive > .table-bordered > :is(tbody,tfoot) > tr:last-child > :is(th,td) {
     border-bottom: 0;
   }
 }

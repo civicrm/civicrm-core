@@ -4,7 +4,7 @@
 
 .crm-container .crm-form-block { /* darkened page bg style */
   box-shadow: var(--crm-form-block-box-shadow);
-  background-color: var(--crm-form-block-background);
+  background-color: var(--crm-form-block-bg);
   border-radius: var(--crm-form-block-border-radius);
   padding: var(--crm-form-block-padding);
   margin: 0;
@@ -124,8 +124,7 @@
 .crm-container .pagination > li {
   display: inline;
 }
-.crm-container .pagination > li > a,
-.crm-container .pagination > li > span {
+.crm-container .pagination > li > :is(a,span) {
   position: relative;
   float: left;
   padding: var(--crm-s) var(--crm-m);
@@ -133,81 +132,59 @@
   line-height: 1.4;
   color: var(--crm-c-link);
   text-decoration: none;
-  background-color: var(--crm-c-page-background);
+  background-color: var(--crm-c-layer1-bg);
   border: var(--crm-c-divider);
 }
-.crm-container .pagination > li > a:hover,
-.crm-container .pagination > li > a:focus,
-.crm-container .pagination > li > span:hover,
-.crm-container .pagination > li > span:focus {
+.crm-container .pagination > li > :is(a:hover,a:focus,span:hover,span:focus) {
   z-index: 2;
   color: var(--crm-c-link-hover);
-  background-color: var(--crm-c-background);
-  border-color: var(--crm-c-background4);
+  background-color: var(--crm-c-layer2-bg);
 }
-.crm-container .pagination > li:first-child > a,
-.crm-container .pagination > li:first-child > span {
+.crm-container .pagination > li:first-child > :is(a,span) {
   margin-left: 0;
   border-top-left-radius: var(--crm-roundness);
   border-bottom-left-radius: var(--crm-roundness);
 }
-.crm-container .pagination > li:last-child > a,
-.crm-container .pagination > li:last-child > span {
+.crm-container .pagination > li:last-child > :is(a,span) {
   border-top-right-radius: var(--crm-roundness);
   border-bottom-right-radius: var(--crm-roundness);
 }
-.crm-container .pagination > .active > a,
-.crm-container .pagination > .active > a:hover,
-.crm-container .pagination > .active > a:focus,
-.crm-container .pagination > .active > span,
-.crm-container .pagination > .active > span:hover,
-.crm-container .pagination > .active > span:focus {
+.crm-container .pagination > .active > :is(a,a:hover,a:focus,span,span:hover,span:focus) {
   z-index: 3;
   color: var(--crm-c-primary-text);
   cursor: default;
   background-color: var(--crm-c-primary);
   border: var(--crm-c-divider);
 }
-.crm-container .pagination > .disabled > span,
-.crm-container .pagination > .disabled > span:hover,
-.crm-container .pagination > .disabled > span:focus,
-.crm-container .pagination > .disabled > a,
-.crm-container .pagination > .disabled > a:hover,
-.crm-container .pagination > .disabled > a:focus {
+.crm-container .pagination > .disabled > :is(a,a:hover,a:focus,span,span:hover,span:focus) {
   color: var(--crm-c-inactive);
   cursor: not-allowed;
   background-color: transparent;
   border: var(--crm-c-divider);
 }
-.crm-container .pagination-lg > li > a,
-.crm-container .pagination-lg > li > span {
+.crm-container .pagination-lg > li > :is(a,span) {
   padding: var(--crm-m2) var(--crm-r);
   font-size: var(--crm-r1);
   line-height: 1.3;
 }
-.crm-container .pagination-lg > li:first-child > a,
-.crm-container .pagination-lg > li:first-child > span {
+.crm-container .pagination-lg > li:first-child > :is(a,span) {
   border-top-left-radius: calc(1.5 * var(--crm-roundness));
   border-bottom-left-radius: calc(1.5 * var(--crm-roundness));
 }
-.crm-container .pagination-lg > li:last-child > a,
-.crm-container .pagination-lg > li:last-child > span {
+.crm-container .pagination-lg > li:last-child > :is(a,span) {
   border-top-right-radius: calc(1.5 * var(--crm-roundness));
   border-bottom-right-radius: calc(1.5 * var(--crm-roundness));
 }
-.crm-container .pagination-sm > li > a,
-.crm-container .pagination-sm > li > span {
+.crm-container .pagination-sm > li > :is(a,span) {
   padding: var(--crm-padding-small);
   font-size: var(--crm-font-size-small);
   line-height: 1.5;
 }
-.crm-container .pagination-sm > li:first-child > a,
-.crm-container .pagination-sm > li:first-child > span {
+.crm-container .pagination-sm > li:first-child > :is(a,span) {
   border-top-left-radius: calc(0.75 * var(--crm-roundness));
   border-bottom-left-radius: calc(0.75 * var(--crm-roundness));
 }
-.crm-container .pagination-sm > li:last-child > a,
-.crm-container .pagination-sm > li:last-child > span {
+.crm-container .pagination-sm > li:last-child > :is(a,span) {
   border-top-right-radius: calc(0.75 * var(--crm-roundness));
   border-bottom-right-radius: calc(0.75 * var(--crm-roundness));
 }
