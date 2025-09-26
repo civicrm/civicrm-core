@@ -218,7 +218,7 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
       __FUNCTION__,
       ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique') .
       ' ' .
-      CRM_Utils_System::docURL2('sysadmin/upgrade/todo/#todo'),
+      CRM_Utils_System::docURL2('sysadmin/troubleshooting/'),
       ts('Duplicate records in UFMatch'),
       \Psr\Log\LogLevel::ERROR,
       'fa-database'
