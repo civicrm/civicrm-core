@@ -360,6 +360,10 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
       if (!$gcid) {
         $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+        if ($this->_contactId === 0) {
+          // Use 0 as a flag to select current contact (for eg. "View My Contact" links)
+          $this->_contactId = CRM_Core_Session::getLoggedInContactId();
+        }
       }
       else {
         $this->_contactId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_GroupContact', $gcid, 'contact_id');
