@@ -138,7 +138,7 @@ select.crm-form-select,
 .ui-datepicker .ui-datepicker-header select {
   transition: var(--crm-input-active-ani);
   font-size: var(--crm-input-font-size);
-  background-color: var(--crm-input-background);
+  background-color: var(--crm-input-bg);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   color: var(--crm-input-color);
@@ -162,7 +162,7 @@ select.crm-form-multiselect {
   border: 1px solid var(--crm-c-darkest);
 }
 .crm-container .replace-plain {
-  background-color: var(--crm-input-background);
+  background-color: var(--crm-input-bg);
   min-width: var(--crm-huge-input);
 }
 input.crm-form-text:focus,
@@ -348,7 +348,7 @@ input.crm-form-checkbox) + label {
 }
 /* Slider */
 .crm-container .ui-slider {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border: 1px solid var(--crm-input-border-color);
 }
 .crm-container .ui-slider .ui-slider-handle {
@@ -391,7 +391,7 @@ input.crm-form-checkbox) + label {
 .crm-container select.form-control,
 .crm-container .select2-container-multi .select2-choices,
 .crm-container .select2-container .select2-choice {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border: 1px solid var(--crm-input-border-color);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
@@ -538,7 +538,7 @@ input.crm-form-checkbox) + label {
 
 .select2-drop.select2-drop-active.crm-container {
   min-width: var(--crm-big-input);
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border-bottom-left-radius: var(--crm-input-border-radius);
   border-bottom-right-radius: var(--crm-input-border-radius);
   border-color: var(--crm-c-focus);
@@ -587,10 +587,10 @@ input.crm-form-checkbox) + label {
 .select2-results .select2-no-results,
 .select2-results .select2-searching,
 .select2-results .select2-selection-limit {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
 }
 .select2-drop.select2-drop-active.crm-container .select2-results .select2-highlighted {
-  background: var(--crm-c-drag-background);
+  background: var(--crm-c-drag-bg);
 }
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
@@ -697,7 +697,7 @@ input.crm-form-checkbox) + label {
   height: unset;
 }
 #ui-datepicker-div {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border-radius: 0;
   box-shadow: var(--crm-popup-shadow);
   min-width: 30ch;

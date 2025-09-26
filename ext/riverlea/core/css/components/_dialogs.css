@@ -160,7 +160,7 @@
   z-index: 99998;
 }
 #crm-notification-container div.ui-notify-message-style {
-  background: var(--crm-notify-background);
+  background: var(--crm-notify-bg);
   box-shadow: var(--crm-popup-shadow);
   color: var(--crm-notify-col);
   border-radius: var(--crm-notify-radius);

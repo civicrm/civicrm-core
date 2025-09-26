@@ -4,7 +4,7 @@
 
 .crm-container .crm-form-block { /* darkened page bg style */
   box-shadow: var(--crm-form-block-box-shadow);
-  background-color: var(--crm-form-block-background);
+  background-color: var(--crm-form-block-bg);
   border-radius: var(--crm-form-block-border-radius);
   padding: var(--crm-form-block-padding);
   margin: 0;

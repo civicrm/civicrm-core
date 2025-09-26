@@ -60,14 +60,14 @@
   --crm-c-link: var(--crm-c-blue-dark);
   --crm-c-link-hover: var(--crm-c-blue-darker);
   --crm-c-divider: 1px solid var(--crm-c-blue-overlay); /* thames */
-  --crm-c-lowest-contrast-bg: #fff;
-  --crm-c-highest-contrast-bg: var(--crm-c-gray-700);
+  --crm-c-layer0-bg: #fff;
+  --crm-c-inverse-bg: var(--crm-c-gray-700);
   --crm-c-page-bg: #f3f2ed;
   --crm-c-container-bg: #f8f8f8;
   --crm-c-layer1-bg: var(--crm-c-gray-050);
   --crm-c-layer2-bg: color-mix(in srgb,var(--crm-c-layer1-bg) 90%,#000 10%);
-  --crm-c-drag-background: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
-  --crm-c-code-background: var(--crm-c-blue-overlay2); /* background for code regions */
+  --crm-c-drag-bg: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
+  --crm-c-code-bg: var(--crm-c-blue-overlay2); /* background for code regions */
   --crm-c-focus: var(--crm-c-blue-dark);
   /* Emphasis colours */
   --crm-c-primary: var(--crm-c-blue-dark); /* primary button bgs */ /* thames */
@@ -173,7 +173,7 @@
 :root {
 /* Tables */
   --crm-table-outside-border: 1px solid var(--crm-c-layer2-bg);
-  --crm-table-background: var(--crm-c-page-bg);
+  --crm-table-bg: var(--crm-c-page-bg);
   --crm-table-row-border: var(--crm-c-divider);
   --crm-table-column-border: 0 solid transparent;
   --crm-table-font-size: var(--crm-font-size);
@@ -258,7 +258,7 @@
   --crm-form-block-box-shadow: var(--crm-block-shadow);
   --crm-form-block-padding: var(--crm-m);
   --crm-form-block-border-radius: var(--crm-roundness);
-  --crm-input-background-image: linear-gradient(top, #eee 1%, #fff 15%);
+  --crm-input-bg-image: linear-gradient(top, #eee 1%, #fff 15%);
   --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: #0000001a; /* thames */
   --crm-input-border-radius: 3px;
@@ -312,7 +312,7 @@
   --crm-dash-tabs-padding: unset; /* thames */
   --crm-dash-tab-bg: transparent;
   --crm-dash-tabs-roundness: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
-  --crm-dash-tab-bg-hover: var(--crm-c-lowest-contrast-bg); /* thames */
+  --crm-dash-tab-bg-hover: var(--crm-c-layer0-bg); /* thames */
   --crm-dash-tab-padding: var(--crm-m2) var(--crm-r1); /* thames */
   --crm-dash-tab-border: var(--crm-dash-border); /* thames */
   --crm-dash-tab-border-hover: 0 solid transparent;
@@ -328,7 +328,7 @@
   --crm-dash-box-shadow: 0; /* thames */
   --crm-dash-heading-inset: unset;
   --crm-dash-panel-padding: var(--crm-r2); /* thames */
-  --crm-dash-panel-bg: var(--crm-c-lowest-contrast-bg); /* thames */
+  --crm-dash-panel-bg: var(--crm-c-layer0-bg); /* thames */
   --crm-dash-panel-border: 0;
   --crm-dash-panel-radius: 0 var(--crm-dash-roundness) var(--crm-dash-roundness) 0;
   --crm-dash-edit-border: 1px solid var(--crm-c-blue-dark); /* thames */
@@ -363,7 +363,7 @@
   --crm-dashlet-border: unset;
   --crm-dashlet-padding: var(--crm-s2);
   --crm-dashlet-box-shadow: none;
-  --crm-dashlet-header-bg: var(--crm-c-lowest-contrast-bg); /* Thames */
+  --crm-dashlet-header-bg: var(--crm-c-layer0-bg); /* Thames */
   --crm-dashlet-header-col: var(--crm-expand-header-color);
   --crm-dashlet-header-border: unset;
   --crm-dashlet-header-border-width: unset;
@@ -385,7 +385,7 @@
 /* Button dropdowns */
   --crm-dropdown-padding: var(--crm-s);
   --crm-dropdown-radius: var(--crm-roundness);
-  --crm-dropdown-bg: var(--crm-c-lowest-contrast-bg); /* thames */
+  --crm-dropdown-bg: var(--crm-c-layer0-bg); /* thames */
   --crm-dropdown-col: var(--crm-c-blue-darker); /* thames */
   --crm-dropdown-hover: var(--crm-c-blue-dark); /* thames */
   --crm-dropdown-hover-bg: var(--crm-c-blue-light); /* thames */
@@ -398,7 +398,7 @@
 }
 :root {
 /* Notifications */
-  --crm-notify-background: var(--crm-c-lowest-contrast-bg); /* thames */
+  --crm-notify-bg: var(--crm-c-layer0-bg); /* thames */
   --crm-notify-padding: var(--crm-m2);
   --crm-notify-col: var(--crm-c-text); /* thames */
   --crm-notify-accent-border: 0.875rem 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */ /* thames */

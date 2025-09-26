@@ -1,7 +1,7 @@
 .crm-container table:not(.crm-inline-edit-form,
 .crm-table-group-summary) {
   border: var(--crm-table-outside-border);
-  background: var(--crm-table-background);
+  background: var(--crm-table-bg);
   box-shadow: var(--crm-block-shadow);
   margin: 0 0 var(--crm-r);
   border-collapse: collapse;
@@ -145,7 +145,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container table.form-layout-compressed {
   width: var(--crm-table-compressed-width);
   border: var(--crm-table-outside-border);
-  background: var(--crm-table-background);
+  background: var(--crm-table-bg);
   box-shadow: var(--crm-block-shadow);
   margin: var(--crm-m) 0 var(--crm-l);
 }
@@ -200,7 +200,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   display: table;
   border-collapse: collapse;
   border: var(--crm-table-outside-border);
-  background-color: var(--crm-table-background);
+  background-color: var(--crm-table-bg);
 }
 .crm-container .crm-grid-row,
 .crm-container .crm-grid-header {
@@ -227,7 +227,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 
 .crm-container table#payLater table#payLaterOptions.form-layout {
   border: var(--c-crm-table-nested-border);
-  background: var(--crm-c-table-background);
+  background: var(--crm-c-table-bg);
 }
 
 /* Striped rows */
@@ -246,7 +246,7 @@ tbody.scrollContent:has(.alternateRow),
 .crm-container table.dataTable:is(.stripe,.display) tbody tr.even:not(.disabled),
 tbody.scrollContent tr.alternateRow:not(.disabled),
 .crm-container .table-striped > tbody > tr:nth-of-type(2n):not(.disabled) {
-  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-bg) 0%, #000 var(--crm-table-row-alternate-row-bg));
+  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-bg) 0%, (--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
 }
 .crm-container table.dataTable.hover tbody tr.odd:hover,
 .crm-container table.dataTable.display tbody tr.odd:hover,
@@ -271,7 +271,7 @@ tbody.scrollContent tr.alternateRow:hover,
 }
 .crm-container table.dataTable.display tbody tr > .sorting_1,
 .crm-container table.dataTable.order-column.stripe tbody tr > .sorting_1 {
-  background-color: color-mix(in srgb, var(--crm-striped-bg) var(--crm-table-row-alternate-row-bg), #000 6%) !important;
+  background-color: color-mix(in srgb, var(--crm-striped-bg) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix)) !important;
 }
 
 /* Table bg colours */
