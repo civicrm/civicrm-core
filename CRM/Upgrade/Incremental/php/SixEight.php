@@ -29,6 +29,12 @@ class CRM_Upgrade_Incremental_php_SixEight extends CRM_Upgrade_Incremental_Base 
    */
   public function upgrade_6_8_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add column "UserJob.label"', 'alterSchemaField', 'UserJob', 'label', [
+      'title' => ts('User Job Label'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'description' => ts('Label for job.'),
+    ], 'name');
   }
 
 }

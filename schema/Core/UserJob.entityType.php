@@ -41,6 +41,13 @@ return [
       'description' => ts('Unique name for job.'),
       'add' => '5.50',
     ],
+    'label' => [
+      'title' => ts('User Job Label'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'description' => ts('Label for job.'),
+      'add' => '6.8',
+    ],
     'created_id' => [
       'title' => ts('Created By Contact ID'),
       'sql_type' => 'int unsigned',

@@ -48,7 +48,7 @@ class MixedFlowsTest extends AbstractFlowsTest {
     $response = $http->send($request);
     $this->assertFailedDueToProhibition($response);
     // The following assertion merely identifies current behavior. If you can get it working generally, then huzza.
-    $this->assertBodyRegexp(';Session already active;', $response);
+    $this->assertBodyRegexp(';A mismatched session is already active;', $response);
     // $this->assertMyContact($this->getLebowskiCID(), NULL, $response);
     // $this->assertNoCookies($response);
 

@@ -613,13 +613,19 @@ EOHTML;
       ->setValues(['me' => $submitValues])
       ->execute();
 
+    // Submit draft - won't count toward the limit
+    Afform::submitDraft()
+      ->setName($this->formName)
+      ->setValues(['me' => []])
+      ->execute();
+
     // Autofilling form works because limit hasn't been reached
     Afform::prefill()
       ->setName($this->formName)
       ->setFillMode('form')
       ->execute();
 
-    // Last time
+    // Submit again (this will overwrite the draft)
     Afform::submit()
       ->setName($this->formName)
       ->setValues(['me' => $submitValues])

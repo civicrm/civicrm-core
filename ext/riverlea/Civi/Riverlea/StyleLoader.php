@@ -118,15 +118,19 @@ class StyleLoader implements \Symfony\Component\EventDispatcher\EventSubscriberI
     }
 
     if ($bundle->name === 'coreStyles') {
-      foreach (self::CORE_FILES as $file) {
-        $bundle->addStyleFile('riverlea', "core/css/{$file}");
+      // queue all core files in order
+      // between crm-i at -101
+      // and civicrm.css at -99
+      $j = count(self::CORE_FILES);
+      foreach (self::CORE_FILES as $i => $file) {
+        $bundle->addStyleFile('riverlea', "core/css/{$file}", ['weight' => -100 + ($i / $j)]);
       }
-      // get DynamicCss asset
+      // get the URL for dynamic css asset (aka "the river")
       $riverUrl = \Civi::service('asset_builder')->getUrl(
         self::DYNAMIC_FILE,
         $this->getCssParams()
       );
-      // queue after core files to ensure variables override
+      // queue dynamic css late
       $bundle->addStyleUrl($riverUrl, ['weight' => 100]);
     }
   }

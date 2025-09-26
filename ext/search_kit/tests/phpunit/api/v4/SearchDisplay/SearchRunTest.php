@@ -2981,7 +2981,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->saveTestRecords('Individual', [
       'defaults' => ['last_name' => $lastName],
       'records' => [
-        ['test_person_fields.float' => 12345678.89, 'test_person_fields.money' => 12345678.89, 'test_person_fields.floatopts' => 2],
+        ['test_person_fields.float' => .1234567889, 'test_person_fields.money' => 12345678.89, 'test_person_fields.floatopts' => 2],
+        ['test_person_fields.float' => 0, 'test_person_fields.money' => 1, 'test_person_fields.floatopts' => NULL],
       ],
     ]);
 
@@ -2998,16 +2999,48 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           ],
         ],
       ],
-      'display' => NULL,
+      'display' => [
+        'type' => 'table',
+        'settings' => [
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'test_person_fields.float',
+              'format' => [
+                \NumberFormatter::MAX_FRACTION_DIGITS => 5,
+                \NumberFormatter::MIN_FRACTION_DIGITS => 2,
+              ],
+            ],
+            [
+              'type' => 'field',
+              'key' => 'test_person_fields.money',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'test_person_fields.bool',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'test_person_fields.floatopts:label',
+            ],
+          ],
+        ],
+      ],
     ];
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
 
-    $this->assertCount(1, $result);
-    $this->assertSame('12,345,678.89', $result[0]['columns'][0]['val']);
+    $this->assertCount(2, $result);
+
+    $this->assertSame('0.12346', $result[0]['columns'][0]['val']);
     $this->assertSame('$12,345,678.89', $result[0]['columns'][1]['val']);
     $this->assertSame('', $result[0]['columns'][2]['val']);
     $this->assertSame('Two', $result[0]['columns'][3]['val']);
+
+    $this->assertSame('0.00', $result[1]['columns'][0]['val']);
+    $this->assertSame('$1.00', $result[1]['columns'][1]['val']);
+    $this->assertSame('', $result[1]['columns'][2]['val']);
+    $this->assertSame('', $result[1]['columns'][3]['val']);
   }
 
   public function testManageOwn(): void {

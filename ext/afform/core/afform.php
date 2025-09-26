@@ -257,13 +257,19 @@ function afform_civicrm_alterMenu(&$items) {
   }
   foreach ($afforms as $name => $meta) {
     if (!empty($meta['server_route'])) {
-      $items[$meta['server_route']] = [
+      $newMenuItem = [
         'title' => $meta['title'] ?? NULL,
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
         'access_arguments' => [["@afform:$name"], 'and'],
         'is_public' => $meta['is_public'] ?? FALSE,
       ];
+      // The 'adminGroup' and 'desc' and 'weight' attributes are used to place links on the `civicrm/admin` screen.
+      // For the sake of the civicrm_admin_ui extension, keep these attributes.
+      $existingItem = $items[$meta['server_route']] ?? [];
+      $existingAttributes = array_intersect_key($existingItem, ['adminGroup' => 1, 'desc' => 1, 'weight' => 1]);
+
+      $items[$meta['server_route']] = $newMenuItem + $existingAttributes;
     }
   }
 }

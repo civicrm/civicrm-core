@@ -2,7 +2,7 @@
   "use strict";
 
   // Trait provides base methods and properties common to all search display types
-  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($timeout, $interval, crmApi4, crmStatus) {
+  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($timeout, $interval, $sce, crmApi4, crmStatus) {
 
     // Return a base trait shared by all search display controllers
     // Gets mixed in using angular.extend()
@@ -190,6 +190,12 @@
         return _.pick(this.afFieldset ? this.afFieldset.getFieldData() : {}, function(val) {
           return typeof val !== 'undefined' && val !== null && (_.includes(['boolean', 'number', 'object'], typeof val) || val.length);
         });
+      },
+
+      // WARNING: Only to be used with trusted/sanitized markup.
+      // This is safe to use on html columns because `AbstractRunAction::formatColumn` already runs it through `CRM_Utils_String::purifyHTML()`.
+      getRawHtml(html) {
+        return $sce.trustAsHtml(html);
       },
 
       // Generate params for the SearchDisplay.run api

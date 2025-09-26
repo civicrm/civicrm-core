@@ -201,13 +201,15 @@ WHERE e.id = %1";
    * Get array of location block BAOs.
    *
    * @param array $entityBlock
-   * @param bool $microformat
-   *
+   * @param bool $useMarkup
+   *   If TRUE, then `address[display]` will be filled with an address summary -- using markup.
+   *   If FALSE, then `address[display]` will be filled with an address summary -- using plain-text.
+   *   NOTE: Regardless of the flag, `address['display_text']` will have an address summary -- using plain-text.
    * @return CRM_Core_BAO_Location[]|null
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getValues($entityBlock, $microformat = FALSE): ?array {
+  public static function getValues($entityBlock, $useMarkup = FALSE): ?array {
     if (empty($entityBlock)) {
       // Can't imagine this is reachable.
       CRM_Core_Error::deprecatedWarning('calling function pointlessly is deprecated');
@@ -218,7 +220,7 @@ WHERE e.id = %1";
       'email' => CRM_Core_BAO_Email::getValues($entityBlock),
       'openid' => CRM_Core_BAO_OpenID::getValues($entityBlock),
       'phone' => CRM_Core_BAO_Phone::getValues($entityBlock),
-      'address' => CRM_Core_BAO_Address::getValues($entityBlock, $microformat),
+      'address' => CRM_Core_BAO_Address::getValues($entityBlock, $useMarkup),
     ];
   }
 
