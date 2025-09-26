@@ -42,7 +42,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       return;
     }
     $this->applyFilter('__ALL__', 'trim');
-    $this->add('text', 'label', ts('Name'),
+    $name = $this->add('text', 'label', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_ContactType', 'label'),
       TRUE
     );
@@ -61,6 +61,10 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       // dev/core#4470 except Household which can be disabled
       if (is_null($this->parentId) && $contactTypeName != 'Household') {
         $enabled->freeze();
+      }
+      // Freeze name field for built-in contact types
+      if (is_null($this->parentId)) {
+        $name->freeze();
       }
     }
     // TODO: Remove when dropping image_URL column
