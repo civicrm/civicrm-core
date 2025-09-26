@@ -962,7 +962,7 @@ return [
       'size' => 2,
       'maxlength' => 8,
     ],
-    'default' => 20,
+    'default' => 120,
     'add' => '4.7',
     'title' => ts('Secure Cache Timeout'),
     'is_domain' => 1,
