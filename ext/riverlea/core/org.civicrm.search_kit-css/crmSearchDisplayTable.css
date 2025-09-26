@@ -8,7 +8,7 @@ table.crm-sticky-header > thead > tr {
   z-index: 2;
 }
 .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
-  padding-inline: 0;
+  padding-inline: var(--crm-m);
   text-transform: none;
   color: initial;
   min-width: 95px; /* Don't allow button to be split on 2 lines */

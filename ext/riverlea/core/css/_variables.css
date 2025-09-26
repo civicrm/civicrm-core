@@ -48,8 +48,8 @@
   --crm-c-link: var(--crm-c-blue-dark);
   --crm-c-link-hover: var(--crm-c-blue-darker);
   --crm-c-divider: 1px solid var(--crm-c-gray-300);
-  --crm-c-lowest-contrast-bg: #fff;
-  --crm-c-highest-contrast-bg: var(--crm-c-gray-700);
+  --crm-c-lowest-contrast-bg: #fff; /* For the lightest bg in light mode */
+  --crm-c-highest-contrast-bg: var(--crm-c-gray-700); /* For the darkest bg in light mode - with light text on top */
   --crm-c-page-bg: var(--crm-c-lowest-contrast-bg);
   --crm-c-container-bg: #f4f4ed;
   --crm-c-layer1-bg: var(--crm-c-gray-050);
@@ -174,10 +174,9 @@
   --crm-table-header-bg: var(--crm-c-lowest-contrast-bg);
   --crm-table-header-col: var(--crm-c-text);
   --crm-table-header-txt: inherit;
-  --crm-table-even-row: var(--crm-c-layer1-bg);
-  --crm-table-even-hover: var(--crm-c-yellow-less-light);
-  --crm-table-odd-row: var(--crm-c-gray-025);
-  --crm-table-odd-hover: var(--crm-c-yellow-light);
+  --crm-table-row-bg: var(--crm-table-background); /* don't make transparent */
+  --crm-table-row-alternate-row-bg: 7%; /* 0% for no tint, 100% for all #000 */
+  --crm-table-row-hover: var(--crm-c-yellow-light);
   --crm-table-sort-col: var(--crm-c-gray-300);
   --crm-table-sort-float: left; /* 'left', 'right' or 'none' */
   --crm-table-sort-active-col: var(--crm-c-link);

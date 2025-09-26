@@ -80,10 +80,8 @@
   --crm-btn-small-padding: var(--crm-s1) var(--crm-m1);
   --crm-btn-height: 40px;
 /* Tables */
-  --crm-table-even-row:  var(--crm-c-lowest-contrast-bg);
-  --crm-table-odd-row: var(--crm-c-gray-050);
-  --crm-table-even-hover: var(--crm-c-gray-025);
-  --crm-table-odd-hover: var(--crm-c-gray-100);
+  --crm-table-row-bg:  var(--crm-c-lowest-contrast-bg);
+  --crm-table-row-hover: var(--crm-c-gray-200);
   --crm-table-sort-col: var(--crm-c-gray-500);
   --crm-table-nested-padding: 0 0 var(--crm-r) 0;
   --crm-table-nested-head-border: 2px solid var(--crm-c-gray-300);

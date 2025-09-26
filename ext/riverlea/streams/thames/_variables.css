@@ -182,10 +182,8 @@
   --crm-table-header-bottom: 2px solid var(--crm-c-gray-300);
   --crm-table-header-bg: var(--crm-c-page-bg);
   --crm-table-header-txt: inherit;
-  --crm-table-even-row: var(--crm-c-layer1-bg);
-  --crm-table-even-hover: var(--crm-c-blue-overlay);
-  --crm-table-odd-row: var(--crm-c-gray-025);
-  --crm-table-odd-hover: var(--crm-c-blue-overlay);
+  --crm-table-row-bg: var(--crm-c-gray-025);
+  --crm-table-row-hover: var(--crm-c-blue-overlay);
   --crm-table-sort-col: var(--crm-c-gray-300);
   --crm-table-sort-float: left; /* 'left', 'right' or 'none' */
   --crm-table-sort-active-col: var(--crm-c-link);
