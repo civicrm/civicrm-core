@@ -1,3 +1,5 @@
+1.4.9-6.7 - Changelog moved to - https://lab.civicrm.org/extensions/riverlea/-/blob/main/CHANGELOG.md
+
 1.4.8-6.6
  - ADDED - 9 new flexbox utility classes for use by extension devs/etc, e.g. '.crm-flex-align-start' (https://github.com/civicrm/civicrm-core/pull/33118)
  - CHANGED - Empty stream to include all new variables / patterns (https://github.com/civicrm/civicrm-core/pull/33126)
