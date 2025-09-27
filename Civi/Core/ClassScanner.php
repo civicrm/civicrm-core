@@ -116,7 +116,7 @@ class ClassScanner {
    *   Ex: ['CRM_Foo_Bar', 'Civi\Whiz\Bang']
    */
   private static function scanClasses(): array {
-    $classes = static::scanCoreClasses();
+    $classes = array_merge(static::scanCoreClasses(), static::scanLegacyApi4());
     \CRM_Utils_Hook::scanClasses($classes);
     return $classes;
   }
@@ -154,6 +154,24 @@ class ClassScanner {
 
     $cache->set($cacheKey, $classes, static::TTL);
     return $classes;
+  }
+
+  /**
+   * Historically, a special scanner implicitly looked at Civi/Api4/ folder in each extension.
+   * Going forward, this is replaced by the general-purpose ClassScanner, and many ext's already use that.
+   * But some don't. This provides backward compat for those.
+   *
+   * @return array
+   */
+  private static function scanLegacyApi4(): array {
+    $mixInfos = \CRM_Extension_System::singleton()->getMixinLoader()->getMixInfos();
+    $result = [];
+    foreach ($mixInfos as $mixInfo) {
+      if (is_dir($mixInfo->getPath('Civi/Api4')) && empty(preg_grep('/^scan-classes@/', $mixInfo->mixins))) {
+        static::scanFolders($result, $mixInfo->getPath(), 'Civi/Api4', '\\');
+      }
+    }
+    return $result;
   }
 
   private static function filterLiveClasses(array $classes, array $criteria): array {

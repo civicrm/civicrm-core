@@ -28,7 +28,7 @@ class CRM_Extension_MixinLoader {
     $cachedScan = $force ? NULL : $cache->get('mixinScan');
     $cachedBootData = $force ? NULL : $cache->get('mixinBoot');
 
-    [$funcFiles, $mixInfos] = $cachedScan ?: (new CRM_Extension_MixinScanner($system->getMapper(), $system->getManager(), TRUE))->build();
+    [$funcFiles, $mixInfos] = $cachedScan ?: $this->scan($system);
     $bootData = $cachedBootData ?: new CRM_Extension_BootCache();
 
     $this->loadMixins($bootData, $funcFiles, $mixInfos);
@@ -40,6 +40,22 @@ class CRM_Extension_MixinLoader {
       $bootData->lock();
       $cache->set('mixinBoot', $bootData, 24 * 60 * 60);
     }
+  }
+
+  /**
+   * Get the list of extensions with their mixin data.
+   *
+   * @return \CRM_Extension_MixInfo[]
+   */
+  public function getMixInfos(): array {
+    // Ordinarily, get this from cache. But in cases where an ext is being actively toggled, we may find the cache temporarily empty.
+    $system = CRM_Extension_System::singleton();
+    [$funcFiles, $mixInfos] = $system->getCache()->get('mixinScan') ?: $this->scan($system);
+    return $mixInfos;
+  }
+
+  private function scan(CRM_Extension_System $system): array {
+    return (new CRM_Extension_MixinScanner($system->getMapper(), $system->getManager(), TRUE))->build();
   }
 
   /**
