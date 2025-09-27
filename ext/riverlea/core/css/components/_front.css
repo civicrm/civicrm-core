@@ -46,9 +46,6 @@ af-form > fieldset > legend {
   font-size: var(--crm-r1);
   border-radius: var(--crm-roundness);
 }
-.crm-contribution-confirm-form-block fieldset legend:has(~ .header-dark) {
-  display: none; /* fix for duplication on confirmation screen of legend text with Header Dark text */
-}
 .crm-container.crm-public .crm-section:not(.alert) {
   padding: 0;
 }
