@@ -97,6 +97,7 @@ class Rebuilder {
     $config = CRM_Core_Config::singleton();
 
     if (!empty($targets['ext'])) {
+      // N.B. clearModuleList() includes call to CRM_Extension_System::singleton()->getCache()->flush();
       $config->clearModuleList();
 
       // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
@@ -140,7 +141,11 @@ class Rebuilder {
         Civi::cache('contactTypes')->clear();
         Civi::cache('metadata')->clear(); /* Again? Huh. */
         ClassScanner::cache('index')->flush();
-        CRM_Extension_System::singleton()->getCache()->flush();
+
+        // If ext=>TRUE, then we've already flushed ext system (10ms ago).
+        if (empty($targets['ext'])) {
+          CRM_Extension_System::singleton()->getCache()->flush();
+        }
       }
 
       // also reset the various static memory caches
