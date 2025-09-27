@@ -72,8 +72,9 @@ class Rebuilder {
       'metadata' => TRUE,
       'system' => TRUE,
       'userjob' => TRUE,
-      'menu' => TRUE,
+      'navigation' => TRUE,
       'perms' => TRUE,
+      'router' => TRUE,
       'strings' => TRUE,
       'settings' => TRUE,
       'cases' => TRUE,
@@ -83,6 +84,14 @@ class Rebuilder {
     if (!empty($targets['*'])) {
       $targets = array_merge($all, $targets);
       unset($targets['*']);
+    }
+
+    if (isset($targets['menu'])) {
+      \CRM_Core_Error::deprecatedWarning("In Civi::rebuild(), the 'menu' option is deprecated. For CiviCRM 6.9+, please specify combination of 'router', 'navigation', and/or 'system'.");
+      $targets['router'] = $targets['router'] || $targets['menu'];
+      $targets['navigation'] = $targets['navigation'] || $targets['menu'];
+      $targets['system'] = $targets['system'] || $targets['menu'];
+      unset($targets['menu']);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -170,9 +179,12 @@ class Rebuilder {
       $session = CRM_Core_Session::singleton();
       $session->reset(2);
     }
-    if (!empty($targets['menu'])) {
+    if (!empty($targets['router'])) {
       CRM_Core_Menu::store();
-      CRM_Core_BAO_Navigation::resetNavigation();
+    }
+    if (!empty($targets['navigation'])) {
+      CRM_Core_BAO_Navigation::resetContactNavigation(NULL);
+      Civi::cache('navigation')->flush();
     }
     if (!empty($targets['perms'])) {
       $config->cleanupPermissions();

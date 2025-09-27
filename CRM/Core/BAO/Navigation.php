@@ -466,10 +466,7 @@ ORDER BY weight";
     if (!$contactID) {
       // In theory, the name "resetNavigation" could mean _merely_ flushing the navigation tree(s).
       // In practice, it evolved into an entry-point for diverse parties to signal that anything nav-adjacent should reset.
-      static::resetContactNavigation(NULL);
-      Civi::cache('navigation')->flush();
-      // reset ACL and System caches
-      Civi::rebuild(['system' => TRUE])->execute();
+      Civi::rebuild(['system' => TRUE, 'navigation' => TRUE])->execute();
     }
     else {
       static::resetContactNavigation($contactID);
