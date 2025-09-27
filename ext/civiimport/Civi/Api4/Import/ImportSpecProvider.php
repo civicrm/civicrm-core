@@ -91,11 +91,17 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
       $field->setDescription(ts('Data being imported into the field.'));
       $field->setColumnName($column['name']);
       if ($column['name'] === '_entity_id') {
-        $field->setFkEntity($parser->getBaseEntity());
-        $field->setInputType('EntityRef');
-        $field->setInputAttrs([
-          'label' => CoreUtil::getInfoItem($parser->getBaseEntity(), 'title'),
-        ]);
+        try {
+          $baseEntity = $parser->getBaseEntity();
+          $field->setFkEntity($baseEntity);
+          $field->setInputType('EntityRef');
+          $field->setInputAttrs([
+            'label' => CoreUtil::getInfoItem($baseEntity, 'title'),
+          ]);
+        }
+        catch (\CRM_Core_Exception $e) {
+          // Search display may have been deleted
+        }
       }
       $spec->addFieldSpec($field);
     }
