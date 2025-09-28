@@ -887,6 +887,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   public function verifyIPN() {
     if (CIVICRM_UF === 'UnitTests') {
       // This won't work in unit tests - could look at capturing the API call and verifying data passed back in the test case?
+      Civi::log()->debug('PayPalIPN: Skipping verification in unit test environment.');
       return TRUE;
     }
 
@@ -955,6 +956,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     curl_close($ch);
+    Civi::log()->debug('PayPalIPN: Verification response from PayPal: "' . $res . '".');
 
     // Check if PayPal verifies the IPN data, and if so, return true.
     if ($res == self::IPN_VALID) {
