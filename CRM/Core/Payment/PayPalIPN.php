@@ -253,7 +253,7 @@ class CRM_Core_Payment_PayPalIPN {
       $input['payment_processor_id'] = $paymentProcessorID;
 
       if (!$paymentProcessor->verifyIPN()) {
-        Civi::log()->debug('IPN verification failed (PayPal returned INVALID); input {input}', ['input' => $input]);
+        Civi::log()->debug('PayPalIPN: Verification failed; input {input}', ['input' => $input]);
         return;
       }
 
