@@ -5,20 +5,24 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 {if $localExtensionRows}
   <div id="extensions">
     <div id="{$categoryType}-extensions">
-      <div class="crm-extensions-group">
-        <h3 class="crm-extensions-group-header">
+      <div class="ui-widget ui-widget-content ui-corner-all" style="margin-bottom: 20px;">
+        <h3 class="ui-widget-header ui-corner-top ui-helper-clearfix" style="margin: 0; padding: 8px 12px; font-size: 14px;">
           {ts}Installed{/ts}
-          <span class="crm-extension-count">{$localExtensionStats.installed + $localExtensionStats.disabled}</span>
+          <span class="ui-state-default ui-corner-all crm-extension-count"
+                style="float: right; padding: 2px 8px; font-size: 11px; font-weight: normal;background: #666;color: white;border-radius: 10px;">
+                {$localExtensionStats.installed + $localExtensionStats.disabled}
+          </span>
         </h3>
-        <div class="crm-extensions-group-content">
-          <div class="crm-extensions-subgroup">
-            <h4 class="crm-extensions-subgroup-header">
+        <div class="ui-widget-content" style="border-top: none;">
+          <div class="ui-widget">
+            <h4 class="ui-state-default ui-helper-clearfix"
+                style="margin: 0; padding: 6px 20px; font-size: 16px; font-weight: 600; background: #f6f6f6;">
               {ts}Enabled{/ts}
-              <span class="crm-extension-count">{$localExtensionStats.installed}</span>
+              <span class="ui-state-active ui-corner-all crm-extension-count" style="padding: 2px 8px; font-size: 11px; font-weight: normal; background: #666;color: white;border-radius: 10px;">{$localExtensionStats.installed}</span>
             </h4>
             {* handle enable/disable actions*}
             {strip}
-              <table id="extensions" class="display">
+              <table class="ui-widget ui-widget-content display" style="margin: 0; border: none;">
                 <thead>
                 <tr>
                   <th>{ts}Extension{/ts}</th>
@@ -38,15 +42,16 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
             {/strip}
           </div>
         </div>
-        <div class="crm-extensions-group-content">
-          <div class="crm-extensions-subgroup">
-            <h4 class="crm-extensions-subgroup-header">
+        <div class="ui-widget-content" style="border-top: none;">
+          <div class="ui-widget">
+            <h4 class="ui-state-default ui-helper-clearfix"
+                style="margin: 0; padding: 6px 20px; font-size: 16px; font-weight: 600; background: #f6f6f6;">
               {ts}Disabled{/ts}
-              <span class="crm-extension-count">{$localExtensionStats.disabled}</span>
+              <span class="ui-state-active ui-corner-all crm-extension-count" style="padding: 2px 8px; font-size: 11px; font-weight: normal; background: #666;color: white;border-radius: 10px;">{$localExtensionStats.disabled}</span>
             </h4>
             {* handle enable/disable actions*}
             {strip}
-              <table id="extensions" class="display">
+              <table class="ui-widget ui-widget-content display" style="margin: 0; border: none;">
                 <thead>
                 <tr>
                   <th>{ts}Extension{/ts}</th>
@@ -67,15 +72,15 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
           </div>
         </div>
       </div>
-      <div class="crm-extensions-group">
-        <h3 class="crm-extensions-group-header">
-          <span>{ts}Uninstalled{/ts}</span>
-          <span class="crm-extension-count">{$localExtensionStats.uninstalled}</span>
+      <div class="ui-widget ui-widget-content ui-corner-all" style="margin-bottom: 20px;">
+        <h3 class="ui-widget-header ui-corner-top ui-helper-clearfix" style="margin: 0; padding: 8px 12px; font-size: 14px;">
+          {ts}Uninstalled{/ts}
+          <span class="ui-state-default ui-corner-all crm-extension-count" style="padding: 2px 8px; font-size: 11px; font-weight: normal;background: #666;color: white;border-radius: 10px;">{$localExtensionStats.uninstalled}</span>
         </h3>
-        <div class="crm-extensions-group-content">
+        <div class="ui-widget-content" style="border-top: none;">
           {* handle enable/disable actions*}
           {strip}
-            <table id="extensions" class="display">
+            <table class="ui-widget ui-widget-content display" style="margin: 0; border: none;">
               <thead>
               <tr>
                 <th>{ts}Extension{/ts}</th>

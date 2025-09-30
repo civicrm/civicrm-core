@@ -26,26 +26,26 @@
 
     {include file="CRM/common/enableDisableApi.tpl"}
     {include file="CRM/common/jsortable.tpl"}
-    <div>
-      <input type="text" id="search_extension" placeholder="🔍{ts escape='htmlattribute'}Search extensions{/ts}" oninput="filterExtensions()">
+    <div class="ui-widget ui-widget-content ui-corner-all" style="padding: 4px;">
+      <input type="text" id="search_extension" class="ui-widget-content ui-corner-all" placeholder="🔍{ts escape='htmlattribute'}Search extensions{/ts}" oninput="filterExtensions()" style="padding: 8px; width: 250px; border: 1px solid #aaa;">
     </div>
     <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
         <ul class="crm-extensions-tabs-list" role="tablist">
             <li id="tab_summary" role="tab" class="crm-tab-button">
               <a href="#extensions-main" title="{ts escape='htmlattribute'}Core Extensions{/ts}">
-              <span> </span> {ts}Core Extensions{/ts}
+              <span> </span> {ts}Core Extensions{/ts} <span id="core_match_count"></span>
               <em>&nbsp;</em>
               </a>
             </li>
             <li id="tab_other" role="tab" class="crm-tab-button">
               <a href="#extensions-other" title="{ts escape='htmlattribute'}Other Extensions{/ts}">
-              <span> </span> {ts}Other Extensions{/ts}
+              <span> </span> {ts}Other Extensions{/ts}<span id="other_match_count"></span>
               <em>&nbsp;</em>
               </a>
             </li>
             <li id="tab_addnew" role="tab" class="crm-tab-button">
               <a href="#extensions-addnew" title="{ts escape='htmlattribute'}Add New{/ts}">
-              <span> </span> {ts}Add New{/ts}
+              <span> </span> {ts}Add New{/ts}<span id="new_match_count"></span>
               <em>&nbsp;</em>
               </a>
             </li>
@@ -99,118 +99,104 @@
       }); // .click
     }); // onload
 
-    // Search functionality
+    // Search functionality with count display
     function filterExtensions() {
       const searchTerm = document.getElementById('search_extension').value.toLowerCase().trim();
-      const extensionRows = document.querySelectorAll('.extension_summary');
-      extensionRows.forEach(extensionRow => {
-        const title = extensionRow.querySelector('summary').textContent.toLowerCase();
-        extensionRow.style.display = title.includes(searchTerm) ? 'table-row' : 'none';
-      });
+
+      // Get all tabs
+      const coreTab = document.getElementById('extensions-main');
+      const otherTab = document.getElementById('extensions-other');
+      const addNewTab = document.getElementById('extensions-addnew');
+
+      // Initialize counts
+      let coreCount = 0;
+      let otherCount = 0;
+      let addNewCount = 0;
+
+      // Filter Core Extensions
+      if (coreTab) {
+        const coreRows = coreTab.querySelectorAll('.extension_summary');
+        coreRows.forEach(extensionRow => {
+          const title = extensionRow.querySelector('summary').textContent.toLowerCase();
+          const isVisible = title.includes(searchTerm);
+          extensionRow.style.display = isVisible ? 'table-row' : 'none';
+          if (isVisible) coreCount++;
+        });
+      }
+
+      // Filter Other Extensions
+      if (otherTab) {
+        const otherRows = otherTab.querySelectorAll('.extension_summary');
+        otherRows.forEach(extensionRow => {
+          const title = extensionRow.querySelector('summary').textContent.toLowerCase();
+          const isVisible = title.includes(searchTerm);
+          extensionRow.style.display = isVisible ? 'table-row' : 'none';
+          if (isVisible) otherCount++;
+        });
+      }
+
+      // Filter Add New Extensions (if applicable)
+      if (addNewTab) {
+        const addNewRows = addNewTab.querySelectorAll('.extension_summary');
+        addNewRows.forEach(extensionRow => {
+          const title = extensionRow.querySelector('summary').textContent.toLowerCase();
+          const isVisible = title.includes(searchTerm);
+          extensionRow.style.display = isVisible ? 'table-row' : 'none';
+          if (isVisible) addNewCount++;
+        });
+      }
+
+      // Update tab labels with counts
+      const coreTabCount = document.querySelector('#core_match_count');
+      const otherTabCount = document.querySelector('#other_match_count');
+      const addNewTabCount = document.querySelector('#new_match_count');
+
+      if (coreTabCount) {
+        if (searchTerm) {
+          coreTabCount.textContent = ` (${coreCount})`;
+        } else {
+          coreTabCount.textContent = '';
+        }
+      }
+
+      if (otherTabCount) {
+        if (searchTerm) {
+          otherTabCount.textContent = ` (${otherCount})`;
+        } else {
+          otherTabCount.textContent = '';
+        }
+      }
+
+      if (addNewTabCount) {
+        if (searchTerm) {
+          addNewTabCount.textContent = ` (${addNewCount})`;
+        } else {
+          addNewTabCount.textContent = '';
+        }
+      }
     }
     </script>
   <style>
-  #search_extension {
-    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    width: 250px;
-  }
-  .crm-container #extensions-other {
-    padding: 0;
-    border-top: 0;
-  }
-  .crm-container #extensions-other table {
-    box-shadow: none;
-    border: 0 solid transparent;
-  }
-  .crm-container #extensions-other table th {
-    background-color: var(--crm-tab-bg-active);
-    min-width: max-content;
-    white-space: nowrap; /* prevents wrapping of sort icons with oversized descriptions */
-  }
-  .crm-container #extensions-other table summary {
-    padding: 0;
-    background-color: unset;
-    color: var(--crm-c-text);
-    font-weight: unset;
-    font-family: var(--crm-font);
-  }
-  .crm-extensions-group {
-    margin-bottom: 20px;
-  }
-
-  .crm-extensions-group-header {
-    background: #f4f4f4;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-bottom: none;
-    font-weight: bold;
-    margin: 0;
-    font-size: 14px;
-    color: #333;
-  }
-
-  .crm-extensions-group-content {
-    border: 1px solid #ddd;
-    border-top: none;
-  }
-
-  .crm-extensions-subgroup {
-    margin: 0;
-  }
-
-  .crm-extensions-subgroup-header {
-    background: #fafafa;
-    padding: 6px 20px;
-    border-bottom: 1px solid #eee !important;
-    font-size: 16px;
-    font-weight: 600;
-    color: #666 !important;;
-    margin: 0;
-  }
-
-  .crm-extensions-subgroup:last-child .crm-extensions-subgroup-header {
-    border-bottom: none;
-  }
-
-  .crm-extensions-subgroup table {
-    margin: 0;
-    border: none;
-  }
-
-  .crm-extensions-subgroup .crm-extensions-subgroup-header + table {
-    border-top: none;
-  }
-
-  .crm-extensions-group.empty {
-    opacity: 0.7;
-  }
-
-  .crm-extensions-group.empty .crm-extensions-group-content {
-    padding: 20px;
-    text-align: center;
-    color: #666;
-    font-style: italic;
-  }
-
-  .crm-extension-count {
-    float: right;
-    background: #666;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: normal;
-  }
-  #extensions {
-    /*
-    padding-right: 20px;
-    padding-left: 20px;
-    */
-  }
-
+    .crm-container #extensions-other {
+      padding: 0;
+      border-top: 0;
+    }
+    .crm-container #extensions-other table {
+      box-shadow: none;
+      border: 0 solid transparent;
+    }
+    .crm-container #extensions-other table th {
+      background-color: var(--crm-tab-bg-active);
+      min-width: max-content;
+      white-space: nowrap; /* prevents wrapping of sort icons with oversized descriptions */
+    }
+    .crm-container #extensions-other table summary {
+      padding: 0;
+      background-color: unset;
+      color: var(--crm-c-text);
+      font-weight: unset;
+      font-family: var(--crm-font);
+    }
   </style>
     {/literal}
 {/if}
