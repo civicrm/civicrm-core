@@ -568,10 +568,7 @@ class CRM_Export_BAO_ExportProcessor {
     if (!$this->isMergeSameHousehold()) {
       return [];
     }
-    return [
-      CRM_Utils_Array::key('Household Member of', $this->getRelationshipTypes()),
-      CRM_Utils_Array::key('Head of Household for', $this->getRelationshipTypes()),
-    ];
+    return array_keys(array_intersect($this->getRelationshipTypes(), ['Household Member of', 'Head of Household for']));
   }
 
   /**
