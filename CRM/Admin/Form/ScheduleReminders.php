@@ -157,9 +157,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->addField('repetition_frequency_unit', ['placeholder' => FALSE])->setAttribute('class', 'crm-form-select');
     $this->addField('end_frequency_unit', ['placeholder' => FALSE])->setAttribute('class', 'crm-form-select');
     // Data for js pluralization
+    // Don't want to include 'minute' option as not supported by RecipientBuilder::parseRepetitionInterval()
+    $excludeFrequencyOptions = ['minute' => NULL];
     $this->assign('recurringFrequencyOptions', [
-      'plural' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::getRecurringFrequencyUnits(2)),
-      'single' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::getRecurringFrequencyUnits()),
+      'plural' => CRM_Utils_Array::makeNonAssociative(array_diff_key(CRM_Core_SelectValues::getRecurringFrequencyUnits(2), $excludeFrequencyOptions)),
+      'single' => CRM_Utils_Array::makeNonAssociative(array_diff_key(CRM_Core_SelectValues::getRecurringFrequencyUnits(), $excludeFrequencyOptions)),
     ]);
 
     $this->addField('title', [], TRUE);
