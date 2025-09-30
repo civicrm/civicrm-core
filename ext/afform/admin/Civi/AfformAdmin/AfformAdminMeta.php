@@ -217,7 +217,7 @@ class AfformAdminMeta {
       ];
 
       // Explicitly load Contact and Custom entities because they do not have afformEntity files
-      $contactAndCustom = Entity::get(TRUE)
+      $contactAndCustom = Entity::get(FALSE)
         ->addClause('OR', ['name', '=', 'Contact'], ['type', 'CONTAINS', 'CustomValue'])
         ->execute()->indexBy('name');
       foreach ($contactAndCustom as $name => $entity) {
@@ -225,7 +225,7 @@ class AfformAdminMeta {
       }
 
       // Call getFields on getFields to get input type labels
-      $inputTypeLabels = \Civi\Api4\Contact::getFields()
+      $inputTypeLabels = \Civi\Api4\Contact::getFields(FALSE)
         ->setLoadOptions(TRUE)
         ->setAction('getFields')
         ->addWhere('name', '=', 'input_type')
@@ -344,7 +344,7 @@ class AfformAdminMeta {
         'danger' => E::ts('Danger'),
       ];
 
-      $perms = \Civi\Api4\Permission::get()
+      $perms = \Civi\Api4\Permission::get(FALSE)
         ->addWhere('group', 'IN', ['afformGeneric', 'const', 'civicrm', 'cms'])
         ->addWhere('is_active', '=', 1)
         ->setOrderBy(['title' => 'ASC'])
