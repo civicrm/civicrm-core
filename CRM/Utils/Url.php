@@ -78,6 +78,22 @@ class CRM_Utils_Url {
   }
 
   /**
+   * @param string $url
+   *   Ex: 'http://local.example.com:8080/foo/bar/whiz'
+   * @return string
+   *   Ex: 'http://local.example.com:8080'
+   */
+  public static function toOrigin(string $url): string {
+    return \CRM_Utils_Url::unparseUrl(
+      \CRM_Utils_Url::parseUrl($url)
+        ->withUserInfo('')
+        ->withPath('')
+        ->withQuery('')
+        ->withFragment('')
+    );
+  }
+
+  /**
    * Parse an internal URL. Extract the CiviCRM route.
    *
    * @param string $pageUrl
