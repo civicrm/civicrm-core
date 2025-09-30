@@ -3990,7 +3990,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'weight' => 0,
       ];
     }
-    if ($contributionStatus !== 'Pending') {
+    if ($contributionStatus !== 'Pending' && CRM_Core_Permission::check('refund contributions')) {
       $actionLinks[] = [
         'url' => 'civicrm/payment',
         'title' => ts('Record Refund'),

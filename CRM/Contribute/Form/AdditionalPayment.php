@@ -108,6 +108,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $this->_paymentType = $this->getPaymentType();
 
+    if ($this->isARefund() && !CRM_Core_Permission::check('refund contributions')) {
+      throw new CRM_Core_Exception('You do not have permission to refund contributions.');
+    }
+
     if (!empty($this->_mode) && $this->isARefund()) {
       throw new CRM_Core_Exception(ts('Credit card payment is not for Refund payments use'));
     }
