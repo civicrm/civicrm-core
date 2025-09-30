@@ -593,7 +593,8 @@ EOHTML;
       'layout' => self::$layouts['aboutMe'],
       'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'create_submission' => TRUE,
-      'submit_limit' => 3,
+      'submit_limit_per_user' => 3,
+      'submit_limit' => 5,
     ]);
 
     $cid = $this->createLoggedInUser();
@@ -631,14 +632,74 @@ EOHTML;
       ->setValues(['me' => $submitValues])
       ->execute();
 
-    // Stats should report that we've reached the submission limit
-    $stats = Afform::get(FALSE)
+    // Stats should report that we've reached the per-user limit
+    $stats = Afform::get()
       ->addSelect('submit_enabled', 'submission_count', 'submit_currently_open')
       ->addWhere('name', '=', $this->formName)
       ->execute()->single();
     $this->assertTrue($stats['submit_enabled']);
     $this->assertFalse($stats['submit_currently_open']);
     $this->assertEquals(3, $stats['submission_count']);
+
+    // Prefilling and submitting are no longer allowed.
+    try {
+      Afform::prefill()
+        ->setName($this->formName)
+        ->setFillMode('entity')
+        ->execute();
+      $this->fail();
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+    }
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['me' => $submitValues])
+        ->execute();
+      $this->fail();
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+    }
+    $this->assertTrue(is_a($e, '\Civi\API\Exception\UnauthorizedException'));
+
+    // Switch users to test the total limit
+    $this->userLogout();
+    $this->createLoggedInUser();
+
+    $submitValues = [
+      ['fields' => ['first_name' => 'Secondy', 'last_name' => 'Lasty']],
+    ];
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submitValues])
+      ->execute();
+
+    // Submit draft - won't count toward the limit
+    Afform::submitDraft()
+      ->setName($this->formName)
+      ->setValues(['me' => []])
+      ->execute();
+
+    // Autofilling form works because limit hasn't been reached
+    Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->execute();
+
+    // Submit again (this will overwrite the draft)
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submitValues])
+      ->execute();
+
+    // Stats should report that we've reached the total submission limit
+    $stats = Afform::get()
+      ->addSelect('submit_enabled', 'submission_count', 'submit_currently_open')
+      ->addWhere('name', '=', $this->formName)
+      ->execute()->single();
+    $this->assertTrue($stats['submit_enabled']);
+    $this->assertFalse($stats['submit_currently_open']);
+    $this->assertEquals(5, $stats['submission_count']);
 
     // Prefilling and submitting are no longer allowed.
     try {
