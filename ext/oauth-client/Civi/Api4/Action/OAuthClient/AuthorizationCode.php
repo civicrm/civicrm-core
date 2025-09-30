@@ -27,6 +27,8 @@ use Civi\OAuth\OAuthException;
  * @method string getLandingUrl()
  * @method $this setPrompt(string $prompt)
  * @method string getPrompt()
+ * @method $this setResponseMode(string $responseMode)
+ * @method string getResponseMode()
  * @method $this setTtl(int $ttl)
  * @method int getTtl()
  *
@@ -62,14 +64,25 @@ class AuthorizationCode extends AbstractGrantAction {
   protected $ttl = 3600;
 
   /**
+   * How do we expect the OAuth server to send its response data?
+   *
+   * Note: The OAuthProvider should declare a list of supported responseModes (default: `["query"]`).
+   * If the requested mode is not supported, then the AuthorizationCode request will fail.
+   *
+   * @var string|null
+   */
+  protected $responseMode;
+
+  /**
    * Tee-up the authorization request.
    *
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
     $this->validate();
+    $output = [];
 
-    /** @var \League\OAuth2\Client\Provider\GenericProvider $provider */
+    /** @var \League\OAuth2\Client\Provider\GenericProvider|\Civi\OAuth\CiviGenericProvider $provider */
     $provider = $this->createLeagueProvider();
 
     // NOTE: If we don't set scopes, then getAuthorizationUrl() would implicitly use getDefaultScopes().
@@ -93,7 +106,28 @@ class AuthorizationCode extends AbstractGrantAction {
     if ($this->prompt !== NULL) {
       $authOptions['prompt'] = $this->prompt;
     }
-    $result[] = [
+
+    $allowResponseModes = is_callable([$provider, 'getResponseModes']) ? $provider->getResponseModes() : ['query'];
+    $output['response_mode'] = $this->responseMode ?: 'query';
+    if (!in_array($output['response_mode'], $allowResponseModes)) {
+      throw new \CRM_Core_Exception('Unsupported response mode: ' . $output['response_mode']);
+    }
+    switch ($output['response_mode']) {
+      case 'query':
+        // This is standard/default. No need to pass literal `?response_mode=query`.
+        break;
+
+      case 'web_message':
+        $authOptions['response_mode'] = $this->getResponseMode();
+        $output['response_origin'] = \CRM_Utils_Url::toOrigin($provider->getBaseAuthorizationUrl());
+        $output['continue_url'] = \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
+        break;
+
+      default:
+        throw new \CRM_Core_Exception('Unsupported response mode: ' . $output['response_mode']);
+    }
+
+    $result[] = $output + [
       'url' => $provider->getAuthorizationUrl($authOptions),
     ];
   }
