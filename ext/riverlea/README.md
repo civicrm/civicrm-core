@@ -10,7 +10,7 @@ When you enable CiviCRM, you will see these themes in your usual CiviCRM theme o
 
 ## Changelog
 
-Is at [Changelog.md](CHANGELOG.md).
+From 6.7 this is on CiviCRM's Gitlab at [lab.civicrm.org/riverlea/CHANGELOG.md](https://lab.civicrm.org/extensions/riverlea/-/blob/main/CHANGELOG.md).
 
 ## Version numbering
 
