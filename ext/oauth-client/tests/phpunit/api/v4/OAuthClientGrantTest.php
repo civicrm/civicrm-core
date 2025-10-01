@@ -4,6 +4,7 @@ use CRM_OAuth_ExtensionUtil as E;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
+use GuzzleHttp\Psr7\Request;
 
 /**
  * Test the "grant" methods (authorizationCode, clientCredential, etc).
@@ -111,8 +112,137 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       $this->assertEquals('example-id', $actualQuery['client_id']);
       $this->assertEquals('web_message', $actualQuery['response_mode']);
       $this->assertMatchesRegularExpression(';civicrm/oauth-client/return;', $actualQuery['redirect_uri']);
-      $this->assertEquals($actualQuery['redirect_uri'], $ac['continue_url']);
+      $this->assertEquals($actualQuery['redirect_uri'], $ac['redirect_uri']);
     }
+  }
+
+  public static function getStartPageExamples(): array {
+    $exs = [];
+    // $ex['scenario name'] = [provider, startPagePolicy, userPermissions, activeSettings, expectStartPageContent)
+    // For "expectStartPageContent", mix of the following: 'Not Shown', 'T&C', 'No T&C', 'Allow Skip', 'Prohibit Skip', 'Need Approval'
+
+    $basicOauth = 'test_example_3';
+    $civiConnect = 'test_example_4_sandbox';
+    $notYetApproved = ['oauth_civi_connect_approved' => FALSE, 'oauth_auto_confirm' => FALSE];
+    $allApproved = ['oauth_civi_connect_approved' => TRUE, 'oauth_auto_confirm' => TRUE];
+    $fullAdmin = ['manage OAuth client', 'administer payment processors'];
+    $partialAdmin = ['administer payment processors'];
+
+    $exs['always for full admin, basic'] = [$basicOauth, $fullAdmin, $notYetApproved, 'always', ['Allow Skip', 'No T&C']];
+    $exs['always for full admin, CiviConnect'] = [$civiConnect, $fullAdmin, $notYetApproved, 'always', ['Allow Skip', 'T&C']];
+
+    $exs['never for full admin, basic'] = [$basicOauth, $fullAdmin, $notYetApproved, 'never', ['Not Shown']];
+    $exs['never for full admin, CiviConnect'] = [$civiConnect, $fullAdmin, $notYetApproved, 'never', ['Not Shown']];
+
+    $exs['unconfigured site, full admin, basic'] = [$basicOauth, $fullAdmin, $notYetApproved, 'auto', ['No T&C', 'Allow Skip']];
+    $exs['unconfigured site, full admin, CiviConnect'] = [$civiConnect, $fullAdmin, $notYetApproved, 'auto', ['T&C', 'Allow Skip']];
+
+    $exs['configured site, full admin, basic'] = [$basicOauth, $fullAdmin, $allApproved, 'auto', ['Not Shown']];
+    $exs['configured site, full admin, CiviConnect'] = [$civiConnect, $fullAdmin, $allApproved, 'auto', ['Not Shown']];
+
+    // Support for hook_oauthGrant is in a parallel PR. Test coverage can be expanded later.
+    // $exs['unconfigured site, partial admin, CiviConnect'] = [$civiConnect, $partialAdmin, $notYetApproved, 'auto', ['Need Approval']];
+    // $exs['configured site, partial admin, CiviConnect'] = [$civiConnect, $partialAdmin, $allApproved, 'auto', ['Not Shown']];
+    // $exs['unconfigured site, partial admin, basic'] = [$basicOauth, $partialAdmin, $notYetApproved, 'auto', ['Prohibit Skip']];
+
+    return $exs;
+  }
+
+  /**
+   * Generate the URL to start the auth-code flow, beginning with Civi's internal confirmation screen.
+   *
+   * @dataProvider getStartPageExamples
+   * @param string $provider
+   *   Name of the provider to use
+   * @param array $userPermissions
+   *   List of permissions that the current user has.
+   * @param array $settings
+   *   List of system-settings that are preconfigured
+   * @param string $startPagePolicy
+   *   The value of `AuthorizationCode::$startPage`, specifying whether we want a start-page.
+   *   Ex: 'always', 'never', or 'auto'
+   * @param array $expectStartPage
+   *   A list of expectations for the content of the start page, such as:
+   *   - 'Not Shown': The start page is not shown the user.
+   *   - 'T&C': The start page includes the "Terms and Conditions" box
+   *   - 'Allow Skip': The start page allows the user to skip this in the future.
+   */
+  public function testAuthorizationCode_startPage(string $provider, array $userPermissions, array $settings, string $startPagePolicy, array $expectStartPage): void {
+    $cleanup = CRM_Utils_AutoClean::with(function() use ($settings) {
+      foreach ($settings as $key => $value) {
+        \Civi::settings()->revert($key);
+      }
+    });
+    foreach ($settings as $key => $value) {
+      \Civi::settings()->set($key, $value);
+    }
+
+    $usePerms = function($ps) {
+      $base = ['access CiviCRM'];
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);
+    };
+
+    $usePerms(['manage OAuth client']);
+    // For CiviConnect sandbox, the client already exists. Otherwise, make a new client.
+    if (preg_match('/test_.*_sandbox/', $provider)) {
+      $client = Civi\Api4\OAuthClient::get(FALSE)
+        ->addWhere('provider', '=', $provider)
+        ->execute()
+        ->single();
+    }
+    else {
+      $client = $this->createClient($provider);
+    }
+
+    $usePerms($userPermissions);
+    $ac = Civi\Api4\OAuthClient::authorizationCode()
+      ->addWhere('id', '=', $client['id'])
+      ->setStartPage($startPagePolicy)
+      ->setTag('PaymentProcessor:1234')
+      ->execute()
+      ->single();
+
+    if (in_array('Not Shown', $expectStartPage)) {
+      $this->assertMatchesRegularExpression(';^https://(example.com|sandbox.connect.civicrm.org)/(one|two|three|four)/;', $ac['url'], 'Expected URL for remote auth page');
+      $this->assertStringContainsString('state=CC_', $ac['url']);
+      return;
+    }
+
+    $this->assertEquals('civicrm/oauth-client/start', $this->extractRoute($ac['url']), "Expected URL for start page");
+    $this->assertStringContainsString('state=CC_', $ac['url']);
+
+    try {
+      $client = new \Civi\Test\LocalHttpClient();
+      $response = $client->sendRequest(new Request('GET', (string) $ac['url']));
+      $responseBody = (string) $response->getBody();
+    }
+    catch (\Exception $e) {
+      $expectException = in_array('Need Approval', $expectStartPage);
+      if ($expectException) {
+        $responseBody = $e->getMessage();
+      }
+      else {
+        throw $e;
+      }
+    }
+
+    $availableClaims = [
+      'T&C' => fn() => $this->assertMatchesRegularExpression(';Terms and Conditions;i', $responseBody, 'Should have terms and conditions.'),
+      'No T&C' => fn() => $this->assertDoesNotMatchRegularExpression(';Terms and Conditions;i', $responseBody, 'Should not have terms and conditions.'),
+      'Allow Skip' => fn() => $this->assertMatchesRegularExpression(';Do not show this message again;i', $responseBody, 'Should allow option to skip in future.'),
+      'Prohibit Skip' => fn() => $this->assertDoesNotMatchRegularExpression(';Do not show this message again;i', $responseBody, 'Should not allow option to skip in future.'),
+      'Need Approval' => fn() => $this->assertStringContainsString('The system administrator must approve CiviConnect.', $responseBody, 'Should not be allowed. User needs admin approval.'),
+    ];
+    foreach ($expectStartPage as $claim) {
+      call_user_func($availableClaims[$claim]);
+    }
+  }
+
+  protected function extractRoute(string $actualUrl): string {
+    $config = CRM_Core_Config::singleton();
+    $parsedUrl = parse_url($actualUrl);
+    \parse_str($parsedUrl['query'], $parsedQuery);
+    return trim($parsedQuery[$config->userFrameworkURLVar] ?? $parsedUrl['path'], '/');
   }
 
   /**
