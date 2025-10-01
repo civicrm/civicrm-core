@@ -116,7 +116,7 @@ function oauth_client_civicrm_managed(array &$entities, ?array $modules = NULL):
   \CRM_OAuth_Hook::oauthProviders($providers);
 
   foreach ($providers as $provider) {
-    if (in_array('CiviConnect', $provider['tags'] ?? [])) {
+    if (array_intersect($provider['tags'] ?? [], ['CiviConnect', 'CiviConnectSandbox', 'CiviConnectLocal'])) {
       $entities[] = [
         'module' => E::LONG_NAME,
         'name' => 'CiviConnect_' . $provider['name'],

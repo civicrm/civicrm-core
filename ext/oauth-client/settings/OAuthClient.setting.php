@@ -30,4 +30,18 @@ return [
     'is_contact' => 0,
     'description' => E::ts('Secret key to identify this site to the CiviConnect bridge. Use CryptoToken format.'),
   ],
+  'oauth_civi_connect_urls' => [
+    'group_name' => 'OAuth Preferences',
+    'group' => 'oauth',
+    'name' => 'oauth_civi_connect_urls',
+    'type' => 'String',
+    'html_type' => 'textarea',
+    'default' => "live=https://connect.civicrm.org\nsandbox=https://sandbox.connect.civicrm.org",
+    'add' => '6.8',
+    'title' => E::ts('CiviConnect: URLs'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => E::ts('Define the bridge servers. You may define up to three: "live", "sandbox", and "local".'),
+    // 'on_change' => ['Civi\OAuth\CiviConnectProviders::onChangeUrls'],
+  ],
 ];
