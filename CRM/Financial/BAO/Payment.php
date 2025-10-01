@@ -197,7 +197,7 @@ class CRM_Financial_BAO_Payment {
     }
     // Note that we reload the payments rather than use $contribution['paid_amount']
     // here as we are interested in the paid_amount AFTER this payment has been made.
-    elseif ($contributionStatus === 'Completed') {
+    elseif (in_array($contributionStatus, ['Partially paid', 'Completed'])) {
       $contributionPaidAmount = Contribution::get(FALSE)
         ->addSelect('paid_amount')
         ->addWhere('id', '=', $contribution['id'])
