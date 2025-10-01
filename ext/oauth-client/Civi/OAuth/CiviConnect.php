@@ -4,6 +4,7 @@ namespace Civi\OAuth;
 
 use Civi;
 use Civi\Core\Service\AutoService;
+use CRM_OAuth_ExtensionUtil as E;
 use CRM_Utils_Cache_Interface;
 use GuzzleHttp\Client;
 
@@ -50,6 +51,42 @@ class CiviConnect extends AutoService {
       return $key['id'];
     }
     return NULL;
+  }
+
+  /**
+   * Get a list of available bridge servers.
+   *
+   * @return array
+   */
+  public function getHosts(): array {
+    $urlText = \Civi::settings()->get('oauth_civi_connect_urls');
+    $urls = [];
+    foreach (preg_split(';[ \r\n\t]+;', trim($urlText)) as $urlLine) {
+      [$name, $url] = explode('=', $urlLine, 2);
+      $urls[$name] = rtrim($url, '/');
+    }
+
+    $hosts = [];
+    $hosts['live'] = [
+      'url' => $urls['live'] ?? NULL,
+      'name()' => fn($name) => $name,
+      'title()' => fn($title) => $title,
+      'tag' => 'CiviConnect',
+    ];
+    $hosts['sandbox'] = [
+      'url' => $urls['sandbox'] ?? NULL,
+      'name()' => fn($name) => $name . '_sandbox',
+      'title()' => fn($title) => E::ts('%1 (Sandbox)', [1 => $title]),
+      'tag' => 'CiviConnectSandbox',
+    ];
+    $hosts['local'] = [
+      'url' => $urls['local'] ?? NULL,
+      'name()' => fn($name) => $name . '_local',
+      'title()' => fn($title) => E::ts('%1 (Local)', [1 => $title]),
+      'tag' => 'CiviConnectLocal',
+    ];
+
+    return $hosts;
   }
 
   /**
