@@ -151,7 +151,7 @@ class InlineEdit extends Run {
     $columns = $this->display['settings']['columns'];
     foreach ($columns as $column) {
       if (array_key_exists($column['key'], $this->values)) {
-        $editableInfo = $this->getEditableInfo($column['key']);
+        $editableInfo = $this->getEditableInfo($column);
         if (!$editableInfo) {
           throw new \CRM_Core_Exception('Cannot edit column ' . $column['key']);
         }

@@ -123,6 +123,7 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
             'fee_amount' => $contribution['fee_amount'],
             'currency' => $contribution['currency'],
           ])
+          ->setNotificationForCompleteOrder(FALSE)
           ->execute();
       }
       $mappedRow[$contributionKey]['id'] = $contribution['id'];

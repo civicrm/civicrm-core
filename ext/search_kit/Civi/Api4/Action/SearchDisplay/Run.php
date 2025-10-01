@@ -213,7 +213,7 @@ class Run extends AbstractRunAction {
   private function addEditableInfo(SearchDisplayRunResult $result): void {
     foreach ($this->display['settings']['columns'] as $column) {
       if (!empty($column['editable'])) {
-        $result->editable[$column['key']] = $this->getEditableInfo($column['key']);
+        $result->editable[$column['key']] = $this->getEditableInfo($column);
       }
     }
   }

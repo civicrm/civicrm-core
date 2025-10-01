@@ -155,6 +155,10 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         foreach ($filterFields as $field) {
           $params = $apiParams;
           $params['where'][] = [$field, 'LIKE', $prefix . $apiRequest->getInput() . '%'];
+          // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
+          $params['select'] = array_map(function ($field) {
+            return explode(':', $field)[0];
+          }, $params['select']);
           $savedSearch['api_params']['sets'][] = ['UNION DISTINCT', 'Contact', 'get', $params];
         }
         // Remove filter as we've already embedded it in the WHERE clauses of each UNION

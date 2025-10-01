@@ -166,7 +166,7 @@ return [
       ],
     ],
     'amount_total' => [
-      'title' => E::ts('Total Amount'),
+      'title' => E::ts('Total Amount Requested'),
       'sql_type' => 'decimal(20,2)',
       'input_type' => 'Text',
       'required' => TRUE,
@@ -179,7 +179,7 @@ return [
       ],
     ],
     'amount_requested' => [
-      'title' => E::ts('Amount Requested'),
+      'title' => E::ts('Amount Requested in Original Currency'),
       'sql_type' => 'decimal(20,2)',
       'input_type' => 'Text',
       'description' => E::ts('Requested grant amount, in original currency (optional).'),

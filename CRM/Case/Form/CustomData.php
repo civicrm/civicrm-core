@@ -204,8 +204,9 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form implements CRM_Case_Form_Ca
   private function formatDisplayValue(mixed $value, int $customFieldId, string $customFieldDataType): string {
     switch ($customFieldDataType) {
       case 'Money':
-        // Money is special for non-US locales because at this point it's in human format so we don't try
-        // want to try to convert it.
+      case 'Float':
+        // Money and Float are special for non-US locales because at this point
+        // it's in human format so we don't want to try to convert it.
         return $value;
 
       case 'File':
