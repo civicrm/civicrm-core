@@ -4,6 +4,7 @@ namespace Civi\OAuth;
 
 use Civi;
 use Civi\Core\Service\AutoService;
+use GuzzleHttp\Client;
 
 /**
  * Manage a connection to the `connect.civicrm.org` bridge-server.
@@ -87,6 +88,65 @@ class CiviConnect extends AutoService {
 
   private function createId(string $keyPair): string {
     return 'eddsa_' . base64_encode(sodium_crypto_sign_publickey($keyPair));
+  }
+
+  /**
+   * @param string $serviceUrl
+   *   Ex: 'https://connect.civicrm.org/
+   * @param string|null $redirectUri
+   *   Ex: 'https://savewahles.org/civicrm/oauth-client/return'
+   *
+   * @return void
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function register(string $serviceUrl, ?string $redirectUri = NULL): void {
+    $redirectUri ??= \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
+    $cacheKey = 'oauth_check_' . md5($serviceUrl . ' ' . $this->getId() . $redirectUri);
+    try {
+      (new Client())->post("$serviceUrl/account/redirect-url", [
+        'form_params' => [
+          'client_id' => $this->getId(),
+          'client_secret' => $this->createAuthToken(),
+          'redirect_uri' => $redirectUri,
+        ],
+      ]);
+    }
+    finally {
+      Civi::cache('long')->delete($cacheKey);
+    }
+  }
+
+  /**
+   * @param string $authorizeUrl
+   *   Ex: 'https://connect.civicrm.org/foobar/authorize
+   * @param string|null $redirectUri
+   *   Ex: 'https://savewahles.org/civicrm/oauth-client/return'
+   *
+   * @return void
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function isRegistered(string $authorizeUrl, ?string $redirectUri = NULL): bool {
+    $redirectUri ??= \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
+
+    $serviceUrl = \CRM_Utils_Url::toOrigin($authorizeUrl);
+    $cache = Civi::cache('long');
+    $cacheKey = 'oauth_check_' . md5($serviceUrl . ' ' . $this->getId() . $redirectUri);
+    $registered = $cache->get($cacheKey);
+    if ($registered !== NULL) {
+      return $registered;
+    }
+
+    $response = (new Client())->post("$serviceUrl/account/check-url", [
+      'http_errors' => FALSE,
+      'form_params' => [
+        'client_id' => $this->getId(),
+        'client_secret' => $this->createAuthToken(),
+        'redirect_uri' => $redirectUri,
+      ],
+    ]);
+    $registered = ($response->getStatusCode() === 200);
+    $cache->set($cacheKey, $registered, 5 * 60);
+    return $registered;
   }
 
 }
