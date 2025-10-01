@@ -118,7 +118,7 @@ function oauth_client_civicrm_managed(array &$entities, ?array $modules = NULL):
   \Civi::dispatcher()->dispatch('hook_civicrm_oauthProviders', $event);
 
   foreach ($providers as $provider) {
-    if (in_array('CiviConnect', $provider['tags'] ?? [])) {
+    if (array_intersect($provider['tags'] ?? [], ['CiviConnect', 'CiviConnectSandbox', 'CiviConnectLocal'])) {
       $entities[] = [
         'module' => E::LONG_NAME,
         'name' => 'CiviConnect_' . $provider['name'],
