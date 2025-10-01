@@ -101,7 +101,7 @@
 .crm-container a.button.delete-button:hover,
 .crm-container a.button.delete-button:focus,
 .crm-container a.button.delete:hover {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-cancel-bg);
+  background: color-mix(in srgb, var(--crm-btn-cancel-bg) 87.5%, #000 12.5%);
 }
 .crm-container .crm-button-type-cancel:hover,
 .crm-container .crm-button-type-cancel:focus,
@@ -121,7 +121,6 @@
 }
 #bootstrap-theme .btn.btn-secondary:hover,
 #bootstrap-theme .btn.btn-secondary:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-secondary); /* darkening fallback if hover state not set */
   background: var(--crm-c-secondary-hover);
   color: var(--crm-c-secondary-text);
 }
@@ -131,7 +130,7 @@
 }
 #bootstrap-theme .btn.btn-info:hover,
 #bootstrap-theme .btn.btn-info:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-info-bg);
+  background: color-mix(in srgb, var(--crm-btn-info-bg) 87.5%, #000 12.5%);
   color: var(--crm-btn-info-text);
 }
 #bootstrap-theme .btn-warning {
@@ -140,7 +139,7 @@
 }
 #bootstrap-theme .btn.btn-warning:hover,
 #bootstrap-theme .btn.btn-warning:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-warning-bg);
+  background: color-mix(in srgb, var(--crm-btn-warning-bg) 87.5%, #000 12.5%);
   color: var(--crm-btn-warning-text);
 }
 #bootstrap-theme .btn-success {
@@ -149,7 +148,7 @@
 }
 #bootstrap-theme .btn.btn-success:hover,
 #bootstrap-theme .btn.btn-success:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-success-bg);
+  background: color-mix(in srgb, var(--crm-btn-success-bg) 87.5%, #000 12.5%);
   color: var(--crm-btn-success-text);
 }
 #bootstrap-theme .btn-danger {
@@ -158,7 +157,7 @@
 }
 #bootstrap-theme .btn.btn-danger:hover,
 #bootstrap-theme .btn.btn-danger:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-danger-bg);
+  background: color-mix(in srgb, var(--crm-btn-danger-bg) 87.5%, #000 12.5%);
   color: var(--crm-btn-danger-text);
 }
 
@@ -289,11 +288,6 @@
 #bootstrap-theme .btn-secondary.dropdown-toggle:hover,
 #bootstrap-theme .btn-secondary.dropdown-toggle:focus {
   background: var(--crm-c-secondary-hover);
-}
-.crm-container .crm-search-display button.dropdown-toggle:not(.btn-default):not(.btn-secondary),
-#bootstrap-theme .crm-search-display th .btn-group .btn {
-  background-color: var(--crm-c-background4);
-  color: var(--crm-c-text);
 }
 
 /* BS3 Button groups and dropdowns  */
@@ -500,7 +494,7 @@
   left: auto;
 }
 #bootstrap-theme .btn-group .btn + .btn.dropdown-toggle {
-  border-left: 1px solid var(--crm-c-page-background);
+  border-left: 1px solid var(--crm-table-bg);
 }
 
 /* Icons (for ease, include .button & .ui-button icons) */

@@ -426,7 +426,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-container .tag-tree-wrapper div.tag-info {
   width: auto;
   position: relative;
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
   border: 0 solid transparent;
   box-shadow: var(--crm-block-shadow);
   padding: var(--crm-padding-reg);
@@ -625,7 +625,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
 /* Custom searches */
 .crm-container > #crm-main-content-wrapper > fieldset {
   display: grid;
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
   border: 0 solid transparent;
   box-shadow: var(--crm-block-shadow);
   padding: var(--crm-padding-reg);
@@ -844,7 +844,7 @@ details + .crm-content-block:has(.dataTables_wrapper) {
   gap: var(--crm-flex-gap);
 }
 .crm-mosaico-wizard .crm-mosaico-template-item.thumbnail {
-  background: var(--crm-c-background2) !important /* vs _template-item.scss */;
+  background: var(--crm-c-layer1-bg) !important /* vs _template-item.scss */;
   border: var(--crm-c-divider) !important /* vs _template-item.scss */;
   border-radius: var(--crm-roundness) !important /* vs _template-item.scss */;
 }

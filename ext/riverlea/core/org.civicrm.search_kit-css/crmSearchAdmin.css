@@ -72,13 +72,13 @@
   color: var(--crm-tab-col);
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
-  border: 1px solid var(--crm-c-gray-300);
+  border: var(--crm-c-divider);
   border-right: 0 none;
   box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 }
 .crm-search ul.nav-stacked li[role=separator] {
   height: var(--crm-m2);
-  border-top: 1px solid var(--crm-c-gray-300);
+  border-top: var(--crm-c-divider);
   margin: var(--crm-m) var(--crm-l) 0 var(--crm-r);
 }
 .crm-search ul.nav-stacked li a[disabled] {
@@ -107,7 +107,7 @@
   right: 28px;
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel {
-  border: 1px solid var(--crm-c-gray-300);
+  border: var(--crm-c-divider);
   margin: 0;
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel .panel-body {
@@ -174,7 +174,7 @@
 /* Tab: Select Fields */
 
 .crm-search fieldset.crm-draggable {
-  background-color: var(--crm-c-drag-background);
+  background-color: var(--crm-c-drag-bg);
   border-radius: var(--crm-roundness);
   border: 0 solid transparent;
 }
@@ -243,7 +243,7 @@
   display: block;
 }
 .crm-search crm-search-admin-link-group {
-  background: var(--crm-c-background2);
+  background: var(--crm-c-layout1-bg);
 }
 .crm-search crm-search-admin-link-group table {
   margin: var(--crm-padding-reg);
@@ -255,7 +255,7 @@
   border: 0 solid transparent;
 }
 .crm-search-admin-edit-columns details {
-  background-color: var(--crm-c-page-background);
+  border-radius: var(--crm-roundness);
   margin: 0;
   border: 0;
 }
