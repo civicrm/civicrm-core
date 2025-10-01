@@ -7,6 +7,7 @@ use Civi\OAuth\OAuthException;
 
 /**
  * Class AuthorizationCode
+ *
  * @package Civi\Api4\Action\OAuthClient
  *
  * In this workflow, we seek permission from the browser-user to access
@@ -25,6 +26,8 @@ use Civi\OAuth\OAuthException;
  *
  * @method $this setLandingUrl(string $landingUrl)
  * @method string getLandingUrl()
+ * @method $this setStartPage(string $startPage)
+ * @method string getStartPage()
  * @method $this setPrompt(string $prompt)
  * @method string getPrompt()
  * @method $this setResponseMode(string $responseMode)
@@ -54,6 +57,19 @@ class AuthorizationCode extends AbstractGrantAction {
    * @see https://developers.google.com/identity/protocols/oauth2/web-server
    */
   protected $prompt = NULL;
+
+  /**
+   * Should we show a start page -- informing the user that they'll be going off-site?
+   *
+   * Added ~v6.8. Traditionally, all callers were expected to do their own confirmation.
+   * For compatibility, the current default is 'never'. But we should look at changing to 'auto'.
+   *
+   * @var string
+   *   'auto': (Recommended) Let oauth-client decide whether to show a prompt.
+   *   'never': (Compatibility) Do not show a prompt. Suitable if you have already prompted.
+   *   'always': Always show a prompt, regardless of policy.
+   */
+  protected $startPage = 'never';
 
   /**
    * How long we will wait for the user return. After this time, the stored "state" is lost.
@@ -128,9 +144,39 @@ class AuthorizationCode extends AbstractGrantAction {
         throw new \CRM_Core_Exception('Unsupported response mode: ' . $output['response_mode']);
     }
 
-    $result[] = $output + [
-      'url' => $provider->getAuthorizationUrl($authOptions),
-    ];
+    $externalUrl = $provider->getAuthorizationUrl($authOptions);
+    if ($this->isStartPageRequired()) {
+      $token = \Civi::service('crypto.jwt')->encode([
+        'exp' => \CRM_Utils_Time::time() + $this->getTtl(),
+        'scope' => 'CiviOauthClientStart',
+        'clientId' => $this->getClientDef()['id'],
+        'url' => $externalUrl,
+      ], 'SIGN');
+      $result[] = $output + [
+        'url' => \Civi::url('current://civicrm/oauth-client/start')->addQuery(['jwt' => $token]),
+      ];
+    }
+    else {
+      if ($this->isCiviConnect() && \Civi::settings()->get('oauth_civi_connect_approved')) {
+        \Civi::service('oauth_client.civi_connect')->register($provider->getCiviConnectUrl());
+      }
+      $result[] = $output + [
+        'url' => $externalUrl,
+      ];
+    }
+  }
+
+  protected function isStartPageRequired(): bool {
+    if ($this->startPage === 'always') {
+      return TRUE;
+    }
+    if ($this->startPage === 'never') {
+      return FALSE;
+    }
+    if ($this->isCiviConnect() && !\Civi::settings()->get('oauth_civi_connect_approved')) {
+      return TRUE;
+    }
+    return !\Civi::settings()->get('oauth_auto_confirm');
   }
 
   protected function validate() {
@@ -165,6 +211,14 @@ class AuthorizationCode extends AbstractGrantAction {
     $r = new \ReflectionMethod(get_class($obj), $method);
     $r->setAccessible(TRUE);
     return $r->invokeArgs($obj, $args);
+  }
+
+  /**
+   * @return bool
+   * @throws \Civi\OAuth\OAuthException
+   */
+  protected function isCiviConnect(): bool {
+    return ($this->getClientDef()['guid'] === '{civi_connect}');
   }
 
 }
