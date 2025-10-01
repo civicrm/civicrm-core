@@ -197,7 +197,7 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     elseif ($id === NULL && $cacheKey === NULL) {
       // Delete everything.
       $keys = $this->redis->keys($this->prefix . '*');
-      if ( $keys !== false ){
+      if ($keys !== FALSE) {
         $this->redis->del($keys);
       }
     }

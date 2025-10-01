@@ -73,9 +73,10 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
         echo 'Could not connect to redisd server';
         CRM_Utils_System::civiExit();
       }
-      if ( $user && $pass ) {
+      if ($user && $pass) {
         $redis->auth([$user, $pass]);
-      }else if ($pass) {
+      }
+      elseif ($pass) {
         $redis->auth($pass);
       }
       Civi::$statics[__CLASS__][$id] = $redis;
@@ -164,7 +165,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     // more general rethink of cache expiration/TTL.
 
     $keys = $this->_cache->keys($this->_prefix . '*');
-    if ( $keys !== false ) {
+    if ($keys !== FALSE) {
       $this->_cache->del($keys);
     }
     return TRUE;
