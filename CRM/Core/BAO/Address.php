@@ -1085,7 +1085,14 @@ SELECT is_primary,
         }
         else {
           // collapse the tree to summarize
-          $family = trim(implode(" & ", array_keys($first_names)) . " " . $last_name);
+          // "first_names" is a leftover misnomer from before it was converted
+          // to tokens - it's now the whole display name, so remove last name
+          // and just add it only at the end.
+          $remove_last_names = str_replace($last_name, '', array_keys($first_names));
+          $remove_last_names = array_map(function($v) {
+            return trim($v);
+          }, $remove_last_names);
+          $family = trim(implode(" & ", $remove_last_names) . " " . $last_name);
         }
         if ($count) {
           $processedNames .= "\n" . $family;
