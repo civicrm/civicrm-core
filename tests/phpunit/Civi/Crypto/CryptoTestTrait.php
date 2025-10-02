@@ -22,6 +22,8 @@ trait CryptoTestTrait {
       'jwt-hs256::abcd1234abcd1234',
       'jwt-hs384:b64:8h5wNGnJbdVHpXms2RwcVx+jxCNdYEsYCdNlPpVgNLRMg9Q2xKYnxSfuihS6YCRi',
       'jwt-hs256::fdsafdsafdsa',
+      'jwt-eddsa-keypair:b64:1mLWxLLESEJphn4V8RHZfkk5UtoxBHXzrWFjdf7swNdQvgc+K4gd/xnwjFaInkfnHiFFjRRckbfZZXrYVLeRgFC+Bz4riB3/GfCMVoieR+ceIUWNFFyRt9llethUt5GA',
+      // Example EdDSA keypair generated with `base64_encode(sodium_crypto_sign_keypair())`
     ];
   }
 
@@ -78,8 +80,14 @@ trait CryptoTestTrait {
     ]);
     $this->assertEquals(0, $key['weight']);
 
-    $this->assertEquals(7, count($examples));
-    $this->assertEquals(7 + $origCount, count($registry->getKeys()));
+    $key = $registry->addKey($registry->parseKey($examples[7]) + [
+      'tags' => ['SIGN-TEST-EDDSA'],
+      'id' => 'sign-key-eddsa',
+    ]);
+    $this->assertEquals(0, $key['weight']);
+
+    $this->assertEquals(8, count($examples));
+    $this->assertEquals(8 + $origCount, count($registry->getKeys()));
   }
 
 }
