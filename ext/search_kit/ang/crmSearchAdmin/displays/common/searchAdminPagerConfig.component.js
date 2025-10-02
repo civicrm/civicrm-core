@@ -32,14 +32,13 @@
         this.display.settings.pager = this.display.settings.pager ? false : getDefaultSettings();
         if (this.display.settings.pager && !this.display.settings.limit) {
           this.toggleLimit();
+        } else if (!this.display.settings.pager && this.noLimit) {
+          delete this.display.settings.limit;
         }
       };
 
       this.toggleLimit = function() {
-        if (ctrl.noLimit) {
-          delete ctrl.display.settings.limit;
-        }
-        else if (ctrl.display.settings.limit) {
+        if (ctrl.display.settings.limit) {
           ctrl.display.settings.limit = 0;
         } else {
           ctrl.display.settings.limit = CRM.crmSearchAdmin.defaultPagerSize;
