@@ -36,6 +36,8 @@ use Civi\Core\Event\GenericHookEvent;
  * @method array getFilters()
  * @method $this setExclude(array $exclude)
  * @method array getExclude()
+ * @method $this setQuickEdit(bool $quickEdit)
+ * @method bool getQuickEdit()
  */
 class AutocompleteAction extends AbstractAction {
   use Traits\SavedSearchInspectorTrait;
@@ -119,6 +121,15 @@ class AutocompleteAction extends AbstractAction {
    * @var array
    */
   public $exclude = [];
+
+  /**
+   * Whether quick-edit links are enabled
+   *
+   * @var bool
+   */
+  public $quickEdit = FALSE;
+
+  private $quickEditPaths = [];
 
   /**
    * Filters set programmatically by `civi.api.prepare` listener. Automatically trusted.
@@ -237,6 +248,9 @@ class AutocompleteAction extends AbstractAction {
       }
       foreach ($this->display['settings']['extra'] ?? [] as $name => $key) {
         $item[$key] = $row['data'][$name] ?? $item[$key] ?? NULL;
+      }
+      if ($this->quickEdit) {
+        $item['quickEdit'] = $this->getQuickEditData($row['data']);
       }
       $result[] = $item;
     }
@@ -380,6 +394,17 @@ class AutocompleteAction extends AbstractAction {
     // Add 'sort' fields
     $additions = array_merge($additions, array_column($this->display['settings']['sort'] ?? [], 0));
 
+    // Add fields needed by `self::getQuickEditData`
+    if ($this->quickEdit) {
+      if ($this->savedSearch['api_entity'] === 'Contact') {
+        $additions[] = 'contact_type';
+      }
+      $labelField = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'label_field');
+      if ($labelField) {
+        $additions[] = $labelField;
+      }
+    }
+
     // Key by field name and combine with original SELECT
     $additions = array_unique($additions);
     $additions = array_combine($additions, $additions);
@@ -428,6 +453,55 @@ class AutocompleteAction extends AbstractAction {
     catch (\CRM_Core_Exception $e) {
       // Search display not found
     }
+  }
+
+  private function getQuickEditData(array $rowData): ?array {
+    $entityName = $this->savedSearch['api_entity'];
+    // Afforms use contact type as the entity, e.g. "Individual" not "Contact".
+    if ($entityName === 'Contact') {
+      $entityName = $rowData['contact_type'] ?? $rowData['contact_type:name'] ?? 'Contact';
+    }
+    // Ensure a quick-edit form exists for this entity
+    $info = $this->getQuickEditInfo($entityName);
+    // Ensure user has permission to edit this record
+    // Note: calling `checkAccessDelegated` like this may slow down the autocomplete's responsiveness
+    // If that becomes a problem, consider moving the permission check to an ajax call in `$.fn.crmAutocomplete` after the record is selected
+    if (!$info || empty($rowData[$info['id_field']]) || !CoreUtil::checkAccessDelegated($entityName, 'update', $rowData, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+      return NULL;
+    }
+    $quickEdit = [];
+    // TODO: Adding the id to the path like `Individual1` is just guesswork
+    $quickEdit['path'] = $info['path'] . "#/?{$entityName}1={$rowData[$info['id_field']]}";
+    if ($info['label_field'] && !empty($rowData[$info['label_field']])) {
+      $quickEdit['title'] = $rowData[$info['label_field']];
+    }
+    else {
+      $quickEdit['title'] = CoreUtil::getInfoItem($entityName, 'title');
+    }
+    return $quickEdit;
+  }
+
+  private function getQuickEditInfo(string $entityName): ?array {
+    // Use cache since this function is called once per row
+    if (array_key_exists($entityName, $this->quickEditPaths)) {
+      return $this->quickEditPaths[$entityName];
+    }
+    $this->quickEditPaths[$entityName] = NULL;
+    $route = \Civi\Api4\Route::get(FALSE)
+      ->addSelect('path', 'access_arguments')
+      ->addWhere('path', '=', "civicrm/quick-edit/$entityName")
+      ->execute()->first();
+    // Ensure user has permission to use the form
+    if ($route &&
+      (!$this->checkPermissions || empty($route['access_arguments'][0]) || \CRM_Core_Permission::check($route['access_arguments'][0]))
+    ) {
+      $this->quickEditPaths[$entityName] = [
+        'path' => $route['path'],
+        'id_field' => CoreUtil::getIdFieldName($entityName),
+        'label_field' => CoreUtil::getInfoItem($entityName, 'label_field'),
+      ];
+    }
+    return $this->quickEditPaths[$entityName];
   }
 
   /**

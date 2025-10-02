@@ -1,0 +1,18 @@
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" actions="{create: false, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Individual1" class="af-container">
+    <div class="af-container">
+      <div class="af-container af-layout-inline">
+        <af-field name="first_name" />
+        <af-field name="middle_name" />
+        <af-field name="last_name" />
+      </div>
+      <div af-join="Email" data="{is_primary: true}">
+        <div class="af-container af-layout-inline">
+          <af-field name="email" defn="{required: false}" />
+        </div>
+      </div>
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">{{:: ts('Save') }}</button>
+</af-form>
