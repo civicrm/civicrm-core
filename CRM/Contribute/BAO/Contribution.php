@@ -3189,11 +3189,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $checkStatus = [
       'Cancelled' => ['Completed', 'Refunded'],
-      'Completed' => ['Cancelled', 'Refunded', 'Chargeback'],
+      'Completed' => ['Cancelled', 'Refunded', 'Chargeback', 'Partially paid'],
       'Pending' => ['Cancelled', 'Completed', 'Failed', 'Partially paid'],
       'In Progress' => ['Cancelled', 'Completed', 'Failed'],
       'Refunded' => ['Cancelled', 'Completed'],
-      'Partially paid' => ['Completed'],
+      'Partially paid' => ['Completed', 'Refunded'],
       'Pending refund' => ['Completed', 'Refunded'],
       'Failed' => ['Pending'],
     ];

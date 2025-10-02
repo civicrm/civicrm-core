@@ -589,8 +589,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'return' => ['contribution_status_id'],
       'id' => $contributionID,
     ]);
-    //Still we've a status of Completed after refunding a partial amount.
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    // We should now have a status of "Partially paid" after refunding a partial amount.
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
 
     //Refund the complete amount.
     $this->callAPISuccess('Payment', 'create', [
