@@ -466,6 +466,14 @@ if (!defined('CIVICRM_DB_CACHE_PASSWORD')) {
 }
 
 /**
+ * Change this if your cache server requires a username (currently only works
+ * with Redis - if you are ACLs)
+ */
+if (!defined('CIVICRM_DB_CACHE_USERNAME')) {
+  define('CIVICRM_DB_CACHE_USERNAME', '');
+}
+
+/**
  * Items in cache will expire after the number of seconds specified here.
  * Default value is 3600 (i.e., after an hour)
  */
