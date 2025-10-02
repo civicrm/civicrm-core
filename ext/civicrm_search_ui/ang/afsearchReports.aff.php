@@ -3,13 +3,13 @@ use CRM_SearchKitReports_ExtensionUtil as E;
 
 return [
   'type' => 'search',
-  'title' => E::ts('Search Kit Reports'),
+  'title' => E::ts('Reports'),
   'icon' => 'fa-list-alt',
-  'server_route' => 'civicrm/search_kit_reports',
+  'server_route' => 'civicrm/searchui/report/list',
   'navigation' => [
     'parent' => 'Reports',
-    'label' => E::ts('Search Kit Reports'),
-    'name' => 'afsearchSearchKitReports',
+    'label' => E::ts('Reports'),
+    'name' => 'afsearchReports',
     'weight' => 10000,
   ],
   'permission' => [
