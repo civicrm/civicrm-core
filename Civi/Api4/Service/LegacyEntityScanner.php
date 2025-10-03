@@ -129,7 +129,7 @@ class LegacyEntityScanner extends AutoSubscriber {
         'api4_legacy_entity_scan',
         $message,
         ts('Api4 Entities using Legacy Entity Scanner'),
-        \Psr\Log\LogLevel::WARNING,
+        \Psr\Log\LogLevel::INFO,
         'fa-box'
       );
 
