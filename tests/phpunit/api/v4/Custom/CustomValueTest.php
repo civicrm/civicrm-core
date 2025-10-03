@@ -20,6 +20,7 @@
 namespace api\v4\Custom;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
@@ -321,6 +322,135 @@ class CustomValueTest extends Api4TestBase {
       ->addValue('is_multiple', FALSE)
       ->execute();
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+  }
+
+  public function testCustomValueSaveAsNull(): void {
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'test_nulls',
+    ]);
+    $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id.name' => 'test_nulls'],
+      'records' => [
+        ['name' => 'string', 'html_type' => 'Text', 'data_type' => 'String'],
+        ['name' => 'select', 'html_type' => 'Select', 'data_type' => 'String', 'serialize' => 1, 'option_values' => ['a' => 'A', 'b' => 'B']],
+        ['name' => 'int', 'html_type' => 'Text', 'data_type' => 'Int'],
+        ['name' => 'float', 'html_type' => 'Text', 'data_type' => 'Float'],
+        ['name' => 'money', 'html_type' => 'Text', 'data_type' => 'Money'],
+        ['name' => 'memo', 'html_type' => 'Text', 'data_type' => 'Memo'],
+        ['name' => 'date', 'html_type' => 'Date', 'data_type' => 'Date'],
+        ['name' => 'stateprovince', 'html_type' => 'Select', 'data_type' => 'StateProvince'],
+        ['name' => 'country', 'html_type' => 'Select', 'data_type' => 'Country'],
+        ['name' => 'link', 'html_type' => 'Text', 'data_type' => 'Link'],
+        ['name' => 'contactref', 'html_type' => 'Autocomplete-Select', 'data_type' => 'ContactReference'],
+        ['name' => 'entityref', 'html_type' => 'Autocomplete-Select', 'data_type' => 'EntityReference', 'fk_entity' => 'Contact'],
+      ],
+    ]);
+
+    $cid = $this->createTestRecord('Contact', [
+      'test_nulls.string' => NULL,
+      'test_nulls.select' => NULL,
+      'test_nulls.int' => NULL,
+      'test_nulls.float' => NULL,
+      'test_nulls.money' => NULL,
+      'test_nulls.memo' => NULL,
+      'test_nulls.date' => NULL,
+      'test_nulls.stateprovince' => NULL,
+      'test_nulls.country' => NULL,
+      'test_nulls.link' => NULL,
+      'test_nulls.contactref' => NULL,
+      'test_nulls.entityref' => NULL,
+    ])['id'];
+
+    $contact = Contact::get(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addSelect('test_nulls.*')
+      ->execute()->single();
+
+    $this->assertSame(NULL, $contact['test_nulls.string']);
+    $this->assertSame(NULL, $contact['test_nulls.select']);
+    $this->assertSame(NULL, $contact['test_nulls.int']);
+    $this->assertSame(NULL, $contact['test_nulls.float']);
+    $this->assertSame(NULL, $contact['test_nulls.money']);
+    $this->assertSame(NULL, $contact['test_nulls.memo']);
+    $this->assertSame(NULL, $contact['test_nulls.date']);
+    $this->assertSame(NULL, $contact['test_nulls.stateprovince']);
+    $this->assertSame(NULL, $contact['test_nulls.country']);
+    $this->assertSame(NULL, $contact['test_nulls.link']);
+    $this->assertSame(NULL, $contact['test_nulls.contactref']);
+    $this->assertSame(NULL, $contact['test_nulls.entityref']);
+
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addValue('test_nulls.string', 'test')
+      ->addValue('test_nulls.select', ['a', 'b'])
+      ->addValue('test_nulls.int', 0)
+      ->addValue('test_nulls.float', 0.0)
+      ->addValue('test_nulls.money', 0.0)
+      ->addValue('test_nulls.memo', '<strong>test</strong>')
+      ->addValue('test_nulls.date', '2020-01-01')
+      ->addValue('test_nulls.stateprovince', 1234)
+      ->addValue('test_nulls.country', 1228)
+      ->addValue('test_nulls.link', 'http://example.com')
+      ->addValue('test_nulls.contactref', 1)
+      ->addValue('test_nulls.entityref', 1)
+      ->execute();
+
+    $contact = Contact::get(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addSelect('test_nulls.*')
+      ->execute()->single();
+
+    // Assert all values were set correctly
+    $this->assertSame('test', $contact['test_nulls.string']);
+    $this->assertSame(['a', 'b'], $contact['test_nulls.select']);
+    $this->assertSame(0, $contact['test_nulls.int']);
+    $this->assertSame(0.0, $contact['test_nulls.float']);
+    $this->assertSame(0.00, $contact['test_nulls.money']);
+    $this->assertSame('<strong>test</strong>', $contact['test_nulls.memo']);
+    $this->assertSame('2020-01-01', $contact['test_nulls.date']);
+    $this->assertSame(1234, $contact['test_nulls.stateprovince']);
+    $this->assertSame(1228, $contact['test_nulls.country']);
+    $this->assertSame('http://example.com', $contact['test_nulls.link']);
+    $this->assertSame(1, $contact['test_nulls.contactref']);
+    $this->assertSame(1, $contact['test_nulls.entityref']);
+
+    // Update all values back to NULL
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addValue('test_nulls.string', NULL)
+      ->addValue('test_nulls.select', NULL)
+      ->addValue('test_nulls.select', NULL)
+      ->addValue('test_nulls.int', NULL)
+      ->addValue('test_nulls.float', NULL)
+      ->addValue('test_nulls.money', NULL)
+      ->addValue('test_nulls.memo', NULL)
+      ->addValue('test_nulls.date', NULL)
+      ->addValue('test_nulls.stateprovince', NULL)
+      ->addValue('test_nulls.country', NULL)
+      ->addValue('test_nulls.link', NULL)
+      ->addValue('test_nulls.contactref', NULL)
+      ->addValue('test_nulls.entityref', NULL)
+      ->execute();
+
+    // Get the updated contact
+    $contact = Contact::get(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addSelect('test_nulls.*')
+      ->execute()->single();
+
+    // Assert all values are NULL again
+    $this->assertSame(NULL, $contact['test_nulls.string']);
+    $this->assertSame(NULL, $contact['test_nulls.select']);
+    $this->assertSame(NULL, $contact['test_nulls.int']);
+    $this->assertSame(NULL, $contact['test_nulls.float']);
+    $this->assertSame(NULL, $contact['test_nulls.money']);
+    $this->assertSame(NULL, $contact['test_nulls.memo']);
+    $this->assertSame(NULL, $contact['test_nulls.date']);
+    $this->assertSame(NULL, $contact['test_nulls.stateprovince']);
+    $this->assertSame(NULL, $contact['test_nulls.country']);
+    $this->assertSame(NULL, $contact['test_nulls.link']);
+    $this->assertSame(NULL, $contact['test_nulls.contactref']);
+    $this->assertSame(NULL, $contact['test_nulls.entityref']);
   }
 
 }
