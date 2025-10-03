@@ -134,3 +134,34 @@ fieldset.af-container.af-layout-inline {
   display: flex;
   padding-block: 0.25rem;
 }
+
+/* Filter Sets */
+af-filter-sets {
+  --crm-expand-body-padding: 1rem;
+  --crm-btn-margin: 0;
+
+  display: inline-flex;
+  gap: var(--crm-flex-gap, 0.5rem);
+  padding: var(--crm-flex-gap, 0.5rem);
+  background-color: var(--crm-c-background2);
+}
+af-filter-sets dialog {
+  border: none;
+}
+af-filter-sets dialog ul {
+  list-style: none;
+  padding-left: 0;
+}
+af-filter-sets details > summary.crm-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+af-filter-sets details > summary.crm-accordion-header .af-filter-set-description {
+  font-weight: lighter;
+  font-style: italic;
+}
+af-filter-sets dialog .crm-buttons {
+  justify-content: space-between;
+}

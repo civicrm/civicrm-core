@@ -293,6 +293,12 @@ class AfformAdminMeta {
             ],
           ],
         ],
+        'filtersets' => [
+          'title' => E::ts('Saved Filters'),
+          'element' => [
+            '#tag' => 'af-filter-sets',
+          ],
+        ],
         'submit' => [
           'title' => E::ts('Submit Button'),
           'afform_type' => ['form'],

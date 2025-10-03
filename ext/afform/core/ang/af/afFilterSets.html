@@ -1,0 +1,119 @@
+<select
+  ng-if="$ctrl.options.length"
+  ng-model="$ctrl.getSetFilterSet"
+  ng-model-options="{getterSetter: true}"
+  >
+  <option value="">- {{:: ts('Saved filters') }} - </option>
+  <option ng-repeat="filterSet in $ctrl.options" value="{{:: filterSet.id }}">
+    {{:: filterSet.label }}
+  </option>
+</select>
+
+<div class="crm-buttons">
+  <button
+    ng-if="$ctrl.options.length"
+    type="button"
+    class="btn btn-secondary"
+    crm-icon="fa-gear"
+    ng-click="$ctrl.manageDialog.open()"
+    >
+    {{:: ts('Manage') }}
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-primary"
+    crm-icon="fa-plus"
+    ng-click="$ctrl.saveDialog.open()"
+    ng-disabled="!$ctrl.saveDialog.canOpen()"
+    >
+    {{ $ctrl.options.length ? ts('Save current') : ts('Save filters') }}
+  </button>
+</div>
+
+<dialog class="af-filter-sets-new">
+  <div ng-show="$ctrl.saveDialog.inProgress" class="crm-loading-spinner">
+    <div class="sr-only">{{:: ts('Saving...') }}</div>
+  </div>
+  <div ng-show="!$ctrl.saveDialog.inProgress">
+    <label for="newFilterSetLabel">{{:: ts('Name') }}</label>
+    <input id="newFilterSetLabel" ng-model="$ctrl.saveDialog.label" />
+
+    <dl>
+      <div ng-repeat="(key, value) in $ctrl.getCurrentFilters()">
+        <dt>{{:: key }}</dt><dd>{{ value }}</dd>
+      </div>
+    </dl>
+
+    <div class="crm-buttons">
+      <button
+        type="button"
+        class="btn btn-warning"
+        crm-icon="fa-times"
+        ng-click="$ctrl.saveDialog.close()"
+        >
+        {{:: ts('Close') }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        crm-icon="fa-save"
+        ng-click="$ctrl.saveDialog.save()"
+        ng-disabled="!$ctrl.saveDialog.canSave()"
+        >
+        {{:: ts('Save') }}
+      </button>
+
+    </div>
+  </div>
+</dialog>
+
+<dialog class="af-filter-sets-manage">
+  <div ng-if="!$ctrl.options.length" class="status status-warning">
+    {{:: ts('No filter sets have been created for this form.')}}
+  </div>
+
+  <ul ng-if="$ctrl.options.length">
+    <li ng-repeat="filterSet in $ctrl.options" class="af-filter-set-manage">
+
+      <details class="crm-accordion-wrapper">
+
+      <summary class="crm-accordion-header">
+        {{:: filterSet.label }}
+        <span class="af-filter-set-description">
+          {{:: $ctrl.manageDialog.itemDescription(filterSet) }}
+        </span>
+      </summary>
+
+      <div class="crm-accordion-body">
+        <dl>
+          <div ng-repeat="(key, value) in filterSet.filters">
+            <dt>{{:: key }}</dt><dd>{{ value }}</dd>
+          </div>
+        </dl>
+        <button
+          type="button"
+          class="btn btn-danger btn-xs"
+          crm-icon="fa-trash"
+          ng-click="$ctrl.manageDialog.deleteItem(filterSet)"
+          >
+          Delete
+        </button>
+      </div>
+      </details>
+    </li>
+
+  </ul>
+
+  <div class="crm-buttons">
+    <button
+      type="button"
+      class="btn btn-warning"
+      crm-icon="fa-times"
+      ng-click="$ctrl.manageDialog.close()"
+      >
+      {{:: ts('Close') }}
+    </button>
+  </div>
+
+</dialog>
