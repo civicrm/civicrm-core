@@ -32,6 +32,7 @@ class CRM_Afform_ArrayHtml {
       'type' => 'text',
       'security' => 'text',
       'actions' => 'js',
+      'behavior' => 'js',
     ],
     'af-field' => [
       '#selfClose' => TRUE,
