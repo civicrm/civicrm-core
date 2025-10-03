@@ -53,8 +53,16 @@
     </tr>
     {/if}
   </table>
-<fieldset>
+<fieldset class="crm-paymentProcessor-details">
 <legend>{ts}Processor Details for Live Payments{/ts}</legend>
+{if !empty($form.live_initiator)}
+    <div class="help">
+        {ts}Create connection with {/ts}
+        {$form.live_initiator.html}
+        <button class="crm-live-initiator">{ts}Go{/ts}</button>
+    </div>
+{/if}
+
     <table class="form-layout-compressed">
         <tr class="crm-paymentProcessor-form-block-user_name">
             <td class="label">{$form.user_name.label}</td><td>{$form.user_name.html} {help id="$ppTypeName-live-user-name" title=$form.user_name.label}</td>
@@ -97,8 +105,16 @@
     </table>
 </fieldset>
 
-<fieldset>
+<fieldset class="crm-paymentProcessor-details">
 <legend>{ts}Processor Details for Test Payments{/ts}</legend>
+  {if !empty($form.test_initiator)}
+    <div class="help">
+      {ts}Create connection with {/ts}
+      {$form.test_initiator.html}
+      <button class="crm-live-initiator">{ts}Go{/ts}</button>
+    </div>
+  {/if}
+
     <table class="form-layout-compressed">
         <tr class="crm-paymentProcessor-form-block-test_user_name">
             <td class="label">{$form.test_user_name.label}</td><td>{$form.test_user_name.html} {help id="$ppTypeName-test-user-name" title=$form.test_user_name.label}</td></tr>
@@ -139,8 +155,9 @@
 {/if}
 {/if}
 </table>
-       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </fieldset>
+
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
 {if $action eq 1  or $action eq 2}
@@ -164,3 +181,65 @@
   </script>
 
 {/if}
+
+<script type="text/javascript">
+{literal}
+
+  CRM.$(function($) {
+
+    const responseModes = {
+      'query': function(resp) {
+        window.location = resp.url;
+      },
+      'web_message': function(resp) {
+        const popup = window.open(resp.url, 'child', 'width=600,height=600');
+        const callback = (e) => {
+          if (e.origin === resp.response_origin) {
+            window.removeEventListener("message", callback)
+            popup.close();
+            window.location = resp.continue_url + (resp.continue_url.indexOf('?') < 0 ? '?' : '&') + $.param(e.data);
+          }
+        }
+        window.addEventListener("message", callback)
+      },
+      'UNKNOWN': function(resp) {
+        CRM.alert(ts('Unrecognized OAuth flow: ' + resp.flow));
+      }
+    };
+
+    function initiateApiKey(processorId, initiatorUrl) {
+      const unsavedChanges = CRM.utils.initialValueChanged($('form[data-warn-changes=true]:visible'));
+
+      if (unsavedChanges) {
+        CRM.alert(
+          '<p>' + ts('Please save changes first.') + '</p>',
+          ts('Unsaved Changes')
+        );
+      }
+      else {
+        $.get(initiatorUrl).then(onInitiate)
+      }
+
+      return false;
+    }
+
+    function onInitiate(resp) {
+      let flow = responseModes[resp.response_mode] || responseModes.UNKNOWN
+      flow(resp);
+    }
+
+    $('.crm-live-initiator').click(() => initiateApiKey('live', $('[name=live_initiator]').val()))
+    $('.crm-test-initiator').click(() => initiateApiKey('test', $('[name=test_initiator]').val()))
+
+    const isNew = {/literal}{$action == 1 ? "true" : "false"}{literal};
+    const hasInitiator = {/literal}{empty($form.live_initiator) ? "false" : "true" }{literal};
+    if (isNew && hasInitiator) {
+      $('.crm-paymentProcessor-details').hide();
+      $('[name=user_name]').val('_PLACEHOLDER_');
+      // $('[name=test_user_name]').val('_PLACEHOLDER_');
+    }
+
+  })
+
+{/literal}
+</script>

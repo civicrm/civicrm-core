@@ -1,0 +1,152 @@
+<?php
+
+namespace Civi\OAuth;
+
+use Civi;
+use Civi\Core\Service\AutoService;
+use GuzzleHttp\Client;
+
+/**
+ * Manage a connection to the `connect.civicrm.org` bridge-server.
+ */
+class CiviConnect extends AutoService {
+
+  /**
+   * @service oauth_client.civi_connect
+   * @inject crypto.registry
+   * @return \Civi\OAuth\CiviConnect
+   */
+  public static function factory(\Civi\Crypto\CryptoRegistry $registry) {
+    $instance = new static();
+    // Registering our key via factory() means that we guarantee CRED key is already registered,
+    // which helps with parsing. If using the factory is a problem, then CONNECT key probably
+    // needs async registration, eg `$registry->addKey(['callback' => ...])`.
+    if (!empty(Civi::settings()->get('oauth_civi_connect_keypair'))) {
+      $registry->addKey($instance->createRegistration());
+    }
+    else {
+      $instance->generateCreds();
+    }
+    return $instance;
+  }
+
+  /**
+   * Find or create the connection parameters for CiviConnect bridge service.
+   *
+   * @return array
+   *   Tuple: [clientId, clientSecret]
+   */
+  public function getCreds(): array {
+    return [$this->getId(), $this->createAuthToken()];
+  }
+
+  public function getId(): ?string {
+    $registry = Civi::service('crypto.registry');
+    foreach ($registry->findKeysByTag('CONNECT') as $key) {
+      return $key['id'];
+    }
+    return NULL;
+  }
+
+  /**
+   * Generate a new key-pair to identify the current deployment.
+   *
+   * @return static
+   */
+  public function generateCreds(): CiviConnect {
+    $keyPair = sodium_crypto_sign_keypair();
+    Civi::settings()->set('oauth_civi_connect_keypair',
+      Civi::service('crypto.token')->encrypt($keyPair, 'CRED')
+    );
+    Civi::service('crypto.registry')->addKey($this->createRegistration());
+    return $this;
+  }
+
+  /**
+   * Generate metadata/registration record for our key-pair.
+   *
+   * @return array
+   * @see \Civi\Crypto\CryptoRegistry::addKey()
+   */
+  protected function createRegistration(): array {
+    $encryptedKeyPair = Civi::settings()->get('oauth_civi_connect_keypair');
+    $keyPair = Civi::service('crypto.token')->decrypt($encryptedKeyPair, 'CRED');
+    return [
+      'key' => $keyPair,
+      'suite' => 'jwt-eddsa-keypair',
+      'tags' => ['CONNECT'],
+      'id' => $this->createId($keyPair),
+    ];
+  }
+
+  public function createAuthToken(array $claims = []): string {
+    return Civi::service('crypto.jwt')->encode(array_merge([
+      'exp' => \CRM_Utils_Time::strtotime('+1 hour'),
+      'scope' => 'CiviConnect',
+    ], $claims), 'CONNECT');
+  }
+
+  private function createId(string $keyPair): string {
+    return 'eddsa_' . base64_encode(sodium_crypto_sign_publickey($keyPair));
+  }
+
+  /**
+   * @param string $serviceUrl
+   *   Ex: 'https://connect.civicrm.org/
+   * @param string|null $redirectUri
+   *   Ex: 'https://savewahles.org/civicrm/oauth-client/return'
+   *
+   * @return void
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function register(string $serviceUrl, ?string $redirectUri = NULL): void {
+    $redirectUri ??= \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
+    $cacheKey = 'oauth_check_' . md5($serviceUrl . ' ' . $this->getId() . $redirectUri);
+    try {
+      (new Client())->post("$serviceUrl/account/redirect-url", [
+        'form_params' => [
+          'client_id' => $this->getId(),
+          'client_secret' => $this->createAuthToken(),
+          'redirect_uri' => $redirectUri,
+        ],
+      ]);
+    }
+    finally {
+      Civi::cache('long')->delete($cacheKey);
+    }
+  }
+
+  /**
+   * @param string $authorizeUrl
+   *   Ex: 'https://connect.civicrm.org/foobar/authorize
+   * @param string|null $redirectUri
+   *   Ex: 'https://savewahles.org/civicrm/oauth-client/return'
+   *
+   * @return void
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function isRegistered(string $authorizeUrl, ?string $redirectUri = NULL): bool {
+    $redirectUri ??= \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
+
+    $serviceUrl = \CRM_Utils_Url::toOrigin($authorizeUrl);
+    $cache = Civi::cache('long');
+    $cacheKey = 'oauth_check_' . md5($serviceUrl . ' ' . $this->getId() . $redirectUri);
+    $registered = $cache->get($cacheKey);
+    if ($registered !== NULL) {
+      return $registered;
+    }
+
+    $response = (new Client())->post("$serviceUrl/account/check-url", [
+      'http_errors' => FALSE,
+      'form_params' => [
+        'client_id' => $this->getId(),
+        'client_secret' => $this->createAuthToken(),
+        'redirect_uri' => $redirectUri,
+      ],
+    ]);
+    $registered = ($response->getStatusCode() === 200);
+    $cache->set($cacheKey, $registered, 5 * 60);
+    return $registered;
+  }
+
+}
