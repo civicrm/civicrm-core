@@ -134,6 +134,7 @@
               class='crm-event-manage-registration-form-block-custom_post_multiple'>
             <td class="label">{$form.custom_post_id_multiple.$profilePostNum.label}</td>
             <td class="html-adjust">{$form.custom_post_id_multiple.$profilePostNum.html}
+              <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
               <span class='profile_bottom_link_remove'>
                 <a href="#" class="crm-hover-button crm-button-rem-profile">
                   <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}
