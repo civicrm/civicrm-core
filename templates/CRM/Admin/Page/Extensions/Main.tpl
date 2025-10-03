@@ -4,45 +4,103 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 *}
 {if $localExtensionRows}
   <div id="extensions">
-    {strip}
-    {* handle enable/disable actions*}
-    <table id="extensions" class="display">
-      <thead>
-        <tr>
-          <th>{ts}Extension{/ts}</th>
-          <th>{ts}Status{/ts}</th>
-          <th>{ts}Version{/ts}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {foreach from=$localExtensionRows key=extKey item=row}
-        <tr id="extension-{$row.file|escape}" class="crm-entity crm-extension-{$row.file|escape}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.status eq 'installed'} extension-installed{/if}">
-          <td class="crm-extensions-label">
-            <details class="crm-accordion-light">
-              <summary>
-              <strong>{$row.label|escape}</strong><br/>{$row.description|escape}
-              {if $extAddNewEnabled && array_key_exists($extKey, $remoteExtensionRows) && $remoteExtensionRows[$extKey].upgradelink|smarty:nodefaults}
-                <div class="crm-extensions-upgrade">{$remoteExtensionRows[$extKey].upgradelink|smarty:nodefaults}</div>
-              {/if}
-              </summary>
-              {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row localExtensionRows=$localExtensionRows remoteExtensionRows=$remoteExtensionRows}
-            </details>
-          </td>
-          <td class="crm-extensions-status">{$row.statusLabel} </td>
-          <td class="crm-extensions-version right">{$row.version|escape}
-            {if !$row.is_stable}
-              {icon icon="fa-flask crm-extensions-stage"}{ts}This is a pre-release version. For more details, see the expanded description.{/ts}{/icon}
-            {else}
-              {icon icon="fa-check-circle crm-extensions-stage"}{ts}This is a stable release version.{/ts}{/icon}
-            {/if}
-          </td>
-          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
-        </tr>
-        {/foreach}
-      </tbody>
-    </table>
-    {/strip}
+    <div id="{$categoryType}-extensions">
+      <div class="ui-widget ui-widget-content ui-corner-all" style="margin-bottom: 20px;">
+        <h3 class="ui-widget-header ui-corner-top ui-helper-clearfix" style="margin: 0; padding: 8px 12px; font-size: 14px;">
+          {ts}Installed{/ts}
+          <span class="ui-state-default ui-corner-all crm-extension-count"
+                style="float: right; padding: 2px 8px; font-size: 11px; font-weight: normal;background: #666;color: white;border-radius: 10px;">
+                {$localExtensionStats.installed + $localExtensionStats.disabled}
+          </span>
+        </h3>
+        <div class="ui-widget-content" style="border-top: none;">
+          <div class="ui-widget">
+            <h4 class="ui-state-default ui-helper-clearfix"
+                style="margin: 0; padding: 6px 20px; font-size: 16px; font-weight: 600; background: #f6f6f6;">
+              {ts}Enabled{/ts}
+              <span class="ui-state-active ui-corner-all crm-extension-count" style="padding: 2px 8px; font-size: 11px; font-weight: normal; background: #666;color: white;border-radius: 10px;">{$localExtensionStats.installed}</span>
+            </h4>
+            {* handle enable/disable actions*}
+            {strip}
+              <table class="ui-widget ui-widget-content display" style="margin: 0; border: none;">
+                <thead>
+                <tr>
+                  <th>{ts}Extension{/ts}</th>
+                  <th>{ts}Author{/ts}</th>
+                  <th>{ts}Version{/ts}</th>
+                  <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach from=$localExtensionRows key=extKey item=row}
+                  {if $row.is_core eq $isCore and $row.status eq 'installed'}
+                    {include file="CRM/Admin/Page/Extensions/MainTableRow.tpl" row=$row extKey=$extKey localExtensionRows=$localExtensionRows remoteExtensionRows=$remoteExtensionRows}
+                  {/if}
+                {/foreach}
+                </tbody>
+              </table>
+            {/strip}
+          </div>
+        </div>
+        <div class="ui-widget-content" style="border-top: none;">
+          <div class="ui-widget">
+            <h4 class="ui-state-default ui-helper-clearfix"
+                style="margin: 0; padding: 6px 20px; font-size: 16px; font-weight: 600; background: #f6f6f6;">
+              {ts}Disabled{/ts}
+              <span class="ui-state-active ui-corner-all crm-extension-count" style="padding: 2px 8px; font-size: 11px; font-weight: normal; background: #666;color: white;border-radius: 10px;">{$localExtensionStats.disabled}</span>
+            </h4>
+            {* handle enable/disable actions*}
+            {strip}
+              <table class="ui-widget ui-widget-content display" style="margin: 0; border: none;">
+                <thead>
+                <tr>
+                  <th>{ts}Extension{/ts}</th>
+                  <th>{ts}Author{/ts}</th>
+                  <th>{ts}Version{/ts}</th>
+                  <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach from=$localExtensionRows key=extKey item=row}
+                  {if $row.is_core eq $isCore and $row.status eq 'disabled'}
+                    {include file="CRM/Admin/Page/Extensions/MainTableRow.tpl" row=$row extKey=$extKey localExtensionRows=$localExtensionRows remoteExtensionRows=$remoteExtensionRows}
+                  {/if}
+                {/foreach}
+                </tbody>
+              </table>
+            {/strip}
+          </div>
+        </div>
+      </div>
+      <div class="ui-widget ui-widget-content ui-corner-all" style="margin-bottom: 20px;">
+        <h3 class="ui-widget-header ui-corner-top ui-helper-clearfix" style="margin: 0; padding: 8px 12px; font-size: 14px;">
+          {ts}Uninstalled{/ts}
+          <span class="ui-state-default ui-corner-all crm-extension-count" style="padding: 2px 8px; font-size: 11px; font-weight: normal;background: #666;color: white;border-radius: 10px;">{$localExtensionStats.uninstalled}</span>
+        </h3>
+        <div class="ui-widget-content" style="border-top: none;">
+          {* handle enable/disable actions*}
+          {strip}
+            <table class="ui-widget ui-widget-content display" style="margin: 0; border: none;">
+              <thead>
+              <tr>
+                <th>{ts}Extension{/ts}</th>
+                <th>{ts}Author{/ts}</th>
+                <th>{ts}Version{/ts}</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              {foreach from=$localExtensionRows key=extKey item=row}
+                {if $row.is_core eq $isCore and $row.status eq 'uninstalled'}
+                  {include file="CRM/Admin/Page/Extensions/MainTableRow.tpl" row=$row extKey=$extKey localExtensionRows=$localExtensionRows remoteExtensionRows=$remoteExtensionRows}
+                {/if}
+              {/foreach}
+              </tbody>
+            </table>
+          {/strip}
+        </div>
+      </div>
+    </div>
   </div>
 {else}
   <div class="messages status no-popup">
