@@ -58,8 +58,12 @@
  *}
 <script type="text/template" id="field_summary_template">
   <span class="crm-designer-buttons">
-    <a class="crm-i fa-pencil crm-designer-action-settings" title="{ts escape='htmlattribute'}Settings{/ts}" aria-hidden="true"></a>
-    <a class="crm-i fa-trash crm-designer-action-remove" title="{ts escape='htmlattribute'}Remove{/ts}" aria-hidden="true"></a>
+    <a class="crm-designer-action-settings" title="{ts escape='htmlattribute'}Settings{/ts}" aria-label="{ts escape='htmlattribute'}Settings{/ts}">
+      <i class="crm-i fa-pencil" role="img" aria-hidden="true"></i>
+    </a>
+    <a class="crm-designer-action-remove" title="{ts escape='htmlattribute'}Remove{/ts}" aria-label="{ts escape='htmlattribute'}Remove{/ts}">
+      <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
+    </a>
   </span>
   <div class="description"><%= help_pre %></div>
   <div class="crm-designer-row-label">
