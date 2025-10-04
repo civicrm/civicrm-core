@@ -4,6 +4,7 @@
 
 .crm-container .primary .crm-label {
   font-weight: bold;
+  font-family: var(--crm-font-bold);
 }
 
 /* Contact name/header */
@@ -308,7 +309,7 @@ div.crm-inline-edit-form div.crm-clear {
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
   color: var(--crm-c-danger-text);
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
+  background: color-mix(in srgb, var(--crm-btn-cancel-bg) 87.5%, #000 12.5%);
 }
 
 /* Tags */
@@ -346,7 +347,7 @@ div.crm-inline-edit-form div.crm-clear {
 .crm-contact-page .crm-tag-item {
   border-radius: var(--crm-roundness);
   padding: 0 var(--crm-m);
-  background-color: var(--crm-c-background2);
+  background-color: var(--crm-c-layer2-bg);
 }
 #crm-main-content-wrapper:has(.crm-contact-page) {
   box-shadow: var(--crm-block-shadow);

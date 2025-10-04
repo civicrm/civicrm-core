@@ -74,7 +74,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 
 /* Card style */
 .af-container-style-pane {
-  background-color: var(--crm-form-block-background);
+  background-color: var(--crm-form-block-bg);
   border-radius: var(--crm-form-block-border-radius);
   box-shadow: var(--crm-form-block-box-shadow);
   position: relative;
@@ -82,7 +82,7 @@ details.af-container.af-layout-inline > *:not(summary) {
   padding-top: 50px !important;
 }
 #bootstrap-theme .af-container-style-pane > .af-title {
-  background-color: var(--crm-c-background5);
+  background-color: var(--crm-form-block-header);
   color: var(--crm-c-text-light);
   border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
   position: absolute;
