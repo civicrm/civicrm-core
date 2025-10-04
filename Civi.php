@@ -195,7 +195,7 @@ class Civi {
    * Ex: Rebuild the temp SQL data and the system-caches (and nothing else))
    *   Civi::rebuild(['tables' => TRUE, 'system' => TRUE])->execute();
    * Ex: Rebuild everything except the menu
-   *   Civi::rebuild(['*' => TRUE, 'menu' => FALSE])->execute();
+   *   Civi::rebuild(['*' => TRUE, 'router' => FALSE])->execute();
    *
    * @param string|array{ext:bool,files:bool,tables:bool,sessions:bool,metadata:bool,system:bool,userjob:bool,menu:bool,perms:bool,strings:bool,settings:bool,cases:bool,triggers:bool,entities:bool}|null $targets
    *   The special key '*' indicates that all flags should start as TRUE (but you may opt-out of specific ones).
@@ -207,8 +207,10 @@ class Civi {
    *     - metadata: Rebuild metadata about the available entities and fields
    *     - system: Reset any cache-services defined by the system.
    *     - userjob: Delete any expired UserJob records.
-   *     - menu: Rebuild the routing-table and nav-bars.
+   *     - menu: (DEPRECATED 6.9+) Equivalent to 'router' + 'navigation' + 'system'.
+   *     - navigation: (ADDED 6.9) Reset navigation indices for all users.
    *     - perms: Republish the list of available permissions. (Some CMS's need to be notified.)
+   *     - router: (ADDED 6.9) Rebuild list of available HTTP routes.
    *     - strings: Reset caches involving visible strings (WordReplacements, JS ts()).
    *     - settings: Rebuild the index of available settings and their values.
    *     - cases: Somethingsomething.
