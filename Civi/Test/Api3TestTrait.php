@@ -546,13 +546,19 @@ trait Api3TestTrait {
     // Build where clause for 'getcount', 'getsingle', 'getvalue', 'get' & 'replace'
     if ($v4Action == 'get' || $v3Action == 'replace') {
       foreach ($v3Params as $key => $val) {
-        $op = '=';
-        if (is_array($val) && count($val) == 1 && array_intersect_key($val, array_flip(\CRM_Core_DAO::acceptedSQLOperators()))) {
-          foreach ($val as $op => $newVal) {
-            $val = $newVal;
-          }
+        if ($key === 'orderBy') {
+          $v4Params[$key] = $val;
+          $indexBy = NULL;
         }
-        $v4Params['where'][] = [$key, $op, $val];
+        else {
+          $op = '=';
+          if (is_array($val) && count($val) == 1 && array_intersect_key($val, array_flip(\CRM_Core_DAO::acceptedSQLOperators()))) {
+            foreach ($val as $op => $newVal) {
+              $val = $newVal;
+            }
+          }
+          $v4Params['where'][] = [$key, $op, $val];
+        }
       }
     }
 

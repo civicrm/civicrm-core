@@ -219,7 +219,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(9, $contribution['total_amount']);
 
     $payment = Payment::get()
-      ->setContributionID($contribution['id'])
+      ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
     $this->assertEquals(567, $payment['pan_truncation']);
     $this->assertEquals(9, $payment['total_amount']);
