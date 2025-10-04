@@ -21,6 +21,8 @@ use League\OAuth2\Client\Token\AccessToken;
  */
 class CiviGenericProvider extends \League\OAuth2\Client\Provider\GenericProvider {
 
+  use ResponseModeTrait;
+
   /**
    * @var string
    */
