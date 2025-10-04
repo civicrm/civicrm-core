@@ -1892,7 +1892,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $feeAmount->freeze();
     }
 
-    $element = &$form->add('text', 'invoice_id', ts('Invoice ID'),
+    $element = &$form->add('text', 'invoice_id', ts('Invoice Reference'),
       $attributes['invoice_id']
     );
     if ($form->_online) {
@@ -1900,7 +1900,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     else {
       $form->addRule('invoice_id',
-        ts('This Invoice ID already exists in the database.'),
+        ts('This Invoice Reference already exists in the database.'),
         'objectExists',
         ['CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id']
       );
