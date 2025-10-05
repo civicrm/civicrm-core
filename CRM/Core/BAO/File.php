@@ -102,6 +102,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
 
     $config = CRM_Core_Config::singleton();
 
+    $data = str_replace(DIRECTORY_SEPARATOR, '/', $data);
     $path = explode('/', $data);
     $filename = $path[count($path) - 1];
 
