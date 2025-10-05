@@ -810,11 +810,17 @@ class CRM_Core_I18n {
     // temporary to avoid collision with word replacements
     $translationReplacement = 'tr-' . $replacementsLocale;
     if ((!isset(Civi::$statics[__CLASS__]) || !array_key_exists($translationReplacement, Civi::$statics[__CLASS__]))) {
+      Civi::$statics[__CLASS__][$translationReplacement] = [];
+
       if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
-        Civi::$statics[__CLASS__][$translationReplacement] = CRM_Core_BAO_TranslationSource::getTranslationSources($replacementsLocale);
-      }
-      else {
-        Civi::$statics[__CLASS__][$translationReplacement] = [];
+        try {
+          Civi::$statics[__CLASS__][$translationReplacement] = CRM_Core_BAO_TranslationSource::getTranslationSources($replacementsLocale);
+        }
+        catch (\CRM_Core_Exception $e) {
+          // dont crash everything if we can't get translation source
+          // for example - if this is called before the upgrade step that add `civicrm_translation_source`
+          // TODO: define this exception more narrowly?
+        }
       }
     }
     return Civi::$statics[__CLASS__][$translationReplacement];
