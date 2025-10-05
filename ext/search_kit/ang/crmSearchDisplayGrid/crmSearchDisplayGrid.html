@@ -9,5 +9,10 @@
     class="crm-search-display-grid-container crm-search-display-grid-layout-{{$ctrl.settings.colno}}"
     ng-include="'~/crmSearchDisplayGrid/crmSearchDisplayGrid' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'"
   ></div>
+  <div ng-if="$ctrl.rowCount === 0" class="crm-search-display-grid-no-results">
+    <p class="alert alert-info text-center">
+      {{ $ctrl.settings.noResultsText || ts('None found.') }}
+    </p>
+  </div>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>
