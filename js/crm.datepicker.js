@@ -74,6 +74,7 @@
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
           settings.onSelect = function (dateText, inst) {
+            updateDataField();
             if (settings.time !== false) {
               $timeField.focus();
             } else {
