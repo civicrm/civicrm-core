@@ -41,7 +41,7 @@
     showLegend: (displayCtrl) => (displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
 
     // the legend gets the series "name", which is the delisted value of the series column
-    legendTextAccessor: (displayCtrl) => ((d) => displayCtrl.renderDataValue(d.name, displayCtrl.getFirstColumnForAxis('w'))),
+    legendTextAccessor: (displayCtrl) => ((d) => displayCtrl.getFirstColumnForAxis('w').renderValue(d.name)),
 
     // fallback to a line chart if we dont have a grouping column yet
     getChartConstructor: (displayCtrl) => displayCtrl.getColumnsForAxis('w') ? dc.seriesChart : dc.lineChart,
@@ -51,9 +51,11 @@
       displayCtrl.chart
         .dimension(displayCtrl.dimension)
         .group(displayCtrl.group)
-        .valueAccessor(displayCtrl.getValueAccessor(displayCtrl.getFirstColumnForAxis('y')))
-        .keyAccessor((d) => d.key[0])
-        .seriesAccessor((d) => d.key[1]);
+        .valueAccessor((d) => displayCtrl.getFirstColumnForAxis('y').valueAccessor(d))
+        // note: the datapoint keys are an array [w_value, x_value]
+        // see buildDimension on crmSearchDisplayChartKit
+        .keyAccessor((d) => d.key[1])
+        .seriesAccessor((d) => d.key[0]);
 
       displayCtrl.buildCoordinateGrid();
     }
