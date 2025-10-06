@@ -85,6 +85,13 @@ class Rebuilder {
       $targets = array_merge($all, $targets);
       unset($targets['*']);
     }
+    // if resetting system it is highly advisable to reset
+    // the cms cache to remove hanging references to old CiviCRM
+    // paths (particular if asset codes change)
+    // TODO: move asset paths out of `system` target?
+    if (!empty($targets['system']) && !isset($targets['cms'])) {
+      $targets['cms'] = TRUE;
+    }
 
     if (isset($targets['menu'])) {
       \CRM_Core_Error::deprecatedWarning("In Civi::rebuild(), the 'menu' option is deprecated. For CiviCRM 6.9+, please specify combination of 'router', 'navigation', and/or 'system'.");
