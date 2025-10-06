@@ -1452,15 +1452,18 @@ class CRM_Utils_System {
       $params['page'] = self::formatDocUrl($params['page']);
     }
 
-    if (!isset($params['title']) or $params['title'] === NULL) {
+    if (!isset($params['title'])) {
       $params['title'] = ts('Opens documentation in a new window.');
     }
+    else {
+      $params['title'] = $params['title'] ?: '';
+    }
 
-    if (!isset($params['text']) or $params['text'] === NULL) {
+    if (!isset($params['text'])) {
       $params['text'] = ts('(Learn more...)');
     }
 
-    if (!isset($params['style']) || $params['style'] === NULL) {
+    if (!isset($params['style'])) {
       $style = '';
     }
     else {
@@ -1469,10 +1472,12 @@ class CRM_Utils_System {
 
     $link = $docBaseURL . str_replace(' ', '+', $params['page']);
 
-    if (isset($params['URLonly']) && $params['URLonly'] == TRUE) {
+    if (!empty($params['URLonly'])) {
       return $link;
     }
     else {
+      $params['text'] = htmlspecialchars($params['text']);
+      $params['title'] = htmlspecialchars($params['title']);
       return "<a href=\"{$link}\" $style target=\"_blank\" class=\"crm-doc-link no-popup\" title=\"{$params['title']}\">{$params['text']}</a>";
     }
   }
