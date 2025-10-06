@@ -334,7 +334,7 @@ class CustomValueTest extends Api4TestBase {
         ['name' => 'string', 'html_type' => 'Text', 'data_type' => 'String'],
         ['name' => 'select', 'html_type' => 'Select', 'data_type' => 'String', 'serialize' => 1, 'option_values' => ['a' => 'A', 'b' => 'B']],
         ['name' => 'int', 'html_type' => 'Text', 'data_type' => 'Int'],
-        ['name' => 'float', 'html_type' => 'Text', 'data_type' => 'Float'],
+        ['name' => 'float', 'html_type' => 'Text', 'data_type' => 'Float', 'default_value' => '11.11'],
         ['name' => 'money', 'html_type' => 'Text', 'data_type' => 'Money'],
         ['name' => 'memo', 'html_type' => 'Text', 'data_type' => 'Memo'],
         ['name' => 'date', 'html_type' => 'Date', 'data_type' => 'Date'],
