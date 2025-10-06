@@ -35,24 +35,30 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
   private Result $existingEmails;
 
   /**
+   *
+   * @param bool $nonContact
+   *    If TRUE, this will NOT return emails belonging to the form-associated ContactID.
+   *    This is used by the Event form which should not silently default to the email
+   *    address(es) of the contact who created the Event.
+   *    See https://lab.civicrm.org/dev/core/-/issues/6127
    * @return \Civi\Api4\Generic\Result
    * @throws CRM_Core_Exception
    */
-  public function getExistingEmails() : Result {
+  public function getExistingEmails($nonContact = FALSE) : Result {
     if (!isset($this->existingEmails)) {
-      if ($this->getContactID()) {
-        $this->existingEmails = Email::get()
-          ->addSelect('*', 'custom.*')
-          ->addOrderBy('is_primary', 'DESC')
-          ->addWhere('contact_id', '=', $this->getContactID())
-          ->execute();
-      }
       if ($this->getLocationBlockID()) {
         // In this scenario we are looking up the emails for an event or domain & so we do not apply permissions
         $this->existingEmails = Email::get(FALSE)
           ->addSelect('*', 'custom.*')
           ->addOrderBy('is_primary', 'DESC')
           ->addWhere('id', 'IN', [$this->getLocationBlockValue('email_id'), $this->getLocationBlockValue('email_2_id')])
+          ->execute();
+      }
+      elseif (!$nonContact && $this->getContactID()) {
+        $this->existingEmails = Email::get()
+          ->addSelect('*', 'custom.*')
+          ->addOrderBy('is_primary', 'DESC')
+          ->addWhere('contact_id', '=', $this->getContactID())
           ->execute();
       }
     }
