@@ -11,7 +11,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit' && !empty($cd_edit.editable)}title="{ts escape='htmlattribute'}Edit{/ts}"{/if}>
     {if $permission EQ 'edit' && !empty($cd_edit.editable)}
       <div class="crm-edit-help">
-        <span class="crm-i fa-pencil" aria-hidden="true"></span> {ts}Edit{/ts}
+        <span class="crm-i fa-pencil" role="img" aria-hidden="true"></span> {ts}Edit{/ts}
       </div>
     {/if}
 
