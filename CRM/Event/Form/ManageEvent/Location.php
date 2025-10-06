@@ -77,7 +77,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       ];
       // Get all the existing email addresses, The array historically starts
       // with 1 not 0 so we do something nasty to continue that.
-      $this->_values['email'] = array_merge([0 => 1], (array) $this->getExistingEmails());
+      $this->_values['email'] = array_merge([0 => 1], (array) $this->getExistingEmails(TRUE));
       unset($this->existingEmails[0]);
 
       //get event values.
