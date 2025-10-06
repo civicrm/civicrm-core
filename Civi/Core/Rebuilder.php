@@ -79,6 +79,7 @@ class Rebuilder {
       'cases' => TRUE,
       'triggers' => TRUE,
       'entities' => TRUE,
+      'cms' => TRUE,
     ];
     if (!empty($targets['*'])) {
       $targets = array_merge($all, $targets);
@@ -200,6 +201,9 @@ class Rebuilder {
     }
     if (!empty($targets['entities'])) {
       CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    }
+    if (!empty($targets['cms'])) {
+      \CRM_Utils_System::flush();
     }
   }
 
