@@ -1707,9 +1707,7 @@ WHERE  id = $cfID
           $address .= ($address ? ' :: ' : '') . $event[$field];
         }
       }
-      if ($address) {
-        $events[$event['loc_block_id']] = $address;
-      }
+      $events[$event['loc_block_id']] = $address ?: ts("(Location %1)", [1 => $event['loc_block_id']]);
     }
 
     return CRM_Utils_Array::asort($events);
