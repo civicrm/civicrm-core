@@ -414,7 +414,14 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @return bool
    */
   public static function isUpgradeMode($path = NULL) {
-    if (defined('CIVICRM_UPGRADE_ACTIVE')) {
+    if (!defined('CIVICRM_UPGRADE_ACTIVE') && !empty(Civi::$statics[CRM_Core_DAO::class]['init'])) {
+      $dbVersion = \CRM_Core_DAO::singleValueQuery('SELECT version FROM civicrm_domain WHERE id = %1', [
+        1 => [\CRM_Core_Config::domainID(), 'Positive'],
+      ]);
+      define('CIVICRM_UPGRADE_ACTIVE', version_compare($dbVersion, \CRM_Utils_System::version(), '<'));
+    }
+
+    if (defined('CIVICRM_UPGRADE_ACTIVE') && CIVICRM_UPGRADE_ACTIVE) {
       return TRUE;
     }
 
