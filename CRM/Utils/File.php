@@ -1067,21 +1067,33 @@ HTACCESS;
 
     $targetData = imagecreatetruecolor($targetWidth, $targetHeight);
 
-    // resize
-    imagecopyresized($targetData, $sourceData,
-      0, 0, 0, 0,
-      $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+    if ($sourceMime == 'image/png') {
+      // Keep PNG transparency
+      imagealphablending($targetData, FALSE);
+      imagesavealpha($targetData, TRUE);
+      $transparentColor = imagecolorallocatealpha($targetData, 0, 0, 0, 127);
+      imagefilledrectangle($targetData, 0, 0, $targetWidth, $targetHeight, $transparentColor);
+      imagecopyresampled($targetData, $sourceData,
+        0, 0, 0, 0,
+        $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+      imagepng($targetData, $targetFile);
+    }
+    else {
+      imagecopyresized($targetData, $sourceData,
+        0, 0, 0, 0,
+        $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+      $fp = fopen($targetFile, 'w+');
+      ob_start();
+      imagejpeg($targetData);
+      $image_buffer = ob_get_contents();
+      ob_end_clean();
+      fwrite($fp, $image_buffer);
+      rewind($fp);
+      fclose($fp);
+    }
 
-    // save the resized image
-    $fp = fopen($targetFile, 'w+');
-    ob_start();
-    imagejpeg($targetData);
-    $image_buffer = ob_get_contents();
-    ob_end_clean();
+    imagedestroy($sourceData);
     imagedestroy($targetData);
-    fwrite($fp, $image_buffer);
-    rewind($fp);
-    fclose($fp);
 
     // return the URL to link to
     $config = CRM_Core_Config::singleton();
