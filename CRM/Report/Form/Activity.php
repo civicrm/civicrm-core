@@ -1010,7 +1010,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       if (array_key_exists('civicrm_contact_contact_assignee', $row)) {
         $assigneeNames = explode(';', $row['civicrm_contact_contact_assignee']);
         if ($value = $row['civicrm_contact_contact_assignee_id']) {
-          $assigneeContactIds = explode(';', $value);
+          $assigneeContactIds = explode(';', (string) $value);
           $link = [];
           if ($viewLinks) {
             foreach ($assigneeContactIds as $id => $value) {
