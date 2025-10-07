@@ -883,6 +883,7 @@ return [
     'title' => ts('Logging'),
     'description' => ts('If enabled, all actions will be logged with a complete record of changes.'),
     'validate_callback' => 'CRM_Logging_Schema::checkLoggingSupport',
+    'metadata_callback' => ['CRM_Core_BAO_Setting', 'loggingMetadataCallback'],
     'on_change' => [
       'CRM_Logging_Schema::onToggle',
     ],
