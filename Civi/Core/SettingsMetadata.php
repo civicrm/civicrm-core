@@ -69,6 +69,14 @@ class SettingsMetadata {
     self::_filterSettingsSpecification($filters, $settingsMetadata);
     if ($loadOptions) {
       self::fillOptions($settingsMetadata, $loadOptions);
+      // Maybe this should have its own conditional instead of $loadOptions, but the two
+      // are conceptually and functionally related; if you're loading settings for a form,
+      // you need both. If not, you probably need neither.
+      self::resolveCallbacks($settingsMetadata);
+    }
+    // Treat this as internal and don't return it
+    foreach ($settingsMetadata as &$setting) {
+      unset($setting['metadata_callback']);
     }
 
     return $settingsMetadata;
@@ -230,6 +238,14 @@ class SettingsMetadata {
       }
       else {
         $spec['options'] = $options;
+      }
+    }
+  }
+
+  private static function resolveCallbacks(array &$settingsMetadata): void {
+    foreach ($settingsMetadata as &$setting) {
+      if (isset($setting['metadata_callback'])) {
+        \Civi\Core\Resolver::singleton()->call($setting['metadata_callback'], [&$setting]);
       }
     }
   }

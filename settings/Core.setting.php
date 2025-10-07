@@ -884,6 +884,7 @@ return [
     'title' => ts('Logging'),
     'description' => ts('If enabled, all actions will be logged with a complete record of changes.'),
     'validate_callback' => 'CRM_Logging_Schema::checkLoggingSupport',
+    'metadata_callback' => ['Civi\SettingPage\Misc', 'loggingMetadataCallback'],
     'on_change' => [
       'CRM_Logging_Schema::onToggle',
     ],

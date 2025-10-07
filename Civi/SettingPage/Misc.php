@@ -54,4 +54,16 @@ class Misc extends AutoSubscriber {
     $event->settingsPages['misc'] = $page;
   }
 
+  public static function loggingMetadataCallback(array &$setting) {
+    // Disable field on setting form if system does not meet requirements
+    if (\CRM_Core_I18n::isMultilingual()) {
+      $setting['description'] = ts('Logging is not supported in multilingual environments.');
+      $setting['html_attributes']['disabled'] = 'disabled';
+    }
+    elseif (!\CRM_Core_DAO::checkTriggerViewPermission(FALSE)) {
+      $setting['description'] = ts("In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.");
+      $setting['html_attributes']['disabled'] = 'disabled';
+    }
+  }
+
 }
