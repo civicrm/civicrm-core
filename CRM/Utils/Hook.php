@@ -2298,6 +2298,22 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called to gather setting page definitions.
+   *
+   * @param array $settingsPages
+   *   Setting page definitions to which to add
+   *
+   * @return mixed
+   */
+  public static function alterSettingsPages(array &$settingsPages) {
+    $null = NULL;
+    return self::singleton()->invoke(['settingsPages'], $settingsPages,
+      $null, $null, $null, $null, $null,
+      'civicrm_alterSettingsPages'
+    );
+  }
+
+  /**
    * This hook is called before running an api call.
    *
    * @param API_Wrapper[] $wrappers

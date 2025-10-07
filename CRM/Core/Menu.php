@@ -75,10 +75,28 @@ class CRM_Core_Menu {
         self::read($file, self::$_items);
       }
 
+      self::getSettingPages(self::$_items);
+
       CRM_Utils_Hook::alterMenu(self::$_items);
     }
 
     return self::$_items;
+  }
+
+  private static function getSettingPages(&$menu) {
+    $settingPages = [];
+    CRM_Utils_Hook::alterSettingsPages($settingPages);
+    foreach ($settingPages as $name => $settingPage) {
+      $path = $settingPage['path'] ??= 'civicrm/admin/setting/' . $name;
+      $menu[$path] = [
+        'title' => $settingPage['title'],
+        'page_callback' => $settingPage['page_callback'] ?? 'CRM_Admin_Form_SettingPage',
+        'is_public' => FALSE,
+      ];
+      if (!empty($settingPage['adminGroup'])) {
+        $menu[$path]['adminGroup'] = $settingPage['adminGroup'];
+      }
+    }
   }
 
   /**
