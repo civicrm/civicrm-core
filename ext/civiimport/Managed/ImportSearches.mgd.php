@@ -18,7 +18,6 @@ foreach ($importEntities as $importEntity) {
     'target' => '_blank',
     'join' => '_entity_id',
   ];
-  $createdBy = empty($importEntity['created_by']) ? '' : ' (' . E::ts('Created by %1', [$importEntity['created_by'], 'String']) . ')';
   $managedEntities[] = [
     'name' => 'SavedSearch_Import' . $importEntity['user_job_id'],
     'entity' => 'SavedSearch',
@@ -72,7 +71,7 @@ foreach ($importEntities as $importEntity) {
       'version' => 4,
       'values' => [
         'name' => 'Import' . '_' . $importEntity['user_job_id'],
-        'label' => E::ts('Import') . ' ' . $importEntity['user_job_id'] . $createdBy,
+        'label' => $importEntity['title'] . ' ' . $importEntity['description'],
         'saved_search_id.name' => 'Import' . '_' . $importEntity['user_job_id'],
         'type' => 'table',
         'settings' => [
