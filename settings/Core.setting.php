@@ -182,7 +182,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If enabled, CiviCRM will permit submissions from external sites to profiles. This is disabled by default to limit abuse.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 200]],
+    'settings_pages' => ['misc' => ['weight' => 200, 'section' => 'security']],
   ],
   'allow_alert_autodismissal' => [
     'group_name' => 'CiviCRM Preferences',
@@ -263,7 +263,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If enabled, some operations will be transferred to background workers. This requires configuring a background service.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 30]],
+    'settings_pages' => ['misc' => ['weight' => 30, 'section' => 'performance']],
   ],
   'defaultExternUrl' => [
     'group_name' => 'CiviCRM Preferences',
@@ -417,10 +417,10 @@ return [
     'legacy_key' => 'maxAttachments',
     'type' => 'Integer',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'html_type' => 'number',
     'html_attributes' => [
-      'size' => 2,
-      'maxlength' => 8,
+      'class' => 'four',
+      'min' => 1,
     ],
     'default' => 3,
     'add' => '4.3',
@@ -429,7 +429,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Maximum number of files (documents, images, etc.) which can be attached to emails or activities. This setting applies to UI forms and limits the number of fields available on the form.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 100]],
+    'settings_pages' => ['misc' => ['weight' => 100, 'section' => 'files']],
   ],
   'max_attachments_backend' => [
     'group_name' => 'CiviCRM Preferences',
@@ -438,10 +438,10 @@ return [
     'legacy_key' => 'maxAttachmentsBackend',
     'type' => 'Integer',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'html_type' => 'number',
     'html_attributes' => [
-      'size' => 2,
-      'maxlength' => 8,
+      'class' => 'four',
+      'min' => 1,
     ],
     'default' => CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND,
     'add' => '5.20',
@@ -450,7 +450,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Maximum number of files (documents, images, etc.) which can be processed during backend processing such as automated inbound email processing. This should be a big number higher than the other Maximum Attachments setting above. This setting here merely provides an upper limit to prevent attacks that might overload the server.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 110]],
+    'settings_pages' => ['misc' => ['weight' => 110, 'section' => 'files']],
   ],
   'maxFileSize' => [
     'group_name' => 'CiviCRM Preferences',
@@ -458,10 +458,10 @@ return [
     'name' => 'maxFileSize',
     'type' => 'Integer',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'html_type' => 'number',
     'html_attributes' => [
-      'size' => 2,
-      'maxlength' => 8,
+      'class' => 'four',
+      'min' => 1,
     ],
     // Set default to match php.ini 'upload_max_filesize'
     'default' => ini_get('upload_max_filesize') ? intval(ini_parse_quantity(ini_get('upload_max_filesize')) / (1024 * 1024)) : 3,
@@ -472,7 +472,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Maximum Size of file (documents, images, etc.) which can be attached to emails or activities.<br />Note: php.ini should support this file size.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 120]],
+    'settings_pages' => ['misc' => ['weight' => 120, 'section' => 'files']],
   ],
   'contact_undelete' => [
     'group_name' => 'CiviCRM Preferences',
@@ -488,7 +488,7 @@ return [
     'description' => ts('If enabled, deleted contacts will be moved to trash (instead of being destroyed). Users with the proper permission are able to search for the deleted contacts and restore them (or delete permanently).'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Core_BAO_Setting::validateBoolSetting',
-    'settings_pages' => ['misc' => ['weight' => 20]],
+    'settings_pages' => ['misc' => ['weight' => 20, 'section' => 'history']],
   ],
   'allowPermDeleteFinancial' => [
     'group_name' => 'CiviCRM Preferences',
@@ -531,7 +531,7 @@ return [
     'is_contact' => 0,
     'description' => ts("If enabled, CiviCRM sends PDF receipt as an attachment during event signup or online contribution."),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 40]],
+    'settings_pages' => ['misc' => ['weight' => 40, 'section' => 'pdf']],
   ],
   'recordGeneratedLetters' => [
     'group_name' => 'CiviCRM Preferences',
@@ -553,7 +553,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::getPDFLoggingOptions',
     ],
-    'settings_pages' => ['misc' => ['weight' => 50]],
+    'settings_pages' => ['misc' => ['weight' => 50, 'section' => 'pdf']],
   ],
   'dompdf_font_dir' => [
     'is_domain' => 1,
@@ -573,7 +573,7 @@ return [
     'default' => NULL,
     'help_text' => NULL,
     'add' => '5.43',
-    'settings_pages' => ['misc' => ['weight' => 60]],
+    'settings_pages' => ['misc' => ['weight' => 60, 'section' => 'pdf']],
   ],
   'dompdf_chroot' => [
     'is_domain' => 1,
@@ -593,7 +593,7 @@ return [
     'default' => NULL,
     'help_text' => NULL,
     'add' => '5.43',
-    'settings_pages' => ['misc' => ['weight' => 70]],
+    'settings_pages' => ['misc' => ['weight' => 70, 'section' => 'pdf']],
   ],
   'dompdf_enable_remote' => [
     'is_domain' => 1,
@@ -609,7 +609,7 @@ return [
     'default' => TRUE,
     'help_text' => NULL,
     'add' => '5.43',
-    'settings_pages' => ['misc' => ['weight' => 80]],
+    'settings_pages' => ['misc' => ['weight' => 80, 'section' => 'pdf']],
   ],
   'dompdf_log_output_file' => [
     'is_domain' => 1,
@@ -648,7 +648,7 @@ return [
     'is_contact' => 0,
     'description' => ts('<a href="%1">weasyprint is an alternative utility for generating PDFs</a> which is a successor to the discontinued wkhtmltopdf. Your system administrator will need to download and install this utility, and enter the executable path here.', [1 => 'https://weasyprint.org/']),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 90]],
+    'settings_pages' => ['misc' => ['weight' => 90, 'section' => 'pdf']],
   ],
   'wkhtmltopdfPath' => [
     'group_name' => 'CiviCRM Preferences',
@@ -668,7 +668,7 @@ return [
     'is_contact' => 0,
     'description' => ts('<a href="%1">wkhtmltopdf is a now-discontinued utility for generating PDFs</a>. See weasyprint for an updated alternative.', [1 => 'https://wkhtmltopdf.org/']),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 95]],
+    'settings_pages' => ['misc' => ['weight' => 95, 'section' => 'pdf']],
   ],
   'checksum_timeout' => [
     'group_name' => 'CiviCRM Preferences',
@@ -677,10 +677,11 @@ return [
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_attributes' => [
-      'size' => 2,
-      'maxlength' => 8,
+      'class' => 'four',
+      'min' => 1,
+      'step' => 1,
     ],
-    'html_type' => 'text',
+    'html_type' => 'number',
     'default' => 7,
     'add' => '4.3',
     'title' => ts('Checksum Lifespan'),
@@ -688,7 +689,7 @@ return [
     'is_contact' => 0,
     'description' => ts('The number of days before a personalized (hashed) link will expire.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 10]],
+    'settings_pages' => ['misc' => ['weight' => 10, 'section' => 'security']],
   ],
   'blogUrl' => [
     'group_name' => 'CiviCRM Preferences',
@@ -821,7 +822,7 @@ return [
     'is_contact' => 0,
     'description' => ts("If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts"),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 130]],
+    'settings_pages' => ['misc' => ['weight' => 130, 'section' => 'security']],
   ],
   'disable_core_css' => [
     'group_name' => 'CiviCRM Preferences',
@@ -886,7 +887,7 @@ return [
     'on_change' => [
       'CRM_Logging_Schema::onToggle',
     ],
-    'settings_pages' => ['misc' => ['weight' => 20]],
+    'settings_pages' => ['misc' => ['weight' => 0, 'section' => 'history']],
   ],
   'logging_uniqueid_date' => [
     'add' => '4.7',
@@ -959,10 +960,10 @@ return [
     'name' => 'secure_cache_timeout_minutes',
     'type' => 'Integer',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'html_type' => 'number',
     'html_attributes' => [
-      'size' => 2,
-      'maxlength' => 8,
+      'class' => 'four',
+      'min' => 1,
     ],
     'default' => 120,
     'add' => '4.7',
@@ -993,10 +994,10 @@ return [
     'name' => 'recentItemsMaxCount',
     'type' => 'Integer',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'html_type' => 'number',
     'html_attributes' => [
-      'size' => 2,
-      'maxlength' => 3,
+      'class' => 'four',
+      'min' => 1,
     ],
     'default' => 20,
     'add' => '4.7',
@@ -1005,7 +1006,7 @@ return [
     'is_contact' => 0,
     'description' => ts('How many items should CiviCRM store in it\'s "Recently viewed" list.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 140]],
+    'settings_pages' => ['misc' => ['weight' => 140, 'section' => 'history']],
   ],
   'recentItemsProviders' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1029,7 +1030,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Utils_Recent::getProviders',
     ],
-    'settings_pages' => ['misc' => ['weight' => 150]],
+    'settings_pages' => ['misc' => ['weight' => 150, 'section' => 'history']],
   ],
   'import_batch_size' => [
     'name' => 'import_batch_size',
@@ -1047,7 +1048,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Number of records to process at once during import.'),
     'help_text' => ts('If your imports time out, reduce this number. You can increase it for better import performance on servers with longer timeouts.'),
-    'settings_pages' => ['misc' => ['weight' => 180]],
+    'settings_pages' => ['misc' => ['weight' => 180, 'section' => 'performance']],
   ],
   'disable_sql_memory_engine' => [
     'name' => 'disable_sql_memory_engine',
@@ -1061,7 +1062,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Some hosting providers do not support this engine.'),
     'help_text' => NULL,
-    'settings_pages' => ['misc' => ['weight' => 190]],
+    'settings_pages' => ['misc' => ['weight' => 190, 'section' => 'performance']],
   ],
   'dedupe_default_limit' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1077,7 +1078,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Default to only loading matches against this number of contacts'),
     'help_text' => ts('Deduping larger databases can crash the server. By configuring a limit other than 0 here the dedupe query will only search for matches against a limited number of contacts.'),
-    'settings_pages' => ['misc' => ['weight' => 160]],
+    'settings_pages' => ['misc' => ['weight' => 160, 'section' => 'performance']],
   ],
   'syncCMSEmail' => [
     'group_name' => 'CiviCRM Preferences',
