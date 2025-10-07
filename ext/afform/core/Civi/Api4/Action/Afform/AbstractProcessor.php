@@ -67,7 +67,22 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected $_entityIds = [];
 
+  /**
+   * Values of each entity that is submitted on the form.
+   * Eg. $entityValues['Contribution1'][0]['fields']['field1' => 1, 'field2' => 2]
+   *
+   * @var array
+   */
   protected $_entityValues = [];
+
+  /**
+   * Get the (submitted) values from all the entities on the form
+   *
+   * @return array
+   */
+  public function getEntityValues() {
+    return $this->_entityValues;
+  }
 
   protected array $_response = [];
 
