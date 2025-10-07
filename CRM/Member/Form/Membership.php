@@ -1058,11 +1058,11 @@ DESC limit 1");
       $params['contribution_source'] = $this->getContributionSource();
 
       $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-      if (empty($params['is_override']) &&
-        ($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId
-      ) {
-        $params['status_id'] = $pendingMembershipStatusId;
-        $params['skipStatusCal'] = TRUE;
+      if (($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId) {
+        if (empty($params['is_override'])) {
+          $params['status_id'] = $pendingMembershipStatusId;
+          $params['skipStatusCal'] = TRUE;
+        }
         $params['is_pay_later'] = 1;
         $this->assign('is_pay_later', 1);
       }
