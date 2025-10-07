@@ -172,7 +172,7 @@ return [
     // Originally not exposed in UI as breakage possible. But by accident or design was added to misc .
     // As with the SmartGroupCache time out a different page
     // might make more sense.
-    'settings_pages' => ['misc' => ['weight' => 170]],
+    'settings_pages' => ['misc' => ['weight' => 170, 'section' => 'performance']],
   ],
   'searchPrimaryDetailsOnly' => [
     'group_name' => 'Search Preferences',
