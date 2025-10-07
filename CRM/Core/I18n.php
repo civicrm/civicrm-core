@@ -810,7 +810,7 @@ class CRM_Core_I18n {
     // temporary to avoid collision with word replacements
     $translationReplacement = 'tr-' . $replacementsLocale;
     if ((!isset(Civi::$statics[__CLASS__]) || !array_key_exists($translationReplacement, Civi::$statics[__CLASS__]))) {
-      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
+      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode() && CRM_Core_BAO_Domain::isDBVersionAtLeast('6.7.beta')) {
         Civi::$statics[__CLASS__][$translationReplacement] = CRM_Core_BAO_TranslationSource::getTranslationSources($replacementsLocale);
       }
       else {
