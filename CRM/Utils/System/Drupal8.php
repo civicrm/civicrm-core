@@ -212,8 +212,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
    * @inheritDoc
+   * @deprecated
    */
   public function addHTMLHead($header) {
+    \CRM_Core_Error::deprecatedFunctionWarning('Civi::resources()->addStyleFile() or addScriptFile() etc');
     \Drupal::service('civicrm.page_state')->addHtmlHeader($header);
   }
 
