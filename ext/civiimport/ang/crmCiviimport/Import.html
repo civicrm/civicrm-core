@@ -76,6 +76,12 @@
         <input class="huge" crm-ui-select='{data: dateFormats}' ng-model="userJob.metadata.import_options.date_format" >
       </label>
     </div>
+    <div>
+      <label>
+        {{:: ts('Import name') }}
+        <input class="huge" ng-model="userJob.label" >
+      </label>
+    </div>
   </div>
   <hr>
   <div id="import-actions">
