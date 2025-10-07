@@ -11,6 +11,7 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -48,9 +49,15 @@ class SearchDisplayTasksSubscriber extends \Civi\Core\Service\AutoService implem
     $entityName = $event->search['api_entity'] ?? NULL;
     // Hack to support relationships
     $entityName = ($entityName === 'RelationshipCache') ? 'Relationship' : $entityName;
-    if ($entityName && is_array($enabledActions)) {
-      $event->tasks[$entityName] = array_intersect_key($event->tasks[$entityName], array_flip($enabledActions));
+    if (is_array($enabledActions)) {
+      if ($entityName) {
+        $event->tasks[$entityName] = array_intersect_key($event->tasks[$entityName], array_flip($enabledActions));
+      }
+      if (CoreUtil::isContact($entityName)) {
+        $event->tasks['Contact'] = array_intersect_key($event->tasks['Contact'], array_flip($enabledActions));
+      }
     }
+
   }
 
 }
