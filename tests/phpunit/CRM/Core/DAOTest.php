@@ -559,6 +559,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testSupportedFields(): void {
     // Hack a different db version which will trigger getSupportedFields to filter out newer fields
     CRM_Core_BAO_Domain::getDomain()->version = '5.26.0';
+    Civi::$statics['CRM_Core_BAO_Domain']['version'] = '5.26.0';
 
     $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
     // 'icon' was added in 5.28
@@ -585,6 +586,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testTableHasBeenAdded(): void {
     // Hack a different db version
     CRM_Core_BAO_Domain::getDomain()->version = '5.28.0';
+    Civi::$statics['CRM_Core_BAO_Domain']['version'] = '5.28.0';
 
     // Table was added in 5.29
     $this->assertFalse(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
