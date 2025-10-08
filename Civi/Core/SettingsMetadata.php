@@ -105,6 +105,11 @@ class SettingsMetadata {
       \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
       $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
       \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
+      foreach ($settingsMetadata as &$setting) {
+        if (isset($setting['help_text']) && is_string($setting['help_text'])) {
+          $setting['help_text'] = (array) ($setting['help_text'] ?: []);
+        }
+      }
       $cache->set($cacheString, $settingsMetadata);
     }
 
