@@ -12,10 +12,11 @@ return [
     'add' => '6.7.alpha1',
   ],
   'getIndices' => fn() => [
-    'index_source_key' => [
+    'UI_source_key' => [
       'fields' => [
         'source_key' => TRUE,
       ],
+      'unique' => TRUE,
       'add' => '6.7.alpha1',
     ],
   ],
