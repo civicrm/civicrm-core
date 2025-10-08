@@ -19,14 +19,16 @@
  * This class generates form components for Search Parameters
  *
  */
-class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
+class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_SettingPage {
+
+  public function getTemplateFileName() {
+    return 'CRM/Admin/Form/SettingPage.tpl';
+  }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->setTitle(ts('Settings - Search Preferences'));
-
     parent::buildQuickForm();
 
     // Option 1 can't be unchecked. @see self::enableOptionOne
