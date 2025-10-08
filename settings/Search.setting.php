@@ -17,8 +17,6 @@
 /*
  * Settings metadata file
  */
-$optimizationSeeAlso = '<br/>' . ts('See also: <a href="%1">Search Optimization</a>', [1 => 'https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/" target="_blank"']);
-$searchConfigSeeAlso = '<br/>' . ts('See also: <a %1>Search Configuration Options</a>', [1 => 'https://docs.civicrm.org/en/user/latest/initial-set-up/customizing-the-user-interface/#customizing-search-preferences" target="_blank"']);
 return [
   'search_autocomplete_count' => [
     'group_name' => 'Search Preferences',
@@ -118,14 +116,20 @@ return [
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'number',
+    'html_attributes' => [
+      'class' => 'six',
+      'min' => 0,
+    ],
     'default' => 5,
     'add' => '4.6',
     'title' => ts('Smart group cache timeout'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('The number of minutes to cache smart group contacts. The best value will depend on your site and the complexity of the groups and acls you use. A value of zero means no caching at all. You may need to experiment with this.') . $optimizationSeeAlso,
-    'help_text' => '',
-    'settings_pages' => ['search' => ['weight' => 80]],
+    'help_text' => ts('The number of minutes to cache smart group contacts. The best value will depend on your site and the complexity of the groups and acls you use. A value of zero means no caching at all. You may need to experiment with this.'),
+    'help_doc_url' => [
+      'page' => 'sysadmin/setup/optimizations',
+    ],
+    'settings_pages' => ['misc' => ['section' => 'performance', 'weight' => 20]],
   ],
   'defaultSearchProfileID' => [
     'group_name' => 'Search Preferences',
