@@ -1,4 +1,4 @@
-.crm-container .messages .crm-i {
+.crm-container .messages > .crm-i {
   padding: 0 var(--crm-m) var(--crm-s) 0;
   float: left;
 }

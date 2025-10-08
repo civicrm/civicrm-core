@@ -1438,18 +1438,22 @@ class CRM_Utils_System {
    * @return null|string
    *   URL or link to documentation page, based on provided parameters.
    */
-  public static function docURL($params) {
+  public static function docURL(array $params): ?string {
+    $link = $params['url'] ?? NULL;
 
-    if (!isset($params['page'])) {
-      return NULL;
+    if (!$link && isset($params['page'])) {
+      if (($params['resource'] ?? NULL) == 'wiki') {
+        $docBaseURL = self::getWikiBaseURL();
+      }
+      else {
+        $docBaseURL = self::getDocBaseURL();
+        $params['page'] = self::formatDocUrl($params['page']);
+      }
+      $link = $docBaseURL . str_replace(' ', '+', $params['page']);
     }
 
-    if (($params['resource'] ?? NULL) == 'wiki') {
-      $docBaseURL = self::getWikiBaseURL();
-    }
-    else {
-      $docBaseURL = self::getDocBaseURL();
-      $params['page'] = self::formatDocUrl($params['page']);
+    if (!empty($params['URLonly']) || is_null($link)) {
+      return $link;
     }
 
     if (!isset($params['title'])) {
@@ -1460,7 +1464,7 @@ class CRM_Utils_System {
     }
 
     if (!isset($params['text'])) {
-      $params['text'] = ts('(Learn more...)');
+      $params['text'] = ts('Learn more...');
     }
 
     if (!isset($params['style'])) {
@@ -1470,16 +1474,9 @@ class CRM_Utils_System {
       $style = "style=\"{$params['style']}\"";
     }
 
-    $link = $docBaseURL . str_replace(' ', '+', $params['page']);
-
-    if (!empty($params['URLonly'])) {
-      return $link;
-    }
-    else {
-      $params['text'] = htmlspecialchars($params['text']);
-      $params['title'] = htmlspecialchars($params['title']);
-      return "<a href=\"{$link}\" $style target=\"_blank\" class=\"crm-doc-link no-popup\" title=\"{$params['title']}\">{$params['text']}</a>";
-    }
+    $params['text'] = htmlspecialchars($params['text']);
+    $params['title'] = htmlspecialchars($params['title']);
+    return "<a href=\"{$link}\" $style target=\"_blank\" class=\"crm-doc-link no-popup\" title=\"{$params['title']}\">{$params['text']} <i class=\"crm-i fa-external-link\" role=\"img\" aria-hidden=\"true\"></i></a>";
   }
 
   /**
