@@ -822,7 +822,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   public function replaceTokens(string $text): string {
     $matches = [];
-    preg_match_all('/\[[a-zA-Z0-9]{1,}\.[0-9]{1,}\.[^.]{1,}\]/', $text, $matches);
+    preg_match_all('/\[[a-zA-Z0-9]{1,}\.[0-9]{1,}\.[^.\]]{1,}\]/', $text, $matches);
 
     foreach ($matches[0] as $match) {
       // strip [ ] and split on .
