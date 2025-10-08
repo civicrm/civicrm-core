@@ -7921,7 +7921,7 @@ INSERT INTO `civicrm_relationship_type` (`id`, `name_a_b`, `label_a_b`, `name_b_
  (6,'Volunteer for','Volunteer for','Volunteer is','Volunteer is','Volunteer relationship.','Individual','Organization',NULL,NULL,0,1),
  (7,'Head of Household for','Head of Household for','Head of Household is','Head of Household is','Head of household.','Individual','Household',NULL,NULL,1,1),
  (8,'Household Member of','Household Member of','Household Member is','Household Member is','Household membership.','Individual','Household',NULL,NULL,1,1),
- (9,'Case Coordinator is','Case Coordinator is','Case Coordinator','Case Coordinator','Case Coordinator','Individual','Individual',NULL,NULL,0,1),
+ (9,'Case Coordinator is','Case Coordinator is','Case Coordinator','Case Coordinator','Case Coordinator',NULL,'Individual',NULL,NULL,0,1),
  (10,'Supervised by','Supervised by','Supervisor','Supervisor','Immediate workplace supervisor','Individual','Individual',NULL,NULL,0,1);
 /*!40000 ALTER TABLE `civicrm_relationship_type` ENABLE KEYS */;
 UNLOCK TABLES;
