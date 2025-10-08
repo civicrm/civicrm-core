@@ -463,7 +463,8 @@ return [
       'size' => 2,
       'maxlength' => 8,
     ],
-    'default' => 3,
+    // Set default to match php.ini 'upload_max_filesize'
+    'default' => ini_get('upload_max_filesize') ? intval(ini_parse_quantity(ini_get('upload_max_filesize')) / (1024 * 1024)) : 3,
     'validate_callback' => 'CRM_Core_BAO_Setting::validateMaxFileSize',
     'add' => '4.3',
     'title' => ts('Maximum File Size (in MB)'),
