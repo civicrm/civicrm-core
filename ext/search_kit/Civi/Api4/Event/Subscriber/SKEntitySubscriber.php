@@ -56,7 +56,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'title' => $display['label'],
         'title_plural' => $display['label'],
         'description' => $display['settings']['description'] ?? NULL,
-        'type' => ['SavedSearch'],
+        'type' => ['DAOEntity', 'SavedSearch'],
         'table_name' => $display['tableName'],
         'class_args' => [$display['name']],
         'label_field' => NULL,
