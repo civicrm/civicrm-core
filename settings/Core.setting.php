@@ -464,6 +464,7 @@ return [
       'maxlength' => 8,
     ],
     'default' => 3,
+    'validate_callback' => 'CRM_Core_BAO_Setting::validateMaxFileSize',
     'add' => '4.3',
     'title' => ts('Maximum File Size (in MB)'),
     'is_domain' => 1,
