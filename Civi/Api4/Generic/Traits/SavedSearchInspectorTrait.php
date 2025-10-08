@@ -314,6 +314,8 @@ trait SavedSearchInspectorTrait {
         $field = $this->getField($fieldName);
         $operators = array_values($field['operators'] ?? []) ?: CoreUtil::getOperators();
         $options = $field['options'] ?? NULL;
+        // Fallback in case getQuery wasn't available
+        $dataType ??= $field['data_type'] ?? NULL;
       }
       elseif (is_a($expr, SqlFunction::class)) {
         $options = $expr->getOptions();
