@@ -335,6 +335,24 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return TRUE;
   }
 
+  public static function validateExecutable($value, $fieldSpec): bool {
+    // Required is a separate check
+    if (!$value) {
+      return TRUE;
+    }
+    // Only check the first space separated piece to allow for a value
+    // such as /usr/bin/xvfb-run -- weasyprint
+    $pieces = explode(' ', $value, 2);
+    $executable = $pieces[0];
+    if (!file_exists($executable)) {
+      throw new CRM_Core_Exception("Executable $executable does not exist");
+    }
+    if (!is_executable($executable)) {
+      throw new CRM_Core_Exception("Executable $executable is not executable");
+    }
+    return TRUE;
+  }
+
   /**
    * @deprecated in 6.9 will be removed around 6.21
    */
