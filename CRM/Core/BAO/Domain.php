@@ -64,6 +64,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
         throw new CRM_Core_Exception('No domain in DB');
       }
       Civi::$statics[__CLASS__]['current'] = $domain;
+      Civi::$statics[__CLASS__]['version'] = $domain->version;
     }
     return $domain;
   }
@@ -76,11 +77,20 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @throws \CRM_Core_Exception
    */
   public static function version($skipUsingCache = FALSE) {
+    // We should be allowed to read domain version before the full entity system is live.
+    // But ideally, getDomain() and version() remain in strict sync.
+
     if ($skipUsingCache) {
       Civi::$statics[__CLASS__]['current'] = NULL;
+      Civi::$statics[__CLASS__]['version'] = NULL;
     }
 
-    return self::getDomain()->version;
+    if (!isset(Civi::$statics[__CLASS__]['version'])) {
+      Civi::$statics[__CLASS__]['version'] = \CRM_Core_DAO::singleValueQuery('SELECT version FROM civicrm_domain WHERE id = %1', [
+        1 => [\CRM_Core_Config::domainID(), 'Positive'],
+      ]);
+    }
+    return Civi::$statics[__CLASS__]['version'];
   }
 
   /**
