@@ -7,3 +7,6 @@
     <p>{$help_text|escape}</p>
   {/foreach}
 {/if}
+{if !empty($settingMeta.values.$id.help_doc_url)}
+  {docURL params=$settingMeta.values.$id.help_doc_url}
+{/if}
