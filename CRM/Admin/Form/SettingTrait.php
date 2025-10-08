@@ -116,7 +116,7 @@ trait CRM_Admin_Form_SettingTrait {
    * @param $setting
    * @return mixed
    */
-  protected function getSettingMetadata($setting) {
+  protected function getSettingMetadata($setting): array {
     return $this->getSettingsMetaData()[$setting];
   }
 
@@ -176,18 +176,6 @@ trait CRM_Admin_Form_SettingTrait {
         $description = $props['description'] ?? NULL;
         $descriptions[$settingName] = $description;
         $this->assign("{$settingName}_description", $description);
-        if ($settingName === 'max_attachments') {
-          //temp hack @todo fix to get from metadata
-          $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
-        }
-        if ($settingName === 'max_attachments_backend') {
-          //temp hack @todo fix to get from metadata
-          $this->addRule('max_attachments_backend', ts('Value should be a positive number'), 'positiveInteger');
-        }
-        if ($settingName === 'maxFileSize') {
-          //temp hack
-          $this->addRule('maxFileSize', ts('Value should be a positive number'), 'positiveInteger');
-        }
       }
     }
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
@@ -283,7 +271,7 @@ trait CRM_Admin_Form_SettingTrait {
    *
    * @return string
    */
-  protected function getQuickFormType($spec) {
+  protected static function getQuickFormType($spec) {
     if (isset($spec['quick_form_type']) &&
     !($spec['quick_form_type'] === 'Element' && !empty($spec['html_type']))) {
       // This is kinda transitional
@@ -352,27 +340,32 @@ trait CRM_Admin_Form_SettingTrait {
     $settings = $this->getSettingsToSetByMetadata($params);
     foreach ($settings as $setting => $settingValue) {
       $settingMetaData = $this->getSettingMetadata($setting);
-      if (!empty($settingMetaData['sortable'])) {
-        $settings[$setting] = $this->getReorderedSettingData($setting, $settingValue);
-      }
-      elseif ($this->getQuickFormType($settingMetaData) === 'CheckBoxes') {
-        $settings[$setting] = array_keys($settingValue);
-      }
-      elseif ($this->getQuickFormType($settingMetaData) === 'CheckBox') {
-        // This will be an array with one value.
-        $settings[$setting] = (bool) reset($settings[$setting]);
-      }
-      elseif ($settingMetaData['type'] === 'Integer') {
-        // QuickForm is pretty slack when it comes to types, cast to an integer.
-        if (is_numeric($settingValue)) {
-          $settings[$setting] = (int) $settingValue;
-        }
-        if (!$settingValue && empty($settingMetaData['is_required'])) {
-          $settings[$setting] = NULL;
-        }
-      }
+      $settings[$setting] = self::formatSettingValue($settingMetaData, $settingValue);
     }
     Setting::set(FALSE)->setValues($settings)->execute();
+  }
+
+  protected static function formatSettingValue(array $settingMetaData, $settingValue) {
+    if (!empty($settingMetaData['sortable'])) {
+      $settingValue = self::getReorderedSettingData($settingMetaData['name'], $settingValue);
+    }
+    elseif (self::getQuickFormType($settingMetaData) === 'CheckBoxes') {
+      $settingValue = array_keys($settingValue);
+    }
+    elseif (self::getQuickFormType($settingMetaData) === 'CheckBox') {
+      // This will be an array with one value.
+      $settingValue = (bool) reset($settingValue);
+    }
+    elseif ($settingMetaData['type'] === 'Integer') {
+      // QuickForm is pretty slack when it comes to types, cast to an integer.
+      if (is_numeric($settingValue)) {
+        $settingValue = (int) $settingValue;
+      }
+      if (!$settingValue && empty($settingMetaData['is_required'])) {
+        $settingValue = NULL;
+      }
+    }
+    return $settingValue;
   }
 
   /**
@@ -394,7 +387,7 @@ trait CRM_Admin_Form_SettingTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  private function getReorderedSettingData($setting, $settingValue) {
+  private static function getReorderedSettingData(string $setting, array $settingValue): array {
     // Get order from $_POST as $_POST maintains the order the sorted setting
     // options were sent. You can simply assign data from $_POST directly to
     // $settings[] but preference has to be given to data from Quickform.

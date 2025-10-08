@@ -64,9 +64,12 @@ class CRM_Admin_Form_SettingPage extends CRM_Core_Form {
       }
     }
     $sections = array_filter($sections, fn($section) => !empty($section['fields']));
+
     $this->assign('settingPageName', $filter);
     $this->assign('settingPage', $this->settingPage);
     $this->assign('settingSections', $sections);
+
+    $this->addFormRule(['CRM_Admin_Form_SettingPage', 'formRule'], $settings);
   }
 
   public function setDefaultValues() {
@@ -101,6 +104,55 @@ class CRM_Admin_Form_SettingPage extends CRM_Core_Form {
 
     uasort($sections, ['CRM_Utils_Sort', 'cmpFunc']);
     return $sections;
+  }
+
+  /**
+   * Setting validation form rule.
+   *
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   * @param array $settings
+   *   Settings metadata
+   *
+   * @return bool|array
+   *   true if no errors, else array of errors
+   */
+  public static function formRule($fields, $files, $settings) {
+    $errors = [];
+
+    foreach ($settings as $settingName => $settingMeta) {
+      if (!empty($settingMeta['validate_callback'])) {
+        $errorText = NULL;
+        $callback = Civi\Core\Resolver::singleton()->get($settingMeta['validate_callback']);
+        // These validate_callbacks are inconsistent. Some return FALSE, others throw an Exception.
+        try {
+          $value = self::formatSettingValue($settingMeta, $fields[$settingName] ?? NULL);
+          $valid = call_user_func_array($callback, [$value, $settingMeta]);
+        }
+        catch (CRM_Core_Exception $e) {
+          $valid = FALSE;
+          $errorText = $e->getMessage();
+        }
+        if (!$valid) {
+          $errors[$settingName] = $errorText ?: ts('Invalid value for %1', [1 => $settingMeta['title']]);
+        }
+      }
+      // Add validation for number fields. Don't worry too much about the message text as it shouldn't ever be seen; number inputs are constrained clientside.
+      if ($settingMeta['type'] === 'Integer' && is_string($fields[$settingName] ?? NULL) && strlen($fields[$settingName])) {
+        if (!CRM_Utils_Rule::integer($fields[$settingName])) {
+          $errors[$settingName] = ts('Invalid value for %1', [1 => $settingMeta['title']]);
+        }
+        if (isset($settingMeta['html_attributes']['min']) && $fields[$settingName] < $settingMeta['html_attributes']['min']) {
+          $errors[$settingName] = ts('Invalid value for %1', [1 => $settingMeta['title']]);
+        }
+        if (isset($settingMeta['html_attributes']['max']) && $fields[$settingName] > $settingMeta['html_attributes']['max']) {
+          $errors[$settingName] = ts('Invalid value for %1', [1 => $settingMeta['title']]);
+        }
+      }
+    }
+
+    return empty($errors) ? TRUE : $errors;
   }
 
 }
