@@ -1,7 +1,15 @@
 <li>
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label for="af-gui-button-text">{{:: ts('Text:') }}</label>
+    <input id="af-gui-button-text" type="text" class="form-control" ng-model="$ctrl.node['#children'][0]['#text']">
+  </div>
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label for="af-gui-button-icon">{{:: ts('Icon:') }}</label>
+    <input id="af-gui-button-icon" crm-ui-icon-picker class="form-control" ng-model="$ctrl.node['crm-icon']">
+  </div>
   <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline" >
-    <label>{{:: ts('Color:') }}</label>
-    <select class="form-control {{ getSetStyle().replace('btn', 'text') }}" ng-model="getSetStyle" ng-model-options="{getterSetter: true}" title="{{:: ts('Button color scheme') }}">
+    <label for="af-gui-button-color">{{:: ts('Color:') }}</label>
+    <select id="af-gui-button-color" class="form-control {{ getSetStyle().replace('btn', 'text') }}" ng-model="getSetStyle" ng-model-options="{getterSetter: true}" title="{{:: ts('Button color scheme') }}">
       <option ng-repeat="(style, label) in styles" class="{{ style.replace('btn', 'bg') }}" value="{{ style }}">{{ label }}</option>
     </select>
   </div>
