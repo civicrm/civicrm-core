@@ -109,16 +109,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
     $content = $template->fetch('CRM/common/success.tpl');
 
-    if ($this->_print) {
-      // unexpected - trying to print the output of the upgrader?
-      // @todo remove this case and just ignore $this->_print entirely
-      // for now we use the original call, to maintain preexisting behaviour (however strange that is)
-      \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_System::theme with $print and $maintenance is unexpected and may behave strangely. This codepath will be removed in a future release. If you need it, please comment on https://lab.civicrm.org/dev/core/-/issues/5803');
-      echo CRM_Utils_System::theme($content, $this->_print, TRUE);
-    }
-    else {
-      echo CRM_Utils_System::renderMaintenanceMessage($content);
-    }
+    CRM_Utils_System::renderMaintenanceMessage($content);
   }
 
   /**
@@ -192,16 +183,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
     $content = $template->fetch('CRM/common/success.tpl');
 
-    if ($this->_print) {
-      // unexpected - trying to print the output of the upgrader?
-      // @todo remove this case and just ignore $this->_print entirely
-      // for now we use the original call, to maintain preexisting behaviour (however strange that is)
-      \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_System::theme with $print and $maintenance is unexpected and may behave strangely. This codepath will be removed in a future release. If you need it, please comment on https://lab.civicrm.org/dev/core/-/issues/5803');
-      echo CRM_Utils_System::theme($content, $this->_print, TRUE);
-    }
-    else {
-      echo CRM_Utils_System::renderMaintenanceMessage($content);
-    }
+    CRM_Utils_System::renderMaintenanceMessage($content);
   }
 
 }

@@ -342,13 +342,13 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function renderMaintenanceMessage(string $content): string {
+  public function renderMaintenanceMessage(string $content): void {
     // wrap in a minimal header
     $headerContent = CRM_Core_Region::instance('html-header', FALSE)->render('');
 
     // note - not adding #crm-container is a hacky way to avoid rendering
     // the civicrm menubar. @todo a better way
-    return <<<HTML
+    print <<<HTML
       <!DOCTYPE html >
       <html class="crm-standalone">
         <head>
@@ -361,6 +361,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
         </body>
       </html>
     HTML;
+
+    exit();
   }
 
   /**

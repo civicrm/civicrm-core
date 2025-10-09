@@ -201,26 +201,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * If we are using a theming system, invoke theme, else just print the content.
-   *
-   * @param string $content
-   *   The content that will be themed.
-   * @param bool $print
-   *   (optional) Are we displaying to the screen or bypassing theming?
-   * @param bool $maintenance
-   *   (optional) For maintenance mode.
-   *
-   * @return string
-   */
-  public static function theme(
-    &$content,
-    $print = FALSE,
-    $maintenance = FALSE
-  ) {
-    return CRM_Core_Config::singleton()->userSystem->theme($content, $print, $maintenance);
-  }
-
-  /**
    * Generate a query string if input is an array.
    *
    * @param array|string $query

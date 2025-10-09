@@ -217,7 +217,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $exit = TRUE;
     if ($config->initialized) {
       $content = $template->fetch('CRM/common/fatal.tpl');
-      echo CRM_Utils_System::theme($content);
+      CRM_Utils_System::theme($content);
       $exit = CRM_Utils_System::shouldExitAfterFatal();
     }
     else {
@@ -465,7 +465,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // set the response code before starting the request
     http_response_code(500);
 
-    echo CRM_Utils_System::theme($content);
+    CRM_Utils_System::theme($content);
     $exit = CRM_Utils_System::shouldExitAfterFatal();
 
     if ($exit) {
