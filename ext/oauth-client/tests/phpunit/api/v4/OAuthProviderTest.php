@@ -35,12 +35,20 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
       ->addWhere('name', 'LIKE', 'test_example%')
       ->addOrderBy('name', 'DESC')
       ->execute();
-    $this->assertEquals(2, $examples->count());
+    $this->assertEquals(3, $examples->count());
 
-    $this->assertEquals('Civi\OAuth\CiviGenericProvider', $examples->last()['class']);
-    $this->assertEquals('My\Example2', $examples->first()['class']);
-    $this->assertEquals('https://example.com/one/auth', $examples->last()['options']['urlAuthorize']);
-    $this->assertEquals('https://example.com/two', $examples->first()['options']['urlAuthorize']);
+    $this->assertEquals('test_example_3', $examples[0]['name']);
+    $this->assertEquals('Civi\OAuth\CiviGenericProvider', $examples[0]['class']);
+    $this->assertEquals('https://example.com/three/auth', $examples[0]['options']['urlAuthorize']);
+
+    $this->assertEquals('test_example_2', $examples[1]['name']);
+    $this->assertEquals('My\Example2', $examples[1]['class']);
+    $this->assertEquals('https://example.com/two', $examples[1]['options']['urlAuthorize']);
+
+    $this->assertEquals('test_example_1', $examples[2]['name']);
+    $this->assertEquals('Civi\OAuth\CiviGenericProvider', $examples[2]['class']);
+    $this->assertEquals('https://example.com/one/auth', $examples[2]['options']['urlAuthorize']);
+
   }
 
 }

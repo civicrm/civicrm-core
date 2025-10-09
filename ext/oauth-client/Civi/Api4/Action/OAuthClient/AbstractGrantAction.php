@@ -56,6 +56,10 @@ abstract class AbstractGrantAction extends \Civi\Api4\Generic\AbstractBatchActio
     }
   }
 
+  protected function getSelect() {
+    return ['*'];
+  }
+
   /**
    * Look up the definition for the desired client.
    *
