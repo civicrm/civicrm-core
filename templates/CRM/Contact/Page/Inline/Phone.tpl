@@ -34,7 +34,7 @@
             {$item.location_type} {$item.phone_type}
           </div>
           <div class="crm-content crm-contact_phone">
-            {$item.phone}{if !empty($item.phone_ext)}&nbsp;&nbsp;{ts}ext.{/ts} {$item.phone_ext}{/if}
+            {$item.phone|escape}{if !empty($item.phone_ext)}&nbsp;&nbsp;{ts}ext.{/ts} {$item.phone_ext}{/if}
           </div>
         </div>
         {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='phone' customGroups=$item.custom identifier=$blockId}
