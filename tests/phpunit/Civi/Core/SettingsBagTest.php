@@ -39,25 +39,43 @@ class SettingsBagTest extends \CiviUnitTestCase {
     $defaultValue = $settingsBag->getDefault('maxFileSize');
 
     // Question: how is an empty value '' treated when retrieving a seting?
-    Setting::set()->addValue('maxFileSize', '')->execute();
+    // Setting::set()->addValue('maxFileSize', '')->execute();
+    $settingsBag->set('maxFileSize', '');
 
     // Get the value from settingsBag
-    $value = $settingsBag->get('maxFileSize');
+    $bagGet = $settingsBag->get('maxFileSize');
 
-    // Get the value from cv
-    $cvVal = exec('cv setting:get maxFileSize --out json');
-    $cvVal = json_decode($cvVal, TRUE)[0]['value'];
+    // Get the value from cv setting:get
+    $exec = exec('cv setting:get maxFileSize --out json');
+    $cvGetCmd = json_decode($exec, TRUE)[0]['value'];
+
+    // Get the value from cv php:eval
+    $exec = exec('cv ev \'return Civi::settings()->get("maxFileSize");\' --out json');
+    $cvEvalCmd = json_decode($exec, TRUE);
 
     // Get the value from the api
     $api3Value = civicrm_api3('Setting', 'getsingle')['maxFileSize'];
     $api4Value = Setting::get()->addSelect('maxFileSize')->execute()->single()['value'];
 
-    // They should all be the same, right?
-    $this->assertSame($defaultValue, $cvVal);
-    $this->assertSame($defaultValue, $value);
-    $this->assertSame($defaultValue, $api3Value);
-    $this->assertSame($defaultValue, $api4Value);
+    // Do we get the same result if we re-hydrate the cache?
+    \CRM_Core_Config::singleton(TRUE, TRUE);
+    $bagGetRedux = \Civi::settings()->get('maxFileSize');
 
+    // They should all be the same, right?
+    $report = json_encode([
+      'bagGet' => $bagGet,
+      'cvGetCmd' => $cvGetCmd,
+      'cvEvalCmd' => $cvEvalCmd,
+      'api3Value' => $api3Value,
+      'api4Value' => $api4Value,
+      'bagGetRedux' => $bagGetRedux,
+    ], JSON_PRETTY_PRINT);
+    $this->assertSame($defaultValue, $cvGetCmd, "Check value consistency. Report: $report");
+    $this->assertSame($defaultValue, $cvEvalCmd, "Check value consistency. Report: $report");
+    $this->assertSame($defaultValue, $bagGet, "Check value consistency. Report: $report");
+    $this->assertSame($defaultValue, (int) $api3Value, "Check value consistency. Report: $report");
+    $this->assertSame($defaultValue, $api4Value, "Check value consistency. Report: $report");
+    $this->assertSame($defaultValue, $bagGetRedux, "Check value consistency. Report: $report");
   }
 
 }
