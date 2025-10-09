@@ -1686,51 +1686,28 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * @inheritdoc
-   * @todo why are the environment checks here? could they be removed
    */
-  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+  public function theme($content, $print = FALSE, $maintenance = FALSE): void {
     if ($maintenance) {
       \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_Base::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
-    }
-    if (!$print) {
-      if (!function_exists('is_admin')) {
-        throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
-      }
-      if (!defined('ABSPATH')) {
-        throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
-      }
-      if (is_admin()) {
-        require_once ABSPATH . 'wp-admin/admin-header.php';
-      }
-      else {
-        // FIXME: we need to figure out to replace civicrm content on the frontend pages
-      }
-    }
-
-    print $content;
-    return NULL;
-  }
-
-  /**
-   * @inheritdoc
-   * @todo environment checks are copied from the original implementation of `theme` above and should probably
-   * be removed
-   */
-  public function renderMaintenanceMessage(string $content): string {
-    if (!function_exists('is_admin')) {
-      throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
-    }
-    if (!defined('ABSPATH')) {
-      throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
+      $this->renderMaintenanceMessage($content);
+      return;
     }
     if (is_admin()) {
       require_once ABSPATH . 'wp-admin/admin-header.php';
     }
-    else {
-      // FIXME: we need to figure out to replace civicrm content on the frontend pages
-    }
+    print $content;
+  }
 
-    return $content;
+  /**
+   * @inheritdoc
+   * be removed
+   */
+  public function renderMaintenanceMessage(string $content): void {
+    if (is_admin()) {
+      require_once ABSPATH . 'wp-admin/admin-header.php';
+    }
+    print $content;
   }
 
   /**
