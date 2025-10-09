@@ -26,7 +26,7 @@
         {if $item.name}
         <div class="crm-summary-row {if $item.is_primary eq 1} primary{/if}">
           <div class="crm-label">{$item.provider}&nbsp;({$item.location_type})</div>
-          <div class="crm-content crm-contact_im">{$item.name}</div>
+          <div class="crm-content crm-contact_im">{$item.name|escape}</div>
         </div>
         {/if}
         {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='im' customGroups=$item.custom identifier=$blockId}
