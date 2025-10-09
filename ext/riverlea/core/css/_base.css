@@ -46,6 +46,9 @@ body {
 .crm-container table.dataTable.display tbody tr:hover {
   background-color: transparent;
 }
+.crm-container td:empty {
+    padding: 0 !important; /* allows empty cells to collapse to 0 width */
+}
 /* Remove list styles (bullets/numbers) */
 .crm-container ol,
 .crm-container ul {
@@ -288,8 +291,8 @@ dl dl {
 .crm-container tr.disabled,
 .crm-container tr:has(td.disabled),
 .crm-container .table-striped > tbody > tr:has(td.disabled) {
-  background-color: var(--crm-c-page-bg) !important /* vs jquery */;
   --crm-striped-bg: var(--crm-c-page-bg) /* for striped rows */;
+  background-color: var(--crm-striped-bg) !important /* vs jquery */;
 }
 .crm-container tr.disabled td *:not(.btn,button,i,a),
 .crm-container td.disabled,

@@ -7,8 +7,9 @@
   --crm-c-primary: var(--crm-c-gray-500);
   --crm-c-primary-hover: var(--crm-c-gray-600);
   --crm-c-primary-text: var(--crm-c-text);
-  --crm-c-layer0-bg: var(--crm-c-darkest);
-  --crm-c-container-bg: var(--crm-c-gray-900);
+  --crm-c-layer0-bg: var(--crm-c-gray-900);
+  --crm-c-page-bg: var(--crm-c-gray-900);
+  --crm-c-container-bg: var(--crm-c-gray-800);
   --crm-c-layer1-bg: var(--crm-c-gray-800);
   --crm-c-layer2-bg: var(--crm-c-gray-700);
   --crm-c-inverse-bg: var(--crm-c-gray-300);

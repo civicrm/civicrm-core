@@ -59,14 +59,14 @@
   --crm-expand-body-bg: var(--crm-c-layer1-bg);
   --crm-expand-body-border: 0;
   --crm-dash-header-bg: transparent;
+  --crm-dash-tab-bg-hover: var(--crm-c-layer1-bg);
   --crm-dash-block-bg: var(--crm-c-layer1-bg);
   --crm-dash-label-bg: transparent;
-  --crm-dash-panel-bg: #414141;
-  --crm-dash-tab-bg-hover: var(--crm-c-layer1-bg);
   --crm-dash-summary-row-bg: var(--crm-c-container-bg);
   --crm-dropdown-bg: var(--crm-c-layer1-bg);
   --crm-dropdown-2-bg: var(--crm-c-layer1-bg);
   --crm-tabs-bg: var(--crm-c-layer2-bg);
+  --crm-tab-bg-active: var(--crm-c-layer1-bg);
   --crm-panel-border-col: var(--crm-c-gray-500);
   --crm-input-border-color: var(--crm-c-gray-500);
   --crm-table-row-bg: var(--crm-c-layer1-bg);

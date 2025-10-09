@@ -288,6 +288,7 @@
   --crm-tabs-border: 4px solid var(--crm-c-blue-overlay2);
   --crm-tabs-gap: var(--crm-s);
   --crm-tab-bg-hover: var(--crm-c-blue-overlay);
+  --crm-tab-bg-active: var(--crm-c-layer0-bg);
   --crm-tab-hang: 0 0 calc(-1 * var(--crm-s)) 0; /* lip to extend tab flush with active region - set to 0 for no lip */ /* thames todo check */
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m); /* thames todo check */
   --crm-tab-col: var(--crm-c-text);

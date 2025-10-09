@@ -9,7 +9,7 @@ html.cms-standalone body {
 }
 
 .crm-container details {
-  background-color: var(--crm-expand-body-bg);
+  /* background-color: var(--crm-expand-body-bg); Removed for FormBuilder clashes */
   border: var(--crm-c-divider);
 }
 

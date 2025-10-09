@@ -531,7 +531,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #bootstrap-theme a.bg-success:focus,
 #bootstrap-theme .dropdown-menu a.bg-success:hover,
 #bootstrap-theme .dropdown-menu .bg-success a:hover {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-success);
+  background: color-mix(in srgb, var(--crm-c-success) 87.5%, #000 12.5%);
   color: var(--crm-c-success-text);
 }
 #bootstrap-theme .dropdown-menu .bg-info a,
@@ -544,7 +544,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #bootstrap-theme a.bg-info:focus,
 #bootstrap-theme .dropdown-menu .bg-info a:hover,
 #bootstrap-theme .dropdown-menu a.bg-info:hover {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-info);
+  background: color-mix(in srgb, var(--crm-c-info) 87.5%, #000 12.5%);
   color: var(--crm-c-info-text);
 }
 #bootstrap-theme .bg-warning,
@@ -557,7 +557,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #bootstrap-theme a.bg-warning:focus,
 #bootstrap-theme .dropdown-menu .bg-warning a:hover,
 #bootstrap-theme .dropdown-menu a.bg-warning:hover {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-warning);
+  background: color-mix(in srgb, var(--crm-c-warning) 87.5%, #000 12.5%);
   color: var(--crm-c-warning-text);
 }
 #bootstrap-theme .bg-danger,
@@ -570,7 +570,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #bootstrap-theme a.bg-danger:focus,
 #bootstrap-theme .dropdown-menu .bg-danger a:hover,
 #bootstrap-theme .dropdown-menu a.bg-danger:hover {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
+  background: color-mix(in srgb, var(--crm-c-danger) 87.5%, #000 12.5%);
   color: var(--crm-c-danger-text);
 }
 #bootstrap-theme .dropdown-menu .bg-danger .crm-i::before {

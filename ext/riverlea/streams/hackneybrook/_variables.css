@@ -73,6 +73,7 @@
   --crm-tab-count-bg: var(--crm-c-blue-dark);
   --crm-tab-count-col: var(--crm-c-text-light);
   --crm-tab-border: 1px solid var(--crm-c-gray-400);
+  --crm-tab-bg-active: var(--crm-c-container-bg);
   /* Contact dashboard */
   --crm-dash-border: 0;
   --crm-dash-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
@@ -94,9 +95,10 @@
   --crm-dash-summary-row-bg: var(--crm-c-layer2-bg);
   --crm-dash-heading-inset: var(--crm-side-tabs-width);
   --crm-dash-panel-padding: var(--crm-r);
-  --crm-dash-panel-bg: var(--crm-c-container-bg);
+  --crm-dash-panel-bg: var(--crm-dash-tab-bg-hover);
   --crm-dash-panel-border: var(--crm-c-divider);
   --crn-dash-panel-radius: var(--crm-dash-roundness);
+
   --crm-dash-image-size: 100px;
   --crm-dash-image-radius: 200px;
   --crm-dash-image-right: 0; /* distance from right of dashboard */
@@ -104,11 +106,12 @@
   --crm-dash-image-border: 0;
   /* Dialog */
   --crm-dialog-header-bg: var(--crm-c-gray-200);
+  --crm-dialog-header-border-col: transparent;
   --crm-dialog-header-col: var(--crm-c-text);
   --crm-dialog-header-size: var(--crm-r);
   --crm-dialog-header-padding: var(--crm-s) var(--crm-m1) var(--crm-s) var(--crm-m2);
-  --crm-dialog-header-radius: var(--crm-dialog-radius) var(--crm-dialog-radius) 0 0;
-  --crm-dialog-body-bg: var(--crm-c-layer0-bg);
+  --crm-dialog-header-radius: var(--crm-dialog-radius);
+  --crm-dialog-body-bg: var(--crm-c-container-bg);
   --crm-dialog-body-padding: var(--crm-r);
   /* Dashlet */
   --crm-dashlet-border: var(--crm-c-divider);

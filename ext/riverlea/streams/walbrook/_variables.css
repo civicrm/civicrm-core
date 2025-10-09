@@ -80,7 +80,7 @@
   --crm-btn-small-padding: var(--crm-s1) var(--crm-m1);
   --crm-btn-height: 40px;
 /* Tables */
-  --crm-table-row-bg:  var(--crm-c-layer0-bg);
+  --crm-table-row-bg:  var(--crm-c-container-bg);
   --crm-table-row-hover: var(--crm-c-gray-200);
   --crm-table-sort-col: var(--crm-c-gray-500);
   --crm-table-nested-padding: 0 0 var(--crm-r) 0;
@@ -120,6 +120,7 @@
 /* Form */
   --crm-form-block-padding: var(--crm-r);
   --crm-form-block-border-radius: 0;
+  --crm-input-bg: var(--crm-c-container-bg);
   --crm-input-bg-image: none;
   --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: #c2cfd8;
@@ -138,6 +139,7 @@
   --crm-tabs-border: var(--crm-c-divider);
   --crm-tab-roundness: 2px 2px 0 0;
   --crm-tab-bg-hover:  var(--crm-c-layer0-bg);
+  --crm-tab-bg-active: var(--crm-c-container-bg);
   --crm-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m);
   --crm-tab-weight: bold;
@@ -183,7 +185,7 @@
   --crm-dialog-bg: var(--crm-c-container-bg);
   --crm-dialog-padding: 0;
   --crm-dialog-line: var(--crm-c-divider);
-  --crm-dialog-header-bg: var(--crm-c-layer1-bg);
+  --crm-dialog-header-bg: var(--crm-c-layer2-bg);
   --crm-dialog-header-col: var(--crm-c-text);
 /* Dashlet */
   --crm-dashlet-border: var(--crm-tab-border);

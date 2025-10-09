@@ -216,7 +216,7 @@
   --crm-expand-body-padding: var(--crm-padding-reg);
 /* .crm-accordion-light */
   --crm-expand2-header-bg: unset;
-  --crm-expand2-header-bg-active: var(--crm-c-layer1-bg);
+  --crm-expand2-header-bg-active: unset;
   --crm-expand2-header-weight: normal;
   --crm-expand2-header-color: var(--crm-c-text);
   --crm-expand2-header-border: unset;
@@ -283,7 +283,7 @@
   --crm-tabs-gap: var(--crm-s);
   --crm-tab-bg: var(--crm-c-layer1-bg);
   --crm-tab-bg-hover: color-mix(in srgb,var(--crm-c-layer1-bg) 75%,#000 25%);
-  --crm-tab-bg-active: var(--crm-c-layer0-bg);
+  --crm-tab-bg-active: var(--crm-c-container-bg);
   --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
   --crm-tab-col: var(--crm-c-text);

@@ -255,8 +255,6 @@ i.crm-i.crm-search-move-icon {
   display: block;
 }
 .crm-search .crm-search-admin-relative details > summary {
-  background: var(--crm-expand-header2-bg);
-  color: var(--crm-expand-header2-color);
   padding: var(--crm-padding-small) var(--crm-padding-reg);
 }
 .crm-search crm-search-admin-link-group {
@@ -273,13 +271,10 @@ i.crm-i.crm-search-move-icon {
 }
 .crm-search-admin-edit-columns details,
 .crm-search .crm-search-admin-relative details {
-  background-color: var(--crm-c-layer2-bg);
   border-radius: var(--crm-roundness);
   border: 0;
 }
 .crm-search-admin-edit-columns details > summary {
-  background: var(--crm-expand-header2-bg);
-  color: var(--crm-expand-header2-color);
   padding: var(--crm-padding-reg);
   font-size: inherit;
 }

@@ -53,6 +53,7 @@
   --crm-checkbox-list-bg: var(--crm-c-dkblue-01);
   --crm-input-description: var(--crm-input-label-color);
   --crm-filter-bg: var(--crm-c-dkblue-02);
+  --crm-dropdown-col: var(--crm-c-text);
   /* Emphasis colours */
   --crm-c-info-on-page-bg: var(--crm-c-secondary);
   --crm-c-danger-on-page-bg: var(--crm-btn-danger-bg);
@@ -108,8 +109,12 @@
   background: var(--crm-c-dkblue-01) !important;
 }
 .crm-container summary {
-  background: var(--crm-c-dkblue-03);
+  /* background: var(--crm-c-dkblue-03); */
   color: var(--crm-expand-header-color);
+}
+.crm-container summary:hover,
+.crm-container summary:focus {
+  background: var(--crm-c-blue-overlay4);
 }
 .crm-container details {
   background-color: var(--crm-c-dkblue-02);

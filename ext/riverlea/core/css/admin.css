@@ -115,7 +115,7 @@
 }
 .crm-container table.dataTable.display tbody tr > .sorting_1,
 .crm-container table.dataTable.order-column.stripe tbody tr > .sorting_1 {
-  background-color: color-mix(in srgb, var(--crm-striped-bg) var(--crm-table-row-alternate-bg), (--crm-table-row-alternate-bg)  6%) !important;
+  background-color: color-mix(in srgb, var(--crm-striped-bg) 100%, var(--crm-table-row-alternate-bg)  6%) !important;
 }
 
 /* Navigation Menu Editor */
