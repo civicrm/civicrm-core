@@ -436,14 +436,6 @@
      <weight>1</weight>
   </item>
   <item>
-     <path>civicrm/admin/setting/component</path>
-     <title>Enable CiviCRM Components</title>
-   <desc>Enable or disable components (e.g. CiviEvent, CiviMember, etc.) for your site based on the features you need. We recommend disabling any components not being used in order to simplify the user interface. You can easily re-enable components at any time from this screen.</desc>
-     <page_callback>CRM_Admin_Form_Setting_Component</page_callback>
-     <adminGroup>System Settings</adminGroup>
-     <weight>10</weight>
-  </item>
-  <item>
      <path>civicrm/admin/extensions</path>
      <title>Manage Extensions</title>
      <page_callback>CRM_Admin_Page_Extensions</page_callback>
