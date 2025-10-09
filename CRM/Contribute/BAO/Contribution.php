@@ -1994,6 +1994,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
     if ($isCompleted) {
       // Ideally add deprecation notice here & only accept pending for repeattransaction.
+      CRM_Core_Error::deprecatedWarning('Only Pending status should be passed into repeatTransaction()');
       return self::completeOrder($input, NULL, $createContribution['id']);
     }
     return $createContribution;
