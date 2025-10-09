@@ -380,7 +380,7 @@
           CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
           return;
         }
-        status = CRM.status({});
+        status = CRM.status({error: ts('Not saved')});
         $element.block();
         if (cancelDraftWatcher) {
           cancelDraftWatcher();
