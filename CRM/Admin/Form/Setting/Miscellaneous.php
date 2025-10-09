@@ -75,13 +75,11 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     $errors = [];
 
     // validate max file size
-    $iniBytes = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
-    $inputBytes = ((int) $fields['maxFileSize']) * 1024 * 1024;
-
-    if ($inputBytes > $iniBytes) {
-      $errors['maxFileSize'] = ts("Maximum file size cannot exceed limit defined in \"php.ini\" (\"upload_max_filesize=%1\").", [
-        1 => ini_get('upload_max_filesize'),
-      ]);
+    try {
+      CRM_Core_BAO_Setting::validateMaxFileSize($fields['maxFileSize']);
+    }
+    catch (CRM_Core_Exception $e) {
+      $errors['maxFileSize'] = $e->getMessage();
     }
 
     // validate recent items stack size
