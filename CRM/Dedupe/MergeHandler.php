@@ -108,9 +108,7 @@ class CRM_Dedupe_MergeHandler {
     $activeRelTables = CRM_Dedupe_Merger::getActiveRelTables($this->toRemoveID);
     $activeMainRelTables = CRM_Dedupe_Merger::getActiveRelTables($this->toKeepID);
     foreach ($relTables as $name => $null) {
-      if (!in_array($name, $activeRelTables, TRUE) &&
-        !(($name === 'rel_table_users') && in_array($name, $activeMainRelTables, TRUE))
-      ) {
+      if (!in_array($name, $activeRelTables, TRUE)) {
         unset($relTables[$name]);
       }
     }

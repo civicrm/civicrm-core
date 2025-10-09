@@ -1134,7 +1134,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
       $caseActivities[$caseActivityId]['subject'] = $dao->subject;
 
       //Activity Type
-      $caseActivities[$caseActivityId]['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '"></span> ' : '')
+      $caseActivities[$caseActivityId]['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '" role="img" aria-hidden="true"></span> ' : '')
         . $activityTypes[$dao->type]['label'];
 
       // Activity Target (With Contact) (There can be more than one)

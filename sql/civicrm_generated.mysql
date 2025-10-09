@@ -2964,7 +2964,7 @@ UNLOCK TABLES;
 LOCK TABLES `civicrm_domain` WRITE;
 /*!40000 ALTER TABLE `civicrm_domain` DISABLE KEYS */;
 INSERT INTO `civicrm_domain` (`id`, `name`, `description`, `version`, `contact_id`, `locales`, `locale_custom_strings`) VALUES
- (1,'Default Domain Name',NULL,'6.8.alpha1',1,NULL,'a:1:{s:5:\"en_US\";a:0:{}}');
+ (1,'Default Domain Name',NULL,'6.9.alpha1',1,NULL,'a:1:{s:5:\"en_US\";a:0:{}}');
 /*!40000 ALTER TABLE `civicrm_domain` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -7921,7 +7921,7 @@ INSERT INTO `civicrm_relationship_type` (`id`, `name_a_b`, `label_a_b`, `name_b_
  (6,'Volunteer for','Volunteer for','Volunteer is','Volunteer is','Volunteer relationship.','Individual','Organization',NULL,NULL,0,1),
  (7,'Head of Household for','Head of Household for','Head of Household is','Head of Household is','Head of household.','Individual','Household',NULL,NULL,1,1),
  (8,'Household Member of','Household Member of','Household Member is','Household Member is','Household membership.','Individual','Household',NULL,NULL,1,1),
- (9,'Case Coordinator is','Case Coordinator is','Case Coordinator','Case Coordinator','Case Coordinator','Individual','Individual',NULL,NULL,0,1),
+ (9,'Case Coordinator is','Case Coordinator is','Case Coordinator','Case Coordinator','Case Coordinator',NULL,'Individual',NULL,NULL,0,1),
  (10,'Supervised by','Supervised by','Supervisor','Supervisor','Immediate workplace supervisor','Individual','Individual',NULL,NULL,0,1);
 /*!40000 ALTER TABLE `civicrm_relationship_type` ENABLE KEYS */;
 UNLOCK TABLES;

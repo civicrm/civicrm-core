@@ -33,6 +33,10 @@ class Admin {
    * @throws \CRM_Core_Exception
    */
   public static function getAdminSettings():array {
+    // Check minimum permission needed to reach this
+    if (!\CRM_Core_Permission::check('manage own search_kit')) {
+      return [];
+    }
     $schema = self::getSchema();
     $data = [
       'schema' => self::addImplicitFKFields($schema),
@@ -58,6 +62,10 @@ class Admin {
         ->execute(),
       'myName' => \CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
       'dateFormats' => self::getDateFormats(),
+      'numberAttributes' => [
+        \NumberFormatter::MAX_FRACTION_DIGITS => E::ts('Max Decimal Places'),
+        \NumberFormatter::MIN_FRACTION_DIGITS => E::ts('Min Decimal Places'),
+      ],
     ];
     $perms = \Civi\Api4\Permission::get()
       ->addWhere('group', 'IN', ['civicrm', 'cms'])

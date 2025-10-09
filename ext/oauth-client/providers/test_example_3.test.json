@@ -1,0 +1,10 @@
+{
+  "title": "Third Test Example",
+  "options": {
+    "urlAuthorize": "https://example.com/three/auth",
+    "urlAccessToken": "https://example.com/three/token",
+    "urlResourceOwnerDetails": "https://example.com/three/owner",
+    "scopes": ["scope-3-foo", "scope-3-bar"],
+    "responseModes": ["query", "web_message"]
+  }
+}

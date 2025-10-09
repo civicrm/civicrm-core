@@ -21,7 +21,6 @@ class LegacyEntityScanner extends AutoSubscriber {
   public static function getSubscribedEvents(): array {
     return [
       'civi.api4.entityTypes' => 'addEntities',
-      'hook_civicrm_check' => 'check',
     ];
   }
 
@@ -116,24 +115,6 @@ class LegacyEntityScanner extends AutoSubscriber {
       }
     }
     return FALSE;
-  }
-
-  public function check(GenericHookEvent $e): void {
-    $legacyEntities = self::getEntitiesFromClasses();
-
-    if ($legacyEntities) {
-      $intro = ts('Some of your extensions are providing entities through the Legacy Entity Scanner. These should be updated to use <code>scan-classes</code> mixin for better performance and future proofing.');
-      $entityList = implode('', array_map(fn ($info) => "<li><code>{$info['name']}</code></li>", $legacyEntities));
-      $message = "<p>{$intro}</p><ul>{$entityList}</ul>";
-      $e->messages[] = new \CRM_Utils_Check_Message(
-        'api4_legacy_entity_scan',
-        $message,
-        ts('Api4 Entities using Legacy Entity Scanner'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-box'
-      );
-
-    }
   }
 
 }

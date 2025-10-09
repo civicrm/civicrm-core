@@ -2156,7 +2156,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'select' => [],
     ];
     $props['api'] += [
-      'formName' => 'qf:' . get_class($this),
+      'formName' => 'qf:' . get_class($this) . ':' . ($this->_id ?? $this->_contactId ?? ''),
     ];
     // If fieldName is missing and no default entity is set for the form, this will throw an excption.
     // In that case, you should explicitly supply api.fieldName in the format `EntityName.field_name`

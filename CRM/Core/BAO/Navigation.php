@@ -460,18 +460,34 @@ ORDER BY weight";
    *
    * @param int $contactID
    *   Reset only entries belonging to that contact ID.
-   *
-   * @return string
+   * @return void
    */
-  public static function resetNavigation($contactID = NULL) {
+  public static function resetNavigation($contactID = NULL): void {
+    if (!$contactID) {
+      // In theory, the name "resetNavigation" could mean _merely_ flushing the navigation tree(s).
+      // In practice, it evolved into an entry-point for diverse parties to signal that anything nav-adjacent should reset.
+      Civi::rebuild(['system' => TRUE, 'navigation' => TRUE])->execute();
+    }
+    else {
+      static::resetContactNavigation($contactID);
+    }
+  }
+
+  /**
+   * Mark the current "navigation" data as invalid for one or all contacts.
+   *
+   * @param int|null $contactID
+   *   NULL for all contacts.
+   * @return string
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @internal
+   */
+  public static function resetContactNavigation(?int $contactID): string {
     $newKey = CRM_Utils_String::createRandom(self::CACHE_KEY_STRLEN, CRM_Utils_String::ALPHANUMERIC);
     if (!$contactID) {
       $ser = serialize($newKey);
       $query = "UPDATE civicrm_setting SET value = '$ser' WHERE name='navigation' AND contact_id IS NOT NULL";
       CRM_Core_DAO::executeQuery($query);
-      Civi::cache('navigation')->flush();
-      // reset ACL and System caches
-      Civi::rebuild(['system' => TRUE])->execute();
     }
     else {
       // before inserting check if contact id exists in db
@@ -850,7 +866,7 @@ ORDER BY weight";
       ->getBagByContact(NULL, $cid)
       ->get('navigation');
     if (strlen($key ?? '') !== self::CACHE_KEY_STRLEN) {
-      $key = self::resetNavigation($cid);
+      $key = self::resetContactNavigation($cid);
     }
     return $key;
   }
@@ -913,6 +929,15 @@ ORDER BY weight";
             'name' => 'CiviCRM Home',
             'url' => 'civicrm/dashboard?reset=1',
             'icon' => 'crm-i fa-house-user',
+            'weight' => 1,
+          ],
+        ];
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('View My Contact'),
+            'name' => 'CiviCRM Dashboard',
+            'url' => 'civicrm/contact/view?cid=' . CRM_Core_Session::getLoggedInContactID() . '&reset=1',
+            'icon' => 'crm-i fa-user',
             'weight' => 1,
           ],
         ];

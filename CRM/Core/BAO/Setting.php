@@ -316,6 +316,25 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return TRUE;
   }
 
+  public static function validateMaxFileSize($value): bool {
+    if (!$value) {
+      // Value is not required
+      return TRUE;
+    }
+    if (!CRM_Utils_Rule::positiveInteger($value)) {
+      throw new CRM_Core_Exception(ts('Maximum file size must be a positive integer'));
+    }
+    $iniBytes = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
+    $inputBytes = ((int) $value) * 1024 * 1024;
+
+    if ($inputBytes > $iniBytes) {
+      throw new CRM_Core_Exception(ts('Maximum file size cannot exceed limit defined in "php.ini" ("upload_max_filesize=%1").', [
+        1 => ini_get('upload_max_filesize'),
+      ]));
+    }
+    return TRUE;
+  }
+
   /**
    * This provides information about the setting - similar to the fields concept for DAO information.
    * As the setting is serialized code creating validation setting input needs to know the data type

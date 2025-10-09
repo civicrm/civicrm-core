@@ -130,7 +130,7 @@ class CRM_Financial_BAO_Payment {
     }
     else {
       // Link the payment with the relevant financial items, by creating EntityFinancialItems.
-      // We also ensure the status of the Item is set to Paid or Partially Paid as appropriate.
+      // We also ensure the status of the Item is set to Paid or Partially paid as appropriate.
       foreach ($payableItems as $payableItem) {
         if ($payableItem['allocation'] === 0.0) {
           continue;
@@ -186,7 +186,7 @@ class CRM_Financial_BAO_Payment {
       }
     }
     elseif ($contributionStatus === 'Pending' && $params['total_amount'] > 0) {
-      self::updateContributionStatus($contribution['id'], 'Partially Paid');
+      self::updateContributionStatus($contribution['id'], 'Partially paid');
       $participantPayments = civicrm_api3('ParticipantPayment', 'get', [
         'contribution_id' => $contribution['id'],
         'participant_id.status_id' => ['IN' => ['Pending from pay later', 'Pending from incomplete transaction']],
@@ -197,10 +197,22 @@ class CRM_Financial_BAO_Payment {
     }
     // Note that we reload the payments rather than use $contribution['paid_amount']
     // here as we are interested in the paid_amount AFTER this payment has been made.
-    elseif ($contributionStatus === 'Completed' && ((float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
-      // If the contribution has previously been completed (fully paid) and now has total payments adding up to 0
-      //  change status to 'refunded'.
-      self::updateContributionStatus($contribution['id'], 'Refunded');
+    elseif (in_array($contributionStatus, ['Partially paid', 'Completed'])) {
+      $contributionPaidAmount = Contribution::get(FALSE)
+        ->addSelect('paid_amount')
+        ->addWhere('id', '=', $contribution['id'])
+        ->execute()
+        ->first()['paid_amount'];
+      if ($contributionPaidAmount === 0.0) {
+        // If the contribution has previously been Completed (fully paid) and now has total payments adding up to 0
+        //  change status to 'refunded'.
+        // Note: If refunds add up to more than total amount it'll get set to "Partially paid" - see below.
+        self::updateContributionStatus($contribution['id'], 'Refunded');
+      }
+      elseif ($contributionPaidAmount < $contribution['total_amount']) {
+        // Amount paid is less than contribution amount. Set to "Partially paid".
+        self::updateContributionStatus($contribution['id'], 'Partially paid');
+      }
     }
     CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], $params['participant_id'] ?? NULL, $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     return $trxn;

@@ -21,6 +21,7 @@ return [
           'version' => 4,
           'select' => [
             'id',
+            'label',
             'created_date',
             'expires_date',
             'start_date',
@@ -93,7 +94,9 @@ return [
         'type' => 'table',
         'settings' => [
           'description' => NULL,
-          'sort' => [],
+          'sort' => [
+            ['id', 'DESC'],
+          ],
           'limit' => 50,
           'pager' => [],
           'placeholder' => 5,
@@ -101,38 +104,45 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'label' => E::ts('User Job ID'),
+              'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
+              'key' => 'label',
+              'label' => E::ts('Name'),
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
               'key' => 'created_date',
-              'label' => E::ts('Import Job Created Date'),
+              'label' => E::ts('Created'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'expires_date',
-              'label' => E::ts('Import Job Expires Date'),
+              'label' => E::ts('Expires'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'end_date',
-              'label' => E::ts('Job Ended Date'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'status_id:label',
-              'label' => E::ts('Job Status'),
+              'label' => E::ts('Ended'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'job_type:label',
-              'label' => E::ts('Job Type'),
+              'label' => E::ts('Type'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'status_id:label',
+              'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
@@ -288,7 +298,9 @@ return [
         'type' => 'table',
         'settings' => [
           'description' => E::ts('Available import templates'),
-          'sort' => [],
+          'sort' => [
+            ['id', 'DESC'],
+          ],
           'limit' => 50,
           'pager' => [],
           'placeholder' => 5,
@@ -394,6 +406,7 @@ return [
           'version' => 4,
           'select' => [
             'id',
+            'label',
             'created_id.display_name',
             'created_date',
             'job_type:label',
@@ -462,7 +475,9 @@ return [
         'type' => 'table',
         'settings' => [
           'description' => E::ts('All import jobs'),
-          'sort' => [],
+          'sort' => [
+            ['id', 'DESC'],
+          ],
           'limit' => 50,
           'pager' => [],
           'placeholder' => 5,
@@ -475,35 +490,35 @@ return [
             ],
             [
               'type' => 'field',
+              'key' => 'label',
+              'label' => E::ts('Name'),
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
               'key' => 'created_id.display_name',
               'label' => E::ts('Created By'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'name',
-              'label' => E::ts('Import Name'),
-              'sortable' => TRUE,
-              'link' => [
-                'path' => '[job_type:url]?reset=1&template_id=[id]',
-                'entity' => '',
-                'action' => '',
-                'join' => '',
-                'target' => '',
-              ],
-            ],
-            [
-              'type' => 'field',
               'key' => 'created_date',
-              'label' => E::ts('Created Date'),
+              'label' => E::ts('Created'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'expires_date',
-              'label' => E::ts('Expires Date'),
+              'label' => E::ts('Expires'),
               'sortable' => TRUE,
               'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'end_date',
+              'label' => E::ts('Ended'),
+              'sortable' => TRUE,
             ],
             [
               'type' => 'field',

@@ -297,11 +297,19 @@ class SendTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface,
    * @noinspection DisconnectedForeachInstructionInspection
    */
   public function assertCronRuns(array $cronRuns): void {
-    foreach ($cronRuns as $cronRun) {
+    foreach ($cronRuns as $cronRunKey => $cronRun) {
       \CRM_Utils_Time::setTime($cronRun['time']);
       civicrm_api3('job', 'send_reminder');
+
+      $allMessages = $this->mut->getAllMessages('ezc');
+
       if (array_key_exists('message_count', $cronRun)) {
-        $this->assertEquals($cronRun['message_count'], count($this->mut->getAllMessages()));
+        $summary = sprintf("Cron Run #%s (%s). Found %d messages:\n", $cronRunKey, $cronRun['time'], count($allMessages));
+        foreach ($allMessages as $message) {
+          /** @var \ezcMail $message */
+          $summary .= sprintf(" * %s (%s)\n", json_encode($message->subject), json_encode($message->to));
+        }
+        $this->assertEquals($cronRun['message_count'], count($allMessages), "Found wrong message count\n$summary");
       }
       if (array_key_exists('to', $cronRun)) {
         $this->mut->assertRecipients($cronRun['to']);

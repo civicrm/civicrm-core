@@ -52,8 +52,11 @@ class CRM_Core_I18n {
       case 'js':
         return substr(json_encode($text, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), 1, -1);
 
+      case 'html':
       case 'htmlattribute':
-        return htmlspecialchars($text, ENT_QUOTES);
+        // Note: the default flags in htmlspecialchars changed from PHP 8.0 to PHP 8.1
+        // Setting them explicitly prevents any PHP-version-specific surprises.
+        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML401);
     }
     throw new Exception('Invalid escape mode: ' . $mode);
   }
@@ -810,7 +813,7 @@ class CRM_Core_I18n {
     // temporary to avoid collision with word replacements
     $translationReplacement = 'tr-' . $replacementsLocale;
     if ((!isset(Civi::$statics[__CLASS__]) || !array_key_exists($translationReplacement, Civi::$statics[__CLASS__]))) {
-      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
+      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode() && CRM_Core_BAO_Domain::isDBVersionAtLeast('6.7.beta')) {
         Civi::$statics[__CLASS__][$translationReplacement] = CRM_Core_BAO_TranslationSource::getTranslationSources($replacementsLocale);
       }
       else {

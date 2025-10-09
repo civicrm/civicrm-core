@@ -452,7 +452,7 @@ class ContributionParser extends ImportParser {
    */
   private function lookupContribution(array $params): array {
     $where = [];
-    foreach (['id' => 'Contribution ID', 'trxn_id' => 'Transaction ID', 'invoice_id' => 'Invoice ID'] as $field => $label) {
+    foreach (['id' => 'Contribution ID', 'trxn_id' => 'Transaction ID', 'invoice_id' => 'Invoice Reference'] as $field => $label) {
       if (!empty($params[$field])) {
         $where[] = [$field, '=', $params[$field]];
       }

@@ -60,6 +60,11 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
     if ($fv) {
       // make sure u CRM_Utils_String::unserialize - since it's stored in serialized form
       $result = CRM_Utils_String::unserialize($fv);
+      if ($result === FALSE) {
+        // See https://github.com/civicrm/civicrm-core/pull/33638
+        Civi::log()->error("Invalid saved_search.form_values for search ID $id. Failed to unserialize. Risk of unexpected search results.");
+        return [];
+      }
     }
 
     $specialFields = ['contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id'];
@@ -405,7 +410,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
     foreach ($groups as $group) {
       // Filter out arrays in Form Values which are group searchs.
       $groupSearches = array_filter(
-        $group['saved_search_id.form_values'],
+        $group['saved_search_id.form_values'] ?: [],
         function($v) {
           return ($v[0] == 'group');
         }

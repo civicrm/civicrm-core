@@ -568,6 +568,7 @@ if (!CRM.vars) CRM.vars = {};
 
   // Autocomplete based on APIv4 and Select2.
   $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    select2Options = select2Options || {};
     function getApiParams() {
       if (typeof apiParams === 'function') {
         return apiParams();
@@ -605,10 +606,27 @@ if (!CRM.vars) CRM.vars = {};
       }
       return links;
     }
+    function getQuickEditLinks($el) {
+      const links = [];
+      let data = $el.select2('data');
+      if (!select2Options.quickEdit || !data || (Array.isArray(data) && !data.length)) {
+        return links;
+      }
+      if (!Array.isArray(data)) {
+        data = [data];
+      }
+      data.forEach((item) => {
+        links.push({
+          path: item.quickEdit.path,
+          icon: 'fa-pencil',
+          title: ts('Edit %1', {1: item.quickEdit.title}),
+        });
+      });
+      return links;
+    }
     if (entityName === 'destroy') {
       return $(this).off('.crmEntity').crmSelect2('destroy');
     }
-    select2Options = select2Options || {};
     return $(this).each(function() {
       const $el = $(this).off('.crmEntity');
       let staticItems = getStaticOptions(select2Options.static),
@@ -624,6 +642,7 @@ if (!CRM.vars) CRM.vars = {};
               input: input,
               searchField: context && context.searchField || null,
               exclude: context && context.previousIds || null,
+              quickEdit: !!select2Options.quickEdit,
             }, getApiParams()))};
           },
           results: function(response, page, query) {
@@ -666,7 +685,7 @@ if (!CRM.vars) CRM.vars = {};
             callback(multiple ? existing : existing[0]);
             $el.trigger('initSelectionComplete');
           } else {
-            var params = $.extend({}, getApiParams(), {ids: idsNeeded});
+            var params = $.extend({quickEdit: !!select2Options.quickEdit}, getApiParams(), {ids: idsNeeded});
             CRM.api4(entityName, 'autocomplete', params).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
               $el.trigger('initSelectionComplete');
@@ -676,11 +695,13 @@ if (!CRM.vars) CRM.vars = {};
         formatInputTooShort: function() {
           let html = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
           html += renderStaticOptionMarkup(staticItems);
+          html += renderQuickAddMarkup  (getQuickEditLinks($el));
           html += renderQuickAddMarkup(quickAddLinks);
           return html;
         },
         formatNoMatches: function() {
           let html = _.escape($.fn.select2.defaults.formatNoMatches);
+          html += renderQuickAddMarkup(getQuickEditLinks($el));
           html += renderQuickAddMarkup(quickAddLinks);
           return html;
         }
@@ -1181,7 +1202,7 @@ if (!CRM.vars) CRM.vars = {};
         }
       }
       var $icon = $(submitButton).siblings('.crm-i').add('.crm-i, .ui-icon', submitButton);
-      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-pulse');
+      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-spin');
     }
   }
 

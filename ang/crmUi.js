@@ -760,6 +760,7 @@
           multi: '<',
           autoOpen: '<',
           quickAdd: '<',
+          quickEdit: '<',
           staticOptions: '<'
         },
         link: function(scope, element, attr, ctrl) {
@@ -828,6 +829,7 @@
                 minimumInputLength: autoOpen ? 0 : 1,
                 static: ctrl.staticOptions || [],
                 quickAdd: ctrl.quickAdd,
+                quickEdit: ctrl.quickEdit,
               });
             });
           };

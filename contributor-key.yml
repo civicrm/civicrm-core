@@ -977,7 +977,7 @@
 
 - github      : larssandergreen
   name        : Lars Sander-Green
-  organization: Wildsight
+  organization: Wikimedia Foundation
 
 - github      : laryn
   name        : Laryn Kragt Bakker
@@ -1377,6 +1377,10 @@
 
 - name        : Peter Davis
   organization: Fuzion
+
+- github      : pminf
+  name        : Philipp Michael
+  organization: Parlamentwatch e.V.
 
 - github      : powdevel
   name        : Beto Aveiga

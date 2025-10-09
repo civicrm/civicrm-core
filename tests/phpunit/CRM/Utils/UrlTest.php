@@ -197,4 +197,10 @@ class CRM_Utils_UrlTest extends CiviUnitTestCase {
     }
   }
 
+  public function testOriginUrl() {
+    $this->assertEquals('https://example.com', CRM_Utils_Url::toOrigin('https://example.com/'));
+    $this->assertEquals('https://example.com', CRM_Utils_Url::toOrigin('https://user:pass@example.com/foo/bar/whiz?whiz=1#bang'));
+    $this->assertEquals('http://local.example.com:8080', CRM_Utils_Url::toOrigin('http://local.example.com:8080/foo/bar/whiz'));
+  }
+
 }

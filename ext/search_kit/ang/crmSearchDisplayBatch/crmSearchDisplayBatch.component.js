@@ -57,14 +57,14 @@
           this.reportLinks = [
             {
               title: ts('View My Import Batches'),
-              href: CRM.url('civicrm/imports/my-listing'),
+              href: CRM.url('civicrm/imports/my-listing#/?job_type=search_batch_import'),
               icon: 'fa-user-tag',
             },
           ];
           if (CRM.checkPerm('administer queues')) {
             this.reportLinks.push({
               title: ts('View All Import Batches'),
-              href: CRM.url('civicrm/imports/all-imports'),
+              href: CRM.url('civicrm/imports/all-imports#/?job_type=search_batch_import'),
               icon: 'fa-list-alt',
             });
           }
@@ -116,6 +116,7 @@
           display: this.display,
           rowCount: this.newBatch.rowCount,
           targets: this.newBatch.targets,
+          label: this.newBatch.label,
         }, 0).then(function(userJob) {
           $location.search('batch', userJob.id);
           // Re-init display to switch modes from creating batch to editing batch
