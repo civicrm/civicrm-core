@@ -963,7 +963,7 @@ abstract class CRM_Utils_System_Base {
    * @param string $content
    */
   public function outputError($content) {
-    echo CRM_Utils_System::theme($content);
+    CRM_Utils_System::theme($content);
   }
 
   /**
