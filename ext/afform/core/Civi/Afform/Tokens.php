@@ -215,7 +215,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
   /**
    * Get Additional args from the row context.
    *
-   * This supports args for the contact being viewed and for the case being viewed.
+   * This supports args for the contact, the case and the activity being viewed.
    *
    * @param \Civi\Token\TokenRow $row
    * @return array
@@ -227,6 +227,9 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     }
     if (!empty($row->context['caseId'])) {
       $afformArgs['case_id'] = $row->context['caseId'];
+    }
+    if (!empty($row->context['activityId'])) {
+      $afformArgs['activity_id'] = $row->context['activityId'];
     }
     return $afformArgs;
   }
