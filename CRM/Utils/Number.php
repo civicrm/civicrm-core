@@ -69,6 +69,7 @@ class CRM_Utils_Number {
    * @deprecated use ini_parse_quantity
    */
   public static function formatUnitSize($size): int {
+    CRM_Core_Error::deprecatedFunctionWarning('ini_parse_quantity', 'CRM_Utils_Number::formatUnitSize');
     return ini_parse_quantity($size ?: 0);
   }
 
