@@ -4,12 +4,16 @@
   --crm-c-dkblue-03: #1a292f;
   --crm-c-dkblue-04: #1e323b;
   --crm-c-dkblue-08: #2ea4ff;
-  --crm-c-background: var(--crm-c-dkblue-02);
+  --crm-c-container-bg: var(--crm-c-dkblue-02);
   --crm-dash-tabs-bg: var(--crm-c-dkblue-03);
   --crm-dash-tab-count-bg: var(--crm-c-blue-darker);
-  --crm-c-page-background: var(--crm-c-dkblue-01);
-  --crm-c-code-background: var(--crm-c-dkblue-04);
+  --crm-c-code-bg: var(--crm-c-dkblue-04);
   --crm-dashlet-bg: var(--crm-c-dkblue-02);
+  --crm-c-layer0-bg: var(--crm-c-dkblue-01);
+  --crm-c-page-bg: var(--crm-c-dkblue-01);
+  --crm-c-container-bg: var(--crm-c-dkblue-02);
+  --crm-c-layer1-bg: var(--crm-c-dkblue-03);
+  --crm-c-layer2-bg: var(--crm-c-dkblue-04);
   --crm-c-green: #335417;
   --crm-c-link: var(--crm-c-dkblue-08);
   --crm-c-link-hover: color-mix(in srgb, white, var(--crm-c-dkblue-08) 70%);
@@ -22,35 +26,34 @@
   --crm-c-text: var(--crm-c-blue-overlay2);
   --crm-tabs-bg: var(--crm-dkblue-01);
   --crm-tabs-border: var(--crm-dkblue-01);
-  --crm-c-drag-background: var(--crm-c-dkblue-04);
+  --crm-c-drag-bg: var(--crm-c-dkblue-04);
   --crm-tab-bg-active: var(--crm-c-dkblue-02);
   --crm-tab-bg-hover: var(--crm-c-dkblue-02);
   --crm-tab-bg: transparent;
   --crm-alert-success-bg: var(--crm-c-dkblue-03);
   --crm-alert-warning-bg: #383124;
-  --crm-input-background: var(--crm-c-blue-darker);
+  --crm-input-bg: var(--crm-c-blue-darker);
   --crm-inline-edit-bg: var(--crm-c-dkblue-01);
   --crm-input-color: var(--crm-c-blue); /* text */
   --crm-expand-body-bg: var(--crm-c-dkblue-03);
   --crm-expand-header-color: var(--crm-c-blue-light);
   --crm-expand-header-bg: var(--crm-c-dkblue-03);
-  --crm-c-divider: var(--crm-c-dkblue-03);
-  --crm-table-odd-row: var(--crm-c-dkblue-02);
-  --crm-table-even-row: var(--crm-c-dkblue-01);
-  --crm-table-odd-hover: var(--crm-c-dkblue-03);
-  --crm-table-even-hover: var(--crm-c-dkblue-02);
-  --crm-c-background2: var(--crm-c-dkblue-02);
-  --crm-c-background3: var(--crm-c-dkblue-02);
-  --crm-c-background4: var(--crm-c-dkblue-01);
-  --crm-panel-background: var(--crm-c-dkblue-02);
-  --crm-form-block-background: var(--crm-c-dkblue-02);
-  --crm-notify-background: var(--crm-c-dkblue-02);
+  --crm-c-divider: var(--crm-c-dkblue-04);
+  --crm-table-outside-border: var(--crm-c-divider);
+  --crm-table-row-bg: var(--crm-c-dkblue-02);
+  --crm-table-row-hover: var(--crm-c-dkblue-03);
+  --crm-table-row-alternate-bg: #fff;
+  --crm-c-layer1-bg: var(--crm-c-dkblue-02);
+  --crm-c-layer2-bg: var(--crm-c-dkblue-02);
+  --crm-panel-bg: var(--crm-c-dkblue-02);
+  --crm-form-block-bg: var(--crm-c-dkblue-02);
+  --crm-notify-bg: var(--crm-c-dkblue-02);
   --crm-expand-header-bg-active: var(--crm-c-dkblue-04);
   --crm-checkbox-list-col: var(--crm-input-label-color);
   --crm-checkbox-list-bg: var(--crm-c-dkblue-01);
-  --crm-checkbox-list-bg2: var(--crm-c-dkblue-02);
   --crm-input-description: var(--crm-input-label-color);
   --crm-filter-bg: var(--crm-c-dkblue-02);
+  --crm-dropdown-col: var(--crm-c-text);
   /* Emphasis colours */
   --crm-c-info-on-page-bg: var(--crm-c-secondary);
   --crm-c-danger-on-page-bg: var(--crm-btn-danger-bg);
@@ -106,8 +109,12 @@
   background: var(--crm-c-dkblue-01) !important;
 }
 .crm-container summary {
-  background: var(--crm-c-dkblue-03);
+  /* background: var(--crm-c-dkblue-03); */
   color: var(--crm-expand-header-color);
+}
+.crm-container summary:hover,
+.crm-container summary:focus {
+  background: var(--crm-c-blue-overlay4);
 }
 .crm-container details {
   background-color: var(--crm-c-dkblue-02);

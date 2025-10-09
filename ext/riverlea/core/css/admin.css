@@ -85,6 +85,38 @@
 .crm-container .crm-extensions-stage.fa-trophy {
   color: var(--crm-notify-success);
 }
+.crm-container .extension-installed {
+  background: var(--crm-alert-success-bg);
+  color: var(--crm-alert-success-text);
+}
+.crm-container .extension-installed summary {
+  color: var(--crm-alert-success-text);
+}
+.crm-container table.dataTable.display tbody {
+  --crm-striped-bg: var(--crm-table-row-bg);
+}
+.crm-container table.dataTable.display tbody tr:not(.disabled) {
+  background-color: var(--crm-striped-bg) !important;
+}
+.crm-container table.dataTable.display tbody tr.even:not(.disabled) {
+  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-bg) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
+}
+.crm-container table.dataTable.display tbody tr.extension-installed {
+  --crm-striped-bg: var(--crm-alert-success-bg);
+}
+.crm-container table.dataTable.display tbody tr.extension-installed.even {
+  --crm-striped-bg: color-mix(in srgb, var(--crm-alert-success-bg) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
+}
+.crm-container table.dataTable.display tbody tr:hover {
+  --crm-striped-bg: var(--crm-table-row-hover);
+}
+.crm-container table.dataTable.display tbody tr.even:hover {
+  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-hover) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
+}
+.crm-container table.dataTable.display tbody tr > .sorting_1,
+.crm-container table.dataTable.order-column.stripe tbody tr > .sorting_1 {
+  background-color: color-mix(in srgb, var(--crm-striped-bg) 100%, var(--crm-table-row-alternate-bg)  6%) !important;
+}
 
 /* Navigation Menu Editor */
 .crm-container .navigation-tree .jstree-hovered {
