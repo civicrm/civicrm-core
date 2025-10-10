@@ -103,6 +103,9 @@ class FieldSpec {
   public function __construct($name, $entity, $dataType = 'String') {
     $this->entity = $entity;
     $this->name = $name;
+    if (empty($dataType)) {
+	    $dataType = 'String';
+    }
     $this->setDataType($dataType);
   }
 
