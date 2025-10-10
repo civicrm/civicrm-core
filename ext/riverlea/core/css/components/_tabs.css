@@ -87,6 +87,7 @@
 .crm-container #mainTabContainer ul.ui-tabs-nav a em {
   background: var(--crm-dash-tab-count-bg);
   color: var(--crm-dash-tab-count-col);
+  word-break: keep-all;
 }
 .crm-container li.crm-count-0 a.ui-tabs-anchor,
 .crm-container li.crm-count-0 a.ui-tabs-anchor em {
