@@ -587,6 +587,9 @@ abstract class ImportParser extends \CRM_Import_Parser {
       if ($result) {
         $contactID = $result['id'];
       }
+      else {
+        throw new \CRM_Core_Exception(ts('Cannot import to a deleted contact %1', [1 => $contactID]));
+      }
     }
     return $contactID;
   }
