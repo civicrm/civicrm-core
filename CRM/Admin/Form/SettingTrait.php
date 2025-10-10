@@ -169,105 +169,111 @@ trait CRM_Admin_Form_SettingTrait {
     $this->addSettingsToFormFromMetadata();
     $settingMetaData = $this->getSettingsMetaData();
     $descriptions = [];
-    foreach ($settingMetaData as $setting => $props) {
-      $quickFormType = $this->getQuickFormType($props);
-      if (isset($quickFormType)) {
-        $options = $props['options'] ?? NULL;
-        if ($options) {
-          if ($quickFormType === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
-            // If the spec specifies the field is not required add a null option.
-            // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
-            // when it is true.
-            $options = ['' => ts('None')] + $options;
-          }
-        }
-        if ($props['type'] === 'Boolean') {
-          $options = [$props['title'] => $props['name']];
-        }
-
-        //Load input as readonly whose values are overridden in civicrm.settings.php.
-        if (Civi::settings()->getMandatory($setting) !== NULL) {
-          $props['html_attributes']['readonly'] = TRUE;
-          $this->readOnlyFields[] = $setting;
-        }
-
-        $add = 'add' . $quickFormType;
-        if ($add === 'addElement') {
-          $this->$add(
-            $props['html_type'],
-            $setting,
-            $props['title'],
-            ($options !== NULL) ? $options : $props['html_attributes'] ?? [],
-            ($options !== NULL) ? $props['html_attributes'] ?? [] : NULL
-          );
-        }
-        elseif ($add === 'addSelect') {
-          $this->addElement('select', $setting, $props['title'], $options, $props['html_attributes'] ?? NULL);
-        }
-        elseif ($add === 'addCheckBox') {
-          $this->addCheckBox($setting, '', $options, NULL, $props['html_attributes'] ?? NULL, NULL, NULL, ['&nbsp;&nbsp;']);
-        }
-        elseif ($add === 'addCheckBoxes') {
-          $newOptions = array_flip($options);
-          $classes = 'crm-checkbox-list';
-          if (!empty($props['sortable'])) {
-            $classes .= ' crm-sortable-list';
-            $newOptions = array_flip(self::reorderSortableOptions($setting, $options));
-          }
-          $settingMetaData[$setting]['wrapper_element'] = ['<ul class="' . $classes . '"><li>', '</li></ul>'];
-          $this->addCheckBox($setting,
-            $props['title'],
-            $newOptions,
-            NULL, NULL, NULL, NULL,
-            '</li><li>'
-          );
-        }
-        elseif ($add === 'addChainSelect') {
-          $this->addChainSelect($setting, ['label' => $props['title']] + $props['chain_select_settings']);
-        }
-        elseif ($add === 'addMonthDay') {
-          $this->add('date', $setting, $props['title'], CRM_Core_SelectValues::date(NULL, 'M d'));
-        }
-        elseif ($add === 'addEntityRef') {
-          $this->$add($setting, $props['title'], $props['entity_reference_options']);
-        }
-        elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
-        }
-        elseif ($add === 'add') {
-          $this->add($props['html_type'], $setting, $props['title'], $options, FALSE, $props['html_extra'] ?? NULL);
-        }
-        else {
-          $this->$add($setting, $props['title'], $options);
-        }
+    foreach ($settingMetaData as $settingName => &$props) {
+      $added = $this->addSettingFieldToForm($settingName, $props);
+      if ($added) {
         // Migrate to using an array as easier in smart...
         $description = $props['description'] ?? NULL;
-        $descriptions[$setting] = $description;
-        $this->assign("{$setting}_description", $description);
-        if ($setting === 'max_attachments') {
+        $descriptions[$settingName] = $description;
+        $this->assign("{$settingName}_description", $description);
+        if ($settingName === 'max_attachments') {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
         }
-        if ($setting === 'max_attachments_backend') {
+        if ($settingName === 'max_attachments_backend') {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments_backend', ts('Value should be a positive number'), 'positiveInteger');
         }
-        if ($setting === 'maxFileSize') {
+        if ($settingName === 'maxFileSize') {
           //temp hack
           $this->addRule('maxFileSize', ts('Value should be a positive number'), 'positiveInteger');
         }
-
       }
     }
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
     $this->assign('fields', $this->getSettingsOrderedByWeight());
-    // @todo look at sharing the code below in the settings trait.
+
     if ($this->hasReadOnlyFields()) {
       $this->freeze($this->readOnlyFields);
       CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
     }
+  }
+
+  protected function addSettingFieldToForm(string $settingName, array &$props) {
+    $quickFormType = $this->getQuickFormType($props);
+    if (isset($quickFormType)) {
+      $options = $props['options'] ?? NULL;
+      if ($options) {
+        if ($quickFormType === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
+          // If the spec specifies the field is not required add a null option.
+          // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
+          // when it is true.
+          $options = ['' => ts('None')] + $options;
+        }
+      }
+      if ($props['type'] === 'Boolean') {
+        $options = [$props['title'] => $props['name']];
+      }
+
+      //Load input as readonly whose values are overridden in civicrm.settings.php.
+      if (Civi::settings()->getMandatory($settingName) !== NULL) {
+        $props['html_attributes']['readonly'] = TRUE;
+        $this->readOnlyFields[] = $settingName;
+      }
+
+      $add = 'add' . $quickFormType;
+      if ($add === 'addElement') {
+        $this->$add(
+          $props['html_type'],
+          $settingName,
+          $props['title'],
+          ($options !== NULL) ? $options : $props['html_attributes'] ?? [],
+          ($options !== NULL) ? $props['html_attributes'] ?? [] : NULL
+        );
+      }
+      elseif ($add === 'addSelect') {
+        $this->addElement('select', $settingName, $props['title'], $options, $props['html_attributes'] ?? NULL);
+      }
+      elseif ($add === 'addCheckBox') {
+        $this->addCheckBox($settingName, '', $options, NULL, $props['html_attributes'] ?? NULL, NULL, NULL, ['&nbsp;&nbsp;']);
+      }
+      elseif ($add === 'addCheckBoxes') {
+        $newOptions = array_flip($options);
+        $classes = 'crm-checkbox-list';
+        if (!empty($props['sortable'])) {
+          $classes .= ' crm-sortable-list';
+          $newOptions = array_flip(self::reorderSortableOptions($settingName, $options));
+        }
+        $props['wrapper_element'] = ['<ul class="' . $classes . '"><li>', '</li></ul>'];
+        $this->addCheckBox($settingName,
+          $props['title'],
+          $newOptions,
+          NULL, NULL, NULL, NULL,
+          '</li><li>'
+        );
+      }
+      elseif ($add === 'addChainSelect') {
+        $this->addChainSelect($settingName, ['label' => $props['title']] + $props['chain_select_settings']);
+      }
+      elseif ($add === 'addMonthDay') {
+        $this->add('date', $settingName, $props['title'], CRM_Core_SelectValues::date(NULL, 'M d'));
+      }
+      elseif ($add === 'addEntityRef') {
+        $this->$add($settingName, $props['title'], $props['entity_reference_options']);
+      }
+      elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
+        $this->addRadio($settingName, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
+      }
+      elseif ($add === 'add') {
+        $this->add($props['html_type'], $settingName, $props['title'], $options, FALSE, $props['html_extra'] ?? NULL);
+      }
+      else {
+        $this->$add($settingName, $props['title'], $options);
+      }
+    }
+    return isset($quickFormType);
   }
 
   /**

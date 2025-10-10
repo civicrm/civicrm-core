@@ -26,17 +26,21 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
   protected $_settings = [];
 
   /**
+   * List of sections, keyed by name.
+   * Sections can be added using hook_civicrm_preProcess
+   *
+   * @var array[]
+   *   {title: string, icon: string, weight: int, description: string, docUrl: array}
+   */
+  public $sections = [];
+
+  /**
    * @var bool
    */
   public $submitOnce = TRUE;
 
-  /**
-   * Get the tpl file name.
-   *
-   * @return string
-   */
-  public function getTemplateFileName() {
-    return 'CRM/Form/basicForm.tpl';
+  public function preProcess() {
+    $this->addSettingsToFormFromMetadata();
   }
 
   /**
@@ -55,11 +59,33 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    $this->assign('entityInClassFormat', 'setting');
-    $this->addFieldsDefinedInSettingsMetadata();
+    $filter = $this->getSettingPageFilter();
+    $settings = $this->getSettingsMetaData();
 
-    // @todo - do we still like this redirect?
-    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
+    // Sections can be defined in child class & modified with hook_civicrm_preProcess
+    $sections = $this->sections;
+    // "catch-all" generic section for uncategorized settings
+    $sections['']['weight'] = PHP_INT_MIN;
+    // Sort settings into sections & add to form
+    foreach ($settings as $settingName => &$setting) {
+      $added = $this->addSettingFieldToForm($settingName, $setting);
+      if ($added) {
+        $placement = $setting['settings_pages'][$filter];
+        $section = $placement['section'] ?? '';
+        $sections[$section]['fields'][$settingName] = $setting;
+      }
+    }
+    $sections = array_filter($sections, fn($section) => !empty($section['fields']));
+    uasort($sections, ['CRM_Utils_Sort', 'cmpFunc']);
+
+    if ($this->hasReadOnlyFields()) {
+      $this->freeze($this->readOnlyFields);
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
+    }
+
+    $this->assign('settingPageName', $filter);
+    $this->assign('settingSections', $sections);
+
     $this->addButtons([
       [
         'type' => 'next',
@@ -80,6 +106,8 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
     try {
       $this->saveMetadataDefinedSettings($params);
+      CRM_Core_Session::setStatus(ts('Settings Saved.'), ts('Saved'), 'success');
+      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
     }
     catch (CRM_Core_Exception $e) {
       CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');
