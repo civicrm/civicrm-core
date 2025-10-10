@@ -131,4 +131,24 @@ class SettingTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue(is_array($setting['default']));
   }
 
+  public function testMaxFileSize(): void {
+    $settingMeta = civicrm_api4('Setting', 'getFields', ['where' => [['name', '=', 'maxFileSize']]], 0);
+    $phpUploadMax = intval(ini_parse_quantity(ini_get('upload_max_filesize')) / (1024 * 1024));
+    $this->assertSame($phpUploadMax, $settingMeta['default']);
+    try {
+      // Non-numeric values aren't allowed
+      Setting::set()->addValue('maxFileSize', '1G')->execute();
+      $this->fail();
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+    try {
+      // Values higher than the php setting aren't allowed
+      Setting::set()->addValue('maxFileSize', $phpUploadMax + 1)->execute();
+      $this->fail();
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+  }
+
 }
