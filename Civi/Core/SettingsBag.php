@@ -466,6 +466,7 @@ class SettingsBag {
 
     if (!is_array($value) && \CRM_Utils_System::isNull($value)) {
       $dao->value = 'null';
+      $value = NULL;
     }
     else {
       $dao->value = serialize($value);

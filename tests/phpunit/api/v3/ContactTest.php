@@ -820,7 +820,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ]);
     $result = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Dog']);
-    $this->assertEquals(NULL, $result['preferred_language']);
+    $this->assertSame('en_US', $result['preferred_language']);
   }
 
   /**
