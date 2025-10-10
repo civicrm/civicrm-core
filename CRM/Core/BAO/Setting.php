@@ -336,35 +336,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * This provides information about the setting - similar to the fields concept for DAO information.
-   * As the setting is serialized code creating validation setting input needs to know the data type
-   * This also helps move information out of the form layer into the data layer where people can interact with
-   * it via the API or other mechanisms. In order to keep this consistent it is important the form layer
-   * also leverages it.
-   *
-   * Note that this function should never be called when using the runtime getvalue function. Caching works
-   * around the expectation it will be called during setting administration
-   *
-   * Function is intended for configuration rather than runtime access to settings
-   *
-   * The following params will filter the result. If none are passed all settings will be returns
-   *
-   * @param int $componentID
-   *   Id of relevant component.
-   * @param array $filters
-   * @param int $domainID
-   * @param null $profile
-   *
-   * @return array
-   *   the following information as appropriate for each setting
-   *   - name
-   *   - type
-   *   - default
-   *   - add (CiviCRM version added)
-   *   - is_domain
-   *   - is_contact
-   *   - description
-   *   - help_text
+   * @deprecated in 6.9 will be removed around 6.21
    */
   public static function getSettingSpecification(
     $componentID = NULL,
@@ -372,6 +344,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $domainID = NULL,
     $profile = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('Civi\Core\SettingsMetadata::getMetadata');
     return \Civi\Core\SettingsMetadata::getMetadata($filters, $domainID);
   }
 
