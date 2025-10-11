@@ -40,7 +40,12 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
   public $submitOnce = TRUE;
 
   public function preProcess() {
-    $this->addSettingsToFormFromMetadata();
+    $filter = $this->getSettingPageFilter();
+    // Start with fully-resolved metadata for all settings; this allows callbacks to add/remove themselves from pages
+    $allSettings = \Civi\Core\SettingsMetadata::getMetadata(NULL, NULL, TRUE, FALSE, TRUE);
+    $this->_settings = array_filter($allSettings, function ($setting) use ($filter) {
+      return !empty($setting['settings_pages'][$filter]);
+    });
   }
 
   /**
@@ -60,29 +65,36 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $filter = $this->getSettingPageFilter();
-    $settings = $this->getSettingsMetaData();
 
-    // Sections can be defined in child class & modified with hook_civicrm_preProcess
+    // Sections can be defined in child class preprocess function, and/or modified with hook_civicrm_preProcess
     $sections = $this->sections;
-    // "catch-all" generic section for uncategorized settings
-    $sections['']['weight'] = PHP_INT_MIN;
+    // "catch-all" default section for uncategorized settings
+    $sections['default']['weight'] = PHP_INT_MIN;
+
     // Sort settings into sections & add to form
-    foreach ($settings as $settingName => &$setting) {
+    foreach ($this->_settings as $settingName => &$setting) {
       $added = $this->addSettingFieldToForm($settingName, $setting);
       if ($added) {
         $placement = $setting['settings_pages'][$filter];
-        $section = $placement['section'] ?? '';
-        $sections[$section]['fields'][$settingName] = $setting;
+        $sectionName = $placement['section'] ?? 'default';
+        $setting['weight'] = $placement['weight'] ?? 0;
+        $sections[$sectionName]['fields'][$settingName] = $setting;
       }
     }
+    // Remove sections with no fields
     $sections = array_filter($sections, fn($section) => !empty($section['fields']));
+    // Sort fields by weight
+    foreach ($sections as &$section) {
+      uasort($section['fields'], ['CRM_Utils_Sort', 'cmpFunc']);
+    }
+    // Sort sections by weight
     uasort($sections, ['CRM_Utils_Sort', 'cmpFunc']);
 
     $this->assign('readOnlyFields', $this->readOnlyFields);
     $this->assign('settingPageName', $filter);
     $this->assign('settingSections', $sections);
 
-    $this->addFormRule([self::class, 'genericSettingsFormRule'], $settings);
+    $this->addFormRule([self::class, 'genericSettingsFormRule'], $this->_settings);
 
     $this->addButtons([
       [
