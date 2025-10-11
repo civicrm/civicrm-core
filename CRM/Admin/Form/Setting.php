@@ -43,8 +43,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       $this->setDefaultsForMetadataDefinedFields();
 
       // @todo these should be retrievable from the above function.
-      $this->_defaults['enableSSL'] = Civi::settings()->get('enableSSL');
-      $this->_defaults['verifySSL'] = Civi::settings()->get('verifySSL');
       $this->_defaults['environment'] = CRM_Core_Config::environment();
     }
 
@@ -92,13 +90,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function commonProcess(&$params) {
-
-    foreach (['verifySSL', 'enableSSL'] as $name) {
-      if (isset($params[$name])) {
-        Civi::settings()->set($name, $params[$name]);
-        unset($params[$name]);
-      }
-    }
     try {
       $this->saveMetadataDefinedSettings($params);
     }

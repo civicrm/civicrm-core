@@ -267,12 +267,15 @@ return [
     'title' => ts('Extern URL Style'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('This setting provides transitional support. It should be set to "Prefer normal router." If your deployment requires "Prefer standalone script", then please ensure that the issue is tracked in lab.civicrm.org.'),
+    'help_text' => [
+      ts('CiviCRM generates callback URLs for external services.'),
+      ts('This setting provides transitional support. It should be set to "Prefer normal router." If your deployment requires "Prefer standalone script", then please ensure that the issue is tracked in lab.civicrm.org.'),
+    ],
     'options' => [
       'standalone' => ts('Prefer standalone scripts'),
       'router' => ts('Prefer normal router'),
     ],
-    'settings_pages' => ['url' => ['weight' => 70]],
+    'settings_pages' => ['url' => ['section' => 'advanced', 'weight' => 70]],
   ],
   'activity_assignee_notification' => [
     'group_name' => 'CiviCRM Preferences',
@@ -749,10 +752,11 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => [
+      ts('Verifying the SSL certificate helps confirm that CiviCRM is securely communicating directly to payment processors.'),
       ts('If disabled, outbound web-service requests will allow unverified, insecure HTTPS connections'),
       ts('Unless you are absolutely unable to configure your server to check the SSL certificate of the remote server you should leave this set to Yes'),
     ],
-    'settings_pages' => ['url' => ['weight' => 60]],
+    'settings_pages' => ['url' => ['section' => 'security', 'weight' => 60]],
   ],
   'enableSSL' => [
     'group_name' => 'CiviCRM Preferences',
@@ -765,8 +769,13 @@ return [
     'title' => ts('Force SSL?'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('If enabled, inbound HTTP requests for sensitive pages will be redirected to HTTPS.'),
-    'settings_pages' => ['url' => ['weight' => 50]],
+    'validateion_callback' => 'CRM_Core_BAO_Setting::validateEnableSSL',
+    'help_text' => [
+      ts('If enabled, inbound HTTP requests for sensitive pages will be redirected to HTTPS.'),
+      ts('If you use a payment processor service where credit card and billing information is collected on your site, it is strongly recommended that you create or obtain an SSL certificate and configure your webserver to support SSL connections. Consult your hosting provider or web-server documentation for more information on obtaining and installing SSL certificates.'),
+      ts('Once you have your certificate installed, test that is working by navigating to one of your online contribution pages and changing the URL prefix from "http://" to "https://". If your browser loads the page and indicates a valid security certificate - then you can change this setting to "Yes" and CiviCRM will automatically redirect requests for all online contribution / member / event / admin pages to the corresponding SSL secured URLs.'),
+    ],
+    'settings_pages' => ['url' => ['section' => 'security', 'weight' => 50]],
   ],
   'wpBasePage' => [
     'group_name' => 'CiviCRM Preferences',
@@ -812,7 +821,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => ts('Prevent the stylesheet "civicrm.css" from being loaded.'),
-    'settings_pages' => ['url' => ['weight' => 30]],
+    'settings_pages' => ['url' => ['section' => 'style', 'weight' => 30]],
   ],
   'empoweredBy' => [
     'group_name' => 'CiviCRM Preferences',
