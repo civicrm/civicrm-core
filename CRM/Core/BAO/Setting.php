@@ -558,4 +558,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
   }
 
+  public static function userFrameworkLoggingMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it (currently only Drupal)
+    if (!CRM_Core_Config::singleton()->userSystem->supportsUfLogging()) {
+      unset($setting['settings_pages']['debug']);
+    }
+  }
+
 }
