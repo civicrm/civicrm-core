@@ -196,9 +196,7 @@
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
         <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
-        <td>{$form.is_confirm_enabled.html}
-          <div class="description">{ts}The confirmation screen is optional for events.{/ts}</div>
-        </td>
+        <td>{$form.is_confirm_enabled.html}</td>
       </tr>
     </table>
     <table class="form-layout-compressed" id="confirm_screen_settings">
@@ -302,7 +300,6 @@ target_element_type ="block"
 field_type          ="radio"
 invert              = 0
 }
-{if !$is_monetary}
 {include file="CRM/common/showHideByFieldValue.tpl"
 trigger_field_id    ="is_confirm_enabled"
 trigger_value       =""
@@ -311,7 +308,6 @@ target_element_type ="block"
 field_type          ="radio"
 invert              = 0
 }
-{/if}
 {include file="CRM/common/showHideByFieldValue.tpl"
 trigger_field_id    ="is_email_confirm"
 trigger_value       =""

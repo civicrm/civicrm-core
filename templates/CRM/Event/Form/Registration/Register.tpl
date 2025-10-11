@@ -178,7 +178,7 @@
 
     function toggleAdditionalParticipants() {
       var submit_button = $("#crm-submit-buttons > button").html();
-      {/literal}{if $event.is_monetary || $event.is_confirm_enabled}{literal}
+      {/literal}{if $event.is_confirm_enabled}{literal}
         var next_translated = '{/literal}{ts escape="js"}Review{/ts}{literal}';
       {/literal}{else}{literal}
         var next_translated = '{/literal}{ts escape="js"}Register{/ts}{literal}';
