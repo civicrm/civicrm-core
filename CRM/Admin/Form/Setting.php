@@ -41,9 +41,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     if (!$this->_defaults) {
       $this->_defaults = [];
       $this->setDefaultsForMetadataDefinedFields();
-
-      // @todo these should be retrievable from the above function.
-      $this->_defaults['environment'] = CRM_Core_Config::environment();
     }
 
     return $this->_defaults;
