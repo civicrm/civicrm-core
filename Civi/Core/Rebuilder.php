@@ -17,7 +17,6 @@ use CRM_ACL_BAO_Cache;
 use CRM_Case_XMLRepository;
 use CRM_Contact_BAO_Contact;
 use CRM_Contribute_BAO_Contribution;
-use CRM_Core_BAO_Navigation;
 use CRM_Core_BAO_WordReplacement;
 use CRM_Core_Config;
 use CRM_Core_DAO;
@@ -188,7 +187,6 @@ class Rebuilder {
       CRM_Core_Menu::store();
     }
     if (!empty($targets['navigation'])) {
-      CRM_Core_BAO_Navigation::resetContactNavigation(NULL);
       Civi::cache('navigation')->flush();
     }
     if (!empty($targets['perms'])) {
