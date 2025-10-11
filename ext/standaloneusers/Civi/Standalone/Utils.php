@@ -18,7 +18,7 @@ class Utils {
       }
 
       // remove hide menu
-      $item['child'] = array_filter($item['child'], fn ($subitem) => ($subitem['attributes']['name'] !== 'Hide Menu'));
+      $item['child'] = array_filter($item['child'], fn ($subitem) => !in_array($subitem['attributes']['name'], ['Hide Menu', 'View My Contact']));
 
       // Add My Account.
       $item['child'][] = [
