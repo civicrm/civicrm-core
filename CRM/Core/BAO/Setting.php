@@ -336,35 +336,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * This provides information about the setting - similar to the fields concept for DAO information.
-   * As the setting is serialized code creating validation setting input needs to know the data type
-   * This also helps move information out of the form layer into the data layer where people can interact with
-   * it via the API or other mechanisms. In order to keep this consistent it is important the form layer
-   * also leverages it.
-   *
-   * Note that this function should never be called when using the runtime getvalue function. Caching works
-   * around the expectation it will be called during setting administration
-   *
-   * Function is intended for configuration rather than runtime access to settings
-   *
-   * The following params will filter the result. If none are passed all settings will be returns
-   *
-   * @param int $componentID
-   *   Id of relevant component.
-   * @param array $filters
-   * @param int $domainID
-   * @param null $profile
-   *
-   * @return array
-   *   the following information as appropriate for each setting
-   *   - name
-   *   - type
-   *   - default
-   *   - add (CiviCRM version added)
-   *   - is_domain
-   *   - is_contact
-   *   - description
-   *   - help_text
+   * @deprecated in 6.9 will be removed around 6.21
    */
   public static function getSettingSpecification(
     $componentID = NULL,
@@ -372,6 +344,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $domainID = NULL,
     $profile = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('Civi\Core\SettingsMetadata::getMetadata');
     return \Civi\Core\SettingsMetadata::getMetadata($filters, $domainID);
   }
 
@@ -540,6 +513,18 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       if ($mailing_backend['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
         CRM_Core_Session::setStatus(ts('Now that your site is in production mode, you may want to enable <a %1>outbound email</a>.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1') . '"']), ts("Production environment set"), "success");
       }
+    }
+  }
+
+  public static function loggingMetadataCallback(array &$setting): void {
+    // Disable field on setting form if system does not meet requirements
+    if (\CRM_Core_I18n::isMultilingual()) {
+      $setting['description'] = ts('Logging is not supported in multilingual environments.');
+      $setting['html_attributes']['disabled'] = 'disabled';
+    }
+    elseif (!\CRM_Core_DAO::checkTriggerViewPermission(FALSE)) {
+      $setting['description'] = ts("In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.");
+      $setting['html_attributes']['disabled'] = 'disabled';
     }
   }
 

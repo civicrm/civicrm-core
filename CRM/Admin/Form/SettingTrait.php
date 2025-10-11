@@ -67,7 +67,7 @@ trait CRM_Admin_Form_SettingTrait {
    */
   protected function getSettingsMetaData(): array {
     if (empty($this->settingsMetadata)) {
-      $this->settingsMetadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => array_keys($this->_settings)], NULL, TRUE);
+      $this->settingsMetadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => array_keys($this->_settings)], NULL, TRUE, FALSE, TRUE);
       // This array_merge re-orders to the key order of $this->_settings.
       $this->settingsMetadata = array_merge($this->_settings, $this->settingsMetadata);
     }
