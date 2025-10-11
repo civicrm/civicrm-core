@@ -2535,4 +2535,11 @@ ORDER BY civicrm_mailing.id DESC";
     return $types;
   }
 
+  public static function validateMailerJobSize($value): bool {
+    if ($value && $value < 1000) {
+      throw new CRM_Core_Exception(ts('The job size must be at least 1000 or set to 0 (unlimited).'));
+    }
+    return TRUE;
+  }
+
 }

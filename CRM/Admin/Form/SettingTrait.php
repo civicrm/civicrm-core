@@ -255,7 +255,7 @@ trait CRM_Admin_Form_SettingTrait {
         $this->addRadio($settingName, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
       }
       elseif ($add === 'add') {
-        $this->add($props['html_type'], $settingName, $props['title'], $options ?? $props['html_attributes'] ?? NULL, FALSE, $options ? ($props['html_attributes'] ?? NULL) : ($props['html_extra'] ?? NULL));
+        $this->add($props['html_type'], $settingName, $props['title'], $options ?? $props['html_attributes'] ?? NULL, !empty($props['is_required']), $options ? ($props['html_attributes'] ?? NULL) : ($props['html_extra'] ?? NULL));
       }
       else {
         $this->$add($settingName, $props['title'], $options);
