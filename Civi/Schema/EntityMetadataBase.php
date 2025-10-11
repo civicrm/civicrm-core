@@ -224,7 +224,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           'data_type' => \CRM_Core_BAO_CustomField::getDataTypeString($customField),
           'input_type' => $inputTypeMap[$customField['html_type']] ?? $customField['html_type'],
           'input_attrs' => [
-            'label' => $customGroup['title'] . ': ' . $customField['label'],
+            'label' => $customField['label'],
           ],
           'default' => $customField['default_value'],
           'help_pre' => $customField['help_pre'],
