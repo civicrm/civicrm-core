@@ -194,16 +194,12 @@
 <details id="confirm" {if !$defaultsEmpty}open{/if}>
   <summary class="collapsible-title">{ts}Confirmation Screen{/ts}</summary>
   <div class="crm-accordion-body">
-    {if !$is_monetary}
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
         <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
-        <td>{$form.is_confirm_enabled.html}
-          <div class="description">{ts}The confirmation screen is optional for free events.{/ts}</div>
-        </td>
+        <td>{$form.is_confirm_enabled.html}</td>
       </tr>
     </table>
-    {/if}
     <table class="form-layout-compressed" id="confirm_screen_settings">
       <tr class="crm-event-manage-registration-form-block-confirm_title">
         <td scope="row" class="label" width="20%">{$form.confirm_title.label} <span
@@ -305,7 +301,6 @@ target_element_type ="block"
 field_type          ="radio"
 invert              = 0
 }
-{if !$is_monetary}
 {include file="CRM/common/showHideByFieldValue.tpl"
 trigger_field_id    ="is_confirm_enabled"
 trigger_value       =""
@@ -314,7 +309,6 @@ target_element_type ="block"
 field_type          ="radio"
 invert              = 0
 }
-{/if}
 {include file="CRM/common/showHideByFieldValue.tpl"
 trigger_field_id    ="is_email_confirm"
 trigger_value       =""

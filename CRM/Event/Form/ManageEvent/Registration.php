@@ -378,12 +378,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   public function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    // CRM-11182 - Optional confirmation page for free events
-    $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_id, 'is_monetary');
-    $form->assign('is_monetary', $is_monetary);
-    if ($is_monetary == "0") {
-      $form->addYesNo('is_confirm_enabled', ts('Use a confirmation screen'), NULL, NULL, ['onclick' => "return showHideByValue('is_confirm_enabled','','confirm_screen_settings','block','radio',false);"]);
-    }
+    $form->addYesNo('is_confirm_enabled', ts('Use a confirmation screen?'), NULL, NULL, ['onclick' => "return showHideByValue('is_confirm_enabled','','confirm_screen_settings','block','radio',false);"]);
     $form->add('text', 'confirm_title', ts('Title'), $attributes['confirm_title']);
     $form->add('wysiwyg', 'confirm_text', ts('Introductory Text'), $attributes['confirm_text'] + ['class' => 'collapsed', 'preset' => 'civievent']);
     $form->add('wysiwyg', 'confirm_footer_text', ts('Footer Text'), $attributes['confirm_text'] + ['class' => 'collapsed', 'preset' => 'civievent']);
@@ -447,7 +442,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         $errorMsg['registration_link_text'] = ts('Please enter Registration Link Text');
       }
       // Check if the confirm text is set if we have enabled the confirmation page or page is monetary which forces the confirm page.
-      if (($values['confirm_title'] ?? '') === '' && (!empty($values['is_confirm_enabled']) || CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_id, 'is_monetary'))) {
+      if (($values['confirm_title'] ?? '') === '' && (!empty($values['is_confirm_enabled']))) {
         $errorMsg['confirm_title'] = ts('Please enter a Title for the registration Confirmation Page');
       }
       if (($values['thankyou_title'] ?? '') === '') {
