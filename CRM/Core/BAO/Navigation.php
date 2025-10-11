@@ -918,7 +918,7 @@ ORDER BY weight";
         $item['child'][] = [
           'attributes' => [
             'label' => ts('View My Contact'),
-            'name' => 'CiviCRM Dashboard',
+            'name' => 'View My Contact',
             'url' => 'civicrm/contact/view?cid=' . CRM_Core_Session::getLoggedInContactID() . '&reset=1',
             'icon' => 'crm-i fa-user',
             'weight' => 1,
