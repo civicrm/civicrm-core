@@ -247,7 +247,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
-    'settings_pages' => ['date' => ['weight' => 0]],
+    'settings_pages' => ['date' => ['section' => 'display', 'weight' => 0]],
   ],
   'dateformatFull' => [
     'group_name' => 'Localization Preferences',
@@ -262,7 +262,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
-    'settings_pages' => ['date' => ['weight' => 10]],
+    'settings_pages' => ['date' => ['section' => 'display', 'weight' => 10]],
   ],
   'dateformatPartial' => [
     'group_name' => 'Localization Preferences',
@@ -277,7 +277,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
-    'settings_pages' => ['date' => ['weight' => 20]],
+    'settings_pages' => ['date' => ['section' => 'display', 'weight' => 20]],
   ],
   'dateformatTime' => [
     'add' => '4.7',
@@ -296,7 +296,7 @@ return [
     ],
     'default' => '%l:%M %P',
     'title' => ts('Date Format: Time Only'),
-    'settings_pages' => ['date' => ['weight' => 40]],
+    'settings_pages' => ['date' => ['section' => 'display', 'weight' => 40]],
   ],
   'dateformatYear' => [
     'add' => '4.7',
@@ -315,7 +315,7 @@ return [
     ],
     'default' => '%Y',
     'title' => ts('Date Format: Year Only'),
-    'settings_pages' => ['date' => ['weight' => 30]],
+    'settings_pages' => ['date' => ['section' => 'display', 'weight' => 30]],
   ],
   'dateformatFinancialBatch' => [
     'add' => '4.7',
@@ -334,7 +334,7 @@ return [
     ],
     'default' => '%m/%d/%Y',
     'title' => ts('Date Format: Financial Batch'),
-    'settings_pages' => ['date' => ['weight' => 50]],
+    'settings_pages' => ['date' => ['section' => 'display', 'weight' => 50]],
   ],
   'dateformatshortdate' => [
     'add' => '4.7',
@@ -353,7 +353,7 @@ return [
     ],
     'default' => '%m/%d/%Y',
     'title' => ts('Date Format: Short date Month Day Year'),
-    'settings_pages' => ['date' => ['weight' => 60]],
+    'settings_pages' => ['date' => ['section' => 'display', 'weight' => 60]],
   ],
   'dateInputFormat' => [
     'add' => '4.7',
@@ -371,7 +371,7 @@ return [
     ],
     'default' => 'mm/dd/yy',
     'title' => ts('Date Input Format'),
-    'settings_pages' => ['date' => ['weight' => 70]],
+    'settings_pages' => ['date' => ['section' => 'input', 'weight' => 10]],
   ],
   'fieldSeparator' => [
     'add' => '4.7',
@@ -406,7 +406,7 @@ return [
     'html_type' => 'MonthDay',
     'default' => ['M' => 1, 'd' => 1],
     'title' => ts('Fiscal Year Start'),
-    'settings_pages' => ['date' => ['weight' => 100]],
+    'settings_pages' => ['date' => ['section' => 'calendar', 'weight' => 20]],
   ],
   'languageLimit' => [
     'group_name' => 'Localization Preferences',
@@ -551,7 +551,7 @@ return [
     'on_change' => [
       'CRM_Core_BAO_PreferencesDate::onChangeSetting',
     ],
-    'settings_pages' => ['date' => ['weight' => 80]],
+    'settings_pages' => ['date' => ['section' => 'input', 'weight' => 20]],
   ],
   'weekBegins' => [
     'group_name' => 'Localization Preferences',
@@ -569,7 +569,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
-    'settings_pages' => ['date' => ['weight' => 90]],
+    'settings_pages' => ['date' => ['section' => 'calendar', 'weight' => 10]],
   ],
   'contact_default_language' => [
     'group_name' => 'Localization Preferences',
