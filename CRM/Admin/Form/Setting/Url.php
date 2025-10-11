@@ -18,52 +18,32 @@
 /**
  * This class generates form components for Site Url.
  */
-class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
+class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Generic {
 
-  /**
-   * Build the form object.
-   */
-  public function buildQuickForm() {
-    $this->setTitle(ts('Settings - Resource URLs'));
-    $this->addFormRule(['CRM_Admin_Form_Setting_Url', 'formRule']);
-
-    parent::buildQuickForm();
-  }
-
-  /**
-   * @param array $fields
-   *
-   * @return array|bool
-   */
-  public static function formRule($fields) {
-    if (isset($fields['enableSSL']) &&
-      $fields['enableSSL']
-    ) {
-      $config = CRM_Core_Config::singleton();
-      $url = str_replace('http://', 'https://',
-        CRM_Utils_System::url('civicrm/dashboard', 'reset=1', TRUE,
-          NULL, FALSE, FALSE
-        )
-      );
-      if (!CRM_Utils_System::checkURL($url, TRUE)) {
-        $errors = [
-          'enableSSL' => ts('You need to set up a secure server before you can use the Force Secure URLs option'),
-        ];
-        return $errors;
-      }
-    }
-    return TRUE;
-  }
-
-  public function postProcess() {
-    // if extensions url is set, lets clear session status messages to avoid
-    // a potentially spurious message which might already have been set. This
-    // is a bit hackish
-    // CRM-10629
-    $session = CRM_Core_Session::singleton();
-    $session->getStatus(TRUE);
-
-    parent::postProcess();
+  public function preProcess(): void {
+    parent::preProcess();
+    $this->sections = [
+      'location' => [
+        'title' => ts('Locations'),
+        'icon' => 'fa-sitemap',
+        'weight' => 10,
+      ],
+      'style' => [
+        'title' => ts('Styles'),
+        'icon' => 'fa-paint-roller',
+        'weight' => 20,
+      ],
+      'security' => [
+        'title' => ts('Security'),
+        'icon' => 'fa-lock',
+        'weight' => 30,
+      ],
+      'advanced' => [
+        'title' => ts('Advanced'),
+        'icon' => 'fa-wrench',
+        'weight' => 50,
+      ],
+    ];
   }
 
 }

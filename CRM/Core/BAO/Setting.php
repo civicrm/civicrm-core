@@ -353,6 +353,18 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return TRUE;
   }
 
+  public static function validateEnableSSL($value, $fieldSpec): bool {
+    if ($value) {
+      $url = str_replace('http://', 'https://',
+        CRM_Utils_System::url('civicrm/dashboard', 'reset=1', TRUE, NULL, FALSE)
+      );
+      if (!CRM_Utils_System::checkURL($url, TRUE)) {
+        throw new CRM_Core_Exception(ts('You need to set up a secure server before you can use the Force Secure URLs option'));
+      }
+    }
+    return TRUE;
+  }
+
   /**
    * @deprecated in 6.9 will be removed around 6.21
    */
