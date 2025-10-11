@@ -53,8 +53,16 @@
     </tr>
     {/if}
   </table>
-<fieldset>
+<fieldset class="crm-paymentProcessor-details">
 <legend>{ts}Processor Details for Live Payments{/ts}</legend>
+{if !empty($form.live_initiator)}
+    <div class="help">
+        {ts}Create connection with {/ts}
+        {$form.live_initiator.html}
+        <button class="crm-live-initiator">{ts}Go{/ts}</button>
+    </div>
+{/if}
+
     <table class="form-layout-compressed">
         <tr class="crm-paymentProcessor-form-block-user_name">
             <td class="label">{$form.user_name.label}</td><td>{$form.user_name.html} {help id="$ppTypeName-live-user-name" title=$form.user_name.label}</td>
@@ -97,8 +105,16 @@
     </table>
 </fieldset>
 
-<fieldset>
+<fieldset class="crm-paymentProcessor-details">
 <legend>{ts}Processor Details for Test Payments{/ts}</legend>
+  {if !empty($form.test_initiator)}
+    <div class="help">
+      {ts}Create connection with {/ts}
+      {$form.test_initiator.html}
+      <button class="crm-live-initiator">{ts}Go{/ts}</button>
+    </div>
+  {/if}
+
     <table class="form-layout-compressed">
         <tr class="crm-paymentProcessor-form-block-test_user_name">
             <td class="label">{$form.test_user_name.label}</td><td>{$form.test_user_name.html} {help id="$ppTypeName-test-user-name" title=$form.test_user_name.label}</td></tr>
@@ -139,8 +155,9 @@
 {/if}
 {/if}
 </table>
-       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </fieldset>
+
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
 {if $action eq 1  or $action eq 2}
@@ -164,3 +181,23 @@
   </script>
 
 {/if}
+
+<script type="text/javascript">
+{literal}
+
+  CRM.$(function($) {
+    $('.crm-live-initiator').click(() => CRM.initiator({url: $('[name=live_initiator]').val()}))
+    $('.crm-test-initiator').click(() => CRM.initiator({url: $('[name=test_initiator]').val()}))
+
+    const isNew = {/literal}{$action == 1 ? "true" : "false"}{literal};
+    const hasInitiator = {/literal}{empty($form.live_initiator) ? "false" : "true" }{literal};
+    if (isNew && hasInitiator) {
+      $('.crm-paymentProcessor-details').hide();
+      $('[name=user_name]').val('_PLACEHOLDER_');
+      // $('[name=test_user_name]').val('_PLACEHOLDER_');
+    }
+
+  })
+
+{/literal}
+</script>
