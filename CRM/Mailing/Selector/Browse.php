@@ -643,6 +643,10 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
   }
 
   public function pagerAtoZ() {
+    if (!Civi::settings()->get('includeAlphabeticalPager')) {
+      $this->_parent->assign('aToZ', NULL);
+      return;
+    }
 
     $params = [];
     $whereClause = $this->whereClause($params, FALSE);
