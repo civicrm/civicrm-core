@@ -7,6 +7,9 @@
     {/if}
   </td>
   <td>
+    {if !empty($readOnlyFields) && in_array($setting_name, $readOnlyFields)}
+      <i class="crm-i fa-lock disabled" role="img" aria-hidden="true"></i>
+    {/if}
     {if !empty($fieldSpec.wrapper_element)}
       {$fieldSpec.wrapper_element.0 nofilter}{$form.$setting_name.html}{$fieldSpec.wrapper_element.1 nofilter}
     {else}

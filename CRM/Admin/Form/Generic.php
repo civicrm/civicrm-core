@@ -78,11 +78,7 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
     $sections = array_filter($sections, fn($section) => !empty($section['fields']));
     uasort($sections, ['CRM_Utils_Sort', 'cmpFunc']);
 
-    if ($this->hasReadOnlyFields()) {
-      $this->freeze($this->readOnlyFields);
-      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
-    }
-
+    $this->assign('readOnlyFields', $this->readOnlyFields);
     $this->assign('settingPageName', $filter);
     $this->assign('settingSections', $sections);
 
