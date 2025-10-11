@@ -205,9 +205,9 @@ trait CRM_Admin_Form_SettingTrait {
         $options = [$props['title'] => $props['name']];
       }
 
-      //Load input as readonly whose values are overridden in civicrm.settings.php.
+      // Disable input when values are overridden in civicrm.settings.php.
       if (Civi::settings()->getMandatory($settingName) !== NULL) {
-        $props['html_attributes']['readonly'] = TRUE;
+        $props['html_attributes']['disabled'] = TRUE;
         $this->readOnlyFields[] = $settingName;
       }
 

@@ -8,6 +8,14 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-setting-block crm-setting-block-{$settingPageName}">
+{crmRegion name="crm-setting-form-$settingPageName-top"}
+  {if !empty($readOnlyFields)}
+    <div class="description">
+      <i class="crm-i fa-lock" role="img" aria-hidden="true"></i>
+      {ts}Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php.{/ts}
+    </div>
+  {/if}
+{/crmRegion}
   {foreach from=$settingSections key="sectionName" item="section"}
     <div class="crm-setting-section crm-setting-section-{$sectionName}">
       {crmRegion name="crm-setting-$settingPageName-section-$sectionName"}
