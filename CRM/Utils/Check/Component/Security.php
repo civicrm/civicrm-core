@@ -126,17 +126,12 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       if ($this->isDirAccessible($privateDir, $heuristicUrl)) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('Files in the data directory (<a href="%3">%2</a>) should not be downloadable.'
+          ts('Files in the data directory (<a href="%1">%2</a>) should not be downloadable.', [1 => $heuristicUrl, 2 => $privateDir])
             . '<br />'
-            . '<a href="%1">Read more about this warning</a>',
-            [
-              1 => $this->createDocUrl('uploads-should-not-be-accessible'),
-              2 => $privateDir,
-              3 => $heuristicUrl,
-            ]),
-            ts('Private Files Readable'),
-            \Psr\Log\LogLevel::WARNING,
-            'fa-lock'
+            . ts('<a href="%1">Read more about this warning</a>', [1 => $this->createDocUrl('uploads-should-not-be-accessible')]),
+          ts('Private Files Readable'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-lock'
         );
       }
     }
@@ -201,13 +196,13 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     // Test that $publicDir is not browsable
     foreach ($publicDirs as $publicDir => $publicUrl) {
       if ($this->isBrowsable($publicDir, $publicUrl)) {
-        $msg = 'Directory <a href="%1">%2</a> should not be browseable via the web.'
+        $msg = ts('Directory <a %1>%2</a> should not be browseable via the web.', [1 => "href='$publicDir'", 2 => $publicDir])
           . '<br />' .
-          '<a href="%3">Read more about this warning</a>';
+          '<a href="' . $docs_url . '">' . ts('Read more about this warning') . '</a>';
         $docs_url = $this->createDocUrl('directories-should-not-be-browsable');
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts($msg, [1 => $publicDir, 2 => $publicDir, 3 => $docs_url]),
+          $msg,
           ts('Browseable Directories'),
           \Psr\Log\LogLevel::ERROR,
           'fa-lock'

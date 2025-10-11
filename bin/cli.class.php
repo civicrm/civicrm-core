@@ -314,7 +314,7 @@ class civicrm_cli {
     $out .= "  --output will pretty print the result from the api call\n";
     $out .= "  --json will print the result from the api call as JSON\n";
     $out .= "  PARAMS is one or more --param=value combinations to pass to the api\n";
-    return ts($out);
+    return $out;
   }
 
   /**
