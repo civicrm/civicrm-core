@@ -329,7 +329,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
 
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another Financial Account Type.'));
+      CRM_Core_Session::setStatus(ts('You can add another Financial Account Type.'));
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts',
         "reset=1&action=add&aid={$this->_aid}"));
     }

@@ -103,7 +103,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
         $paymentProcessors[$paymentProcessorID]['test_id'] = CRM_Financial_BAO_PaymentProcessor::getTestProcessorId($paymentProcessorID);
       }
       catch (CRM_Core_Exception $e) {
-        CRM_Core_Session::setStatus(ts('No test processor entry exists for %1. Not having a test entry for each processor could cause problems', [$paymentProcessor['name']]));
+        CRM_Core_Session::setStatus(ts('No test processor entry exists for %1. Not having a test entry for each processor could cause problems', [1 => $paymentProcessor['name']]));
       }
     }
 

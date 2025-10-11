@@ -55,7 +55,7 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
     elseif ($this->entity) {
       $entityName = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->entity);
       if (!$entityName) {
-        throw new CRM_Core_Exception(ts('Invalid import entity %1', [htmlentities($this->entity), 'String']));
+        throw new CRM_Core_Exception(ts('Invalid import entity %1', [1 => htmlentities($this->entity)]));
       }
       $entityPath = explode('_', $entityName);
       $this->classPrefix = $entityPath[0] . '_' . $entityPath[1] . '_Import';

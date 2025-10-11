@@ -88,7 +88,7 @@ trait LocalizationTrait {
         'severity' => 'error',
         'fields' => ['locale'],
         'name' => 'badLocale',
-        'message' => ts('The given locale is not valid (%1)', [json_encode($this->locale)]),
+        'message' => ts('The given locale is not valid (%1)', [1 => json_encode($this->locale)]),
       ];
     }
   }

@@ -1928,7 +1928,7 @@ class CRM_Utils_System {
         break;
 
       default:
-        $title = ts(ucfirst($action)) . ' ' . $daoClass::getEntityTitle();
+        $title = ucfirst($action) . ' ' . $daoClass::getEntityTitle();
     }
 
     return [

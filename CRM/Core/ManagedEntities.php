@@ -479,11 +479,11 @@ class CRM_Core_ManagedEntities {
       foreach (['name', 'module', 'entity', 'params'] as $key) {
         if (empty($declare[$key])) {
           $str = print_r($declare, TRUE);
-          throw new CRM_Core_Exception(ts('Managed Entity (%1) is missing field "%2": %3', [$module, $key, $str]));
+          throw new CRM_Core_Exception(ts('Managed Entity (%1) is missing field "%2": %3', [1 => $module, 2 => $key, 3 => $str]));
         }
       }
       if (!$this->isModuleRecognised($declare['module'])) {
-        throw new CRM_Core_Exception(ts('Entity declaration references invalid or inactive module name [%1]', [$declare['module']]));
+        throw new CRM_Core_Exception(ts('Entity declaration references invalid or inactive module name [%1]', [1 => $declare['module']]));
       }
     }
   }

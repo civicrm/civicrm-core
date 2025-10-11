@@ -37,12 +37,12 @@ class CRM_Utils_Check_Component_Smarty extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
       "
-        <p>" . (ts("CiviCRM recommends Smarty version 5. This site is overriding that default with an older version of Smarty.")) . "</p>
-        <p>" . (ts("CiviCRM will support such overrides until version 6.10. By v6.11, Smarty 5 will be required. You can try out Smarty 5 before then by deleting the line starting with <code>%1</code> from the <code>%2</code> file.", [1 => "define($settingName", 2 => 'civicrm.settings.php'])) . "</p>
-        <p>" . (ts('CiviCRM <a %1>v6.10-ESR</a> provides extended support for Smarty v2 and v4. To learn more and discuss, see the <a %2>Smarty transition page</a>.' . '</p>', [
+        <p>" . ts("CiviCRM recommends Smarty version 5. This site is overriding that default with an older version of Smarty.") . "</p>
+        <p>" . ts("CiviCRM will support such overrides until version 6.10. By v6.11, Smarty 5 will be required. You can try out Smarty 5 before then by deleting the line starting with <code>%1</code> from the <code>%2</code> file.", [1 => "define($settingName", 2 => 'civicrm.settings.php']) . "</p>
+        <p>" . ts('CiviCRM <a %1>v6.10-ESR</a> provides extended support for Smarty v2 and v4. To learn more and discuss, see the <a %2>Smarty transition page</a>.', [
           1 => 'target="_blank" href="' . htmlentities('https://civicrm.org/esr') . '"',
           2 => 'target="_blank" href="' . htmlentities('https://civicrm.org/redirect/smarty-v3') . '"',
-        ])),
+        ]) . '</p>',
         ts('Smarty Version Override'),
         LogLevel::WARNING,
         'fa-lock'

@@ -692,9 +692,9 @@ class CRM_Report_Form extends CRM_Core_Form {
         $this->_createNew = TRUE;
         $this->_params = $this->_formValues;
         $this->_params['view_mode'] = 'criteria';
-        $this->_params['title'] = $this->getTitle() . ts(' (copy created by %1 on %2)', [
-          CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
-          CRM_Utils_Date::customFormat(date('Y-m-d H:i')),
+        $this->_params['title'] = $this->getTitle() . ' ' . ts('(copy created by %1 on %2)', [
+          1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
+          2 => CRM_Utils_Date::customFormat(date('Y-m-d H:i')),
         ]);
         // Do not pass go. Do not collect another chance to re-run the same query.
         CRM_Report_Form_Instance::postProcess($this);
@@ -1688,7 +1688,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     if (!empty($options)) {
       $options = [
-        '-' => ts(' - none - '),
+        '-' => ts('- none -'),
       ] + $options;
       for ($i = 1; $i <= 5; $i++) {
         $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);

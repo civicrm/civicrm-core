@@ -334,7 +334,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     if (!$this->_pageId) {
       CRM_PCP_BAO_PCP::sendStatusUpdate($pcp->id, $statusId, TRUE, $this->_component);
       if ($approvalMessage && ($params['status_id'] ?? NULL) == 1) {
-        $notifyStatus .= ts(' You will receive a second email as soon as the review process is complete.');
+        $notifyStatus .= ' ' . ts('You will receive a second email as soon as the review process is complete.');
       }
     }
 

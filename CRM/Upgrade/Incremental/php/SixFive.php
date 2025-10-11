@@ -51,7 +51,7 @@ class CRM_Upgrade_Incremental_php_SixFive extends CRM_Upgrade_Incremental_Base {
         . " " . ts("If your extensions or other custom code will not run on Smarty5, you should log an issue with the maintainer. If the maintainer does not respond you should consider uninstalling the extension.")
         . " " . ts("In the short term you can make your site continue to use Smarty2 by editing your civicrm.settings.php file and adding the line %1",
           [1 => sprintf("<pre>  define('CIVICRM_SMARTY_AUTOLOAD_PATH',\n    %s);</pre>", htmlentities(var_export($smarty2Path, 1)))])
-        . (ts('Upcoming versions will standardize on Smarty v5. CiviCRM <a %1>v6.4-ESR</a> will provide extended support for Smarty v2, v3, & v4. To learn more and discuss, see the <a %2>Smarty transition page</a>.' . '</p>', [
+        . (ts('Upcoming versions will standardize on Smarty v5. CiviCRM <a %1>v6.4-ESR</a> will provide extended support for Smarty v2, v3, & v4. To learn more and discuss, see the <a %2>Smarty transition page</a>.', [
           1 => 'target="_blank" href="' . htmlentities('https://civicrm.org/esr') . '"',
           2 => 'target="_blank" href="' . htmlentities('https://civicrm.org/redirect/smarty-v3') . '"',
         ])

@@ -65,7 +65,7 @@ abstract class CRM_Core_Form_Task_PickProfile extends CRM_Core_Form_Task {
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
 
-    $this->setTitle(ts('Update multiple ' . $this::$entityShortname . 's'));
+    $this->setTitle(ts('Update multiple %1s', [1 => $this::$entityShortname]));
 
     // validations
     if (count($this->_entityIds) > $this->_maxEntities) {

@@ -99,7 +99,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $url_params = "reset=1";
     $params = [
       'name' => $name,
-      'label' => ts($name),
+      'label' => $name,
       'url' => "{$url}?{$url_params}",
       'parent_id' => NULL,
       'is_active' => TRUE,
@@ -126,7 +126,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $url_params = "reset=1&output=criteria";
     $params = [
       'name' => $name,
-      'label' => ts($name),
+      'label' => $name,
       'url' => "{$url}?{$url_params}",
       'parent_id' => NULL,
       'is_active' => TRUE,
