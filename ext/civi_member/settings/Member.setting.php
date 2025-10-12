@@ -34,7 +34,7 @@ return [
     'title' => ts('Default online membership renewal page'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If you select a default online contribution page for self-service membership renewals, a "renew" link pointing to that page will be displayed on the Contact Dashboard for memberships which were entered offline. You will need to ensure that the membership block for the selected online contribution page includes any currently available memberships.'),
-    'help_text' => NULL,
+    'help_text' => ts('If you select a default online contribution page for self-service membership renewals, a "renew" link pointing to that page will be displayed on the Contact Dashboard for memberships which were entered offline. You will need to ensure that the membership block for the selected online contribution page includes any currently available memberships.'),
+    'settings_pages' => ['member' => ['weight' => 0]],
   ],
 ];
