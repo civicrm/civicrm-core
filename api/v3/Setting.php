@@ -48,11 +48,9 @@ function civicrm_api3_setting_getfields($params) {
   if ($domainID === 'current_domain') {
     $domainID = NULL;
   }
-  $result = CRM_Core_BAO_Setting::getSettingSpecification(
-    $params['component_id'] ?? NULL,
+  $result = \Civi\Core\SettingsMetadata::getMetadata(
     $params['filters'] ?? [],
     $domainID,
-    $params['profile'] ?? NULL
   );
   // find any supplemental information
   if (!empty($params['action'])) {
