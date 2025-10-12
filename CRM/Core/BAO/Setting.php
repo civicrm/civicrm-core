@@ -572,4 +572,18 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
   }
 
+  public static function wpBasePageMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it
+    if (!CRM_Core_Config::singleton()->userSystem->canSetBasePage()) {
+      unset($setting['settings_pages']['uf']);
+    }
+  }
+
+  public static function userFrameworkUsersTableNameMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it
+    if (!CRM_Core_Config::singleton()->userSystem->hasUsersTable()) {
+      unset($setting['settings_pages']['uf']);
+    }
+  }
+
 }

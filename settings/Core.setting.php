@@ -789,6 +789,7 @@ return [
     'title' => ts('WordPress Base Page'),
     'is_domain' => 1,
     'is_contact' => 0,
+    'metadata_callback' => ['CRM_Core_BAO_Setting', 'wpBasePageMetadataCallback'],
     'help_text' => [
       ts('If set, CiviCRM will use this setting as the base url.'),
       ts('By default, CiviCRM will generate front-facing pages using the home page as its base. If you want to use a different template for CiviCRM pages, set the path here.'),
@@ -917,6 +918,7 @@ return [
       'maxlength' => '64',
     ],
     'default' => 'users',
+    'metadata_callback' => ['CRM_Core_BAO_Setting', 'userFrameworkUsersTableNameMetadataCallback'],
     'title' => ts('CMS Users Table Name'),
     'settings_pages' => ['uf' => ['weight' => 0]],
   ],
