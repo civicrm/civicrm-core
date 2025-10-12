@@ -910,7 +910,7 @@ ORDER BY weight";
           'attributes' => [
             'label' => ts('CiviCRM Home'),
             'name' => 'CiviCRM Home',
-            'url' => 'civicrm/dashboard?reset=1',
+            'url' => 'civicrm/home?reset=1',
             'icon' => 'crm-i fa-house-user',
             'weight' => 1,
           ],
