@@ -625,7 +625,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another price set field.'), '', 'info');
+      CRM_Core_Session::setStatus(ts('You can add another price set field.'), '', 'info');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field/edit', 'reset=1&action=add&sid=' . $this->_sid));
     }
     else {

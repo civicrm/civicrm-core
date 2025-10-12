@@ -39,7 +39,7 @@ return [
         'saved_search_id.name' => 'CiviCRM_Reports',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts(NULL),
+          'description' => NULL,
           'sort' => [
             ['title', 'ASC'],
           ],

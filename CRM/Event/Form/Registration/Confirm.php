@@ -583,7 +583,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           //if primary participant contributing additional amount
           //append (multiple participants) to its fee level. CRM-4196.
           if (count($params) > 1) {
-            $participantRecord['amount_level'] .= ts(' (multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
+            $participantRecord['amount_level'] .= ' ' . ts('(multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
           }
 
           //passing contribution id is already registered.
