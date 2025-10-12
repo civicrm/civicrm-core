@@ -18,7 +18,7 @@
 /**
  * This class generates form components for Site Url.
  */
-class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
+class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Generic {
 
   /**
    * Build the form object.
@@ -30,16 +30,6 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     );
 
     parent::buildQuickForm();
-
-    // Conditionally remove settings that don't apply to the current UF.
-    $settingMetaData = $this->getSettingsMetaData();
-    if (!$config->userSystem->hasUsersTable()) {
-      unset($settingMetaData['userFrameworkUsersTableName']);
-    }
-    if (!$config->userSystem->canSetBasePage()) {
-      unset($settingMetaData['wpBasePage']);
-    }
-    $this->assign('settings_fields', $settingMetaData);
 
     $viewsIntegration = $config->userSystem->viewsIntegration();
     $this->assign('viewsIntegration', $viewsIntegration);
