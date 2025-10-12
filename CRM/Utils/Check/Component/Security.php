@@ -74,10 +74,9 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           $url[] = $log_path[1];
           $log_url = implode($filePathMarker, $url);
           if ($this->fileExists($log_url)) {
-            $docs_url = $this->createDocUrl('the-log-file-should-not-be-accessible');
             $msg = ts('The <a %1>CiviCRM debug log</a> should not be downloadable.', [1 => "href='$log_url'"])
               . '<br />'
-              . '<a href="' . $docs_url . '">' . ts('Read more about this warning') . '</a>';
+              . $this->createDocLink('the-log-file-should-not-be-accessible');
             $messages[] = new CRM_Utils_Check_Message(
               __FUNCTION__,
               $msg,
@@ -128,7 +127,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           __FUNCTION__,
           ts('Files in the data directory (<a %1>%2</a>) should not be downloadable.', [1 => 'href="' . $heuristicUrl . '"', 2 => $privateDir])
             . '<br />'
-            . ts('<a %1>Read more about this warning</a>', [1 => 'href="' . $this->createDocUrl('uploads-should-not-be-accessible') . '"']),
+            . $this->createDocLink('uploads-should-not-be-accessible'),
           ts('Private Files Readable'),
           \Psr\Log\LogLevel::WARNING,
           'fa-lock'
@@ -198,8 +197,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       if ($this->isBrowsable($publicDir, $publicUrl)) {
         $msg = ts('Directory <a %1>%2</a> should not be browseable via the web.', [1 => "href='$publicDir'", 2 => $publicDir])
           . '<br />' .
-          '<a href="' . $docs_url . '">' . ts('Read more about this warning') . '</a>';
-        $docs_url = $this->createDocUrl('directories-should-not-be-browsable');
+          $this->createDocLink('directories-should-not-be-browsable');
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
           $msg,
@@ -449,8 +447,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    *
    * @return string
    */
-  public function createDocUrl($topic) {
-    return CRM_Utils_System::docURL2('sysadmin/setup/security#' . $topic, TRUE);
+  public function createDocLink($topic) {
+    return CRM_Utils_System::docURL2('sysadmin/setup/security#' . $topic, FALSE, ts('Read more about this warning'));
   }
 
   /**
