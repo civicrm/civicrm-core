@@ -195,7 +195,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     // Test that $publicDir is not browsable
     foreach ($publicDirs as $publicDir => $publicUrl) {
       if ($this->isBrowsable($publicDir, $publicUrl)) {
-        $msg = ts('Directory <a %1>%2</a> should not be browseable via the web.', [1 => "href='$publicDir'", 2 => $publicDir])
+        $msg = ts('Directory <a %1>%2</a> should not be browseable via the web.', [1 => "href='$publicUrl'", 2 => $publicDir])
           . '<br />' .
           $this->createDocLink('directories-should-not-be-browsable');
         $messages[] = new CRM_Utils_Check_Message(
