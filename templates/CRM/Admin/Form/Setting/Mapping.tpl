@@ -8,11 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 <div class="help">
-    {ts}CiviCRM includes plugins for several mapping and geocoding web services. When your users save a contact or event location address, a geocoding service will convert the address into geographical coordinates, which are required for mapping. Mapping services allow your users to display addresses on a map.{/ts} {help id='map-intro-id'}
+  {ts}CiviCRM includes plugins for several mapping and geocoding web services. When your users save a contact or event location address, a geocoding service will convert the address into geographical coordinates, which are required for mapping. Mapping services allow your users to display addresses on a map.{/ts}
+  {docURL page='user/initial-set-up/mapping/'}
 </div>
-<div class="crm-block crm-form-block crm-map-form-block">
-    {include file='CRM/Admin/Form/Setting/SettingForm.tpl'}
-</div>
+{include file='CRM/Admin/Form/Generic.tpl'}
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
