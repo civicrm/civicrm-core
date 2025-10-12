@@ -126,9 +126,9 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       if ($this->isDirAccessible($privateDir, $heuristicUrl)) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('Files in the data directory (<a href="%1">%2</a>) should not be downloadable.', [1 => $heuristicUrl, 2 => $privateDir])
+          ts('Files in the data directory (<a %1>%2</a>) should not be downloadable.', [1 => 'href="' . $heuristicUrl . '"', 2 => $privateDir])
             . '<br />'
-            . ts('<a href="%1">Read more about this warning</a>', [1 => $this->createDocUrl('uploads-should-not-be-accessible')]),
+            . ts('<a %1>Read more about this warning</a>', [1 => 'href="' . $this->createDocUrl('uploads-should-not-be-accessible') . '"']),
           ts('Private Files Readable'),
           \Psr\Log\LogLevel::WARNING,
           'fa-lock'
