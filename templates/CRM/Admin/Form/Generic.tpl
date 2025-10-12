@@ -33,7 +33,11 @@
         {/if}
         <table class="form-layout-compressed">
           {foreach from=$section.fields key="setting_name" item="fieldSpec"}
-            {include file="CRM/Admin/Form/Setting/SettingField.tpl"}
+            {if !empty($fieldSpec.template)}
+              {include file=$fieldSpec.template}
+            {else}
+              {include file="CRM/Admin/Form/Setting/SettingField.tpl"}
+            {/if}
           {/foreach}
         </table>
       {/crmRegion}
