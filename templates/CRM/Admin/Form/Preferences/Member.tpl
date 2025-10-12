@@ -7,4 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/Form/basicForm.tpl"}
+<div class="help">
+  {docURL page="user/membership/online-membership-sign-up/"}
+</div>
+{include file="CRM/Admin/Form/Generic.tpl"}
+
