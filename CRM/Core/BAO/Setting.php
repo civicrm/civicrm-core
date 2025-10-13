@@ -365,6 +365,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return TRUE;
   }
 
+  public static function validateCustomTranslateFunction($value, $fieldSpec): bool {
+    if ($value && !function_exists($value)) {
+      throw new CRM_Core_Exception(ts('Please define the custom translation function first.'));
+    }
+    return TRUE;
+  }
+
   public static function validatePath($value, $fieldSpec): bool {
     if (isset($value) && strlen($value) && !CRM_Utils_Rule::settingPath($value)) {
       throw new CRM_Core_Exception(ts("'%1' directory does not exist", [1 => $value]));
