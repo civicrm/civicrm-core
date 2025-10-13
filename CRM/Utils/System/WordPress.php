@@ -1313,6 +1313,18 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * Output JSON response to the client
+   *
+   * @param array $response
+   * @param int $httpResponseCode
+   *
+   * @return void
+   */
+  public static function sendJSONResponse(array $response, int $httpResponseCode): void {
+    wp_send_json($response, $httpResponseCode);
+  }
+
+  /**
    * Start a new session if there's no existing session ID.
    *
    * Checks are needed to prevent sessions being started when not necessary.

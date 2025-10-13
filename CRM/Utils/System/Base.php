@@ -1048,6 +1048,21 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Output JSON response to the client
+   *
+   * @param array $response
+   * @param int $httpResponseCode
+   *
+   * @return void
+   */
+  public static function sendJSONResponse(array $response, int $httpResponseCode): void {
+    http_response_code($httpResponseCode);
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
+    echo json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
    * Start a new session.
    */
   public function sessionStart() {
