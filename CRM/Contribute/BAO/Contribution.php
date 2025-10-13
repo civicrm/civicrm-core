@@ -3079,15 +3079,67 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $updated = CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
         }
 
-        //if Change contribution amount
         $params['trxnParams']['fee_amount'] = $params['fee_amount'] ?? NULL;
         $params['trxnParams']['net_amount'] = $params['net_amount'] ?? NULL;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
-        if (isset($totalAmount) &&
-          bccomp($totalAmount, $params['prevContribution']->total_amount, 5) !== 0
-        ) {
-          //Update Financial Records
+
+        // Change contribution currency
+        if (isset($params['currency']) && $params['currency'] !== $params['prevContribution']->currency) {
+          // Create a negative transaction for the first amount in the first currency
+          $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = - $params['prevContribution']->net_amount;
+          $params['trxnParams']['currency'] = $params['prevContribution']->currency;
+          CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedCurrency');
+
+          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedCurrency');
+          // Set trxnParams back to amounts for new currency
+          $params['trxnParams']['total_amount'] = $totalAmount;
+          $params['trxnParams']['fee_amount'] = $params['fee_amount'] ?? NULL;
+          $params['trxnParams']['net_amount'] = $params['net_amount'] ?? $totalAmount;
+
+          // Fix line items and financial items
+          if (empty($params['skipLineItem'])) {
+            if ($params['prevContribution']->net_amount) {
+              // Replace with new currency and amount, proportionally
+              $conversionFactor = $params['trxnParams']['net_amount'] / $params['prevContribution']->net_amount;
+              $fieldToFix = [
+                'subTotal'
+              ];
+              foreach ($params['line_item'] as $index => &$lineItems) {
+                foreach ($lineItems as $lineItemID => &$lineItem) {
+                  foreach ($fieldToFix as $field) {
+                    $lineItem[$field] = $lineItem[$field] * $conversionFactor;
+                  }
+                  CRM_Price_BAO_LineItem::create($lineItem);
+
+                  $financialItem = \Civi\Api4\FinancialItem::get(FALSE)
+                    ->addWhere('entity_table', '=', 'civicrm_line_item')
+                    ->addWhere('entity_id', '=', $lineItemID)
+                    ->execute()->first();
+                  $financialItemParams = [
+                    'id' => $financialItem['id'],
+                    'amount' => $financialItem['amount'] * $conversionFactor,
+                    'currency' => $params['currency'],
+                    'description' => ($lineItem['qty'] != 1 ? $lineItem['qty'] . ' of ' : '') . $lineItem['label'],
+                  ];
+                  CRM_Financial_BAO_FinancialItem::create($financialItemParams);
+                }
+              }
+            }
+          }
+          // Then we sent the currency back to the new currency for the next call to the financial functions
+          $params['trxnParams']['currency'] = $params['currency'];
+          // And zero out the previous amount, so the next block creates a new financial txn with the full amount
+          // in the new currency.
+          $params['prevContribution']->total_amount = $params['prevContribution']->net_amount = 0;
+          // We have wrangled the line items into shape already - don't create any more.
+          $params['skipLineItem'] = TRUE;
+          $updated = TRUE;
+        }
+
+        // Change contribution amount
+        if (isset($totalAmount) && bccomp($totalAmount, $params['prevContribution']->total_amount, 5) !== 0 ) {
+          // Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedAmount');
           CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedAmount');
