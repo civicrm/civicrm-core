@@ -73,7 +73,8 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
 
     // Sort settings into sections & add to form
     foreach ($this->_settings as $settingName => &$setting) {
-      $added = $this->addSettingFieldToForm($settingName, $setting);
+      // If element was already added by a form class override, don't add it again
+      $added = $this->elementExists($settingName) || $this->addSettingFieldToForm($settingName, $setting);
       if ($added) {
         $placement = $setting['settings_pages'][$filter];
         $sectionName = $placement['section'] ?? 'default';
