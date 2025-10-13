@@ -16,7 +16,7 @@
  */
 
 /**
- * This class generates form components generic to CiviCRM settings.
+ * @deprecated use CRM_Admin_Form_Generic instead.
  */
 class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
