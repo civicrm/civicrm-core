@@ -76,6 +76,8 @@ class CRM_Core_ManagedEntities {
   public function reconcile($modules = NULL) {
     $modules = $modules ? (array) $modules : NULL;
     $declarations = $this->getDeclarations($modules);
+    // remove declarations for entities we dont recognise
+    $declarations = $this->filterUnrecognisedEntities($declarations);
     $plan = $this->createPlan($declarations, $modules);
     if (!CRM_Core_Config::isUpgradeMode()) {
       $plan = $this->optimizePlan($plan);
@@ -173,6 +175,19 @@ class CRM_Core_ManagedEntities {
    */
   private function filterPlanByAction(array $plan, string $action): array {
     return CRM_Utils_Array::findAll($plan, ['managed_action' => $action]);
+  }
+
+  /**
+   * Filter out declarations for entities we dont recognise
+   *
+   * This is useful during upgrade mode, when extension entities are not available.
+   *
+   * @param array[] $declarations
+   *
+   * @return array
+   */
+  private function filterUnrecognisedEntities(array $declarations): array {
+    return array_filter($declarations, fn ($declaration) => CoreUtil::entityExists($declaration['entity']));
   }
 
   /**
