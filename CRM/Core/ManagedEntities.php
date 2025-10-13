@@ -259,7 +259,7 @@ class CRM_Core_ManagedEntities {
     }
     // APIv3
     else {
-      $result = civicrm_api($item['entity_type'], 'create', $params);
+      $result = civicrm_api3($item['entity_type'], 'create', $params);
       if (!empty($result['is_error'])) {
         $this->onApiError($item['module'], $item['name'], 'create', $result['error_message']);
         return;
