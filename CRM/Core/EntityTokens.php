@@ -656,12 +656,12 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $field = array_merge($field, $this->getTokenMetadataOverrides()[$field['name']]);
     }
     if ($field['type'] === 'Custom') {
-      // Convert to apiv3 style for now. Later we can add v4 with
-      // portable naming & support for labels/ dates etc so let's leave
+      // Convert to apiv3 style for now (swap group and field labels, use double colon, use custom_123 key)
+      // Later we can add v4 with portable naming & support for labels/ dates etc so let's leave
       // the space open for that.
-      // Not the existing QuickForm widget has handling for the custom field
+      // Note the existing QuickForm widget has handling for the custom field
       // format based on the title using this syntax.
-      $parts = explode(': ', $field['label'], 2);
+      $parts = explode(': ', $field['title'], 2);
       $field['title'] = "{$parts[1]} :: {$parts[0]}";
       $tokenName = 'custom_' . $field['custom_field_id'];
       $tokensMetadata[$tokenName] = $field;
