@@ -67,7 +67,7 @@
       window.location = CRM.url('civicrm/a#/mailing/' + mailingId);
     };
 
-    this.onError = function() {
+    this.onError = function(error) {
       CRM.alert(ts('An error occurred while attempting to create mailing.'), ts('Error'), 'error');
       this.cancel();
     };

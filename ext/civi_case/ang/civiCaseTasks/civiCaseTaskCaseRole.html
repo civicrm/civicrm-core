@@ -28,7 +28,7 @@
     </div>
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5>{{:: ts('Adding roles...') }}</h5>
-      <crm-search-batch-runner entity="'CaseContact'" action="get" params="$ctrl.run" ids="$ctrl.ids" id-field="case_id" success="$ctrl.onSuccess(result)" error="$ctrl.onError()" ></crm-search-batch-runner>
+      <crm-search-batch-runner entity="'CaseContact'" action="get" params="$ctrl.run" ids="$ctrl.ids" id-field="case_id" success="$ctrl.onSuccess(result)" error="$ctrl.onError(error)" ></crm-search-batch-runner>
     </div>
     <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" />
     <crm-dialog-button text="ts('Save')" icons="{primary: 'fa-user-plus'}" on-click="$ctrl.submit()" disabled="$ctrl.run || $ctrl.existingCount === null || !civiCaseTaskCaseRoleForm.$valid" />

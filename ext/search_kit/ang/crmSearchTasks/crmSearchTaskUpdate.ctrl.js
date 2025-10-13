@@ -80,7 +80,7 @@
       this.close();
     };
 
-    this.onError = function() {
+    this.onError = function(error) {
       CRM.alert(ts('An error occurred while attempting to update %1 %2.', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
       this.cancel();
     };
