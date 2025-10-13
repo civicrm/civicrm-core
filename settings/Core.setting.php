@@ -109,8 +109,9 @@ return [
     'title' => ts('Address Fields'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'help_text' => ts('Select the fields to be included when editing a contact or event address.'),
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
+    'settings_pages' => ['address' => ['section' => 'edit', 'weight' => 10]],
   ],
   'address_format' => [
     'group_name' => 'CiviCRM Preferences',
@@ -123,7 +124,8 @@ return [
     'title' => ts('Address Display Format'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'template' => 'CRM/Admin/Form/Preferences/AddressFormat.tpl',
+    'settings_pages' => ['address' => ['section' => 'display', 'weight' => 10]],
   ],
   'mailing_format' => [
     'group_name' => 'CiviCRM Preferences',
@@ -136,7 +138,8 @@ return [
     'title' => ts('Mailing Label Format'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'template' => 'CRM/Admin/Form/Preferences/AddressMailingFormat.tpl',
+    'settings_pages' => ['address' => ['section' => 'labels', 'weight' => 10]],
   ],
   'display_name_format' => [
     'group_name' => 'CiviCRM Preferences',
