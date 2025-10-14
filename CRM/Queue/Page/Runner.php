@@ -9,9 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CRM/Core/Page.php';
-
 /**
  * The queue-runner page provides an interactive, web-based system
  * running the tasks in a queue and monitoring its progression.
