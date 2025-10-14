@@ -1,17 +1,17 @@
 <select
-  ng-if="$ctrl.options.length"
+  ng-if="$ctrl.savedSets.length"
   ng-model="$ctrl.getSetFilterSet"
   ng-model-options="{getterSetter: true}"
   >
   <option value="">- {{:: ts('Saved filters') }} - </option>
-  <option ng-repeat="filterSet in $ctrl.options" value="{{:: filterSet.id }}">
+  <option ng-repeat="filterSet in $ctrl.savedSets" value="{{:: filterSet.id }}">
     {{:: filterSet.label }}
   </option>
 </select>
 
 <div class="crm-buttons">
   <button
-    ng-if="$ctrl.options.length"
+    ng-if="$ctrl.savedSets.length"
     type="button"
     class="btn btn-secondary"
     crm-icon="fa-gear"
@@ -21,13 +21,23 @@
   </button>
 
   <button
+    ng-if="$ctrl.updateDialog.canOpen()"
+    type="button"
+    class="btn btn-secondary"
+    crm-icon="fa-save"
+    ng-click="$ctrl.updateDialog.open()"
+    >
+    {{:: ts('Save changes') }}
+  </button>
+
+  <button
     type="button"
     class="btn btn-primary"
     crm-icon="fa-plus"
     ng-click="$ctrl.saveDialog.open()"
     ng-disabled="!$ctrl.saveDialog.canOpen()"
     >
-    {{ $ctrl.options.length ? ts('Save current') : ts('Save filters') }}
+    {{ $ctrl.savedSets.length ? ts('Save new') : ts('Save filters') }}
   </button>
 </div>
 
@@ -40,7 +50,7 @@
     <input id="newFilterSetLabel" ng-model="$ctrl.saveDialog.label" />
 
     <dl>
-      <div ng-repeat="(key, value) in $ctrl.getCurrentFilters()">
+      <div ng-repeat="(key, value) in $ctrl.renderFilterSetValues($ctrl.getCurrentFilterValues())">
         <dt>{{:: key }}</dt><dd>{{ value }}</dd>
       </div>
     </dl>
@@ -68,26 +78,68 @@
   </div>
 </dialog>
 
+<dialog class="af-filter-set-update">
+  <div ng-show="$ctrl.updateDialog.inProgress" class="crm-loading-spinner">
+    <div class="sr-only">{{:: ts('Saving...') }}</div>
+  </div>
+  <div ng-show="!$ctrl.updateDialog.inProgress">
+    <label for="updateFilterSetLabel">{{:: ts('Name') }}</label>
+    <input id="updateFilterSetLabel" ng-model="$ctrl.updateDialog.label" />
+
+    <dl>
+      <div ng-repeat="(key, value) in $ctrl.renderFilterSetValues($ctrl.getCurrentFilterValues())">
+        <dt>{{:: key }}</dt><dd>{{ value }}</dd>
+      </div>
+    </dl>
+
+    <div class="crm-buttons">
+      <button
+        type="button"
+        class="btn btn-warning"
+        crm-icon="fa-times"
+        ng-click="$ctrl.updateDialog.close()"
+        >
+        {{:: ts('Close') }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        crm-icon="fa-save"
+        ng-click="$ctrl.updateDialog.update()"
+        ng-disabled="!$ctrl.updateDialog.canUpdate()"
+        >
+        {{:: ts('Save changes') }}
+      </button>
+
+    </div>
+  </div>
+</dialog>
+
 <dialog class="af-filter-sets-manage">
-  <div ng-if="!$ctrl.options.length" class="status status-warning">
+  <div ng-if="!$ctrl.savedSets.length" class="status status-warning">
     {{:: ts('No filter sets have been created for this form.')}}
   </div>
 
-  <ul ng-if="$ctrl.options.length">
-    <li ng-repeat="filterSet in $ctrl.options" class="af-filter-set-manage">
+  <ul ng-if="$ctrl.savedSets.length">
+    <li ng-repeat="filterSet in $ctrl.savedSets" class="af-filter-set-manage">
 
       <details class="crm-accordion-wrapper">
 
       <summary class="crm-accordion-header">
         {{:: filterSet.label }}
         <span class="af-filter-set-description">
-          {{:: $ctrl.manageDialog.itemDescription(filterSet) }}
+          {{::
+            ts('Created %1 by %2', {
+              1: filterSet.created_date,
+              2: (filterSet['created_by.display_name'] ? filterSet['created_by.display_name'] : 'UNKNOWN')
+            })
+          }}
         </span>
       </summary>
 
       <div class="crm-accordion-body">
         <dl>
-          <div ng-repeat="(key, value) in filterSet.filters">
+          <div ng-repeat="(key, value) in $ctrl.renderFilterSetValues(filterSet.filters)">
             <dt>{{:: key }}</dt><dd>{{ value }}</dd>
           </div>
         </dl>
