@@ -86,7 +86,7 @@ if (!defined('CIVI_SETUP')) {
     );
     $str = \Civi\Setup\SettingsUtil::evaluate($tplPath, $params);
 
-    if (!$m->getField('doNotCreateSettingsFile', 'value')) {
+    if (!$m->doNotCreateSettingsFile) {
       file_put_contents($m->settingsPath, $str);
     }
 

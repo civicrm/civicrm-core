@@ -197,25 +197,16 @@ class Setup {
   /**
    * Create the settings file.
    *
-   * @param bool $create
-   *   Flag to create civicrm.settings.php
-   *
    * @return \Civi\Setup\Event\InstallFilesEvent
    */
-  public function installFiles($create = TRUE) {
+  public function installFiles() {
     if ($this->pendingAction !== NULL) {
       throw new InitException(sprintf("Cannot begin action %s. Already executing %s.", __FUNCTION__, $this->pendingAction));
     }
     $this->pendingAction = __FUNCTION__;
 
     try {
-      $model = $this->getModel();
-      $model->addField([
-        'name' => 'doNotCreateSettingsFile',
-        'type' => 'bool',
-        'value' => !$create,
-      ]);
-      $event = new InstallFilesEvent($model);
+      $event = new InstallFilesEvent($this->getModel());
       return $this->getDispatcher()->dispatch('civi.setup.installFiles', $event);
     }
     finally {

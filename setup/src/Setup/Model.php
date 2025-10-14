@@ -69,6 +69,10 @@ namespace Civi\Setup;
  *   Open-ended list translations files which should be downloaded. Each entry is a url of an mo-file.
  *   Provide each entry with en_US langugae code. That code will be replaced with the actual language.
  *   The default is: ['https://download.civicrm.org/civicrm-l10n-core/mo/en_US/civicrm.mo']
+ * @property bool $doNotCreateSettingsFile
+ *   Flag to skip creation of civicrm.settings.php on install.
+ *   Set to TRUE if you want to NOT create civicrm.settings.php on install.
+ *   The default is FALSE, create settings file on install.
  */
 class Model {
 
@@ -192,6 +196,12 @@ class Model {
         'civicrm.mo' => 'https://download.civicrm.org/civicrm-l10n-core/mo/[locale]/civicrm.mo',
       ),
     ));
+    $this->addField([
+      'description' => 'Option for installation process to skip creation of civicrm.settings.php',
+      'name' => 'doNotCreateSettingsFile',
+      'type' => 'bool',
+      'value' => FALSE,
+    ]);
   }
 
   /**
