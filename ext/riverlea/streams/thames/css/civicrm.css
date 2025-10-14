@@ -1,15 +1,15 @@
 /* Only affect body colour in standalone */
 html.cms-standalone body {
-  background-color: var(--crm-c-page-background);
+  background-color: var(--crm-c-page-bg);
 }
 
 #crm-container {
   min-height: 100vh;
-  background-color: var(--crm-c-page-background);
+  background-color: var(--crm-c-page-bg);
 }
 
 .crm-container details {
-  background-color: var(--crm-expand-body-bg);
+  /* background-color: var(--crm-expand-body-bg); Removed for FormBuilder clashes */
   border: var(--crm-c-divider);
 }
 
@@ -236,7 +236,7 @@ html.cms-standalone body {
     background-color: var(--crm-c-blue-overlay);
 }
   50% {
-    background-color: var(--crm-c-page-background);
+    background-color: var(--crm-c-page-bg);
 }
   100% {
     background-color: var(--crm-c-blue-overlay);
@@ -570,7 +570,7 @@ html.crm-standalone  nav.breadcrumb>ol {
   /*issue https://lab.civicrm.org/extensions/riverlea/-/issues/102 */
   margin-left: 1rem;
   /* crmSearchAdmin applies this var as the bg here and it does not suit us. */
-  --crm-c-page-background: transparent;
+  --crm-c-page-bg: transparent;
 }
 
 /* Override _dropdowns.css */
@@ -589,7 +589,7 @@ html.crm-standalone  nav.breadcrumb>ol {
 
 /* Fix Mosaico wizard */
 .crm_wizard__tille {
-  --crm-panel-background: transparent;
+  --crm-panel-bg: transparent;
 }
 .crmb-wizard-button-right {
   gap: 1rem;
@@ -632,7 +632,7 @@ ul.crm-quickSearch-results a:active {
   min-width: 8rem;
   max-width: 13rem;
   text-align: left;
-  --crm-c-background2: transparent;
+  --crm-c-layer1-bg: transparent;
 
   .crm-status-box-msg {
     color: white;
