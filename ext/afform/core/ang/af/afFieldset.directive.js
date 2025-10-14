@@ -12,7 +12,7 @@
         var self = ctrls[0];
         self.afFormCtrl = ctrls[1];
       },
-      controller: function($scope, $element) {
+      controller: function($scope, $element, crmApi4) {
         let ctrl = this;
         let localData = [];
         let joinOffsets = {};
@@ -67,7 +67,9 @@
               }
             }, true);
           }
+          $scope.$watch(this.getFilterSetId, () => this.fetchFilterSetValues());
         };
+
         /**
          * Get fieldset values to use for afform filters
          * @returns Object
@@ -81,6 +83,45 @@
             (['boolean', 'number', 'object'].includes(typeof value) && value !== null) || (value && value.length)
           ));
         };
+
+        /**
+         * Get value for a given field based on currently applied filterset
+         * Used by afField controller on load
+         */
+        this.getFilterSetFieldValue = (fieldName) => {
+          if (this.filtersetValues && this.filtersetValues.hasOwnProperty(fieldName)) {
+            return this.filtersetValues[fieldName];
+          }
+          return null;
+        };
+
+        /**
+         * Fetch values for a filterset from the server
+         */
+        this.fetchFilterSetValues = () => {
+          const filtersetId = this.getFilterSetId();
+          if (!filtersetId) {
+            return;
+          }
+          crmApi4('AfformFilterSet', 'get', {
+            where: [['id', '=', filtersetId]],
+            select: ['filters'],
+          })
+          .then((result) => {
+            if (result && result[0] && result[0].filters) {
+              this.filtersetValues = result[0].filters;
+            }
+            else {
+              this.filtersetValues = {};
+            }
+            $scope.$broadcast('afFormReset');
+          });
+        };
+
+        /**
+         * Get filter set ID from URL hash param
+         */
+        this.getFilterSetId = () => ($scope && $scope.routeParams) ? $scope.routeParams._filterset : null;
       }
     };
   });

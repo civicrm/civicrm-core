@@ -160,6 +160,9 @@
           else if (urlArgs && (ctrl.fieldName in urlArgs)) {
             setValue(urlArgs[ctrl.fieldName]);
           }
+          else if (urlArgs && urlArgs._filterset) {
+            setValue(ctrl.afFieldset.getFilterSetFieldValue(ctrl.fieldName));
+          }
           else if (firstLoad && ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
