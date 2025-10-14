@@ -72,7 +72,7 @@ trait UserJobTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getUserJob(): array {
+  public function getUserJob(): array {
     if (empty($this->userJob)) {
       $this->userJob = UserJob::get()
         ->addSelect('*', 'search_display_id.name', 'search_display_id.saved_search_id.name')
