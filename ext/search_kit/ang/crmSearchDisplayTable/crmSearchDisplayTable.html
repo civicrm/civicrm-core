@@ -5,6 +5,22 @@
     <crm-search-tasks-menu ng-if="$ctrl.settings.actions && $ctrl.taskManager" ids="$ctrl.selectedRows" task-manager="$ctrl.taskManager" display-mode="$ctrl.settings.actions_display_mode || 'menu'"></crm-search-tasks-menu>
     <span ng-if="$ctrl.settings.headerCount" ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
     <div class="form-group pull-right" ng-include="'~/crmSearchDisplay/toolbar.html'" ng-if="$ctrl.toolbar"></div>
+    <details ng-if="$ctrl.settings.toggleColumns">
+      <summary>{{:: ts('Toggle Columns') }}</summary>
+      <div class="crm-accordion-body">
+        <!-- TODO: select2 might be nicer here? -->
+        <label ng-repeat="(index, col) in $ctrl._allColumns">
+          <input type="checkbox"
+            ng-model="$ctrl._allColumns[index].toggled"
+            ng-change="$ctrl.toggleColumns()"
+            >
+            {{:: $ctrl.getColumnToggleLabel(col) }}
+        </label>
+        <button type="button" class="btn btn-secondary" ng-click="$ctrl.resetColumnToggles()">
+          Reset
+        </button>
+      </div>
+    </details>
   </div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>
