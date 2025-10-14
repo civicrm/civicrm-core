@@ -19,8 +19,13 @@
         // Mix in copies of traits to this controller
         ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
 
+      this._allColumns = null;
+
       this.$onInit = function() {
         let tallyParams;
+
+        this._allColumns = ctrl.settings.columns;
+        this.resetColumnToggles();
 
         // Copy API params from the run and adapt them in a secondary `tally` call for the "Totals" row
         if (ctrl.settings.tally) {
@@ -125,6 +130,47 @@
           }
         }
         return cssClass;
+      };
+
+      /**
+       * Filter row columns to the toggled ones (on the clientside)
+       *
+       * TODO: sometimes we may want to pass column selections to the server
+       * to lighten the query (and for actions like spreadsheet export)
+       *
+       * We *dont* want to keep refetching from the server  when toggling
+       * columns on/off on the same page - so this approach works well for now
+       */
+      this.getRowColumns = (row) => row.columns.filter((col, index) => this._allColumns[index].toggled);
+
+      this.toggleColumns = () => {
+        this.settings.columns = this._allColumns.filter((col) => col.toggled);
+      };
+
+      this.getColumnToggleLabel = (col) => {
+        if (col.label) {
+          return col.label;
+        }
+        if (col.key) {
+          return `[${col.key}]`;
+        }
+        if (col.type === 'menu') {
+          return ts('Menu');
+        }
+        if (col.type === 'buttons') {
+          return ts('Buttons');
+        }
+        if (col.type === 'links') {
+          return ts('Links');
+        }
+        return ts('Column %1', {1: col.index});
+      }
+      this.resetColumnToggles = () => {
+        this._allColumns.forEach((col, index) => {
+          this._allColumns[index].toggled = true;
+          this._allColumns[index].index = index;
+        });
+        this.toggleColumns();
       };
 
     }
