@@ -8,29 +8,33 @@
   </div>
 </fieldset>
 
-<details>
+<details class="crm-accordion-bold">
   <summary>{{:: ts('Style') }}</summary>
-  <div class="form-inline">
-    <label>{{:: ts('Table Style') }}</label>
-    <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.parent.tableClasses">
-      <label>
-        <input type="checkbox" ng-checked="$ctrl.includes($ctrl.display.settings.classes, style.name)" ng-click="$ctrl.parent.toggle($ctrl.display.settings.classes, style.name)">
-        <span>{{:: style.label }}</span>
-      </label>
+  <div class="crm-accordion-body">
+    <div class="form-inline">
+      <label>{{:: ts('Table Style') }}</label>
+      <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.parent.tableClasses">
+        <label>
+          <input type="checkbox" ng-checked="$ctrl.includes($ctrl.display.settings.classes, style.name)" ng-click="$ctrl.parent.toggle($ctrl.display.settings.classes, style.name)">
+          <span>{{:: style.label }}</span>
+        </label>
+      </div>
     </div>
   </div>
 </details>
 
 
-<details>
+<details class="crm-accordion-bold">
   <summary>{{:: ts('Footer') }}</summary>
-  <search-admin-pager-config display="$ctrl.display" no-limit="true"></search-admin-pager-config>
-  <div class="form-inline">
-    <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
-      <label>
-        <input type="checkbox" ng-click="$ctrl.toggleTally()" ng-checked="!!$ctrl.display.settings.tally">
-        <span>{{:: ts('Show Totals in Footer') }}</span>
-      </label>
+  <div class="crm-accordion-body">
+    <search-admin-pager-config display="$ctrl.display" no-limit="true"></search-admin-pager-config>
+    <div class="form-inline">
+      <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
+        <label>
+          <input type="checkbox" ng-click="$ctrl.toggleTally()" ng-checked="!!$ctrl.display.settings.tally">
+          <span>{{:: ts('Show Totals in Footer') }}</span>
+        </label>
+      </div>
     </div>
   </div>
 </details>
