@@ -1498,11 +1498,20 @@ if (!CRM.vars) CRM.vars = {};
       return $('#crm-notification-container').notify('create', params, options);
     }
     else {
-      if (title.length) {
-        text = title + "\n" + text;
+      if (typeof Swal === 'function') {
+        Swal.fire({
+          icon: type,
+          text: text || '',
+          title: title || '',
+        });
       }
-      // strip html tags as they are not parsed in standard alerts
-      alert($("<div/>").html(text).text());
+      else {
+        if (title.length) {
+          text = title + "\n" + text;
+        }
+        // strip html tags as they are not parsed in standard alerts
+        alert($("<div/>").html(text).text());
+      }
       return null;
     }
   };
