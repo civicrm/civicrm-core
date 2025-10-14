@@ -220,6 +220,13 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
     $form->assign('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR', FALSE));
     $form->assign('allRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID(), FALSE));
     $form->assign('importedRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=IMPORTED', FALSE));
-    $form->setTitle(ts('My Custom Title'));
+    try {
+      $userJob = $form->getUserJob();
+      if (!empty($userJob['label'])) {
+        $form->setTitle(ts('Import: %1', [1 => $label]));
+      }
+    }
+    catch (Exception $e) {
+    }
   }
 }
