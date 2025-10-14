@@ -22,6 +22,11 @@ use Civi\Api4\Utils\CoreUtil;
 class Meta {
 
   /**
+   * 64 characters is the max for some versions of SQL, minus the length of "index_" = 58.
+   */
+  const MAX_COLUMN_LENGTH = 58;
+
+  /**
    * Get calculated fields used by a saved search
    *
    * @param string $apiEntity
@@ -110,19 +115,18 @@ class Meta {
     // Strip the pseuoconstant suffix
     [$name, $suffix] = array_pad(explode(':', $key), 2, NULL);
     if (!empty($sqlName)) {
-      if (!preg_match(';^[A-Za-z0-9_]+$;', $sqlName) || strlen($sqlName) > 58) {
+      if (!preg_match(';^[A-Za-z0-9_]+$;', $sqlName) || strlen($sqlName) > self::MAX_COLUMN_LENGTH) {
         throw new \CRM_Core_Exception("Malformed column name");
       }
       $name = $sqlName;
     }
-    // Sanitize the name and limit to 58 characters.
-    // 64 characters is the max for some versions of SQL, minus the length of "index_" = 58.
-    if (strlen($name) <= 58) {
+    // Sanitize the name and limit to MAX_COLUMN_LENGTH characters.
+    if (strlen($name) <= self::MAX_COLUMN_LENGTH) {
       $name = \CRM_Utils_String::munge($name, '_', NULL);
     }
     // Append a hash of the full name to trimmed names to keep them unique but predictable
     else {
-      $name = \CRM_Utils_String::munge($name, '_', 42) . substr(md5($name), 0, 16);
+      $name = \CRM_Utils_String::munge($name, '_', self::MAX_COLUMN_LENGTH - 16) . substr(md5($name), 0, 16);
     }
     return [$name, $suffix];
   }
