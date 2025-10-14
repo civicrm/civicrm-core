@@ -368,6 +368,7 @@
               'metadata' : $scope.userJob.metadata,
               'job_type' : $scope.userJob.job_type,
               'status_id:name' : 'draft',
+              'label' : $scope.userJob.label,
             };
             if ($scope.mappingSaving.newFieldMapping) {
               templateJob.name = 'import_' + $scope.mappingSaving.newFieldMappingName;

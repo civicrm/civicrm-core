@@ -33,7 +33,7 @@ function run() {
   $moveStatus = CRM_Core_BAO_ConfigSetting::doSiteMove();
 
   echo $moveStatus . '<br />';
-  echo ts("If no errors are displayed above, the site move steps have completed successfully. Please visit <a href=\"{$config->userFrameworkBaseURL}\">your moved site</a> and test the move.");
+  echo "If no errors are displayed above, the site move steps have completed successfully. Please visit <a href=\"{$config->userFrameworkBaseURL}\">your moved site</a> and test the move.";
 }
 
 run();

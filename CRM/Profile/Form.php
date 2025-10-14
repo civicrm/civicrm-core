@@ -625,7 +625,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
               $fileId = $url['file_id'];
               $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileId);
               $deleteURL = CRM_Utils_System::url('civicrm/file',
-                "reset=1&id={$fileId}&eid=$entityId&fid={$key}&action=delete&fcs={$fileHash}"
+                "reset=1&id={$fileId}&fid={$key}&action=delete&fcs={$fileHash}"
               );
               $text = ts("Delete Attached File");
               $customFiles[$field['name']]['deleteURL'] = "<a href=\"{$deleteURL}\" onclick = \"if (confirm( ' $deleteExtra ' )) this.href+='&amp;confirmed=1'; else return false;\">$text</a>";
@@ -667,7 +667,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
               $fileId = $url['file_id'];
               $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileId);
               $deleteURL = CRM_Utils_System::url('civicrm/file',
-                "reset=1&id={$fileId}&eid=$entityId&fid={$customFieldID}&action=delete&fcs={$fileHash}"
+                "reset=1&id={$fileId}&fid={$customFieldID}&action=delete&fcs={$fileHash}"
               );
               $text = ts("Delete Attached File");
               $customFiles[$field['name']]['deleteURL'] = "<a href=\"{$deleteURL}\" onclick = \"if (confirm( ' $deleteExtra ' )) this.href+='&amp;confirmed=1'; else return false;\">$text</a>";

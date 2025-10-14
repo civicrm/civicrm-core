@@ -332,11 +332,11 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $errorMsg = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
-      $errorMsg[] = ts(' Store Name is not set for this payment processor');
+      $errorMsg[] = ts('Store Name is not set for this payment processor');
     }
 
     if (empty($this->_paymentProcessor['url_site'])) {
-      $errorMsg[] = ts(' URL is not set for this payment processor');
+      $errorMsg[] = ts('URL is not set for this payment processor');
     }
 
     if (!empty($errorMsg)) {

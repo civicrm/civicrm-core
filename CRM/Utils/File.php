@@ -1067,21 +1067,33 @@ HTACCESS;
 
     $targetData = imagecreatetruecolor($targetWidth, $targetHeight);
 
-    // resize
-    imagecopyresized($targetData, $sourceData,
-      0, 0, 0, 0,
-      $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+    if ($sourceMime == 'image/png') {
+      // Keep PNG transparency
+      imagealphablending($targetData, FALSE);
+      imagesavealpha($targetData, TRUE);
+      $transparentColor = imagecolorallocatealpha($targetData, 0, 0, 0, 127);
+      imagefilledrectangle($targetData, 0, 0, $targetWidth, $targetHeight, $transparentColor);
+      imagecopyresampled($targetData, $sourceData,
+        0, 0, 0, 0,
+        $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+      imagepng($targetData, $targetFile);
+    }
+    else {
+      imagecopyresized($targetData, $sourceData,
+        0, 0, 0, 0,
+        $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+      $fp = fopen($targetFile, 'w+');
+      ob_start();
+      imagejpeg($targetData);
+      $image_buffer = ob_get_contents();
+      ob_end_clean();
+      fwrite($fp, $image_buffer);
+      rewind($fp);
+      fclose($fp);
+    }
 
-    // save the resized image
-    $fp = fopen($targetFile, 'w+');
-    ob_start();
-    imagejpeg($targetData);
-    $image_buffer = ob_get_contents();
-    ob_end_clean();
+    imagedestroy($sourceData);
     imagedestroy($targetData);
-    fwrite($fp, $image_buffer);
-    rewind($fp);
-    fclose($fp);
 
     // return the URL to link to
     $config = CRM_Core_Config::singleton();
@@ -1197,20 +1209,17 @@ HTACCESS;
   /**
    * Get the maximum file size permitted for upload.
    *
-   * This function contains logic to check the server setting if none
-   * is configured. It is unclear if this is still relevant but perhaps it is no
-   * harm-no-foul.
+   * This is mostly redundant with what settings.get already does.
    *
    * @return int
-   *   Size in mega-bytes.
+   *   Size in megabytes.
    */
   public static function getMaxFileSize(): int {
-    $maxFileSizeMegaBytes = \Civi::settings()->get('maxFileSize');
-    //Fetch maxFileSizeMegaBytes from php_ini when $config->maxFileSize is set to "no limit".
-    if (empty($maxFileSizeMegaBytes)) {
-      $maxFileSizeMegaBytes = round((CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize')) / (1024 * 1024)), 2);
-    }
-    return $maxFileSizeMegaBytes;
+    $maxFileSize = (int) Civi::settings()->get('maxFileSize');
+    // The default value for this setting is based on php.ini:upload_max_filesize
+    // Normally the default would be returned if the setting isn't set;
+    // this is only an issue if the setting was explicitly set to 0.
+    return $maxFileSize ?: (int) Civi::settings()->getDefault('maxFileSize');
   }
 
 }

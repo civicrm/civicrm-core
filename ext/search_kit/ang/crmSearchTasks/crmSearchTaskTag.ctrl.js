@@ -103,7 +103,7 @@
       this.close();
     };
 
-    this.onError = function() {
+    this.onError = function(error) {
       CRM.alert(ts('An error occurred while updating tags.'), ts('Error'), 'error');
       this.cancel();
     };

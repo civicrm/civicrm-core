@@ -7222,14 +7222,14 @@ AND   displayRelType.is_active = 1
    */
   protected function getQillForRelativeDateRange($from, $to, string $fieldTitle, string $relativeRange): string {
     if (!$from) {
-      return ts('%1 is ', [$fieldTitle]) . $relativeRange . ' (' . ts('to %1', [CRM_Utils_Date::customFormat($to)]) . ')';
+      return ts('%1 is ', [1 => $fieldTitle]) . $relativeRange . ' (' . ts('to %1', [1 => CRM_Utils_Date::customFormat($to)]) . ')';
     }
     if (!$to) {
-      return ts('%1 is ', [$fieldTitle]) . $relativeRange . ' (' . ts('from %1', [CRM_Utils_Date::customFormat($from)]) . ')';
+      return ts('%1 is ', [1 => $fieldTitle]) . $relativeRange . ' (' . ts('from %1', [1 => CRM_Utils_Date::customFormat($from)]) . ')';
     }
-    return ts('%1 is ', [$fieldTitle]) . $relativeRange . ' (' . ts('between %1 and %2', [
-      CRM_Utils_Date::customFormat($from),
-      CRM_Utils_Date::customFormat($to),
+    return ts('%1 is ', [1 => $fieldTitle]) . $relativeRange . ' (' . ts('between %1 and %2', [
+      1 => CRM_Utils_Date::customFormat($from),
+      2 => CRM_Utils_Date::customFormat($to),
     ]) . ')';
   }
 

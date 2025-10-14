@@ -30,11 +30,11 @@
     </div>
     <div ng-if="$ctrl.run && !$ctrl.addContacts" class="crm-search-task-progress">
       <h5>{{:: ts('Creating mailing...') }}</h5>
-      <crm-search-batch-runner entity="'Group'" action="create" params="$ctrl.run" success="$ctrl.afterGroupCreate(result)" error="$ctrl.onError()" ></crm-search-batch-runner>
+      <crm-search-batch-runner entity="'Group'" action="create" params="$ctrl.run" success="$ctrl.afterGroupCreate(result)" error="$ctrl.onError(error)" ></crm-search-batch-runner>
     </div>
     <div ng-if="$ctrl.addContacts" class="crm-search-task-progress">
       <h5>{{:: ts('Adding contacts...') }}</h5>
-      <crm-search-batch-runner entity="'GroupContact'" action="save" params="$ctrl.addContacts" ids="$ctrl.ids" id-field="contact_id" success="$ctrl.onSuccess(result)" error="$ctrl.onError()" ></crm-search-batch-runner>
+      <crm-search-batch-runner entity="'GroupContact'" action="save" params="$ctrl.addContacts" ids="$ctrl.ids" id-field="contact_id" success="$ctrl.onSuccess(result)" error="$ctrl.onError(error)" ></crm-search-batch-runner>
     </div>
     <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" />
     <crm-dialog-button text="ts('Create Mailing')" icons="{primary: 'fa-paper-plane'}" on-click="$ctrl.submit()" disabled="!$ctrl.recipientCount || $ctrl.run || !crmSearchTaskMailingForm.$valid" />

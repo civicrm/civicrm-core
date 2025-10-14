@@ -422,7 +422,7 @@ input.crm-form-checkbox) + label {
   top: auto;
 }
 .crm-container .select2-container .select2-choice > .select2-chosen {
-  margin-right: var(--crm-m2);
+  margin-right: var(--crm-r2);
 }
 .crm-container .select2-container-multi .select2-choices::before,
 .crm-container .select2-container .select2-choice .select2-arrow::before {

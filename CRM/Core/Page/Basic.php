@@ -414,6 +414,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
           CRM_Core_DAO::storeValues($object, $values[$object->id]);
 
           if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
+            $values[$object->id]['contact_type_a_display'] = $values[$object->id]['contact_type_b_display'] = '';
             if (isset($values[$object->id]['contact_type_a'])) {
               $values[$object->id]['contact_type_a_display'] = $contactTypes[$values[$object->id]['contact_type_a']];
             }

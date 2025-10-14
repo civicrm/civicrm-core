@@ -568,10 +568,10 @@ abstract class ImportParser extends \CRM_Import_Parser {
         $contactID = array_key_first($possibleMatches);
       }
       elseif (count($possibleMatches) > 1) {
-        throw new \CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $possibleMatches));
+        throw new \CRM_Core_Exception(ts('Record duplicates multiple contacts:') . ' ' . implode(',', $possibleMatches));
       }
       elseif (!in_array($action, ['create', 'ignore', 'save'], TRUE)) {
-        throw new \CRM_Core_Exception(ts('No matching %1 found', [$entity, 'String']));
+        throw new \CRM_Core_Exception(ts('No matching %1 found', [1 => $entity]));
       }
     }
     if ($contactID && !isset($contactParams['is_deleted']) && $this->getExistingContactValue($contactID, 'is_deleted')) {
@@ -586,6 +586,9 @@ abstract class ImportParser extends \CRM_Import_Parser {
         ->execute()->first();
       if ($result) {
         $contactID = $result['id'];
+      }
+      else {
+        throw new \CRM_Core_Exception(ts('Cannot import to a deleted contact %1', [1 => $contactID]));
       }
     }
     return $contactID;

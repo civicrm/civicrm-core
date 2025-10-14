@@ -203,33 +203,21 @@
   padding: 0;
   border: 0 solid transparent;
 }
-.crm-search-admin-edit-columns fieldset.crm-draggable:has(> details) { /* targetted to cetaild because SK Tokens extension shares classname */
+.crm-search-admin-edit-columns fieldset.crm-draggable:has(> details) { /* targetted to details because other layouts share classnmae */
   display: grid;
-  grid-template-columns: 2ch auto;
-  align-items: center;
-}
-.crm-search-admin-edit-columns fieldset.crm-draggable:has(details[open]) {
-  align-items: start;
+  grid-template-columns: 2.5ch auto;
 }
 #bootstrap-theme .crm-search-admin-edit-columns fieldset.crm-draggable .btn.btn-xs.pull-right {
-  line-height: 1.45rem;
-  display: block;
   z-index: 1;
   position: absolute;
-  right: calc(4 * var(--crm-padding-small)); /* aligns button relative to stream padding */
+  right: 0;
+  top: var(--crm-xs1);
+  margin: var(--crm-expand-header-padding);
 }
-i.crm-i.crm-search-move-icon {
+#bootstrap-theme .crm-search-admin-edit-columns i.crm-i.crm-search-move-icon {
   opacity: .5;
-}
-.crm-draggable details > *,
-.crm-draggable details > .form-inline {
-  padding-inline: var(--crm-expand-body-padding);
-}
-.crm-draggable details > div:first-of-type {
-  padding-top: var(--crm-expand-body-padding);
-}
-.crm-draggable details > div:last-of-type {
-  padding-bottom: var(--crm-expand-body-padding);
+  padding: var(--crm-expand-header-padding);
+  justify-self: center;
 }
 #bootstrap-theme .crm-search-admin-edit-columns .input-group-btn {
   display: flex;
@@ -254,9 +242,6 @@ i.crm-i.crm-search-move-icon {
   position: relative;
   display: block;
 }
-.crm-search .crm-search-admin-relative details > summary {
-  padding: var(--crm-padding-small) var(--crm-padding-reg);
-}
 .crm-search crm-search-admin-link-group {
   background: var(--crm-c-layout1-bg);
 }
@@ -269,14 +254,10 @@ i.crm-i.crm-search-move-icon {
   padding: 0;
   border: 0 solid transparent;
 }
-.crm-search-admin-edit-columns details,
-.crm-search .crm-search-admin-relative details {
-  border-radius: var(--crm-roundness);
+.crm-search-admin-edit-columns details {
+  background-color: var(--crm-c-page-background);
+  margin: 0;
   border: 0;
-}
-.crm-search-admin-edit-columns details > summary {
-  padding: var(--crm-padding-reg);
-  font-size: inherit;
 }
 /* Various */
 
