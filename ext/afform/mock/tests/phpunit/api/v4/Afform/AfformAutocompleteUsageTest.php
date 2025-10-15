@@ -204,7 +204,7 @@ EOHTML;
       $this->fail();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Illegal value for test_af_fields: contact_ref.', $e->getMessage());
+      $this->assertEquals('Illegal value for contact_ref.', $e->getMessage());
     }
 
     // Submit with a valid ID, it should work
@@ -310,7 +310,7 @@ EOHTML;
       $this->fail();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Illegal value for test_address_fields: contact_ref.', $e->getMessage());
+      $this->assertEquals('Illegal value for contact_ref.', $e->getMessage());
     }
 
     // Submit with a valid ID, it should work

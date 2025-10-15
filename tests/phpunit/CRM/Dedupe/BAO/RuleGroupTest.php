@@ -251,8 +251,8 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Address'], 'text', 'address_');
 
     $fields = $this->getSupportedFields('Organization');
-    $fields[$this->getCustomGroupTable()][$customField['column_name']] = 'Custom Group: ' . $customField['label'];
-    $fields[$this->getCustomGroupTable('address_')] = [$this->getCustomFieldColumnName('address_text') => 'address_Group with field text: Enter text here'];
+    $fields[$this->getCustomGroupTable()][$customField['column_name']] = $customField['label'];
+    $fields[$this->getCustomGroupTable('address_')] = [$this->getCustomFieldColumnName('address_text') => 'Enter text here'];
     $this->assertEquals($fields, CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization'));
   }
 
@@ -273,7 +273,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     $cf = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
 
     $fields = $this->getSupportedFields('Organization');
-    $fields[$this->getCustomGroupTable()][$cf['column_name']] = 'Custom Group: ' . $cf['label'];
+    $fields[$this->getCustomGroupTable()][$cf['column_name']] = $cf['label'];
 
     $this->assertEquals($fields, CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization'));
   }
