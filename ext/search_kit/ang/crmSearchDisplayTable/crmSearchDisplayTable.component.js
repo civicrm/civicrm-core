@@ -24,8 +24,16 @@
       this.$onInit = function() {
         let tallyParams;
 
-        this._allColumns = ctrl.settings.columns;
-        this.resetColumnToggles();
+        this._allColumns = ctrl.settings.columns.map((col, index) => {
+          // store the canonical index on the array items
+          // useful when we want to refer to this index
+          // after filtering, e.g. in getApiParams
+          col.index = index;
+          col.toggled = true;
+          return col;
+        });
+
+        ctrl.onPreRun.push(() => this.trackFetchedColumns());
 
         // Copy API params from the run and adapt them in a secondary `tally` call for the "Totals" row
         if (ctrl.settings.tally) {
@@ -46,6 +54,7 @@
         }
 
         this.initializeDisplay($scope, $element);
+
 
         if (ctrl.settings.draggable) {
           ctrl.draggableOptions = {
@@ -133,18 +142,15 @@
       };
 
       /**
-       * Filter row columns to the toggled ones (on the clientside)
+       * Get the columns to display from a result row
        *
-       * TODO: sometimes we may want to pass column selections to the server
-       * to lighten the query (and for actions like spreadsheet export)
-       *
-       * We *dont* want to keep refetching from the server  when toggling
-       * columns on/off on the same page - so this approach works well for now
+       * The columns in the result row will correspond to those most recently fetched
+       * - so we need to find those first and then use those indices to filter by
+       * toggled status
        */
-      this.getRowColumns = (row) => row.columns.filter((col, index) => this._allColumns[index].toggled);
-
-      this.toggleColumns = () => {
-        this.settings.columns = this._allColumns.filter((col) => col.toggled);
+      this.getRowColumns = (row) => {
+        const resultColumns = this._allColumns.filter((col) => col.fetched);
+        return row.columns.filter((col, index) => resultColumns[index].toggled);
       };
 
       this.getColumnToggleLabel = (col) => {
@@ -164,15 +170,48 @@
           return ts('Links');
         }
         return ts('Column %1', {1: col.index});
-      }
+      };
+
+      /**
+       * Update the settings for which columns to include.
+       *
+       * If including columns that we haven't fetched, trigger a refetch
+       */
+      this.toggleColumns = () => {
+        this.settings.columns = this._allColumns.filter((col) => col.toggled);
+        if (this._allColumns.find((col) => col.toggled && !col.fetched)) {
+          this.getResultsPronto();
+        }
+      };
+
       this.resetColumnToggles = () => {
         this._allColumns.forEach((col, index) => {
           this._allColumns[index].toggled = true;
-          this._allColumns[index].index = index;
         });
         this.toggleColumns();
       };
 
+      /**
+       * Keep track of which columns we have fetched each
+       * time we fetch results. This allows us to only
+       * refetch if we need columns we don't have (we can
+       * hide columns without refetching)
+       */
+      this.trackFetchedColumns = () => {
+        this._allColumns.forEach((col, index) => {
+          this._allColumns[index].fetched = col.toggled;
+        });
+      };
+
+      // Override base method: add userJobId
+      const _getApiParams = this.getApiParams;
+      this.getApiParams = function(mode) {
+        const apiParams = _getApiParams.call(this, mode);
+        apiParams.toggleColumns = this._allColumns
+          .filter((col) => col.toggled)
+          .map((col) => col.index);
+        return apiParams;
+      };
     }
   });
 
