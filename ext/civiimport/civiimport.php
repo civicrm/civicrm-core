@@ -223,7 +223,7 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
     try {
       $userJob = $form->getUserJob();
       if (!empty($userJob['label'])) {
-        $form->setTitle(ts('Import: %1', [1 => $label]));
+        $form->setTitle(ts('Import: %1', [1 => $userJob['label']]));
       }
     }
     catch (Exception $e) {
