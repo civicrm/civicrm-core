@@ -68,7 +68,7 @@ class Api4SelectQuery extends Api4Query {
     parent::__construct($api);
 
     // Always select ID of main table unless grouping by something else
-    $keys = CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
+    $keys = (array) CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
     $this->forceSelectId = !$this->isAggregateQuery() || array_intersect($this->getGroupBy(), $keys);
 
     // Build field lists
