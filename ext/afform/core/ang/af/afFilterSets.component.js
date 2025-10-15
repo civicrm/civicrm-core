@@ -57,6 +57,10 @@
       };
 
       this.renderFilterSetValues = (values) => {
+        if (!values) {
+          return;
+        }
+
         const meta = this.getFieldsetMeta();
 
         const rendered = {};
@@ -144,7 +148,9 @@
         open: () => {
           const current = this.getCurrentFilterSet();
           this.updateDialog.id = current.id;
-          this.updateDialog.label = current.label;
+          this.updateDialog.oldLabel = current.label;
+          this.updateDialog.newLabel = current.label;
+          this.updateDialog.oldValues = current.filters;
           $element[0].querySelector('dialog.af-filter-set-update').showModal();
         },
         close: () => $element[0].querySelector('dialog.af-filter-set-update').close(),
@@ -155,12 +161,16 @@
             return false;
           }
           const currentValues = this.getCurrentFilterValues();
+          if (!Object.keys(currentValues).length) {
+            return false;
+          }
+          // if no changes from saved then nothing to update
           if (JSON.stringify(saved.filters) === JSON.stringify(currentValues)) {
             return false;
           }
           return true;
         },
-        canUpdate: () => this.updateDialog.id && this.updateDialog.label,
+        canUpdate: () => this.updateDialog.id && this.updateDialog.newLabel,
         update: () => {
           if (!this.updateDialog.canUpdate()) {
             return;
@@ -173,7 +183,7 @@
           crmApi4('AfformFilterSet', 'update', {
             where: [['id', '=', this.updateDialog.id]],
             values: {
-              label: this.updateDialog.label,
+              label: this.updateDialog.newLabel,
               filters: newValues
             }
           })

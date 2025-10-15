@@ -83,14 +83,30 @@
     <div class="sr-only">{{:: ts('Saving...') }}</div>
   </div>
   <div ng-show="!$ctrl.updateDialog.inProgress">
+    <h2>{{ ts('Updating %1', {1: $ctrl.updateDialog.oldLabel }) }}</h2>
     <label for="updateFilterSetLabel">{{:: ts('Name') }}</label>
-    <input id="updateFilterSetLabel" ng-model="$ctrl.updateDialog.label" />
+    <input id="updateFilterSetLabel" ng-model="$ctrl.updateDialog.newLabel" />
 
-    <dl>
-      <div ng-repeat="(key, value) in $ctrl.renderFilterSetValues($ctrl.getCurrentFilterValues())">
-        <dt>{{:: key }}</dt><dd>{{ value }}</dd>
+    <!-- TODO: highlight changes -->
+    <div class="af-container af-layout-cols">
+      <div class="af-filter-set-before">
+        <h3>{{:: ts('Before') }}</h3>
+        <dl>
+          <div ng-repeat="(key, value) in $ctrl.renderFilterSetValues($ctrl.updateDialog.oldValues)">
+            <dt>{{:: key }}</dt><dd>{{ value }}</dd>
+          </div>
+        </dl>
       </div>
-    </dl>
+
+      <div class="af-filter-set-after">
+        <h3>{{:: ts('After') }}</h3>
+        <dl>
+          <div ng-repeat="(key, value) in $ctrl.renderFilterSetValues($ctrl.getCurrentFilterValues())">
+            <dt>{{:: key }}</dt><dd>{{ value }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
 
     <div class="crm-buttons">
       <button
@@ -143,6 +159,14 @@
             <dt>{{:: key }}</dt><dd>{{ value }}</dd>
           </div>
         </dl>
+        <button
+          type="button"
+          class="btn btn-primary btn-xs"
+          crm-icon="fa-eye"
+          ng-click="$ctrl.manageDialog.close() || $ctrl.applyFilterSet(filterSet.id)"
+          >
+          View
+        </button>
         <button
           type="button"
           class="btn btn-danger btn-xs"
