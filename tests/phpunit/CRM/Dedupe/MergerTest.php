@@ -1637,6 +1637,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_website' => [
         0 => 'contact_id',
       ],
+      'civicrm_search_param_set' => [
+        0 => 'created_by',
+      ],
     ];
   }
 
