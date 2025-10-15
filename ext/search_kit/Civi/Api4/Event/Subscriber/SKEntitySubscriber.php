@@ -129,10 +129,10 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       case 'view':
         $tableName = _getSearchKitDisplayTableName($newName);
         $tempSettings = $event->params['settings'];
-        $query = (new SKEntityGenerator())->createQuery($this->savedSearch['api_entity'], $this->savedSearch['api_params'], $tempSettings);
+        $sql = (new SKEntityGenerator())->createQuery($this->savedSearch['api_entity'], $this->savedSearch['api_params'], $tempSettings);
         $columnSpecs = array_column($tempSettings['columns'], 'spec');
         $columns = implode(', ', array_column($columnSpecs, 'name'));
-        $sql = "CREATE VIEW `$tableName` ($columns) AS " . $query->getSql();
+        $sql = "CREATE VIEW `$tableName` ($columns) AS " . $sql;
 
         // do not i18n-rewrite
         \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
