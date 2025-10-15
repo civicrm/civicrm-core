@@ -25,12 +25,13 @@ use Civi\Api4\Utils\FormattingUtil;
 class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
 
   /**
-   * Name of dedupe rule to use.
+   * Name or ID of dedupe rule to use.
    *
    * A default rule group can be used such as "Individual.Unsupervised" or "Household.Supervised"
    * or else the name of a specific rule group can be given.
+   * To look up a rule by ID, pass an integer.
    *
-   * @var string
+   * @var string|int
    * @optionsCallback getRuleGroupNames
    * @required
    */
@@ -57,6 +58,10 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
+    if (is_int($this->dedupeRule)) {
+      $this->dedupeRule = \CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $this->dedupeRule);
+    }
+
     $dedupeParams = [
       'check_permission' => $this->getCheckPermissions(),
     ];
