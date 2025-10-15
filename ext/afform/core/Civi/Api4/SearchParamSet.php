@@ -2,7 +2,7 @@
 namespace Civi\Api4;
 
 /**
- * AfformFilterSet entity.
+ * SearchParamSet entity.
  *
  * Provided by the Afform: Core Runtime extension.
  *
@@ -10,7 +10,7 @@ namespace Civi\Api4;
  * @since 6.8
  * @package Civi\Api4
  */
-class AfformFilterSet extends Generic\DAOEntity {
+class SearchParamSet extends Generic\DAOEntity {
 
   /**
    * @return array
