@@ -61,10 +61,10 @@
         <search-admin-tasks-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-tasks-config>
       </div>
       <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
-      <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Allow user to toggle columns on and off') }}">
+      <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Allow user to pick which columns to include when viewing/download results') }}">
         <label for="crm-search-admin-display-table-column-toggle">
           <input type="checkbox" class="form-control crm-flex-1" id="crm-search-admin-display-table-column-toggle" ng-model="$ctrl.display.settings.toggleColumns">
-          {{:: ts('Enable Toggling Columns') }}
+          {{:: ts('Enable Column Picker') }}
         </label>
       </div>
       <div class="form-inline" ng-repeat="style in $ctrl.parent.tableClasses">

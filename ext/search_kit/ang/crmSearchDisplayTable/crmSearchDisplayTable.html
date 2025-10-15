@@ -6,7 +6,7 @@
     <span ng-if="$ctrl.settings.headerCount" ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
     <div class="form-group pull-right" ng-include="'~/crmSearchDisplay/toolbar.html'" ng-if="$ctrl.toolbar"></div>
     <details ng-if="$ctrl.settings.toggleColumns">
-      <summary>{{:: ts('Toggle Columns') }}</summary>
+      <summary>{{:: ts('Pick Columns') }}</summary>
       <div class="crm-accordion-body">
         <!-- TODO: select2 might be nicer here? -->
         <label ng-repeat="(index, col) in $ctrl._allColumns">
