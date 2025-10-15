@@ -135,8 +135,8 @@ fieldset.af-container.af-layout-inline {
   padding-block: 0.25rem;
 }
 
-/* Filter Sets */
-af-filter-sets {
+/* Search Param Sets */
+af-search-param-sets {
   --crm-expand-body-padding: 1rem;
   --crm-btn-margin: 0;
   display: inline-flex;
@@ -144,27 +144,36 @@ af-filter-sets {
   padding: var(--crm-flex-gap, 0.5rem);
   background-color: var(--crm-c-background2);
 }
-af-filter-sets dialog {
-  border: none;
+af-search-param-sets dialog {
+  background: var(--crm-c-container-bg);
+  border: 0;
+  border-radius: var(--crm-dialog-radius);
+  box-shadow: var(--crm-popup-shadow);
+  color: var(--crm-c-text);
+  max-height: 90%;
+  padding: 1rem;
 }
-af-filter-sets dialog ul {
+af-search-param-sets dialog ul {
   list-style: none;
   padding-left: 0;
 }
-af-filter-sets details > summary.crm-accordion-header {
+af-search-param-sets details > summary.crm-accordion-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
 }
-af-filter-sets details > summary.crm-accordion-header .af-filter-set-description {
+af-search-param-sets details > summary.crm-accordion-header .af-search-param-set-description {
   font-weight: lighter;
   font-style: italic;
 }
-af-filter-sets dialog .crm-buttons {
-  justify-content: space-between;
+af-search-param-sets dialog .crm-buttons {
+  justify-content: flex-end;
 }
-af-filter-sets dl > div {
+#bootstrap-theme af-search-param-sets dl {
+  margin-top: var(--crm-flex-gap);
+}
+af-search-param-sets dl > div {
   display: flex;
   gap: var(--crm-flex-gap, 0.5rem);
 }

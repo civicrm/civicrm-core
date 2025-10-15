@@ -8,5 +8,5 @@
 /**
  * Placeholder class retained for legacy compatibility.
  */
-class CRM_Afform_DAO_AfformFilterSet extends CRM_Core_DAO_Base {
+class CRM_Afform_DAO_SearchParamSet extends CRM_Core_DAO_Base {
 }

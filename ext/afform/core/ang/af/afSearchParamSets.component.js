@@ -1,72 +1,61 @@
 (function(angular, $, _) {
   "use strict";
-  angular.module('af').component('afFilterSets', {
+  angular.module('af').component('afSearchParamSets', {
     require: {
       afFieldset: '^^'
     },
-    templateUrl: '~/af/afFilterSets.html',
+    templateUrl: '~/af/afSearchParamSets.html',
     controller: function($scope, $element, crmApi4, $window, $location) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform');
 
-      // local model of filter set savedSets
+      // local model of saved records
       this.savedSets = [];
 
       this.$onInit = () => {
         this.formName = this.afFieldset.getFormName();
         this.saveDialog.reset();
 
-        this.fetchFilterSets();
+        this.fetchSearchParamSets();
       };
 
-      this.fetchFilterSets = () => crmApi4('AfformFilterSet', 'get', {
+      this.fetchSearchParamSets = () => crmApi4('SearchParamSet', 'get', {
           select: ['label', 'filters', 'created_by.display_name', 'created_date'],
           where: [['afform_name', '=', this.formName]],
           orderBy: {'label': 'ASC'}
         })
         .then((results) => this.savedSets = results)
-        .catch(() => this.savedSets = [{id: '', label: ts('fetching filter sets failed')}]);
+        .catch(() => this.savedSets = [{id: '', label: ts('Error fetching Saved Searches')}]);
 
-      this.applyFilterSet = (id) => $window.location.hash = id ? `#?_filterset=${id}` : '';
+      this.applySearchParamSet = (id) => $window.location.hash = id ? `#?_s=${id}` : '';
 
-      this.getSetFilterSet = (value) => {
+      this.getSetSearchParamSet = (value) => {
         if (value !== undefined) {
-          this.applyFilterSet(value);
+          this.applySearchParamSet(value);
           return '';
         }
-        const filterSet = this.getCurrentFilterSet();
-        return (filterSet && filterSet.id) ? `${filterSet.id}` : '';
+        const searchParamSet = this.getCurrentSearchParamSet();
+        return (searchParamSet && searchParamSet.id) ? `${searchParamSet.id}` : '';
       };
 
-      this.getCurrentFilterSet = () => {
+      this.getCurrentSearchParamSet = () => {
         const hashParams = new URLSearchParams($window.location.hash.slice(1));
-        const urlValue = parseInt(hashParams.get('_filterset'));
-        return this.savedSets.find((filterSet) => filterSet.id === urlValue);
+        const urlValue = parseInt(hashParams.get('_s'));
+        return this.savedSets.find((searchParamSet) => searchParamSet.id === urlValue);
       };
 
       this.getCurrentFilterValues = () => this.afFieldset ? this.afFieldset.getFilterValues() : {};
 
-      this.getFieldsetMeta = () => {
-        const meta = {};
-        const fieldElements = $element[0].closest('[af-fieldset]').querySelectorAll('af-field');
-        fieldElements.forEach((field) => {
-          const name = field.getAttribute('name');
-          const defn = angular.element(field).controller('afField').defn;
-          meta[name] = defn;
-        });
-        return meta;
-      };
-
-      this.renderFilterSetValues = (values) => {
+      this.renderSearchParamSetFilters = (values) => {
         if (!values) {
           return;
         }
 
-        const meta = this.getFieldsetMeta();
+        const fieldMeta = this.afFieldset.getFieldMeta();
 
         const rendered = {};
 
         Object.keys(values).forEach((key) => {
-          const defn = meta[key];
+          const defn = fieldMeta[key];
           const rawValue = values[key];
 
           const formatValue = (v) => {
@@ -88,10 +77,10 @@
       };
 
       this.saveDialog = {
-        open: () => $element[0].querySelector('dialog.af-filter-sets-new').showModal(),
-        close: () => $element[0].querySelector('dialog.af-filter-sets-new').close(),
+        open: () => $element[0].querySelector('dialog.af-search-param-set-new').showModal(),
+        close: () => $element[0].querySelector('dialog.af-search-param-set-new').close(),
         reset: () => {
-          this.saveDialog.label = ts('New filter set');
+          this.saveDialog.label = ts('New search');
           this.saveDialog.inProgress = false;
         },
         canOpen: () => Object.keys(this.getCurrentFilterValues()).length,
@@ -112,12 +101,12 @@
 
           let newId = null;
 
-          return crmApi4('AfformFilterSet', 'create', {
+          return crmApi4('SearchParamSet', 'create', {
             values: values
           })
           .then((result) => newId = (result && result[0]) ? result[0].id : null)
-          .then(() => this.fetchFilterSets())
-          .then(() => this.applyFilterSet(newId))
+          .then(() => this.fetchSearchParamSets())
+          .then(() => this.applySearchParamSet(newId))
           .then(() => this.saveDialog.close())
           .catch((error) => {
             const errorMessage = (error && error.error_message) ? error.error_message : ts('Unknown error');
@@ -128,44 +117,40 @@
       };
 
       this.manageDialog = {
-        open: () => $element[0].querySelector('dialog.af-filter-sets-manage').showModal(),
-        close: () => $element[0].querySelector('dialog.af-filter-sets-manage').close(),
-        deleteItem: (filterSet) => {
-          crmApi4('AfformFilterSet', 'delete', {
-            where: [['id', '=', filterSet.id]]
+        open: () => $element[0].querySelector('dialog.af-search-param-sets-manage').showModal(),
+        close: () => $element[0].querySelector('dialog.af-search-param-sets-manage').close(),
+        deleteItem: (searchParamSet) => {
+          crmApi4('SearchParamSet', 'delete', {
+            where: [['id', '=', searchParamSet.id]]
           })
-          .then(() => this.fetchFilterSets());
+          .then(() => this.fetchSearchParamSets());
         },
-        itemDescription: (filterSet) => ts('Created %1 by %2', {
-          1: filterSet.created_date,
-          2: (filterSet['created_by.display_name'] ? filterSet['created_by.display_name'] : 'UNKNOWN')
-        }),
       };
 
       this.updateDialog = {
         id: null,
         label: '',
         open: () => {
-          const current = this.getCurrentFilterSet();
+          const current = this.getCurrentSearchParamSet();
           this.updateDialog.id = current.id;
           this.updateDialog.oldLabel = current.label;
           this.updateDialog.newLabel = current.label;
-          this.updateDialog.oldValues = current.filters;
-          $element[0].querySelector('dialog.af-filter-set-update').showModal();
+          this.updateDialog.valueComparison = this.updateDialog.getValueComparison();
+          $element[0].querySelector('dialog.af-search-param-set-update').showModal();
         },
-        close: () => $element[0].querySelector('dialog.af-filter-set-update').close(),
+        close: () => $element[0].querySelector('dialog.af-search-param-set-update').close(),
         inProgress: false,
         canOpen: () => {
-          const saved = this.getCurrentFilterSet();
-          if (!saved) {
+          const current = this.getCurrentSearchParamSet();
+          if (!current) {
             return false;
           }
-          const currentValues = this.getCurrentFilterValues();
-          if (!Object.keys(currentValues).length) {
+          const newValues = this.getCurrentFilterValues();
+          if (!Object.keys(newValues).length) {
             return false;
           }
           // if no changes from saved then nothing to update
-          if (JSON.stringify(saved.filters) === JSON.stringify(currentValues)) {
+          if (JSON.stringify(current.filters) === JSON.stringify(newValues)) {
             return false;
           }
           return true;
@@ -180,16 +165,43 @@
 
           const newValues = this.getCurrentFilterValues();
 
-          crmApi4('AfformFilterSet', 'update', {
+          crmApi4('SearchParamSet', 'update', {
             where: [['id', '=', this.updateDialog.id]],
             values: {
               label: this.updateDialog.newLabel,
               filters: newValues
             }
           })
-          .then(() => this.fetchFilterSets())
+          .then(() => this.fetchSearchParamSets())
           .then(() => this.updateDialog.inProgress = false)
           .then(() => this.updateDialog.close());
+        },
+        getValueComparison: () => {
+          console.log(this.getCurrentSearchParamSet());
+          const oldValues = this.renderSearchParamSetFilters(this.getCurrentSearchParamSet().filters);
+          const newValues = this.renderSearchParamSetFilters(this.getCurrentFilterValues());
+
+          const oldKeys = Object.keys(oldValues);
+          const newKeys = Object.keys(newValues);
+
+          const comparison = {};
+
+          // only set in oldValues
+          oldKeys.filter((key) => !newKeys.includes(key)).forEach((key) => comparison[key] = [oldValues[key], ts('[none]')]);
+
+          // keys in both
+          oldKeys.filter((key) => newKeys.includes(key)).forEach((key) => {
+            if (newValues[key] === oldValues[key]) {
+              // no change, return single item array
+              comparison[key] = [oldValues[key]];
+              return;
+            }
+            comparison[key] = [oldValues[key], newValues[key]];
+          });
+          // only set in newValues
+          newKeys.filter((key) => !oldKeys.includes(key)).forEach((key) => comparison[key] = [ts('[none]'), newValues[key]]);
+
+          return comparison;
         }
       };
     }

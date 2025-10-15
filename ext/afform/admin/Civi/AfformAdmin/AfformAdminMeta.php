@@ -293,10 +293,10 @@ class AfformAdminMeta {
             ],
           ],
         ],
-        'filtersets' => [
-          'title' => E::ts('Saved Filters'),
+        'search_param_sets' => [
+          'title' => E::ts('Saved Search Param Sets'),
           'element' => [
-            '#tag' => 'af-filter-sets',
+            '#tag' => 'af-search-param-sets',
           ],
         ],
         'submit' => [

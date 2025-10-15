@@ -44,6 +44,19 @@
           return ctrl.afFormCtrl ? ctrl.afFormCtrl.getFormMeta().name : $scope.meta.name;
         };
 
+        this.getFieldMeta = () => {
+          const meta = {};
+          const fieldElements = $element[0].querySelectorAll('af-field');
+          fieldElements.forEach((field) => {
+            const name = field.getAttribute('name');
+            // this is nasty but we cant parse the `defn` attribute directly
+            // because its not proper JSON, so this is least nasty for now
+            const defn = angular.element(field).controller('afField').defn;
+            meta[name] = defn;
+          });
+          return meta;
+        };
+
         this.getJoinOffset = function(joinEntity) {
           joinOffsets[joinEntity] = joinEntity in joinOffsets ? joinOffsets[joinEntity] + 1 : 0;
           return joinOffsets[joinEntity];
@@ -59,6 +72,7 @@
           }
           return CRM.cache.get(getCacheKey(), {})[fieldName];
         };
+
         this.$onInit = function() {
           if (this.storeValues) {
             $scope.$watch(ctrl.getFieldData, function(newVal, oldVal) {
@@ -67,7 +81,7 @@
               }
             }, true);
           }
-          $scope.$watch(this.getFilterSetId, () => this.fetchFilterSetValues());
+          $scope.$watch(this.getSearchParamSetId, () => this.fetchSearchParamSetValues());
         };
 
         /**
@@ -85,28 +99,28 @@
         };
 
         /**
-         * Get value for a given field based on currently applied filterset
+         * Get value for a given field based on currently applied SearchParamSet
          * Used by afField controller on load
          */
-        this.getFilterSetFieldValue = (fieldName) => {
-          if (this.filtersetValues && this.filtersetValues.hasOwnProperty(fieldName)) {
-            return this.filtersetValues[fieldName];
+        this.getSearchParamSetFieldValue = (fieldName) => {
+          if (this.searchParamSetValues && this.searchParamSetValues.hasOwnProperty(fieldName)) {
+            return this.searchParamSetValues[fieldName];
           }
           return null;
         };
 
         /**
-         * Fetch values for a filterset from the server
+         * Fetch values for a SearchParamSet from the server
          */
-        this.fetchFilterSetValues = () => {
-          const filtersetId = this.getFilterSetId();
-          if (!filtersetId) {
+        this.fetchSearchParamSetValues = () => {
+          const searchParamSetId = this.getSearchParamSetId();
+          if (!searchParamSetId) {
             return;
           }
-          crmApi4('AfformFilterSet', 'get', {
+          crmApi4('SearchParamSet', 'get', {
             where: [
-              ['id', '=', filtersetId],
-              // check the filterset ID is relevant to the current afform
+              ['id', '=', searchParamSetId],
+              // check the searchParamSet ID is relevant to the current afform
               // (in case multiple on the page)
               ['afform_name', '=', this.getFormName()]
             ],
@@ -114,19 +128,19 @@
           })
           .then((result) => {
             if (result && result[0] && result[0].filters) {
-              this.filtersetValues = result[0].filters;
+              this.searchParamSetValues = result[0].filters;
             }
             else {
-              this.filtersetValues = {};
+              this.searchParamSetValues = {};
             }
             $scope.$broadcast('afFormReset');
           });
         };
 
         /**
-         * Get filter set ID from URL hash param
+         * Get search param set ID from URL hash param
          */
-        this.getFilterSetId = () => ($scope && $scope.routeParams) ? $scope.routeParams._filterset : null;
+        this.getSearchParamSetId = () => ($scope && $scope.routeParams) ? $scope.routeParams._s : null;
       }
     };
   });
