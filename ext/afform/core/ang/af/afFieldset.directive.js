@@ -104,7 +104,12 @@
             return;
           }
           crmApi4('AfformFilterSet', 'get', {
-            where: [['id', '=', filtersetId]],
+            where: [
+              ['id', '=', filtersetId],
+              // check the filterset ID is relevant to the current afform
+              // (in case multiple on the page)
+              ['afform_name', '=', this.getFormName()]
+            ],
             select: ['filters'],
           })
           .then((result) => {
