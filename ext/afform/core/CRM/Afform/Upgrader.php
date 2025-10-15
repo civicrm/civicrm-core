@@ -111,7 +111,7 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
   }
 
   public function upgrade_1005(): bool {
-    E::schema()->createEntityTable('schema/upgrader/1005-AfformFilterSet.entityType.php');
+    E::schema()->createEntityTable('schema/upgrader/1005-SearchParamSet.entityType.php');
     return TRUE;
   }
 

@@ -2,24 +2,25 @@
 use CRM_Afform_ExtensionUtil as E;
 
 return [
-  'name' => 'AfformFilterSet',
-  'table' => 'civicrm_afform_filter_set',
+  'name' => 'SearchParamSet',
+  'table' => 'civicrm_search_param_set',
+  'class' => 'CRM_Afform_DAO_SearchParamSet',
   'getInfo' => fn() => [
-    'title' => E::ts('FormBuilder Filter Set'),
-    'title_plural' => E::ts('FormBuilder Filter Sets'),
-    'description' => E::ts('Saves sets of filters for a FormBuilder search form'),
+    'title' => E::ts('Search Settings Set'),
+    'title_plural' => E::ts('Saved Search Settings'),
+    'description' => E::ts('Save settings for a FormBuilder search form'),
     'label_column' => 'label',
   ],
   'getPaths' => fn() => [
-    'view' => '[afform_name:url]#?_filterset=[id]',
+    'view' => '[afform_name:url]#?_s=[id]',
   ],
   'getFields' => fn() => [
     'id' => [
-      'title' => E::ts('Filter Set ID'),
+      'title' => E::ts('Search Param Set ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
       'required' => TRUE,
-      'description' => E::ts('Unique Filter Set ID'),
+      'description' => E::ts('Unique Search Param Set ID'),
       'add' => '6.9',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
@@ -63,7 +64,7 @@ return [
       'title' => ts('Icon'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
-      'description' => ts('Icon for this filter set'),
+      'description' => ts('Icon for this search param set'),
     ],
     'created_by' => [
       'title' => E::ts('Created By'),
@@ -89,7 +90,7 @@ return [
       'sql_type' => 'timestamp',
       'input_type' => 'Text',
       'readonly' => TRUE,
-      'description' => E::ts('When this filter set was last modified.'),
+      'description' => E::ts('When this search param set was last modified.'),
       'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
     ],
   ],
