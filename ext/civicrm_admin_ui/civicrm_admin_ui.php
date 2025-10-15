@@ -13,6 +13,24 @@ function civicrm_admin_ui_civicrm_config(&$config) {
 }
 
 /**
+ * Implements hook_civicrm_pageRun().
+ */
+function civicrm_admin_ui_civicrm_pageRun(&$page) {
+  $pageName = get_class($page);
+  if ($pageName == 'CRM_Mailing_Page_Report') {
+    $smarty = CRM_Core_Smarty::singleton();
+    $report = $smarty->getTemplateVars()['report'];
+    foreach ($report['click_through'] as $key => &$val) {
+      if (preg_match('/mid=(\d+).*uid=(\d+)/', $val['link'], $matches)) {
+        $val['link_unique'] = CRM_Utils_System::url('civicrm/mailing/report/urltrack#/?mid=' . $matches[1] . '&uid=' . $matches[2]);
+      }
+    }
+    $smarty->assign('report', $report);
+    $smarty->assign('is_adminui_enabled', TRUE);
+  }
+}
+
+/**
  * Implements hook_civicrm_postProcess().
  */
 function civicrm_admin_ui_civicrm_postProcess($className, $form) {
