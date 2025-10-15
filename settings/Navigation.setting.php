@@ -56,15 +56,4 @@ return [
     'validate_callback' => 'CRM_Utils_Color::normalize',
     'settings_pages' => ['display' => ['weight' => 820]],
   ],
-  'navigation' => [
-    'group' => 'navigation',
-    'group_Name' => 'Navigation settings',
-    'name' => 'navigation',
-    'type' => 'String',
-    'title' => ts('Contact Navigation Menu Cache Key'),
-    'is_contact' => 1,
-    'is_domain' => 0,
-    // NOTE: key was used without meta in previous versions
-    'add' => '6.4',
-  ],
 ];
