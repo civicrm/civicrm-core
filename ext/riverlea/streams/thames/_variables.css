@@ -226,7 +226,6 @@
   --crm-expand2-header-bg: transparent;
   --crm-expand2-header-bg-active: var(--crm-c-layer2-bg);
   --crm-expand2-header-weight: normal;
-  --crm-expand2-header-color: var(--crm-c-text);
   --crm-expand2-header-border: unset;
   --crm-expand2-header-border-width: unset;
   --crm-expand2-header-padding: .6rem 1.6rem 0.6rem 2.8rem; /*var(--crm-s) var(--crm-m); */ /* thames */
@@ -244,7 +243,6 @@
   --crm-alert-success-bg: var(--crm-c-blue-light); /* thames */
   --crm-alert-success-border: unset; /* thames */
   --crm-alert-success-text: unset; /* thames */
-  --crm-alert-warning-text: var(--crm-c-text);
   --crm-alert-warning-border: var(--crm-c-yellow);
   --crm-alert-info-bg: var(--crm-c-blue-light);
   --crm-alert-info-border: var(--crm-c-blue);
@@ -259,7 +257,6 @@
   --crm-form-block-padding: var(--crm-m);
   --crm-form-block-border-radius: var(--crm-roundness);
   --crm-input-bg-image: linear-gradient(top, #eee 1%, #fff 15%);
-  --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: #0000001a; /* thames */
   --crm-input-border-radius: 3px;
   --crm-input-active-ani: border-color .15s ease-in-out 0s;
@@ -291,7 +288,6 @@
   --crm-tab-bg-active: var(--crm-c-layer0-bg);
   --crm-tab-hang: 0 0 calc(-1 * var(--crm-s)) 0; /* lip to extend tab flush with active region - set to 0 for no lip */ /* thames todo check */
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m); /* thames todo check */
-  --crm-tab-col: var(--crm-c-text);
   --crm-tab-weight: normal;
   --crm-tab-count-bg: var(--crm-c-info-text);
   --crm-tab-count-col: var(--crm-c-info);
@@ -394,7 +390,6 @@
   --crm-dropdown-width: 23ch; /* thames */
   --crm-dropdown-danger-bg: var(--crm-c-danger); /* for delete links in dropdowns */
   --crm-dropdown-2-bg: var(--crm-c-secondary);
-  --crm-dropdown-2-col: var(--crm-c-text);
   --crm-dropdown-2-padding: var(--crm-padding-small);
 }
 :root {
