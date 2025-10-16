@@ -245,10 +245,11 @@
     function addWriteJoinFields(fieldList) {
       _.eachRight(fieldList, function(field, pos) {
         const fkNameField = field.fk_entity && getField('name', field.fk_entity, $scope.action);
-        if (fkNameField) {
+        if (fkNameField && !field.name.includes(':')) {
           const newField = _.cloneDeep(fkNameField);
           newField.name = field.name + '.' + newField.name;
-          fieldList.splice(pos, 0, newField);
+          // Insert new field after the current one
+          fieldList.splice(pos + 1, 0, newField);
         }
       });
     }
