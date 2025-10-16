@@ -51,4 +51,20 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
 
   }
 
+  /**
+   * Create, read, and destroy token - with full access to secrets.
+   */
+  public function testGetByTag(): void {
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+
+    $examples = Civi\Api4\OAuthProvider::get()
+      ->addWhere('tags', 'CONTAINS', 'LaundryInstructions')
+      ->addOrderBy('name', 'DESC')
+      ->execute();
+    $this->assertEquals(1, $examples->count());
+
+    $this->assertEquals('My\Example2', $examples->single()['class']);
+    $this->assertEquals('https://example.com/two', $examples->single()['options']['urlAuthorize']);
+  }
+
 }

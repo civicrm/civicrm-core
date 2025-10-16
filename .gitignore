@@ -29,6 +29,7 @@
 !/ext/recaptcha
 !/ext/iframe
 !/ext/oembed
+!/ext/paypal_ppcp
 !/ext/payflowpro
 !/ext/ckeditor4
 !/ext/legacybatchentry

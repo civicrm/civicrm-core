@@ -101,7 +101,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       $this->assertEquals('example-id', $actualQuery['client_id']);
       $this->assertEquals('web_message', $actualQuery['response_mode']);
       $this->assertMatchesRegularExpression(';civicrm/oauth-client/return;', $actualQuery['redirect_uri']);
-      $this->assertEquals($actualQuery['redirect_uri'], $ac['continue_url']);
+      $this->assertEquals($actualQuery['redirect_uri'], $ac['redirect_uri']);
     }
   }
 
