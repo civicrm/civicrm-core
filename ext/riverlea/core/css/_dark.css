@@ -1,8 +1,32 @@
 :root {
-  --crm-alert-danger-bg: var(--crm-c-danger);
-  --crm-alert-danger-text: var(--crm-c-danger-text);
+  --crm-c-text: var(--crm-c-text-light);
   --crm-c-success-on-page-bg: var(--crm-c-success-light);
   --crm-c-warning-on-page-bg: var(--crm-c-warning-light);
   --crm-dash-label-bg: transparent;
   --crm-table-row-alternate-bg: #fff;
+  --crm-alert-danger-bg: var(--crm-c-danger);
+  --crm-alert-danger-text: var(--crm-c-danger-text);
+  --crm-alert-danger-border: color-mix(in srgb, var(--crm-alert-danger-bg) 90%,#fff 10%);
+  --crm-alert-info-bg: var(--crm-c-info);
+  --crm-alert-info-border: color-mix(in srgb, var(--crm-alert-info-bg) 90%,#fff 10%);
+  --crm-alert-info-text: var(--crm-c-success-text);
+  --crm-alert-success-bg: var(--crm-c-success);
+  --crm-alert-success-border: color-mix(in srgb, var(--crm-alert-success-bg) 90%,#fff 10%);
+  --crm-alert-success-text: var(--crm-c-success-text);
+  --crm-alert-warning-bg: var(--crm-c-warning);
+  --crm-alert-warning-border: color-mix(in srgb, var(--crm-alert-warning-bg) 90%,#fff 10%);
+  --crm-c-code-bg: var(--crm-c-layer1-bg);
+  --crm-c-danger-on-page-bg: var(--crm-c-danger-light);
+  --crm-c-divider: 1px solid var(--crm-c-gray-500);
+  --crm-c-info-on-page-bg: var(--crm-c-info-light);
+  --crm-c-layer1-bg: var(--crm-c-gray-800);
+  --crm-c-layer2-bg: var(--crm-c-gray-700);
+  --crm-c-primary-on-page-bg: var(--crm-c-gray-300);
+  --crm-c-secondary-on-page-bg: #cdcdcd;
+  --crm-dialog-header-border-col: transparent;
+  --crm-expand-body-bg: var(--crm-c-layer1-bg);
+  --crm-heading-col: var(--crm-c-text-light);
+  --crm-input-description: var(--crm-c-gray-300);
+  --crm-popup-shadow: 0 3px 18px 0 rgb(0,0,0);
+  --crm-tabs-bg: var(--crm-c-layer2-bg);
 }
