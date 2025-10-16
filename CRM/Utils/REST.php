@@ -399,8 +399,8 @@ class CRM_Utils_REST {
       $content = $smarty->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
       CRM_Utils_System::appendTPLFile($tpl, $content);
 
-      return CRM_Utils_System::theme($content);
-
+      CRM_Utils_System::theme($content);
+      return;
     }
     else {
       $content = "<!-- .tpl file embedded: $tpl -->\n";

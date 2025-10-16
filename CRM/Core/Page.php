@@ -268,7 +268,7 @@ class CRM_Core_Page {
     //its time to call the hook.
     CRM_Utils_Hook::alterContent($content, 'page', $pageTemplateFile, $this);
 
-    echo CRM_Utils_System::theme($content, $this->_print);
+    CRM_Utils_System::theme($content);
   }
 
   /**

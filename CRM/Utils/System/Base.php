@@ -337,40 +337,38 @@ abstract class CRM_Utils_System_Base {
   /**
    * @see https://lab.civicrm.org/dev/core/-/issues/5803
    *
-   * If we are using a theming system, invoke theme, else just print the content.
+   * Print content to screen.
+   *
+   * On WP this adds the admin header on admin screens.
    *
    * @param string $content
-   *   The content that will be themed.
+   *   Content to print
    * @param bool $print
+   *   DEPRECATED - this function will always print
    * @param bool $maintenance
-   *   DEPRECATED - use renderMaintenanceMessage instead,
-   *
-   * @throws Exception
-   * @return string|null
-   *   NULL, If $print is FALSE, and some other criteria match up.
-   *   The themed string, otherwise.
-   *
-   * @todo Remove maintenance param
-   * @todo The return value is inconsistent.
-   * @todo Better to always return, and never print.
+   *   DEPRECATED - use renderMaintenanceMessage directly instead
    */
-  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+  public function theme($content, $print = FALSE, $maintenance = FALSE): void {
     if ($maintenance) {
       \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_System::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
-      $content = $this->renderMaintenanceMessage($content);
+      $this->renderMaintenanceMessage($content);
+      return;
     }
+
     print $content;
-    return NULL;
   }
 
   /**
-   * Wrap content in maintenance template
+   * Print content to screen, wrapped in maintenance template if possible
+   *
+   * NOTE: on D7 / Backdrop / Standalone this function exits immediately
+   *
+   * @todo make the behaviours consistent?
    *
    * @param string $content
-   * @return string
    */
-  public function renderMaintenanceMessage(string $content): string {
-    return $content;
+  public function renderMaintenanceMessage(string $content): void {
+    print $content;
   }
 
   /**
@@ -965,7 +963,7 @@ abstract class CRM_Utils_System_Base {
    * @param string $content
    */
   public function outputError($content) {
-    echo CRM_Utils_System::theme($content);
+    CRM_Utils_System::theme($content);
   }
 
   /**
