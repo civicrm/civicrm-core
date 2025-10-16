@@ -764,7 +764,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
       $this->fillIdFields($records, $entityName);
       $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
-      \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+      try {
+        \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+      }
+      catch (\Throwable $e) {
+        \Civi::log('afform')->error('Afform: ' . $event->getAfform()['name'] . ': civi.afform.submit crashed with error: ' . $e->getMessage());
+        throw $e;
+      }
     }
   }
 
