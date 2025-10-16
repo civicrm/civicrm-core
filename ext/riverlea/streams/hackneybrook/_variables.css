@@ -62,7 +62,6 @@
   --crm-alert-info-text: var(--crm-c-blue-darker);
   --crm-alert-danger-text: var(--crm-c-text);
   /* Form */
-  --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: var(--crm-c-gray-300);
   --crm-input-box-shadow: 0;
   --crm-input-label-weight: normal;

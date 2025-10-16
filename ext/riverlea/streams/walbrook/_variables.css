@@ -122,7 +122,6 @@
   --crm-form-block-border-radius: 0;
   --crm-input-bg: var(--crm-c-container-bg);
   --crm-input-bg-image: none;
-  --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: #c2cfd8;
   --crm-input-border-radius: var(--crm-roundness);
   --crm-input-box-shadow: inset 0 0 3px 0 rgba(0,0,0,.2);
