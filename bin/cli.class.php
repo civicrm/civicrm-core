@@ -220,9 +220,19 @@ class civicrm_cli {
     if (ord($_SERVER['SCRIPT_NAME']) != 47) {
       $_SERVER['SCRIPT_NAME'] = '/' . $_SERVER['SCRIPT_NAME'];
     }
-
+    $isJoomla = FALSE;
+    if (str_contains(__FILE__, 'administrator/components/com_civicrm/civicrm/')) {
+      $isJoomla = TRUE;
+      global $civicrm_root;
+    }
     $civicrm_root = dirname(__DIR__);
     chdir($civicrm_root);
+    if ($isJoomla && !class_exists('CRM_Core_ClassLoader')) {
+      require_once $civicrm_root . '/CRM/Utils/System/Base.php';
+      require_once $civicrm_root . '/CRM/Utils/System/Joomla.php';
+      $joomlaClass = new CRM_Utils_System_Joomla();
+      $joomlaClass->loadJoomlaFramework();
+    }
     if (getenv('CIVICRM_SETTINGS')) {
       require_once getenv('CIVICRM_SETTINGS');
     }
