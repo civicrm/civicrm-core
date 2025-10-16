@@ -2,7 +2,7 @@
 <extension key="scheduled_communications" type="module">
   <file>scheduled_communications</file>
   <name>Scheduled Communications</name>
-  <description>Schedule communications using SearchKit</description>
+  <description>Schedule communications using SearchKit. This extension allows you to send standard scheduled reminders to contacts that you have selected in a SearchKit, relative to the dates of other entities, like activities, that are also in your SearchKit.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM</author>
