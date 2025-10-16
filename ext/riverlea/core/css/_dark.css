@@ -1,0 +1,8 @@
+:root {
+  --crm-alert-danger-bg: var(--crm-c-danger);
+  --crm-alert-danger-text: var(--crm-c-danger-text);
+  --crm-c-success-on-page-bg: var(--crm-c-success-light);
+  --crm-c-warning-on-page-bg: var(--crm-c-warning-light);
+  --crm-dash-label-bg: transparent;
+  --crm-table-row-alternate-bg: #fff;
+}

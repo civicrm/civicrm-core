@@ -21,7 +21,6 @@
   --crm-dash-panel-bg: var(--crm-c-dkblue-02);
   --crm-dash-block-bg: var(--crm-c-dkblue-03);
   --crm-dash-summary-row-bg: transparent;
-  --crm-dash-label-bg: transparent;
   --crm-c-text: var(--crm-c-blue-overlay2);
   --crm-tabs-bg: var(--crm-dkblue-01);
   --crm-tabs-border: var(--crm-dkblue-01);
@@ -41,7 +40,6 @@
   --crm-table-outside-border: var(--crm-c-divider);
   --crm-table-row-bg: var(--crm-c-dkblue-02);
   --crm-table-row-hover: var(--crm-c-dkblue-03);
-  --crm-table-row-alternate-bg: #fff;
   --crm-panel-bg: var(--crm-c-dkblue-02);
   --crm-form-block-bg: var(--crm-c-dkblue-02);
   --crm-notify-bg: var(--crm-c-dkblue-02);
@@ -54,12 +52,8 @@
   /* Emphasis colours */
   --crm-c-info-on-page-bg: var(--crm-c-secondary);
   --crm-c-danger-on-page-bg: var(--crm-btn-danger-bg);
-  --crm-c-warning-on-page-bg: var(--crm-c-warning-light);
-  --crm-c-success-on-page-bg: var(--crm-c-success-light);
   --crm-c-primary-on-page-bg: var(--crm-c-secondary);
   --crm-c-secondary-on-page-bg: var(--crm-c-secondary);
-  --crm-alert-danger-bg: var(--crm-c-danger);
-  --crm-alert-danger-text: var(--crm-c-danger-text);
   --crm-alert-info-bg: var(--crm-c-blue-darker);
   --crm-alert-info-text: var(--crm-c-blue-light);
   --crm-c-warning-text: black;

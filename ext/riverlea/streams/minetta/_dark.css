@@ -27,12 +27,8 @@
   --crm-alert-success-bg: var(--crm-c-success);
   --crm-alert-success-text: var(--crm-c-success-text);
   --crm-alert-success-border: color-mix(in srgb, var(--crm-alert-success-bg) 90%,#fff 10%);
-  --crm-c-success-on-page-bg: var(--crm-c-success-light);
   --crm-alert-warning-bg: var(--crm-c-warning);
   --crm-alert-warning-border: color-mix(in srgb, var(--crm-alert-warning-bg) 90%,#fff 10%);
-  --crm-c-warning-on-page-bg: var(--crm-c-warning-light);
-  --crm-alert-danger-bg: var(--crm-c-danger);
-  --crm-alert-danger-text: var(--crm-c-danger-text);
   --crm-alert-danger-border: color-mix(in srgb, var(--crm-alert-danger-bg) 90%,#fff 10%);
   --crm-c-danger-on-page-bg: var(--crm-c-danger-light);
   --crm-alert-info-bg: var(--crm-c-info);
@@ -53,7 +49,6 @@
   --crm-expand-body-bg: var(--crm-c-layer1-bg);
   --crm-dash-header-bg: transparent;
   --crm-dash-block-bg: var(--crm-c-layer1-bg);
-  --crm-dash-label-bg: transparent;
   --crm-dash-panel-bg: #414141;
   --crm-dropdown-bg: var(--crm-c-layer1-bg);
   --crm-dropdown-2-bg: var(--crm-c-layer1-bg);
@@ -61,7 +56,6 @@
   --crm-table-outside-border: var(--crm-c-divider);
   --crm-table-row-border: 1px solid var(--crm-c-gray-200);
   --crm-table-row-hover: var(--crm-c-amber);
-  --crm-table-row-alternate-bg: #fff;
   --crm-panel-border-col: var(--crm-c-gray-200);
   --crm-input-border-color: var(--crm-c-gray-200);
   --crm-input-color: var(--crm-c-text);
