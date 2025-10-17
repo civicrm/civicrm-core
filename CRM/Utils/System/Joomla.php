@@ -270,6 +270,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   * @internal
    */
   public function addHTMLHead($string = NULL) {
     if ($string) {
