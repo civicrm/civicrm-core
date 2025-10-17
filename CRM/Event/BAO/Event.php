@@ -2336,7 +2336,7 @@ WHERE  ce.loc_block_id = $locBlockId";
           }
         }
 
-        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
+        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params, FALSE, NULL, 'email');
 
         //dev/event#10
         //If the event profile includes a note field and the submitted value of
