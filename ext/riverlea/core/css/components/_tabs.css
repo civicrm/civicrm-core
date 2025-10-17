@@ -146,6 +146,8 @@
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li {
   background: var(--crm-dash-tab-bg);
   margin: var(--crm-dash-tab-hang);
+}
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list li span {
   word-break: break-word;
 }
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li .ui-tabs-anchor {
