@@ -7,7 +7,7 @@ namespace Civi\Api4;
  * Provided by the Afform: Core Runtime extension.
  *
  * @searchable secondary
- * @since 6.8
+ * @since 6.9
  * @package Civi\Api4
  */
 class SearchParamSet extends Generic\DAOEntity {
