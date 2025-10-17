@@ -957,14 +957,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
    * @inheritdoc
-   * @todo use Drupal "maintenance page" template and theme during installation
-   */
-  public function renderMaintenanceMessage(string $content): string {
-    return $content;
-  }
-
-  /**
-   * @inheritdoc
    */
   public function ipAddress():?string {
     // dev/core#4756 fallback if checking before CMS bootstrap
