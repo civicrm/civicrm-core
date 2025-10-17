@@ -84,7 +84,7 @@
   --crm-c-danger: var(--crm-c-red-dark); /* thames */
   --crm-c-danger-text: var(--crm-c-text-light);
   --crm-c-warning: var(--crm-c-amber); /* bg on .btn-warning, .label-warming but border on notification .alert */
-  --crm-c-warning-text: var(--crm-c-text);
+  --crm-c-warning-text: var(--crm-c-text-dark);
   --crm-c-info: var(--crm-c-blue-dark);
   --crm-c-info-text: var(--crm-c-text-light);
 }
@@ -135,7 +135,7 @@
   --crm-link-decoration: none;
   --crm-link-decoration-hover: underline;
   --crm-heading-bg: unset; /*var(--crm-c-blue-light);*/ /* thames */
-  --crm-heading-col: var(--crm-c-text);
+  --crm-heading-col: var(--crm-c-text-dark);
   --crm-heading-padding: var(--crm-s1) var(--crm-m1); /* thames unset this? todo */
   --crm-heading-margin: var(--crm-m) 0;
   --crm-heading-radius: var(--crm-roundness);
@@ -203,7 +203,7 @@
 :root {
 /* Accordions */
   --crm-expand-icon: "\f0da"; /* unicode value for FontAwesome icon */
-  --crm-expand-icon-color: var(--text);
+  --crm-expand-icon-color: var(--crm-c-text);
   --crm-expand-icon-spacing: var(--crm-m);
   --crm-expand-transform: rotate(90deg);
   --crm-expand-transition: transform .3s;
