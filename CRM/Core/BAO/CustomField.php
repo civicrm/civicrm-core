@@ -1581,11 +1581,8 @@ SELECT id
     if ($customFields[$customFieldId]['data_type'] == 'Float' ||
       $customFields[$customFieldId]['data_type'] == 'Money'
     ) {
-      if (!$value) {
-        $value = 0;
-      }
 
-      if ($customFields[$customFieldId]['data_type'] == 'Money') {
+      if ($customFields[$customFieldId]['data_type'] == 'Money' && isset($value) && $value !== '') {
         $value = CRM_Utils_Rule::cleanMoney($value);
       }
     }
