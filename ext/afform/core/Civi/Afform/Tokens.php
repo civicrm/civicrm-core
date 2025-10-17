@@ -101,6 +101,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
             if (empty($row->context['contactId'])) {
               continue;
             }
+            \Civi::$statics['afformtokenscontext'] = TRUE;
             $url = self::createUrl($afform, $row->context['contactId'], self::getAfformArgsFromTokenContext($row));
             $row->format('text/plain')->tokens(static::$prefix, $afform['name'] . 'Url', $url);
             $row->format('text/html')->tokens(static::$prefix, $afform['name'] . 'Link', sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
