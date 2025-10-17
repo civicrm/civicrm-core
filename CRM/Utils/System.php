@@ -1944,6 +1944,18 @@ class CRM_Utils_System {
     self::sendResponse(new Response(200, [], $message));
   }
 
+  /**
+   * Output JSON response to the client
+   *
+   * @param array $response
+   * @param int $httpResponseCode
+   *
+   * @return void
+   */
+  public static function sendJSONResponse(array $response, int $httpResponseCode): void {
+    CRM_Core_Config::singleton()->userSystem->sendJSONResponse($response, $httpResponseCode);
+  }
+
   public static function isMaintenanceMode(): bool {
     try {
       $civicrmSetting = \Civi::settings()->get('core_maintenance_mode');
