@@ -18,17 +18,6 @@
 /**
  * This class generates form components for component preferences.
  */
-class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
-
-  /**
-   * This should only be populated programmatically via the settings metadata.
-   *
-   * DO NOT add new settings to these - they need to be migrated to being declared in metadata.
-   *
-   * @var array
-   */
-  protected $_settings = [
-    'default_renewal_contribution_page' => CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME,
-  ];
+class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Generic {
 
 }

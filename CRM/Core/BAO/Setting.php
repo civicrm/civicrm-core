@@ -335,6 +335,50 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return TRUE;
   }
 
+  public static function validateExecutable($value, $fieldSpec): bool {
+    // Required is a separate check
+    if (!$value) {
+      return TRUE;
+    }
+    // Only check the first space separated piece to allow for a value
+    // such as /usr/bin/xvfb-run -- weasyprint
+    $pieces = explode(' ', $value, 2);
+    $executable = $pieces[0];
+    if (!file_exists($executable)) {
+      throw new CRM_Core_Exception("Executable $executable does not exist");
+    }
+    if (!is_executable($executable)) {
+      throw new CRM_Core_Exception("Executable $executable is not executable");
+    }
+    return TRUE;
+  }
+
+  public static function validateEnableSSL($value, $fieldSpec): bool {
+    if ($value) {
+      $url = str_replace('http://', 'https://',
+        CRM_Utils_System::url('civicrm/dashboard', 'reset=1', TRUE, NULL, FALSE)
+      );
+      if (!CRM_Utils_System::checkURL($url, TRUE)) {
+        throw new CRM_Core_Exception(ts('You need to set up a secure server before you can use the Force Secure URLs option'));
+      }
+    }
+    return TRUE;
+  }
+
+  public static function validateCustomTranslateFunction($value, $fieldSpec): bool {
+    if ($value && !function_exists($value)) {
+      throw new CRM_Core_Exception(ts('Please define the custom translation function first.'));
+    }
+    return TRUE;
+  }
+
+  public static function validatePath($value, $fieldSpec): bool {
+    if (isset($value) && strlen($value) && !CRM_Utils_Rule::settingPath($value)) {
+      throw new CRM_Core_Exception(ts("'%1' directory does not exist", [1 => $value]));
+    }
+    return TRUE;
+  }
+
   /**
    * @deprecated in 6.9 will be removed around 6.21
    */
@@ -525,6 +569,27 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     elseif (!\CRM_Core_DAO::checkTriggerViewPermission(FALSE)) {
       $setting['description'] = ts("In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.");
       $setting['html_attributes']['disabled'] = 'disabled';
+    }
+  }
+
+  public static function userFrameworkLoggingMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it (currently only Drupal)
+    if (!CRM_Core_Config::singleton()->userSystem->supportsUfLogging()) {
+      unset($setting['settings_pages']['debug']);
+    }
+  }
+
+  public static function wpBasePageMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it
+    if (!CRM_Core_Config::singleton()->userSystem->canSetBasePage()) {
+      unset($setting['settings_pages']['uf']);
+    }
+  }
+
+  public static function userFrameworkUsersTableNameMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it
+    if (!CRM_Core_Config::singleton()->userSystem->hasUsersTable()) {
+      unset($setting['settings_pages']['uf']);
     }
   }
 

@@ -18,27 +18,38 @@
 /**
  * This class generates form components for the display preferences.
  */
-class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
+class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Generic {
+
+  public function preProcess() {
+    parent::preProcess();
+    $this->sections = [
+      'default' => [
+        'title' => ts('General'),
+      ],
+      'contact' => [
+        'title' => ts('Contacts'),
+        'icon' => 'fa-contacts',
+        'weight' => 10,
+      ],
+      'activity' => [
+        'title' => ts('Activities'),
+        'icon' => 'fa-tasks',
+        'weight' => 20,
+      ],
+      'theme' => [
+        'title' => ts('Theme'),
+        'icon' => 'fa-palette',
+        'weight' => 30,
+      ],
+    ];
+  }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-
     //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
     $this->assign('invoicing', Civi::settings()->get('invoicing'));
-
-    $this->addElement(
-      'xbutton',
-      'ckeditor_config',
-      CRM_Core_Page::crmIcon('fa-wrench') . ' ' . ts('Configure CKEditor'),
-      [
-        'type' => 'submit',
-        'class' => 'crm-button',
-        'style' => 'display:inline-block;vertical-align:middle;float:none!important;',
-        'value' => 1,
-      ]
-    );
 
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');
     $this->assign('editOptions', $editOptions);
@@ -61,10 +72,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
    * Process the form submission.
    */
   public function postProcess() {
-    if ($this->_action == CRM_Core_Action::VIEW) {
-      return;
-    }
-
+    parent::postProcess();
     $this->_params = $this->controller->exportValues($this->_name);
 
     if (!empty($this->_params['contact_edit_preferences'])) {
@@ -76,17 +84,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       }
       $opGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'contact_edit_options', 'id', 'name');
       CRM_Core_BAO_OptionValue::updateOptionWeights($opGroupId, array_flip($preferenceWeights));
-    }
-
-    $this->postProcessCommon();
-
-    // If "Configure CKEditor" button was clicked
-    if (!empty($this->_params['ckeditor_config'])) {
-      // Suppress the "Saved" status message and redirect to the CKEditor Config page
-      $session = CRM_Core_Session::singleton();
-      $session->getStatus(TRUE);
-      $url = CRM_Utils_System::url('civicrm/admin/ckeditor', 'reset=1');
-      $session->pushUserContext($url);
     }
   }
 

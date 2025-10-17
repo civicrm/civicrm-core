@@ -19,14 +19,37 @@
  * This class generates form components for Search Parameters
  *
  */
-class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
+class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Generic {
+
+  /**
+   * Define sections.
+   */
+  public function preProcess(): void {
+    parent::preProcess();
+    $this->sections = [
+      'search' => [
+        'title' => ts('Search Configuration'),
+        'icon' => 'fa-search',
+        'weight' => 0,
+      ],
+      'autocomplete' => [
+        'title' => ts('Autocompletes'),
+        'icon' => 'fa-keyboard',
+        'weight' => 10,
+      ],
+      'legacy' => [
+        'title' => ts('Legacy Search Settings'),
+        'description' => ts('These settings do not apply to the new SearchKit search engine.'),
+        'icon' => 'fa-clock-rotate-left',
+        'weight' => 50,
+      ],
+    ];
+  }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->setTitle(ts('Settings - Search Preferences'));
-
     parent::buildQuickForm();
 
     // Option 1 can't be unchecked. @see self::enableOptionOne

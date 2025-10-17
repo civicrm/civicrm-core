@@ -13,7 +13,7 @@ return [
     'title' => E::ts('Backend Dark Mode Control'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => E::ts('Control whether and how dark mode can be activated on backend pages (for supported Riverlea themes only)'),
+    'help_text' => E::ts('Control whether and how dark mode can be activated (for supported Riverlea themes only).'),
     'options' => [
       'inherit' => E::ts('Inherit from browser/OS'),
       'light' => E::ts('Always use light mode'),
@@ -22,7 +22,7 @@ return [
     'settings_pages' => [
       'riverlea' => ['weight' => 100],
       // show alongside backend theme selector on Display settings page
-      'display' => ['weight' => 900],
+      'display' => ['section' => 'theme', 'weight' => 20],
     ],
   ],
   'riverlea_dark_mode_frontend' => [
@@ -35,7 +35,7 @@ return [
     'title' => E::ts('Frontend Dark Mode Control'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => E::ts('Control whether and how dark mode can be activated on frontend pages (for supported Riverlea themes only)'),
+    'help_text' => E::ts('Control whether and how dark mode can be activated (for supported Riverlea themes only).'),
     'options' => [
       'inherit' => E::ts('Inherit from browser/OS'),
       'light' => E::ts('Always use light mode'),
@@ -44,7 +44,7 @@ return [
     'settings_pages' => [
       'riverlea' => ['weight' => 110],
       // show alongside frontend theme selector on Display settings page
-      'display' => ['weight' => 950],
+      'display' => ['section' => 'theme', 'weight' => 40],
     ],
   ],
 ];

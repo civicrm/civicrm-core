@@ -419,6 +419,13 @@ class CRM_Core_Component {
     return self::isEnabled(self::getComponentName($id));
   }
 
+  public static function validateComponents(array $components): bool {
+    if (in_array('CiviPledge', $components) && !in_array('CiviContribute', $components)) {
+      throw new CRM_Core_Exception(ts('You need to enable CiviContribute before enabling CiviPledge.'));
+    }
+    return TRUE;
+  }
+
   /**
    * Callback for the "enable_components" setting (pre change)
    *

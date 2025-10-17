@@ -15,23 +15,30 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Core\SettingsMetadata;
-
 /**
- * This class generates form components for the display preferences.
+ * Contribution, tax and invoicing settings form
  */
-class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
+class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Generic {
 
-  /**
-   * Build the form object.
-   */
-  public function buildQuickForm(): void {
-    parent::buildQuickForm();
-    $invoiceSettings = SettingsMetadata::getMetadata(['name' => ['invoice_prefix', 'invoice_notes', 'invoice_due_date', 'invoice_is_email_pdf', 'invoice_due_date_period', 'tax_display_settings']], NULL, TRUE);
-    // Let the main template file deal with the main setting & then Contribute.tpl
-    // can stick the invoice settings in a div that can show-hide-toggle if invoicing is enabled.
-    $this->assign('fields', $this->filterMetadataByWeight(array_diff_key($this->getSettingsMetaData(), $invoiceSettings)));
-    $this->assign('invoiceDependentFields', $invoiceSettings);
+  public function preProcess() {
+    parent::preProcess();
+    // Every Admin_Form_Generic already comes with a 'default' section but giving it a title adds a header.
+    // This will collect all settings with no section declared
+    $this->sections = [
+      'default' => [
+        'title' => ts('General'),
+        'icon' => 'fa-cash-register',
+      ],
+      // Javascript on the Contribute.tpl will hide this section if invoicing is disabled
+      'invoice' => [
+        'title' => ts('Tax and Invoicing'),
+        'icon' => 'fa-file-invoice-dollar',
+        'doc_url' => [
+          'page' => 'user/contributions/invoicing/',
+        ],
+        'weight' => 10,
+      ],
+    ];
   }
 
 }
