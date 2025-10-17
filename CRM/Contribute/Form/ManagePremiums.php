@@ -37,17 +37,16 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
+    $this->assign('defaultImageURL', self::_defaultImage());
     if ($this->_id) {
       $tempDefaults = Product::get()->addSelect('*', 'custom.*')->addWhere('id', '=', $this->_id)->execute()->first();
-      if (isset($tempDefaults['image']) && isset($tempDefaults['thumbnail'])) {
+      if (!empty($tempDefaults['image'])) {
         $defaults['imageUrl'] = $tempDefaults['image'];
         $defaults['imageOption'] = 'thumbnail';
+        $this->assign('imageURL', $tempDefaults['thumbnail'] ?? $tempDefaults['image']);
       }
       else {
         $defaults['imageOption'] = 'noImage';
-      }
-      if (isset($tempDefaults['thumbnail']) && isset($tempDefaults['image'])) {
-        $this->assign('imageURL', $tempDefaults['image']);
       }
       if (isset($tempDefaults['period_type'])) {
         $this->assign('showSubscriptions', TRUE);
@@ -119,7 +118,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $image['thumbnail'] = ts('Display image and thumbnail from these locations on the web:');
     $imageJS['thumbnail'] = ['onclick' => 'add_upload_file_block(\'thumbnail\');', 'class' => 'required'];
     $image['default_image'] = ts('Use default image');
-    $imageJS['default_image'] = ['onclick' => 'add_upload_file_block(\'default\');', 'class' => 'required'];
+    $imageJS['default_image'] = ['onclick' => 'add_upload_file_block(\'default_image\');', 'class' => 'required'];
     $image['noImage'] = ts('Do not display an image');
     $imageJS['noImage'] = ['onclick' => 'add_upload_file_block(\'noImage\');', 'class' => 'required'];
 
@@ -127,6 +126,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->addRule('imageOption', ts('Please select an option for the premium image.'), 'required');
 
     $this->addElement('text', 'imageUrl', ts('Image URL'));
+    $this->addElement('text', 'thumbnailUrl', ts('Thumbnail URL'));
     $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'CRM.$("input[name=imageOption][value=image]").prop("checked", true);']);
     $this->add('text', 'price', ts('Market Value'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'price'), TRUE);
     $this->addRule('price', ts('Please enter the Market Value for this product.'), 'money');
@@ -332,20 +332,14 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * @param array $params
    */
   protected function _processImages(&$params) {
-    $defaults = [
-      'imageOption' => 'noImage',
-      'uploadFile' => ['name' => ''],
-      'image' => '',
-      'thumbnail' => '',
-      'imageUrl' => '',
-    ];
-    $params = array_merge($defaults, $params);
-
     // User is uploading an image
     if ($params['imageOption'] == 'image') {
+      $config = CRM_Core_Config::singleton();
       $imageFile = $params['uploadFile']['name'];
+      $pathParts = pathinfo($imageFile);
+      $params['image'] = $config->imageUploadURL . $pathParts['filename'] . "." . $pathParts['extension'];
       try {
-        $params['image'] = CRM_Utils_File::resizeImage($imageFile, 200, 200, "_full");
+        $params['thumbnail'] = CRM_Utils_File::resizeImage($imageFile, 400, 400, "_thumb");
       }
       catch (CRM_Core_Exception $e) {
         $params['image'] = self::_defaultImage();
@@ -353,15 +347,14 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
         CRM_Core_Session::setStatus($e->getMessage() . " $msg", ts('Notice'), 'alert');
       }
     }
-
     // User is specifying existing URLs for the images
     elseif ($params['imageOption'] == 'thumbnail') {
       $params['image'] = $params['imageUrl'];
+      $params['thumbnail'] = $params['thumbnailUrl'];
     }
-
     // User wants a default image
     elseif ($params['imageOption'] == 'default_image') {
-      $params['image'] = self::_defaultImage();
+      $params['image'] = $params['thumbnail'] = self::_defaultImage();
     }
   }
 
