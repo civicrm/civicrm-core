@@ -19,6 +19,7 @@ use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\PaymentProcessor;
 use Civi\Api4\UFJoin;
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Event\PostEvent;
 use Civi\Order\Event\OrderCompleteEvent;
@@ -4488,6 +4489,22 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       default:
         throw new CRM_Core_Exception('Unknown unit: ' . $unit);
+    }
+  }
+
+  public static function on_civi_imports(GenericHookEvent $event) {
+    if (CRM_Core_Permission::check([
+      'access CiviContribute',
+      'edit contributions',
+    ])) {
+      $event->imports = array_merge($event->imports, [
+        'contribution_import' => [
+          'label' => ts('Import Contributions'),
+          'name' => 'contribution_import',
+          'url' => CRM_Utils_System::url('civicrm/import/contribution', 'reset=1', FALSE, FALSE, TRUE, FALSE, TRUE),
+          'no_ts_label' => 'Import Contributions',
+        ],
+      ]);
     }
   }
 
