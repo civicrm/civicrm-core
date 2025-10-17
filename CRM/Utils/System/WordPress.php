@@ -331,6 +331,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       global $post;
       if ($post) {
         $frontend_url = get_permalink($post->ID);
+        if ($frontend_url == CRM_Utils_System::baseURL()) {
+          // Frontend URL is the bare WP homepage. Append civicrm basepage path so that
+          // URLs will resolve to a workable civicrm page/form.
+          $frontend_url = $this->getBasePageUrl();
+        }
         if (civi_wp()->basepage->is_match($post->ID)) {
           $basepage = TRUE;
         }
