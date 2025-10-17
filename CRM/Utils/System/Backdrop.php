@@ -185,6 +185,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
 
   /**
    * @inheritDoc
+   * @internal
    */
   public function addHTMLHead($header) {
     static $count = 0;

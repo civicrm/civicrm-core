@@ -272,9 +272,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   * @internal
+   * @deprecated
    */
   public function addHTMLHead($head) {
-    \CRM_Core_Error::deprecatedFunctionWarning("addHTMLHead is deprecated in WordPress and will be removed in a future version");
+    \CRM_Core_Error::deprecatedFunctionWarning('Civi::resources() or CRM_Core_Region::instance("html-header")');
     static $registered = FALSE;
     if (!$registered) {
       // front-end view
