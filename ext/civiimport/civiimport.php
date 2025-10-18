@@ -91,16 +91,11 @@ function _civiimport_civicrm_get_import_tables(): array {
     LEFT JOIN civicrm_contact created_id ON created_id.id = user_job.created_id
     LEFT JOIN civicrm_search_display sd ON sd.id = user_job.search_display_id
     LEFT JOIN civicrm_saved_search ss ON ss.id = sd.saved_search_id
-      -- As of writing expires date is probably not being managed
-      -- it is intended to be used to actually purge the record in
-      -- a cleanup job so it might not be relevant here & perhaps this will
-      -- be removed later
-      WHERE (user_job.expires_date IS NULL OR user_job.expires_date > NOW())
       -- this is a short-cut for looking up if they are imports
       -- it is a new convention, at best, to require anything
       -- specific in the job_type, but it saves any onerous lookups
       -- in a function which needs to avoid loops
-      AND job_type LIKE "%import%"
+      WHERE job_type LIKE "%import%"
       -- also more of a feature than a specification - but we need a table
       -- to do this pseudo-api
       AND metadata LIKE "%table_name%"');
