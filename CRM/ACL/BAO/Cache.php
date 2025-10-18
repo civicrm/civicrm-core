@@ -85,15 +85,19 @@ SELECT acl_id
    */
   protected static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
-      $dao = new CRM_ACL_BAO_Cache();
-      if ($id) {
-        $dao->contact_id = $id;
-      }
-      $dao->acl_id = $aclID;
-
       $cache[$aclID] = 1;
 
-      $dao->save();
+      $params = [
+        1 => [$aclID, 'Integer'],
+      ];
+      if ($id) {
+        $query = "INSERT INTO civicrm_acl_cache (contact_id, acl_id) VALUES (%2, %1)";
+        $params[2] = [$id, 'Integer'];
+      }
+      else {
+        $query = "INSERT INTO civicrm_acl_cache (contact_id, acl_id) VALUES (NULL, %1)";
+      }
+      CRM_Core_DAO::executeQuery($query, $params);
     }
   }
 
