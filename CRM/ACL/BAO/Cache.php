@@ -87,17 +87,10 @@ SELECT acl_id
     foreach ($cache as $aclID => $data) {
       $cache[$aclID] = 1;
 
-      $params = [
-        1 => [$aclID, 'Integer'],
-      ];
-      if ($id) {
-        $query = "INSERT INTO civicrm_acl_cache (contact_id, acl_id) VALUES (%2, %1)";
-        $params[2] = [$id, 'Integer'];
-      }
-      else {
-        $query = "INSERT INTO civicrm_acl_cache (contact_id, acl_id) VALUES (NULL, %1)";
-      }
-      CRM_Core_DAO::executeQuery($query, $params);
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_cache (acl_id, contact_id) VALUES (%1, %2)", [
+        1  => [$aclID, 'Integer'],
+        2 => $id ? [$id, 'Integer'] : ['NULL', 'String'],
+      ]);
     }
   }
 
