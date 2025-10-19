@@ -21,13 +21,45 @@ use Civi\Payment\Exception\PaymentProcessorException;
  * Class CRM_Core_Payment_PayPalImpl for paypal pro, paypal standard & paypal express.
  */
 class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
-  const CHARSET = 'iso-8859-1';
 
+  /**
+   * Types of PayPal experience supported by this class.
+   */
   const PAYPAL_PRO = 'PayPal';
   const PAYPAL_STANDARD = 'PayPal_Standard';
   const PAYPAL_EXPRESS = 'PayPal_Express';
 
+  /**
+   * Production Postback URL for IPN verification
+   */
+  const IPN_VERIFY_URI = 'https://ipnpb.paypal.com/cgi-bin/webscr';
+  /**
+   * Sandbox Postback URL for IPN verification
+   */
+  const IPN_SANDBOX_VERIFY_URI = 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr';
+
+  /**
+   * Response from PayPal indicating IPN validation was successful
+   */
+  const IPN_VALID = 'VERIFIED';
+  /**
+   * Response from PayPal indicating IPN validation failed
+   */
+  const IPN_INVALID = 'INVALID';
+
+  /**
+   * Processor mode: 'live' or 'test'.
+   *
+   * @var string
+   */
   protected $_mode = NULL;
+
+  /**
+   * Whether to use local certificate files for IPN post-back.
+   *
+   * @var bool
+   */
+  protected $_use_local_certs = FALSE;
 
   /**
    * Constructor.
@@ -840,6 +872,134 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     $paypalIPN->main();
+  }
+
+  /**
+   * Verify incoming IPN data.
+   * Sends the incoming post data back to PayPal using the cURL library.
+   *
+   * This method is substantially copied from the PayPal example code published here:
+   * https://github.com/paypal/ipn-code-samples/blob/master/php/PaypalIPN.php - function verifyIPN()
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function verifyIPN() {
+    if (CIVICRM_UF === 'UnitTests') {
+      // This won't work in unit tests - could look at capturing the API call and verifying data passed back in the test case?
+      Civi::log()->debug('PayPalIPN: Skipping verification in unit test environment.');
+      return TRUE;
+    }
+
+    if (!count($_POST)) {
+      throw new CRM_Core_Exception("Missing POST Data");
+    }
+
+    $raw_post_data = file_get_contents('php://input');
+    $raw_post_array = explode('&', $raw_post_data);
+    $myPost = [];
+    foreach ($raw_post_array as $keyval) {
+      $keyval = explode('=', $keyval);
+      if (count($keyval) == 2) {
+        // Since we do not want the plus in the datetime string to be encoded to a space, we manually encode it.
+        if ($keyval[0] === 'payment_date') {
+          if (substr_count($keyval[1], '+') === 1) {
+            $keyval[1] = str_replace('+', '%2B', $keyval[1]);
+          }
+        }
+        $myPost[$keyval[0]] = urldecode($keyval[1]);
+      }
+    }
+
+    // Build the body of the verification post request, adding the _notify-validate command.
+    $req = 'cmd=_notify-validate';
+    foreach ($myPost as $key => $value) {
+      $value = urlencode($value);
+      $req .= "&$key=$value";
+    }
+
+    // Post the data back to PayPal, using curl. Throw exceptions if errors occur.
+    if (!function_exists('curl_init')) {
+      throw new CRM_Core_Exception('curl functions NOT available.');
+    }
+    $ch = curl_init($this->getPaypalUriForIPN());
+    curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $req);
+    curl_setopt($ch, CURLOPT_SSLVERSION, 6);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+    // This is often required if the server is missing a global cert bundle, or is using an outdated one.
+    if ($this->_use_local_certs) {
+      curl_setopt($ch, CURLOPT_CAINFO, __DIR__ . "/cert/cacert.pem");
+    }
+    curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'User-Agent: PHP-IPN-Verification-Script',
+      'Connection: Close',
+    ]);
+    $res = curl_exec($ch);
+    if (!$res) {
+      $errno = curl_errno($ch);
+      $errstr = curl_error($ch);
+      curl_close($ch);
+      throw new CRM_Core_Exception("cURL error: [$errno] $errstr");
+    }
+
+    $info = curl_getinfo($ch);
+    $http_code = $info['http_code'];
+    if ($http_code != 200) {
+      throw new CRM_Core_Exception("PayPal responded with http code $http_code");
+    }
+
+    curl_close($ch);
+    Civi::log()->debug('PayPalIPN: Verification response from PayPal: "' . $res . '".');
+
+    // Check if PayPal verifies the IPN data, and if so, return true.
+    if ($res == self::IPN_VALID) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Sets curl to use php curl's built in certs (may be required in some environments).
+   *
+   * This method is based on the PayPal example code published here:
+   * https://github.com/paypal/ipn-code-samples/blob/master/php/PaypalIPN.php - function usePHPCerts()
+   *
+   * @param bool $useLocal Whether or not to use local certificates.
+   * @return void
+   */
+  public function useLocalCertsForIPN($useLocal) {
+    if ($useLocal) {
+      $this->_use_local_certs = TRUE;
+    }
+    else {
+      $this->_use_local_certs = FALSE;
+    }
+  }
+
+  /**
+   * Determine endpoint to post the IPN verification data to.
+   *
+   * This method is based on the PayPal example code published here:
+   * https://github.com/paypal/ipn-code-samples/blob/master/php/PaypalIPN.php - function getPaypalUri()
+   *
+   * @return string
+   */
+  protected function getPaypalUriForIPN() {
+    if ($this->_mode == 'test') {
+      return self::IPN_SANDBOX_VERIFY_URI;
+    }
+    else {
+      return self::IPN_VERIFY_URI;
+    }
   }
 
   /**
