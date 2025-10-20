@@ -535,6 +535,7 @@
     "Civi/Api4/Action/EntityTag/*",
     "Civi/Api4/Action/Event/*",
     "Civi/Api4/Action/MailSettings/*",
+    "Civi/Api4/Action/Note/*",
     "Civi/Api4/Action/Queue/RunLoop.php",
     "Civi/Api4/Action/WorkflowMessageExample/*",
     "Civi/Api4/Campaign.php",

@@ -1570,23 +1570,6 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Deprecated: use hook_civicrm_selectWhereClause instead.
-   * @deprecated since 5.67 will be removed around 5.85
-   * .
-   * @param array &$noteValues
-   */
-  public static function notePrivacy(&$noteValues) {
-    $null = NULL;
-    self::singleton()->invoke(['noteValues'], $noteValues,
-      $null, $null, $null, $null, $null,
-      'civicrm_notePrivacy'
-    );
-    if (isset($noteValues['notePrivacy_hidden'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('hook_civicrm_selectWhereClause', 'hook_civicrm_notePrivacy');
-    }
-  }
-
-  /**
    * This hook is called before record is exported as CSV.
    *
    * @param string $exportTempTable
