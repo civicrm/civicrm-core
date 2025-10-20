@@ -1,13 +1,7 @@
 /* HackneyBrook dark mode settings */
 :root {
-  --crm-c-link: #f5c929;
-  --crm-c-link-hover: #f2d465;
-  --crm-c-layer0-bg: var(--crm-c-gray-900);
-  --crm-c-container-bg: var(--crm-c-gray-900);
-  --crm-c-primary: var(--crm-c-container-bg);
-  --crm-c-primary-text: var(--crm-c-text);
-  --crm-c-secondary: var(--crm-c-layer1-bg);
-  --crm-c-inactive: var(--crm-c-gray-400);
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
   --crm-c-amber: #993b00;
   --crm-c-red: #b3001b;
   --crm-c-red-dark: #a11b1f;
@@ -20,38 +14,68 @@
   --crm-c-gray-500: #6c6c6c;
   --crm-c-gray-300: #e1dfdf;
   --crm-c-gray-200: #bdbdbd;
-  --crm-checkbox-list-bg: #665800;
-/* And others */
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-c-link: #f5c929;
+  --crm-c-link-hover: #f2d465;
   --crm-c-focus: #00a3a5;
-  --crm-btn-icon-bg: var(--crm-c-gray-700);
+  --crm-c-inactive: var(--crm-c-gray-400);
+/* Backgrounds, '--crm-c-*-bg' */
+  --crm-c-layer0-bg: var(--crm-c-gray-900);
+  --crm-c-container-bg: var(--crm-c-gray-900);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+  --crm-c-primary: var(--crm-c-container-bg);
+  --crm-c-primary-text: var(--crm-c-text);
+  --crm-c-secondary: var(--crm-c-layer1-bg);
+/* Shadows */
   --crm-block-shadow: 0;
+/* Sizes */
+/* Type */
   --crm-heading-bg: #354b55;
-  --crm-dashlet-bg: var(--crm-c-layer1-bg);
-  --crm-dashlet-header-bg: var(--crm-c-layer2-bg);
-  --crm-dashlet-tabs-border: 0;
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+  --crm-btn-icon-bg: var(--crm-c-gray-700);
   --crm-btn-border: 1px solid var(--crm-c-gray-500);
+/* Tables '--crm-table-' */
+  --crm-table-row-bg: var(--crm-c-layer1-bg);
+  --crm-table-row-border: 1px solid var(--crm-c-gray-200);
+  --crm-table-row-hover: var(--crm-c-layer2-bg);
+/* Panels '--crm-panel-' */
+  --crm-panel-border-col: var(--crm-c-gray-500);
+/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
   --crm-expand-header-bg: var(--crm-c-layer2-bg);
   --crm-expand-header-bg-active: var(--crm-c-gray-600);
   --crm-expand-body-border: 0;
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-input-border-color: var(--crm-c-gray-500);
+  --crm-checkbox-list-bg: #665800;
+/* Tabs '--crm-tabs' */
+  --crm-tab-bg-active: var(--crm-c-layer1-bg);
+/* Contact layout '--crm-dash-' */
   --crm-dash-header-bg: transparent;
   --crm-dash-tab-bg-hover: var(--crm-c-layer1-bg);
   --crm-dash-block-bg: var(--crm-c-layer1-bg);
   --crm-dash-summary-row-bg: var(--crm-c-container-bg);
-  --crm-dropdown-bg: var(--crm-c-layer1-bg);
-  --crm-dropdown-2-bg: var(--crm-c-layer1-bg);
-  --crm-tab-bg-active: var(--crm-c-layer1-bg);
-  --crm-panel-border-col: var(--crm-c-gray-500);
-  --crm-input-border-color: var(--crm-c-gray-500);
-  --crm-table-row-bg: var(--crm-c-layer1-bg);
-  --crm-table-row-border: 1px solid var(--crm-c-gray-200);
-  --crm-table-row-hover: var(--crm-c-layer2-bg);
+/* Dialog '--crm-dialog-' */
   --crm-dialog-header-bg: var(--crm-c-layer1-bg);
   --crm-dialog-body-bg: var(--crm-c-layer1-bg);
+/* Dashlet for main dashboard '--crm-dashlet-' */
+  --crm-dashlet-bg: var(--crm-c-layer1-bg);
+  --crm-dashlet-header-bg: var(--crm-c-layer2-bg);
+  --crm-dashlet-tabs-border: 0;
+/* Button dropdowns '--crm-dropdown-' */
+  --crm-dropdown-bg: var(--crm-c-layer1-bg);
+  --crm-dropdown-2-bg: var(--crm-c-layer1-bg);
+/* Notifications '--crm-notify-' */
   --crm-notify-bg: var(--crm-c-darkest);
   --crm-notify-col: var(--crm-c-text-light);
-  --crm-wizard-active-bg: var(--crm-c-blue-dark);
-  --crm-filter-item-bg: var(--crm-c-layer1-bg);
+/* Icons '--crm-icon-' */
   --crm-icon-danger-color: var(--crm-notify-danger);
   --crm-icon-success-color: var(--crm-notify-success);
   --crm-icon-warning-color: var(--crm-notify-warning);
+/* Wizard '--crm-wizard-' */
+  --crm-wizard-active-bg: var(--crm-c-blue-dark);
+/* Alpha filter '--crm-filter-' */
+  --crm-filter-item-bg: var(--crm-c-layer1-bg);
+/* Frontend '--crm-f- */
 }

@@ -1,15 +1,7 @@
 /* Minetta dark mode settings */
 :root {
-  --crm-c-focus: #8cd4cb;
-  --crm-c-link: var(--crm-c-teal);
-  --crm-c-link-hover: var(--crm-c-yellow);
-  --crm-c-primary: var(--crm-c-gray-500);
-  --crm-c-primary-hover: var(--crm-c-gray-600);
-  --crm-c-primary-text: var(--crm-c-text);
-  --crm-c-layer0-bg: var(--crm-c-gray-900);
-  --crm-c-page-bg: var(--crm-c-gray-900);
-  --crm-c-container-bg: var(--crm-c-gray-800);
-  --crm-c-inverse-bg: var(--crm-c-gray-300);
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
   --crm-c-teal: #a3ebe6;
   --crm-c-gray-900: #363636;
   --crm-c-gray-800: #464646;
@@ -17,30 +9,61 @@
   --crm-c-gray-600: #67676a;
   --crm-c-gray-300: #e1dfdf;
   --crm-c-gray-200: #bdbdbd;
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-c-focus: #8cd4cb;
+  --crm-c-link: var(--crm-c-teal);
+  --crm-c-link-hover: var(--crm-c-yellow);
   --crm-c-inactive: color-mix(in srgb,var(--crm-c-text) 95%,#000 5%);
-  /* Emphasis colours */
-  /* And others */
+/* Backgrounds, '--crm-c-*-bg' */
+  --crm-c-layer0-bg: var(--crm-c-gray-900);
+  --crm-c-page-bg: var(--crm-c-gray-900);
+  --crm-c-container-bg: var(--crm-c-gray-800);
+  --crm-c-inverse-bg: var(--crm-c-gray-300);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+  --crm-c-primary: var(--crm-c-gray-500);
+  --crm-c-primary-hover: var(--crm-c-gray-600);
+  --crm-c-primary-text: var(--crm-c-text);
+/* Shadows */
   --crm-block-shadow: 0;
+/* Sizes */
+/* Type */
   --crm-heading-bg: var(--crm-c-blue-dark);
-  --crm-dashlet-bg: var(--crm-c-layer1-bg);
-  --crm-dashlet-header-bg: var(--crm-c-layer2-bg);
-  --crm-expand-header-bg: var(--crm-c-layer2-bg);
-  --crm-expand-header-bg-active: var(--crm-c-gray-600);
-  --crm-dash-header-bg: transparent;
-  --crm-dash-block-bg: var(--crm-c-layer1-bg);
-  --crm-dash-panel-bg: #414141;
-  --crm-dropdown-bg: var(--crm-c-layer1-bg);
-  --crm-dropdown-2-bg: var(--crm-c-layer1-bg);
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
   --crm-table-outside-border: var(--crm-c-divider);
   --crm-table-row-border: 1px solid var(--crm-c-gray-200);
   --crm-table-row-hover: var(--crm-c-amber);
+/* Panels '--crm-panel-' */
   --crm-panel-border-col: var(--crm-c-gray-200);
+/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
+  --crm-expand-header-bg: var(--crm-c-layer2-bg);
+  --crm-expand-header-bg-active: var(--crm-c-gray-600);
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-form-block-bg: var(--crm-c-layer1-bg);
   --crm-input-border-color: var(--crm-c-gray-200);
   --crm-input-radio-color: #38c4b4;
+/* Tabs '--crm-tabs'/
+/* Contact layout '--crm-dash-' */
+  --crm-dash-header-bg: transparent;
+  --crm-dash-block-bg: var(--crm-c-layer1-bg);
+  --crm-dash-panel-bg: #414141;
+/* Dialog '--crm-dialog-' */
   --crm-dialog-header-bg: var(--crm-c-layer1-bg);
   --crm-dialog-body-bg: var(--crm-c-layer1-bg);
+/* Dashlet for main dashboard '--crm-dashlet-' */
+  --crm-dashlet-bg: var(--crm-c-layer1-bg);
+  --crm-dashlet-header-bg: var(--crm-c-layer2-bg);
+/* Button dropdowns '--crm-dropdown-' */
+  --crm-dropdown-bg: var(--crm-c-layer1-bg);
+  --crm-dropdown-2-bg: var(--crm-c-layer1-bg);
+/* Notifications '--crm-notify-' */
   --crm-notify-bg: var(--crm-c-darkest);
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
   --crm-wizard-active-bg: var(--crm-c-dark-teal);
-  --crm-form-block-bg: var(--crm-c-layer1-bg);
+/* Alpha filter '--crm-filter-' */
   --crm-filter-item-bg: var(--crm-c-layer1-bg);
+/* Frontend '--crm-f- */
 }

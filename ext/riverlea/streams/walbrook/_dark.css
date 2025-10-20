@@ -1,50 +1,73 @@
 /* Walbrook dark mode settings */
 
 :root {
-  --crm-c-link: var(--crm-c-amber);
-  --crm-c-link-hover: var(--crm-c-amber-light);
-  --crm-c-focus: var(--crm-c-link);
-  --crm-c-page-bg: var(--crm-c-darkest);
-  --crm-c-layer0-bg: var(--crm-c-darkest);
-  --crm-c-container-bg: var(--crm-c-gray-900);
+/* Colour names, e.g. green, red, blue '--crm-c-' */
   --crm-c-gray-800: #222831;
   --crm-c-gray-700: #353842;
   --crm-c-gray-600: #67676a;
   --crm-c-gray-500: #b3b3b3;
-/* Emphasis colours */
+/* Practical colours, e.g. background, text, link '--crm-c-' */
+  --crm-c-text-light: #fff;
+  --crm-c-text-dark: #302f35;
+  --crm-c-text: var(--crm-c-text-dark);
+  --crm-c-link: var(--crm-c-amber);
+  --crm-c-link-hover: var(--crm-c-amber-light);
+  --crm-c-focus: var(--crm-c-link);
+  --crm-c-inactive: var(--crm-c-gray-400);
+/* Backgrounds, '--crm-c-*-bg' */
+  --crm-c-page-bg: var(--crm-c-darkest);
+  --crm-c-layer0-bg: var(--crm-c-darkest);
+  --crm-c-container-bg: var(--crm-c-gray-900);
+  --crm-c-drag-bg: var(--crm-c-layer2-bg);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
   --crm-c-success: var(--crm-c-green-dark);
   --crm-c-warning-text: var(--crm-c-text-dark);
   --crm-alert-warning-text: var(--crm-c-text-dark);
   --crm-c-info: var(--crm-c-blue-dark);
-/* And others */
+/* Shadows */
   --crm-block-shadow: 0 3px 18px 0 rgb(0,0,0);
+/* Sizes */
+/* Type */
   --crm-heading-bg: var(--crm-c-secondary);
-  --crm-dashlet-header-bg: var(--crm-c-layer1-bg);
-  --crm-expand-header-bg: transparent;
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
+  --crm-table-row-hover: var(--crm-alert-info-border);
+/* Panels '--crm-panel-' */
+  --crm-panel-border-col: var(--crm-c-gray-500);
+  --crm-panel-border: 1px;
+  --crm-panel-bg: var(--crm-c-container-bg);
+/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
   --crm-expand-header-bg-active: var(--crm-c-secondary-hover);
-  --crm-expand2-header-bg: transparent;
   --crm-expand2-header-bg-active: var(--crm-c-secondary-hover);
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-form-block-bg: var(--crm-c-container-bg);
+  --crm-input-border-color: var(--crm-c-gray-500);
+/* Tabs '--crm-tabs'/
+/* Contact layout '--crm-dash-' */
   --crm-dash-header-bg: var(--crm-c-layer2-bg);
   --crm-dash-block-bg: var(--crm-c-container-bg);
   --crm-dash-tabs-bg: var(--crm-c-layer1-bg);
   --crm-dash-panel-bg: var(--crm-c-container-bg);
   --crm-dash-tab-bg-hover: var(--crm-c-layer2-bg);
   --crm-dash-box-shadow: inset 0 5px 18px -5px rgba(0, 0, 0, 0.75);
+  --crm-dash-edit-border: 1px solid var(--crm-c-link-hover);
+/* Dialog '--crm-dialog-' */
+  --crm-dialog-body-bg: var(--crm-c-container-bg);
+/* Dashlet for main dashboard '--crm-dashlet-' */
+  --crm-dashlet-header-bg: var(--crm-c-layer1-bg);
+/* Button dropdowns '--crm-dropdown-' */
   --crm-dropdown-bg: var(--crm-c-container-bg);
   --crm-dropdown-2-bg: var(--crm-c-container-bg);
-  --crm-panel-border-col: var(--crm-c-gray-500);
-  --crm-panel-border: 1px;
-  --crm-panel-bg: var(--crm-c-container-bg);
-  --crm-input-border-color: var(--crm-c-gray-500);
-  --crm-table-row-hover: var(--crm-alert-info-border);
-  --crm-c-inactive: var(--crm-c-gray-400);
-  --crm-dialog-body-bg: var(--crm-c-container-bg);
+/* Notifications '--crm-notify-' */
   --crm-notify-bg: var(--crm-c-container-bg);
-  --crm-form-block-bg: var(--crm-c-container-bg);
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
   --crm-wizard-bg: var(--crm-c-container-bg);
   --crm-wizard-active-bg: var(--crm-c-primary);
   --crm-wizard-active-col: var(--crm-c-primary-text);
-  --crm-dash-edit-border: 1px solid var(--crm-c-link-hover);
+/* Alpha filter '--crm-filter-' */
   --crm-filter-bg: var(--crm-c-blue-dark);
-  --crm-c-drag-bg: var(--crm-c-layer2-bg);
+/* Frontend '--crm-f- */
 }

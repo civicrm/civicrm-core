@@ -1,62 +1,86 @@
 :root {
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
   --crm-c-dkblue-01: #050b0d;
   --crm-c-dkblue-02: #0c191e;
   --crm-c-dkblue-03: #1a292f;
   --crm-c-dkblue-04: #1e323b;
   --crm-c-dkblue-08: #2ea4ff;
-  --crm-dash-tabs-bg: var(--crm-c-dkblue-03);
-  --crm-dash-tab-count-bg: var(--crm-c-blue-darker);
-  --crm-c-code-bg: var(--crm-c-dkblue-04);
-  --crm-dashlet-bg: var(--crm-c-dkblue-02);
+  --crm-c-green: #335417;
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-c-text: var(--crm-c-blue-overlay2);
+  --crm-c-link: var(--crm-c-dkblue-08);
+  --crm-c-link-hover: color-mix(in srgb, white, var(--crm-c-dkblue-08) 70%);
+  --crm-c-divider: var(--crm-c-dkblue-04);
+/* Backgrounds, '--crm-c-*-bg' */
   --crm-c-layer0-bg: var(--crm-c-dkblue-01);
   --crm-c-page-bg: var(--crm-c-dkblue-01);
   --crm-c-container-bg: var(--crm-c-dkblue-02);
   --crm-c-layer1-bg: var(--crm-c-dkblue-02);
   --crm-c-layer2-bg: var(--crm-c-dkblue-02);
-  --crm-c-green: #335417;
-  --crm-c-link: var(--crm-c-dkblue-08);
-  --crm-c-link-hover: color-mix(in srgb, white, var(--crm-c-dkblue-08) 70%);
-  --crm-dash-header-col: var(--crm-c-blue-light);
-  --crm-dash-tab-bg-hover: var(--crm-c-dkblue-02);
-  --crm-dash-panel-bg: var(--crm-c-dkblue-02);
-  --crm-dash-block-bg: var(--crm-c-dkblue-03);
-  --crm-dash-summary-row-bg: transparent;
-  --crm-c-text: var(--crm-c-blue-overlay2);
-  --crm-tabs-bg: var(--crm-dkblue-01);
-  --crm-tabs-border: var(--crm-dkblue-01);
+  --crm-c-code-bg: var(--crm-c-dkblue-04);
   --crm-c-drag-bg: var(--crm-c-dkblue-04);
-  --crm-tab-bg-active: var(--crm-c-dkblue-02);
-  --crm-tab-bg-hover: var(--crm-c-dkblue-02);
-  --crm-tab-bg: transparent;
-  --crm-alert-success-bg: var(--crm-c-dkblue-03);
-  --crm-alert-warning-bg: #383124;
-  --crm-input-bg: var(--crm-c-blue-darker);
-  --crm-inline-edit-bg: var(--crm-c-dkblue-01);
-  --crm-input-color: var(--crm-c-blue); /* text */
-  --crm-expand-body-bg: var(--crm-c-dkblue-03);
-  --crm-expand-header-color: var(--crm-c-blue-light);
-  --crm-expand-header-bg: var(--crm-c-dkblue-03);
-  --crm-c-divider: var(--crm-c-dkblue-04);
-  --crm-table-outside-border: var(--crm-c-divider);
-  --crm-table-row-bg: var(--crm-c-dkblue-02);
-  --crm-table-row-hover: var(--crm-c-dkblue-03);
-  --crm-panel-bg: var(--crm-c-dkblue-02);
-  --crm-form-block-bg: var(--crm-c-dkblue-02);
-  --crm-notify-bg: var(--crm-c-dkblue-02);
-  --crm-expand-header-bg-active: var(--crm-c-dkblue-04);
-  --crm-checkbox-list-col: var(--crm-input-label-color);
-  --crm-checkbox-list-bg: var(--crm-c-dkblue-01);
-  --crm-input-description: var(--crm-input-label-color);
-  --crm-filter-bg: var(--crm-c-dkblue-02);
-  --crm-dropdown-col: var(--crm-c-text);
-  /* Emphasis colours */
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
   --crm-c-info-on-page-bg: var(--crm-c-secondary);
   --crm-c-danger-on-page-bg: var(--crm-btn-danger-bg);
   --crm-c-primary-on-page-bg: var(--crm-c-secondary);
   --crm-c-secondary-on-page-bg: var(--crm-c-secondary);
+  --crm-c-warning-text: black;
+/* Shadows */
+/* Sizes */
+/* Type */
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
+  --crm-table-outside-border: var(--crm-c-divider);
+  --crm-table-row-bg: var(--crm-c-dkblue-02);
+  --crm-table-row-hover: var(--crm-c-dkblue-03);
+/* Panels '--crm-panel-' */
+  --crm-panel-bg: var(--crm-c-dkblue-02);
+/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
+  --crm-expand-body-bg: var(--crm-c-dkblue-03);
+  --crm-expand-header-color: var(--crm-c-blue-light);
+  --crm-expand-header-bg: var(--crm-c-dkblue-03);
+  --crm-expand-header-bg-active: var(--crm-c-dkblue-04);
+/* Alerts '--crm-alert' */
+  --crm-alert-success-bg: var(--crm-c-dkblue-03);
+  --crm-alert-warning-bg: #383124;
   --crm-alert-info-bg: var(--crm-c-blue-darker);
   --crm-alert-info-text: var(--crm-c-blue-light);
-  --crm-c-warning-text: black;
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-form-block-bg: var(--crm-c-dkblue-02);
+  --crm-input-bg: var(--crm-c-blue-darker);
+  --crm-input-color: var(--crm-c-blue); /* text */
+  --crm-input-description: var(--crm-input-label-color);
+  --crm-checkbox-list-col: var(--crm-input-label-color);
+  --crm-checkbox-list-bg: var(--crm-c-dkblue-01);
+  --crm-inline-edit-bg: var(--crm-c-dkblue-01);
+/* Tabs '--crm-tabs' */
+  --crm-tabs-bg: var(--crm-dkblue-01);
+  --crm-tabs-border: var(--crm-dkblue-01);
+  --crm-tab-bg-active: var(--crm-c-dkblue-02);
+  --crm-tab-bg-hover: var(--crm-c-dkblue-02);
+  --crm-tab-bg: transparent;
+/* Contact layout '--crm-dash-' */
+  --crm-dash-header-col: var(--crm-c-blue-light);
+  --crm-dash-tabs-bg: var(--crm-c-dkblue-03);
+  --crm-dash-tab-count-bg: var(--crm-c-blue-darker);
+  --crm-dash-tab-bg-hover: var(--crm-c-dkblue-02);
+  --crm-dash-panel-bg: var(--crm-c-dkblue-02);
+  --crm-dash-block-bg: var(--crm-c-dkblue-03);
+  --crm-dash-summary-row-bg: transparent;
+/* Dialog '--crm-dialog-' */
+/* Dashlet for main dashboard '--crm-dashlet-' */
+  --crm-dashlet-bg: var(--crm-c-dkblue-02);
+/* Button dropdowns '--crm-dropdown-' */
+  --crm-dropdown-col: var(--crm-c-text);
+/* Notifications '--crm-notify-' */
+  --crm-notify-bg: var(--crm-c-dkblue-02);
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
+/* Alpha filter '--crm-filter-' */
+  --crm-filter-bg: var(--crm-c-dkblue-02);
+/* Frontend '--crm-f- */
 }
 
 .crm-container div.crm-summary-row div.crm-label {
