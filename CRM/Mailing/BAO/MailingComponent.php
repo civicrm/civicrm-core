@@ -9,12 +9,16 @@
  +--------------------------------------------------------------------+
  */
 
+
+use Civi\Core\Event\PreEvent;
+use Civi\Core\Event\PostEvent;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent {
+class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent implements Civi\Core\HookInterface {
 
   /**
    * @deprecated
@@ -43,40 +47,51 @@ class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent 
    *
    * @param array $params
    *
+   * @deprecated since 6.8 will be removed around 6.24
+   *
    * @return CRM_Mailing_BAO_MailingComponent
    */
   public static function add(array $params) {
-    $id = $params['id'] ?? NULL;
-    $component = new CRM_Mailing_BAO_MailingComponent();
-    if ($id) {
-      $component->id = $id;
-      $component->find(TRUE);
-    }
+    return self::writeRecord($params);
+  }
 
-    $component->copyValues($params);
-    if (empty($id) && empty($params['body_text'])) {
-      $component->body_text = CRM_Utils_String::htmlToText($params['body_html'] ?? '');
-    }
+  /**
+   * Clear cached options when altering mailing components
+   *
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(PostEvent $event): void {
+    \Civi::cache('metadata')->clear();
+  }
 
-    if ($component->is_default) {
-      if (!empty($id)) {
-        $sql = 'UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type = %1 AND id <> %2';
-        $sqlParams = [
-          1 => [$component->component_type, 'String'],
-          2 => [$id, 'Positive'],
-        ];
+  /**
+   * Event fired when creating a contribution
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
+    if ($event->action === 'create') {
+      if (empty($event->params['body_text'])) {
+        $event->params['body_text'] = CRM_Utils_String::htmlToText($event->params['body_html'] ?? '');
       }
-      else {
-        $sql = 'UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type = %1';
-        $sqlParams = [
-          1 => [$component->component_type, 'String'],
-        ];
+      if (!empty($event->params['is_default'])) {
+        CRM_Core_DAO::executeQuery('UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type = %1', [
+          1 => [$event->params['component_type'], 'String'],
+        ]);
       }
-      CRM_Core_DAO::executeQuery($sql, $sqlParams);
+    }
+    elseif (!empty($event->params['is_default'])) {
+      if (empty($event->params['component_type'])) {
+        $event->params['component_type'] = CRM_Core_DAO::singleValueQuery('SELECT component_type FROM civicrm_mailing_component WHERE id = %1', [1 => [$event->params['id'], 'Positive']]);
+      }
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type = %1 AND id <> %2', [
+        1 => [$event->params['component_type'], 'String'],
+        2 => [$event->params['id'], 'Positive'],
+      ]);
     }
 
-    $component->save();
-    return $component;
   }
 
 }
