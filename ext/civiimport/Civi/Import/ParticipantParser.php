@@ -72,10 +72,11 @@ class ParticipantParser extends ImportParser {
         'supports_multiple' => FALSE,
         'is_required' => TRUE,
         // For now we stick with the action selected on the DataSource page.
-        'actions' => $this->isUpdateExisting() ?
-          [['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')]] :
-          [['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')]],
-        'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
+        'actions' => [
+          ['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')],
+          ['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')],
+        ],
+        'default_action' => 'create',
         'entity_name' => 'Participant',
         'entity_title' => ts('Participant'),
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
