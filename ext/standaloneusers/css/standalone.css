@@ -46,7 +46,8 @@ div.crm-container .standalone-auth-form label {
   margin-bottom: 0.25rem;
 }
 /* the div.crm-container is to beat the specificity of civicrm.css under Greenwich */
-div.crm-container .standalone-auth-form input {
+div.crm-container .standalone-auth-form input[type=password],
+div.crm-container .standalone-auth-form input[type=text] {
   box-sizing: border-box;
   width: 100%;
   height: 2rem;
