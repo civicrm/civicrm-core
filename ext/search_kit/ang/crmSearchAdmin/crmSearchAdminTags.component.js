@@ -8,7 +8,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminTags.html',
     controller: function ($scope, $element, crmApi4, crmStatus) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       this.allTags = CRM.crmSearchAdmin.tags;
 
@@ -39,7 +39,7 @@
       };
 
       this.getStyle = function(id) {
-        var tag = ctrl.getTag(id);
+        const tag = ctrl.getTag(id);
         if (tag && tag.color) {
           return 'background-color: ' + tag.color + '; color: ' + CRM.utils.colorContrast(tag.color);
         }

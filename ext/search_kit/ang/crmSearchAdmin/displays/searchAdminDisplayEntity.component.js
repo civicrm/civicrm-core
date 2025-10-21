@@ -12,7 +12,7 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayEntity.html',
     controller: function($scope, crmApi4, crmUiHelp, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       $scope.hs = crmUiHelp({file: 'CRM/Search/Help/DisplayTypeEntity'});
       this.createSqlName = searchMeta.createSqlName;

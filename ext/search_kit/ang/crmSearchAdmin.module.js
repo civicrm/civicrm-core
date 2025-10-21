@@ -2,7 +2,7 @@
   "use strict";
 
   // Shared between router and searchMeta service
-  var searchEntity,
+  let searchEntity,
     searchTasks = {};
 
   // Declare module and route/controller/services
@@ -27,7 +27,7 @@
         resolve: {
           // Load saved search
           savedSearch: function($route, crmApi4) {
-            var params = $route.current.params;
+            const params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
               select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'form_values', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
@@ -52,7 +52,7 @@
         resolve: {
           // Load saved search
           savedSearch: function($route, crmApi4) {
-            var params = $route.current.params;
+            const params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
               select: ['label', 'description', 'api_entity', 'api_params', 'form_values', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
@@ -74,7 +74,7 @@
 
     // Controller for tabbed view of SavedSearches
     .controller('searchList', function($scope, $timeout, searchMeta, formatForSelect2) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = $scope.$ctrl = this;
       searchEntity = 'SavedSearch';
 
@@ -111,7 +111,7 @@
     // Controller for creating a new search
     .controller('searchCreate', function($scope, $routeParams, $location) {
       searchEntity = $routeParams.entity;
-      var ctrl = $scope.$ctrl = this;
+      const ctrl = $scope.$ctrl = this;
       this.savedSearch = {
         api_entity: searchEntity,
         is_template: ($routeParams.is_template == '1'),
@@ -164,7 +164,7 @@
       }
       // Get join metadata matching a given expression like "Email AS Contact_Email_contact_id_01"
       function getJoin(savedSearch, fullNameOrAlias) {
-        var alias = _.last(fullNameOrAlias.split(' AS ')),
+        let alias = _.last(fullNameOrAlias.split(' AS ')),
           path = alias,
           baseEntity = searchEntity,
           labels = [],
@@ -179,7 +179,7 @@
             return;
           }
           path = path.replace(join.alias + '_', '');
-          var num = parseInt(path.substr(0, 2), 10);
+          let num = parseInt(path.substr(0, 2), 10);
           labels.push(join.label + (num > 1 ? ' ' + num : ''));
           path = path.replace(/^\d\d_?/, '');
           if (path.length) {
@@ -196,7 +196,7 @@
         });
         // Add the numbered suffix to the join conditions
         // If this is a deep join, also add the base entity prefix
-        var prefix = alias.replace(new RegExp('_?' + join.alias + '_?\\d?\\d?$'), '');
+        let prefix = alias.replace(new RegExp('_?' + join.alias + '_?\\d?\\d?$'), '');
         function replaceRefs(condition) {
           if (_.isArray(condition)) {
             _.each(condition, function(ref, side) {
@@ -215,7 +215,7 @@
         return result;
       }
       function getFieldAndJoin(fieldName, entityName) {
-        var fieldPath = fieldName.split(':')[0],
+        let fieldPath = fieldName.split(':')[0],
           dotSplit = fieldPath.split('.'),
           name,
           join,
@@ -243,15 +243,15 @@
         return {field: field, join: join};
       }
       function parseFnArgs(info, expr) {
-        var matches = /([_A-Z]*)\((.*)\)(:[a-z]+)?$/.exec(expr),
-          fnName = matches[1],
-          argString = matches[2];
+        const matches = /([_A-Z]*)\((.*)\)(:[a-z]+)?$/.exec(expr),
+          fnName = matches[1];
+        let argString = matches[2];
         info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName || 'e'});
         info.data_type = (info.fn && info.fn.data_type) || null;
         info.suffix = matches[3];
 
         function getKeyword(whitelist) {
-          var keyword;
+          let keyword;
           _.each(_.filter(whitelist), function(flag) {
             if (argString.indexOf(flag + ' ') === 0 || argString.indexOf(flag + ',') === 0 || argString === flag) {
               keyword = flag;
@@ -263,7 +263,7 @@
         }
 
         function getExpr() {
-          var expr;
+          let expr;
           if (argString.indexOf('"') === 0) {
             // Match double-quoted string
             expr = argString.match(/"([^"\\]|\\.)*"/)[0];
@@ -281,7 +281,7 @@
         }
 
         _.each(info.fn.params, function(param, index) {
-          var exprCount = 0,
+          let exprCount = 0,
             expr, flagBefore;
           argString = _.trim(argString);
           if (!argString.length || (param.name && !_.startsWith(argString, param.name + ' '))) {
@@ -290,7 +290,7 @@
           if (param.max_expr) {
             while (++exprCount <= param.max_expr && argString.length) {
               flagBefore = getKeyword(_.keys(param.flag_before || {}));
-              var name = getKeyword(param.name ? [param.name] : []);
+              let name = getKeyword(param.name ? [param.name] : []);
               expr = getExpr();
               if (expr) {
                 expr.param = param.name || index;
@@ -337,9 +337,9 @@
             value: arg.substr(1, arg.length - 2)
           };
         } else if (arg) {
-          var fieldAndJoin = getFieldAndJoin(arg, searchEntity);
+          const fieldAndJoin = getFieldAndJoin(arg, searchEntity);
           if (fieldAndJoin.field) {
-            var split = arg.split(':'),
+            const split = arg.split(':'),
               prefixPos = split[0].lastIndexOf(fieldAndJoin.field.name);
             return {
               type: 'field',
@@ -358,13 +358,13 @@
         if (!expr) {
           return;
         }
-        var splitAs = expr.split(' AS '),
+        const splitAs = expr.split(' AS '),
           info = {fn: null, args: [], alias: _.last(splitAs), data_type: null},
           bracketPos = expr.indexOf('(');
         if (bracketPos >= 0 && !_.findWhere(CRM.crmSearchAdmin.pseudoFields, {name: expr})) {
           parseFnArgs(info, splitAs[0]);
         } else {
-          var arg = parseArg(splitAs[0]);
+          const arg = parseArg(splitAs[0]);
           if (arg) {
             arg.param = 0;
             info.data_type = arg.data_type;
@@ -374,8 +374,8 @@
         return info;
       }
       function getDefaultLabel(col, savedSearch) {
-        var info = parseExpr(col),
-          label = '';
+        const info = parseExpr(col);
+        let label = '';
         if (info.fn) {
           label = '(' + info.fn.title + ')';
         }
@@ -471,9 +471,9 @@
         },
         // Find all possible search columns that could serve as contact_id for a smart group
         getSmartGroupColumns: function(savedSearch) {
-          var joins = _.pluck((savedSearch.api_params.join || []), 0);
+          const joins = _.pluck((savedSearch.api_params.join || []), 0);
           return _.transform([savedSearch.api_entity].concat(joins), function(columns, joinExpr) {
-            var joinName = joinExpr.split(' AS '),
+            const joinName = joinExpr.split(' AS '),
               joinInfo = joinName[1] ? getJoin(savedSearch, joinName[1]) : {entity: joinName[0]},
               entity = getEntity(joinInfo.entity),
               prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
@@ -491,8 +491,8 @@
         // Ensure option lists are loaded for all fields with options
         // Sets an optionsLoaded property on each entity to avoid duplicate requests
         loadFieldOptions: function(entities) {
-          var entitiesToLoad = _.transform(entities, function(entitiesToLoad, entityName) {
-            var entity = getEntity(entityName);
+          const entitiesToLoad = _.transform(entities, function(entitiesToLoad, entityName) {
+            const entity = getEntity(entityName);
             if (!('optionsLoaded' in entity)) {
               entity.optionsLoaded = false;
               entitiesToLoad[entityName] = [entityName, 'getFields', {
@@ -508,9 +508,9 @@
           if (!_.isEmpty(entitiesToLoad)) {
             crmApi4(entitiesToLoad).then(function(results) {
               _.each(results, function(fields, entityName) {
-                var entity = getEntity(entityName);
+                const entity = getEntity(entityName);
                 _.each(fields, function(options, fieldName) {
-                  var field = _.find(entity.fields, {name: fieldName});
+                  const field = _.find(entity.fields, {name: fieldName});
                   if (field) {
                     field.options = options;
                   }
@@ -521,7 +521,7 @@
           }
         },
         pickIcon: function() {
-          var deferred = $q.defer();
+          const deferred = $q.defer();
           $('#crm-search-admin-icon-picker').off('change').siblings('.crm-icon-picker-button').click();
           $('#crm-search-admin-icon-picker').on('change', function() {
             deferred.resolve($(this).val());
@@ -530,7 +530,7 @@
         },
         // Returns name of explicit or implicit join, for links
         getJoinEntity: function(info) {
-          var arg = _.findWhere(info.args, {type: 'field'}) || {},
+          const arg = _.findWhere(info.args, {type: 'field'}) || {},
             field = arg.field || {};
           if (field.fk_entity || field.name !== field.fieldName) {
             return arg.prefix + (field.fk_entity ? field.name : field.name.substr(0, field.name.lastIndexOf('.')));
@@ -540,7 +540,7 @@
           return '';
         },
         getPrimaryAndSecondaryEntitySelect: function() {
-          var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'primary'}),
+          const primaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'primary'}),
             secondaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'secondary'}),
             select = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
           select.push({

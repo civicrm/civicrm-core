@@ -3,7 +3,7 @@
 
   // Generic controller for running an ApiBatch task
   angular.module('crmSearchTasks').controller('crmSearchTaskApiBatch', function($scope, searchTaskBaseTrait) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+    const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
       // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
       ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait);
 
@@ -35,7 +35,7 @@
     }
 
     this.onSuccess = function(result) {
-      var entityTitle = this.getEntityTitle(result.batchCount);
+      const entityTitle = this.getEntityTitle(result.batchCount);
       if (result.action === 'inlineEdit') {
         CRM.status(ts('Saved'));
       } else {
