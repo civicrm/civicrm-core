@@ -87,13 +87,16 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
    * @throws \Exception
    */
   public function postProcess() {
+    // Parent postProcess will save all settings with the `'settings_pages' => ['smtp'...` metadata
+    parent::postProcess();
     // flush caches so we reload details for future requests
     // CRM-11967
     Civi::rebuild(['system' => TRUE])->execute();
 
     $formValues = $this->controller->exportValues($this->_name);
 
-    Civi::settings()->set('allow_mail_from_logged_in_contact', (!empty($formValues['allow_mail_from_logged_in_contact'])));
+    // FIXME: Shouldn't we be unsetting ALL already-processed values? e.g.
+    // $formValues = array_diff_key($formValues, $this->_settings);
     unset($formValues['allow_mail_from_logged_in_contact']);
 
     $buttonName = $this->controller->getButtonName();
@@ -191,6 +194,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
       $formValues['smtpPassword'] = \Civi::service('crypto.token')->encrypt($formValues['smtpPassword'], 'CRED');
     }
 
+    // FIXME: This setting stores all values from the quickform (including `qfKey`, etc)??
     Civi::settings()->set('mailing_backend', $formValues);
   }
 
