@@ -9,7 +9,8 @@
         <input type="text" class="form-control" id="totpcode" maxlength=6>
       </div>
       <div>
-        <button id="submit" type="submit" class="btn crm-button">{ts}Submit{/ts}</button>
+        <button id="submit" type="submit" class="btn crm-button"><i id="submit-icon" class="crm-i fa-check" role="img" aria-hidden="true" ></i>
+        {ts}Submit{/ts}</button>
       </div>
     </form>
   </div>
@@ -23,6 +24,12 @@
       totpcodeInput = document.getElementById('totpcode');
 
     async function submit(e) {
+      const iconClasses = document.getElementById('submit-icon').classList;
+      const submitButton = document.getElementById('submit');
+
+      submitButton.disabled = true;
+      iconClasses.replace('fa-check', 'fa-spinner');
+      iconClasses.add('fa-spin');
       e.preventDefault();
       let errorMsg = 'Unexpected error';
       try {
@@ -42,6 +49,9 @@
           window.location = response.url;
           return;
         }
+        submitButton.disabled = false;
+        iconClasses.replace('fa-spinner', 'fa-check');
+        iconClasses.remove('fa-spin');
         errorMsg = response.publicError || "Unexpected error";
       }
       catch (e) {
