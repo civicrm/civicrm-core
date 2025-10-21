@@ -95,7 +95,7 @@ class SearchSegmentExtraFieldProvider extends AutoService implements Generic\Spe
       foreach ($item['when'] ?? [] as $clause) {
         // Add field prefix
         $clause[0] = $prefix . $clause[0];
-        $conditions[] = $query->composeClause($clause, 'WHERE', 0);
+        $conditions[] = $query->treeWalkClauses($clause, 'WHERE', 0);
       }
       // If no conditions, this is the ELSE clause
       if (!$conditions) {
