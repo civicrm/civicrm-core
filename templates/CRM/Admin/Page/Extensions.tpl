@@ -27,6 +27,9 @@
     {include file="CRM/common/enableDisableApi.tpl"}
     {include file="CRM/common/jsortable.tpl"}
 
+    <div class="ui-widget ui-widget-content ui-corner-all" style="padding: 4px;">
+      <input type="search" id="search_extension" class="ui-widget-content ui-corner-all" placeholder="🔍 {ts escape='htmlattribute'}Search extensions{/ts}" oninput="filterExtensions()" style="padding: 8px;">
+    </div>
     <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
         <ul class="crm-extensions-tabs-list" role="tablist">
             <li id="tab_summary" role="tab" class="crm-tab-button">
@@ -87,6 +90,31 @@
         return false;
       }); // .click
     }); // onload
+
+    // Keyword search
+    function filterExtensions() {
+      const searchTerm = document.getElementById('search_extension').value.toLowerCase().trim();
+      const coreTab = document.getElementById('extensions-main');
+      const addNewTab = document.getElementById('extensions-addnew');
+      // Filter Core Extensions
+      if (coreTab) {
+        const coreRows = coreTab.querySelectorAll('.crm-extension-row');
+        coreRows.forEach(extensionRow => {
+          const title = extensionRow.querySelector('summary').textContent.toLowerCase();
+          const isVisible = title.includes(searchTerm);
+          extensionRow.style.display = isVisible ? 'table-row' : 'none';
+        });
+      }
+      // Filter Add New Extensions
+      if (addNewTab) {
+        const addNewRows = addNewTab.querySelectorAll('.crm-extension-row');
+        addNewRows.forEach(extensionRow => {
+          const title = extensionRow.querySelector('summary').textContent.toLowerCase();
+          const isVisible = title.includes(searchTerm);
+          extensionRow.style.display = isVisible ? 'table-row' : 'none';
+        });
+      }
+    }
     </script>
     {/literal}
 {/if}
