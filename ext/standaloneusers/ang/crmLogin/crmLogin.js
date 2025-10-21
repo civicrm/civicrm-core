@@ -12,6 +12,9 @@
       this.loading = true;
       this.loggedInAs = null;
 
+      let rememberJWT = localStorage.getItem('rememberJWT');
+      this.rememberMe = !!rememberJWT;
+
       this.forgottenPasswordUrl = CRM.url('civicrm/login/password');
 
       this.logoutUrl = CRM.url('civicrm/logout');
@@ -48,13 +51,22 @@
 
         let publicError = ts('Unexpected error');
 
+        if (!this.rememberMe) {
+          // They have chosen not to remember, so clear any existing thing now.
+          localStorage.removeItem('rememberJWT');
+          rememberJWT = null;
+        }
+
         crmApi4('User', 'login', {
           identifier: this.identifier,
           password: this.password,
-          originalUrl
+          originalUrl,
+          rememberMe: this.rememberMe,
+          rememberJWT
         })
         .then((response) => {
           if (response.url) {
+            // Success.
             $window.location = response.url;
             return;
           }

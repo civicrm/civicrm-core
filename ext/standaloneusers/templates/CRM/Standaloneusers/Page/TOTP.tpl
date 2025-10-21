@@ -28,6 +28,17 @@
       try {
         const response = await CRM.api4('User', 'login', { mfaClass: 'TOTP', mfaData: totpcodeInput.value });
         if (response.url) {
+          // Successful login. If we started the login with rememberMe then we
+          // will receive a JWT on successful login. We store this on
+          // localStorage to skip MFA in future.
+          if (response.rememberJWT) {
+            console.log("storing rememberJWT");// FIXME: remove
+            localStorage.setItem('rememberJWT', response.rememberJWT);
+          }
+          else {
+            console.log("clearing rememberJWT"); // FIXME: remove
+            localStorage.removeItem('rememberJWT');
+          }
           window.location = response.url;
           return;
         }

@@ -16,6 +16,13 @@
       <label for="passwordInput" class="form-label">{{:: ts('Password') }}</label>
       <input type="password" class="form-control crm-form-text" id="passwordInput" ng-model="$ctrl.password" required />
     </div>
+    <div class="input-wrapper">
+      <label for="rememberInput" class="form-label">
+        <input type="checkbox" class="form-control crm-form-checkbox" id="rememberInput" ng-model="$ctrl.rememberMe" />
+        {{:: ts('Remember me') }}</label>
+
+      <!-- user help here? what does remember me mean? -->
+    </div>
     <div class="login-or-forgot">
       <a href="{{:: $ctrl.forgottenPasswordUrl }}">{{:: ts('Forgotten password?') }}</a>
       <button type="submit" class="btn btn-primary crm-button">{{:: ts('Log In') }}</button>

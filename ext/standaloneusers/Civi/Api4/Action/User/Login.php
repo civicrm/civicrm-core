@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\User;
 use Civi;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Crypto\Exception\CryptoException;
 use Civi\Standalone\Event\LoginEvent;
 use Civi\Standalone\MFA\Base as MFABase;
 use Civi\Standalone\Security;
@@ -25,6 +26,24 @@ class Login extends AbstractAction {
    * @default NULL
    */
   protected ?string $password = NULL;
+
+  /**
+   * Remember me?
+   *
+   * Does the user want to be remembered, thereby skipping MFA for a while?
+   *
+   * @var bool
+   * @default FALSE
+   */
+  protected bool $rememberMe = FALSE;
+
+  /**
+   * Previously issued JWT that authorised skipping MFA.
+   *
+   * @var string|null
+   * @default NULL
+   */
+  protected ?string $rememberJWT = NULL;
 
   /**
    * MFA Class.
@@ -84,6 +103,16 @@ class Login extends AbstractAction {
         \CRM_Core_Session::singleton()->set('pendingLogin', []);
         $this->loginUser($pending['userID']);
         $result['url'] = $pending['successUrl'];
+        $result['rememberJWT'] = '';
+        if ($pending['rememberMe']) {
+          // User wishes to bypass MFA for a period of time.
+          // TODO: make expiry configurable.
+          $result['rememberJWT'] = \Civi::service('crypto.jwt')->encode([
+            'exp' => time() + 60 * 60 * 24 * 30,
+            'sub' => "user:$pending[userID]",
+            'scope' => 'rememberMe',
+          ]);
+        }
       }
       else {
         $result['publicError'] = "MFA failed verification";
@@ -125,6 +154,7 @@ class Login extends AbstractAction {
     // TODO: should login by email be behind a setting?
     // if (!$user && \Civi::settings()->get('standaloneusers_allow_login_by_email')) {
     if (!$user) {
+      // Since the identifier did not match a username, try an email.
       $user = \Civi\Api4\User::get(FALSE)
         ->addWhere('uf_name', '=', $this->identifier)
         ->addWhere('is_active', '=', TRUE)
@@ -180,13 +210,40 @@ class Login extends AbstractAction {
         return;
 
       case 1:
-        // MFA enabled. Store data in a pendingLogin key on session.
+        // MFA enabled. Can it be skipped via the 'remember' mechanism?
+        if ($this->rememberMe && $this->rememberJWT) {
+          /** @var \Civi\Crypto\CryptoJwt $jwt */
+          $jwtService = \Civi::service('crypto.jwt');
+          try {
+            $decoded = $jwtService->decode($this->rememberJWT);
+            // Subject of JWT must match.
+            if ($decoded['sub'] === "user:$userID") {
+              // TODO: consider checking more content, e.g.
+              // a hash based on the (hashed) password,
+              // so if password is changed, MFA must be re-done.
+
+              // TODO: possibly invalidate if iat is older than
+              // our configured time-limit for remember me,
+              // in case that changed since the token was created.
+
+              $this->loginUser($userID);
+              $result['url'] = $successUrl;
+              return;
+            }
+          }
+          catch (CryptoException $e) {
+            // Invalid JWT.
+          }
+        }
+
+        // Store data in a pendingLogin key on session.
         // @todo expose the 120s timeout to config?
         \CRM_Core_Session::singleton()->set('pendingLogin', [
           'userID' => $userID,
           'username' => $user['username'],
           'expiry' => time() + 120,
           'successUrl' => $successUrl,
+          'rememberMe' => $this->rememberMe,
         ]);
         $mfaClass = $mfaClasses[0];
         $mfa = new $mfaClass($userID);
