@@ -28,7 +28,7 @@
 .crm-container .form-layout-compressed td.label,
 .crm-container .selector td.label,
 .crm-container .form-layout-compressed th.label {
-  width: var(--crm-input-label-width);
+  min-width: var(--crm-input-label-width);
   text-align: var(--crm-input-label-align);
   margin: var(--crm-m) var(--crm-m2) 0 0;
   font-family: var(--crm-input-label-font);
