@@ -42,14 +42,11 @@ class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent 
    * Create and Update mailing component.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   (deprecated) the array that holds all the db ids.
    *
    * @return CRM_Mailing_BAO_MailingComponent
    */
-  public static function add(&$params, $ids = []) {
-    $id = $params['id'] ?? $ids['id'] ?? NULL;
+  public static function add(array $params) {
+    $id = $params['id'] ?? NULL;
     $component = new CRM_Mailing_BAO_MailingComponent();
     if ($id) {
       $component->id = $id;
