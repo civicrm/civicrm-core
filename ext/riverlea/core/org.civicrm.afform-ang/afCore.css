@@ -135,3 +135,15 @@ fieldset.af-container.af-layout-inline {
   display: flex;
   padding-block: 0.25rem;
 }
+.af-container ul.crm-checkbox-list {
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  height: auto;
+}
+.crm-public .af-container ul.crm-checkbox-list {
+  border: 0;
+}
+.crm-public .af-container ul.crm-checkbox-list li {
+  background-color: inherit;
+}
