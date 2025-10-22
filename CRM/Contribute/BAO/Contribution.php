@@ -2877,9 +2877,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $statusId = $params['contribution']->contribution_status_id;
-
+    // Checking $params['is_pay_later'] means we only pick this up if
+    // is_pay_later has been passed in - this feels like a mistake but it
+    // is an entrenched mistake (the previous code did the same although
+    // less obviously as it checked a partially populated contribution object.
+    $isPayLater = !empty($params['is_pay_later']);
     if ($contributionStatus !== 'Failed' &&
-      !($contributionStatus === 'Pending' && !$params['contribution']->is_pay_later)
+      !($contributionStatus === 'Pending' && !$isPayLater)
     ) {
       $skipRecords = TRUE;
       $pendingStatus = [
