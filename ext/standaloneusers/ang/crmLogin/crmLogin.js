@@ -14,11 +14,11 @@
 
       let rememberJWT = localStorage.getItem('rememberJWT');
       this.rememberMe = !!rememberJWT;
+      this.mfa_remember = CRM.vars.standalone.mfa_remember;
 
       this.forgottenPasswordUrl = CRM.url('civicrm/login/password');
 
       this.logoutUrl = CRM.url('civicrm/logout');
-
       this.$onInit = () => {
         if (CRM.config.cid) {
           return crmApi4('Contact', 'get', {
@@ -35,6 +35,12 @@
 
       this.canSubmit = () => {
         return this.identifier && this.password && !this.loading;
+      };
+      this.rememberMeChanged = () => {
+        if (!this.rememberMe) {
+          // Immediately remove the JWT if user de-selects.
+          localStorage.removeItem('rememberJWT');
+        }
       };
 
       this.attemptLogin = () => {

@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\User;
 use Civi;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\User;
 use Civi\Crypto\Exception\CryptoException;
 use Civi\Standalone\Event\LoginEvent;
 use Civi\Standalone\MFA\Base as MFABase;
@@ -103,22 +104,53 @@ class Login extends AbstractAction {
         \CRM_Core_Session::singleton()->set('pendingLogin', []);
         $this->loginUser($pending['userID']);
         $result['url'] = $pending['successUrl'];
-        $result['rememberJWT'] = '';
-        if ($pending['rememberMe']) {
-          // User wishes to bypass MFA for a period of time.
-          // TODO: make expiry configurable.
-          $result['rememberJWT'] = \Civi::service('crypto.jwt')->encode([
-            'exp' => time() + 60 * 60 * 24 * 30,
-            'sub' => "user:$pending[userID]",
-            'scope' => 'rememberMe',
-          ]);
-        }
+        $result['rememberJWT'] = $this->createRememberJWT($pending);
       }
       else {
         $result['publicError'] = "MFA failed verification";
       }
     }
 
+  }
+
+  protected function createRememberJWT(array $pending): string {
+    $days = \Civi::settings()->get('standalone_mfa_remember') ?? 0;
+    if (!$days || empty($pending['rememberMe'])) {
+      // Feature disabled by admin or request.
+      return '';
+    }
+
+    $hashedPass = $this->getPassHash($pending['userID']);
+    if (!$hashedPass) {
+      // This should not happen. But if it does, it's very fishy and we should
+      // not support bypassing MFA.
+      return '';
+    }
+
+    return \Civi::service('crypto.jwt')->encode([
+      'iat' => time(),
+      'exp' => time() + 60 * 60 * 24 * $days,
+      'sub' => "user:$pending[userID]",
+      'scope' => 'rememberMe',
+      'hash' => $hashedPass,
+    ]);
+  }
+
+  protected function getPassHash(int $userID): string {
+    // Create a short hash of the hashed password so that when the
+    // user updates their password (even to the same password) then
+    // it invalidates any previously generated rememberJWT values.
+    $hashedPass = User::get(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addSelect('hashed_password')
+      ->execute()
+      ->first()['hashed_password'] ?? '';
+    if (!$hashedPass) {
+      // This should not happen. But if it does, it's very fishy and we should
+      // not support bypassing MFA.
+      return '';
+    }
+    return hash('xxh3', CIVICRM_SITE_KEY . $hashedPass);
   }
 
   /**
@@ -211,33 +243,29 @@ class Login extends AbstractAction {
 
       case 1:
         // MFA enabled. Can it be skipped via the 'remember' mechanism?
-        if ($this->rememberMe && $this->rememberJWT) {
+        $days = \Civi::settings()->get('standalone_mfa_remember') ?? 0;
+        if ($days && $this->rememberMe && $this->rememberJWT) {
           /** @var \Civi\Crypto\CryptoJwt $jwt */
           $jwtService = \Civi::service('crypto.jwt');
           try {
             $decoded = $jwtService->decode($this->rememberJWT);
-            // Subject of JWT must match.
-            if ($decoded['sub'] === "user:$userID") {
-              // TODO: consider checking more content, e.g.
-              // a hash based on the (hashed) password,
-              // so if password is changed, MFA must be re-done.
-
-              // TODO: possibly invalidate if iat is older than
-              // our configured time-limit for remember me,
-              // in case that changed since the token was created.
-
+            if ($decoded['sub'] === "user:$userID"
+              && ($decoded['scope'] ?? '') === 'rememberMe'
+              && ($decoded['hash'] ?? '') === $this->getPassHash($userID)
+              && ((time() - $decoded['iat'] ?? 0) < $days * 60 * 60 * 24)
+            ) {
+              // Valid rememberJWT, allow bypassing MFA.
               $this->loginUser($userID);
               $result['url'] = $successUrl;
               return;
             }
           }
           catch (CryptoException $e) {
-            // Invalid JWT.
+            // Invalid/expired JWT.
           }
         }
 
-        // Store data in a pendingLogin key on session.
-        // @todo expose the 120s timeout to config?
+        // Store data in a pendingLogin key on session, valid for 2 mins.
         \CRM_Core_Session::singleton()->set('pendingLogin', [
           'userID' => $userID,
           'username' => $user['username'],

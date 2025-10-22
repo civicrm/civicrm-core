@@ -6,7 +6,7 @@
 
       <div class="input-wrapper">
         <label for="totpcode" name=totp class="form-label">{ts}Enter the code from your authenticator app{/ts}</label>
-        <input type="text" class="form-control" id="totpcode" maxlength=6>
+        <input type="text" class="form-control" id="totpcode" maxlength=6 autocomplete="off" >
       </div>
       <div>
         <button id="submit" type="submit" class="btn crm-button"><i id="submit-icon" class="crm-i fa-check" role="img" aria-hidden="true" ></i>
@@ -39,11 +39,9 @@
           // will receive a JWT on successful login. We store this on
           // localStorage to skip MFA in future.
           if (response.rememberJWT) {
-            console.log("storing rememberJWT");// FIXME: remove
             localStorage.setItem('rememberJWT', response.rememberJWT);
           }
           else {
-            console.log("clearing rememberJWT"); // FIXME: remove
             localStorage.removeItem('rememberJWT');
           }
           window.location = response.url;
