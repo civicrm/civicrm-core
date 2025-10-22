@@ -299,7 +299,7 @@ dl dl {
 .crm-container #extensions-main table tr.disabled td {
   font-style: italic;
 }
-.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label) {
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label,.crm-job-name) {
   display: inline-flex;
 }
 
