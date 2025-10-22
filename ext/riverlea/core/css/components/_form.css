@@ -333,6 +333,16 @@ input.crm-form-checkbox + label,
 .crm-container.crm-public .crm-profile-view .crm-option-label-pair {
   --crm-checkbox-width: auto;
 }
+/* Stacks label for checkbox/radio on contact layout custom field sets */
+.crm-container .contact_panel tr:is(.custom_field-row,.custom_field-help-pre-row) {
+  display: flex;
+  flex-direction: column;
+}
+.crm-container .contact_panel .custom_field-row td.label {
+  white-space: normal;
+  width: 100%;
+  text-align: left;
+}
 /* Override more general styling */
 .crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
 input.crm-form-checkbox) + label {
