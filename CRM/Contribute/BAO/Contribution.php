@@ -201,6 +201,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     $result = $contribution->save();
+    // Re-load the contribution, first removing all money values.
+    // We need to have some contribution details later on - ie
+    // if for record financial accounts and for adding activities.
+    // Under some circumstances (server dependent) the php values
+    // might be unrounded floats that save to rounded floats so
+    // doing the reload once here when we can unset them
+    // is better than possibly unreliable re-loads in other places.
+    unset($contribution->total_amount, $contribution->net_amount, $contribution->fee_amount, $contribution->non_deductible_amount, $contribution->tax_amount);
+    $contribution->find(TRUE);
     // Save invoice number if appropriate. Note we used to try to
     // avoid a second save but check https://lab.civicrm.org/dev/core/-/issues/5004
     // to see how that worked out....
@@ -519,10 +528,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     $transaction->commit();
 
-    if (empty($contribution->contact_id)) {
-      $contribution->find(TRUE);
-    }
-
     $isCompleted = ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id));
     if (!empty($params['on_behalf'])
       ||  $isCompleted
@@ -569,23 +574,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
         "action=view&reset=1&id={$contribution->id}&cid={$contribution->contact_id}&context=home"
       );
-      // in some update cases we need to get extra fields - ie an update that doesn't pass in all these params
-      $titleFields = [
-        'contact_id',
-        'total_amount',
-        'currency',
-        'financial_type_id',
-      ];
-      $retrieveRequired = 0;
-      foreach ($titleFields as $titleField) {
-        if (!isset($contribution->$titleField)) {
-          $retrieveRequired = 1;
-          break;
-        }
-      }
-      if ($retrieveRequired == 1) {
-        $contribution->find(TRUE);
-      }
+
       $financialType = CRM_Contribute_PseudoConstant::financialType($contribution->financial_type_id);
       $title = CRM_Contact_BAO_Contact::displayName($contribution->contact_id) . ' - (' . CRM_Utils_Money::format($contribution->total_amount, $contribution->currency) . ' ' . ' - ' . $financialType . ')';
 
@@ -2888,9 +2877,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $statusId = $params['contribution']->contribution_status_id;
-
+    // Checking $params['is_pay_later'] means we only pick this up if
+    // is_pay_later has been passed in - this feels like a mistake but it
+    // is an entrenched mistake (the previous code did the same although
+    // less obviously as it checked a partially populated contribution object.
+    $isPayLater = !empty($params['is_pay_later']);
     if ($contributionStatus !== 'Failed' &&
-      !($contributionStatus === 'Pending' && !$params['contribution']->is_pay_later)
+      !($contributionStatus === 'Pending' && !$isPayLater)
     ) {
       $skipRecords = TRUE;
       $pendingStatus = [
@@ -2927,9 +2920,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!isset($totalAmount) && !empty($params['prevContribution'])) {
         $totalAmount = $params['total_amount'] = $params['prevContribution']->total_amount;
       }
-      if (empty($contribution->currency)) {
-        $contribution->find(TRUE);
-      }
+
       //build financial transaction params
       $trxnParams = [
         'contribution_id' => $contribution->id,
