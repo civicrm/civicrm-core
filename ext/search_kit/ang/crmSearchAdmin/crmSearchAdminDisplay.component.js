@@ -11,7 +11,7 @@
     },
     template: function() {
       // Dynamic template generates switch condition for each display type
-      var html =
+      let html =
         '<div ng-switch="$ctrl.display.type">\n';
       _.each(CRM.crmSearchAdmin.displayTypes, function(type) {
         html +=
@@ -33,7 +33,7 @@
       return html;
     },
     controller: function($scope, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       let initDefaults;
 
@@ -100,7 +100,7 @@
       };
 
       this.addCol = function(type) {
-        var col = _.cloneDeep(this.colTypes[type].defaults);
+        const col = _.cloneDeep(this.colTypes[type].defaults);
         col.type = type;
         if (this.display.type === 'table') {
           col.alignment = 'text-right';
@@ -151,7 +151,7 @@
       };
 
       this.getFieldLabel = function(key) {
-        var expr = ctrl.getExprFromSelect(selectToKey(key));
+        const expr = ctrl.getExprFromSelect(selectToKey(key));
         return searchMeta.getDefaultLabel(expr, ctrl.savedSearch);
       };
 
@@ -237,7 +237,7 @@
       };
 
       this.canBeImage = function(col) {
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
         return info.args[0] && info.args[0].field && info.args[0].field.input_type === 'File';
       };
@@ -251,7 +251,7 @@
       };
 
       this.canBeEditable = function(col) {
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
         return !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
@@ -263,7 +263,7 @@
         if (!col.key || ctrl.display.settings.draggable) {
           return false;
         }
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr),
           arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};
         return arg.field && arg.field.type !== 'Pseudo';
@@ -272,7 +272,7 @@
       // Aggregate functions (COUNT, AVG, MAX) cannot autogenerate links, except for GROUP_CONCAT
       // which gets special treatment in APIv4 to convert it to an array.
       function canUseLinks(colKey) {
-        var expr = ctrl.getExprFromSelect(colKey),
+        const expr = ctrl.getExprFromSelect(colKey),
           info = searchMeta.parseExpr(expr);
         return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
       }
@@ -284,7 +284,7 @@
           ctrl.onChangeLink(column, {});
         } else {
           delete column.editable;
-          var defaultLink = ctrl.getLinks(column.key)[0];
+          const defaultLink = ctrl.getLinks(column.key)[0];
           ctrl.onChangeLink(column, defaultLink || {path: 'civicrm/'});
         }
       };
@@ -319,7 +319,7 @@
           searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
             _.each(tasks, function (task) {
               if (task.number === '> 0' || task.number === '=== 1') {
-                var link = {
+                const link = {
                   text: task.title,
                   icon: task.icon,
                   task: task.name,
@@ -340,7 +340,7 @@
         if (!canUseLinks(columnKey)) {
           return ctrl.links['0'];
         }
-        var expr = ctrl.getExprFromSelect(columnKey),
+        const expr = ctrl.getExprFromSelect(columnKey),
           info = searchMeta.parseExpr(expr),
           joinEntity = searchMeta.getJoinEntity(info);
         if (!ctrl.links[joinEntity]) {

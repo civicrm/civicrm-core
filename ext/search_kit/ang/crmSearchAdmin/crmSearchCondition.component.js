@@ -12,7 +12,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchCondition.html',
     controller: function ($scope) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       this.operators = {};
 
@@ -83,8 +83,8 @@
 
       // Return a list of operators allowed for the current field
       this.getOperators = function() {
-        var field = ctrl.field || {},
-          allowedOps = field.operators;
+        const field = ctrl.field || {};
+        let allowedOps = field.operators;
         if (!allowedOps && field.data_type === 'Boolean') {
           allowedOps = ['=', '!=', 'IS EMPTY', 'IS NOT NULL'];
         }
@@ -97,7 +97,7 @@
         if (!allowedOps) {
           return CRM.crmSearchAdmin.operators;
         }
-        var opKey = allowedOps.join();
+        const opKey = allowedOps.join();
         if (!ctrl.operators[opKey]) {
           ctrl.operators[opKey] = _.filter(CRM.crmSearchAdmin.operators, function(operator) {
             return _.includes(allowedOps, operator.key);
@@ -127,7 +127,7 @@
             ctrl.clause.push('');
           }
           // Change multi/single value to/from an array
-          var shouldBeArray = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], getOperator());
+          const shouldBeArray = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], getOperator());
           if (!_.isArray(getValue()) && shouldBeArray) {
             setValue([]);
           } else if (_.isArray(getValue()) && !shouldBeArray) {

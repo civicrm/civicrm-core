@@ -20,7 +20,7 @@
         ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
 
       this.$onInit = function() {
-        var tallyParams;
+        let tallyParams;
 
         // Copy API params from the run and adapt them in a secondary `tally` call for the "Totals" row
         if (ctrl.settings.tally) {

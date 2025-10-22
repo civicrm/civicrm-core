@@ -2,10 +2,10 @@
   "use strict";
 
   angular.module('crmSearchTasks').controller('crmSearchTaskMailing', function($scope, crmApi4, searchTaskBaseTrait, formatForSelect2) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+    const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
       // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
-      ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait),
-      mailingId;
+      ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait);
+    let mailingId;
 
     this.mailing = {
       name: '',

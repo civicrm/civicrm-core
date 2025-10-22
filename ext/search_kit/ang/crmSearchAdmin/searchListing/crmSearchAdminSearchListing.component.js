@@ -9,10 +9,10 @@
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, searchDisplayEditableTrait) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait)),
-        afformLoad;
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
+      let afformLoad;
 
       $scope.crmUrl = CRM.url;
       this.searchDisplayPath = CRM.url('civicrm/search');
@@ -136,10 +136,10 @@
       });
 
       this.deleteOrRevert = function(row) {
-        var search = row.data,
+        const search = row.data,
           revert = !!search['base_module:label'];
         function getMessage() {
-          var title = revert ? ts('Revert this search to its packaged settings?') : ts('Permanently delete this saved search?'),
+          let title = revert ? ts('Revert this search to its packaged settings?') : ts('Permanently delete this saved search?'),
             msg = '<h4>' + _.escape(title) + '</h4>' +
             '<ul>';
           if (revert) {
@@ -177,7 +177,7 @@
           return msg + '</ul>';
         }
 
-        var dialog = CRM.confirm({
+        const dialog = CRM.confirm({
           title: revert ? ts('Revert %1', {1: search.label}) : ts('Delete %1', {1: search.label}),
           message: getMessage(),
         }).on('crmConfirm:yes', function() {
@@ -335,7 +335,7 @@
       // @return {Promise}
       this.loadAfforms = function() {
         if (!ctrl.afformEnabled && !afformLoad) {
-          var deferred = $q.defer();
+          const deferred = $q.defer();
           afformLoad = deferred.promise;
           deferred.resolve([]);
         }
@@ -350,7 +350,7 @@
           ctrl.afforms = {};
           _.each(afforms, function(afform) {
             _.each(_.uniq(afform.search_displays), function(searchNameDisplayName) {
-              var searchName = searchNameDisplayName.split('.')[0];
+              const searchName = searchNameDisplayName.split('.')[0];
               ctrl.afforms[searchName] = ctrl.afforms[searchName] || [];
               ctrl.afforms[searchName].push({
                 title: afform.title,

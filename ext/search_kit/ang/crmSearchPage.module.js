@@ -21,8 +21,8 @@
         resolve: {
           // Load saved search display
           info: function($route, crmApi4) {
-            var params = $route.current.params;
-            var apiCalls = {
+            const params = $route.current.params;
+            const apiCalls = {
               search: ['SavedSearch', 'get', {
                 select: ['id', 'name', 'api_entity'],
                 where: [['name', '=', params.savedSearchName]],

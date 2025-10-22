@@ -9,7 +9,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminFields.html',
     controller: function ($scope, $element) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       // savedSearch.api_params.select is an array of strings.

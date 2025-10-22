@@ -19,15 +19,15 @@
 
       // Called by the controller's $onInit function
       initializeDisplay: function($scope, $element) {
-        var ctrl = this;
+        const ctrl = this;
         this.$element = $element;
         this.limit = this.settings.limit;
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
         this.seed = Date.now();
         this.uniqueId = generateUniqueId(20);
         this.placeholders = [];
-        var placeholderCount = 'placeholder' in this.settings ? this.settings.placeholder : 5;
-        for (var p=0; p < placeholderCount; ++p) {
+        const placeholderCount = 'placeholder' in this.settings ? this.settings.placeholder : 5;
+        for (let p=0; p < placeholderCount; ++p) {
           this.placeholders.push({});
         }
         _.each(ctrl.onInitialize, function(callback) {
@@ -168,7 +168,7 @@
         // (wait a brief timeout to allow more important things to happen first)
         $timeout(function() {
           if (hasCounter && (!(ctrl.loading || ctrl.results) || !angular.equals({}, ctrl.getAfformFilters()))) {
-            var params = ctrl.getApiParams('row_count');
+            const params = ctrl.getApiParams('row_count');
             // Exclude afform filters
             params.filters = ctrl.filters;
             crmApi4('SearchDisplay', 'run', params).then(function(result) {
@@ -220,9 +220,9 @@
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
       runSearch: function(apiCalls, statusParams, editedRow) {
-        var ctrl = this,
-          requestId = ++this._runCount,
-          apiParams = this.getApiParams();
+        const ctrl = this;
+        const requestId = ++this._runCount;
+        const apiParams = this.getApiParams();
         if (!statusParams) {
           this.loading = true;
         }
@@ -244,7 +244,7 @@
             if (!ctrl.limit || (ctrl.results.length < ctrl.limit && ctrl.page === 1)) {
               ctrl.rowCount = ctrl.results.length;
             } else if (ctrl.settings.pager || ctrl.settings.headerCount) {
-              var params = ctrl.getApiParams('row_count');
+              const params = ctrl.getApiParams('row_count');
               crmApi4('SearchDisplay', apiCalls.run[1], params).then(function(result) {
                 if (requestId < ctrl._runCount) {
                   return; // Another request started after this one

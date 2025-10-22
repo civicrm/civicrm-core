@@ -12,7 +12,7 @@
 
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, searchDisplayBaseTrait) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in a copy of searchDisplayBaseTrait
         ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait));
 
