@@ -48,23 +48,37 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         ],
       ];
 
+      // If this is FALSE then we search all contact info, not just primary details.
+      $primaryDetailsOnly = (bool) \Civi::settings()->get('searchPrimaryDetailsOnly');
+      // A list of joins needed for supporting non-primary details.
+      $joinToEntities = [];
       $allowedFilters = \Civi::settings()->get('quicksearch_options');
-      foreach ($apiRequest->getFilters() as $filterField => $val) {
+      if (!$primaryDetailsOnly) {
+        $allowedFilters = self::convertToNonPrimaryField($allowedFilters);
+      }
+      $filters = $apiRequest->getFilters();
+      if (!$primaryDetailsOnly) {
+        $filters = array_combine(self::convertToNonPrimaryField(array_keys($filters)), array_values($filters));
+      }
+      foreach ($filters as $filterField => $val) {
         if (in_array($filterField, $allowedFilters)) {
           // Add trusted filter
           $apiRequest->addFilter($filterField, $val);
           $apiRequest->setInput($val);
 
-          // If the filter is from a multi-record custom field set, add necessary join to the savedSearch query
+          // If the filter is from a multi-record custom field set, or is a non-primary contact detail, add necessary join to the savedSearch query
           if (str_contains($filterField, '.')) {
-            [$customGroupName, $customFieldName] = explode('.', $filterField);
-            $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $customGroupName]);
+            $entityName = strtok($filterField, '.');
+            $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $entityName]);
             if (!empty($customGroup['is_multiple'])) {
               $apiParams['join'][] = [
-                "Custom_$customGroupName AS $customGroupName",
+                "Custom_$entityName AS $entityName",
                 'INNER',
-                ['id', '=', "$customGroupName.entity_id"],
+                ['id', '=', "$entityName.entity_id"],
               ];
+            }
+            if (in_array($entityName, ['phone', 'email', 'address'])) {
+              $joinToEntities[$entityName] = TRUE;
             }
           }
         }
@@ -93,17 +107,24 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         7 => 'address_primary.country_id:label',
         8 => 'address_primary.postal_code',
       ];
+      if (!$primaryDetailsOnly) {
+        $autocompleteOptionsMap = self::convertToNonPrimaryField($autocompleteOptionsMap);
+      }
       // If doing a search by a field other than the default,
       // add that field as the column
-      if ($apiRequest->getFilters()) {
-        $filterFields = array_keys($apiRequest->getFilters());
+      if ($filters) {
+        $filterFields = array_keys($filters);
         $columns[0]['rewrite'] = "[sort_name] :: [" . implode('] :: [', $filterFields) . "]";
       }
       else {
         $filterFields = ['sort_name'];
         if (\Civi::settings()->get('includeEmailInName')) {
-          $filterFields[] = 'email_primary.email';
-          $columns[] = ['type' => 'field', 'key' => 'email_primary.email'];
+          $emailField = $primaryDetailsOnly ? 'email_primary.email' : 'email.email';
+          $filterFields[] = $emailField;
+          $columns[] = ['type' => 'field', 'key' => $emailField];
+          if (!$primaryDetailsOnly) {
+            $joinToEntities['email'] = TRUE;
+          }
         }
         if (\Civi::settings()->get('includeNickNameInName')) {
           $filterFields[] = 'nick_name';
@@ -129,12 +150,19 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
             'type' => 'field',
             'key' => $autocompleteOptionsMap[$option],
           ];
+          $joinToEntities[explode('.', $autocompleteOptionsMap[$option])[0]] = TRUE;
         }
       }
 
       $apiParams['select'] = array_unique(array_merge(['id'], $filterFields, $extraFields));
       $display['settings']['columns'] = $columns;
+      if (!$primaryDetailsOnly) {
+        foreach (array_keys($joinToEntities) as $entity) {
+          $apiParams['join'][] = [ucfirst($entity) . " AS $entity", 'LEFT'];
+        }
+      }
 
+      $apiParams['groupBy'] = ['id'];
       // Single filter
       if (count($filterFields) === 1) {
         $display['settings']['searchFields'] = $filterFields;
@@ -206,6 +234,13 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         ],
       ],
     ];
+  }
+
+  private static function convertToNonPrimaryField(string|array $field): string|array {
+    if (is_array($field)) {
+      return array_map([self::class, 'convertToNonPrimaryField'], $field);
+    }
+    return str_replace('_primary', '', $field);
   }
 
 }
