@@ -210,11 +210,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $inputParams = $params;
     $isARefund = self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id);
 
-    if ($context === 'changedAmount' || $context === 'changeFinancialType') {
-      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-    }
-
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
     $params['entity_id'] = $trxn->id;
