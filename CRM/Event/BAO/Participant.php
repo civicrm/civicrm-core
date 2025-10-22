@@ -10,8 +10,6 @@
 
  */
 
-use Civi\Core\Event\GenericHookEvent;
-
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -1937,22 +1935,6 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $participantRoleClause = "REGEXP '{$regexp}'";
     }
     return $participantRoleClause ?? '';
-  }
-
-  public static function on_civi_imports(GenericHookEvent $event) {
-    if (CRM_Core_Permission::check([
-      'access CiviEvent',
-      'edit event participants',
-    ])) {
-      $event->imports = array_merge($event->imports, [
-        'participant_import' => [
-          'label' => ts('Import Participants'),
-          'name' => 'participant_import',
-          'url' => CRM_Utils_System::url('civicrm/import/participant', 'reset=1', FALSE, FALSE, TRUE, FALSE, TRUE),
-          'no_ts_label' => 'Import Participants',
-        ],
-      ]);
-    }
   }
 
 }
