@@ -31,7 +31,14 @@ return [
     'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::addressProvider'],
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => 'CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service. You must register to use the USPS service at https://www.usps.com/business/web-tools-apis/address-information.htm. If you are approved, they will provide you with a User ID and the URL for the service. Plugins for other address standardization services may be available from 3rd party developers. If installed, they will be included in the drop-down below. ',
+    'help_text' => [
+      ts('CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service.'),
+      ts('Plugins for other address standardization services may be available from 3rd party developers. If installed, they will be included in the drop-down below.'),
+    ],
+    'help_doc_url' => [
+      'page' => 'user/common-workflows/importing-data-into-civicrm/#address-standardisation',
+    ],
+    'settings_pages' => ['address' => ['section' => 'standardization', 'weight' => 10]],
   ],
   'address_standardization_userid' => [
     'group_name' => 'Address Preferences',
@@ -44,7 +51,8 @@ return [
     'title' => ts('Provider service user ID'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => NULL,
+    'help_text' => ts('Web service user ID.'),
+    'settings_pages' => ['address' => ['section' => 'standardization', 'weight' => 20]],
   ],
   'address_standardization_url' => [
     'group_name' => 'Address Preferences',
@@ -57,8 +65,9 @@ return [
     'title' => ts('Provider Service URL'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => 'Web Service URL',
+    'help_text' => ts('Web Service URL'),
     'validate_callback' => 'CRM_Utils_Rule::url',
+    'settings_pages' => ['address' => ['section' => 'standardization', 'weight' => 30]],
   ],
   'hideCountryMailingLabels' => [
     'group_name' => 'Address Preferences',
@@ -71,7 +80,7 @@ return [
     'title' => ts('Hide Country in Mailing Labels when same as domain country'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Do not display the country field in mailing labels when the country is the same as that of the domain'),
-    'help_text' => NULL,
+    'help_text' => ts('Do not display the country field in mailing labels when the country is the same as that of the domain'),
+    'settings_pages' => ['address' => ['section' => 'labels', 'weight' => 20]],
   ],
 ];

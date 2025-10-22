@@ -37,8 +37,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getRedactOptions',
     ],
-    'description' => ts('Should activity emails be redacted? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
-    'help_text' => '',
+    'help_text' => ts('Should activity emails be redacted? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
     'settings_pages' => ['case' => ['weight' => 0]],
   ],
   'civicaseAllowMultipleClients' => [
@@ -59,8 +58,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getMultiClientOptions',
     ],
-    'description' => ts('How many clients may be associated with a given case? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
-    'help_text' => '',
+    'help_text' => ts('How many clients may be associated with a given case? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
     'settings_pages' => ['case' => ['weight' => 10]],
   ],
   'civicaseNaturalActivityTypeSort' => [
@@ -81,8 +79,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getSortOptions',
     ],
-    'description' => ts('How to sort activity-types on the "Manage Case" screen? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
-    'help_text' => '',
+    'help_text' => ts('How to sort activity-types on the "Manage Case" screen? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
     'settings_pages' => ['case' => ['weight' => 20]],
   ],
   'civicaseShowCaseActivities' => [
@@ -97,8 +94,7 @@ return [
     'title' => ts('Include case activities in general activity views.'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('e.g. the Contact form\'s Activity tab listing. Without this ticked, activities that belong to a case are hidden (default behavior). Warning: enabling this option means that all case activities relating to a contact will be listed which could result in users without "access all cases and activities" permission being able to see see the summarized details (date, subject, assignees, status etc.). Such users will still be prevented from managing the case and viewing/editing the activity.'),
-    'help_text' => '',
+    'help_text' => ts('e.g. the Contact form\'s Activity tab listing. Without this ticked, activities that belong to a case are hidden (default behavior). Warning: enabling this option means that all case activities relating to a contact will be listed which could result in users without "access all cases and activities" permission being able to see see the summarized details (date, subject, assignees, status etc.). Such users will still be prevented from managing the case and viewing/editing the activity.'),
     'settings_pages' => ['case' => ['weight' => 30]],
   ],
 ];

@@ -29,7 +29,6 @@ return [
     'title' => ts('CVV required for backoffice?'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Is the CVV code required for back office credit card transactions'),
     'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
     'settings_pages' => ['contribute' => ['weight' => 10]],
   ],
@@ -44,7 +43,6 @@ return [
     'title' => ts('Deprecated, virtualized setting'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => NULL,
   ],
   'invoicing' => [
     'group_name' => 'Contribute Preferences',
@@ -61,7 +59,7 @@ return [
     'on_change' => [
       'CRM_Invoicing_Utils::onToggle',
     ],
-    'settings_pages' => ['contribute' => ['weight' => 90]],
+    'settings_pages' => ['contribute' => ['section' => 'invoice', 'weight' => -99]],
   ],
   'invoice_prefix' => [
     'default' => 'INV_',
@@ -70,10 +68,10 @@ return [
     'add' => '5.23',
     'type' => 'String',
     'title' => ts('Invoice Prefix'),
-    'description' => ts('Prefix added to new invoice numbers.'),
+    'help_text' => ts('Prefix added to new invoice numbers.'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'settings_pages' => ['contribute' => ['weight' => 100]],
+    'settings_pages' => ['contribute' => ['section' => 'invoice', 'weight' => 100]],
   ],
   'invoice_due_date' => [
     'default' => '10',
@@ -85,7 +83,7 @@ return [
     'type' => 'Integer',
     'is_domain' => 1,
     'is_contact' => 0,
-    'settings_pages' => ['contribute' => ['weight' => 110]],
+    'settings_pages' => ['contribute' => ['section' => 'invoice', 'weight' => 110]],
   ],
   'invoice_due_date_period' => [
     'default' => 'days',
@@ -97,14 +95,14 @@ return [
     'type' => 'String',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Select the interval for due date.'),
+    'help_text' => ts('Select the interval for due date.'),
     'options' => [
       'select' => ts('- select -'),
       'days' => ts('Days'),
       'months' => ts('Months'),
       'years' => ts('Years'),
     ],
-    'settings_pages' => ['contribute' => ['weight' => 120]],
+    'settings_pages' => ['contribute' => ['section' => 'invoice', 'weight' => 120]],
   ],
   'invoice_notes' => [
     'default' => '',
@@ -115,9 +113,9 @@ return [
     'add' => '5.23',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Note displayed on PDF invoice or credit notes.'),
+    'help_text' => ts('Note displayed on PDF invoice or credit notes.'),
     'attributes' => ['rows' => 2, 'cols' => 40],
-    'settings_pages' => ['contribute' => ['weight' => 130]],
+    'settings_pages' => ['contribute' => ['section' => 'invoice', 'weight' => 130]],
   ],
   'invoice_is_email_pdf' => [
     'name' => 'invoice_is_email_pdf',
@@ -127,8 +125,8 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'title' => ts('Automatically email invoice when user purchases online'),
-    'description' => ts('Should a pdf invoice be emailed automatically?'),
-    'settings_pages' => ['contribute' => ['weight' => 140]],
+    'help_text' => ts('Should a pdf invoice be emailed automatically?'),
+    'settings_pages' => ['contribute' => ['section' => 'invoice', 'weight' => 140]],
   ],
   'tax_term' => [
     'default' => 'Sales Tax',
@@ -139,7 +137,7 @@ return [
     'type' => 'String',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
+    'help_text' => '',
     'settings_pages' => ['contribute' => ['weight' => 80]],
   ],
   'tax_display_settings' => [
@@ -151,9 +149,9 @@ return [
     'title' => ts('Tax Display Settings'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
+    'help_text' => '',
     'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::taxDisplayOptions'],
-    'settings_pages' => ['contribute' => ['weight' => 160]],
+    'settings_pages' => ['contribute' => ['section' => 'invoice', 'weight' => 160]],
   ],
   'deferred_revenue_enabled' => [
     'group_name' => 'Contribute Preferences',
@@ -167,7 +165,6 @@ return [
     'title' => ts('Enable Deferred Revenue'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => NULL,
     'settings_pages' => ['contribute' => ['weight' => 50]],
   ],
   'default_invoice_page' => [
@@ -187,7 +184,6 @@ return [
     'title' => ts('Default invoice payment page'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => NULL,
     'settings_pages' => ['contribute' => ['weight' => 70]],
   ],
   'always_post_to_accounts_receivable' => [
@@ -202,7 +198,6 @@ return [
     'title' => ts('Always post to Accounts Receivable?'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => NULL,
     'settings_pages' => ['contribute' => ['weight' => 40]],
   ],
   'update_contribution_on_membership_type_change' => [
@@ -217,8 +212,7 @@ return [
     'title' => ts('Automatically update related contributions when Membership Type is changed'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.'),
-    'help_text' => NULL,
+    'help_text' => ts('Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.'),
     'settings_pages' => ['contribute' => ['weight' => 20]],
   ],
 ];
