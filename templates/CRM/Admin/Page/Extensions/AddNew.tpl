@@ -22,9 +22,11 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
         <tr id="addnew-row_{$row.file}" class="crm-extension-row crm-extensions crm-extensions_{$row.file} {cycle values="odd-row,even-row"}">
           <td class="crm-extensions-label">
             <details class="crm-accordion-light">
-              <summary><strong>{$row.label|escape}</strong>
-              <br/>{$row.description|escape}</summary>
-                {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
+              <summary>
+                <strong>{$row.label|escape}</strong>
+                <br/>{$row.description|escape}
+              </summary>
+              {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
             </details>
           </td>
           <td class="crm-extensions-version right">{$row.version|escape}
@@ -43,7 +45,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
   </div>
 {else}
   <div class="messages status no-popup">
-       {icon icon="fa-info-circle"}{/icon}
-      {ts}There are no extensions to display. Please click "Refresh" to update information about available extensions.{/ts}
+    {icon icon="fa-info-circle"}{/icon}
+    {ts}There are no extensions to display. Please click "Refresh" to update information about available extensions.{/ts}
   </div>
 {/if}
