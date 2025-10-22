@@ -143,6 +143,7 @@ fieldset.af-container.af-layout-inline {
 }
 .crm-public .af-container ul.crm-checkbox-list {
   border: 0;
+  background-color: inherit;
 }
 .crm-public .af-container ul.crm-checkbox-list li {
   background-color: inherit;
