@@ -33,8 +33,8 @@
   --crm-c-teal: #399389;
 /* Practical colours */
   --crm-c-text: #34303b;
-  --crm-c-link: var(--crm-c-blue-darker);
-  --crm-c-link-hover: #004370;
+  --crm-c-link: var(--crm-c-blue-dark);
+  --crm-c-link-hover: var(--crm-c-blue-darker);
   --crm-c-page-bg: #e8eef0;
   --crm-c-container-bg: var(--crm-c-layer0-bg);
   --crm-c-drag-bg: var(--crm-c-gray-200); /* background for drag/drop regions, select2 highlight */
