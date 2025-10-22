@@ -424,10 +424,12 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     //  We are going to call APIv4 PaymentProcessor.save() for -one- side only (live XOR test). Get the APIv4 fields we need.
     $dualFields = ['user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject'];
     foreach ($dualFields as $field) {
-      if ($test) {
-        $values[$field] = $values["test_$field"];
+      if (isset($values["test_$field"])) {
+        if ($test) {
+          $values[$field] = $values["test_$field"];
+        }
+        unset($values["test_$field"]);
       }
-      unset($values["test_$field"]);
     }
 
     if (!empty($values['accept_credit_cards'])) {
