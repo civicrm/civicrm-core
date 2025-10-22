@@ -589,5 +589,37 @@ return [
         'duplicate_matching',
       ],
     ],
+    'created_date' => [
+      'title' => ts('Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the contribution created.'),
+      'add' => '6.9',
+      'unique_name' => 'contribution_created_date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'label' => ts('Created Date'),
+      ],
+    ],
+    'modified_date' => [
+      'title' => ts('Modified Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the contribution created or modified or deleted.'),
+      'add' => '6.9',
+      'unique_name' => 'contribution_modified_date',
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'label' => ts('Modified Date'),
+      ],
+    ],
   ],
 ];
