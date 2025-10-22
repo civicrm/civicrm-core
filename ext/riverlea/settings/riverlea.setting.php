@@ -47,4 +47,28 @@ return [
       'display' => ['section' => 'theme', 'weight' => 40],
     ],
   ],
+  'riverlea_font_size' => [
+    'name' => 'riverlea_font_size',
+    'group' => 'riverlea',
+    'default' => '1',
+    'html_type' => 'select',
+    'add' => 1.0,
+    'options' => [
+      '0.75' => E::ts('Smallest'),
+      '0.875' => E::ts('Small'),
+      '1' => E::ts('Default'),
+      '1.125' => E::ts('Big'),
+      '1.5' => E::ts('Bigger'),
+    ],
+    'on_change' => [
+      '\\Civi\\Riverlea\\StyleLoader::onChangeFontsize',
+    ],
+    'title' => E::ts('Font size'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => E::ts('The font size (Smallest 12px, Small 14px, Default 16px, Big 18px, Bigger 24px)'),
+    'settings_pages' => [
+      'riverlea' => ['weight' => 500],
+    ],
+  ],
 ];
