@@ -17,7 +17,7 @@ return [
         'is_reserved' => TRUE,
         'extension' => E::SHORT_NAME,
         'file_prefix' => 'streams/hackneybrook/',
-        'css_file' => '_variables.css',
+        'css_file' => '_main.css',
         'css_file_dark' => '_dark.css',
         'vars' => [],
         'vars_dark' => [],
