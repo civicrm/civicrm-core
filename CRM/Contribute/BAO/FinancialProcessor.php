@@ -188,9 +188,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // erm, yes because? but, hey, it's tested.
       return $lineItemDetails['line_total'];
     }
-    else {
-      return CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * ((float) $lineItemDetails['line_total']);
-    }
+    throw new CRM_Core_Exception('unreachable');
   }
 
   /**
