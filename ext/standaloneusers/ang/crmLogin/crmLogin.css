@@ -6,26 +6,3 @@
 .crm-login-loading {
   text-align: center;
 }
-
-.crm-login .crm-loading-spinner {
-  --crm-loading-spinner-size: 48px;
-  width: var(--crm-loading-spinner-size);
-  height: var(--crm-loading-spinner-size);
-  border: 5px solid var(--crm-c-info-text);
-  border-bottom-color: var(--crm-c-info);
-  border-radius: 50%;
-  display: inline-block;
-  box-sizing: border-box;
-  animation: crmLoadingSpinner 1s linear infinite;
-  margin: 2rem;
-}
-
-@keyframes crmLoadingSpinner {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
