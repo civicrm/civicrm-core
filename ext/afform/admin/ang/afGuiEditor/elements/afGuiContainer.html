@@ -1,4 +1,8 @@
 <div class="af-gui-bar {{ block ? 'af-gui-block-bar' : '' }}" ng-if="$ctrl.node['#tag'] && $ctrl.node['#tag'] !== 'af-tab'" ng-click="selectEntity()" >
+  <div class="crm-sortable-grab"></div>
+  <label class="af-gui-node-title af-gui-container-title af-gui-text-h3" ng-if="$ctrl.node['#tag'] && $ctrl.node['#tag'] !== 'af-tab' && !block" title="{{:: ts('Container title') }}">
+    <i class="crm-i {{ $ctrl.getCollapsibleIcon() }}" role="img" aria-hidden="true"></i><span placeholder="{{:: ts('No title') }}" crm-ui-editable ng-model="$ctrl.getSetTitle" ng-model-options="{getterSetter: true}"></span>
+  </label>
   <div ng-if="!$ctrl.loading" class="form-inline" title="{{ $ctrl.getToolTip() }}">
     <span ng-if="block">{{ $ctrl.join ? ts($ctrl.join) + ':' : ts('Block:') }}</span>
     <select ng-if="block" ng-model="block.directive" ng-change="selectBlockDirective()" title="{{:: ts('Select block') }}">
@@ -18,10 +22,6 @@
   </div>
   <div ng-if="$ctrl.loading"><i class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i></div>
 </div>
-<label class="af-gui-node-title af-gui-container-title af-gui-text-h3" ng-if="$ctrl.node['#tag'] && $ctrl.node['#tag'] !== 'af-tab' && !block" title="{{:: ts('Container title') }}">
-  <i class="crm-i {{ $ctrl.getCollapsibleIcon() }}" role="img" aria-hidden="true"></i>
-  <span placeholder="{{:: ts('No title') }}" crm-ui-editable ng-model="$ctrl.getSetTitle" ng-model-options="{getterSetter: true}"></span>
-</label>
 <div ng-if="!$ctrl.loading" ui-sortable="$ctrl.sortableOptions" ui-sortable-update="$ctrl.editor.onDrop" ng-model="getSetChildren" ng-model-options="{getterSetter: true}" class="af-gui-layout {{ getLayout() }}">
   <div ng-repeat="item in getSetChildren()" >
     <div ng-switch="$ctrl.getNodeType(item)">
