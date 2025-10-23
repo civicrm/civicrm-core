@@ -37,7 +37,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   private function assignCiviimportVariables(): void {
-    $contactTypes = CRM_Utils_Array::formatForSelect2(CRM_Contact_BAO_ContactType::basicTypeInfo(), 'name', 'label');
+    $contactTypes = CRM_Utils_Array::formatForSelect2(CRM_Contact_BAO_ContactType::basicTypeInfo(), 'label', 'name');
     $parser = $this->getParser();
     $this->isQuickFormMode = FALSE;
     Civi::resources()->addVars('crmImportUi', [
