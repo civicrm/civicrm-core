@@ -22,6 +22,47 @@
  */
 class CRM_Contribute_BAO_FinancialProcessor {
 
+  private CRM_Contribute_DAO_Contribution $updatedContribution;
+
+  private ?CRM_Contribute_BAO_Contribution $originalContribution;
+
+  public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution) {
+    $this->originalContribution = $originalContribution;
+    $this->updatedContribution = $updatedContribution;
+  }
+
+  public function getUpdatedContribution(): CRM_Contribute_DAO_Contribution {
+    return $this->updatedContribution;
+  }
+
+  public function getOriginalContribution(): ?CRM_Contribute_BAO_Contribution {
+    return $this->originalContribution;
+  }
+
+  public function getUpdatedContributionStatus(): string {
+    return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->updatedContribution->contribution_status_id);
+  }
+
+  public function getOriginalContributionStatus(): ?string {
+    return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->originalContribution->contribution_status_id);
+  }
+
+  public function isNegativeTransaction(): bool {
+    return in_array($this->getUpdatedContributionStatus(), ['Refunded', 'Chargeback', 'Cancelled'], TRUE);
+  }
+
+  public function isFailedTransaction(): bool {
+    return $this->getUpdatedContributionStatus() === 'Failed';
+  }
+
+  public function isPendingTransaction(): bool {
+    return $this->getUpdatedContributionStatus() === 'Pending';
+  }
+
+  public function isAccountsReceivableTransaction(): bool {
+    return $this->getUpdatedContributionStatus() === 'Pending' || $this->getUpdatedContributionStatus() === 'In Progress';
+  }
+
   /**
    * Get the financial account for the item associated with the new transaction.
    *
