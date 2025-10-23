@@ -67,25 +67,17 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return array
    */
   private static function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, bool $isARefund, $trxnIds, $fieldId): array {
+    $postUpdateContribution = $params['contribution'];
     foreach ($fields as $fieldValueId => $lineItemDetails) {
       $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
-      $receiveDate = CRM_Utils_Date::isoToMysql($params['prevContribution']->receive_date);
-      if ($params['contribution']->receive_date) {
-        $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);
-      }
-
       $financialAccount = CRM_Contribute_BAO_FinancialProcessor::getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
 
-      $currency = $params['prevContribution']->currency;
-      if ($params['contribution']->currency) {
-        $currency = $params['contribution']->currency;
-      }
       $previousLineItemTotal = $previousLineItems[$fieldValueId]['line_total'] ?? 0;
-      $isContributionStatusNegative = CRM_Contribute_BAO_Contribution::isContributionStatusNegative($params['contribution']->contribution_status_id);
+      $isContributionStatusNegative = CRM_Contribute_BAO_Contribution::isContributionStatusNegative($postUpdateContribution->contribution_status_id);
       $itemParams = [
-        'transaction_date' => $receiveDate,
-        'contact_id' => $params['prevContribution']->contact_id,
-        'currency' => $currency,
+        'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
+        'contact_id' => $postUpdateContribution->contact_id,
+        'currency' => $postUpdateContribution->currency,
         'amount' => self::getFinancialItemAmountFromParams($isContributionStatusNegative, $context, $lineItemDetails, $isARefund, $previousLineItemTotal),
         'description' => $prevFinancialItem['description'] ?? NULL,
         'status_id' => $prevFinancialItem['status_id'],
@@ -107,7 +99,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $taxAmount -= $previousLineItems[$fieldValueId]['tax_amount'] ?? 0;
         }
         if ($taxAmount != 0) {
-          $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
+          $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id, $context) * $taxAmount;
           $itemParams['description'] = \Civi::settings()->get('tax_term');
           if ($lineItemDetails['financial_type_id']) {
             $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
