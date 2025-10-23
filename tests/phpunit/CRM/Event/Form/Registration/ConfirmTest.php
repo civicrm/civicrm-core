@@ -27,7 +27,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Initial test of submit function.
    */
-  public function testSubmit(): void {
+  public function testSubmit(['is_show_calendar_links' => TRUE]): void {
     $this->submitPaidEvent();
     $this->assertMailSentContainingStrings([
       'Dear Kim,',
