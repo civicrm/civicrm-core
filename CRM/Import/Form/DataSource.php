@@ -279,7 +279,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
         $submittedValues = $this->getSubmittedValues();
         $fieldsToCopyOver = array_keys(array_diff_key($submittedValues, $this->submittableFields));
         $templateID = (int) $this->getSubmittedValue('userJobTemplate');
-        if ($templateID && $templateID !== $this->getUserJob()['metadata']['template_id'] ?? NULL) {
+        if ($templateID && $templateID !== ($this->getUserJob()['metadata']['template_id'] ?? NULL)) {
           $this->updateUserJobMetadata('template_id', $templateID);
           $this->updateUserJobMetadata('import_mappings', $this->getTemplateJob()['metadata']['import_mappings']);
           $this->updateUserJobMetadata('import_options', $this->getTemplateJob()['metadata']['import_options']);
