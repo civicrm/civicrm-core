@@ -2188,7 +2188,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // If financial type has changed from non-deductible to deductible, let the user know so they can adjust the non-deductible amount
     $toType = $submittedValues['financial_type_id'] ?? NULL;
     $fromType = $this->_defaults['financial_type_id'] ?? NULL;
-    if (($this->_action & CRM_Core_Action::UPDATE) && ($toType != $fromType) && ($submittedValues['non_deductible_amount'] ?? NULL)) {
+    if (($this->_action & CRM_Core_Action::UPDATE) && ($toType != $fromType) && !empty($submittedValues['non_deductible_amount'])) {
       $deductible = FinancialType::get(TRUE)
         ->addSelect('is_deductible')
         ->addWhere('id', 'IN', [$toType, $fromType])
