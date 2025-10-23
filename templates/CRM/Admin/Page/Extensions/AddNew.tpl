@@ -32,8 +32,6 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
           <td class="crm-extensions-version right">{$row.version|escape}
             {if $row.ready == 'ready'}
               {icon icon="fa-trophy crm-extensions-stage"}{ts}This extension has been reviewed by the community.{/ts}{/icon}
-            {else}
-              {icon icon="fa-warning crm-extensions-stage"}{ts}This extension has not been reviewed by the community. Proceed with caution.{/ts}{/icon}
             {/if}
           </td>
           <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>

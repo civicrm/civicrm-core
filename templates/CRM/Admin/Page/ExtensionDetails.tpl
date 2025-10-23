@@ -17,6 +17,9 @@
         {ts}Version{/ts}</td><td>{$extension.version|escape}
       </td>
     </tr>
+    <tr>
+      <td class="label">{ts}Released on{/ts}</td><td>{$extension.releaseDate|escape}</td>
+    </tr>
     {if $extension.develStage}
     <tr>
       <td class="label">{ts}Stability{/ts}</td>
@@ -25,8 +28,7 @@
           {icon icon="fa-trophy crm-extensions-stage"}{ts}This extension has been reviewed by the community.{/ts}{/icon}
           {ts}This extension has been reviewed by the community.{/ts}
         {elseif $extension.develStage == 'stable' && $extension.ready == 'not_ready'}
-          <div class="crm-error alert alert-danger">
-            {icon icon="fa-warning crm-extensions-stage"}{ts}This extension has not been reviewed by the community.{/ts} {ts}Please proceed with caution.{/ts}{/icon}
+          <div class="crm-error alert alert-warning">
             {ts}Please proceed with caution.{/ts} {ts}This extension has not been reviewed by the community and therefore may conflict with your configuration.{/ts} {ts}Consider evaluating the stated version compatibility, the total number of active installations and the date of the latest release of the extension as these may be good indicators of the extension's stability. If a support link is listed, please consult their issue queue to review any known issues.{/ts} {docURL page="dev/extensions/lifecycle"}</div>
         {else}
           {$extension.develStage_formatted|escape}
@@ -34,9 +36,6 @@
       </td>
     </tr>
     {/if}
-    <tr>
-      <td class="label">{ts}Released on{/ts}</td><td>{$extension.releaseDate|escape}</td>
-    </tr>
     <tr>
       <td class="label">{ts}Active Installs{/ts}</td><td>{$extension.usage}</td>
     </tr>
