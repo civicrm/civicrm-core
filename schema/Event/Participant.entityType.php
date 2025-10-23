@@ -368,5 +368,39 @@ return [
         'on_delete' => 'SET NULL',
       ],
     ],
+    'created_date' => [
+      'title' => ts('Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the participant record was created.'),
+      'add' => '6.9',
+      'unique_name' => 'participant_created_date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+        'label' => ts('Created Date'),
+      ],
+    ],
+    'modified_date' => [
+      'title' => ts('Modified Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the participant record created or modified or deleted.'),
+      'add' => '6.9',
+      'unique_name' => 'participant_modified_date',
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+        'label' => ts('Modified Date'),
+      ],
+    ],
   ],
 ];

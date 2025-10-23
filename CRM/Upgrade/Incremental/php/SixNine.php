@@ -62,6 +62,40 @@ class CRM_Upgrade_Incremental_php_SixNine extends CRM_Upgrade_Incremental_Base {
       ],
     ]);
 
+    $this->addTask('Add column "Participant.created_date"', 'alterSchemaField', 'Participant', 'created_date', [
+      'title' => ts('Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the participant record was created.'),
+      'unique_name' => 'participant_created_date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+        'label' => ts('Created Date'),
+      ],
+    ]);
+
+    $this->addTask('Add column "Participant.modified_date"', 'alterSchemaField', 'Participant', 'modified_date', [
+      'title' => ts('Modified Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the participant record created or modified or deleted.'),
+      'unique_name' => 'participant_modified_date',
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+        'label' => ts('Modified Date'),
+      ],
+    ]);
+
     // dev/core#2290 - Remove id from cache tables
     $tables = ['civicrm_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache', 'civicrm_group_contact_cache'];
     foreach ($tables as $table) {
