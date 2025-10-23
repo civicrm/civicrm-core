@@ -27,6 +27,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
   private ?CRM_Contribute_BAO_Contribution $originalContribution;
 
   public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution) {
+    // Deal with slopping typing first.
+    if ($originalContribution) {
+      $originalContribution->contribution_status_id = (int) $originalContribution->contribution_status_id;
+    }
+    $updatedContribution->contribution_status_id = (int) $updatedContribution->contribution_status_id;
     $this->originalContribution = $originalContribution;
     $this->updatedContribution = $updatedContribution;
   }
@@ -61,6 +66,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
   public function isAccountsReceivableTransaction(): bool {
     return $this->getUpdatedContributionStatus() === 'Pending' || $this->getUpdatedContributionStatus() === 'In Progress';
+  }
+
+  public function isStatusChange(): bool {
+    return $this->originalContribution->contribution_status_id !== $this->updatedContribution->contribution_status_id;
   }
 
   /**
