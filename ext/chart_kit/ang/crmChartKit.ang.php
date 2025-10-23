@@ -4,14 +4,13 @@ return [
   'js' => [
     'ang/crmChartKit.js',
     'ang/crmChartKit/*.js',
-    'ang/crmChartKit/chartTypes/*.js',
+    'ang/crmChartKit/typeBackends/*.js',
   ],
   'css' => [
     'ang/crmChartKit.css',
   ],
   'partials' => [
     'ang/crmChartKit',
-    'ang/crmChartKit/chartTypes',
   ],
   'requires' => [
     'crmUi',
