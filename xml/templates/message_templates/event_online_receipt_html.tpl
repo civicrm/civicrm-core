@@ -132,7 +132,7 @@
           {/if}
         {/if}
 
-        {if {event.is_active|boolean} and {event.is_show_calendar_links|boolean}}
+        {if {event.is_show_calendar_links|boolean}}
           <tr>
             <td colspan="2" {$valueStyle}>
               {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
