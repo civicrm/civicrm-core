@@ -1670,6 +1670,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    *   ID of the civicrm_price_field_value field for the discount id.
    */
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID = NULL) {
+    throw new CRM_Core_Exception('is this hit');
     $financialTypeID = $contributionParams['contribution']->financial_type_id;
     $total_amount = $contributionParams['total_amount'];
     if (is_array($feeLevel)) {
