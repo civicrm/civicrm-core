@@ -443,8 +443,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $dbCustomGroupTableName = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name', 'id',
       'Database check for custom group record.'
     );
-    $this->assertEquals(strtolower("civicrm_value_{$params['name']}_$customGroupID"), $dbCustomGroupTableName,
-      "The table name should be suffixed with '_ID' unless specified.");
+    $this->assertEquals(strtolower("civicrm_value_{$params['name']}"), $dbCustomGroupTableName);
   }
 
   /**
@@ -472,6 +471,55 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
       ->execute()->first();
     $this->assertEquals('Test_Group_2', $group['title']);
     $this->assertEquals('test_otherTableName', $group['table_name']);
+  }
+
+  /**
+   * Test create() when inferred table name already exists
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateInferredTableNameConflict() {
+    $customGroupID_1 = $this->callAPISuccess('CustomGroup', 'create', [
+      'title' => 'Test Group XYZ',
+      'name' => 'test_group_xyz_1',
+      'extends' => [0 => 'Individual', 1 => []],
+      'weight' => 4,
+      'collapse_display' => 1,
+      'style' => 'Inline',
+      'help_pre' => 'This is Pre Help For Test Group XYZ',
+      'help_post' => 'This is Post Help For Test Group XYZ',
+      'is_active' => 1,
+      'version' => 3,
+    ])['id'];
+
+    $customGroup_1 = CustomGroup::get()
+      ->addWhere('id', '=', $customGroupID_1)
+      ->addSelect('table_name')
+      ->execute()
+      ->first();
+
+    $this->assertEquals('civicrm_value_test_group_xyz', $customGroup_1['table_name'], "The table name should not be suffixed with '_ID'.");
+
+    $customGroupID_2 = $this->callAPISuccess('CustomGroup', 'create', [
+      'title' => 'Test_Group_xyz',
+      'name' => 'test_group_xyz_2',
+      'extends' => [0 => 'Individual', 1 => []],
+      'weight' => 4,
+      'collapse_display' => 1,
+      'style' => 'Inline',
+      'help_pre' => 'This is Pre Help For Test_Group_xyz',
+      'help_post' => 'This is Post Help For Test_Group_xyz',
+      'is_active' => 1,
+      'version' => 3,
+    ])['id'];
+
+    $customGroup_2 = CustomGroup::get()
+      ->addWhere('id', '=', $customGroupID_2)
+      ->addSelect('table_name')
+      ->execute()
+      ->first();
+
+    $this->assertEquals("civicrm_value_test_group_xyz_$customGroupID_2", $customGroup_2['table_name'], "The table name should be suffixed with '_ID'.");
   }
 
   /**

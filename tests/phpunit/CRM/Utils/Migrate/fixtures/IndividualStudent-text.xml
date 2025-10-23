@@ -12,7 +12,7 @@
       <collapse_display>0</collapse_display>
       <weight>1</weight>
       <is_active>1</is_active>
-      <table_name>civicrm_value_example_1</table_name>
+      <table_name>civicrm_value_example</table_name>
       <is_multiple>0</is_multiple>
       <collapse_adv_display>0</collapse_adv_display>
       <is_reserved>0</is_reserved>
@@ -32,7 +32,7 @@
       <weight>1</weight>
       <is_active>1</is_active>
       <is_view>0</is_view>
-      <column_name>name1_1</column_name>
+      <column_name>name1</column_name>
       <serialize>0</serialize>
       <in_selector>0</in_selector>
       <fk_entity_on_delete>set_null</fk_entity_on_delete>
