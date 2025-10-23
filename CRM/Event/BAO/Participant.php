@@ -1672,6 +1672,9 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID = NULL) {
     $financialTypeID = $contributionParams['contribution']->financial_type_id;
     $total_amount = $contributionParams['total_amount'];
+    if (empty($discountedPriceFieldOptionID)) {
+      CRM_Core_Error::deprecatedWarning('not passing the option ID is deprecated');
+    }
 
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
