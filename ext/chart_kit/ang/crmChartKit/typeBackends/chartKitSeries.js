@@ -1,10 +1,10 @@
-(function (angular, $, _, dc) {
-  "use strict";
+(function (dc) {
+  CRM.chart_kit = CRM.chart_kit || {};
 
-  // common renderer for line/bar/area charts, which will stack by default
-  // (compare with composite chart, where each column can be line/bar/area )
-  angular.module('crmChartKit').factory('chartKitSeries', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitSeriesAdmin.html',
+  CRM.chart_kit.typeBackends = CRM.chart_kit.typeBackends || {};
+
+  CRM.chart_kit.typeBackends.series = {
+    adminTemplate: '~/crmChartKitAdmin/typeBackends/chartKitSeriesAdmin.html',
 
     getInitialDisplaySettings: () => ({
       showLegend: 'right',
@@ -59,6 +59,6 @@
 
       displayCtrl.buildCoordinateGrid();
     }
-  }));
-})(angular, CRM.$, CRM._, CRM.chart_kit.dc);
+  };
+})(CRM.chart_kit.dc);
 

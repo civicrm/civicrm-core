@@ -1,8 +1,10 @@
-(function (angular, $, _, dc, d3) {
-  "use strict";
+(function (dc, d3) {
+  CRM.chart_kit = CRM.chart_kit || {};
 
-  angular.module('crmChartKit').factory('chartKitHeatMap', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitHeatMapAdmin.html',
+  CRM.chart_kit.typeBackends = CRM.chart_kit.typeBackends || {};
+
+  CRM.chart_kit.typeBackends.heatmap = {
+    adminTemplate: '~/crmChartKitAdmin/typeBackends/chartKitHeatMapAdmin.html',
 
     getAxes: () => ({
       'w': {
@@ -96,6 +98,6 @@
           boxGroups.select('.heat-box-label').text((d) => displayCtrl.renderDataLabel(d, 'label').replaceAll('\n', ' - '));
         });
     }
-  }));
-})(angular, CRM.$, CRM._, CRM.chart_kit.dc, CRM.chart_kit.d3);
+  };
+})(CRM.chart_kit.dc, CRM.chart_kit.d3);
 

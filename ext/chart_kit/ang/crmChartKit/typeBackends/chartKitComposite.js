@@ -1,8 +1,10 @@
-(function (angular, $, _, dc) {
-  "use strict";
+(function (dc) {
+  CRM.chart_kit = CRM.chart_kit || {};
 
-  angular.module('crmChartKit').factory('chartKitComposite', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitCompositeAdmin.html',
+  CRM.chart_kit.typeBackends = CRM.chart_kit.typeBackends || {};
+
+  CRM.chart_kit.typeBackends.composite = {
+    adminTemplate: '~/crmChartKitAdmin/typeBackends/chartKitCompositeAdmin.html',
 
     getInitialDisplaySettings: () => ({
       barWidth: 10,
@@ -125,6 +127,6 @@
 
     // helper for whether to display grouped bar settings in the admin screen
     isGroupedBar: (displayCtrl) => (displayCtrl.getColumnsForAxis('y').filter((col) => col.seriesType === 'bar').length > 1),
-  }));
-})(angular, CRM.$, CRM._, CRM.chart_kit.dc);
+  };
+})(CRM.chart_kit.dc);
 

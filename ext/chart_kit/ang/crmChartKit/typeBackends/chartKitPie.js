@@ -1,8 +1,10 @@
-(function (angular, $, _, dc) {
-  "use strict";
+(function (dc) {
+  CRM.chart_kit = CRM.chart_kit || {};
 
-  angular.module('crmChartKit').factory('chartKitPie', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitPieAdmin.html',
+  CRM.chart_kit.typeBackends = CRM.chart_kit.typeBackends || {};
+
+  CRM.chart_kit.typeBackends.pie = {
+    adminTemplate: '~/crmChartKitAdmin/typeBackends/chartKitPieAdmin.html',
 
     getAxes: () => ({
       'w': {
@@ -42,6 +44,6 @@
     }),
 
     getChartConstructor: () => dc.pieChart,
-  }));
-})(angular, CRM.$, CRM._, CRM.chart_kit.dc);
+  };
+})(CRM.chart_kit.dc);
 
