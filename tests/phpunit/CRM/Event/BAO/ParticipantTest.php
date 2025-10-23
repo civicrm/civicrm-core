@@ -111,6 +111,8 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'must_wait' => NULL,
       'transferred_to_contact_id' => NULL,
       'created_id' => $this->ids['Contact']['individual_0'],
+      'created_date' => date('Y-m-d H:i:s'),
+      'modified_date' => date('Y-m-d H:i:s'),
     ];
 
     foreach ($compareValues as $key => $value) {
