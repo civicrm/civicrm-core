@@ -1,15 +1,181 @@
-(function (angular, $, _, d3, dc) {
+(function (angular, $, _) {
   "use strict";
 
-  /**
-   * chartKitColumn service provides the ChartKitColumn class
-   *
-   * A "chart column" is a search field from the SearchKit SavedSearch
-   * plus settings like reduceType and scaleType which control how data
-   * in that field is processed when it is included in the chart
-   *
-   */
-  angular.module('crmChartKit').factory('chartKitColumn', (chartKitReduceTypes) => {
+  // Provides pluggable chart types for use in the chart_kit display and admin components
+  angular.module('crmChartKit').factory('chartKitChartTypes', (
+    chartKitPie,
+    chartKitRow,
+    chartKitStack,
+    chartKitComposite,
+    chartKitSeries,
+    chartKitHeatMap
+  ) => {
+
+    const ts = CRM.ts('chart_kit');
+
+    const legacySettingsAdaptor = (settings) => {
+      let updated = false;
+      // for pie/row charts, x axis was moved to w. if pie/row chart has x
+      // columns but no y columns, then transfer them
+      if (settings.chartType === 'pie' || settings.chartType === 'row') {
+        // if no cols for w axis
+        if (!settings.columns.find((col) => col.axis === 'w')) {
+
+          // update any x cols to w
+          settings.columns.forEach((col, i) => {
+            if (col.axis === 'x') {
+              settings.columns[i].axis = 'w';
+              updated = true;
+            }
+          });
+        }
+      }
+
+      if (settings.chartOrderColIndex) {
+        if (!settings.columns[settings.chartOrderColIndex].isOrder) {
+          settings.columns[settings.chartOrderColIndex].isOrder = true;
+          updated = true;
+        }
+      }
+
+      if (updated) {
+        CRM.alert(ts("Please resave charts in SearchKit to avoid this message"), ts("Deprecated chart settings detected"));
+      }
+      return settings;
+    };
+
+
+    const types = [
+      {
+        key: 'pie',
+        label: ts('Pie'),
+        icon: 'fa-pie-chart',
+        service: chartKitPie,
+      },
+      {
+        key: 'row',
+        label: ts('Row'),
+        icon: 'fa-chart-bar',
+        service: chartKitRow
+      },
+      {
+        key: 'line',
+        label: ts('Line'),
+        icon: 'fa-line-chart',
+        service: chartKitStack
+      },
+      {
+        key: 'bar',
+        label: ts('Bar'),
+        icon: 'fa-chart-column',
+        service: chartKitStack
+      },
+      {
+        key: 'area',
+        label: ts('Area'),
+        icon: 'fa-chart-area',
+        service: chartKitStack
+      },
+      {
+        key: 'series',
+        label: ts('Series'),
+        icon: 'fa-chart-gantt',
+        service: chartKitSeries
+      },
+      {
+        key: 'composite',
+        label: ts('Combined'),
+        icon: 'fa-layer-group',
+        service: chartKitComposite
+      },
+      {
+        key: 'heatmap',
+        label: ts('Heat Map'),
+        icon: 'fa-table-cells-large',
+        service: chartKitHeatMap
+      },
+    ];
+
+    const reduceTypes = [
+      {
+        key: 'sum',
+        label: ts('Sum'),
+        final: (f) => f,
+        add: (p, v) => p + v,
+        sub: (p, v) => p - v,
+        start: () => 0
+      },
+      {
+        key: 'count',
+        label: ts('Count'),
+        final: (f) => f,
+        add: (p, v) => p + 1,
+        sub: (p, v) => p - 1,
+        start: () => 0
+      },
+      {
+        key: 'mean',
+        label: ts('Average'),
+        final: (f) => f[0] / f[1],
+        add: (p, v) => [
+          p[0] + v,
+          p[1] + 1,
+        ],
+        sub: (p, v) => [
+          p[0] - v,
+          p[1] - 1,
+        ],
+        start: () => [0, 0]
+      },
+      {
+        key: "percentage_sum",
+        label: ts("Percentage of total"),
+        final: (f, total) => f / total,
+        add: (p, v) => p + v,
+        sub: (p, v) => p - v,
+        start: () => 0,
+        // note: percentage reducers dont support data render currently
+        // though it could be used instead of floor to allow configurable
+        // decimal places for percentage?
+        render: (v, dataRender) => {
+          const percentage = Math.floor(100 * v);
+          return `${percentage}%`;
+          }
+      },
+      {
+        key: "percentage_count",
+        label: ts("Percentage of count"),
+        final: (f, total) => f / total,
+        add: (p, v) => p + 1,
+        sub: (p, v) => p - 1,
+        start: () => 0,
+        // note: percentage reducers dont support data render currently (see above)
+        render: (v, dataRender) => {
+          const percentage = Math.floor(100 * v);
+          return `${percentage}%`;
+        }
+      },
+      {
+        key: 'list',
+        label: ts('List'),
+        final: (f) => f,
+        add: (p, v) => {
+          if (p.indexOf(v) < 0) {
+            p.push(v);
+          }
+          return p;
+        },
+        sub: (p, v) => p.filter((x) => x != v),
+        start: () => [],
+        // apply the dataRender to each coordinate, then join
+        render: (v, dataRender) => {
+          if (!v.map) {
+            return dataRender(v);
+          }
+          return v.map((item) => dataRender(item)).join(', ');
+        },
+      }
+    ];
 
     // TODO: other parsers?
     const datePrecisionParser = (v, options) => {
@@ -290,7 +456,5 @@
         this.total = v;
       }
     }
-
-    return ChartKitColumn;
   });
-})(angular, CRM.$, CRM._, CRM.chart_kit.d3, CRM.chart_kit.dc);
+})(angular, CRM.$, CRM._);
