@@ -116,7 +116,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return array
    */
-  private static function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, bool $isARefund, $trxnIds, $fieldId): array {
+  private function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, bool $isARefund, $trxnIds, $fieldId): array {
     $postUpdateContribution = $params['contribution'];
     foreach ($fields as $fieldValueId => $lineItemDetails) {
       $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
@@ -246,7 +246,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * adds unpredictability.
    *
    */
-  public static function updateFinancialAccounts(&$params, $context = NULL) {
+  public function updateFinancialAccounts(&$params, $context = NULL) {
     $isARefund = self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id);
 
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
@@ -256,7 +256,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $trxnIds['id'] = $params['entity_id'];
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
     foreach ($params['line_item'] as $fieldId => $fields) {
-      $params = CRM_Contribute_BAO_FinancialProcessor::createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $isARefund, $trxnIds, $fieldId);
+      $params = $this->createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $isARefund, $trxnIds, $fieldId);
     }
   }
 
