@@ -1672,10 +1672,6 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID = NULL) {
     $financialTypeID = $contributionParams['contribution']->financial_type_id;
     $total_amount = $contributionParams['total_amount'];
-    if (is_array($feeLevel)) {
-      CRM_Core_Error::deprecatedFunctionWarning('array passed for string value');
-      $feeLevel = (string) current($feeLevel);
-    }
 
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
