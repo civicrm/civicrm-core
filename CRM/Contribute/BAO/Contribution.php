@@ -3051,7 +3051,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {
           //Update Financial Records
-          $callUpdateFinancialAccounts = CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccountsOnContributionStatusChange($params);
+          $callUpdateFinancialAccounts = $financialProcessor->updateFinancialAccountsOnContributionStatusChange($params);
           if ($callUpdateFinancialAccounts) {
             $financialProcessor->updateFinancialAccounts($params, 'changedStatus');
             CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedStatus');
@@ -3113,7 +3113,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       else {
         // records finanical trxn and entity financial trxn
         // also make it available as return value
-        CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($trxnParams, $params);
+        $financialProcessor->recordAlwaysAccountsReceivable($trxnParams, $params);
         $trxnParams['pan_truncation'] = $params['pan_truncation'] ?? NULL;
         $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
         $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);

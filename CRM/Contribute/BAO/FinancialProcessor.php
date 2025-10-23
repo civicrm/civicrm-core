@@ -295,7 +295,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return bool
    *   Return indicates whether the updateFinancialAccounts function should continue.
    */
-  public static function updateFinancialAccountsOnContributionStatusChange(&$params) {
+  public function updateFinancialAccountsOnContributionStatusChange(&$params) {
     $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
     $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
 
@@ -345,7 +345,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // This is an update so original currency if none passed in.
       $params['trxnParams']['currency'] = $params['currency'] ?? $params['prevContribution']->currency;
 
-      $transactionIDs[] = CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
+      $transactionIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams'], $params);
       $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['entity_id'] = $transactionIDs[] = $trxn->id;
@@ -404,7 +404,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return null|int
    */
-  public static function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
+  public function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
     if (!Civi::settings()->get('always_post_to_accounts_receivable')) {
       return NULL;
     }
