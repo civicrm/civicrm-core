@@ -181,7 +181,7 @@ class GenericParser extends ImportParser {
         ],
       ])->single();
       if (!empty($params['Contact'])) {
-        $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], ($existing['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
+        $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], ($params['Contact']['id'] ?? $existing['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
         $params[$this->getBaseEntity()]['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $params['Contact']['id'];
       }
       $entity = civicrm_api4($this->baseEntity, 'save', [

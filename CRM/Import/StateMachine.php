@@ -58,7 +58,9 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
         throw new CRM_Core_Exception(ts('Invalid import entity %1', [1 => htmlentities($this->entity)]));
       }
       $entityPath = explode('_', $entityName);
-      if ($this->entity === 'Event') {
+      if ($this->entity === 'Event'
+        || ($entityPath[1] === 'Contact' && $entity !== 'Contact')
+      ) {
         // If we allow this to be set it finds the participant import...
         $this->classPrefix = '';
       }
