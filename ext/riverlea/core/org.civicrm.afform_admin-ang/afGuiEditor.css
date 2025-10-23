@@ -349,14 +349,14 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-element:hover,
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-markup:hover,
 #afGuiEditor .crm-editable-enabled:hover:not(:focus) {
-  border: 2px dashed var(--crm-c-gray-700);
+  outline: 2px dashed var(--crm-c-gray-700);
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container .af-gui-element:hover,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container .af-gui-markup:hover {
   border-width: 1px;
 }
 #afGuiEditor-canvas .af-entity-selected {
-  border: 2px dashed var(--crm-c-blue-dark);
+  outline: 2px dashed var(--crm-c-blue-dark);
 }
 #afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
   background-color: var(--crm-c-primary);
@@ -683,7 +683,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 #afGuiEditor .ui-sortable-helper .af-gui-palette-item {
   height: 30px;
   width: 300px;
-  border: 2px dashed var(--crm-c-blue-dark);
+  outline: 2px dashed var(--crm-c-blue-dark);
 }
 .af-gui-conditional-dialog .api4-operator {
   width: 110px;
