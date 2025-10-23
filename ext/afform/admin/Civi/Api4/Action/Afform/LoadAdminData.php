@@ -41,6 +41,9 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     if (!$newForm) {
       // Load existing afform if name provided
       $info['definition'] = $this->loadForm($this->definition['name']);
+      if ($locale = $info['definition']['locale'][0] ?? FALSE) {
+        \CRM_Core_I18n::singleton()->setLocale($locale);
+      }
     }
     else {
       // Create new blank afform
@@ -80,6 +83,23 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
             ],
           ];
           break;
+      }
+
+    }
+
+    if (\CRM_Core_I18n::isMultiLingual()) {
+      $locale = $info['definition']['locale'][0] ?? FALSE;
+
+      // if no locale yet, set a sensible default locale
+      if (!$locale) {
+        $force = \Civi::settings()->get('force_translation_source_locale') ?? TRUE;
+        $locale = $force ? \Civi::settings()->get('lcMessages') : \CRM_Core_I18n::getLocale();
+        $info['definition']['locale'] = [$locale];
+      }
+
+      // force the locale to ensure that all the labels are in the afform defined locale
+      if ($locale != \CRM_Core_I18n::getLocale()) {
+        \CRM_Core_I18n::singleton()->setLocale($locale);
       }
     }
 

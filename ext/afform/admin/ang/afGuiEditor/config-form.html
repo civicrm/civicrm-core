@@ -8,6 +8,16 @@
     <input ng-model="editor.afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" ng-model-options="editor.debounceMode" >
   </div>
 
+  <div class="form-group" ng-if="editor.meta.locales">
+    <label for="afform_locale">
+      {{:: ts('Locale') }} <span class="crm-marker">*</span>
+    </label>
+    <input ng-list crm-ui-select="{multiple: false, data: editor.meta.locales}" class="form-control" id="afform_locale" ng-model="editor.afform.locale">
+    <p class="help-block">
+      {{:: ts('Any custom text (label, placeholder, help...) is assumed to be in the locale you set. You are then able to translate the strings by going to Administer -> Localization -> Translations to ...') }}
+    </p>
+  </div>
+
   <div class="form-group">
     <label for="af_config_form_description">
       {{:: ts('Description') }}
