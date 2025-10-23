@@ -99,7 +99,7 @@
   min-width: 21px;
 }
 #afGuiEditor .crm-editable-enabled:hover:not(:focus) {
-  border: 2px dashed grey !important;
+  outline: 2px dashed grey !important;
 }
 /* Undo Shoreditch add-ons */
 #afGuiEditor .crm-editable-enabled:before,
@@ -198,7 +198,7 @@ body.af-gui-dragging {
 }
 
 #afGuiEditor .af-gui-container {
-  border: 2px dashed transparent;
+  outline: 2px dashed transparent;
   position: relative;
   padding: 22px 3px 3px;
   min-height: 40px;
@@ -237,7 +237,7 @@ body.af-gui-dragging {
 
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container:hover,
 .af-gui-dragging #afGuiEditor .af-gui-container {
-  border: 2px dashed #757575;
+  outline: 2px dashed #757575;
 }
 #afGuiEditor .af-gui-container.af-gui-dragtarget {
   border: 2px solid #0071bd;
@@ -268,7 +268,7 @@ body.af-gui-dragging {
 }
 
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected {
-  border: 2px dashed #0071bd;
+  outline: 2px dashed #0071bd;
 }
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
   background-color: #0071bd;
@@ -303,7 +303,7 @@ body.af-gui-dragging {
 #afGuiEditor .ui-sortable-helper .af-gui-palette-item {
   height: 30px;
   width: 300px;
-  border: 2px dashed #0071bd;
+  outline: 2px dashed #0071bd;
 }
 
 #afGuiEditor .af-gui-entity-palette-select-list {
