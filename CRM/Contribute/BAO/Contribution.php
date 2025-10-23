@@ -3142,7 +3142,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if (!empty($params['prevContribution']) && $entityTable === 'civicrm_participant'
-      && $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
+      && $financialProcessor->isStatusChange()
     ) {
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $entityId, 'event_id');
       $feeLevel = str_replace('�', '', $params['prevContribution']->amount_level);
