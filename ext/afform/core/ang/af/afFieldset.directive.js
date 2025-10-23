@@ -60,13 +60,14 @@
           return CRM.cache.get(getCacheKey(), {})[fieldName];
         };
         this.$onInit = function() {
-          if (this.storeValues) {
-            $scope.$watch(ctrl.getFieldData, function(newVal, oldVal) {
+          $scope.$watch(ctrl.getFieldData, function(newVal, oldVal) {
+            $element[0].dispatchEvent(new Event('crmFormChangeFilters'));
+            if (this.storeValues) {
               if (typeof newVal === 'object' && typeof oldVal === 'object' && Object.keys(newVal).length) {
                 CRM.cache.set(getCacheKey(), newVal);
               }
-            }, true);
-          }
+            }
+          }, true);
         };
       }
     };
