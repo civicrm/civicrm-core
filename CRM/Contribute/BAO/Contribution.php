@@ -2887,10 +2887,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       !($financialProcessor->isPendingTransaction() && !$isPayLater)
     ) {
       $skipRecords = TRUE;
-      $pendingStatus = [
-        'Pending',
-        'In Progress',
-      ];
       if ($financialProcessor->isAccountsReceivableTransaction()) {
         $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
           $params['financial_type_id'],
@@ -3068,7 +3064,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
 
-        if (CRM_Contribute_BAO_FinancialProcessor::isPaymentInstrumentChange($params, $pendingStatus)) {
+        if ($financialProcessor->isPaymentInstrumentChange($params)) {
           $updated = CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
         }
 
