@@ -234,7 +234,7 @@
         {/if}
       {/crmRegion}
     </div>
-    {if $event.is_active and $event.is_show_calendar_links}
+    {if $event.is_show_calendar_links}
         <div class="action-link section iCal_links-section">
           {include file="CRM/Event/Page/iCalLinks.tpl"}
         </div>
