@@ -2883,8 +2883,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // is an entrenched mistake (the previous code did the same although
     // less obviously as it checked a partially populated contribution object.
     $isPayLater = !empty($params['is_pay_later']);
-    if (!$financialProcessor->isFailedTransaction() &&
-      !($financialProcessor->isPendingTransaction() && !$isPayLater)
+    $isIncompletePending = $financialProcessor->isPendingTransaction() && !$isPayLater;
+    if (!$financialProcessor->isFailedTransaction() && !$isIncompletePending
     ) {
       $skipRecords = TRUE;
       $pendingStatus = [
