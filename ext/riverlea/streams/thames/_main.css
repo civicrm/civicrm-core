@@ -1040,10 +1040,6 @@ html.crm-standalone  nav.breadcrumb>ol {
   --crm-c-page-bg: transparent;
 }
 
-/* Override _dropdowns.css */
-#afGuiEditor .af-gui-bar .dropdown-menu {
-  --crm-c-danger-text: var(--crm-c-red-dark);
-}
 /* Override contactSummary.css */
 #crm-contact-actions-list a.delete {
   --crm-c-danger-text: var(--crm-c-red-dark);
