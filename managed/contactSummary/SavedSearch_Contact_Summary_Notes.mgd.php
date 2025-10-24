@@ -10,7 +10,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Notes',
-        'label' => ts('Contact Summary Notes'),
+        'label' => 'Contact Summary Notes',
         'api_entity' => 'Note',
         'api_params' => [
           'version' => 4,
@@ -62,7 +62,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Notes_Tab',
-        'label' => ts('Contact Summary Notes Tab'),
+        'label' => 'Contact Summary Notes Tab',
         'saved_search_id.name' => 'Contact_Summary_Notes',
         'type' => 'table',
         'settings' => [
@@ -84,39 +84,39 @@ return [
             [
               'type' => 'field',
               'key' => 'subject',
-              'label' => ts('Subject'),
+              'label' => 'Subject',
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'note',
-              'label' => ts('Note'),
+              'label' => 'Note',
               'sortable' => TRUE,
               'show_linebreaks' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'note_date',
-              'label' => ts('Note Date'),
+              'label' => 'Note Date',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'modified_date',
-              'label' => ts('Modified'),
+              'label' => 'Modified',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contact_id.sort_name',
-              'label' => ts('Created By'),
+              'label' => 'Created By',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Note_EntityFile_File_01_file_name',
-              'label' => ts('Attachments'),
+              'label' => 'Attachments',
               'sortable' => TRUE,
               'link' => [
                 'path' => '[GROUP_CONCAT_Note_EntityFile_File_01_url]',
@@ -142,7 +142,7 @@ return [
             ],
             [
               'size' => 'btn-xs',
-              'label' => ts('Row Actions'),
+              'label' => 'Row Actions',
               'label_hidden' => TRUE,
               'links' => [
                 [

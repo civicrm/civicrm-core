@@ -87,7 +87,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Relationships',
-        'label' => ts('Contact Summary Relationships'),
+        'label' => 'Contact Summary Relationships',
         'api_entity' => 'RelationshipCache',
         'api_params' => [
           'version' => 4,
@@ -127,7 +127,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Relationships_Active',
-        'label' => ts('Contact Summary Relationships Active'),
+        'label' => 'Contact Summary Relationships Active',
         'saved_search_id.name' => 'Contact_Summary_Relationships',
         'type' => 'table',
         'settings' => [
@@ -143,7 +143,7 @@ return [
             [
               'type' => 'field',
               'key' => 'near_relation:label',
-              'label' => ts('Relationship'),
+              'label' => 'Relationship',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -155,7 +155,7 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.display_name',
-              'label' => ts('With'),
+              'label' => 'With',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -183,26 +183,26 @@ return [
             [
               'type' => 'field',
               'key' => 'start_date',
-              'label' => ts('Dates'),
+              'label' => 'Dates',
               'sortable' => TRUE,
               'rewrite' => '[start_date] - [end_date]',
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.address_primary.city',
-              'label' => ts('City'),
+              'label' => 'City',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.address_primary.state_province_id:label',
-              'label' => ts('State/Prov'),
+              'label' => 'State/Prov',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.email_primary.email',
-              'label' => ts('Email'),
+              'label' => 'Email',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -219,7 +219,7 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.phone_primary.phone',
-              'label' => ts('Phone'),
+              'label' => 'Phone',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -240,7 +240,7 @@ return [
               'icon' => 'fa-bars',
               'links' => $links,
               'type' => 'menu',
-              'label' => ts('Row Actions'),
+              'label' => 'Row Actions',
               'label_hidden' => TRUE,
               'alignment' => 'text-right',
             ],
@@ -281,7 +281,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Relationships_Inactive',
-        'label' => ts('Contact Summary Relationships Inactive'),
+        'label' => 'Contact Summary Relationships Inactive',
         'saved_search_id.name' => 'Contact_Summary_Relationships',
         'type' => 'table',
         'settings' => [
@@ -297,7 +297,7 @@ return [
             [
               'type' => 'field',
               'key' => 'near_relation:label',
-              'label' => ts('Relationship'),
+              'label' => 'Relationship',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -309,7 +309,7 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.display_name',
-              'label' => ts('With'),
+              'label' => 'With',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -337,26 +337,26 @@ return [
             [
               'type' => 'field',
               'key' => 'start_date',
-              'label' => ts('Dates'),
+              'label' => 'Dates',
               'sortable' => TRUE,
               'rewrite' => '[start_date] - [end_date]',
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.address_primary.city',
-              'label' => ts('City'),
+              'label' => 'City',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.address_primary.state_province_id:label',
-              'label' => ts('State/Prov'),
+              'label' => 'State/Prov',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.email_primary.email',
-              'label' => ts('Email'),
+              'label' => 'Email',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -373,7 +373,7 @@ return [
             [
               'type' => 'field',
               'key' => 'RelationshipCache_Contact_far_contact_id_01.phone_primary.phone',
-              'label' => ts('Phone'),
+              'label' => 'Phone',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -392,7 +392,7 @@ return [
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
-              'label' => ts('Row Actions'),
+              'label' => 'Row Actions',
               'label_hidden' => TRUE,
               'links' => [
                 [

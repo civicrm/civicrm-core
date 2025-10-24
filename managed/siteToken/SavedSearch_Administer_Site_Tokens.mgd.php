@@ -10,7 +10,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Administer_Site_Tokens',
-        'label' => ts('Administer Site Tokens'),
+        'label' => 'Administer Site Tokens',
         'api_entity' => 'SiteToken',
         'api_params' => [
           'version' => 4,
@@ -48,7 +48,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Administer_Site_Tokens_Table_1',
-        'label' => ts('Administer Site Tokens'),
+        'label' => 'Administer Site Tokens',
         'saved_search_id.name' => 'Administer_Site_Tokens',
         'type' => 'table',
         'settings' => [
@@ -66,32 +66,32 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'label' => ts('ID'),
+              'label' => 'ID',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'label',
-              'label' => ts('Label'),
+              'label' => 'Label',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'name',
-              'label' => ts('Token String'),
+              'label' => 'Token String',
               'sortable' => TRUE,
               'rewrite' => '{ldelim}site.[name]{rdelim}',
             ],
             [
               'type' => 'field',
               'key' => 'is_reserved',
-              'label' => ts('Reserved'),
+              'label' => 'Reserved',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'label' => ts('Enabled'),
+              'label' => 'Enabled',
               'sortable' => TRUE,
               'cssRules' => [],
             ],
