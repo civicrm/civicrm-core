@@ -162,6 +162,7 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
     $eventParameters = [
       'start_date' => 'tomorrow 19:00',
       'end_date' => 'tomorrow 20:00',
+      'is_public' => FALSE,
     ];
     $this->eventCreateUnpaid($eventParameters);
 
