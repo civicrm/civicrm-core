@@ -167,7 +167,7 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
     $this->eventCreateUnpaid($eventParameters);
 
     $expectedDate = date('Ymd', strtotime('tomorrow'));
-    $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, $this->getEventId(), FALSE);
+    $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, $this->getEventId(), NULL, FALSE);
     $calendar = explode("\n", CRM_Utils_ICalendar::createCalendarFile($info));
     $expectedLines = [
       "TZID:America/Los_Angeles" => FALSE,
