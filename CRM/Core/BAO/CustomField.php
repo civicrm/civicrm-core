@@ -2001,7 +2001,7 @@ WHERE  id IN ( %1, %2 )
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
       if (!isset($params['column_name'])) {
         // if add mode & column_name not present, calculate it.
-        $params['column_name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 32));
+        $params['column_name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 60));
       }
       if (!isset($params['name'])) {
         $params['name'] = CRM_Utils_String::munge($params['label'], '_', 64);
@@ -2142,7 +2142,17 @@ WHERE  id IN ( %1, %2 )
     $op = empty($params['id']) ? 'add' : 'modify';
     if ($op !== 'modify') {
       if ($params['is_append_field_id_to_column_name']) {
-        $params['column_name'] .= "_{$customField->id}";
+        // only append field ID if column name already used in this custom group
+        $columNameExists = \Civi\Api4\CustomField::get(FALSE)
+          ->selectRowCount()
+          ->addWhere('id', '<>', $customField->id)
+          ->addWhere('custom_group_id', '=', $customField->custom_group_id)
+          ->addWhere('column_name', '=', $params['column_name'])
+          ->execute()
+          ->count();
+        if ($columNameExists) {
+          $params['column_name'] .= "_{$customField->id}";
+        }
       }
       $customField->column_name = $params['column_name'];
       $customField->save();
