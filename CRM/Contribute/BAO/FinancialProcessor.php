@@ -55,6 +55,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
     return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->originalContribution->contribution_status_id);
   }
 
+  public function getOriginalPaymentInstrumentID(): ?int {
+    if (!$this->originalContribution) {
+      return NULL;
+    }
+    return $this->originalContribution->payment_instrument_id;
+  }
+
   public function isNegativeTransaction(): bool {
     return in_array($this->getUpdatedContributionStatus(), ['Refunded', 'Chargeback', 'Cancelled'], TRUE);
   }
@@ -110,6 +117,37 @@ class CRM_Contribute_BAO_FinancialProcessor {
       );
     }
     return $default;
+  }
+
+  /**
+   * @param array $params
+   *
+   * @return int
+   * @throws CRM_Core_Exception
+   */
+  public function getToFinancialAccount(array $params): int {
+    if ($this->isAccountsReceivableTransaction()) {
+      return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+        $params['financial_type_id'],
+        'Accounts Receivable Account is'
+      );
+    }
+    if (!empty($params['payment_processor'])) {
+      return CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['payment_processor'], NULL, 'civicrm_payment_processor');
+    }
+    // Probably here we should check $this->updatedContribution instead of params
+    // and then we would not need the next if.
+    if (!empty($params['payment_instrument_id'])) {
+      return CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
+    }
+    // Probably updatedContribution makes more sense - per previous comment.
+    // dev/financial#160 - If this is a contribution update, also check for an existing payment_instrument_id.
+    if ($this->getOriginalPaymentInstrumentID()) {
+      return CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount((int) $params['prevContribution']->payment_instrument_id);
+    }
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
+    $queryParams = [1 => [$relationTypeId, 'Integer']];
+    return CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
   }
 
   /**

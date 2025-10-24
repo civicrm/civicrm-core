@@ -2856,36 +2856,17 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       !($financialProcessor->isPendingTransaction() && !$isPayLater)
     ) {
       $skipRecords = TRUE;
-      if ($financialProcessor->isAccountsReceivableTransaction()) {
-        $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-          $params['financial_type_id'],
-          'Accounts Receivable Account is'
-        );
-      }
-      elseif (!empty($params['payment_processor'])) {
-        $params['to_financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['payment_processor'], NULL, 'civicrm_payment_processor');
+      if (!$financialProcessor->isAccountsReceivableTransaction() && !empty($params['payment_processor'])) {
         $params['payment_instrument_id'] = civicrm_api3('PaymentProcessor', 'getvalue', [
           'id' => $params['payment_processor'],
           'return' => 'payment_instrument_id',
         ]);
       }
-      elseif (!empty($params['payment_instrument_id'])) {
-        $params['to_financial_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
-      }
-      // dev/financial#160 - If this is a contribution update, also check for an existing payment_instrument_id.
-      elseif ($isUpdate && $params['prevContribution']->payment_instrument_id) {
-        $params['to_financial_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount((int) $params['prevContribution']->payment_instrument_id);
-      }
-      else {
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
-        $queryParams = [1 => [$relationTypeId, 'Integer']];
-        $params['to_financial_account_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
-      }
 
       //build financial transaction params
       $trxnParams = [
         'contribution_id' => $contribution->id,
-        'to_financial_account_id' => $params['to_financial_account_id'],
+        'to_financial_account_id' => $financialProcessor->getToFinancialAccount($params),
         // If receive_date is not deliberately passed in we assume 'now'.
         // test testCompleteTransactionWithReceiptDateSet ensures we don't
         // default to loading the stored contribution receive_date.
@@ -3113,7 +3094,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     // when a fee is charged
     if (!empty($params['fee_amount']) && (empty($params['prevContribution']) || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount) && $skipRecords) {
-      CRM_Core_BAO_FinancialTrxn::recordFees($params);
+      CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $financialProcessor->getToFinancialAccount($params)]);
     }
 
     unset($params['line_item']);
