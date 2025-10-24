@@ -5,6 +5,31 @@
 */
 
 :root {
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
+/* Practical colours, e.g. text, link '--crm-c-' */
   --crm-c-text: #fff;
+/* Backgrounds, '--crm-c-*-bg' */
   --crm-c-page-bg: var(--crm-c-gray-900);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+/* Shadows */
+/* Sizes */
+/* Type */
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
+/* Panels '--crm-panel-' */
+/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Tabs '--crm-tabs' */
+/* Contact layout '--crm-dash-' */
+/* Dialog '--crm-dialog-' */
+/* Dashlet for main dashboard '--crm-dashlet-' */
+/* Button dropdowns '--crm-dropdown-' */
+/* Notifications '--crm-notify-' */
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
+/* Alpha filter '--crm-filter-' */
+/* Frontend '--crm-f- */
 }

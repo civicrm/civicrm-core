@@ -1,78 +1,69 @@
 /* Minetta dark mode settings */
 :root {
-  --crm-c-text: #fff;
-  --crm-c-focus: #8cd4cb;
-  --crm-c-link: var(--crm-c-teal);
-  --crm-c-link-hover: var(--crm-c-yellow);
-  --crm-c-primary: var(--crm-c-gray-500);
-  --crm-c-primary-hover: var(--crm-c-gray-600);
-  --crm-c-primary-text: var(--crm-c-text);
-  --crm-c-layer0-bg: var(--crm-c-gray-900);
-  --crm-c-page-bg: var(--crm-c-gray-900);
-  --crm-c-container-bg: var(--crm-c-gray-800);
-  --crm-c-layer1-bg: var(--crm-c-gray-800);
-  --crm-c-layer2-bg: var(--crm-c-gray-700);
-  --crm-c-inverse-bg: var(--crm-c-gray-300);
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
   --crm-c-teal: #a3ebe6;
   --crm-c-gray-900: #363636;
   --crm-c-gray-800: #464646;
   --crm-c-gray-700: #535252;
   --crm-c-gray-600: #67676a;
-  --crm-c-gray-500: #6c6c6c;
   --crm-c-gray-300: #e1dfdf;
   --crm-c-gray-200: #bdbdbd;
-  --crm-c-divider: 1px solid var(--crm-c-gray-500);
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-c-focus: #8cd4cb;
+  --crm-c-link: var(--crm-c-teal);
+  --crm-c-link-hover: var(--crm-c-yellow);
   --crm-c-inactive: color-mix(in srgb,var(--crm-c-text) 95%,#000 5%);
-  /* Emphasis colours */
-  --crm-alert-success-bg: var(--crm-c-success);
-  --crm-alert-success-text: var(--crm-c-success-text);
-  --crm-alert-success-border: color-mix(in srgb, var(--crm-alert-success-bg) 90%,#fff 10%);
-  --crm-c-success-on-page-bg: var(--crm-c-success-light);
-  --crm-alert-warning-bg: var(--crm-c-warning);
-  --crm-alert-warning-border: color-mix(in srgb, var(--crm-alert-warning-bg) 90%,#fff 10%);
-  --crm-c-warning-on-page-bg: var(--crm-c-warning-light);
-  --crm-alert-danger-bg: var(--crm-c-danger);
-  --crm-alert-danger-text: var(--crm-c-danger-text);
-  --crm-alert-danger-border: color-mix(in srgb, var(--crm-alert-danger-bg) 90%,#fff 10%);
-  --crm-c-danger-on-page-bg: var(--crm-c-danger-light);
-  --crm-alert-info-bg: var(--crm-c-info);
-  --crm-alert-info-text: var(--crm-c-success-text);
-  --crm-alert-info-border: color-mix(in srgb, var(--crm-alert-info-bg) 90%,#fff 10%);
-  --crm-c-info-on-page-bg: var(--crm-c-info-light);
-  --crm-c-primary-on-page-bg: var(--crm-c-gray-300);
-  --crm-c-secondary-on-page-bg: #cdcdcd;
-  /* And others */
+/* Backgrounds, '--crm-c-*-bg' */
+  --crm-c-layer0-bg: var(--crm-c-gray-900);
+  --crm-c-page-bg: var(--crm-c-gray-900);
+  --crm-c-container-bg: var(--crm-c-gray-800);
+  --crm-c-inverse-bg: var(--crm-c-gray-300);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+  --crm-c-primary: var(--crm-c-gray-500);
+  --crm-c-primary-hover: var(--crm-c-gray-600);
+  --crm-c-primary-text: var(--crm-c-text);
+/* Shadows */
   --crm-block-shadow: 0;
-  --crm-popup-shadow: 0 3px 18px 0 rgb(0,0,0);
+/* Sizes */
+/* Type */
   --crm-heading-bg: var(--crm-c-blue-dark);
-  --crm-heading-col: var(--crm-c-text-light);
-  --crm-dashlet-bg: var(--crm-c-layer1-bg);
-  --crm-dashlet-header-bg: var(--crm-c-layer2-bg);
-  --crm-expand-header-bg: var(--crm-c-layer2-bg);
-  --crm-expand-header-bg-active: var(--crm-c-gray-600);
-  --crm-expand-body-bg: var(--crm-c-layer1-bg);
-  --crm-dash-header-bg: transparent;
-  --crm-dash-block-bg: var(--crm-c-layer1-bg);
-  --crm-dash-label-bg: transparent;
-  --crm-dash-panel-bg: #414141;
-  --crm-dropdown-bg: var(--crm-c-layer1-bg);
-  --crm-dropdown-2-bg: var(--crm-c-layer1-bg);
-  --crm-tabs-bg: var(--crm-c-layer2-bg);
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
   --crm-table-outside-border: var(--crm-c-divider);
   --crm-table-row-border: 1px solid var(--crm-c-gray-200);
   --crm-table-row-hover: var(--crm-c-amber);
-  --crm-table-row-alternate-bg: #fff;
+/* Panels '--crm-panel-' */
   --crm-panel-border-col: var(--crm-c-gray-200);
+/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
+  --crm-expand-header-bg: var(--crm-c-layer2-bg);
+  --crm-expand-header-bg-active: var(--crm-c-gray-600);
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-form-block-bg: var(--crm-c-layer1-bg);
   --crm-input-border-color: var(--crm-c-gray-200);
-  --crm-input-color: var(--crm-c-text);
-  --crm-input-description: var(--crm-c-gray-300);
   --crm-input-radio-color: #38c4b4;
-  --crm-dialog-header-border-col: transparent;
+/* Tabs '--crm-tabs'/
+/* Contact layout '--crm-dash-' */
+  --crm-dash-header-bg: transparent;
+  --crm-dash-block-bg: var(--crm-c-layer1-bg);
+  --crm-dash-panel-bg: #414141;
+/* Dialog '--crm-dialog-' */
   --crm-dialog-header-bg: var(--crm-c-layer1-bg);
   --crm-dialog-body-bg: var(--crm-c-layer1-bg);
+/* Dashlet for main dashboard '--crm-dashlet-' */
+  --crm-dashlet-bg: var(--crm-c-layer1-bg);
+  --crm-dashlet-header-bg: var(--crm-c-layer2-bg);
+/* Button dropdowns '--crm-dropdown-' */
+  --crm-dropdown-bg: var(--crm-c-layer1-bg);
+  --crm-dropdown-2-bg: var(--crm-c-layer1-bg);
+/* Notifications '--crm-notify-' */
   --crm-notify-bg: var(--crm-c-darkest);
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
   --crm-wizard-active-bg: var(--crm-c-dark-teal);
-  --crm-form-block-bg: var(--crm-c-layer1-bg);
-  --crm-c-code-bg: var(--crm-c-layer1-bg);
+/* Alpha filter '--crm-filter-' */
   --crm-filter-item-bg: var(--crm-c-layer1-bg);
+/* Frontend '--crm-f- */
 }

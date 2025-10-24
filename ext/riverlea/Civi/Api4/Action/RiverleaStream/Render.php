@@ -123,11 +123,13 @@ class Render extends \Civi\Api4\Generic\BasicBatchAction {
    * @return string
    */
   private static function concatStreamCss(array $stream, bool $darkMode = FALSE): string {
+    $content = [];
+
     if ($darkMode) {
+      $content[] = "/* core dark vars */";
+      $content[] = GetWithFileContent::getFileContent('core/css/_dark.css', 'riverlea', NULL);
       $stream = self::getDarkStream($stream);
     }
-
-    $content = [];
 
     if ($stream['css_file']) {
       $content[] = "/* {$stream['label']} file: {$stream['css_file']} */";
