@@ -44,7 +44,7 @@ class CRM_Event_ICalendar {
     $rss = CRM_Utils_Request::retrieveValue('rss', 'Positive', 0);
     $gCalendar = CRM_Utils_Request::retrieveValue('gCalendar', 'Positive', 0);
 
-    $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
+    $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end, FALSE);
 
     if ($gCalendar && count($info) === 1) {
       return self::gCalRedirect($info);
