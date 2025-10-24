@@ -1,7 +1,4 @@
-(function (angular, dc, d3, crossfilter) {
-  "use strict";
-
-  const ts = CRM.ts('chart_kit');
+(function (ts, dc, d3, crossfilter, CiviSearchDisplay) {
 
   class CiviSearchDisplayChartKit extends CiviSearchDisplay {
 
@@ -15,9 +12,6 @@
       super.connectedCallback();
 
       this.renderContainer();
-
-      // run the initialiser from the base trait
-      this.initializeDisplay();
 
       // add our trait functions to the pre and post search hooks
       this.onPreRun.push(() => {
@@ -49,7 +43,7 @@
       //  $scope.$watch('$ctrl.settings', this.onSettingsChange, true);
       });
 
-      setTimeout(() => this.getResultsSoon(), 2000);
+      // setTimeout(() => this.getResultsSoon(), 2000);
 
     }
 
@@ -58,7 +52,6 @@
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-      console.log(name);
       super.attributeChangedCallback(name, oldValue, newValue);
 
       if (name === 'settings') {
@@ -185,7 +178,7 @@
     // into at different points
     renderChart() {
       //this.renderContainer();
-      this.renderLoading();
+      // this.renderLoading();
 
       if (this.results.length === 0) {
         // show a no results type thing
@@ -671,4 +664,4 @@
 
   customElements.define('civi-search-display-chart-kit', CiviSearchDisplayChartKit);
 
-})(angular, CRM.chart_kit.dc, CRM.chart_kit.d3, CRM.chart_kit.crossfilter);
+})(CRM.ts('chart_kit'), CRM.chart_kit.dc, CRM.chart_kit.d3, CRM.chart_kit.crossfilter, CRM.components.CiviSearchDisplay);
