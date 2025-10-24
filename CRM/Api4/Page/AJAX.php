@@ -147,9 +147,21 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
         \Civi\API\Exception\UnauthorizedException::class => 403,
       ];
       $status = $statusMap[get_class($e)] ?? 500;
+
+      $errorId = rtrim(chunk_split(CRM_Utils_String::createRandom(12, CRM_Utils_String::ALPHANUMERIC), 4, '-'), '-');
+      $logMessage = 'AJAX Error ({error_id}): failed with exception';
+      $logContext = ['error_id' => $errorId, 'exception' => $e];
+      if ($status === 500) {
+        \Civi::log()->error($logMessage, $logContext);
+      }
+      else {
+        \Civi::log()->warning($logMessage, $logContext);
+      }
+
       // Send error code (but don't overwrite success code if there are multiple calls and one was successful)
       $this->httpResponseCode = $this->httpResponseCode ?: $status;
       if (CRM_Core_Permission::check('view debug output') || (method_exists($e, 'getErrorData') && ($e->getErrorData()['show_detailed_error'] ?? FALSE))) {
+        $response['error_id'] = $errorId;
         $response['error_code'] = $e->getCode();
         $response['error_message'] = $e->getMessage();
         if (!empty($params['debug']) && CRM_Core_Permission::check('view debug output')) {
@@ -168,14 +180,9 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
         }
       }
       else {
-        $error_id = rtrim(chunk_split(CRM_Utils_String::createRandom(12, CRM_Utils_String::ALPHANUMERIC), 4, '-'), '-');
         $response['error_code'] = '1';
         $response['error_message']  = ts('Sorry an error occurred and your request was not completed. (Error ID: %1)', [
-          1 => $error_id,
-        ]);
-        \Civi::log()->debug('AJAX Error ({error_id}): failed with exception', [
-          'error_id' => $error_id,
-          'exception' => $e,
+          1 => $errorId,
         ]);
       }
       $response['status'] = $status;
