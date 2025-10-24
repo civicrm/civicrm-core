@@ -2,7 +2,10 @@
 
   CRM.chart_kit = CRM.chart_kit || {};
 
-  CRM.chart_kit.legacySettingsAdaptor = (settings) => {
+  // this is the canonical definition of utils, overwrite any other one
+  CRM.chart_kit.utils = {};
+
+  CRM.chart_kit.utils.legacySettingsAdaptor = (settings) => {
     let updated = false;
     // for pie/row charts, x axis was moved to w. if pie/row chart has x
     // columns but no y columns, then transfer them
@@ -33,7 +36,7 @@
     return settings;
   };
 
-  CRM.chart_kit.chartTypes = [
+  CRM.chart_kit.options.chartTypes = [
     {
       key: 'pie',
       label: ts('Pie'),
@@ -87,7 +90,7 @@
   // Provides pluggable reducer for use in the chart_kit crossfilter
   // - see `buildGroup` function in `crmSearchDisplayChartKit`
   // - in the UI these are exposed as "Stat type"
-  CRM.chart_kit.reduceTypes = [
+  CRM.chart_kit.options.reduceTypes = [
     {
       key: 'sum',
       label: ts('Sum'),
@@ -210,113 +213,15 @@
     }
     return date.toLocaleString();
   };
-
   /**
-   * Canoncial options for configuring a chart kit column
+   * chartKitColumn service provides the ChartKitColumn class
    *
-   * Some options may be constrained in specific contexts - e.g. a
-   * particular axis may only allow some scaletypes
+   * A "chart column" is a search field from the SearchKit SavedSearch
+   * plus settings like reduceType and scaleType which control how data
+   * in that field is processed when it is included in the chart
    */
-  const configOptions = {
-    reduceType: CRM.chart_kit.reduceTypes,
-    scaleType: [
-      {
-        key: 'numeric',
-        label: ts('Numeric'),
-      },
-      {
-        key: 'categorical',
-        label: ts('Categorical'),
-      },
-      {
-        key: 'date',
-        label: ts('Datetime'),
-      },
-    ],
-    datePrecision: [
-      {
-        key: 'year',
-        label: ts('Year'),
-      },
-      {
-        key: 'month',
-        label: ts('Month'),
-      },
-      {
-        key: 'week',
-        label: ts('Week'),
-      },
-      {
-        key: 'day',
-        label: ts('Day'),
-      },
-      {
-        key: 'hour',
-        label: ts('Hour'),
-      },
-    ],
-    seriesType: [
-      {
-        key: 'bar',
-        label: ts('Bar')
-      },
-      {
-        key: 'line',
-        label: ts('Line')
-      },
-      {
-        key: 'area',
-        label: ts('Area')
-      },
-    ],
-    dataLabelType: [
-      {
-        key: "none",
-        label: "None",
-      },
-      {
-        key: "title",
-        label: "On hover",
-      },
-      {
-        key: "label",
-        label: "Always show",
-      }
-    ],
-    dataLabelFormatter: [
-      {
-        key: "none",
-        label: "None",
-      },
-      {
-        key: "round",
-        label: "Round",
-        apply: (v, options) => v.toFixed(options.decimalPlaces),
-      },
-      {
-        key: "formatMoney",
-        label: "Money formatter",
-        apply: (v, options) => CRM.formatMoney(v, null, options.moneyFormatString),
-      },
-      // NOTE: this is currently used to render appropriately precise dates when using
-      // the datePrecision options. expects date values to be stored as timestamps
-      // TODO: allow configuring other date formats
-      {
-        key: "formatDate",
-        label: "Date format",
-        apply: dateFormatter
-      }
-    ],
-  };
 
   CRM.chart_kit.column = class ChartKitColumn {
-
-    // this would make sense as a static class field,
-    // but our linter doesnt allow it yet (MDN widely accepted 2022)
-    // static configOptions = configOptions;
-    static configOptions() {
-      return configOptions;
-    }
 
     constructor (
       name,
@@ -342,7 +247,7 @@
 
       this.total = null;
 
-      this.reducer = configOptions.reduceType.find((type) => type.key === (this.reduceType));
+      this.reducer = CRM.chart_kit.options.reduceType.find((type) => type.key === (this.reduceType));
 
       this.parsers = [];
       this.formatters = [];
@@ -381,7 +286,7 @@
       // add rounding or money format formatters
       // NOTE: these are mutually exclusive with date formatter and each other
       else if (props.dataLabelFormatter) {
-        const formatter = configOptions.dataLabelFormatter.find((formatter) => formatter.key === props.dataLabelFormatter);
+        const formatter = CR.dataLabelFormatter.find((formatter) => formatter.key === props.dataLabelFormatter);
 
         if (formatter && formatter.apply) {
           // TODO: better way to provide these?
@@ -451,8 +356,6 @@
     setTotal(v) {
       this.total = v;
     }
-  }
-
-
+  };
 
 })(CRM.chart_kit.d3, CRM.chart_kit.dc, CRM.ts('chart_kit'));

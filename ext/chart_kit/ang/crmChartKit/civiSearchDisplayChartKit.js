@@ -1,11 +1,10 @@
-(function (angular, dc, d3, crossfilter) {
-  "use strict";
-
-  const ts = CRM.ts('chart_kit');
+(function (ts, dc, d3, crossfilter, CiviSearchDisplay) {
 
   class CiviSearchDisplayChartKit extends CiviSearchDisplay {
 
+    /* jshint ignore:start */
     static observedAttributes = ['filters', 'settings'];
+    /* jshint ignore:end */
 
     constructor() {
       super();
@@ -15,9 +14,6 @@
       super.connectedCallback();
 
       this.renderContainer();
-
-      // run the initialiser from the base trait
-      this.initializeDisplay();
 
       // add our trait functions to the pre and post search hooks
       this.onPreRun.push(() => {
@@ -42,15 +38,7 @@
         }
 
         this.renderChart();
-
-        // trigger re-rendering as you edit settings
-        // TODO: could this be quite js intensive on the client browser? should we make it optional?
-        // TODO: get debounce to work?
-      //  $scope.$watch('$ctrl.settings', this.onSettingsChange, true);
       });
-
-      setTimeout(() => this.getResultsSoon(), 2000);
-
     }
 
     disconnectedCallback() {
@@ -58,7 +46,6 @@
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-      console.log(name);
       super.attributeChangedCallback(name, oldValue, newValue);
 
       if (name === 'settings') {
@@ -132,12 +119,6 @@
       }
     }
 
-    // templateUrl: '~/crmChartKit/chartKitCanvas.html',
-    // controller: function ($scope, $element, searchDisplayBaseTrait, chartKitChartTypes, chartKitColumn) {
-
-    // Mix in base display trait
-    // angular.extend(this, _.cloneDeep(searchDisplayBaseTrait));
-
     getSortKeys() {
       return this.getDimensionColumns().map((col) => col.sourceKey);
     }
@@ -151,9 +132,11 @@
       // but this is the only way to get magic that the server knows about the order
       // (like option groups / month order etc)
       this.settings.sort = sortKeys.map((key) => [key, 'ASC']);
-    };
+    }
 
     _onChangeSettings() {
+      // triggers re-rendering as you edit settings
+      // TODO: could this be quite js intensive on the client browser? should we make it optional?
       clearTimeout(this.queuedSettingsChange);
       this.queuedSettingsChange = setTimeout(() => {
         if (!this.chartContainer) {
@@ -179,13 +162,13 @@
           this.renderChart();
         }
       }, 500);
-    };
+    }
 
     // this provides the common render steps - which chart types can then hook
     // into at different points
     renderChart() {
       //this.renderContainer();
-      this.renderLoading();
+      // this.renderLoading();
 
       if (this.results.length === 0) {
         // show a no results type thing
@@ -215,7 +198,7 @@
       // run the dc render
       this.chart.render();
       this.renderDownloadLinks();
-    };
+    }
 
     initChartType() {
       // run initial settings through our legacy adaptor
@@ -230,7 +213,7 @@
         return false;
       }
       return true;
-    };
+    }
 
     buildCrossfilter() {
       const dataPoints = this.results.map((record, i) => {
@@ -245,7 +228,7 @@
       });
 
       this.ndx = crossfilter(dataPoints);
-    };
+    }
 
     buildDimension() {
       const colNames = this.getDimensionColumns().map((col) => col.name);
@@ -260,7 +243,7 @@
         const colName = colNames[0];
         this.dimension = this.ndx.dimension((d) => d[colName]);
       }
-    };
+    }
 
     buildGroup() {
 
@@ -296,7 +279,7 @@
       const columnTotals = this.ndx.groupAll().reduce(reduceAdd, reduceSub, reduceStart).value();
 
       this.getColumns().forEach((col) => col.setTotal(columnTotals[col.name]));
-    };
+    }
 
     buildChart() {
       // use override from chart type if defined - otherwise use a default
@@ -324,7 +307,7 @@
       if (this.chart.ordering) {
         this.chart.ordering(this.getOrderAccessor());
       }
-    };
+    }
 
     buildCoordinateGrid() {
       const xCol = this.getFirstColumnForAxis('x');
@@ -355,7 +338,7 @@
         // that would be amazing but very non-trivial
         .brushOn(false)
         .mouseZoomable(xCol.scaleType !== 'categorical');
-    };
+    }
 
     loadChartData() {
       // use override from the chart type if defined
@@ -369,7 +352,7 @@
           // default value is just the first y co-ordinate
           .valueAccessor((d) => this.getFirstColumnForAxis('y').valueAccessor(d));
       }
-    };
+    }
 
     formatChart() {
       // provide title and label accessors based on our column config
@@ -394,7 +377,7 @@
       if (this.chartType.showLegend && this.chartType.showLegend(this)) {
         this.addLegend();
       }
-    };
+    }
 
     formatCoordinateGrid() {
       const xCol = this.getFirstColumnForAxis('x');
@@ -443,7 +426,7 @@
       this.chart
         .margins(this.settings.format.padding)
         .clipPadding(this.settings.format.padding.clip ? this.settings.format.padding.clip : 20);
-    };
+    }
 
     addLegend() {
       const legend = dc.legend();
@@ -469,7 +452,7 @@
         this.chart.selectAll('.dc-legend-item text')
           .attr('y', legend.itemHeight() - 2)
       );
-    };
+    }
 
     buildColumns() {
       if (!this.chartType) {
@@ -525,7 +508,7 @@
               col.key,
               col
         ));
-    };
+    }
 
     getColumns() {
       return this.columns;
@@ -546,7 +529,7 @@
     getOrderColumn() {
       const orderCol = this.getColumns().find((col) => col.isOrder);
       return orderCol ? orderCol : this.getFirstColumnForAxis('w');
-    };
+    }
 
     getOrderDirection() {
       return this.settings.chartOrderDir ? this.settings.chartOrderDir : 'ASC';
@@ -560,7 +543,7 @@
       const orderSign = (this.getOrderDirection() === 'ASC') ? 1 : -1;
 
       return ((d) => orderSign * orderCol.valueAccessor(d));
-    };
+    }
 
     renderDataLabel(dataPoint, maskContext = null, maskColsByName = null) {
       if (!dataPoint || dataPoint.key === 'empty') {
@@ -588,7 +571,7 @@
         // remove blanks
         .filter((label) => !!label)
         .join(' - ');
-    };
+    }
 
     get chartCanvas() {
       return this.querySelector('.crm-chart-kit-canvas');
@@ -600,14 +583,14 @@
       this.chartCanvas.style.backgroundColor = formatSettings.backgroundColor;
       this.chartCanvas.style.padding = formatSettings.padding ? formatSettings.padding.outer : null;
       this.chartCanvas.style.display = 'inline-block';
-    };
+    }
 
     setContainerStyles() {
       const formatSettings = this.settings.format ? this.settings.format : {};
       this.chartContainer.style.height = formatSettings.height;
       this.chartContainer.style.width = formatSettings.width;
       this.chartContainer.style.margin = formatSettings.padding ? formatSettings.padding.inner : null;
-    };
+    }
 
     // build color scale integrating user-assigned colors
     buildColumnColorScale(columns) {
@@ -624,7 +607,7 @@
 
       // mapping function from our dict
       return ((layerName) => finalColors[layerName]);
-    };
+    }
 
     downloadImageUrl(mime, url, ext) {
       const filename = (this.settings.format.title ? this.settings.format.title : 'chart').replace(/[^a-zA-Z0-9-]+/g, '') + '.' + ext;
@@ -635,18 +618,18 @@
       this.chartContainer.append(downloadLink);
       downloadLink.click();
       this.chartContainer.removeChild(downloadLink);
-    };
+    }
 
     getSvgData() {
       // get svg as base64 xml.
       const svg = this.chartContainer.querySelector('svg');
       const xml = new XMLSerializer().serializeToString(svg);
       return 'data:image/svg+xml;base64,' + btoa(xml);
-    };
+    }
 
     downloadSVG() {
       this.downloadImageUrl('image/svg+xml', this.getSvgData(), 'svg');
-    };
+    }
 
     downloadPNG() {
       const svgData = this.getSvgData();
@@ -666,9 +649,9 @@
         this.chartContainer.removeChild(canvas);
       };
       img.src = svgData;
-    };
+    }
   }
 
   customElements.define('civi-search-display-chart-kit', CiviSearchDisplayChartKit);
 
-})(angular, CRM.chart_kit.dc, CRM.chart_kit.d3, CRM.chart_kit.crossfilter);
+})(CRM.ts('chart_kit'), CRM.chart_kit.dc, CRM.chart_kit.d3, CRM.chart_kit.crossfilter, CRM.components.CiviSearchDisplay);
