@@ -2847,7 +2847,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionStatus = $financialProcessor->getUpdatedContributionStatus();
 
-    $statusId = $params['contribution']->contribution_status_id;
     // Checking $params['is_pay_later'] means we only pick this up if
     // is_pay_later has been passed in - this feels like a mistake but it
     // is an entrenched mistake (the previous code did the same although
@@ -2883,11 +2882,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['to_financial_account_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
       }
 
-      $totalAmount = $params['total_amount'] ?? NULL;
-      if (!isset($totalAmount) && !empty($params['prevContribution'])) {
-        $totalAmount = $params['total_amount'] = $params['prevContribution']->total_amount;
-      }
-
       //build financial transaction params
       $trxnParams = [
         'contribution_id' => $contribution->id,
@@ -2898,16 +2892,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // Note that as we deprecate completetransaction in favour
         // of Payment.create handling of trxn_date will tighten up.
         'trxn_date' => $params['receive_date'] ?? date('YmdHis'),
-        'total_amount' => $totalAmount,
-        'fee_amount' => $params['fee_amount'] ?? NULL,
-        'net_amount' => $params['net_amount'] ?? $totalAmount,
         'currency' => $contribution->currency,
         'trxn_id' => $contribution->trxn_id,
-        // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
-        // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
-        // this should really default to completed (after discussion).
-        'status_id' => $statusId,
-        'payment_instrument_id' => $params['payment_instrument_id'] ?? $params['contribution']->payment_instrument_id,
+        'payment_instrument_id' => $params['payment_instrument_id'] ?? $contribution->payment_instrument_id,
         'check_number' => $params['check_number'] ?? NULL,
         'pan_truncation' => $params['pan_truncation'] ?? NULL,
         'card_type_id' => $params['card_type_id'] ?? NULL,
@@ -3038,10 +3025,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         //if Change contribution amount
         $params['trxnParams']['fee_amount'] = $params['fee_amount'] ?? NULL;
         $params['trxnParams']['net_amount'] = $params['net_amount'] ?? NULL;
+        $totalAmount = $contribution->total_amount ?? 0;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
-        if (isset($totalAmount) &&
-          bccomp($totalAmount, $params['prevContribution']->total_amount, 5) !== 0
+        if (bccomp($totalAmount, $params['prevContribution']->total_amount, 5) !== 0
         ) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
@@ -3074,6 +3061,21 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
 
       else {
+        // Setting these amounts is consistent with historical code but feels a bit off.
+        // Surely in this scenario we have a new contribution & can get them all from the
+        // contribution object (only).
+        $trxnParams['total_amount'] = $params['total_amount'] ?? NULL;
+        if (!isset($trxnParams['total_amount']) && !empty($params['prevContribution'])) {
+          $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
+        }
+        $trxnParams['fee_amount'] = $params['fee_amount'] ?? NULL;
+        $trxnParams['net_amount'] = $params['net_amount'] ?? $contribution->net_amount;
+        $statusId = $params['contribution']->contribution_status_id;
+        // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
+        // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
+        // this should really default to completed (after discussion). But after moving this
+        // to the only place it is actually used - maybe it makes more sense?
+        $trxnParams['status_id'] = $statusId;
         // records finanical trxn and entity financial trxn
         // also make it available as return value
         $financialProcessor->recordAlwaysAccountsReceivable($trxnParams, $params);
