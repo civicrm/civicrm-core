@@ -202,7 +202,7 @@ return [
                   'action' => 'view',
                   'target' => 'crm-popup',
                   'icon' => 'fa-external-link',
-                  'text' => ts('View Activity'),
+                  'text' => 'View Activity',
                   'style' => 'default',
                 ],
                 [
@@ -210,7 +210,7 @@ return [
                   'action' => 'update',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => ts('Update Activity'),
+                  'text' => 'Update Activity',
                   'style' => 'default',
                 ],
                 [
@@ -218,7 +218,7 @@ return [
                   'action' => 'delete',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => ts('Delete Activity'),
+                  'text' => 'Delete Activity',
                   'style' => 'danger',
                 ],
               ],
@@ -234,7 +234,7 @@ return [
             [
               'action' => 'add',
               'entity' => 'Activity',
-              'text' => ts('Add Activity'),
+              'text' => 'Add Activity',
               'icon' => 'fa-plus',
               'style' => 'primary',
               'target' => 'crm-popup',
