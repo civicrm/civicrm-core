@@ -908,13 +908,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @param bool $absolute
    *   Return urls in absolute form (useful when sending an email).
    * @param null $additionalWhereClause
+   * @param string|null $context
+   *   If this is email then groups should be handled differently.
    *
    * @return null|array
    */
   public static function getValues(
     $cid, &$fields, &$values,
     $searchable = TRUE, $componentWhere = NULL,
-    $absolute = FALSE, $additionalWhereClause = NULL
+    $absolute = FALSE, $additionalWhereClause = NULL,
+    $context = NULL
   ) {
     if (empty($cid) && empty($componentWhere)) {
       return NULL;
@@ -996,20 +999,28 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
           $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $details->$name);
         }
         elseif ($name == 'group') {
-          $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE);
+          $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE, FALSE, TRUE, NULL, FALSE, $context === 'email');
           $title = $ids = [];
 
           foreach ($groups as $g) {
             // CRM-8362: User and User Admin visibility groups should be included in display if user has
             // VIEW permission on that group
+            // dev/core#5854 - BUT if this is for an email being resent by an admin, then
+            // we only want public groups.
             $groupPerm = CRM_Contact_BAO_Group::checkPermission($g['group_id'], TRUE);
 
             if ($g['visibility'] != 'User and User Admin Only' ||
               CRM_Utils_Array::key(CRM_Core_Permission::VIEW, $groupPerm)
             ) {
-              $title[] = $g['title'];
+              if ($context != 'email') {
+                $title[] = $g['title'];
+              }
               if ($g['visibility'] == 'Public Pages') {
                 $ids[] = $g['group_id'];
+                if ($context == 'email') {
+                  // Note above when we called getContactGroup(), we passed in $public=true when context was email, which tells it to retrieve frontend_title, it just puts it in the field called title.
+                  $title[] = $g['title'];
+                }
               }
             }
           }
@@ -1903,7 +1914,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       else {
         $profileType = $gId ? CRM_Core_BAO_UFField::getProfileType($gId) : NULL;
         if ($profileType == 'Contact') {
-          $profileType = 'Individual';
+          if ($contactId) {
+            $profileType = \Civi\Api4\Contact::get(FALSE)
+              ->addWhere('id', '=', $contactId)
+              ->addSelect('contact_type')
+              ->execute()->first()['contact_type'];
+          }
+          else {
+            $profileType = 'Individual';
+          }
         }
       }
 

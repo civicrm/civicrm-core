@@ -18,7 +18,6 @@
 return [
   'geoAPIKey' => [
     'add' => '4.7',
-    'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
     'group_name' => 'Map Preferences',
@@ -33,12 +32,11 @@ return [
     ],
     'default' => NULL,
     'title' => ts('Geo Provider Key'),
-    'description' => ts('Enter the API key or Application ID associated with your geocoding provider.'),
+    'help_text' => ts('Enter the API key or Application ID associated with your geocoding provider.'),
     'settings_pages' => ['mapping' => ['weight' => 30]],
   ],
   'geoProvider' => [
     'add' => '4.7',
-    'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
     'group_name' => 'Map Preferences',
@@ -58,12 +56,11 @@ return [
     ],
     'default' => NULL,
     'title' => ts('Geocoding Provider'),
-    'description' => ts('This can be the same or different from the mapping provider selected.'),
+    'help_text' => ts('This can be the same or different from the mapping provider selected.'),
     'settings_pages' => ['mapping' => ['weight' => 20]],
   ],
   'mapAPIKey' => [
     'add' => '4.7',
-    'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
     'group_name' => 'Map Preferences',
@@ -78,12 +75,11 @@ return [
     ],
     'default' => NULL,
     'title' => ts('Map Provider Key'),
-    'description' => ts('Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.'),
+    'help_text' => ts('Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.'),
     'settings_pages' => ['mapping' => ['weight' => 10]],
   ],
   'mapProvider' => [
     'add' => '4.7',
-    'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
     'group_name' => 'Map Preferences',
@@ -100,7 +96,7 @@ return [
     ],
     'default' => NULL,
     'title' => ts('Mapping Provider'),
-    'description' => ts('Choose the mapping provider that has the best coverage for the majority of your contact addresses.'),
+    'help_text' => ts('Choose the mapping provider that has the best coverage for the majority of your contact addresses.'),
     'settings_pages' => ['mapping' => ['weight' => 0]],
   ],
 ];

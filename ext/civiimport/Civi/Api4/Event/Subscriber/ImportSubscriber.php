@@ -62,9 +62,9 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       /** @noinspection PhpUndefinedFieldInspection */
       $event->entities['Import_' . $userJobID] = [
         'name' => 'Import_' . $userJobID,
-        'title' => ts('Import Data') . ' ' . $userJobID . (empty($table['created_by']) ? '' : '(' . $table['created_by'] . ')'),
-        'title_plural' => ts('Import Data') . ' ' . $userJobID,
-        'description' => ts('Import Job temporary data'),
+        'title' => $table['title'],
+        'title_plural' => $table['title'],
+        'description' => $table['description'],
         'primary_key' => ['_id'],
         'type' => ['Import'],
         'table_name' => $table['table_name'],

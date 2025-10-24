@@ -2875,8 +2875,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $params = [
       'checkPermissions' => FALSE,
       'savedSearch' => [
-        'name' => 'Test_row_number',
-        'label' => 'Test row number',
         'api_entity' => 'Contact',
         'api_params' => [
           'version' => 4,
@@ -2940,6 +2938,62 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals(4, $row[3][0]['val']);
     $this->assertEquals('', $row[3][3]['val']);
+  }
+
+  public function testRunWithTagFilter(): void {
+    $contactId = $this->saveTestRecords('Contact', ['records' => 6])->column('id');
+    $tags = $this->saveTestRecords('Tag', [
+      'records' => [
+        ['label' => uniqid('a')],
+        ['label' => uniqid('b')],
+      ],
+    ]);
+    $tagId = $tags->column('id');
+    $this->saveTestRecords('EntityTag', [
+      'records' => [
+        ['entity_id' => $contactId[0], 'tag_id' => $tagId[0]],
+        ['entity_id' => $contactId[0], 'tag_id' => $tagId[1]],
+        ['entity_id' => $contactId[1], 'tag_id' => $tagId[0]],
+        ['entity_id' => $contactId[2], 'tag_id' => $tagId[1]],
+        ['entity_id' => $contactId[3], 'tag_id' => $tagId[0]],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'sort_name',
+            'tags',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['id', 'IN', $contactId],
+          ],
+          'groupBy' => [
+            'id',
+          ],
+        ],
+      ],
+      'display' => NULL,
+      'sort' => [
+        ['id', 'ASC'],
+      ],
+      'debug' => TRUE,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', ['filters' => ['tags' => [$tagId[0]]]] + $params);
+    $this->assertCount(3, $result);
+
+    $result = civicrm_api4('SearchDisplay', 'run', ['filters' => ['tags' => [$tagId[1]]]] + $params);
+    $this->assertCount(2, $result);
+
+    $result = civicrm_api4('SearchDisplay', 'run', ['filters' => ['tags:name' => $tags->column('name')]] + $params);
+    $this->assertCount(4, $result);
   }
 
   /**

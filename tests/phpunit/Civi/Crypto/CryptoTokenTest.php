@@ -15,6 +15,9 @@ use Civi\Crypto\Exception\CryptoException;
 
 /**
  * Test major use-cases of the 'crypto.token' service.
+ *
+ * @group headless
+ * @group crypto
  */
 class CryptoTokenTest extends \CiviUnitTestCase {
 

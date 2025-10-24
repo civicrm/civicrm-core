@@ -12,7 +12,7 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
     controller: function($scope, searchMeta, formatForSelect2, crmUiHelp) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Display'});
 
@@ -84,7 +84,7 @@
       };
 
       this.getTallyFunctions = function() {
-        var allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
+        const allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
           return fn.category === 'aggregate' && fn.params.length;
         });
         return {results: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])};

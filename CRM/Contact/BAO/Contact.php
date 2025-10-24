@@ -2613,6 +2613,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return CRM_Core_BAO_Log::getContactLogCount($contactId);
 
       case 'note':
+        // @deprecated, not called from Core
         return CRM_Core_BAO_Note::getContactNoteCount($contactId);
 
       case 'contribution':

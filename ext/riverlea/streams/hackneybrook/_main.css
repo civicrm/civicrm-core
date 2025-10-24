@@ -18,8 +18,7 @@
   /* Practical colours */
   --crm-c-text: #2b2b2b;
   --crm-c-divider: 1px solid var(--crm-c-gray-200);
-  --crm-c-background: var(--crm-c-gray-025); /* background to page header, often form block & dialog bg */
-  --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
+  --crm-c-container-bg: var(--crm-c-gray-025);
 /* Emphasis colours */
   --crm-c-primary: var(--crm-c-gray-025);
   --crm-c-primary-text: var(--crm-c-text);
@@ -51,8 +50,6 @@
   --crm-btn-icon-bg: rgba(256,256,256,0.25);
   --crm-btn-icon-border: var(--crm-btn-border);
   --crm-btn-icon-padding: 0px;
-  /* Tables */
-  --crm-table-outside-border: var(--crm-c-divider);
   /* Accordions */
   /* .crm-accordion-bold */
   --crm-expand-header-bg: var(--crm-c-gray-200);
@@ -65,7 +62,6 @@
   --crm-alert-info-text: var(--crm-c-blue-darker);
   --crm-alert-danger-text: var(--crm-c-text);
   /* Form */
-  --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: var(--crm-c-gray-300);
   --crm-input-box-shadow: 0;
   --crm-input-label-weight: normal;
@@ -76,6 +72,7 @@
   --crm-tab-count-bg: var(--crm-c-blue-dark);
   --crm-tab-count-col: var(--crm-c-text-light);
   --crm-tab-border: 1px solid var(--crm-c-gray-400);
+  --crm-tab-bg-active: var(--crm-c-container-bg);
   /* Contact dashboard */
   --crm-dash-border: 0;
   --crm-dash-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
@@ -85,7 +82,7 @@
   --crm-dash-tabs-bg: transparent;
   --crm-dash-tabs-padding: var(--crm-r) 0;
   --crm-dash-tab-bg: transparent;
-  --crm-dash-tab-bg-hover: var(--crm-c-background);
+  --crm-dash-tab-bg-hover: var(--crm-c-container-bg);
   --crm-dash-tab-padding: var(--crm-m2) var(--crm-m1) var(--crm-m2) var(--crm-r);
   --crm-dash-tab-border: 1px solid transparent;
   --crm-dash-tab-border-hover: var(--crm-c-divider);
@@ -94,10 +91,10 @@
   --crm-dash-tab-align: right;
   --crm-dash-tab-hang: 0 -1px 0 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-dash-tab-radius: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
-  --crm-dash-summary-row-bg: var(--crm-c-background3);
+  --crm-dash-summary-row-bg: var(--crm-c-layer2-bg);
   --crm-dash-heading-inset: var(--crm-side-tabs-width);
   --crm-dash-panel-padding: var(--crm-r);
-  --crm-dash-panel-bg: var(--crm-c-background);
+  --crm-dash-panel-bg: var(--crm-dash-tab-bg-hover);
   --crm-dash-panel-border: var(--crm-c-divider);
   --crn-dash-panel-radius: var(--crm-dash-roundness);
   --crm-dash-image-size: 100px;
@@ -106,12 +103,13 @@
   --crm-dash-image-top: -10px; /* distance from top of dashboard */
   --crm-dash-image-border: 0;
   /* Dialog */
-  --crm-dialog-header-bg: var(--crm-c-background4);
+  --crm-dialog-header-bg: var(--crm-c-gray-200);
+  --crm-dialog-header-border-col: transparent;
   --crm-dialog-header-col: var(--crm-c-text);
   --crm-dialog-header-size: var(--crm-r);
   --crm-dialog-header-padding: var(--crm-s) var(--crm-m1) var(--crm-s) var(--crm-m2);
-  --crm-dialog-header-radius: var(--crm-dialog-radius) var(--crm-dialog-radius) 0 0;
-  --crm-dialog-body-bg: var(--crm-c-page-background);
+  --crm-dialog-header-radius: var(--crm-dialog-radius);
+  --crm-dialog-body-bg: var(--crm-c-container-bg);
   --crm-dialog-body-padding: var(--crm-r);
   /* Dashlet */
   --crm-dashlet-border: var(--crm-c-divider);
@@ -120,14 +118,14 @@
   --crm-dashlet-tabs-border: 3px solid #fff;
   --crm-dashlet-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
   /* Button dropdowns */
-  --crm-dropdown-bg: var(--crm-c-page-background);
+  --crm-dropdown-bg: var(--crm-c-layer0-bg);
   --crm-dropdown-col: var(--crm-c-text);
   --crm-dropdown-hover-bg: var(--crm-c-secondary-hover);
   --crm-dropdown-border: var(--crm-btn-border);
   --crm-dropdown-width: 180px;
-  --crm-dropdown-2-bg: var(--crm-c-background3);
+  --crm-dropdown-2-bg: var(--crm-c-layer2-bg);
   /* Notifications */
-  --crm-notify-background: rgb(0,0,0);
+  --crm-notify-bg: rgb(0,0,0);
   --crm-notify-padding: 10px 10px 15px 15px;
   --crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: 0;

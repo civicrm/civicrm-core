@@ -6,8 +6,8 @@
     </div>
     <hr />
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
-      <h5>{{:: ts(apiBatch.runMsg, {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</h5>
-      <crm-search-batch-runner entity="$ctrl.entity" action="{{:: apiBatch.action }}" params="$ctrl.run" ids="$ctrl.ids" success="$ctrl.onSuccess(result)" error="$ctrl.onError()" id-field="{{:: $ctrl.entityInfo.primary_key[0] }}" display-ctrl="$ctrl.displayCtrl" is-link="$ctrl.isLink"></crm-search-batch-runner>
+      <h5 ng-if="apiBatch.runMsg">{{:: ts(apiBatch.runMsg, {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</h5>
+      <crm-search-batch-runner entity="$ctrl.entity" action="{{:: apiBatch.action }}" params="$ctrl.run" ids="$ctrl.ids" success="$ctrl.onSuccess(result)" error="$ctrl.onError(error)" id-field="{{:: $ctrl.entityInfo.primary_key[0] }}" display-ctrl="$ctrl.displayCtrl" is-link="$ctrl.isLink"></crm-search-batch-runner>
     </div>
 
     <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>

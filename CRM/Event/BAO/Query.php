@@ -27,6 +27,9 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   public static function &getFields($checkPermission = TRUE) {
     $fields = [];
     $fields = array_merge($fields, CRM_Event_DAO_Event::import());
+    // Unset 'id' to keep historical behaviour, despite the id having had import usage
+    // added for actual import code.
+    unset($fields['id']);
     $fields = array_merge($fields, self::getParticipantFields());
     $fields = array_merge($fields, CRM_Core_DAO_Discount::export());
     $fields['event'] = self::getPseudoEventDateFieldMetadata();

@@ -454,7 +454,7 @@
   organization: Giant Rabbit
 
 - github      : djnatedagreat
-  name        : Nate Harris
+  name        : Nate Frank
   organization: New York State Senate
 
 - github      : dkguru
@@ -508,6 +508,9 @@
 
 - github      : dsuguy2007
   name        : Tommy Sheppard
+
+- github      : duncan-s-white
+  name        : Duncan White
 
 - github      : dvhirst
   name        : Donald Hirst
@@ -1247,6 +1250,10 @@
 - name        : Neil Zampella
 
 - github      : netzih
+
+- github      : nfreesto
+  name        : Nathan Freestone
+  organization: Giant Rabbit
 
 - github      : nganivet
   name        : Nicolas Ganivet

@@ -17,8 +17,6 @@
 /*
  * Settings metadata file
  */
-$optimizationSeeAlso = '<br/>' . ts('See also: <a href="%1">Search Optimization</a>', [1 => 'https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/" target="_blank"']);
-$searchConfigSeeAlso = '<br/>' . ts('See also: <a %1>Search Configuration Options</a>', [1 => 'https://docs.civicrm.org/en/user/latest/initial-set-up/customizing-the-user-interface/#customizing-search-preferences" target="_blank"']);
 return [
   'search_autocomplete_count' => [
     'group_name' => 'Search Preferences',
@@ -27,14 +25,17 @@ return [
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'number',
+    'html_attributes' => [
+      'class' => 'six',
+      'min' => 1,
+    ],
     'default' => 15,
     'add' => '4.3',
     'title' => ts('Autocomplete Results'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('The maximum number of contacts to show at a time when typing in an autocomplete field.'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 150]],
+    'help_text' => ts('The maximum number of contacts to show at a time when typing in an autocomplete field.'),
+    'settings_pages' => ['search' => ['section' => 'autocomplete', 'weight' => 0]],
   ],
   'includeOrderByClause' => [
     'group_name' => 'Search Preferences',
@@ -47,9 +48,8 @@ return [
     'title' => ts('Include Order By Clause'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If disabled, the search results will not be ordered. This may improve response time on search results on large datasets.'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 60]],
+    'help_text' => ts('If disabled, the search results will not be ordered. This may improve response time on search results on large datasets.'),
+    'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 60]],
   ],
   'includeWildCardInName' => [
     'group_name' => 'Search Preferences',
@@ -62,9 +62,8 @@ return [
     'title' => ts('Automatic Wildcard'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts("If enabled, wildcards are automatically added to the beginning AND end of the search term when users search for contacts by Name. EXAMPLE: Searching for 'ada' will return any contact whose name includes those letters - e.g. 'Adams, Janet', 'Nadal, Jorge', etc. If disabled, a wildcard is added to the end of the search term only. EXAMPLE: Searching for 'ada' will return any contact whose last name begins with those letters - e.g. 'Adams, Janet' but NOT 'Nadal, Jorge'. Disabling this feature will speed up search significantly for larger databases, but users must manually enter wildcards ('%' or '_') to the beginning of the search term if they want to find all records which contain those letters. EXAMPLE: '%ada' will return 'Nadal, Jorge'."),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 10]],
+    'help_text' => ts("If enabled, wildcards are automatically added to the beginning AND end of the search term when users search for contacts by Name. EXAMPLE: Searching for 'ada' will return any contact whose name includes those letters - e.g. 'Adams, Janet', 'Nadal, Jorge', etc. If disabled, a wildcard is added to the end of the search term only. EXAMPLE: Searching for 'ada' will return any contact whose last name begins with those letters - e.g. 'Adams, Janet' but NOT 'Nadal, Jorge'. Disabling this feature will speed up search significantly for larger databases, but users must manually enter wildcards ('%' or '_') to the beginning of the search term if they want to find all records which contain those letters. EXAMPLE: '%ada' will return 'Nadal, Jorge'."),
+    'settings_pages' => ['search' => ['section' => 'search', 'weight' => 10]],
   ],
   'includeEmailInName' => [
     'group_name' => 'Search Preferences',
@@ -77,9 +76,8 @@ return [
     'title' => ts('Include Email'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If enabled, email addresses are automatically included when users search by Name. Disabling this feature will speed up search significantly for larger databases, but users will need to use the Email search fields (from Advanced Search, Search Builder, or Profiles) to find contacts by email address.'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 20]],
+    'help_text' => ts('If enabled, email addresses are automatically included when users search by Name. Disabling this feature will speed up search significantly for larger databases, but users will need to use the Email search fields (from Advanced Search, Search Builder, or Profiles) to find contacts by email address.'),
+    'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 20]],
   ],
   'includeNickNameInName' => [
     'group_name' => 'Search Preferences',
@@ -92,9 +90,8 @@ return [
     'title' => ts('Include Nickname'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If enabled, nicknames are automatically included when users search by Name.'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 40]],
+    'help_text' => ts('If enabled, nicknames are automatically included when users search by Name.'),
+    'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 40]],
   ],
   'includeAlphabeticalPager' => [
     'group_name' => 'Search Preferences',
@@ -107,9 +104,8 @@ return [
     'title' => ts('Include Alphabetical Pager'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If disabled, the alphabetical pager will not be displayed on the search screens. This will improve response time on search results on large datasets.'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 50]],
+    'help_text' => ts('If disabled, the alphabetical pager will not be displayed on the search screens. This will improve response time on search results on large datasets.'),
+    'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 50]],
   ],
   'smartGroupCacheTimeout' => [
     'group_name' => 'Search Preferences',
@@ -118,14 +114,20 @@ return [
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'number',
+    'html_attributes' => [
+      'class' => 'six',
+      'min' => 0,
+    ],
     'default' => 5,
     'add' => '4.6',
     'title' => ts('Smart group cache timeout'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('The number of minutes to cache smart group contacts. The best value will depend on your site and the complexity of the groups and acls you use. A value of zero means no caching at all. You may need to experiment with this.') . $optimizationSeeAlso,
-    'help_text' => '',
-    'settings_pages' => ['search' => ['weight' => 80]],
+    'help_text' => ts('The number of minutes to cache smart group contacts. The best value will depend on your site and the complexity of the groups and acls you use. A value of zero means no caching at all. You may need to experiment with this.'),
+    'help_doc_url' => [
+      'page' => 'sysadmin/setup/optimizations',
+    ],
+    'settings_pages' => ['misc' => ['section' => 'performance', 'weight' => 20]],
   ],
   'defaultSearchProfileID' => [
     'group_name' => 'Search Preferences',
@@ -142,12 +144,11 @@ return [
     ],
     'default' => NULL,
     'add' => '4.6',
-    'title' => ts('Default Contact Search Profile'),
+    'title' => ts('Advanced Search Profile'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If set, this will be the default profile used for contact search.'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 70]],
+    'help_text' => ts('If set, this will be the default profile used for contact search.'),
+    'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 80]],
   ],
   'prevNextBackend' => [
     'group_name' => 'Search Preferences',
@@ -167,12 +168,11 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Core_BAO_PrevNextCache::getPrevNextBackends',
     ],
-    'description' => ts('When performing a search, how should the search-results be cached?'),
-    'help_text' => '',
+    'help_text' => ts('When performing a search, how should the search-results be cached?'),
     // Originally not exposed in UI as breakage possible. But by accident or design was added to misc .
     // As with the SmartGroupCache time out a different page
     // might make more sense.
-    'settings_pages' => ['misc' => ['weight' => 170]],
+    'settings_pages' => ['misc' => ['weight' => 170, 'section' => 'performance']],
   ],
   'searchPrimaryDetailsOnly' => [
     'group_name' => 'Search Preferences',
@@ -185,9 +185,8 @@ return [
     'title' => ts('Search Primary Details Only'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('If enabled, only primary details (eg contact\'s primary email, phone, etc) will be included in Basic and Advanced Search results. Disabling this feature will allow users to match contacts using any email, phone etc detail.'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 30]],
+    'help_text' => ts('If enabled, only primary details (eg contact\'s primary email, phone, etc) will be included in Basic and Advanced Search results. Disabling this feature will allow users to match contacts using any email, phone etc detail.'),
+    'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 30]],
   ],
   'quicksearch_options' => [
     'group_name' => 'Search Preferences',
@@ -216,9 +215,8 @@ return [
     'title' => ts('Quicksearch options'),
     'is_domain' => '1',
     'is_contact' => 0,
-    'description' => ts("Which fields can be searched on in the menubar quicksearch box?"),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 90]],
+    'help_text' => ts("Which fields can be searched on in the menubar quicksearch box?"),
+    'settings_pages' => ['search' => ['section' => 'autocomplete', 'weight' => 90]],
   ],
   'autocomplete_displays' => [
     'group_name' => 'Search Preferences',
@@ -234,9 +232,8 @@ return [
     'title' => ts('Autocomplete Search Displays'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Choose a SearchKit display for autocomplete results per entity type. Create a new autocomplete display in SearchKit and select "Make Default Autocomplete" to add it to this setting.'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 100]],
+    'help_text' => ts('Choose a SearchKit display for autocomplete results per entity type. Create a new autocomplete display in SearchKit and select "Make Default Autocomplete" to add it to this setting.'),
+    'settings_pages' => ['search' => ['section' => 'autocomplete', 'weight' => 10]],
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Search::getAutocompleteDisplays',
     ],
@@ -250,19 +247,18 @@ return [
     'name' => 'default_pager_size',
     'type' => 'Integer',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'html_type' => 'number',
     'html_attributes' => [
-      'size' => 2,
-      'maxlength' => 3,
+      'class' => 'six',
+      'min' => 1,
     ],
     'default' => 50,
     'add' => '5.39',
     'title' => ts('Default Search Pager size'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('What is the default number of records to show on a search'),
-    'help_text' => NULL,
-    'settings_pages' => ['search' => ['weight' => 120]],
+    'help_text' => ts('What is the default number of records to show on a search'),
+    'settings_pages' => ['search' => ['section' => 'search', 'weight' => 20]],
   ],
 
 ];

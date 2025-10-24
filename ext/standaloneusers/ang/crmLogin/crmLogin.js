@@ -9,9 +9,26 @@
     controller: function($scope, $window, $timeout, crmApi4, crmStatus) {
       var ts = $scope.ts = CRM.ts('standaloneusers');
 
-      this.loading = false;
+      this.loading = true;
+      this.loggedInAs = null;
 
       this.forgottenPasswordUrl = CRM.url('civicrm/login/password');
+
+      this.logoutUrl = CRM.url('civicrm/logout');
+
+      this.$onInit = () => {
+        if (CRM.config.cid) {
+          return crmApi4('Contact', 'get', {
+            select: ['display_name'],
+            where: [['id', '=', CRM.config.cid]],
+          })
+          .then((result) => this.loggedInAs = ts('Logged in as %1.', {1: result[0].display_name}))
+          .then(() => this.loading = false);
+        }
+        else {
+          this.loading = false;
+        }
+      };
 
       this.canSubmit = () => {
         return this.identifier && this.password && !this.loading;

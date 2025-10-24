@@ -28,7 +28,7 @@
 .crm-container .form-layout-compressed td.label,
 .crm-container .selector td.label,
 .crm-container .form-layout-compressed th.label {
-  width: var(--crm-input-label-width);
+  min-width: var(--crm-input-label-width);
   text-align: var(--crm-input-label-align);
   margin: var(--crm-m) var(--crm-m2) 0 0;
   font-family: var(--crm-input-label-font);
@@ -138,7 +138,7 @@ select.crm-form-select,
 .ui-datepicker .ui-datepicker-header select {
   transition: var(--crm-input-active-ani);
   font-size: var(--crm-input-font-size);
-  background-color: var(--crm-input-background);
+  background-color: var(--crm-input-bg);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   color: var(--crm-input-color);
@@ -162,7 +162,7 @@ select.crm-form-multiselect {
   border: 1px solid var(--crm-c-darkest);
 }
 .crm-container .replace-plain {
-  background-color: var(--crm-c-background3);
+  background-color: var(--crm-input-bg);
   min-width: var(--crm-huge-input);
 }
 input.crm-form-text:focus,
@@ -321,38 +321,55 @@ input.crm-form-checkbox + label,
   height: auto;
   box-shadow: none;
 }
-/* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
+/* Checkbox/radio fields with n-per-line. */
 .crm-container .crm-multiple-checkbox-radio-options {
-  --gap: 1em;
-  --checkbox-width: 2em;
+  --crm-gap: 0.5em;
+  --crm-checkbox-width: 1.5em;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gap);
+  gap: var(--crm-gap);
 }
-/* Reset checkbox width when its rendered as text '(x)' in confirmation screens /dev/core/-/issues/5550 */
+/* Reset checkbox width when its rendered as text '(x)' in confirmations */
 .crm-container.crm-public .crm-profile-view .crm-option-label-pair {
-  --checkbox-width: auto;
+  --crm-checkbox-width: auto;
+}
+/* Stacks label for checkbox/radio on contact layout custom field sets */
+.crm-container .contact_panel tr:is(.custom_field-row,.custom_field-help-pre-row) {
+  display: flex;
+  flex-direction: column;
+}
+.crm-container .contact_panel .custom_field-row td.label {
+  white-space: normal;
+  width: 100%;
+  text-align: left;
 }
 /* Override more general styling */
 .crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
 input.crm-form-checkbox) + label {
-  margin-left: 0;
+  margin: 0 !important /* vs L309 */;
+  padding: 0;
+  white-space: initial;
 }
 .crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
   display: grid;
-  grid-template-columns: var(--checkbox-width) 1fr;
+  grid-template-columns: var(--crm-checkbox-width) 1fr;
   align-items: baseline;
 }
 .crm-container .crm-multiple-checkbox-radio-options.crm-options-per-line .crm-option-label-pair {
-  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--gap)) / var(--crm-opts-per-line));
+  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--crm-gap)) / var(--crm-opts-per-line));
 }
 /* Slider */
 .crm-container .ui-slider {
-  background: var(--crm-c-background4);
+  background: var(--crm-input-bg);
+  border: 1px solid var(--crm-input-border-color);
 }
 .crm-container .ui-slider .ui-slider-handle {
+  border: var(--crm-btn-border);
+  background: var(--crm-c-secondary);
+}
+.crm-container .ui-slider .ui-slider-range {
   border: 0;
-  background: var(--crm-c-background5);
+  border-radius: 0;
 }
 
 /* Input types */
@@ -386,7 +403,7 @@ input.crm-form-checkbox) + label {
 .crm-container select.form-control,
 .crm-container .select2-container-multi .select2-choices,
 .crm-container .select2-container .select2-choice {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border: 1px solid var(--crm-input-border-color);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
@@ -417,7 +434,7 @@ input.crm-form-checkbox) + label {
   top: auto;
 }
 .crm-container .select2-container .select2-choice > .select2-chosen {
-  margin-right: var(--crm-m2);
+  margin-right: var(--crm-r2);
 }
 .crm-container .select2-container-multi .select2-choices::before,
 .crm-container .select2-container .select2-choice .select2-arrow::before {
@@ -459,22 +476,22 @@ input.crm-form-checkbox) + label {
 }
 .select2-container-disabled a {
   box-shadow: none;
-  background: var(--crm-c-page-background);
+  background: var(--crm-c-layer1-bg);
 }
 .select2-container-disabled .select2-arrow {
   background: transparent;
 }
 .crm-container .select2-container.select2-container-disabled .select2-choice {
-  background-color: var(--crm-c-background);
+  background-color: var(--crm-c-container-bg);
   border: 1px dotted var(--crm-c-inactive);
   cursor: default;
 }
 .select2-container.select2-container-disabled .select2-choice .select2-arrow {
   border-left: 0;
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
 }
 .select2-results .select2-disabled {
-  background: var(--crm-c-background2);
+  background: var(--crm-c-layer1-bg);
   cursor: not-allowed;
 }
 .select2-results .select2-disabled > * {
@@ -533,7 +550,7 @@ input.crm-form-checkbox) + label {
 
 .select2-drop.select2-drop-active.crm-container {
   min-width: var(--crm-big-input);
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border-bottom-left-radius: var(--crm-input-border-radius);
   border-bottom-right-radius: var(--crm-input-border-radius);
   border-color: var(--crm-c-focus);
@@ -582,14 +599,14 @@ input.crm-form-checkbox) + label {
 .select2-results .select2-no-results,
 .select2-results .select2-searching,
 .select2-results .select2-selection-limit {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
 }
 .select2-drop.select2-drop-active.crm-container .select2-results .select2-highlighted {
-  background: var(--crm-c-drag-background);
+  background: var(--crm-form-select-bg);
 }
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
   border: 1px solid var(--crm-input-border-color);
   border-radius: var(--crm-input-border-radius);
   box-sizing: border-box;
@@ -615,7 +632,7 @@ input.crm-form-checkbox) + label {
 }
 .select2-results li.select2-result-with-children > .select2-result-label {
   font-weight: bold;
-  background: var(--crm-c-background3);
+  background: var(--crm-c-layout2-bg);
   padding: var(--crm-s);
 }
 .crm-container .crm-select2-row-description p {
@@ -692,7 +709,7 @@ input.crm-form-checkbox) + label {
   height: unset;
 }
 #ui-datepicker-div {
-  background: var(--crm-input-background);
+  background: var(--crm-input-bg);
   border-radius: 0;
   box-shadow: var(--crm-popup-shadow);
   min-width: 30ch;
@@ -722,7 +739,7 @@ input.crm-form-checkbox) + label {
 }
 #ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next)::before {
   font-family: "FontAwesome";
-  color: var(--crm-c-text);
+  color: var(--text);
   font-size: var(--crm-small-font-size);
   line-height: var(--crm-l);
   padding: 0;

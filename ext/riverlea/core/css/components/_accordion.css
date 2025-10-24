@@ -13,6 +13,9 @@
   border-radius: var(--crm-expand-radius);
   padding: var(--crm-expand-header-padding);
 }
+.crm-container details .crm-accordion-body {
+  padding: var(--crm-expand-body-padding);
+}
 .crm-container details[open] > summary { /* open version of that */
   border-radius: var(--crm-expand-radius) var(--crm-expand-radius) 0 0;
 }

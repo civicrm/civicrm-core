@@ -510,7 +510,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       ];
-      if (!$this->_values['event']['is_monetary'] && !$this->_values['event']['is_confirm_enabled']) {
+      if (!$this->_values['event']['is_confirm_enabled']) {
         $buttonParams['name'] = ts('Register');
       }
       else {
@@ -891,6 +891,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         // The concept of contributeMode is deprecated - but still needs removal from the message templates.
         $this->set('contributeMode', 'notify');
       }
+      if (empty($this->_values['event']['is_confirm_enabled']) && empty($params['additional_participants'])) {
+        $this->skipToThankYouPage();
+      }
     }
     else {
       $params['description'] = ts('Online Event Registration') . ' ' . $this->_values['event']['title'];
@@ -913,6 +916,31 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $statusMsg = ts('Registration information for participant 1 has been saved.');
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     }
+  }
+
+  /**
+   * Process confirm function and pass browser to the thank you page.
+   */
+  protected function skipToThankYouPage() {
+    // call the post process hook for the main page before we switch to confirm
+    $this->postProcessHook();
+
+    // build the confirm page
+    $confirmForm = &$this->controller->_pages['Confirm'];
+    $confirmForm->preProcess();
+    $confirmForm->buildQuickForm();
+
+    // the confirmation page is valid
+    $data = &$this->controller->container();
+    $data['valid']['Confirm'] = 1;
+
+    // confirm the contribution
+    // mainProcess calls the hook also
+    $confirmForm->mainProcess();
+    $qfKey = $this->controller->_key;
+
+    // redirect to thank you page
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
   }
 
   /**

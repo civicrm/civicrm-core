@@ -36,8 +36,8 @@ class CRM_Utils_ColorTest extends CiviUnitTestCase {
    */
   public function testGetRgb($color, $expectedRGB, $expectedHex) {
     $rgb = CRM_Utils_Color::getRgb($color);
-    $this->assertEquals($expectedRGB, $rgb);
-    $this->assertEquals($expectedHex, CRM_Utils_Color::rgbToHex($rgb));
+    $this->assertSame($expectedRGB, $rgb);
+    $this->assertSame($expectedHex, CRM_Utils_Color::rgbToHex($rgb));
   }
 
   public static function rgbExamples() {

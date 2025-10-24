@@ -129,7 +129,7 @@ class ContactDuplicatesTest extends Api4TestBase {
     $this->assertContainsEquals($testContacts[3], $found);
 
     $found = Contact::getDuplicates(FALSE)
-      ->setDedupeRule('customRule')
+      ->setDedupeRule($customRuleGroup['id'])
       ->addValue('last_name', 'A2')
       ->addValue('test1.text', 'T2')
       ->addValue('test1.select:label', 'Red')

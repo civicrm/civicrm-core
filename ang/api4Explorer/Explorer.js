@@ -245,10 +245,11 @@
     function addWriteJoinFields(fieldList) {
       _.eachRight(fieldList, function(field, pos) {
         const fkNameField = field.fk_entity && getField('name', field.fk_entity, $scope.action);
-        if (fkNameField) {
+        if (fkNameField && !field.name.includes(':')) {
           const newField = _.cloneDeep(fkNameField);
           newField.name = field.name + '.' + newField.name;
-          fieldList.splice(pos, 0, newField);
+          // Insert new field after the current one
+          fieldList.splice(pos + 1, 0, newField);
         }
       });
     }
@@ -1068,16 +1069,11 @@
     // Format string to be cli-input-safe
     function cliFormat(str) {
       str = str.replace(/\b(true|false)\b/g, match => match === "true" ? '1' : '0');
-      if (!_.includes(str, ' ') && !_.includes(str, '"') && !_.includes(str, "'")) {
+      const safeCliPattern = /^[a-zA-Z0-9_\-\.\/]+$/;
+      if (safeCliPattern.test(str)) {
         return str;
       }
-      if (!_.includes(str, "'")) {
-        return "'" + str + "'";
-      }
-      if (!_.includes(str, '"')) {
-        return '"' + str + '"';
-      }
-      return "'" + str.replace(/'/g, "\\'") + "'";
+      return "'" + str.replace(/'/g, "'\\''") + "'";
     }
 
     function fetchMeta() {

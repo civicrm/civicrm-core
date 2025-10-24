@@ -1,36 +1,38 @@
 <div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
-<details>
+<details class="crm-accordion-bold">
   <summary>{{:: ts('Settings') }}</summary>
-  <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
-  <fieldset>
-    <div class="form-inline">
-      <label for="crm-search-admin-display-style">{{:: ts('Style') }}</label>
-      <select id="crm-search-admin-display-style" class="form-control" ng-model="$ctrl.display.settings.style" ng-change="$ctrl.display.settings.symbol = ''">
-        <option value="ul">{{:: ts('Bullets') }}</option>
-        <option value="ol">{{:: ts('Numbers') }}</option>
-      </select>
-      <label for="crm-search-admin-display-symbol">{{:: ts('Symbol') }}</label>
-      <select id="crm-search-admin-display-symbol" class="form-control" ng-model="$ctrl.display.settings.symbol">
-        <option ng-repeat="symbol in $ctrl.symbols[$ctrl.display.settings.style]" value="{{ symbol.char }}">
-          {{ symbol.label }}
-        </option>
-      </select>
-    </div>
-  </fieldset>
-  <fieldset>
-    <div class="form-inline crm-search-admin-flex-row" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
-    <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if no results.') }}">
-      <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
-      <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
-    </div>
-  </fieldset>
-  <fieldset>
-    <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
-    <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
-  </fieldset>
-  <fieldset>
-    <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
-  </fieldset>
+  <div class="crm-accordion-body">
+    <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
+    <fieldset>
+      <div class="form-inline">
+        <label for="crm-search-admin-display-style">{{:: ts('Style') }}</label>
+        <select id="crm-search-admin-display-style" class="form-control" ng-model="$ctrl.display.settings.style" ng-change="$ctrl.display.settings.symbol = ''">
+          <option value="ul">{{:: ts('Bullets') }}</option>
+          <option value="ol">{{:: ts('Numbers') }}</option>
+        </select>
+        <label for="crm-search-admin-display-symbol">{{:: ts('Symbol') }}</label>
+        <select id="crm-search-admin-display-symbol" class="form-control" ng-model="$ctrl.display.settings.symbol">
+          <option ng-repeat="symbol in $ctrl.symbols[$ctrl.display.settings.style]" value="{{ symbol.char }}">
+            {{ symbol.label }}
+          </option>
+        </select>
+      </div>
+    </fieldset>
+    <fieldset>
+      <div class="form-inline crm-search-admin-flex-row" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
+      <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if no results.') }}">
+        <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
+        <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
+      </div>
+    </fieldset>
+    <fieldset>
+      <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
+      <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
+    </fieldset>
+    <fieldset>
+      <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
+    </fieldset>
+  </div>
 </details>
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
@@ -45,32 +47,34 @@
       </button>
       <details>
         <summary>{{ $ctrl.parent.getColLabel(col) }}</summary>
-        <div class="form-inline">
-          <label title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
-            <input type="checkbox" ng-model="col.break">
-            {{:: ts('New Line') }}
-          </label>
-          &nbsp;
-          <label title="{{:: ts('Disable line breaks to keep contents inline') }}">
-            <input type="checkbox" ng-model="col.nowrap" >
-            {{:: ts('Prevent Wrapping') }}
-          </label>
-        </div>
-        <div class="form-inline crm-search-admin-flex-row">
-          <label>
-            <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getColLabel(col)" >
-            {{:: ts('Label') }}
-          </label>
-          <input ng-if="col.label" class="form-control crm-flex-1" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
-          <crm-search-admin-token-select ng-if="col.label" model="col" field="label" suffix=":label"></crm-search-admin-token-select>
-        </div>
-        <div class="form-inline" ng-if="col.label">
-          <label style="visibility: hidden"><input type="checkbox" disabled></label><!--To indent by 1 checkbox-width-->
-          <div class="checkbox">
-            <label><input type="checkbox" ng-model="col.forceLabel"> {{:: ts('Show label even when field is blank') }}</label>
+        <div class="crm-accordion-body">
+          <div class="form-inline">
+            <label title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
+              <input type="checkbox" ng-model="col.break">
+              {{:: ts('New Line') }}
+            </label>
+            &nbsp;
+            <label title="{{:: ts('Disable line breaks to keep contents inline') }}">
+              <input type="checkbox" ng-model="col.nowrap" >
+              {{:: ts('Prevent Wrapping') }}
+            </label>
           </div>
+          <div class="form-inline crm-search-admin-flex-row">
+            <label>
+              <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getColLabel(col)" >
+              {{:: ts('Label') }}
+            </label>
+            <input ng-if="col.label" class="form-control crm-flex-1" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
+            <crm-search-admin-token-select ng-if="col.label" model="col" field="label" suffix=":label"></crm-search-admin-token-select>
+          </div>
+          <div class="form-inline" ng-if="col.label">
+            <label style="visibility: hidden"><input type="checkbox" disabled></label><!--To indent by 1 checkbox-width-->
+            <div class="checkbox">
+              <label><input type="checkbox" ng-model="col.forceLabel"> {{:: ts('Show label even when field is blank') }}</label>
+            </div>
+          </div>
+          <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
         </div>
-        <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
       </details>
     </fieldset>
   </fieldset>

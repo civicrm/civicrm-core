@@ -625,17 +625,6 @@ abstract class CRM_Utils_Hook {
    */
   public static function aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
     $null = NULL;
-    // Legacy support for hooks that still expect 'civicrm_group' to be 'civicrm_saved_search'
-    // This was changed in 5.64
-    if ($tableName === 'civicrm_group') {
-      $initialValue = $currentGroups;
-      $legacyTableName = 'civicrm_saved_search';
-      self::singleton()
-        ->invoke(['type', 'contactID', 'tableName', 'allGroups', 'currentGroups'], $type, $contactID, $legacyTableName, $allGroups, $currentGroups, $null, 'civicrm_aclGroup');
-      if ($initialValue != $currentGroups) {
-        CRM_Core_Error::deprecatedWarning('Since 5.64 hook_civicrm_aclGroup passes "civicrm_group" instead of "civicrm_saved_search" for the $tableName when referring to Groups. Hook listeners should be updated.');
-      }
-    }
     return self::singleton()
       ->invoke(['type', 'contactID', 'tableName', 'allGroups', 'currentGroups'], $type, $contactID, $tableName, $allGroups, $currentGroups, $null, 'civicrm_aclGroup');
   }
@@ -1567,23 +1556,6 @@ abstract class CRM_Utils_Hook {
   public static function alterLocationMergeData(&$blocksDAO, $mainId, $otherId, $migrationInfo) {
     $null = NULL;
     return self::singleton()->invoke(['blocksDAO', 'mainId', 'otherId', 'migrationInfo'], $blocksDAO, $mainId, $otherId, $migrationInfo, $null, $null, 'civicrm_alterLocationMergeData');
-  }
-
-  /**
-   * Deprecated: use hook_civicrm_selectWhereClause instead.
-   * @deprecated since 5.67 will be removed around 5.85
-   * .
-   * @param array &$noteValues
-   */
-  public static function notePrivacy(&$noteValues) {
-    $null = NULL;
-    self::singleton()->invoke(['noteValues'], $noteValues,
-      $null, $null, $null, $null, $null,
-      'civicrm_notePrivacy'
-    );
-    if (isset($noteValues['notePrivacy_hidden'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('hook_civicrm_selectWhereClause', 'hook_civicrm_notePrivacy');
-    }
   }
 
   /**

@@ -518,7 +518,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         // Add user-friendly placeholder
         foreach (['a', 'b'] as $x) {
           $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : ($jsData[$id]["contact_type_$x"] ?? NULL);
-          $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', [strtolower($contactTypes[$type]['label'])]) : ts('- select contact -');
+          $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', [1 => strtolower($contactTypes[$type]['label'])]) : ts('- select contact -');
         }
       }
     }

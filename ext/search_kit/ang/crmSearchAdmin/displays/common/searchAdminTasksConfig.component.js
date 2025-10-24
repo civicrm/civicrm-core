@@ -9,7 +9,7 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminTasksConfig.html',
     controller: function($scope, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {

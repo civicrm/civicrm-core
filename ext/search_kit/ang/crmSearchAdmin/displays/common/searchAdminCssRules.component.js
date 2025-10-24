@@ -12,7 +12,7 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminCssRules.html',
     controller: function($scope, $element, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.getField = searchMeta.getField;
@@ -55,7 +55,7 @@
       };
 
       this.addClause = function(style) {
-        var clause = [style];
+        const clause = [style];
         if (ctrl.default && ctrl.getField(ctrl.default)) {
           clause.push(ctrl.default, '=');
         }

@@ -47,9 +47,20 @@ class CryptoJwt extends AutoService {
    */
   public function encode($payload, $keyIdOrTag = 'SIGN') {
     $key = $this->getRegistry()->findKey($keyIdOrTag);
-    $alg = $this->suiteToAlg($key['suite']);
-    // Currently, registry only has symmetric keys in $key['key']. For public key-pairs, might need to change.
-    return JWT::encode($payload, $key['key'], $alg, $key['id']);
+    switch ($key['suite']) {
+      // Asymmetric key-pairs...
+      case 'jwt-eddsa-keypair':
+        $privateKey = base64_encode(sodium_crypto_sign_secretkey($key['key']));
+        return JWT::encode($payload, $privateKey, 'EdDSA', $key['id']);
+
+      case 'jwt-eddsa-public':
+        throw new CryptoException("Cannot use public-key to sign JWT.");
+
+      // Symmetric keys...
+      default:
+        $alg = $this->suiteToAlg($key['suite']);
+        return JWT::encode($payload, $key['key'], $alg, $key['id']);
+    }
   }
 
   /**
@@ -63,12 +74,28 @@ class CryptoJwt extends AutoService {
    */
   public function decode($token, $keyTag = 'SIGN') {
     $keyRows = $this->getRegistry()->findKeysByTag($keyTag);
+    if (empty($keyRows)) {
+      throw new CryptoException("Unknown key/tag ($keyTag)");
+    }
 
     $jwtKeys = [];
     foreach ($keyRows as $key) {
-      if ($alg = $this->suiteToAlg($key['suite'])) {
-        // Currently, registry only has symmetric keys in $key['key']. For public key-pairs, might need to change.
-        $jwtKeys[$key['id']] = new Key($key['key'], $alg);
+      switch ($key['suite']) {
+        // Asymmetric key-pairs...
+        case 'jwt-eddsa-keypair':
+          $publicKey = base64_encode(sodium_crypto_sign_publickey($key['key']));
+          $jwtKeys[$key['id']] = new Key($publicKey, 'EdDSA');
+          break;
+
+        case 'jwt-eddsa-public':
+          $jwtKeys[$key['id']] = new Key(base64_encode($key['key']), 'EdDSA');
+          break;
+
+        // Symmetric keys...
+        default:
+          $alg = $this->suiteToAlg($key['suite']);
+          $jwtKeys[$key['id']] = new Key($key['key'], $alg);
+          break;
       }
     }
 

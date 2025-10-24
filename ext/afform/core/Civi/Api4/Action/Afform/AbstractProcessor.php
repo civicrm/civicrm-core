@@ -67,7 +67,22 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected $_entityIds = [];
 
+  /**
+   * Values of each entity that is submitted on the form.
+   * Eg. $entityValues['Contribution1'][0]['fields']['field1' => 1, 'field2' => 2]
+   *
+   * @var array
+   */
   protected $_entityValues = [];
+
+  /**
+   * Get the (submitted) values from all the entities on the form
+   *
+   * @return array
+   */
+  public function getEntityValues() {
+    return $this->_entityValues;
+  }
 
   protected array $_response = [];
 
@@ -295,8 +310,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Directly loads a join entity e.g. from an autocomplete field in the join block.
    */
-  private function loadJoin(array $afEntity, array $values): array {
-    $joinResult = [];
+  private function loadJoin(array $afEntity, array $values): void {
     foreach ($values as $entityIndex => $value) {
       foreach ($value['joins'] as $joinEntity => $joins) {
         $joinIdField = CoreUtil::getIdFieldName($joinEntity);
@@ -305,15 +319,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           foreach ($join as $fieldName => $fieldValue) {
             if (!empty($joinInfo['fields'][$fieldName])) {
               $where = [[$fieldName, '=', $fieldValue]];
-              $joinResult = $this->getJoinResult($afEntity, $joinEntity, $joinInfo, $where, 1);
-              $this->_entityIds[$afEntity['name']][$entityIndex]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinResult, [$joinIdField]);
-              $this->_entityValues[$afEntity['name']][$entityIndex]['joins'][$joinEntity] = array_values($joinResult);
+              $joinResult = \CRM_Utils_Array::first($this->getJoinResult($afEntity, $joinEntity, $joinInfo, $where, 1));
+              if ($joinResult) {
+                $this->_entityIds[$afEntity['name']][$entityIndex]['joins'][$joinEntity][$joinIndex][$joinIdField] = $joinResult[$joinIdField];
+                $this->_entityValues[$afEntity['name']][$entityIndex]['joins'][$joinEntity][$joinIndex] = $joinResult;
+              }
             }
           }
         }
       }
     }
-    return array_values($joinResult);
   }
 
   public function getJoinResult(array $afEntity, string $joinEntity, array $join, array $where, int $limit): array {
@@ -749,7 +764,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
       $this->fillIdFields($records, $entityName);
       $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
-      \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+      try {
+        \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+      }
+      catch (\Throwable $e) {
+        \Civi::log('afform')->error('Afform: ' . $event->getAfform()['name'] . ': civi.afform.submit crashed with error: ' . $e->getMessage());
+        throw $e;
+      }
     }
   }
 

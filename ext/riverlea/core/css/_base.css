@@ -46,6 +46,9 @@ body {
 .crm-container table.dataTable.display tbody tr:hover {
   background-color: transparent;
 }
+.crm-container td:empty {
+  padding: 0 !important; /* allows empty cells to collapse to 0 width */
+}
 /* Remove list styles (bullets/numbers) */
 .crm-container ol,
 .crm-container ul {
@@ -156,7 +159,7 @@ body {
   font-size: var(--crm-font-size);
   line-height: 1.4;
   color: var(--crm-c-text);
-  background: var(--crm-c-page-background);
+  background: var(--crm-c-page-bg);
 }
 .crm-container table,
 .crm-container tr,
@@ -288,14 +291,15 @@ dl dl {
 .crm-container tr.disabled,
 .crm-container tr:has(td.disabled),
 .crm-container .table-striped > tbody > tr:has(td.disabled) {
-  background-color: var(--crm-c-page-background);
+  --crm-striped-bg: var(--crm-c-page-bg) /* for striped rows */;
+  background-color: var(--crm-striped-bg) !important /* vs jquery */;
 }
 .crm-container tr.disabled td *:not(.btn,button,i,a),
 .crm-container td.disabled,
 .crm-container #extensions-main table tr.disabled td {
   font-style: italic;
 }
-.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label) {
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label,.crm-job-name) {
   display: inline-flex;
 }
 
@@ -365,8 +369,8 @@ dl dl {
 }
 .crm-container code {
   display: inline;
-  background-color: var(--crm-c-code-background);
-  border: 1px solid var(--crm-c-background4);
+  background-color: var(--crm-c-code-bg);
+  border: var(--crm-c-code-border);
   color: var(--crm-c-text);
   border-radius: 2px;
   padding: 2px;
@@ -380,8 +384,8 @@ dl dl {
   font-size: var(--crm-font-size) !important /* vs inline css on api3 */;
   line-height: 1.4  !important /* vs inline css on api3 */;
   color: var(--crm-c-text);
-  background-color: var(--crm-c-code-background);
-  border: 1px solid var(--crm-c-background4);
+  background-color: var(--crm-c-code-bg);
+  border: var(--crm-c-code-border);
   border-radius: var(--crm-roundness);
 }
 .crm-container pre code {

@@ -21,7 +21,7 @@
 .crm-container .ui-sortable-helper.crm-dashlet {
   box-shadow: var(--crm-block-shadow);
 }
-.crm-container #civicrm-dashboard .crm-dashlet-header {
+.crm-container .crm-dashlet-header {
   background-color: var(--crm-dashlet-header-bg);
   border-radius: var(--crm-dashlet-radius);
   border: var(--crm-dashlet-header-border);
@@ -109,10 +109,8 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   display: inline-block;
   width: 340px;
   height: var(--crm-xxl);
-  margin: 10px;
-  box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
   box-shadow: var(--crm-popup-shadow);
-  background-color: var(--crm-c-background4);
+  background-color: color-mix(in srgb, var(--crm-dashlet-bg) 90%, #fff 10%);
   border-radius: var(--crm-dashlet-radius);
   margin: 0;
 }

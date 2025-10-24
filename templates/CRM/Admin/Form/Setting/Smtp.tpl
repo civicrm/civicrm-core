@@ -7,11 +7,17 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{if !empty($readOnlyFields)}
+  <div class="description">
+    <i class="crm-i fa-lock" role="img" aria-hidden="true"></i>
+    {ts}Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php.{/ts}
+  </div>
+{/if}
 <div class="crm-block crm-form-block crm-smtp-form-block">
   <div>
   <h3>{ts}General{/ts}</h3>
     <table class="form-layout-compressed">
-      {foreach from=$settings_fields key="setting_name" item="fieldSpec"}
+      {foreach from=$settingSections.default.fields key="setting_name" item="fieldSpec"}
         {include file="CRM/Admin/Form/Setting/SettingField.tpl"}
       {/foreach}
     </table>
@@ -27,7 +33,12 @@
      <table>
            <tr class="crm-smtp-form-block-outBound_option">
               <td class="label">{$form.outBound_option.label}</td>
-              <td>{$form.outBound_option.html}</td>
+              <td>
+                {if in_array('outBound_option', $readOnlyFields)}
+                  <i class="crm-i fa-lock disabled" role="img" aria-hidden="true"></i>
+                {/if}
+                {$form.outBound_option.html}
+              </td>
            </tr>
         </table>
             <div id="bySMTP" class="mailoption">
@@ -36,29 +47,50 @@
                 <table class="form-layout-compressed">
                     <tr class="crm-smtp-form-block-smtpServer">
                        <td class="label">{$form.smtpServer.label}</td>
-                       <td>{$form.smtpServer.html}<br  />
+                       <td>
+                         {if in_array('smtpServer', $readOnlyFields)}
+                           <i class="crm-i fa-lock disabled" role="img" aria-hidden="true"></i>
+                         {/if}
+                         {$form.smtpServer.html}<br  />
                             <span class="description">{ts}Enter the SMTP server (machine) name, such as "smtp.example.com".  If the server uses SSL, add "ssl://" to the beginning of the server name, such as "ssl://smtp.example.com".{/ts}</span>
                        </td>
                     </tr>
                     <tr class="crm-smtp-form-block-smtpPort">
                        <td class="label">{$form.smtpPort.label}</td>
-                       <td>{$form.smtpPort.html}<br />
+                       <td>
+                         {if in_array('smtpPort', $readOnlyFields)}
+                           <i class="crm-i fa-lock disabled" role="img" aria-hidden="true"></i>
+                         {/if}
+                         {$form.smtpPort.html}<br />
                            <span class="description">{ts}The most common SMTP port possibilities are 25, 465, and 587.  Check with your mail provider for the appropriate one.{/ts}</span>
                        </td>
                     </tr>
                     <tr class="crm-smtp-form-block-smtpAuth">
                        <td class="label">{$form.smtpAuth.label}</td>
-                       <td>{$form.smtpAuth.html}<br />
+                       <td>
+                         {if in_array('smtpAuth', $readOnlyFields)}
+                           <i class="crm-i fa-lock disabled" role="img" aria-hidden="true"></i>
+                         {/if}
+                         {$form.smtpAuth.html}<br />
                          <span class="description">{ts}Does your SMTP server require authentication (user name + password)?{/ts}</span>
                        </td>
                     </tr>
                     <tr class="crm-smtp-form-block-smtpUsername">
                        <td class="label">{$form.smtpUsername.label}</td>
-                       <td>{$form.smtpUsername.html}</td>
+                       <td>
+                         {if in_array('smtpUsername', $readOnlyFields)}
+                           <i class="crm-i fa-lock disabled" role="img" aria-hidden="true"></i>
+                         {/if}
+                         {$form.smtpUsername.html}
+                       </td>
                     </tr>
                     <tr class="crm-smtp-form-block-smtpPassword">
                        <td class="label">{$form.smtpPassword.label}</td>
-                       <td>{$form.smtpPassword.html}<br />
+                       <td>
+                         {if in_array('smtpPassword', $readOnlyFields)}
+                           <i class="crm-i fa-lock disabled" role="img" aria-hidden="true"></i>
+                         {/if}
+                         {$form.smtpPassword.html}<br />
                            <span class="description">{ts}If your SMTP server requires authentication, enter your Username and Password here.{/ts}</span>
                        </td>
                     </tr>

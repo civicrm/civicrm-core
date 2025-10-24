@@ -476,29 +476,14 @@ ORDER BY weight";
   /**
    * Mark the current "navigation" data as invalid for one or all contacts.
    *
-   * @param int|null $contactID
-   *   NULL for all contacts.
+   * @param int $contactID
    * @return string
    * @throws \Civi\Core\Exception\DBQueryException
    * @internal
    */
-  public static function resetContactNavigation(?int $contactID): string {
+  public static function resetContactNavigation(int $contactID): string {
     $newKey = CRM_Utils_String::createRandom(self::CACHE_KEY_STRLEN, CRM_Utils_String::ALPHANUMERIC);
-    if (!$contactID) {
-      $ser = serialize($newKey);
-      $query = "UPDATE civicrm_setting SET value = '$ser' WHERE name='navigation' AND contact_id IS NOT NULL";
-      CRM_Core_DAO::executeQuery($query);
-    }
-    else {
-      // before inserting check if contact id exists in db
-      // this is to handle weird case when contact id is in session but not in db
-      $contact = new CRM_Contact_DAO_Contact();
-      $contact->id = $contactID;
-      if ($contact->find(TRUE)) {
-        Civi::contactSettings($contactID)->set('navigation', $newKey);
-      }
-    }
-
+    Civi::cache('navigation')->set("contact_$contactID", $newKey);
     return $newKey;
   }
 
@@ -862,9 +847,7 @@ ORDER BY weight";
    * @return object|string
    */
   public static function getCacheKey($cid) {
-    $key = Civi::service('settings_manager')
-      ->getBagByContact(NULL, $cid)
-      ->get('navigation');
+    $key = Civi::cache('navigation')->get("contact_{$cid}");
     if (strlen($key ?? '') !== self::CACHE_KEY_STRLEN) {
       $key = self::resetContactNavigation($cid);
     }
@@ -935,7 +918,7 @@ ORDER BY weight";
         $item['child'][] = [
           'attributes' => [
             'label' => ts('View My Contact'),
-            'name' => 'CiviCRM Dashboard',
+            'name' => 'View My Contact',
             'url' => 'civicrm/contact/view?cid=' . CRM_Core_Session::getLoggedInContactID() . '&reset=1',
             'icon' => 'crm-i fa-user',
             'weight' => 1,

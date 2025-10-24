@@ -36,40 +36,39 @@
   {if !empty($element.options_per_line)}
         {assign var="element_name" value=$element.element_name}
         <tr class="custom-field-row {$element_name}-row" {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element_name}_group"{/if}>
-         <td class="label"{if $element.html_type === "Radio"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel}{/if}</td>
-         <td>
-            {assign var="count" value=1}
-                <table class="form-layout-compressed">
-                 <tr>
-                   {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                   {foreach name=outer key=key item=item from=$form.$element_name}
-                     {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
-                     {if is_array($item) && array_key_exists('html', $item)}
-                          <td class="labels font-light">{$form.$element_name.$key.html}</td>
-                              {if $count == $element.options_per_line}
-                                {assign var="count" value=1}
-                           </tr>
-                            {else}
-                                {assign var="count" value=$count+1}
-                            {/if}
-                         {/if}
-                    {/foreach}
-                 </tr>
-                </table>
-         </td>
+          <td class="label">{if $element.html_type === "Radio" || $element.html_type === "CheckBox"}<span id="{$element_name}_group">{$form.$element_name.label|regex_replace:"/\<(\/|)label\>/":""}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel}{/if}
+          </td>
+          <td>
+            <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};" {if $element.html_type === "CheckBox"}role="group" aria-labelledby="{$element_name}_group"{/if}>
+              {foreach name=outer key=key item=item from=$form.$element_name}
+                {if is_array($item) && array_key_exists('html', $item)}
+                  {$form.$element_name.$key.html}
+                {/if}
+              {/foreach}
+              {* Include the edit options list for admins *}
+              {if $formElement.html|strstr:"crm-option-edit-link"}
+                {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
+              {/if}
+            </div>
+          </td>
         </tr>
   {else}
         {capture assign="name"}{if !empty($element.name)}{$element.name}{/if}{/capture}
         {capture assign="element_name"}{if !empty($element.element_name)}{$element.element_name}{/if}{/capture}
         <tr class="custom-field-row {$element_name}-row"  {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element_name}_group"{/if}>
-          <td class="label">{if $element.html_type === "Radio"}<span id="{$element_name}_group">{$element.label}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel}{/if}</td>
+          <td class="label">{if $element.html_type === "Radio" || $element.html_type === "CheckBox"}<span id="{$element_name}_group">{$form.$element_name.label|regex_replace:"/\<(\/|)label\>/":""}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel}{/if}</td>
         <td>
-          {$form.$element_name.html}&nbsp;
+            {if $element.html_type === "CheckBox" || $element.html_type === "Radio"}<div class="crm-multiple-checkbox-radio-options" {if $element.html_type === "CheckBox"}role="group" aria-labelledby="{$element_name}_group"{/if}>{$form.$element_name.html}</div>
+            {else}{$form.$element_name.html}{/if}
       {if $element.html_type eq 'Autocomplete-Select'}
           {if $element.data_type eq 'ContactReference'}
                   {include file="CRM/Custom/Form/ContactReference.tpl"}
                 {/if}
         {/if}
+          {* Include the edit options list for admins *}
+          {if $formElement.html|strstr:"crm-option-edit-link"}
+            {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
+          {/if}
           </td>
   {/if}
      {/if}

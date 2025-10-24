@@ -201,6 +201,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     $result = $contribution->save();
+    // Re-load the contribution, first removing all money values.
+    // We need to have some contribution details later on - ie
+    // if for record financial accounts and for adding activities.
+    // Under some circumstances (server dependent) the php values
+    // might be unrounded floats that save to rounded floats so
+    // doing the reload once here when we can unset them
+    // is better than possibly unreliable re-loads in other places.
+    unset($contribution->total_amount, $contribution->net_amount, $contribution->fee_amount, $contribution->non_deductible_amount, $contribution->tax_amount);
+    $contribution->find(TRUE);
     // Save invoice number if appropriate. Note we used to try to
     // avoid a second save but check https://lab.civicrm.org/dev/core/-/issues/5004
     // to see how that worked out....
@@ -519,10 +528,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     $transaction->commit();
 
-    if (empty($contribution->contact_id)) {
-      $contribution->find(TRUE);
-    }
-
     $isCompleted = ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id));
     if (!empty($params['on_behalf'])
       ||  $isCompleted
@@ -569,23 +574,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
         "action=view&reset=1&id={$contribution->id}&cid={$contribution->contact_id}&context=home"
       );
-      // in some update cases we need to get extra fields - ie an update that doesn't pass in all these params
-      $titleFields = [
-        'contact_id',
-        'total_amount',
-        'currency',
-        'financial_type_id',
-      ];
-      $retrieveRequired = 0;
-      foreach ($titleFields as $titleField) {
-        if (!isset($contribution->$titleField)) {
-          $retrieveRequired = 1;
-          break;
-        }
-      }
-      if ($retrieveRequired == 1) {
-        $contribution->find(TRUE);
-      }
+
       $financialType = CRM_Contribute_PseudoConstant::financialType($contribution->financial_type_id);
       $title = CRM_Contact_BAO_Contact::displayName($contribution->contact_id) . ' - (' . CRM_Utils_Money::format($contribution->total_amount, $contribution->currency) . ' ' . ' - ' . $financialType . ')';
 
@@ -2854,9 +2843,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   public static function recordFinancialAccounts(&$params, CRM_Contribute_DAO_Contribution $contribution) {
     $skipRecords = $return = FALSE;
     $isUpdate = !empty($params['prevContribution']);
+    $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution);
 
     $additionalParticipantId = [];
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'] ?? NULL);
+    $contributionStatus = $financialProcessor->getUpdatedContributionStatus();
 
     if (($params['contribution_mode'] ?? NULL) === 'participant') {
       $entityId = $params['participant_id'];
@@ -2888,16 +2878,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $statusId = $params['contribution']->contribution_status_id;
-
-    if ($contributionStatus !== 'Failed' &&
-      !($contributionStatus === 'Pending' && !$params['contribution']->is_pay_later)
+    // Checking $params['is_pay_later'] means we only pick this up if
+    // is_pay_later has been passed in - this feels like a mistake but it
+    // is an entrenched mistake (the previous code did the same although
+    // less obviously as it checked a partially populated contribution object.
+    $isPayLater = !empty($params['is_pay_later']);
+    if (!$financialProcessor->isFailedTransaction() &&
+      !($financialProcessor->isPendingTransaction() && !$isPayLater)
     ) {
       $skipRecords = TRUE;
       $pendingStatus = [
         'Pending',
         'In Progress',
       ];
-      if (in_array($contributionStatus, $pendingStatus)) {
+      if ($financialProcessor->isAccountsReceivableTransaction()) {
         $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
           $params['financial_type_id'],
           'Accounts Receivable Account is'
@@ -2927,9 +2921,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!isset($totalAmount) && !empty($params['prevContribution'])) {
         $totalAmount = $params['total_amount'] = $params['prevContribution']->total_amount;
       }
-      if (empty($contribution->currency)) {
-        $contribution->find(TRUE);
-      }
+
       //build financial transaction params
       $trxnParams = [
         'contribution_id' => $contribution->id,
@@ -2954,7 +2946,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'pan_truncation' => $params['pan_truncation'] ?? NULL,
         'card_type_id' => $params['card_type_id'] ?? NULL,
       ];
-      if ($contributionStatus === 'Refunded' || $contributionStatus === 'Chargeback' || $contributionStatus === 'Cancelled') {
+      if ($financialProcessor->isNegativeTransaction()) {
         $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
         if (isset($params['refund_trxn_id'])) {
           // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
@@ -2962,7 +2954,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
       //CRM-16259, set is_payment flag for non pending status
-      if (!in_array($contributionStatus, $pendingStatus)) {
+      if (!$financialProcessor->isAccountsReceivableTransaction()) {
         $trxnParams['is_payment'] = 1;
       }
       if (!empty($params['payment_processor'])) {
@@ -3013,7 +3005,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             if (isset($params['fee_amount'])) {
               $params['trxnParams']['fee_amount'] = 0 - $params['fee_amount'];
             }
-            if (in_array($params['contribution']->contribution_status_id, $pendingStatus)) {
+            if ($financialProcessor->isAccountsReceivableTransaction()) {
               $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
                 $params['prevContribution']->financial_type_id, $accountRelationship);
             }
@@ -3023,7 +3015,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
                 $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
               }
             }
-            CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changeFinancialType');
+            $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
+            $financialProcessor->updateFinancialAccounts($params, 'changeFinancialType');
             $params['skipLineItem'] = FALSE;
             foreach ($params['line_item'] as &$lineItems) {
               foreach ($lineItems as &$line) {
@@ -3038,7 +3031,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             if (isset($params['fee_amount'])) {
               $params['trxnParams']['fee_amount'] = $params['fee_amount'];
             }
-            CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params);
+            $financialProcessor->updateFinancialAccounts($params);
             CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE);
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
             $updated = TRUE;
@@ -3058,9 +3051,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {
           //Update Financial Records
-          $callUpdateFinancialAccounts = CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccountsOnContributionStatusChange($params);
+          $callUpdateFinancialAccounts = $financialProcessor->updateFinancialAccountsOnContributionStatusChange($params);
           if ($callUpdateFinancialAccounts) {
-            CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedStatus');
+            $financialProcessor->updateFinancialAccounts($params, 'changedStatus');
             CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedStatus');
           }
           $updated = TRUE;
@@ -3089,7 +3082,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         ) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
-          CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedAmount');
+          $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
+          $financialProcessor->updateFinancialAccounts($params, 'changedAmount');
           CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedAmount');
           $updated = TRUE;
         }
@@ -3119,7 +3113,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       else {
         // records finanical trxn and entity financial trxn
         // also make it available as return value
-        CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($trxnParams, $params);
+        $financialProcessor->recordAlwaysAccountsReceivable($trxnParams, $params);
         $trxnParams['pan_truncation'] = $params['pan_truncation'] ?? NULL;
         $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
         $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
@@ -3148,7 +3142,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if (!empty($params['prevContribution']) && $entityTable === 'civicrm_participant'
-      && $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
+      && $financialProcessor->isStatusChange()
     ) {
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $entityId, 'event_id');
       $feeLevel = str_replace('�', '', $params['prevContribution']->amount_level);
@@ -3989,7 +3983,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'weight' => 0,
       ];
     }
-    if ($contributionStatus !== 'Pending') {
+    if ($contributionStatus !== 'Pending' && CRM_Core_Permission::check('refund contributions')) {
       $actionLinks[] = [
         'url' => 'civicrm/payment',
         'title' => ts('Record Refund'),

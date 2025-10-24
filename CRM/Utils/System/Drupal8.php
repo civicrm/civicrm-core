@@ -215,7 +215,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @deprecated
    */
   public function addHTMLHead($header) {
-    \CRM_Core_Error::deprecatedFunctionWarning('Civi::resources()->addStyleFile() or addScriptFile() etc');
+    \CRM_Core_Error::deprecatedFunctionWarning('Civi::resources() or CRM_Core_Region::instance("html-header")');
     \Drupal::service('civicrm.page_state')->addHtmlHeader($header);
   }
 
@@ -953,14 +953,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function viewsIntegration(): string {
     return '<p><strong>' . ts('To enable CiviCRM Views integration, install the <a %1>CiviCRM Entity</a> module.', [1 => 'href="https://www.drupal.org/project/civicrm_entity"']) . '</strong></p>';
-  }
-
-  /**
-   * @inheritdoc
-   * @todo use Drupal "maintenance page" template and theme during installation
-   */
-  public function renderMaintenanceMessage(string $content): string {
-    return $content;
   }
 
   /**

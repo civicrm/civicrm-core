@@ -11,9 +11,8 @@ return [
     'title' => ts('Credit Notes Prefix'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Prefix added to new credit note identifiers.'),
     'default' => 'CN_',
     'help_text' => ts('The credit note ID is generated when a contribution is set to Refunded, Cancelled or Chargeback. It is visible on invoices, if invoices are enabled'),
-    'settings_pages' => ['contribute' => ['weight' => 80]],
+    'settings_pages' => ['contribute' => ['section' => 'invoice', 'weight' => 101]],
   ],
 ];

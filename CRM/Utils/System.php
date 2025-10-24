@@ -30,7 +30,6 @@ use GuzzleHttp\Psr7\Response;
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
  * @method static void appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb link to the existing breadcrumbs.
  * @method static void resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
- * @method static void addHTMLHead(string $head) Append a string to the head of the HTML file. Note: this is only used in Drupal7/Backdrop/Joomla and is deprecated in Drupal8+/Wordpress/Standalone
  * @method static string postURL(int $action) Determine the post URL for a form.
  * @method static string|null getUFLocale() Get the locale of the CMS.
  * @method static bool setUFLocale(string $civicrm_language) Set the locale of the CMS.
@@ -198,26 +197,6 @@ class CRM_Utils_System {
     }
 
     return $url;
-  }
-
-  /**
-   * If we are using a theming system, invoke theme, else just print the content.
-   *
-   * @param string $content
-   *   The content that will be themed.
-   * @param bool $print
-   *   (optional) Are we displaying to the screen or bypassing theming?
-   * @param bool $maintenance
-   *   (optional) For maintenance mode.
-   *
-   * @return string
-   */
-  public static function theme(
-    &$content,
-    $print = FALSE,
-    $maintenance = FALSE
-  ) {
-    return CRM_Core_Config::singleton()->userSystem->theme($content, $print, $maintenance);
   }
 
   /**
@@ -1438,18 +1417,22 @@ class CRM_Utils_System {
    * @return null|string
    *   URL or link to documentation page, based on provided parameters.
    */
-  public static function docURL($params) {
+  public static function docURL(array $params): ?string {
+    $link = $params['url'] ?? NULL;
 
-    if (!isset($params['page'])) {
-      return NULL;
+    if (!$link && isset($params['page'])) {
+      if (($params['resource'] ?? NULL) == 'wiki') {
+        $docBaseURL = self::getWikiBaseURL();
+      }
+      else {
+        $docBaseURL = self::getDocBaseURL();
+        $params['page'] = self::formatDocUrl($params['page']);
+      }
+      $link = $docBaseURL . str_replace(' ', '+', $params['page']);
     }
 
-    if (($params['resource'] ?? NULL) == 'wiki') {
-      $docBaseURL = self::getWikiBaseURL();
-    }
-    else {
-      $docBaseURL = self::getDocBaseURL();
-      $params['page'] = self::formatDocUrl($params['page']);
+    if (!empty($params['URLonly']) || is_null($link)) {
+      return $link;
     }
 
     if (!isset($params['title'])) {
@@ -1460,7 +1443,7 @@ class CRM_Utils_System {
     }
 
     if (!isset($params['text'])) {
-      $params['text'] = ts('(Learn more...)');
+      $params['text'] = ts('Learn more...');
     }
 
     if (!isset($params['style'])) {
@@ -1470,16 +1453,9 @@ class CRM_Utils_System {
       $style = "style=\"{$params['style']}\"";
     }
 
-    $link = $docBaseURL . str_replace(' ', '+', $params['page']);
-
-    if (!empty($params['URLonly'])) {
-      return $link;
-    }
-    else {
-      $params['text'] = htmlspecialchars($params['text']);
-      $params['title'] = htmlspecialchars($params['title']);
-      return "<a href=\"{$link}\" $style target=\"_blank\" class=\"crm-doc-link no-popup\" title=\"{$params['title']}\">{$params['text']}</a>";
-    }
+    $params['text'] = htmlspecialchars($params['text']);
+    $params['title'] = htmlspecialchars($params['title']);
+    return "<a href=\"{$link}\" $style target=\"_blank\" class=\"crm-doc-link no-popup\" title=\"{$params['title']}\">{$params['text']} <i class=\"crm-i fa-external-link\" role=\"img\" aria-hidden=\"true\"></i></a>";
   }
 
   /**
@@ -1931,7 +1907,7 @@ class CRM_Utils_System {
         break;
 
       default:
-        $title = ts(ucfirst($action)) . ' ' . $daoClass::getEntityTitle();
+        $title = ucfirst($action) . ' ' . $daoClass::getEntityTitle();
     }
 
     return [
@@ -1966,6 +1942,18 @@ class CRM_Utils_System {
 
   public static function sendOkRequestResponse(string $message = 'OK'): void {
     self::sendResponse(new Response(200, [], $message));
+  }
+
+  /**
+   * Output JSON response to the client
+   *
+   * @param array $response
+   * @param int $httpResponseCode
+   *
+   * @return void
+   */
+  public static function sendJSONResponse(array $response, int $httpResponseCode): void {
+    CRM_Core_Config::singleton()->userSystem->sendJSONResponse($response, $httpResponseCode);
   }
 
   public static function isMaintenanceMode(): bool {

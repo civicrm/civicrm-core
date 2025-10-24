@@ -18,15 +18,7 @@
 /**
  * This class generates form components for Mapping and Geocoding.
  */
-class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
-
-  /**
-   * Build the form object.
-   */
-  public function buildQuickForm() {
-    $this->setTitle(ts('Settings - Mapping and Geocoding Providers'));
-    parent::buildQuickForm();
-  }
+class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Generic {
 
   /**
    * Global form rule.

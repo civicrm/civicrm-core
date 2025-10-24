@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Service;
 
+use Civi\Core\ClassScanner;
 use Civi\Core\Service\AutoSubscriber;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Api4\Generic\EntityInterface;
@@ -21,6 +22,7 @@ class LegacyEntityScanner extends AutoSubscriber {
   public static function getSubscribedEvents(): array {
     return [
       'civi.api4.entityTypes' => 'addEntities',
+      'hook_civicrm_check' => 'check',
     ];
   }
 
@@ -101,6 +103,7 @@ class LegacyEntityScanner extends AutoSubscriber {
 
     foreach ($active as $ext) {
       $info = $infos[$ext['fullName']];
+      // Optimization: Avoid duplicate scans for exts with 'scan-classes@'.
       if (!self::hasScanClasses($info)) {
         $locations[] = $ext['filePath'];
       }
@@ -115,6 +118,27 @@ class LegacyEntityScanner extends AutoSubscriber {
       }
     }
     return FALSE;
+  }
+
+  public function check(GenericHookEvent $e): void {
+    // Prefer entities be discoverable via class-scanner. Any entities that aren't should generate warnings.
+    $scannedEntities = array_map(fn($c) => $c::getEntityName(), ClassScanner::get(['interface' => EntityInterface::class]));
+    $legacyEntities = self::getEntitiesFromClasses();
+    $unscannedEntities = array_filter($legacyEntities, fn($e) => !in_array($e['name'], $scannedEntities));
+
+    if ($unscannedEntities) {
+      $intro = ts('Some of your extensions are providing entities through the Legacy Entity Scanner. These should be updated to use <code>scan-classes</code> mixin for better performance and future proofing.');
+      $entityList = implode('', array_map(fn ($info) => sprintf("<li><code>%s</code></li>", $info['name']), $unscannedEntities));
+      $message = "<p>{$intro}</p><ul>{$entityList}</ul>";
+      $e->messages[] = new \CRM_Utils_Check_Message(
+        'api4_legacy_entity_scan',
+        $message,
+        ts('APIv4 Entities using Legacy Entity Scanner'),
+        \Psr\Log\LogLevel::INFO,
+        'fa-box'
+      );
+
+    }
   }
 
 }

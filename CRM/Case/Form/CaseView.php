@@ -556,7 +556,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form implements CRM_Case_Form_Case
   public static function activityForm($form) {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
     //build reporter select
-    $reporters = ["" => ts(' - any reporter - ')];
+    $reporters = ["" => ts('- any reporter -')];
     foreach ($caseRelationships as $key => & $value) {
       $reporters[$value['cid']] = $value['sort_name'] . " ( {$value['relation']} )";
     }
@@ -581,7 +581,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form implements CRM_Case_Form_Case
     $form->add('select', 'activity_type_filter_id', ts('Activity Type'), ['' => ts('- select activity type -')] + $aTypesFilter, FALSE, ['id' => 'activity_type_filter_id_' . $form->_caseID]);
 
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $form->add('select', 'status_id', ts('Status'), ["" => ts(' - any status - ')] + $activityStatus, FALSE, ['id' => 'status_id_' . $form->_caseID]);
+    $form->add('select', 'status_id', ts('Status'), ["" => ts('- any status -')] + $activityStatus, FALSE, ['id' => 'status_id_' . $form->_caseID]);
 
     // activity date search filters
     $form->add('datepicker', 'activity_date_low_' . $form->_caseID, ts('Activity Dates - From'), [], FALSE, ['time' => FALSE]);
