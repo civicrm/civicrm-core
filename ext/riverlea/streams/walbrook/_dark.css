@@ -9,7 +9,6 @@
 /* Practical colours, e.g. background, text, link '--crm-c-' */
   --crm-c-text-light: #fff;
   --crm-c-text-dark: #302f35;
-  --crm-c-text: var(--crm-c-text-dark);
   --crm-c-link: var(--crm-c-amber);
   --crm-c-link-hover: var(--crm-c-amber-light);
   --crm-c-focus: var(--crm-c-link);
