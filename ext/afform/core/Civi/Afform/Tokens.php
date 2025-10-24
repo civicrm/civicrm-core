@@ -228,9 +228,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     if (!empty($row->context['caseId'])) {
       $afformArgs['case_id'] = $row->context['caseId'];
     }
-    if (!empty($row->context['activityId'])) {
-      $afformArgs['activity_id'] = $row->context['activityId'];
-    }
+    $event = GenericHookEvent::create(['row' => $row, 'afformArgs' => &$afformArgs]);
+      \Civi::dispatcher()->dispatch('civi.afform.createToken', $event);
     return $afformArgs;
   }
 

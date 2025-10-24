@@ -3,6 +3,7 @@ namespace Civi\Afform\Behavior;
 
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformPrefillEvent;
+use Civi\Token\TokenRow;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -18,6 +19,7 @@ class ActivityAutofill extends AbstractBehavior implements EventSubscriberInterf
   public static function getSubscribedEvents() {
     return [
       'civi.afform.prefill' => ['onAfformPrefill', 99],
+      '&civi.afform.createToken' => ['onCreateToken', 99],
     ];
   }
 
@@ -60,6 +62,12 @@ class ActivityAutofill extends AbstractBehavior implements EventSubscriberInterf
           $apiRequest->loadEntity($entity, [['id' => $id]]);
         }
       }
+    }
+  }
+
+  public function onCreateToken(TokenRow $row, array &$afformArgs) {
+    if (!empty($row->context['activityId'])) {
+      $afformArgs['activity_id'] = $row->context['activityId'];
     }
   }
 
