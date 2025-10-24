@@ -49,6 +49,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   public function getOriginalContributionStatus(): ?string {
+    if (!$this->originalContribution) {
+      return NULL;
+    }
     return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->originalContribution->contribution_status_id);
   }
 
@@ -64,8 +67,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
     return $this->getUpdatedContributionStatus() === 'Pending';
   }
 
+  public function isCompletedTransaction(): bool {
+    return $this->getUpdatedContributionStatus() === 'Completed';
+  }
+
   public function isAccountsReceivableTransaction(): bool {
     return $this->getUpdatedContributionStatus() === 'Pending' || $this->getUpdatedContributionStatus() === 'In Progress';
+  }
+
+  public function isOriginalStatusPending(): bool {
+    return in_array($this->getOriginalContributionStatus(), ['Pending', 'In Progress'], TRUE);
   }
 
   public function isStatusChange(): bool {
@@ -436,21 +447,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * Does this transaction reflect a payment instrument change.
    *
    * @param array $params
-   * @param array $pendingStatuses
    *
    * @return bool
    */
-  public static function isPaymentInstrumentChange(&$params, $pendingStatuses) {
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
-
+  public function isPaymentInstrumentChange(array $params): bool {
     if (array_key_exists('payment_instrument_id', $params)) {
       if (CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id) &&
         !CRM_Utils_System::isNull($params['payment_instrument_id'])
       ) {
         //check if status is changed from Pending to Completed
         // do not update payment instrument changes for Pending to Completed
-        if (!($contributionStatus == 'Completed' &&
-          in_array($params['prevContribution']->contribution_status_id, $pendingStatuses))
+        if (!($this->isCompletedTransaction() &&
+          $this->isOriginalStatusPending())
         ) {
           return TRUE;
         }
