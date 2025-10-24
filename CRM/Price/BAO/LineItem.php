@@ -208,8 +208,6 @@ WHERE li.contribution_id = %1";
       2 => [$entity, 'Text'],
     ];
 
-    $getTaxDetails = FALSE;
-
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
       if (!$dao->id) {
@@ -246,9 +244,6 @@ WHERE li.contribution_id = %1";
         $lineItems[$dao->id]['tax_rate'] = FALSE;
       }
       $lineItems[$dao->id]['subTotal'] = $lineItems[$dao->id]['qty'] * $lineItems[$dao->id]['unit_price'];
-      if ($lineItems[$dao->id]['tax_amount'] != '') {
-        $getTaxDetails = TRUE;
-      }
     }
     return $lineItems;
   }
