@@ -2118,8 +2118,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // Add Additional common information to formatted params.
       CRM_Contribute_Form_AdditionalInfo::postProcessCommon($formValues, $params, $this);
       if ($pId) {
-        $params['contribution_mode'] = 'participant';
-        $params['participant_id'] = $pId;
         $params['skipLineItem'] = 1;
       }
       $params['line_item'] = [$this->getOrder()->getPriceSetID() => $this->getOrder()->getLineItems()];
