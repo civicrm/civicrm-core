@@ -321,6 +321,13 @@ class Afform extends Generic\AbstractEntity {
           'readonly' => TRUE,
           'required' => FALSE,
         ],
+        [
+          'name' => 'locale',
+          'title' => ts('Locale'),
+          'data_type' => 'String',
+          'input_type' => 'Select',
+          'required' => \CRM_Core_I18n::isMultiLingual(),
+        ],
       ];
       // Calculated fields returned by get action
       if ($self->getAction() === 'get') {

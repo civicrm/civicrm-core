@@ -44,6 +44,7 @@ class AfformAdminMeta {
       'afform_tags' => $afformTags,
       'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
       'confirmation_types' => self::getConfirmationTypes(),
+      'locales' => self::getLocales(),
     ];
   }
 
@@ -399,6 +400,27 @@ class AfformAdminMeta {
       }
     }
     return $entityFilterOptions;
+  }
+
+  private static function getLocales(): array {
+    $options = NULL;
+    if (\CRM_Core_I18n::isMultiLingual()) {
+      $languages = \CRM_Core_I18n::languages();
+      $locales = \CRM_Core_I18n::getMultilingual();
+
+      if (\Civi::settings()->get('force_translation_source_locale') ?? TRUE) {
+        $defaultLocale = \Civi::settings()->get('lcMessages');
+        $locales = [$defaultLocale];
+      }
+
+      foreach ($locales as $index => $locale) {
+        $options[] = [
+          'id' => $locale,
+          'text' => $languages[$locale],
+        ];
+      }
+    }
+    return $options;
   }
 
 }
