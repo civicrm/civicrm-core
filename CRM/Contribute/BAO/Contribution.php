@@ -2847,17 +2847,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionStatus = $financialProcessor->getUpdatedContributionStatus();
 
-    if (!empty($params['membership_id'])) {
-      //so far $params['membership_id'] should only be set coming in from membershipBAO::create so the situation where multiple memberships
-      // are created off one contribution should be handled elsewhere
-      $entityId = $params['membership_id'];
-      $entityTable = 'civicrm_membership';
-    }
-    else {
-      $entityId = $contribution->id;
-      $entityTable = 'civicrm_contribution';
-    }
-
     $statusId = $params['contribution']->contribution_status_id;
     // Checking $params['is_pay_later'] means we only pick this up if
     // is_pay_later has been passed in - this feels like a mistake but it
@@ -3099,6 +3088,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
+      if (!empty($params['membership_id'])) {
+        //so far $params['membership_id'] should only be set coming in from membershipBAO::create so the situation where multiple memberships
+        // are created off one contribution should be handled elsewhere
+        $entityId = $params['membership_id'];
+        $entityTable = 'civicrm_membership';
+      }
+      else {
+        $entityId = $contribution->id;
+        $entityTable = 'civicrm_contribution';
+      }
       CRM_Price_BAO_LineItem::processPriceSet($entityId, $params['line_item'] ?? NULL, $params['contribution'], $entityTable, $isUpdate);
     }
 
