@@ -2,6 +2,8 @@
 
 namespace Civi\Riverlea;
 
+use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoService;
 use CRM_riverlea_ExtensionUtil as E;
 
 /**
@@ -12,9 +14,7 @@ use CRM_riverlea_ExtensionUtil as E;
  *
  * @service riverlea.style_loader
  */
-class StyleLoader implements \Symfony\Component\EventDispatcher\EventSubscriberInterface, \Civi\Core\Service\AutoServiceInterface {
-
-  use \Civi\Core\Service\AutoServiceTrait;
+class StyleLoader extends AutoService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
 
   public const DYNAMIC_FILE = 'river.css';
 
@@ -99,11 +99,14 @@ class StyleLoader implements \Symfony\Component\EventDispatcher\EventSubscriberI
     }
   }
 
-  public function alterBundles($e): void {
+  public function alterBundles(GenericHookEvent $e): void {
     if (!$this->isActive()) {
       return;
     }
 
+    /**
+     * @var \CRM_Core_Resources_Bundle
+     */
     $bundle = $e->bundle;
 
     if ($bundle->name === 'bootstrap3') {
