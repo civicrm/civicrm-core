@@ -285,6 +285,12 @@ class AfformAdminMeta {
             ],
           ],
         ],
+        'search_param_sets' => [
+          'title' => E::ts('Saved Search Param Sets'),
+          'element' => [
+            '#tag' => 'af-search-param-sets',
+          ],
+        ],
         'submit' => [
           'title' => E::ts('Submit Button'),
           'afform_type' => ['form'],
