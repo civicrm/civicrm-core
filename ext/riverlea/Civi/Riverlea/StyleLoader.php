@@ -99,11 +99,14 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     }
   }
 
-  public function alterBundles($e): void {
+  public function alterBundles(GenericHookEvent $e): void {
     if (!$this->isActive()) {
       return;
     }
 
+    /**
+     * @var \CRM_Core_Resources_Bundle
+     */
     $bundle = $e->bundle;
 
     if ($bundle->name === 'bootstrap3') {
