@@ -2988,10 +2988,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         if (!empty($params['financial_type_id']) &&
           $params['contribution']->financial_type_id != $params['prevContribution']->financial_type_id
         ) {
-          $accountRelationship = 'Income Account is';
-          if (!empty($params['revenue_recognition_date']) || $params['prevContribution']->revenue_recognition_date) {
-            $accountRelationship = 'Deferred Revenue Account is';
-          }
+          $accountRelationship = $contribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
           $oldFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['prevContribution']->financial_type_id, $accountRelationship);
           $newFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['financial_type_id'], $accountRelationship);
           if ($oldFinancialAccount != $newFinancialAccount) {
