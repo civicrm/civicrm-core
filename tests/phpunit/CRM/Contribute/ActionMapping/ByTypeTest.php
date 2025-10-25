@@ -478,6 +478,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
         'address_id.name' => 'Billing Address Name',
         'address_id.display' => 'Billing Address',
         'header' => 'Message Header',
+        'created_date' => 'Created Date',
+        'modified_date' => 'Modified Date',
       ], $comparison);
   }
 
