@@ -332,6 +332,10 @@
         ctrl.settings = ctrl.display.settings;
       }
 
+      // this is used to filter toggled columns in the table
+      // search display - here its trivial
+      this.getRowColumns = (row) => row.columns;
+
       // @return {Promise}
       this.loadAfforms = function() {
         if (!ctrl.afformEnabled && !afformLoad) {
