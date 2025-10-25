@@ -3,10 +3,10 @@
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu {
     border-top: 0 none !important;
-    margin-top: $menubarHeight;
+    margin-top: var(--crm-c-menubar-height);
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
-    margin-top: calc($menubarHeight * 2);
+    margin-top: calc(var(--crm-c-menubar-height) * 2);
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-bar {
     visibility: hidden;
@@ -30,18 +30,4 @@
 }
 .breadcrumb ol li:not(:first-child)::before {
   content: " \BB ";
-}
-
-.standalone-errors {
-  background: #ffe8e4;
-  color: #422;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-.standalone-errors code {
-  color: #004e81;
-}
-.standalone-errors .backtrace {
-  font-size: 0.825rem;
 }

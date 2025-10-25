@@ -213,3 +213,15 @@ html.crm-standalone #crm-container:has(.standalone-auth-form) {
 html.crm-standalone .standalone-auth-box {
   background: var(--crm-c-page-bg);
 }
+html.crm-standalone .standalone-errors {
+  background: #ffe8e4;
+  color: #422;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+html.crm-standalone .standalone-errors code {
+  color: #004e81;
+}
+html.crm-standalone .standalone-errors .backtrace {
+  font-size: 0.825rem;
+}
