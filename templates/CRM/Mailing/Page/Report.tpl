@@ -123,26 +123,37 @@
 
 {if $report.mailing.url_tracking && $report.click_through|@count > 0}
 <fieldset>
-<legend>{ts}Click-through Summary{/ts}</legend>
-{strip}
-<table class="crm-info-panel">
-<tr>
-<th><a href="{$report.event_totals.links.clicks}">{ts}Clicks{/ts}</a></th>
-<th><a href="{$report.event_totals.links.clicks_unique}">{ts}Unique Clicks{/ts}</a></th>
-<th>{ts}Success Rate{/ts}</th>
-<th>{ts}URL{/ts}</th>
-<th>{ts}Report{/ts}</th></tr>
-{foreach from=$report.click_through item=row}
-<tr class="{cycle values="odd-row,even-row"}">
-<td>{if $row.clicks > 0}<a href="{$row.link}">{$row.clicks}</a>{else}{$row.clicks}{/if}</td>
-<td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
-<td>{$row.rate|string_format:"%0.2f"}%</td>
-<td><a href="{$row.url}">{$row.url}</a></td>
-<td><a href="{$row.report}">{ts}Report{/ts}</a></td>
-</tr>
-{/foreach}
-</table>
-{/strip}
+  <legend>{ts}Click-through Summary{/ts}</legend>
+  <table class="crm-info-panel">
+    <tr>
+      {if $is_adminui_enabled}
+        <th><a href="{$report.event_totals.links.clicks}">{ts}Clicks{/ts}</a></th>
+        <th>{ts}Success Rate{/ts}</th>
+        <th>{ts}URL{/ts}</th>
+      {else}
+        <th><a href="{$report.event_totals.links.clicks}">{ts}Clicks{/ts}</a></th>
+        <th><a href="{$report.event_totals.links.clicks_unique}">{ts}Unique Clicks{/ts}</a></th>
+        <th>{ts}Success Rate{/ts}</th>
+        <th>{ts}URL{/ts}</th>
+        <th>{ts}Report{/ts}</th>
+      {/if}
+    </tr>
+    {foreach from=$report.click_through item=row}
+      <tr class="{cycle values="odd-row,even-row"}">
+        {if $is_adminui_enabled}
+          <td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
+          <td>{$row.rate|string_format:"%0.2f"}%</td>
+          <td><a href="{$row.url}">{$row.url|truncate:100:'....':true:true}</a></td>
+        {else}
+          <td>{if $row.clicks > 0}<a href="{$row.link}">{$row.clicks}</a>{else}{$row.clicks}{/if}</td>
+          <td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
+          <td>{$row.rate|string_format:"%0.2f"}%</td>
+          <td><a href="{$row.url}">{$row.url|truncate:100:'....':true:true}</a></td>
+          <td><a href="{$row.report}">{ts}Report{/ts}</a></td>
+        {/if}
+      </tr>
+    {/foreach}
+  </table>
 </fieldset>
 {/if}
 
