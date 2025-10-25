@@ -31,16 +31,6 @@ return [
     ],
   ],
   'getFields' => fn() => [
-    'id' => [
-      'title' => ts('Cache ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
-      'required' => TRUE,
-      'description' => ts('Unique table ID'),
-      'add' => '1.6',
-      'primary_key' => TRUE,
-      'auto_increment' => TRUE,
-    ],
     'contact_id' => [
       'title' => ts('Contact ID'),
       'sql_type' => 'int unsigned',
