@@ -1,12 +1,20 @@
 /* CiviCRM navigation menu stylesheet */
 
+:root {
+  --crm-menubar-height: $menubarHeight;
+  --crm-c-menubar-bg: $menubarColor;
+  --crm-c-menubar-item: $menuItemColor;
+  --crm-c-menubar-text: $textColor;
+  --crm-c-menubar-highlight: $highlightColor;
+  --crm-c-menubar-highlight-text: $highlightTextColor;
+}
 #civicrm-menu-nav {
   line-height: 0;
   text-align: left;
   font-size: 13px;
 }
 #civicrm-menu {
-  background-color: $menubarColor;
+  background-color: var(--crm-c-menubar-bg);
   width: 100%;
   z-index: 500;
   height: auto;
@@ -39,8 +47,8 @@
 #civicrm-menu li a:hover,
 #civicrm-menu li a.highlighted {
   text-decoration: none;
-  background-color: $highlightColor;
-  color: $highlightTextColor;
+  background-color: var(--crm-c-menubar-highlight);
+  color: var(--crm-c-menubar-highlight-text);
 }
 #civicrm-menu li li .sub-arrow:before {
   content: "\f0da";
@@ -130,7 +138,7 @@ input#crm-qsearch-input {
   margin: 4px 4px 0;
   padding: 2px 8px;
   min-height: 0;
-  height: calc($menubarHeight - 10px);
+  height: calc(var(--crm-menubar-height) - 10px);
   width: 30px;
   transition: width .5s .05s, background-color .3s .05s;
   color: black;
@@ -177,7 +185,7 @@ ul.crm-quickSearch-results.ui-state-disabled {
 }
 #civicrm-menu #crm-menubar-toggle-position a i {
   margin: 0;
-  border-top: 2px solid $textColor;
+  border-top: 2px solid var(--crm-c-menubar-text);
   font-size: 11px;
   opacity: .8;
 }
@@ -256,12 +264,12 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 
   #civicrm-menu li a {
-    background-color: $menuItemColor;
-    color: $textColor;
+    background-color: var(--crm-c-menubar-item);
+    color: var(--crm-c-menubar-text);
   }
 
   #civicrm-menu > li > a {
-    height: $menubarHeight;
+    height: var(--crm-menubar-height);
     padding: 0 8px;
   }
 
