@@ -23,25 +23,3 @@
   }
 
 }
-
-.breadcrumb ol li {
-  display: inline;
-  list-style-type: none;
-}
-.breadcrumb ol li:not(:first-child)::before {
-  content: " \BB ";
-}
-
-.standalone-errors {
-  background: #ffe8e4;
-  color: #422;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-.standalone-errors code {
-  color: #004e81;
-}
-.standalone-errors .backtrace {
-  font-size: 0.825rem;
-}
