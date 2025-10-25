@@ -187,9 +187,7 @@
       },
 
       getAfformFilters: function() {
-        return _.pick(this.afFieldset ? this.afFieldset.getFieldData() : {}, function(val) {
-          return typeof val !== 'undefined' && val !== null && (_.includes(['boolean', 'number', 'object'], typeof val) || val.length);
-        });
+        return this.afFieldset ? this.afFieldset.getFilterValues() : {};
       },
 
       // WARNING: Only to be used with trusted/sanitized markup.
