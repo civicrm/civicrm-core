@@ -405,6 +405,7 @@
   --crm-icon-success-color: inherit;
   --crm-icon-warning-color: inherit;
   --crm-icon-info-color: inherit;
+  --crm-loading-spinner-size: 48px;
 /* Form Builder UI */
   --crm-fb-header-bg: var(--crm-c-layer2-bg);
 /* Wizard */

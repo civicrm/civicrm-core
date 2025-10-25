@@ -35,7 +35,7 @@
             return;
           }
 
-          this.chartContainer.innerHtml = '<div class="crm-loading-element"></div>';
+          this.chartContainer.innerHtml = '<div class="crm-loading-spinner"></div>';
 
           this.buildColumns();
 
