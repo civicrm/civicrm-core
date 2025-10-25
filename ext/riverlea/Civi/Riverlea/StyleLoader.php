@@ -189,29 +189,40 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
 
     $e->content = $render['content'] ?? '';
   }
-  
-  /** Get font size from setting and add a variable for it
+
+  /**
+   * Validate the font size setting: it should be a floating
+   * point number (CSS font size in rem)
+   */
+  public static function validateFontSize($value):bool {
+    $fontSize = floatval($value);
+    if ($fontSize < 0.5 || $fontSize > 2) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * Get font size setting and add a variable for it
    * to the CSS properties of every stream
    */
   public static function onChangeFontsize($oldValue, $newValue, $metadata) {
     if ($oldValue != $newValue) {
-      // Make sure a floating point number was input
       $fontSize = floatval($newValue);
-      if ($fontSize > 0.3 && $fontSize < 5) {
-        // Get current CSS properties for every stream
-        $riverleaStreams = \Civi\Api4\RiverleaStream::get(TRUE)
+      // Get current CSS properties for every stream
+      $riverleaStreams = \Civi\Api4\RiverleaStream::get(TRUE)
         ->addSelect('vars')
         ->execute();
-        // Add new font size to each stream as a CSS property
-        foreach ($riverleaStreams as $riverleaStream) {
-          $riverleaStream['vars']['--crm-font-size'] = $fontSize . "rem";
-          // Write the new value to the CSS vars of each stream
-          $results = \Civi\Api4\RiverleaStream::update(TRUE)
+      // Add new font size to each stream as a CSS property
+      foreach ($riverleaStreams as $riverleaStream) {
+        $riverleaStream['vars']['--crm-font-size'] = $fontSize . "rem";
+        // Write the new value to the CSS vars of each stream
+        $results = \Civi\Api4\RiverleaStream::update(TRUE)
           ->addValue('vars', $riverleaStream['vars'])
           ->addWhere('id', '=', $riverleaStream['id'])
           ->execute();
-        }
       }
     }
   }
+
 }

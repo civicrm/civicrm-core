@@ -51,6 +51,7 @@ return [
     'name' => 'riverlea_font_size',
     'group' => 'riverlea',
     'default' => '1',
+    'type' => 'String',
     'html_type' => 'select',
     'add' => 1.0,
     'options' => [
@@ -63,6 +64,7 @@ return [
     'on_change' => [
       '\\Civi\\Riverlea\\StyleLoader::onChangeFontsize',
     ],
+    'validate_callback' => '\\Civi\\Riverlea\\StyleLoader::validateFontsize',
     'title' => E::ts('Font size'),
     'is_domain' => 1,
     'is_contact' => 0,
