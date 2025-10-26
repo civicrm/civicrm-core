@@ -98,7 +98,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
         $value = '';
       }
       else {
-        $value = (boolean) $value;
+        $value = (bool) $value;
       }
       break;
 
