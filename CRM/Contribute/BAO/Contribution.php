@@ -2845,37 +2845,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $isUpdate = !empty($params['prevContribution']);
     $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution);
 
-    $additionalParticipantId = [];
     $contributionStatus = $financialProcessor->getUpdatedContributionStatus();
-
-    if (($params['contribution_mode'] ?? NULL) === 'participant') {
-      $entityId = $params['participant_id'];
-      $entityTable = 'civicrm_participant';
-      $additionalParticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
-    }
-    elseif (!empty($params['membership_id'])) {
-      //so far $params['membership_id'] should only be set coming in from membershipBAO::create so the situation where multiple memberships
-      // are created off one contribution should be handled elsewhere
-      $entityId = $params['membership_id'];
-      $entityTable = 'civicrm_membership';
-    }
-    else {
-      $entityId = $contribution->id;
-      $entityTable = 'civicrm_contribution';
-    }
-
-    $entityID[] = $entityId;
-    if (!empty($additionalParticipantId)) {
-      $entityID += $additionalParticipantId;
-      // build line item array if necessary
-      if ($additionalParticipantId) {
-        CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
-      }
-    }
-    // prevContribution appears to mean - original contribution object- ie copy of contribution from before the update started that is being updated
-    if (empty($params['prevContribution'])) {
-      $entityID = NULL;
-    }
 
     $statusId = $params['contribution']->contribution_status_id;
     // Checking $params['is_pay_later'] means we only pick this up if
@@ -3115,6 +3085,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
+      if (!empty($params['membership_id'])) {
+        //so far $params['membership_id'] should only be set coming in from membershipBAO::create so the situation where multiple memberships
+        // are created off one contribution should be handled elsewhere
+        $entityId = $params['membership_id'];
+        $entityTable = 'civicrm_membership';
+      }
+      else {
+        $entityId = $contribution->id;
+        $entityTable = 'civicrm_contribution';
+      }
       CRM_Price_BAO_LineItem::processPriceSet($entityId, $params['line_item'] ?? NULL, $params['contribution'], $entityTable, $isUpdate);
     }
 
@@ -3134,13 +3114,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Core_BAO_FinancialTrxn::recordFees($params);
     }
 
-    if (!empty($params['prevContribution']) && $entityTable === 'civicrm_participant'
-      && $financialProcessor->isStatusChange()
-    ) {
-      $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $entityId, 'event_id');
-      $feeLevel = str_replace('�', '', $params['prevContribution']->amount_level);
-      CRM_Event_BAO_Participant::createDiscountTrxn($eventID, $params, $feeLevel);
-    }
     unset($params['line_item']);
     return $return;
   }
