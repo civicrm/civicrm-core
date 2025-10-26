@@ -1,0 +1,4 @@
+<extension key='test.extension.uncletest' type='module'>
+  <file>uncletest</file>
+  <name>test_extension_uncletest</name>
+</extension>
