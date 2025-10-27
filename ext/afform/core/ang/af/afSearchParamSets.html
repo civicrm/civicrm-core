@@ -3,7 +3,7 @@
   ng-model="$ctrl.getSetSearchParamSet"
   ng-model-options="{getterSetter: true}"
   >
-  <option value="">- {{:: ts('Saved filters') }} - </option>
+  <option value="">- {{:: ts('Saved searches') }} - </option>
   <option ng-repeat="searchParamSet in $ctrl.savedSets" value="{{:: searchParamSet.id }}">
     {{:: searchParamSet.label }}
   </option>
@@ -130,9 +130,9 @@
   <ul ng-if="$ctrl.savedSets.length">
     <li ng-repeat="searchParamSet in $ctrl.savedSets">
 
-      <details class="crm-accordion-wrapper">
+      <details class="crm-accordion-bold">
 
-        <summary class="crm-accordion-header">
+        <summary>
           {{:: searchParamSet.label }}
           <span class="af-search-param-set-description">
             {{::
@@ -146,7 +146,7 @@
 
         <div class="crm-accordion-body">
           <dl>
-            <div ng-repeat="(key, value) in $ctrl.renderSearchParamSetFilters(searchParamSet.filters)">
+            <div ng-repeat="(key, value) in $ctrl.renderSearchParamSetDetails(searchParamSet)">
               <dt>{{:: key }}</dt><dd>{{ value }}</dd>
             </div>
           </dl>
@@ -157,7 +157,7 @@
               crm-icon="fa-eye"
               ng-click="$ctrl.manageDialog.close() || $ctrl.applySearchParamSet(searchParamSet.id)"
               >
-              {{:: ts('Use') }}
+              {{:: ts('Open') }}
             </button>
             <button
               type="button"

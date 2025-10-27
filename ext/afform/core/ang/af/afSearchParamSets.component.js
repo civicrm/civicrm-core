@@ -19,7 +19,7 @@
       };
 
       this.fetchSearchParamSets = () => crmApi4('SearchParamSet', 'get', {
-          select: ['label', 'filters', 'created_by.display_name', 'created_date'],
+          select: ['label', 'filters', 'columns', 'created_by.display_name', 'created_date'],
           where: [['afform_name', '=', this.formName]],
           orderBy: {'label': 'ASC'}
         })
@@ -33,45 +33,87 @@
           this.applySearchParamSet(value);
           return '';
         }
-        const searchParamSet = this.getCurrentSearchParamSet();
-        return (searchParamSet && searchParamSet.id) ? `${searchParamSet.id}` : '';
+        const selected = this.getSelectedParamSet();
+        return (selected && selected.id) ? `${selected.id}` : '';
       };
 
-      this.getCurrentSearchParamSet = () => {
+      this.getSelectedParamSet = () => {
         const hashParams = new URLSearchParams($window.location.hash.slice(1));
         const urlValue = parseInt(hashParams.get('_s'));
         return this.savedSets.find((searchParamSet) => searchParamSet.id === urlValue);
       };
 
-      this.getCurrentFilterValues = () => this.afFieldset ? this.afFieldset.getFilterValues() : {};
-
-      this.renderSearchParamSetFilters = (values) => {
-        if (!values) {
-          return;
+      this.getCurrentParams = () => {
+        if (!this.afFieldset) {
+          return {};
         }
+        const params = {};
 
-        const fieldMeta = this.afFieldset.getFieldMeta();
+        params.filters = this.afFieldset.getFilterValues();
 
+        params.columns = {};
+
+        // find column toggle settings for any table search displays
+        // note 1: there can be multiple tables inside the same af-fieldset
+        // so we store columns keyed by search + display name
+        // note 2: this is unpleasant angular, but only reading data so
+        // shouldn't cause too many problems
+        $element.closest('[af-fieldset]').find('crm-search-display-table').each((i, $table) => {
+          const tableCtrl = angular.element($table).controller('crmSearchDisplayTable');
+          if (!tableCtrl) {
+            return;
+          }
+          const columns = tableCtrl.getToggledColumns();
+          if (!Object.keys(columns).length) {
+            return;
+          }
+          params.columns[tableCtrl.getSearchDisplayKey()] = columns;
+        });
+        return params;
+      };
+
+      this.renderSearchParamSetDetails = (paramSet) => {
         const rendered = {};
 
-        Object.keys(values).forEach((key) => {
-          const defn = fieldMeta[key];
-          const rawValue = values[key];
+        if (paramSet.filters) {
+          // TODO: move meta getter to afFieldset?
+          const fieldMeta = this.afFieldset.getFieldMeta();
 
-          const formatValue = (v) => {
-            if (defn.options && defn.options.length) {
-              const selected = defn.options.find((o) => o.id == v);
-              if (selected) {
-                return selected.label;
+          Object.keys(paramSet.filters).forEach((key) => {
+            const defn = fieldMeta[key];
+            const rawValue = paramSet.filters[key];
+
+            const formatValue = (v) => {
+              if (defn.options && defn.options.length) {
+                const selected = defn.options.find((o) => o.id == v);
+                if (selected) {
+                  return selected.label;
+                }
               }
-            }
-            return v;
-          };
+              return v;
+            };
 
-          const value = (rawValue && rawValue.map) ? rawValue.map(formatValue).join(', ') : formatValue(rawValue);
+            const value = (rawValue && rawValue.map) ? rawValue.map(formatValue).join(', ') : formatValue(rawValue);
 
-          rendered[defn.label] = value;
-        });
+            rendered[defn.label] = value;
+          });
+        }
+
+        if (paramSet.columns) {
+          const displayKeys = Object.keys(paramSet.columns);
+          if (displayKeys.length > 1)
+            displayKeys.forEach((displayKey) => {
+              // TODO: how to get search label here
+              const label = ts('%1 columns', {1: displayKey});
+              const columns = Object.values(paramSet.columns[displayKey]).join(', ');
+              rendered[label] = columns;
+            });
+          else if (displayKeys.length === 1) {
+            // most of the time there is only one display
+            const displayKey = displayKeys[0];
+            rendered[ts('Columns')] = Object.values(paramSet.columns[displayKey]).join(', ');
+          }
+        }
 
         return rendered;
       };
@@ -83,8 +125,17 @@
           this.saveDialog.label = ts('New search');
           this.saveDialog.inProgress = false;
         },
-        canOpen: () => Object.keys(this.getCurrentFilterValues()).length,
-        canSave: () => !this.saveDialog.inProgress && this.saveDialog.label && Object.keys(this.getCurrentFilterValues()).length,
+        canOpen: () => {
+          const params = this.getCurrentParams();
+          if (Object.keys(params.filters).length) {
+            return true;
+          }
+          if (Object.keys(params.columns).length) {
+            return true;
+          }
+          return false;
+        },
+        canSave: () => !this.saveDialog.inProgress && this.saveDialog.label && Object.keys(this.getCurrentParams()).length,
         save: () => {
           if (!this.saveDialog.canSave()) {
             return;
@@ -92,9 +143,12 @@
 
           this.saveDialog.inProgress = true;
 
+          const current = this.getCurrentParams();
+
           const values = {
             afform_name: this.formName,
-            filters: this.getCurrentFilterValues(),
+            filters: current.filters,
+            columns: current.columns,
             label: this.saveDialog.label,
             created_by: CRM.config.cid,
           };
@@ -131,29 +185,29 @@
         id: null,
         label: '',
         open: () => {
-          const current = this.getCurrentSearchParamSet();
-          this.updateDialog.id = current.id;
-          this.updateDialog.oldLabel = current.label;
-          this.updateDialog.newLabel = current.label;
+          const selected = this.getSelectedParamSet();
+          this.updateDialog.id = selected.id;
+          this.updateDialog.oldLabel = selected.label;
+          this.updateDialog.newLabel = selected.label;
           this.updateDialog.valueComparison = this.updateDialog.getValueComparison();
           $element[0].querySelector('dialog.af-search-param-set-update').showModal();
         },
         close: () => $element[0].querySelector('dialog.af-search-param-set-update').close(),
         inProgress: false,
         canOpen: () => {
-          const current = this.getCurrentSearchParamSet();
-          if (!current) {
+          const selected = this.getSelectedParamSet();
+          if (!selected) {
             return false;
           }
-          const newValues = this.getCurrentFilterValues();
-          if (!Object.keys(newValues).length) {
-            return false;
+          // if there are changes from saved we can update
+          const newParams = this.getCurrentParams();
+          if (JSON.stringify(selected.filters) !== JSON.stringify(newParams.filters)) {
+            return true;
           }
-          // if no changes from saved then nothing to update
-          if (JSON.stringify(current.filters) === JSON.stringify(newValues)) {
-            return false;
+          if (JSON.stringify(selected.columns) !== JSON.stringify(newParams.columns)) {
+            return true;
           }
-          return true;
+          return false;
         },
         canUpdate: () => this.updateDialog.id && this.updateDialog.newLabel,
         update: () => {
@@ -163,13 +217,14 @@
 
           this.updateDialog.inProgress = true;
 
-          const newValues = this.getCurrentFilterValues();
+          const newParams = this.getCurrentParams();
 
           crmApi4('SearchParamSet', 'update', {
             where: [['id', '=', this.updateDialog.id]],
             values: {
               label: this.updateDialog.newLabel,
-              filters: newValues
+              filters: newParams.filters,
+              columns: newParams.columns
             }
           })
           .then(() => this.fetchSearchParamSets())
@@ -177,9 +232,9 @@
           .then(() => this.updateDialog.close());
         },
         getValueComparison: () => {
-          console.log(this.getCurrentSearchParamSet());
-          const oldValues = this.renderSearchParamSetFilters(this.getCurrentSearchParamSet().filters);
-          const newValues = this.renderSearchParamSetFilters(this.getCurrentFilterValues());
+          const current = this.getSelectedParamSet();
+          const oldValues = this.renderSearchParamSetDetails(current);
+          const newValues = this.renderSearchParamSetDetails(this.getCurrentParams());
 
           const oldKeys = Object.keys(oldValues);
           const newKeys = Object.keys(newValues);

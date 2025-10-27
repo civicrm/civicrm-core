@@ -141,8 +141,9 @@ af-search-param-sets {
   --crm-btn-margin: 0;
   display: inline-flex;
   gap: var(--crm-flex-gap, 0.5rem);
-  padding: var(--crm-flex-gap, 0.5rem);
+  padding: var(--crm-flex-gap, 0.5rem) 0;
   background-color: var(--crm-c-background2);
+  align-items: center;
 }
 af-search-param-sets dialog {
   background: var(--crm-c-container-bg);

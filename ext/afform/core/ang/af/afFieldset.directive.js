@@ -103,8 +103,8 @@
          * Used by afField controller on load
          */
         this.getSearchParamSetFieldValue = (fieldName) => {
-          if (this.searchParamSetValues && this.searchParamSetValues.hasOwnProperty(fieldName)) {
-            return this.searchParamSetValues[fieldName];
+          if (this.selectedSearchParamSet && this.selectedSearchParamSet.filters && this.selectedSearchParamSet.filters.hasOwnProperty(fieldName)) {
+            return this.selectedSearchParamSet.filters[fieldName];
           }
           return null;
         };
@@ -124,15 +124,17 @@
               // (in case multiple on the page)
               ['afform_name', '=', this.getFormName()]
             ],
-            select: ['filters'],
+            select: ['filters', 'columns'],
           })
           .then((result) => {
-            if (result && result[0] && result[0].filters) {
-              this.searchParamSetValues = result[0].filters;
+            if (result && result[0]) {
+              this.selectedSearchParamSet = result[0];
             }
             else {
-              this.searchParamSetValues = {};
+              this.selectedSearchParamSet = {};
             }
+            // reset the form so af-fields read these
+            // values into their controllers
             $scope.$broadcast('afFormReset');
           });
         };
