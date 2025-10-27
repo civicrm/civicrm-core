@@ -396,6 +396,16 @@ class CRM_Extension_Info {
     }
   }
 
+  public function isInstallable(): bool {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    foreach ($this->requires as $require) {
+      if (!$manager->isEnabled($require)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
   /**
    * Filter out invalid requirements, e.g. extensions that have been moved to core.
    *
