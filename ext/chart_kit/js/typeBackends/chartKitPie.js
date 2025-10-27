@@ -30,7 +30,7 @@
 
     hasCoordinateGrid: () => false,
 
-    showLegend: (displayCtrl) => (displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
+    showLegend: (displayCtrl) => (displayCtrl._settings.showLegend && displayCtrl._settings.showLegend !== 'none'),
 
     // the legend is cross product of column values from w columns
     legendTextAccessor: (displayCtrl) => ((d) =>

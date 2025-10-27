@@ -37,7 +37,7 @@
 
     hasCoordinateGrid: () => true,
 
-    showLegend: (displayCtrl) => (displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
+    showLegend: (displayCtrl) => (displayCtrl._settings.showLegend && displayCtrl._settings.showLegend !== 'none'),
 
     getChartConstructor: () => dc.compositeChart,
 
@@ -102,9 +102,9 @@
           const maxBarSpace = Math.max(1, Math.floor(groupSpace / barCount));
 
           // cap setting values below max
-          displayCtrl.settings.barGap = Math.floor(Math.min(displayCtrl.settings.barGap, maxBarSpace - 1));
-          displayCtrl.settings.barWidth = Math.floor(Math.min(displayCtrl.settings.barWidth, maxBarSpace - displayCtrl.settings.barGap));
-          const barSpace = displayCtrl.settings.barWidth + displayCtrl.settings.barGap;
+          displayCtrl._settings.barGap = Math.floor(Math.min(displayCtrl._settings.barGap, maxBarSpace - 1));
+          displayCtrl._settings.barWidth = Math.floor(Math.min(displayCtrl._settings.barWidth, maxBarSpace - displayCtrl._settings.barGap));
+          const barSpace = displayCtrl._settings.barWidth + displayCtrl._settings.barGap;
           const centerOffset = Math.floor((groupSpace - (barCount * barSpace)) / 2);
 
           yAxisColumns.forEach((col, subIndex) => {
@@ -115,7 +115,7 @@
             }
 
             dc.transition(displayCtrl.chart.selectAll(`.sub._${subIndex} .bar`))
-              .attr('width', displayCtrl.settings.barWidth)
+              .attr('width', displayCtrl._settings.barWidth)
               .attr('transform', `translate(${(offsetIndex * barSpace + centerOffset)}, 0)`);
             // move labels to align with bars
             dc.transition(displayCtrl.chart.selectAll(`.sub._${subIndex} .barLabel`))

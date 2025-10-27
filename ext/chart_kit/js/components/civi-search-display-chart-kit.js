@@ -1,4 +1,4 @@
-(function (ts, dc, d3, crossfilter, CiviSearchDisplay) {
+(function (ts, dc, d3, crossfilter, chartKitChartTypes, chartKitTypeBackends, chartKitColumn, chartKitUtils, CiviSearchDisplay) {
 
   class CiviSearchDisplayChartKit extends CiviSearchDisplay {
 
@@ -12,6 +12,9 @@
 
     connectedCallback() {
       super.connectedCallback();
+
+      // run initial settings through our legacy adaptor
+      this._settings = chartKitUtils.legacySettingsAdaptor(this.settings);
 
       this.renderContainer();
 
@@ -54,7 +57,7 @@
     }
 
     get title() {
-      return (this.settings && this.settings.format) ? this.settings.format.title : null;
+      return (this._settings && this._settings.format) ? this._settings.format.title : null;
     }
 
     renderLoading() {
@@ -81,7 +84,7 @@
     }
 
     renderDownloadLinks() {
-      if (this.settings && this.settings.showDownloadLinks) {
+      if (this._settings && this._settings.showDownloadLinks) {
         this.querySelector('.crm-chart-kit-download-links').innerHTML = `
           <a class="btn btn-sm crm-chart-kit-download-svg" onclick="this.closest('civi-search-display-chart-kit').downloadSVG()">
             ${ts('Download (SVG)')}
@@ -115,7 +118,7 @@
       this.setContainerStyles();
       this.setCanvasStyles();
       if (this.titleContainer) {
-        this.titleContainer.style.color = (this.settings && this.settings.format) ? this.settings.format.labelColor : null;
+        this.titleContainer.style.color = (this._settings && this._settings.format) ? this._settings.format.labelColor : null;
       }
     }
 
@@ -131,7 +134,7 @@
       // always sort the query by X axis - we can handle differently when we pass to d3
       // but this is the only way to get magic that the server knows about the order
       // (like option groups / month order etc)
-      this.settings.sort = sortKeys.map((key) => [key, 'ASC']);
+      this._settings.sort = sortKeys.map((key) => [key, 'ASC']);
     }
 
     _onChangeSettings() {
@@ -142,6 +145,9 @@
         if (!this.chartContainer) {
           return;
         }
+        // run initial settings through our legacy adaptor
+        this._settings = chartKitUtils.legacySettingsAdaptor(this.settings);
+
         this.renderTitle();
         // just in case the chart type has been removed somehow
         if (!this.initChartType()) {
@@ -201,14 +207,13 @@
     }
 
     initChartType() {
-      // run initial settings through our legacy adaptor
-      const key = this.settings.chartType;
-      const type = CRM.chart_kit.chartTypes.find((type) => type.key === key);
+      const key = this._settings.chartType;
+      const type = chartKitChartTypes.find((type) => type.key === key);
       if (!type) {
         this.chartContainer.innerText = ts('No chart type selected.');
         return false;
       }
-      this.chartType = CRM.chart_kit.typeBackends[type.backend];
+      this.chartType = chartKitTypeBackends[type.backend];
       if (!this.chartType) {
         return false;
       }
@@ -301,7 +306,7 @@
 
       // load in cap if implemented by chart type
       if (this.chart.cap) {
-        this.chart.cap(this.settings.maxSegments ? this.settings.maxSegments : null);
+        this.chart.cap(this._settings.maxSegments ? this._settings.maxSegments : null);
       }
       // load in ordering if implement by chart type
       if (this.chart.ordering) {
@@ -361,13 +366,13 @@
         .label((d) => this.renderDataLabel(d, 'label'));
 
       this.chart
-        .width(() => (this.settings.format.width))
-        .height(() => (this.settings.format.height))
+        .width(() => (this._settings.format.width))
+        .height(() => (this._settings.format.height))
         .on('pretransition', chart => {
-          chart.selectAll('text').attr('fill', this.settings.format.labelColor);
+          chart.selectAll('text').attr('fill', this._settings.format.labelColor);
           // we need to add the background here as well as to the containing div
           // in order for inclusion in exports
-          chart.svg().style('background', this.settings.format.backgroundColor);
+          chart.svg().style('background', this._settings.format.backgroundColor);
         });
 
       if (this.chartType.hasCoordinateGrid()) {
@@ -388,7 +393,7 @@
       }
 
       this.chart.xAxisLabel(
-        this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCol.label
+        this._settings.format.xAxisLabel ? this._settings.format.xAxisLabel : xCol.label
         // TODO: could we have multi-x?
         //this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCols.map((col) => col.label).join(' - ')
       );
@@ -404,7 +409,7 @@
         this.chart.yAxis().tickFormat((v) => leftYCols[0].renderValue(v));
       }
       this.chart.yAxisLabel(
-        this.settings.format.yAxisLabel ? this.settings.format.yAxisLabel : leftYCols.map((col) => col.label).join(' - ')
+        this._settings.format.yAxisLabel ? this._settings.format.yAxisLabel : leftYCols.map((col) => col.label).join(' - ')
       );
 
       if (supportsRightYAxis) {
@@ -414,18 +419,18 @@
         }
         if (rightYCols) {
           this.chart.rightYAxisLabel(
-            this.settings.format.rightYAxisLabel ? this.settings.format.rightYAxisLabel : rightYCols.map((col) => col.label).join(' - ')
+            this._settings.format.rightYAxisLabel ? this._settings.format.rightYAxisLabel : rightYCols.map((col) => col.label).join(' - ')
           );
         }
       }
 
       // set gridline settings
-      this.chart.renderVerticalGridLines(this.settings.format.xAxisGridlines);
-      this.chart.renderHorizontalGridLines(this.settings.format.yAxisGridlines);
+      this.chart.renderVerticalGridLines(this._settings.format.xAxisGridlines);
+      this.chart.renderHorizontalGridLines(this._settings.format.yAxisGridlines);
 
       this.chart
-        .margins(this.settings.format.padding)
-        .clipPadding(this.settings.format.padding.clip ? this.settings.format.padding.clip : 20);
+        .margins(this._settings.format.padding)
+        .clipPadding(this._settings.format.padding.clip ? this._settings.format.padding.clip : 20);
     }
 
     addLegend() {
@@ -437,12 +442,12 @@
 
       legend.highlightSelected(true);
 
-      if (this.settings.showLegend === 'right') {
+      if (this._settings.showLegend === 'right') {
         // depends on chart type which padding keys are set
         // (potential bug: if you set right padding on an axis chart, then switch to a chart without a right axis setting,
         // it will keep using the right padding value, which you can no longer edit
-        const rightPadding = this.settings.format.padding.right ? this.settings.format.padding.right : this.settings.format.padding.outer;
-        legend.x(this.settings.format.width - legend.itemWidth() - rightPadding);
+        const rightPadding = this._settings.format.padding.right ? this._settings.format.padding.right : this._settings.format.padding.outer;
+        legend.x(this._settings.format.width - legend.itemWidth() - rightPadding);
       }
       this.chart.legend(legend);
 
@@ -469,7 +474,7 @@
       const countByAxis = {};
 
       // get column settings for the display
-      this.columns = this.settings.columns
+      this.columns = this._settings.columns
         // filter columns with no source column set
         .filter((col) => col.key)
         .map((col) => {
@@ -502,7 +507,7 @@
         // sort by name (which sorts by axis)
         .sort((a, b) => a.name > b.name)
         // initialise each ChartKitColumn object
-        .map((col) => new CRM.chart_kit.column(
+        .map((col) => new chartKitColumn(
               col.name,
               col.axis,
               col.key,
@@ -532,7 +537,7 @@
     }
 
     getOrderDirection() {
-      return this.settings.chartOrderDir ? this.settings.chartOrderDir : 'ASC';
+      return this._settings.chartOrderDir ? this._settings.chartOrderDir : 'ASC';
     }
 
     getOrderAccessor() {
@@ -578,7 +583,7 @@
     }
 
     setCanvasStyles() {
-      const formatSettings = this.settings.format ? this.settings.format : {};
+      const formatSettings = this._settings.format ? this._settings.format : {};
 
       this.chartCanvas.style.backgroundColor = formatSettings.backgroundColor;
       this.chartCanvas.style.padding = formatSettings.padding ? formatSettings.padding.outer : null;
@@ -586,7 +591,7 @@
     }
 
     setContainerStyles() {
-      const formatSettings = this.settings.format ? this.settings.format : {};
+      const formatSettings = this._settings.format ? this._settings.format : {};
       this.chartContainer.style.height = formatSettings.height;
       this.chartContainer.style.width = formatSettings.width;
       this.chartContainer.style.margin = formatSettings.padding ? formatSettings.padding.inner : null;
@@ -610,7 +615,7 @@
     }
 
     downloadImageUrl(mime, url, ext) {
-      const filename = (this.settings.format.title ? this.settings.format.title : 'chart').replace(/[^a-zA-Z0-9-]+/g, '') + '.' + ext;
+      const filename = (this._settings.format.title ? this._settings.format.title : 'chart').replace(/[^a-zA-Z0-9-]+/g, '') + '.' + ext;
       const downloadLink = document.createElement('a');
       downloadLink.download = filename;
       downloadLink.href = url;
@@ -635,8 +640,8 @@
       const svgData = this.getSvgData();
 
       const canvas = document.createElement('canvas');
-      canvas.width = this.settings.format.width;
-      canvas.height = this.settings.format.height;
+      canvas.width = this._settings.format.width;
+      canvas.height = this._settings.format.height;
 
       this.chartContainer.append(canvas);
 
@@ -654,4 +659,4 @@
 
   customElements.define('civi-search-display-chart-kit', CiviSearchDisplayChartKit);
 
-})(CRM.ts('chart_kit'), CRM.chart_kit.dc, CRM.chart_kit.d3, CRM.chart_kit.crossfilter, CRM.components.CiviSearchDisplay);
+})(CRM.ts('chart_kit'), CRM.chart_kit.dc, CRM.chart_kit.d3, CRM.chart_kit.crossfilter, CRM.chart_kit.chartTypes, CRM.chart_kit.typeBackends, CRM.chart_kit.column, CRM.chart_kit.utils, CRM.components.civi_search_display);

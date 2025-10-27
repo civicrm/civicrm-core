@@ -32,9 +32,9 @@
 
     hasCoordinateGrid: () => true,
 
-    showLegend: (displayCtrl) => (displayCtrl.getColumnsForAxis('y').length > 1 && displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
+    showLegend: (displayCtrl) => (displayCtrl.getColumnsForAxis('y').length > 1 && displayCtrl._settings.showLegend && displayCtrl._settings.showLegend !== 'none'),
 
-    getChartConstructor: (displayCtrl) => (displayCtrl.settings.chartType === 'bar') ? dc.barChart : dc.lineChart,
+    getChartConstructor: (displayCtrl) => (displayCtrl._settings.chartType === 'bar') ? dc.barChart : dc.lineChart,
 
     loadChartData: (displayCtrl) => {
       displayCtrl.chart
@@ -54,7 +54,7 @@
 
       displayCtrl.chart.colors(displayCtrl.buildColumnColorScale(yAxisColumns));
 
-      if (displayCtrl.settings.chartType === 'area') {
+      if (displayCtrl._settings.chartType === 'area') {
         // chart should be a line chart by this point
         displayCtrl.chart.renderArea(true);
       }
