@@ -64,7 +64,7 @@
       displayCtrl.chart
         .colorAccessor((d) => colorColumn.valueAccessor(d))
         .calculateColorDomain();
-      const colorScale = d3.scaleLinear(displayCtrl.chart.colorDomain(), [displayCtrl.settings.colorScaleMin, displayCtrl.settings.colorScaleMax]);
+      const colorScale = d3.scaleLinear(displayCtrl.chart.colorDomain(), [displayCtrl._settings.colorScaleMin, displayCtrl._settings.colorScaleMax]);
       displayCtrl.chart.colors(colorScale);
 
 
@@ -88,7 +88,7 @@
             label.classList.add('heat-box-label');
             label.setAttribute('x', x);
             label.setAttribute('y', y);
-            label.setAttribute('fill', displayCtrl.settings.format.labelColor);
+            label.setAttribute('fill', displayCtrl._settings.format.labelColor);
             label.style.textAnchor = 'middle';
 
             return label;

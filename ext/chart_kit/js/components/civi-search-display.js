@@ -1,4 +1,4 @@
-(function (api4, angular, $, _) {
+(function (api4, $, _) {
 
   const generateUniqueId = (length) => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -11,7 +11,7 @@
 
   CRM.components = CRM.components || {};
 
-  CRM.components.CiviSearchDisplay = class CiviSearchDisplay extends HTMLElement {
+  CRM.components.civi_search_display = class CiviSearchDisplay extends HTMLElement {
 
     /* jshint ignore:start */
     static observedAttributes = ['filters'];
@@ -229,7 +229,7 @@
       // - or afform filters are present which would interfere with an accurate total
       // (wait a brief timeout to allow more important things to happen first)
       setTimeout(() => {
-        if (hasCounter && (!(this.loading || this.results) || !angular.equals({}, this.getAfformFilters()))) {
+        if (hasCounter && (!(this.loading || this.results) || !Object.keys(this.getAfformFilters()).length)) {
           const params = this.getApiParams('row_count');
           // Exclude afform filters
           params.filters = this.filters;
@@ -262,7 +262,7 @@
     }
 
     getAfformFilters() {
-      return this.afFieldsetCtrl ? this.afFieldsetCtrl.getAfformFilters() : {};
+      return this.afFieldsetCtrl ? this.afFieldsetCtrl.getFilterValues() : {};
     }
 
     // Generate params for the SearchDisplay.run api
@@ -355,4 +355,4 @@
     }
   };
 
-})(CRM.api4, angular, CRM.$, CRM._);
+})(CRM.api4, CRM.$, CRM._);

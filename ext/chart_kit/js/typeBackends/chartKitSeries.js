@@ -38,7 +38,7 @@
 
     hasCoordinateGrid: () => true,
 
-    showLegend: (displayCtrl) => (displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
+    showLegend: (displayCtrl) => (displayCtrl._settings.showLegend && displayCtrl._settings.showLegend !== 'none'),
 
     // the legend gets the series "name", which is the delisted value of the series column
     legendTextAccessor: (displayCtrl) => ((d) => displayCtrl.getFirstColumnForAxis('w').renderValue(d.name)),
@@ -47,7 +47,7 @@
     getChartConstructor: (displayCtrl) => displayCtrl.getColumnsForAxis('w') ? dc.seriesChart : dc.lineChart,
 
     loadChartData: (displayCtrl) => {
-      displayCtrl.chart.chart((displayCtrl.settings.seriesDisplayType === 'bar') ? dc.barChart : dc.lineChart);
+      displayCtrl.chart.chart((displayCtrl._settings.seriesDisplayType === 'bar') ? dc.barChart : dc.lineChart);
       displayCtrl.chart
         .dimension(displayCtrl.dimension)
         .group(displayCtrl.group)

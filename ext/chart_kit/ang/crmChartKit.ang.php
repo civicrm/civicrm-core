@@ -4,7 +4,6 @@ return [
   'js' => [
     'ang/crmChartKit.js',
     'ang/crmChartKit/*.js',
-    'ang/crmChartKit/typeBackends/*.js',
   ],
   'css' => [
     'ang/crmChartKit.css',
