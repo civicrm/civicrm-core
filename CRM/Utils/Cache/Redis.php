@@ -62,6 +62,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     $port = $config['port'] ?? self::DEFAULT_PORT;
     // Ugh.
     $pass = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD');
+    $user = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_USERNAME');
     $id = implode(':', ['connect', $host, $port /* $pass is constant */]);
     if (!isset(Civi::$statics[__CLASS__][$id])) {
       // Ideally, we'd track the connection in the service-container, but the
@@ -72,7 +73,10 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
         echo 'Could not connect to redisd server';
         CRM_Utils_System::civiExit();
       }
-      if ($pass) {
+      if ($user && $pass) {
+        $redis->auth([$user, $pass]);
+      }
+      elseif ($pass) {
         $redis->auth($pass);
       }
       Civi::$statics[__CLASS__][$id] = $redis;
@@ -96,7 +100,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
       $this->_prefix = $config['prefix'];
     }
     if (defined('CIVICRM_DEPLOY_ID')) {
-      $this->_prefix = CIVICRM_DEPLOY_ID . '_' . $this->_prefix;
+      $this->_prefix .= '_' . CIVICRM_DEPLOY_ID;
     }
 
     $this->_cache = self::connect($config);
@@ -161,7 +165,9 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     // more general rethink of cache expiration/TTL.
 
     $keys = $this->_cache->keys($this->_prefix . '*');
-    $this->_cache->del($keys);
+    if ($keys !== FALSE) {
+      $this->_cache->del($keys);
+    }
     return TRUE;
   }
 
