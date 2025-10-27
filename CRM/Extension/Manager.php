@@ -252,6 +252,13 @@ class CRM_Extension_Manager {
    */
   public function install($keys, $mode = 'install') {
     $keys = (array) $keys;
+    while ($keys) {
+      $this->_install($keys, $mode);
+      $keys = $this->findInstallableSubmodules();
+    }
+  }
+
+  private function _install(array $keys, $mode = 'install') {
     $origStatuses = $this->getStatuses();
 
     // TODO: to mitigate the risk of crashing during installation, scan
@@ -391,12 +398,17 @@ class CRM_Extension_Manager {
     $disableRequirements = $this->findDisableRequirements($keys);
 
     $requiredExtensions = $this->mapper->getKeysByTag('mgmt:required');
+    $submodules = $this->mapper->getKeysByTag('mgmt:submodule');
+    $blockedRequirements = array_diff($disableRequirements, $submodules, $keys);
 
     // This munges order, but makes it comparable.
-    sort($disableRequirements);
-    if ($keys !== $disableRequirements) {
-      throw new CRM_Extension_Exception_DependencyException("Cannot disable extension due to dependencies. Consider disabling all these: " . implode(',', $disableRequirements));
+    sort($blockedRequirements);
+    if ($blockedRequirements) {
+      throw new CRM_Extension_Exception_DependencyException("Cannot disable extension due to dependencies. Consider disabling all these: " . implode(',', $blockedRequirements));
     }
+
+    // Nothing blocked -- so we have requested $keys and implied submodules. Uninstall in topological order.
+    $keys = $disableRequirements;
 
     $this->addProcess($keys, 'disable');
 
@@ -465,6 +477,8 @@ class CRM_Extension_Manager {
 
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
+
+    $keys = array_unique(array_merge($this->findChildSubmodules($keys), $keys));
 
     // Component data still lives inside of core-core. Uninstalling is nonsensical.
     $notUninstallable = array_intersect($keys, $this->mapper->getKeysByTag('component'));
@@ -875,6 +889,36 @@ class CRM_Extension_Manager {
       }
     }
     return $sorter->sort();
+  }
+
+  /**
+   * Get a list of submodules that are ready to be installed.
+   *
+   * @return array
+   * @throws \CRM_Extension_Exception
+   */
+  protected function findInstallableSubmodules(): array {
+    return array_filter(
+      $this->mapper->getKeysByTag('mgmt:submodule'),
+      fn($m) => !$this->isEnabled($m) && $this->mapper->keyToInfo($m)->isInstallable()
+    );
+  }
+
+  /**
+   * Find the immediate children for some list of extensions.
+   *
+   * @param string|array $parents
+   *   List of extensions. For each, we want to know about its children.
+   * @return array
+   *   List of children
+   * @throws \CRM_Extension_Exception
+   */
+  protected function findChildSubmodules($parents): array {
+    $parents = (array) $parents;
+    return array_filter(
+      $this->mapper->getKeysByTag('mgmt:submodule'),
+      fn($child) => in_array($this->mapper->keyToInfo($child)->parent, $parents)
+    );
   }
 
   /**
