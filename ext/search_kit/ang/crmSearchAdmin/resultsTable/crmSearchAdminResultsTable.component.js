@@ -39,6 +39,10 @@
         $scope.$watch('$ctrl.search.api_params', buildSettings, true);
       };
 
+      // this is used to filter toggled columns in the table
+      // search display - here its trivial
+      this.getRowColumns = (row) => row.columns;
+
       // Add callbacks for pre & post run
       this.onPreRun.push(function(apiCalls) {
         // So the raw SQL can be shown in the "Query Info" tab
