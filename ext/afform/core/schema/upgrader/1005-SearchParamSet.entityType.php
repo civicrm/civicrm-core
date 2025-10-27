@@ -60,6 +60,13 @@ return [
       'description' => E::ts('JSON filter configuration'),
       'serialize' => CRM_Core_DAO::SERIALIZE_JSON,
     ],
+    'columns' => [
+      'title' => E::ts('Columns'),
+      'sql_type' => 'text',
+      'input_type' => 'TextArea',
+      'description' => E::ts('JSON array of report columns to show by default'),
+      'serialize' => CRM_Core_DAO::SERIALIZE_JSON,
+    ],
     'icon' => [
       'title' => ts('Icon'),
       'sql_type' => 'varchar(255)',
