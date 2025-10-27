@@ -29,6 +29,38 @@ class CRM_Upgrade_Incremental_php_SixNine extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_9_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    $this->addTask('Add column "Contribution.created_date"', 'alterSchemaField', 'Contribution', 'created_date', [
+      'title' => ts('Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the contribution created.'),
+      'unique_name' => 'contribution_created_date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'label' => ts('Created Date'),
+      ],
+    ]);
+
+    $this->addTask('Add column "Contribution.modified_date"', 'alterSchemaField', 'Contribution', 'modified_date', [
+      'title' => ts('Modified Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the contribution created or modified or deleted.'),
+      'unique_name' => 'contribution_modified_date',
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'label' => ts('Modified Date'),
+      ],
+    ]);
   }
 
 }
