@@ -274,7 +274,7 @@ class CRM_Extension_Manager {
     foreach ($keys as $key) {
       /** @var CRM_Extension_Info $info */
       /** @var CRM_Extension_Manager_Base $typeManager */
-      list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+      [$info, $typeManager] = $this->_getInfoTypeHandler($key);
 
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
@@ -334,7 +334,7 @@ class CRM_Extension_Manager {
     }
     foreach ($keys as $key) {
       // throws Exception
-      list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+      [$info, $typeManager] = $this->_getInfoTypeHandler($key);
 
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
@@ -410,7 +410,7 @@ class CRM_Extension_Manager {
           case self::STATUS_INSTALLED:
             $this->addProcess([$key], 'disabling');
             // throws Exception
-            list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+            [$info, $typeManager] = $this->_getInfoTypeHandler($key);
             $typeManager->onPreDisable($info);
             $this->_setExtensionActive($info, 0);
             $typeManager->onPostDisable($info);
@@ -419,7 +419,7 @@ class CRM_Extension_Manager {
 
           case self::STATUS_INSTALLED_MISSING:
             // throws Exception
-            list ($info, $typeManager) = $this->_getMissingInfoTypeHandler($key);
+            [$info, $typeManager] = $this->_getMissingInfoTypeHandler($key);
             $typeManager->onPreDisable($info);
             $this->_setExtensionActive($info, 0);
             $typeManager->onPostDisable($info);
@@ -483,7 +483,7 @@ class CRM_Extension_Manager {
         case self::STATUS_DISABLED:
           $this->addProcess([$key], 'uninstalling');
           // throws Exception
-          list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+          [$info, $typeManager] = $this->_getInfoTypeHandler($key);
           $typeManager->onPreUninstall($info);
           $this->_removeExtensionEntry($info);
           $typeManager->onPostUninstall($info);
@@ -491,7 +491,7 @@ class CRM_Extension_Manager {
 
         case self::STATUS_DISABLED_MISSING:
           // throws Exception
-          list ($info, $typeManager) = $this->_getMissingInfoTypeHandler($key);
+          [$info, $typeManager] = $this->_getMissingInfoTypeHandler($key);
           $typeManager->onPreUninstall($info);
           $this->_removeExtensionEntry($info);
           $typeManager->onPostUninstall($info);
