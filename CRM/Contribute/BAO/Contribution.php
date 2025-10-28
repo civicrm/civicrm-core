@@ -2921,52 +2921,48 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
         }
 
-        //if financial type is changed
-        if (!empty($params['financial_type_id']) &&
-          $params['contribution']->financial_type_id != $params['prevContribution']->financial_type_id
-        ) {
-          $accountRelationship = $contribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
-          $oldFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['prevContribution']->financial_type_id, $accountRelationship);
-          $newFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['financial_type_id'], $accountRelationship);
-          if ($oldFinancialAccount != $newFinancialAccount) {
-            $params['trxnParams']['trxn_date'] = date('YmdHis');
-            $params['total_amount'] = 0;
-            // If we have a fee amount set reverse this as well.
-            if (isset($params['fee_amount'])) {
-              $params['trxnParams']['fee_amount'] = 0 - $params['fee_amount'];
-            }
-            if ($financialProcessor->isAccountsReceivableTransaction()) {
-              $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-                $params['prevContribution']->financial_type_id, $accountRelationship);
-            }
-            else {
-              $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC');
-              if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
-                $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
-              }
-            }
-            $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-            $financialProcessor->updateFinancialAccounts($params, 'changeFinancialType');
-            $params['skipLineItem'] = FALSE;
-            foreach ($params['line_item'] as &$lineItems) {
-              foreach ($lineItems as &$line) {
-                $line['financial_type_id'] = $params['financial_type_id'];
-              }
-            }
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changeFinancialType');
-            /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
-            $params['financial_account_id'] = $newFinancialAccount;
-            $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
-            // Set the transaction fee amount back to the original value for creating the new positive financial trxn.
-            if (isset($params['fee_amount'])) {
-              $params['trxnParams']['fee_amount'] = $params['fee_amount'];
-            }
-            $financialProcessor->updateFinancialAccounts($params);
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE);
-            $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
-            $updated = TRUE;
-            $params['deferred_financial_account_id'] = $newFinancialAccount;
+        //if financial account is changed
+        $accountRelationship = $contribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
+        $oldFinancialAccount = $financialProcessor->getOriginalFinancialAccount();
+        $newFinancialAccount = $financialProcessor->getUpdatedFinancialAccount();
+        if ($oldFinancialAccount != $newFinancialAccount) {
+          $params['trxnParams']['trxn_date'] = date('YmdHis');
+          $params['total_amount'] = 0;
+          // If we have a fee amount set reverse this as well.
+          if (isset($params['fee_amount'])) {
+            $params['trxnParams']['fee_amount'] = 0 - $params['fee_amount'];
           }
+          if ($financialProcessor->isAccountsReceivableTransaction()) {
+            $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+              $params['prevContribution']->financial_type_id, $accountRelationship);
+          }
+          else {
+            $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC');
+            if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
+              $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
+            }
+          }
+          $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
+          $financialProcessor->updateFinancialAccounts($params, 'changeFinancialType');
+          $params['skipLineItem'] = FALSE;
+          foreach ($params['line_item'] as &$lineItems) {
+            foreach ($lineItems as &$line) {
+              $line['financial_type_id'] = $params['financial_type_id'];
+            }
+          }
+          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changeFinancialType');
+          /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
+          $params['financial_account_id'] = $newFinancialAccount;
+          $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
+          // Set the transaction fee amount back to the original value for creating the new positive financial trxn.
+          if (isset($params['fee_amount'])) {
+            $params['trxnParams']['fee_amount'] = $params['fee_amount'];
+          }
+          $financialProcessor->updateFinancialAccounts($params);
+          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE);
+          $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
+          $updated = TRUE;
+          $params['deferred_financial_account_id'] = $newFinancialAccount;
         }
 
         //Update contribution status

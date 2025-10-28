@@ -90,6 +90,29 @@ class CRM_Contribute_BAO_FinancialProcessor {
     return $this->originalContribution->contribution_status_id !== $this->updatedContribution->contribution_status_id;
   }
 
+  public function getOriginalFinancialAccount(): ?int {
+    if (!$this->originalContribution) {
+      return NULL;
+    }
+    $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
+    return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->originalContribution->financial_type_id, $accountRelationship);
+  }
+
+  /**
+   * @throws CRM_Core_Exception
+   */
+  public function getUpdatedFinancialAccount(): int {
+    $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
+    $account = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->updatedContribution->financial_type_id, $accountRelationship);
+    if ($account) {
+      throw new CRM_Core_Exception(ts("Account not configured '%1' for financial type %2", [
+        '1' => $accountRelationship,
+        '2' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $this->updatedContribution->financial_type_id)
+      ]));
+    }
+    return $account;
+  }
+
   /**
    * Get the financial account for the item associated with the new transaction.
    *
