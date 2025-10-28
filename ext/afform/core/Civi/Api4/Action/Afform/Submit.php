@@ -96,30 +96,30 @@ class Submit extends AbstractProcessor {
     if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
       // check for verification email
       $this->processVerficationEmail($submission['id']);
-      return [];
     }
+    else {
+      // process and save various enities
+      $this->processFormData($this->_entityValues);
 
-    // process and save various enities
-    $this->processFormData($this->_entityValues);
+      $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
+      // Update submission record with entity IDs.
+      if (!empty($this->_afform['create_submission'])) {
+        $submissionId = $submission['id'];
+        if (!empty($this->args['sid'])) {
+          $submissionId = $this->args['sid'];
+        }
 
-    $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
-    // Update submission record with entity IDs.
-    if (!empty($this->_afform['create_submission'])) {
-      $submissionId = $submission['id'];
-      if (!empty($this->args['sid'])) {
-        $submissionId = $this->args['sid'];
+        AfformSubmission::update(FALSE)
+          ->addWhere('id', '=', $submissionId)
+          ->addValue('data', $submissionData)
+          ->addValue('status_id:name', $status)
+          ->execute();
       }
 
-      AfformSubmission::update(FALSE)
-        ->addWhere('id', '=', $submissionId)
-        ->addValue('data', $submissionData)
-        ->addValue('status_id:name', $status)
-        ->execute();
-    }
-
-    // Return ids plus token for uploading files
-    foreach ($this->_entityIds as $key => $value) {
-      $this->setResponseItem($key, $value);
+      // Return ids plus token for uploading files
+      foreach ($this->_entityIds as $key => $value) {
+        $this->setResponseItem($key, $value);
+      }
     }
 
     // todo - add only if needed?
