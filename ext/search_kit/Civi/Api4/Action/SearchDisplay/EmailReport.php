@@ -1,8 +1,6 @@
 <?php
 namespace Civi\Api4\Action\SearchDisplay;
 
-use Civi\Token\TokenProcessor;
-
 /**
  * Leverages the saveFile action to save the SearchDisplay to a file,
  * and then emails one or more contacts with the saved file as an attachment.
@@ -98,44 +96,25 @@ class EmailReport extends SaveFile {
           $toEmail = $contact['email_primary.email'];
         }
 
-        $schema['contactId'] = 'contactId';
-        $context['contactId'] = $contactId;
-
-        // Whether to enable Smarty evaluation.
-        $useSmarty = (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) ?? FALSE;
-
-        $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
-          'controller' => __CLASS__,
-          'schema' => $schema,
-          'smarty' => $useSmarty,
-        ]);
-
-        // Populate the token processor.
-        $tokenProcessor->addMessage('messageSubject', ($this->subject ?? $messageTemplates->msg_subject), 'text/plain');
-        $tokenProcessor->addMessage('html', $messageTemplates->msg_html, 'text/html');
-        $tokenProcessor->addMessage('text', ($messageTemplates->msg_text ?? \CRM_Utils_String::htmlToText($messageTemplates->msg_html)), 'text/plain');
-        $row = $tokenProcessor->addRow($context);
-        // Evaluate and render.
-        $tokenProcessor->evaluate();
-        $messageSubject = $row->render('messageSubject');
-        $html = $row->render('html');
-        $text = $row->render('text');
+        $tokenContext = [
+          'contactId' => $contactId,
+        ];
 
         // set up the parameters for CRM_Utils_Mail::send
         $mailParams = [
-          'groupName' => 'Email from API',
+          'groupName' => 'SearchDisplay_EmailReport',
           'from' => $from,
           'toName' => $toName,
           'toEmail' => $toEmail,
-          'subject' => $messageSubject,
+          'messageTemplate' => [
+            'msg_subject' => $this->subject,
+          ],
           'messageTemplateID' => $messageTemplates->id,
           'contactId' => $contactId,
           'attachments' => [$attachment],
+          'tokenContext' => $tokenContext,
         ];
 
-        // render the &amp; entities in text mode, so that the links work
-        $mailParams['text'] = str_replace('&amp;', '&', $text);
-        $mailParams['html'] = $html;
         if (!empty($this->cc)) {
           $mailParams['cc'] = $this->cc;
         }
@@ -144,7 +123,7 @@ class EmailReport extends SaveFile {
         }
 
         // Try to send the email.
-        $emailResult = \CRM_Utils_Mail::send($mailParams);
+        [$emailResult] = \CRM_Core_BAO_MessageTemplate::sendTemplate($mailParams);
         if (!$emailResult) {
           throw new \API_Exception('Error sending email to ' . $contact['display_name'] . ' <' . $toEmail . '> ');
         }
