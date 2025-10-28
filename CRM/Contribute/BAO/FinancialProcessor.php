@@ -104,7 +104,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
   public function getUpdatedFinancialAccount(): int {
     $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
     $account = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->updatedContribution->financial_type_id, $accountRelationship);
-    if ($account) {
+    if (!$account) {
       throw new CRM_Core_Exception(ts("Account not configured '%1' for financial type %2", [
         '1' => $accountRelationship,
         '2' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $this->updatedContribution->financial_type_id)
