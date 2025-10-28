@@ -2956,6 +2956,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['skipLineItem'] = FALSE;
           foreach ($params['line_item'] as &$lineItems) {
             foreach ($lineItems as &$line) {
+              if ($line['financial_type_id'] != $params['financial_type_id']) {
+                throw new Exception('where is this hit');
+              }
+              if ($line['financial_type_id'] !== $params['financial_type_id']) {
+                throw new Exception('where is this hit on strict');
+              }
               $line['financial_type_id'] = $params['financial_type_id'];
             }
           }
