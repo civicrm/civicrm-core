@@ -2802,9 +2802,12 @@ WHERE      f.id IN ($ids)";
       }
     }
     if ($field->serialize) {
-      // Ensure length is at least 255, but allow it to go higher.
-      $text_length = intval($field->text_length) < 255 ? 255 : $field->text_length;
-      $params['type'] = 'varchar(' . $text_length . ')';
+      // Serialized fields must be able to hold long strings. TEXT is acceptable,
+      // otherwise force using a VARCHAR of at least 255, but allow it to go higher.
+      if ($params['type'] !== 'text') {
+        $text_length = intval($field->text_length) < 255 ? 255 : $field->text_length;
+        $params['type'] = 'varchar(' . $text_length . ')';
+      }
     }
     if (isset($field->default_value)) {
       $params['default'] = "'{$field->default_value}'";
