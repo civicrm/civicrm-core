@@ -15,12 +15,12 @@
 
       this.getMetadata = function() {
         if (!fetchedMetadata) {
-          fetchedMetadata = crmApi4({
-            entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', mngr.getEntityName()]]}, 0],
-            tasks: ['SearchDisplay', 'getSearchTasks', {savedSearch: displayCtrl.search, display: displayCtrl.display}]
+          fetchedMetadata = crmApi4('SearchDisplay', 'getSearchTasks', {
+            savedSearch: displayCtrl.search,
+            display: displayCtrl.display,
           }).then(function(result) {
-            mngr.entityInfo = result.entityInfo;
-            mngr.tasks = result.tasks;
+            mngr.entityInfo = result.editable.entityInfo;
+            mngr.tasks = result;
           }, function(failure) {
             mngr.tasks = [];
             mngr.entityInfo = [];
@@ -29,9 +29,6 @@
         return fetchedMetadata;
       };
 
-      this.getEntityName = function() {
-        return displayCtrl.apiEntity === 'RelationshipCache' ? 'Relationship' : displayCtrl.apiEntity;
-      };
       this.getApiParams = function() {
         return displayCtrl.getApiParams();
       };
@@ -48,7 +45,7 @@
       this.doTask = function(task, ids, isLink) {
         const data = {
           ids: ids,
-          entity: mngr.getEntityName(),
+          entity: mngr.entityInfo.name,
           search: displayCtrl.search,
           display: displayCtrl.display,
           displayCtrl: displayCtrl,
