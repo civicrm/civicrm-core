@@ -88,7 +88,7 @@ class ParticipantTest extends Api4TestBase {
         'source' => $dummy['sources'][$i % 3],
       ];
     }
-    $this->saveTestRecords('Participant', [
+    $pid = $this->saveTestRecords('Participant', [
       'records' => $records,
       'defaults' => [
         'status_id' => 2,
@@ -96,7 +96,7 @@ class ParticipantTest extends Api4TestBase {
         'register_date' => 20070219,
         'event_level' => 'Payment',
       ],
-    ]);
+    ])->column('id');
     $sqlCount = $this->getRowCount('civicrm_participant');
     $this->assertEquals($participantCount, $sqlCount, "Unexpected count");
 
@@ -213,9 +213,9 @@ class ParticipantTest extends Api4TestBase {
       ->addWhere('event_id', '=', $secondEventId)
       ->setCheckPermissions(FALSE)
       ->execute();
-    $expectedDeletes = [2, 7, 12, 17];
+    $expectedDeletes = [$pid[1], $pid[6], $pid[11], $pid[16]];
     $this->assertEquals($expectedDeletes, array_column((array) $deleteResult, 'id'),
-      "didn't delete every second record as expected");
+      "didn't delete every 5th record as expected");
 
     $sqlCount = $this->getRowCount('civicrm_participant');
     $this->assertEquals(
