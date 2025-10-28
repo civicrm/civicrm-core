@@ -61,6 +61,12 @@ class CRM_Upgrade_Incremental_php_SixNine extends CRM_Upgrade_Incremental_Base {
         'label' => ts('Modified Date'),
       ],
     ]);
+
+    // dev/core#2290 - Remove id from cache tables
+    $tables = ['civicrm_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache', 'civicrm_group_contact_cache'];
+    foreach ($tables as $table) {
+      $this->addTask("dev/core#2290 - Remove id column from '$table' table", 'dropColumn', $table, 'id');
+    }
   }
 
 }
