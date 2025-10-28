@@ -771,6 +771,7 @@ abstract class CRM_Utils_Hook {
    *     - 'always' (default): always delete orphaned records
    *     - 'never': never delete orphaned records
    *     - 'unused': only delete orphaned records if there are no other references to it in the DB. (This is determined by calling the API's "getrefcount" action.)
+   *   + 'source' (optional): string, the file which defined this entity
    * @param array|NULL $modules
    *   (Added circa v5.50) If given, only report entities related to $modules. NULL is a wildcard ("all modules").
    *
