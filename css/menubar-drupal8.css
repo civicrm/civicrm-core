@@ -31,17 +31,17 @@ nav#civicrm-menu-nav .crm-menubar-toggle-btn-icon {
   }
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu {
-    padding-top: $menubarHeight !important;
+    padding-top: var(--crm-menubar-height) !important;
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
-    padding-top: calc($menubarHeight * 2) !important;
+    padding-top: calc(var(--crm-menubar-height) * 2) !important;
   }
   /* The Drupal menu is 40px tall so we add that to our menubar height */
   body.crm-menubar-visible.crm-menubar-below-cms-menu {
-    padding-top: calc($menubarHeight + 40px) !important;
+    padding-top: calc(var(--crm-menubar-height) + 40px) !important;
   }
   body.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped {
-    padding-top: calc($menubarHeight * 2 + 40px) !important;
+    padding-top: calc(var(--crm-menubar-height) * 2 + 40px) !important;
   }
 
   body.crm-menubar-below-cms-menu > #civicrm-menu-nav ul#civicrm-menu {
