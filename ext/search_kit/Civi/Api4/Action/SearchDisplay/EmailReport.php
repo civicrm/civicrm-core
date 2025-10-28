@@ -60,9 +60,8 @@ class EmailReport extends SaveFile {
       $attachment = [
         'fullPath' => $result['file']->uri,
         'mime_type' => $result['file']->mime_type,
-        'cleanName' => $result['file']->description
+        'cleanName' => $result['file']->description,
       ];
-
 
       if (!\CRM_Utils_Type::validate($this->contactID, 'CommaSeparatedIntegers')) {
         throw new \API_Exception('Parameter contact_id must be a unique id or a list of ids separated by comma');
@@ -158,4 +157,5 @@ class EmailReport extends SaveFile {
       }
     }
   }
+
 }
