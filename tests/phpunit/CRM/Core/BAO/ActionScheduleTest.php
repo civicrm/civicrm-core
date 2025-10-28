@@ -2137,19 +2137,19 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // Assert the timestamp as of when the emails of respective three reminders as configured
     // 2 weeks before, on and 1 day after MED, are sent
-    $this->assertApproxEquals(
+    $this->assertEqualsWithDelta(
       strtotime('2012-06-01 01:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleBefore->id, 'action_date_time', 'action_schedule_id', TRUE)),
       // Variation in test execution time.
       3
     );
-    $this->assertApproxEquals(
+    $this->assertEqualsWithDelta(
       strtotime('2012-06-15 00:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleOn->id, 'action_date_time', 'action_schedule_id', TRUE)),
       // Variation in test execution time.
       3
     );
-    $this->assertApproxEquals(
+    $this->assertEqualsWithDelta(
       strtotime('2012-06-16 01:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleAfter->id, 'action_date_time', 'action_schedule_id', TRUE)),
       // Variation in test execution time.
