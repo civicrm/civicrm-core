@@ -154,9 +154,15 @@
         <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
       </div>
 
-      <div class="form-group" ng-if="editor.afform.create_submission">
-        <label for="submit_limit">{{:: ts('Maximum Submissions') }}</label>
-        <input type="number" min="1" step="1" id="submit_limit" ng-model="editor.afform.submit_limit" placeholder="{{:: ts('Unlimited') }}">
+      <div class="crm-flex-box" ng-if="editor.afform.create_submission">
+        <div class="form-group">
+          <label for="submit_limit">{{:: ts('Max Submissions (total)') }}</label>
+          <input class="form-control eight" type="number" min="1" step="1" id="submit_limit" ng-model="editor.afform.submit_limit" placeholder="{{:: ts('Unlimited') }}">
+        </div>
+        <div class="form-group">
+          <label for="submit_limit_per_user">{{:: ts('Max Submissions (per user)') }}</label>
+          <input class="form-control eight" type="number" min="1" step="1" id="submit_limit_per_user" ng-model="editor.afform.submit_limit_per_user" placeholder="{{:: ts('Unlimited') }}">
+        </div>
       </div>
 
       <div class="form-group">
