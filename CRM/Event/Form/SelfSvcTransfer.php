@@ -323,16 +323,16 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   /**
    * Based on input, create participant row for transferee and send email
    *
-   * @param CRM_Event_BAO_Participant $participant
+   * @param array $participant
    *
    * @throws \CRM_Core_Exception
    */
-  public function participantTransfer($participant): void {
-    $contactDetails = civicrm_api3('Contact', 'getsingle', ['id' => $participant->contact_id, 'return' => ['display_name', 'email']]);
+  private function participantTransfer(array $participant): void {
+    $contactDetails = civicrm_api3('Contact', 'getsingle', ['id' => $participant['contact_id'], 'return' => ['display_name', 'email']]);
 
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantDetails = [];
-    $query = 'SELECT * FROM civicrm_participant WHERE id = ' . $participant->id;
+    $query = 'SELECT * FROM civicrm_participant WHERE id = ' . $participant['id'];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $participantDetails[$dao->id] = [
@@ -349,7 +349,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
 
     $eventDetails = [];
-    $eventParams = ['id' => $participant->event_id];
+    $eventParams = ['id' => $participant['event_id']];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails);
 
     //get default participant role.
@@ -365,14 +365,14 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $participantName = $contactDetails['display_name'];
       $tplParams = [
         'event' => $eventDetails,
-        'participant' => $participantDetails[$participant->id],
-        'participantID' => $participant->id,
+        'participant' => $participantDetails[$participant['id']],
+        'participantID' => $participant['id'],
         'participant_status' => 'Registered',
       ];
 
       $sendTemplateParams = [
         'workflow' => 'event_online_receipt',
-        'contactId' => $participantDetails[$participant->id]['contact_id'],
+        'contactId' => $participantDetails[$participant['id']]['contact_id'],
         'tplParams' => $tplParams,
         'from' => $receiptFrom,
         'toName' => $participantName,
@@ -380,8 +380,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'cc' => $eventDetails['cc_confirm'] ?? NULL,
         'bcc' => $eventDetails['bcc_confirm'] ?? NULL,
         'modelProps' => [
-          'participantID' => $participant->id,
-          'eventID' => $participant->event_id,
+          'participantID' => $participant['id'],
+          'eventID' => $participant['event_id'],
         ],
       ];
       CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
@@ -473,7 +473,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       CRM_Financial_BAO_FinancialItem::create($prevFinancialItem);
     }
     //send a confirmation email to the new participant
-    $this->participantTransfer($participant);
+    $this->participantTransfer((array) $participant);
     //now update registered_by_id
     $query = "UPDATE civicrm_participant cp SET cp.registered_by_id = %1 WHERE  cp.id = ({$participant->id})";
     CRM_Core_DAO::executeQuery($query, [1 => [$fromParticipantID, 'Integer']]);
