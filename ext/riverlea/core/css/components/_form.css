@@ -879,12 +879,6 @@ input.crm-form-checkbox) + label {
   margin-top: 10px;
   margin-bottom: 10px;
 }
-#bootstrap-theme .radio.disabled label,
-#bootstrap-theme fieldset[disabled].radio label,
-#bootstrap-theme .checkbox.disabled label,
-#bootstrap-theme fieldset[disabled] .checkbox label {
-  cursor: not-allowed;
-}
 #bootstrap-theme .radio label,
 #bootstrap-theme .checkbox label {
   min-height: 20px;
@@ -906,14 +900,23 @@ input.crm-form-checkbox) + label {
   vertical-align: middle;
   cursor: var(--crm-hover-clickable);
 }
-#bootstrap-theme .radio-inline.disabled,
-fieldset[disabled] #bootstrap-theme .radio-inline,
-#bootstrap-theme .checkbox-inline.disabled,
-fieldset[disabled] #bootstrap-theme .checkbox-inline {
-  cursor: not-allowed;
-}
 #bootstrap-theme .radio-inline + .radio-inline,
 #bootstrap-theme .checkbox-inline + .checkbox-inline {
   margin-top: 0;
   margin-left: var(--crm-m);
+}
+
+/* Disabled styles */
+
+.crm-container :is(input,textarea,option):disabled,
+.crm-container fieldset[disabled] input,
+#bootstrap-theme .disabled:is(.radio,.checkbox) label,
+#bootstrap-theme fieldset[disabled] :is(.radio,.checkbox) label,
+#bootstrap-theme .disabled:is(.radio-inline,.checkbox-inline),
+#bootstrap-theme fieldset[disabled] :is(.radio-inline,.checkbox-inline) {
+  cursor: not-allowed;
+  color: var(--crm-c-inactive);
+}
+.crm-container :is(input,textarea,option):disabled {
+  background-color: color-mix(in srgb, var(--crm-input-background) 90%, var(--crm-c-text) 10%);
 }
