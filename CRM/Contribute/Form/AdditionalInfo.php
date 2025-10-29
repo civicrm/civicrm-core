@@ -349,11 +349,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
       $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
     }
-    else {
-      if ($form->_action & CRM_Core_Action::UPDATE) {
-        $form->assign('lineItem', empty($form->_lineItems) ? FALSE : $form->_lineItems);
-      }
-    }
 
     //handle custom data
     if (!empty($params['hidden_custom'])) {
