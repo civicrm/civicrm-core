@@ -17,7 +17,7 @@
       </button>
     </div>
   </td>
-  <td ng-repeat="(colIndex, colInfo) in $ctrl.settings.columns" title="{{:: colData.title }}" class="crm-search-col-type-{{:: colInfo.type }}" data-field-name="{{:: colInfo.key }}">
+  <td ng-repeat="(colIndex, colInfo) in $ctrl.columns" ng-if="colInfo.enabled" title="{{:: colData.title }}" class="crm-search-col-type-{{:: colInfo.type }}" data-field-name="{{:: colInfo.key }}">
     <crm-search-display-editable display="$ctrl" is-full-row-mode="true" col-key="colInfo.key" ng-if="colInfo.editable && $ctrl.editing === -1"></crm-search-display-editable>
   </td>
 </tr>

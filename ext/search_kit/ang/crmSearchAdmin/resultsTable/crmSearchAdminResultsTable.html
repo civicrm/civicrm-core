@@ -9,8 +9,8 @@
       <tr ng-model="$ctrl.search.api_params.select" ui-sortable="sortableColumnOptions">
         <th class="crm-search-result-select" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.settings.actions">
         </th>
-        <th ng-repeat="item in $ctrl.search.api_params.select" ng-click="$ctrl.setSort($ctrl.settings.columns[$index], $event)" title="{{$index || !$ctrl.crmSearchAdmin.groupExists ? ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).') : ts('Column reserved for smart group.')}}">
-          <i ng-if=":: $ctrl.isSortable($ctrl.settings.columns[$index])" class="crm-i {{ $ctrl.getSort($ctrl.settings.columns[$index]) }}" role="img" aria-hidden="true"></i>
+        <th ng-repeat="item in $ctrl.search.api_params.select" ng-click="$ctrl.setSort($ctrl.columns[$index], $event)" title="{{$index || !$ctrl.crmSearchAdmin.groupExists ? ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).') : ts('Column reserved for smart group.')}}">
+          <i ng-if=":: $ctrl.isSortable($ctrl.columns[$index])" class="crm-i {{ $ctrl.getSort($ctrl.columns[$index]) }}" role="img" aria-hidden="true"></i>
           <span ng-class="{'crm-draggable': $index || !$ctrl.crmSearchAdmin.groupExists}">{{ getColumnLabel($index) }}</span>
           <span ng-switch="$index || !$ctrl.crmSearchAdmin.groupExists ? 'sortable' : 'locked'">
             <i ng-switch-when="locked" class="crm-i fa-lock" role="img" aria-hidden="true"></i>

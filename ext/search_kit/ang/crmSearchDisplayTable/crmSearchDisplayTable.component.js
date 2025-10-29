@@ -15,25 +15,14 @@
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait, searchDisplayEditableTrait, crmApi4, crmStatus) {
-      let ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in copies of traits to this controller
         ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
-
-      this._allColumns = null;
 
       this.$onInit = function() {
         let tallyParams;
 
-        this._allColumns = ctrl.settings.columns.map((col, index) => {
-          // store the canonical index on the array items
-          // useful when we want to refer to this index
-          // after filtering, e.g. in getApiParams
-          col.index = index;
-          col.toggled = true;
-          return col;
-        });
-
-        ctrl.onPreRun.push(() => this.trackFetchedColumns());
+        ctrl.onPreRun.push(this.trackFetchedColumns);
 
         // Copy API params from the run and adapt them in a secondary `tally` call for the "Totals" row
         if (ctrl.settings.tally) {
@@ -141,18 +130,6 @@
         return cssClass;
       };
 
-      /**
-       * Get the columns to display from a result row
-       *
-       * The columns in the result row will correspond to those most recently fetched
-       * - so we need to find those first and then use those indices to filter by
-       * toggled status
-       */
-      this.getRowColumns = (row) => {
-        const resultColumns = this._allColumns.filter((col) => col.fetched);
-        return row.columns.filter((col, index) => resultColumns[index].toggled);
-      };
-
       this.getColumnToggleLabel = (col) => {
         if (col.label) {
           return col.label;
@@ -178,15 +155,14 @@
        * If including columns that we haven't fetched, trigger a refetch
        */
       this.toggleColumns = () => {
-        this.settings.columns = this._allColumns.filter((col) => col.toggled);
-        if (this._allColumns.find((col) => col.toggled && !col.fetched)) {
+        if (this.columns.find((col) => col.enabled && !col.fetched)) {
           this.getResultsPronto();
         }
       };
 
       this.resetColumnToggles = () => {
-        this._allColumns.forEach((col, index) => {
-          this._allColumns[index].toggled = true;
+        this.columns.forEach((col, index) => {
+          this.columns[index].enabled = true;
         });
         this.toggleColumns();
       };
@@ -198,20 +174,11 @@
        * hide columns without refetching)
        */
       this.trackFetchedColumns = () => {
-        this._allColumns.forEach((col, index) => {
-          this._allColumns[index].fetched = col.toggled;
+        this.columns.forEach((col) => {
+          col.fetched = col.enabled;
         });
       };
 
-      // Override base method: add userJobId
-      const _getApiParams = this.getApiParams;
-      this.getApiParams = function(mode) {
-        const apiParams = _getApiParams.call(this, mode);
-        apiParams.toggleColumns = this._allColumns
-          .filter((col) => col.toggled)
-          .map((col) => col.index);
-        return apiParams;
-      };
     }
   });
 

@@ -9,9 +9,9 @@
       <summary>{{:: ts('Pick Columns') }}</summary>
       <div class="crm-accordion-body">
         <!-- TODO: select2 might be nicer here? -->
-        <label ng-repeat="(index, col) in $ctrl._allColumns">
+        <label ng-repeat="(index, col) in $ctrl.columns">
           <input type="checkbox"
-            ng-model="$ctrl._allColumns[index].toggled"
+            ng-model="$ctrl.columns[index].enabled"
             ng-change="$ctrl.toggleColumns()"
             >
             {{:: $ctrl.getColumnToggleLabel(col) }}
@@ -28,7 +28,7 @@
         <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.hasExtraFirstColumn()">
           <span class="sr-only">{{:: ts('Bulk row actions')}}</span>
         </th>
-        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.getHeaderClass(col) }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
+        <th ng-repeat="col in $ctrl.columns" ng-if="col.enabled" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.getHeaderClass(col) }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
           <i ng-if=":: $ctrl.isSortable(col)" class="crm-i crm-search-table-column-sort-icon {{ $ctrl.getSort(col) }}" role="img" aria-hidden="true"></i>
           <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
         </th>
