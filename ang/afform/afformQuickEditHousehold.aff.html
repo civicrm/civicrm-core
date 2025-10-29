@@ -1,11 +1,9 @@
 <af-form ctrl="afform">
-  <af-entity type="Individual" name="Individual1" actions="{create: false, update: true}" security="RBAC" url-autofill="1" />
-  <fieldset af-fieldset="Individual1" class="af-container">
+  <af-entity type="Household" name="Household1" actions="{create: false, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Household1" class="af-container">
     <div class="af-container">
       <div class="af-container af-layout-inline">
-        <af-field name="first_name" />
-        <af-field name="middle_name" />
-        <af-field name="last_name" />
+        <af-field name="household_name" />
       </div>
       <div af-join="Email" actions="{update: true, delete: true}" af-repeat="Add Email" min="0" >
         <afblock-contact-email actions="{update: true, delete: true}"></afblock-contact-email>
