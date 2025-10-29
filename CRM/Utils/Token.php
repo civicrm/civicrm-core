@@ -1559,6 +1559,7 @@ class CRM_Utils_Token {
           '$receive_date' => 'contribution.receive_date',
           '$thankyou_date' => 'contribution.thankyou_date',
           '$receipt_date' => 'contribution.receipt_date',
+          '$cancel_date' => 'contribution.cancel_date',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
