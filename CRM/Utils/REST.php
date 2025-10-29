@@ -314,12 +314,13 @@ class CRM_Utils_REST {
     ];
 
     if (array_key_exists('json', $requestParams) && $requestParams['json'][0] == "{") {
+      $requestParams['json'] = str_replace('\\"', '"', $requestParams['json']);
       $params = json_decode($requestParams['json'], TRUE);
       if ($params === NULL) {
         CRM_Utils_JSON::output([
           'is_error' => 1,
           0 => 'error_message',
-          1 => 'Unable to decode supplied JSON.',
+          1 => 'Unable to decode supplied JSON: ' . json_last_error_msg(),
         ]);
       }
     }
