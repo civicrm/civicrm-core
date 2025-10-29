@@ -195,7 +195,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
    * point number (CSS font size in rem)
    */
   public static function validateFontSize($value):bool {
-    $fontSize = floatval($value);
+    $fontSize = \CRM_Utils_Type::validate($value, 'Float', FALSE);
     if ($fontSize < 0.5 || $fontSize > 2) {
       return FALSE;
     }
