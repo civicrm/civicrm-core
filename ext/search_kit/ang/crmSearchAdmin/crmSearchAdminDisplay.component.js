@@ -11,9 +11,8 @@
     },
     template: function() {
       // Dynamic template generates switch condition for each display type
-      let html =
-        '<div ng-switch="$ctrl.display.type">\n';
-      _.each(CRM.crmSearchAdmin.displayTypes, function(type) {
+      let html = '<div ng-switch="$ctrl.display.type">\n';
+      CRM.crmSearchAdmin.displayTypes.forEach(function(type) {
         html +=
           '<div ng-switch-when="' + type.id + '">\n' +
           '  <div class="help-block"><i class="crm-i ' + type.icon + '" role="img" aria-hidden="true"></i> ' + _.escape(type.description) + '</div>' +
@@ -203,24 +202,9 @@
         }
       };
 
-      // Because angular dropdowns must be a by-reference variable
-      const suffixOptionCache = {};
-
       this.getSuffixOptions = function(col) {
-        let expr = ctrl.getExprFromSelect(col.key),
-          info = searchMeta.parseExpr(expr);
-        if (!info.fn && info.args[0] && info.args[0].field && info.args[0].field.suffixes) {
-          let cacheKey = info.args[0].field.suffixes.join();
-          if (!(cacheKey in suffixOptionCache)) {
-            suffixOptionCache[cacheKey] = Object.keys(CRM.crmSearchAdmin.optionAttributes)
-              .filter(key => info.args[0].field.suffixes.includes(key))
-              .reduce((filteredOptions, key) => {
-                filteredOptions[key] = CRM.crmSearchAdmin.optionAttributes[key];
-                return filteredOptions;
-              }, {});
-          }
-          return suffixOptionCache[cacheKey];
-        }
+        let expr = ctrl.getExprFromSelect(col.key);
+        return ctrl.crmSearchAdmin.getSuffixOptions(expr);
       };
 
       function getSetSuffix(index, val) {
@@ -317,7 +301,7 @@
           };
           ctrl.links[''] = _.filter(ctrl.links['*'], {join: ''});
           searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
-            _.each(tasks, function (task) {
+            tasks.forEach(function (task) {
               if (task.number === '> 0' || task.number === '=== 1') {
                 const link = {
                   text: task.title,
@@ -443,8 +427,9 @@
 
       // Add or remove an item from an array
       this.toggle = function(collection, item) {
-        if (_.includes(collection, item)) {
-          _.pull(collection, item);
+        const index = collection.indexOf(item);
+        if (index > -1) {
+          collection.splice(index, 1);
         } else {
           collection.push(item);
         }
