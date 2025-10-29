@@ -160,7 +160,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     // Get Line Items if we don't have them already.
     if (empty($params['line_item'])) {
-      CRM_Price_BAO_LineItem::getLineItemArray($params, $contributionID ? [$contributionID] : NULL);
+      if ($contributionID) {
+        $order = new CRM_Financial_BAO_Order();
+        $order->setExistingContributionID($contributionID);
+        $order->setOverrideTotalAmount($params['total_amount'] ?? NULL);
+        $order->setOverrideFinancialTypeID($params['financial_type_id'] ?? NULL);
+        $params['line_item'] = [$order->getLineItems()];
+      }
+      else {
+        CRM_Price_BAO_LineItem::getLineItemArray($params);
+      }
     }
 
     // We should really ALWAYS calculate tax amount off the line items.
