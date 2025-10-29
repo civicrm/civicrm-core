@@ -25,7 +25,19 @@ class CRM_Utils_Check_Component_Tokens extends CRM_Utils_Check_Component {
     $changes = CRM_Utils_Token::getTokenDeprecations();
     $messages = $problems = [];
     foreach ($changes['WorkFlowMessageTemplates'] as $workflowName => $workflowChanges) {
+      $usesLineItems = (bool) CRM_Core_DAO::singleValueQuery('
+          SELECT COUNT(*)
+          FROM civicrm_msg_template
+          WHERE workflow_name = "' . $workflowName . '"
+          AND (
+            msg_html LIKE "%$lineItems%"
+          )
+        ');
       foreach ($workflowChanges as $old => $new) {
+        if ($old === '$lineItem' && $usesLineItems) {
+          // Line Item is OK if part of a lineItems loop but not at the top level.
+          continue;
+        }
         if (CRM_Core_DAO::singleValueQuery("
           SELECT COUNT(*)
           FROM civicrm_msg_template
