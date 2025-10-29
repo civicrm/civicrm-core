@@ -396,14 +396,12 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function sendCancellation() {
-    $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantDetails = [];
     $query = "SELECT * FROM civicrm_participant WHERE id = {$this->_from_participant_id}";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $participantDetails[$dao->id] = [
         'id' => $dao->id,
-        'role' => $participantRoles[$dao->role_id],
         'is_test' => $dao->is_test,
         'event_id' => $dao->event_id,
         'status_id' => $dao->status_id,
@@ -416,8 +414,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $eventDetails = [];
     $eventParams = ['id' => $this->_event_id];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails[$this->_event_id]);
-    //get default participant role.
-    $eventDetails[$this->_event_id]['participant_role'] = $participantRoles[$eventDetails[$this->_event_id]['default_role_id']] ?? NULL;
     //send a 'cancelled' email to user, and cc the event's cc_confirm email
     CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_from_participant_id,
       $participantDetails[$this->_from_participant_id],
