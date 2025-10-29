@@ -56,7 +56,7 @@ class Submit extends AbstractProcessor {
     $errors = $event->getErrors();
     if ($errors) {
       \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors, TRUE));
-      throw new \CRM_Core_Exception(implode("\n", $errors));
+      throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
     }
 
     // Save submission record
