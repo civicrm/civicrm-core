@@ -22,6 +22,8 @@ use Civi\Api4\Utils\FormattingUtil;
  * @method string getSeed()
  * @method $this setAfform(string $afform)
  * @method string getAfform()
+ * @method $this setToggleColumns(array $columnIndices)
+ * @method array getToggleColumns()
  * @package Civi\Api4\Action\SearchDisplay
  */
 abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
@@ -71,6 +73,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @var string
    */
   protected $afform;
+
+  /**
+   * Indices of columns to return
+   * @var array
+   */
+  protected array $toggleColumns = [];
 
   /**
    * @var array
@@ -148,8 +156,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       foreach ($this->getSelectClause() as $key => $item) {
         $data[$key] = $this->getValue($key, $record, $index);
       }
-      foreach ($this->display['settings']['columns'] as $column) {
-        $columns[] = $this->formatColumn($column, $data, $this->display['settings']);
+      foreach ($this->display['settings']['columns'] as $index => $column) {
+        $columns[] = $this->isColumnEnabled($index) ? $this->formatColumn($column, $data, $this->display['settings']) : NULL;
       }
       $row = [
         'data' => $data,
@@ -839,7 +847,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * Fills in info about each link in the search display.
    */
   protected function preprocessLinks(): void {
-    foreach ($this->display['settings']['columns'] as &$column) {
+    foreach ($this->display['settings']['columns'] as $index => &$column) {
+      if (!$this->isColumnEnabled($index)) {
+        continue;
+      }
       if (!empty($column['link'])) {
         $this->preprocessLink($column['link']);
       }
@@ -1374,9 +1385,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
     // Add requested sort after verifying it corresponds to sortable columns
     foreach ($this->sort as $item) {
-      $column = array_column($this->display['settings']['columns'], NULL, 'key')[$item[0]] ?? NULL;
-      if ($column && !(isset($column['sortable']) && !$column['sortable'])) {
-        $currentSort[] = $item;
+      foreach ($this->display['settings']['columns'] as $index => $column) {
+        if (($column['key'] ?? NULL) === $item[0] && $this->isColumnEnabled($index) && !(isset($column['sortable']) && !$column['sortable'])) {
+          $currentSort[] = $item;
+          break;
+        }
       }
     }
 
@@ -1424,7 +1437,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $this->addSelectExpression($addition);
     }
     $possibleTokens = '';
-    foreach ($this->display['settings']['columns'] as $column) {
+    foreach ($this->display['settings']['columns'] as $index => $column) {
+      if (!$this->isColumnEnabled($index)) {
+        continue;
+      }
       // Collect display values in which a token is allowed
       $possibleTokens .= ($column['rewrite'] ?? '');
       $possibleTokens .= ($column['title'] ?? '');
@@ -1888,6 +1904,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return 'relationship_id';
     }
     return CoreUtil::getIdFieldName($entityName);
+  }
+
+  protected function isColumnEnabled(int $columnIndex): bool {
+    if (!$this->toggleColumns) {
+      return TRUE;
+    }
+    return in_array($columnIndex, $this->toggleColumns);
   }
 
   /**

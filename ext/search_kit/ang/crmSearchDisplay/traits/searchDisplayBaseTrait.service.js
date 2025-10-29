@@ -30,6 +30,14 @@
         for (let p=0; p < placeholderCount; ++p) {
           this.placeholders.push({});
         }
+        this.columns = this.settings.columns.map((column) => {
+          // Break reference so original settings are preserved
+          const col = _.cloneDeep(column);
+          // Used by crmSearchDisplayTable.toggleColumns
+          col.enabled = true;
+          col.fetched = true;
+          return col;
+        });
         _.each(ctrl.onInitialize, function(callback) {
           callback.call(ctrl, $scope, $element);
         });
@@ -198,7 +206,7 @@
 
       // Generate params for the SearchDisplay.run api
       getApiParams: function(mode) {
-        return {
+        const apiParams = {
           return: arguments.length ? mode : 'page:' + this.page,
           savedSearch: this.search,
           display: this.display,
@@ -208,6 +216,17 @@
           filters: this.getFilters(),
           afform: this.afFieldset ? this.afFieldset.getFormName() : null
         };
+        // Add toggleColumns if any columns are disabled
+        const toggleColumns = this.columns.reduce((indices, col, index) => {
+          if (col.enabled) {
+            indices.push(index);
+          }
+          return indices;
+        }, []);
+        if (toggleColumns.length < this.columns.length) {
+          apiParams.toggleColumns = toggleColumns;
+        }
+        return apiParams;
       },
 
       onClickSearchButton: function() {

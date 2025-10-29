@@ -30,12 +30,6 @@ trait SavedSearchInspectorTrait {
   protected $savedSearch;
 
   /**
-   * Toggle columns to include in the result
-   * @var array
-   */
-  protected array $toggleColumns = [];
-
-  /**
    * @var array{select: array, where: array, having: array, orderBy: array, limit: int, offset: int, checkPermissions: bool, debug: bool}
    */
   protected $_apiParams;
@@ -118,12 +112,6 @@ trait SavedSearchInspectorTrait {
         'id' => NULL,
         'name' => NULL,
       ];
-    }
-    if (
-      $this->toggleColumns
-      && (count($this->toggleColumns) < count($this->display['settings']['columns']))
-      ) {
-      $this->display['settings']['columns'] = array_values(array_map(fn ($i) => $this->display['settings']['columns'][$i], $this->toggleColumns));
     }
   }
 
