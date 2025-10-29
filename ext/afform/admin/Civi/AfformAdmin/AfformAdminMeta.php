@@ -36,9 +36,16 @@ class AfformAdminMeta {
     foreach ($afformTypes as $index => $type) {
       $afformTypes[$index]['plural'] = $plurals[$type['name']] ?? \CRM_Utils_String::pluralize($type['label']);
     }
+    $containerStyles = (array) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('name', 'label')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('option_group_id:name', '=', 'afform_container_style')
+      ->addOrderBy('weight', 'ASC')
+      ->execute();
     return [
       'afform_type' => $afformTypes,
       'afform_placement' => $afformPlacement,
+      'afform_container_style' => $containerStyles,
       'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
       'placement_filters' => self::getPlacementFilterOptions(),
       'afform_tags' => $afformTags,

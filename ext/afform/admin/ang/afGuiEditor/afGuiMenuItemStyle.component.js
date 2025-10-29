@@ -9,13 +9,10 @@
       node: '='
     },
     controller: function($scope, afGui) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
-      // Todo: Make this an option group so other extensions can add to it
-      this.styles = [
-        {name: 'af-container-style-pane', label: ts('Panel Pane')}
-      ];
+      this.styles = _.cloneDeep(afGui.meta.afform_container_style);
 
       $scope.getSetStyle = function(style) {
         var options = _.map(ctrl.styles, 'name');
