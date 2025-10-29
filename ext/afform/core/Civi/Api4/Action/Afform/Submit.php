@@ -60,19 +60,14 @@ class Submit extends AbstractProcessor {
     }
 
     // Save submission record
-    $status = 'Processed';
     if (!empty($this->_afform['create_submission']) && empty($this->args['sid'])) {
-      if (!empty($this->_afform['manual_processing'])) {
-        $status = 'Pending';
-      }
-
       $userId = \CRM_Core_Session::getLoggedInContactID();
 
       $submissionRecord = [
         'contact_id' => $userId,
         'afform_name' => $this->name,
         'data' => $this->getValues(),
-        'status_id:name' => $status,
+        'status_id:name' => 'Pending',
       ];
       // Update draft if it exists
       if ($userId) {
@@ -112,7 +107,7 @@ class Submit extends AbstractProcessor {
         AfformSubmission::update(FALSE)
           ->addWhere('id', '=', $submissionId)
           ->addValue('data', $submissionData)
-          ->addValue('status_id:name', $status)
+          ->addValue('status_id:name', 'Processed')
           ->execute();
       }
 
