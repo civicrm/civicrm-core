@@ -200,6 +200,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
               'path' => "'{$task['url']}'",
               'query' => "{reset: 1}",
               'data' => "{cids: ids.join(','), qfKey: '$key'}",
+              'mode' => $task['mode'] ?? 'back',
             ],
           ];
         }
