@@ -18,6 +18,7 @@
         link: function($scope, $el, $attr, ctrls) {
           $scope.afFieldset = ctrls[0];
           $scope.afJoin = ctrls[1];
+          $scope.element = $el;
         },
         controller: function($scope) {
           this.getItems = $scope.getItems = function() {
