@@ -1140,33 +1140,33 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       define('_JEXEC', 1);
       define('DS', DIRECTORY_SEPARATOR);
       define('JPATH_BASE', $joomlaBase . DS . 'administrator');
-      require $joomlaBase . '/administrator/includes/defines.php';
+      require_once $joomlaBase . '/administrator/includes/defines.php';
     }
 
     // Get the framework.
     if (file_exists($joomlaBase . '/libraries/import.legacy.php') && !file_exists($joomlaBase . '/libraries/bootstrap.php')) {
-      require $joomlaBase . '/libraries/import.legacy.php';
+      require_once $joomlaBase . '/libraries/import.legacy.php';
     }
 
     if (!file_exists($joomlaBase . '/libraries/bootstrap.php')) {
-      require $joomlaBase . '/libraries/cms.php';
+      require_once $joomlaBase . '/libraries/cms.php';
     }
     else {
-      require $joomlaBase . '/libraries/bootstrap.php';
+      require_once $joomlaBase . '/libraries/bootstrap.php';
       require_once $joomlaBase . '/includes/framework.php';
     }
     self::getJVersion($joomlaBase);
 
     if (version_compare(JVERSION, '3.8', 'lt')) {
-      require $joomlaBase . '/libraries/import.php';
-      require $joomlaBase . '/libraries/joomla/event/dispatcher.php';
+      require_once $joomlaBase . '/libraries/import.php';
+      require_once $joomlaBase . '/libraries/joomla/event/dispatcher.php';
     }
 
     require_once $joomlaBase . '/configuration.php';
 
     if (version_compare(JVERSION, '3.0', 'lt')) {
-      require $joomlaBase . '/libraries/joomla/environment/uri.php';
-      require $joomlaBase . '/libraries/joomla/application/component/helper.php';
+      require_once $joomlaBase . '/libraries/joomla/environment/uri.php';
+      require_once $joomlaBase . '/libraries/joomla/application/component/helper.php';
     }
     elseif (version_compare(JVERSION, '3.8', 'lt')) {
       jimport('joomla.environment.uri');
