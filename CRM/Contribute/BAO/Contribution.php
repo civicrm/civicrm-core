@@ -160,7 +160,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     // Get Line Items if we don't have them already.
     if (empty($params['line_item'])) {
-      CRM_Price_BAO_LineItem::getLineItemArray($params, $contributionID ? [$contributionID] : NULL);
+      if ($contributionID) {
+        $order = new CRM_Financial_BAO_Order();
+        $order->setExistingContributionID($contributionID);
+        $params['line_item'] = [$order->getLineItems()];
+      }
+      else {
+        CRM_Price_BAO_LineItem::getLineItemArray($params);
+      }
     }
 
     // We should really ALWAYS calculate tax amount off the line items.
@@ -2950,6 +2957,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $params['skipLineItem'] = FALSE;
             foreach ($params['line_item'] as &$lineItems) {
               foreach ($lineItems as &$line) {
+                if ($line['financial_type_id'] != $params['financial_type_id']) {
+                  throw new Exception('where is this hit');
+                }
+                if ($line['financial_type_id'] !== $params['financial_type_id']) {
+                  throw new Exception('where is this hit on strict');
+                }
                 $line['financial_type_id'] = $params['financial_type_id'];
               }
             }
