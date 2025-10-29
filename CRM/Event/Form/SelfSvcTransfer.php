@@ -330,20 +330,17 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   public function participantTransfer($participant): void {
     $contactDetails = civicrm_api3('Contact', 'getsingle', ['id' => $participant->contact_id, 'return' => ['display_name', 'email']]);
 
-    $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantDetails = [];
     $query = 'SELECT * FROM civicrm_participant WHERE id = ' . $participant->id;
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $participantDetails[$dao->id] = [
         'id' => $dao->id,
-        'role' => $participantRoles[$dao->role_id],
         'is_test' => $dao->is_test,
         'event_id' => $dao->event_id,
         'status_id' => $dao->status_id,
         'fee_amount' => $dao->fee_amount,
         'contact_id' => $dao->contact_id,
-        'register_date' => $dao->register_date,
         'registered_by_id' => $dao->registered_by_id,
       ];
     }
@@ -351,9 +348,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $eventDetails = [];
     $eventParams = ['id' => $participant->event_id];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails);
-
-    //get default participant role.
-    $eventDetails['participant_role'] = $participantRoles[$eventDetails['default_role_id']] ?? NULL;
 
     $toEmail = $contactDetails['email'] ?? NULL;
     if ($toEmail) {
