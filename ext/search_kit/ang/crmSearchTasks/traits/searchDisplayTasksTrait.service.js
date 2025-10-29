@@ -56,7 +56,7 @@
         };
         // If task uses a crmPopup form
         if (task.crmPopup) {
-          const mode = task.crmPopup.mode && task.crmPopup.mode == 'front'  ? 'front' : 'back';
+          const mode = ('mode' in task.crmPopup) ? task.crmPopup.mode : 'back';
           const path = $rootScope.$eval(task.crmPopup.path, data),
             query = task.crmPopup.query && $rootScope.$eval(task.crmPopup.query, data);
           CRM.loadForm(CRM.url(path, query, mode), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
