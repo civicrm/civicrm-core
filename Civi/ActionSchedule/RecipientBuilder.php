@@ -257,7 +257,7 @@ class RecipientBuilder {
         ->merge($this->joinReminder('INNER JOIN', 'addl', $query))
         ->merge($this->prepareAddlFilter('c.id'), ['params'])
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
-        ->groupBy("reminder.contact_id")
+        ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
         ->having("SUM(ISNULL(reminder.action_date_time)) = 0")
         ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
         ->param([
