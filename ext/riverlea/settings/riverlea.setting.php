@@ -68,7 +68,7 @@ return [
     'title' => E::ts('Font size'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => E::ts('The font size (Smallest 12px, Small 14px, Default 16px, Big 18px, Bigger 24px)'),
+    'help_text' => E::ts('For systems where 1rem = 16px (which is the default in RiverLea and all browsers) these sizes represent: Smallest 12px, Small 14px, Default 16px, Big 18px, Bigger 24px.'),
     'settings_pages' => [
       'riverlea' => ['weight' => 500],
     ],
