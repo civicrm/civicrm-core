@@ -350,16 +350,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
     }
     else {
-      //offline contribution
-      // assigned various dates to the templates
-      $form->assign('receipt_date', CRM_Utils_Date::processDate($params['receipt_date']));
-
-      if (!empty($params['cancel_date'])) {
-        $form->assign('cancel_date', CRM_Utils_Date::processDate($params['cancel_date']));
-      }
-      if (!empty($params['thankyou_date'])) {
-        $form->assign('thankyou_date', CRM_Utils_Date::processDate($params['thankyou_date']));
-      }
       if ($form->_action & CRM_Core_Action::UPDATE) {
         $form->assign('lineItem', empty($form->_lineItems) ? FALSE : $form->_lineItems);
       }
