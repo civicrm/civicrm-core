@@ -607,8 +607,7 @@ return [
     'title' => ts('Force source translations to the default language'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => NULL,
-    'description' => ts('When choosing <strong>Yes</strong>, created content (i.e. Forms, Searches, etc.) will save the source translations as originating from your default language. Otherwise, you can choose the base locale for each Form or it defaults to the current users language.'),
+    'help_text' => ts('When enabled, created content (i.e. Forms, Searches, etc.) will save the source translations as originating from your default language. Otherwise, you can choose the base locale for each Form or it defaults to the current users language.'),
     'settings_pages' => ['localization' => ['section' => 'language', 'weight' => 45]],
   ],
 ];
