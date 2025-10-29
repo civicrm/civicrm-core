@@ -1045,7 +1045,11 @@ class CRM_Financial_BAO_Order {
       if ($this->getOverrideTotalAmount() !== FALSE) {
         $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
       }
-      elseif ($this->getPriceFieldMetadata($lineItem['price_field_id'])['name'] === 'other_amount') {
+      elseif ($this->getPriceFieldMetadata($lineItem['price_field_id'])['name'] === 'other_amount'
+        // If we are loading an existing contribution then this switcheroo to treat the amount set
+        // as being the inclusive amount has already been done, so skip.
+        && !$this->getExistingContributionID() && !$this->getTemplateContributionID()
+      ) {
         // Other amount is a front end user entered form. It is reasonable to think it would be tax inclusive.
         $lineItem['line_total_inclusive'] = $lineItem['line_total'];
         $lineItem['line_total'] = $lineItem['line_total_inclusive'] ? $lineItem['line_total_inclusive'] / (1 + ($lineItem['tax_rate'] / 100)) : 0;

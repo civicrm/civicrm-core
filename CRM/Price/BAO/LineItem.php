@@ -452,6 +452,7 @@ WHERE li.contribution_id = %1";
       }
     }
     else {
+      CRM_Core_Error::deprecatedWarning('use the api to load line items for existing entities');
       $setID = NULL;
       $totalEntityId = count($entityId);
       if ($entityTable == 'contribution') {
