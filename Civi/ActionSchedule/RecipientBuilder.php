@@ -215,12 +215,14 @@ class RecipientBuilder {
     // the first part of the startDateClause array is the earliest the reminder can be sent. If the
     // event (e.g membership_end_date) has changed then the reminder may no longer apply
     // @todo - this only handles events that get moved later. Potentially they might get moved earlier
+    // also, do not create any more entries if there are unprocessed ones still pending
     $repeatInsert = $query
       ->merge($this->joinReminder('INNER JOIN', 'rel', $query))
       ->merge($this->selectIntoActionLog(self::PHASE_RELATION_REPEAT, $query))
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : [])
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
+      ->having("SUM(ISNULL(reminder.action_date_time)) = 0")
       ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
       ->param([
         'casRepetitionInterval' => $this->parseRepetitionInterval(),
@@ -255,7 +257,8 @@ class RecipientBuilder {
         ->merge($this->joinReminder('INNER JOIN', 'addl', $query))
         ->merge($this->prepareAddlFilter('c.id'), ['params'])
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
-        ->groupBy("reminder.contact_id")
+        ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
+        ->having("SUM(ISNULL(reminder.action_date_time)) = 0")
         ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
         ->param([
           'casRepetitionInterval' => $this->parseRepetitionInterval(),
