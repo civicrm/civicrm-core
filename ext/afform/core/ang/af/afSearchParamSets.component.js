@@ -26,7 +26,7 @@
         .then((results) => this.savedSets = results)
         .catch(() => this.savedSets = [{id: '', label: ts('Error fetching Saved Searches')}]);
 
-      this.applySearchParamSet = (id) => $window.location.hash = id ? `#?_s=${id}` : '';
+      this.applySearchParamSet = (id) => $window.location.hash = `#?_s=${id ? id : 0}`;
 
       this.getSetSearchParamSet = (value) => {
         if (value !== undefined) {

@@ -11,13 +11,22 @@
 
 <div class="crm-buttons">
   <button
+    ng-if="$ctrl.getSetSearchParamSet()"
+    type="button"
+    class="btn btn-secondary"
+    crm-icon="fa-times"
+    ng-click="$ctrl.applySearchParamSet(0)"
+    aria-label="{{:: ts('Clear saved search') }}"
+    >
+  </button>
+  <button
     ng-if="$ctrl.savedSets.length"
     type="button"
     class="btn btn-secondary"
     crm-icon="fa-gear"
     ng-click="$ctrl.manageDialog.open()"
+    aria-label="{{:: ts('Manage') }}"
     >
-    {{:: ts('Manage') }}
   </button>
 
   <button
