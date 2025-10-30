@@ -40,7 +40,7 @@
           }
           initializeBlockContainer();
         }
-        _.each(afGui.meta.elements, function(element) {
+        Object.values(afGui.meta.elements).forEach((element) => {
           if (element.directive) {
             genericElements.push(element.directive);
           }
