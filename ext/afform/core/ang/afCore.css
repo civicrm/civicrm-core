@@ -93,6 +93,7 @@ af-form {
 
 .af-field-type-toggle .crm-af-field,
 .af-gui-field-input-type-toggle .crm-af-field {
+  display: flex;
   flex-flow: row nowrap;
   grid-gap: 0.5rem;
 

@@ -132,6 +132,7 @@ fieldset.af-container.af-layout-inline {
 /* Radio buttons */
 
 .af-field-type-toggle .crm-af-field,
+.af-gui-field-input-type-toggle .crm-af-field,
 .af-field-type-radio .crm-af-field {
   display: flex;
   padding-block: 0.25rem;
