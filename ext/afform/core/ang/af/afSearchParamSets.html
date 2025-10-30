@@ -48,7 +48,7 @@
   <div ng-show="!$ctrl.saveDialog.inProgress">
     <h2>{{ ts('Save new search') }}</h2>
     <label for="newSearchParamSetLabel">{{:: ts('Name') }}</label>
-    <input id="newSearchParamSetLabel" ng-model="$ctrl.saveDialog.label" />
+    <input id="newSearchParamSetLabel" ng-model="$ctrl.saveDialog.label" ng-required placeholder="{{:: ts('New search') }}" />
 
     <dl>
       <div ng-repeat="(key, value) in $ctrl.renderSearchParamSetFilters($ctrl.getCurrentFilterValues())">

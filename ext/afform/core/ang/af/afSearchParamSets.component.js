@@ -122,7 +122,7 @@
         open: () => $element[0].querySelector('dialog.af-search-param-set-new').showModal(),
         close: () => $element[0].querySelector('dialog.af-search-param-set-new').close(),
         reset: () => {
-          this.saveDialog.label = ts('New search');
+          this.saveDialog.label = '';
           this.saveDialog.inProgress = false;
         },
         canOpen: () => {
