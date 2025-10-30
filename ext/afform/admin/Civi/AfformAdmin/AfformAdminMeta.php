@@ -294,7 +294,10 @@ class AfformAdminMeta {
           ],
         ],
         'search_param_sets' => [
-          'title' => E::ts('Saved Search Param Sets'),
+          'title' => E::ts('Saved Search Picker'),
+          'admin_tpl' => '~/afGuiEditor/elements/afGuiSearchParamSets.html',
+          'directive' => 'af-search-param-sets',
+          'afform_type' => 'search',
           'element' => [
             '#tag' => 'af-search-param-sets',
           ],
