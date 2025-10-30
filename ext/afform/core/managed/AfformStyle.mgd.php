@@ -15,12 +15,11 @@ return [
         'name' => 'afform_container_style',
         'title' => E::ts('Afform Container Style'),
         'description' => NULL,
-        'data_type' => NULL,
+        'data_type' => 'String',
         'is_reserved' => TRUE,
         'is_active' => TRUE,
         'is_locked' => FALSE,
         'option_value_fields' => [
-          'name',
           'label',
         ],
       ],
@@ -36,7 +35,7 @@ return [
       'version' => 4,
       'values' => [
         'option_group_id.name' => 'afform_container_style',
-        'name' => 'af-container-style-pane',
+        'value' => 'af-container-style-pane',
         'label' => E::ts('Panel Pane'),
         'description' => NULL,
         'is_reserved' => TRUE,

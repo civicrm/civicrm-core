@@ -37,7 +37,7 @@ class AfformAdminMeta {
       $afformTypes[$index]['plural'] = $plurals[$type['name']] ?? \CRM_Utils_String::pluralize($type['label']);
     }
     $containerStyles = (array) \Civi\Api4\OptionValue::get(FALSE)
-      ->addSelect('name', 'label')
+      ->addSelect('value', 'label')
       ->addWhere('is_active', '=', TRUE)
       ->addWhere('option_group_id:name', '=', 'afform_container_style')
       ->addOrderBy('weight', 'ASC')

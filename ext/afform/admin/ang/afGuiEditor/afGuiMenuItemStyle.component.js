@@ -15,7 +15,7 @@
       this.styles = _.cloneDeep(afGui.meta.afform_container_style);
 
       $scope.getSetStyle = function(style) {
-        var options = _.map(ctrl.styles, 'name');
+        const options = ctrl.styles.map(item => item.value);
         if (arguments.length) {
           afGui.modifyClasses(ctrl.node, options, style);
         }
