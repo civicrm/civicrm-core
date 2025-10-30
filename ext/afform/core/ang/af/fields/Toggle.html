@@ -1,0 +1,6 @@
+<label class="crm-af-field-label" >
+  <input type="checkbox" ng-required="$ctrl.defn.required" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" />
+  <span ng-repeat="opt in getOptions() track by opt.id" ng-if="opt.id !== !getSetValue()">
+    {{:: opt.label }}
+  </span>
+</label>

@@ -1,0 +1,8 @@
+<div class="crm-af-field">
+  <label>
+    <input type="checkbox" ng-checked="defaultValueContains(true)" ng-click="toggleDefaultValueItem(true)">
+    <span ng-repeat="opt in $ctrl.getOptions()" ng-if="getSet('afform_default')() == opt.id">
+      {{:: opt.label }}
+    </span>
+  </label>
+</div>
