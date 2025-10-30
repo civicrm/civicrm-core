@@ -55,6 +55,15 @@ class SearchDisplay extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\SearchDisplay\EmailReport
+   */
+  public static function emailReport($checkPermissions = TRUE) {
+    return (new Action\SearchDisplay\EmailReport(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\SearchDisplay\InlineEdit
    */
   public static function inlineEdit($checkPermissions = TRUE) {
