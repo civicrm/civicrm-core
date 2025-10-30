@@ -4,8 +4,8 @@
     <label for="{{ fieldId + opt.id }}">{{:: opt.label }}</label>
   </li>
 </ul>
-  <input type="checkbox" ng-required="$ctrl.defn.required" ng-if="!$ctrl.isMultiple()" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}"  aria-label="{{$ctrl.defn.label}}"  />
-<label class="crm-af-field-label" for="{{:: fieldId }}" ng-if="!$ctrl.isMultiple() && $ctrl.defn.label" >
+<label class="crm-af-field-label" ng-if="!$ctrl.isMultiple()" >
+  <input type="checkbox" ng-required="$ctrl.defn.required" ng-if="!$ctrl.isMultiple()" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" aria-label="{{$ctrl.defn.label}}" />
   {{:: $ctrl.defn.label }}
   <span class="crm-marker" title="{{:: ts('Required') }}" ng-if="$ctrl.defn.required">*</span>
 </label>

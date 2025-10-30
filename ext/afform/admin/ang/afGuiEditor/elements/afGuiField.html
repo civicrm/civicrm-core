@@ -2,7 +2,6 @@
 <div ng-if="!editingOptions" class="af-gui-element af-gui-field" >
   <div class="af-gui-bar" title="{{:: getOriginalLabel() }}">
     <div class="form-inline">
-      <span ng-if="$ctrl.node.defn.label === false || ($ctrl.getDefn().input_type === 'CheckBox' && $ctrl.getDefn().data_type === 'Boolean')">{{:: getOriginalLabel() }} </span>
       <div class="btn-group pull-right" af-gui-menu >
         <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
           <span><i class="crm-i fa-gear" role="img" aria-hidden="true"></i></span>
@@ -11,7 +10,7 @@
       </div>
     </div>
   </div>
-  <label ng-style="{visibility: $ctrl.node.defn.label === false || ($ctrl.getDefn().input_type === 'CheckBox' && $ctrl.getDefn().data_type === 'Boolean') ? 'hidden' : 'visible'}" ng-class="{'af-gui-field-required': getProp('required')}" class="af-gui-node-title">
+  <label ng-style="{visibility: $ctrl.showLabel() ? 'visible' : 'hidden'}" ng-class="{'af-gui-field-required': getProp('required')}" class="af-gui-node-title">
     <span crm-ui-editable ng-model="getSet('label')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().label">{{ getProp('label') }}</span>
   </label>
   <div class="af-gui-field-help" ng-if="propIsset('help_pre')">
