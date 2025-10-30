@@ -131,7 +131,60 @@ fieldset.af-container.af-layout-inline {
 
 /* Radio buttons */
 
+.af-field-type-toggle .crm-af-field,
 .af-field-type-radio .crm-af-field {
   display: flex;
   padding-block: 0.25rem;
+}
+
+/* Toggle buttons */
+
+.af-field-type-toggle .crm-af-field {
+  flex-flow:row nowrap;
+  grid-gap:0.5rem;
+
+  & label {
+    align-self:center;
+  }
+
+  & input[type="checkbox"] {
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    position:relative;
+    font-size:inherit;
+    width:2.75em!important;
+    height:1.35em!important;
+    box-sizing:content-box;
+    border-radius:1em;
+    vertical-align:text-bottom;
+    color:inherit;
+    border:2px solid var(--crm-c-gray-500);
+    background-color:var(--crm-c-gray-500)!important;
+  }
+
+  & input[type="checkbox"]::before {
+    content:"";
+    position:absolute;
+    top:50%;
+    left:0;
+    transform:translate(0, -50%);
+    box-sizing:border-box;
+    width:1.25em!important;
+    height:1.25em!important;
+    margin:0 0.1em;
+    border:1px solid;
+    border-radius:50%;
+    background:#fff;
+  }
+  & input[type="checkbox"]:checked {
+    border:2px solid var(--crm-c-blue-dark)!important;
+    background-color:var(--crm-c-blue-dark)!important;
+  }
+  & input[type="checkbox"]:checked::before {
+    left:1.2em;
+  }
+  & input[type="checkbox"]:disabled {
+    opacity:0.4;
+  }
 }
