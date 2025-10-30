@@ -172,9 +172,6 @@
           ctrl.node.defn = ctrl.node.defn || {};
           return $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
         }
-        if (ctrl.getDefn().input_type === 'Toggle') {
-          return (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
-        }
         return ctrl.getDefn().options || (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
       };
 
