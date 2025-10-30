@@ -79,16 +79,18 @@
       this.onAfformReset = () => {
         const savedSearchParamSet = this.afFieldset.selectedSearchParamSet;
         if (!savedSearchParamSet) {
+          this.columns.forEach((col) => col.enabled = true);
           return;
         }
         const columns = savedSearchParamSet.columns ? savedSearchParamSet.columns[this.getSearchDisplayKey()] : null;
         if (!columns || !Object.keys(columns).length) {
+          this.columns.forEach((col) => col.enabled = true);
           return;
         }
         // note columns are saved as key => label if possible,
         // or label => label if not
         // first deselect all
-        this.columns.forEach((col, i) => this.columns[i].enabled = false);
+        this.columns.forEach((col) => col.enabled = false);
         // reselect selected columns
         Object.keys(columns).forEach((keyOrLabel) => {
           const findByKey = this.columns.findIndex((col) => col.key === keyOrLabel);
