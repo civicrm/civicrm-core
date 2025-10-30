@@ -536,7 +536,7 @@ WHERE {$clause}
     $activity->save();
     //really this should use Activity BAO& not be here but refactoring will have to be later
     //actually the whole ajax call could be done as an api ajax call & post hook would be sorted
-    CRM_Utils_Hook::post('edit', 'Activity', $activity->id, $activity);
+    CRM_Utils_Hook::post('edit', 'Activity', $activity->id, $activity, $params);
 
     return $activityId;
   }

@@ -179,7 +179,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
     Civi::cache('metadata')->clear();
     CRM_Core_PseudoConstant::flush();
 
-    CRM_Utils_Hook::post($op, 'OptionValue', $id, $optionValue);
+    CRM_Utils_Hook::post($op, 'OptionValue', $id, $optionValue, $params);
 
     // Create relationship for payment instrument options
     if (!empty($params['financial_account_id'])) {
