@@ -15,6 +15,7 @@ use Civi\API\Event\PrepareEvent;
 use Civi\API\Event\ExceptionEvent;
 use Civi\API\Event\ResolveEvent;
 use Civi\API\Event\RespondEvent;
+use Civi\API\Exception\UnauthorizedException;
 
 /**
  * @package Civi
@@ -145,7 +146,7 @@ class Kernel {
       }
       catch (\Civi\API\Exception\UnauthorizedException $e) {
         // We catch and re-throw to log for visibility
-        \CRM_Core_Error::backtrace('API Request Authorization failed', TRUE);
+        \Civi::log()->error('API Request Authorization failed: ' . $apiRequest->getEntityName() . '::' . $apiRequest->getActionName(), ['apiRequest[where]' => $apiRequest->getWhere()]);
         throw $e;
       }
 
