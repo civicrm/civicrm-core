@@ -19,12 +19,33 @@ return [
             'label',
             'value',
             'description',
-            'option_group_id:label',
+            'id',
+            'OptionValue_OptionGroup_option_group_id_01_OptionGroup_CustomField_option_group_id_01.id',
+            'OptionValue_OptionGroup_option_group_id_01.id',
           ],
           'orderBy' => [],
           'where' => [],
           'groupBy' => [],
-          'join' => [],
+          'join' => [
+            [
+              'OptionGroup AS OptionValue_OptionGroup_option_group_id_01',
+              'INNER',
+              [
+                'option_group_id',
+                '=',
+                'OptionValue_OptionGroup_option_group_id_01.id',
+              ],
+            ],
+            [
+              'CustomField AS OptionValue_OptionGroup_option_group_id_01_OptionGroup_CustomField_option_group_id_01',
+              'INNER',
+              [
+                'OptionValue_OptionGroup_option_group_id_01.id',
+                '=',
+                'OptionValue_OptionGroup_option_group_id_01_OptionGroup_CustomField_option_group_id_01.option_group_id',
+              ],
+            ],
+          ],
           'having' => [],
         ],
       ],
@@ -90,14 +111,14 @@ return [
               'icon' => 'fa-bars',
               'links' => [
                 [
-                  'entity' => 'OptionValue',
-                  'action' => 'update',
+                  'entity' => '',
+                  'action' => '',
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
-                  'path' => '',
+                  'path' => 'civicrm/admin/custom/group/field/option?reset=1&action=update&id=[id]&fid=[OptionValue_OptionGroup_option_group_id_01_OptionGroup_CustomField_option_group_id_01.id]&gid=[OptionValue_OptionGroup_option_group_id_01.id]',
                   'condition' => [],
                 ],
                 [
