@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use Civi\Api4\Utils\CoreUtil;
 use CRM_Search_ExtensionUtil as E;
@@ -25,10 +26,15 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
   protected $display;
 
   /**
-   * @param \Civi\Api4\Generic\Result $result
-   * @throws \CRM_Core_Exception
+   * Override execute method to change the result object type
+   * @return \Civi\Api4\Result\SearchDisplayRunResult
    */
+  public function execute() {
+    return parent::execute();
+  }
+
   public function _run(\Civi\Api4\Generic\Result $result) {
+    $this->checkPermissionToLoadSearch();
     $this->loadSavedSearch();
     $this->loadSearchDisplay();
 
@@ -36,31 +42,44 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     $entityName = $this->savedSearch['api_entity'];
     // Hack to support relationships
     $entityName = ($entityName === 'RelationshipCache') ? 'Relationship' : $entityName;
-    $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $entityName)
-      ->addSelect('name', 'title_plural')
-      ->setChain([
-        'actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name'],
-        'fields' => ['$name', 'getFields', ['where' => [['deprecated', '=', FALSE], ['type', '=', 'Field']]], 'name'],
-      ])
-      ->execute()->first();
 
-    if (!$entity) {
-      return;
+    $entity = Entity::get(FALSE)->addWhere('name', '=', $entityName)
+      ->addSelect('name', 'title', 'title_plural', 'primary_key')
+      ->execute()->single();
+    // Used by searchDisplayTasksTrait
+    $result->editable['entityInfo'] = $entity;
+
+    $actions = [];
+    $fields = [];
+    try {
+      $actions = (array) civicrm_api4($entity['name'], 'getActions', [
+        'checkPermissions' => $this->checkPermissions,
+        'where' => [['name', 'IN', ['get', 'update', 'delete']]],
+      ], 'name');
+      $fields = (array) civicrm_api4($entity['name'], 'getFields', [
+        'checkPermissions' => $this->checkPermissions,
+        'where' => [['deprecated', '=', FALSE], ['type', '=', 'Field']],
+      ], 'name');
+    }
+    catch (UnauthorizedException $e) {
+      // Limited access user
     }
 
     $tasks = [$entity['name'] => []];
 
-    if (CoreUtil::isContact($entity['name']) || array_key_exists($entity['name'], \CRM_Export_BAO_Export::getComponents())) {
-      $key = \CRM_Core_Key::get('CRM_Export_Controller_Standalone', TRUE);
-      $tasks[$entity['name']]['export'] = [
-        'title' => E::ts('Export %1', [1 => $entity['title_plural']]),
-        'icon' => 'fa-file-excel-o',
-        'crmPopup' => [
-          'path' => "'civicrm/export/standalone'",
-          'query' => "{reset: 1, entity: '{$entity['name']}'}",
-          'data' => "{id: ids.join(','), qfKey: '$key'}",
-        ],
-      ];
+    if (array_key_exists('get', $actions)) {
+      if (CoreUtil::isContact($entity['name']) || array_key_exists($entity['name'], \CRM_Export_BAO_Export::getComponents())) {
+        $key = \CRM_Core_Key::get('CRM_Export_Controller_Standalone', TRUE);
+        $tasks[$entity['name']]['export'] = [
+          'title' => E::ts('Export %1', [1 => $entity['title_plural']]),
+          'icon' => 'fa-file-excel-o',
+          'crmPopup' => [
+            'path' => "'civicrm/export/standalone'",
+            'query' => "{reset: 1, entity: '{$entity['name']}'}",
+            'data' => "{id: ids.join(','), qfKey: '$key'}",
+          ],
+        ];
+      }
     }
 
     $tasks[$entity['name']]['download'] = [
@@ -72,7 +91,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       'number' => '>= 0',
     ];
 
-    if (array_key_exists('update', $entity['actions'])) {
+    if (array_key_exists('update', $actions)) {
       $tasks[$entity['name']]['update'] = [
         'module' => 'crmSearchTasks',
         'title' => E::ts('Update %1', [1 => $entity['title_plural']]),
@@ -81,7 +100,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ];
 
       // Enable/disable are basically shortcut update actions
-      if (isset($entity['fields']['is_active'])) {
+      if (isset($fields['is_active'])) {
         $tasks[$entity['name']]['enable'] = [
           'title' => E::ts('Enable %1', [1 => $entity['title_plural']]),
           'icon' => 'fa-toggle-on',
@@ -122,10 +141,9 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskTag.html'],
         ];
       }
-
     }
 
-    if (array_key_exists('delete', $entity['actions'])) {
+    if (array_key_exists('delete', $actions)) {
       $tasks[$entity['name']]['delete'] = [
         'title' => E::ts('Delete %1', [1 => $entity['title_plural']]),
         'icon' => 'fa-trash',
@@ -145,7 +163,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
      * FIXME: Move these somewhere?
      */
 
-    if ($entity['name'] === 'Group') {
+    if ($entity['name'] === 'Group' && array_key_exists('get', $actions)) {
       $tasks['Group']['refresh'] = [
         'title' => E::ts('Refresh Group Cache'),
         'icon' => 'fa-refresh',
@@ -182,6 +200,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
               'path' => "'{$task['url']}'",
               'query' => "{reset: 1}",
               'data' => "{cids: ids.join(','), qfKey: '$key'}",
+              'mode' => $task['mode'] ?? 'back',
             ],
           ];
         }
@@ -197,19 +216,21 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           ],
         ];
       }
-      $tasks[$entity['name']]['contact.relationship'] = [
-        'title' => E::ts('Add Relationship'),
-        'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskRelationship.html'],
-        'icon' => 'fa-user-plus',
-        'module' => 'crmSearchTasks',
-        // Initial values can be set via `hook_civicrm_searchKitTasks`
-        // @var array{contact_id: array, relationship_type: string, disableRelationshipSelect: bool, description: string, start_date: string, end_date: string}
-        'values' => [],
-        'relationshipTypes' => [],
-      ];
-      // In search mode, load relationship types enabled in case roles
-      if (!empty($this->savedSearch)) {
-        $tasks[$entity['name']]['contact.relationship']['relationshipTypes'] = $this->getRelationshipTypes($this->savedSearch);
+      if (array_key_exists('update', $actions)) {
+        $tasks[$entity['name']]['contact.relationship'] = [
+          'title' => E::ts('Add Relationship'),
+          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskRelationship.html'],
+          'icon' => 'fa-user-plus',
+          'module' => 'crmSearchTasks',
+          // Initial values can be set via `hook_civicrm_searchKitTasks`
+          // @var array{contact_id: array, relationship_type: string, disableRelationshipSelect: bool, description: string, start_date: string, end_date: string}
+          'values' => [],
+          'relationshipTypes' => [],
+        ];
+        // In search mode, load relationship types enabled in case roles
+        if (!empty($this->savedSearch)) {
+          $tasks[$entity['name']]['contact.relationship']['relationshipTypes'] = $this->getRelationshipTypes($this->savedSearch);
+        }
       }
     }
 
@@ -241,7 +262,11 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       // Add default for number of rows action requires
       $task += ['number' => '> 0'];
       if (!empty($task['apiBatch']['fields'])) {
-        $this->getApiBatchFields($task);
+        $fieldPermission = $this->getApiBatchFields($task);
+        if (!$fieldPermission) {
+          unset($tasks[$entity['name']][$name]);
+          continue;
+        }
       }
       // If action includes a WHERE clause, add it to the conditions (see e.g. the enable/disable actions)
       if (!empty($task['apiBatch']['params']['where'])) {
@@ -256,17 +281,24 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     $result->exchangeArray($tasks[$entity['name']]);
   }
 
-  private function getApiBatchFields(array &$task) {
-    $fieldInfo = civicrm_api4($task['entity'], 'getFields', [
-      'checkPermissions' => $this->getCheckPermissions(),
-      'action' => $task['apiBatch']['action'] ?? 'update',
-      'select' => ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'required', 'nullable'],
-      'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
-      'where' => [['name', 'IN', array_column($task['apiBatch']['fields'], 'name')]],
-    ])->indexBy('name');
-    foreach ($task['apiBatch']['fields'] as &$field) {
-      $field += $fieldInfo[$field['name']] ?? [];
+  private function getApiBatchFields(array &$task): bool {
+    try {
+      $fieldInfo = civicrm_api4($task['entity'], 'getFields', [
+        'checkPermissions' => $this->getCheckPermissions(),
+        'action' => $task['apiBatch']['action'] ?? 'update',
+        'select' => ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'required', 'nullable'],
+        'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
+        'where' => [['name', 'IN', array_column($task['apiBatch']['fields'], 'name')]],
+      ])->indexBy('name');
+      foreach ($task['apiBatch']['fields'] as &$field) {
+        $field += $fieldInfo[$field['name']] ?? [];
+      }
     }
+    catch (\CRM_Core_Exception $e) {
+      // User doesn't have permission
+      return FALSE;
+    }
+    return TRUE;
   }
 
   public static function fields(): array {

@@ -30,6 +30,14 @@
         for (let p=0; p < placeholderCount; ++p) {
           this.placeholders.push({});
         }
+        this.columns = this.settings.columns.map((column) => {
+          // Break reference so original settings are preserved
+          const col = _.cloneDeep(column);
+          // Used by crmSearchDisplayTable.toggleColumns
+          col.enabled = true;
+          col.fetched = true;
+          return col;
+        });
         _.each(ctrl.onInitialize, function(callback) {
           callback.call(ctrl, $scope, $element);
         });
@@ -187,9 +195,7 @@
       },
 
       getAfformFilters: function() {
-        return _.pick(this.afFieldset ? this.afFieldset.getFieldData() : {}, function(val) {
-          return typeof val !== 'undefined' && val !== null && (_.includes(['boolean', 'number', 'object'], typeof val) || val.length);
-        });
+        return this.afFieldset ? this.afFieldset.getFilterValues() : {};
       },
 
       // WARNING: Only to be used with trusted/sanitized markup.
@@ -200,7 +206,7 @@
 
       // Generate params for the SearchDisplay.run api
       getApiParams: function(mode) {
-        return {
+        const apiParams = {
           return: arguments.length ? mode : 'page:' + this.page,
           savedSearch: this.search,
           display: this.display,
@@ -210,6 +216,17 @@
           filters: this.getFilters(),
           afform: this.afFieldset ? this.afFieldset.getFormName() : null
         };
+        // Add toggleColumns if any columns are disabled
+        const toggleColumns = this.columns.reduce((indices, col, index) => {
+          if (col.enabled) {
+            indices.push(index);
+          }
+          return indices;
+        }, []);
+        if (toggleColumns.length < this.columns.length) {
+          apiParams.toggleColumns = toggleColumns;
+        }
+        return apiParams;
       },
 
       onClickSearchButton: function() {

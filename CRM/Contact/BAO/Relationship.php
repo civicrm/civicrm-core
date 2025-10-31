@@ -254,7 +254,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_relationship', $relationship->id);
     }
 
-    CRM_Utils_Hook::post($hook, 'Relationship', $relationship->id, $relationship);
+    CRM_Utils_Hook::post($hook, 'Relationship', $relationship->id, $relationship, $params);
 
     return $relationship;
   }

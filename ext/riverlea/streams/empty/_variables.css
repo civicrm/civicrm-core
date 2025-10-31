@@ -44,12 +44,14 @@
   --crm-version: 'Empty, v' var(--crm-release);
 /* Fonts '--crm-font-' */
 /* Colour names, e.g. green, red, blue '--crm-c-' */
-/* Practical colours, e.g. background, text, link '--crm-c-' */
+/* Practical colours, e.g. text, link '--crm-c-' */
   --crm-c-text-light: #fff;
   --crm-c-text-dark: #302f35;
   --crm-c-text: var(--crm-c-text-dark);
   --crm-c-page-bg: #fff;
+/* Backgrounds, '--crm-c-*-bg' */
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+/* Shadows */
 /* Sizes */
 /* Type */
 /* Mouse events */

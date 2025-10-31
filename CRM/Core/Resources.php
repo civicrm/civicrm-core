@@ -545,7 +545,6 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     // "color" is deprecated in favor of the more specific "menubarColor"
     $menubarColor = $params['color'] ?? $params['menubarColor'];
     $vars = [
-      '$resourceBase' => rtrim($config->resourceBase, '/'),
       '$menubarHeight' => $params['height'] . 'px',
       '$breakMin' => $params['breakpoint'] . 'px',
       '$breakMax' => ($params['breakpoint'] - 1) . 'px',

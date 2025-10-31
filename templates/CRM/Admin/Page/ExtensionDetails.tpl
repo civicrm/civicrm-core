@@ -91,7 +91,14 @@
     </td>
   </tr>
     <tr>
-      <td class="label">{ts}License{/ts}</td><td><a href="{$extension.urls['Licensing']}" target="_blank">{$extension.license|escape}</a></td>
+      <td class="label">{ts}License{/ts}</td>
+      <td>
+        {if !empty($extension.urls['Licensing']) }
+          <a href="{$extension.urls['Licensing']}" target="_blank">{$extension.license|escape}</a>
+        {else}
+          {$extension.license|escape}
+        {/if}
+      </td>
     </tr>
     {if !empty($extension.path)}
       <tr>

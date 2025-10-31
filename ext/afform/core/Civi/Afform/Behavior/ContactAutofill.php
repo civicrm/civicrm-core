@@ -5,6 +5,7 @@ use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Token\TokenRow;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -21,6 +22,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     return [
       'civi.afform.sort.prefill' => 'onAfformSortPrefill',
       'civi.afform.prefill' => ['onAfformPrefill', 99],
+      '&civi.afform.createToken' => ['onCreateToken', 99],
     ];
   }
 
@@ -146,6 +148,12 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
           $apiRequest->loadEntity($entity, $relatedIds);
         }
       }
+    }
+  }
+
+  public function onCreateToken(TokenRow $row, array &$afformArgs) {
+    if (!empty($row->context['contactId'])) {
+      $afformArgs['contact_id'] = $row->context['contactId'];
     }
   }
 

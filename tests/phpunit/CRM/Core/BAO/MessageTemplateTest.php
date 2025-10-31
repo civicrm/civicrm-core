@@ -684,7 +684,7 @@ emo
     $returned_parts = explode('_', substr($messageContent['subject'], $checksum_position));
     $expected_parts = explode('_', substr($fixedExpected, $checksum_position));
     $this->assertEquals($expected_parts[0], $returned_parts[0]);
-    $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
+    $this->assertEqualsWithDelta($expected_parts[1], $returned_parts[1], 2);
     $this->assertEquals($expected_parts[2], $returned_parts[2]);
   }
 

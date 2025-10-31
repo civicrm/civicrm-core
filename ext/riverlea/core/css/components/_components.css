@@ -666,9 +666,20 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   margin: -50px;
   z-index: -1;
   background: var(--crm-svg-logo);
-  animation: loadingspin 1.5s linear infinite;
+  animation: crmLoadingSpinner 1.5s linear infinite;
 }
-@keyframes loadingspin {
+.crm-loading-spinner {
+  width: var(--crm-loading-spinner-size);
+  height: var(--crm-loading-spinner-size);
+  border: 5px solid var(--crm-c-info-text);
+  border-bottom-color: var(--crm-c-info);
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: crmLoadingSpinner 1s linear infinite;
+  margin: 2rem;
+}
+@keyframes crmLoadingSpinner {
   0% {
     transform: rotate(0deg);
   }

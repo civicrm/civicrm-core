@@ -81,7 +81,7 @@ class CRM_Core_BAO_SchemaHandler {
    * @return string
    */
   public static function buildTableSQL($params): string {
-    $sql = "CREATE TABLE {$params['name']} (";
+    $sql = "CREATE TABLE IF NOT EXISTS {$params['name']} (";
     if (isset($params['fields']) &&
       is_array($params['fields'])
     ) {

@@ -101,7 +101,17 @@ class Tokens extends AutoService implements EventSubscriberInterface {
             if (empty($row->context['contactId'])) {
               continue;
             }
+            if (function_exists('civi_wp')) {
+              // For WordPress: add modifying callbacks prior to multi-lingual compat.
+              add_filter('civicrm/basepage/match', [civi_wp()->basepage, 'ensure_match'], 9);
+              add_filter('civicrm/core/url/base', [civi_wp()->basepage, 'ensure_url'], 9, 2);
+            }
             $url = self::createUrl($afform, $row->context['contactId'], self::getAfformArgsFromTokenContext($row));
+            if (function_exists('civi_wp')) {
+              // For WordPress: remove callbacks.
+              remove_filter('civicrm/basepage/match', [civi_wp()->basepage, 'ensure_match'], 9);
+              remove_filter('civicrm/core/url/base', [civi_wp()->basepage, 'ensure_url'], 9);
+            }
             $row->format('text/plain')->tokens(static::$prefix, $afform['name'] . 'Url', $url);
             $row->format('text/html')->tokens(static::$prefix, $afform['name'] . 'Link', sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
           }
@@ -215,19 +225,16 @@ class Tokens extends AutoService implements EventSubscriberInterface {
   /**
    * Get Additional args from the row context.
    *
-   * This supports args for the contact being viewed and for the case being viewed.
+   * Dispatches event 'civi.afform.createToken' so entity types can
+   * fill in their tokens (usually in Civi/Afform/Behavior/).
    *
    * @param \Civi\Token\TokenRow $row
    * @return array
    */
   private static function getAfformArgsFromTokenContext(TokenRow $row): array {
     $afformArgs = [];
-    if (!empty($row->context['contactId'])) {
-      $afformArgs['contact_id'] = $row->context['contactId'];
-    }
-    if (!empty($row->context['caseId'])) {
-      $afformArgs['case_id'] = $row->context['caseId'];
-    }
+    $event = GenericHookEvent::create(['row' => $row, 'afformArgs' => &$afformArgs]);
+    \Civi::dispatcher()->dispatch('civi.afform.createToken', $event);
     return $afformArgs;
   }
 

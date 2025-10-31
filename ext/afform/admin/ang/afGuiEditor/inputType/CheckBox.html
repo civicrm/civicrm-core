@@ -6,7 +6,8 @@
 </ul>
 <div class="form-inline" ng-if="$ctrl.getDefn().data_type === 'Boolean'">
   <input type="checkbox" ng-checked="defaultValueContains(true)" ng-click="toggleDefaultValueItem(true) ">
-  <label class="af-gui-node-title" ng-if="$ctrl.node.defn.label != false">{{:: $ctrl.getDefn().label }}
-  <span class="crm-marker" title="{{:: ts('Required') }}" ng-if="getProp('required')">*</span>
+  <label ng-if="$ctrl.node.defn.label != false">
+    <span crm-ui-editable ng-model="getSet('label')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().label">{{ getProp('label') }}</span>
+    <span class="crm-marker" title="{{:: ts('Required') }}" ng-if="getProp('required')">*</span>
   </label>
 </div>

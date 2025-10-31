@@ -99,7 +99,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
 
     $transaction->commit();
 
-    CRM_Utils_Hook::post('delete', 'Group', $id, $group);
+    CRM_Utils_Hook::post('delete', 'Group', $id, $group, $params);
   }
 
   /**

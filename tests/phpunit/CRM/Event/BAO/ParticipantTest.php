@@ -90,7 +90,6 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $compareValues = $fetchParticipant[$participantID];
 
     $params = [
-      'send_receipt' => 1,
       'is_test' => 0,
       'is_pay_later' => 0,
       'event_id' => $this->getEventID(),
@@ -107,16 +106,22 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'discount_id' => NULL,
       'fee_currency' => NULL,
       'discount_amount' => NULL,
-      'cart_id' => NULL,
       'must_wait' => NULL,
       'transferred_to_contact_id' => NULL,
       'created_id' => $this->ids['Contact']['individual_0'],
     ];
 
-    foreach ($compareValues as $key => $value) {
-      if ($key[0] !== '_' && $key !== 'N') {
-        $this->assertEquals($compareValues->$key, $params[$key], 'Check for ' . $key . ' for given participant');
-      }
+    $dateParams = [
+      'created_date',
+      'modified_date',
+    ];
+
+    foreach ($dateParams as $key) {
+      $this->assertEqualsWithDelta(time(), strtotime($compareValues->$key), 2, 'Check for ' . $key . ' for given participant');
+    }
+
+    foreach ($params as $key => $value) {
+      $this->assertEquals($compareValues->$key, $value, 'Check for ' . $key . ' for given participant');
     }
   }
 

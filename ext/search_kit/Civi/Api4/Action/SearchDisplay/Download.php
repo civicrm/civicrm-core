@@ -25,19 +25,20 @@ class Download extends AbstractRunAction {
     $settings =& $this->display['settings'];
     $fileName = '';
 
+    // Respect if user has disabled any columns, otherwise show all
+    $this->toggleColumns = $this->toggleColumns ?: array_keys($settings['columns']);
+
     // Checking permissions for menu, link or button columns is costly, so remove them early
     foreach ($settings['columns'] as $index => $col) {
       // Remove buttons/menus and other column types that cannot be rendered in a spreadsheet
-      if (empty($col['key'])) {
-        unset($settings['columns'][$index]);
+      if (in_array($index, $this->toggleColumns) && empty($col['key'])) {
+        unset($this->toggleColumns[array_search($index, $this->toggleColumns)]);
       }
       // Avoid wasting time processing links, editable and other non-printable items from spreadsheet
       else {
         \CRM_Utils_Array::remove($settings['columns'][$index], 'link', 'editable', 'icons', 'cssClass');
       }
     }
-    // Reset indexes as some items may have been removed
-    $settings['columns'] = array_values($settings['columns']);
 
     // Displays are only exportable if they have actions enabled
     if (empty($settings['actions'])) {
@@ -49,7 +50,7 @@ class Download extends AbstractRunAction {
       $apiParams['limit'] = $settings['limit'];
     }
     $apiParams['orderBy'] = $this->getOrderByFromSort();
-    $this->augmentSelectClause($apiParams, $settings);
+    $this->augmentSelectClause($apiParams);
 
     $this->applyFilters();
 

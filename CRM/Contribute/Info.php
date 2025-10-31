@@ -62,6 +62,10 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
         'label' => ts('edit contributions'),
         'description' => ts('Record and update contributions'),
       ],
+      'refund contributions' => [
+        'label' => ts('Refund contributions'),
+        'description' => ts('Allow refunds to be issued for contributions'),
+      ],
       'make online contributions' => [
         'label' => ts('make online contributions'),
       ],

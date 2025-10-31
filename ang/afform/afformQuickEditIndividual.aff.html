@@ -7,10 +7,11 @@
         <af-field name="middle_name" />
         <af-field name="last_name" />
       </div>
-      <div af-join="Email" data="{is_primary: true}">
-        <div class="af-container af-layout-inline">
-          <af-field name="email" defn="{required: false}" />
-        </div>
+      <div af-join="Email" actions="{update: true, delete: true}" af-repeat="Add Email" min="0" >
+        <afblock-contact-email actions="{update: true, delete: true}"></afblock-contact-email>
+      </div>
+      <div af-join="Address" actions="{update: true, delete: true}" af-repeat="Add Address" min="0">
+        <afblock-contact-address></afblock-contact-address>
       </div>
     </div>
   </fieldset>

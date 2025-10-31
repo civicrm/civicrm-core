@@ -142,10 +142,10 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
     }
 
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Case', $case->id, $case);
+      CRM_Utils_Hook::post('edit', 'Case', $case->id, $case, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'Case', $case->id, $case);
+      CRM_Utils_Hook::post('create', 'Case', $case->id, $case, $params);
     }
     $transaction->commit();
 

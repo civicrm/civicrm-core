@@ -15,12 +15,12 @@
 
       this.getMetadata = function() {
         if (!fetchedMetadata) {
-          fetchedMetadata = crmApi4({
-            entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', mngr.getEntityName()]]}, 0],
-            tasks: ['SearchDisplay', 'getSearchTasks', {savedSearch: displayCtrl.search, display: displayCtrl.display}]
+          fetchedMetadata = crmApi4('SearchDisplay', 'getSearchTasks', {
+            savedSearch: displayCtrl.search,
+            display: displayCtrl.display,
           }).then(function(result) {
-            mngr.entityInfo = result.entityInfo;
-            mngr.tasks = result.tasks;
+            mngr.entityInfo = result.editable.entityInfo;
+            mngr.tasks = result;
           }, function(failure) {
             mngr.tasks = [];
             mngr.entityInfo = [];
@@ -29,9 +29,6 @@
         return fetchedMetadata;
       };
 
-      this.getEntityName = function() {
-        return displayCtrl.apiEntity === 'RelationshipCache' ? 'Relationship' : displayCtrl.apiEntity;
-      };
       this.getApiParams = function() {
         return displayCtrl.getApiParams();
       };
@@ -48,7 +45,7 @@
       this.doTask = function(task, ids, isLink) {
         const data = {
           ids: ids,
-          entity: mngr.getEntityName(),
+          entity: mngr.entityInfo.name,
           search: displayCtrl.search,
           display: displayCtrl.display,
           displayCtrl: displayCtrl,
@@ -59,9 +56,10 @@
         };
         // If task uses a crmPopup form
         if (task.crmPopup) {
+          const mode = ('mode' in task.crmPopup) ? task.crmPopup.mode : 'back';
           const path = $rootScope.$eval(task.crmPopup.path, data),
             query = task.crmPopup.query && $rootScope.$eval(task.crmPopup.query, data);
-          CRM.loadForm(CRM.url(path, query, 'back'), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
+          CRM.loadForm(CRM.url(path, query, mode), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
             .on('crmFormSuccess', (e) => {
                 // refreshAfterTask emits its own
                 // crmPopupFormSuccess event
@@ -70,9 +68,10 @@
             });
         }
         else if (task.redirect) {
+          const mode = task.redirect.mode && task.crmPopup.mode == 'front'  ? 'front' : 'back';
           const redirectPath = $rootScope.$eval(task.redirect.path, data),
             redirectQuery = task.redirect.query && $rootScope.$eval(task.redirect.query, data) && $rootScope.$eval(task.redirect.data, data);
-          $window.open(CRM.url(redirectPath, redirectQuery, 'back'), '_blank');
+          $window.open(CRM.url(redirectPath, redirectQuery, mode), '_blank');
         }
         // If task uses dialogService
         else {

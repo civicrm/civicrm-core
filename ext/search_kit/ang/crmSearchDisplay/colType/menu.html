@@ -1,10 +1,10 @@
 <div class="btn-group" role="group" ng-if="colData.links.length">
-  <button type="button" class="dropdown-toggle btn {{:: $ctrl.settings.columns[colIndex].size }} btn-{{:: $ctrl.settings.columns[colIndex].style }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="colData.open = true">
-    <i ng-if=":: $ctrl.settings.columns[colIndex].icon" class="crm-i {{:: $ctrl.settings.columns[colIndex].icon }}" role="img" aria-hidden="true"></i>
+  <button type="button" class="dropdown-toggle btn {{:: $ctrl.columns[colIndex].size }} btn-{{:: $ctrl.columns[colIndex].style }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="colData.open = true">
+    <i ng-if=":: $ctrl.columns[colIndex].icon" class="crm-i {{:: $ctrl.columns[colIndex].icon }}" role="img" aria-hidden="true"></i>
     {{:: colData.text }}
     <span class="caret"></span>
   </button>
-  <ul class="dropdown-menu {{ $ctrl.settings.columns[colIndex].alignment === 'text-right' ? 'dropdown-menu-right' : '' }}" ng-if=":: colData.open">
+  <ul class="dropdown-menu {{ $ctrl.columns[colIndex].alignment === 'text-right' ? 'dropdown-menu-right' : '' }}" ng-if=":: colData.open">
     <li ng-repeat="link in colData.links" class="bg-{{:: link.style }}">
       <a ng-attr-href="{{ link.url || '' }}" target="{{:: link.target }}" title="{{:: link.title }}" ng-click="$ctrl.onClickLink(link, row.key, $event)">
         <i ng-if=":: link.icon" class="crm-i {{:: link.icon }}" role="img" aria-hidden="true"></i>

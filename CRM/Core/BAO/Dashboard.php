@@ -33,7 +33,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Dashboard', $params['id'] ?? NULL, $params);
     $dao = self::addDashlet($params);
-    CRM_Utils_Hook::post($hook, 'Dashboard', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'Dashboard', $dao->id, $dao, $params);
     return $dao;
   }
 

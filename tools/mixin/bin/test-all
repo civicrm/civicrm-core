@@ -1,4 +1,5 @@
 #!/bin/bash
+{
 set -e
 # Not really readed, and currently segfaulting on CI: # export XDEBUG_PORT= XDEBUG_MODE=off
 
@@ -21,6 +22,10 @@ JUNIT_DIR="$1"
 ## TODO: Once the managed-entity regression is examined/fixed, remove the MY_MIXINS list. Then it will test all mixins.
 # MY_MIXINS='ang-php@1 case-xml@1 menu-xml@1 setting-php@1 theme-php@1'
 MY_MIXINS=''
+
+## Unit-tests for old-mixins may conflict with unit-tests for new-mixins.
+## Therefore, these are pulled out and tested separately.
+OLD_MIXINS='mgd-php@1 entity-types-php@1 smarty-v2@1'
 
 ###############################################################################
 
@@ -57,6 +62,17 @@ fi
 
 
 set -ex
-mixer_test "mixin-isolate-bare.xml" $MY_MIXINS --isolate --bare
-mixer_test "mixin-combine-bare.xml" $MY_MIXINS --bare
-mixer_test "mixin-combine-copy.xml" $MY_MIXINS
+
+## Test all mixins individually.
+mixer_test "mixin-isolate-bare.xml" --isolate --bare
+
+## Test the latest mixins (together), and test older mixins (together).
+## Load the mixins directly from civicrm-core:mixin/
+mixer_test "mixin-combine-bare-new.xml" --bare --exclude="$OLD_MIXINS"
+mixer_test "mixin-combine-bare-old.xml" --bare $OLD_MIXINS
+
+mixer_test "mixin-combine-copy-new.xml" --copy --exclude="$OLD_MIXINS"
+mixer_test "mixin-combine-copy-old.xml" --copy $OLD_MIXINS
+
+exit
+}

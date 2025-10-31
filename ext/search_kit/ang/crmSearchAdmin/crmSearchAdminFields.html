@@ -1,8 +1,15 @@
 <div ng-model="$ctrl.select" ui-sortable="$ctrl.sortableOptions">
-  <fieldset ng-repeat="col in $ctrl.select" class="crm-draggable">
+  <fieldset ng-repeat="col in $ctrl.select" class="crm-draggable form-inline">
     <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
     <crm-search-function ng-if="!col.isPseudoField && $ctrl.crmSearchAdmin.paramExists('groupBy')" class="form-inline" mode="select" expr="col.key"></crm-search-function>
     <label ng-if="col.isPseudoField || !$ctrl.crmSearchAdmin.paramExists('groupBy')">{{:: col.label }}</label>
+    <label ng-if="col.suffixOptions" title="{{:: ts('Format for %1', {1: col.label}) }}">
+      <span class="sr-only">{{:: ts('Format for %1', {1: col.label}) }}</span>
+      <select ng-model="col.key" class="form-control crm-auto-width">
+        <option value="{{ col.rawKey }}">{{:: ts('Raw Value') }}</option>
+        <option ng-repeat="(k, v) in col.suffixOptions" value="{{ col.rawKey + ':' + k }}">{{ v }}</option>
+      </select>
+    </label>
     <button type="button" class="btn btn-xs pull-right" ng-if="$ctrl.select.length > 1" ng-click="$ctrl.crmSearchAdmin.clearParam('select', $index)" title="{{:: ts('Remove') }}">
       <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
     </button>

@@ -169,7 +169,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       CRM_Core_DAO::singleValueQuery(self::getAlterSerializeSQL($customField));
     }
 
-    CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField);
+    CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField, $params);
 
     Civi::rebuild(['system' => TRUE])->execute();
 
@@ -260,7 +260,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       if (!empty($records[$index]['custom']) && is_array($records[$index]['custom'])) {
         CRM_Core_BAO_CustomValueTable::store($records[$index]['custom'], static::getTableName(), $customField->id, $op);
       }
-      CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField);
+      CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField, $records[$index]);
     }
     return $customFields;
   }

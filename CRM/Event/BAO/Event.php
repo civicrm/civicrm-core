@@ -66,10 +66,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
     $result = $event->save();
 
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Event', $event->id, $event);
+      CRM_Utils_Hook::post('edit', 'Event', $event->id, $event, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'Event', $event->id, $event);
+      CRM_Utils_Hook::post('create', 'Event', $event->id, $event, $params);
     }
     if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);

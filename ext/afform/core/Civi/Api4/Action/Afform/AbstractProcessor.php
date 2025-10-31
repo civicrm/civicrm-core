@@ -99,7 +99,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   public function _run(Result $result) {
     $this->_afform = civicrm_api4('Afform', 'get', [
-      'select' => ['*', 'submit_currently_open'],
+      'select' => ['*', 'submit_currently_open', 'submit_limit_per_user', 'user_submission_count'],
       'where' => [['name', '=', $this->name]],
     ])->first();
     // Either the form doesn't exist or user lacks permission
@@ -107,6 +107,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       throw new UnauthorizedException(E::ts('You do not have permission to submit this form'), ['show_detailed_error' => TRUE]);
     }
     if (empty($this->_afform['submit_currently_open'])) {
+      if (!empty($this->_afform['submit_limit_per_user']) && (($this->_afform['user_submission_count'] ?? 0) >= $this->_afform['submit_limit_per_user'])) {
+        throw new UnauthorizedException(E::ts('You have reached the maximum number of submissions for this form.'));
+      }
       throw new UnauthorizedException(E::ts('This form is not currently open for submissions.'), ['show_detailed_error' => TRUE]);
     }
 
@@ -310,8 +313,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Directly loads a join entity e.g. from an autocomplete field in the join block.
    */
-  private function loadJoin(array $afEntity, array $values): array {
-    $joinResult = [];
+  private function loadJoin(array $afEntity, array $values): void {
     foreach ($values as $entityIndex => $value) {
       foreach ($value['joins'] as $joinEntity => $joins) {
         $joinIdField = CoreUtil::getIdFieldName($joinEntity);
@@ -320,15 +322,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           foreach ($join as $fieldName => $fieldValue) {
             if (!empty($joinInfo['fields'][$fieldName])) {
               $where = [[$fieldName, '=', $fieldValue]];
-              $joinResult = $this->getJoinResult($afEntity, $joinEntity, $joinInfo, $where, 1);
-              $this->_entityIds[$afEntity['name']][$entityIndex]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinResult, [$joinIdField]);
-              $this->_entityValues[$afEntity['name']][$entityIndex]['joins'][$joinEntity] = array_values($joinResult);
+              $joinResult = \CRM_Utils_Array::first($this->getJoinResult($afEntity, $joinEntity, $joinInfo, $where, 1));
+              if ($joinResult) {
+                $this->_entityIds[$afEntity['name']][$entityIndex]['joins'][$joinEntity][$joinIndex][$joinIdField] = $joinResult[$joinIdField];
+                $this->_entityValues[$afEntity['name']][$entityIndex]['joins'][$joinEntity][$joinIndex] = $joinResult;
+              }
             }
           }
         }
       }
     }
-    return array_values($joinResult);
   }
 
   public function getJoinResult(array $afEntity, string $joinEntity, array $join, array $where, int $limit): array {

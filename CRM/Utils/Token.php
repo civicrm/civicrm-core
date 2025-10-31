@@ -1513,6 +1513,7 @@ class CRM_Utils_Token {
           '$domain_postal_code' => 'domain.postal_code',
           '$domain_state' => 'domain.state_province_id:abbr',
           '$domain_country' => 'domain.country_id:abbr',
+          '$lineItem' => '$lineItems',
         ],
         'contribution_online_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1520,6 +1521,7 @@ class CRM_Utils_Token {
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
           '$dataArray' => ts('see default template for how to show this'),
+          '$lineItem' => '$lineItems',
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
@@ -1540,6 +1542,7 @@ class CRM_Utils_Token {
           '$module' => 'unknown',
           '$currency' => 'contribution.currency',
           '$paidBy' => 'contribution.payment_instrument_id:label',
+          '$lineItem' => '$lineItems',
         ],
         'membership_online_receipt' => [
           '$dataArray' => ts('see default template for how to show this'),
@@ -1551,6 +1554,7 @@ class CRM_Utils_Token {
           '$mem_status' => 'membership.membership_status_id:name',
           '$receive_date' => 'contribution.receive_date',
           '$currency' => 'contribution.currency',
+          '$lineItem' => '$lineItems',
         ],
         'contribution_offline_receipt' => [
           '$totalTaxAmount' => 'contribution.tax_amount',
@@ -1559,6 +1563,8 @@ class CRM_Utils_Token {
           '$receive_date' => 'contribution.receive_date',
           '$thankyou_date' => 'contribution.thankyou_date',
           '$receipt_date' => 'contribution.receipt_date',
+          '$cancel_date' => 'contribution.cancel_date',
+          '$lineItem' => '$lineItems',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1584,6 +1590,7 @@ class CRM_Utils_Token {
           '$trxn_id' => 'contribution.trxn_id',
           '$participant_status_id' => 'participant.status_id',
           '$participant.role' => 'participant.role_id:label',
+          '$lineItem' => '$lineItems',
         ],
         'event_online_receipt' => [
           '`$participant.id`' => 'participant.id',
@@ -1596,6 +1603,7 @@ class CRM_Utils_Token {
           '$event.participant_role' => 'participant.role_id:label',
           '$paidBy' => 'contribution.payment_instrument_id:label',
           '$title' => 'event.title',
+          '$lineItem' => '$lineItems',
         ],
         'participant_transferred' => [
           '$location' => 'event.location',

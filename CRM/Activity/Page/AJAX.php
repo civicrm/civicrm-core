@@ -396,7 +396,7 @@ class CRM_Activity_Page_AJAX {
 
     $params['mainActivityId'] = $mainActivityId;
     CRM_Activity_BAO_Activity::copyExtendedActivityData($params);
-    CRM_Utils_Hook::post('create', 'CaseActivity', $caseActivity->id, $caseActivity);
+    CRM_Utils_Hook::post('create', 'CaseActivity', $caseActivity->id, $caseActivity, $params);
 
     return (['error_msg' => $error_msg, 'newId' => $mainActivity->id]);
   }

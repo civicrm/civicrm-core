@@ -402,12 +402,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
     CRM_Contact_BAO_Contact_Utils::clearContactCaches();
 
     if ($invokeHooks) {
-      if ($isEdit) {
-        CRM_Utils_Hook::post('edit', $params['contact_type'], $contact->id, $contact);
-      }
-      else {
-        CRM_Utils_Hook::post('create', $params['contact_type'], $contact->id, $contact);
-      }
+      CRM_Utils_Hook::post($isEdit ? 'edit' : 'create', $params['contact_type'], $contact->id, $contact, $params);
     }
 
     // In order to prevent a series of expensive queries in intensive batch processing
@@ -771,7 +766,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     }
     CRM_Core_BAO_Log::register($contact->id, 'civicrm_contact', $contact->id);
 
-    CRM_Utils_Hook::post('edit', $contact->contact_type, $contact->id, $contact);
+    CRM_Utils_Hook::post('edit', $contact->contact_type, $contact->id, $contact, $updateParams);
 
     return TRUE;
   }

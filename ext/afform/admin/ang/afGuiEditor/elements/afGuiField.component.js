@@ -145,7 +145,8 @@
 
       $scope.hasOptions = function() {
         const inputType = $scope.getProp('input_type');
-        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
+        return _.contains(['CheckBox', 'Toggle', 'Radio', 'Select'], inputType) &&
+          !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
 
       this.getOptions = function() {
@@ -211,6 +212,7 @@
         }
         switch (type) {
           case 'CheckBox':
+          case 'Toggle':
           case 'Radio':
             return defn.options || defn.data_type === 'Boolean';
 
@@ -296,7 +298,7 @@
 
       function defaultValueShouldBeArray() {
         return ($scope.getProp('data_type') !== 'Boolean' &&
-          ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_attrs.multiple')));
+          ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_type') === 'Toggle' || $scope.getProp('input_attrs.multiple')));
       }
 
       function setFieldDefn() {
@@ -383,9 +385,18 @@
         return afGui.getSearchDisplayFields(ctrl.container.getSearchDisplay(), _.noop, [ctrl.getFieldName()]);
       };
 
+      this.showLabel = () => {
+        if (this.node.defn.label === false) {
+          return false;
+        }
+        // Single checkboxes don't get a separate label
+        return !(getSet('input_type') === 'CheckBox' && this.getDefn().data_type === 'Boolean');
+      };
+
       $scope.defaultValueContains = function(val) {
         const defaultVal = getSet('afform_default');
-        return defaultVal === val || (Array.isArray(defaultVal) && defaultVal.includes(val));      };
+        return defaultVal === val || (Array.isArray(defaultVal) && defaultVal.includes(val));
+      };
 
       $scope.toggleDefaultValueItem = function(val) {
         if (defaultValueShouldBeArray()) {
@@ -457,7 +468,7 @@
               clearOut(ctrl.node, ['defn', 'input_attrs']);
             }
             // Boolean checkbox has no options
-            if (val === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean' && ctrl.node.defn) {
+            if ((val === 'CheckBox' || val === 'Toggle') && ctrl.getDefn().data_type === 'Boolean' && ctrl.node.defn) {
               delete ctrl.node.defn.options;
             }
           }

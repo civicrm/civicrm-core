@@ -180,7 +180,7 @@ class AfformMetadataInjector {
     }
 
     // Boolean checkbox has no options
-    if ($fieldInfo['data_type'] === 'Boolean' && $inputType === 'CheckBox') {
+    if ($fieldInfo['data_type'] === 'Boolean' && ($inputType === 'CheckBox')) {
       unset($fieldInfo['options'], $fieldDefn['options']);
     }
 

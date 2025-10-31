@@ -294,7 +294,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
     elseif ($permission == CRM_Core_Permission::EDIT) {
       $tasks = self::taskTitles();
     }
-    else {
+    elseif ($permission == CRM_Core_Permission::VIEW) {
       $tasks = [
         self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
         self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],

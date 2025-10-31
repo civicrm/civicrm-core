@@ -419,7 +419,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
 
     $transaction->commit();
 
-    CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $case);
+    CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $case, $params);
 
     return $caseType;
   }

@@ -39,7 +39,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     if (!$dao->find(TRUE)) {
       $dao->save();
       Civi::$statics[__CLASS__][$params['domain_id']][(int) $dao->contact_id] = (int) $dao->uf_id;
-      CRM_Utils_Hook::post($hook, 'UFMatch', $dao->id, $dao);
+      CRM_Utils_Hook::post($hook, 'UFMatch', $dao->id, $dao, $params);
     }
     return $dao;
   }

@@ -44,7 +44,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     if (!$dao->find(TRUE)) {
       $dao->save();
     }
-    CRM_Utils_Hook::post($hook, 'MembershipPayment', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'MembershipPayment', $dao->id, $dao, $params);
     // CRM-14197 we are in the process on phasing out membershipPayment in favour of storing both contribution_id & entity_id (membership_id) on the line items
     // table. However, at this stage we have both - there is still quite a bit of refactoring to do to set the line_iten entity_id right the first time
     // however, we can assume at this stage that any contribution id will have only one line item with that membership type in the line item table
@@ -134,6 +134,103 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
       }
     }
     return $latestContributionID ?? NULL;
+  }
+
+  /**
+   * This is a helper function towards deprecating/removing MembershipPayment
+   * It checks for memberships linked via MembershipPayment with missing LineItems
+   *
+   * @param int $contributionID
+   * @param array $membershipIDsWithLineItems
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @internal
+   */
+  public static function getMembershipPaymentsWithMissingLineitems(int $contributionID, array $membershipIDsWithLineItems): array {
+    $doubleCheckParams = [
+      'return' => 'membership_id',
+      'contribution_id' => $contributionID,
+    ];
+    if (!empty($membershipIDsWithLineItems)) {
+      $doubleCheckParams['membership_id'] = ['NOT IN' => $membershipIDsWithLineItems];
+    }
+    $membershipPayments = civicrm_api3('MembershipPayment', 'get', $doubleCheckParams)['values'];
+    if (!empty($membershipPayments)) {
+      $membershipIDsWithLineItems = [];
+      self::deprecatedWarning($contributionID);
+      foreach ($membershipPayments as $membershipPayment) {
+        $membershipIDsWithLineItems[] = $membershipPayment['membership_id'];
+      }
+    }
+    return $membershipIDsWithLineItems;
+  }
+
+  /**
+   * Delete the records that are associated with this Membership Payment.
+   *
+   * @param int $membershipId
+   * @param bool $preserveContrib
+   *
+   * @return object
+   *   $membershipPayment deleted membership payment object
+   * @internal
+   */
+  public static function deleteMembershipPayment(int $membershipId, bool $preserveContrib = FALSE) {
+    $membershipPayment = new CRM_Member_DAO_MembershipPayment();
+    $membershipPayment->membership_id = $membershipId;
+    $membershipPayment->find();
+
+    while ($membershipPayment->fetch()) {
+      if (!$preserveContrib) {
+        CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
+      }
+      CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
+      $membershipPayment->delete();
+      CRM_Utils_Hook::post('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
+    }
+    return $membershipPayment;
+  }
+
+  /**
+   * @param int $membershipID
+   * @param int $contributionID
+   * @param bool $isSkipLineItem Creating a legacy MembershipPayment record creates a LineItem. If we already have a lineItem
+   *   set this to TRUE to skip creating lineItems
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @internal
+   */
+  public static function legacyMembershipPaymentCreate(int $membershipID, int $contributionID, bool $isSkipLineItem = FALSE) {
+    $membershipPaymentParams = [
+      'membership_id' => $membershipID,
+      'contribution_id' => $contributionID,
+      'isSkipLineItem' => $isSkipLineItem,
+    ];
+    civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
+  }
+
+  /**
+   * Checks if a MembershipPayment exists and if not creates one
+   *
+   * @param int $membershipID
+   * @param int $contributionID
+   * @param bool $isSkipLineItem Creating a legacy MembershipPayment record creates a LineItem. If we already have a lineItem
+   *   set this to TRUE to skip creating lineItems
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @internal
+   */
+  public static function legacyMembershipPaymentCreateIfNotExist(int $membershipID, int $contributionID, bool $isSkipLineItem = FALSE) {
+    $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
+      'membership_id' => $membershipID,
+      'contribution_id' => $contributionID,
+    ]);
+    if (empty($membershipPayment['count'])) {
+      self::legacyMembershipPaymentCreate($membershipID, $contributionID, $isSkipLineItem);
+    }
   }
 
 }

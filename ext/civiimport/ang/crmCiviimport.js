@@ -275,6 +275,10 @@
               let optGroup = dedupeRules.find(group => group.contact_type === rule.contact_type);
               if (!optGroup) {
                 const contactType = $scope.data.contactTypes.find(type => type.id === rule.contact_type);
+                // The contactType might be disabled, ex: Households
+                if (!contactType) {
+                  return;
+                }
                 optGroup = {contact_type: rule.contact_type, text: contactType.text, icon: contactType.icon, children: []};
                 dedupeRules.push(optGroup);
               }

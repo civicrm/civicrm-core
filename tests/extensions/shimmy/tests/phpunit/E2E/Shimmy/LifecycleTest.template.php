@@ -26,13 +26,21 @@ class E2E_Shimmy_LifecycleTest extends \Civi\Test\MixinTestCase {
     return $mixinTests;
   }
 
+  public static function getTestId(): array {
+    // We don't really want to use a data provider, but we don't to ensure that each
+    // invocation of this suite can produce distinct results-files.
+    return ['%%TEST_ID%%' => ['%%TEST_ID%%']];
+  }
+
   /**
    * Install and uninstall the extension. Ensure that various mixins+artifacts work correctly.
    *
    * This interacts with Civi by running many subprocesses (`cv api3` and `cv api4` commands).
    * This style of interaction is a better representation of how day-to-day sysadmin works.
+   *
+   * @dataProvider getTestId
    */
-  public function testLifecycleWithSubprocesses(): void {
+  public function testLifecycleWithSubprocesses(string $id): void {
     $this->runLifecycle($this->createCvWithSubprocesses());
   }
 
@@ -42,8 +50,10 @@ class E2E_Shimmy_LifecycleTest extends \Civi\Test\MixinTestCase {
    * This interacts with Civi by calling local PHP functions (`civicrm_api3(` and `civicrm_api4()`).
    * This style of interaction reveals whether the install/uninstall mechanics have data-leaks that
    * may cause subtle/buggy interactions during the transitions.
+   *
+   * @dataProvider getTestId
    */
-  public function testLifecycleWithLocalFunctions(): void {
+  public function testLifecycleWithLocalFunctions(string $id): void {
     $this->runLifecycle($this->createCvWithLocalFunctions());
   }
 

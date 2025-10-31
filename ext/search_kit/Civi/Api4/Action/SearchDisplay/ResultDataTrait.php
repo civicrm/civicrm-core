@@ -49,6 +49,9 @@ trait ResultDataTrait {
     $data_columns = [];
     $result = [];
     foreach ($columns as $index => $col) {
+      if (!$this->isColumnEnabled($index)) {
+        continue;
+      }
       $col += ['type' => NULL, 'label' => '', 'rewrite' => FALSE];
       $data_columns[$index] = $col;
       // Convert html to plain text

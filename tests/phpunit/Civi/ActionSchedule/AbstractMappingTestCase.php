@@ -314,7 +314,7 @@ abstract class AbstractMappingTestCase extends \CiviUnitTestCase {
     usort($actualMessages, [__CLASS__, 'compareSimpleMsgs']);
     foreach ($expectMessages as $offset => $expectMessage) {
       $actualMessage = $actualMessages[$offset];
-      $this->assertApproxEquals(strtotime($expectMessage['time']), strtotime($actualMessage['time']), $this->dateTolerance, $errorText);
+      $this->assertEqualsWithDelta(strtotime($expectMessage['time']), strtotime($actualMessage['time']), $this->dateTolerance, $errorText);
       if (isset($expectMessage['to'])) {
         sort($expectMessage['to']);
         $this->assertEquals($expectMessage['to'], $actualMessage['to'], $errorText);

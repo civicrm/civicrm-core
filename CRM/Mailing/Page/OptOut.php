@@ -32,7 +32,7 @@ class CRM_Mailing_Page_OptOut extends CRM_Core_Page {
     }
 
     $wrapper = new CRM_Utils_Wrapper();
-    return $wrapper->run('CRM_Mailing_Form_OptOut', $this->_title);
+    return $wrapper->run('CRM_Mailing_Form_Optout', $this->_title);
   }
 
   /**
