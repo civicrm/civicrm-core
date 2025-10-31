@@ -98,12 +98,6 @@
           }
           return crmApi4('Afform', 'prefill', params)
             .then((result) => {
-              // In some cases (noticed on Wordpress) the response header incorrectly outputs success when there's an error.
-              if (result.error_message) {
-                disableForm(result.error_message);
-                $element.unblock();
-                return;
-              }
               result.forEach((item) => {
                 // Use _.each() because item.values could be cast as an object if array keys are not sequential
                 _.each(item.values, (values, index) => {
