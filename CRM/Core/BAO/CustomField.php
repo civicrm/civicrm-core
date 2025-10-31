@@ -2777,7 +2777,8 @@ WHERE      f.id IN ($ids)";
       'name' => $field->column_name,
       'type' => CRM_Core_BAO_CustomValueTable::fieldToSQLType(
         $field->data_type,
-        $field->text_length
+        $field->text_length,
+        $field->serialize
       ),
       'required' => $field->is_required,
       'searchable' => $field->is_searchable && $field->is_active,
@@ -2799,14 +2800,6 @@ WHERE      f.id IN ($ids)";
         $params['fk_table_name'] = $fkFields[$field->data_type];
         $params['fk_field_name'] = 'id';
         $params['fk_attributes'] = 'ON DELETE SET NULL';
-      }
-    }
-    if ($field->serialize) {
-      // Serialized fields must be able to hold long strings. TEXT is acceptable,
-      // otherwise force using a VARCHAR of at least 255, but allow it to go higher.
-      if ($params['type'] !== 'text') {
-        $text_length = intval($field->text_length) < 255 ? 255 : $field->text_length;
-        $params['type'] = 'varchar(' . $text_length . ')';
       }
     }
     if (isset($field->default_value)) {
