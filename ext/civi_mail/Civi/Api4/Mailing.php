@@ -10,6 +10,7 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Action\Mailing\ProcessQueue;
 use Civi\Api4\Action\Mailing\UpdateAction;
 use Civi\Api4\Action\Mailing\CreateAction;
 use Civi\Api4\Action\Mailing\SaveAction;
@@ -50,6 +51,11 @@ class Mailing extends Generic\DAOEntity {
    */
   public static function save($checkPermissions = TRUE): SaveAction {
     return (new SaveAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  public static function runQueue($checkPermissions = TRUE): ProcessQueue {
+    return (new ProcessQueue(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

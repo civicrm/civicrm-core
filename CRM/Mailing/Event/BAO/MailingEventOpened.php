@@ -24,7 +24,7 @@ class CRM_Mailing_Event_BAO_MailingEventOpened extends CRM_Mailing_Event_DAO_Mai
    *
    * @return bool
    */
-  public static function open($queue_id) {
+  public static function open($queue_id): bool {
     // First make sure there's a matching queue event.
     $q = new CRM_Mailing_Event_BAO_MailingEventQueue();
     $q->id = $queue_id;
@@ -293,6 +293,10 @@ class CRM_Mailing_Event_BAO_MailingEventOpened extends CRM_Mailing_Event_DAO_Mai
       ];
     }
     return $results;
+  }
+
+  public static function queuedOpen(\CRM_Queue_TaskContext $ctx, $queue_id): bool {
+    return self::open($queue_id);
   }
 
 }
