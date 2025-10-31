@@ -439,7 +439,7 @@ SELECT count(*)
             = CRM_Core_DAO::VALUE_SEPARATOR .
             implode(CRM_Core_DAO::VALUE_SEPARATOR, $defVal) .
             CRM_Core_DAO::VALUE_SEPARATOR;
-          $customField->save();
+          CRM_Core_BAO_CustomField::createField($customField, 'modify');
         }
       }
       elseif (in_array($customOption->value, $defVal)) {
@@ -454,7 +454,7 @@ SELECT count(*)
           = CRM_Core_DAO::VALUE_SEPARATOR .
           implode(CRM_Core_DAO::VALUE_SEPARATOR, $tempVal) .
           CRM_Core_DAO::VALUE_SEPARATOR;
-        $customField->save();
+        CRM_Core_BAO_CustomField::createField($customField, 'modify');
       }
     }
     else {
@@ -474,12 +474,12 @@ SELECT count(*)
 
       if (!empty($params['default_value'])) {
         $customField->default_value = $customOption->value;
-        $customField->save();
+        CRM_Core_BAO_CustomField::createField($customField, 'modify');
       }
       elseif ($customField->find(TRUE) && $customField->default_value == $customOption->value) {
         // this is the case where this option is the current default value and we have been reset
         $customField->default_value = 'null';
-        $customField->save();
+        CRM_Core_BAO_CustomField::createField($customField, 'modify');
       }
     }
 
