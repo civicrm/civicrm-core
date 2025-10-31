@@ -225,21 +225,14 @@ class Tokens extends AutoService implements EventSubscriberInterface {
   /**
    * Get Additional args from the row context.
    *
-   * This supports args for the contact being viewed and for the case being viewed.
-   * It also dispatches event 'civi.afform.createToken' so other entity types can
-   * fill in their tokens.
+   * Dispatches event 'civi.afform.createToken' so entity types can
+   * fill in their tokens (usually in Civi/Afform/Behavior/).
    *
    * @param \Civi\Token\TokenRow $row
    * @return array
    */
   private static function getAfformArgsFromTokenContext(TokenRow $row): array {
     $afformArgs = [];
-    if (!empty($row->context['contactId'])) {
-      $afformArgs['contact_id'] = $row->context['contactId'];
-    }
-    if (!empty($row->context['caseId'])) {
-      $afformArgs['case_id'] = $row->context['caseId'];
-    }
     $event = GenericHookEvent::create(['row' => $row, 'afformArgs' => &$afformArgs]);
     \Civi::dispatcher()->dispatch('civi.afform.createToken', $event);
     return $afformArgs;
