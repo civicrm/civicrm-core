@@ -100,7 +100,7 @@ foreach ($locales as $index => $langCode) {
               'type' => 'field',
               'key' => 'source',
               'dataType' => 'Text',
-              'label' => ts('Source Text'),
+              'label' => 'Source Text',
               'sortable' => TRUE,
               'editable' => FALSE,
             ],
@@ -108,7 +108,7 @@ foreach ($locales as $index => $langCode) {
               'type' => 'field',
               'key' => 'TranslationSource_Translation_source_key_01.string',
               'dataType' => 'Text',
-              'label' => ts('Translation'),
+              'label' => 'Translation',
               'sortable' => TRUE,
               'editable' => TRUE,
               'icons' => [
