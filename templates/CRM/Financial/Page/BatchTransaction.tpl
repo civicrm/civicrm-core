@@ -166,7 +166,7 @@ function batchSummary(entityID) {
   //post request and get response
   CRM.$.post( postUrl, {batchID: entityID}, function(html) {
     CRM.$.each(html, function(i, val) {
-      CRM.$("#row_" + i).html(val);
+      CRM.$("#row_" + i).text(val);
     });
   },
   'json');
