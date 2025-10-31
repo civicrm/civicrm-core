@@ -386,7 +386,7 @@
       };
 
       this.showLabel = () => {
-        if (this.node.defn.label === false) {
+        if (this.node.defn && this.node.defn.label === false) {
           return false;
         }
         // Single checkboxes don't get a separate label
