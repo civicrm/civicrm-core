@@ -35,6 +35,7 @@ class CRM_Utils_JSON {
   /**
    * Output json to the client.
    * @param mixed $input
+   * @deprecated - use CRM_Utils_System::sendJSONResponse
    */
   public static function output($input) {
     if (CIVICRM_UF === 'UnitTests') {

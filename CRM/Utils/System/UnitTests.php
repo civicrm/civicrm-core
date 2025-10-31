@@ -218,4 +218,11 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     return '127.0.0.1';
   }
 
+  /**
+   * Simulate JSON response to the client
+   */
+  public static function sendJSONResponse(array $response, int $httpResponseCode): void {
+    throw new CRM_Core_Exception_PrematureExitException('sendJSONResponse', $response, $httpResponseCode);
+  }
+
 }

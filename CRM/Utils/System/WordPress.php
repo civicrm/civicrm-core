@@ -1323,7 +1323,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @return void
    */
   public static function sendJSONResponse(array $response, int $httpResponseCode): void {
-    wp_send_json($response, $httpResponseCode);
+    wp_send_json($response, $httpResponseCode, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   }
 
   /**
