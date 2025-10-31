@@ -152,7 +152,7 @@ class CiviEnvBuilder {
   protected function assertValid() {
     foreach ($this->steps as $step) {
       if (!$step->isValid()) {
-        throw new RuntimeException("Found invalid step: " . var_dump($step, 1));
+        throw new RuntimeException("Found invalid step: " . var_export($step, TRUE));
       }
     }
   }
@@ -240,7 +240,7 @@ class CiviEnvBuilder {
       else {
         $test = $GLOBALS['CIVICRM_TEST_CASE'];
         $this->appliedBy = get_class($test) . '::';
-        $this->appliedBy .= (is_callable($test, 'name') ? $test->name() : $test->getName());
+        $this->appliedBy .= (is_callable([$test, 'name']) ? $test->name() : $test->getName());
       }
 
       $this->assertValid();

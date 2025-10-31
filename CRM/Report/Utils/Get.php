@@ -98,7 +98,7 @@ class CRM_Report_Utils_Get {
       case 'like':
       case 'eq':
       case 'neq':
-        $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Array::value('type', $field));
+        $value = self::getTypedValue("{$fieldName}_value", $field['type'] ?? NULL);
         if ($value !== NULL) {
           $defaults["{$fieldName}_value"] = $value;
           $defaults["{$fieldName}_op"] = $fieldOP;

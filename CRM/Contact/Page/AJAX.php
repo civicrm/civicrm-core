@@ -96,8 +96,8 @@ class CRM_Contact_Page_AJAX {
       foreach ($_GET as $param => $val) {
         if (empty($val) ||
           in_array($param, $excludeGet) ||
-          strpos($param, 'return.') !== FALSE ||
-          strpos($param, 'api.') !== FALSE
+          str_contains($param, 'return.') ||
+          str_contains($param, 'api.')
         ) {
           continue;
         }

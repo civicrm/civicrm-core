@@ -2,8 +2,15 @@
   padding: 1px max(10px, 1vw) 1rem;
 }
 
-html.crm-standalone  nav.breadcrumb>ol {
+.breadcrumb > ol {
   padding-inline-start: 0;
+}
+.breadcrumb ol li {
+  display: inline;
+  list-style-type: none;
+}
+.breadcrumb ol li:not(:first-child)::before {
+  content: " \BB ";
 }
 
 .standalone-auth-form {
@@ -14,16 +21,17 @@ html.crm-standalone  nav.breadcrumb>ol {
   height: 100vh;
 }
 .standalone-auth-box {
+  /* box sizing */
   grid-row: 2;
   box-sizing: border-box;
   width: clamp(280px, 68vw, 45rem);
   margin: 0;
-  background-color: white;
   border: none;
   border-radius: 3px;
   padding: clamp(1rem, 3vw, 2rem);
+  background-color: var(--crm-standalone-auth-box-bg, #fff);
 }
-.standalone-auth-form img.crm-logo {
+.standalone-auth-form .crm-logo {
   width: 100%;
   max-width: 400px;
   margin: 0 auto 2rem;
@@ -56,4 +64,19 @@ div.crm-container .standalone-auth-form input {
   grid-column: 2;
   place-self: end;
   margin-right: 0; /* override civicrm.css's 6px */
+}
+
+/* moved here from menubar-standalone.css
+TODO: can these be removed, or at least made to use Riverlea vars? */
+.standalone-errors {
+  background: #ffe8e4;
+  color: #422;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.standalone-errors code {
+  color: #004e81;
+}
+.standalone-errors .backtrace {
+  font-size: 0.825rem;
 }

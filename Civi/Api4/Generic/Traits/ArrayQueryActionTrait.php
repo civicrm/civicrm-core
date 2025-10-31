@@ -197,14 +197,50 @@ trait ArrayQueryActionTrait {
 
       case 'CONTAINS':
       case 'NOT CONTAINS':
-        if (is_array($value)) {
+        if (is_array($value) && is_array($expected)) {
+          return empty(array_diff($expected, $value)) == ($operator == 'CONTAINS');
+        }
+
+        if (!is_array($value) && is_array($expected)) {
+          return in_array($value, $expected) == ($operator == 'CONTAINS');
+        }
+
+        if (is_array($value) && !is_array($expected)) {
           return in_array($expected, $value) == ($operator == 'CONTAINS');
         }
-        elseif (is_string($value) || is_numeric($value)) {
+
+        if (is_string($value) || is_numeric($value)) {
           // Lowercase check if string contains string
           return (str_contains(strtolower((string) $value), strtolower((string) $expected))) == ($operator == 'CONTAINS');
         }
         return ($value == $expected) == ($operator == 'CONTAINS');
+
+      case 'CONTAINS ONE OF':
+      case 'NOT CONTAINS ONE OF':
+        if (is_array($value) && is_array($expected)) {
+          if (is_array($value) && is_array($expected)) {
+            foreach ($value as $v) {
+              if (in_array($v, $expected)) {
+                return TRUE == ($operator == 'CONTAINS ONE OF');
+              }
+            }
+            return FALSE == ($operator == 'CONTAINS ONE OF');
+          }
+        }
+
+        if (!is_array($value) && is_array($expected)) {
+          return in_array($value, $expected) == ($operator == 'CONTAINS ONE OF');
+        }
+
+        if (is_array($value) && !is_array($expected)) {
+          return in_array($expected, $value) == ($operator == 'CONTAINS ONE OF');
+        }
+
+        if (is_string($value) || is_numeric($value)) {
+          // Lowercase check if string contains string
+          return (strpos(strtolower((string) $value), strtolower((string) $expected)) !== FALSE) == ($operator == 'CONTAINS ONE OF');
+        }
+        return ($value == $expected) == ($operator == 'CONTAINS ONE OF');
 
       default:
         throw new NotImplementedException("Unsupported operator: '$operator' cannot be used with array data");
@@ -243,21 +279,24 @@ trait ArrayQueryActionTrait {
    * @return array
    */
   protected function selectArray($values) {
-    if ($this->getSelect() === ['row_count']) {
+    $select = $this->getSelect();
+    if ($select === ['row_count']) {
       $values = [['row_count' => count($values)]];
     }
-    elseif ($this->getSelect()) {
+    elseif ($values && $select) {
       // Return only fields specified by SELECT
+      $keys = array_flip($select);
       foreach ($values as &$value) {
-        $value = array_intersect_key($value, array_flip($this->getSelect()));
+        $value = array_intersect_key($value, $keys);
       }
     }
-    else {
+    elseif ($values) {
       // With no SELECT specified, return all values that are keyed by plain field name; omit those with :pseudoconstant suffixes
-      foreach ($values as &$value) {
-        $value = array_filter($value, function($key) {
-          return strpos($key, ':') === FALSE;
-        }, ARRAY_FILTER_USE_KEY);
+      $keysWithSuffixes = array_filter(array_keys(\CRM_Utils_Array::first($values)), fn($key) => str_contains($key, ':'));
+      if ($keysWithSuffixes) {
+        foreach ($values as &$value) {
+          \CRM_Utils_Array::remove($value, $keysWithSuffixes);
+        }
       }
     }
     return $values;

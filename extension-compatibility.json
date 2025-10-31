@@ -1,4 +1,8 @@
 {
+  "hotfix_extup": {
+    "obsolete": "6.1",
+    "force-uninstall": true
+  },
   "org.civicrm.angularex": {
     "obsolete": "5.69",
     "disable": true,

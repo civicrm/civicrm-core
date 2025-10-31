@@ -11,6 +11,12 @@ return [
     'add' => '4.4',
     'label_field' => 'title',
   ],
+  'getPaths' => fn() => [
+    'add' => 'civicrm/admin/badgelayout/add?reset=1&action=add',
+    'delete' => 'civicrm/admin/badgelayout/add?reset=1&action=delete&id=[id]',
+    'update' => 'civicrm/admin/badgelayout/add?reset=1&action=update&id=[id]',
+    'browse' => 'civicrm/admin/badgelayout',
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Print Label ID'),

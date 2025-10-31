@@ -8,6 +8,16 @@
     <input ng-model="editor.afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" ng-model-options="editor.debounceMode" >
   </div>
 
+  <div class="form-group" ng-if="editor.meta.locales" ng-if="editor.meta.locales.length">
+    <label for="afform_locale">
+      {{:: ts('Locale') }} <span class="crm-marker">*</span>
+    </label>
+    <input ng-list crm-ui-select="{multiple: false, data: editor.meta.locales}" class="form-control" id="afform_locale" ng-model="editor.afform.locale">
+    <p class="help-block">
+      {{:: ts('Any custom text (label, placeholder, help...) is assumed to be in the locale you set. You are then able to translate the strings by going to Administer -> Localization -> Translations to ...') }}
+    </p>
+  </div>
+
   <div class="form-group">
     <label for="af_config_form_description">
       {{:: ts('Description') }}
@@ -33,6 +43,14 @@
       {{:: ts('What permission is required to use this form?') }}
       {{:: ts('Join multiple permissions with "And" to require all, or "Or" to require at least one.') }}
     </p>
+  </div>
+
+  <div class="form-group">
+    <label for="afform_tags">
+      {{:: ts('Tags') }}
+    </label>
+    <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_tags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
+    <p class="help-block">{{:: ts('Tags can be used to keep track of your forms if Used For is set to include Afform.') }} <a target="_blank" href="/civicrm/tag?reset=1">{{:: ts('Manage Tags') }}</a></p>
   </div>
 
   <!-- Placement options do not apply to blocks -->
@@ -76,7 +94,7 @@
       <p class="help-block disabled" ng-if="!editor.afform.server_route">{{:: ts('Requires a page route') }}</p>
     </div>
 
-    <div class="form-group" ng-show="!!editor.afform.navigation || editor.isContactSummary()">
+    <div class="form-group" ng-show="!!editor.afform.navigation || editor.hasPlacementEntities()">
       <div class="form-inline">
         <label for="afform_icon">{{:: ts('Icon') }}</label>
         <input required id="afform_icon" ng-model="editor.afform.icon" crm-ui-icon-picker class="form-control">
@@ -92,26 +110,18 @@
         {{:: ts('Additional contexts in which the form can be embedded.') }}
       </p>
       <p class="text-warning" ng-if="!editor.afform.server_route && editor.placementRequiresServerRoute()">
-        <i class="crm-i fa-exclamation-triangle"></i>{{ ts('%1 placement requires a page route.', {1: editor.placementRequiresServerRoute()}) }}
+        <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>{{ ts('%1 placement requires a page route.', {1: editor.placementRequiresServerRoute()}) }}
       </p>
     </div>
 
-    <div class="form-group">
-      <label for="afform_tags">
-        {{:: ts('Tags') }}
-      </label>
-      <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_tags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
-      <p class="help-block">{{:: ts('Tags can be used to keep track of your forms if Used For is set to include Afform.') }} <a target="_blank" href="/civicrm/tag?reset=1">{{:: ts('Manage Tags') }}</a></p>
-    </div>
-
-    <div class="form-group" ng-if="editor.isContactSummary()">
-      <div class="form-inline">
-        <label for="afform_summary_contact_type">{{:: ts('For') }}</label>
-        <input class="form-control" crm-autocomplete="'ContactType'" id="afform_summary_contact_type" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">
+    <div class="form-group" ng-if="editor.afform.placement.length">
+      <div class="form-inline" ng-repeat="entity in editor.getPlacementEntities()">
+        <label for="placement-filter-{{:: entity.filter.name }}">{{:: entity.filter.label }}</label>
+        <input class="form-control" ng-list crm-ui-select="{multiple: true, placeholder: ts('Any'), data: entity.filter.options}" id="placement-filter-{{:: entity.filter.name }}" ng-model="editor.afform.placement_filters[entity.filter.name]" >
       </div>
       <div class="form-inline">
-        <label for="afform_summary_weight">{{:: ts('Position') }}</label>
-        <input class="form-control" type="number" id="afform_summary_weight" ng-model="editor.afform.summary_weight" placeholder="{{:: ts('Auto') }}">
+        <label for="afform_placement_weight">{{:: ts('Position') }}</label>
+        <input class="form-control" type="number" id="afform_placement_weight" ng-model="editor.afform.placement_weight" placeholder="{{:: ts('Auto') }}">
       </div>
     </div>
 
@@ -154,9 +164,15 @@
         <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
       </div>
 
-      <div class="form-group" ng-if="editor.afform.create_submission">
-        <label for="submit_limit">{{:: ts('Maximum Submissions') }}</label>
-        <input type="number" min="1" step="1" id="submit_limit" ng-model="editor.afform.submit_limit" placeholder="{{:: ts('Unlimited') }}">
+      <div class="crm-flex-box" ng-if="editor.afform.create_submission">
+        <div class="form-group">
+          <label for="submit_limit">{{:: ts('Max Submissions (total)') }}</label>
+          <input class="form-control eight" type="number" min="1" step="1" id="submit_limit" ng-model="editor.afform.submit_limit" placeholder="{{:: ts('Unlimited') }}">
+        </div>
+        <div class="form-group">
+          <label for="submit_limit_per_user">{{:: ts('Max Submissions (per user)') }}</label>
+          <input class="form-control eight" type="number" min="1" step="1" id="submit_limit_per_user" ng-model="editor.afform.submit_limit_per_user" placeholder="{{:: ts('Unlimited') }}">
+        </div>
       </div>
 
       <div class="form-group">
@@ -179,7 +195,19 @@
         </div>
       </div>
 
-      <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}">
+      <div class="form-group">
+        <label>
+          {{:: ts('Confirmation type') }}
+        </label>
+        <p class="form-inline">
+          <label class="radio" ng-repeat="ctype in editor.meta.confirmation_types">
+            <input class="crm-form-radio" type="radio" name="confirmation_type" ng-model="editor.afform.confirmation_type" ng-value="ctype.value">
+            {{:: ctype.label }}
+          </label>
+        </p>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}" ng-if="editor.afform.confirmation_type === 'redirect_to_url'">
         <label for="af_config_redirect">
           {{:: ts('Post-Submit Page') }}
         </label>
@@ -190,5 +218,14 @@
         <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
       </div>
     </div>
+
+    <div class="form-group" ng-if="editor.afform.confirmation_type === 'show_confirmation_message'">
+      <label for="af_config_confirmation_message">
+        {{:: ts('Confirmation message') }}
+      </label>
+      <textarea ng-model="editor.afform.confirmation_message" class="form-control" id="af_config_confirmation_message" ng-model-options="editor.debounceMode"></textarea>
+      <p class="help-block">{{:: ts("This message wil be displayed when the form is submitted.") }}</p>
+    </div>
+
   </fieldset>
 </ng-form>

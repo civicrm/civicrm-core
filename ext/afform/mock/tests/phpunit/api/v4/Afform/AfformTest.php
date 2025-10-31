@@ -31,7 +31,7 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
     }
   }
 
-  public function getBasicDirectives() {
+  public static function getBasicDirectives() {
     $directives = [
       ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => ['access Foobar'], 'placement' => ['dashboard_dashlet'], 'submit_enabled' => TRUE]],
       ['mockBareFile', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM'], 'placement' => [], 'submit_enabled' => TRUE]],
@@ -52,7 +52,7 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
    */
   public function testGetUpdateRevert($formName, $originalMetadata): void {
     $get = function($arr, $key) {
-      return isset($arr[$key]) ? $arr[$key] : NULL;
+      return $arr[$key] ?? NULL;
     };
 
     $checkDashlet = function($afform) use ($formName) {
@@ -130,7 +130,7 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
     $checkDashlet($originalMetadata);
   }
 
-  public function getFormatExamples() {
+  public static function getFormatExamples() {
     $ex = [];
     $formats = ['html', 'shallow', 'deep'];
     foreach (glob(__DIR__ . '/../formatExamples/*.php') as $exampleFile) {
@@ -228,7 +228,7 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
     Afform::revert()->addWhere('name', '=', $formName)->execute();
   }
 
-  public function getWhitespaceExamples() {
+  public static function getWhitespaceExamples() {
     $ex = [];
     foreach (glob(__DIR__ . '/../formatExamples/*.php') as $exampleFile) {
       $example = require $exampleFile;

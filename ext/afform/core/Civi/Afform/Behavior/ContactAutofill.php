@@ -5,6 +5,7 @@ use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Token\TokenRow;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -21,6 +22,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     return [
       'civi.afform.sort.prefill' => 'onAfformSortPrefill',
       'civi.afform.prefill' => ['onAfformPrefill', 99],
+      '&civi.afform.createToken' => ['onCreateToken', 99],
     ];
   }
 
@@ -96,7 +98,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
       $autoFillMode = $entity['autofill'] ?? '';
       $relatedContact = $entity['autofill-relationship'] ?? NULL;
-      if ($relatedContact && strpos($autoFillMode, 'relationship:') === 0) {
+      if ($relatedContact && str_starts_with($autoFillMode, 'relationship:')) {
         $event->addDependency($entityName, $relatedContact);
       }
     }
@@ -119,13 +121,13 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
       }
       // Autofill with current entity (e.g. on the contact summary screen)
       if (!$id && $autoFillMode === 'entity_id' && $apiRequest->getFillMode() === 'form') {
-        $id = $apiRequest->getArgs()['entity_id'] ?? NULL;
+        $id = $apiRequest->getArgs()['contact_id'] ?? NULL;
         if ($id) {
           $apiRequest->loadEntity($entity, [['id' => $id]]);
         }
       }
       // Autofill by relationship
-      if (!$id && $relatedContact && strpos($autoFillMode, 'relationship:') === 0) {
+      if (!$id && $relatedContact && str_starts_with($autoFillMode, 'relationship:')) {
         $relationshipType = substr($autoFillMode, strlen('relationship:'));
         $relatedEntity = $event->getFormDataModel()->getEntity($relatedContact);
         if ($relatedEntity) {
@@ -146,6 +148,12 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
           $apiRequest->loadEntity($entity, $relatedIds);
         }
       }
+    }
+  }
+
+  public function onCreateToken(TokenRow $row, array &$afformArgs) {
+    if (!empty($row->context['contactId'])) {
+      $afformArgs['contact_id'] = $row->context['contactId'];
     }
   }
 

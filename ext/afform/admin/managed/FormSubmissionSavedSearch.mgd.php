@@ -57,14 +57,12 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('Id'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contact_id.display_name',
-              'dataType' => 'String',
               'label' => E::ts('Submitted by'),
               'sortable' => TRUE,
               'link' => [
@@ -85,14 +83,12 @@ return [
             [
               'type' => 'field',
               'key' => 'submission_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Submission Date/Time'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Submission Status'),
               'sortable' => TRUE,
               'icons' => [

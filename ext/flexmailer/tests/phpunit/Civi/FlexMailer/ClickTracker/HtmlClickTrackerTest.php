@@ -29,7 +29,7 @@ class HtmlClickTrackerTest extends \CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function getHrefExamples() {
+  public static function getHrefExamples() {
     $exs = [];
 
     // For each example, the test-harness will useHtmlClickTracker to wrap the URL in "tracking(...)".

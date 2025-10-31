@@ -130,6 +130,11 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'items',
         // Survey entity
         'instructions',
+        // Standalone user fields
+        'username',
+        'password',
+        'hashed_password',
+        'password_reset_token',
       ];
       $custom = CRM_Core_DAO::executeQuery('
         SELECT cf.id, cf.name AS field_name, cg.name AS group_name

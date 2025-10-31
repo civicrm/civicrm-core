@@ -40,6 +40,11 @@ class EntityRepository {
     return self::$entities[$entityName] ?? NULL;
   }
 
+  public static function entityExists(string $entityName): bool {
+    self::loadAll();
+    return isset(self::$entities[$entityName]);
+  }
+
   /**
    * @internal
    * @return array
@@ -47,6 +52,11 @@ class EntityRepository {
   public static function getTableIndex(): array {
     self::loadAll();
     return self::$tableIndex;
+  }
+
+  public static function tableExists(string $tableName): bool {
+    self::loadAll();
+    return isset(self::$tableIndex[$tableName]);
   }
 
   /**

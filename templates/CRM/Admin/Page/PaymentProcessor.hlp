@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='proc-type-title'}
-  {ts}Payment Processors{/ts}
-{/htxt}
 {htxt id='proc-type'}
 <p>{ts}Refer to the following documentation:{/ts}</p>
 <ul>

@@ -114,6 +114,7 @@ class CRM_Queue_Runner {
    *   - onEndUrl: string, the URL to which one redirects.
    *   - pathPrefix: string, prepended to URLs for the web-runner;
    *     default: 'civicrm/queue'.
+   *   - buttons
    */
   public function __construct($runnerSpec) {
     $this->title = $runnerSpec['title'] ?? ts('Queue Runner');
@@ -123,7 +124,7 @@ class CRM_Queue_Runner {
     $this->onEnd = $runnerSpec['onEnd'] ?? NULL;
     $this->onEndUrl = $runnerSpec['onEndUrl'] ?? NULL;
     $this->pathPrefix = $runnerSpec['pathPrefix'] ?? 'civicrm/queue';
-    $this->buttons = CRM_Utils_Array::value('buttons', $runnerSpec, ['retry' => TRUE, 'skip' => TRUE]);
+    $this->buttons = $runnerSpec['buttons'] ?? ['retry' => TRUE, 'skip' => TRUE];
     // perhaps this value should be randomized?
     $this->qrid = $this->queue->getName();
   }
@@ -147,7 +148,7 @@ class CRM_Queue_Runner {
   }
 
   /**
-   * [EXPERIMENTAL] Run all tasks interactively. Redirect to a screen which presents the progress.
+   * Run all tasks interactively. Redirect to a screen which presents the progress.
    *
    * The exact mechanism and pageflow may be determined by the system configuration --
    * environments which support multiprocessing (background queue-workers) can use those;
@@ -158,7 +159,7 @@ class CRM_Queue_Runner {
    *
    * @throws \CRM_Core_Exception
    */
-  public function runAllInteractive(): void {
+  public function runAllInteractive(bool $redirectImmediately = TRUE): ?string {
     $this->assertRequirementsWeb();
     $this->assertRequirementsBackground();
 
@@ -171,17 +172,19 @@ class CRM_Queue_Runner {
     UserJob::save(FALSE)->setRecords([$userJob])->execute();
 
     if (Civi::settings()->get('enableBackgroundQueue')) {
-      $this->runAllViaBackground();
-      return;
+      $url = $this->startBackgroundRun();
     }
-    $this->runAllViaWeb();
+    else {
+      $url = $this->startWebRun();
+    }
+    if ($redirectImmediately) {
+      CRM_Utils_System::redirect($url);
+    }
+    return $url;
   }
 
   protected function runAllViaBackground() {
-    $url = CRM_Utils_System::url('civicrm/queue/monitor', ['name' => $this->queue->getName()]);
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = "active" WHERE name = %1', [
-      1 => [$this->queue->getName(), 'String'],
-    ]);
+    $url = $this->startBackgroundRun();
     CRM_Utils_System::redirect($url);
   }
 
@@ -189,10 +192,31 @@ class CRM_Queue_Runner {
    * Redirect to the web-based queue-runner and evaluate all tasks in a queue.
    */
   public function runAllViaWeb() {
-    $_SESSION['queueRunners'][$this->qrid] = serialize($this);
-    $url = CRM_Utils_System::url($this->pathPrefix . '/runner', 'reset=1&qrid=' . urlencode($this->qrid));
-    $this->disableBackgroundExecution();
+    $url = $this->startWebRun();
     CRM_Utils_System::redirect($url);
+  }
+
+  /**
+   * Start background runner and return url
+   *
+   * @return string queue monitor url
+   */
+  public function startBackgroundRun(): string {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = "active" WHERE name = %1', [
+      1 => [$this->queue->getName(), 'String'],
+    ]);
+    return CRM_Utils_System::url('civicrm/queue/monitor', ['name' => $this->queue->getName()], FALSE, NULL, FALSE);
+  }
+
+  /**
+   * Start web-based queue-runner and return url.
+   *
+   * @return string queue runner url
+   */
+  public function startWebRun(): string {
+    $_SESSION['queueRunners'][$this->qrid] = serialize($this);
+    $this->disableBackgroundExecution();
+    return CRM_Utils_System::url($this->pathPrefix . '/runner', 'reset=1&qrid=' . urlencode($this->qrid), FALSE, NULL, FALSE);
   }
 
   /**

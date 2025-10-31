@@ -72,7 +72,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function fileExtensions() {
+  public static function fileExtensions() {
     return [
       ['txt'],
       ['danger'],
@@ -94,7 +94,56 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     unlink($newFile);
   }
 
-  public function fileNames() {
+  public function testCreateDir() {
+    foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
+      $validNewPath = sys_get_temp_dir() . '/testCreateDir-' . uniqid();
+      $this->assertEquals(TRUE, CRM_Utils_File::createDir($validNewPath, $abortMode), 'Should create directory');
+      $this->assertTrue(is_dir($validNewPath));
+      @rmdir($validNewPath);
+    }
+
+    foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
+      $existingPath = __DIR__;
+      $this->assertEquals(NULL, CRM_Utils_File::createDir($existingPath, $abortMode), 'Does not need to create directory');
+    }
+  }
+
+  public function testCreateDir_invalidPath() {
+    $invalidPath = '/zzz';
+    $this->assertFalse(is_dir($invalidPath));
+
+    // If $abort=FALSE, then it simply returns outcome.
+    $this->assertEquals(FALSE, CRM_Utils_File::createDir($invalidPath, FALSE));
+    $this->assertFalse(is_dir($invalidPath));
+
+    // If $abort='exception', then it raises a normal exception.
+    try {
+      CRM_Utils_File::createDir($invalidPath, 'exception');
+      $this->fail('createDir() should throw exception when given invalid path');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertMatchesRegularExpression('/Failed to create directory: /', $e->getMessage());
+      $this->assertFalse(is_dir($invalidPath));
+    }
+
+    // If $abort=TRUE, then it prints+abends.
+    try {
+      try {
+        ob_start();
+        CRM_Utils_File::createDir($invalidPath, TRUE);
+      }
+      finally {
+        $capture = ob_get_clean();
+      }
+      $this->fail('createDir() should abend when given invalid path');
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertFalse(is_dir($invalidPath));
+      $this->assertMatchesRegularExpression('/Could not create directory/', $capture);
+    }
+  }
+
+  public static function fileNames() {
     $cases = [];
     $cases[] = ['helloworld.txt', TRUE];
     $cases[] = ['../helloworld.txt', FALSE];
@@ -115,7 +164,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_File::isValidFileName($fileName));
   }
 
-  public function pathToFileExtension() {
+  public static function pathToFileExtension() {
     $cases = [];
     $cases[] = ['/evil.pdf', 'pdf'];
     $cases[] = ['/helloworld.jpg', 'jpg'];
@@ -133,7 +182,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertEquals($expectedExtension, CRM_Utils_File::getExtensionFromPath($path));
   }
 
-  public function mimeTypeToExtension() {
+  public static function mimeTypeToExtension() {
     $cases = [];
     $cases[] = ['text/plain', ['txt', 'text', 'conf', 'def', 'list', 'log', 'in', 'ini']];
     $cases[] = ['image/jpeg', ['jpeg', 'jpg', 'jpe']];
@@ -456,7 +505,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirProvider(): array {
+  public static function isDirProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -480,7 +529,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirInvalidArgsProvider(): array {
+  public static function isDirInvalidArgsProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [-2.34555, FALSE],
@@ -496,7 +545,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirBasedirProvider(): array {
+  public static function isDirBasedirProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -523,7 +572,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * dataprovider for testMakeFilenameWithUnicode
    * @return array
    */
-  public function makeFilenameWithUnicodeProvider(): array {
+  public static function makeFilenameWithUnicodeProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -618,7 +667,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function trueOrFalse(): array {
+  public static function trueOrFalse(): array {
     return [
       'TRUE' => [TRUE],
       'FALSE' => [FALSE],

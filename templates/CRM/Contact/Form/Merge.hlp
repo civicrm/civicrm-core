@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="intro-title"}
-Merging Contacts
-{/htxt}
 {htxt id="intro"}
 <p>{ts}Click <strong>Merge</strong> to move data from the Duplicate Contact on the left into the Main Contact. In addition to the contact data (address, phone, email...), you may choose to move all or some of the related records (groups, activities, tags, etc.).{/ts}</p>
 <p>{ts}You will see a row and a checkbox for each type of related data currently linked to the duplicate contact. For example, if the duplicate contact has Activity records - you will see a row and a checkbox for you to mark IF you want those contribution records moved over to the main contact record. If you want to move all related records, you can check the <strong>Mark All</strong> checkbox.{/ts}</p>

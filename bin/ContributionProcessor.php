@@ -208,7 +208,7 @@ class CiviContributeProcessor {
     }
 
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";
-    while (($data = fgetcsv($handle, 1000, $delimiter)) !== FALSE) {
+    while (($data = fgetcsv($handle, 1000, $delimiter, '"', '')) !== FALSE) {
       if ($row !== 1) {
         $data['header'] = $header;
         $params = self::formatAPIParams($data,
@@ -436,7 +436,7 @@ class CiviContributeProcessor {
       // errors due to invoice ID. See:
       // ./CRM/Core/Payment/PayPalIPN.php:200
       if ($recurring->id) {
-        $params['invoice_id'] = md5(uniqid(rand(), TRUE));
+        $params['invoice_id'] = bin2hex(random_bytes(16));
       }
 
       $recurring->copyValues($params);
@@ -496,7 +496,7 @@ class CiviContributeProcessor {
     }
     else {
       // generate a new transaction id, if not already exist
-      $transaction['trxn_id'] = md5(uniqid(rand(), TRUE));
+      $transaction['trxn_id'] = bin2hex(random_bytes(16));
     }
 
     if (!isset($transaction['financial_type_id'])) {

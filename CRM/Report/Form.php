@@ -692,9 +692,9 @@ class CRM_Report_Form extends CRM_Core_Form {
         $this->_createNew = TRUE;
         $this->_params = $this->_formValues;
         $this->_params['view_mode'] = 'criteria';
-        $this->_params['title'] = $this->getTitle() . ts(' (copy created by %1 on %2)', [
-          CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
-          CRM_Utils_Date::customFormat(date('Y-m-d H:i')),
+        $this->_params['title'] = $this->getTitle() . ' ' . ts('(copy created by %1 on %2)', [
+          1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
+          2 => CRM_Utils_Date::customFormat(date('Y-m-d H:i')),
         ]);
         // Do not pass go. Do not collect another chance to re-run the same query.
         CRM_Report_Form_Instance::postProcess($this);
@@ -1688,7 +1688,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     if (!empty($options)) {
       $options = [
-        '-' => ts(' - none - '),
+        '-' => ts('- none -'),
       ] + $options;
       for ($i = 1; $i <= 5; $i++) {
         $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
@@ -2099,7 +2099,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'nhas':
         if ($value !== NULL && strlen($value) > 0) {
           $value = CRM_Utils_Type::escape($value, $type);
-          if (strpos($value, '%') === FALSE) {
+          if (!str_contains($value, '%')) {
             $value = "'%{$value}%'";
           }
           else {
@@ -2157,7 +2157,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'ew':
         if ($value !== NULL && strlen($value) > 0) {
           $value = CRM_Utils_Type::escape($value, $type);
-          if (strpos($value, '%') === FALSE) {
+          if (!str_contains($value, '%')) {
             if ($op == 'sw') {
               $value = "'{$value}%'";
             }
@@ -2820,8 +2820,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             continue;
           }
 
-          if (!empty($this->_params['group_bys']) &&
-            !empty($this->_params['group_bys'][$fieldName]) &&
+          if (!empty($this->_params['group_bys'][$fieldName]) &&
             !empty($this->_params['group_bys_freq'])
           ) {
             switch ($this->_params['group_bys_freq'][$fieldName] ?? NULL) {
@@ -3491,7 +3490,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             $value = NULL;
             if ($op) {
               $pair = $this->getOperationPair(
-                CRM_Utils_Array::value('operatorType', $field),
+                $field['operatorType'] ?? NULL,
                 $fieldName
               );
               $min = $this->_params["{$fieldName}_min"] ?? NULL;
@@ -4162,7 +4161,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         if (array_key_exists('fields', $prop)) {
           foreach ($prop['fields'] as $fieldName => $field) {
             if (($field['dataType'] ?? NULL) === 'ContactReference') {
-              $columnName = CRM_Core_BAO_CustomField::getField(CRM_Core_BAO_CustomField::getKeyID($fieldName))['column_name'];
+              $columnName = CRM_Core_BAO_CustomField::getFieldByName($fieldName)['column_name'];
               $this->_from .= "
 LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_aliases[$table]}.{$columnName} ";
             }
@@ -4924,7 +4923,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       'is_deceased' => [],
       'deceased_date' => [
-        'title' => ts('Deceased Date'),
+        'title' => ts('Deceased / Closed Date'),
       ],
       'job_title' => [
         'title' => ts('Contact Job title'),
@@ -4997,7 +4996,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'type' => CRM_Utils_Type::T_DATE,
       ],
       'is_deceased' => [
-        'title' => ts('Deceased'),
+        'title' => ts('Deceased / Closed'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'default' => $defaults['deceased'] ?? 0,
       ],
@@ -5145,7 +5144,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'String',
       CRM_Core_DAO::$_nullObject,
       FALSE,
-      CRM_Utils_Array::value('task', $this->_params)
+      $this->_params['task'] ?? NULL
     ) ?? ''));
     // if contacts are added to group
     if (!empty($this->_params['groups']) && empty($this->_outputMode)) {
@@ -5616,7 +5615,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'is_deceased' => [
-        'title' => $options['prefix_label'] . ts('Is deceased'),
+        'title' => $options['prefix_label'] . ts('Is deceased / closed'),
         'name' => 'is_deceased',
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'is_fields' => FALSE,
@@ -6052,9 +6051,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       if ($op) {
         return $this->whereClause($field,
           $op,
-          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          $this->_params["{$fieldName}_value"] ?? NULL,
+          $this->_params["{$fieldName}_min"] ?? NULL,
+          $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
     }

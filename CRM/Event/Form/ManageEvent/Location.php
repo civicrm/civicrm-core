@@ -26,9 +26,12 @@ use Civi\Api4\Phone;
  * civicrm_event_page.
  */
 class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
 
   /**
    * @var \Civi\Api4\Generic\Result
+   * @deprecated use `getLocationBlockValue()
    */
   protected $locationBlock;
 
@@ -60,13 +63,22 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $this->setSelectedChild('location');
 
     $this->_values = $this->get('values');
-    if ($this->_id && empty($this->_values)) {
+    if ($this->getEventID() && empty($this->_values)) {
       //get location values.
       $params = [
-        'entity_id' => $this->_id,
+        'entity_id' => $this->getEventID(),
         'entity_table' => 'civicrm_event',
       ];
-      $this->_values = CRM_Core_BAO_Location::getValues($params);
+      $this->_values = [
+        'im' => CRM_Core_BAO_IM::getValues($params),
+        'openid' => CRM_Core_BAO_OpenID::getValues($params),
+        'phone' => CRM_Core_BAO_Phone::getValues($params),
+        'address' => CRM_Core_BAO_Address::getValues($params),
+      ];
+      // Get all the existing email addresses, The array historically starts
+      // with 1 not 0 so we do something nasty to continue that.
+      $this->_values['email'] = array_merge([0 => 1], (array) $this->getExistingEmails(TRUE));
+      unset($this->existingEmails[0]);
 
       //get event values.
       $params = ['id' => $this->_id];
@@ -134,23 +146,17 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    */
   public function buildQuickForm() {
     CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 2);
-    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 2);
+    $this->addEmailBlockNonContactFields(1);
+    $this->addEmailBlockNonContactFields(2);
+    $this->addPhoneBlockFields(1);
+    $this->addPhoneBlockFields(2);
 
     $this->applyFilter('__ALL__', 'trim');
 
     //fix for CRM-1971
     $this->assign('action', $this->_action);
 
-    if ($this->_id) {
-      $this->locationBlock = Event::get()
-        ->addWhere('id', '=', $this->_id)
-        ->setSelect(['loc_block_id.*', 'loc_block_id'])
-        ->execute()->first();
-      $this->_oldLocBlockId = $this->locationBlock['loc_block_id'];
-    }
+    $this->_oldLocBlockId = $this->getLocationBlockID();
 
     // get the list of location blocks being used by other events
 
@@ -188,6 +194,31 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
+   * Get the ID of the location block associated with the event.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   * @api supported for external use. Will not change in minor versions of
+   *   CiviCRM.
+   *
+   */
+  public function getLocationBlockID(): ?int {
+    if (!$this->isDefined('LocationBlock')) {
+      if ($this->getEventID()) {
+        $this->locationBlock = Event::get()
+          ->addWhere('id', '=', $this->getEventID())
+          ->setSelect(['loc_block_id.*', 'loc_block_id'])
+          ->execute()->first();
+        $this->define('LocBlock', 'LocationBlock', ['id' => $this->locationBlock['loc_block_id']]);
+      }
+      else {
+        $this->locationBlock = [];
+      }
+    }
+    return $this->locationBlock['loc_block_id'] ?? NULL;
+  }
+
+  /**
    * Process the form submission.
    */
   public function postProcess() {
@@ -212,7 +243,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
        * affects the selected LocBlock and not the previous one - whether or not
        * there is a previous LocBlock.
        */
-      CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $this->_id,
+      CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $this->getEventID(),
         'loc_block_id', $params['loc_event_id']
       );
 
@@ -353,7 +384,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $params['loc_block_id'] = LocBlock::save(FALSE)->setRecords([$record])->execute()->first()['id'];
 
     // Finally update Event params.
-    $params['id'] = $this->_id;
+    $params['id'] = $this->getEventID();
     Event::save(FALSE)->addRecord($params)->execute();
 
     // Update tab "disabled" CSS class.

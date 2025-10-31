@@ -61,6 +61,7 @@ trait HttpTestTrait {
     $defaults = [
       'handler' => $handler,
       'base_uri' => 'auto:',
+      'timeout' => 15,
     ];
 
     $options = array_merge($defaults, $options);

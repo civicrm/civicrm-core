@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class SqlExpressionParserTest extends Api4TestBase implements TransactionalInterface {
 
-  public function aggregateFunctions() {
+  public static function aggregateFunctions() {
     return [
       ['AVG'],
       ['COUNT'],

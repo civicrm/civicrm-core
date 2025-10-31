@@ -56,14 +56,21 @@ trait ContactSaveTrait {
   protected function saveLocations(array $params, $contact) {
     foreach (['Address', 'Email', 'Phone', 'IM'] as $entity) {
       foreach (['primary', 'billing'] as $type) {
-        $prefix = strtolower($entity) . '_' . $type . '.';
-        $item = \CRM_Utils_Array::filterByPrefix($params, $prefix);
-        // Not allowed to update by id or alter primary or billing flags
-        unset($item['id'], $item['is_primary'], $item['is_billing']);
+        $joinName = strtolower($entity) . '_' . $type;
+        $joinPrefix = $joinName . '.';
+        $item = \CRM_Utils_Array::filterByPrefix($params, $joinPrefix);
+        // For updating by id, setting e.g. 'primary_email' is equivalent to 'primary_email.id'
+        if (array_key_exists($joinName, $params)) {
+          $item['id'] ??= $params[$joinName];
+        }
+        // Not allowed to alter primary or billing flags
+        unset($item['is_primary'], $item['is_billing']);
         if ($item) {
           $labelField = CoreUtil::getInfoItem($entity, 'label_field');
-          // If NULL was given for the main field (e.g. `email`) then delete the record
-          if ($labelField && array_key_exists($labelField, $item) && is_null($item[$labelField])) {
+          $labelParamExists = $labelField && array_key_exists($labelField, $item);
+          $idParamExists = array_key_exists('id', $item);
+          // If NULL was given for the main field (e.g. `email`) or the ID, then delete the record
+          if (($labelParamExists && is_null($item[$labelField])) || (!$labelParamExists && $idParamExists && is_null($item['id']))) {
             civicrm_api4($entity, 'delete', [
               'checkPermissions' => FALSE,
               'where' => [
@@ -80,14 +87,33 @@ trait ContactSaveTrait {
               'records' => [$item],
               'match' => ['contact_id', "is_$type"],
             ])->first();
+            // Update object values for sake of api output
+            $contact->$joinName = $saved['id'];
             foreach ($saved as $key => $value) {
-              $key = $prefix . $key;
+              $key = $joinPrefix . $key;
               $contact->$key = $value;
             }
           }
         }
       }
     }
+  }
+
+  /**
+   * Get fields the logged in user is not permitted to act on.
+   *
+   * Override parent to exclude api_key as this is dealt with elsewhere.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getUnpermittedFields(): array {
+    $fields = parent::getUnpermittedFields();
+    if (\CRM_Core_Session::getLoggedInContactID()) {
+      // This is handled in the BAO to allow for edit own api key.
+      unset($fields['api_key']);
+    }
+    return $fields;
   }
 
 }

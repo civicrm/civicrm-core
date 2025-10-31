@@ -31,7 +31,7 @@ function civicrm_api3_domain_get($params) {
   if (!empty($params['current_domain'])) {
     $params['id'] = CRM_Core_Config::domainID();
   }
-  if (!empty($params['options']) && !empty($params['options']['is_count'])) {
+  if (!empty($params['options']['is_count'])) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 
@@ -73,9 +73,7 @@ function civicrm_api3_domain_get($params) {
 
       if (!empty($values['location']['address'])) {
         foreach ($address_array as $value) {
-          $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
-          $values['location']['address'][1]
-          );
+          $domain['domain_address'][$value] = $values['location']['address'][1][$value] ?? NULL;
         }
       }
 

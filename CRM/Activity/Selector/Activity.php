@@ -420,7 +420,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
 
       $engagementLevel = $row['engagement_level'] ?? NULL;
       if ($engagementLevel) {
-        $row['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
+        $row['engagement_level'] = $engagementLevels[$engagementLevel] ?? $engagementLevel;
       }
 
       $actionLinks = $this->actionLinks($row['activity_type_id'],

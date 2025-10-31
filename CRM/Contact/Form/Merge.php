@@ -151,7 +151,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
           throw new CRM_Core_Exception(ts('There is no Supervised dedupe rule configured for contact type %1.', [1 => $this->_contactType]));
         }
       }
-      $this->assign('browseUrl', $browseUrl);
       if ($browseUrl) {
         CRM_Core_Session::singleton()->pushUserContext($browseUrl);
       }
@@ -195,6 +194,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         }
         $this->assign($position, $this->$position);
       }
+
+      $this->assign('returnUrl', $this->next ?? $browseUrl);
 
       // get user info of other contact.
       $otherUfId = CRM_Core_BAO_UFMatch::getUFId($this->_oid);

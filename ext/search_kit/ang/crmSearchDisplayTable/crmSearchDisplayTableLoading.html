@@ -3,7 +3,7 @@
   <td ng-if=":: $ctrl.hasExtraFirstColumn()">
     <input ng-if=":: $ctrl.settings.actions" type="checkbox" disabled>
   </td>
-  <td ng-repeat="col in $ctrl.settings.columns">
+  <td ng-repeat="col in $ctrl.columns" ng-if="col.enabled">
     <div class="crm-search-loading-placeholder"></div>
   </td>
 </tr>

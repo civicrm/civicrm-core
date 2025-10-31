@@ -61,8 +61,13 @@ class InlineEdit extends Run {
   public function updateExistingRow(): void {
     // Apply rowKey to filters
     $entityName = $this->savedSearch['api_entity'];
-    $keyName = CoreUtil::getIdFieldName($entityName);
-    $this->applyFilter($keyName, $this->rowKey);
+    $keyName = $filterKey = $this->getRowKeyName();
+    // Hack to support relationships
+    if ($entityName === 'RelationshipCache') {
+      $filterKey = 'relationship_id';
+      $entityName = 'Relationship';
+    }
+    $this->applyFilter($filterKey, $this->rowKey);
     $this->return = NULL;
     $this->_apiParams['offset'] = 0;
 
@@ -79,7 +84,7 @@ class InlineEdit extends Run {
     foreach ($columns as $columnIndex => $column) {
       // Editable column
       $editableInfo = $existingValues['columns'][$columnIndex]['edit'] ?? NULL;
-      if (array_key_exists($column['key'], $this->values) && $editableInfo) {
+      if ($editableInfo && array_key_exists($column['key'], $this->values)) {
         $value = $this->values[$column['key']];
         if (empty($editableInfo['nullable']) && ($value === NULL || $value === '')) {
           continue;
@@ -115,7 +120,7 @@ class InlineEdit extends Run {
       throw new \CRM_Core_Exception('Inline edit failed.');
     }
 
-    $checkPermissions = empty($this->display['settings']['acl_bypass']);
+    $checkPermissions = empty($this->display['acl_bypass']);
     // Run create/update tasks
     foreach ($tasks as $editableEntity => $editableItems) {
       foreach ($editableItems as $editableItem) {
@@ -146,7 +151,7 @@ class InlineEdit extends Run {
     $columns = $this->display['settings']['columns'];
     foreach ($columns as $column) {
       if (array_key_exists($column['key'], $this->values)) {
-        $editableInfo = $this->getEditableInfo($column['key']);
+        $editableInfo = $this->getEditableInfo($column);
         if (!$editableInfo) {
           throw new \CRM_Core_Exception('Cannot edit column ' . $column['key']);
         }
@@ -170,7 +175,7 @@ class InlineEdit extends Run {
       throw new \CRM_Core_Exception('Not enough data to create new row');
     }
 
-    $checkPermissions = empty($this->display['settings']['acl_bypass']);
+    $checkPermissions = empty($this->display['acl_bypass']);
     $saved = [];
 
     foreach ($tasks as $joinName => $editableItem) {
@@ -242,7 +247,7 @@ class InlineEdit extends Run {
       $values[$parentField] = $this->values[$parentField];
     }
     civicrm_api4($entityName, 'update', [
-      'checkPermissions' => empty($this->display['settings']['acl_bypass']),
+      'checkPermissions' => empty($this->display['acl_bypass']),
       'where' => [
         [$keyName, '=', $this->rowKey],
       ],

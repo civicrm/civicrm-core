@@ -311,7 +311,10 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     // Otherwise: Merely TRUNCATE and INSERT basic data
     $b = new \Civi\Test\CiviEnvBuilder('Basic Data');
-    $b->callback([\Civi\Test::data(), 'populate']);
+    $b->callback([\Civi\Test::data(), 'populate'])
+      ->callback(function ($ctx) {
+        \Civi\Test::schema()->setAutoIncrement();
+      });
     return $b;
   }
 
@@ -354,7 +357,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
     // reset all the caches
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     // initialize the object once db is loaded
     \Civi::$statics = [];
@@ -384,6 +387,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
+    putenv('CIVICRM_DEDUPE_OPTIMIZER=TRUE');
     $this->originalSettings = \Civi::settings()->exportValues();
 
     // There doesn't seem to be a better way to get the current error handler.
@@ -539,6 +543,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;
+    CRM_Utils_Time::resetTime();
     $this->frozenTime = NULL;
 
     error_reporting(E_ALL & ~E_NOTICE);
@@ -686,13 +691,13 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   /**
    * @param array $params
-   * @param string $identifer
+   * @param string $identifier
    *
    * @return int
    */
-  public function membershipTypeCreate(array $params = [], string $identifer = 'test'): int {
+  public function membershipTypeCreate(array $params = [], string $identifier = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge([
       'name' => 'General',
@@ -707,7 +712,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'visibility' => 'Public',
     ], $params);
 
-    $result = $this->createTestEntity('MembershipType', $params, $identifer);
+    $result = $this->createTestEntity('MembershipType', $params, $identifier);
 
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Utils_Cache::singleton()->flush();
@@ -1720,6 +1725,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       CRM_Core_DAO::executeQuery($sql);
     }
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
+
+    // Truncate resets the autoincrements, so re-apply separation
+    \Civi\Test::schema()->setAutoIncrement();
   }
 
   /**
@@ -1930,7 +1938,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
 
     foreach ($params as $key => $value) {
-      if ($key === 'version' || strpos($key, 'api') === 0 || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
+      if ($key === 'version' || str_starts_with($key, 'api') || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
         continue;
       }
       if (in_array($key, $dateFields, TRUE)) {
@@ -2436,7 +2444,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_file WHERE id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
-    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', [
+    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE file_id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
   }
@@ -2542,7 +2550,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @throws \CRM_Core_Exception
    */
   protected function createPartiallyPaidParticipantOrder(): array {
-    $orderParams = $this->getParticipantOrderParams();
+    $orderParams = $this->getParticipantOrderParams(3);
     $orderParams['api.Payment.create'] = ['total_amount' => 150];
     return $this->callAPISuccess('Order', 'create', $orderParams);
   }
@@ -3118,7 +3126,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
       case 'CRM_Contribute_Import_Form_DataSource':
       case 'CRM_Contribute_Import_Form_MapField':
-      case 'CRM_Contribute_Import_Form_Preview':
+      case 'CRM_CiviImport_Form_Generic_Preview':
         if ($this->formController) {
           // Add to the existing form controller.
           $form->controller = $this->formController;
@@ -3173,7 +3181,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
       case 'CRM_Custom_Import_Form_DataSource':
       case 'CRM_Custom_Import_Form_MapField':
-      case 'CRM_Custom_Import_Form_Preview':
+      case 'CRM_CiviImport_Form_Generic_Preview':
         $form->controller = new CRM_Import_Controller('import custom data', ['class_prefix' => 'CRM_Custom_Import']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
@@ -3183,11 +3191,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
         $_SESSION['_' . $form->controller->_name . '_container']['values']['Preview'] = $formValues;
         return $form;
 
-      case strpos($class, 'Search') !== FALSE:
+      case str_contains($class, 'Search'):
         $form->controller = new CRM_Contact_Controller_Search();
         break;
 
-      case strpos($class, '_Form_') !== FALSE:
+      case str_contains($class, '_Form_'):
         $form->controller = new CRM_Core_Controller_Simple($class, $form->getName());
         break;
 
@@ -3232,7 +3240,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     /** @var CRM_Core_Form $form */
     $form = new $class();
     $pageName = $pageName ?: $form->getName();
-    if (strpos($class, 'Search') !== FALSE) {
+    if (str_contains($class, 'Search')) {
       $form->controller = new CRM_Contact_Controller_Search();
     }
     else {
@@ -3250,7 +3258,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getThousandSeparators(): array {
+  public static function getThousandSeparators(): array {
     return [['.'], [',']];
   }
 
@@ -3259,7 +3267,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getBooleanDataProvider(): array {
+  public static function getBooleanDataProvider(): array {
     return [[TRUE], [FALSE]];
   }
 
@@ -3429,9 +3437,42 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  protected function getParticipantOrderParams(): array {
+  protected function getParticipantOrderParams($version = 4): array {
     $this->eventCreatePaid();
     $contactID = $this->individualCreate();
+    if ($version === 4) {
+      return [
+        'contribution_params' => [
+          'total_amount' => 300,
+          'currency' => 'USD',
+          'contact_id' => $contactID,
+          'financial_type_id' => 4,
+        ],
+        'line_items' => [
+          [
+            'price_field_id' => $this->ids['PriceField']['PaidEvent'],
+            'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+            'entity_table' => 'civicrm_participant',
+            'entity_id.event_id' => $this->getEventID('PaidEvent'),
+            'entity_id.role_id' => 1,
+            'entity_id.status_id' => 14,
+            'entity_id.fee_currency' => 'USD',
+            'entity_id.contact_id' => $this->individualCreate(),
+          ],
+          [
+            'price_field_id' => $this->ids['PriceField']['PaidEvent'],
+            'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_plus'],
+            'qty' => 1,
+            'entity_table' => 'civicrm_participant',
+            'entity_id.event_id' => $this->getEventID('PaidEvent'),
+            'entity_id.role_id' => 1,
+            'entity_id.status_id' => 14,
+            'entity_id.fee_currency' => 'USD',
+            'entity_id.contact_id' => $contactID,
+          ],
+        ],
+      ];
+    }
     return [
       'total_amount' => 300,
       'currency' => 'USD',
@@ -3568,8 +3609,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * @return array|int
    */
-  protected function createRuleGroup(): array {
-    return $this->createTestEntity('DedupeRuleGroup', [
+  protected function createRuleGroup($params = []): array {
+    return $this->createTestEntity('DedupeRuleGroup', $params + [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',

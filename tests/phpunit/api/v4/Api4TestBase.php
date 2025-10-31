@@ -53,7 +53,9 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
    */
   public function tearDown(): void {
     $this->conditionallyDeleteTestRecords();
+    \CRM_Utils_Time::resetTime();
     \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+    parent::tearDown();
   }
 
   /**

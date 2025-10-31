@@ -245,6 +245,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params['amount_level'] = 'Unreasonable';
     $params['cancel_reason'] = 'You lose sucker';
     $params['creditnote_id'] = 'sudo rm -rf';
+    $params['financial_type_id'] = 'Member Dues';
     $address = $this->callAPISuccess('Address', 'create', [
       'street_address' => 'Knockturn Alley',
       'contact_id' => $this->individualID,
@@ -700,7 +701,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function createLocalizedContributionDataProvider(): array {
+  public static function createLocalizedContributionDataProvider(): array {
     return [
       [10, '.', ',', 'USD', TRUE],
       ['145.0E+3', '.', ',', 'USD', FALSE],
@@ -1978,7 +1979,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->individualID,
       'email-5' => 'anthony_anderson@civicrm.org',
       'payment_processor_id' => 0,
-      'currencyID' => 'USD',
       'is_pay_later' => 1,
       'invoiceID' => 'f28e1ddc86f8c4a0ff5bcf46393e4bc8',
       'description' => 'Online Contribution: Help Support CiviCRM!',
@@ -1991,7 +1991,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'pay_later_receipt:::This is a pay later receipt',
       'contributionPageId:::' . $contributionPageID,
       'title:::Test Contribution Page',
-      'amount:::$100.00',
+      'amount:::CA$100.00',
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
@@ -2516,7 +2516,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function contributionStatusProvider(): array {
+  public static function contributionStatusProvider(): array {
     $contributionStatuses = civicrm_api3('OptionValue', 'get', [
       'return' => ['id', 'name'],
       'option_group_id' => 'contribution_status',
@@ -2707,7 +2707,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * original contribution where there is more than one line item.
    */
   public function testRepeatTransactionPassedInFinancialTypeTwoLineItems(): void {
-    $this->_params = $this->getParticipantOrderParams();
+    $this->_params = $this->getParticipantOrderParams(3);
     $originalContribution = $this->setUpRecurringContribution();
 
     $this->callAPISuccess('Contribution', 'repeattransaction', [
@@ -2830,8 +2830,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionUpdatedCampaign(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $campaignID = $this->campaignCreate();
-    $campaignID2 = $this->campaignCreate();
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+    $campaignID2 = $this->campaignCreate([], 'second');
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $this->individualID,
       'installments' => '12',
       'frequency_interval' => '1',
@@ -3152,7 +3152,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getScheduledDateData(): array {
+  public static function getScheduledDateData(): array {
     $result = [];
     $result[]['2016-08-31-1-month'] = [
       'data' => [
@@ -3661,7 +3661,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $mut->checkMailLog([
       // billing header
-      'Billing Name and Address',
+      'Billing Address',
       // billing name
       'anthony_anderson@civicrm.org',
     ], [
@@ -4812,7 +4812,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getRepeatTransactionNextSchedData(): array {
+  public static function getRepeatTransactionNextSchedData(): array {
     // Both these tests handle/test the case that next_sched_contribution_date is empty when Contribution.repeattransaction
     //   is called for the first time. Historically setting it was inconsistent but on new updates it should always be set.
     /*

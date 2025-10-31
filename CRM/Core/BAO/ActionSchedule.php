@@ -345,75 +345,82 @@ FROM civicrm_action_schedule cas
     $actionSchedule->find(FALSE);
 
     while ($actionSchedule->fetch()) {
-      $query = CRM_Core_BAO_ActionSchedule::prepareMailingQuery($mapping, $actionSchedule);
-      $dao = CRM_Core_DAO::executeQuery($query,
-        [1 => [$actionSchedule->id, 'Integer']]
-      );
+      try {
+        $query = CRM_Core_BAO_ActionSchedule::prepareMailingQuery($mapping, $actionSchedule);
+        $dao = CRM_Core_DAO::executeQuery($query,
+          [1 => [$actionSchedule->id, 'Integer']]
+        );
 
-      if ($dao->N > 0) {
-        Civi::log()->info("Sending Scheduled Reminder {$actionSchedule->id} to {$dao->N} recipients");
-      }
-
-      $bccRecipients = $mapping->getBccRecipients($actionSchedule);
-      $alternateRecipients = $mapping->getAlternateRecipients($actionSchedule);
-
-      $multilingual = CRM_Core_I18n::isMultilingual();
-      $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping);
-      while ($dao->fetch()) {
-        $row = $tokenProcessor->addRow()
-          ->context('contactId', $dao->contactID)
-          ->context('actionSearchResult', (object) $dao->toArray());
-
-        // switch language if necessary
-        if ($multilingual) {
-          $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $dao->contactID, 'preferred_language');
-          $row->context('locale', CRM_Core_BAO_ActionSchedule::pickLocale($actionSchedule->communication_language, $preferred_language));
+        if ($dao->N > 0) {
+          Civi::log()
+            ->info("Sending Scheduled Reminder {$actionSchedule->id} to {$dao->N} recipients");
         }
 
-        foreach ($dao->toArray() as $key => $value) {
-          if (preg_match('/^tokenContext_(.*)/', $key, $m)) {
-            if (!in_array($m[1], $tokenProcessor->context['schema'])) {
-              $tokenProcessor->context['schema'][] = $m[1];
+        $bccRecipients = $mapping->getBccRecipients($actionSchedule);
+        $alternateRecipients = $mapping->getAlternateRecipients($actionSchedule);
+
+        $multilingual = CRM_Core_I18n::isMultilingual();
+        $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping);
+        while ($dao->fetch()) {
+          $row = $tokenProcessor->addRow()
+            ->context('contactId', $dao->contactID)
+            ->context('actionSearchResult', (object) $dao->toArray());
+
+          // switch language if necessary
+          if ($multilingual) {
+            $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $dao->contactID, 'preferred_language');
+            $row->context('locale', CRM_Core_BAO_ActionSchedule::pickLocale($actionSchedule->communication_language, $preferred_language));
+          }
+
+          foreach ($dao->toArray() as $key => $value) {
+            if (preg_match('/^tokenContext_(.*)/', $key, $m)) {
+              if (!in_array($m[1], $tokenProcessor->context['schema'])) {
+                $tokenProcessor->context['schema'][] = $m[1];
+              }
+              $row->context($m[1], $value);
             }
-            $row->context($m[1], $value);
           }
         }
+
+        $tokenProcessor->evaluate();
+        foreach ($tokenProcessor->getRows() as $tokenRow) {
+          $dao = $tokenRow->context['actionSearchResult'];
+          $errors = [];
+
+          // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
+          $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
+
+          // FIXME: This can't be right: "If mode is User Preference, send sms unconditionally without checking user preference"!
+          if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
+            CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID, $dao->entityID, $alternateRecipients, $bccRecipients));
+          }
+          // FIXME: This can't be right: "If mode is User Preference, send email unconditionally without checking user preference"!
+          if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
+            CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID, $alternateRecipients, $bccRecipients));
+          }
+          // insert activity log record if needed
+          if ($actionSchedule->record_activity && empty($errors)) {
+            $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
+            CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
+          }
+
+          unset($swapLocale);
+
+          // update action log record
+          $logParams = [
+            'id' => $dao->reminderID,
+            'is_error' => !empty($errors),
+            'message' => empty($errors) ? "null" : implode(' ', $errors),
+            'action_date_time' => $now,
+          ];
+          CRM_Core_BAO_ActionLog::create($logParams);
+        }
       }
-
-      $tokenProcessor->evaluate();
-      foreach ($tokenProcessor->getRows() as $tokenRow) {
-        $dao = $tokenRow->context['actionSearchResult'];
-        $errors = [];
-
-        // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
-        $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
-
-        // FIXME: This can't be right: "If mode is User Preference, send sms unconditionally without checking user preference"!
-        if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
-          CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID, $dao->entityID, $alternateRecipients, $bccRecipients));
-        }
-        // FIXME: This can't be right: "If mode is User Preference, send email unconditionally without checking user preference"!
-        if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
-          CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID, $alternateRecipients, $bccRecipients));
-        }
-        // insert activity log record if needed
-        if ($actionSchedule->record_activity && empty($errors)) {
-          $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
-          CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
-        }
-
-        unset($swapLocale);
-
-        // update action log record
-        $logParams = [
-          'id' => $dao->reminderID,
-          'is_error' => !empty($errors),
-          'message' => empty($errors) ? "null" : implode(' ', $errors),
-          'action_date_time' => $now,
-        ];
-        CRM_Core_BAO_ActionLog::create($logParams);
+      catch (Throwable $e) {
+        // If one scheduled reminder fails to process that shouldn't stop the others from running.
+        // It would be nice to flag this to the user but for now putting it in the logs at least means the problem can be found!
+        \Civi::log()->error('Error processing scheduled reminder (ActionScheduleID: ' . $actionSchedule->id . '): ' . $e->getMessage());
       }
-
     }
   }
 
@@ -496,7 +503,7 @@ FROM civicrm_action_schedule cas
    * @throws \CRM_Core_Exception
    */
   public static function processQueue($now = NULL, $params = []): void {
-    $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
+    $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::date('YmdHis');
 
     $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
     foreach ($mappings as $mappingID => $mapping) {

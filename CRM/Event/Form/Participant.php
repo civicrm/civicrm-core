@@ -271,6 +271,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     parent::preProcess();
     $this->assign('feeBlockPaid', FALSE);
 
+    $this->assign('accessCiviContribute', CRM_Core_Permission::access('CiviContribute'));
+
     // @todo eliminate this duplication.
     $this->_contactId = $this->getContactID();
     $this->_eID = CRM_Utils_Request::retrieve('eid', 'Positive', $this);
@@ -340,7 +342,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($this->_submitValues['event_id']) {
         $this->_eventId = (int) $this->_submitValues['event_id'];
       }
-      $this->buildEventFeeForm($this);
+      $this->buildEventFeeForm();
       CRM_Event_Form_EventFees::setDefaultValues($this);
     }
 
@@ -542,7 +544,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
 
     if ($this->isOverloadFeesMode()) {
-      $this->buildEventFeeForm($this);
+      $this->buildEventFeeForm();
       return;
     }
 
@@ -1024,10 +1026,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['currency'] = $this->getCurrency();
         $contributionParams['contact_id'] = $this->_contactID;
 
-        if ($this->_id) {
-          $contributionParams['contribution_mode'] = 'participant';
-          $contributionParams['participant_id'] = $this->_id;
-        }
         // Set is_pay_later flag for back-office offline Pending status contributions
         if ($contributionParams['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending')) {
           $contributionParams['is_pay_later'] = 1;
@@ -1195,12 +1193,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @internal - this will be made protected, once some notice is provided to lineItem
    * edit extension which calls it form tests.
    *
-   * @param \CRM_Event_Form_Participant $form
-   *
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public function buildEventFeeForm($form) {
+  private function buildEventFeeForm() {
+    $form = $this;
     //as when call come from register.php
     if (!$form->_eventId) {
       $form->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $form);
@@ -1511,7 +1508,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($this->getEventID(), $contribParams, '', CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($this->getSubmittedValues()));
+    $firstLine = array_values($this->getLineItems())[0];
+    CRM_Event_BAO_Participant::createDiscountTrxn($this->getEventID(), $contribParams, '', $firstLine['price_field_value_id']);
 
     $transaction->commit();
 
@@ -1779,7 +1777,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   protected function sendReceipts($params, array $participants): array {
     $sent = [];
     $notSent = [];
-    $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params));
+    $this->assignEventDetailsToTpl($params['event_id'], $params['role_id'] ?? NULL, $params['receipt_text'] ?? NULL);
 
     if ($this->_mode) {
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
@@ -2044,7 +2042,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    */
   public function getInvoiceID(): string {
     if (!$this->invoiceID) {
-      $this->invoiceID = md5(uniqid(rand(), TRUE));
+      $this->invoiceID = bin2hex(random_bytes(16));
     }
     return $this->invoiceID;
   }

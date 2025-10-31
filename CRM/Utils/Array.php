@@ -582,6 +582,25 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Example:
+   *   $data = deepSort($data, fn(array &$a) => sort($a)))
+   *   $data = deepSort($data, fn(array &$a) => uksort($a, 'strnatcmp'))
+   *
+   * @param array $array
+   *   The array that should be sorted.
+   * @param callable $sort
+   *   A function which sorts an array.
+   */
+  public static function deepSort(array &$array, callable $sort): void {
+    $sort($array);
+    foreach ($array as &$value) {
+      if (is_array($value)) {
+        self::deepSort($value, $sort);
+      }
+    }
+  }
+
+  /**
    * Unsets an arbitrary list of array elements from an associative array.
    *
    * @param array $items
@@ -1394,7 +1413,7 @@ class CRM_Utils_Array {
   public static function filterByPrefix(array &$collection, string $prefix): array {
     $filtered = [];
     foreach (array_keys($collection) as $key) {
-      if (!$prefix || strpos($key, $prefix) === 0) {
+      if (!$prefix || str_starts_with($key, $prefix)) {
         $filtered[substr($key, strlen($prefix))] = $collection[$key];
         unset($collection[$key]);
       }
@@ -1421,9 +1440,9 @@ class CRM_Utils_Array {
       if (!empty($option['children'])) {
         $option['children'] = self::formatForSelect2($option['children'], $label, $id);
       }
-      $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description', 'grouping']));
+      $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description', 'grouping', 'filter']));
     }
-    return $options;
+    return array_values($options);
   }
 
 }

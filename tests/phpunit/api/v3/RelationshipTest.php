@@ -167,13 +167,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Check relationship already exists.
-   *
-   * @param int $version
-   *
-   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipCreateAlreadyExists(int $version): void {
-    $this->_apiversion = $version;
+  public function testRelationshipCreateAlreadyExists(): void {
+    $this->_apiversion = 3;
     $params = [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
@@ -391,11 +387,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Check relationship update.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipCreateDuplicate($version) {
-    $this->_apiversion = $version;
+  public function testRelationshipCreateDuplicate() {
+    $this->_apiversion = 3;
     $relParams = [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,

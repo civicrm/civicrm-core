@@ -140,4 +140,15 @@ trait WriteTrait {
     return $saved;
   }
 
+  /**
+   * Get fields the logged in user is not permitted to act on.
+   *
+   * Override parent to implement custom handling.
+   *
+   * @return array
+   */
+  public function getUnpermittedFields(): array {
+    return [];
+  }
+
 }

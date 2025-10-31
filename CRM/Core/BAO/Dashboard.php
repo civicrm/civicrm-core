@@ -33,7 +33,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Dashboard', $params['id'] ?? NULL, $params);
     $dao = self::addDashlet($params);
-    CRM_Utils_Hook::post($hook, 'Dashboard', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'Dashboard', $dao->id, $dao, $params);
     return $dao;
   }
 
@@ -114,7 +114,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $defaultDashlets = [];
     $defaults = ['blog' => 1, 'getting-started' => '0'];
     foreach ($defaults as $name => $column) {
-      if (!empty($allDashlets[$name]) && !empty($allDashlets[$name]['id'])) {
+      if (!empty($allDashlets[$name]['id'])) {
         $defaultDashlets[$name] = [
           'dashboard_id' => $allDashlets[$name]['id'],
           'is_active' => 1,

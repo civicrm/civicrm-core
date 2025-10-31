@@ -63,7 +63,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
   public function testCaseTokenConsistency(): void {
     $this->createLoggedInUser();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $this->createCustomGroupWithFieldOfType(['extends' => 'Case']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Case'], 'text', NULL, ['label' => 'Life Cycle: Status']);
     $tokens = CRM_Core_SelectValues::caseTokens();
     $this->assertEquals($this->getCaseTokens(), $tokens);
     $tokenString = $this->getTokenString(array_keys($this->getCaseTokens()));
@@ -145,7 +145,7 @@ case.custom_1 :' . '
       '{case.is_deleted:label}' => 'Case is in the Trash',
       '{case.created_date}' => 'Created Date',
       '{case.modified_date}' => 'Modified Date',
-      '{case.custom_1}' => 'Enter text here :: Group with field text',
+      '{case.custom_1}' => 'Life Cycle: Status :: Group with field text',
     ];
   }
 
@@ -759,7 +759,7 @@ event.loc_block_id.phone_id.phone :456 789
 event.description :event description
 event.location :15 Walton St<br />
 up the road<br />
-Emerald City, Maine 90210-1234<br />
+Emerald City, ME 90210-1234<br />
 United States<br />
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
@@ -885,6 +885,7 @@ $100.00
     $this->assertStringContainsString('Beverley Hills
 90210
 California
+CA
 United States', $tokenProcessor->getRow(0)->render('message'));
   }
 
@@ -950,6 +951,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.city}' => 'Domain (Organization) City',
       '{domain.postal_code}' => 'Domain (Organization) Postal Code',
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
+      '{domain.state_province_id:abbr}' => 'Domain (Organization) State Abbreviation',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
       '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
       '{site.message_header}' => 'Message Header',
@@ -1053,7 +1055,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.title}' => 'Event Title',
       '{event.start_date}' => 'Event Start Date',
       '{event.end_date}' => 'Event End Date',
-      '{event.event_type_id:label}' => 'Type',
+      '{event.event_type_id:label}' => 'Event Type',
       '{event.summary}' => 'Event Summary',
       '{event.loc_block_id.email_id.email}' => 'Event Contact Email',
       '{event.loc_block_id.phone_id.phone}' => 'Event Contact Phone',
@@ -1085,6 +1087,9 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{' . $entity . '.contribution_recur_id.cancel_date}' => 'Cancel Date',
       '{' . $entity . '.contribution_recur_id.cancel_reason}' => 'Cancellation Reason',
       '{' . $entity . '.contribution_recur_id.end_date}' => 'Recurring Contribution End Date',
+      '{' . $entity . '.contribution_recur_id.next_sched_contribution_date}' => 'Next Scheduled Contribution Date',
+      '{' . $entity . '.contribution_recur_id.failure_count}' => 'Number of Failures',
+      '{' . $entity . '.contribution_recur_id.failure_retry_date}' => 'Retry Failed Attempt Date',
       '{' . $entity . '.contribution_recur_id.financial_type_id}' => 'Financial Type ID',
     ];
   }

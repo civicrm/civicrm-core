@@ -110,7 +110,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
     $session->set('userID', NULL);
     $test->setUpHeadless();
 
-    \CRM_Utils_System::flushCache();
+    \Civi::rebuild(['system' => TRUE])->execute();
     \Civi::reset();
     \CRM_Core_Session::singleton()->set('userID', NULL);
     // ugh, performance
@@ -251,20 +251,20 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
     foreach ($byInterface['HeadlessInterface'] as $className => $nonce) {
       $clazz = new \ReflectionClass($className);
       $docComment = str_replace("\r\n", "\n", $clazz->getDocComment());
-      if (strpos($docComment, "@group headless\n") === FALSE) {
+      if (!str_contains($docComment, "@group headless\n")) {
         echo "WARNING: Class $className implements HeadlessInterface. It should declare \"@group headless\".\n";
       }
-      if (strpos($docComment, "@group e2e\n") !== FALSE) {
+      if (str_contains($docComment, "@group e2e\n")) {
         echo "WARNING: Class $className implements HeadlessInterface. It should not declare \"@group e2e\".\n";
       }
     }
     foreach ($byInterface['EndToEndInterface'] as $className => $nonce) {
       $clazz = new \ReflectionClass($className);
       $docComment = str_replace("\r\n", "\n", $clazz->getDocComment());
-      if (strpos($docComment, "@group e2e\n") === FALSE) {
+      if (!str_contains($docComment, "@group e2e\n")) {
         echo "WARNING: Class $className implements EndToEndInterface. It should declare \"@group e2e\".\n";
       }
-      if (strpos($docComment, "@group headless\n") !== FALSE) {
+      if (str_contains($docComment, "@group headless\n")) {
         echo "WARNING: Class $className implements EndToEndInterface. It should not declare \"@group headless\".\n";
       }
     }

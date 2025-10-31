@@ -107,6 +107,14 @@ class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
     return TRUE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    unset($this->_expires);
+    return TRUE;
+  }
+
   private function reobjectify($value) {
     if (is_object($value)) {
       return unserialize(serialize($value));

@@ -112,7 +112,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
    *
    * @return array
    */
-  public function customDataProvider(): array {
+  public static function customDataProvider(): array {
     return [
       0 => [
         'input' => [

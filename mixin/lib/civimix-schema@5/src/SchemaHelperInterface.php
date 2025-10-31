@@ -10,16 +10,22 @@ namespace CiviMix\Schema;
  * newer revisions of the library can be loaded, the implementation is an anonymous-class,
  * and the interface uses soft type-hints.
  *
- * @method bool hasSchema()
+ * [[ CiviCRM 5.74+ / civimix-schema@5.74+ ]]
  *
+ * @method bool hasSchema()
  * @method void install()
  * @method void uninstall()
- *
  * @method string generateInstallSql()
  * @method string generateUninstallSql()
  *
- * TODO: void addTables(string[] $tables)
- * TODO: void addColumn(string $table, string $column)
+ * [[ CiviCRM 5.76+ / civimix-schema@5.76+ ]]
+ *
+ * @method string arrayToSql(array $defn) Converts an entity or field definition to SQL statement.
+ *
+ * [[ CiviCRM 6.2+ / civimix-schema@5.85+ ]]
+ *
+ * @method bool createEntityTable(string $filePath)
+ * @method bool alterSchemaField(string $entityName, string $fieldName, array $fieldSpec)
  *
  * To see the latest implementation:
  *

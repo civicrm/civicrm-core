@@ -40,7 +40,7 @@ class SendPasswordResetEmail extends BasicBatchAction {
     // (Re)generate token and store on User.
     $token = PasswordReset::updateToken($user['id'], $this->timeout);
 
-    $workflowMessage = self::preparePasswordResetWorkflow($user, $token);
+    $workflowMessage = self::preparePasswordResetWorkflow($user, $token, $this->timeout);
     if ($workflowMessage) {
       // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
       try {
@@ -76,7 +76,7 @@ class SendPasswordResetEmail extends BasicBatchAction {
    *
    * @return \CRM_Standaloneusers_WorkflowMessage_PasswordReset|null
    */
-  public static function preparePasswordResetWorkflow(array $user, string $token): ?CRM_Standaloneusers_WorkflowMessage_PasswordReset {
+  public static function preparePasswordResetWorkflow(array $user, string $token, int $tokenTimeout): ?CRM_Standaloneusers_WorkflowMessage_PasswordReset {
     // Find the message template
     $tplID = MessageTemplate::get(FALSE)
       ->setSelect(['id'])
@@ -100,10 +100,11 @@ class SendPasswordResetEmail extends BasicBatchAction {
     $email = $user['uf_name'];
     $contactId = $user['contact_id'];
 
-    // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
+    // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml}
+    // {$usernamePlaintext} {$usernameHtml} {$tokenTimeoutPlaintext} {$tokenTimeoutHtml}
     [$domainFromName, $domainFromEmail] = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $workflowMessage = (new CRM_Standaloneusers_WorkflowMessage_PasswordReset())
-      ->setRequiredParams($username, $email, $contactId, $token)
+      ->setRequiredParams($username, $email, $contactId, $token, $tokenTimeout)
       ->setFrom("\"$domainFromName\" <$domainFromEmail>");
 
     return $workflowMessage;

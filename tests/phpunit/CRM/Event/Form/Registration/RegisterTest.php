@@ -138,7 +138,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     }
   }
 
-  public function eventDataProvider(): array {
+  public static function eventDataProvider(): array {
     return [
       'inactive_event' => [
         'form_values' => ['is_active' => FALSE],

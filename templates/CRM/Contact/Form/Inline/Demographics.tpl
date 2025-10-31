@@ -30,7 +30,7 @@
         {$form.is_deceased.label}
       </div>
     </div>
-    <div class="crm-summary-row">
+    <div class="crm-summary-row" id="showDeceasedDate">
       <div class="crm-label crm-deceased-date">{$form.deceased_date.label}</div>
       <div class="crm-content crm-deceased-date">
         {$form.deceased_date.html}
@@ -39,19 +39,5 @@
   </div>
 </div> <!-- end of main -->
 
-{literal}
-<script type="text/javascript">
-function showDeceasedDate( ) {
-  if ( cj("#is_deceased").is(':checked') ) {
-    cj(".crm-deceased-date").show( );
-  } else {
-    cj(".crm-deceased-date").hide( );
-    cj("#deceased_date").val('');
-  }
-}
+{include file="CRM/Contact/Form/ShowDeceasedDate.js.tpl"}
 
-CRM.$(function($) {
-  showDeceasedDate( );
-});
-</script>
-{/literal}

@@ -3,8 +3,8 @@ endif; ?>
 <h2><?php echo ts('Sample Data'); ?></h2>
 
 <p>
-  <label for="loadGenerated"><span>Load sample data:</span><input id="loadGenerated" type="checkbox" name="civisetup[loadGenerated]" value=1 <?php echo $model->loadGenerated ? "checked='checked'" : ""; ?> /></label> <br />
-  <span class="advancedTip"><?php echo ts("Fill the database with randomly-generated individuals, organizations, households, contributions, activities, etc. (English only). Sample data is mainly used for demo and testing sites, not for real installs."); ?></span><br />
+  <label for="loadGenerated"><span><?php echo ts('Fill system with fake information'); ?></span> <input id="loadGenerated" type="checkbox" name="civisetup[loadGenerated]" value=1 <?php echo $model->loadGenerated ? "checked='checked'" : ""; ?> /></label> <br />
+  <span class="advancedTip"><?php echo ts("To initialize a demo site, load sample data about fake people. Only available in English (United States)."); ?></span><br />
 </p>
 
 <script type="text/javascript">

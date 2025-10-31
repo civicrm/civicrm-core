@@ -20,11 +20,10 @@
  */
 
 return [
-  // FIXME: This is arguably the worst name for a setting ever
-  'is_enabled' => [
+  'multisite_is_enabled' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
-    'name' => 'is_enabled',
+    'name' => 'multisite_is_enabled',
     'title' => ts('Enable Multi Site Configuration'),
     'html_type' => 'checkbox',
     'type' => 'Boolean',
@@ -33,7 +32,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Make CiviCRM aware of multiple domains. You should configure a domain group if enabled'),
-    'documentation_link' => ['page' => 'Multi Site Installation', 'resource' => 'wiki'],
+    'documentation_link' => ['page' => 'sysadmin/setup/multisite', 'resource' => ''],
     'help_text' => NULL,
     'settings_pages' => ['multisite' => ['weight' => 10]],
   ],

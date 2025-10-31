@@ -754,7 +754,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   public function testJoinOnTags(): void {
     $tagName = 'act_tag_nm_' . mt_rand();
     $tagDescription = 'act_tag_ds_' . mt_rand();
-    $tagColor = '#' . substr(md5(mt_rand()), 0, 6);
+    $tagColor = '#' . bin2hex(random_bytes(3));
     $tag = $this->callAPISuccess('Tag', 'create', ['name' => $tagName, 'color' => $tagColor, 'description' => $tagDescription, 'used_for' => 'Activities']);
     $activity = $this->callAPISuccess('Activity', 'Create', $this->_params);
     $this->callAPISuccess('EntityTag', 'create', ['entity_table' => 'civicrm_activity', 'tag_id' => $tag['id'], 'entity_id' => $activity['id']]);

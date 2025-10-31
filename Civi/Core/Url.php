@@ -619,7 +619,7 @@ final class Url implements \JsonSerializable {
     $renderedPieces = $this->toRenderedPieces();
     $scheme = $renderedPieces['scheme'];
 
-    if ($scheme === NULL || $scheme === 'current') {
+    if ($scheme === NULL || $scheme === '' || $scheme === 'current') {
       $scheme = static::detectScheme();
     }
 

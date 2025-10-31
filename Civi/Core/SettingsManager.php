@@ -364,7 +364,7 @@ class SettingsManager {
    *
    * We now simplify to two simple groups, 'domain' and 'contact'.
    *
-   *    $civicrm_settings['domain']['foo'] = 'bar';
+   *    $civicrm_setting['domain']['foo'] = 'bar';
    *
    * 'Personal Preferences' is still aliased for compatibility (is this still needed in June 2024?).
    *

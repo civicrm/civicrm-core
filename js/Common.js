@@ -380,7 +380,7 @@ if (!CRM.vars) CRM.vars = {};
       description = row.description || $(row.element).data('description'),
       ret = '';
     if (icon) {
-      ret += '<i class="crm-i ' + icon + '" aria-hidden="true"></i> ';
+      ret += '<i class="crm-i ' + icon + '" role="img" aria-hidden="true"></i> ';
     }
     if (color) {
       ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
@@ -414,7 +414,7 @@ if (!CRM.vars) CRM.vars = {};
       title = ' title="' + text + '"';
       sr = '<span class="sr-only">' + text + '</span>';
     }
-    return '<i class="crm-i ' + icon + '"' + title + ' aria-hidden="true"></i>' + sr;
+    return '<i class="crm-i ' + icon + '"' + title + ' role="img" aria-hidden="true"></i>' + sr;
   };
 
   /**
@@ -471,7 +471,7 @@ if (!CRM.vars) CRM.vars = {};
             placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
           if (m.length && placeholder === m) {
             iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
-            out = '<i class="crm-i ' + iconClass + '" aria-hidden="true"></i> ' + out;
+            out = '<i class="crm-i ' + iconClass + '" role="img" aria-hidden="true"></i> ' + out;
           }
           return out;
         };
@@ -545,7 +545,7 @@ if (!CRM.vars) CRM.vars = {};
     let markup = '<div class="crm-entityref-links crm-entityref-quick-add">';
     quickAddLinks.forEach((link) => {
       markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" role="img" aria-hidden="true"></i> ' +
         _.escape(link.title) + '</a>';
     });
     markup += '</div>';
@@ -559,7 +559,7 @@ if (!CRM.vars) CRM.vars = {};
     var markup = '<div class="crm-entityref-links crm-entityref-links-static">';
     _.each(staticItems, function(link) {
       markup += ' <a class="crm-hover-button" href="#' + _.escape(link.id) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" role="img" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -568,6 +568,7 @@ if (!CRM.vars) CRM.vars = {};
 
   // Autocomplete based on APIv4 and Select2.
   $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    select2Options = select2Options || {};
     function getApiParams() {
       if (typeof apiParams === 'function') {
         return apiParams();
@@ -576,6 +577,17 @@ if (!CRM.vars) CRM.vars = {};
     }
     function getQuickAddLinks(paths) {
       const links = [];
+      if (paths && typeof paths === 'boolean') {
+        // Get all paths matching entity type
+        paths = CRM.config.quickAdd
+          .filter(link => {
+            if (entityName === 'Contact') {
+              return ['Individual', 'Organization', 'Household'].includes(link.entity);
+            }
+            return link.entity === entityName;
+          })
+          .map(link => link.path);
+      }
       if (paths && paths.length) {
         const apiParams = getApiParams();
         paths.forEach((path) => {
@@ -594,10 +606,27 @@ if (!CRM.vars) CRM.vars = {};
       }
       return links;
     }
+    function getQuickEditLinks($el) {
+      const links = [];
+      let data = $el.select2('data');
+      if (!select2Options.quickEdit || !data || (Array.isArray(data) && !data.length)) {
+        return links;
+      }
+      if (!Array.isArray(data)) {
+        data = [data];
+      }
+      data.forEach((item) => {
+        links.push({
+          path: item.quickEdit.path,
+          icon: 'fa-pencil',
+          title: ts('Edit %1', {1: item.quickEdit.title}),
+        });
+      });
+      return links;
+    }
     if (entityName === 'destroy') {
       return $(this).off('.crmEntity').crmSelect2('destroy');
     }
-    select2Options = select2Options || {};
     return $(this).each(function() {
       const $el = $(this).off('.crmEntity');
       let staticItems = getStaticOptions(select2Options.static),
@@ -608,17 +637,34 @@ if (!CRM.vars) CRM.vars = {};
         ajax: {
           quietMillis: 250,
           url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
-          data: function (input, pageNum) {
+          data: function (input, page, context) {
             return {params: JSON.stringify(_.assign({
               input: input,
-              page: pageNum || 1
+              searchField: context && context.searchField || null,
+              exclude: context && context.previousIds || null,
+              quickEdit: !!select2Options.quickEdit,
             }, getApiParams()))};
           },
-          results: function(data) {
-            return {
-              results: data.values,
-              more: data.count > data.countFetched
+          results: function(response, page, query) {
+            const data = {
+              results: response.values,
+              more: response.countMatched > response.countFetched,
+              context: query.context || {},
             };
+            // Set context for use in the data function above
+            // `searchFields` will be an array like [id, sort_name, email_primary.email]
+            // and `searchField` will be the current field searched
+            data.context.searchField = response.searchField;
+            data.context.searchFields = response.searchFields;
+            data.context.previousIds = data.context.previousIds || [];
+            data.context.previousIds.push(...data.results.map(item => item.id));
+            // If no more results for this searchField, advance to the next
+            const fieldIndex = data.context.searchFields.indexOf(data.context.searchField);
+            if (!data.more && query.term.length && response.searchField && fieldIndex < (data.context.searchFields.length - 1)) {
+              data.context.searchField = data.context.searchFields[fieldIndex + 1];
+              data.more = true;
+            }
+            return data;
           },
         },
         minimumInputLength: 1,
@@ -637,21 +683,25 @@ if (!CRM.vars) CRM.vars = {};
           // If we already have the data, just return it
           if (!idsNeeded.length) {
             callback(multiple ? existing : existing[0]);
+            $el.trigger('initSelectionComplete');
           } else {
-            var params = $.extend({}, getApiParams(), {ids: idsNeeded});
+            var params = $.extend({quickEdit: !!select2Options.quickEdit}, getApiParams(), {ids: idsNeeded});
             CRM.api4(entityName, 'autocomplete', params).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
+              $el.trigger('initSelectionComplete');
             });
           }
         },
         formatInputTooShort: function() {
           let html = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
           html += renderStaticOptionMarkup(staticItems);
+          html += renderQuickAddMarkup  (getQuickEditLinks($el));
           html += renderQuickAddMarkup(quickAddLinks);
           return html;
         },
         formatNoMatches: function() {
           let html = _.escape($.fn.select2.defaults.formatNoMatches);
+          html += renderQuickAddMarkup(getQuickEditLinks($el));
           html += renderQuickAddMarkup(quickAddLinks);
           return html;
         }
@@ -928,7 +978,7 @@ if (!CRM.vars) CRM.vars = {};
     }
     markup += '<div><div class="crm-select2-row-label ' + _.escape(row.label_class || '') + '">' +
       (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
-      (row.icon ? '<i class="crm-i ' + _.escape(row.icon) + '" aria-hidden="true"></i> ' : '') +
+      (row.icon ? '<i class="crm-i ' + _.escape(row.icon) + '" role="img" aria-hidden="true"></i> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
       '</div>' +
       '<div class="crm-select2-row-description">';
@@ -971,7 +1021,7 @@ if (!CRM.vars) CRM.vars = {};
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + _.escape(link.url) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
+        '<i class="crm-i ' + _.escape(link.icon || 'fa-plus-circle') + '" role="img" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -1152,7 +1202,7 @@ if (!CRM.vars) CRM.vars = {};
         }
       }
       var $icon = $(submitButton).siblings('.crm-i').add('.crm-i, .ui-icon', submitButton);
-      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-pulse');
+      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-spin');
     }
   }
 
@@ -1732,7 +1782,23 @@ if (!CRM.vars) CRM.vars = {};
         }
         $(this).parent().toggleClass('collapsed');
         e.preventDefault();
+      })
+
+      // Save the state for sticky accordions
+      .on('click', 'details.crm-accordion-sticky', function(e) {
+        // Workaround to run last, otherwise the open attribute is not yet updated
+        setTimeout(() => {
+          CRM.cache.set('sticky-' + this.id, document.getElementById(this.id).hasAttribute('open'));
+        }, 0);
       });
+
+    // Expand sticky accordions
+    Array.from(document.querySelectorAll('.crm-container details.crm-accordion-sticky')).forEach((expander) => {
+      var state = CRM.cache.get('sticky-' + expander.id);
+      if (state === true || state === false) {
+        expander.toggleAttribute('open', state);
+      }
+    });
 
     $().crmtooltip();
   });
@@ -1849,7 +1915,7 @@ if (!CRM.vars) CRM.vars = {};
 
 
   // Determine if a user has a given permission.
-  // @see CRM_Core_Resources::addPermissions
+  // @see CRM_Core_Resources_CollectionAdderTrait::addPermissions
   CRM.checkPerm = function(perm) {
     return CRM.permissions && CRM.permissions[perm];
   };
@@ -1935,6 +2001,51 @@ if (!CRM.vars) CRM.vars = {};
      b = parseInt(hexcolor.substr(4, 2), 16),
      yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? 'black' : 'white';
+  };
+
+  const ALPHANUMERIC = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  CRM.utils.createRandom = function (length, charset) {
+    charset = charset || ALPHANUMERIC;
+    let result = '';
+    const chars = charset.length;
+    for (let i = 0; i < length; i++) {
+      result += charset.charAt(Math.floor(Math.random() * chars));
+    }
+    return result;
+  };
+
+  // Port of CRM_Utils_String::munge()
+  CRM.utils.munge = function (name, char = '_', len = 63) {
+    name = name.trim().replace(/[^a-zA-Z0-9]+/g, char);
+    if (!name.replace(/_/, '').length) {
+      name = CRM.utils.createRandom(len, ALPHANUMERIC);
+    }
+    return len ? name.substring(0, len) : name;
+  };
+
+  CRM.utils.syncFields = function (sourceSelector, targetSelector) {
+    // Ensure selectors are valid
+    const $source = $(sourceSelector);
+    const $target = $(targetSelector);
+
+    if (!$source.length || !$target.length) {
+      console.warn('CRM.syncFields - one or both selectors not found:', sourceSelector, targetSelector);
+      return;
+    }
+
+    // Initialize the last known value
+    $source.data('lastValue', $source.val());
+
+    $source.on('input', function() {
+      const sourceValue = $(this).val();
+      const targetValue = $target.val();
+
+      // Only update target if it currently matches source's previous value
+      if ($source.data('lastValue') === targetValue) {
+        $target.val(sourceValue);
+      }
+      $source.data('lastValue', sourceValue);
+    });
   };
 
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided

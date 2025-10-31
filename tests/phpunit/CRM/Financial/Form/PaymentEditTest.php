@@ -66,10 +66,11 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       'trxn_id' => 'txn_12',
       'trxn_date' => date('Y-m-d H:i:s'),
     ];
-    $this->getTestForm('CRM_Financial_Form_PaymentEdit', $params, [
+    $email = $this->getTestForm('CRM_Financial_Form_PaymentEdit', $params, [
       'contribution_id' => $contribution['id'],
       'id' => $financialTrxnInfo['id'],
-    ])->processForm();
+    ])->processForm()->getFirstMail();
+    $this->assertEmpty($email, 'Changing payment method should not send an email');
 
     $payments = CRM_Contribute_BAO_Contribution::getPaymentInfo($contribution['id'], 'contribute', TRUE);
     $expectedPaymentParams = [

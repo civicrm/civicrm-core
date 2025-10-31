@@ -107,14 +107,6 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       ->setSqlRenderer([__CLASS__, 'countMailingEvents']);
     $spec->addFieldSpec($field);
 
-    $field = new FieldSpec('stats_forwards', 'Mailing', 'Integer');
-    $field->setLabel(ts('Stats: Forwards'))
-      ->setDescription(ts('Total mailing forwards'))
-      ->setColumnName('id')
-      ->setReadonly(TRUE)
-      ->setSqlRenderer([__CLASS__, 'countMailingEvents']);
-    $spec->addFieldSpec($field);
-
     $field = new FieldSpec('stats_replies', 'Mailing', 'Integer');
     $field->setLabel(ts('Stats: Replies'))
       ->setDescription(ts('Total mailing replies'))
@@ -183,10 +175,6 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       case 'stats_optouts_and_unsubscribes':
         $tableName = \CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName();
         $count = "DISTINCT $tableName.event_queue_id";
-        break;
-
-      case 'stats_forwards':
-        $tableName = \CRM_Mailing_Event_BAO_MailingEventForward::getTableName();
         break;
 
       case 'stats_replies':

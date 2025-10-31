@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Utils;
 
-use Civi\API\Exception\NotImplementedException;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
 use Civi\Api4\Generic\AbstractAction;
@@ -35,7 +34,7 @@ class CoreUtil {
   public static function getBAOFromApiName($entityName): ?string {
     // TODO: It would be nice to just call self::getInfoItem($entityName, 'dao')
     // but that currently causes test failures, probably due to early-bootstrap issues.
-    if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
+    if ($entityName === 'CustomValue' || str_starts_with($entityName, 'Custom_')) {
       $dao = \Civi\Api4\CustomValue::getInfo()['dao'];
     }
     else {
@@ -136,6 +135,22 @@ class CoreUtil {
   }
 
   /**
+   * Get sql for table, including database prefix if needed
+   *
+   * @param string $entityName
+   *
+   * @return string|null
+   */
+  public static function getTableExpr(string $entityName): ?string {
+    $tableName = self::getInfoItem($entityName, 'table_name');
+    $databaseName = self::getInfoItem($entityName, 'database_name');
+    if ($databaseName) {
+      return "`$databaseName`.`$tableName`";
+    }
+    return "`$tableName`";
+  }
+
+  /**
    * Given a sql table name, return the name of the api entity.
    *
    * @param string $tableName
@@ -162,6 +177,8 @@ class CoreUtil {
     $operators = \CRM_Core_DAO::acceptedSQLOperators();
     $operators[] = 'CONTAINS';
     $operators[] = 'NOT CONTAINS';
+    $operators[] = 'CONTAINS ONE OF';
+    $operators[] = 'NOT CONTAINS ONE OF';
     $operators[] = 'IS EMPTY';
     $operators[] = 'IS NOT EMPTY';
     $operators[] = 'REGEXP';
@@ -313,17 +330,11 @@ class CoreUtil {
    * @param string $entityName
    * @param int $entityId
    * @return array{name: string, type: string, count: int, table: string|null, key: string|null}[]
-   * @throws NotImplementedException
    */
   public static function getRefCount(string $entityName, $entityId): array {
-    $daoName = self::getInfoItem($entityName, 'dao');
-    if (!$daoName) {
-      throw new NotImplementedException("Cannot getRefCount for $entityName - dao not found.");
-    }
-    /** @var \CRM_Core_DAO $dao */
-    $dao = new $daoName();
-    $dao->id = $entityId;
-    return $dao->getReferenceCounts();
+    $entity = \Civi::entity($entityName);
+    $idField = self::getIdFieldName($entityName);
+    return $entity->getReferenceCounts([$idField => $entityId]);
   }
 
   /**
@@ -332,11 +343,10 @@ class CoreUtil {
    * @param string $entityName
    * @param $entityId
    * @return int
-   * @throws NotImplementedException
    */
   public static function getRefCountTotal(string $entityName, $entityId): int {
     $total = 0;
-    foreach ((array) self::getRefCount($entityName, $entityId) as $ref) {
+    foreach (self::getRefCount($entityName, $entityId) as $ref) {
       $total += $ref['count'] ?? 0;
     }
     return $total;

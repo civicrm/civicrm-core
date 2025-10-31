@@ -7,16 +7,12 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='id-financial_type_id-title'}
-  {ts}Financial Type{/ts}
-{/htxt}
-{htxt id='id-financial_type_id'}
+
+{htxt id='financial_type_id'}
 {ts}Sets the default financial type for payments against this pledge.{/ts}
 {/htxt}
 
-{htxt id='id-contribution_page_id-title'}
-  {ts}Self-service Payments Page{/ts}
-{/htxt}
-{htxt id='id-contribution_page_id'}
+
+{htxt id='contribution_page_id'}
 {ts}Select an Online Contribution page that the user can access to make self-service pledge payments. (Only Online Contribution pages configured to include the Pledge option are listed.){/ts}
 {/htxt}

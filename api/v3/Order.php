@@ -138,10 +138,6 @@ function civicrm_api3_order_create(array $params): array {
       $entityParams['status_id'] = $entityParams['participant_status_id'];
       $entityParams['skipLineItem'] = TRUE;
       $entityResult = civicrm_api3('Participant', 'create', $entityParams);
-      // @todo - once membership is cleaned up & financial validation tests are extended
-      // we can look at removing this - some weird handling in removeFinancialAccounts
-      $params['contribution_mode'] = 'participant';
-      $params['participant_id'] = $entityResult['id'];
       foreach ($entityParams['line_references'] as $lineIndex) {
         $order->setLineItemValue('entity_id', $entityResult['id'], $lineIndex);
       }

@@ -7,9 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-campaign_id-title"}
-  {ts}Campaigns{/ts}
-{/htxt}
-{htxt id="id-campaign_id"}
+
+{htxt id='campaign_id'}
 {ts}Your organization can use Campaigns to track all constituent interactions related to a particular fund-raising or engagement effort. You can link activities, contributions, event participation, mailings, membership signups, and pledges to a particular campaign.{/ts}
 {/htxt}

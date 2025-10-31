@@ -72,7 +72,6 @@ return [
             [
               'type' => 'field',
               'key' => 'label',
-              'dataType' => 'String',
               'label' => E::ts('Label'),
               'sortable' => TRUE,
               'icons' => [
@@ -86,7 +85,6 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
-              'dataType' => 'Text',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,

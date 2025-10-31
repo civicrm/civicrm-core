@@ -54,7 +54,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     // Verify the API handler we're talking to is valid.
     $entities = civicrm_api3('Entity', 'get');
     $entity = $_GET['entity'] ?? NULL;
-    if (!empty($entity) && in_array($entity, $entities['values']) && strpos($entity, '.') === FALSE) {
+    if (!empty($entity) && in_array($entity, $entities['values']) && !str_contains($entity, '.')) {
       $action = $_GET['action'] ?? NULL;
       $doc = self::getDocblock($entity, $action);
       $result = [
@@ -108,7 +108,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
         $contents = $actionFileContents;
       }
       // If action isn't in this file, try generic
-      if (strpos($contents, "function $fnName") === FALSE) {
+      if (!str_contains($contents, "function $fnName")) {
         $fnName = "civicrm_api3_generic_$action";
         $file = "api/v3/Generic/" . ucfirst($action) . '.php';
         $contents = file_get_contents($file, FILE_USE_INCLUDE_PATH);

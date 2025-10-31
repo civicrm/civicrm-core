@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-intro-title"}
-  {ts}Contribution Pages{/ts}
-{/htxt}
 {htxt id="id-intro"}
     {capture assign=newPageURL}{crmURL p="civicrm/admin/contribute/add" q="action=add&reset=1"}{/capture}
     <p>{ts}CiviContribute allows you to create and maintain any number of Online Contribution Pages. You can create different pages for different programs or campaigns, and you can customize text, amounts, types of information collected from contributors, etc.{/ts}</p>

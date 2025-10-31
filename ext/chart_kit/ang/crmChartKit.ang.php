@@ -1,6 +1,5 @@
 <?php
-// Base angular module declares external dependencies
-
+// Module for rendering Chart search displays
 return [
   'js' => [
     'ang/crmChartKit.js',
@@ -21,7 +20,7 @@ return [
     'ui.bootstrap',
     'crmSearchDisplay',
   ],
-  'basePages' => ['civicrm/admin/search'],
+  'basePages' => ['civicrm/search', 'civicrm/admin/search'],
   'bundles' => ['bootstrap3', 'chart_kit'],
   'exports' => [
     'crm-search-display-chart-kit' => 'E',

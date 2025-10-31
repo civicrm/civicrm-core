@@ -30,7 +30,7 @@
       {/foreach}
       </tbody>
     </table>
-    <a href="{crmURL p='civicrm/event/cart_checkout'}" class="button crm-check-out-button"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Checkout{/ts}</a>
+    <a href="{crmURL p='civicrm/event/cart_checkout'}" class="button crm-check-out-button"><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}Checkout{/ts}</a>
   </div>
 {/if}
-<a href="{crmURL p="civicrm/event/ical" q="reset=1&page=1&html=1"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> Back to Event List</a>
+<a href="{crmURL p="civicrm/event/ical" q="reset=1&page=1&html=1"}"><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> Back to Event List</a>

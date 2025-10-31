@@ -127,10 +127,10 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
       ->addWhere('workflow_name', '=', 'contribution_online_receipt')
       ->addWhere('is_default', '=', TRUE)
       ->execute();
-    $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates('5.4.alpha1');
-    $messages = $messageTemplateObject->getUpgradeMessages();
+    $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates('5.43.alpha1');
+    $messages = $messageTemplateObject->getUpgradeMessages('5.40');
     $this->assertEquals([
-      'Contributions - Receipt (on-line)' => 'Use email greeting at top where available',
+      'Contributions - Receipt (on-line)' => 'Missed templates from earlier versions',
     ], $messages);
   }
 

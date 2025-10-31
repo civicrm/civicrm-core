@@ -28,7 +28,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $dataValues = [
       'integer' => [1, 2, 3],
       'number' => [10.11, 20.22, 30.33],
-      'string' => [substr(sha1(rand()), 0, 4) . '(', substr(sha1(rand()), 0, 3) . '|', substr(sha1(rand()), 0, 2) . ','],
+      'string' => [bin2hex(random_bytes(2)) . '(', bin2hex(random_bytes(2)) . '|', bin2hex(random_bytes(1)) . ','],
       // 'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
       // This does not work in the test at the moment due to caching issues.
       //'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
@@ -54,7 +54,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       }
       elseif ($dataType === 'contact') {
         for ($i = 0; $i < 3; $i++) {
-          $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com']);
+          $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => bin2hex(random_bytes(4)) . '@yahoo.com']);
           $this->optionGroup[$dataType]['values'][$i] = $result['id'];
         }
       }
@@ -170,7 +170,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $customId = $customField['id'];
     $params = [
       'contact_type' => 'Individual',
-      'email' => substr(sha1(rand()), 0, 7) . 'man1@yahoo.com',
+      'email' => bin2hex(random_bytes(4)) . 'man1@yahoo.com',
     ];
     $result = $this->callAPISuccess('Contact', 'create', $params);
     $contactId = $result['id'];
@@ -183,8 +183,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       unset($selectedValue[$count]);
     }
     elseif ($customField['html_type'] == 'Link') {
-      $selectedValue = "http://" . substr(sha1(rand()), 0, 7) . ".com";
-      $notselectedValue = "http://" . substr(sha1(rand()), 0, 7) . ".com";
+      $selectedValue = "http://" . bin2hex(random_bytes(4)) . ".com";
+      $notselectedValue = "http://" . bin2hex(random_bytes(4)) . ".com";
     }
     elseif ($type == 'date') {
       $selectedValue = date('Ymd');
@@ -265,7 +265,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           }
           // To be precise in for these operator we can't just rely on one contact,
           // hence creating multiple contact with custom value less/more then $selectedValue respectively
-          $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man2@yahoo.com']);
+          $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => bin2hex(random_bytes(4)) . 'man2@yahoo.com']);
           $contactId2 = $result['id'];
           $this->callAPISuccess('CustomValue', 'create', ['entity_id' => $contactId2, 'custom_' . $customId => $lesserSelectedValue]);
 
@@ -278,7 +278,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
             $this->assertEquals($contactId2, $result['id']);
           }
           else {
-            $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man3@yahoo.com']);
+            $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => bin2hex(random_bytes(4)) . 'man3@yahoo.com']);
             $contactId3 = $result['id'];
             $this->callAPISuccess('CustomValue', 'create', ['entity_id' => $contactId3, 'custom_' . $customId => $greaterSelectedValue]);
 

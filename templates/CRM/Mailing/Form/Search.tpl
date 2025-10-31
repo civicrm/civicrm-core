@@ -10,7 +10,7 @@
 <div class="crm-block crm-form-block crm-search-form-block">
   <table class="form-layout">
     <tr>
-       <td>{$form.mailing_name.label} {help id="id-mailing_name"}<br />
+       <td>{$form.mailing_name.label} {help id="mailing_name"}<br />
         {$form.mailing_name.html|crmAddClass:big}
       </td>
     </tr>
@@ -18,7 +18,7 @@
       {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing" to='' from='' colspan='2' class='' hideRelativeLabel=0}
     </tr>
     <tr>
-      <td colspan="1">{$form.sort_name.label} {help id="id-create_sort_name"}<br />
+      <td colspan="1">{$form.sort_name.label} {help id="sort_name"}<br />
         {$form.sort_name.html|crmAddClass:big}
         <br/><br/>
         <div class="crm-search-form-block-is_archive">
@@ -45,7 +45,7 @@
     {* language *}
     {if array_key_exists('language', $form)}
       <tr>
-        <td>{$form.language.label} {help id="id-language"}<br />
+        <td>{$form.language.label} {help id="language"}<br />
           {$form.language.html|crmAddClass:big}
         </td>
       </tr>

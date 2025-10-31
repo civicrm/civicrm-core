@@ -12,8 +12,10 @@
 use Civi\Api4\EntityFinancialAccount;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\FinancialAccount;
+use Civi\Api4\FinancialItem;
 use Civi\Api4\FinancialType;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\LineItem;
 
 /**
  * Class api_v3_TaxContributionPageTest
@@ -341,7 +343,9 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * Update a contribution.
    *
    * Function tests that line items, financial records are updated when
-   * contribution amount is changed
+   * contribution amount is changed.
+   *
+   * @throws CRM_Core_Exception
    */
   public function testCreateUpdateContributionChangeTotal(): void {
     $this->setUpContributionPage();
@@ -371,16 +375,21 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ];
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
 
-    $lineItems = $this->callAPISuccess('line_item', 'getvalue', [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'sequential' => 1,
-      'return' => 'line_total',
-    ]);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
 
-    $this->assertEquals('300.00', $lineItems);
+    $this->assertEquals('300.00', $lineItem['line_total']);
     $this->assertEquals('300.00', $this->getFinancialTrxnAmount($contribution['id']));
-    $this->assertEquals('320.00', $this->_getFinancialItemAmount($contribution['id']));
+    $financialItems = FinancialItem::get(FALSE)
+      ->addWhere('entity_id', '=', $lineItem['id'])
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->execute();
+    $amount = 0;
+    foreach ($financialItems as $financialItem) {
+      $amount += $financialItem['amount'];
+    }
+    $this->assertEquals('320.00', $amount);
   }
 
   /**
@@ -395,21 +404,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
      LEFT JOIN civicrm_entity_financial_trxn AS ceft ON ft.id = ceft.financial_trxn_id
      WHERE ceft.entity_table = 'civicrm_contribution'
      AND ceft.entity_id = $contributionID";
-    return CRM_Core_DAO::singleValueQuery($query);
-  }
-
-  /**
-   * @param int $contId
-   *
-   * @return null|string
-   */
-  public function _getFinancialItemAmount(int $contId): ?string {
-    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
-    $query = "SELECT
-     SUM(amount)
-     FROM civicrm_financial_item
-     WHERE entity_table = 'civicrm_line_item'
-     AND entity_id = $lineItem";
     return CRM_Core_DAO::singleValueQuery($query);
   }
 

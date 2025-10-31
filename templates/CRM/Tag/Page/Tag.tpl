@@ -20,7 +20,7 @@
   <div id="mainTabContainer">
     <ul role="tablist">
       <li role="tab" class="ui-corner-all crm-tab-button" title="{ts escape='htmlattribute'}Main Tag List{/ts}">
-        <a href="#tree"><i class="crm-i fa-tags" aria-hidden="true"></i> {ts}Tag Tree{/ts}</a>
+        <a href="#tree"><i class="crm-i fa-tags" role="img" aria-hidden="true"></i> {ts}Tag Tree{/ts}</a>
       </li>
       {foreach from=$tagsets item=set}
         <li role="tab" class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts escape='htmlattribute' 1=$set.used_for_label_str}Tag Set for %1{/ts}">
@@ -29,7 +29,7 @@
       {/foreach}
       {crmPermission has='administer Tagsets'}
         <li role="tab" class="ui-corner-all crm-tab-button" title="{ts escape='htmlattribute'}Add Tag Set{/ts}">
-          <a href="#new-tagset"><i class="crm-i fa-plus" aria-hidden="true"></i></a>
+          <a href="#new-tagset"><i class="crm-i fa-plus" role="img" aria-hidden="true"></i></a>
         </li>
       {/crmPermission}
     </ul>
@@ -38,7 +38,7 @@
         {ts}Organize the tag hierarchy by clicking and dragging. Shift-click to select multiple tags to merge/move/delete.{/ts}
       </div>
       <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts escape='htmlattribute'}Filter List{/ts}" allowclear="1"/>
-      <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+      <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
     </div>
     {foreach from=$tagsets item=set}
       <div id="tagset-{$set.id}" role="tabpanel">
@@ -364,7 +364,7 @@
     });
   })(CRM.$, CRM._);
 </script>
-<style type="text/css">
+<style>
   div.tag-tree-wrapper {
     position: relative;
     min-height: 250px;
@@ -463,16 +463,16 @@
   <% {rdelim} %>
   <div class="crm-submit-buttons">
     <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= tagset || '' %>" class="button crm-popup">
-      <span><i class="crm-i fa-plus" aria-hidden="true"></i> {ts}Add Tag{/ts}</span>
+      <span><i class="crm-i fa-plus" role="img" aria-hidden="true"></i> {ts}Add Tag{/ts}</span>
     </a>
     <% if(tagset && adminTagsets) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=update&id="}<%= tagset %>" class="button crm-popup tagset-action-update">
-        <span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Set{/ts}</span>
+        <span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit Set{/ts}</span>
       </a>
     <% {rdelim} %>
     <% if(tagset && !length && adminTagsets && (!is_reserved || adminReserved)) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= tagset %>" class="button crm-popup small-popup tagset-action-delete">
-        <span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete Set{/ts}</span>
+        <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete Set{/ts}</span>
       </a>
     <% {rdelim} %>
   </div>
@@ -499,7 +499,7 @@
         <span class="tdl">{ts}Used For:{/ts}</span>
         {literal}
           <span class="<% if (!data.is_reserved || adminReserved) { %>crm-editable-enabled used-for-toggle<% } %>">
-            <% if (!data.used_for.length) { %><i class="crm-i fa-pencil crm-editable-placeholder" aria-hidden="true"></i><% } %>
+            <% if (!data.used_for.length) { %><i class="crm-i fa-pencil crm-editable-placeholder" role="img" aria-hidden="true"></i><% } %>
             <% _.forEach(data.used_for, function(key, i) { %><%- (i ? ', ' : '') + usedFor[key] %><% }) %>
           </span>
           <span style="display: none">
@@ -514,26 +514,26 @@
       </div>
     <% {rdelim} %>
     <div><span class="tdl">{ts}Usage Count:{/ts}</span> <%= data.usages %></div>
-    <a class="clear-tag-selection" href="#" title="{ts escape='htmlattribute'}Clear selection{/ts}"><i class="crm-i fa-ban" aria-hidden="true"></i></a>
+    <a class="clear-tag-selection" href="#" title="{ts escape='htmlattribute'}Clear selection{/ts}"><i class="crm-i fa-ban" role="img" aria-hidden="true"></i></a>
   </div>
   <div class="crm-submit-buttons">
     <% if(!tagset) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= id %>" class="button crm-popup" title="{ts escape='htmlattribute'}Create new tag under this one{/ts}">
-        <span><i class="crm-i fa-plus" aria-hidden="true"></i> {ts}Add Child{/ts}</span>
+        <span><i class="crm-i fa-plus" role="img" aria-hidden="true"></i> {ts}Add Child{/ts}</span>
       </a>
     <% {rdelim} %>
     <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup" title="{ts escape='htmlattribute'}Duplicate this tag{/ts}">
-      <span><i class="crm-i fa-copy" aria-hidden="true"></i> {ts}Clone Tag{/ts}</span>
+      <span><i class="crm-i fa-copy" role="img" aria-hidden="true"></i> {ts}Clone Tag{/ts}</span>
     </a>
     <% if(!data.is_reserved || adminReserved) {ldelim} %>
       <% if(tagsetCount) {ldelim} %>
         <a href="#move" class="button move-tag-button" title="{ts escape='htmlattribute'}Move to a different tagset{/ts}">
-          <span><i class="crm-i fa-share-square-o" aria-hidden="true"></i> {ts}Move Tag{/ts}</span>
+          <span><i class="crm-i fa-share-square-o" role="img" aria-hidden="true"></i> {ts}Move Tag{/ts}</span>
         </a>
       <% {rdelim} %>
       <% if(!hasChildren) {ldelim} %>
         <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= id %>" class="button crm-popup small-popup">
-          <span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span>
+          <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete{/ts}</span>
         </a>
       <% {rdelim} %>
     <% {rdelim} %>
@@ -547,20 +547,20 @@
       <p>* {ts 1="<%= reserved %>"}%1 reserved.{/ts}</p>
     <% {rdelim} %>
   <p><span class="tdl">{ts}Total Usage:{/ts}</span> <%= usages %></p>
-  <a class="clear-tag-selection" href="#" title="{ts escape='htmlattribute'}Clear selection{/ts}"><i class="crm-i fa-ban" aria-hidden="true"></i></a>
+  <a class="clear-tag-selection" href="#" title="{ts escape='htmlattribute'}Clear selection{/ts}"><i class="crm-i fa-ban" role="img" aria-hidden="true"></i></a>
   <div class="crm-submit-buttons">
     <% if(!reserved || adminReserved) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup" title="{ts escape='htmlattribute'}Combine tags into one{/ts}">
-        <span><i class="crm-i fa-compress" aria-hidden="true"></i> {ts}Merge Tags{/ts}</span>
+        <span><i class="crm-i fa-compress" role="img" aria-hidden="true"></i> {ts}Merge Tags{/ts}</span>
       </a>
       <% if(tagsetCount) {ldelim} %>
         <a href="#move" class="button move-tag-button" title="{ts escape='htmlattribute'}Move to a different tagset{/ts}">
-          <span><i class="crm-i fa-share-square-o" aria-hidden="true"></i> {ts}Move Tags{/ts}</span>
+          <span><i class="crm-i fa-share-square-o" role="img" aria-hidden="true"></i> {ts}Move Tags{/ts}</span>
         </a>
       <% {rdelim} %>
       <% if(!hasChildren) {ldelim} %>
         <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= items.join() %>" class="button crm-popup small-popup">
-          <span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete All{/ts}</span>
+          <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete All{/ts}</span>
         </a>
       <% {rdelim} %>
     <% {rdelim} %>
@@ -576,6 +576,6 @@
       <% if(typeof description === 'string' && description.length && description !== 'null') {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
     </div>
     <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts escape='htmlattribute'}Filter List{/ts}" allowclear="1"/>
-    <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+    <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
   </div>
 </script>

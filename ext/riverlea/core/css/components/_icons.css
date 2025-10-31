@@ -1,4 +1,4 @@
-.crm-container .messages .crm-i {
+.crm-container .messages > .crm-i {
   padding: 0 var(--crm-m) var(--crm-s) 0;
   float: left;
 }
@@ -26,6 +26,11 @@ input#crm-qsearch-input::placeholder {
 #crm-notification-container .ui-notify-message a.ui-notify-cross::before,
 .crm-container #crm-notification-container div.ui-notify-message h1::before,
 div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container td.disabled:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container tr.disabled td.crm-search-ctrl-column::after,
+.crm-container td.disabled.crm-search-ctrl-column::after,
+.crm-container tr.disabled td.crm-extensions-status::before,
 .crm-container .delete-icon,
 .crm-container span.batch-valid,
 .crm-container span.batch-invalid,
@@ -39,8 +44,8 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container #crm-notification-container div.ui-notify-message.error h1::before,
 .crm-container span.batch-invalid::before {
-  content: var(--crm-icon-alert);
-  color: var(--crm-notify-alert);
+  content: var(--crm-icon-danger);
+  color: var(--crm-notify-danger);
 }
 .crm-container #crm-notification-container div.ui-notify-message.success h1::before,
 .crm-container span.batch-valid::before {
@@ -54,7 +59,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container #crm-notification-container div.ui-notify-message.alert h1::before,
 .crm-container #crm-notification-container div.ui-notify-message.warning h1::before {
-  content: var(--crm-icon-alert);
+  content: var(--crm-icon-danger);
   color: var(--crm-notify-warning);
 }
 .crm-container .messages.crm-empty-table > i.crm-i {
@@ -80,7 +85,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 
 /* Close icon */
 #crm-notification-container .ui-notify-message a.ui-notify-cross,
-div.civicrm-community-messages a.civicrm-community-message-dismiss,
+.crm-container div.civicrm-community-messages a.civicrm-community-message-dismiss,
 .crm-container .ui-icon-circle-close {
   font-size: 0;
   float: right;
@@ -109,7 +114,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .crm-i.fa-times,
 .crm-container .btn-danger .crm-i,
 .crm-container button .fa-times {
-  color: var(--crm-icon-alert-color);
+  color: var(--crm-icon-danger-color);
 }
 .crm-container .crm-dashlet-header a.fa-times {
   color: var(--crm-dashlet-header-col);
@@ -211,7 +216,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 /* Trash icons */
 .crm-container .delete-icon {
   background-image: none;
-  color: var(--crm-alert-text-danger);
+  color: var(--crm-alert-danger-text);
 }
 .crm-container .delete-button > .delete-icon {
   color: inherit;
@@ -219,11 +224,21 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .delete-icon::before,
 .crm-container .crm-i.fa-trash::before {
   content: "\f1f8";
-  color: var(--crm-icon-alert-color);
+  color: var(--crm-icon-danger-color);
 }
 .crm-container .delete-icon:hover::before,
 .crm-container .delete-icon:focus::before {
-  color: var(--crm-icon-alert-color);
+  color: var(--crm-icon-danger-color);
+}
+
+/* Inactive icon */
+.crm-container tr.disabled > td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label)::before,
+.crm-container td.disabled:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container tr.disabled td.crm-search-ctrl-column::after,
+.crm-container tr.disabled td.crm-extensions-status::before,
+.crm-container td.disabled.crm-search-ctrl-column::after {
+  content: "\f05e" / "Disabled row.";
+  font-style: normal;
 }
 
 /* Jqueery UI icons (tags) */
@@ -250,7 +265,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .jstree-default.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox::before,
 .crm-container .jstree-default .jstree-checked > .jstree-checkbox::before {
   content: '\f046';
-  color: var(--crm-c-success);
+  color: var(--crm-c-success-on-page-bg);
 }
 .jstree-default > .jstree-no-dots .jstree-closed > .jstree-ocl::before,
 .jstree .jstree-closed > .jstree-ocl::before {
@@ -265,7 +280,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   color: var(--crm-c-text);
 }
 .crm-container .jstree-default .jstree-search {
-  color: var(--crm-c-alert);
+  color: var(--crm-c-danger);
   font-weight: normal;
 }
 .crm-container #navigation-tree li.jstree-node {

@@ -278,7 +278,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
       //truly spaces are less than required.
       if (is_numeric($spaces) && $spaces <= ($processedCnt + $currentPageMaxCount)) {
-        if (CRM_Utils_Array::value('amount', $this->_params[0], 0) == 0 || $this->_requireApproval) {
+        if (($this->_params[0]['amount'] ?? 0) == 0 || $this->_requireApproval) {
           $this->_allowWaitlist = FALSE;
           $this->set('allowWaitlist', $this->_allowWaitlist);
           if ($this->_requireApproval) {
@@ -304,7 +304,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         CRM_Core_Session::setStatus($statusMessage, ts('Registration Error'), 'error');
       }
       elseif ($processedCnt == $spaces) {
-        if (CRM_Utils_Array::value('amount', $this->_params[0], 0) == 0
+        if (($this->_params[0]['amount'] ?? 0) == 0
           || $realPayLater || $this->_requireApproval
         ) {
           $this->_resetAllowWaitlist = TRUE;
@@ -356,7 +356,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           !$this->_allowWaitlist &&
           !$realPayLater &&
           !$this->_requireApproval &&
-          !(CRM_Utils_Array::value('amount', $this->_params[0], 0) == 0)
+          !(($this->_params[0]['amount'] ?? 0) == 0)
         ) {
           $paymentBypassed = ts('Please go back to the main registration page, to complete payment information.');
         }
@@ -481,8 +481,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
             }
             else {
               // check with first_name and last_name for additional participants
-              if (!empty($value['first_name']) && ($value['first_name'] == CRM_Utils_Array::value('first_name', $fields)) &&
-                (($value['last_name'] ?? NULL) == CRM_Utils_Array::value('last_name', $fields))
+              if (!empty($value['first_name']) && ($value['first_name'] == ($fields['first_name'] ?? NULL)) &&
+                (($value['last_name'] ?? NULL) == ($fields['last_name'] ?? NULL))
               ) {
                 $errors['first_name'] = ts('The first name and last name must be unique for each participant.');
                 break;
@@ -502,7 +502,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
         //validate price field params.
         $priceSetErrors = $self->validatePriceSet($allParticipantParams, $self->get('priceSetId'), $self->get('priceSet'));
-        $errors = array_merge($errors, CRM_Utils_Array::value($addParticipantNum, $priceSetErrors, []));
+        $errors = array_merge($errors, $priceSetErrors[$addParticipantNum] ?? []);
 
         if (!$self->_allowConfirmation &&
           is_numeric($self->_availableRegistrations)
@@ -511,7 +511,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
             !$self->_allowWaitlist &&
             !$realPayLater &&
             !$self->_requireApproval &&
-            !(CRM_Utils_Array::value('amount', $self->_params[0], 0) == 0) &&
+            !(($self->_params[0]['amount'] ?? 0) == 0) &&
             $totalParticipants < $self->_availableRegistrations
           ) {
             $errors['_qf_default'] = ts("Your event registration will be confirmed. Please go back to the main registration page, to complete payment information.");
@@ -539,7 +539,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         !$self->_allowWaitlist &&
         !$realPayLater &&
         !$self->_requireApproval &&
-        !(CRM_Utils_Array::value('amount', $self->_params[0], 0) == 0)
+        !(($self->_params[0]['amount'] ?? 0) == 0)
       ) {
         $errors['_qf_default'] = ts("You are going to skip the last participant, your event registration will be confirmed. Please go back to the main registration page, to complete payment information.");
       }
@@ -571,7 +571,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if (!empty($self->_params[0]['bypass_payment']) ||
       $self->_allowWaitlist ||
       empty($self->_fields) ||
-      CRM_Utils_Array::value('amount', $self->_params[0]) > 0
+      ($self->_params[0]['amount'] ?? 0) > 0
     ) {
       return TRUE;
     }
@@ -586,7 +586,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
     }
     elseif (!empty($fields['amount']) &&
-      (CRM_Utils_Array::value('value', $self->_values['fee'][$fields['amount']]) > 0)
+      (($self->_values['fee'][$fields['amount']]['value'] ?? 0) > 0)
     ) {
       $validatePayement = TRUE;
     }

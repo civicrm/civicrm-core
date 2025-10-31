@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Mapping;
 use Civi\Api4\Queue;
 use Civi\Api4\UserJob;
 use Civi\Core\ClassScanner;
@@ -60,9 +59,24 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
   public static function hook_civicrm_queueStatus(CRM_Queue_Queue $queue, string $status): void {
     $userJobId = static::findUserJobId($queue->getName());
     if ($userJobId && $status === 'completed') {
+      $userJob = UserJob::get(FALSE)
+        ->addWhere('id', '=', $userJobId)->execute()->first();
+      $newStatus = 'completed';
+      $dataSource = $userJob['metadata']['submitted_values']['dataSource'] ?? NULL;
+      if ($dataSource) {
+        /* @var \CRM_Import_DataSource $dataSource */
+        $dataSource = new $dataSource();
+        $dataSource->setUserJobID($userJobId);
+        if ($dataSource->getRowCount(['new'])) {
+          $newStatus = 'incomplete';
+        }
+        elseif ($dataSource->getRowCount(['unimported'])) {
+          $newStatus = 'complete_with_errors';
+        }
+      }
       UserJob::update(FALSE)
         ->addWhere('id', '=', $userJobId)
-        ->setValues(['status_id' => 1, 'end_date' => 'now'])
+        ->setValues(['status_id:name' => $newStatus, 'end_date' => 'now'])
         ->execute();
     }
   }
@@ -97,12 +111,6 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
       unset($params['metadata']['MapField']['saveMapping'], $params['metadata']['MapField']['updateMapping']);
     }
 
-    // If the related mapping is deleted then delete the UserJob template
-    // This almost never happens in practice...
-    if ($event->entity === 'Mapping' && $event->action === 'delete') {
-      $mappingName = Mapping::get(FALSE)->addWhere('id', '=', $event->id)->addSelect('name')->execute()->first()['name'];
-      UserJob::delete(FALSE)->addWhere('name', '=', 'import_' . $mappingName)->execute();
-    }
     if ($event->entity === 'UserJob' && $event->action === 'delete') {
       Queue::delete(FALSE)->addWhere('name', '=', 'user_job_' . $event->id)->execute();
     }
@@ -194,6 +202,18 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
         'id' => 4,
         'name' => 'in_progress',
         'label' => ts('In Progress'),
+      ],
+      [
+        'id' => 5,
+        'name' => 'incomplete',
+        'label' => ts('Incomplete'),
+        'description' => ts('Processing finished but still incomplete'),
+      ],
+
+      [
+        'id' => 6,
+        'name' => 'complete_with_errors',
+        'label' => ts('Complete with Errors'),
       ],
     ];
   }

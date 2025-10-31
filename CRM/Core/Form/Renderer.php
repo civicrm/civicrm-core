@@ -184,22 +184,22 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       $type = 'multiselect';
     }
     // Add widget-specific class
-    if (!$class || strpos($class, 'crm-form-') === FALSE) {
+    if (!$class || !str_contains($class, 'crm-form-')) {
       $class = ($class ? "$class " : '') . 'crm-form-' . $type;
     }
-    elseif (strpos($class, 'crm-form-entityref') !== FALSE) {
+    elseif (str_contains($class, 'crm-form-entityref')) {
       self::preProcessEntityRef($element);
     }
     elseif (str_contains($class, 'crm-form-autocomplete')) {
       self::preProcessAutocomplete($element);
     }
-    elseif (strpos($class, 'crm-form-contact-reference') !== FALSE) {
+    elseif (str_contains($class, 'crm-form-contact-reference')) {
       self::preprocessContactReference($element);
     }
     // Hack to support html5 fields (number, url, etc)
     else {
       foreach (CRM_Core_Form::$html5Types as $type) {
-        if (strpos($class, "crm-form-$type") !== FALSE) {
+        if (str_contains($class, "crm-form-$type")) {
           $element->setAttribute('type', $type);
           // Also add the "base" class for consistent styling
           $class .= ' crm-form-text';
@@ -441,7 +441,7 @@ HEREDOC;
     // Initially hide if not needed
     // Note: visibility:hidden prevents layout jumping around unlike display:none
     $display = $field->getValue() !== NULL ? '' : ' style="visibility:hidden;"';
-    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear', ['escape' => 'htmlattribute']) . '"><i class="crm-i fa-times" aria-hidden="true"></i></a>';
+    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear', ['escape' => 'htmlattribute']) . '"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>';
   }
 
 }

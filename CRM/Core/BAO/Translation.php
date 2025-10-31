@@ -246,6 +246,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
 
     $translations = Translation::get()
       ->addWhere('entity_table', '=', CRM_Core_DAO_AllCoreTables::getTableForEntityName($apiRequest['entity']))
+      ->addWhere('status_id:name', '=', 'active')
       ->setCheckPermissions(FALSE)
       ->setSelect(['entity_field', 'entity_id', 'string', 'language']);
     if ((substr($userLocale->nominal ?? '', '-3', '3') !== '_NO')) {

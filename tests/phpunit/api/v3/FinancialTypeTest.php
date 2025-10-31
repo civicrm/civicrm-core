@@ -39,11 +39,11 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       'is_multiple' => FALSE,
     ]);
     $financialTypeData = [
-      'Financial Type' . substr(sha1(rand()), 0, 4) => [
+      'Financial Type' . bin2hex(random_bytes(2)) => [
         ['Test-1', 'Test-2', NULL],
         [NULL, '', 'Test_3'],
       ],
-      'Financial Type' . substr(sha1(rand()), 0, 4) => [
+      'Financial Type' . bin2hex(random_bytes(2)) => [
         [NULL, NULL, NULL],
         ['Test_1', NULL, 'Test_3'],
       ],

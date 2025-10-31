@@ -27,7 +27,7 @@
 {/foreach}
 
 {* Hack to prevent WP toolbars from popping up above the dialog *}
-{literal}<style type="text/css">
+{literal}<style>
   #wpadminbar,
   .wp-editor-expand #wp-content-editor-tools,
   .wp-editor-expand div.mce-toolbar-grp {

@@ -108,7 +108,9 @@ class CRM_Utils_String {
    * @return string
    */
   public static function convertStringToSnakeCase(string $str): string {
-    return strtolower(ltrim(preg_replace('/(?=[A-Z])/', '_$0', $str), '_'));
+    // Use regular expression to replace uppercase with underscore + lowercase, avoiding duplicates
+    $str = preg_replace('/(?<!^|_)(?=[A-Z])/', '_', $str);
+    return strtolower($str);
   }
 
   /**
@@ -266,6 +268,32 @@ class CRM_Utils_String {
   public static function base64UrlDecode($v) {
     // PHP base64_decode() is already forgiving about padding ("=").
     return base64_decode(str_replace(['-', '_'], ['+', '/'], $v));
+  }
+
+  /**
+   * @var string[]
+   *   Array(string $base64 => string $base64mbz)
+   */
+  private static $mbzTable = ['Z' => 'Z0', '+' => 'Z1', '/' => 'Z2'];
+
+  /**
+   * Encode string using Base64 with multibyte "Z"-escaping (MBZ).
+   *
+   * Base64-MBZ strings are -strictly- alphanumeric, but they may be slightly longer
+   * than standard Base64. For inputs with random-like data (such as crypto keys, signatures,
+   * ciphertext, and compressed-files), it should be 4-5% longer.
+   *
+   * @param string $raw
+   *
+   * @return string
+   *   Base64, but with some characters ('Z', '+', '/') replaced by multibyte expressions ("Z0", "Z1", "Z2").
+   */
+  public static function base64mbzEncode($raw) {
+    return strtr(rtrim(base64_encode($raw), '='), self::$mbzTable);
+  }
+
+  public static function base64mbzDecode($str) {
+    return base64_decode(strtr($str, array_flip(self::$mbzTable)));
   }
 
   /**
@@ -465,7 +493,7 @@ class CRM_Utils_String {
     $name = str_replace('\'', '', $name);
 
     // check for comma in name
-    if (strpos($name, ',') !== FALSE) {
+    if (str_contains($name, ',')) {
 
       // name has a comma - assume lname, fname [mname]
       $names = explode(',', $name);
@@ -645,9 +673,17 @@ class CRM_Utils_String {
       $config->set('HTML.MaxImgLength', NULL);
       $config->set('CSS.MaxImgLength', NULL);
       $def = $config->maybeGetRawHTMLDefinition();
+      $uri = $config->getDefinition('URI');
+      $uri->addFilter(new CRM_Utils_HTMLPurifier_URIFilter(), $config);
+
       if (!empty($def)) {
         $def->addElement('figcaption', 'Block', 'Flow', 'Common');
         $def->addElement('figure', 'Block', 'Optional: (figcaption, Flow) | (Flow, figcaption) | Flow', 'Common');
+        // Allow `<summary>` and `<details>`
+        $def->addElement('details', 'Block', 'Flow', 'Common', [
+          'open' => new \HTMLPurifier_AttrDef_HTML_Bool('open'),
+        ]);
+        $def->addElement('summary', 'Inline', 'Inline', 'Common');
       }
       $_filter = new HTMLPurifier($config);
     }
@@ -660,14 +696,16 @@ class CRM_Utils_String {
    *
    * @param string $string
    * @param int $maxLen
-   *
+   * @param string $ellipsis
+   *  The literal form of the ellipsis.
    * @return string
    */
-  public static function ellipsify($string, $maxLen) {
+  public static function ellipsify($string, $maxLen, $ellipsis = '...') {
     if (mb_strlen($string, 'UTF-8') <= $maxLen) {
       return $string;
     }
-    return mb_substr($string, 0, $maxLen - 3, 'UTF-8') . '...';
+    $ellipsisLen = mb_strlen($ellipsis, 'UTF-8');
+    return mb_substr($string, 0, $maxLen - $ellipsisLen, 'UTF-8') . $ellipsis;
   }
 
   /**
@@ -995,7 +1033,7 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function stringContainsTokens(string $string) {
-    return strpos($string, '{') !== FALSE;
+    return str_contains($string, '{');
   }
 
   /**

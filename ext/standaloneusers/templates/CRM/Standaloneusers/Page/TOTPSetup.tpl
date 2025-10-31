@@ -1,7 +1,7 @@
 <div class="standalone-auth-form">
   <div class="standalone-auth-box">
     <form id=totp-form>
-      <img class="crm-logo" src="{$logoUrl}" alt="logo for CiviCRM, with an intersecting blue and green triangle">
+      {include file='CRM/common/logo.tpl'}
       {$statusMessages}
 
       <h1>{ts}Set up Multi-Factor Authentication{/ts}</h1>

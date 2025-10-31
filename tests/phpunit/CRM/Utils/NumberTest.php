@@ -14,7 +14,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function randomDecimalCases() {
+  public static function randomDecimalCases() {
     $cases = [];
     // array(array $precision, int $expectedMinInclusive, int $expectedMaxExclusive)
     $cases[] = [[1, 0], 0, 10];
@@ -35,7 +35,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
       $decimal = CRM_Utils_Number::createRandomDecimal($precision);
       // print "Assert $decimal between $expectedMinInclusive and $expectedMaxExclusive\n";
       $this->assertTrue(($expectedMinInclusive <= $decimal) && ($decimal < $expectedMaxExclusive), "Assert $decimal between $expectedMinInclusive and $expectedMaxExclusive");
-      if (strpos($decimal, '.') === FALSE) {
+      if (!str_contains($decimal, '.')) {
         $decimal .= '.';
       }
       list ($before, $after) = explode('.', $decimal);
@@ -47,7 +47,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function truncDecimalCases() {
+  public static function truncDecimalCases() {
     $cases = [];
     // array($value, $precision, $expectedValue)
     $cases[] = [523, [1, 0], 5];
@@ -72,7 +72,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
     );
   }
 
-  public function sizeCases() {
+  public static function sizeCases() {
     $cases = [];
     $cases[] = ['20M', '20971520'];
     $cases[] = ['40G', '42949672960'];

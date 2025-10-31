@@ -44,6 +44,36 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
     );
     $this->addTask('Set a default activity priority', 'addActivityPriorityDefault');
     $this->addSimpleExtensionTask('Enable dedupe backward compatibility', ['legacydedupefinder']);
+    $this->addTask('Increase field length of civicrm_action_schedule.entity_status', 'alterSchemaField', 'ActionSchedule', 'entity_status', [
+      'title' => ts('Entity Status'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Select',
+      'description' => ts('Entity status'),
+      'add' => '3.4',
+      'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
+      'input_attrs' => [
+        'label' => ts('Entity Status'),
+        'multiple' => '1',
+        'control_field' => 'entity_value',
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getEntityStatusOptions'],
+      ],
+    ]);
+    $this->addTask('Increase field length of civicrm_action_schedule.start_action_date', 'alterSchemaField', 'ActionSchedule', 'start_action_date', [
+      'title' => ts('Start Action Date'),
+      'sql_type' => 'varchar(2048)',
+      'input_type' => 'Select',
+      'description' => ts('Entity date'),
+      'add' => '3.4',
+      'input_attrs' => [
+        'label' => ts('Start Date'),
+        'control_field' => 'entity_value',
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getActionDateOptions'],
+      ],
+    ]);
   }
 
   public static function migrateFromEmailAddressValues($rev): bool {

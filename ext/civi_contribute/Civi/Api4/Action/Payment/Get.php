@@ -28,6 +28,7 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
    * Contribution ID for filtering
    *
    * @var int
+   * @deprecated - use where clause
    */
   protected $contributionID = NULL;
 
@@ -69,11 +70,25 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
    * @var \Civi\Api4\Generic\Result $result
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
+    $wheres = $this->getWhere();
+    foreach ($wheres as $whereID => $whereValues) {
+      if ($whereValues[0] === 'contribution_id') {
+        $contributionWhereOp = $whereValues[1];
+        $contributionWhereValue = $whereValues[2];
+        unset($wheres[$whereID]);
+        $this->setWhere($wheres);
+        break;
+      }
+    }
     if (!empty($this->contributionID)) {
+      $contributionWhereOp = '=';
+      $contributionWhereValue = $this->contributionID;
+    }
+    if (!empty($contributionWhereOp) && !empty($contributionWhereValue)) {
       $financialTrxns = FinancialTrxn::get(FALSE)
         ->addJoin('EntityFinancialTrxn AS entity_financial_trxn', 'INNER', 'id = entity_financial_trxn.financial_trxn_id')
         ->addWhere('is_payment', '=', TRUE)
-        ->addWhere('entity_financial_trxn.entity_id', '=', $this->contributionID)
+        ->addWhere('entity_financial_trxn.entity_id', $contributionWhereOp, $contributionWhereValue)
         ->addWhere('entity_financial_trxn.entity_table', '=', 'civicrm_contribution')
         ->execute()
         ->column('id');

@@ -292,6 +292,7 @@ AND    reset_date IS NULL
       ->addSelect('display_name', 'email')
       ->addWhere('domain_id', '=', 'current_domain')
       ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('is_default', 'DESC')
       ->addOrderBy('display_name')
       ->execute();
     foreach ($domainFrom as $address) {

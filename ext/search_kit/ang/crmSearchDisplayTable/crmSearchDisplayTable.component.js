@@ -15,12 +15,14 @@
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait, searchDisplayEditableTrait, crmApi4, crmStatus) {
-      let ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in copies of traits to this controller
         ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
 
       this.$onInit = function() {
-        var tallyParams;
+        let tallyParams;
+
+        ctrl.onPreRun.push(this.trackFetchedColumns);
 
         // Copy API params from the run and adapt them in a secondary `tally` call for the "Totals" row
         if (ctrl.settings.tally) {
@@ -42,10 +44,10 @@
 
         this.initializeDisplay($scope, $element);
 
+
         if (ctrl.settings.draggable) {
           ctrl.draggableOptions = {
-            containment: $element,
-            direction: 'vertical',
+            containment: $element.children('div').first(),
             handle: '.crm-draggable',
             forcePlaceholderSize: true,
             helper: function(e, ui) {
@@ -126,6 +128,55 @@
           }
         }
         return cssClass;
+      };
+
+      this.getColumnToggleLabel = (col) => {
+        if (col.label) {
+          return col.label;
+        }
+        if (col.key) {
+          return `[${col.key}]`;
+        }
+        if (col.type === 'menu') {
+          return ts('Menu');
+        }
+        if (col.type === 'buttons') {
+          return ts('Buttons');
+        }
+        if (col.type === 'links') {
+          return ts('Links');
+        }
+        return ts('Column %1', {1: col.index});
+      };
+
+      /**
+       * Update the settings for which columns to include.
+       *
+       * If including columns that we haven't fetched, trigger a refetch
+       */
+      this.toggleColumns = () => {
+        if (this.columns.find((col) => col.enabled && !col.fetched)) {
+          this.getResultsPronto();
+        }
+      };
+
+      this.resetColumnToggles = () => {
+        this.columns.forEach((col, index) => {
+          this.columns[index].enabled = true;
+        });
+        this.toggleColumns();
+      };
+
+      /**
+       * Keep track of which columns we have fetched each
+       * time we fetch results. This allows us to only
+       * refetch if we need columns we don't have (we can
+       * hide columns without refetching)
+       */
+      this.trackFetchedColumns = () => {
+        this.columns.forEach((col) => {
+          col.fetched = col.enabled;
+        });
       };
 
     }

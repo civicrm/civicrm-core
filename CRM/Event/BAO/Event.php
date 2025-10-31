@@ -66,10 +66,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
     $result = $event->save();
 
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Event', $event->id, $event);
+      CRM_Utils_Hook::post('edit', 'Event', $event->id, $event, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'Event', $event->id, $event);
+      CRM_Utils_Hook::post('create', 'Event', $event->id, $event, $params);
     }
     if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);
@@ -957,7 +957,7 @@ WHERE civicrm_event.is_active = 1
     $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
       ['id' => $id],
       // since the location is sharable, lets use the same loc_block_id.
-      ['loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)] + $params,
+      ['loc_block_id' => $eventValues['loc_block_id'] ?? NULL] + $params,
       $fieldsFix,
       NULL,
       $blockCopyOfCustomValue
@@ -1010,7 +1010,7 @@ WHERE civicrm_event.is_active = 1
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_event', $copyEvent->id);
     }
 
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
     CRM_Utils_Hook::copy('Event', $copyEvent, $id);
 
     return $copyEvent;
@@ -1119,8 +1119,8 @@ WHERE civicrm_event.is_active = 1
           'email' => $notifyEmail,
           'confirm_email_text' => $values['event']['confirm_email_text'] ?? NULL,
           'isShowLocation' => $values['event']['is_show_location'] ?? NULL,
-          'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
-          'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
+          'credit_card_number' => CRM_Utils_System::mungeCreditCard($participantParams['credit_card_number'] ?? NULL),
+          'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($participantParams['credit_card_exp_date'] ?? NULL)),
           'selfcancelxfer_time' => abs($values['event']['selfcancelxfer_time']),
           'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? ts('after') : ts('before'),
           'currency' => $values['event']['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency,
@@ -1195,12 +1195,8 @@ WHERE civicrm_event.is_active = 1
           $sendTemplateParams['toName'] = $displayName;
           $sendTemplateParams['toEmail'] = $notifyEmail;
           $sendTemplateParams['autoSubmitted'] = TRUE;
-          $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_confirm',
-            $values['event']
-          );
-          $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_confirm',
-            $values['event']
-          );
+          $sendTemplateParams['cc'] = $values['event']['cc_confirm'] ?? NULL;
+          $sendTemplateParams['bcc'] = $values['event']['bcc_confirm'] ?? NULL;
 
           if (Civi::settings()->get('invoice_is_email_pdf') && !empty($values['contributionId'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;
@@ -1411,7 +1407,7 @@ WHERE civicrm_event.is_active = 1
           $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($params[$name]);
           $values[$index] = $campaigns[$params[$name]] ?? NULL;
         }
-        elseif (strpos($name, '-') !== FALSE) {
+        elseif (str_contains($name, '-')) {
           [$fieldName, $id] = CRM_Utils_System::explode('-', $name, 2);
           $detailName = str_replace(' ', '_', $name);
           if (in_array($fieldName, [
@@ -1621,7 +1617,7 @@ WHERE  id = $cfID
           //get the params submitted by participant.
           $participantParams = NULL;
           if (isset($values['params'])) {
-            $participantParams = CRM_Utils_Array::value($pId, $values['params'], []);
+            $participantParams = $values['params'][$pId] ?? [];
           }
 
           [$profilePre, $groupTitles] = self::buildCustomDisplay($preProfileID,
@@ -1711,9 +1707,7 @@ WHERE  id = $cfID
           $address .= ($address ? ' :: ' : '') . $event[$field];
         }
       }
-      if ($address) {
-        $events[$event['loc_block_id']] = $address;
-      }
+      $events[$event['loc_block_id']] = $address ?: ts("(Location %1)", [1 => $event['loc_block_id']]);
     }
 
     return CRM_Utils_Array::asort($events);
@@ -2270,7 +2264,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @throws \CRM_Core_Exception
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function getProfileDisplay(array $profileIds, int $cid, int $participantId, ?string $note = NULL, ?array $groups = NULL, bool $isTest = FALSE): ?array {
+  public static function getProfileDisplay(array $profileIds, ?int $cid, int $participantId, ?string $note = NULL, ?array $groups = NULL, bool $isTest = FALSE): ?array {
     foreach ($profileIds as $gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = [];
@@ -2301,9 +2295,7 @@ WHERE  ce.loc_block_id = $locBlockId";
               'campaign_id'
             );
             $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
-            $values[$fields['participant_campaign_id']['title']] = CRM_Utils_Array::value($campaignId,
-              $campaigns
-            );
+            $values[$fields['participant_campaign_id']['title']] = $campaigns[$campaignId] ?? NULL;
           }
           unset($fields['participant_campaign_id']);
         }
@@ -2344,7 +2336,7 @@ WHERE  ce.loc_block_id = $locBlockId";
           }
         }
 
-        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
+        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params, FALSE, NULL, 'email');
 
         //dev/event#10
         //If the event profile includes a note field and the submitted value of

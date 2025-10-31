@@ -80,21 +80,18 @@ return [
             [
               'type' => 'field',
               'key' => 'acl_role_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('ACL Role'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'ACLEntityRole_Group_entity_id_01.title',
-              'dataType' => 'String',
               'label' => E::ts('Assigned to'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,

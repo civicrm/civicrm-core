@@ -7,17 +7,13 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-template-title-title"}
-  {ts}Title{/ts}
-{/htxt}
-{htxt id="id-template-title"}
+
+{htxt id='template_title'}
 {ts}This is the title that users will see when they are selecting an event template to clone for a new event. It is <em>not</em> the title of the event itself.{/ts}
 {/htxt}
 
-{htxt id="id-select-template-title"}
-  {ts}Template{/ts}
-{/htxt}
-{htxt id="id-select-template"}
+
+{htxt id='template_id'}
 {if $params.isTemplate}
     {ts}You can select an existing Event Template as the basis for the new template you are creating, or you can create the template from scratch.{/ts}
 {else}
@@ -25,18 +21,14 @@
 {/if}
 {/htxt}
 
-{htxt id="id-participant-role-title"}
-  {ts}Participant Role{/ts}
-{/htxt}
-{htxt id="id-participant-role"}
+
+{htxt id='default_role_id'}
     <p>{ts}The Role you select here is automatically assigned to people when they register online for this event (usually the default 'Attendee' role).{/ts}</p>
     <p>{ts}You can also allow people to choose a Role by creating a Profile with the Participant Role field. Then include that Profile when you configure the Online Registration page for this event.{/ts}</p>
 {/htxt}
 
-{htxt id="id-listing-title"}
-  {ts}Participant Listing{/ts}
-{/htxt}
-{htxt id="id-listing"}
+
+{htxt id='participant_listing_id'}
     {ts}To allow users to see a listing of participants, set this field to 'Name' (list names only), 'Name and Email', or 'Name, Status and Register Date'.{/ts}
     {if !$params.isTemplate}
       {ts}You will need to set Access Control permissions to include 'view event participants' for any Roles you want to access this listing.{/ts}
@@ -53,10 +45,8 @@
     {/if}
 {/htxt}
 
-{htxt id="id-max_participants-title"}
-  {ts}Maximum Participants{/ts}
-{/htxt}
-{htxt id="id-max_participants"}
+
+{htxt id='max_participants'}
 <p>{ts}Optionally set a maximum number of participants for this event.{/ts}</p>
 <p>{if $params.waitlist}
   {ts}You may allow users to join a waitlist when the event is full (by checking the box below).{/ts}
@@ -66,61 +56,45 @@
 <p>{ts}Otherwise, the registration link is hidden and the &quot;Event Full Message&quot' is displayed when the maximum number of registrations is reached. Only participants with status types marked as 'counted' are included when checking if the event is full.{/ts}</p>
 {/htxt}
 
-{htxt id="id-event_full_text-title"}
-  {ts}Event-Full Message{/ts}
-{/htxt}
-{htxt id="id-event_full_text"}
+
+{htxt id='event_full_text'}
 {ts}Text displayed on the Event Information page when the maximum number of registrations is reached (unless you are offering a waitlist). If online registration is enabled, this message will also be displayed if users attempt to register.{/ts}
 {/htxt}
 
-{htxt id="id-has_waitlist-title"}
-  {ts}Waitlist{/ts}
-{/htxt}
-{htxt id="id-has_waitlist"}
+
+{htxt id='has_waitlist'}
 {ts}Check this box to allow users to join a waitlist if the event is full. If a space becomes available, the first participant from the waitlist will move to 'Pending from waitlist' status, and will be sent an email with a link to complete their registration (including paying event fees - if any).{/ts}
 {/htxt}
 
-{htxt id="id-help-waitlist_text-title"}
-  {ts}Waitlist Text{/ts}
-{/htxt}
-{htxt id="id-help-waitlist_text"}
+
+{htxt id='waitlist_text'}
 {ts}This message is displayed on the event information and event registration pages when the event is full AND the waitlist feature is enabled.{/ts} 
 {/htxt}
 
-{htxt id="id-is_map-title"}
-  {ts}Map{/ts}
-{/htxt}
-{htxt id="id-is_map"}
+
+{htxt id='is_map'}
 {capture assign=mapURL}{crmURL p='civicrm/admin/setting/mapping' q="reset=1"}{/capture} 
 {ts 1=$mapURL}Include map presenting event location on event information page? (A map provider must be configured under <a href='%1'>Administer > System Settings > Mapping and Geocoding</a>){/ts}
 {/htxt}
 
-{htxt id="id-is_show_calendar_links-title"}
-  {ts}Calendar Links{/ts}
-{/htxt}
-{htxt id="id-is_show_calendar_links"}
+
+{htxt id='is_show_calendar_links'}
 {ts}Displays links to download an iCal file with the event information, as well as a link to add to Google Calendar. The links will be displayed on the event information page, as well as on the thank-you page and in the email receipt.{/ts}
 {/htxt}
 
-{htxt id="id-is_active-title"}
-  {ts}Event is active{/ts}
-{/htxt}
-{htxt id="id-is_active"}
+
+{htxt id='is_active'}
 <p>{ts}Enables the Event Information page, which also allows access to Event Registration (if registrations are open).{/ts}</p>
 {/htxt}
 
-{htxt id="id-is_public-title"}
-  {ts}Public Events{/ts}
-{/htxt}
-{htxt id="id-is_public"}
+
+{htxt id='is_public'}
 {capture assign=eventsURL}target="_blank" href="{crmURL p="civicrm/event/list" q="reset=1" fe=1 h=1}"{/capture}
 <p>{ts 1=$eventsURL}When enabled, this event will be included in iCalendar feeds and displayed on your site's <a %1>Upcoming Events</a> block.{/ts}</p>
 {/htxt}
 
-{htxt id="id-is_share-title"}
-  {ts}Social Sharing{/ts}
-{/htxt}
-{htxt id="id-is_share"}
+
+{htxt id='is_share'}
 <p>{ts}When enabled, links helping people share this event with their social network will be displayed (e.g. Facebook, Twitter, LinkedIn and email).{/ts}</p>
 <p>{ts}Social media links will be included on the Event Info page, Thank-you page, Tell-a-Friend page (if enabled), and in event confirmation emails.{/ts}</p>
 {/htxt}

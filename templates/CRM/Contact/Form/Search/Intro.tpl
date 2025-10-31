@@ -14,18 +14,22 @@
 
   {* Provide link to modify smart group search criteria if we are viewing a smart group (ssID = saved search ID) *}
   {if $permissionEditSmartGroup && !empty($editSmartGroupURL)}
-      <a href="{$editSmartGroupURL}" class="button no-popup"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts 1=$group.title}Edit Smart Group Search Criteria for %1{/ts}</span></a>
-      {help id="id-edit-smartGroup"}
+      <a href="{$editSmartGroupURL}" class="button no-popup"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts 1=$group.title}Edit Smart Group Search Criteria for %1{/ts}</span></a>
+      {capture assign='helpTitle'}{ts}Edit Smart Group{/ts}{/capture}
+      {help id="edit-smartGroup" title=$helpTitle}
   {/if}
 
   {if $permissionedForGroup}
     {capture assign=addMembersURL}{crmURL q="context=amtg&amtgID=`$group.id`&reset=1"}{/capture}
-      <a href="{$addMembersURL}" class="button no-popup"><span><i class="crm-i fa-user-plus" aria-hidden="true"></i> {ts 1=$group.title}Add Contacts to %1{/ts}</span></a>
-      {if $ssID}{help id="id-add-to-smartGroup"}{/if}
+      <a href="{$addMembersURL}" class="button no-popup"><span><i class="crm-i fa-user-plus" role="img" aria-hidden="true"></i> {ts 1=$group.title}Add Contacts to %1{/ts}</span></a>
+      {if $ssID}
+        {capture assign='helpTitle'}{ts}Add to Smart Group{/ts}{/capture}
+        {help id="add-to-smartGroup" title=$helpTitle}
+      {/if}
   {/if}
   {if $permissionEditSmartGroup}
     {capture assign=groupSettingsURL}{crmURL p='civicrm/group/edit' q="action=update&id=`$group.id`&reset=1"}{/capture}
-        <a href="{$groupSettingsURL}" class="action-item button"><span><i class="crm-i fa-wrench" aria-hidden="true"></i> {ts}Edit Group Settings{/ts}</span></a>
+        <a href="{$groupSettingsURL}" class="action-item button"><span><i class="crm-i fa-wrench" role="img" aria-hidden="true"></i> {ts}Edit Group Settings{/ts}</span></a>
   {/if}
   </div>
 {/if}

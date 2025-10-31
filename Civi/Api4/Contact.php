@@ -93,10 +93,31 @@ class Contact extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
+   *
    * @return Action\Contact\MergeDuplicates
    */
-  public static function mergeDuplicates($checkPermissions = TRUE) {
+  public static function mergeDuplicates(bool $checkPermissions = TRUE): Action\Contact\MergeDuplicates {
     return (new Action\Contact\MergeDuplicates(self::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   *
+   * @return Action\Contact\GetMergedTo
+   */
+  public static function getMergedTo(bool $checkPermissions = TRUE): Action\Contact\GetMergedTo {
+    return (new Action\Contact\GetMergedTo(self::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   *
+   * @return Action\Contact\GetMergedFrom
+   */
+  public static function getMergedFrom(bool $checkPermissions = TRUE): Action\Contact\GetMergedFrom {
+    return (new Action\Contact\GetMergedFrom(self::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

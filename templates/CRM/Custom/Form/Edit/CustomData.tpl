@@ -34,7 +34,7 @@
   {else}
     <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id} add-more-link-{$group_id}-{$cgCount}">
       <a href="#" class="crm-hover-button" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">
-        <i class="crm-i fa-plus-circle" aria-hidden="true"></i>
+        <i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i>
         {ts 1=$cd_edit.title}Another %1 record{/ts}
       </a>
     </div>

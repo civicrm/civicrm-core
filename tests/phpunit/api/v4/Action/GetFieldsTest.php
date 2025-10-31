@@ -92,6 +92,10 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($fields['birth_date']['input_attrs']['date']);
     $this->assertFalse($fields['birth_date']['input_attrs']['time']);
     $this->assertArrayNotHasKey('format_type', $fields['birth_date']['input_attrs']);
+
+    // Check extra fields
+    $this->assertEquals('Integer', $fields['address_primary']['data_type']);
+    $this->assertEquals('Email', $fields['email_primary']['fk_entity']);
   }
 
   public function testComponentFields(): void {
@@ -350,7 +354,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['First', 'Second', 'Third', 'Fourth'], array_column($sampleFields, 'title'));
   }
 
-  public function entityFieldsWithDependencies(): array {
+  public static function entityFieldsWithDependencies(): array {
     return [
       ['Contact', ['contact_type', 'contact_sub_type']],
       ['Case', ['case_type_id', 'status_id']],

@@ -83,7 +83,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals(['org.civicrm.a', 'org.civicrm.b'], $info->requires);
   }
 
-  public function getExampleAuthors() {
+  public static function getExampleAuthors() {
     $authorAliceXml = '<author><name>Alice</name><email>alice@example.org</email><role>Maintainer</role></author>';
     $authorAliceArr = ['name' => 'Alice', 'email' => 'alice@example.org', 'role' => 'Maintainer'];
     $authorBobXml = ' <author><name>Bob</name><homepage>https://example.com/bob</homepage><role>Developer</role></author>';

@@ -54,6 +54,11 @@ class CRM_Contact_Form_Inline_ContactInfo extends CRM_Contact_Form_Inline {
       $params['contact_sub_type'] = $this->_contactSubType;
     }
 
+    if ((($this->_contactType == 'Organization') || ($this->_contactType == 'Household')) && empty($params['is_deceased'])) {
+      $params['is_deceased'] = FALSE;
+      $params['deceased_date'] = '';
+    }
+
     CRM_Contact_BAO_Contact::create($params);
 
     // Saving current employer affects relationship tab, and possibly related memberships and contributions

@@ -56,28 +56,24 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('System Queue ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'type:label',
-              'dataType' => 'String',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status:label',
-              'dataType' => 'String',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
               'rewrite' => '',

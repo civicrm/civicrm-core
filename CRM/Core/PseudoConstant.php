@@ -143,7 +143,7 @@ class CRM_Core_PseudoConstant {
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName);
 
     // Custom fields are not in the schema
-    if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
+    if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7])) {
       $customField = new CRM_Core_BAO_CustomField();
       $customField->id = (int) substr($fieldName, 7);
       $options = $customField->getOptions($context);
@@ -320,13 +320,22 @@ class CRM_Core_PseudoConstant {
       if (!$daoName) {
         return NULL;
       }
-      // We don't have good mapping so have to do a bit of guesswork from the menu
-      [, $parent, , $child] = explode('_', $daoName);
-      $sql = "SELECT path FROM civicrm_menu
+
+      $dao = new $daoName();
+      $path = $dao::getEntityPaths()['browse'] ?? NULL;
+
+      if (!$path) {
+        // We don't have good mapping so have to do a bit of guesswork from the menu
+        // @todo Get rid of this! It's unreliable and doesn't work if the path is replaced by
+        // an afform one because the callback changes to CRM_Afform_Page_AfformBase
+        [, $parent, , $child] = explode('_', $daoName);
+        $sql = "SELECT path FROM civicrm_menu
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
         LIMIT 1";
-      return CRM_Core_DAO::singleValueQuery($sql);
+        $path = CRM_Core_DAO::singleValueQuery($sql);
+      }
+      return $path;
     }
     return NULL;
   }
@@ -872,10 +881,12 @@ WHERE  id = %1";
    *
    * @return array
    */
-  public static function relationshipTypeOptions() {
+  public static function relationshipTypeOptions($fieldName = NULL, $options = []) {
     $relationshipTypes = [];
-    $relationshipLabels = self::relationshipType();
-    foreach (self::relationshipType('name') as $id => $type) {
+    $onlyActive = empty($options['include_disabled']) ? 1 : NULL;
+    $relationshipLabels = self::relationshipType('label', FALSE, $onlyActive);
+    $relationshipNames = self::relationshipType('name', FALSE, $onlyActive);
+    foreach ($relationshipNames as $id => $type) {
       $relationshipTypes[$type['name_a_b']] = $relationshipLabels[$id]['label_a_b'];
       if ($type['name_b_a'] && $type['name_b_a'] != $type['name_a_b']) {
         $relationshipTypes[$type['name_b_a']] = $relationshipLabels[$id]['label_b_a'];

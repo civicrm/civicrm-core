@@ -97,7 +97,7 @@ return [
     ],
     'entity_status' => [
       'title' => ts('Entity Status'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(255)',
       'input_type' => 'Select',
       'description' => ts('Entity status'),
       'add' => '3.4',
@@ -152,7 +152,7 @@ return [
     ],
     'start_action_date' => [
       'title' => ts('Start Action Date'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(2048)',
       'input_type' => 'Select',
       'description' => ts('Entity date'),
       'add' => '3.4',

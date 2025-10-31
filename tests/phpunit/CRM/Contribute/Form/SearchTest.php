@@ -583,7 +583,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getSearchData(): array {
+  public static function getSearchData(): array {
     return [
       // Case 1: Search for ONLY those recurring contributions with status "In Progress"
       'in_progress_search' => [

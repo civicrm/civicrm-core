@@ -26,7 +26,7 @@ class LoaderTest extends \CiviUnitTestCase {
     \Civi::container()->get('angular')->clear();
   }
 
-  public function factoryScenarios() {
+  public static function factoryScenarios() {
     return [
       ['dummy1', 1, ['access CiviCRM', 'administer CiviCRM']],
       ['dummy2', 0, []],

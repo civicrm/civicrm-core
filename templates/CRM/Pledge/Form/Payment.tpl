@@ -23,10 +23,11 @@
       <td class="form-layout">
         {$form.currency.html}&nbsp;{$form.scheduled_amount.html}
         {if !$pledgePayment}
+          {capture assign='linkTitle'}{ts}Adjust payment amount{/ts}{/capture}
           <a href="#" class="crm-hover-button action-item adjust-pledge-payment">
-            {ts}Adjust scheduled amount{/ts}
+            {$linkTitle}
           </a>
-          {help id="adjust-payment-amount"}
+          {help id="adjust-payment-amount" title=$linkTitle}
         {/if}
       </td>
     </tr>

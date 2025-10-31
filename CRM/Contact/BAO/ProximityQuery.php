@@ -238,9 +238,7 @@ ACOS(
     $qill = [];
     foreach ($proximityVars as $var => $recordQill) {
       $proximityValues = $query->getWhereValues("prox_{$var}", $grouping);
-      if (!empty($proximityValues) &&
-        !empty($proximityValues[2])
-      ) {
+      if (!empty($proximityValues[2])) {
         $proximityAddress[$var] = $proximityValues[2];
         if ($recordQill) {
           $qill[] = $proximityValues[2];

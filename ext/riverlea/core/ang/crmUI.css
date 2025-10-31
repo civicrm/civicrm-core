@@ -1,0 +1,24 @@
+/* CSS rules for Angular module "crmUI" */
+
+/* In-place edit  */
+.crm-container [crm-ui-editable] {
+  padding-left: 2px;
+  border: 2px dashed transparent;
+}
+.crm-container [crm-ui-editable]:hover,
+.crm-container [crm-ui-editable]:focus {
+  border: 2px dashed #d1d1d1;
+  cursor: pointer;
+  background-color: white !important;
+  color: var(--crm-c-text-dark);
+}
+.crm-container span[crm-ui-editable] {
+  display: inline-block !important;
+  padding-right: 2px;
+  min-height: 1em;
+  min-width: 3em;
+}
+.crm-container [crm-ui-editable]:empty:before {
+  content: attr(placeholder);
+  color: #9a9a9a;
+}

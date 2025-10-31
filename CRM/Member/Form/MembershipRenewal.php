@@ -183,11 +183,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['receive_date'] = $now . ' ' . CRM_Utils_Time::date('H:i:s');
 
     if ($defaults['id']) {
-      $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
-        $defaults['id'],
-        'contribution_id',
-        'membership_id'
-      );
+      $defaults['record_contribution'] = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($defaults['id']);
     }
 
     $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
@@ -281,7 +277,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $totalAmount = $values['minimum_fee'] ?? 0;
         // @todo - feels a bug - we use taxRate from the form default rather than from the specified type?!?
         if ($this->getTaxRateForFinancialType($values['financial_type_id'])) {
-          $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
+          $taxAmount = ($taxRate / 100) * ($values['minimum_fee'] ?? 0);
           $totalAmount = $totalAmount + $taxAmount;
         }
 
@@ -655,11 +651,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   protected function sendReceipt() {
     $receiptFrom = $this->_params['from_email_address'];
-
-    if (!empty($this->_params['payment_instrument_id'])) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      $this->_params['paidBy'] = $paymentInstrument[$this->_params['payment_instrument_id']];
-    }
     //get the group Tree
     $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $this->_id, FALSE, $this->_memType);
 
@@ -764,8 +755,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
     }
 
-    // @todo stop passing $ids (membership and userId may be set by this point)
-    CRM_Member_BAO_Membership::create($memParams, $ids);
+    CRM_Member_BAO_Membership::create($memParams);
   }
 
 }

@@ -22,7 +22,7 @@ namespace api\v4\Action;
 use api\v4\Api4TestBase;
 use Civi\Api4\Membership;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
 /**

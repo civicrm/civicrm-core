@@ -23,7 +23,7 @@
       </tr>
       <tr class="crm-badge-layout-form-block-label_format_name">
         <td class="label">{$form.label_format_name.label}</td>
-        <td>{$form.label_format_name.html} {help id="id-label_format" file="CRM/Badge/Form/Layout.hlp"}</td>
+        <td>{$form.label_format_name.html} {help id="label_format_name" file="CRM/Badge/Form/Layout.hlp"}</td>
       </tr>
       <tr class="crm-badge-layout-form-block-description">
         <td class="label">{$form.description.label}</td>
@@ -35,7 +35,7 @@
          <table>
            <tr>
             <td>{$form.image_1.html}
-               <a href="#" class="crm-hover-button clear-image" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+               <a href="#" class="crm-hover-button clear-image" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
              <br/>
              <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
             </td>
@@ -55,7 +55,7 @@
          <table>
           <tr>
            <td>{$form.image_2.html}
-              <a href="#" class="crm-hover-button clear-image" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+              <a href="#" class="crm-hover-button clear-image" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
             <br/>
             <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
            </td>

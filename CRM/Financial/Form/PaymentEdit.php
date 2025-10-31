@@ -162,7 +162,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     // if Credit Card is chosen and pan_truncation is not NULL ensure that it's value is numeric else throw validation error
     if (CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $fields['payment_instrument_id']) === 'Credit Card' &&
       !empty($fields['pan_truncation']) &&
-      !CRM_Utils_Rule::numeric($fields['pan_truncation'])
+      !is_numeric($fields['pan_truncation'])
     ) {
       $errors['pan_truncation'] = ts('Please enter a valid Card Number');
     }
@@ -226,6 +226,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       $newFinancialTrxn['total_amount'] = $this->_values['total_amount'];
       $newFinancialTrxn['currency'] = $this->_values['currency'];
       $newFinancialTrxn['contribution_id'] = $this->getContributionID();
+      $newFinancialTrxn['is_send_contribution_notification'] = FALSE;
       $newFinancialTrxn += $this->getSubmittedCustomFields();
       civicrm_api3('Payment', 'create', $newFinancialTrxn);
     }

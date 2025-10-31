@@ -324,6 +324,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
     return $defaults;
   }
 
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      // Because value contains <angle brackets>
+      'from_email_address',
+    ];
+  }
+
   /**
    * Process the form after the input has been submitted and validated.
    *
@@ -646,8 +653,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
-      if (strpos($fields['html_message'], $token) !== FALSE) {
-        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
+      if (str_contains($fields['html_message'], $token)) {
+        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [1 => $token, 2 => $replacement]);
       }
     }
     return empty($tokenErrors) ? TRUE : ['html_message' => implode('<br>', $tokenErrors)];

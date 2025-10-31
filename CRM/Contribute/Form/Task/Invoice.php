@@ -131,6 +131,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     }
   }
 
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      // Because value contains <angle brackets>
+      'from_email_address',
+    ];
+  }
+
   /**
    * Build the form object.
    */

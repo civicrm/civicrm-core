@@ -12,7 +12,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts escape='htmlattribute'}Add or edit website{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="crm-i fa-pencil" aria-hidden="true"></span> {if empty($website)}{ts}Add website{/ts}{else}{ts}Add or edit website{/ts}{/if}
+        <span class="crm-i fa-pencil" role="img" aria-hidden="true"></span> {if empty($website)}{ts}Add website{/ts}{else}{ts}Add or edit website{/ts}{/if}
       </div>
     {/if}
     {if empty($website)}

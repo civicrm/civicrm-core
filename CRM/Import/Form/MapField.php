@@ -37,13 +37,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected $shouldSortMapperFields = TRUE;
 
   /**
-   * Column headers, if we have them
-   *
-   * @var array
-   */
-  protected $_columnHeaders;
-
-  /**
    * An array of booleans to keep track of whether a field has been used in
    * form building already.
    *
@@ -149,38 +142,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   }
 
   /**
-   * Add the saved mapping fields to the form.
-   *
-   * @param int|null $savedMappingID
-   *
-   * @deprecated - working to remove this in favour of `addSavedMappingFields`
-   * @throws \CRM_Core_Exception
-   */
-  protected function buildSavedMappingFields($savedMappingID) {
-    CRM_Core_Error::deprecatedFunctionWarning('addSavedMappingFields');
-    //to save the current mappings
-    if (!$savedMappingID) {
-      $saveDetailsName = ts('Save this field mapping');
-      $this->applyFilter('saveMappingName', 'trim');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    else {
-      // @todo we should stop doing this - the passed in value should be fine, confirmed OK in contact import.
-      $savedMapping = $this->get('savedMapping');
-      $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
-      $this->add('hidden', 'mappingId', $savedMapping);
-
-      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
-      $saveDetailsName = ts('Save as a new field mapping');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    $this->assign('savedMappingName', $mappingName ?? NULL);
-    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
-  }
-
-  /**
    * Validate that sufficient fields have been supplied to match to a contact.
    *
    * @param string $contactType
@@ -242,6 +203,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       $mappedFieldData = $this->userJob['metadata']['import_mappings'][$columnNumber];
       $mappedField = array_intersect_key($mappedFieldData, array_fill_keys(['name', 'column_number', 'entity_data'], TRUE));
       $mappedField['mapping_id'] = $mappingID;
+      if (!isset($mappedField['column_number'])) {
+        $mappedField['column_number'] = $columnNumber;
+      }
     }
     else {
       $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
@@ -274,20 +238,25 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     //Updating Mapping Records
     if ($this->getSubmittedValue('updateMapping')) {
       $savedMappingID = (int) $this->getSubmittedValue('mappingId');
-      foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField($savedMappingID, $i, TRUE);
+      if ($savedMappingID) {
+        foreach (array_keys($this->getColumnHeaders()) as $i) {
+          $this->saveMappingField($savedMappingID, $i, TRUE);
+        }
+        $this->setSavedMappingID($savedMappingID);
       }
-      $this->setSavedMappingID($savedMappingID);
+      // @todo - this Template key is obsolete - definitely in Civiimport - probably entirely.
       $this->updateUserJobMetadata('Template', ['mapping_id' => (int) $this->getSubmittedValue('mappingId')]);
     }
     //Saving Mapping Details and Records
     if ($this->getSubmittedValue('saveMapping')) {
+      // @todo - stop saving the mapping.
       $savedMappingID = Mapping::create(FALSE)->setValues([
         'name' => $this->getSubmittedValue('saveMappingName'),
         'description' => $this->getSubmittedValue('saveMappingDesc'),
         'mapping_type_id:name' => $this->getMappingTypeName(),
       ])->execute()->first()['id'];
       $this->setSavedMappingID($savedMappingID);
+      // @todo - this Template key is obsolete - definitely in Civiimport - probably entirely.
       $this->updateUserJobMetadata('Template', ['mapping_id' => $savedMappingID]);
       foreach (array_keys($this->getColumnHeaders()) as $i) {
         $this->saveMappingField($savedMappingID, $i, FALSE);
@@ -331,33 +300,20 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     }
     $sel1 = $this->_mapperFields;
 
-    $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $this->_name;
 
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
-      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
-      $jsSet = FALSE;
       if ($this->getSubmittedValue('savedMapping')) {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if (isset($fieldMappings[$i])) {
-          if ($fieldMapping['name'] !== ts('do_not_import')) {
-            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
+          if (!empty($fieldMapping['name']) && $fieldMapping['name'] !== ts('do_not_import')) {
             $defaults["mapper[$i]"] = [$fieldMapping['name']];
-            $jsSet = TRUE;
           }
           else {
             $defaults["mapper[$i]"] = [];
           }
-          if (!$jsSet) {
-            for ($k = 1; $k < 4; $k++) {
-              $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
-            }
-          }
         }
         else {
-          // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-          $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
-
           if ($hasHeaders) {
             $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
           }
@@ -365,7 +321,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         //end of load mapping
       }
       else {
-        $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
         if ($hasHeaders) {
           // Infer the default from the skipped headers if we have them
           $defaults["mapper[$i]"] = [
@@ -377,10 +332,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
           ];
         }
       }
-      $sel->setOptions([$sel1]);
+      $sel = &$this->addElement('select', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), $sel1);
+
     }
-    $js .= "</script>\n";
-    $this->assign('initHideBoxes', $js);
     $this->setDefaults($defaults);
     return [$sel, $headerPatterns];
   }
@@ -389,11 +343,14 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * Add the saved mapping fields to the form.
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 6.6 will be removed around 6.12
    */
   protected function addSavedMappingFields(): void {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - take a copy');
     $savedMappingID = $this->getSavedMappingID();
     //to save the current mappings
-    if (!$savedMappingID) {
+    if (!$savedMappingID && !$this->getTemplateJob()) {
       $saveDetailsName = ts('Save this field mapping');
       $this->applyFilter('saveMappingName', 'trim');
       $this->add('text', 'saveMappingName', ts('Name'));
@@ -409,7 +366,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     }
     $this->assign('savedMappingName', $this->getMappingName());
     $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
-    $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
+    $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'mappingRule']);
   }
 
   /**
@@ -420,8 +377,11 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    *
    * @return array|true
    *   list of errors to be posted back to the form
+   *
+   * @deprecated since 6.6 will be removed around 6.12
    */
   public static function mappingRule($fields) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - take a copy');
     $errors = [];
     if (!empty($fields['saveMapping'])) {
       $nameField = $fields['saveMappingName'] ?? NULL;
@@ -430,7 +390,10 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       }
       else {
         $mappingTypeId = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Contact');
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, $mappingTypeId)) {
+        $mapping = new CRM_Core_DAO_Mapping();
+        $mapping->name = $nameField;
+        $mapping->mapping_type_id = $mappingTypeId;
+        if ($mapping->find(TRUE)) {
           $errors['saveMappingName'] = ts('Duplicate Import Mapping Name');
         }
       }
@@ -442,54 +405,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       $assignError->assign('mappingDetailsError', $_flag);
     }
     return empty($errors) ? TRUE : $errors;
-  }
-
-  /**
-   * This transforms the lists of fields for each contact type & component
-   * into a single unified list suitable for select2.
-   *
-   * @return array
-   */
-  public function getFieldOptions(): array {
-    $fields = $this->getFields();
-    $entity = $this->getBaseEntity();
-    $categories = $this->getImportEntities();
-    $highlightedFields = $this->getHighlightedFields();
-    foreach ($fields as $fieldName => $field) {
-      if ($fieldName === '') {
-        // @todo stop setting 'do not import' in the first place.
-        continue;
-      }
-      if ($field['name'] === 'id' && $entity === $field['entity'] && !$this->isUpdateExisting()) {
-        continue;
-      }
-      $childField = [
-        'text' => $field['label'] ?? ($field['html']['label'] ?? $field['title']),
-        'id' => $fieldName,
-        'has_location' => !empty($field['hasLocationType']),
-        'default_value' => $field['default_value'] ?? '',
-        'contact_type' => $field['contact_type'] ?? NULL,
-        'match_rule' => $field['match_rule'] ?? NULL,
-      ];
-      if (in_array($fieldName, $highlightedFields, TRUE)) {
-        $childField['text'] .= '*';
-      }
-      $category = ($childField['has_location'] || $field['name'] === 'contact_id') ? 'Contact' : $field['entity_instance'] ?? ($field['entity'] ?? $entity);
-      if (empty($categories[$category])) {
-        $category = $entity;
-      }
-      $categories[$category]['children'][$fieldName] = $childField;
-    }
-
-    foreach ($categories as $index => $category) {
-      if (empty($category['children'])) {
-        unset($categories[$index]);
-      }
-      else {
-        $categories[$index]['children'] = array_values($category['children']);
-      }
-    }
-    return array_values($categories);
   }
 
   /**
@@ -527,7 +442,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if (isset($fieldMappings[$i])) {
           if (($fieldMapping['name'] === 'do_not_import')) {
-            $defaults["mapper[$i]"] = NULL;
+            $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
           }
           elseif (array_key_exists($fieldMapping['name'], $this->getAvailableFields())) {
             $defaults["mapper[$i]"] = $fieldMapping['name'];
@@ -544,18 +459,115 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
             // (but perhaps not disabled or acl-restricted) but we should also
             // handle it here rather than rely on our other efforts.
             $mappingFailures[] = $columnHeader;
-            $defaults["mapper[$i]"] = NULL;
+            $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
           }
         }
       }
       if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
         $defaults["mapper[$i]"] = $this->defaultFromHeader($columnHeader, $headerPatterns);
       }
+      elseif (!isset($defaults["mapper[$i]"])) {
+        $defaults["mapper[$i]"] = $this->isQuickFormMode ? NULL : [];
+      }
     }
     if (!$this->isSubmitted() && $mappingFailures) {
       CRM_Core_Session::setStatus(ts('Unable to load saved mapping. Please ensure all fields are correctly mapped'));
     }
     return $defaults;
+  }
+
+  /**
+   * Validate the the mapped fields contain enough to meet the dedupe rule lookup requirements.
+   *
+   * @internal this function may change without notice.
+   *
+   * @param array $rule
+   * @param array $mapper Mapper array as submitted
+   * @param array $contactIdentifierFields Array of fields which in themselves uniquely identify a contact.
+   *   This array will likely have an import specific prefix.
+   *
+   * @return string|null
+   *   Error string if insufficient.
+   */
+  protected function validateDedupeFieldsSufficientInMapping(array $rule, array $mapper, array $contactIdentifierFields): ?string {
+    $threshold = $rule['threshold'];
+    $ruleFields = $rule['fields'];
+    $weightSum = 0;
+    foreach ($mapper as $mapping) {
+      // The mapping['name'] is the civiimport format - mapping[0] is being phased out.
+      $fieldName = $mapping['name'] ?? $mapping[0] ?? '';
+      if (str_contains($fieldName, '.')) {
+        // If the field name contains a . - eg. address_primary.street_address
+        // we just want the part after the .
+        $fieldName = substr($fieldName, strpos($fieldName, '.') + 1);
+      }
+      if (in_array($fieldName, $contactIdentifierFields)) {
+        // It is enough to have external identifier or contact ID mapped..
+        $weightSum = $threshold;
+        break;
+      }
+      if (array_key_exists($fieldName, $ruleFields)) {
+        $weightSum += $ruleFields[$fieldName];
+      }
+    }
+    if ($weightSum < $threshold) {
+      return $rule['rule_message'];
+    }
+    return NULL;
+  }
+
+  /**
+   * @param array $rule
+   * @param array $mapper
+   * @param array $contactIdentifierFields
+   *
+   * @return array
+   */
+  protected function validateContactFields(array $rule, array $mapper, array $contactIdentifierFields): array {
+    $mapperError = [];
+    if (!$this->isUpdateExisting()) {
+      $missingDedupeFields = $this->validateDedupeFieldsSufficientInMapping($rule, $mapper, $contactIdentifierFields);
+      if ($missingDedupeFields) {
+        $mapperError['_qf_default'] = $missingDedupeFields;
+      }
+    }
+    return $mapperError;
+  }
+
+  /**
+   * @param $mapper
+   *
+   * @return array
+   */
+  protected function getImportKeys($mapper): array {
+    $importKeys = [];
+    foreach ($mapper as $field) {
+      if (is_array($field)) {
+        $importKeys[] = $field;
+      }
+      else {
+        $importKeys[] = [$field];
+      }
+    }
+    return $importKeys;
+  }
+
+  /**
+   * @param array $mapper
+   *
+   * @return array
+   */
+  protected static function getMappedFields(array $mapper): array {
+    $mappedFields = [];
+    foreach ($mapper as $field) {
+      if (is_array($field)) {
+        $mappedFields[] = $field[0];
+      }
+      else {
+        $mappedFields[] = $field;
+      }
+    }
+    return $mappedFields;
   }
 
 }

@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {*Table displays contribution totals for a contact or search result-set *}
-{if !empty($annual.count) OR $contributionSummary.total.count OR $contributionSummary.cancel.count OR $contributionSummary.soft_credit.count}
+{if !empty($annual.count) OR (!empty($contributionSummary) AND ($contributionSummary.total.count OR $contributionSummary.cancel.count OR $contributionSummary.soft_credit.count))}
     <table class="form-layout-compressed">
 
     {if !empty($annual.count)}

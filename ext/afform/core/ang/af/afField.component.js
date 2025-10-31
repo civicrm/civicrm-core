@@ -34,6 +34,8 @@
           $element.addClass('af-field-type-multiple');
         }
 
+        this.fkEntity = this.defn.fk_entity || null;
+
         if (this.defn.name !== this.fieldName) {
           if (!this.defn.name) {
             console.error('Missing field definition for: ' + this.fieldName);
@@ -76,8 +78,8 @@
         }
 
         // ChainSelect - watch control field & reload options as needed
-        if (ctrl.defn.input_type === 'ChainSelect') {
-          var controlField = namePrefix + ctrl.defn.input_attrs.control_field;
+        if (ctrl.defn.input_type === 'ChainSelect' && ctrl.defn.input_attrs.control_field) {
+          const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
           $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
             // After switching option list, remove invalid options
             function validateValue() {
@@ -117,6 +119,22 @@
               validateValue();
             }
           }, true);
+        }
+
+        // Dynamic foreign key
+        if (ctrl.defn.input_type === 'EntityRef' && ctrl.defn.dfk_entities && ctrl.defn.input_attrs.control_field) {
+          const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
+          $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
+            if (val && val.length) {
+              if (Array.isArray(val)) {
+                ctrl.fkEntity = ctrl.defn.dfk_entities[val[0]];
+              } else {
+                ctrl.fkEntity = ctrl.defn.dfk_entities[val];
+              }
+            } else {
+              ctrl.fkEntity = null;
+            }
+          });
         }
 
         // Wait for parent controllers to initialize
@@ -206,7 +224,8 @@
       this.isMultiple = function() {
         return (
           (['Select', 'EntityRef', 'ChainSelect'].includes(ctrl.defn.input_type) && ctrl.defn.input_attrs.multiple) ||
-          (ctrl.defn.input_type === 'CheckBox' && ctrl.defn.data_type !== 'Boolean')
+          ((ctrl.defn.input_type === 'CheckBox' || ctrl.defn.input_type === 'Toggle') && ctrl.defn.data_type !== 'Boolean') ||
+          ((ctrl.defn.input_type === 'Hidden' || ctrl.defn.input_type === 'DisplayOnly') && (ctrl.defn.serialize || ctrl.defn.data_type === 'Array'))
         );
       };
 
@@ -215,6 +234,10 @@
         // For values passed from the url, split
         if (typeof value === 'string' && ctrl.isMultiple()) {
           value = value.split(',');
+        }
+        // Support "Select Current User" default
+        if (ctrl.defn.input_type === 'EntityRef' && ['Contact', 'Individual'].includes(ctrl.fkEntity) && value === 'user_contact_id') {
+          value = CRM.config.cid;
         }
         // correct the value type
         if (ctrl.defn.input_type !== 'DisplayOnly') {
@@ -266,6 +289,55 @@
         // Since the ids are kind of meaningless. Making that change would require adding a function
         // to get the widget template rather than just concatenating the input_type into an ngInclude.
         return ctrl.defn.input_type === 'DisplayOnly';
+      };
+
+      ctrl.isDisabled = function() {
+        if (ctrl.isReadonly()) {
+          return true;
+        }
+        if (ctrl.defn.input_type === 'EntityRef' && !ctrl.fkEntity) {
+          return true;
+        }
+        return false;
+      };
+
+      ctrl.getDisplayValue = function(value) {
+        if (value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length)) {
+          return '';
+        }
+        if (fieldOptions) {
+          let keys = Array.isArray(value) ? value : [value];
+          let options = fieldOptions.filter((option) => keys.includes(option.id));
+          return options.map((option) => option.label).join(', ');
+        }
+        if (ctrl.defn.data_type === 'Date' || ctrl.defn.data_type === 'Timestamp') {
+          try {
+            return CRM.utils.formatDate(value, null, ctrl.defn.data_type === 'Timestamp');
+          } catch (e) {
+            return '';
+          }
+        }
+        if (ctrl.fkEntity) {
+          // EntityRef fields: fetch label via API if not already present
+          // This is async, so we return a placeholder and update later
+          const ids = Array.isArray(value) ? value : [value];
+          if (!ctrl._entityLabels) {
+            ctrl._entityLabels = {};
+          }
+          // Call autocomplete api
+          if (!(ids.join() in ctrl._entityLabels)) {
+            ctrl._entityLabels[ids.join()] = null;
+            const params = ctrl.getAutocompleteParams();
+            params.ids = ids;
+            crmApi4(ctrl.fkEntity, 'autocomplete', params)
+              .then(function(result) {
+                // Join all labels
+                ctrl._entityLabels[ids.join()] = result.map((item) => item.label).join(', ');
+              });
+          }
+          return ctrl._entityLabels[ids.join()] || ts('Loading...');
+        }
+        return value;
       };
 
       // ngChange callback from Existing entity field
@@ -407,7 +479,11 @@
             offset *= 365;
         }
         let newDate = new Date(baseDate.getTime() + offset * 24 * 60 * 60 * 1000);
-        let defaultDate = newDate.toISOString().split('T')[0];
+        let localYear = newDate.getFullYear();
+        let localMonth = String(newDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        let localDay = String(newDate.getDate()).padStart(2, '0');
+        let defaultDate = `${localYear}-${localMonth}-${localDay}`; // Format YYYY-MM-DD
+
         if (includeTime) {
           defaultDate += ' ' + newDate.toTimeString().slice(0,8);
         }

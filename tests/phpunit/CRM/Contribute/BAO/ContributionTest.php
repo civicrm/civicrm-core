@@ -25,12 +25,18 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_Financial_FinancialACLTrait;
   use CRMTraits_Financial_PriceSetTrait;
 
+  protected $iniSet = [];
+
   /**
    * Clean up after tests.
    */
   public function tearDown(): void {
     $this->disableFinancialACLs();
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_campaign']);
+    foreach ($this->iniSet as $key => $value) {
+      ini_set($key, $value);
+    }
     parent::tearDown();
   }
 
@@ -228,7 +234,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
     $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
-    $this->assertStringContainsString('b.financial_type_id IN (' . $permittedFinancialType . ')', $sql);
+    $this->assertStringContainsString('`b`.`financial_type_id` IN (' . $permittedFinancialType . ')', $sql);
 
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
@@ -260,8 +266,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
     $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
-    $this->assertStringContainsString('WHERE b.id NOT IN (0)', $sql);
+    $this->assertStringContainsString('`b`.`id` NOT IN (0)', $sql);
     $this->assertStringNotContainsString('b.financial_type_id', $sql);
+    $this->assertStringNotContainsString('`b`.`financial_type_id`', $sql);
     CRM_Core_DAO::executeQuery($sql);
   }
 
@@ -275,7 +282,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     if ($entity !== 'Contribution') {
       return;
     }
-    $clauses['id'] = 'NOT IN (0)';
+    $clauses['id'] = ['NOT IN (0)'];
   }
 
   /**
@@ -968,15 +975,13 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $financialType = $this->createFinancialType();
     $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
     /** @var CRM_Contribute_Form_Contribution $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => $params['total_amount'],
       'financial_type_id' => $financialType['id'],
       'contact_id' => $contactId,
       'contribution_status_id' => $isCompleted ? 1 : 2,
       'price_set_id' => 0,
-    ]);
-    $form->buildForm();
-    $form->postProcess();
+    ])->processForm();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contact_id' => $contactId,
@@ -1492,6 +1497,33 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $activityContact = $this->callAPISuccessGetSingle('ActivityContact', $activityContactParams);
 
     $this->assertEquals($activityContact['contact_id'], $contactId_2, 'Check target contact ID matches the second contact');
+  }
+
+  public function testPrecisionSettingUpdate(): void {
+    $this->iniSet['serialize_precision'] = ini_get('serialize_precision');
+    ini_set('serialize_precision', 17);
+    $this->createTestEntity('Contribution', [
+      'total_amount' => 7.71,
+      'fee_amount' => .20,
+      'contact_id' => $this->individualCreate(),
+      'financial_type_id:name' => 'Donation',
+      'contribution_status_id:name' => 'Completed',
+    ]);
+    // We can expect this to fail if the code was unable to retrieve
+    // the contribution due to a rounding issue.
+    // Directly after saving there is a contribution->find(TRUE)
+    // if this does not find the contribution then activity create will later
+    // fail
+    $net = '7.4500000000000002';
+    $contribution = Contribution::update(FALSE)
+      ->setValues([
+        'id' => $this->ids['Contribution']['default'],
+        'net_amount' => $net,
+        'fee_amount' => .26,
+        'total_amount' => 7.71,
+      ])
+      ->execute();
+    $this->assertCount(1, $contribution);
   }
 
   /**

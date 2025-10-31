@@ -327,16 +327,21 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       1 => [$id, 'Positive'],
     ]);
     if ($query->fetch()) {
-      if (!preg_match('/^civicrm_value_/', $query->entity_table)) {
+      if ($query->entity_table) {
         // A normal attachment directly on its entity.
         return [$query->is_valid, $query->entity_table, $query->entity_id];
       }
 
       // Ex: Translate custom-field table ("civicrm_value_foo_4") to
       // entity table ("civicrm_activity").
-      $tblIdx = \CRM_Utils_Array::index(['table_name'], $this->getCustomFields());
-      if (isset($tblIdx[$query->entity_table])) {
-        return [$query->is_valid, $tblIdx[$query->entity_table]['entity_table'], $query->entity_id];
+
+      // There is CoreUtil::getRefCounts etc, but we need more than a count,
+      // and we only want _custom field_ references to this file.
+      //
+      // What if there's more than one reference - does the system support
+      // checking multiple entities for access? For now take first found.
+      foreach ($this->getCustomFieldReferencesToId($id) as $custom_value) {
+        return [$query->is_valid, $custom_value['entity_table'], $custom_value['entity_id']];
       }
       throw new \Exception('Failed to lookup entity table for custom field.');
     }
@@ -367,8 +372,32 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
         'field_name' => $query->field_name,
         'table_name' => $query->table_name,
         'extends' => $query->extends,
+        'column_name' => $query->column_name,
         'entity_table' => CoreUtil::getTableName($query->extends),
       ];
+    }
+    return $rows;
+  }
+
+  /**
+   * @param int $id
+   *   e.g. file ID.
+   * @return array
+   */
+  private function getCustomFieldReferencesToId($id): array {
+    $rows = [];
+    foreach ($this->getCustomFields() as $field) {
+      $dao = \CRM_Core_DAO::executeQuery("SELECT cv.entity_id
+        FROM `{$field['table_name']}` cv
+        WHERE cv.`{$field['column_name']}` = %1",
+        [1 => [$id, 'Positive']]
+      );
+      while ($dao->fetch()) {
+        $rows[] = [
+          'entity_id' => $dao->entity_id,
+          'entity_table' => $field['entity_table'],
+        ];
+      }
     }
     return $rows;
   }

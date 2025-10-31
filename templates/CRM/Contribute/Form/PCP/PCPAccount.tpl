@@ -16,7 +16,7 @@
 
 {if $profileDisplay}
 <div class="messages status no-popup">
-  <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+  <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>
   <strong>{ts}Profile is not configured with Email address.{/ts}</strong>
 </div>
 {else}

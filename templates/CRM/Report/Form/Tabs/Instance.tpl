@@ -10,7 +10,7 @@
 <div id="report-tab-format" class="civireport-criteria" role="tabpanel">
   <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-title">
-      <td class="report-label" width="20%">{$form.title.label} {help id="id-report_title" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td class="report-label" width="20%">{$form.title.label} {help id="title" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
       <td >{$form.title.html}</td>
     </tr>
     <tr class="crm-report-instanceForm-form-block-description">
@@ -18,7 +18,7 @@
       <td>{$form.description.html}</td>
     </tr>
     <tr class="crm-report-instanceForm-form-block-report_header">
-      <td class="report-label" width="20%">{$form.report_header.label}{help id="id-report_header" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td class="report-label" width="20%">{$form.report_header.label}{help id="report_header" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
       <td>{$form.report_header.html}</td>
     </tr>
     <tr class="crm-report-instanceForm-form-block-report_footer">
@@ -29,7 +29,11 @@
 </div>
 
 <div id="report-tab-email" class="civireport-criteria" role="tabpanel">
-  <h3 class="email-delivery-settings-title">{ts}Email Delivery Settings{/ts} {help id="id-email_settings" file="CRM/Report/Form/Tabs/Settings.hlp"}</h3>
+  <h3 class="email-delivery-settings-title">
+    {ts}Email Delivery Settings{/ts}
+    {capture assign='helpTitle'}{ts}Email Delivery{/ts}{/capture}
+    {help id="email-delivery-settings" title=$helpTitle file="CRM/Report/Form/Tabs/Settings.hlp"}
+  </h3>
   <table class="form-layout email-delivery-settings-fields">
     <tr class="crm-report-instanceForm-form-block-email_subject">
       <td class="report-label" width="20%">{$form.email_subject.label}</td>
@@ -55,7 +59,7 @@
       </td>
     </tr>
     <tr class="crm-report-instanceForm-form-block-parent_id" id="navigation_menu">
-      <td class="report-label">{$form.parent_id.label} {help id="id-parent" file="CRM/Admin/Form/Navigation.hlp"}</td>
+      <td class="report-label">{$form.parent_id.label} {help id="parent_id" file="CRM/Admin/Form/Navigation.hlp"}</td>
       <td>{$form.parent_id.html|crmAddClass:huge}</td>
     </tr>
     {if !empty($form.drilldown_id)}
@@ -66,7 +70,7 @@
     {/if}
     {if $config->userFramework neq 'Joomla'}
       <tr class="crm-report-instanceForm-form-block-permission">
-        <td class="report-label" width="20%">{$form.permission.label} {help id="id-report_perms" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+        <td class="report-label" width="20%">{$form.permission.label} {help id="permission" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
         <td>{$form.permission.html|crmAddClass:huge}</td>
       </tr>
       {if !empty($form.grouprole)}
@@ -77,25 +81,25 @@
       {/if}
     {/if}
     <tr class="crm-report-instanceForm-form-block-add-to-my-reports">
-      <td class="report-label">{$form.add_to_my_reports.label} {help id="id-add_to_my_reports" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td class="report-label">{$form.add_to_my_reports.label} {help id="add_to_my_reports" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
       <td>{$form.add_to_my_reports.html}
         <span class="description">{ts}If set to Yes, this report will appear in the My Reports section of the reports listing page and will only be visible by you.{/ts}</span>
       </td>
     </tr>
     <tr class="crm-report-instanceForm-form-block-isReserved">
-      <td class="report-label">{$form.is_reserved.label} {help id="id-is_reserved" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td class="report-label">{$form.is_reserved.label} {help id="is_reserved" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
       <td>{$form.is_reserved.html}
         <span class="description">{ts}If reserved, only users with 'administer reserved reports' permission can modify this report instance.{/ts}</span>
       </td>
     </tr>
     <tr class="crm-report-instanceForm-form-block-addToDashboard">
-      <td class="report-label">{$form.addToDashboard.label} {help id="id-dash_avail" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td class="report-label">{$form.addToDashboard.label} {help id="addToDashboard" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
       <td>{$form.addToDashboard.html}
         <span class="description">{ts}Users with appropriate permissions can add this report to their dashboard.{/ts}</span>
       </td>
     </tr>
     <tr class="crm-report-instanceForm-form-block-limitUser">
-      <td class="report-label">{$form.row_count.label} {help id="id-dash_limit" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
+      <td class="report-label">{$form.row_count.label} {help id="row_count" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
       <td>{$form.row_count.html} {ts}rows{/ts}</td>
     </tr>
     <tr class="crm-report-instanceForm-form-block-cache_minutes">

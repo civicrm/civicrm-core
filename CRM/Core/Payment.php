@@ -1218,10 +1218,6 @@ abstract class CRM_Core_Payment {
    * @return string
    */
   protected function getAmount($params = []) {
-    if (!CRM_Utils_Rule::numeric($params['amount'])) {
-      CRM_Core_Error::deprecatedWarning('Passing Amount value that is not numeric is deprecated please report this in gitlab');
-      return CRM_Utils_Money::formatUSLocaleNumericRounded(filter_var($params['amount'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION), 2);
-    }
     // Amount is already formatted to a machine-friendly format but may NOT have
     // decimal places - eg. it could be 1000.1 so this would return 1000.10.
     return Civi::format()->machineMoney($params['amount']);
@@ -1672,6 +1668,7 @@ abstract class CRM_Core_Payment {
       throw new CRM_Core_Exception($notFound);
     }
 
+    // handlePaymentNotification() or handlePaymentCron()
     $method = 'handle' . $method;
     $extension_instance_found = FALSE;
 

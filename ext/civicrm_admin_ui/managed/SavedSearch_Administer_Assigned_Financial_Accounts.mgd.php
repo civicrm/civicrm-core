@@ -87,28 +87,24 @@ return [
             [
               'type' => 'field',
               'key' => 'account_relationship:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Relationship'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'financial_account_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Financial Account'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'EntityFinancialAccount_FinancialAccount_financial_account_id_01.accounting_code',
-              'dataType' => 'String',
               'label' => E::ts('Accounting Code'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'EntityFinancialAccount_FinancialAccount_financial_account_id_01.financial_account_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Account Type (Code)'),
               'sortable' => TRUE,
               'rewrite' => '[EntityFinancialAccount_FinancialAccount_financial_account_id_01.financial_account_type_id:label] ([EntityFinancialAccount_FinancialAccount_financial_account_id_01.account_type_code])',
@@ -116,14 +112,12 @@ return [
             [
               'type' => 'field',
               'key' => 'EntityFinancialAccount_FinancialAccount_financial_account_id_01.contact_id.display_name',
-              'dataType' => 'String',
               'label' => E::ts('Owner'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'EntityFinancialAccount_FinancialAccount_financial_account_id_01.is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,

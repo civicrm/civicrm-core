@@ -44,7 +44,7 @@
           call_user_func(array('CRM_Core_Permission','check'), 'add cases') ) AND
         $allowToAddNewCase}
         <div class="action-link">
-        <a accesskey="N" href="{$newCaseURL|smarty:nodefaults}" class="button no-popup"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Case{/ts}</span></a>
+        <a accesskey="N" href="{$newCaseURL|smarty:nodefaults}" class="button no-popup"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Case{/ts}</span></a>
         </div>
     {/if}
 

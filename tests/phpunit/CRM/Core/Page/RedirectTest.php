@@ -14,7 +14,7 @@ class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function examples() {
+  public static function examples() {
     $cases = [];
     // $cases[] = array(string $requestPath, string $requestArgs, string $pageArgs, string $expectedUrl)
 

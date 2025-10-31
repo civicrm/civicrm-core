@@ -131,7 +131,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $this->_values = [];
     if ($this->_relationshipId) {
       $this->_values = \Civi\Api4\Relationship::get(FALSE)
-        ->addSelect('contact_id_a', 'contact_id_b', 'created_date', 'id', 'is_active', 'is_permission_a_b', 'is_permission_b_a', 'modified_date', 'relationship_type_id')
+        ->addSelect('*')
         ->addWhere('id', '=', $this->_relationshipId)
         ->execute()
         ->first();
@@ -518,7 +518,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         // Add user-friendly placeholder
         foreach (['a', 'b'] as $x) {
           $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : ($jsData[$id]["contact_type_$x"] ?? NULL);
-          $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', [strtolower($contactTypes[$type]['label'])]) : ts('- select contact -');
+          $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', [1 => strtolower($contactTypes[$type]['label'])]) : ts('- select contact -');
         }
       }
     }

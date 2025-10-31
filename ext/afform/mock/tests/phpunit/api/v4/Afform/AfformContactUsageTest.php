@@ -4,6 +4,7 @@ namespace api\v4\Afform;
 use Civi\Api4\Afform;
 use Civi\Api4\AfformSubmission;
 use Civi\Api4\Contact;
+use Civi\Api4\Phone;
 
 /**
  * Test case for Afform.checkAccess, Afform.prefill and Afform.submit.
@@ -512,9 +513,8 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
       // Should fail required fields missing
-      $this->assertCount(2, $e->getErrorData()['validation']);
-      $this->assertEquals('First Name is a required field.', $e->getErrorData()['validation'][0]);
-      $this->assertEquals('Email is a required field.', $e->getErrorData()['validation'][1]);
+      $this->assertStringContainsString('First Name is a required field', $e->getMessage());
+      $this->assertStringContainsString('Email is a required field', $e->getMessage());
     }
 
   }
@@ -550,8 +550,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
       // Should fail required fields missing
-      $this->assertCount(1, $e->getErrorData()['validation']);
-      $this->assertEquals('Last Name has a max length of 20.', $e->getErrorData()['validation'][0]);
+      $this->assertEquals('Last Name has a max length of 20.', $e->getMessage());
     }
   }
 
@@ -584,8 +583,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
       // Should fail required fields missing
-      $this->assertCount(1, $e->getErrorData()['validation']);
-      $this->assertEquals('Email is a required field.', $e->getErrorData()['validation'][0]);
+      $this->assertEquals('Email is a required field.', $e->getMessage());
     }
 
   }
@@ -595,7 +593,8 @@ EOHTML;
       'layout' => self::$layouts['aboutMe'],
       'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'create_submission' => TRUE,
-      'submit_limit' => 3,
+      'submit_limit_per_user' => 3,
+      'submit_limit' => 5,
     ]);
 
     $cid = $this->createLoggedInUser();
@@ -615,26 +614,92 @@ EOHTML;
       ->setValues(['me' => $submitValues])
       ->execute();
 
+    // Submit draft - won't count toward the limit
+    Afform::submitDraft()
+      ->setName($this->formName)
+      ->setValues(['me' => []])
+      ->execute();
+
     // Autofilling form works because limit hasn't been reached
     Afform::prefill()
       ->setName($this->formName)
       ->setFillMode('form')
       ->execute();
 
-    // Last time
+    // Submit again (this will overwrite the draft)
     Afform::submit()
       ->setName($this->formName)
       ->setValues(['me' => $submitValues])
       ->execute();
 
-    // Stats should report that we've reached the submission limit
-    $stats = Afform::get(FALSE)
+    // Stats should report that we've reached the per-user limit
+    $stats = Afform::get()
       ->addSelect('submit_enabled', 'submission_count', 'submit_currently_open')
       ->addWhere('name', '=', $this->formName)
       ->execute()->single();
     $this->assertTrue($stats['submit_enabled']);
     $this->assertFalse($stats['submit_currently_open']);
     $this->assertEquals(3, $stats['submission_count']);
+
+    // Prefilling and submitting are no longer allowed.
+    try {
+      Afform::prefill()
+        ->setName($this->formName)
+        ->setFillMode('entity')
+        ->execute();
+      $this->fail();
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+    }
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['me' => $submitValues])
+        ->execute();
+      $this->fail();
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+    }
+    $this->assertTrue(is_a($e, '\Civi\API\Exception\UnauthorizedException'));
+
+    // Switch users to test the total limit
+    $this->userLogout();
+    $this->createLoggedInUser();
+
+    $submitValues = [
+      ['fields' => ['first_name' => 'Secondy', 'last_name' => 'Lasty']],
+    ];
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submitValues])
+      ->execute();
+
+    // Submit draft - won't count toward the limit
+    Afform::submitDraft()
+      ->setName($this->formName)
+      ->setValues(['me' => []])
+      ->execute();
+
+    // Autofilling form works because limit hasn't been reached
+    Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->execute();
+
+    // Submit again (this will overwrite the draft)
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submitValues])
+      ->execute();
+
+    // Stats should report that we've reached the total submission limit
+    $stats = Afform::get()
+      ->addSelect('submit_enabled', 'submission_count', 'submit_currently_open')
+      ->addWhere('name', '=', $this->formName)
+      ->execute()->single();
+    $this->assertTrue($stats['submit_enabled']);
+    $this->assertFalse($stats['submit_currently_open']);
+    $this->assertEquals(5, $stats['submission_count']);
 
     // Prefilling and submitting are no longer allowed.
     try {
@@ -716,6 +781,146 @@ EOHTML;
     // This first submit we did not specify a parent form, so got a generic individual
     $contact = $this->getTestRecord('Individual', ['first_name' => 'John', 'last_name' => $lastName]);
     $this->assertEquals([$contactType], $contact['contact_sub_type']);
+  }
+
+  public function testMultipleLocationJoins(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <div actions="{update: true, delete: true}" class="af-container">
+      <div class="af-container af-layout-inline">
+        <af-field name="first_name" />
+        <af-field name="last_name" />
+      </div>
+    </div>
+    <div af-join="Phone" actions="{update: true, delete: true}" data="{location_type_id: 1}">
+      <div class="af-container af-layout-inline">
+        <af-field name="phone" defn="{required: false, input_attrs: {}}" />
+        <af-field name="phone_ext" />
+      </div>
+    </div>
+    <div af-join="Phone" actions="{update: true, delete: true}" data="{location_type_id: 2}">
+      <div class="af-container af-layout-inline">
+        <af-field name="phone" defn="{required: false, input_attrs: {}}" />
+      </div>
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $cid = $this->createTestRecord('Individual', [
+      'first_name' => 'One',
+      'last_name' => 'Name',
+    ])['id'];
+
+    $phone2 = $this->createTestRecord('Phone', [
+      'phone' => '2-2',
+      'location_type_id' => 2,
+      'phone_ext' => '222',
+      'contact_id' => $cid,
+    ])['id'];
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->setArgs(['Individual1' => $cid])
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertCount(1, $prefill['Individual1']['values']);
+    $this->assertEquals('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertNull($prefill['Individual1']['values'][0]['joins']['Phone'][0]);
+    $this->assertEquals('2-2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
+
+    // Create one new phone, update the other
+    $submitValues = [
+      [
+        'fields' => ['first_name' => 'Firsty', 'last_name' => 'Lasty'],
+        'joins' => [
+          'Phone' => [
+            ['phone' => '1-1-1', 'phone_ext' => '111'],
+            ['id' => $phone2, 'phone' => '2-2-2'],
+          ],
+        ],
+      ],
+    ];
+    $submit = Afform::submit()
+      ->setName($this->formName)
+      ->setArgs(['Individual1' => $cid])
+      ->setValues(['Individual1' => $submitValues])
+      ->execute();
+
+    $phoneValues = Phone::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addOrderBy('location_type_id')
+      ->execute();
+
+    $this->assertCount(2, $phoneValues);
+    $this->assertEquals(1, $phoneValues[0]['location_type_id']);
+    $this->assertEquals('1-1-1', $phoneValues[0]['phone']);
+    $this->assertEquals('111', $phoneValues[0]['phone_ext']);
+    $this->assertEquals(2, $phoneValues[1]['location_type_id']);
+    $this->assertEquals('2-2-2', $phoneValues[1]['phone']);
+    $this->assertEquals('222', $phoneValues[1]['phone_ext']);
+
+    // Create a new contact with no phones
+    $cid = $this->createTestRecord('Individual', [
+      'first_name' => 'Two',
+      'last_name' => 'Name',
+    ])['id'];
+
+    // Create one new phone, update the other
+    $submitValues = [
+      [
+        'fields' => ['first_name' => 'Two', 'last_name' => 'Lasty'],
+        'joins' => [
+          'Phone' => [
+            ['phone' => '1', 'phone_ext' => '111'],
+            ['phone' => '2'],
+          ],
+        ],
+      ],
+    ];
+    $submit = Afform::submit()
+      ->setName($this->formName)
+      ->setArgs(['Individual1' => $cid])
+      ->setValues(['Individual1' => $submitValues])
+      ->execute();
+
+    $phoneValues = Phone::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addOrderBy('location_type_id')
+      ->execute();
+
+    $this->assertCount(2, $phoneValues);
+    $this->assertEquals(1, $phoneValues[0]['location_type_id']);
+    $this->assertEquals('1', $phoneValues[0]['phone']);
+    $this->assertEquals('111', $phoneValues[0]['phone_ext']);
+    $this->assertEquals(2, $phoneValues[1]['location_type_id']);
+    $this->assertEquals('2', $phoneValues[1]['phone']);
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->setArgs(['Individual1' => $cid])
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertCount(1, $prefill['Individual1']['values']);
+    $this->assertEquals('Two', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('1', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone']);
+    $this->assertEquals($phoneValues[0]['id'], $prefill['Individual1']['values'][0]['joins']['Phone'][0]['id']);
+    $this->assertEquals('111', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone_ext']);
+    $this->assertEquals('2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
+    $this->assertEquals($phoneValues[1]['id'], $prefill['Individual1']['values'][0]['joins']['Phone'][1]['id']);
+
   }
 
 }

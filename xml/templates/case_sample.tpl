@@ -65,18 +65,18 @@ INSERT INTO `civicrm_option_value` ( `option_group_id`, `label`, `value`, `name`
 -- * Relationship Types
 -- *
 -- *******************************************************/
-INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (SELECT 'Homeless Services Coordinator is', 'Homeless Services Coordinator is', 'Homeless Services Coordinator', 'Homeless Services Coordinator',  'Homeless Services Coordinator', 'Individual', 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Homeless Services Coordinator is'));
+INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (SELECT 'Homeless Services Coordinator is', 'Homeless Services Coordinator is', 'Homeless Services Coordinator', 'Homeless Services Coordinator',  'Homeless Services Coordinator', NULL, 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Homeless Services Coordinator is'));
 
 
 INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (
-SELECT 'Health Services Coordinator is', 'Health Services Coordinator is', 'Health Services Coordinator', 'Health Services Coordinator',  'Health Services Coordinator', 'Individual', 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Health Services Coordinator is'));
+SELECT 'Health Services Coordinator is', 'Health Services Coordinator is', 'Health Services Coordinator', 'Health Services Coordinator',  'Health Services Coordinator', NULL, 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Health Services Coordinator is'));
 
 
 INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (
-SELECT 'Senior Services Coordinator is', 'Senior Services Coordinator is', 'Senior Services Coordinator', 'Senior Services Coordinator', 'Senior Services Coordinator', 'Individual', 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Senior Services Coordinator is'));
+SELECT 'Senior Services Coordinator is', 'Senior Services Coordinator is', 'Senior Services Coordinator', 'Senior Services Coordinator', 'Senior Services Coordinator', NULL, 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Senior Services Coordinator is'));
 
 INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (
-SELECT 'Benefits Specialist is', 'Benefits Specialist is', 'Benefits Specialist', 'Benefits Specialist', 'Benefits Specialist', 'Individual', 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Benefits Specialist is'));
+SELECT 'Benefits Specialist is', 'Benefits Specialist is', 'Benefits Specialist', 'Benefits Specialist', 'Benefits Specialist', NULL, 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Benefits Specialist is'));
 
 -- /*******************************************************
 -- *

@@ -29,6 +29,14 @@
       if (afform.submission_date) {
         afform.submission_date = CRM.utils.formatDate(afform.submission_date);
       }
+      afform.can_manage = CRM.checkPerm('administer afform');
+      // Check for ownership and correct permission
+      if (!afform.can_manage && afform.created_id) {
+        // Permission, manage own afform, is to only manage afform's the user created
+        if (CRM.checkPerm('manage own afform') && (CRM.config.cid === afform.created_id)) {
+          afform.can_manage = true;
+        }
+      }
       afforms[afform.type] = afforms[afform.type] || [];
       afforms[afform.type].push(afform);
     }, {});
@@ -107,7 +115,7 @@
           }, 0]);
         }
         var apiCall = crmStatus(
-          afform.has_base ? {start: ts('Reverting...')} : {start: ts('Deleting...'), success: ts('Deleted')},
+          afform.has_base ? {start: ts('Reverting...')} : {start: ts('Deleting...'), success: ts('Deleted'), error: ts('Error deleting')},
           crmApi4(apiOps)
         );
         if (afform.has_base) {
@@ -116,7 +124,9 @@
             ctrl.afforms[ctrl.tab][index] = result[1];
           });
         } else {
-          ctrl.afforms[ctrl.tab].splice(index, 1);
+          apiCall.then(function() {
+            ctrl.afforms[ctrl.tab].splice(index, 1);
+          });
         }
       }
     };

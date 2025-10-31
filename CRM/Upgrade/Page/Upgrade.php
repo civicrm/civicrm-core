@@ -107,13 +107,9 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       $template->assign('upgraded', FALSE);
     }
 
-    // Render page header
-    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-      CRM_Utils_System::addHTMLHead($region->render(''));
-    }
-
     $content = $template->fetch('CRM/common/success.tpl');
-    echo CRM_Utils_System::theme($content, $this->_print, TRUE);
+
+    CRM_Utils_System::renderMaintenanceMessage($content);
   }
 
   /**
@@ -185,13 +181,9 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $template->assign('newVersion', $latestVer);
     $template->assign('sid', CRM_Utils_System::getSiteID());
 
-    // Render page header
-    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-      CRM_Utils_System::addHTMLHead($region->render(''));
-    }
-
     $content = $template->fetch('CRM/common/success.tpl');
-    echo CRM_Utils_System::theme($content, $this->_print, TRUE);
+
+    CRM_Utils_System::renderMaintenanceMessage($content);
   }
 
 }

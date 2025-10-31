@@ -37,7 +37,7 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function subtractCurrenciesDataProvider() {
+  public static function subtractCurrenciesDataProvider() {
     return [
       [number_format(300.00, 2), number_format(299.99, 2), 'USD', number_format(0.01, 2)],
       [2, 1, 'USD', 1],

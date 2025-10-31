@@ -45,18 +45,27 @@ class WebEntrypoint {
    * - handles the route args
    */
   public static function invoke(): void {
+    // parse the request uri (should we use URL for this?)
     $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    $parts = explode('?', $requestUri);
+    $args = explode('/', $parts[0] ?? '');
+    // Remove empty path segments, a//b becomes equivalent to a/b
+    $args = array_values(array_filter($args));
+
+    // if request is for any path that doesn't start civicrm,
+    // throw 404 before we waste any effort doing anything else
+    // (may well be spam)
+    if ($args && ($args[0] !== 'civicrm')) {
+      http_response_code(404);
+      print 'Path not found';
+      exit();
+    }
 
     // initialise config and boot container
     \CRM_Core_Config::singleton();
 
     // Add CSS, JS, etc. that is required for this page.
     \CRM_Core_Resources::singleton()->addCoreResources();
-
-    $parts = explode('?', $requestUri);
-    $args = explode('/', $parts[0] ?? '');
-    // Remove empty path segments, a//b becomes equivalent to a/b
-    $args = array_values(array_filter($args));
     if (!$args) {
       // This is a request for the site's homepage. See if we have one.
 

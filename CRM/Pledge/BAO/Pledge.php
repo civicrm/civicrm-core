@@ -63,7 +63,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
     $result = $pledge->save();
 
-    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge);
+    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge, $params);
 
     return $result;
   }

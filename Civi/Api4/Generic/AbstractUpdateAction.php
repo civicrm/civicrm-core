@@ -21,7 +21,7 @@ use Civi\Api4\Utils\CoreUtil;
  *
  * @method $this setValues(array $values) Set all field values from an array of key => value pairs.
  * @method array getValues() Get field values.
- * @method $this setReload(bool $reload) Specify whether complete objects will be returned after saving.
+ * @method $this setReload(?array $reload) Optionally reload $ENTITIES after saving with an extra SELECT.
  * @method bool getReload()
  *
  * @package Civi\Api4\Generic
@@ -39,14 +39,15 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
   protected $values = [];
 
   /**
-   * Reload $ENTITIES after saving.
+   * Optionally reload $ENTITIES after saving with an extra SELECT.
    *
-   * Setting to `true` will load complete records and return them as the api result.
-   * If `false` the api usually returns only the fields specified to be updated.
+   * By default, this action typically returns partial records containing only the fields
+   * that were updated. If more is needed, set `reload` to an array of fields to SELECT
+   * (use `['*']` to select all) and they will be returned via an extra get request.
    *
-   * @var bool
+   * @var array|bool
    */
-  protected $reload = FALSE;
+  protected $reload;
 
   /**
    * Criteria for selecting items to update.

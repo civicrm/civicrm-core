@@ -1,6 +1,5 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
-use Civi\Api4\MessageTemplate;
 use Civi\Api4\Navigation;
 
 /**
@@ -17,16 +16,21 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public function preInstall() {
-    $config = \CRM_Core_Config::singleton();
-    // We generally only want to run on standalone. In theory, we might also run headless tests.
-    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_UnitTests'])) {
-      throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
+  public function preInstall(): void {
+    $entity = include __DIR__ . '/../../schema/User.entityType.php';
+    $tableName = 'civicrm_uf_match';
+    $ctx = new CRM_Queue_TaskContext();
+    foreach ($entity['getFields']() as $fieldName => $fieldSpec) {
+      // We can't run the next line in preInstall - so it's contents are copied here.
+      // CRM_Upgrade_Incremental_Base::alterSchemaField(NULL, 'User', $fieldName, $params);
+      $fieldSql = Civi::schemaHelper()->arrayToSql($fieldSpec);
+      if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
+        CRM_Upgrade_Incremental_Base::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+      }
+      else {
+        CRM_Upgrade_Incremental_Base::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+      }
     }
-    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_UnitTests'])) {
-      throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
-    }
-    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_uf_match');
   }
 
   /**
@@ -52,44 +56,9 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
       ['pass']
     )));
 
-    $this->createPasswordResetMessageTemplate();
-
     // `standaloneusers` is installed as part of the overall install process for `Standalone`.
     // A subsequent step will configure some default users (*depending on local options*).
     // See also: `StandaloneUsers.civi-setup.php`
-  }
-
-  protected function createPasswordResetMessageTemplate() {
-
-    $baseTpl = [
-      'workflow_name' => 'password_reset',
-      'msg_title' => 'Password reset',
-      'msg_subject' => '{ts}Password reset link for{/ts} {domain.name}',
-      'msg_text' => <<<TXT
-        {ts}A password reset link was requested for this account.  If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}
-
-        {\$resetUrlPlaintext}
-
-        {domain.name}
-        TXT,
-      'msg_html' => <<<HTML
-        <p>{ts}A password reset link was requested for this account.&nbsp; If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}</p>
-
-        <p><a href="{\$resetUrlHtml}">{\$resetUrlHtml}</a></p>
-
-        <p>{domain.name}</p>
-        HTML,
-    ];
-
-    // Create a "reserved" template. This is a pristine copy provided for reference.
-    MessageTemplate::save(FALSE)
-      ->setDefaults($baseTpl)
-      ->setRecords([
-        ['is_reserved' => TRUE, 'is_default' => FALSE],
-        ['is_reserved' => FALSE, 'is_default' => TRUE],
-      ])
-      ->execute();
-
   }
 
   /**

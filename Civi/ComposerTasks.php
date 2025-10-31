@@ -14,7 +14,7 @@ class ComposerTasks {
    * @return void
    */
   public static function stripSourceMap(array $task = []): void {
-    if (empty($task['src-path']) || !is_string($task['src-path']) || strpos($task['src-path'], '..') !== FALSE) {
+    if (empty($task['src-path']) || !is_string($task['src-path']) || str_contains($task['src-path'], '..')) {
       throw new \LogicException("stripSourceMap(): Task must specify a valid 'src-path'");
     }
     $path = dirname(__DIR__) . '/' . $task['src-path'];

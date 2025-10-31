@@ -20,7 +20,12 @@
 
 #afGuiEditor {
   gap: var(--crm-r);
-  height: 100% !important /* vs inline fixed height */;
+}
+#afGuiEditor-canvas,
+#afGuiEditor-palette,
+#afGuiEditor-canvas > .panel,
+#afGuiEditor-palette > .panel {
+  height: 100%; /* for scrolling panels */
 }
 #afGuiEditor .af-gui-columns {
   display: grid;
@@ -93,6 +98,7 @@
 #afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
   white-space: nowrap;
   overflow: hidden;
+  max-width: unset !important; /* vs inline max-width set by Form Builder UI */
 }
 #afGuiEditor .panel-heading .form-inline.pull-right button {
   max-height: 32px;
@@ -102,8 +108,9 @@
   padding: var(--crm-padding-reg);
   position: relative;
   border-top: none !important;
-  height: 100%;
+  height: calc(100% - var(--crm-panel-head-height));
   background: var(--crm-tab-bg-active);
+  overflow-y: scroll;
 }
 
 /* Edit palette (left side) */
@@ -208,7 +215,7 @@
   cursor: auto;
 }
 .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover {
-  background-color: var(--crm-c-background3);
+  background-color: var(--crm-c-layout2-bg);
 }
 
 /* Edit canvas (right side) */
@@ -239,7 +246,7 @@
   width: 100%;
   border-radius: 0;
   transition: opacity .2s;
-  background-color: var(--crm-c-background3);
+  background-color: var(--crm-fb-header-bg);
   padding-inline: var(--crm-xs);
   cursor: move;
   display: flex;
@@ -268,7 +275,7 @@
 #afGuiEditor .af-gui-node-title {
   position: absolute;
   top: 1px;
-  width: calc(100% - var(--crm-r4));
+  margin-right: 18px;
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
@@ -279,15 +286,13 @@
   opacity: 1;
   transition: opacity .2s;
 }
-#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container:not(.af-gui-container-type-fieldset),
-#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-element,
-#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-markup {
-  border: 2px solid var(--crm-c-background2);
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover :is(.af-gui-container:not(.af-gui-container-type-fieldset),.af-gui-element,.af-gui-markup) {
+  border: 2px solid var(--crm-c-layout1-bg);
 }
 /* Dragging related */
 #afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar,
 #afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-container-title span:empty {
-  background-color: var(--crm-c-background4);
+  background-color: color-mix(in srgb, var(--crm-fb-header-bg) 80%, #000 20%);
   opacity: 1;
   transition: opacity .1s;
 }
@@ -344,14 +349,14 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-element:hover,
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-markup:hover,
 #afGuiEditor .crm-editable-enabled:hover:not(:focus) {
-  border: 2px dashed var(--crm-c-gray-700);
+  outline: 2px dashed var(--crm-c-gray-700);
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container .af-gui-element:hover,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container .af-gui-markup:hover {
   border-width: 1px;
 }
 #afGuiEditor-canvas .af-entity-selected {
-  border: 2px dashed var(--crm-c-blue-dark);
+  outline: 2px dashed var(--crm-c-blue-dark);
 }
 #afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
   background-color: var(--crm-c-primary);
@@ -369,10 +374,11 @@ af-gui-container > .af-gui-bar,
 
 /* Card style */
 #afGuiEditor .af-gui-search-display {
-  border: 1px dotted var(--crm-c-background5);
+  border: var(--crm-c-divider);
+  border-style: dotted;
   color: var(--crm-c-text);
   padding: var(--crm-padding-reg);
-  background-color: var(--crm-c-background2);
+  background-color: var(--crm-c-layout1-bg);
 }
 
 /* Markup area */
@@ -383,12 +389,18 @@ af-gui-container > .af-gui-bar,
   width: 100%;
   height: 100%;
 }
+#afGuiEditor .af-gui-markup-content {
+  /* stop markup-content-overlay growing too big and obscuring af-gui-bar */
+  position: relative;
+  /* stop editor click target shrinking too small */
+  min-height: 2rem;
+}
 #afGuiEditor .af-gui-markup-content:hover .af-gui-markup-content-overlay {
   background-color: rgba(255, 255, 255, .2);
 }
 #afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar {
   width: 100%;
-  background-color: var(--crm-c-background3);
+  background-color: var(--crm-c-layout2-bg);
   display: flex;
   align-items: center;
   padding: var(--crm-m);
@@ -405,32 +417,32 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
-  color: var(--crm-c-info);
+  color: var(--crm-c-link);
 }
 #afGuiEditor .af-gui-add-element-button span {
   display: inline-block;
   width: 18px;
   height: 18px;
-  color: var(--crm-c-info);
+  color: var(--crm-c-link);
 }
 #bootstrap-theme #afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
-  border-color: var(--crm-c-background2) !important;
+  border-color: var(--crm-c-layout1-bg) !important;
 }
 #bootstrap-theme #afGuiEditor .af-gui-button > .btn-default.disabled {
-  background-color: var(--crm-c-background2) !important;
+  background-color: var(--crm-c-layer1-bg) !important;
 }
 #afGuiEditor .af-gui-container-title span:empty {
   font-weight: lighter;
 }
 #afGuiEditor .af-gui-field-required:after {
   content: '*';
-  color: var(--crm-c-alert);
+  color: var(--crm-notify-danger);
   position: relative;
   left: -4px;
 }
 /* For editing field placeholder text */
 #afGuiEditor .af-gui-field-input input[type=text].form-control {
-  color: var(--crm-c-background5);
+  color: var(--crm-c-text);
 }
 #afGuiEditor .af-gui-field-input-type-number input[type=text].form-control {
   background-image: url('../images/number.png');
@@ -467,7 +479,6 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-gui-text-h5,
 #afGuiEditor .af-gui-text-h6 {
   font-weight: bold;
-  font-family: var(--crm-font-bold);
 }
 #afGuiEditor.af-gui-editing-content .panel-heading,
 #afGuiEditor.af-gui-editing-content .af-gui-element,
@@ -482,7 +493,7 @@ af-gui-container > .af-gui-bar,
   background: none;
 }
 #afGuiEditor .af-gui-dropzone {
-  background-color: var(--crm-c-background2);
+  background-color: var(--crm-c-dr);
   border: 2px solid var(--crm-c-info);
   min-height: 30px;
 }
@@ -494,7 +505,7 @@ af-gui-container > .af-gui-bar,
   padding-inline: var(--crm-padding-reg);
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li {
-  background-color: var(--crm-c-background2);
+  background-color: var(--crm-c-layer1-bg);
   cursor: move;
   height: var(--crm-btn-height);
   display: flex;
@@ -502,7 +513,7 @@ af-gui-container > .af-gui-bar,
   padding-inline: var(--crm-m);
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li:nth-child(even) {
-  background-color: var(--crm-c-background3);
+  background-color: color-mix(in srgb, var(--crm-c-layer1-bg) 92%, #000 8%);
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li > div {
   display: inline-block;
@@ -523,14 +534,14 @@ af-gui-container > .af-gui-bar,
 /* Rules for Conditional dialog */
 .af-gui-conditional-dialog fieldset {
   padding: 6px;
-  border-top: 1px solid var(--crm-c-background2);
+  border-top: 1px solid var(--crm-c-drag-bg);
   margin-top: 10px;
   margin-bottom: 10px;
   position: relative;
 }
 .af-gui-conditional-dialog fieldset fieldset {
   padding-top: 0;
-  border: 1px solid var(--crm-c-background2);
+  border: var(--crm-c-divider);
   border-top: 0;
 }
 #bootstrap-theme .af-gui-conditional-dialog af-gui-clause > .btn-group {
@@ -663,16 +674,16 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 
 /* Misc - aka stuff I can't identify but don't want to risk removing*/
 #bootstrap-theme #afGuiEditor .af-gui-bar .btn.active {
-  background-color: var(--crm-c-background5);
+  background-color: color-mix(in srgb, var(--crm-fb-header-bg) 80%, #000);
 }
 #afGuiEditor .af-gui-bar > .form-inline > span {
-  color: var(--crm-c-background5);
+  color: var(--crm-c-text);
   font-style: italic;
 }
 #afGuiEditor .ui-sortable-helper .af-gui-palette-item {
   height: 30px;
   width: 300px;
-  border: 2px dashed var(--crm-c-blue-dark);
+  outline: 2px dashed var(--crm-c-blue-dark);
 }
 .af-gui-conditional-dialog .api4-operator {
   width: 110px;

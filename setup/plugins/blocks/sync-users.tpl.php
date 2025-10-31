@@ -4,10 +4,10 @@ endif; ?>
 <h2><?php echo ts('Users'); ?></h2>
 
 <p>
-  <label for="syncUsers"><span>Synchronize all existing users:</span><input id="syncUsers" type="checkbox" name="civisetup[syncUsers]" value=1 <?php echo $model->syncUsers ? "checked='checked'" : ""; ?> /></label> <br />
+  <label for="syncUsers"><span><?php echo ts('Synchronize all existing users'); ?></span> <input id="syncUsers" type="checkbox" name="civisetup[syncUsers]" value=1 <?php echo $model->syncUsers ? "checked='checked'" : ""; ?> /></label> <br />
   <span class="advancedTip">
   <?php $cmsTitle = ($model->cms === 'Drupal8') ? 'Drupal' : $model->cms; ?>
-  <?php echo ts("To help manage communication preferences, each <em>%1 User record</em> should be internally linked to a <em>CiviCRM Contact record</em>.", [1 => $cmsTitle]); ?><br />
+  <?php echo ts("To help manage communication preferences, each \"<em>%1 User</em>\" should be internally linked to a \"<em>CiviCRM Contact</em>\".", [1 => $cmsTitle]); ?><br />
   </span>
 </p>
 

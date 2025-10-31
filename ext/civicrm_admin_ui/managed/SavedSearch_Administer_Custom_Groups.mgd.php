@@ -86,21 +86,18 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'String',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'title',
-              'dataType' => 'String',
               'label' => E::ts('Group Title'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'extends:label',
-              'dataType' => 'String',
               'label' => E::ts('Used For'),
               'sortable' => TRUE,
               'rewrite' => '[extends:label]',
@@ -108,14 +105,12 @@ return [
             [
               'type' => 'field',
               'key' => 'extends_entity_column_value:label',
-              'dataType' => 'String',
               'label' => E::ts('Subtypes'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -123,14 +118,12 @@ return [
             [
               'type' => 'field',
               'key' => 'style:label',
-              'dataType' => 'String',
               'label' => E::ts('Style'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'html',
               'key' => 'GROUP_CONCAT_CustomGroup_CustomField_custom_group_id_01_label',
-              'dataType' => 'String',
               'label' => E::ts('Fields'),
               'sortable' => TRUE,
               'rewrite' => "{capture assign=fields}[GROUP_CONCAT_CustomGroup_CustomField_custom_group_id_01_label]{/capture}{\$fields|replace:',':'<br>'}",

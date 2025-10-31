@@ -568,10 +568,7 @@ class CRM_Export_BAO_ExportProcessor {
     if (!$this->isMergeSameHousehold()) {
       return [];
     }
-    return [
-      CRM_Utils_Array::key('Household Member of', $this->getRelationshipTypes()),
-      CRM_Utils_Array::key('Head of Household for', $this->getRelationshipTypes()),
-    ];
+    return array_keys(array_intersect($this->getRelationshipTypes(), ['Household Member of', 'Head of Household for']));
   }
 
   /**
@@ -840,7 +837,7 @@ class CRM_Export_BAO_ExportProcessor {
       // always add contact_a.id to the ORDER clause
       // so the order is deterministic
       //CRM-15301
-      if (strpos('contact_a.id', $order) === FALSE) {
+      if (!str_contains('contact_a.id', $order)) {
         $order .= ", contact_a.id";
       }
 
@@ -1448,7 +1445,7 @@ class CRM_Export_BAO_ExportProcessor {
       switch ($type) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($fieldSpec['data_type'] ?? NULL, ['Country', 'StateProvince', 'ContactReference'])) {
+          if (in_array($fieldSpec['data_type'] ?? NULL, ['Country', 'StateProvince', 'ContactReference', 'EntityReference'])) {
             return "`$fieldName` text";
           }
           // some of those will be exported as a (localisable) string

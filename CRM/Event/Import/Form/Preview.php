@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Import\ParticipantParser;
+
 /**
  *
  * @package CRM
@@ -22,11 +24,11 @@
 class CRM_Event_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
-   * @return CRM_Event_Import_Parser_Participant
+   * @return \Civi\Import\ParticipantParser
    */
-  protected function getParser(): CRM_Event_Import_Parser_Participant {
+  protected function getParser(): ParticipantParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Event_Import_Parser_Participant();
+      $this->parser = new ParticipantParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

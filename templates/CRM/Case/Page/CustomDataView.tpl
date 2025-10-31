@@ -32,7 +32,7 @@
                 {elseif $element.field_data_type == 'Money' && $element.field_type == 'Text'}
                   {$element.data|crmMoney}
                 {elseif $element.field_data_type == 'ContactReference' && $element.contact_ref_links}
-                  {', '|implode:$element.contact_ref_links}
+                  {$element.contact_ref_links|join:', '}
                 {else}
                   {$element.field_value}
                 {/if}

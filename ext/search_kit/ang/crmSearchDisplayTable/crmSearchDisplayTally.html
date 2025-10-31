@@ -3,7 +3,7 @@
   <td ng-if=":: $ctrl.hasExtraFirstColumn()">
     {{:: $ctrl.settings.tally.label }}
   </td>
-  <td ng-repeat="col in $ctrl.settings.columns">
+  <td ng-repeat="col in $ctrl.columns" ng-if="col.enabled">
     <div ng-if="!$ctrl.tally" class="crm-search-loading-placeholder"></div>
     <div ng-if="$ctrl.tally">
       {{:: col.tally.label }}

@@ -177,7 +177,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $maxKey = count($totalLables) - 1;
       if (isset($maxKey) && !empty($totalLables[$maxKey]['value'])) {
         foreach ($totalLables[$maxKey]['value'] as $i => $v) {
-          if ($totalLables[$maxKey]['amount_id'][$i] == CRM_Utils_Array::value('default_discount_fee_id', $defaults)) {
+          if ($totalLables[$maxKey]['amount_id'][$i] == ($defaults['default_discount_fee_id'] ?? NULL)) {
             $defaults['discounted_default'] = $i;
             break;
           }
@@ -277,11 +277,12 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
     $this->addSelect('price_set_id', [
       'entity' => 'PriceSet',
-      'option_url' => 'civicrm/admin/price',
       'options' => $price,
       'label' => ts('Price Set'),
       'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
+      'class' => 'crm-form-select-priceset',
     ]);
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.openRelatedConfig.js');
 
     $default = [0 => NULL];
     $this->add('hidden', 'price_field_id', '', ['id' => 'price_field_id']);
@@ -632,7 +633,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                 $fieldParams['option_id'] = $params['price_field_value'];
 
                 $priceSet = new CRM_Price_BAO_PriceSet();
-                $priceSet->id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $params), 'price_set_id');
+                $priceSet->id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'] ?? NULL, 'price_set_id');
 
                 if ($this->_defaultValues['financial_type_id'] != $params['financial_type_id']) {
                   CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $priceSet->id, 'financial_type_id', $params['financial_type_id']);
@@ -731,7 +732,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   if (!empty($value['is_default'])) {
                     $fieldParams['default_option'] = $value['weight'];
                   }
-                  if (!empty($discountFieldIDs[$j]) && !empty($discountFieldIDs[$j][$value['weight']])) {
+                  if (!empty($discountFieldIDs[$j][$value['weight']])) {
                     $fieldParams['option_id'][$value['weight']] = $discountFieldIDs[$j][$value['weight']];
                     unset($discountFieldIDs[$j][$value['weight']]);
                   }

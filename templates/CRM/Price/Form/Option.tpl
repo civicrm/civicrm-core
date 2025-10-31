@@ -19,7 +19,10 @@
         <tr class="crm-price-option-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
           <td>{$form.membership_type_id.html}
-            <br /> <span class="description">{ts}If a membership type is selected, a membership will be created or renewed when users select this option. Leave this blank if you are using this for non-membership options (e.g. magazine subscription).{/ts} {help id="id-member-price-options" file="CRM/Price/Page/Field.hlp"}</span></td>
+            <br /> <span class="description">{ts}If a membership type is selected, a membership will be created or renewed when users select this option. Leave this blank if you are using this for non-membership options (e.g. magazine subscription).{/ts}
+              {capture assign='helpTitle'}{ts}Price Options{/ts}{/capture}
+              {help id="member-price-options" file="CRM/Price/Page/Field.hlp" title=$helpTitle}</span>
+          </td>
         </tr>
         <tr class="crm-price-option-form-block-membership_num_terms">
           <td class="label">{$form.membership_num_terms.label}</td>
@@ -66,14 +69,14 @@
       {if !empty($form.count.html)}
         <tr class="crm-price-option-form-block-count">
           <td class="label">{$form.count.label}</td>
-          <td>{$form.count.html} {help id="id-participant-count" file="CRM/Price/Page/Field.hlp"}</td>
+          <td>{$form.count.html} {help id="count" file="CRM/Price/Page/Field.hlp"}</td>
         </tr>
         {* 2 line fix for CRM-10241 *}
       {/if}
       {if !empty($form.max_value.html)}
         <tr class="crm-price-option-form-block-max_value">
           <td class="label">{$form.max_value.label}</td>
-          <td>{$form.max_value.html} {help id="id-participant-max" file="CRM/Price/Page/Field.hlp"}</td>
+          <td>{$form.max_value.html} {help id="max_value" file="CRM/Price/Page/Field.hlp"}</td>
         </tr>
         {* fix for CRM-10241 *}
       {/if}
@@ -92,7 +95,7 @@
       {/if}
       <tr class="crm-price-field-form-block-visibility_id">
         <td class="label">{$form.visibility_id.label}</td>
-        <td>&nbsp;{$form.visibility_id.html} {help id="id-visibility-options" file="CRM/Price/Page/Field.hlp"}</td>
+        <td>&nbsp;{$form.visibility_id.html} {help id="visibility_id" file="CRM/Price/Page/Field.hlp"}</td>
       </tr>
     </table>
 

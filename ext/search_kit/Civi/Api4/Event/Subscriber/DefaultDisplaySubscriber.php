@@ -58,6 +58,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     if (!$entityName) {
       throw new \CRM_Core_Exception("Entity name is required to get autocomplete default display.");
     }
+    $primaryKeys = CoreUtil::getInfoItem($entityName, 'primary_key');
     $idField = CoreUtil::getIdFieldName($entityName);
 
     // If there's no label field, fall back on id. That's a pretty lame autocomplete but better than nothing.
@@ -101,6 +102,12 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
       'rewrite' => "#[$idField]" . (isset($columns[1]) ? " [$columns[1]]" : ''),
       'empty_value' => "#[$idField]",
     ];
+
+    // Set search fields. Include primary key if singular.
+    $e->display['settings']['searchFields'] = $searchFields;
+    if (count($primaryKeys) === 1 && !in_array($primaryKeys[0], $searchFields)) {
+      array_unshift($e->display['settings']['searchFields'], $primaryKeys[0]);
+    }
 
     // Default icons
     $iconFields = CoreUtil::getInfoItem($entityName, 'icon_field') ?? [];

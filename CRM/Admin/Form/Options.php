@@ -248,7 +248,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     // CRM-11516
     if ($this->_gName == 'payment_instrument') {
       $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
-      $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
+      $financialAccount = \Civi\Api4\FinancialAccount::get()
+        ->addSelect('id', 'label')
+        ->addWhere('financial_account_type_id', '=', key($accountType))
+        ->addWhere('is_active', '=', TRUE)
+        ->addOrderBy('label')
+        ->execute()
+        ->column('label', 'id');
 
       $this->add('select', 'financial_account_id', ts('Financial Account'),
         ['' => ts('- select -')] + $financialAccount,

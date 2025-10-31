@@ -43,17 +43,6 @@
        {contact.display_name}
       </td>
      </tr>
-     <tr>
-      {if '{contribution.financial_type_id}'}
-        <td {$labelStyle}>
-         {ts}Financial Type{/ts}
-        </td>
-        <td {$valueStyle}>
-         {contribution.financial_type_id:label}
-        </td>
-      {/if}
-     </tr>
-
      {if $isShowLineItems}
        <tr>
         <td colspan="2" {$valueStyle}>
@@ -198,16 +187,16 @@
       </tr>
      {/if}
 
-     {if !empty($ccContribution)}
+      {if {contribution.address_id.display|boolean}}
       <tr>
        <th {$headerStyle}>
-        {ts}Billing Name and Address{/ts}
+        {ts}Billing Address{/ts}
        </th>
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-        {$billingName}<br />
-        {$address|nl2br}
+         {contribution.address_id.name}<br/>
+         {contribution.address_id.display}
        </td>
       </tr>
       <tr>

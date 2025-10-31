@@ -7,9 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="separation-title"}
-  {ts}Activity Separation{/ts}
-{/htxt}
+
 {htxt id="separation"}
   <p>{ts}With separate activities, you can enter different activity information for different contacts after creating the activities.{/ts}</p>
   <p>{ts}With a single activity, the activity information cannot be customized for each contact.{/ts}</p>

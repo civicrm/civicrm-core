@@ -123,6 +123,18 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    */
   public $submitOnce = TRUE;
 
+  protected array $forceEmailConfirmed = [];
+
+  /**
+   * @var CRM_Campaign_BAO_Petition
+   */
+  protected $bao;
+
+  /**
+   * @var array
+   */
+  protected $petition;
+
   /**
    */
   public function __construct() {
@@ -587,7 +599,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
           list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
 
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
-          $this->_fields[$key] = $field;
         }
       }
     }

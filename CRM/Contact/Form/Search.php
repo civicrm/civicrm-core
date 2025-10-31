@@ -193,7 +193,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     return (bool) $searchContext;
   }
 
-  public static function setModeValues() {
+  public static function setModeValues(): void {
     self::$_modeValues = [
       CRM_Contact_BAO_Query::MODE_CONTACTS => [
         'selectorName' => self::$_selectorName,
@@ -214,6 +214,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Contribute_Task',
         'component' => 'CiviContribute',
+        'contributionSummary' => [],
       ],
       CRM_Contact_BAO_Query::MODE_EVENT => [
         'selectorName' => 'CRM_Event_Selector_Search',
@@ -328,7 +329,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $componentModes = [];
     foreach (self::$_modeValues as $id => & $value) {
-      if (strpos($value['component'], 'Civi') !== FALSE
+      if (str_contains($value['component'], 'Civi')
         && !array_key_exists($value['component'], $enabledComponents)
       ) {
         continue;
@@ -643,7 +644,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'mailing_click_status',
           'mailing_reply_status',
           'mailing_optout',
-          'mailing_forward',
           'mailing_unsubscribe',
           'mailing_date_low',
           'mailing_date_high',
@@ -692,7 +692,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     self::setModeValues();
 
     $setDynamic = FALSE;
-    if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
+    if (str_contains(self::$_selectorName, 'CRM_Contact_Selector')) {
       $selector = new self::$_selectorName(
         $this->_customSearchClass,
         $this->_formValues,
@@ -815,7 +815,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
       $setDynamic = FALSE;
 
-      if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
+      if (str_contains(self::$_selectorName, 'CRM_Contact_Selector')) {
         $selector = new self::$_selectorName(
           $this->_customSearchClass,
           $this->_formValues,

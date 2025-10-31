@@ -101,7 +101,7 @@ class CRM_Contact_Form_Edit_Address {
 
     foreach ($elements as $name) {
       //Remove id from name, to allow comparison against enabled addressOptions.
-      $nameWithoutID = strpos($name, '_id') !== FALSE ? substr($name, 0, -3) : $name;
+      $nameWithoutID = str_contains($name, '_id') ? substr($name, 0, -3) : $name;
       // Skip fields which are not enabled in the address options.
       if (empty($addressOptions[$nameWithoutID])) {
         $continue = TRUE;
@@ -131,7 +131,7 @@ class CRM_Contact_Form_Edit_Address {
     }
 
     $entityId = NULL;
-    if (!empty($form->_values['address']) && !empty($form->_values['address'][$blockId])) {
+    if (!empty($form->_values['address'][$blockId])) {
       $entityId = $form->_values['address'][$blockId]['id'];
     }
 

@@ -84,7 +84,7 @@
   {if $getTaxDetails && $totalTaxAmount}
     <div class="crm-grid-row">
       <div class="crm-grid-cell bold right text-right">{ts 1=$taxTerm}Total %1{/ts}</div>
-      <div class="crm-grid-cell right text-right">{$totalTaxAmount|crmMoney:$currency}</div>
+      <div class="crm-grid-cell right text-right" id="totalTaxAmount" data-totalTaxAmount="{$totalTaxAmount}">{$totalTaxAmount|crmMoney:$currency}</div>
     </div>
   {/if}
   {if $context EQ "Event"}
@@ -92,13 +92,13 @@
       {assign var=eventSubTotal value=$totalAmount-$totalTaxAmount}
       <div class="crm-grid-row">
         <div class="crm-grid-cell bold right text-right">{ts}Subtotal{/ts}</div>
-        <div class="crm-grid-cell right text-right">{$eventSubTotal|crmMoney:$currency}</div>
+        <div class="crm-grid-cell right text-right" id="eventSubTotal" data-eventSubTotal="{$eventSubTotal}">{$eventSubTotal|crmMoney:$currency}</div>
       </div>
     {/if}
   {/if}
   <div class="crm-grid-row">
     <div class="crm-grid-cell bold right text-right">{ts}Total{/ts}</div>
-    <div class="crm-grid-cell right text-right">{$totalAmount|crmMoney:$currency}</div>
+    <div class="crm-grid-cell right text-right" id="totalAmount" data-totalAmount="{$totalAmount}">{$totalAmount|crmMoney:$currency}</div>
   </div>
   {* set by CRM/Contribute/Page/PaymentInfo.tpl *}
   <div class="hiddenElement">
@@ -125,7 +125,7 @@
           {assign var="totalcount" value=$totalcount+$lineItemCount}
         {/if}
       {/foreach}
-      <div class="crm-grid-cell right text-right">{$totalcount}</div>
+      <div class="crm-grid-cell right text-right" id="participantTotalCount" data-participantTotalCount="{$totalcount}">{$totalcount}</div>
     </div>
   {/if}
 </div>

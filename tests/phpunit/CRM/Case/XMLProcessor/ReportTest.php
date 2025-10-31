@@ -134,7 +134,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
    * Data provider for testGetCaseReport
    * @return array
    */
-  public function caseReportDataProvider() {
+  public static function caseReportDataProvider() {
     return [
       [
         // activity set name

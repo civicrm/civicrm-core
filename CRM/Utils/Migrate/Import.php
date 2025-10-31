@@ -71,7 +71,7 @@ class CRM_Utils_Migrate_Import {
     $this->profileJoins($xml, $idMap);
 
     // clean up all caches etc
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
   }
 
   /**

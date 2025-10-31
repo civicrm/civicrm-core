@@ -34,6 +34,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
     $str = $this->translatePermission($str, 'Drupal', [
       'view user account' => 'access user profiles',
       'administer users' => 'administer users',
+      'bypass maintenance mode' => 'access site in maintenance mode',
     ]);
 
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {

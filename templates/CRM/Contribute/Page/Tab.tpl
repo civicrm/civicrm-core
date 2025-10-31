@@ -48,9 +48,9 @@
 
           {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-              <a accesskey="N" href="{$newContribURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
+              <a accesskey="N" href="{$newContribURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
               {if $newCredit}
-                <a accesskey="N" href="{$newCreditURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
+                <a accesskey="N" href="{$newCreditURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
               {/if}
               <br /><br />
             </div>

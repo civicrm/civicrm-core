@@ -49,7 +49,7 @@
                             {if $canViewMyInvoicesOrAccessCiviContribute}
                                 <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
-                                    <i class="crm-i fa-download" aria-hidden="true"></i>
+                                    <i class="crm-i fa-download" role="img" aria-hidden="true"></i>
                                     {if empty($row.contribution_status_name) || (!empty($row.contribution_status_name) && $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled')}
                                         <span>{ts}Download Invoice{/ts}</span>
                                     {else}

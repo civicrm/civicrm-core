@@ -794,7 +794,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
         break;
       }
       // If data has been entered for a recurring field, tell the tpl layer to open the pane
-      if (!empty($form->_formValues) && !empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
+      if (!empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
         $form->assign('contribution_recur_pane_open', TRUE);
         break;
       }

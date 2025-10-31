@@ -81,7 +81,7 @@ class CRM_Core_BAO_SchemaHandler {
    * @return string
    */
   public static function buildTableSQL($params): string {
-    $sql = "CREATE TABLE {$params['name']} (";
+    $sql = "CREATE TABLE IF NOT EXISTS {$params['name']} (";
     if (isset($params['fields']) &&
       is_array($params['fields'])
     ) {
@@ -589,6 +589,10 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool TRUE if FK is found
    */
   public static function checkFKExists(string $table_name, string $constraint_name): bool {
+    if (!isset(\Civi::$statics['CRM_Core_DAO']['init'])) {
+      // This could get called early during installation.
+      return FALSE;
+    }
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
       WHERE TABLE_SCHEMA = DATABASE()
@@ -825,9 +829,9 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool
    */
   public static function migrateUtf8mb4($revert = FALSE, $patterns = [], $databaseList = NULL) {
-    $newCharSet = $revert ? 'utf8' : 'utf8mb4';
-    $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
-    $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
+    $newCharSet = $revert ? 'utf8mb3' : 'utf8mb4';
+    $newCollation = $revert ? 'utf8mb3_unicode_ci' : 'utf8mb4_unicode_ci';
+    $newBinaryCollation = $revert ? 'utf8mb3_bin' : 'utf8mb4_bin';
     $tables = [];
     $dao = new CRM_Core_DAO();
     $databases = $databaseList ?? [$dao->_database];
@@ -875,11 +879,11 @@ MODIFY      {$columnName} varchar( $length )
         if (!$dao->Collation || $dao->Collation === $newCollation || $dao->Collation === $newBinaryCollation) {
           continue;
         }
-        if (strpos($dao->Collation, 'utf8') !== 0) {
+        if (!str_starts_with($dao->Collation, 'utf8')) {
           continue;
         }
 
-        if (strpos($dao->Collation, '_bin') !== FALSE) {
+        if (str_contains($dao->Collation, '_bin')) {
           $tableCollation = $newBinaryCollation;
         }
         else {

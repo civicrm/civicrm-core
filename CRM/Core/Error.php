@@ -34,8 +34,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Status code of various types of errors.
    */
   const FATAL_ERROR = 2;
+
+  /**
+   * @deprecated
+   */
   const DUPLICATE_CONTACT = 8001;
   const DUPLICATE_CONTRIBUTION = 8002;
+
+  /**
+   * @deprecated
+   */
   const DUPLICATE_PARTICIPANT = 8003;
 
   /**
@@ -209,7 +217,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $exit = TRUE;
     if ($config->initialized) {
       $content = $template->fetch('CRM/common/fatal.tpl');
-      echo CRM_Utils_System::theme($content);
+      CRM_Utils_System::theme($content);
       $exit = CRM_Utils_System::shouldExitAfterFatal();
     }
     else {
@@ -409,6 +417,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       'code' => NULL,
       'exception' => $exception,
     ];
+    if (is_a($exception, '\Civi\Core\Exception\DBQueryException')) {
+      $vars['message'] = $exception->getUserMessage();
+    }
     if (!$vars['message']) {
       $vars['message'] = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', [1 => 'https://civicrm.org/bug-reporting']);
     }
@@ -454,7 +465,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // set the response code before starting the request
     http_response_code(500);
 
-    echo CRM_Utils_System::theme($content);
+    CRM_Utils_System::theme($content);
     $exit = CRM_Utils_System::shouldExitAfterFatal();
 
     if ($exit) {
@@ -501,7 +512,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     if ($log) {
       // Log the output to error_log with a unique reference.
-      $unique = substr(md5(random_bytes(32)), 0, 12);
+      $unique = bin2hex(random_bytes(6));
       error_log("errorID:$unique\n$out");
 
       if (!$checkPermission) {
@@ -838,8 +849,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       $ret[] = sprintf(
         "%s(%s): %s%s(%s)",
-        CRM_Utils_Array::value('file', $trace, '[internal function]'),
-        CRM_Utils_Array::value('line', $trace, ''),
+        $trace['file'] ?? '[internal function]',
+        $trace['line'] ?? '',
         $className,
         $fnName,
         implode(", ", $args)
@@ -918,6 +929,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * @deprecated since 6.1 will be removed around 6.13
+   *
    * @param $message
    * @param int $code
    * @param string $level
@@ -926,6 +939,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @return object
    */
   public static function createError($message, $code = 8000, $level = 'Fatal', $params = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('something that is less silly');
     $error = CRM_Core_Error::singleton();
     $error->push($code, $level, [$params], $message);
     return $error;
@@ -971,10 +985,24 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
-    if ($pearError instanceof DB_Error) {
-      throw new DBQueryException($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
+    $message = $pearError->getMessage();
+
+    // wrapped in case settings/log aren't available yet
+    try {
+      $messageWithDetails = $message . ' ' . $pearError->getUserInfo();
+
+      \Civi::log()->debug($messageWithDetails . "\n\n" . self::formatBacktrace($pearError->getBacktrace()));
     }
-    throw new CRM_Core_Exception($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
+    catch (\Exception $e) {
+      // well we tried
+    }
+
+    $code = $pearError->getCode();
+
+    if ($pearError instanceof DB_Error) {
+      throw new DBQueryException($message, $code, ['exception' => $pearError]);
+    }
+    throw new CRM_Core_Exception($message, $code, ['exception' => $pearError]);
   }
 
   /**

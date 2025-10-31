@@ -46,7 +46,7 @@
 {/if}
 
 <div class="action-link">
-  <a href="{$backUrl}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {$backUrlTitle}</a>
+  <a href="{$backUrl}"><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> {$backUrlTitle}</a>
 </div>
 
 {include file="CRM/common/pager.tpl" location="bottom"}

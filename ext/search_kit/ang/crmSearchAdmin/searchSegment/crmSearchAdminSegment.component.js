@@ -7,10 +7,10 @@
     },
     templateUrl: '~/crmSearchAdmin/searchSegment/crmSearchAdminSegment.html',
     controller: function ($scope, searchMeta, dialogService, crmApi4, crmStatus) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this,
-        originalEntity,
-        originalField;
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+        ctrl = this;
+      let originalEntity;
+      let originalField;
 
       this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
@@ -62,14 +62,14 @@
       };
 
       function getDefaultField() {
-        var item = _.findLast(ctrl.segment.items, function(item) {
+        const item = _.findLast(ctrl.segment.items, function(item) {
           return item.when && item.when[0] && item.when[0][0];
         });
         return item ? item.when[0][0] : searchMeta.getEntity(ctrl.segment.entity_name).fields[0].name;
       }
 
       this.addItem = function(addCondition) {
-        var item = {label: ''};
+        const item = {label: ''};
         if (addCondition) {
           ctrl.addCondition(item);
         }
@@ -77,7 +77,7 @@
       };
 
       this.addCondition = function(item) {
-        var defaultField = getDefaultField();
+        const defaultField = getDefaultField();
         item.when = item.when || [];
         item.when.push([defaultField, '=']);
       };
@@ -94,9 +94,9 @@
 
       // Select2-formatted fields that can be used in "when" clause, including :name suffix if applicable
       this.selectFields = function() {
-        var fields = {results: []};
+        const fields = {results: []};
         _.each(searchMeta.getEntity(ctrl.segment.entity_name).fields, function(field) {
-          var item = {
+          const item = {
             id: field.name + (field.suffixes && _.includes(field.suffixes, 'name') ? ':name' : ''),
             text: field.label,
             description: field.description
@@ -121,7 +121,7 @@
             _.remove(searchMeta.getEntity(originalEntity).fields, {name: originalField});
           }
           // Refresh all segment fields in this entity
-          var entity = searchMeta.getEntity(ctrl.segment.entity_name);
+          const entity = searchMeta.getEntity(ctrl.segment.entity_name);
           _.remove(entity.fields, function(field) {
             return field.name.indexOf('segment_') === 0;
           });

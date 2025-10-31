@@ -40,7 +40,7 @@
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows will be skipped (not imported).{/ts}
             {if $invalidRowCount}
-                <div class="action-link"><a href="{$downloadErrorRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
+                <div class="action-link"><a href="{$downloadErrorRecordsUrl}"><i class="crm-i fa-download" role="img" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
             {/if}
         </td>
     </tr>

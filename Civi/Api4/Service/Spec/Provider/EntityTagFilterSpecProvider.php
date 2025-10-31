@@ -70,12 +70,14 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
   public static function getTagFilterSql(array $field, string $fieldAlias, string $operator, $value, Api4SelectQuery $query, int $depth): string {
     $tableName = CoreUtil::getTableName($field['entity']);
     $tagTree = \CRM_Core_BAO_Tag::getChildTags();
+    $value = (array) ($value ?: NULL);
     foreach ($value as $tagID) {
       if (!empty($tagTree[$tagID])) {
         $value = array_unique(array_merge($value, $tagTree[$tagID]));
       }
     }
-    $tags = $value ? \CRM_Utils_Type::validate(implode(',', $value), 'CommaSeparatedIntegers') : '0';
+    $tags = implode(',', $value);
+    $tags = $tags && \CRM_Utils_Rule::commaSeparatedIntegers($tags) ? $tags : '0';
     return "$fieldAlias $operator (SELECT entity_id FROM `civicrm_entity_tag` WHERE entity_table = '$tableName' AND tag_id IN ($tags))";
   }
 

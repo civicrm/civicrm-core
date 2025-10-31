@@ -477,6 +477,45 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals($attachment['id'], $result[$cfId]);
   }
 
+  /**
+   * Similar to testCustomFileField but
+   * (a) We can't create it with attachment api since it will still make
+   * entity_file records, and what we're testing is attachment.get when those
+   * records aren't present anymore.
+   * (b) I forget what b was.
+   */
+  public function testCustomFileFieldAttachmentGet(): void {
+    $customGroup = $this->customGroupCreate(['title' => 'attachment_test_group']);
+    $params = [
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'test_file_attachment',
+      'label' => 'test_file_attachment',
+      'html_type' => 'File',
+      'data_type' => 'File',
+      'is_active' => 1,
+    ];
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $cfId = 'custom_' . $customField['id'];
+
+    $cid = $this->individualCreate();
+
+    $file = \Civi\Api4\File::create(FALSE)
+      ->addValue('mime_type', 'text/plain')
+      ->addValue('content', 'My test content')
+      ->addValue('file_name', 'testCustomFileField.txt')
+      ->execute()->first();
+    \Civi\Api4\Contact::update(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addValue('attachment_test_group.test_file_attachment', $file['id'])
+      ->execute();
+
+    $att = $this->callAPISuccess('Attachment', 'getsingle', ['id' => $file['id']]);
+
+    // id doesn't tell us much, but mostly we're just testing it succeeded
+    $this->assertEquals($file['id'], $att['id']);
+    $this->assertEquals('testCustomFileField.txt', $att['name']);
+  }
+
   public function testUpdateCustomField(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $params = ['id' => $customGroup['id'], 'is_active' => 0];

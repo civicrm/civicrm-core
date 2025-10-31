@@ -10,39 +10,29 @@
  */
 class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
 
-  protected $_mut = NULL;
-
   protected static $bodytext = 'Unit tests keep children safe.';
-
-  public function setUp(): void {
-    parent::setUp();
-    $this->_mut = new CiviMailUtils($this, TRUE);
-  }
-
-  public function tearDown(): void {
-    $this->_mut->stop();
-    parent::tearDown();
-  }
 
   /**
    * Basic send.
+   *
+   * @throws \Random\RandomException
    */
   public function testSend(): void {
     $contact_params_1 = [
-      'first_name' => substr(sha1(rand()), 0, 7),
+      'first_name' => bin2hex(random_bytes(4)),
       'last_name' => 'Anderson',
-      'email' => substr(sha1(rand()), 0, 7) . '@example.org',
+      'email' => bin2hex(random_bytes(4)) . '@example.org',
       'contact_type' => 'Individual',
     ];
-    $contact_id_1 = $this->individualCreate($contact_params_1);
+    $this->individualCreate($contact_params_1);
 
     $contact_params_2 = [
-      'first_name' => substr(sha1(rand()), 0, 7),
+      'first_name' => bin2hex(random_bytes(4)),
       'last_name' => 'Xylophone',
-      'email' => substr(sha1(rand()), 0, 7) . '@example.org',
+      'email' => bin2hex(random_bytes(4)) . '@example.org',
       'contact_type' => 'Individual',
     ];
-    $contact_id_2 = $this->individualCreate($contact_params_2);
+    $this->individualCreate($contact_params_2);
 
     $subject = 'Test spool';
     $params = [
@@ -53,14 +43,14 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
       'text' => self::$bodytext,
       'html' => "<p>\n" . self::$bodytext . '</p>',
     ];
-
+    $mailUtil = new CiviMailUtils($this, TRUE);
     CRM_Utils_Mail::send($params);
 
-    $mail = $this->_mut->getMostRecentEmail('raw');
+    $mail = $mailUtil->getMostRecentEmail('raw');
     $this->assertStringContainsString("Subject: $subject", $mail);
     $this->assertStringContainsString(self::$bodytext, $mail);
 
-    $mail = $this->_mut->getMostRecentEmail('ezc');
+    $mail = $mailUtil->getMostRecentEmail('ezc');
 
     $this->assertEquals($subject, $mail->subject);
     $this->assertStringContainsString($contact_params_1['email'], $mail->from->email, 'From address incorrect.');

@@ -466,7 +466,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    * Data provider for testCaseRoles and testLocateNameOrLabel
    * @return array
    */
-  public function xmlCaseRoleDataProvider(): array {
+  public static function xmlCaseRoleDataProvider(): array {
     return [
       // Simulate one that has been converted to the format it should be going
       // forward, where name is the actual name, i.e. same as machineName.

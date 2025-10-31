@@ -13,8 +13,9 @@
 
 {if !$addBlock}
 <tr>
-    <td>{ts}Website{/ts}
-        &nbsp;&nbsp;{help id="id-website" file="CRM/Contact/Form/Contact.hlp"}
+    <td>
+      {capture assign='colTitle'}{ts}Website{/ts}{/capture}{$colTitle}
+      {help id="id-website" file="CRM/Contact/Form/Contact.hlp" title=$colTitle}
     </td>
     <td>{ts}Website Type{/ts}</td>
     <td colspan="2"></td>

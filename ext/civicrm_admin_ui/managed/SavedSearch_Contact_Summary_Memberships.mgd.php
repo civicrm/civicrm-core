@@ -93,7 +93,6 @@ return [
             [
               'type' => 'field',
               'key' => 'membership_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Membership'),
               'sortable' => TRUE,
               'rewrite' => '[membership_type_id:label] [IF_owner_membership_id_owner_membership_id]',
@@ -101,45 +100,39 @@ return [
             [
               'type' => 'field',
               'key' => 'join_date',
-              'dataType' => 'Date',
               'label' => E::ts('Member Since'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'start_date',
-              'dataType' => 'Date',
               'label' => E::ts('Membership Start Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'end_date',
-              'dataType' => 'Date',
               'label' => E::ts('Membership Expiration Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'source',
-              'dataType' => 'String',
               'label' => E::ts('Membership Source'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
-              'dataType' => 'Boolean',
               'label' => E::ts('Auto Renew'),
               'sortable' => FALSE,
-              'rewrite' => ' ',
+              'rewrite' => '[none]',
               'icons' => [
                 [
                   'icon' => 'fa-exclamation-triangle',
@@ -163,7 +156,6 @@ return [
             [
               'type' => 'field',
               'key' => 'COUNT_Membership_Membership_owner_membership_id_01_id',
-              'dataType' => 'Integer',
               'label' => E::ts('Related'),
               'sortable' => TRUE,
             ],
@@ -341,7 +333,6 @@ return [
             [
               'type' => 'field',
               'key' => 'membership_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Membership'),
               'sortable' => TRUE,
               'rewrite' => '[membership_type_id:label] [IF_owner_membership_id_owner_membership_id]',
@@ -349,45 +340,39 @@ return [
             [
               'type' => 'field',
               'key' => 'join_date',
-              'dataType' => 'Date',
               'label' => E::ts('Member Since'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'start_date',
-              'dataType' => 'Date',
               'label' => E::ts('Membership Start Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'end_date',
-              'dataType' => 'Date',
               'label' => E::ts('Membership Expiration Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'source',
-              'dataType' => 'String',
               'label' => E::ts('Membership Source'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
-              'dataType' => 'Boolean',
               'label' => E::ts('Auto Renew'),
               'sortable' => FALSE,
-              'rewrite' => ' ',
+              'rewrite' => '[none]',
               'icons' => [
                 [
                   'icon' => 'fa-exclamation-triangle',

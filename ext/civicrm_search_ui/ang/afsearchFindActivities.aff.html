@@ -1,0 +1,52 @@
+<div af-fieldset="">
+  <div class="af-container">
+    <div class="af-container af-layout-inline">
+      <af-field name="target_contact_id" defn="{label: 'With', input_attrs: {}}" />
+      <af-field name="assignee_contact_id" />
+      <af-field name="source_contact_id" />
+    </div>
+    <div class="af-container af-layout-inline">
+      <af-field name="activity_type_id" defn="{input_attrs: {multiple: true}}" />
+      <af-field name="engagement_level" defn="{input_attrs: {multiple: true}}" />
+    </div>
+    <div class="af-container af-layout-inline">
+      <af-field name="activity_date_time" defn="{input_type: 'Select', search_range: true, options: [{id: '{}', label: 'Choose Date Range'}, {id: 'this.day', label: 'Today'}, {id: 'this.week', label: 'This week'}, {id: 'this.month', label: 'This calendar month'}, {id: 'this.quarter', label: 'This quarter'}, {id: 'this.fiscal_year', label: 'This fiscal year'}, {id: 'this.year', label: 'This calendar year'}, {id: 'previous.day', label: 'Yesterday'}, {id: 'previous.week', label: 'Previous week'}, {id: 'previous.month', label: 'Previous calendar month'}, {id: 'previous.quarter', label: 'Previous quarter'}, {id: 'previous.fiscal_year', label: 'Previous fiscal year'}, {id: 'previous.year', label: 'Previous calendar year'}, {id: 'ending.week', label: 'Last 7 days including today'}, {id: 'ending_30.day', label: 'Last 30 days including today'}, {id: 'ending_60.day', label: 'Last 60 days including today'}, {id: 'ending_90.day', label: 'Last 90 days including today'}, {id: 'ending.year', label: 'Last 12 months including today'}, {id: 'ending_2.year', label: 'Last 2 years including today'}, {id: 'ending_3.year', label: 'Last 3 years including today'}, {id: 'starting.day', label: 'Tomorrow'}, {id: 'next.week', label: 'Next week'}, {id: 'next.month', label: 'Next calendar month'}, {id: 'next.quarter', label: 'Next quarter'}, {id: 'next.fiscal_year', label: 'Next fiscal year'}, {id: 'next.year', label: 'Next calendar year'}, {id: 'starting.week', label: 'Next 7 days including today'}, {id: 'starting.month', label: 'Next 30 days including today'}, {id: 'starting_2.month', label: 'Next 60 days including today'}, {id: 'starting.quarter', label: 'Next 90 days including today'}, {id: 'starting.year', label: 'Next 12 months including today'}, {id: 'current.week', label: 'Current week to-date'}, {id: 'current.month', label: 'Current calendar month to-date'}, {id: 'current.quarter', label: 'Current quarter to-date'}, {id: 'current.year', label: 'Current calendar year to-date'}, {id: 'earlier.day', label: 'To end of yesterday'}, {id: 'earlier.week', label: 'To end of previous week'}, {id: 'earlier.month', label: 'To end of previous calendar month'}, {id: 'earlier.quarter', label: 'To end of previous quarter'}, {id: 'earlier.year', label: 'To end of previous calendar year'}, {id: 'greater.day', label: 'From start of current day'}, {id: 'greater.week', label: 'From start of current week'}, {id: 'greater.month', label: 'From start of current calendar month'}, {id: 'greater.quarter', label: 'From start of current quarter'}, {id: 'greater.year', label: 'From start of current calendar year'}, {id: 'less.week', label: 'To end of current week'}, {id: 'less.month', label: 'To end of current calendar month'}, {id: 'less.quarter', label: 'To end of current quarter'}, {id: 'less.year', label: 'To end of current calendar year'}, {id: 'previous_2.day', label: 'Previous 2 days'}, {id: 'previous_2.week', label: 'Previous 2 weeks'}, {id: 'previous_2.month', label: 'Previous 2 calendar months'}, {id: 'previous_2.quarter', label: 'Previous 2 quarters'}, {id: 'previous_2.year', label: 'Previous 2 calendar years'}, {id: 'previous_2.fiscal_year', label: 'Previous 2 fiscal years'}, {id: 'previous_before.day', label: 'Day prior to yesterday'}, {id: 'previous_before.week', label: 'Week prior to previous week'}, {id: 'previous_before.month', label: 'Month prior to previous calendar month'}, {id: 'previous_before.quarter', label: 'Quarter prior to previous quarter'}, {id: 'previous_before.year', label: 'Year prior to previous calendar year'}, {id: 'previous_before.fiscal_year', label: 'Fiscal year prior to previous fiscal year'}, {id: 'greater_previous.week', label: 'From end of previous week'}, {id: 'greater_previous.month', label: 'From end of previous calendar month'}, {id: 'greater_previous.quarter', label: 'From end of previous quarter'}, {id: 'greater_previous.year', label: 'From end of previous calendar year'}], default_date_type: 'fixed', input_attrs: {}}" />
+      <af-field name="status_id" defn="{input_attrs: {multiple: true}}" />
+      <af-field name="subject" />
+      <af-field name="details" defn="{input_type: 'Text', input_attrs: {}}" />
+    </div>
+    <div class="af-container af-layout-inline">
+      <af-field name="priority_id" defn="{input_attrs: {multiple: true}}" />
+      <af-field name="location" />
+      <af-field name="is_test" defn="{input_type: 'Radio'}" />
+      <af-field name="ISNOTNULL_parent_id" defn="{input_type: 'Radio'}" />
+    </div>
+  </div>
+  <div class="af-markup">
+    
+    
+    
+    
+    
+    
+    
+    <!--
+    <p>TODO :<br />
+- Add Filter : Search by email (and not only by name)<br />
+- Add Filter : Search by Name (text field ?)<br />
+- Add Filter :<span class="ng-pristine ng-untouched ng-valid ng-binding ng-isolate-scope ng-not-empty" contenteditable="true" crm-ui-editable="" ng-model="$ctrl.node['#children'][0]['#text']"> Est lie a une activite de suivi ?<br />
+- Add Filter : Activite de suivi ?</span><br />
+- Hide/Add button : View source id entity linked to the activity (if exists) instead of viewing activity or hide Edit/delete (done for contribution type but not others : which?)<br />
+- Default Filter : in core search there is a default filter about contribution that I don't find (diff : 50 activities old:491<>SK:641)<br />
+&nbsp;</p>
+-->
+  
+  
+  
+  
+  
+  
+  
+  </div>
+  <crm-search-display-table search-name="ActivitySearch" display-name="Search_Activities"></crm-search-display-table>
+</div>

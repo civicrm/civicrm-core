@@ -112,7 +112,7 @@ class CRM_Utils_Schema {
    */
   public static function getSize(SimpleXMLElement $fieldXML): string {
     // Extract from <size> tag if supplied
-    if (!empty($fieldXML->html) && !empty($fieldXML->html->size)) {
+    if (!empty($fieldXML->html->size)) {
       return (string) $fieldXML->html->size;
     }
     return self::getDefaultSize(self::toString('length', $fieldXML));

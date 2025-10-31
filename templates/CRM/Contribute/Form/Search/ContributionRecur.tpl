@@ -56,14 +56,14 @@
         </td>
       </tr>
       <tr>
-        <td>{ts}Processor ID{/ts} {help id="processor-id" file="CRM/Contact/Form/Search/Advanced"}</td>
+        <td>{ts}Processor ID{/ts} {help id="contribution_recur_processor_id" file="CRM/Contact/Form/Search/Advanced"}</td>
         <td></td>
         <td col='span2'>
           {$form.contribution_recur_processor_id.html}
         </td>
       </tr>
       <tr>
-        <td>{ts}Transaction ID{/ts} {help id="transaction-id" file="CRM/Contact/Form/Search/Advanced"}</td>
+        <td>{ts}Transaction ID{/ts} {help id="contribution_recur_trxn_id" file="CRM/Contact/Form/Search/Advanced"}</td>
         <td></td>
         <td col='span2'>
           {$form.contribution_recur_trxn_id.html}

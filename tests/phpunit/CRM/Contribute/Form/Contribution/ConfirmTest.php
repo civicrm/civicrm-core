@@ -353,20 +353,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param array $submittedValues
-   * @param int|null $contributionPageID
-   *   Will default to calling $this->>getContributionPageID()
-   *
-   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
-   */
-  protected function submitOnlineContributionForm(array $submittedValues, ?int $contributionPageID = NULL) {
-    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID ?: $this->getContributionPageID()])
-      ->addSubsequentForm('CRM_Contribute_Form_Contribution_Confirm');
-    $form->processForm();
-    return $form;
-  }
-
-  /**
    * @param bool $isSeparateMembershipPayment
    *
    * @deprecated see testSeparatePaymentWithTax for preferred way to get valid config.

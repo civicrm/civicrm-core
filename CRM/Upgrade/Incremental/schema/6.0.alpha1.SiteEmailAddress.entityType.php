@@ -36,7 +36,7 @@ return [
     ],
     'display_name' => [
       'title' => ts('Display Name'),
-      'sql_type' => 'varchar(63)',
+      'sql_type' => 'varchar(254)',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Full name of the sender'),

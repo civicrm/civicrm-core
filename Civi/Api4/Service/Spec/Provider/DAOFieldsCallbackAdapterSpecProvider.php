@@ -23,6 +23,8 @@ use Civi\Schema\EntityRepository;
 /**
  * Legacy adapter for the DAO `fields_callback` quasi-hook
  *
+ * Note: `fields_callback` is now deprecated in favor of the `civi.entity.fields` event.
+ *
  * @service
  * @internal
  */
@@ -48,7 +50,7 @@ class DAOFieldsCallbackAdapterSpecProvider extends \Civi\Core\Service\AutoServic
       if (isset($unmodifiedFields[$fieldName]) && $fieldDefinition == $unmodifiedFields[$fieldName]) {
         continue;
       }
-      $newFieldSpec = self::legacyArrayToField($fieldDefinition, $spec->getEntity());
+      $newFieldSpec = self::legacyArrayToField($fieldDefinition, $spec->getEntity(), $spec);
       $oldFieldSpec = $spec->getFieldByName($fieldName);
       if (!$oldFieldSpec) {
         $spec->addFieldSpec($newFieldSpec);
@@ -80,7 +82,7 @@ class DAOFieldsCallbackAdapterSpecProvider extends \Civi\Core\Service\AutoServic
   /**
    * Legacy function to convert array from DAO::fields() to a FieldSpec
    */
-  private static function legacyArrayToField(array $data, string $entityName): FieldSpec {
+  private static function legacyArrayToField(array $data, string $entityName, RequestSpec $spec): FieldSpec {
     $dataTypeName = self::getDataType($data);
 
     $hasDefault = isset($data['default']) && $data['default'] !== '';
@@ -90,7 +92,10 @@ class DAOFieldsCallbackAdapterSpecProvider extends \Civi\Core\Service\AutoServic
     $field->setType('Field');
     $field->setColumnName($name);
     $field->setNullable(empty($data['required']));
-    $field->setRequired(!empty($data['required']) && !$hasDefault && $name !== 'id');
+    // Api4 only expects field to be 'required' if the action is create.
+    if ($spec->getAction() === 'create') {
+      $field->setRequired(!empty($data['required']) && !$hasDefault && $name !== 'id');
+    }
     $field->setTitle($data['title'] ?? NULL);
     $field->setLabel($data['html']['label'] ?? NULL);
     $field->setLocalizable($data['localizable'] ?? FALSE);
@@ -101,7 +106,8 @@ class DAOFieldsCallbackAdapterSpecProvider extends \Civi\Core\Service\AutoServic
     if (isset($data['usage'])) {
       $field->setUsage(array_keys(array_filter($data['usage'])));
     }
-    if ($hasDefault) {
+    // Per SpecGatherer::getSpec — default value only makes sense for create actions
+    if ($hasDefault && $spec->getAction() === 'create') {
       $field->setDefaultValue(FormattingUtil::convertDataType($data['default'], $dataTypeName));
     }
     $field->setSerialize($data['serialize'] ?? NULL);

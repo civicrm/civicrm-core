@@ -55,8 +55,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_params = [
       'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}.\nhttps://civicrm.org\n{domain.address}{action.optOutUrl}",
-      // 'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
-      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"{action.forward}\">Forward this email</a></p><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      // 'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
       'header_id' => '',
@@ -296,8 +296,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
     $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertMatchesRegularExpression('!>Forward this email</a>!', $previewResult['values']['body_html']);
-    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!civicrm/mailing/optout&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
@@ -537,7 +536,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function submitProvider() {
+  public static function submitProvider() {
     // $useLogin, $params, $expectedFailure, $expectedJobCount
     $cases = [];
     $cases[] = [
@@ -783,6 +782,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $sql = "UPDATE civicrm_mailing_job SET is_test = 0 WHERE mailing_id = {$mail['id']}";
     CRM_Core_DAO::executeQuery($sql);
 
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_recipients(mailing_id,contact_id,email_id,phone_id) SELECT mailing_id,contact_id,email_id,phone_id FROM civicrm_mailing_event_queue");
+
     foreach (['bounce', 'unsubscribe', 'opened'] as $type) {
       $temporaryTable = CRM_Utils_SQL_TempTable::build()->setCategory($type)->createWithQuery("SELECT event_queue_id, time_stamp, id as delivered_id
         FROM civicrm_mailing_event_delivered
@@ -805,6 +806,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $expectedResult = [
       //since among 100 mails 20 has been bounced
       'Recipients' => 100,
+      'Queued' => 100,
       'Delivered' => 80,
       'Bounces' => 20,
       'Opened' => 20,

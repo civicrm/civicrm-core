@@ -9,7 +9,7 @@ class CRM_Core_Page_Inline_HelpTest extends CiviUnitTestCase {
   /**
    * various test cases
    */
-  public function fileTestCases(): array {
+  public static function fileTestCases(): array {
     $cases = [];
     $cases['relative paths are allowed'] = ['CRM/Admin/Form/Setting/Url', TRUE];
     $cases['sometimes civi does this on windows'] = ['CRM\\Admin\\Form\\Setting\\Url', TRUE];

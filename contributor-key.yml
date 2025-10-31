@@ -21,27 +21,27 @@
 
 - github      : agileware
   name        : Agileware Team
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-dev
   name        : Agileware Team
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-fj
   name        : Francis Whittle
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-iris
   name        : Iris
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-justin
   name        : Justin Freeman
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-pengyi
   name        : Pengyi Zhang
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : ahed-compucorp
   name        : Ahed Eid
@@ -109,6 +109,7 @@
 
 - github      : angusfretwell
   name        : Angus Fretwell
+  organization: Buildkite
 
 - github      : AnwenW
   name        : Anwen Williams
@@ -257,6 +258,14 @@
 - github      : brianPHM
   name        : Brian Matemachani
 
+- github      : briangflett
+  name        : Brian Flett
+  organization: Non Profit Tech Advisor
+
+- github      : briennek
+  organization: Civil Justice, Inc.
+  name        : Brienne K.
+
 - github      : briennekordis
   name        : Brienne Kordis
   organization: Megaphone Technology Consulting
@@ -316,6 +325,8 @@
 - github      : christopher-yu
   name        : Christopher Yu
   organization: Giant Rabbit
+
+- github      : chumkui
 
 - github      : clarkac1
   name        : Andy Clark
@@ -396,6 +407,10 @@
   name        : David Glick
   organization: Glick Software
 
+- github      : DieEinzigWahreWarsteinerin
+  name        : Evita Wagner
+  organization: ASMAC (American Society of Music Arrangers and Composers)
+
 - github      : deb1990
   name        : Debarshi Bhaumik
   organization: CompuCorp
@@ -422,6 +437,9 @@
 - github      : devappsoftware
   organization: DevApp
 
+- gitub       : dev-allinappli
+  name        : dev ALL IN APPLI
+
 - github      : devarun
   name        : Arun Singh
 
@@ -435,11 +453,15 @@
   name        : Peter Haight
   organization: Giant Rabbit
 
-- github      : dlobo
-  name        : Donald Lobo
+- github      : djnatedagreat
+  name        : Nate Frank
+  organization: New York State Senate
 
 - github      : dkguru
   organization: Jesper Angelo
+
+- github      : dlobo
+  name        : Donald Lobo
 
 - github      : don-alejandro-z
 
@@ -486,6 +508,9 @@
 
 - github      : dsuguy2007
   name        : Tommy Sheppard
+
+- github      : duncan-s-white
+  name        : Duncan White
 
 - github      : dvhirst
   name        : Donald Hirst
@@ -618,6 +643,8 @@
 - github      : giovannidalmas1967
   name        : Giovanni Dalmas
 
+- github      : gitressa
+
 - github      : jmcheung
   name        : Jon-Man Cheung
   organization: GMCVO Databases
@@ -652,6 +679,9 @@
 
 - github      : hosseinamin
   name        : Hossein Amin
+
+- github      : IamDrowsy
+  name        : Albrecht Schmidt
 
 - github      : in2part
 
@@ -950,7 +980,7 @@
 
 - github      : larssandergreen
   name        : Lars Sander-Green
-  organization: Wildsight
+  organization: Wikimedia Foundation
 
 - github      : laryn
   name        : Laryn Kragt Bakker
@@ -969,6 +999,10 @@
 - github      : lemacarl
   name        : Carl Andrew Lema
   organization: Kanzu Code
+
+- github      : lenajukna
+  name        : Lena Jukna
+  organization: SYSTOPIA
 
 - github      : Levi-70
   name        : Levi.k
@@ -1071,6 +1105,8 @@
   name        : Matthew Wire
   organization: MJW Consulting
 
+- github      : Matt5K
+
 - github      : marcineqpol
   name        : Marcin Lewandowski
 
@@ -1159,7 +1195,7 @@
   name        : Mathieu Lutfy
   organization: Coop SymbioTIC
 
-  github      : 19ATf72
+- github      : 19ATf72
   name        : Micah Hobby
   organization: Circle Interactive
 
@@ -1215,6 +1251,10 @@
 
 - github      : netzih
 
+- github      : nfreesto
+  name        : Nathan Freestone
+  organization: Giant Rabbit
+
 - github      : nganivet
   name        : Nicolas Ganivet
   organization: CiviDesk
@@ -1256,6 +1296,8 @@
 
 - github      : otetard
   name        : Olivier Tétard
+
+- github      : ozhamlet
 
 - github      : nowszy
   name        : Pawel Nowak
@@ -1335,11 +1377,17 @@
   name        : Peter Davis
   organization: Fuzion
 
+- github      : Peter-Reck
+
 - github      : pillarsdotnet
   name        : Bob Vincent
 
 - name        : Peter Davis
   organization: Fuzion
+
+- github      : pminf
+  name        : Philipp Michael
+  organization: Parlamentwatch e.V.
 
 - github      : powdevel
   name        : Beto Aveiga
@@ -1373,6 +1421,8 @@
 - github      : rasmuswinter
   name        : Rasmus Winter
   organization: Outlandish
+
+- github      : RaulJMCD
 
 - github      : ray-wright
   name        : Ray Wright
@@ -1459,6 +1509,10 @@
 
 - name        : Steve Binkowski
 
+- github      : stuart897
+  name        : Stuart
+  organization: NIAB
+
 - github      : shaneonabike
   name        : Shane Bill
   organization: Coop SymbioTIC
@@ -1518,6 +1572,9 @@
 - github      : shitijg
   name        : Shitij Gugnani
   organization: CompuCorp
+
+- github      : Sjord
+  name        : Sjoerd Langkemper
 
 - name        : James van der Hoven
 
@@ -1732,7 +1789,7 @@
   name        : Vinu Varshith Sekar
   organization: CompuCorp
 
-- github      : vinay-osseed
+- github      : vinugawade
   name        : Vinay Gawade
   organization: OSSeed Technologies LLP
 
@@ -1875,4 +1932,21 @@
   name        : Joanna Suchogórska
   organization: Future Processing
 
-- github      : gitressa
+- github      : peetcreative
+  name        : Peter Klausing
+  organization: 5Knoten
+
+- github      : pzukowicz
+  name        : Patryk Żukowicz
+  organization: TechSoup
+
+- github      : shahrukh-compuco
+  name        : Muhammad Shahrukh
+  organization: CompuCo
+
+- github      : rafe-murray
+  name        : Rafe Murray
+  organization: JMA Consulting
+
+- github      : MundMBo
+  name        : Marvin Müller

@@ -8,7 +8,7 @@ class RequestTest extends \CiviUnitTestCase {
   /**
    * @return array
    */
-  public function validEntityActionPairs() {
+  public static function validEntityActionPairs() {
     $cases = [];
     $cases[] = [
       ['MyEntity', 'MyAction', 3],
@@ -44,7 +44,7 @@ class RequestTest extends \CiviUnitTestCase {
   /**
    * @return array
    */
-  public function invalidEntityActionPairs() {
+  public static function invalidEntityActionPairs() {
     $cases = [];
     $cases[] = ['Not!Valid', 'create', 4];
     $cases[] = ['My+Entity', 'MyAction', 4];

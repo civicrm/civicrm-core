@@ -1,6 +1,7 @@
 <div af-fieldset="">
   <div class="af-container af-layout-inline">
-    <af-field name="title" defn="{label: 'Title', input_attrs: {}}" />
+    <af-field name="title" defn="{label: 'Title', input_attrs: {}, search_operator: 'CONTAINS'}" />
+    <af-field name="group_type" defn="{input_attrs: {multiple: true}}" />
     <af-field name="visibility" defn="{label: 'Visibility', input_attrs: {multiple: true}}" />
     <af-field name="is_active" defn="{input_type: 'Radio', label: 'Enabled', afform_default: true}" />
   </div>

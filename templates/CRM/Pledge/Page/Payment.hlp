@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="adjust-payment-amount-title"}
-  {ts}Payment Amount{/ts}
-{/htxt}
 {htxt id="adjust-payment-amount"}
 {ts}If you enter an amount which is different than the current scheduled amount, choose one of these options:{/ts}
 <p>

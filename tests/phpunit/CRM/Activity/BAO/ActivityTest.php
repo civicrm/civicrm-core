@@ -1129,7 +1129,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getActivityDateData() {
+  public static function getActivityDateData() {
     return [
       'last-year-activity' => [
         'params' => [
@@ -1716,7 +1716,7 @@ $textValue
 
     $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
-    $fileUri = "{$filepath}/{$fileName}";
+    $fileUri = "{$filepath}{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'aaaaaa', $fileName);
 
@@ -1781,7 +1781,7 @@ $textValue
 
     $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
-    $fileUri = "{$filepath}/{$fileName}";
+    $fileUri = "{$filepath}{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
 
@@ -2063,7 +2063,7 @@ $textValue
    * Dataprovider for testTargetAssigneeVariations
    * @return array
    */
-  public function targetAndAssigneeProvider():array {
+  public static function targetAndAssigneeProvider():array {
     return [
       // Explicit index so that it's easy to see which one has failed without
       // having to finger count.

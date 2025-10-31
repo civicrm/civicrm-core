@@ -777,13 +777,13 @@ GROUP BY    currency
       if ($dao->amount2) {
         $amount2[]
           = CRM_Utils_Money::format($dao->amount2, $dao->currency) . "(" .
-          $dao->count . ")";
+          $dao->count2 . ")";
         $average2[] = CRM_Utils_Money::format($dao->avg2, $dao->currency);
       }
       $count2 += $dao->count2;
     }
 
-    $statistics['counts']['range_one_title'] = ['title' => ts('Initial Date Range:')];
+    $statistics['counts']['range_one_title'] = ['value' => '', 'title' => ts('Initial Date Range:')];
     $statistics['counts']['amount'] = [
       'value' => implode(',  ', $amount),
       'title' => ts('Total Amount'),
@@ -792,6 +792,7 @@ GROUP BY    currency
     $statistics['counts']['count'] = [
       'value' => $count,
       'title' => ts('Total Donations'),
+      'type' => CRM_Utils_Type::T_FLOAT,
     ];
     $statistics['counts']['avg'] = [
       'value' => implode(',  ', $average),
@@ -800,6 +801,8 @@ GROUP BY    currency
     ];
     $statistics['counts']['range_two_title'] = [
       'title' => ts('Second Date Range:'),
+      'value' => '',
+      'type' => CRM_Utils_Type::T_STRING,
     ];
     $statistics['counts']['amount2'] = [
       'value' => implode(',  ', $amount2),
@@ -809,6 +812,7 @@ GROUP BY    currency
     $statistics['counts']['count2'] = [
       'value' => $count2,
       'title' => ts('Total Donations'),
+      'type' => CRM_Utils_Type::T_FLOAT,
     ];
     $statistics['counts']['avg2'] = [
       'value' => implode(',  ', $average2),

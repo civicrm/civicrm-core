@@ -173,7 +173,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
     // Save whitelisted params starting with config_
     foreach ($params as $key => $val) {
       $val = trim($val);
-      if (strpos($key, 'config_') === 0 && strlen($val) && in_array(substr($key, 7), $whiteList)) {
+      if (str_starts_with($key, 'config_') && strlen($val) && in_array(substr($key, 7), $whiteList)) {
         if ($val != 'true' && $val != 'false' && $val != 'null' && $val[0] != '{' && $val[0] != '[' && !is_numeric($val)) {
           $val = '"' . $val . '"';
         }

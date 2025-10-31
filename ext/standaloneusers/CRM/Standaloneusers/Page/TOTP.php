@@ -32,7 +32,6 @@ class CRM_Standaloneusers_Page_TOTP extends CRM_Core_Page {
     $this->assign('statusMessages', CRM_Core_Smarty::singleton()->fetch("CRM/common/status.tpl"));
 
     $this->assign('pageTitle', '');
-    $this->assign('logoUrl', E::url('images/civicrm-logo.png'));
     $this->assign('breadcrumb', NULL);
     parent::run();
   }

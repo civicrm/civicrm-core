@@ -16,7 +16,7 @@
   <title>{ts}Error{/ts}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <base href="{$config->resourceBase}" />
-  <style type="text/css" media="screen">
+  <style media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
     @import url({$config->resourceBase}css/crm-i.css);
     @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
@@ -26,13 +26,13 @@
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 {else}
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
-  <style type="text/css" media="screen">
+  <style media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
     @import url({$config->resourceBase}css/crm-i.css);
     @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
   </style>
 {/if}
-<div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
+<div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red" role="img" aria-hidden="true"></i>
     <div class="crm-section crm-error-message">{$message|escape}</div>
     {if !empty($error.message) && $message != $error.message}
         <hr style="solid 1px" />

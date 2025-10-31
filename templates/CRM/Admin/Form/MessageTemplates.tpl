@@ -13,6 +13,7 @@
     {ts}Use this form to add or edit re-usable message templates.{/ts} {help id="id-intro" file="CRM/Admin/Page/MessageTemplates.hlp"}
   </div>
 {/if}
+{capture assign='tokenTitle'}{ts}Tokens{/ts}{/capture}
 
 <h3>{if $action eq 1}{ts}New Message Template{/ts}{elseif $action eq 2}{ts}Edit Message Template{/ts}{else}{ts}Delete Message Template{/ts}{/if}</h3>
 
@@ -42,7 +43,7 @@
           <td>
             {$form.msg_subject.html|crmAddClass:huge}
             <input class="crm-token-selector big" data-field="msg_subject" />
-            {help id="id-token-subject" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
+            {help id="id-token-subject" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
           </td>
         </tr>
         <tr>
@@ -67,13 +68,12 @@
 
       <details id="msg_html_section" class="crm-accordion-bold crm-html_email-accordion " open>
         <summary>
-          {ts}HTML Format{/ts}
-          {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
+          {ts}Message Body{/ts}
         </summary>
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helphtml">
             <input class="crm-token-selector big" data-field="msg_html" />
-            {help id="id-token-html" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
+            {help id="id-token-html" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
           </div>
           <div class="clear"></div>
           <div class='html'>
@@ -85,12 +85,12 @@
       <details id="msg_text_section" class="crm-accordion-bold crm-plaint_text_email-accordion " open>
         <summary>
           {ts}Optional Plain-Text Format{/ts}
-          {help id="id-message-plain" file="CRM/Contact/Form/Task/Email.hlp"}
+          {help id="msg_text" file="CRM/Contact/Form/Task/Email.hlp" title=$form.msg_text.textLabel}
         </summary>
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helptext">
             <input class="crm-token-selector big" data-field="msg_text" />
-            {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
+            {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
           </div>
           <div class="clear"></div>
           <div class='text'>
@@ -107,7 +107,7 @@
           <div class="spacer"></div>
           <div class='html'>
             {$form.pdf_format_id.html}
-            {help id="id-msg-template" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
+            {help id="pdf_format_id" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
             <div class="description">{ts}Page format to use when creating PDF files using this template.{/ts}</div>
           </div>
         </div>

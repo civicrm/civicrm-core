@@ -19,8 +19,12 @@ if (!defined('CIVI_SETUP')) {
 
     $e->getModel()->extensions[] = 'org.civicrm.search_kit';
     $e->getModel()->extensions[] = 'org.civicrm.afform';
+    $e->getModel()->extensions[] = 'org.civicrm.afform_admin';
     $e->getModel()->extensions[] = 'authx';
     $e->getModel()->extensions[] = 'civiimport';
     $e->getModel()->extensions[] = 'message_admin';
+    $e->getModel()->extensions[] = 'riverlea';
 
+    $e->getModel()->settings['theme_backend'] = 'minetta';
+    $e->getModel()->settings['theme_frontend'] = 'minetta';
   });

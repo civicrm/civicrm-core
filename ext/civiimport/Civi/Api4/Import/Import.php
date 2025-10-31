@@ -28,10 +28,10 @@ class Import extends DAOGetAction {
     $this->getImportRows($result);
     $parser = $this->getParser($userJobID);
     foreach ($result as $row) {
-      if (!in_array($row['_status'], ['new', 'valid'], TRUE) && !$parser->validateRow($row)) {
+      if (!$parser->validateRow($row)) {
         continue;
       }
-      $parser->import(array_values($row));
+      $parser->import($row);
     }
     $parser->doPostImportActions();
 

@@ -182,7 +182,6 @@ class CRM_Mailing_BAO_Query {
       case 'civicrm_mailing_event_opened':
       case 'civicrm_mailing_event_reply':
       case 'civicrm_mailing_event_unsubscribe':
-      case 'civicrm_mailing_event_forward':
       case 'civicrm_mailing_event_trackable_url_open':
         $from = " $side JOIN $name ON $name.event_queue_id = civicrm_mailing_event_queue.id";
         break;
@@ -354,16 +353,6 @@ class CRM_Mailing_BAO_Query {
         );
         return;
 
-      case 'mailing_forward':
-        $valueTitle = ['Y' => ts('Forwards')];
-        // since its a checkbox
-        $values[2] = 'Y';
-        self::mailingEventQueryBuilder($query, $values,
-          'civicrm_mailing_event_forward', 'mailing_forward',
-          ts('Mailing: '), $valueTitle
-        );
-        return;
-
       case 'mailing_job_status':
         if (!empty($value)) {
           if ($value != 'Scheduled' && $value != 'Canceled') {
@@ -401,7 +390,7 @@ class CRM_Mailing_BAO_Query {
     $mailings = CRM_Mailing_BAO_Mailing::getMailingsList();
 
     if (!empty($mailings)) {
-      $form->add('select', 'mailing_id', ts('Mailing Name(s)'), $mailings, FALSE,
+      $form->add('select', 'mailing_id', ts('Mailing Name'), $mailings, FALSE,
         ['id' => 'mailing_id', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
@@ -431,7 +420,6 @@ class CRM_Mailing_BAO_Query {
 
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));
-    $form->add('checkbox', 'mailing_forward', ts('Forwards'));
     // Campaign select field
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'mailing_campaign_id');
 

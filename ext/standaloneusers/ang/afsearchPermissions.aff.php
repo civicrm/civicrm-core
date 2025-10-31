@@ -7,4 +7,9 @@ return [
   'icon' => 'fa-list-alt',
   'server_route' => 'civicrm/admin/rolepermissions',
   'permission' => ['cms:administer users'],
+  'navigation' => [
+    'parent' => 'Users and Permissions',
+    'label' => E::ts('User Permissions'),
+    'weight' => 0,
+  ],
 ];

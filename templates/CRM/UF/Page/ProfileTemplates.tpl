@@ -29,7 +29,7 @@
         </span>
       </div>
       <input type="text" class="crm-form-text" placeholder="{ts escape='htmlattribute'}Search Fields{/ts}" />
-      <a class="crm-designer-palette-clear-search crm-hover-button" href="#" style="visibility:hidden" title="{ts escape='htmlattribute'}Clear search{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+      <a class="crm-designer-palette-clear-search crm-hover-button" href="#" style="visibility:hidden" title="{ts escape='htmlattribute'}Clear search{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
       <div class="crm-designer-palette-controls">
         <a href="#" class="crm-designer-palette-toggle" rel="open_all">{ts}Open All{/ts}</a>&nbsp; |&nbsp;
         <a href="#" class="crm-designer-palette-toggle" rel="close_all">{ts}Close All{/ts}</a>
@@ -58,8 +58,12 @@
  *}
 <script type="text/template" id="field_summary_template">
   <span class="crm-designer-buttons">
-    <a class="crm-i fa-pencil crm-designer-action-settings" title="{ts escape='htmlattribute'}Settings{/ts}" aria-hidden="true"></a>
-    <a class="crm-i fa-trash crm-designer-action-remove" title="{ts escape='htmlattribute'}Remove{/ts}" aria-hidden="true"></a>
+    <a class="crm-designer-action-settings" title="{ts escape='htmlattribute'}Settings{/ts}" aria-label="{ts escape='htmlattribute'}Settings{/ts}">
+      <i class="crm-i fa-pencil" role="img" aria-hidden="true"></i>
+    </a>
+    <a class="crm-designer-action-remove" title="{ts escape='htmlattribute'}Remove{/ts}" aria-label="{ts escape='htmlattribute'}Remove{/ts}">
+      <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
+    </a>
   </span>
   <div class="description"><%= help_pre %></div>
   <div class="crm-designer-row-label">
@@ -106,7 +110,7 @@
 <script type="text/template" id="profile_selector_template">
     <div>
         <span class="crm-profile-selector-select"></span>
-        <button type="button" class="crm-profile-selector-preview" title="{ts escape='htmlattribute'}Preview{/ts}"><i class="crm-i fa-television" aria-hidden="true"></i> {ts}Preview{/ts}</button>
+        <button type="button" class="crm-profile-selector-preview" title="{ts escape='htmlattribute'}Preview{/ts}"><i class="crm-i fa-television" role="img" aria-hidden="true"></i> {ts}Preview{/ts}</button>
         {if $perm}
           <button class="crm-profile-selector-edit">{ts}Edit{/ts}</button>
           <button class="crm-profile-selector-copy">{ts}Copy{/ts}</button>

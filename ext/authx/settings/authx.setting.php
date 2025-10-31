@@ -48,7 +48,7 @@ $_authx_settings = function() {
     ],
     'default' => ['site_key', 'perm'],
     'title' => ts('Authentication guard'),
-    'description' => ts('Enable an authentication guard if you want to limit which users may authenticate via authx. The permission-based guard is satisfied by checking user permissions. The key-based guard is satisfied by checking the secret site-key. If there are no guards, then any user can authenticate.'),
+    'help_text' => ts('Enable an authentication guard if you want to limit which users may authenticate via authx. The permission-based guard is satisfied by checking user permissions. The key-based guard is satisfied by checking the secret site-key. If there are no guards, then any user can authenticate.'),
     'pseudoconstant' => [
       'callback' => ['\Civi\Authx\Meta', 'getGuardTypes'],
     ],
@@ -67,6 +67,10 @@ $_authx_settings = function() {
       ],
       'default' => ['jwt'],
       'title' => ts('Acceptable credentials (%1)', [1 => $flowLabel]),
+      'help_text' => ts('Specify which types of credentials are allowed in this authentication flow.'),
+      'help_doc_url' => [
+        'page' => 'dev/framework/authx/',
+      ],
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getCredentialTypes'],
       ],
@@ -82,7 +86,10 @@ $_authx_settings = function() {
       ],
       'default' => 'optional',
       'title' => ts('User account requirements (%1)', [1 => $flowLabel]),
-      'help_text' => NULL,
+      'help_markup' => ts('CiviCRM Contacts are often attached to CMS User Accounts. When authenticating a Contact, should it also load the User Account?'),
+      'help_doc_url' => [
+        'page' => 'dev/framework/authx/',
+      ],
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getUserModes'],
       ],
@@ -97,12 +104,6 @@ $_authx_settings = function() {
   $s['authx_header_cred']['default'] = []; /* @see \authx_civicrm_install() */
   $s['authx_xheader_cred']['default'] = ['jwt', 'api_key'];
   $s['authx_pipe_cred']['default'] = ['jwt', 'api_key'];
-
-  // Oof. Attach description to one flow. This is silly - should be on all flows. But, at time of writing, the auto-generated `settings_pages` would become unreadable.
-  $finalFlow = key(array_slice($flows, -1));
-  $seeAlso = ts('See also: <a %1>Authentication Documentation</a>', [1 => 'href="https://docs.civicrm.org/dev/en/latest/framework/authx/" target="_blank"']);
-  $s["authx_{$finalFlow}_cred"]['description'] = ts('Specify which types of <em>credentials</em> are allowed in each <em>authentication flow</em>.') . '<br/>' . $seeAlso;
-  $s["authx_{$finalFlow}_user"]['description'] = ts('CiviCRM <em>Contacts</em> are often attached to CMS <em>User Accounts</em>. When authenticating a <em>Contact</em>, should it also load the <em>User Account</em>?') . '<br/>' . $seeAlso;
 
   return $s;
 };

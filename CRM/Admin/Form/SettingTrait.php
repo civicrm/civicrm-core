@@ -67,7 +67,7 @@ trait CRM_Admin_Form_SettingTrait {
    */
   protected function getSettingsMetaData(): array {
     if (empty($this->settingsMetadata)) {
-      $this->settingsMetadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => array_keys($this->_settings)], NULL, TRUE);
+      $this->settingsMetadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => array_keys($this->_settings)], NULL, TRUE, FALSE, TRUE);
       // This array_merge re-orders to the key order of $this->_settings.
       $this->settingsMetadata = array_merge($this->_settings, $this->settingsMetadata);
     }
@@ -116,7 +116,7 @@ trait CRM_Admin_Form_SettingTrait {
    * @param $setting
    * @return mixed
    */
-  protected function getSettingMetadata($setting) {
+  protected function getSettingMetadata($setting): array {
     return $this->getSettingsMetaData()[$setting];
   }
 
@@ -169,105 +169,99 @@ trait CRM_Admin_Form_SettingTrait {
     $this->addSettingsToFormFromMetadata();
     $settingMetaData = $this->getSettingsMetaData();
     $descriptions = [];
-    foreach ($settingMetaData as $setting => $props) {
-      $quickFormType = $this->getQuickFormType($props);
-      if (isset($quickFormType)) {
-        $options = $props['options'] ?? NULL;
-        if ($options) {
-          if ($quickFormType === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
-            // If the spec specifies the field is not required add a null option.
-            // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
-            // when it is true.
-            $options = ['' => ts('None')] + $options;
-          }
-        }
-        if ($props['type'] === 'Boolean') {
-          $options = [$props['title'] => $props['name']];
-        }
-
-        //Load input as readonly whose values are overridden in civicrm.settings.php.
-        if (Civi::settings()->getMandatory($setting) !== NULL) {
-          $props['html_attributes']['readonly'] = TRUE;
-          $this->readOnlyFields[] = $setting;
-        }
-
-        $add = 'add' . $quickFormType;
-        if ($add === 'addElement') {
-          $this->$add(
-            $props['html_type'],
-            $setting,
-            $props['title'],
-            ($options !== NULL) ? $options : $props['html_attributes'] ?? [],
-            ($options !== NULL) ? $props['html_attributes'] ?? [] : NULL
-          );
-        }
-        elseif ($add === 'addSelect') {
-          $this->addElement('select', $setting, $props['title'], $options, $props['html_attributes'] ?? NULL);
-        }
-        elseif ($add === 'addCheckBox') {
-          $this->addCheckBox($setting, '', $options, NULL, $props['html_attributes'] ?? NULL, NULL, NULL, ['&nbsp;&nbsp;']);
-        }
-        elseif ($add === 'addCheckBoxes') {
-          $newOptions = array_flip($options);
-          $classes = 'crm-checkbox-list';
-          if (!empty($props['sortable'])) {
-            $classes .= ' crm-sortable-list';
-            $newOptions = array_flip(self::reorderSortableOptions($setting, $options));
-          }
-          $settingMetaData[$setting]['wrapper_element'] = ['<ul class="' . $classes . '"><li>', '</li></ul>'];
-          $this->addCheckBox($setting,
-            $props['title'],
-            $newOptions,
-            NULL, NULL, NULL, NULL,
-            '</li><li>'
-          );
-        }
-        elseif ($add === 'addChainSelect') {
-          $this->addChainSelect($setting, ['label' => $props['title']] + $props['chain_select_settings']);
-        }
-        elseif ($add === 'addMonthDay') {
-          $this->add('date', $setting, $props['title'], CRM_Core_SelectValues::date(NULL, 'M d'));
-        }
-        elseif ($add === 'addEntityRef') {
-          $this->$add($setting, $props['title'], $props['entity_reference_options']);
-        }
-        elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
-        }
-        elseif ($add === 'add') {
-          $this->add($props['html_type'], $setting, $props['title'], $options, FALSE, $props['html_extra'] ?? NULL);
-        }
-        else {
-          $this->$add($setting, $props['title'], $options);
-        }
+    foreach ($settingMetaData as $settingName => &$props) {
+      $added = $this->addSettingFieldToForm($settingName, $props);
+      if ($added) {
         // Migrate to using an array as easier in smart...
         $description = $props['description'] ?? NULL;
-        $descriptions[$setting] = $description;
-        $this->assign("{$setting}_description", $description);
-        if ($setting === 'max_attachments') {
-          //temp hack @todo fix to get from metadata
-          $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
-        }
-        if ($setting === 'max_attachments_backend') {
-          //temp hack @todo fix to get from metadata
-          $this->addRule('max_attachments_backend', ts('Value should be a positive number'), 'positiveInteger');
-        }
-        if ($setting === 'maxFileSize') {
-          //temp hack
-          $this->addRule('maxFileSize', ts('Value should be a positive number'), 'positiveInteger');
-        }
-
+        $descriptions[$settingName] = $description;
+        $this->assign("{$settingName}_description", $description);
       }
     }
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
     $this->assign('fields', $this->getSettingsOrderedByWeight());
-    // @todo look at sharing the code below in the settings trait.
+
     if ($this->hasReadOnlyFields()) {
       $this->freeze($this->readOnlyFields);
       CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
     }
+  }
+
+  protected function addSettingFieldToForm(string $settingName, array &$props) {
+    $quickFormType = $this->getQuickFormType($props);
+    if (isset($quickFormType)) {
+      $options = $props['options'] ?? NULL;
+      if ($options) {
+        if ($quickFormType === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
+          // If the spec specifies the field is not required add a null option.
+          // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
+          // when it is true.
+          $options = ['' => ts('None')] + $options;
+        }
+      }
+      if ($props['type'] === 'Boolean') {
+        $options = [$props['title'] => $props['name']];
+      }
+
+      // Disable input when values are overridden in civicrm.settings.php.
+      if (Civi::settings()->getMandatory($settingName) !== NULL) {
+        $props['html_attributes']['disabled'] = TRUE;
+        $this->readOnlyFields[] = $settingName;
+      }
+
+      $add = 'add' . $quickFormType;
+      if ($add === 'addElement') {
+        $this->$add(
+          $props['html_type'],
+          $settingName,
+          $props['title'],
+          ($options !== NULL) ? $options : $props['html_attributes'] ?? [],
+          ($options !== NULL) ? $props['html_attributes'] ?? [] : NULL
+        );
+      }
+      elseif ($add === 'addSelect') {
+        $this->addElement('select', $settingName, $props['title'], $options, $props['html_attributes'] ?? NULL);
+      }
+      elseif ($add === 'addCheckBox') {
+        $this->addCheckBox($settingName, '', $options, NULL, $props['html_attributes'] ?? NULL, NULL, NULL, ['&nbsp;&nbsp;']);
+      }
+      elseif ($add === 'addCheckBoxes') {
+        $newOptions = array_flip($options);
+        $classes = 'crm-checkbox-list';
+        if (!empty($props['sortable'])) {
+          $classes .= ' crm-sortable-list';
+          $newOptions = array_flip(self::reorderSortableOptions($settingName, $options));
+        }
+        $props['wrapper_element'] = ['<ul class="' . $classes . '"><li>', '</li></ul>'];
+        $this->addCheckBox($settingName,
+          $props['title'],
+          $newOptions,
+          NULL, NULL, NULL, NULL,
+          '</li><li>'
+        );
+      }
+      elseif ($add === 'addChainSelect') {
+        $this->addChainSelect($settingName, ['label' => $props['title']] + $props['chain_select_settings']);
+      }
+      elseif ($add === 'addMonthDay') {
+        $this->add('date', $settingName, $props['title'], CRM_Core_SelectValues::date(NULL, 'M d'));
+      }
+      elseif ($add === 'addEntityRef') {
+        $this->$add($settingName, $props['title'], $props['entity_reference_options']);
+      }
+      elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
+        $this->addRadio($settingName, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
+      }
+      elseif ($add === 'add') {
+        $this->add($props['html_type'], $settingName, $props['title'], $options ?? $props['html_attributes'] ?? NULL, !empty($props['is_required']), $options ? ($props['html_attributes'] ?? NULL) : ($props['html_extra'] ?? NULL));
+      }
+      else {
+        $this->$add($settingName, $props['title'], $options);
+      }
+    }
+    return isset($quickFormType);
   }
 
   /**
@@ -277,7 +271,7 @@ trait CRM_Admin_Form_SettingTrait {
    *
    * @return string
    */
-  protected function getQuickFormType($spec) {
+  protected static function getQuickFormType($spec) {
     if (isset($spec['quick_form_type']) &&
     !($spec['quick_form_type'] === 'Element' && !empty($spec['html_type']))) {
       // This is kinda transitional
@@ -346,27 +340,32 @@ trait CRM_Admin_Form_SettingTrait {
     $settings = $this->getSettingsToSetByMetadata($params);
     foreach ($settings as $setting => $settingValue) {
       $settingMetaData = $this->getSettingMetadata($setting);
-      if (!empty($settingMetaData['sortable'])) {
-        $settings[$setting] = $this->getReorderedSettingData($setting, $settingValue);
-      }
-      elseif ($this->getQuickFormType($settingMetaData) === 'CheckBoxes') {
-        $settings[$setting] = array_keys($settingValue);
-      }
-      elseif ($this->getQuickFormType($settingMetaData) === 'CheckBox') {
-        // This will be an array with one value.
-        $settings[$setting] = (bool) reset($settings[$setting]);
-      }
-      elseif ($settingMetaData['type'] === 'Integer') {
-        // QuickForm is pretty slack when it comes to types, cast to an integer.
-        if (is_numeric($settingValue)) {
-          $settings[$setting] = (int) $settingValue;
-        }
-        if (!$settingValue && empty($settingMetaData['is_required'])) {
-          $settings[$setting] = NULL;
-        }
-      }
+      $settings[$setting] = self::formatSettingValue($settingMetaData, $settingValue);
     }
     Setting::set(FALSE)->setValues($settings)->execute();
+  }
+
+  protected static function formatSettingValue(array $settingMetaData, $settingValue) {
+    if (!empty($settingMetaData['sortable'])) {
+      $settingValue = self::getReorderedSettingData($settingMetaData['name'], $settingValue);
+    }
+    elseif (self::getQuickFormType($settingMetaData) === 'CheckBoxes') {
+      $settingValue = array_keys($settingValue);
+    }
+    elseif (self::getQuickFormType($settingMetaData) === 'CheckBox') {
+      // This will be an array with one value.
+      $settingValue = (bool) reset($settingValue);
+    }
+    elseif ($settingMetaData['type'] === 'Integer') {
+      // QuickForm is pretty slack when it comes to types, cast to an integer.
+      if (is_numeric($settingValue)) {
+        $settingValue = (int) $settingValue;
+      }
+      if (!$settingValue && empty($settingMetaData['is_required'])) {
+        $settingValue = NULL;
+      }
+    }
+    return $settingValue;
   }
 
   /**
@@ -388,7 +387,7 @@ trait CRM_Admin_Form_SettingTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  private function getReorderedSettingData($setting, $settingValue) {
+  private static function getReorderedSettingData(string $setting, array $settingValue): array {
     // Get order from $_POST as $_POST maintains the order the sorted setting
     // options were sent. You can simply assign data from $_POST directly to
     // $settings[] but preference has to be given to data from Quickform.

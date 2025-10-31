@@ -402,7 +402,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * As well as checking various things work as expected, this set of tests is
    * here to set out what IS expected behaviour.
    */
-  public function dataForTestAddOrderForMembershipWithDates(): array {
+  public static function dataForTestAddOrderForMembershipWithDates(): array {
     // Prevent test mis-fires because of running over midnight.
     static::$phpunitStartedDate = date('Y-m-d');
 

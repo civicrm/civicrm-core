@@ -14,12 +14,14 @@
  */
 abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
 
+  private static $_entityProviders = [];
+
   public function __construct() {
     parent::__construct();
     // Historically a generated DAO would have one class variable per field.
     // To prevent undefined property warnings, this dynamic DAO mimics that by
     // initializing the object with a property for each field.
-    foreach (static::getEntityDefinition()['getFields']() as $name => $field) {
+    foreach (static::getEntityProvider()->getFields() as $name => $field) {
       $this->$name = NULL;
     }
   }
@@ -29,7 +31,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
    */
   public function keys(): array {
     $keys = [];
-    foreach (static::getEntityDefinition()['getFields']() as $name => $field) {
+    foreach (static::getEntityProvider()->getFields() as $name => $field) {
       if (!empty($field['primary_key'])) {
         $keys[] = $name;
       }
@@ -38,65 +40,65 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   }
 
   public static function getEntityTitle($plural = FALSE) {
-    $info = static::getEntityInfo();
-    return ($plural && isset($info['title_plural'])) ? $info['title_plural'] : $info['title'];
+    $entityProvider = static::getEntityProvider();
+    $title = $entityProvider->getMeta('title');
+    if ($plural) {
+      return $entityProvider->getMeta('title_plural') ?? $title;
+    }
+    return $title;
   }
 
   /**
    * @inheritDoc
    */
   public static function getEntityPaths(): array {
-    $definition = static::getEntityDefinition();
-    if (isset($definition['getPaths'])) {
-      return $definition['getPaths']();
-    }
-    return [];
+    return static::getEntityProvider()->getMeta('paths');
   }
 
   public static function getLabelField(): ?string {
-    return static::getEntityInfo()['label_field'] ?? NULL;
+    return static::getEntityProvider()->getMeta('label_field');
   }
 
   /**
    * @inheritDoc
    */
   public static function getEntityDescription(): ?string {
-    return static::getEntityInfo()['description'] ?? NULL;
+    return static::getEntityProvider()->getMeta('description');
   }
 
   /**
    * @inheritDoc
    */
   public static function getTableName() {
-    return static::getEntityDefinition()['table'];
+    return static::getEntityProvider()->getMeta('table');
   }
 
   /**
    * @inheritDoc
    */
   public function getLog(): bool {
-    return static::getEntityInfo()['log'] ?? FALSE;
+    return static::getEntityProvider()->getMeta('log');
   }
 
   /**
    * @inheritDoc
    */
   public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
-    return static::getEntityInfo()['icon'] ?? NULL;
+    return static::getEntityProvider()->getMeta('icon');
   }
 
   /**
    * @inheritDoc
    */
   protected static function getTableAddVersion(): string {
-    return static::getEntityInfo()['add'] ?? '1.0';
+    return static::getEntityProvider()->getMeta('add') ?? '1.0';
   }
 
   /**
    * @inheritDoc
    */
   public static function getExtensionName(): ?string {
-    return static::getEntityDefinition()['module'];
+    return static::getEntityProvider()->getMeta('module');
   }
 
   /**
@@ -115,6 +117,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   private static function getSchemaFields(): array {
     if (!isset(Civi::$statics[static::class]['fields'])) {
       Civi::$statics[static::class]['fields'] = static::loadSchemaFields();
+      // Note: `fields_callback` is now deprecated in favor of the `civi.entity.fields` event.
       CRM_Core_DAO_AllCoreTables::invoke(static::class, 'fields_callback', Civi::$statics[static::class]['fields']);
     }
     return Civi::$statics[static::class]['fields'];
@@ -122,10 +125,10 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
 
   private static function loadSchemaFields(): array {
     $fields = [];
-    $entityDef = static::getEntityDefinition();
+    $entityProvider = static::getEntityProvider();
     $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class);
 
-    foreach ($entityDef['getFields']() as $fieldName => $fieldSpec) {
+    foreach ($entityProvider->getFields() as $fieldName => $fieldSpec) {
       $field = [
         'name' => $fieldName,
         'type' => !empty($fieldSpec['data_type']) ? \CRM_Utils_Type::getValidTypes()[$fieldSpec['data_type']] : CRM_Utils_Schema::getCrmTypeFromSqlType($fieldSpec['sql_type']),
@@ -164,7 +167,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
       if ($field['usage']['import']) {
         $field['import'] = TRUE;
       }
-      $field['where'] = $entityDef['table'] . '.' . $field['name'];
+      $field['where'] = $entityProvider->getMeta('table') . '.' . $field['name'];
       if ($field['usage']['export'] || (!$field['usage']['export'] && $field['usage']['import'])) {
         $field['export'] = $field['usage']['export'];
       }
@@ -180,8 +183,8 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
           $field['default'] = $fieldSpec['default'] ? '1' : '0';
         }
       }
-      $field['table_name'] = $entityDef['table'];
-      $field['entity'] = $entityDef['name'];
+      $field['table_name'] = $entityProvider->getMeta('table');
+      $field['entity'] = $entityProvider->getMeta('name');
       $field['bao'] = $baoName;
       $field['localizable'] = intval($fieldSpec['localizable'] ?? 0);
       if (!empty($fieldSpec['localize_context'])) {
@@ -236,11 +239,12 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
    * @inheritDoc
    */
   public static function indices(bool $localize = TRUE): array {
-    $definition = static::getEntityDefinition();
+    $entityProvider = static::getEntityProvider();
+    $entityIndices = $entityProvider->getMeta('indices');
     $indices = [];
-    if (isset($definition['getIndices'])) {
-      $fields = $definition['getFields']();
-      foreach ($definition['getIndices']() as $name => $info) {
+    if ($entityIndices) {
+      $fields = $entityProvider->getFields();
+      foreach ($entityIndices as $name => $info) {
         $index = [
           'name' => $name,
           'field' => [],
@@ -258,20 +262,17 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
         if (!empty($info['unique'])) {
           $index['unique'] = TRUE;
         }
-        $index['sig'] = ($definition['table']) . '::' . intval($info['unique'] ?? 0) . '::' . implode('::', $index['field']);
+        $index['sig'] = $entityProvider->getMeta('table') . '::' . intval($info['unique'] ?? 0) . '::' . implode('::', $index['field']);
         $indices[$name] = $index;
       }
     }
     return ($localize && $indices) ? CRM_Core_DAO_AllCoreTables::multilingualize(static::class, $indices) : $indices;
   }
 
-  private static function getEntityDefinition(): array {
+  private static function getEntityProvider(): \Civi\Schema\EntityProvider {
     $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(static::class);
-    return \Civi\Schema\EntityRepository::getEntity($entityName);
-  }
-
-  private static function getEntityInfo(): array {
-    return static::getEntityDefinition()['getInfo']();
+    self::$_entityProviders[$entityName] ??= Civi::entity($entityName);
+    return self::$_entityProviders[$entityName];
   }
 
 }

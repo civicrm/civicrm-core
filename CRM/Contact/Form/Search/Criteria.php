@@ -31,7 +31,7 @@ class CRM_Contact_Form_Search_Criteria {
       $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
 
       if ($contactTypes) {
-        $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,
+        $form->add('select', 'contact_type', ts('Contact Type'), $contactTypes, FALSE,
           ['id' => 'contact_type', 'multiple' => 'multiple', 'class' => 'crm-select2', 'style' => 'width: 100%;']
         );
       }
@@ -63,7 +63,7 @@ class CRM_Contact_Form_Search_Criteria {
       $contactTags = CRM_Core_BAO_Tag::getTags();
 
       if ($contactTags) {
-        $form->add('select', 'contact_tags', ts('Select Tag(s)'), $contactTags, FALSE,
+        $form->add('select', 'contact_tags', ts('Tag'), $contactTags, FALSE,
           ['id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2', 'style' => 'width: 100%;']
         );
       }
@@ -109,7 +109,7 @@ class CRM_Contact_Form_Search_Criteria {
     }
 
     // add checkbox for cms users only
-    $form->addYesNo('uf_user', ts('CMS User?'), TRUE);
+    $form->addYesNo('uf_user', ts('CMS User'), TRUE);
 
     // tag all search
     $form->add('text', 'tag_search', ts('All Tags'));
@@ -136,9 +136,9 @@ class CRM_Contact_Form_Search_Criteria {
 
     $form->add('select',
       'uf_group_id',
-      ts('Views For Display Contacts'),
+      ts('Display Columns'),
       [
-        '0' => ts('- default view -'),
+        '0' => ts('- default columns -'),
       ] + $searchProfiles,
       FALSE,
       ['class' => 'crm-select2']
@@ -203,7 +203,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     $form->addElement('select',
       'privacy_operator',
-      ts('Operator'),
+      ts('Multiple Privacy Options'),
       [
         'OR' => ts('OR'),
         'AND' => ts('AND'),
@@ -212,7 +212,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     $options = [
       1 => ts('Exclude'),
-      2 => ts('Include by Privacy Option(s)'),
+      2 => ts('Include by Privacy Option'),
     ];
     $form->addRadio('privacy_toggle', ts('Privacy Options'), $options, ['allowClear' => FALSE]);
 
@@ -247,13 +247,13 @@ class CRM_Contact_Form_Search_Criteria {
   public static function getSearchFieldMetadata() {
     $fields = [
       'sort_name' => [
-        'title' => ts('Complete OR Partial Name'),
+        'title' => ts('Name'),
         'template_grouping' => 'basic',
         'template' => 'CRM/Contact/Form/Search/Criteria/Fields/sort_name.tpl',
       ],
       'first_name' => ['template_grouping' => 'basic'],
       'last_name' => ['template_grouping' => 'basic'],
-      'email' => ['title' => ts('Complete OR Partial Email'), 'entity' => 'Email', 'template_grouping' => 'basic'],
+      'email' => ['title' => ts('Email'), 'entity' => 'Email', 'template_grouping' => 'basic'],
       'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
       'created_date' => ['name' => 'created_date', 'template_grouping' => 'changeLog'],
       'modified_date' => ['name' => 'modified_date', 'template_grouping' => 'changeLog'],
@@ -315,7 +315,7 @@ class CRM_Contact_Form_Search_Criteria {
     }
     $fields = array_merge(self::getBasicSearchFields(), $searchFields);
     foreach ($fields as $index => $field) {
-      $fields[$index] = array_merge(['class' => '', 'is_custom' => FALSE, 'template' => '', 'help' => '', 'description' => ''], $field);
+      $fields[$index] = array_merge(['class' => '', 'is_custom' => FALSE, 'template' => '', 'description' => ''], $field);
     }
     $form->assign('basicSearchFields', $fields);
   }
@@ -340,7 +340,7 @@ class CRM_Contact_Form_Search_Criteria {
       'tag_types_text' => ['name' => 'tag_types_text'],
       'tag_search' => [
         'name' => 'tag_search',
-        'help' => ['id' => 'id-all-tags', 'file' => NULL],
+        'help' => ['id' => 'tag_search'],
       ],
       'tag_set' => [
         'name' => 'tag_set',
@@ -350,7 +350,7 @@ class CRM_Contact_Form_Search_Criteria {
       'all_tag_types' => [
         'name' => 'all_tag_types',
         'class' => 'search-field__span-3 search-field__checkbox',
-        'help' => ['id' => 'id-all-tag-types', 'file' => NULL],
+        'help' => ['id' => 'all_tag_types'],
       ],
       'phone_numeric' => [
         'name' => 'phone_numeric',
@@ -369,17 +369,17 @@ class CRM_Contact_Form_Search_Criteria {
       ],
       'contact_source' => [
         'name' => 'contact_source',
-        'help' => ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact'],
+        'help' => ['id' => 'contact_source', 'file' => 'CRM/Contact/Form/Contact'],
       ],
       'job_title' => ['name' => 'job_title'],
       'preferred_language' => ['name' => 'preferred_language'],
       'contact_id' => [
         'name' => 'id',
-        'help' => ['id' => 'id-contact-id', 'file' => 'CRM/Contact/Form/Contact'],
+        'help' => ['id' => 'contact_id', 'file' => 'CRM/Contact/Form/Contact'],
       ],
       'external_identifier' => [
         'name' => 'external_identifier',
-        'help' => ['id' => 'id-external-id', 'file' => 'CRM/Contact/Form/Contact'],
+        'help' => ['id' => 'external_identifier', 'file' => 'CRM/Contact/Form/Contact'],
       ],
       'uf_user' => [
         'name' => 'uf_user',

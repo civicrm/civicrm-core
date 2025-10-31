@@ -272,7 +272,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   public function getInvoiceID(): string {
     if (!$this->invoiceID) {
-      $this->invoiceID = md5(uniqid(mt_rand(), TRUE));
+      $this->invoiceID = bin2hex(random_bytes(16));
     }
     return $this->invoiceID;
   }

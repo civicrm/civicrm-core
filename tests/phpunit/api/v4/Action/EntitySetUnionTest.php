@@ -36,26 +36,26 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->saveTestRecords('Group', [
       'records' => [
         ['title' => '1G', 'description' => 'Group 1'],
-        ['title' => '2G', 'description' => 'Group 2'],
+        ['title' => '2>G', 'description' => 'Group > 2'],
         ['title' => '3G', 'group_type:name' => ['Access Control', 'Mailing List']],
       ],
     ]);
     $this->saveTestRecords('Tag', [
       'records' => [
         ['name' => '3T', 'description' => 'Tag 3', 'used_for:name' => ['Contact', 'Activity']],
-        ['name' => '2T', 'description' => 'Tag 2'],
+        ['name' => '2<T', 'description' => 'Tag < 2'],
         ['name' => '1T', 'description' => 'Tag 1'],
       ],
     ]);
     $result = EntitySet::get(FALSE)
       ->addSet('UNION ALL', Group::get()
         ->addSelect('title', 'description', '"group" AS thing')
-        ->addWhere('title', 'IN', ['1G', '2G', '3G'])
+        ->addWhere('title', 'IN', ['1G', '2>G', '3G'])
       )
       ->addSet('UNION ALL', Tag::get()
         // The UNION will automatically alias Tag."name" to "title" because that's the column name in the 1st query
         ->addSelect('name', 'description', '"tag" AS thing')
-        ->addWhere('name', 'IN', ['1T', '2T', '3T'])
+        ->addWhere('name', 'IN', ['1T', '2<T', '3T'])
       )
       ->addOrderBy('title')
       ->setLimit(5)
@@ -64,19 +64,19 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertCount(5, $result);
     $this->assertEquals(['title' => '1G', 'description' => 'Group 1', 'thing' => 'group'], $result[0]);
     $this->assertEquals(['title' => '1T', 'description' => 'Tag 1', 'thing' => 'tag'], $result[1]);
-    $this->assertEquals(['title' => '2G', 'description' => 'Group 2', 'thing' => 'group'], $result[2]);
-    $this->assertEquals(['title' => '2T', 'description' => 'Tag 2', 'thing' => 'tag'], $result[3]);
+    $this->assertEquals(['title' => '2>G', 'description' => 'Group > 2', 'thing' => 'group'], $result[2]);
+    $this->assertEquals(['title' => '2<T', 'description' => 'Tag < 2', 'thing' => 'tag'], $result[3]);
     $this->assertEquals(['title' => '3G', 'description' => NULL, 'thing' => 'group'], $result[4]);
 
     // Try with a "WHERE" clause
     $result = EntitySet::get(FALSE)
       ->addSet('UNION ALL', Group::get()
         ->addSelect('title', 'description', 'group_type:name AS type')
-        ->addWhere('title', 'IN', ['1G', '2G', '3G'])
+        ->addWhere('title', 'IN', ['1G', '2>G', '3G'])
       )
       ->addSet('UNION ALL', Tag::get()
         ->addSelect('name', 'description', 'used_for:name')
-        ->addWhere('name', 'IN', ['1T', '2T', '3T'])
+        ->addWhere('name', 'IN', ['1T', '2<T', '3T'])
       )
       ->addOrderBy('title')
       ->addWhere('title', 'LIKE', '3%')
@@ -172,11 +172,11 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
 
     $result = EntitySet::get(FALSE)
       ->addSelect('id', 'name', 'label', 'parent_id:name', 'is_parent')
-      ->addSet('UNION ALL', ContactType::get()
+      ->addSet('UNION DISTINCT', ContactType::get()
         ->addSelect('*', 'TRUE AS is_parent')
         ->addWhere('name', '=', 'Household')
       )
-      ->addSet('UNION ALL', ContactType::get()
+      ->addSet('UNION DISTINCT', ContactType::get()
         ->addSelect('*', 'FALSE AS is_parent')
         ->addWhere('id', '=', $subType['id'])
       )

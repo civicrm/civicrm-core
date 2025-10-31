@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='icalendar-title'}
-  {ts}ICalendar Downloads and Feeds{/ts}
-{/htxt}
 {htxt id='icalendar'}
 {capture assign=icalPage}{crmURL p='civicrm/event/ical' q="reset=1&list=1"}{/capture}
 {capture assign=rssFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&rss=1"}{/capture}

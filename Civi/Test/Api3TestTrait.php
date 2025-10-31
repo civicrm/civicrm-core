@@ -22,7 +22,7 @@ trait Api3TestTrait {
    *
    * @return array
    */
-  public function versionThreeAndFour() {
+  public static function versionThreeAndFour() {
     return [
       'APIv3' => [3],
       'APIv4' => [4],
@@ -338,7 +338,7 @@ trait Api3TestTrait {
     $chains = $custom = [];
     foreach ($v3Params as $key => $val) {
       foreach ($toRemove as $remove) {
-        if (strpos($key, $remove) === 0) {
+        if (str_starts_with($key, $remove)) {
           if ($remove == 'api.') {
             $chains[$key] = $val;
           }
@@ -403,7 +403,7 @@ trait Api3TestTrait {
         }
       }
       // Convert custom field names
-      if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+      if (str_starts_with($name, 'custom_') && is_numeric($name[7])) {
         // Strictly speaking, using titles instead of names is incorrect, but it works for
         // unit tests where names and titles are identical and saves an extra db lookup.
         $custom[$field['groupTitle']][$field['title']] = $name;
@@ -546,13 +546,19 @@ trait Api3TestTrait {
     // Build where clause for 'getcount', 'getsingle', 'getvalue', 'get' & 'replace'
     if ($v4Action == 'get' || $v3Action == 'replace') {
       foreach ($v3Params as $key => $val) {
-        $op = '=';
-        if (is_array($val) && count($val) == 1 && array_intersect_key($val, array_flip(\CRM_Core_DAO::acceptedSQLOperators()))) {
-          foreach ($val as $op => $newVal) {
-            $val = $newVal;
-          }
+        if ($key === 'orderBy') {
+          $v4Params[$key] = $val;
+          $indexBy = NULL;
         }
-        $v4Params['where'][] = [$key, $op, $val];
+        else {
+          $op = '=';
+          if (is_array($val) && count($val) == 1 && array_intersect_key($val, array_flip(\CRM_Core_DAO::acceptedSQLOperators()))) {
+            foreach ($val as $op => $newVal) {
+              $val = $newVal;
+            }
+          }
+          $v4Params['where'][] = [$key, $op, $val];
+        }
       }
     }
 
@@ -679,7 +685,7 @@ trait Api3TestTrait {
 
     // Replace $value.field_name
     foreach ($params as $name => $param) {
-      if (is_string($param) && strpos($param, '$value.') === 0) {
+      if (is_string($param) && str_starts_with($param, '$value.')) {
         $param = substr($param, 7);
         $params[$name] = $result[$param] ?? NULL;
       }

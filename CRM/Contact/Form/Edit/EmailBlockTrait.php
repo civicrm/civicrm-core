@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\API\EntityLookupTrait;
 use Civi\Api4\Email;
 use Civi\Api4\Generic\Result;
 
@@ -26,6 +27,7 @@ use Civi\Api4\Generic\Result;
  */
 trait CRM_Contact_Form_Edit_EmailBlockTrait {
   use CRM_Contact_Form_Edit_BlockCustomDataTrait;
+  use EntityLookupTrait;
 
   /**
    * @var \Civi\Api4\Generic\Result
@@ -33,18 +35,77 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
   private Result $existingEmails;
 
   /**
+   *
+   * @param bool $nonContact
+   *    If TRUE, this will NOT return emails belonging to the form-associated ContactID.
+   *    This is used by the Event form which should not silently default to the email
+   *    address(es) of the contact who created the Event.
+   *    See https://lab.civicrm.org/dev/core/-/issues/6127
    * @return \Civi\Api4\Generic\Result
    * @throws CRM_Core_Exception
    */
-  public function getExistingEmails() : Result {
+  public function getExistingEmails($nonContact = FALSE) : Result {
     if (!isset($this->existingEmails)) {
-      $this->existingEmails = Email::get()
-        ->addSelect('*', 'custom.*')
-        ->addOrderBy('is_primary', 'DESC')
-        ->addWhere('contact_id', '=', $this->getContactID())
-        ->execute();
+      if ($this->getLocationBlockID()) {
+        // In this scenario we are looking up the emails for an event or domain & so we do not apply permissions
+        $this->existingEmails = Email::get(FALSE)
+          ->addSelect('*', 'custom.*')
+          ->addOrderBy('is_primary', 'DESC')
+          ->addWhere('id', 'IN', [$this->getLocationBlockValue('email_id'), $this->getLocationBlockValue('email_2_id')])
+          ->execute();
+      }
+      elseif (!$nonContact && $this->getContactID()) {
+        $this->existingEmails = Email::get()
+          ->addSelect('*', 'custom.*')
+          ->addOrderBy('is_primary', 'DESC')
+          ->addWhere('contact_id', '=', $this->getContactID())
+          ->execute();
+      }
     }
-    return $this->existingEmails;
+    return isset($this->existingEmails) ? $this->existingEmails : new Result();
+  }
+
+  /**
+   * Return the value from civicrm_loc_block to get emails for.
+   *
+   * @return int|null
+   */
+  public function getLocationBlockID(): ?int {
+    return NULL;
+  }
+
+  /**
+   * Get a value from the location block associated with the event.
+   *
+   * @api supported for use from outside of core.
+   *
+   * @param string $value
+   *
+   * @return mixed|null
+   */
+  public function getLocationBlockValue(string $value) {
+    if (!$this->getLocationBlockID()) {
+      return NULL;
+    }
+    if (!$this->isDefined('LocationBlock')) {
+      $this->define('LocBlock', 'LocationBlock', ['id' => $this->getLocationBlockID()]);
+    }
+    return $this->lookup('LocationBlock', $value);
+  }
+
+  /**
+   * Get the open ids indexed numerically from 1.
+   *
+   * This reflects historical form requirements.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function getExistingEmailsReIndexed() : array {
+    $result = array_merge([0 => 1], (array) $this->getExistingEmails());
+    unset($result[0]);
+    return $result;
   }
 
   /**
@@ -68,6 +129,7 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
       'label' => ts('Email %1', [1 => $blockNumber]),
     ]);
     $this->addRule("email[$blockNumber][email]", ts('Email is not valid.'), 'email');
+    $this->addCustomDataFieldBlock('Email', $blockNumber);
   }
 
   /**
@@ -117,7 +179,6 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
         }",
     ];
     $this->addElement('radio', "email[$blockNumber][is_primary]", '', '', '1', $js);
-    $this->addCustomDataFieldBlock('Email', $blockNumber);
   }
 
   /**

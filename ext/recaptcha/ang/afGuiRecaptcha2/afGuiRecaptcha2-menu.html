@@ -1,10 +1,10 @@
 <li>
   <a href ng-click="$ctrl.node.recaptchatheme = ($ctrl.node.recaptchatheme === 'dark' ? 'light' : 'dark'); $event.stopPropagation();">
     {{:: ts('Light') }}
-    <i class="crm-i fa-toggle-{{ $ctrl.node.recaptchatheme === 'dark' ? 'on' : 'off' }}"></i>
+    <i class="crm-i fa-toggle-{{ $ctrl.node.recaptchatheme === 'dark' ? 'on' : 'off' }}" role="img" aria-hidden="true"></i>
     {{:: ts('Dark') }}
   </a>
 </li>
 <li role="separator" class="divider">
 </li>
-<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash"></i> {{:: ts('Remove ReCaptcha') }}</span></a></li>
+<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {{:: ts('Remove ReCaptcha') }}</span></a></li>

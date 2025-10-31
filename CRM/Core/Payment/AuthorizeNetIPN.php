@@ -161,7 +161,7 @@ class CRM_Core_Payment_AuthorizeNetIPN {
     // Per CRM-17611 it would also not be passed back for a decline.
     elseif ($this->isSuccess()) {
       $input['is_test'] = 1;
-      $input['trxn_id'] = $this->transactionID ?: md5(uniqid(mt_rand(), TRUE));
+      $input['trxn_id'] = $this->transactionID ?: bin2hex(random_bytes(16));
     }
     $this->transactionID = $input['trxn_id'];
 

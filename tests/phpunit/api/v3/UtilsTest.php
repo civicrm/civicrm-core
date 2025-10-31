@@ -72,7 +72,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertTrue($this->runPermissionCheck('contact', 'create', $params), 'permission check should be skippable');
   }
 
-  public function getCamelCaseFuncs() {
+  public static function getCamelCaseFuncs() {
     // There have been two slightly different functions for normalizing names;
     // _civicrm_api_get_camel_name() and \Civi\API\Request::normalizeEntityName().
     return [
@@ -338,7 +338,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
   }
 
-  public function basicArrayCases() {
+  public static function basicArrayCases() {
     $records = [
       ['snack_id' => 'a', 'fruit' => 'apple', 'cheese' => 'swiss'],
       ['snack_id' => 'b', 'fruit' => 'grape', 'cheese' => 'cheddar'],

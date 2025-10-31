@@ -53,6 +53,8 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
 
     // CRM-15434 - Fix mailing search by status in non-English languages
     $statusVals = CRM_Core_SelectValues::getMailingJobStatus();
+    // This isn't a real status for search purposes, and the "status_unscheduled" below is how that's handled.
+    unset($statusVals['Draft']);
     foreach ($statusVals as $statusId => $statusName) {
       $this->addElement('checkbox', "mailing_status[$statusId]", NULL, $statusName);
     }

@@ -56,6 +56,8 @@ class RelationshipCache extends Generic\AbstractEntity {
   public static function getInfo() {
     $info = parent::getInfo();
     $info['bridge_title'] = ts('Relationship');
+    // This entity uses DAOGetAction so counts as a DAOEntity
+    $info['type'][0] = 'DAOEntity';
     $info['bridge'] = [
       'near_contact_id' => [
         'to' => 'far_contact_id',

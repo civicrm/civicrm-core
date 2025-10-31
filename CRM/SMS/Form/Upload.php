@@ -279,7 +279,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $verp[$key]++;
     }
 
-    $urls = array_flip(['forward', 'optOutUrl', 'unsubscribeUrl', 'resubscribeUrl']);
+    $urls = array_flip(['optOutUrl', 'unsubscribeUrl', 'resubscribeUrl']);
     foreach ($urls as $key => $value) {
       $urls[$key]++;
     }

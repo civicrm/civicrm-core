@@ -148,7 +148,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
    */
   public function postProcess() {
 
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_SMS_BAO_SmsProvider::del($this->_id);

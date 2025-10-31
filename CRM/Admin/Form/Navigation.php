@@ -78,7 +78,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     );
 
     $operators = ['AND' => ts('AND'), 'OR' => ts('OR')];
-    $this->add('select', 'permission_operator', NULL, $operators);
+    $this->add('select', 'permission_operator', ts('Permission Operator'), $operators);
 
     //make separator location configurable
     $separator = CRM_Core_SelectValues::navigationMenuSeparator();

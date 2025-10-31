@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_site_email_address',
   'class' => 'CRM_Core_DAO_SiteEmailAddress',
   'getInfo' => fn() => [
-    'title' => ts('Site Email Address'),
-    'title_plural' => ts('Site Email Addresses'),
+    'title' => ts('Site From Email Address'),
+    'title_plural' => ts('Site From Email Addresses'),
     'description' => ts('Sender addresses to use for outbound emails.'),
     'log' => TRUE,
     'add' => '6.0',
@@ -40,7 +40,7 @@ return [
     ],
     'display_name' => [
       'title' => ts('Display Name'),
-      'sql_type' => 'varchar(63)',
+      'sql_type' => 'varchar(254)',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Full name of the sender'),

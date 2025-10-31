@@ -30,7 +30,7 @@ class CustomGroupEntityLinks extends \Civi\Core\Service\AutoSubscriber {
    */
   public function addCustomGroupLinks(\Civi\Core\Event\GenericHookEvent $event) {
     foreach ($event->entities as $name => $entity) {
-      if (strpos($name, 'Custom_') === 0) {
+      if (str_starts_with($name, 'Custom_')) {
         $groupName = substr($name, 7);
         $event->entities[$name]['paths']['add'] = "civicrm/af/custom/{$groupName}/create#?entity_id=[entity_id]";
         $event->entities[$name]['paths']['update'] = "civicrm/af/custom/{$groupName}/update#?Record=[id]";

@@ -377,6 +377,34 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test function that gets duplicate pairs.
+   *
+   * It turns out there are 2 code paths retrieving this data so my initial
+   * focus is on ensuring they match.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isReverse
+   */
+  public function testGetMatchesModifiedDate(bool $isReverse): void {
+    $this->setupMatchData();
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET modified_date = "2020-04-09" WHERE id = ' . $this->ids['Contact']['mickey_1']);
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'check_permissions' => TRUE,
+      'criteria' => ['where' => [['modified_date', 'BETWEEN', ['2020-01-01', '2020-09-01']]]],
+    ])['values'];
+    $this->assertCount(1, $pairs);
+    $this->callAPISuccess('Contact', 'delete', ['id' => ($isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])]);
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'check_permissions' => TRUE,
+      'criteria' => ['Contact' => ['id' => ['>' => 1]]],
+    ])['values'];
+    $this->assertCount(1, $pairs);
+  }
+
+  /**
    * Test that location type is ignored when deduping by postal address.
    *
    * @throws \CRM_Core_Exception
@@ -766,17 +794,19 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testGetRowsElementsAndInfoSpecialInfo(): void {
     $contact1 = $this->individualCreate([
       'preferred_communication_method' => [],
-      'communication_style_id' => 'Familiar',
-      'prefix_id' => 'Mrs.',
-      'suffix_id' => 'III',
+      'communication_style_id:label' => 'Familiar',
+      'prefix_id:label' => 'Mrs.',
+      'suffix_id:label' => 'III',
+      'version' => 4,
     ]);
     $contact2 = $this->individualCreate([
-      'preferred_communication_method' => [
+      'preferred_communication_method:label' => [
         'SMS',
         'Fax',
       ],
-      'communication_style_id' => 'Formal',
-      'gender_id' => 'Female',
+      'communication_style_id:label' => 'Formal',
+      'gender_id:label' => 'Female',
+      'version' => 4,
     ]);
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($contact1, $contact2);
     $rows = $rowsElementsAndInfo['rows'];
@@ -910,7 +940,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Creatd Date merge cases
    * @return array
    */
-  public function createdDateMergeCases() {
+  public static function createdDateMergeCases() {
     $cases = [];
     // Normal pattern merge into the lower id
     $cases[] = [0, 1];
@@ -1196,7 +1226,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $activityGroup['id']]);
   }
 
-  public function contactEntityNameProvider(): iterable {
+  public static function contactEntityNameProvider(): iterable {
     yield ['Contact'];
     yield ['Household'];
     yield ['Individual'];

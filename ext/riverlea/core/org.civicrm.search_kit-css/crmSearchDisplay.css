@@ -23,9 +23,6 @@
 .crm-search-task-dialog input.ng-invalid {
   border-color: var(--crm-c-warning);
 }
-#crm-search-results-page-size {
-  width: 60px;
-}
 .crm-search-display button.dropdown-toggle {
   white-space: nowrap;
   font-size: var(--crm-font-size);
@@ -75,4 +72,51 @@
 }
 .crm-contact-page .crm-search-display-pager {
   padding: 0 var(--crm-r) var(--crm-r) var(--crm-r);
+}
+/* Inline Edit */
+
+#bootstrap-theme .crm-search-field-editing .form-group,
+#bootstrap-theme .crm-search-field-editing .radio-inline,
+#bootstrap-theme .crm-search-field-editing .checkbox-inline {
+  margin-bottom: 0; /* Fix for < 768px */
+  display: flex; /* Stops wrap of radios */
+}
+.crm-editable-enabled:has(span.crm-search-field-value:empty)::before {
+  content: "\f303";
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
+  font-weight: 400;
+  font-size: inherit;
+  font-style: normal;
+  font-variant: normal;
+}
+.crm-editable-enabled:has(span.crm-search-field-value:empty)::after {
+  /* This is a short-term anglo-centric a11y hack for the icon added above */
+  content: 'Edit';
+  text-indent: -10000px;
+  position: absolute;
+}
+.crm-container td.crm-search-field-editing.crm-search-col-type-field {
+  padding-block: 0; /* Removes top/bottom padding on uneditable fields */
+}
+.crm-container td.crm-search-field-editing.crm-search-field-editable,
+.crm-container .crm-search-field-editing .form-inline {
+  padding: 0;
+}
+.crm-search-display-batch span.crm-form-date-wrapper {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+#bootstrap-theme .crm-search-field-editing
+:where(input,.select2-container):where(:not(.crm-form-date,.crm-form-time):not([type="checkbox"]):not([type="radio"])) {
+  width: 12ch !important /* vs inline width */;
+}
+#bootstrap-theme .crm-search-field-editing .crm-ajax-select {
+  width: 16ch !important /* vs inline width */;
+}
+#bootstrap-theme .crm-search-field-editing input[type=number] {
+  width: 9ch;
+}
+.crm-search-display tr:has(.crm-search-field-editing) td.crm-search-ctrl-column:has(.btn-group) { /* Controls for full-row edit */
+  display: inline-table;
+  vertical-align: text-top;
 }

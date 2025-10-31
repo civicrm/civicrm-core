@@ -1,5 +1,5 @@
 <?php
-return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInterface {
+return new class() extends \Civi\Test\EventCheck implements \Civi\Core\HookInterface {
 
   private $validSnippetTypes = [
     'callback',

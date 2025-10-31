@@ -223,7 +223,7 @@ contact_a.sort_name    as sort_name,
     $params = [];
     $name = $this->_formValues['sort_name'] ?? NULL;
     if ($name != NULL) {
-      if (strpos($name, '%') === FALSE) {
+      if (!str_contains($name, '%')) {
         $name = "%{$name}%";
       }
       $params[$count] = [$name, 'String'];
@@ -273,7 +273,7 @@ contact_a.sort_name    as sort_name,
    */
   public function alterRow(&$row) {
     foreach ($row as $fieldName => &$field) {
-      if (strpos($fieldName, 'custom_') === 0) {
+      if (str_starts_with($fieldName, 'custom_')) {
         $field = CRM_Core_BAO_CustomField::displayValue($field, $fieldName);
       }
     }

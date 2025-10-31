@@ -64,7 +64,7 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @return array
    *   Array with the test information.
    */
-  public function getFilenameCases(): array {
+  public static function getFilenameCases(): array {
     return [
       [
         'FilenameInParam',

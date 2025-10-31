@@ -5,7 +5,7 @@
       {{ label }}
     </label>
   </span>
-  <select ng-switch-when="select" class="form-control" ng-model="$ctrl.arg[$ctrl.flag]" ng-change="$ctrl.writeExpr();">
+  <select ng-switch-when="select" class="form-control crm-auto-width" ng-model="$ctrl.arg[$ctrl.flag]" ng-change="$ctrl.writeExpr();">
     <option ng-repeat="(val, label) in $ctrl.param[$ctrl.flag]" value="{{ val }}">
       {{ label }}
     </option>

@@ -150,7 +150,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
-      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG)
+      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG && !defined('CIVICRM_MAIL_LOG_AND_SEND'))
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK)
     ) {
@@ -188,7 +188,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       if (!$domainName || $domainName == 'Default Domain Name') {
-        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default Site Email Address </a> (for system-generated emails).",
+        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default Site From Email Address </a> (for system-generated emails).",
           [
             1 => $fixDomainName,
             2 => $fixEmailUrl,
@@ -196,7 +196,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         );
       }
       else {
-        $msg = ts('Please enter a <a href="%1">default Site Email Address</a> (for system-generated emails).',
+        $msg = ts('Please enter a <a href="%1">default Site From Email Address</a> (for system-generated emails).',
           [1 => $fixEmailUrl]);
       }
     }
@@ -784,7 +784,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'job_id' => $job['id'],
         'options' => ['sort' => "id desc", 'limit' => 1],
       ])['values'][0]['description'] ?? NULL;
-      if (!empty($lastExecutionMessage) && strpos($lastExecutionMessage, 'Failure') !== FALSE) {
+      if (!empty($lastExecutionMessage) && str_contains($lastExecutionMessage, 'Failure')) {
         $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
         $html .= '<tr>
           <td>' . $job['name'] . ' </td>
@@ -1045,7 +1045,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     // Ensure that the MySQL driver supports utf8mb4 encoding.
     $version = mysqli_get_client_info();
-    if (strpos($version, 'mysqlnd') !== FALSE) {
+    if (str_contains($version, 'mysqlnd')) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {

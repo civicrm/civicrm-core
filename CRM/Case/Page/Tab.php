@@ -195,10 +195,8 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    *   (reference) of action links
    */
   public static function &links() {
-    $config = CRM_Core_Config::singleton();
 
     if (!(self::$_links)) {
-      $deleteExtra = ts('Are you sure you want to delete this case?');
       self::$_links = [
         CRM_Core_Action::VIEW => [
           'name' => ts('Manage'),

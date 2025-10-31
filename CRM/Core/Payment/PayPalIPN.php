@@ -61,7 +61,7 @@ class CRM_Core_Payment_PayPalIPN {
    * @throws \CRM_Core_Exception
    */
   public function retrieve($name, $type, $abort = TRUE) {
-    $value = CRM_Utils_Type::validate(CRM_Utils_Array::value($name, $this->_inputParameters), $type, FALSE);
+    $value = CRM_Utils_Type::validate($this->_inputParameters[$name] ?? NULL, $type, FALSE);
     if ($abort && $value === NULL) {
       throw new CRM_Core_Exception("PayPalIPN: Could not find an entry for $name");
     }

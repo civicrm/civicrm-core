@@ -10,10 +10,7 @@
  */
 
 /**
- *
  * @package CRM
- * @copyright U.S. PIRG Education Fund 2007
- *
  */
 
 require_once 'HTML/QuickForm/radio.php';
@@ -32,10 +29,7 @@ class CRM_Core_QuickForm_RadioWithDiv extends HTML_QuickForm_radio {
    */
   public function toHtml(): string {
     $html = parent::toHtml();
-    if (is_numeric($this->getAttribute('options_per_line'))) {
-      return '<div class="crm-option-label-pair" >' . $html . '</div>';
-    }
-    return $html;
+    return '<div class="crm-option-label-pair" >' . $html . '</div>';
   }
 
 }

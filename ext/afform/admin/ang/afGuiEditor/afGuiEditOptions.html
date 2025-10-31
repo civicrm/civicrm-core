@@ -2,11 +2,11 @@
   <h4 class="pull-left">{{:: ts('Customize options') }}</h4>
   <div class="btn-group-sm">
     <button type="button" class="btn btn-default" ng-click="close()">
-      <i class="crm-i fa-times-circle"></i>
+      <i class="crm-i fa-times-circle" role="img" aria-hidden="true"></i>
       {{:: ts('Cancel') }}
     </button>
     <button type="button" class="btn btn-success" ng-click="save()">
-      <i class="crm-i fa-check-circle"></i>
+      <i class="crm-i fa-check-circle" role="img" aria-hidden="true"></i>
       {{:: ts('Done') }}
     </button>
   </div>
@@ -15,7 +15,7 @@
   <li ng-repeat="option in options">
     <div crm-ui-editable ng-model="option.label" default-value="originalLabels[option.id]" >{{ option.label }}</div>
     <button type="button" class="btn btn-danger-outline btn-xs pull-right" ng-click="deleteOption(option, $index)" title="{{:: ts('Remove option') }}">
-      <i class="crm-i fa-trash"></i>
+      <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
     </button>
   </li>
 </ul>
@@ -24,7 +24,7 @@
   <li ng-repeat="option in deletedOptions">
     <div>{{ option.label }}</div>
     <button type="button" class="btn btn-success-outline btn-xs pull-right" ng-click="restoreOption(option, $index)" title="{{:: ts('Restore option') }}">
-      <i class="crm-i fa-arrow-circle-o-up"></i>
+      <i class="crm-i fa-arrow-circle-o-up" role="img" aria-hidden="true"></i>
     </button>
   </li>
 </ul>

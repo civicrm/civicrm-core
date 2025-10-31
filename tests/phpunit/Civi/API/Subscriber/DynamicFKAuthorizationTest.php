@@ -120,7 +120,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   /**
    * @return array
    */
-  public function okDataProvider() {
+  public static function okDataProvider() {
     $cases = [];
 
     $cases[] = ['Widget', 'create', ['id' => self::WIDGET_ID]];
@@ -140,7 +140,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badDataProvider() {
+  public static function badDataProvider() {
     $cases = [];
 
     $cases[] = ['Forbidden', 'create', ['id' => self::FORBIDDEN_ID], '/Authorization failed/'];

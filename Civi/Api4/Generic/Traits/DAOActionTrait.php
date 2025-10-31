@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Generic\Traits;
 
+use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
@@ -25,6 +26,44 @@ trait DAOActionTrait {
    * @var array
    */
   private $_maxWeights = [];
+
+  /**
+   * Get fields the logged in user is not permitted to act on.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getUnpermittedFields(): array {
+    $unpermittedFields = [];
+    if ($this->getCheckPermissions()) {
+      $fields = $this->entityFields();
+      foreach ($fields as $field) {
+        if (!empty($field['permission']) && !\CRM_Core_Permission::check($field['permission'])) {
+          $unpermittedFields[$field['name']] = ['permission' => $field['permission'], 'own_permission' => []];
+        }
+      }
+    }
+    return $unpermittedFields;
+  }
+
+  /**
+   * Filter out any fields with field level permissions.
+   *
+   * @param array $items
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function filterUnpermittedFields(array &$items): void {
+    $unpermittedFields = $this->getUnpermittedFields();
+    $userID = \CRM_Core_Session::getLoggedInContactID();
+    if ($unpermittedFields) {
+      foreach ($items as &$item) {
+        foreach ($unpermittedFields as $unpermittedField => $permissions) {
+          unset($item[$unpermittedField]);
+        }
+      }
+    }
+  }
 
   /**
    * @return \CRM_Core_DAO|string
@@ -122,6 +161,9 @@ trait DAOActionTrait {
         $entityId = FormattingUtil::resolveContactID($idField, $entityId);
       }
       FormattingUtil::formatWriteParams($item, $this->entityFields());
+      if (!$entityId) {
+        self::ensureCustomFieldDefaultsAreWrittenOnCreate($item);
+      }
       $this->formatCustomParams($item, $entityId);
 
       if (!$entityId) {
@@ -139,18 +181,25 @@ trait DAOActionTrait {
     // Ensure array keys start at 0
     $items = array_values($items);
 
-    foreach ($this->write($items) as $index => $dao) {
-      if (!$dao) {
-        $errMessage = sprintf('%s write operation failed', $this->getEntityName());
-        throw new \CRM_Core_Exception($errMessage);
-      }
-      $result[] = $this->baoToArray($dao, $items[$index]);
+    $daos = $this->write($items);
+
+    // Some legacy DAOs return false on error instead of throwing an exception
+    if (in_array(FALSE, $daos)) {
+      $errMessage = sprintf('%s write operation failed', $this->getEntityName());
+      throw new \CRM_Core_Exception($errMessage);
     }
 
-    \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    foreach ($result as &$row) {
-      FormattingUtil::formatOutputValues($row, $this->entityFields());
+    if (empty($this->reload)) {
+      foreach ($daos as $index => $dao) {
+        $result[] = $this->baoToArray($dao, $items[$index]);
+      }
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
+      FormattingUtil::formatOutputValues($result, $this->entityFields());
     }
+    else {
+      $result = $this->reloadResults($daos, $this->reload);
+    }
+
     return $result;
   }
 
@@ -167,6 +216,7 @@ trait DAOActionTrait {
     $baoName = $this->getBaoName();
 
     $method = method_exists($baoName, 'create') ? 'create' : (method_exists($baoName, 'add') ? 'add' : NULL);
+    $this->filterUnpermittedFields($items);
     // Use BAO create or add method if not deprecated
     if ($method && !ReflectionUtils::isMethodDeprecated($baoName, $method)) {
       foreach ($items as $item) {
@@ -203,10 +253,13 @@ trait DAOActionTrait {
       }
       [$fieldName, $fkField] = explode('.', $key);
       $field = $this->entityFields()[$fieldName] ?? NULL;
-      if (!$field || empty($field['fk_entity'])) {
+      if (!$field || $field['type'] !== 'Field' || empty($field['fk_entity'])) {
         continue;
       }
       $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);
+      if (!$fkDao) {
+        throw new \CRM_Core_Exception('Failed to load ' . $field['fk_entity']);
+      }
       // Constrain search to the domain of the current entity
       $domainConstraint = NULL;
       if (isset($fkDao::getSupportedFields()['domain_id'])) {
@@ -229,6 +282,29 @@ trait DAOActionTrait {
         $record[$fieldName] = \CRM_Core_DAO::getFieldValue($fkDao, $value, 'id', $fkField);
       }
       unset($record[$key]);
+    }
+  }
+
+  protected function ensureCustomFieldDefaultsAreWrittenOnCreate(array &$record): void {
+    $specFilters = $record;
+    // The following lines are adapted from \CRM_Custom_Form_CustomDataTrait::addCustomDataFieldsToForm
+    // Reuse the same spec-gatherer from Api4.getFields
+    $spec = new RequestSpec($this->getEntityName(), 'create', $specFilters);
+    $fieldFilters = \Civi::service('spec_gatherer')->getCustomGroupFilters($spec);
+    if ($fieldFilters === NULL) {
+      return;
+    }
+    $customGroups = \CRM_Core_BAO_CustomGroup::getAll($fieldFilters);
+
+    foreach ($customGroups as $customGroup) {
+      foreach ($customGroup['fields'] as $field) {
+        $fieldName = "{$customGroup['name']}.{$field['name']}";
+        if (isset($field['default_value']) && !isset($record[$fieldName])) {
+          $record[$fieldName] = $field['default_value'];
+          // Setting the value for one field in the group will ensure that all get written
+          break;
+        }
+      }
     }
   }
 
@@ -361,6 +437,7 @@ trait DAOActionTrait {
         $oldWeight = civicrm_api4($this->getEntityName(), 'get', [
           'select' => [$weightField],
           'where' => $where,
+          'checkPermissions' => $this->getCheckPermissions(),
         ])[0][$weightField] ?? NULL;
       }
       $record[$weightField] = \CRM_Utils_Weight::updateOtherWeights($daoName, $oldWeight, $newWeight, $filters, $weightField);

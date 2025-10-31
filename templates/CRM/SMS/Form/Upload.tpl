@@ -11,7 +11,7 @@
 {include file="CRM/common/WizardHeader.tpl"}
 
 <div class="help">
-    {ts}You can either <strong>upload</strong> the sms content from your computer OR <strong>compose</strong> the content on this screen.{/ts} {help id="content-intro"}
+    {ts}You can either <strong>upload</strong> the sms content from your computer OR <strong>compose</strong> the content on this screen.{/ts}
 </div>
 
 {include file="CRM/Mailing/Form/Count.tpl"}
@@ -23,7 +23,7 @@
       <td>{$form.SMStemplate.html}</td>
     </tr>
   {/if}
-    <tr class="crm-mailing-upload-form-block-upload_type"><td></td><td colspan="2">{$form.upload_type.label} {$form.upload_type.html} {help id="upload-compose"}</td></tr>
+    <tr class="crm-mailing-upload-form-block-upload_type"><td></td><td colspan="2">{$form.upload_type.label} {$form.upload_type.html} {help id="upload_type"}</td></tr>
 </table>
 
 <fieldset id="compose_id"><legend>{ts}Compose On-screen{/ts}</legend>

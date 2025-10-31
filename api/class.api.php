@@ -181,7 +181,7 @@ class civicrm_api3 {
     $this->local      = TRUE;
     $this->input      = [];
     $this->lastResult = new stdClass();
-    if (!empty($config) && !empty($config['server'])) {
+    if (!empty($config['server'])) {
       // we are calling a remote server via REST
       $this->local = FALSE;
       $this->uri = $config['server'];
@@ -207,7 +207,7 @@ class civicrm_api3 {
       $this->useragent = !empty($config['useragent']) ? $config['useragent'] : 'curl';
       return;
     }
-    if (!empty($config) && !empty($config['conf_path'])) {
+    if (!empty($config['conf_path'])) {
       if (!defined('CIVICRM_SETTINGS_PATH')) {
         define('CIVICRM_SETTINGS_PATH', $config['conf_path'] . '/civicrm.settings.php');
       }

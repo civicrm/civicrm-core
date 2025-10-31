@@ -63,7 +63,7 @@
         <td colspan="2">{ts}Sending Emails (also used for contribution receipts and event confirmations){/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/site_email_address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Site Email Addresses{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/site_email_address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Site From Email Addresses{/ts}</a></td>
         <td>{ts}Sender addresses to use for outbound emails.{/ts}</td>
     </tr>
     <tr class="even">

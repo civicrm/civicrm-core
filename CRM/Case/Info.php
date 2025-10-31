@@ -70,9 +70,9 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * Called via hook to include references from case xml
    */
-  public function getReferenceCounts($dao) {
+  public static function getReferenceCounts($dao): array {
     $result = [];
     if ($dao instanceof CRM_Core_DAO_OptionValue) {
       /** @var CRM_Core_DAO_OptionValue $dao */

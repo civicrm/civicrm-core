@@ -573,7 +573,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getGroupNames(): array {
+  public static function getGroupNames(): array {
     $data = [
       ['Individual', 'first_name', FALSE],
       ['Organization', 'first_name', FALSE],

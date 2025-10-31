@@ -9,7 +9,7 @@
 *}
 {if !empty($participantData)}
   <div class="messages status no-popup">
-    <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+    <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>
     {ts}There are participants registered for repeating events being removed from the set. Those with participants will be converted to standalone events, and those without registration will be deleted.{/ts}
   </div>
   <table class="display">

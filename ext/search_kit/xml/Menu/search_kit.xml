@@ -8,11 +8,11 @@
   <item>
     <path>civicrm/admin/search</path>
     <page_callback>CRM_Search_Page_Admin</page_callback>
-    <access_arguments>administer CiviCRM data;administer search_kit</access_arguments>
+    <access_arguments>administer CiviCRM data;manage own search_kit</access_arguments>
   </item>
   <item>
     <path>civicrm/ajax/admin/search</path>
     <page_callback>CRM_Search_Page_AJAX</page_callback>
-    <access_arguments>administer CiviCRM data;administer search_kit</access_arguments>
+    <access_arguments>administer CiviCRM data;manage own search_kit</access_arguments>
   </item>
 </menu>

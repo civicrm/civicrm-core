@@ -39,7 +39,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
     $selectName = $this->getName() . '[]';
 
     // placeholder {unselected} existence determines if we will render
-    if (strpos($this->_elementTemplate, '{unselected}') === FALSE) {
+    if (!str_contains($this->_elementTemplate, '{unselected}')) {
       // ... a single multi-select with checkboxes
 
       $id = $this->getAttribute('id');

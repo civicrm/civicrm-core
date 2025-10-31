@@ -176,7 +176,17 @@ class GetFromArrayTest extends Api4TestBase {
     $result = MockArrayEntity::get()
       ->addWhere('field6', '=', '0')
       ->execute();
-    $this->assertEquals([3, 4, 5, 6], $result->column('field1'));
+    $this->assertEquals([3, 4, 6], $result->column('field1'));
+
+    $result = MockArrayEntity::get()
+      ->addWhere('field6', 'IS EMPTY')
+      ->execute();
+    $this->assertEquals([1, 2, 3, 4, 6], $result->column('field1'));
+
+    $result = MockArrayEntity::get()
+      ->addWhere('field6', 'IS NOT EMPTY')
+      ->execute();
+    $this->assertEquals([5], $result->column('field1'));
 
     $result = MockArrayEntity::get()
       ->addWhere('field1', 'BETWEEN', [3, 5])

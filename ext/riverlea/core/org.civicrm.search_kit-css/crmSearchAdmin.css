@@ -4,8 +4,19 @@
 
 /* Searchkit listing */
 
-.crm-search-nav-tabs {
+.crm-search:has(.crm-search-nav-tabs) {
+  min-width: fit-content;
+}
+.crm-search:has(.crm-search-nav-tabs) .crm-search-display-table table {
+  border-width: 1px 0 0 0;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+.crm-container .crm-search-nav-tabs {
   position: relative;
+  border-radius: var(--crm-tabs-radius) var(--crm-tabs-radius) 0 0;
+  border: var(--crm-tabs-border);
+  border-bottom: 0;
 }
 #bootstrap-theme .crm-search-nav-tabs > div.btn-group {
   position: absolute;
@@ -61,13 +72,13 @@
   color: var(--crm-tab-col);
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
-  border: 1px solid var(--crm-c-gray-300);
+  border: var(--crm-c-divider);
   border-right: 0 none;
   box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 }
 .crm-search ul.nav-stacked li[role=separator] {
   height: var(--crm-m2);
-  border-top: 1px solid var(--crm-c-gray-300);
+  border-top: var(--crm-c-divider);
   margin: var(--crm-m) var(--crm-l) 0 var(--crm-r);
 }
 .crm-search ul.nav-stacked li a[disabled] {
@@ -96,7 +107,7 @@
   right: 28px;
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel {
-  border: 1px solid var(--crm-c-gray-300);
+  border: var(--crm-c-divider);
   margin: 0;
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel .panel-body {
@@ -131,6 +142,7 @@
   border-top: var(--crm-c-divider);
   margin-block: var(--crm-s);
   border-radius: var(--crm-roundness);
+  position: relative;
 }
 .crm-search fieldset fieldset {
   padding-top: 0;
@@ -156,16 +168,13 @@
 .crm-search .ui-sortable-helper .api4-clause-badge .crm-i {
   display: inline-block;
 }
-.crm-search .api4-operator {
-  width: 235px;
-}
 .crm-search .crm-search-admin-relative .api4-clause-group-sortable {
   margin: var(--crm-r) 0;
 }
 /* Tab: Select Fields */
 
 .crm-search fieldset.crm-draggable {
-  background-color: var(--crm-c-drag-background);
+  background-color: var(--crm-c-drag-bg);
   border-radius: var(--crm-roundness);
   border: 0 solid transparent;
 }
@@ -194,63 +203,47 @@
   padding: 0;
   border: 0 solid transparent;
 }
-.crm-search-admin-edit-columns fieldset.crm-draggable:has(> details) { /* targetted to cetaild because SK Tokens extension shares classname */
+.crm-search-admin-edit-columns fieldset.crm-draggable:has(> details) { /* targetted to details because other layouts share classnmae */
   display: grid;
-  grid-template-columns: 2ch auto;
-  align-items: center;
-}
-.crm-search-admin-edit-columns fieldset.crm-draggable:has(details[open]) {
-  align-items: start;
+  grid-template-columns: 2.5ch auto;
 }
 #bootstrap-theme .crm-search-admin-edit-columns fieldset.crm-draggable .btn.btn-xs.pull-right {
-  line-height: 1.45rem;
-  display: block;
   z-index: 1;
   position: absolute;
-  right: calc(4 * var(--crm-padding-small)); /* aligns button relative to stream padding */
+  right: 0;
+  top: var(--crm-xs1);
+  margin: var(--crm-expand-header-padding);
 }
-i.crm-i.crm-search-move-icon {
+#bootstrap-theme .crm-search-admin-edit-columns i.crm-i.crm-search-move-icon {
   opacity: .5;
-}
-.crm-draggable details > *,
-.crm-draggable details > .form-inline {
-  padding-inline: var(--crm-expand-body-padding);
-}
-.crm-draggable details > div:first-of-type {
-  padding-top: var(--crm-expand-body-padding);
-}
-.crm-draggable details > div:last-of-type {
-  padding-bottom: var(--crm-expand-body-padding);
+  padding: var(--crm-expand-header-padding);
+  justify-self: center;
 }
 #bootstrap-theme .crm-search-admin-edit-columns .input-group-btn {
   display: flex;
   flex-direction: row;
 }
 .crm-search-admin-edit-columns .crm-draggable > td {
-  white-space: nowrap;
   vertical-align: middle;
 }
 .crm-search-admin-edit-columns .crm-draggable > td input {
   max-width: 125px;
 }
 .crm-search-admin-edit-columns .crm-draggable > td.form-inline {
-  font-size: 0;
   padding-right: var(--crm-s);
 }
 .crm-search-admin-edit-columns .crm-draggable tfoot td.form-inline {
   padding: var(--crm-padding-reg);
 }
+.crm-container crm-search-admin-link-select .input-group input {
+  height: var(--crm-btn-height); /* Button/Links - other */
+}
 .crm-search-admin-relative {
   position: relative;
   display: block;
 }
-.crm-search .crm-search-admin-relative details > summary {
-  background: var(--crm-expand-header2-bg);
-  color: var(--crm-expand-header2-color);
-  padding: var(--crm-padding-small) var(--crm-padding-reg);
-}
 .crm-search crm-search-admin-link-group {
-  background: var(--crm-c-background2);
+  background: var(--crm-c-layout1-bg);
 }
 .crm-search crm-search-admin-link-group table {
   margin: var(--crm-padding-reg);
@@ -261,31 +254,15 @@ i.crm-i.crm-search-move-icon {
   padding: 0;
   border: 0 solid transparent;
 }
-.crm-search-admin-edit-columns details,
-.crm-search .crm-search-admin-relative details {
-  background-color: var(--crm-c-page-background);
+.crm-search-admin-edit-columns details {
   border-radius: var(--crm-roundness);
+  margin: 0;
   border: 0;
-}
-.crm-search-admin-edit-columns details > summary {
-  background: var(--crm-expand-header2-bg);
-  color: var(--crm-expand-header2-color);
-  padding: var(--crm-padding-reg);
-  font-size: inherit;
-}
-.crm-search details label {
-  min-width: var(--crm-input-label-width);
-}
-.crm-search details label:has(~ a.helpicon) {
-  min-width: calc(var(--crm-input-label-width) - 19px);
 }
 /* Various */
 
 .crm-search .help-block.bg-warning {
   padding: var(--crm-padding-reg);
-}
-.crm-search .form-control.huge {
-  width: var(--crm-big-input);
 }
 /* Style expires_date date/time width */
 .crm-search #expires_date + input,
@@ -332,9 +309,6 @@ i.crm-i.crm-search-move-icon {
 .crm-draggable:hover > i.crm-i.crm-search-move-icon,
 .crm-draggable:hover > * > i.crm-i.crm-search-move-icon {
   opacity: 1;
-}
-.crm-search input[type=number] {
-  width: 90px;
 }
 /* For display.settings.limit field */
 .crm-search .checkbox-inline.form-control input[type=number] {
@@ -417,7 +391,6 @@ crm-search-admin-import {
   position: absolute;
   top: 1px;
   right: 0;
-  background-color: white;
 }
 .crm-search-admin-relative .help-block { /* reduces help-block by width of crm-search-admin-right button */
   width: calc(100% - 180px);

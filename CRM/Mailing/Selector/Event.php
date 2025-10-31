@@ -182,18 +182,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           );
           break;
 
-        case 'forward':
-          $dateSort = CRM_Mailing_Event_BAO_MailingEventForward::getTableName() . '.time_stamp';
-
-          $this->_columnHeaders = array_merge($this->_columnHeaders,
-            [
-              [
-                'name' => ts('Forwarded Email'),
-              ],
-            ]
-          );
-          break;
-
         case 'reply':
           $dateSort = CRM_Mailing_Event_BAO_MailingEventReply::getTableName() . '.time_stamp';
           break;
@@ -275,14 +263,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
 
       case 'bounce':
         $event = new CRM_Mailing_Event_BAO_MailingEventBounce();
-        $result = $event->getTotalCount($this->_mailing_id,
-          $this->_job_id,
-          $this->_is_distinct
-        );
-        return $result;
-
-      case 'forward':
-        $event = new CRM_Mailing_Event_BAO_MailingEventForward();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
@@ -374,13 +354,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         );
         return $rows;
 
-      case 'forward':
-        $rows = CRM_Mailing_Event_BAO_MailingEventForward::getRows($this->_mailing_id,
-          $this->_job_id, $this->_is_distinct,
-          $offset, $rowCount, $sort
-        );
-        return $rows;
-
       case 'reply':
         $rows = CRM_Mailing_Event_BAO_MailingEventReply::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
@@ -441,7 +414,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         'queue' => ts('Intended Recipients'),
         'delivered' => ts('Successful Deliveries'),
         'bounce' => ts('Bounces'),
-        'forward' => ts('Forwards'),
         'reply' => $this->_is_distinct ? ts('Unique Replies') : ts('Replies'),
         'unsubscribe' => ts('Unsubscribe Requests'),
         'optout' => ts('Opt-out Requests'),

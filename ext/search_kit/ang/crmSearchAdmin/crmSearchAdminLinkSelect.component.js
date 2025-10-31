@@ -11,7 +11,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminLinkSelect.html',
     controller: function ($scope, $element, $timeout) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {

@@ -93,7 +93,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertTrue(isset($examples['workflow/contribution_recurring_edit/AlexCancelled']));
   }
 
-  public function getRenderExamples(): array {
+  public static function getRenderExamples(): array {
     // Phpunit resolves data-providers at a moment where bootstrap is awkward.
     // Dynamic data-providers should call-out to subprocess which can do full/normal boot.
     $uf = getenv('CIVICRM_UF');

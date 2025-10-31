@@ -108,4 +108,37 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
     );
   }
 
+  public function testDiffsInTableWithAllTables(): void {
+    Civi::settings()->set('logging', TRUE);
+
+    // create a contact and update it
+    $cid = $this->individualCreate();
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET first_name = 'Crash' WHERE id=%1", [1 => [$cid, 'Integer']]);
+
+    // Now delete the older log records so we just have our update record
+    CRM_Core_DAO::executeQuery("DELETE FROM log_civicrm_contact WHERE first_name <> 'Crash' AND id=%1", [1 => [$cid, 'Integer']]);
+
+    // get the conn_id for the update log record to give to the differ
+    $log_conn_id = CRM_Core_DAO::singleValueQuery("SELECT log_conn_id FROM log_civicrm_contact WHERE log_action='Update' AND first_name='Crash' AND id=%1", [1 => [$cid, 'Integer']]);
+
+    // Pretend there was a 2 second delay between the create and update since
+    // otherwise the differ will include unrelated junk from other tables
+    // from the create.
+    $log_date = date('YmdHis', strtotime('+2 seconds'));
+    CRM_Core_DAO::executeQuery("UPDATE log_civicrm_contact SET log_date=%2 WHERE log_action='Update' AND first_name='Crash' AND id=%1", [
+      1 => [$cid, 'Integer'],
+      2 => [$log_date, 'Timestamp'],
+    ]);
+
+    // now getting the diffs shouldn't crash even though all that's there is the update log record.
+    $schema = new CRM_Logging_Schema();
+    $tables = $schema->getLogTablesForContact();
+    $differ = new CRM_Logging_Differ($log_conn_id, $log_date, '1 SECOND');
+    $diffs = [];
+    foreach ($tables as $table) {
+      $diffs = array_merge($diffs, $differ->diffsInTable($table, $cid));
+    }
+    $this->assertEmpty($diffs);
+  }
+
 }

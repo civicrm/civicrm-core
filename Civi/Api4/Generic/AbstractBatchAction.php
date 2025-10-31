@@ -56,8 +56,14 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
       'limit' => $this->limit,
       'offset' => $this->offset,
     ];
+    // If reload not needed, only select necessary fields
     if (empty($this->reload)) {
       $params['select'] = $this->getSelect();
+    }
+    // If reload needed, select necessary + requested fields
+    else {
+      $reload = is_array($this->reload) ? $this->reload : ['*'];
+      $params['select'] = array_unique(array_merge($this->getSelect(), $reload));
     }
     return \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4] + $params);
   }

@@ -7,52 +7,38 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-is_monetary-title"}
-  {ts}Execute real-time monetary transactions{/ts}
-{/htxt}
-{htxt id="id-is_monetary"}
+
+{htxt id='is_monetary'}
 {ts}Uncheck this box if you are using this contribution page for free membership signup ONLY, or to solicit in-kind / non-monetary donations such as furniture, equipment.. etc.{/ts}
 {/htxt}
 
-{htxt id="id-pay_later_receipt-title"}
-  {ts}Pay Later Instructions{/ts}
-{/htxt}
-{htxt id="id-pay_later_receipt"}
+
+{htxt id='pay_later_receipt'}
 {ts}Instructions added to Confirmation and Thank-you pages, as well as the confirmation email, when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}
 {/htxt}
 
-{htxt id="id-is_billing_required-title"}
-  {ts}Billing address required{/ts}
-{/htxt}
-{htxt id="id-is_billing_required"}
+
+{htxt id='is_billing_required'}
 {ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}
 {/htxt}
 
-{htxt id="id-amount_block_is_active-title"}
-  {ts}Recurring Contributions{/ts}
-{/htxt}
-{htxt id="id-amount_block_is_active"}
+
+{htxt id='amount_block_is_active'}
 {ts}Uncheck this box if you are using this contribution page for membership signup and renewal only &ndash; and you do NOT want users to select or enter any additional contribution amounts.{/ts}
 {/htxt}
 
-{htxt id="id-is_recur-title"}
-  {ts}Recurring Contributions{/ts}
-{/htxt}
-{htxt id="id-is_recur"}
+
+{htxt id='is_recur'}
 {ts}Check this box if you want to give users the option to make recurring contributions. This feature requires that you use a payment processor which supports recurring billing / subscriptions functionality.{/ts} {docURL page="user/contributions/payment-processors"}
 {/htxt}
 
-{htxt id="id-is_pledge_active-title"}
-  {ts}Pledges{/ts}
-{/htxt}
-{htxt id="id-is_pledge_active"}
+
+{htxt id='is_pledge_active'}
 {ts}Check this box if you want to give users the option to make a Pledge (a commitment to contribute a fixed amount on a recurring basis).{/ts}
 {/htxt}
 
-{htxt id="id-is_allow_other_amount-title"}
-  {ts}Allow other amounts{/ts}
-{/htxt}
-{htxt id="id-is_allow_other_amount"}
+
+{htxt id='is_allow_other_amount'}
 {ts}Check this box if you want to give users the option to enter their own contribution amount. Your page will then include a text field labeled <strong>Other Amount</strong>.{/ts} {ts}You can also set minimum and maximum amounts that users are allowed to enter.{/ts}
 {/htxt}
 

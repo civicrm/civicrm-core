@@ -46,10 +46,12 @@
     <tr class="crm-paymentProcessor-form-block-is_default">
         <td></td><td>{$form.is_default.html}&nbsp;{$form.is_default.label}</td>
     </tr>
+    {if !empty($form.accept_credit_cards)}
     <tr class="crm-paymentProcessor-form-block-accept_credit_cards">
         <td class="label">{$form.accept_credit_cards.label}</td><td>{$form.accept_credit_cards.html}<br />
         <span class="description">{ts}Select Credit Card Types that this payment processor can accept{/ts}</span></td>
     </tr>
+    {/if}
   </table>
 <fieldset>
 <legend>{ts}Processor Details for Live Payments{/ts}</legend>
@@ -145,13 +147,18 @@
   <script type="text/javascript">
   {literal}
     CRM.$(function($) {
-      $('#payment_processor_type_id').change(function() {
+      const $form = $('form.{/literal}{$form.formClass}{literal}');
+      $('#payment_processor_type_id', $form).change(function() {
         var url = {/literal}"{$refreshURL}"{literal} + "&pp=" + $(this).val();
-        $(this).closest('form').attr('data-warn-changes', 'false')
+        $form.attr('data-warn-changes', 'false')
           // Ajax refresh (works in a popup or full-screen)
           .closest('.crm-ajax-container, #crm-main-content-wrapper')
           .crmSnippet({url: url}).crmSnippet('refresh');
       });
+      const $elements = $('input[name=frontend_title], input[name=title]', $form);
+      if ($elements.length === 2) {
+        CRM.utils.syncFields($elements.first(), $elements.last());
+      }
     });
   {/literal}
   </script>

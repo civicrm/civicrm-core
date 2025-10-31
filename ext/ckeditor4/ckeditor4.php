@@ -51,6 +51,19 @@ function ckeditor4_civicrm_buildForm($formName, $form) {
   }
 }
 
+function ckeditor4_civicrm_postProcess($formName, $form) {
+  if ($formName === 'CRM_Admin_Form_Preferences_Display') {
+    // If "Configure CKEditor" button was clicked
+    if (!empty($form->_params['ckeditor_config'])) {
+      // Suppress the "Saved" status message and redirect to the CKEditor Config page
+      $session = CRM_Core_Session::singleton();
+      $session->getStatus(TRUE);
+      $url = CRM_Utils_System::url('civicrm/admin/ckeditor', 'reset=1');
+      $session->pushUserContext($url);
+    }
+  }
+}
+
 function ckeditor4_civicrm_coreResourceList(&$list, $region) {
   // add wysiwyg editor
   $editor = \Civi::settings()->get('editor_id');

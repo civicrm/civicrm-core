@@ -1,0 +1,74 @@
+/*
+    Name: Empty stream;
+    Description: duplicate this to create a new stream;
+    Riverlea version: 1.4.8;
+    Some pointers:
+      - Use this stream to replace the variables in '/core/css/_variables.css'.
+        That's the file to study to understand how RL variables work.
+      - All variables are prefixed with '--crm' to avoid clashes with other CMS theme variables.
+      - '--crm-c-' denotes a colour, and '--crm-f-' denotes a front-end variable
+        that's only applied on '.crm-public'
+      - Variables often exist in chains, pointing to each other so that you can both
+        have one change applied in multiple areas *and* over-ride that in a specific area.
+      - These can run three deep, eg a colour variable ('--crm-c-amber'), is applied to a
+        functional colour variable ('--crm-c-warning') that's then used by '--crm-btn-bg-warning'
+        and '--crm-notify-warning'
+      - All of these are defined in Core Variables, so before replacing in a Stream, decide what your goal is.
+      - E.g., if you wanted to change warning colours to pink. you could redefine '--crm-c-amber'
+        to point to a pink colour property. But that loses the semantic meaning and maybe there's other
+        places that point to amber. It's probably safer to add a variable in your stream '--crm-c-pink'
+        that matches your colour, then set '--crm-c-warning: var(--crm-c-pink)'.
+      - If you only want warning buttons to change, and not notifications, then you could
+        just set '--crm-btn-bg-warning: var(--crm-c-pink)'
+      - Good contrast between backgrounds (usually with 'bg' in the variable name) and foreground (usually with 'text') are
+        needed for accessibility. So most functional colours exist in pairs: '--crm-c-warning' and '--crm-c-warning-text'.
+      - These can be checked with a tool like https://webaim.org/resources/contrastchecker/ - with
+        4.5:1 ratio needed for WCAG AA and 7:1 for WCAG AAA.
+      - '--text' as a foreground colour is normally a black or a white shade, pointing to '--crm-c-text-dark' or '--crm-c-text-light'.
+      - This terminology is key for the inversion with dark-mode, when '-crm-c-text' will change from dark to light
+        but these two variables text-light/dark stay the same as default.
+      - Some colours use 'hsl' processing generate automatically. E.g. 'crm-c-primary-hover' is darker version of any 'crm-c-primary' colour.
+        The same with alert-borders. In other words, check core to ensure you need to over-write every colour, if there's an auto colour and it works.
+      - 'crm-roundness' for border-radius is used in dozens of places, most of which (inputs, buttons, fieldsets, accordions, notifications, etc)
+        can be directly over-ridden with specific variables, e.g. '--crm-input-border-radius'
+      - While you can add your own CSS here, it can prevent future updates of Civi and RiverLea updating for your theme.
+      - Before adding your own CSS in a civicrm.css file a suggested workflow would be:
+          1. use browser inspector to see if the change you want can be handled by a variable.
+          2. if that variable is part of a chain, make a note so you decide later if you only want this one instance changed
+             or all instances.
+          3. if you need to write custom css in a civicrm.css - double check if this is a shortfall of the RiverLea theme - it might be.
+             feel free to open an issue on https://lab.civicrm.org/dev/user-interface suggesting missing variables for your use-case.
+*/
+
+:root {
+  --crm-version: 'Empty, v' var(--crm-release);
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-c-text-light: #fff;
+  --crm-c-text-dark: #302f35;
+  --crm-c-text: var(--crm-c-text-dark);
+  --crm-c-page-bg: #fff;
+/* Backgrounds, '--crm-c-*-bg' */
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+/* Shadows */
+/* Sizes */
+/* Type */
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
+/* Panels '--crm-panel-' */
+/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Tabs '--crm-tabs'/
+/* Contact layout '--crm-dash-' */
+/* Dialog '--crm-dialog-' */
+/* Dashlet for main dashboard '--crm-dashlet-' */
+/* Button dropdowns '--crm-dropdown-' */
+/* Notifications '--crm-notify-' */
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
+/* Alpha filter '--crm-filter-' */
+/* Frontend '--crm-f- */
+}

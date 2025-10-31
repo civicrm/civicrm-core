@@ -382,7 +382,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   public function normalizeDefaultValues($defaults) {
     $this->loadDefaultCountryBasedOnState($defaults);
     if ($this->_ssID && empty($_POST)) {
-      $defaults = array_merge($defaults, CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID));
+      $defaults = array_merge($defaults, (CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID) ?: []));
     }
 
     /*

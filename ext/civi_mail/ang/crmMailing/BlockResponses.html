@@ -74,5 +74,16 @@ Required vars: mailing, crmMailingConst
         <option value=""></option>
       </select>
     </div>
+    <div crm-ui-field="{name: 'subform.unsubscribe_mode', title: ts('One-Click Unsubscribe Mode')}">
+      <select
+        crm-ui-id="subform.unsubscribe_mode"
+        name="unsubscribe_mode"
+        crm-ui-select="{dropdownAutoWidth : true}"
+        ng-model="mailing.unsubscribe_mode"
+        required>
+        <option value="unsubscribe">{{:: ts('Unsubscribe') }}</option>
+        <option value="opt-out">{{:: ts('Opt Out') }}</option>
+      </select>
+    </div>
   </div>
 </div>

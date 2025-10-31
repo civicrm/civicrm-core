@@ -69,7 +69,8 @@
         {* Previous and Next contact navigation when accessing contact summary from search results. *}
         {if $nextPrevError}
           <li class="crm-next-action">
-            {help id="id-next-prev-buttons"}&nbsp;
+            {capture assign='helpTitle'}{ts}Navigation{/ts}{/capture}
+            {help id="id-next-prev-buttons" title=$helpTitle}&nbsp;
           </li>
         {else}
           {if $nextContactID}

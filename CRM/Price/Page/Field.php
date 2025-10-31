@@ -116,7 +116,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $taxTerm = Civi::settings()->get('tax_term');
     $getTaxDetails = FALSE;
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     while ($priceFieldBAO->fetch()) {
       $priceField[$priceFieldBAO->id] = [];
       CRM_Core_DAO::storeValues($priceFieldBAO, $priceField[$priceFieldBAO->id]);

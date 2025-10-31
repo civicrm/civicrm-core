@@ -206,6 +206,7 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
    * @return CRM_Utils_Check_Message[]
    */
   public static function checkUfMatchUnique(): array {
+
     $checks = [];
 
     if (CRM_Core_BAO_UFMatch::tryToAddUniqueIndexOnUfId()) {
@@ -216,9 +217,7 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     // Your DB has multiple uf_match records! Bad
     $checks[] = new CRM_Utils_Check_Message(
       __FUNCTION__,
-      ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique') .
-      ' ' .
-      CRM_Utils_System::docURL2('sysadmin/upgrade/todo/#todo'),
+      ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.'),
       ts('Duplicate records in UFMatch'),
       \Psr\Log\LogLevel::ERROR,
       'fa-database'

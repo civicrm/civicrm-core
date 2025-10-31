@@ -3,21 +3,22 @@
 
   angular.module('crmSearchTasks').component('crmSearchInputVal', {
     bindings: {
-      field: '<',
-      'op': '<',
-      'optionKey': '<',
+      op: '<',
       labelId: '@',
     },
-    require: {ngModel: 'ngModel'},
+    require: {
+      ngModel: 'ngModel',
+      input: '^crmSearchInput'
+    },
     template: '<div class="form-group" ng-include="$ctrl.getTemplate()"></div>',
     controller: function($scope, formatForSelect2, crmApi4) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {
-        var rendered = false,
-          field = this.field || {};
-        ctrl.dateRanges = CRM.crmSearchTasks.dateRanges;
+        const field = getField();
+        let rendered = false;
+        this.dateRanges = CRM.crmSearchTasks.dateRanges;
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
@@ -47,26 +48,32 @@
       };
 
       this.getFkEntity = function() {
-        return ctrl.field ? ctrl.field.fk_entity || ctrl.field.entity : null;
+        const field = getField();
+        return field.fk_entity || field.entity || null;
       };
 
-      var autocompleteStaticOptions = {
+      const autocompleteStaticOptions = {
         Contact: ['user_contact_id'],
+        Individual: ['user_contact_id'],
         '': []
       };
 
       this.getAutocompleteStaticOptions = function() {
-        return autocompleteStaticOptions[ctrl.getFkEntity() || ''] || autocompleteStaticOptions[''];
+        // "Select current user" only make sense in a search context, so check for presence of operator
+        if (ctrl.op) {
+          return autocompleteStaticOptions[ctrl.getFkEntity() || ''] || autocompleteStaticOptions[''];
+        }
+        return autocompleteStaticOptions[''];
       };
 
       this.isMulti = function() {
         // If there's a search operator, return `true` if the operator takes multiple values, else `false`
         if (ctrl.op) {
-          return ctrl.op === 'IN' || ctrl.op === 'NOT IN';
+          return ctrl.op === 'IN' || ctrl.op === 'NOT IN' || ctrl.op === 'CONTAINS' || ctrl.op === 'NOT CONTAINS' || ctrl.op === 'CONTAINS ONE OF' || ctrl.op === 'NOT CONTAINS ONE OF';
         }
         // If no search operator this is an input for e.g. the bulk update action
         // Return `true` if the field is multi-valued, else `null`
-        return ctrl.field && (ctrl.field.serialize || ctrl.field.data_type === 'Array') ? true : null;
+        return ctrl.input.field && (ctrl.input.field.serialize || ctrl.input.field.data_type === 'Array') ? true : null;
       };
 
       this.changeDateType = function() {
@@ -89,7 +96,7 @@
       };
 
       this.dateUnits = function(setUnit) {
-        var vals = ctrl.value.split(' ');
+        const vals = ctrl.value.split(' ');
         if (arguments.length) {
           vals[3] = setUnit;
           ctrl.value = vals.join(' ');
@@ -99,7 +106,7 @@
       };
 
       this.dateNumber = function(setNumber) {
-        var vals = ctrl.value.split(' ');
+        const vals = ctrl.value.split(' ');
         if (arguments.length) {
           vals[2] = setNumber;
           ctrl.value = vals.join(' ');
@@ -124,7 +131,7 @@
       };
 
       this.getTemplate = function() {
-        var field = ctrl.field || {};
+        const field = getField();
 
         if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP', 'REGEXP BINARY', 'NOT REGEXP BINARY'], ctrl.op)) {
           return '~/crmSearchTasks/crmSearchInput/text.html';
@@ -169,9 +176,13 @@
       };
 
       this.getFieldOptions = function() {
-        var field = ctrl.field || {};
-        return {results: formatForSelect2(field.options || [], ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
+        const field = getField();
+        return {results: formatForSelect2(field.options || [], ctrl.input.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
       };
+
+      function getField() {
+        return ctrl.input.field || {};
+      }
 
       function isDateField(field) {
         return field.data_type === 'Date' || field.data_type === 'Timestamp';

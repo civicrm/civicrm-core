@@ -20,7 +20,7 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     $record = $e->getRecord();
     $action = $e->getActionName();
     $mayAdminUsers = \CRM_Core_Permission::check('cms:administer users');
-    $isOwnUser = ((int) \CRM_Utils_System::getLoggedInUfID()) == $record['id'] ?? NULL;
+    $isOwnUser = (CRM_Utils_System::getLoggedInUfID()) == ($record['id'] ?? NULL);
     if ($action === 'delete') {
       if ($isOwnUser) {
         // Prevent users from deleting their own user account

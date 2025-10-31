@@ -43,61 +43,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
   }
 
   /**
-   * Given a note id, decide if the note should be hidden based on privacy setting
-   *
-   * @param object $note
-   *   Either the id of the note to retrieve, or the CRM_Core_DAO_Note object itself.
-   *
-   * @return bool
-   *   TRUE if the note should be hidden, otherwise FALSE
-   * @deprecated in favor of selectWhereClause
-   */
-  public static function getNotePrivacyHidden($note) {
-    if (CRM_Core_Permission::check('view all notes')) {
-      return FALSE;
-    }
-
-    $noteValues = [];
-    if (is_object($note) && get_class($note) === 'CRM_Core_DAO_Note') {
-      CRM_Core_DAO::storeValues($note, $noteValues);
-    }
-    elseif (is_array($note)) {
-      $noteValues = $note;
-    }
-    else {
-      $noteDAO = new CRM_Core_DAO_Note();
-      $noteDAO->id = $note;
-      $noteDAO->find();
-      if ($noteDAO->fetch()) {
-        CRM_Core_DAO::storeValues($noteDAO, $noteValues);
-      }
-    }
-
-    CRM_Utils_Hook::notePrivacy($noteValues);
-
-    if (empty($noteValues['privacy'])) {
-      return FALSE;
-    }
-    elseif (isset($noteValues['notePrivacy_hidden'])) {
-      // If the hook has set visibility, use that setting.
-      return $noteValues['notePrivacy_hidden'];
-    }
-    else {
-      // Default behavior (if hook has not set visibility)
-      // is to hide privacy notes unless the note creator is the current user.
-
-      if ($noteValues['privacy']) {
-        $session = CRM_Core_Session::singleton();
-        $userID = $session->get('userID');
-        return ($noteValues['contact_id'] != $userID);
-      }
-      else {
-        return FALSE;
-      }
-    }
-  }
-
-  /**
    * Takes an associative array and creates a note object.
    *
    * the function extract all the params it needs to initialize the create a
@@ -345,26 +290,14 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Get log record count for a Contact.
-   *
-   * @param int $contactID
-   *
-   * @return int
-   *   $count count of log records
-   *
+   * @deprecated
    */
   public static function getContactNoteCount($contactID) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     $note = new CRM_Core_DAO_Note();
     $note->entity_id = $contactID;
     $note->entity_table = 'civicrm_contact';
-    $note->find();
-    $count = 0;
-    while ($note->fetch()) {
-      if (!self::getNotePrivacyHidden($note)) {
-        $count++;
-      }
-    }
-    return $count;
+    return $note->count();
   }
 
   /**
@@ -386,27 +319,14 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Get total count of direct children visible to the current user.
-   *
-   * @param int $id
-   *   Note ID.
-   *
-   * @return int
-   *   $count Number of notes having the give note as parent
-   *
+   * @deprecated
    */
   public static function getChildCount($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';
     $note->entity_id = $id;
-    $note->find();
-    $count = 0;
-    while ($note->fetch()) {
-      if (!self::getNotePrivacyHidden($note)) {
-        $count++;
-      }
-    }
-    return $count;
+    return $note->count();
   }
 
   /**
@@ -439,43 +359,40 @@ ORDER BY  modified_date desc";
     $note->orderBy('modified_date asc');
     $note->find();
     while ($note->fetch()) {
-      // foreach child, call this function, unless the child is private/hidden
-      if (!self::getNotePrivacyHidden($note)) {
-        CRM_Core_DAO::storeValues($note, $tree[$note->id]);
+      CRM_Core_DAO::storeValues($note, $tree[$note->id]);
 
-        // get name of user that created this note
-        $contact = new CRM_Contact_DAO_Contact();
-        $createdById = $note->contact_id;
-        $contact->id = $createdById;
-        $contact->find();
-        $contact->fetch();
-        $tree[$note->id]['createdBy'] = $contact->display_name;
-        $tree[$note->id]['createdById'] = $createdById;
-        $tree[$note->id]['note_date'] = CRM_Utils_Date::customFormat($tree[$note->id]['note_date']);
-        $tree[$note->id]['modified_date'] = CRM_Utils_Date::customFormat($tree[$note->id]['modified_date']);
+      // get name of user that created this note
+      $contact = new CRM_Contact_DAO_Contact();
+      $createdById = $note->contact_id;
+      $contact->id = $createdById;
+      $contact->find();
+      $contact->fetch();
+      $tree[$note->id]['createdBy'] = $contact->display_name;
+      $tree[$note->id]['createdById'] = $createdById;
+      $tree[$note->id]['note_date'] = CRM_Utils_Date::customFormat($tree[$note->id]['note_date']);
+      $tree[$note->id]['modified_date'] = CRM_Utils_Date::customFormat($tree[$note->id]['modified_date']);
 
-        // paper icon view for attachments part
-        $paperIconAttachmentInfo = CRM_Core_BAO_File::paperIconAttachment('civicrm_note', $note->id);
-        $tree[$note->id]['attachment'] = $paperIconAttachmentInfo ? implode('', $paperIconAttachmentInfo) : '';
+      // paper icon view for attachments part
+      $paperIconAttachmentInfo = CRM_Core_BAO_File::paperIconAttachment('civicrm_note', $note->id);
+      $tree[$note->id]['attachment'] = $paperIconAttachmentInfo ? implode('', $paperIconAttachmentInfo) : '';
 
-        if ($snippet) {
-          $tree[$note->id]['note'] = nl2br($tree[$note->id]['note']);
-          $tree[$note->id]['note'] = smarty_modifier_mb_truncate(
-            $tree[$note->id]['note'],
-            80,
-            '...',
-            TRUE
-          );
-          CRM_Utils_Date::customFormat($tree[$note->id]['modified_date']);
-        }
-        self::buildNoteTree(
-          $note->id,
-          $maxDepth,
-          $snippet,
-          $tree[$note->id]['child'],
-          $depth + 1
+      if ($snippet) {
+        $tree[$note->id]['note'] = nl2br($tree[$note->id]['note']);
+        $tree[$note->id]['note'] = smarty_modifier_mb_truncate(
+          $tree[$note->id]['note'],
+          80,
+          '...',
+          TRUE
         );
+        CRM_Utils_Date::customFormat($tree[$note->id]['modified_date']);
       }
+      self::buildNoteTree(
+        $note->id,
+        $maxDepth,
+        $snippet,
+        $tree[$note->id]['child'],
+        $depth + 1
+      );
     }
 
     return $tree;

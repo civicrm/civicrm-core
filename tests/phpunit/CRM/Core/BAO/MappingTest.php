@@ -34,7 +34,7 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getMappingMaps() {
+  public static function getMappingMaps() {
     return [
       [
         'params' => [

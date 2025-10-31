@@ -16,7 +16,7 @@
           <li id="tab_{$tabName}" role="tab" class="crm-tab-button ui-corner-all {if !$tabValue.valid}disabled{/if} {if is_numeric($tabValue.count)}crm-count-{$tabValue.count}{/if} {if $tabValue.class} {$tabValue.class}{/if}" {$tabValue.extra}>
             {if $tabValue.active}
               <a href="{if $tabValue.template}#{$tabIdPrefix|default:'panel_'}{$tabName}{else}{$tabValue.url|smarty:nodefaults}{/if}" title="{$tabValue.title|escape} {if !$tabValue.valid}({ts escape='htmlattribute'}disabled{/ts}){/if}">
-                <i class="{$tabValue.icon|default:'crm-i fa-puzzle-piece'}" aria-hidden="true"></i>
+                <i class="{$tabValue.icon|default:'crm-i fa-puzzle-piece'}" role="img" aria-hidden="true"></i>
                 <span>{$tabValue.title}</span>
                 {if empty($tabValue.hideCount) && is_numeric($tabValue.count)}<em>{$tabValue.count}</em>{/if}
               </a>
@@ -27,15 +27,11 @@
         {/foreach}
       </ul>
 
-      {foreach from=$tabHeader key=tabName item=tabValue}
-        {if $tabValue.template}
+      {* Item must be named $block for compatibility with InlineAfform.tpl *}
+      {foreach from=$tabHeader key=tabName item=block}
+        {if $block.template}
           <div id="{$tabIdPrefix|default:'panel_'}{$tabName}" role="tabpanel">
-            {if $tabValue.module}
-              <!-- afform tab - need to pass module and directive to afform param -->
-              {include file=$tabValue.template afform=$tabValue}
-            {else}
-              {include file=$tabValue.template}
-            {/if}
+            {include file=$block.template}
           </div>
         {/if}
       {/foreach}

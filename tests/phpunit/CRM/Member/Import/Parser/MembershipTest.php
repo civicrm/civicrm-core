@@ -26,6 +26,7 @@
 
 use Civi\Api4\Membership;
 use Civi\Api4\UserJob;
+use Civi\Import\MembershipParser;
 
 /**
  * @package   CiviCRM
@@ -34,6 +35,7 @@ use Civi\Api4\UserJob;
  */
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
+  use CRMTraits_Import_ParserTrait;
 
   const MEMBERSHIP_TYPE_NAME = 'Mickey Mouse Club Member';
 
@@ -63,7 +65,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-
+    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
     $params = [
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Organization',
@@ -124,7 +126,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'last_name' => 'Anderson',
       'prefix_id' => 3,
       'suffix_id' => 3,
-      'email' => 'b@c.com',
+      'email_primary.email' => 'b@c.com',
       'contact_type' => 'Individual',
     ];
 
@@ -140,14 +142,14 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
         date('Y-m-d'),
       ],
       [
-        $contact2Params['email'],
+        $contact2Params['email_primary.email'],
         self::MEMBERSHIP_TYPE_NAME,
         $startDate2,
         $joinDate2,
       ],
     ];
 
-    $importObject = $this->createImportObject(['email', 'membership_type_id', 'membership_start_date', 'membership_join_date']);
+    $importObject = $this->createImportObject(['Contact.email_primary.email', 'Membership.membership_type_id', 'Membership.start_date', 'Membership.join_date']);
     foreach ($params as $values) {
       $this->assertEquals(CRM_Import_Parser::VALID, $importObject->import($values), $values[0]);
     }
@@ -155,6 +157,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->assertCount(2, $result);
     $this->assertEquals($startDate2, $result[1]['start_date']);
     $this->assertEquals($joinDate2, $result[1]['join_date']);
+    $contacts = $this->callAPISuccess('contact', 'get', ['email' => $contact2Params['email_primary.email'], 'sequential' => 1])['values'];
+    $this->assertCount(1, $contacts);
   }
 
   /**
@@ -162,10 +166,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    */
   public function testImportOverriddenMembershipButWithoutStatus(): void {
     $this->individualCreate(['email' => 'anthony_anderson2@civicrm.org']);
-    $membershipImporter = new CRM_Member_Import_Parser_Membership();
+    $membershipImporter = new MembershipParser();
     $membershipImporter->setUserJobID($this->getUserJobID([
-      'mapper' => [['email'], ['membership_type_id'], ['membership_start_date'], ['member_is_override']],
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+      'mapper' => [['Contact.email_primary.email'], ['Membership.membership_type_id'], ['Membership.start_date'], ['Membership.is_override']],
     ]));
     $membershipImporter->init();
 
@@ -192,11 +195,11 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   public function testImportOverriddenMembershipWithStatus(): void {
     $this->individualCreate(['email' => 'anthony_anderson3@civicrm.org']);
     $membershipImporter = $this->createImportObject([
-      'email',
-      'membership_type_id',
-      'membership_start_date',
-      'member_is_override',
-      'status_id',
+      'Contact.email_primary.email',
+      'Membership.membership_type_id',
+      'Membership.start_date',
+      'Membership.is_override',
+      'Membership.status_id',
     ]);
 
     $importValues = [
@@ -213,9 +216,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
   public function testImportOverriddenMembershipWithValidOverrideEndDate(): void {
     $this->individualCreate(['email' => 'anthony_anderson4@civicrm.org']);
-    $membershipImporter = new CRM_Member_Import_Parser_Membership();
+    $membershipImporter = new MembershipParser();
     $membershipImporter->setUserJobID($this->getUserJobID([
-      'mapper' => [['email'], ['membership_type_id'], ['membership_start_date'], ['member_is_override'], ['status_id'], ['status_override_end_date']],
+      'mapper' => [['Contact.email_primary.email'], ['Membership.membership_type_id'], ['Membership.start_date'], ['Membership.is_override'], ['Membership.status_id'], ['Membership.status_override_end_date']],
+    ],
+    [
+      'Contact' => ['action' => 'update'],
     ]));
     $membershipImporter->init();
 
@@ -230,15 +236,17 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+    $contacts = $this->callAPISuccess('Contact', 'get', ['email' => 'anthony_anderson4@civicrm.org', 'sequential' => 1])['values'];
+    $this->assertCount(1, $contacts);
   }
 
   public function testImportOverriddenMembershipWithInvalidOverrideEndDate(): void {
     $this->individualCreate(['email' => 'anthony_anderson5@civicrm.org']);
     $this->userJobID = $this->getUserJobID([
-      'mapper' => [['email'], ['membership_type_id'], ['membership_start_date'], ['member_is_override'], ['status_id'], ['status_override_end_date']],
+      'mapper' => [['Contact.email_primary.email'], ['Membership.membership_type_id'], ['Membership.start_date'], ['Membership.is_override'], ['Membership.status_id'], ['Membership.status_override_end_date']],
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ]);
-    $membershipImporter = new CRM_Member_Import_Parser_Membership();
+    $membershipImporter = new MembershipParser();
     $membershipImporter->setUserJobID($this->userJobID);
     $membershipImporter->init();
 
@@ -275,11 +283,11 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       ],
     ]);
     $membershipImporter = $this->createImportObject([
-      'email',
-      'membership_type_id',
-      'membership_start_date',
-      'member_is_override',
-      'status_id',
+      'Contact.email_primary.email',
+      'Membership.membership_type_id',
+      'Membership.start_date',
+      'Membership.is_override',
+      'Membership.status_id',
     ]);
 
     $importValues = [
@@ -307,9 +315,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    *
    * @param array $fields
    *
-   * @return \CRM_Member_Import_Parser_Membership
+   * @return \Civi\Import\MembershipParser
    */
-  protected function createImportObject(array $fields): \CRM_Member_Import_Parser_Membership {
+  protected function createImportObject(array $fields): MembershipParser {
     $fieldMapper = [];
     $mapper = [];
     foreach ($fields as $index => $field) {
@@ -317,7 +325,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       $mapper[] = [$field];
     }
 
-    $membershipImporter = new CRM_Member_Import_Parser_Membership($fieldMapper);
+    $membershipImporter = new MembershipParser();
     $membershipImporter->setUserJobID($this->getUserJobID(['mapper' => $mapper]));
     $membershipImporter->init();
     $membershipImporter->_contactType = 'Individual';
@@ -326,24 +334,30 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @param array $submittedValues
+   * @param array $entityConfigurations
    *
    * @return int
    */
-  protected function getUserJobID(array $submittedValues = []): int {
+  protected function getUserJobID(array $submittedValues = [], $entityConfigurations = []): int {
+    $queryFields = ['first_name'];
+    foreach (array_keys($submittedValues['mapper']) as $key) {
+      if ($key > 0) {
+        $queryFields[] = '"value_' . $key . '" AS field_' . $key;
+      }
+    }
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
-          'contactType' => 'Individual',
-          'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
-          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
-          'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-          'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
+          'sqlQuery' => 'SELECT ' . implode(', ', $queryFields) . ' FROM civicrm_contact',
         ], $submittedValues),
+        'entity_configuration' => [
+          'Contact' => array_merge(['contact_type' => 'Individual', 'dedupe_rule' => 'IndividualUnsupervised'], ($entityConfigurations['Contact'] ?? [])),
+          'Membership' => array_merge(['action' => 'update'], ($entityConfigurations['Membership'] ?? [])),
+        ],
       ],
       'status_id:name' => 'draft',
-      'job_type' => 'contact_import',
+      'job_type' => 'membership_import',
     ])->execute()->first()['id'];
     if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
       $dataSource = new CRM_Import_DataSource_CSV($userJobID);
@@ -362,11 +376,11 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $donaldDuckID = $this->individualCreate(['first_name' => 'Donald', 'last_name' => 'Duck']);
     $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Membership']);
     $membershipImporter = $this->createImportObject([
-      'membership_contact_id',
-      'membership_type_id',
-      'membership_start_date',
-      $this->getCustomFieldName('text'),
-      $this->getCustomFieldName('select_string'),
+      'Contact.id',
+      'Membership.membership_type_id',
+      'Membership.start_date',
+      'Membership.' . $this->getCustomFieldName('text', 4),
+      'Membership.' . $this->getCustomFieldName('select_string', 4),
     ]);
     $importValues = [
       $donaldDuckID,
@@ -384,20 +398,64 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that one of the following is enough
+   *  - contact_id + membership_type_id + start_date
+   *  - external_identifier + membership_type_id + start_date
+   *  - email_primary.email + membership_type_id + start_date
+   *
+   * @dataProvider requiredFields
+   */
+  public function testRequiredFields(array $dataProvider): void {
+    $this->individualCreate(['external_identifier' => 'abc', 'email' => 'jenny@example.com']);
+    $mapper = [
+      ['name' => 'Membership.membership_type_id'],
+      ['name' => 'Membership.id'],
+      ['name' => 'Contact.id'],
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'Contact.email_primary.email'],
+      ['name' => 'Membership.start_date'],
+    ];
+    foreach ($mapper as $index => $field) {
+      if (!in_array($field['name'], $dataProvider)) {
+        $mapper[$index]['name'] = 'do_not_import';
+      }
+    }
+
+    $this->importCSV('membership_with_multiple_identifiers.csv', $mapper, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK, 'saveMapping' => FALSE]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+  }
+
+  public static function requiredFields(): array {
+    return [
+      'contact_id' => [['Contact.id', 'Membership.membership_type_id', 'Membership.start_date']],
+      'external_identifier' => [['Contact.external_identifier', 'Membership.membership_type_id', 'Membership.start_date']],
+      'email' => [['Contact.email_primary.email', 'Membership.membership_type_id', 'Membership.start_date']],
+    ];
+  }
+
+  /**
    * Test the full form-flow import.
    */
   public function testImportCSV() :void {
     $this->importCSV('memberships_invalid.csv', [
-      ['name' => 'membership_contact_id'],
-      ['name' => 'membership_source'],
-      ['name' => 'membership_type_id'],
-      ['name' => 'membership_start_date'],
+      ['name' => 'Contact.id'],
+      ['name' => 'Membership.source'],
+      ['name' => 'Membership.membership_type_id'],
+      ['name' => 'Membership.start_date'],
       ['name' => 'do_not_import'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
     $this->assertEquals('Invalid value for field(s) : Membership Type', $row['_status_message']);
+    $userJob = UserJob::get()
+      ->addSelect('status_id:name', 'status_id:label')
+      ->addWhere('id', '=', $this->userJobID)
+      ->execute()->single();
+    $this->assertEquals('complete_with_errors', $userJob['status_id:name']);
+    $this->assertEquals('Complete with Errors', $userJob['status_id:label']);
   }
 
   /**
@@ -409,10 +467,10 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
     ]);
     $this->importCSV('memberships_with_id.csv', [
-      ['name' => 'membership_id'],
-      ['name' => 'membership_source'],
-      ['name' => 'membership_type_id'],
-      ['name' => 'membership_start_date'],
+      ['name' => 'Membership.id'],
+      ['name' => 'Membership.source'],
+      ['name' => 'Membership.membership_type_id'],
+      ['name' => 'Membership.start_date'],
       ['name' => 'do_not_import'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
@@ -424,18 +482,19 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the full form-flow import.
+   * Test the full form-flow import with ID and not all required fields.
    */
   public function testImportCSVWithIDMembershipTypeOptional() :void {
     $this->createTestEntity('Membership', [
       'membership_type_id:name' => 'General',
       'contact_id' => $this->individualCreate(),
+      'start_date' => '2019-03-23',
     ]);
     $this->importCSV('memberships_with_id.csv', [
-      ['name' => 'membership_id'],
-      ['name' => 'membership_source'],
+      ['name' => 'Membership.id'],
+      ['name' => 'Membership.source'],
       ['name' => 'do_not_import'],
-      ['name' => 'membership_start_date'],
+      ['name' => 'do_not_import'],
       ['name' => 'do_not_import'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
@@ -444,18 +503,21 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $membership = Membership::get(FALSE)
       ->execute()->single();
     $this->assertEquals('2019-03-23', $membership['start_date']);
+    $this->assertEquals('Import', $membership['source']);
   }
 
   /**
    * Test the full form-flow import.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImportTSV() :void {
     $this->individualCreate(['email' => 'member@example.com']);
     $this->importCSV('memberships_valid.tsv', [
-      ['name' => 'email'],
-      ['name' => 'membership_source'],
-      ['name' => 'membership_type_id'],
-      ['name' => 'membership_start_date'],
+      ['name' => 'Contact.email_primary.email'],
+      ['name' => 'Membership.source'],
+      ['name' => 'Membership.membership_type_id'],
+      ['name' => 'Membership.start_date'],
       ['name' => 'do_not_import'],
     ], ['fieldSeparator' => 'tab']);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
@@ -477,67 +539,16 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2020-10-01',
     ]);
     $mapping = [
-      ['name' => 'membership_id'],
-      ['name' => 'membership_source'],
-      ['name' => 'membership_type_id'],
-      ['name' => 'membership_start_date'],
-      ['name' => $this->getCustomFieldName('date')],
+      ['name' => 'Membership.id'],
+      ['name' => 'Membership.source'],
+      ['name' => 'Membership.membership_type_id'],
+      ['name' => 'Membership.start_date'],
+      ['name' => 'Membership.' . $this->getCustomFieldName('date', 4)],
     ];
     $this->importCSV('memberships_update_custom_date.csv', $mapping, ['dateFormats' => 32]);
     $membership = $this->callAPISuccessGetSingle('Membership', []);
     $this->assertEquals('2021-03-23', $membership['start_date']);
     $this->assertEquals('2019-03-23 00:00:00', $membership[$this->getCustomFieldName('date')]);
-  }
-
-  /**
-   * Import the csv file values.
-   *
-   * This function uses a flow that mimics the UI flow.
-   *
-   * @param string $csv Name of csv file.
-   * @param array $fieldMappings
-   * @param array $submittedValues
-   */
-  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
-    $submittedValues = array_merge([
-      'uploadFile' => ['name' => __DIR__ . '/data/' . $csv],
-      'skipColumnHeader' => TRUE,
-      'fieldSeparator' => ',',
-      'contactType' => 'Individual',
-      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
-      'dataSource' => 'CRM_Import_DataSource_CSV',
-      'file' => ['name' => $csv],
-      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
-      'groups' => [],
-    ], $submittedValues);
-    $form = $this->getFormObject('CRM_Member_Import_Form_DataSource', $submittedValues);
-    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
-    $form->buildForm();
-    $form->postProcess();
-    // This gets reset in DataSource so re-do....
-    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
-
-    $this->userJobID = $form->getUserJobID();
-    $form = $this->getFormObject('CRM_Member_Import_Form_MapField', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $form->postProcess();
-    /** @var CRM_Member_Import_Form_MapField $form */
-    $form = $this->getFormObject('CRM_Member_Import_Form_Preview', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    try {
-      $form->postProcess();
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $queue = Civi::queue('user_job_' . $this->userJobID);
-      $runner = new CRM_Queue_Runner([
-        'queue' => $queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      ]);
-      $runner->runAll();
-    }
   }
 
   /**
@@ -548,10 +559,54 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   protected function getMapperFromFieldMappings(array $mappings): array {
     $mapper = [];
     foreach ($mappings as $mapping) {
-      $fieldInput = [$mapping['name']];
-      $mapper[] = $fieldInput;
+      $mapper[] = $mapping['name'];
     }
     return $mapper;
+  }
+
+  /**
+   * Get the import's datasource form.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Member_Import_Form_DataSource
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDataSourceForm(array $submittedValues): CRM_Member_Import_Form_DataSource {
+    /** @var \CRM_Member_Import_Form_DataSource $form */
+    $form = $this->getFormObject('CRM_Member_Import_Form_DataSource', $submittedValues);
+    return $form;
+  }
+
+  /**
+   * Get the import's mapField form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Member_Import_Form_MapField
+   * @noinspection PhpUnnecessaryLocalVariableInspection
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMapFieldForm(array $submittedValues): CRM_Member_Import_Form_MapField {
+    /** @var \CRM_Member_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Member_Import_Form_MapField', $submittedValues);
+    return $form;
+  }
+
+  /**
+   * Get the import's preview form.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Member_Import_Form_Preview
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPreviewForm(array $submittedValues): CRM_Member_Import_Form_Preview {
+    /** @var CRM_Member_Import_Form_Preview $form */
+    $form = $this->getFormObject('CRM_Member_Import_Form_Preview', $submittedValues);
+    return $form;
   }
 
 }

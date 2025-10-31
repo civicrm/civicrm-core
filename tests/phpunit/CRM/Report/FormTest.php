@@ -106,7 +106,7 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function reportModeProvider() {
+  public static function reportModeProvider() {
     return [
       'print no mail' => [
         [

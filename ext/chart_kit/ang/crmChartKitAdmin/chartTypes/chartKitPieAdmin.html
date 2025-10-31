@@ -1,0 +1,23 @@
+<div class="crm-chart-kit-pie-admin">
+
+  <div ng-include="'~/crmChartKitAdmin/chartKitAdminColumns.html'"></div>
+
+  <div class="crm-chart-kit-admin-presentation">
+
+    <div ng-include="'~/crmChartKitAdmin/chartKitAdminCanvas.html'"></div>
+
+    <fieldset>
+      <legend>{{:: ts('Pie chart options') }}</legend>
+      <div ng-include="'~/crmChartKitAdmin/chartKitAdminLegend.html'" />
+      <div class="form-inline">
+        <label>
+          {{:: ts('Max segments to show')}}
+        </label>
+        <input type="number" class="form-control crm-search-display-chart-max-segments"
+          ng-model="$ctrl.display.settings.maxSegments" />
+      </div>
+    </fieldset>
+
+  </div>
+
+</div>

@@ -93,7 +93,6 @@ return [
             [
               'type' => 'html',
               'key' => 'event_id.title',
-              'dataType' => 'String',
               'label' => E::ts('Event'),
               'sortable' => TRUE,
               'rewrite' => '[event_id.title]',
@@ -101,28 +100,24 @@ return [
             [
               'type' => 'field',
               'key' => 'fee_level',
-              'dataType' => 'Text',
               'label' => E::ts('Fee level'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'fee_amount',
-              'dataType' => 'Money',
               'label' => E::ts('Amount'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'register_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Registered'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'html',
               'key' => 'Participant_Event_event_id_01.start_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Event Date(s)'),
               'sortable' => TRUE,
               'rewrite' => '[Participant_Event_event_id_01.start_date] -<br> [Participant_Event_event_id_01.end_date]',
@@ -130,14 +125,12 @@ return [
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'role_id:label',
-              'dataType' => 'String',
               'label' => E::ts('Participant Role'),
               'sortable' => TRUE,
             ],

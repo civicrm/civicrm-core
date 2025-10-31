@@ -22,7 +22,7 @@
         {else}
           {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
         {/if}
-        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card event registration{/ts}</a>
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}submit credit card event registration{/ts}</a>
       </div>
     {/if}
     <div class="view-content">
@@ -46,8 +46,8 @@
               <tr class="crm-participant-form-block-additionalParticipants">
                 <td class="label"><label>{ts}Also Registered by this Participant{/ts}</label></td>
                 <td>
-                  {foreach from=$additionalParticipants key=apName item=apURL}
-                    <a href="{$apURL}" title="{ts escape='htmlattribute'}view additional participant{/ts}">{$apName}</a><br />
+                  {foreach from=$additionalParticipants key=apName item=ap}
+                    <a href="{$ap.url}" title="{ts escape='htmlattribute'}view additional participant{/ts}">{$apName}</a>{if $ap.status} ({$ap.status}){/if}<br />
                   {/foreach}
                 </td>
               </tr>
@@ -94,7 +94,7 @@
             </tr>
           {/if}
         </table>
-       {if $participantId and $hasPayment}
+       {if $participantId and $hasPayment && $accessCiviContribute}
         <table class='form-layout'>
           <tr>
             <td class='label'>{ts}Fees{/ts}</td>
@@ -122,7 +122,7 @@
       {/if}
 
       {if $action eq 2 and $accessContribution and array_key_exists(0, $rows) &&  $rows.0.contribution_id}
-      {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+      {include file="CRM/Contribute/Form/Selector.tpl" context="dashboard" single=false}
       {/if}
 
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

@@ -16,7 +16,7 @@ $GLOBALS['CIVICRM_FORCE_MODULES'][] = 'civitest';
 
 function civitest_civicrm_scanClasses(array &$classes): void {
   $phpunit = \Civi::paths()->getPath('[civicrm.root]/tests/phpunit');
-  if (strpos(get_include_path(), $phpunit) !== FALSE) {
+  if (str_contains(get_include_path(), $phpunit)) {
     \Civi\Core\ClassScanner::scanFolders($classes, $phpunit, 'CRM/*/WorkflowMessage', '_', '/Test$/');
     \Civi\Core\ClassScanner::scanFolders($classes, $phpunit, 'Civi/*/WorkflowMessage', '\\', '/Test$/');
     // Exclude all `*Test.php` files - if we load them, then phpunit gets confused.
@@ -26,6 +26,9 @@ function civitest_civicrm_scanClasses(array &$classes): void {
 # Crank up the memory
 ini_set('memory_limit', '2G');
 define('CIVICRM_TEST', 1);
+if (getenv('CIVICRM_UPGRADE_EVIL')) {
+  define('CIVICRM_BOOTSTRAP_FORBIDDEN', TRUE);
+}
 // phpcs:disable
 eval(cv('php:boot --level=settings', 'phpcode'));
 // phpcs:enable
@@ -85,7 +88,7 @@ function cv($cmd, $decode = 'json') {
   $oldOutput = getenv('CV_OUTPUT');
   putenv("CV_OUTPUT=json");
   $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);
-  putenv("CV_OUTPUT=$oldOutput");
+  putenv($oldOutput === FALSE ? "CV_OUTPUT" : "CV_OUTPUT=$oldOutput");
   fclose($pipes[0]);
   $result = stream_get_contents($pipes[1]);
   fclose($pipes[1]);

@@ -109,7 +109,7 @@ class CheckCredential extends AutoService implements EventSubscriberInterface {
       }
       catch (CryptoException $e) {
         // TODO: Is responding that its expired a security risk?
-        if (strpos($e->getMessage(), 'Expired token') !== FALSE) {
+        if (str_contains($e->getMessage(), 'Expired token')) {
           $check->reject('Expired token');
         }
 

@@ -50,7 +50,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getCsvFiles(): array {
+  public static function getCsvFiles(): array {
     return [
       // import.csv is utf8-encoded, with no BOM
       [
@@ -109,7 +109,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function trimDataProvider(): array {
+  public static function trimDataProvider(): array {
     return [
       'plain' => ['plain', 'plain'],
       'non-breaking-space-at-end-latin1' => ['foo' . chr(0xA0), 'foo'],

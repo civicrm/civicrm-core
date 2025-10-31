@@ -5,5 +5,5 @@ return [
   'type' => 'system',
   'title' => E::ts('Submissions'),
   'server_route' => 'civicrm/admin/afform/submissions',
-  'permission' => ['administer afform'],
+  'permission' => ['manage own afform'],
 ];

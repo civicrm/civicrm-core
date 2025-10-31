@@ -28,6 +28,32 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   public $_groupId;
 
   /**
+   * The contact being viewed/edited
+   *
+   * @var int
+   */
+  public $_contactId;
+
+  /**
+   * The record ID for the custom data being viewed/edited
+   *
+   * @var mixed
+   */
+  public $_recId;
+
+  /**
+   * The mode in which the page is being run. ('single' or null)
+   *
+   * @var string|null
+   */
+  public $_multiRecordDisplay;
+
+  /**
+   * @var int
+   */
+  public $_cgcount;
+
+  /**
    * Run the page.
    *
    * This method is called after the page is created. It checks for the

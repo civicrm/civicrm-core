@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<extension key="legacybatchentry" type="module">
+  <file>legacybatchentry</file>
+  <name>Legacy Batch Data Entry</name>
+  <description>Batch data entry screens that are less maintained</description>
+  <license>AGPL-3.0</license>
+  <authors>
+    <author>
+      <name>eileen</name>
+      <email>emcnaughton@wikimedia.org</email>
+      <role>Maintainer</role>
+    </author>
+  </authors>
+  <urls>
+    <url desc="Documentation">https://docs.civicrm.org//</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/core/-/issues</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>stable</develStage>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
+  <comments>This is a transitional module aiming to move towards the new search-kit based data entry</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/LegacyBatchEntry</namespace>
+    <format>25.01.1</format>
+    <angularModule>crmLegacyBatchEntry</angularModule>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
+    <mixin>menu-xml@1.0.0</mixin>
+  </mixins>
+</extension>

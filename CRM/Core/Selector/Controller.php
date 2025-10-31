@@ -192,7 +192,7 @@ class CRM_Core_Selector_Controller {
     $this->_case = $case;
 
     // fix sortID
-    if ($this->_sortID && strpos($this->_sortID, '_') === FALSE) {
+    if ($this->_sortID && !str_contains($this->_sortID, '_')) {
       $this->_sortID .= '_u';
     }
 
@@ -488,7 +488,7 @@ class CRM_Core_Selector_Controller {
     self::$_template->assign('tplFile', $this->_object->getHookedTemplateFileName());
     $contentTpl = CRM_Utils_System::getContentTemplate($this->_print);
     $content = self::$_template->fetch($contentTpl);
-    echo CRM_Utils_System::theme($content, $this->_print);
+    CRM_Utils_System::theme($content);
   }
 
   /**

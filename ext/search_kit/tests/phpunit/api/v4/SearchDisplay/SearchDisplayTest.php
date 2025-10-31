@@ -17,6 +17,17 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->apply();
   }
 
+  public function testGetOptions(): void {
+    $displayTypeOptions = \Civi\Api4\SearchDisplay::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'label', 'description', 'icon', 'grouping'])
+      ->addWhere('name', '=', 'type')
+      ->execute()
+      ->first()['options'];
+
+    $displayTypeOptions = array_column($displayTypeOptions, NULL, 'id');
+    $this->assertEquals('non-viewable', $displayTypeOptions['autocomplete']['grouping']);
+  }
+
   public function testGetDefault() {
     $params = [
       'api_entity' => 'Contact',

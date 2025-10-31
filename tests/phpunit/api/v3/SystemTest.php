@@ -95,9 +95,8 @@ class api_v3_SystemTest extends CiviUnitTestCase {
       $this->callAPISuccess('System', 'utf8conversion', ['is_revert' => 1]);
       $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
       $table->fetch();
-      $version = CRM_Utils_SQL::getDatabaseVersion();
-      $charset = (version_compare($version, '8', '>=') && stripos($version, 'mariadb') === FALSE) ? 'utf8mb3' : 'utf8';
-      $this->assertStringEndsWith('DEFAULT CHARSET=' . $charset . ' COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
+      // "utf8" are "utf8mb3" synonymous, but the canonical form gets flipfloppy depending on the specific versions of MySQL/MariaDB.
+      $this->assertMatchesRegularExpression(';DEFAULT CHARSET=utf8(mb3)? COLLATE=utf8(mb3)?_unicode_ci ROW_FORMAT=DYNAMIC;', $table->Create_Table);
     }
     else {
       $this->markTestSkipped('MySQL Version does not support ut8mb4 testing');

@@ -18,10 +18,6 @@
 /**
  * This class generates form components for previewing custom data
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Custom_Form_Preview extends CRM_Core_Form {
 
@@ -104,9 +100,9 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     if (is_array($this->_groupTree) && !empty($this->_groupTree[$this->_groupId])) {
-      foreach ($this->_groupTree[$this->_groupId]['fields'] as & $field) {
+      foreach ($this->_groupTree[$this->_groupId]['fields'] as $field) {
         //add the form elements
-        CRM_Core_BAO_CustomField::addQuickFormElement($this, $field['element_name'], $field['id'], CRM_Utils_Array::value('is_required', $field));
+        CRM_Core_BAO_CustomField::addQuickFormElement($this, $field['element_name'], $field['id'], !empty($field['is_required']));
       }
 
       $this->assign('groupTree', $this->_groupTree);

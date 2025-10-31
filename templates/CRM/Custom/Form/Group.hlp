@@ -7,93 +7,64 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-group_intro-title"}
-  {ts}Custom Fields{/ts}
-{/htxt}
-{htxt id="id-group_intro"}
-    {ts}Use this form to set the title, the type of record the fields will be used for, and set-level help. You will then be able to add any number of fields to the set.{/ts} {docURL page="user/organising-your-data/creating-custom-fields"}
-{/htxt}
 
-{htxt id="id-title-title"}
-  {ts}Title{/ts}
-{/htxt}
-{htxt id="id-title"}
+{htxt id='title'}
     {ts}For 'inline' display custom sets, this title will appear as the fieldset legend. If you choose the 'tab' display style (which is available for Contact record custom fields), the title will be used for the navigation tab.{/ts}
 {/htxt}
 
-{htxt id="id-display_style-title"}
-  {ts}Display Style{/ts}
-{/htxt}
-{htxt id="id-display_style"}
+
+{htxt id='style'}
     {ts}Select 'Inline' to include this set of fields in the main contact Add/Edit form and Contact Summary screens. Select 'Tab' or 'Tab with Table' to create a separate navigation tab for display and editing these values (generally for less frequently accessed and/or larger sets of fields). 'Tab with Table' is recommended for customs data sets which allow multiple records.{/ts}
     <p class="font-italic">{ts}NOTE: This setting applies only to custom sets used for Contact records (e.g. Individuals, Households, Organizations, or ALL contact types).{/ts}</p>
 {/htxt}
 
-{htxt id="id-extends-title"}
-  {ts}Used For{/ts}
-{/htxt}
-{htxt id="id-extends"}
+
+{htxt id='extends'}
     {ts}Select the type of record that this set of custom fields is applicable for. You can configure custom data for a specific type of contact (e.g. Individuals but NOT Organizations), ANY type of contact, or other record types such as activities, contributions, memberships and event participants.{/ts}
     <p>{ts}EXAMPLE: If you are using CiviEvent, and you want to collect information from people registering for your events, select "Participants". If the information is specific to one type of participant (e.g. event volunteers), select "Participants (role)" and then select the role (e.g. 'Volunteer').{/ts}</p>
     <p>{ts}If your site uses Contact Subtypes, you can assign this set of custom fields to a specific subtype (e.g. 'Student'), OR you can select '- Any -' which makes the fields available to contacts of the parent type (e.g. 'Individual') as well as to any subtypes.{/ts}</p>
 {/htxt}
 
 {capture assign=importMultipleURL}{crmURL p="civicrm/import/custom" q="reset=1"}{/capture}
-{htxt id="id-is_multiple-title"}
-  {ts}Allow Multiple Records{/ts}
-{/htxt}
-{htxt id="id-is_multiple"}
+
+{htxt id='is_multiple'}
     <p>{ts}Checking this box allows you to enter multiple sets of values for a given record.{/ts}</p>
     <p>{ts}<strong>EXAMPLE:</strong> When creating a set of custom fields used to collect <strong>Employment History</strong> - you might have fields for Job Title, Start Date, End Date, and Reason for Leaving. Checking the "multiple records" box allows you to collect information for multiple jobs.{/ts}</p>
     <p>{ts}You can also set the maximum number of records which can be recorded per contact. Using the previous example, you might only want data for the three most recent jobs.{/ts}</p>
     <p>{ts 1=$importMultipleURL}Use the <a href="%1">Multi-value Custom Data Import tool</a> to import data into multiple record custom fields (the parent records should already exist).{/ts}</p>
 {/htxt}
 
-{htxt id="id-max_multiple-title"}
-{ts}Maximum Records{/ts}
-{/htxt}
-{htxt id="id-max_multiple"}
+
+{htxt id='max_multiple'}
  {ts}If you want to set a specific limit on the maximum number of records, enter that number. Otherwise leave this field blank.{/ts}
 {/htxt}
 
-{htxt id="id-weight-title"}
-  {ts}Order{/ts}
-{/htxt}
-{htxt id="id-weight"}
+
+{htxt id='weight'}
     {ts}Weight controls the order in which custom field sets are presented when there are more than one. Enter a positive or negative integer - lower numbers are displayed ahead of higher numbers.{/ts}
 {/htxt}
 
-{htxt id="id-collapse-title"}
-  {ts}Collapsed on Page{/ts}
-{/htxt}
-{htxt id="id-collapse"}
+
+{htxt id='collapse_display'}
     {ts}Check this box if you want only the title for this fieldset to be displayed when the page is initially loaded (fields are hidden).{/ts}
 {/htxt}
 
-{htxt id="id-collapse-adv-title"}
-  {ts}Collapsed on Search{/ts}
-{/htxt}
-{htxt id="id-collapse-adv"}
+
+{htxt id='collapse_adv_display'}
     {ts}Check this box if you want only the title for this fieldset to be displayed when the page is initially loaded (fields are hidden) on advanced search.{/ts}
 {/htxt}
 
-{htxt id="id-is-public-title"}
-  {ts}Is this Custom Group Public{/ts}
-{/htxt}
-{htxt id="id-is-public"}
+
+{htxt id='is_public'}
   {ts}Check this box if you want this custom group to be displayed on public forms e.g. Event Information page. Only public custom groups will be included in event receipts.{/ts}  {docURL page="user/organising-your-data/creating-custom-fields/#is-this-custom-field-set-public"}
 {/htxt}
 
-{htxt id="id-help_pre-title"}
-  {ts}Pre Help{/ts}
-{/htxt}
-{htxt id="id-help_pre"}
+
+{htxt id='help_pre'}
    {ts}Explanatory text displayed at the beginning of this sets of fields.{/ts}
 {/htxt}
 
-{htxt id="id-help_post-title"}
-  {ts}Post Help{/ts}
-{/htxt}
-{htxt id="id-help_post"}
+
+{htxt id='help_post'}
     {ts}Explanatory text displayed below this set of fields.{/ts}
 {/htxt}

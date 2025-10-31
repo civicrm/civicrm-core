@@ -41,7 +41,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $contributionSoft->currency = $config->defaultCurrency;
     }
     $result = $contributionSoft->save();
-    CRM_Utils_Hook::post($hook, 'ContributionSoft', $contributionSoft->id, $contributionSoft);
+    CRM_Utils_Hook::post($hook, 'ContributionSoft', $contributionSoft->id, $contributionSoft, $params);
     return $result;
   }
 

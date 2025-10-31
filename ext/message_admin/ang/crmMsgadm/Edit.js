@@ -142,8 +142,14 @@
 
             return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(respMergeTranslations).then(pickFirsts));
           },
-          tokenList: function () {
-            return CRM.crmMailing.mailTokens;
+          tokenList: function (crmApi) {
+            // FIXME: Use an API that provides tokens more attuned to the particular template.
+            return crmApi('Mailing', 'gettokens', {
+              entity: ['contact', 'mailing'],
+              sequential: 1
+            }).then((r) => {
+              return r.values;
+            });
           }
         }
       });

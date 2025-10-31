@@ -111,7 +111,7 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getEventSearchParameters() {
+  public static function getEventSearchParameters() {
     return [
       [
         [['participant_status_id', '=', 1, 0, 0]],

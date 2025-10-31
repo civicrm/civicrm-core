@@ -39,7 +39,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    *
    * @var array
    */
-  public $_contactTypes;
+  public $_contactTypes = [];
 
   /**
    * The additional clause that we restrict the search with
@@ -84,7 +84,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    */
   public static function preProcessCommon(&$form) {
     $form->_contactIds = [];
-    $form->_contactTypes = [];
 
     $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath) || in_array('map', $form->urlPath);
     if ($isStandAlone) {
@@ -192,7 +191,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
         $selectedTypes = explode(' ', $selectedTypes);
       }
       foreach ($selectedTypes as $ct => $dontcare) {
-        if (strpos($ct, CRM_Core_DAO::VALUE_SEPARATOR) === FALSE) {
+        if (!str_contains($ct, CRM_Core_DAO::VALUE_SEPARATOR)) {
           $form->_contactTypes[] = $ct;
         }
         else {
@@ -447,7 +446,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     if ($searchParams['radio_ts'] == 'ts_sel') {
       // Create a static group.
       // groups require a unique name
-      $randID = md5(time() . rand(1, 1000));
+      $randID = bin2hex(random_bytes(16));
       $grpTitle = "Hidden Group {$randID}";
       $grpID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $grpTitle, 'id', 'title');
 

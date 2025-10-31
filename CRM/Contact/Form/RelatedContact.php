@@ -17,10 +17,6 @@
 
 /**
  * This class generates form components generic to all the contact types.
- *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
  */
 class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
@@ -97,18 +93,8 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   public function buildQuickForm() {
     $params = [];
     $params['id'] = $params['contact_id'] = $this->_contactId;
-    $contact = CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
+    CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
 
-    $countryID = '';
-    $stateID = '';
-    if (!empty($this->_defaults['address'][1])) {
-      $countryID = CRM_Utils_Array::value('country_id',
-        $this->_defaults['address'][1]
-      );
-      $stateID = CRM_Utils_Array::value('state_province_id',
-        $this->_defaults['address'][1]
-      );
-    }
     $this->buildOnBehalfForm();
 
     $this->assign('contact_type', $this->_contactType);

@@ -19,8 +19,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\UserJob;
-
 require_once 'Log.php';
 require_once 'Mail.php';
 
@@ -50,7 +48,9 @@ require_once 'api/api.php';
  * @property string $defaultContactStateProvince
  * @property string $monetaryDecimalPoint
  * @property string $monetaryThousandSeparator
- * @property array fiscalYearStart
+ * @property array $fiscalYearStart
+ * @property string $customFileUploadDir user file upload directory with trailing slash
+ * @property string $imageUploadDir media upload directory with trailing slash
  */
 class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
@@ -88,9 +88,9 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       \Civi\Core\Container::boot($loadFromDB);
 
       if ($loadFromDB && self::$_singleton->dsn) {
-        self::$_singleton->userSystem->postContainerBoot();
-
         Civi::service('settings_manager')->bootComplete();
+
+        self::$_singleton->userSystem->postContainerBoot();
 
         $domain = \CRM_Core_BAO_Domain::getDomain();
         \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
@@ -268,28 +268,23 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @see https://issues.civicrm.org/jira/browse/CRM-8739
    *
    * @param bool $sessionReset
+   * @deprecated
+   *   Deprecated Feb 2025 in favor of Civi::rebuild().
+   *   Reassess after Jun 2026.
+   *   For an extension bridging before+after, suggest guard like:
+   *     if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild(...)->execute()
+   *     else CRM_Core_Config::singleton()->cleanupCaches();
+   *   Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
   public function cleanupCaches($sessionReset = FALSE) {
-    // cleanup templates_c directory
-    $this->cleanup(1, FALSE);
-    // clear all caches
-    self::clearDBCache();
-    // Avoid clearing QuickForm sessions unless explicitly requested
-    if ($sessionReset) {
-      Civi::cache('session')->clear();
-    }
-    Civi::cache('metadata')->clear();
-    CRM_Core_DAO_AllCoreTables::flush();
-    CRM_Utils_System::flushCache();
-
-    // note this used to be earlier, but was crashing because of api4 instability
-    // during extension install
-    UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
-
-    if ($sessionReset) {
-      $session = CRM_Core_Session::singleton();
-      $session->reset(2);
-    }
+    Civi::rebuild([
+      'files' => TRUE,
+      'tables' => TRUE,
+      'sessions' => $sessionReset,
+      'metadata' => TRUE,
+      'system' => TRUE,
+      'userjob' => TRUE,
+    ])->execute();
   }
 
   /**

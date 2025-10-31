@@ -316,36 +316,71 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return TRUE;
   }
 
+  public static function validateMaxFileSize($value): bool {
+    if (!$value) {
+      // Value is not required
+      return TRUE;
+    }
+    if (!CRM_Utils_Rule::positiveInteger($value)) {
+      throw new CRM_Core_Exception(ts('Maximum file size must be a positive integer'));
+    }
+    $iniBytes = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
+    $inputBytes = ((int) $value) * 1024 * 1024;
+
+    if ($inputBytes > $iniBytes) {
+      throw new CRM_Core_Exception(ts('Maximum file size cannot exceed limit defined in "php.ini" ("upload_max_filesize=%1").', [
+        1 => ini_get('upload_max_filesize'),
+      ]));
+    }
+    return TRUE;
+  }
+
+  public static function validateExecutable($value, $fieldSpec): bool {
+    // Required is a separate check
+    if (!$value) {
+      return TRUE;
+    }
+    // Only check the first space separated piece to allow for a value
+    // such as /usr/bin/xvfb-run -- weasyprint
+    $pieces = explode(' ', $value, 2);
+    $executable = $pieces[0];
+    if (!file_exists($executable)) {
+      throw new CRM_Core_Exception("Executable $executable does not exist");
+    }
+    if (!is_executable($executable)) {
+      throw new CRM_Core_Exception("Executable $executable is not executable");
+    }
+    return TRUE;
+  }
+
+  public static function validateEnableSSL($value, $fieldSpec): bool {
+    if ($value) {
+      $url = str_replace('http://', 'https://',
+        CRM_Utils_System::url('civicrm/dashboard', 'reset=1', TRUE, NULL, FALSE)
+      );
+      if (!CRM_Utils_System::checkURL($url, TRUE)) {
+        throw new CRM_Core_Exception(ts('You need to set up a secure server before you can use the Force Secure URLs option'));
+      }
+    }
+    return TRUE;
+  }
+
+  public static function validateCustomTranslateFunction($value, $fieldSpec): bool {
+    if ($value && !function_exists($value)) {
+      throw new CRM_Core_Exception(ts('Please define the custom translation function first.'));
+    }
+    return TRUE;
+  }
+
+  public static function validatePath($value, $fieldSpec): bool {
+    if (isset($value) && strlen($value) && !CRM_Utils_Rule::settingPath($value)) {
+      throw new CRM_Core_Exception(ts("'%1' directory does not exist", [1 => $value]));
+    }
+    return TRUE;
+  }
+
   /**
-   * This provides information about the setting - similar to the fields concept for DAO information.
-   * As the setting is serialized code creating validation setting input needs to know the data type
-   * This also helps move information out of the form layer into the data layer where people can interact with
-   * it via the API or other mechanisms. In order to keep this consistent it is important the form layer
-   * also leverages it.
-   *
-   * Note that this function should never be called when using the runtime getvalue function. Caching works
-   * around the expectation it will be called during setting administration
-   *
-   * Function is intended for configuration rather than runtime access to settings
-   *
-   * The following params will filter the result. If none are passed all settings will be returns
-   *
-   * @param int $componentID
-   *   Id of relevant component.
-   * @param array $filters
-   * @param int $domainID
-   * @param null $profile
-   *
-   * @return array
-   *   the following information as appropriate for each setting
-   *   - name
-   *   - type
-   *   - default
-   *   - add (CiviCRM version added)
-   *   - is_domain
-   *   - is_contact
-   *   - description
-   *   - help_text
+   * @deprecated in 6.9 will be removed around 6.21
    */
   public static function getSettingSpecification(
     $componentID = NULL,
@@ -353,6 +388,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $domainID = NULL,
     $profile = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('Civi\Core\SettingsMetadata::getMetadata');
     return \Civi\Core\SettingsMetadata::getMetadata($filters, $domainID);
   }
 
@@ -521,6 +557,39 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       if ($mailing_backend['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
         CRM_Core_Session::setStatus(ts('Now that your site is in production mode, you may want to enable <a %1>outbound email</a>.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1') . '"']), ts("Production environment set"), "success");
       }
+    }
+  }
+
+  public static function loggingMetadataCallback(array &$setting): void {
+    // Disable field on setting form if system does not meet requirements
+    if (\CRM_Core_I18n::isMultilingual()) {
+      $setting['description'] = ts('Logging is not supported in multilingual environments.');
+      $setting['html_attributes']['disabled'] = 'disabled';
+    }
+    elseif (!\CRM_Core_DAO::checkTriggerViewPermission(FALSE)) {
+      $setting['description'] = ts("In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.");
+      $setting['html_attributes']['disabled'] = 'disabled';
+    }
+  }
+
+  public static function userFrameworkLoggingMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it (currently only Drupal)
+    if (!CRM_Core_Config::singleton()->userSystem->supportsUfLogging()) {
+      unset($setting['settings_pages']['debug']);
+    }
+  }
+
+  public static function wpBasePageMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it
+    if (!CRM_Core_Config::singleton()->userSystem->canSetBasePage()) {
+      unset($setting['settings_pages']['uf']);
+    }
+  }
+
+  public static function userFrameworkUsersTableNameMetadataCallback(array &$setting): void {
+    // Don't show this setting on the form if CMS doesn't support it
+    if (!CRM_Core_Config::singleton()->userSystem->hasUsersTable()) {
+      unset($setting['settings_pages']['uf']);
     }
   }
 

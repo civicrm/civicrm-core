@@ -235,24 +235,13 @@ if (!defined('CIVICRM_UF_BASEURL')) {
   define('CIVICRM_UF_BASEURL', '%%baseURL%%');
 }
 
-/**
- * Specify a Smarty autoload file.
- *
- * Smarty5 is the version of Smarty we are in the process of adopting. To enable it
- * un-comment the line describing the path. Note that this will become always enabled in
- * the near future - this opt-in setting is transitional.
- */
-if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
-  // If not set we should default the Smarty version to Smarty5 which is our stable version.
-  // This will not work for all composer-based installs @todo.
-  if (is_dir($civicrm_root . '/packages')) {
-    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty5/Smarty.php');
-  }
-  elseif (is_dir($civicrm_root . '/../civicrm-packages')) {
-    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty5/Smarty.php');
-  }
+if (!defined('CIVICRM_DEDUPE_OPTIMIZER')) {
+  // This is a temporary define to allow us to phase in improved dedupe queries
+  // with some degree of caution. If you set this to TRUE
+  // then the queries used to dedupe contacts will be combined
+  // for better performance.
+  define('CIVICRM_DEDUPE_OPTIMIZER', FALSE);
 }
-
 /**
  * Define any CiviCRM Settings Overrides per https://docs.civicrm.org/sysadmin/en/latest/customize/settings/
  *
@@ -434,10 +423,11 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
  * unavailable on the host and port that you specify. By default CiviCRM will use
  * an in-memory array cache.
  *
- * To use the php extension memcache  use a value of 'Memcache'
- * To use the php extension memcached use a value of 'Memcached'
- * To use the php extension apc       use a value of 'APCcache'
- * To use the php extension redis     use a value of 'Redis'
+ * To use the php extension memcache    use a value of 'Memcache'
+ * To use the php extension memcached   use a value of 'Memcached'
+ * To use the php extension apc         use a value of 'APCcache'
+ * To use the php extension redis       use a value of 'Redis'
+ * To use the filesystem                use a value of 'FileCache'
  * To not use any caching (not recommended), use a value of 'NoCache'
  *
  */

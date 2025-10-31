@@ -77,7 +77,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   /**
    *
    */
-  public function setAmountDataProvider() {
+  public static function setAmountDataProvider() {
     return [
       [1, '1'],
       [1.23, '1.23'],
@@ -414,7 +414,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    *
    * return array
    */
-  public function otherParamsDataProvider() {
+  public static function otherParamsDataProvider() {
     $valid_bools = [['0' , FALSE], ['', FALSE], [0, FALSE], [FALSE, FALSE], [TRUE, TRUE], [1, TRUE], ['1', TRUE]];
     $valid_strings = [['foo' , 'foo'], ['', '']];
     $valid_strings_inc_null = [['foo' , 'foo'], ['', ''], [NULL, '']];

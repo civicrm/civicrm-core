@@ -58,7 +58,7 @@ trait SelectParamTrait {
     }
     // Get expressions containing wildcards but no dots or parentheses
     $wildFields = array_filter($this->select, function($item) {
-      return strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
+      return str_contains($item, '*') && !str_contains($item, '.') && !str_contains($item, '(') && !str_contains($item, ' ');
     });
     if ($wildFields) {
       // Wildcards should not match "Extra" fields

@@ -1,5 +1,5 @@
 <a href crm-dialog-popup="afformGuiConditionalDialog" popup-tpl="~/afGuiEditor/afGuiConditionalDialog.html" popup-data="{editor: $ctrl.editor, node: $ctrl.node}" title="{{:: ts('Conditional Rules') }}">
-  <i ng-class="{disabled: !$ctrl.node['af-if'] || !$ctrl.node['af-if'].length}" class="crm-i fa-code-fork"></i>
+  <i ng-class="{disabled: !$ctrl.node['af-if'] || !$ctrl.node['af-if'].length}" class="crm-i fa-code-fork" role="img" aria-hidden="true"></i>
   <span ng-if="!$ctrl.node['af-if'].length">
     {{:: ts('Add Conditional Rules') }}
   </span>

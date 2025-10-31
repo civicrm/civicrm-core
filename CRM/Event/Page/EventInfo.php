@@ -69,11 +69,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     // Add Event Type to $values in case folks want to display it
-    $values['event']['event_type'] = CRM_Utils_Array::value($values['event']['event_type_id'], CRM_Event_PseudoConstant::eventType());
+    $values['event']['event_type'] = CRM_Event_PseudoConstant::eventType($values['event']['event_type_id']);
 
     $this->assign('isShowLocation', $values['event']['is_show_location'] ?? NULL);
 
-    $eventCurrency = CRM_Utils_Array::value('currency', $values['event'], $config->defaultCurrency);
+    $eventCurrency = $values['event']['currency'] ?? $config->defaultCurrency;
     $this->assign('eventCurrency', $eventCurrency);
 
     // show event fees.
@@ -273,6 +273,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration && CRM_Core_Permission::check('register for events'));
     $this->assign('allowRegistration', $allowRegistration);
+
+    if (!empty($values['event']['registration_start_date'])
+        && strtotime($values['event']['registration_start_date']) > time()) {
+      $this->assign('registerStartDate', $values['event']['registration_start_date']);
+    }
 
     $isAlreadyRegistered = $this->isAlreadyRegistered();
     // noFullMsg was originally passed in to suppress the message about the event being full. The intent

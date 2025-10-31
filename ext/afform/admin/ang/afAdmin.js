@@ -11,7 +11,7 @@
           // Load data for lists
           afforms: function(crmApi4) {
             return crmApi4('Afform', 'get', {
-              select: ['name', 'title', 'type', 'server_route', 'is_public', 'submission_count', 'submission_date', 'submit_limit', 'submit_enabled', 'submit_currently_open', 'has_local', 'has_base', 'base_module', 'base_module:label', 'placement:label', 'tags:label']
+              select: ['name', 'title', 'type', 'server_route', 'is_public', 'submission_count', 'submission_date', 'submit_limit', 'submit_enabled', 'submit_currently_open', 'has_local', 'has_base', 'base_module', 'base_module:label', 'placement:label', 'tags:label', 'created_id']
             });
           }
         }

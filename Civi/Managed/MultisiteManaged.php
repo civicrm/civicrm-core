@@ -3,7 +3,6 @@
 namespace Civi\Managed;
 
 use Civi\Api4\Domain;
-use Civi\Api4\Setting;
 use Civi\Core\Service\AutoService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -29,10 +28,17 @@ class MultisiteManaged extends AutoService implements EventSubscriberInterface {
    * @param array $managedRecords
    */
   public function generateDomainEntities(array &$managedRecords): void {
-    $multisiteEnabled = Setting::get(FALSE)
-      ->addSelect('is_enabled')
-      ->execute()->first();
-    if (empty($multisiteEnabled['value'])) {
+    // Clear the domains cache in case we added/removed domains (mostly happens in tests)
+    unset($this->domains);
+    // If *any* of the domains are multisite-enabled, then we need to replicate the records.
+    $multisiteEnabled = FALSE;
+    foreach ($this->getDomains() as $domainId) {
+      if (\Civi::settings($domainId)->get('multisite_is_enabled')) {
+        $multisiteEnabled = TRUE;
+        break;
+      }
+    }
+    if (!$multisiteEnabled) {
       return;
     }
 

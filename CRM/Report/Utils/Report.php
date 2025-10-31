@@ -52,7 +52,7 @@ class CRM_Report_Utils_Report {
 
     if ($optionVal) {
       $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
-      return [CRM_Utils_Array::value('id', $templateInfo), $optionVal];
+      return [$templateInfo['id'] ?? NULL, $optionVal];
     }
 
     return FALSE;
@@ -191,7 +191,7 @@ WHERE  inst.report_id = %1";
     if (empty($instanceInfo['attachments'])) {
       $instanceInfo['attachments'] = [];
     }
-    $params['attachments'] = array_merge(CRM_Utils_Array::value('attachments', $instanceInfo), $attachments);
+    $params['attachments'] = array_merge($instanceInfo['attachments'] ?? [], $attachments);
     $params['text'] = '';
     $params['html'] = $fileContent;
 
@@ -199,10 +199,10 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Report_Form $form
    * @param array $rows
    */
-  public static function export2csv(&$form, &$rows) {
+  public static function export2csv($form, &$rows) {
     //Mark as a CSV file.
     CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv');
 
@@ -217,12 +217,12 @@ WHERE  inst.report_id = %1";
    * Utility function for export2csv and CRM_Report_Form::endPostProcess
    * - make CSV file content and return as string.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Report_Form $form
    * @param array $rows
    *
    * @return string
    */
-  public static function makeCsv(&$form, &$rows) {
+  public static function makeCsv($form, $rows) {
     $config = CRM_Core_Config::singleton();
 
     // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as

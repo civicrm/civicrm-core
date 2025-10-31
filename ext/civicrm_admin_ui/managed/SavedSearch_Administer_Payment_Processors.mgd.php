@@ -102,21 +102,18 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'title',
-              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -124,7 +121,6 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
-              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -132,21 +128,18 @@ return [
             [
               'type' => 'field',
               'key' => 'payment_processor_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'PaymentProcessor_EntityFinancialAccount_FinancialAccount_01.name',
-              'dataType' => 'String',
               'label' => E::ts('Financial Account'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -154,19 +147,14 @@ return [
             [
               'type' => 'field',
               'key' => 'is_default',
-              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
-              'rewrite' => ' ',
+              'rewrite' => '[none]',
               'icons' => [
                 [
-                  'icon' => 'fa-check-square-o',
+                  'icon' => 'fa-check',
                   'side' => 'left',
-                  'if' => [
-                    'is_default',
-                    '=',
-                    TRUE,
-                  ],
+                  'if' => ['is_default', '=', TRUE],
                 ],
               ],
             ],

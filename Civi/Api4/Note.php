@@ -21,13 +21,4 @@ namespace Civi\Api4;
 class Note extends Generic\DAOEntity {
   use Generic\Traits\HierarchicalEntity;
 
-  /**
-   * @param bool $checkPermissions
-   * @return Action\Note\Get
-   */
-  public static function get($checkPermissions = TRUE) {
-    return (new Action\Note\Get(__CLASS__, __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
-  }
-
 }

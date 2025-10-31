@@ -12,7 +12,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function definitionProvider() {
+  public static function definitionProvider() {
     $fixtures['empty-defn'] = [
       'json' => json_encode([]),
       'xml' => file_get_contents(__DIR__ . '/xml/empty-defn.xml'),

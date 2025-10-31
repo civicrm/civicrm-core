@@ -42,7 +42,6 @@
     {/if}
   {/if}
   <div class="crm-block crm-form-block crm-member-membershiprenew-form-block">
-    <div>{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
       <tr class="crm-member-membershiprenew-form-block-contact-id">
         <td class="label">{$form.contact_id.label}</td>
@@ -105,7 +104,7 @@
         </tr>
         <tr id="fromEmail">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+          <td>{$form.from_email_address.html}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
         <tr id="notice" class="crm-member-membershiprenew-form-block-receipt_text">
           <td class="label">{$form.receipt_text.label}</td>
@@ -119,10 +118,8 @@
     {/if}
 
     {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Membership' cid=false}
-
-    <div>{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-
     <div class="spacer"></div>
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </div>
   {if $accessContribution and ! $membershipMode}
     {include file="CRM/common/showHideByFieldValue.tpl"

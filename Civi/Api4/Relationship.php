@@ -31,6 +31,33 @@ class Relationship extends Generic\DAOEntity {
   }
 
   /**
+   * @param bool $checkPermissions
+   * @return Action\Relationship\Create
+   */
+  public static function create($checkPermissions = TRUE) {
+    return (new Action\Relationship\Create(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Relationship\Save
+   */
+  public static function save($checkPermissions = TRUE) {
+    return (new Action\Relationship\Save(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Relationship\Update
+   */
+  public static function update($checkPermissions = TRUE) {
+    return (new Action\Relationship\Update(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * @return array
    */
   public static function permissions(): array {

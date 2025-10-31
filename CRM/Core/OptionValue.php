@@ -133,7 +133,7 @@ class CRM_Core_OptionValue {
 
       $optionValue[$dao->id]['label'] = htmlspecialchars($optionValue[$dao->id]['label']);
       $optionValue[$dao->id]['order'] = $optionValue[$dao->id]['weight'];
-      $optionValue[$dao->id]['icon'] = CRM_Utils_Array::value('icon', $optionValue[$dao->id], '');
+      $optionValue[$dao->id]['icon'] = $optionValue[$dao->id]['icon'] ?? '';
       $optionValue[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
         [
           'id' => $dao->id,
@@ -195,7 +195,7 @@ class CRM_Core_OptionValue {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $optionValueID, 'weight', 'id');
       }
       $fieldValues = ['option_group_id' => $optionGroupID];
-      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues);
+      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, $params['weight'] ?? NULL, $fieldValues);
     }
     $params['option_group_id'] = $optionGroupID;
 

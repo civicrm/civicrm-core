@@ -16,7 +16,6 @@
           $scope.crmStatus = crmStatus;
           $scope.crmUiAlert = crmUiAlert;
           $scope.crmUrl = CRM.url;
-          $scope.checkPerm = CRM.checkPerm;
 
           $el.addClass('afform-directive');
 
@@ -45,6 +44,15 @@
           $scope.addTitle = function(addition) {
             $scope.$parent.afformTitle = addition + ' ' + meta.title;
           };
+
+          $scope.checkLinkPerm = function(permissionName, createdId) {
+            // Convert 'manage own [afform|search_kit]' to 'administer [afform|search_kit]' if created_id doesn't match current user
+            if (permissionName.startsWith('manage own') && CRM.config.cid !== createdId) {
+              permissionName = permissionName.replace('manage own', 'administer');
+            }
+            return CRM.checkPerm(permissionName);
+          };
+
         }
       };
       return d;

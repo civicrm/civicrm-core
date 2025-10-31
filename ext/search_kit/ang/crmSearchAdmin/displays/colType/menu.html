@@ -23,7 +23,7 @@
   <div class="btn-group">
     <button type="button" class="btn btn-{{ col.style + ' ' + col.size }}">
       <span class="crm-editable-enabled" ng-click="$ctrl.parent.pickIcon(col, 'icon')">
-        <i class="{{ col.icon ? 'crm-i ' + col.icon : '' }}"></i>
+        <i class="{{ col.icon ? 'crm-i ' + col.icon : '' }}" role="img" aria-hidden="true"></i>
       </span>
       <span crm-ui-editable ng-model="col.text">{{ col.text }}</span>
       <span class="caret disabled"></span>

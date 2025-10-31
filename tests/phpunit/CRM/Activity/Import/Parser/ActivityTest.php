@@ -18,7 +18,9 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\ActivityContact;
 use Civi\Api4\UserJob;
+use Civi\Import\ActivityParser;
 
 /**
  *  Test Activity Import Parser functions
@@ -37,6 +39,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   public function setUp():void {
     parent::setUp();
     $this->createLoggedInUser();
+    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
   }
 
   /**
@@ -56,12 +59,12 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   public function testImport(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Activity'], 'checkbox');
     $values = [
-      'activity_details' => 'fascinating',
-      'activity_type_id' => 1,
-      'activity_date_time' => '2010-01-06',
-      'target_contact_id' => $this->individualCreate(),
-      'activity_subject' => 'riveting stuff',
-      $this->getCustomFieldName('checkbox') => 'L',
+      'Activity.details' => 'fascinating',
+      'Activity.activity_type_id' => 1,
+      'Activity.activity_date_time' => '2010-01-06',
+      'TargetContact.id' => $this->individualCreate(),
+      'Activity.subject' => 'riveting stuff',
+      'Activity.' . $this->getCustomFieldName('checkbox', 4) => 'L',
     ];
     $this->importValues($values);
     $this->callAPISuccessGetSingle('Activity', [$this->getCustomFieldName('checkbox') => 'L']);
@@ -72,14 +75,14 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    *
    * @param array $fields
    *
-   * @return \CRM_Activity_Import_Parser_Activity
+   * @return \Civi\Import\ActivityParser
    */
-  protected function createImportObject(array $fields): \CRM_Activity_Import_Parser_Activity {
+  protected function createImportObject(array $fields): ActivityParser {
     $mapper = [];
     foreach ($fields as $field) {
       $mapper[] = [$field];
     }
-    $importer = new CRM_Activity_Import_Parser_Activity();
+    $importer = new ActivityParser();
     $this->userJobID = $this->getUserJobID(['mapper' => $mapper]);
     $importer->setUserJobID($this->userJobID);
     $importer->init();
@@ -117,7 +120,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
       return CRM_Import_Parser::VALID;
     }
     if ($expectedOutcome === 4) {
-      $this->assertEquals('ERROR', $row['_status']);
+      $this->assertEquals('ERROR', $row['_status'], $row['_status_message']);
       return $row['_status_message'];
     }
   }
@@ -126,17 +129,20 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    * Test validation of various fields.
    *
    * @dataProvider activityImportValidationProvider
+   *
    * @param array $input
    * @param string $expectedError
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testActivityImportValidation(array $input, string $expectedError): void {
     // Supplement some values that can't be done in a data provider because of timing.
-    if (!isset($input['target_contact_id'])) {
-      $input['target_contact_id'] = $this->individualCreate();
+    if (!isset($input['TargetContact.id'])) {
+      $input['TargetContact.id'] = $this->individualCreate();
     }
     if (isset($input['replace_me_custom_field'])) {
       $this->createCustomGroupWithFieldOfType(['extends' => 'Activity'], 'radio');
-      $input[$this->getCustomFieldName('radio')] = $input['replace_me_custom_field'];
+      $input['Activity.' . $this->getCustomFieldName('radio', 4)] = $input['replace_me_custom_field'];
       unset($input['replace_me_custom_field']);
     }
 
@@ -152,7 +158,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    * Dataprovider for some import tests.
    * @return array
    */
-  public function activityImportValidationProvider(): array {
+  public static function activityImportValidationProvider(): array {
     /**
      * Because this is a dataprovider that runs before setup, we
      * can't specify values that don't exist yet, but we're mostly
@@ -168,18 +174,18 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
       // explicit index number so easier to find when it fails
       0 => [
         'input' => [
-          'activity_type_id' => 1,
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 1,
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => '',
       ],
 
       1 => [
         'input' => [
-          'activity_type_id' => 1,
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 1,
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
           'replace_me_custom_field' => '3',
         ],
         'expected_error' => '',
@@ -187,70 +193,70 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
 
       2 => [
         'input' => [
-          'activity_type_id' => 'Meeting',
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => '',
       ],
 
       3 => [
         'input' => [
-          'activity_type_id' => 1,
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 1,
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => '',
       ],
 
       5 => [
         'input' => [
-          'activity_type_id' => 1,
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 1,
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => '',
       ],
 
       6 => [
         'input' => [
-          'activity_type_id' => 'Meeting',
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => '',
       ],
 
       7 => [
         'input' => [
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => 'Missing required fields',
       ],
 
       8 => [
         'input' => [
-          'activity_type_id' => '',
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => '',
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => 'Missing required fields',
       ],
 
       9 => [
         'input' => [
-          'activity_type_id' => 'Meeting',
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => 'Missing required fields',
       ],
 
       10 => [
         'input' => [
-          'activity_type_id' => 'Meeting',
-          'activity_date_time' => '',
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.activity_date_time' => '',
+          'Activity.subject' => 'asubj',
         ],
         'expected_error' => 'Missing required fields',
       ],
@@ -260,8 +266,8 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
       // is correct and it shouldn't be required in UI.
       11 => [
         'input' => [
-          'activity_type_id' => 'Meeting',
-          'activity_date_time' => $some_date,
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.activity_date_time' => $some_date,
         ],
         'expected_error' => '',
       ],
@@ -271,41 +277,41 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
       // is correct and it shouldn't be required in UI.
       12 => [
         'input' => [
-          'activity_type_id' => 'Meeting',
-          'activity_date_time' => $some_date,
-          'activity_subject' => '',
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => '',
         ],
         'expected_error' => '',
       ],
 
-      13 => [
+      'invalid_custom_field' => [
         'input' => [
-          'activity_type_id' => 'Meeting',
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
           'replace_me_custom_field' => 'InvalidValue',
         ],
-        'expected_error' => 'Invalid value for field(s) : Integer radio',
+        'expected_error' => 'Invalid value for field(s) : Group with field radio: Integer radio',
       ],
 
-      14 => [
+      'present_but_empty_custom_field' => [
         'input' => [
-          'activity_type_id' => 'Meeting',
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
           'replace_me_custom_field' => '',
         ],
         'expected_error' => '',
       ],
       // a way to find the contact id is required.
-      15 => [
+      'missing_target_contact_id' => [
         'input' => [
-          'target_contact_id' => '',
-          'activity_type_id' => 'Meeting',
-          'activity_date_time' => $some_date,
-          'activity_subject' => 'asubj',
+          'TargetContact.id' => '',
+          'Activity.activity_type_id' => 'Meeting',
+          'Activity.activity_date_time' => $some_date,
+          'Activity.subject' => 'asubj',
         ],
-        'expected_error' => 'No matching Contact found for ()',
+        'expected_error' => 'No matching TargetContact found',
       ],
 
     ];
@@ -319,8 +325,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   protected function getMapperFromFieldMappings(array $mappings): array {
     $mapper = [];
     foreach ($mappings as $mapping) {
-      $fieldInput = [$mapping['name']];
-      $mapper[] = $fieldInput;
+      $mapper[] = [$mapping['name']];
     }
     return $mapper;
   }
@@ -331,51 +336,57 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   public function testImportCSV() :void {
     $this->individualCreate(['email' => 'mum@example.com']);
     $this->importCSV('activity.csv', [
-      ['name' => 'activity_date_time'],
-      ['name' => 'activity_status_id'],
-      ['name' => 'email'],
-      ['name' => 'activity_type_id'],
-      ['name' => 'activity_details'],
-      ['name' => 'activity_duration'],
-      ['name' => 'priority_id'],
-      ['name' => 'activity_location'],
-      ['name' => 'activity_subject'],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.status_id'],
+      ['name' => 'TargetContact.email_primary.email'],
+      ['name' => 'Activity.activity_type_id'],
+      ['name' => 'Activity.details'],
+      ['name' => 'Activity.duration'],
+      ['name' => 'Activity.priority_id'],
+      ['name' => 'Activity.location'],
+      ['name' => 'Activity.subject'],
       ['name' => 'do_not_import'],
-    ]);
+    ], [], 'create', ['TargetContact' => ['dedupe_rule' => ['unique_email_match'], 'contact_type' => NULL]]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
     $this->callAPISuccessGetSingle('Activity', ['priority_id' => 'Urgent']);
   }
 
   /**
    * Test the full form-flow import and make sure we can map source/target external identifier correctly.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImportCSVExternalIdentifier() :void {
     $contactID1 = $this->individualCreate(['email' => 'mum@example.com', 'external_identifier' => 'individual1']);
     $contactID2 = $this->individualCreate(['email' => 'mum@example.com', 'external_identifier' => 'individual2'], 'individual_2');
     $this->importCSV('activityexternalidentifier.csv', [
-      ['name' => 'activity_date_time'],
-      ['name' => 'activity_status_id'],
-      ['name' => 'email'],
-      ['name' => 'activity_type_id'],
-      ['name' => 'activity_details'],
-      ['name' => 'activity_duration'],
-      ['name' => 'priority_id'],
-      ['name' => 'activity_location'],
-      ['name' => 'activity_subject'],
+      ['name' => 'Activity.activity_date_time'],
+      ['name' => 'Activity.status_id'],
+      ['name' => 'TargetContact.email_primary.email'],
+      ['name' => 'Activity.activity_type_id'],
+      ['name' => 'Activity.details'],
+      ['name' => 'Activity.duration'],
+      ['name' => 'Activity.priority_id'],
+      ['name' => 'Activity.location'],
+      ['name' => 'Activity.subject'],
       ['name' => 'do_not_import'],
-      ['name' => 'source_contact_external_identifier'],
-      ['name' => 'external_identifier'],
+      ['name' => 'SourceContact.external_identifier'],
+      ['name' => 'TargetContact.external_identifier'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status']);
     $activity = $this->callAPISuccessGetSingle('Activity', ['priority_id' => 'Urgent']);
-    $activityContacts = $this->callAPISuccess('ActivityContact', 'get', ['activity_id' => $activity['id'], 'sequential' => TRUE]);
-    $this->assertCount(2, $activityContacts['values']);
-    $this->assertEquals($activityContacts['values'][0]['contact_id'], $contactID1);
-    $this->assertEquals($activityContacts['values'][1]['contact_id'], $contactID2);
+    $activityContacts = ActivityContact::get(FALSE)
+      ->addWhere('activity_id', '=', $activity['id'])
+      ->addSelect('record_type_id:name')
+      ->addSelect('contact_id')
+      ->execute()->indexBy('record_type_id:name');
+    $this->assertCount(2, $activityContacts);
+    $this->assertEquals($contactID1, $activityContacts['Activity Source']['contact_id']);
+    $this->assertEquals($contactID2, $activityContacts['Activity Targets']['contact_id']);
   }
 
   /**
@@ -385,16 +396,19 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    * @noinspection PhpDocMissingThrowsInspection
    */
   protected function getUserJobID(array $submittedValues = []): int {
+    $queryFields = ['first_name'];
+    foreach (array_keys($submittedValues['mapper']) as $key) {
+      if ($key > 0) {
+        $queryFields[] = '"value_' . $key . '" AS field_' . $key;
+      }
+    }
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
           'contactType' => 'Individual',
           'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
-          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
-          'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-          'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
+          'sqlQuery' => 'SELECT ' . implode(', ', $queryFields) . ' FROM civicrm_contact',
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',

@@ -41,7 +41,9 @@ details.af-collapsible > .af-title::before,
 .crm-container .crm-collapsible .collapsible-title::before,
 .crm-container a.crm-expand-row:not(.expanded)::before,
 .crm-container .civicrm-community-messages .crm-collapsible .collapsible-title::before,
-.crm-container .show-children.collapsed::before {
+.crm-container .show-children.collapsed::before,
+/* For jQuery ui collapsible tabs in CiviReport */
+.crm-container .ui-tabs-collapsible > ul.ui-tabs-nav::before {
   font-size: var(--crm-font-size);
   font-style: normal;
   text-rendering: auto;
@@ -61,7 +63,8 @@ details.af-collapsible.af-collapsed > .af-title::before,
 .crm-container a.collapsed:not(.expanded)::before,
 .crm-container a.crm-expand-row::before,
 .crm-container .crm-collapsible.collapsed .collapsible-title::before,
-.crm-container .civicrm-community-messages .crm-collapsible.collapsed .collapsible-title::before {
+.crm-container .civicrm-community-messages .crm-collapsible.collapsed .collapsible-title::before,
+.crm-container .ui-tabs-collapsible > ul.ui-tabs-nav::before {
   transform: none;
   transform-origin: center center;
   transition: var(--crm-expand-transition);
@@ -75,7 +78,8 @@ details.af-collapsible[open] > .af-title::before,
 .crm-container a.expanded::before,
 .crm-container a.crm-expand-row.expanded::before,
 .crm-container .civicrm-community-messages .crm-collapsible .collapsible-title::before,
-.crm-container .show-children.expanded::before {
+.crm-container .show-children.expanded::before,
+.crm-container .ui-tabs-collapsible > ul.ui-tabs-nav:has(li.ui-tabs-active)::before {
   content: var(--crm-expand-icon);
   transform: var(--crm-expand-transform);
   transform-origin: center center;
@@ -124,7 +128,6 @@ a.crm-expand-row:focus {
   background-color: var(--crm-expand-header-bg-active);
 }
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header {
-  font-family: var(--crm-expand2-header-font);
   font-weight: var(--crm-expand2-header-weight);
   background-color: var(--crm-expand2-header-bg);
   color: var(--crm-expand2-header-color);
@@ -171,22 +174,14 @@ a.crm-expand-row:focus {
     ALERTS
 *******************/
 
-.crm-container del,
 .crm-container .ui-icons_deleted,
-.crm-container table.caseSelector td.status-urgent,
 .crm-container .font-red,
-.crm-container .status-removed,
-.crm-container .status-overdue,
-.crm-container .status-fatal,
-.crm-container .status-hold,
-.crm-container .status-past,
-.crm-contact-deceased,
-.crm-container .status-warning {
-  color: var(--crm-c-alert);
+.crm-contact-deceased {
+  color: var(--crm-c-danger-on-page-bg);
 }
 .crm-container .alert.alert-info.font-red { /* for when an info alert wants to be a danger alert! */
-  background-color: var(--crm-alert-background-danger);
-  border-color: var(--crm-alert-border-danger);
+  background-color: var(--crm-alert-danger-bg);
+  border-color: var(--crm-alert-danger-border);
 }
 
 /******************
@@ -360,12 +355,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
   margin-bottom: 0;
 }
-.crm-container .crm-search-nav-tabs { /* Fix for SK tabs border */
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  margin-bottom: 0;
-  border-bottom: 0;
-}
 .crm-container .panel-heading:has(.nav-tabs) {
   padding: 0;
   border-bottom: 0;
@@ -380,14 +369,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   box-shadow: none;
   border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
   background: var(--crm-tab-bg-active);
-  overflow-x: auto;
-}
-.crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table table {
-  border-width: 1px 0 0 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  box-shadow: none;
-  margin-bottom: 0;
 }
 .crm-container .afadmin-list >  .form-inline,
 .crm-search > .ng-scope > .form-inline {
@@ -421,8 +402,8 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .CRM_Contact_Form_Contact > .crm-form-block > details,
 .CRM_Contact_Form_Contact > .crm-form-block > div > details {
   margin-inline: calc(-1 * var(--crm-form-block-padding));
-  padding-inline: var(--crm-expand-2-body-padding);
-  margin-bottom: var(--crm-expand-2-body-padding);
+  padding-inline: var(--crm-expand2-body-padding);
+  margin-bottom: var(--crm-expand2-body-padding);
 }
 .crm-container .crm-add-address-wrapper {
   height: auto;
@@ -445,7 +426,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-container .tag-tree-wrapper div.tag-info {
   width: auto;
   position: relative;
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
   border: 0 solid transparent;
   box-shadow: var(--crm-block-shadow);
   padding: var(--crm-padding-reg);
@@ -454,8 +435,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   top: 0;;
 }
 .crm-container .tag-tree-wrapper div.tag-info .tdl {
-  font-weight: var(--crm-bold-weight);
-  font-family: var(--crm-font-bold);
+  font-weight: bold;
   color: var(--crm-c-text);
 }
 .crm-container .tag-tree-wrapper div.tag-info .crm-submit-buttons {
@@ -524,14 +504,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   box-shadow: none;
   background: var(--crm-tab-bg-active);
 }
-/* Include profile (contribtuion page and events  */
-.crm-contribution-contributionpage-custom-form-block-custom_pre_id td.html-adjust > div > div,
-.crm-contribution-contributionpage-custom-form-block-custom_post_id td.html-adjust > div > div,
-.crm-event-manage-registration-form-block-custom_pre_id td > div > div,
-.crm-event-manage-registration-form-block-custom_post_id td > div > div {
-  display: flex;
-  gap: var(--crm-s);
-}
 /* Event dashboard */
 .CRM_Event_Form_Search .button {
   float: left;
@@ -567,9 +539,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   background: transparent;
   padding: 0;
 }
-.crm-case-activity-form-block-followup_activity_type_id .crm-form-date-wrapper {
-  display: inline-block;
-}
 .crm-case-activity-form-block table.form-layout-compressed {
   width: 100%;
 }
@@ -578,13 +547,18 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 }
 /* API3 explorer */
 
+.crm-container .select2-highlighted .api-field-desc,
+.crm-container .select2-highlighted .crm-marker,
+.crm-container .api-field-desc {
+  color: inherit;
+}
 #api-generated caption {
-  font-weight: var(--crm-bold-weight);
-  font-family: var(--crm-font-bold);
+  font-weight: bold;
 }
 #api-generated tr td:first-of-type {
   width: var(--crm-input-label-width);
 }
+
 /* Display Preferences */
 
 tr.crm-preferences-display-form-block-contact_edit_options td:has(table) {
@@ -651,7 +625,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
 /* Custom searches */
 .crm-container > #crm-main-content-wrapper > fieldset {
   display: grid;
-  background: var(--crm-c-background);
+  background: var(--crm-c-container-bg);
   border: 0 solid transparent;
   box-shadow: var(--crm-block-shadow);
   padding: var(--crm-padding-reg);
@@ -870,7 +844,7 @@ details + .crm-content-block:has(.dataTables_wrapper) {
   gap: var(--crm-flex-gap);
 }
 .crm-mosaico-wizard .crm-mosaico-template-item.thumbnail {
-  background: var(--crm-c-background2) !important /* vs _template-item.scss */;
+  background: var(--crm-c-layer1-bg) !important /* vs _template-item.scss */;
   border: var(--crm-c-divider) !important /* vs _template-item.scss */;
   border-radius: var(--crm-roundness) !important /* vs _template-item.scss */;
 }

@@ -25,7 +25,7 @@ use Civi\Core\HookInterface;
 class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
 
   /**
-   * Set filters for the menubar quicksearch.
+   * Custom autocomplete for the menubar quicksearch.
    *
    * @param \Civi\API\Event\PrepareEvent $event
    */
@@ -36,37 +36,137 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       $apiRequest->getFormName() === 'crmMenubar' &&
       $apiRequest->getFieldName() === 'crm-qsearch-input'
     ) {
-      $allowedFilters = \Civi::settings()->get('quicksearch_options');
-      foreach ($apiRequest->getFilters() as $fieldName => $val) {
-        if (in_array($fieldName, $allowedFilters)) {
-          $apiRequest->addFilter($fieldName, $val);
-        }
-      }
-    }
-  }
 
-  /**
-   */
-  public static function on_civi_search_autocompleteDefault(GenericHookEvent $e) {
-    // Adjust search params for menubar-quicksearch
-    if ($e->formName === 'crmMenubar' && $e->fieldName === 'crm-qsearch-input') {
-      // If doing a search by a field other than the default,
-      // add that field to the main column
-      if ($e->filters) {
-        $filterField = array_keys($e->filters)[0];
-        // If the filter is from a multi-record custom field set, add necessary join to the query
-        if (str_contains($filterField, '.')) {
-          [$customGroupName, $customFieldName] = explode('.', $filterField);
-          $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $customGroupName]);
-          if (!empty($customGroup['is_multiple'])) {
-            $e->savedSearch['api_params']['join'][] = [
-              "Custom_$customGroupName AS $customGroupName",
-              'INNER',
-              ['id', '=', "$customGroupName.entity_id"],
-            ];
+      // Override savedSearch
+      $savedSearch = [
+        'api_entity' => 'Contact',
+      ];
+      $apiParams = [
+        'where' => [
+          // Api4 automatically adds this to most Contact queries, but not within Unions.
+          ['is_deleted', '=', FALSE],
+        ],
+      ];
+
+      $allowedFilters = \Civi::settings()->get('quicksearch_options');
+      foreach ($apiRequest->getFilters() as $filterField => $val) {
+        if (in_array($filterField, $allowedFilters)) {
+          // Add trusted filter
+          $apiRequest->addFilter($filterField, $val);
+          $apiRequest->setInput($val);
+
+          // If the filter is from a multi-record custom field set, add necessary join to the savedSearch query
+          if (str_contains($filterField, '.')) {
+            [$customGroupName, $customFieldName] = explode('.', $filterField);
+            $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $customGroupName]);
+            if (!empty($customGroup['is_multiple'])) {
+              $apiParams['join'][] = [
+                "Custom_$customGroupName AS $customGroupName",
+                'INNER',
+                ['id', '=', "$customGroupName.entity_id"],
+              ];
+            }
           }
         }
       }
+
+      // Override searchDisplay
+      $display = [
+        'settings' => [
+          'sort' => [
+            ['sort_name', 'ASC'],
+          ],
+        ],
+      ];
+
+      $columns = [
+        ['type' => 'field', 'key' => 'sort_name'],
+      ];
+
+      // Map contact_autocomplete_options settings to v4 format
+      $autocompleteOptionsMap = [
+        2 => 'email_primary.email',
+        3 => 'phone_primary.phone',
+        4 => 'address_primary.street_address',
+        5 => 'address_primary.city',
+        6 => 'address_primary.state_province_id:abbr',
+        7 => 'address_primary.country_id:label',
+        8 => 'address_primary.postal_code',
+      ];
+      // If doing a search by a field other than the default,
+      // add that field as the column
+      if ($apiRequest->getFilters()) {
+        $filterFields = array_keys($apiRequest->getFilters());
+        $columns[0]['rewrite'] = "[sort_name] :: [" . implode('] :: [', $filterFields) . "]";
+      }
+      else {
+        $filterFields = ['sort_name'];
+        if (\Civi::settings()->get('includeEmailInName')) {
+          $filterFields[] = 'email_primary.email';
+          $columns[] = ['type' => 'field', 'key' => 'email_primary.email'];
+        }
+        if (\Civi::settings()->get('includeNickNameInName')) {
+          $filterFields[] = 'nick_name';
+          $columns[0] = [
+            'type' => 'field',
+            'key' => 'nick_name',
+            'rewrite' => '[sort_name] "[nick_name]"',
+            'empty_value' => '[sort_name]',
+          ];
+        }
+      }
+      $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, $filterFields);
+
+      // Add extra columns based on search preferences
+      $extraFields = [];
+      $autocompleteOptions = Setting::get(FALSE)
+        ->addSelect('contact_autocomplete_options')->execute()
+        ->first();
+      foreach ($autocompleteOptions['value'] ?? [] as $option) {
+        if (isset($autocompleteOptionsMap[$option])) {
+          $extraFields[] = $autocompleteOptionsMap[$option];
+          $columns[] = [
+            'type' => 'field',
+            'key' => $autocompleteOptionsMap[$option],
+          ];
+        }
+      }
+
+      $apiParams['select'] = array_unique(array_merge(['id'], $filterFields, $extraFields));
+      $display['settings']['columns'] = $columns;
+
+      // Single filter
+      if (count($filterFields) === 1) {
+        $display['settings']['searchFields'] = $filterFields;
+        $savedSearch['api_params'] = $apiParams;
+      }
+      // With multiple filters, a UNION is more performant
+      else {
+        $savedSearch['api_entity'] = 'EntitySet';
+        $savedSearch['api_params'] = [
+          'select' => $apiParams['select'],
+          'sets' => [],
+        ];
+        // Add limit to each subset for max efficiency
+        $apiParams['orderBy'] = ['sort_name' => 'ASC'];
+        $apiParams['limit'] = \Civi::settings()->get('search_autocomplete_count') ?: 15;
+        // Add a UNION per search field
+        $prefix = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
+        foreach ($filterFields as $field) {
+          $params = $apiParams;
+          $params['where'][] = [$field, 'LIKE', $prefix . $apiRequest->getInput() . '%'];
+          // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
+          $params['select'] = array_map(function ($field) {
+            return explode(':', $field)[0];
+          }, $params['select']);
+          $savedSearch['api_params']['sets'][] = ['UNION DISTINCT', 'Contact', 'get', $params];
+        }
+        // Remove filter as we've already embedded it in the WHERE clauses of each UNION
+        $apiRequest->setInput('');
+      }
+
+      $apiRequest->overrideSavedSearch($savedSearch);
+      $apiRequest->overrideDisplay($display);
     }
   }
 
@@ -106,62 +206,6 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         ],
       ],
     ];
-    // Adjust search display for menubar-quicksearch
-    // The display only needs one column as the menubar autocomplete does not support descriptions
-    if (($e->context['formName'] ?? NULL) === 'crmMenubar' && ($e->context['fieldName'] ?? NULL) === 'crm-qsearch-input') {
-      $column = ['type' => 'field'];
-      // Map contact_autocomplete_options settings to v4 format
-      $autocompleteOptionsMap = [
-        2 => 'email_primary.email',
-        3 => 'phone_primary.phone',
-        4 => 'address_primary.street_address',
-        5 => 'address_primary.city',
-        6 => 'address_primary.state_province_id:abbr',
-        7 => 'address_primary.country_id:label',
-        8 => 'address_primary.postal_code',
-      ];
-      $filterFields = [];
-      // If doing a search by a field other than the default,
-      // add that field to the main column
-      if (!empty($e->context['filters'])) {
-        $filterFields[] = array_keys($e->context['filters'])[0];
-      }
-      else {
-        if (\Civi::settings()->get('includeEmailInName')) {
-          $filterFields[] = 'email_primary.email';
-        }
-        if (\Civi::settings()->get('includeNickNameInName')) {
-          $filterFields[] = 'nick_name';
-        }
-      }
-      if (!empty($filterFields)) {
-        // Take the first one as the key.
-        $column['key'] = $filterFields[0];
-        $column['empty_value'] = '[sort_name]';
-        $column['rewrite'] = "[sort_name]";
-        foreach ($filterFields as $filterField) {
-          $column['rewrite'] .= " :: [$filterField]";
-          $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, [$filterField]);
-        }
-      }
-      // No filter & email search disabled: search on name only
-      else {
-        $column['key'] = 'sort_name';
-      }
-      $e->display['settings']['columns'] = [$column];
-      // Add exta columns based on search preferences
-      $autocompleteOptions = Setting::get(FALSE)
-        ->addSelect('contact_autocomplete_options')->execute()
-        ->first();
-      foreach ($autocompleteOptions['value'] ?? [] as $option) {
-        if (isset($autocompleteOptionsMap[$option])) {
-          $e->display['settings']['columns'][] = [
-            'type' => 'field',
-            'key' => $autocompleteOptionsMap[$option],
-          ];
-        }
-      }
-    }
   }
 
 }

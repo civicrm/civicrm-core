@@ -56,7 +56,7 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Data provider for sort fields
    */
-  public function getSortFields() {
+  public static function getSortFields() {
     return [
       ['financial_type', TRUE],
       ['payment_instrument', TRUE],

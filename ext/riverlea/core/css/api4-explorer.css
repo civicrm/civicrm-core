@@ -13,7 +13,7 @@
 }
 .api4-explorer-row > .panel {
   margin: 0;
-  background: var(--crm-panel-background);
+  background: var(--crm-panel-bg);
 }
 .api4-explorer-page .panel-heading {
   display: flex;
@@ -22,7 +22,7 @@
 }
 #bootstrap-theme .api4-explorer-row .panel-heading h3 {
   background-color: transparent;
-  color: var(--crm-alert-text-info);
+  color: var(--crm-alert-info-text);
   background: transparent;
   margin: 0 !important /* vs bootstrap3 */;
   padding: 0 !important /* vs bootstrap3 */;
@@ -52,14 +52,6 @@
 }
 .api4-explorer-page i.fa-arrows {
   cursor: move;
-}
-.api4-input {
-  display: flex;
-  gap: var(--crm-m);
-  margin-bottom: var(--crm-m);
-}
-.api4-input label {
-  display: flex;
 }
 .api4-explorer-page form label {
   min-width: var(--crm-input-label-width);

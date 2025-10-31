@@ -1,26 +1,26 @@
 <div id="bootstrap-theme">
   <div class="alert alert-info">
     <p>
-      <i class="crm-i fa-info-circle"></i>
+      <i class="crm-i fa-info-circle" role="img" aria-hidden="true"></i>
       {{:: ts('Search configuration can be copied from here, then pasted into "Import" to e.g. transfer between sites.') }}
     </p>
     <p>
-      <i class="crm-i fa-link"></i>
+      <i class="crm-i fa-link" role="img" aria-hidden="true"></i>
       {{:: ts('Copyable link:') }}
       <a ng-href="{{:: $ctrl.simpleLink }}" target="_blank">
         <u>{{:: ts('Saved Search Criteria') }}</u>
       </a>
     <p>
-      <i class="crm-i fa-suitcase"></i>
+      <i class="crm-i fa-suitcase" role="img" aria-hidden="true"></i>
       {{:: ts('To package for distribution in an extension, use') }}
       <a ng-href="https://docs.civicrm.org/dev/en/latest/extensions/civix/#export" target="_blank">
         <u>{{:: ts('Civix Export') }}</u>
-        <i class="crm-i fa-file-circle-question"></i>
+        <i class="crm-i fa-file-circle-question" role="img" aria-hidden="true"></i>
       </a>
       {{:: ts('or') }}
       <a ng-href="{{:: $ctrl.apiExplorerLink }}" target="_blank">
         <u>{{:: ts('API Explorer') }}</u>
-        <i class="crm-i fa-external-link"></i>
+        <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
       </a>
     </p>
   </div>
@@ -42,7 +42,7 @@
   <textarea id="crm-search-admin-export-output-code" class="form-control" readonly ng-model="$ctrl.output" rows="8"></textarea>
   <div class="btn-group">
     <button type="button" ng-disabled="!$ctrl.output" class="btn btn-{{ $ctrl.copied ? 'success' : 'primary' }}" ng-click="$ctrl.copyToClipboard()">
-      <i class="crm-i fa-{{ $ctrl.copied ? 'check' : 'clipboard' }}"></i>
+      <i class="crm-i fa-{{ $ctrl.copied ? 'check' : 'clipboard' }}" role="img" aria-hidden="true"></i>
       {{ $ctrl.copied ? ts('Copied to clipboard') : ts('Copy to clipboard') }}
     </button>
   </div>

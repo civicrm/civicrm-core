@@ -1,0 +1,1 @@
+Ensure that error messages about MySQL-SSL connections are reported

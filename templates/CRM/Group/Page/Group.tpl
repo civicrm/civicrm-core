@@ -10,7 +10,7 @@
 {* Actions: 1=add, 2=edit, browse=16, delete=8 *}
 {if $action ne 1 and $action ne 2 and $action ne 8 and $groupPermission eq 1}
 <div class="crm-submit-buttons">
-    <a accesskey="N" href="{crmURL p='civicrm/group/add' q='reset=1'}" class="newGroup button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Group{/ts}</span></a><br/>
+    <a accesskey="N" href="{crmURL p='civicrm/group/add' q='reset=1'}" class="newGroup button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Group{/ts}</span></a><br/>
 </div>
 {/if} {* action ne add or edit *}
 <div class="crm-block crm-content-block">
@@ -29,7 +29,7 @@
 
 {if $action ne 1 and $action ne 2 and $action ne 8 and $groupPermission eq 1}
 <div class="crm-submit-buttons">
-        <a accesskey="N" href="{crmURL p='civicrm/group/add' q='reset=1'}" class="newGroup button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Group{/ts}</span></a><br/>
+        <a accesskey="N" href="{crmURL p='civicrm/group/add' q='reset=1'}" class="newGroup button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Group{/ts}</span></a><br/>
 </div>
 {/if} {* action ne add or edit *}
 </div>

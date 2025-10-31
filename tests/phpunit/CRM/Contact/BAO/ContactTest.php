@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Contact;
+
 /**
  * Class CRM_Contact_BAO_ContactTest
  * @group headless
@@ -7,7 +9,7 @@
 class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_contact', 'civicrm_note'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_note', 'civicrm_im', 'civicrm_phone'], TRUE);
     parent::tearDown();
   }
 
@@ -1316,6 +1318,31 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure that created_date and modified_date are set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testTimestampContactDelete(): void {
+    $this->individualCreate([], 'mod');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET modified_date = "2023-01-09" WHERE id = %1', [1 => [$this->ids['Contact']['mod'], 'Integer']]);
+    $contact = Contact::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Contact']['mod'])
+      ->addSelect('modified_date')
+      ->execute()->first();
+    $this->assertEquals('2023-01-09 00:00:00', $contact['modified_date']);
+    Contact::delete(FALSE)
+      ->setUseTrash(TRUE)
+      ->addWhere('id', '=', $contact['id'])->execute();
+
+    $contact = Contact::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Contact']['mod'])
+      ->addSelect('modified_date')
+      ->execute()->first();
+    $this->assertGreaterThan(time() - 60, strtotime($contact['modified_date']));
+
+  }
+
+  /**
    * Ensure that civicrm_contact.modified_date is updated when manipulating a phone record.
    */
   public function testTimestampsEmail(): void {
@@ -1606,7 +1633,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Data provider for testLongUnicodeIndividualName
    * @return array
    */
-  public function longUnicodeIndividualNames():array {
+  public static function longUnicodeIndividualNames():array {
     return [
       'much less than 128' => [
         [
@@ -1690,7 +1717,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Data provider for testLongUnicodeOrgName
    * @return array
    */
-  public function longUnicodeOrgNames():array {
+  public static function longUnicodeOrgNames():array {
     return [
       'much less than 128' => [
         'асдадасда шшшшшшшшшш',

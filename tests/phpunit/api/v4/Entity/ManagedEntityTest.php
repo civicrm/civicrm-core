@@ -28,7 +28,7 @@ use Civi\Api4\SavedSearch;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use CRM_Core_ManagedEntities;
 use CRM_Core_Module;
@@ -57,7 +57,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
   public function tearDown(): void {
     \Civi::settings()->revert('debug_enabled');
     // Disable multisite
-    \Civi::settings()->revert('is_enabled');
+    \Civi::settings()->revert('multisite_is_enabled');
     parent::tearDown();
   }
 
@@ -673,7 +673,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
           'icon' => 'crm-i test',
           'permission' => ['access CiviCRM'],
           'weight' => 50,
-          'domain_id' => 'current_domain',
+          // 'domain_id' => 'current_domain', // This is implied if not set
         ],
         'match' => ['name'],
       ],
@@ -684,14 +684,16 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertCount(1, $result);
     $this->assertSame(['name'], $result[0]['params']['match']);
 
-    // Enable multisite with multiple domains
-    \Civi::settings()->set('is_enabled', TRUE);
     Domain::create(FALSE)
       ->addValue('name', 'Another domain')
       ->addValue('version', CRM_Utils_System::version())
       ->execute()->single();
     $allDomains = Domain::get(FALSE)->addSelect('id')->addOrderBy('id')->execute();
     $this->assertGreaterThan(1, $allDomains->count());
+    foreach ($allDomains as $domain) {
+      // Enable multisite with multiple domains
+      \Civi::settings($domain['id'])->set('multisite_is_enabled', TRUE);
+    }
 
     $managedRecords = [];
     \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
@@ -707,6 +709,26 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       $this->assertCount(1, $result);
       $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
     }
+
+    // Now we test Domain 1 NOT multisite enabled (ie. "global")
+    // all other domains multisite enabled
+    \Civi::settings($allDomains->first()['id'])->set('multisite_is_enabled', FALSE);
+
+    $managedRecords = [];
+    \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
+
+    // Base entity should not have been renamed
+    $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
+    $this->assertCount(1, $result);
+    $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
+
+    // New item should have been inserted for extra domains
+    foreach (array_slice($allDomains->column('id'), 1) as $domain) {
+      $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains_' . $domain]);
+      $this->assertCount(1, $result);
+      $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
+    }
+
   }
 
   /**
@@ -853,7 +875,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals($expected, \CRM_Core_BAO_Managed::isAPi4ManagedType($entityName));
   }
 
-  public function sampleEntityTypes() {
+  public static function sampleEntityTypes() {
     $entityTypes = [
       // v3 pseudo-entity
       'ActivityType' => FALSE,

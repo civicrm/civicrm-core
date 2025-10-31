@@ -1,7 +1,6 @@
 /* JQuery UI tabs */
 
 .crm-container .ui-tabs,
-.crm-container .crm-search-nav-tabs,
 .crm-container .afadmin-list .nav.nav-tabs { /* entire tab region */
   border: var(--crm-tabs-border);
   border-radius: var(--crm-tabs-radius);
@@ -60,7 +59,6 @@
   color: var(--crm-tab-col);
   padding: var(--crm-tab-padding);
   font-weight: var(--crm-tab-weight);
-  font-family: var(--crm-tab-font);
   font-size: var(--crm-font-size);
   line-height: var(--crm-r1);
   text-decoration: none;
@@ -83,7 +81,7 @@
   display: inline-block;
   text-align: center;
   font-size: var(--crm-m2);
-  /* padding: 0;   */
+  padding: 0 0.2rem;
 }
 .crm-container #mainTabContainer ul.ui-tabs-nav a em {
   background: var(--crm-dash-tab-count-bg);
@@ -95,8 +93,8 @@
 }
 .crm-container .ui-tabs ul.ui-tabs-nav .crm-count-0 a em,
 .crm-container #mainTabContainer ul.ui-tabs-nav .crm-count-0 a em {
-  background: var(--crm-c-background5);
-  color: var(--crm-c-light-text);
+  background: var(--crm-c-primary);
+  color: var(--crm-c-primary-text);
 }
 .crm-container .ui-tabs ul li em:empty,
 .crm-container .nav-tabs .badge:empty { /* this is to keep the height of tabs with empty badges */
@@ -109,6 +107,7 @@
   background: var(--crm-tab-bg-active);
   padding: var(--crm-tab-padding);
   container-type: inline-size;
+  min-height: 12rem;
 }
 
 /* Dashboard */
@@ -146,6 +145,9 @@
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li {
   background: var(--crm-dash-tab-bg);
   margin: var(--crm-dash-tab-hang);
+}
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list li span {
+  word-break: break-word;
 }
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li .ui-tabs-anchor {
   display: grid;

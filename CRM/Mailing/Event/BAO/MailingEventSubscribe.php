@@ -168,11 +168,11 @@ SELECT     civicrm_email.id as email_id
    *
    * @param string $email
    *   The email address.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function send_confirm_request($email) {
     $config = CRM_Core_Config::singleton();
-
-    $domain = CRM_Core_BAO_Domain::getDomain();
 
     //get the default domain email address.
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
@@ -201,6 +201,7 @@ SELECT     civicrm_email.id as email_id
       'toEmail' => $email,
       'replyTo' => $confirm,
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'contactId' => $this->contact_id,
     ];
 
     $url = CRM_Utils_System::url('civicrm/mailing/confirm',

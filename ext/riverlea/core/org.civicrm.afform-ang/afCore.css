@@ -65,10 +65,16 @@ details.af-container > *:nth-of-type(1):not(summary) {
 details.af-container > *:last-of-type {
   padding-bottom: var(--crm-m);
 }
+details.af-container.af-layout-inline {
+  flex-direction: column;
+}
+details.af-container.af-layout-inline > *:not(summary) {
+  display: inline-block;
+}
 
 /* Card style */
 .af-container-style-pane {
-  background-color: var(--crm-form-block-background);
+  background-color: var(--crm-form-block-bg);
   border-radius: var(--crm-form-block-border-radius);
   box-shadow: var(--crm-form-block-box-shadow);
   position: relative;
@@ -76,8 +82,8 @@ details.af-container > *:last-of-type {
   padding-top: 50px !important;
 }
 #bootstrap-theme .af-container-style-pane > .af-title {
-  background-color: var(--crm-c-background5);
-  color: var(--crm-c-light-text);
+  background-color: var(--crm-form-block-header);
+  color: var(--crm-c-text-light);
   border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
   position: absolute;
   top: 0;
@@ -88,17 +94,35 @@ details.af-container > *:last-of-type {
 }
 
 /* Admin edit links */
-.afform-directive .af-admin-edit-form-link {
-  position: absolute !important;
+#bootstrap-theme .afform-directive:has(> .af-admin-edit-form-link) .crm-search-display {
+  padding-top: 0.5rem;
+}
+#bootstrap-theme .afform-directive .af-admin-edit-form-link {
+  position: absolute;
   right: 0;
   top: 0;
-  opacity: .5;
 }
-.afform-directive .af-admin-edit-form-link.open,
-.afform-directive:hover .af-admin-edit-form-link {
+#bootstrap-theme .af-admin-edit-form-link > button {
+  background: transparent;
+  color: var(--crm-c-text);
+  border-radius: 2rem;
+  height: inherit;
+  padding: 0 !important;
+  border: 0;
+  opacity: 0.6;
+}
+#bootstrap-theme .af-admin-edit-form-link.open button,
+#bootstrap-theme .af-admin-edit-form-link button:hover,
+#bootstrap-theme .af-admin-edit-form-link button:focus {
+  background: transparent;
+  color: var(--crm-c-text);
   opacity: 1;
+  box-shadow: none !important; /* vs dropdown-toggle */
 }
-
+#bootstrap-theme .af-admin-edit-form-link > button .crm-i {
+  padding: 0;
+  border: 0;
+}
 /* Fieldset */
 
 fieldset.af-container.af-layout-inline {
@@ -107,7 +131,62 @@ fieldset.af-container.af-layout-inline {
 
 /* Radio buttons */
 
+.af-field-type-toggle .crm-af-field,
+.af-gui-field-input-type-toggle .crm-af-field,
 .af-field-type-radio .crm-af-field {
   display: flex;
   padding-block: 0.25rem;
+}
+
+/* Toggle buttons */
+
+.af-field-type-toggle .crm-af-field,
+.af-gui-field-input-type-toggle .crm-af-field {
+  flex-flow: row nowrap;
+  grid-gap: 0.5rem;
+
+  & label {
+    align-self: center;
+  }
+
+  & input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+    font-size: inherit;
+    width: 2.75em!important;
+    height: 1.35em!important;
+    box-sizing: content-box;
+    border-radius: 1em;
+    vertical-align: text-bottom;
+    color: inherit;
+    border: 2px solid var(--crm-c-gray-500);
+    background-color: var(--crm-c-gray-400)!important;
+  }
+
+  & input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+    box-sizing: border-box;
+    width: 1.25em!important;
+    height: 1.25em!important;
+    margin: 0 0.1em;
+    border: 1px solid;
+    border-radius: 50%;
+    background: #fff;
+  }
+  & input[type="checkbox"]:checked {
+    border: 2px solid var(--crm-c-blue-darker)!important;
+    background-color: var(--crm-c-blue-dark)!important;
+  }
+  & input[type="checkbox"]:checked::before {
+    left: 1.2em;
+  }
+  & input[type="checkbox"]:disabled {
+    opacity: 0.4;
+  }
 }

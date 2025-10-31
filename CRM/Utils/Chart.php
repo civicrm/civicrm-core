@@ -99,7 +99,7 @@ class CRM_Utils_Chart {
     foreach ($params['multiValues'] as $i => $dataSet) {
       $output['values'][$i] = [];
       foreach ($dataSet as $k => $v) {
-        $output['values'][$i][] = ['label' => $k, 'value' => (double) $v];
+        $output['values'][$i][] = ['label' => $k, 'value' => (float) $v];
       }
     }
     if (!$output['values']) {
@@ -270,7 +270,7 @@ class CRM_Utils_Chart {
         }
 
         // generate unique id for this chart instance
-        $uniqueId = md5(uniqid(rand(), TRUE));
+        $uniqueId = bin2hex(random_bytes(16));
 
         $theChart["chart_{$uniqueId}"]['size'] = ['xSize' => $xSize, 'ySize' => $ySize];
         $theChart["chart_{$uniqueId}"]['object'] = $chartObj;

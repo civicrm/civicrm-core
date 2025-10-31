@@ -88,13 +88,13 @@
             <div class="btn-group btn-group-xs pull-right" role="group" aria-label="{{ts('Actions')}}">
 
               <a class="btn btn-default" target="_blank" ng-href="{{crmUrl(resultForm.server_route)}}"  ng-if="resultForm.server_route">
-                <i class="crm-i fa-location-arrow"></i>
+                <i class="crm-i fa-location-arrow" role="img" aria-hidden="true"></i>
                 {{ts('Open')}}
               </a>
 
               <a class="btn btn-default"
                  af-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:resultForm}]">
-                <i class="crm-i fa-floppy-o"></i>
+                <i class="crm-i fa-floppy-o" role="img" aria-hidden="true"></i>
                 {{ts('Save')}}
               </a>
 

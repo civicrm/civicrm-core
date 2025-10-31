@@ -20,6 +20,16 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>This used to be a core CiviCRM functionality and is slowly being phased out. See dev/core#1036</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
