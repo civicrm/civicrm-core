@@ -149,7 +149,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       $status = $statusMap[get_class($e)] ?? 500;
 
       $errorId = rtrim(chunk_split(CRM_Utils_String::createRandom(12, CRM_Utils_String::ALPHANUMERIC), 4, '-'), '-');
-      $logMessage = 'AJAX Error ({error_id}): failed with exception';
+      $logMessage = "AJAX Error ({$errorId}): {$e->getMessage()}";
       $logContext = ['error_id' => $errorId, 'exception' => $e];
       if ($status === 500) {
         \Civi::log()->error($logMessage, $logContext);
