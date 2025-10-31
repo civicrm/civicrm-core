@@ -1952,7 +1952,7 @@ class CRM_Utils_System {
    *
    * @return void
    */
-  public static function sendJSONResponse(array $response, int $httpResponseCode): void {
+  public static function sendJSONResponse(array $response, int $httpResponseCode = 200): void {
     CRM_Core_Config::singleton()->userSystem->sendJSONResponse($response, $httpResponseCode);
   }
 
