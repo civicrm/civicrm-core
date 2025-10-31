@@ -78,10 +78,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       // CRM-21281: Restore entity reference in case the post hook needs it
       $lineItemBAO->entity_id = $entity_id;
       $lineItemBAO->entity_table = $entity_table;
-      CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO);
+      CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'LineItem', $lineItemBAO->id, $lineItemBAO);
+      CRM_Utils_Hook::post('create', 'LineItem', $lineItemBAO->id, $lineItemBAO, $params);
     }
 
     return $return;

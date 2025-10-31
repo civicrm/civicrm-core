@@ -101,7 +101,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\Ho
     $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($ufField->uf_group_id, TRUE);
     CRM_Core_BAO_UFGroup::updateGroupTypes($ufField->uf_group_id, $fieldsType);
 
-    CRM_Utils_Hook::post($op, 'UFField', $ufField->id, $ufField);
+    CRM_Utils_Hook::post($op, 'UFField', $ufField->id, $ufField, $params);
 
     civicrm_api3('profile', 'getfields', ['cache_clear' => TRUE]);
     return $ufField;

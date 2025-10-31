@@ -148,11 +148,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         }
       }
 
-      CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership);
+      CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership, $params);
     }
     else {
       CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Signup', $targetContactID, $activityParams);
-      CRM_Utils_Hook::post('create', 'Membership', $membership->id, $membership);
+      CRM_Utils_Hook::post('create', 'Membership', $membership->id, $membership, $params);
     }
 
     return $membership;

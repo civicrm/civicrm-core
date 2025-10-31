@@ -253,7 +253,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
-    CRM_Utils_Hook::post($action, 'Contribution', $contribution->id, $contribution);
+    CRM_Utils_Hook::post($action, 'Contribution', $contribution->id, $contribution, $params);
     return $result;
   }
 
@@ -1221,7 +1221,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
     $dao->id = $id;
     $results = $dao->delete();
     $transaction->commit();
-    CRM_Utils_Hook::post('delete', 'Contribution', $dao->id, $dao);
+    CRM_Utils_Hook::post('delete', 'Contribution', $dao->id, $dao, $params);
 
     return $results;
   }

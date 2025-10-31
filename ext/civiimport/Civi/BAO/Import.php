@@ -135,7 +135,7 @@ class Import extends CRM_Core_DAO {
       CRM_Core_BAO_CustomValueTable::store($record['custom'], $tableName, $instance->_id, $op);
     }
 
-    CRM_Utils_Hook::post($op, $entityName, $instance->_id, $instance);
+    CRM_Utils_Hook::post($op, $entityName, $instance->_id, $instance, $record);
 
     return $instance;
   }
