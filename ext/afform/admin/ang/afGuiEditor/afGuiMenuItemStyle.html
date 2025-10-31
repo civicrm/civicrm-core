@@ -2,6 +2,6 @@
   <label>{{:: ts('Style:') }}</label>
   <select class="form-control" ng-model="getSetStyle" ng-model-options="{getterSetter: true}">
     <option value="">{{:: ts('None') }}</option>
-    <option ng-repeat="style in $ctrl.styles" value="{{:: style.name }}">{{:: style.label }}</option>
+    <option ng-repeat="style in $ctrl.styles" value="{{:: style.value }}">{{:: style.label }}</option>
   </select>
 </div>
