@@ -53,7 +53,7 @@
         // Ensure boolean options are truly boolean
         if (this.defn.data_type === 'Boolean') {
           if (fieldOptions) {
-            fieldOptions.forEach((option) => option.id = !!option.id);
+            fieldOptions.forEach((option) => option.id = !!Numeric(option.id));
           } else {
             fieldOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}];
           }
