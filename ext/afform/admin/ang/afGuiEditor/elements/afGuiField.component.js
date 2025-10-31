@@ -385,9 +385,18 @@
         return afGui.getSearchDisplayFields(ctrl.container.getSearchDisplay(), _.noop, [ctrl.getFieldName()]);
       };
 
+      this.showLabel = () => {
+        if (this.node.defn.label === false) {
+          return false;
+        }
+        // Single checkboxes don't get a separate label
+        return !(getSet('input_type') === 'CheckBox' && this.getDefn().data_type === 'Boolean');
+      };
+
       $scope.defaultValueContains = function(val) {
         const defaultVal = getSet('afform_default');
-        return defaultVal === val || (Array.isArray(defaultVal) && defaultVal.includes(val));      };
+        return defaultVal === val || (Array.isArray(defaultVal) && defaultVal.includes(val));
+      };
 
       $scope.toggleDefaultValueItem = function(val) {
         if (defaultValueShouldBeArray()) {
