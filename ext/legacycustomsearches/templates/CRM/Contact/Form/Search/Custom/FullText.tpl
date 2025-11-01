@@ -387,11 +387,11 @@
     <tbody>
       {foreach from=$summary.File item=row}
         <tr class="{cycle values="odd-row,even-row"}">
-          <td><a href="{$row.file_url}">{$row.file_name}</a></td>
+          <td><a href="{$row.file_url}" target="_blank">{$row.file_name}</a></td>
           <td>{$row.file_mime_type}</td>
           <td>{crmCrudLink action=VIEW table=$row.file_entity_table id=$row.file_entity_id}</td>
           <td>
-            <a href="{$row.file_url}">{ts}View{/ts}</a>
+            <a href="{$row.file_url}" target="_blank">{ts}View{/ts}</a>
           </td>
         </tr>
       {/foreach}

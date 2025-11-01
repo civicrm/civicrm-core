@@ -56,7 +56,7 @@
                        width="{$element.element_value.imageThumbWidth}">
                 </a>
               {else}
-                <a class="crm-attachment" href="{$element.element_value.fileURL}">{$element.element_value.fileName}</a>
+                <a class="crm-attachment" href="{$element.element_value.fileURL}" target="_blank">{$element.element_value.fileName}</a>
               {/if}
               {if $element.element_value.deleteURL}
                 <a href="#" class="crm-hover-button delete-attachment"
