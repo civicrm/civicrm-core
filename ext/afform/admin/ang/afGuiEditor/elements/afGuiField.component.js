@@ -1,7 +1,7 @@
 // https://civicrm.org/licensing
 (function(angular, $, _) {
   "use strict";
-
+  let id = 0;
   angular.module('afGuiEditor').component('afGuiField', {
     templateUrl: '~/afGuiEditor/elements/afGuiField.html',
     bindings: {
@@ -28,6 +28,7 @@
       let searchJoins = null;
 
       $scope.editingOptions = false;
+      $scope.fieldId = 'af-gui-field-' + id++;
 
       this.$onInit = function() {
         ctrl.hasDefaultValue = !!getSet('afform_default');
@@ -145,6 +146,8 @@
 
       $scope.hasOptions = function() {
         const inputType = $scope.getProp('input_type');
+        if (inputType === 'Range' && ctrl.getDefn().data_type === 'Boolean') {
+        }
         return _.contains(['CheckBox', 'Toggle', 'Radio', 'Select'], inputType) &&
           !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
@@ -232,6 +235,9 @@
           case 'Number':
             return !(defn.options || defn.data_type === 'Boolean');
 
+          case 'Range':
+            return (defn.data_type === 'Integer' || defn.data_type === 'Float' || defn.data_type === 'Money');
+
           case 'DisplayOnly':
           case 'Hidden':
             return true;
@@ -260,6 +266,38 @@
       $scope.propIsset = function(propName) {
         const val = $scope.getProp(propName);
         return !(typeof val === 'undefined' || val === null);
+      };
+
+      $scope.getRangeProp = (prop) => {
+        const options = this.getOptions();
+        if (!options) {
+          const val = $scope.getProp('input_attrs.' + prop);
+          // Set these all explicitly if not set
+          if (typeof val === 'undefined') {
+            ctrl.node.defn = ctrl.node.defn || {};
+            ctrl.node.defn.input_attrs = ctrl.node.defn.input_attrs || {};
+            switch (prop) {
+              case 'min':
+                return (ctrl.node.defn.input_attrs.min = 0);
+              case 'max':
+                return (ctrl.node.defn.input_attrs.max = 99);
+              case 'step':
+                return (ctrl.node.defn.input_attrs.step = 1);
+            }
+          }
+          return val;
+        }
+        // Calculate min, max and range based on options
+        switch (prop) {
+          case 'min':
+            return Math.min(...options.map(opt => Number(opt.id)));
+          case 'max':
+            return Math.max(...options.map(opt => Number(opt.id)));
+          case 'step':
+            const values = options.map(opt => Number(opt.id)).sort((a, b) => a - b);
+            // Return difference between first two values, or 1 if not enough values
+            return values.length > 1 ? values[1] - values[0] : 1;
+        }
       };
 
       $scope.toggleLabel = function() {
@@ -511,6 +549,22 @@
           });
         }
         return searchJoins;
+      };
+
+      // When changing min, keep it under max.
+      this.onChangeMin = () => {
+        const max = $scope.getProp('input_attrs.max');
+        if (typeof max !== 'undefined' && max <= ctrl.node.defn.input_attrs.min) {
+          ctrl.node.defn.input_attrs.min = ctrl.node.defn.input_attrs.max - 1;
+        }
+      };
+
+      // When changing max, keep it over min.
+      this.onChangeMax = () => {
+        const min = $scope.getProp('input_attrs.min');
+        if (typeof min !== 'undefined' && min >= ctrl.node.defn.input_attrs.max) {
+          ctrl.node.defn.input_attrs.max = ctrl.node.defn.input_attrs.min + 1;
+        }
       };
 
       // Returns a reference to a path n-levels deep within an object
