@@ -1,0 +1,4 @@
+<extension key='test.extension.parenttest' type='module'>
+  <file>parenttest</file>
+  <name>test_extension_parenttest</name>
+</extension>
