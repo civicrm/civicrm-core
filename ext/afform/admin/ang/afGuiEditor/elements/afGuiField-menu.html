@@ -18,14 +18,14 @@
     <input id="{{:: $ctrl.getFieldName() }}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
   </form>
 </li>
-<li ng-if="$ctrl.fieldDefn.input_type === 'Number'">
+<li ng-if="($ctrl.fieldDefn.input_type === 'Number' || $ctrl.fieldDefn.input_type === 'Range') && !hasOptions()">
   <div ng-click="$event.stopPropagation()" class="form-inline">
-    <input type="number" class="form-control four" ng-model="getSet('input_attrs.min')" ng-model-options="{getterSetter: true}" title="{{:: ts('Minimum value') }}" placeholder="{{:: ts('Min') }}">
+    <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.min" ng-change="$ctrl.onChangeMin()" title="{{:: ts('Minimum value') }}" placeholder="{{:: ts('Min') }}">
     -
-    <input type="number" class="form-control four" ng-model="getSet('input_attrs.max')" ng-model-options="{getterSetter: true}" title="{{:: ts('Maximum value') }}" placeholder="{{:: ts('Max') }}">
+    <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.max" ng-change="$ctrl.onChangeMax()" title="{{:: ts('Maximum value') }}" placeholder="{{:: ts('Max') }}">
   </div>
 </li>
-<li ng-if="$ctrl.fieldDefn.input_type === 'Number' && $ctrl.fieldDefn.data_type === 'Float'">
+<li ng-if="($ctrl.fieldDefn.input_type === 'Number' || $ctrl.fieldDefn.input_type === 'Range') && $ctrl.fieldDefn.data_type === 'Float' && !hasOptions()">
   <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Decimal places:') }}</label>
     <select class="form-control" ng-model="getSet('input_attrs.step')" ng-model-options="{getterSetter: true}" title="{{:: ts('Decimal places') }}">
