@@ -17,7 +17,6 @@ namespace Civi\Api4;
  *
  * @searchable bridge
  * @see \Civi\Api4\Dashboard
- * @searchable none
  * @since 5.25
  * @package Civi\Api4
  */
