@@ -31,4 +31,15 @@ return [
     ],
     'pseudoconstant' => ['callback' => '\\Civi\\Standalone\\MFA\\Base::getMFAclasses'],
   ],
+  'standalone_favicon' => [
+    'name' => 'standalone_favicon',
+    'group' => 'standaloneusers',
+    'type' => 'String',
+    'title' => ts('Site Favicon'),
+    'description' => ts('URL to a favicon for the site.'),
+    'default' => '',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'html_type' => 'text',
+  ],
 ];
