@@ -1204,7 +1204,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    $params['amount'] = $this->getMainContributionAmount();
+    $params['amount'] = $params['total_amount'];
     $this->set('amount_level', $this->order->getAmountLevel());
     if (!empty($this->getExistingContributionID())) {
       // @todo - verify that this is the same as `$this->>getLineItems()` which it should be & consolidate
