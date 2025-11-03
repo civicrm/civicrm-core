@@ -134,6 +134,12 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('allowClear')) {
         $this->appendUnselectButton($el, $element);
       }
+
+      if (str_contains($element->getAttribute('class') ?: '', 'crm-form-toggle')) {
+        $el['html'] = str_replace('</label>', '', $el['html']);
+        $el['html'] = preg_replace('/<label[^>]*>/', '', $el['html']);
+        $el['html'] = '<div class="crm-form-toggle-container">' . $el['html'] . '</div>';
+      }
     }
 
     return $el;

@@ -152,6 +152,10 @@ return [
     'name' => 'disable_mandatory_tokens_check',
     'type' => 'Boolean',
     'html_type' => 'checkbox',
+    'html_attributes' => [
+      'on' => ts('Yes'),
+      'off' => ts('No'),
+    ],
     'default' => 0,
     'add' => '4.4',
     'title' => ts('Disable check for mandatory tokens'),

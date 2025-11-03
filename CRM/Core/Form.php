@@ -1434,6 +1434,26 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  public function addToggle(string $name, string $title, array $attributes = [], bool $required = FALSE) {
+    $attributes += [
+      'on' => ts('Yes'),
+      'off' => ts('No'),
+      'class' => '',
+    ];
+    $attributes['class'] = ltrim($attributes['class'] . ' crm-form-toggle');
+    $options = array_intersect_key($attributes, ['on' => 1, 'off' => 1]);
+    unset($attributes['on'], $attributes['off']);
+    $toggleText = '';
+    foreach ($options as $key => $value) {
+      $value = htmlspecialchars($value);
+      $toggleText .= "<span class='crm-form-toggle-text crm-form-toggle-text-{$key}'>{$value}</span>";
+    }
+    $this->addElement('advcheckbox', $name, $title, $toggleText, $attributes);
+    if ($required) {
+      $this->addRule($name, ts('%1 is a required field.', [1 => $title]), 'required');
+    }
+  }
+
   /**
    * @param int $id
    * @param string $title

@@ -105,7 +105,10 @@ return [
     'name' => 'smtp_450_is_permanent',
     'type' => 'Boolean',
     'html_type' => 'checkbox',
-    'quick_form_type' => 'CheckBox',
+    'html_attributes' => [
+      'on' => ts('Yes'),
+      'off' => ts('No'),
+    ],
     'default' => 0,
     'title' => ts('Treat SMTP Error 450 4.1.2 as permanent'),
     'add' => '5.80',

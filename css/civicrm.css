@@ -4058,6 +4058,65 @@ span.crm-status-icon {
   margin-left: 30px;
 }
 
+/* Toggle Inputs */
+
+.crm-container .crm-form-toggle-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  grid-gap: .5em;
+
+  & input[type="checkbox"].crm-form-toggle {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+    font-size: inherit;
+    width: 2.75em!important;
+    height: 1.35em!important;
+    box-sizing: content-box;
+    border-radius: 1em;
+    vertical-align: text-bottom;
+    color: inherit;
+    border: 2px solid #919297;
+    background-color: #adaeb3;
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
+  }
+
+  & input[type="checkbox"].crm-form-toggle::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+    box-sizing: border-box;
+    width: 1.25em;
+    height: 1.25em;
+    margin: 0 0.1em;
+    border: 1px solid;
+    border-radius: 50%;
+    background: #fff;
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
+  }
+  & input[type="checkbox"].crm-form-toggle:checked {
+    border: 2px solid #133f51;
+    background-color: #20576f;
+  }
+  & input[type="checkbox"].crm-form-toggle:checked::before {
+    left: 1.2em;
+  }
+  & input[type="checkbox"].crm-form-toggle:disabled {
+    opacity: 0.4;
+  }
+  & input[type="checkbox"]:not(:checked) ~ .crm-form-toggle-text-on {
+    display: none;
+  }
+  & input[type="checkbox"]:checked ~ .crm-form-toggle-text-off {
+    display: none;
+  }
+}
 
 /* Standalone-only styles. A minimal set to make it usable out-of-the-box. */
 html.crm-standalone body {
