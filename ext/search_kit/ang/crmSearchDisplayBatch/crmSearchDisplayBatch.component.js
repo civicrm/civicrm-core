@@ -41,6 +41,7 @@
         // When previewing on the search admin screen, the display will be view-only
         this.isPreviewMode = typeof this.search !== 'string';
         this.userJobId = this.isPreviewMode ? null : $location.search().batch;
+        this.columns = _.cloneDeep(this.settings.columns);
         // Run search if a userJobId is given. Otherwise the "Start New Batch" button will be shown.
         if (this.userJobId) {
           this.runSearch();
