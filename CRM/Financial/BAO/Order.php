@@ -1582,18 +1582,31 @@ class CRM_Financial_BAO_Order {
       $fields = (array) civicrm_api4($entity, 'getfields')->indexBy('name');
       $carryOverFields = array_intersect_key($this->contributionValues, $fields);
       $entityValues += $carryOverFields;
-      if ($entity === 'Membership' && empty($entityValues['status_id'])) {
-        if (empty($entityValues['join_date'])) {
+
+      if ($entity === 'Membership') {
+        // We can pass in API4 style pseudoconstant, eg. status_id:name but that won't work if we also
+        //   calculate status_id. So if we passed it in don't calculate status.
+        $statusIDKeys = array_filter($entityValues, function($key) {
+          return str_starts_with($key, 'status_id');
+        }, ARRAY_FILTER_USE_KEY);
+        $statusIDKey = array_key_first($statusIDKeys);
+
+        if (empty($entityValues['join_date']) && !empty($this->contributionValues['receive_date'])) {
+          // Prefer Membership.join_date, if not set use Contribution receive_date
           $entityValues['join_date'] = $this->contributionValues['receive_date'];
         }
-        $entityValues['status_id'] = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
-          $entityValues['start_date'] ?? NULL,
+        if (empty($statusIDKey) || empty($entityValues[$statusIDKey])) {
+          // For the Membership entity, we didn't pass in a value for "status" so we are going to calculate membership status
+          //   from membership dates and membership type.
+          $entityValues['status_id'] = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
+            $entityValues['start_date'] ?? NULL,
             $entityValues['end_date'] ?? NULL,
             $entityValues['join_date'] ?? NULL,
-          $this->contributionValues['receive_date'],
-          TRUE,
-          $entityValues['membership_type_id']
-        )['id'];
+            $this->contributionValues['receive_date'],
+            TRUE,
+            $entityValues['membership_type_id']
+          )['id'];
+        }
       }
     }
     if (array_keys($entityValues) === ['id']) {
