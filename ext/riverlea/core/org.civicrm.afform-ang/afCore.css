@@ -130,23 +130,20 @@ fieldset.af-container.af-layout-inline {
 }
 
 /* Radio buttons */
-
-.af-field-type-toggle .crm-af-field,
-.af-gui-field-input-type-toggle .crm-af-field,
 .af-field-type-radio .crm-af-field {
   display: flex;
   padding-block: 0.25rem;
 }
 
 /* Toggle buttons */
-
+body.wp-admin .crm-container .af-field-type-toggle .crm-af-field,
 .af-field-type-toggle .crm-af-field,
 .af-gui-field-input-type-toggle .crm-af-field {
-  flex-flow: row nowrap;
-  grid-gap: 0.5rem;
-
   & label {
-    align-self: center;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    grid-gap: var(--crm-m2);
   }
 
   & input[type="checkbox"] {
@@ -155,14 +152,17 @@ fieldset.af-container.af-layout-inline {
     appearance: none;
     position: relative;
     font-size: inherit;
-    width: 2.75em!important;
-    height: 1.35em!important;
+    width: 2.75rem;
+    height: auto;
+    padding: var(--crm-m2) 0;
     box-sizing: content-box;
-    border-radius: 1em;
+    border-radius: 1rem;
     vertical-align: text-bottom;
     color: inherit;
-    border: 2px solid var(--crm-c-gray-500);
-    background-color: var(--crm-c-gray-400)!important;
+    border: 2px solid var(--crm-c-inverse-bg);
+    background-color: var(--crm-c-inverse-bg);
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
   }
 
   & input[type="checkbox"]::before {
@@ -172,19 +172,21 @@ fieldset.af-container.af-layout-inline {
     left: 0;
     transform: translate(0, -50%);
     box-sizing: border-box;
-    width: 1.25em!important;
-    height: 1.25em!important;
-    margin: 0 0.1em;
-    border: 1px solid;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0 var(--crm-xs2);
     border-radius: 50%;
-    background: #fff;
+    border: 1px solid var(--crm-c-layer0-bg);
+    background: var(--crm-c-layer0-bg);
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
   }
   & input[type="checkbox"]:checked {
-    border: 2px solid var(--crm-c-blue-darker)!important;
-    background-color: var(--crm-c-blue-dark)!important;
+    border: 2px solid var(--crm-c-focus);
+    background-color: var(--crm-c-focus);
   }
   & input[type="checkbox"]:checked::before {
-    left: 1.2em;
+    left: 1.2rem;
   }
   & input[type="checkbox"]:disabled {
     opacity: 0.4;
