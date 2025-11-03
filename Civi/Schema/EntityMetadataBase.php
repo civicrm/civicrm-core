@@ -219,12 +219,12 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       foreach ($customGroup['fields'] as $customField) {
         $fieldName = $customGroup['name'] . '.' . $customField['name'];
         $field = [
-          'title' => $customField['label'],
+          'title' => $customGroup['title'] . ': ' . $customField['label'],
           'sql_type' => \CRM_Core_BAO_CustomValueTable::fieldToSQLType($customField['data_type'], $customField['text_length']),
           'data_type' => \CRM_Core_BAO_CustomField::getDataTypeString($customField),
           'input_type' => $inputTypeMap[$customField['html_type']] ?? $customField['html_type'],
           'input_attrs' => [
-            'label' => $customGroup['title'] . ': ' . $customField['label'],
+            'label' => $customField['label'],
           ],
           'default' => $customField['default_value'],
           'help_pre' => $customField['help_pre'],

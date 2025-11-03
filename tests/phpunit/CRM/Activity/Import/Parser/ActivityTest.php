@@ -291,7 +291,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
           'Activity.subject' => 'asubj',
           'replace_me_custom_field' => 'InvalidValue',
         ],
-        'expected_error' => 'Invalid value for field(s) : Group with field radio: Integer radio',
+        'expected_error' => 'Invalid value for field(s) : Integer radio',
       ],
 
       'present_but_empty_custom_field' => [
