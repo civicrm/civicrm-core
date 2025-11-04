@@ -380,7 +380,7 @@ if (!CRM.vars) CRM.vars = {};
       description = row.description || $(row.element).data('description'),
       ret = '';
     if (icon) {
-      ret += '<i class="crm-i ' + icon + '" aria-hidden="true"></i> ';
+      ret += '<i class="crm-i ' + icon + '" role="img" aria-hidden="true"></i> ';
     }
     if (color) {
       ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
@@ -414,7 +414,7 @@ if (!CRM.vars) CRM.vars = {};
       title = ' title="' + text + '"';
       sr = '<span class="sr-only">' + text + '</span>';
     }
-    return '<i class="crm-i ' + icon + '"' + title + ' aria-hidden="true"></i>' + sr;
+    return '<i class="crm-i ' + icon + '"' + title + ' role="img" aria-hidden="true"></i>' + sr;
   };
 
   /**
@@ -471,7 +471,7 @@ if (!CRM.vars) CRM.vars = {};
             placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
           if (m.length && placeholder === m) {
             iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
-            out = '<i class="crm-i ' + iconClass + '" aria-hidden="true"></i> ' + out;
+            out = '<i class="crm-i ' + iconClass + '" role="img" aria-hidden="true"></i> ' + out;
           }
           return out;
         };
@@ -545,7 +545,7 @@ if (!CRM.vars) CRM.vars = {};
     let markup = '<div class="crm-entityref-links crm-entityref-quick-add">';
     quickAddLinks.forEach((link) => {
       markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" role="img" aria-hidden="true"></i> ' +
         _.escape(link.title) + '</a>';
     });
     markup += '</div>';
@@ -559,7 +559,7 @@ if (!CRM.vars) CRM.vars = {};
     var markup = '<div class="crm-entityref-links crm-entityref-links-static">';
     _.each(staticItems, function(link) {
       markup += ' <a class="crm-hover-button" href="#' + _.escape(link.id) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" role="img" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -568,6 +568,7 @@ if (!CRM.vars) CRM.vars = {};
 
   // Autocomplete based on APIv4 and Select2.
   $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    select2Options = select2Options || {};
     function getApiParams() {
       if (typeof apiParams === 'function') {
         return apiParams();
@@ -605,10 +606,27 @@ if (!CRM.vars) CRM.vars = {};
       }
       return links;
     }
+    function getQuickEditLinks($el) {
+      const links = [];
+      let data = $el.select2('data');
+      if (!select2Options.quickEdit || !data || (Array.isArray(data) && !data.length)) {
+        return links;
+      }
+      if (!Array.isArray(data)) {
+        data = [data];
+      }
+      data.forEach((item) => {
+        links.push({
+          path: item.quickEdit.path,
+          icon: 'fa-pencil',
+          title: ts('Edit %1', {1: item.quickEdit.title}),
+        });
+      });
+      return links;
+    }
     if (entityName === 'destroy') {
       return $(this).off('.crmEntity').crmSelect2('destroy');
     }
-    select2Options = select2Options || {};
     return $(this).each(function() {
       const $el = $(this).off('.crmEntity');
       let staticItems = getStaticOptions(select2Options.static),
@@ -624,6 +642,7 @@ if (!CRM.vars) CRM.vars = {};
               input: input,
               searchField: context && context.searchField || null,
               exclude: context && context.previousIds || null,
+              quickEdit: !!select2Options.quickEdit,
             }, getApiParams()))};
           },
           results: function(response, page, query) {
@@ -666,7 +685,7 @@ if (!CRM.vars) CRM.vars = {};
             callback(multiple ? existing : existing[0]);
             $el.trigger('initSelectionComplete');
           } else {
-            var params = $.extend({}, getApiParams(), {ids: idsNeeded});
+            var params = $.extend({quickEdit: !!select2Options.quickEdit}, getApiParams(), {ids: idsNeeded});
             CRM.api4(entityName, 'autocomplete', params).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
               $el.trigger('initSelectionComplete');
@@ -676,11 +695,13 @@ if (!CRM.vars) CRM.vars = {};
         formatInputTooShort: function() {
           let html = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
           html += renderStaticOptionMarkup(staticItems);
+          html += renderQuickAddMarkup  (getQuickEditLinks($el));
           html += renderQuickAddMarkup(quickAddLinks);
           return html;
         },
         formatNoMatches: function() {
           let html = _.escape($.fn.select2.defaults.formatNoMatches);
+          html += renderQuickAddMarkup(getQuickEditLinks($el));
           html += renderQuickAddMarkup(quickAddLinks);
           return html;
         }
@@ -957,7 +978,7 @@ if (!CRM.vars) CRM.vars = {};
     }
     markup += '<div><div class="crm-select2-row-label ' + _.escape(row.label_class || '') + '">' +
       (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
-      (row.icon ? '<i class="crm-i ' + _.escape(row.icon) + '" aria-hidden="true"></i> ' : '') +
+      (row.icon ? '<i class="crm-i ' + _.escape(row.icon) + '" role="img" aria-hidden="true"></i> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
       '</div>' +
       '<div class="crm-select2-row-description">';
@@ -1000,7 +1021,7 @@ if (!CRM.vars) CRM.vars = {};
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + _.escape(link.url) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
+        '<i class="crm-i ' + _.escape(link.icon || 'fa-plus-circle') + '" role="img" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -1181,7 +1202,7 @@ if (!CRM.vars) CRM.vars = {};
         }
       }
       var $icon = $(submitButton).siblings('.crm-i').add('.crm-i, .ui-icon', submitButton);
-      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-pulse');
+      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-spin');
     }
   }
 
@@ -1894,7 +1915,7 @@ if (!CRM.vars) CRM.vars = {};
 
 
   // Determine if a user has a given permission.
-  // @see CRM_Core_Resources::addPermissions
+  // @see CRM_Core_Resources_CollectionAdderTrait::addPermissions
   CRM.checkPerm = function(perm) {
     return CRM.permissions && CRM.permissions[perm];
   };
@@ -2000,6 +2021,31 @@ if (!CRM.vars) CRM.vars = {};
       name = CRM.utils.createRandom(len, ALPHANUMERIC);
     }
     return len ? name.substring(0, len) : name;
+  };
+
+  CRM.utils.syncFields = function (sourceSelector, targetSelector) {
+    // Ensure selectors are valid
+    const $source = $(sourceSelector);
+    const $target = $(targetSelector);
+
+    if (!$source.length || !$target.length) {
+      console.warn('CRM.syncFields - one or both selectors not found:', sourceSelector, targetSelector);
+      return;
+    }
+
+    // Initialize the last known value
+    $source.data('lastValue', $source.val());
+
+    $source.on('input', function() {
+      const sourceValue = $(this).val();
+      const targetValue = $target.val();
+
+      // Only update target if it currently matches source's previous value
+      if ($source.data('lastValue') === targetValue) {
+        $target.val(sourceValue);
+      }
+      $source.data('lastValue', sourceValue);
+    });
   };
 
   // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided

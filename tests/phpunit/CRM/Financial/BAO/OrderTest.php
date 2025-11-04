@@ -110,6 +110,52 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create Order API for membership.
+   * Specifically testing status_id:name and membership dates using Contribution.receive_date
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderForMembershipWithStatus(): void {
+    $this->setUpMembershipPriceSet();
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        // Because the price field value relates to a membership type
+        // the entity_id is understood to be a membership ID.
+        // All provided values prefixed by entity_id will be passed to
+        // the membership.create api.
+        'entity_id.source' => 'Payment',
+        'entity_id.status_id:name' => 'Pending',
+      ])
+      ->execute()->first();
+
+    $lineItem = LineItem::get()
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+
+    // The line item links the membership to the contribution.
+    $this->assertEquals(1, $lineItem['membership_num_terms']);
+    $this->assertEquals(100, $lineItem['unit_price']);
+    $this->assertEquals(100, $lineItem['line_total']);
+    $this->assertEquals(1, $lineItem['qty']);
+
+    $membership = Membership::get()
+      ->addSelect('join_date', 'start_date', 'end_date', 'status_id:name')
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->execute()->single();
+    $this->assertEquals('2010-01-20', $membership['join_date']);
+    $this->assertEquals('2010-01-20', $membership['start_date']);
+    $this->assertEquals('2011-01-19', $membership['end_date']);
+    $this->assertEquals('Pending', $membership['status_id:name']);
+  }
+
+  /**
    * Test creating an order containing items from 2 price sets plus an ad hoc amount.
    *
    * @throws \CRM_Core_Exception
@@ -191,6 +237,41 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       'amount' => 1000,
       'financial_type_id:name' => 'Donation',
     ], 'thousand');
+  }
+
+  public function testCreateOrderWithInclusiveLineItem(): void {
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
+    $this->assertEquals(500, $order['total_amount']);
+    $this->assertEquals(0, $order['tax_amount']);
+    $this->addTaxAccountToFinancialType($order['financial_type_id']);
+    $contribution = Contribution::create()
+      ->setValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+        'total_amount' => 500,
+      ])->execute()->single();
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
+    $this->assertEquals(500, $order['total_amount']);
+    $this->assertEquals(45.45, round($order['tax_amount'], 2));
+    // There is some long-standing messiness with rounding, that is believed to require
+    // a schema change. However, it seems reasonable to expect that this
+    // should calculate the same as just passing in total_amount to the contribution
+    // at this stage - not the post test listener checks the line item totals against this.
+    $this->assertEquals($contribution['total_amount'], $order['total_amount']);
+    $this->assertEquals(round($contribution['tax_amount'], 6), round($order['tax_amount'], 6));
   }
 
   /**

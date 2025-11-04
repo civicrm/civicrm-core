@@ -534,7 +534,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (!empty($defaults['contribution_status_id']) && in_array(
-        CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'),
+        CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $defaults['contribution_status_id']),
         // Historically not 'Cancelled' hence not using CRM_Contribute_BAO_Contribution::isContributionStatusNegative.
         ['Refunded', 'Chargeback']
       )) {
@@ -545,8 +545,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (!empty($defaults['contribution_status_id'])
-      && ('Template' === CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'))
-    ) {
+      && ('Template' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $defaults['contribution_status_id']))) {
       if ($this->elementExists('contribution_status_id')) {
         $this->getElement('contribution_status_id')->freeze();
       }
@@ -732,7 +731,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!$this->_mode) {
       // payment_instrument isn't required in edit and will not be present when payment block is enabled.
       $required = !$this->_id;
-      $checkPaymentID = array_search('Check', CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'validate'));
+      $checkPaymentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         ['' => ts('- select -')] + CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create', ['filter' => 0]),
@@ -1317,7 +1316,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $payment->setBackOffice(TRUE);
       try {
         $completeStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-        $result = $payment->doPayment($paymentParams, 'contribute');
+        $result = $payment->doPayment($paymentParams);
         $this->assign('trxn_id', $result['trxn_id']);
         $contribution->trxn_id = $result['trxn_id'];
         /* Our scenarios here are
@@ -1892,7 +1891,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $feeAmount->freeze();
     }
 
-    $element = &$form->add('text', 'invoice_id', ts('Invoice ID'),
+    $element = &$form->add('text', 'invoice_id', ts('Invoice Reference'),
       $attributes['invoice_id']
     );
     if ($form->_online) {
@@ -1900,7 +1899,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     else {
       $form->addRule('invoice_id',
-        ts('This Invoice ID already exists in the database.'),
+        ts('This Invoice Reference already exists in the database.'),
         'objectExists',
         ['CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id']
       );
@@ -2119,8 +2118,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // Add Additional common information to formatted params.
       CRM_Contribute_Form_AdditionalInfo::postProcessCommon($formValues, $params, $this);
       if ($pId) {
-        $params['contribution_mode'] = 'participant';
-        $params['participant_id'] = $pId;
         $params['skipLineItem'] = 1;
       }
       $params['line_item'] = [$this->getOrder()->getPriceSetID() => $this->getOrder()->getLineItems()];
@@ -2189,7 +2186,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // If financial type has changed from non-deductible to deductible, let the user know so they can adjust the non-deductible amount
     $toType = $submittedValues['financial_type_id'] ?? NULL;
     $fromType = $this->_defaults['financial_type_id'] ?? NULL;
-    if (($this->_action & CRM_Core_Action::UPDATE) && ($toType != $fromType) && ($submittedValues['non_deductible_amount'] ?? NULL)) {
+    if (($this->_action & CRM_Core_Action::UPDATE) && ($toType != $fromType) && !empty($submittedValues['non_deductible_amount'])) {
       $deductible = FinancialType::get(TRUE)
         ->addSelect('is_deductible')
         ->addWhere('id', 'IN', [$toType, $fromType])

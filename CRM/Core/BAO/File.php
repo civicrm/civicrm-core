@@ -102,6 +102,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
 
     $config = CRM_Core_Config::singleton();
 
+    $data = str_replace(DIRECTORY_SEPARATOR, '/', $data);
     $path = explode('/', $data);
     $filename = $path[count($path) - 1];
 
@@ -172,7 +173,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
     }
 
     // lets call the post hook here so attachments code can do the right stuff
-    CRM_Utils_Hook::post($op, 'File', $fileDAO->id, $fileDAO);
+    CRM_Utils_Hook::post($op, 'File', $fileDAO->id, $fileDAO, $params);
   }
 
   /**
@@ -730,7 +731,7 @@ AND       CEF.entity_id    = %2";
         ) {
           $file_url[$fileID] = <<<HEREDOC
               <a href="$url" class="crm-image-popup" title="$title">
-                <i class="crm-i fa-file-image-o" aria-hidden="true"></i>
+                <i class="crm-i fa-file-image-o" role="img" aria-hidden="true"></i>
               </a>
 HEREDOC;
         }
@@ -738,7 +739,7 @@ HEREDOC;
         else {
           $file_url[$fileID] = <<<HEREDOC
               <a href="$url" title="$title">
-                <i class="crm-i fa-paperclip" aria-hidden="true"></i>
+                <i class="crm-i fa-paperclip" role="img" aria-hidden="true"></i>
               </a>
 HEREDOC;
         }

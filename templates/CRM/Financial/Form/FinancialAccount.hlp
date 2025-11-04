@@ -7,16 +7,12 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-financial-owner-title"}
-  {ts}Financial Account Owner{/ts}
-{/htxt}
-{htxt id="id-financial-owner"}
+
+{htxt id='contact_id'}
 <p>{ts}Normally the owner of a financial account is the organization implementing CiviCRM so there is no need to change this. Some organizations that maintain accounts for groups, chapters, regions, constituency associations or other parts of the main CiviCRM organization may need to change the owner to one of these sub-entities or sibling entities.{/ts}</p>
 {/htxt}
 
-{htxt id="id-account-type-code-title"}
-  {ts}Account Type Code{/ts}
-{/htxt}
-{htxt id="id-account-type-code"}
+
+{htxt id='account_type_code'}
 <p>{ts}For export to QuickBooks, export your Chart of Accounts and open in low level text editor. You will be able to see the Account Type Code for each account. Generally, they will be from the following list: BANK, AR, OCASSET, FIXASSET, OASSET, AP, OCLIAB, LTLIAB, EQUITY, INC, COGS, EXP, EXEXP (though there may be others in your version of QuickBooks).{/ts}</p>
 {/htxt}

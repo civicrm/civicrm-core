@@ -4,14 +4,14 @@
     <div class="input-group">
       <input autocomplete="off" class="form-control" placeholder="{{:: ts('Select') }}" title="{{:: ts('Click to add placeholder text') }}" ng-model="getSet('input_attrs.placeholder' + i)" ng-model-options="$ctrl.editor.debounceWithGetterSetter" type="text" />
       <div class="input-group-btn" af-gui-menu>
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="crm-i fa-caret-down"></i></button>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="crm-i fa-caret-down" role="img" aria-hidden="true"></i></button>
         <ul class="dropdown-menu" ng-if="menu.open" title="{{:: ts('Set default value') }}">
           <li class="disabled">
             <a><strong>{{:: ts('Default Value:') }}</strong></a>
           </li>
           <li ng-repeat="opt in $ctrl.getOptions()" >
             <a href ng-click="toggleDefaultValueItem(opt.id); $event.stopPropagation(); $event.target.blur();">
-              <i class="crm-i fa-{{defaultValueContains(opt.id) ? 'check-' : ''}}circle-o"></i>
+              <i class="crm-i fa-{{defaultValueContains(opt.id) ? 'check-' : ''}}circle-o" role="img" aria-hidden="true"></i>
               {{ opt.label }}
             </a>
           </li>

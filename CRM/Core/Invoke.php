@@ -38,7 +38,7 @@ class CRM_Core_Invoke {
       return self::_invoke($args);
     }
     catch (Exception $e) {
-      CRM_Core_Error::handleUnhandledException($e);
+      CRM_Core_Config::singleton()->userSystem->handleUnhandledException($e);
     }
   }
 
@@ -326,8 +326,7 @@ class CRM_Core_Invoke {
     if (CRM_Core_Config::isUpgradeMode() || !CRM_Core_Permission::check('administer CiviCRM')) {
       return;
     }
-    // always use cached results - they will be refreshed by the session timer
-    $status = Civi::cache('checks')->get('systemStatusCheckResult');
+    $status = CRM_Utils_Check::getMaxSeverity();
     $template->assign('footer_status_severity', $status);
     $template->assign('footer_status_message', CRM_Utils_Check::toStatusLabel($status));
 

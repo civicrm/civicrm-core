@@ -248,6 +248,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
     if (!$includeDisabled) {
       $query .= ' WHERE is_active = 1';
     }
+    $query .= ' ORDER BY label';
     $financialTypeOptions = CRM_Core_DAO::executeQuery($query)->fetchAll();
     if (!empty($financialTypes)) {
       $financialTypeOptions = array_column($financialTypeOptions, NULL, 'id');

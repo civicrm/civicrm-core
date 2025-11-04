@@ -1,9 +1,11 @@
 <?php
 
+use Civi\Import\ImportParser;
+
 class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
 
   public function preProcess(): void {
-    if ($this->isStandalone() && !$this->hasValidDataSource()) {
+    if ($this->isStandalone() && !$this->getUserJob()['is_template'] && !$this->hasValidDataSource()) {
       $job = $this->getUserJob();
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/import/' . str_replace('_import', '', $job['job_type']), [
         'id' => $job['id'],
@@ -35,10 +37,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   private function assignCiviimportVariables(): void {
-    $contactTypes = [];
-    foreach (CRM_Contact_BAO_ContactType::basicTypeInfo() as $contactType) {
-      $contactTypes[] = ['id' => $contactType['name'], 'text' => $contactType['label']];
-    }
+    $contactTypes = CRM_Utils_Array::formatForSelect2(CRM_Contact_BAO_ContactType::basicTypeInfo(), 'label', 'name');
     $parser = $this->getParser();
     $this->isQuickFormMode = FALSE;
     Civi::resources()->addVars('crmImportUi', [
@@ -52,6 +51,7 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
       'dateFormats' => $this->getDateFormats(),
       'isTemplate' => $this->getUserJob()['is_template'],
       'isStandalone' => $this->isStandalone(),
+      'bundledActions' => ImportParser::getBundledActions(),
     ]);
   }
 
@@ -188,9 +188,8 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
     try {
       $parser = $self->getParser();
       $mappings = $self->getFieldMappings();
-      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-      $mapperError = $self->validateContactFields($rule, $mappings, ['contact_id', 'external_identifier']);
       $parser->validateMapping($mappings);
+      $mapperError = $self->getMissingContactFields('Contact', $self->getFieldMappings());
     }
     catch (CRM_Core_Exception $e) {
       $mapperError[] = $e->getMessage();
@@ -199,6 +198,23 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
       return ['_qf_default' => implode('<br/>', $mapperError)];
     }
     return TRUE;
+  }
+
+  /**
+   * @param string $entity
+   * @param array $mapper
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  public function getMissingContactFields(string $entity, array $mapper): array {
+    $parser = $this->getParser();
+    $rules = $this->getUserJob()['metadata']['entity_configuration'][$entity]['dedupe_rule'] ?? ['unique_identifier_match'];
+    $missingError = [];
+    foreach ($rules as $rule) {
+      $rule = $parser->getDedupeRule($this->getContactType(), $rule);
+      $missingError = array_merge($missingError, $this->validateContactFields($rule, $this->getImportKeys($mapper), ['external_identifier', 'contact_id', 'id']));
+    }
+    return array_filter($missingError);
   }
 
   /**
@@ -218,9 +234,11 @@ class CRM_CiviImport_Form_MapField extends CRM_Import_Form_MapField {
         $mapper[] = [$field['name']];
       }
     }
-    $parser = $this->getParser();
-    $rule = $parser->getDedupeRule($this->getContactType(), $this->getUserJob()['metadata']['entity_configuration'][$entity]['dedupe_rule'] ?? NULL);
-    return $this->validateContactFields($rule, $this->getImportKeys($mapper), ['external_identifier', 'contact_id', 'id']);
+    $missing = $this->getMissingContactFields($entity, $mapper);
+    if (empty($missing)) {
+      return [];
+    }
+    return ['_qf_default' => implode(' + ', $missing)];
   }
 
   /**

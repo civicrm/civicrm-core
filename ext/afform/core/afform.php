@@ -176,12 +176,6 @@ function _afform_hook_civicrm_angularModules($e) {
       'exports' => [
         $afform['directive_name'] => 'E',
       ],
-      // Permissions needed for conditionally displaying edit-links
-      'permissions' => [
-        'administer afform',
-        'administer search_kit',
-        'all CiviCRM permissions and ACLs',
-      ],
     ];
   }
 
@@ -235,6 +229,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'select' => ['redirect', 'name', 'title', 'autosave_draft', 'confirmation_type', 'confirmation_message'],
     'where' => [['name', '=', $params['name']]],
   ], 0);
+  $formMetaData['title'] = _ts($formMetaData['title']);
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
     'camel' => $moduleName,
@@ -262,13 +257,19 @@ function afform_civicrm_alterMenu(&$items) {
   }
   foreach ($afforms as $name => $meta) {
     if (!empty($meta['server_route'])) {
-      $items[$meta['server_route']] = [
+      $newMenuItem = [
         'title' => $meta['title'] ?? NULL,
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
         'access_arguments' => [["@afform:$name"], 'and'],
         'is_public' => $meta['is_public'] ?? FALSE,
       ];
+      // The 'adminGroup' and 'desc' and 'weight' attributes are used to place links on the `civicrm/admin` screen.
+      // For the sake of the civicrm_admin_ui extension, keep these attributes.
+      $existingItem = $items[$meta['server_route']] ?? [];
+      $existingAttributes = array_intersect_key($existingItem, ['adminGroup' => 1, 'desc' => 1, 'weight' => 1]);
+
+      $items[$meta['server_route']] = $newMenuItem + $existingAttributes;
     }
   }
 }
@@ -283,6 +284,11 @@ function afform_civicrm_permission(&$permissions) {
     'label' => E::ts('FormBuilder: edit and delete forms'),
     'description' => E::ts('Allows non-admin users to create, update and delete forms'),
     'implied_by' => ['administer CiviCRM'],
+  ];
+  $permissions['manage own afform'] = [
+    'label' => E::ts('FormBuilder: edit and delete own forms'),
+    'description' => E::ts('Gives non-admin users the permission to manage their own forms.'),
+    'implied_by' => ['administer afform'],
   ];
 }
 
@@ -317,7 +323,7 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
       // Check authx token
       isset($data['jwt']['scope'], $data['flow']) && $data['jwt']['scope'] === 'afform' && $data['flow'] === 'afformpage'
       // Allow admins to edit forms without requiring a token
-      || CRM_Core_Permission::check('administer afform');
+      || CRM_Core_Permission::check('manage own afform');
   }
 }
 
@@ -547,7 +553,7 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
         ],
       ],
       'conditions' => [
-        ['check user permission', '=', ['administer afform']],
+        ['check user permission', '=', ['manage own afform']],
       ],
       'confirmMsg' => E::ts('Confirm processing %1 %2.'),
       'runMsg' => E::ts('Processing %1 %2...'),

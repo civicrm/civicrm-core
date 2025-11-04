@@ -1,11 +1,11 @@
 <div class="text-right">
   <div class="btn-group btn-group-xs">
     <a class="btn btn-primary" href crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html" popup-data="row.data" title="{{:: ts('Edit Data Segment') }}">
-      <i class="crm-i fa-pencil"></i>
+      <i class="crm-i fa-pencil" role="img" aria-hidden="true"></i>
       {{:: ts('Edit') }}
     </a>
     <a class="btn btn-danger" href crm-confirm="{type: 'delete', obj: row.data}" on-yes="$ctrl.deleteSegment(row)" >
-      <i class="crm-i fa-trash"></i>
+      <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
       {{:: ts('Delete') }}
     </a>
   </div>

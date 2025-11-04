@@ -64,31 +64,32 @@ class MembershipParser extends ImportParser {
     return [
       'Membership' => [
         'text' => ts('Membership Fields'),
-        'is_contact' => FALSE,
+        'entity_type' => 'Membership',
         'required_fields_update' => $this->getRequiredFieldsForMatch(),
         'required_fields_create' => $this->getRequiredFieldsForCreate(),
         'is_base_entity' => TRUE,
         'supports_multiple' => FALSE,
         'is_required' => TRUE,
         // For now we stick with the action selected on the DataSource page.
-        'actions' => $this->isUpdateExisting() ?
-          [['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')]] :
-          [['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')]],
-        'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
+        'actions' => [
+          ['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')],
+          ['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')],
+        ],
+        'default_action' => 'create',
         'entity_name' => 'Membership',
         'entity_title' => ts('Membership'),
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => 'Individual',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',
@@ -176,7 +177,7 @@ class MembershipParser extends ImportParser {
         $existingMembership = $this->checkEntityExists('Membership', $membershipParams['id']);
         $membershipParams['contact_id'] = !empty($membershipParams['contact_id']) ? (int) $membershipParams['contact_id'] : $existingMembership['contact_id'];
       }
-      $membershipParams['contact_id'] = $this->getContactID($contactParams, $membershipParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      $membershipParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($contactParams, $membershipParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
       $membershipParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $membershipParams['contact_id'];
       $formatted = $formatValues = $membershipParams;
       // don't add to recent items, CRM-4399

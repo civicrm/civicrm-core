@@ -1,4 +1,4 @@
-.crm-container .messages .crm-i {
+.crm-container .messages > .crm-i {
   padding: 0 var(--crm-m) var(--crm-s) 0;
   float: left;
 }
@@ -26,8 +26,11 @@ input#crm-qsearch-input::placeholder {
 #crm-notification-container .ui-notify-message a.ui-notify-cross::before,
 .crm-container #crm-notification-container div.ui-notify-message h1::before,
 div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
-.crm-container tr.disabled td:first-of-type::before,
-.crm-container tr:has(.disabled) td:first-of-type::before,
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container td.disabled:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container tr.disabled td.crm-search-ctrl-column::after,
+.crm-container td.disabled.crm-search-ctrl-column::after,
+.crm-container tr.disabled td.crm-extensions-status::before,
 .crm-container .delete-icon,
 .crm-container span.batch-valid,
 .crm-container span.batch-invalid,
@@ -229,10 +232,12 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 
 /* Inactive icon */
-.crm-container tr.disabled td:first-of-type::before,
-.crm-container tr:has(.disabled) td:first-of-type::before {
+.crm-container tr.disabled > td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label)::before,
+.crm-container td.disabled:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container tr.disabled td.crm-search-ctrl-column::after,
+.crm-container tr.disabled td.crm-extensions-status::before,
+.crm-container td.disabled.crm-search-ctrl-column::after {
   content: "\f05e" / "Disabled row.";
-  color: var(--crm-alert-danger-text);
   font-style: normal;
 }
 

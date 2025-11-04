@@ -98,12 +98,6 @@
           }
           return crmApi4('Afform', 'prefill', params)
             .then((result) => {
-              // In some cases (noticed on Wordpress) the response header incorrectly outputs success when there's an error.
-              if (result.error_message) {
-                disableForm(result.error_message);
-                $element.unblock();
-                return;
-              }
               result.forEach((item) => {
                 // Use _.each() because item.values could be cast as an object if array keys are not sequential
                 _.each(item.values, (values, index) => {
@@ -380,7 +374,7 @@
           CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
           return;
         }
-        status = CRM.status({});
+        status = CRM.status({error: ts('Not saved')});
         $element.block();
         if (cancelDraftWatcher) {
           cancelDraftWatcher();
@@ -471,7 +465,7 @@
         const buttons = getDraftButtons();
         $.each(buttons, function(index, button) {
           $(button).text(text).attr('disabled', true);
-          $(button).prepend('<i class="crm-i ' + icon + '" aria-hidden="true"></i> ');
+          $(button).prepend('<i class="crm-i ' + icon + '" role="img" aria-hidden="true"></i> ');
         });
       }
 
@@ -481,7 +475,7 @@
           const initialState = saveDraftButtons[index] || saveDraftButtons[0];
           $(button).text(initialState.text).attr('disabled', false);
           if (initialState.icon) {
-            $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" aria-hidden="true"></i> ');
+            $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" role="img" aria-hidden="true"></i> ');
           }
         });
       }

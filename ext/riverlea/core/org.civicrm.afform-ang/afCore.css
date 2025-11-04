@@ -65,10 +65,16 @@ details.af-container > *:nth-of-type(1):not(summary) {
 details.af-container > *:last-of-type {
   padding-bottom: var(--crm-m);
 }
+details.af-container.af-layout-inline {
+  flex-direction: column;
+}
+details.af-container.af-layout-inline > *:not(summary) {
+  display: inline-block;
+}
 
 /* Card style */
 .af-container-style-pane {
-  background-color: var(--crm-form-block-background);
+  background-color: var(--crm-form-block-bg);
   border-radius: var(--crm-form-block-border-radius);
   box-shadow: var(--crm-form-block-box-shadow);
   position: relative;
@@ -76,7 +82,7 @@ details.af-container > *:last-of-type {
   padding-top: 50px !important;
 }
 #bootstrap-theme .af-container-style-pane > .af-title {
-  background-color: var(--crm-c-background5);
+  background-color: var(--crm-form-block-header);
   color: var(--crm-c-text-light);
   border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
   position: absolute;
@@ -124,8 +130,65 @@ fieldset.af-container.af-layout-inline {
 }
 
 /* Radio buttons */
-
 .af-field-type-radio .crm-af-field {
   display: flex;
   padding-block: 0.25rem;
+}
+
+/* Toggle buttons */
+body.wp-admin .crm-container .af-field-type-toggle .crm-af-field,
+.af-field-type-toggle .crm-af-field,
+.af-gui-field-input-type-toggle .crm-af-field {
+  & label {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    grid-gap: var(--crm-m2);
+  }
+
+  & input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+    font-size: inherit;
+    width: 2.75rem;
+    height: auto;
+    padding: var(--crm-m2) 0;
+    box-sizing: content-box;
+    border-radius: 1rem;
+    vertical-align: text-bottom;
+    color: inherit;
+    border: 2px solid var(--crm-c-inverse-bg);
+    background-color: var(--crm-c-inverse-bg);
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
+  }
+
+  & input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+    box-sizing: border-box;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0 var(--crm-xs2);
+    border-radius: 50%;
+    border: 1px solid var(--crm-c-layer0-bg);
+    background: var(--crm-c-layer0-bg);
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
+  }
+  & input[type="checkbox"]:checked {
+    border: 2px solid var(--crm-c-focus);
+    background-color: var(--crm-c-focus);
+  }
+  & input[type="checkbox"]:checked::before {
+    left: 1.2rem;
+  }
+  & input[type="checkbox"]:disabled {
+    opacity: 0.4;
+  }
 }

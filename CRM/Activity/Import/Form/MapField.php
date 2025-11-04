@@ -78,7 +78,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->addSavedMappingFields();
     $this->addFormRule(['CRM_Activity_Import_Form_MapField', 'formRule'], $this);
 
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
@@ -126,9 +125,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
         foreach ($fields['mapper'] as $field) {
           $importKeys[] = $field[0];
         }
-        $parser = $self->getParser();
-        $rule = $parser->getDedupeRule('Individual', $self->getUserJob()['metadata']['entity_configuration']['TargetContact']['dedupe_rule'] ?? NULL);
-        $errors = $self->validateContactFields($rule, $fields['mapper'], ['external_identifier', 'id']);
+        $errors = $self->getMissingContactFields('TargetContact', $self->getFieldMappings());
 
         $missingFields = $self->validateRequiredFields($importKeys);
         if ($missingFields) {

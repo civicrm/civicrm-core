@@ -15,13 +15,15 @@
     },
     templateUrl: '~/crmSearchTasks/crmSearchBatchRunner.html',
     controller: function($scope, $timeout, $interval, crmApi4) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this,
-        currentBatch = 0,
-        totalBatches,
-        processedCount = 0,
-        countMatched = 0,
-        incrementer;
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
+      const ctrl = this;
+
+      let currentBatch = 0;
+      let totalBatches;
+      let processedCount = 0;
+      let countMatched = 0;
+      let incrementer;
+      let batchResult;
 
       this.progress = 0;
 
@@ -50,7 +52,7 @@
         if (ctrl.last > ctrl.ids.length) {
           ctrl.last = ctrl.ids.length;
         }
-        var params = _.cloneDeep(ctrl.params);
+        const params = _.cloneDeep(ctrl.params);
         if (ctrl.action === 'save') {
           // For the save action, take each record from params and copy it with each supplied id
           params.records = _.transform(ctrl.ids.slice(ctrl.first, ctrl.last), function(records, id) {
@@ -78,22 +80,28 @@
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
             processedCount += result.countFetched;
             countMatched += (result.countMatched || result.count);
+            // Gather all results into one super collection
+            if (batchResult) {
+              batchResult.push(...result);
+            } else {
+              batchResult = result;
+            }
             if (ctrl.last >= ctrl.ids.length) {
               $timeout(function() {
-                result.batchCount = processedCount;
-                result.countMatched = countMatched;
-                ctrl.success({result: result});
+                // Return a complete record of all batches
+                batchResult.batchCount = processedCount;
+                batchResult.countMatched = countMatched;
+                ctrl.success({result: batchResult});
               }, 500);
             } else {
               runBatch();
             }
           }, function(error) {
-            CRM.alert(error.error_message, ts('Error'), 'error');
-            ctrl.error();
+            ctrl.error({error: error});
           });
         // Move the bar every second to simulate progress between batches
         incrementer = $interval(function(i) {
-          var est = Math.floor(100 * (currentBatch + (i / EST_BATCH_TIME)) / totalBatches);
+          const est = Math.floor(100 * (currentBatch + (i / EST_BATCH_TIME)) / totalBatches);
           ctrl.progress = est > 100 ? 100 : est;
         }, 1000, EST_BATCH_TIME);
       }

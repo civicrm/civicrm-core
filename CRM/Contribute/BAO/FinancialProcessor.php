@@ -22,6 +22,97 @@
  */
 class CRM_Contribute_BAO_FinancialProcessor {
 
+  private CRM_Contribute_DAO_Contribution $updatedContribution;
+
+  private ?CRM_Contribute_BAO_Contribution $originalContribution;
+
+  public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution) {
+    // Deal with slopping typing first.
+    if ($originalContribution) {
+      $originalContribution->contribution_status_id = (int) $originalContribution->contribution_status_id;
+    }
+    $updatedContribution->contribution_status_id = (int) $updatedContribution->contribution_status_id;
+    $this->originalContribution = $originalContribution;
+    $this->updatedContribution = $updatedContribution;
+  }
+
+  public function getUpdatedContribution(): CRM_Contribute_DAO_Contribution {
+    return $this->updatedContribution;
+  }
+
+  public function getOriginalContribution(): ?CRM_Contribute_BAO_Contribution {
+    return $this->originalContribution;
+  }
+
+  public function getUpdatedContributionStatus(): string {
+    return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->updatedContribution->contribution_status_id);
+  }
+
+  public function getOriginalContributionStatus(): ?string {
+    if (!$this->originalContribution) {
+      return NULL;
+    }
+    return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->originalContribution->contribution_status_id);
+  }
+
+  public function getOriginalPaymentInstrumentID(): ?int {
+    if (!$this->originalContribution) {
+      return NULL;
+    }
+    return $this->originalContribution->payment_instrument_id;
+  }
+
+  public function isNegativeTransaction(): bool {
+    return in_array($this->getUpdatedContributionStatus(), ['Refunded', 'Chargeback', 'Cancelled'], TRUE);
+  }
+
+  public function isFailedTransaction(): bool {
+    return $this->getUpdatedContributionStatus() === 'Failed';
+  }
+
+  public function isPendingTransaction(): bool {
+    return $this->getUpdatedContributionStatus() === 'Pending';
+  }
+
+  public function isCompletedTransaction(): bool {
+    return $this->getUpdatedContributionStatus() === 'Completed';
+  }
+
+  public function isAccountsReceivableTransaction(): bool {
+    return $this->getUpdatedContributionStatus() === 'Pending' || $this->getUpdatedContributionStatus() === 'In Progress';
+  }
+
+  public function isOriginalStatusPending(): bool {
+    return in_array($this->getOriginalContributionStatus(), ['Pending', 'In Progress'], TRUE);
+  }
+
+  public function isStatusChange(): bool {
+    return $this->originalContribution->contribution_status_id !== $this->updatedContribution->contribution_status_id;
+  }
+
+  public function getOriginalFinancialAccount(): ?int {
+    if (!$this->originalContribution) {
+      return NULL;
+    }
+    $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
+    return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->originalContribution->financial_type_id, $accountRelationship);
+  }
+
+  /**
+   * @throws CRM_Core_Exception
+   */
+  public function getUpdatedFinancialAccount(): int {
+    $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
+    $account = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->updatedContribution->financial_type_id, $accountRelationship);
+    if (!$account) {
+      throw new CRM_Core_Exception(ts("Account not configured '%1' for financial type %2", [
+        '1' => $accountRelationship,
+        '2' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $this->updatedContribution->financial_type_id),
+      ]));
+    }
+    return $account;
+  }
+
   /**
    * Get the financial account for the item associated with the new transaction.
    *
@@ -52,13 +143,43 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
+   * @param array $params
+   *
+   * @return int
+   * @throws CRM_Core_Exception
+   */
+  public function getToFinancialAccount(array $params): int {
+    if ($this->isAccountsReceivableTransaction()) {
+      return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+        $params['financial_type_id'],
+        'Accounts Receivable Account is'
+      );
+    }
+    if (!empty($params['payment_processor'])) {
+      return CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['payment_processor'], NULL, 'civicrm_payment_processor');
+    }
+    // Probably here we should check $this->updatedContribution instead of params
+    // and then we would not need the next if.
+    if (!empty($params['payment_instrument_id'])) {
+      return CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
+    }
+    // Probably updatedContribution makes more sense - per previous comment.
+    // dev/financial#160 - If this is a contribution update, also check for an existing payment_instrument_id.
+    if ($this->getOriginalPaymentInstrumentID()) {
+      return CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount((int) $params['prevContribution']->payment_instrument_id);
+    }
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
+    $queryParams = [1 => [$relationTypeId, 'Integer']];
+    return CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
+  }
+
+  /**
    * Create the financial items for the line.
    *
    * @param array $params
    * @param string $context
    * @param array $fields
    * @param array $previousLineItems
-   * @param array $inputParams
    * @param bool $isARefund
    * @param array $trxnIds
    * @param int $fieldId
@@ -67,26 +188,19 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return array
    */
-  private static function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, array $inputParams, bool $isARefund, $trxnIds, $fieldId): array {
+  private function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, bool $isARefund, $trxnIds, $fieldId): array {
+    $postUpdateContribution = $params['contribution'];
     foreach ($fields as $fieldValueId => $lineItemDetails) {
       $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
-      $receiveDate = CRM_Utils_Date::isoToMysql($params['prevContribution']->receive_date);
-      if ($params['contribution']->receive_date) {
-        $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);
-      }
-
       $financialAccount = CRM_Contribute_BAO_FinancialProcessor::getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
 
-      $currency = $params['prevContribution']->currency;
-      if ($params['contribution']->currency) {
-        $currency = $params['contribution']->currency;
-      }
       $previousLineItemTotal = $previousLineItems[$fieldValueId]['line_total'] ?? 0;
+      $isContributionStatusNegative = CRM_Contribute_BAO_Contribution::isContributionStatusNegative($postUpdateContribution->contribution_status_id);
       $itemParams = [
-        'transaction_date' => $receiveDate,
-        'contact_id' => $params['prevContribution']->contact_id,
-        'currency' => $currency,
-        'amount' => self::getFinancialItemAmountFromParams($inputParams, $context, $lineItemDetails, $isARefund, $previousLineItemTotal),
+        'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
+        'contact_id' => $postUpdateContribution->contact_id,
+        'currency' => $postUpdateContribution->currency,
+        'amount' => self::getFinancialItemAmountFromParams($isContributionStatusNegative, $context, $lineItemDetails, $isARefund, $previousLineItemTotal),
         'description' => $prevFinancialItem['description'] ?? NULL,
         'status_id' => $prevFinancialItem['status_id'],
         'financial_account_id' => $financialAccount,
@@ -107,7 +221,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $taxAmount -= $previousLineItems[$fieldValueId]['tax_amount'] ?? 0;
         }
         if ($taxAmount != 0) {
-          $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
+          $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id, $context) * $taxAmount;
           $itemParams['description'] = \Civi::settings()->get('tax_term');
           if ($lineItemDetails['financial_type_id']) {
             $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
@@ -151,8 +265,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * for historical reasons. Going forwards we can hope to add tests & improve readibility
    * of that function
    *
-   * @param array $params
-   *   Params as passed to contribution.create
+   * @param bool $isContributionStatusNegative
+   *  Is the (new) contribution status negative
    *
    * @param string $context
    *   changeFinancialType| changedAmount
@@ -166,7 +280,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @todo move recordFinancialAccounts & helper functions to their own class?
    *
    */
-  protected static function getFinancialItemAmountFromParams($params, $context, $lineItemDetails, $isARefund, $previousLineItemTotal) {
+  protected static function getFinancialItemAmountFromParams(bool $isContributionStatusNegative, $context, $lineItemDetails, $isARefund, $previousLineItemTotal) {
     if ($context == 'changedAmount') {
       $lineTotal = $lineItemDetails['line_total'];
       if ($lineTotal != $previousLineItemTotal) {
@@ -182,15 +296,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
       if ($isARefund) {
         $cancelledTaxAmount = $lineItemDetails['tax_amount'] ?? '0.00';
       }
-      return CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * ((float) $lineItemDetails['line_total'] + (float) $cancelledTaxAmount);
+      return ($isContributionStatusNegative ? -1 : 1) * ((float) $lineItemDetails['line_total'] + (float) $cancelledTaxAmount);
     }
     elseif ($context === NULL) {
       // erm, yes because? but, hey, it's tested.
       return $lineItemDetails['line_total'];
     }
-    else {
-      return CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * ((float) $lineItemDetails['line_total']);
-    }
+    throw new CRM_Core_Exception('unreachable');
   }
 
   /**
@@ -206,14 +318,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * adds unpredictability.
    *
    */
-  public static function updateFinancialAccounts(&$params, $context = NULL) {
-    $inputParams = $params;
+  public function updateFinancialAccounts(&$params, $context = NULL) {
     $isARefund = self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id);
-
-    if ($context === 'changedAmount' || $context === 'changeFinancialType') {
-      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-    }
 
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
@@ -222,7 +328,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $trxnIds['id'] = $params['entity_id'];
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
     foreach ($params['line_item'] as $fieldId => $fields) {
-      $params = CRM_Contribute_BAO_FinancialProcessor::createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $inputParams, $isARefund, $trxnIds, $fieldId);
+      $params = $this->createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $isARefund, $trxnIds, $fieldId);
     }
   }
 
@@ -261,7 +367,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return bool
    *   Return indicates whether the updateFinancialAccounts function should continue.
    */
-  public static function updateFinancialAccountsOnContributionStatusChange(&$params) {
+  public function updateFinancialAccountsOnContributionStatusChange(&$params) {
     $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
     $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
 
@@ -311,7 +417,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // This is an update so original currency if none passed in.
       $params['trxnParams']['currency'] = $params['currency'] ?? $params['prevContribution']->currency;
 
-      $transactionIDs[] = CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
+      $transactionIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams'], $params);
       $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['entity_id'] = $transactionIDs[] = $trxn->id;
@@ -370,7 +476,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return null|int
    */
-  public static function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
+  public function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
     if (!Civi::settings()->get('always_post_to_accounts_receivable')) {
       return NULL;
     }
@@ -402,21 +508,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * Does this transaction reflect a payment instrument change.
    *
    * @param array $params
-   * @param array $pendingStatuses
    *
    * @return bool
    */
-  public static function isPaymentInstrumentChange(&$params, $pendingStatuses) {
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
-
+  public function isPaymentInstrumentChange(array $params): bool {
     if (array_key_exists('payment_instrument_id', $params)) {
       if (CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id) &&
         !CRM_Utils_System::isNull($params['payment_instrument_id'])
       ) {
         //check if status is changed from Pending to Completed
         // do not update payment instrument changes for Pending to Completed
-        if (!($contributionStatus == 'Completed' &&
-          in_array($params['prevContribution']->contribution_status_id, $pendingStatuses))
+        if (!($this->isCompletedTransaction() &&
+          $this->isOriginalStatusPending())
         ) {
           return TRUE;
         }

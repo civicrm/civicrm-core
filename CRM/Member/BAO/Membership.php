@@ -148,11 +148,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         }
       }
 
-      CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership);
+      CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership, $params);
     }
     else {
       CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Signup', $targetContactID, $activityParams);
-      CRM_Utils_Hook::post('create', 'Membership', $membership->id, $membership);
+      CRM_Utils_Hook::post('create', 'Membership', $membership->id, $membership, $params);
     }
 
     return $membership;
@@ -631,7 +631,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $params['source_record_id'] = $membershipId;
       CRM_Activity_BAO_Activity::deleteActivity($params);
     }
-    self::deleteMembershipPayment($membershipId, $preserveContrib);
+    CRM_Member_BAO_MembershipPayment::deleteMembershipPayment($membershipId, $preserveContrib);
     CRM_Price_BAO_LineItem::deleteLineItems($membershipId, 'civicrm_membership');
 
     $results = $membership->delete();
@@ -1398,32 +1398,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         $numRelatedAvailable--;
       }
     }
-  }
-
-  /**
-   * Delete the record that are associated with this Membership Payment.
-   *
-   * @param int $membershipId
-   * @param bool $preserveContrib
-   *
-   * @return object
-   *   $membershipPayment deleted membership payment object
-   */
-  public static function deleteMembershipPayment($membershipId, $preserveContrib = FALSE) {
-
-    $membershipPayment = new CRM_Member_DAO_MembershipPayment();
-    $membershipPayment->membership_id = $membershipId;
-    $membershipPayment->find();
-
-    while ($membershipPayment->fetch()) {
-      if (!$preserveContrib) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
-      }
-      CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
-      $membershipPayment->delete();
-      CRM_Utils_Hook::post('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
-    }
-    return $membershipPayment;
   }
 
   /**

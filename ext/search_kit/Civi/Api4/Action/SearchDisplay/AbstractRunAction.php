@@ -22,6 +22,8 @@ use Civi\Api4\Utils\FormattingUtil;
  * @method string getSeed()
  * @method $this setAfform(string $afform)
  * @method string getAfform()
+ * @method $this setToggleColumns(array $columnIndices)
+ * @method array getToggleColumns()
  * @package Civi\Api4\Action\SearchDisplay
  */
 abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
@@ -71,6 +73,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @var string
    */
   protected $afform;
+
+  /**
+   * Indices of columns to return
+   * @var array
+   */
+  protected array $toggleColumns = [];
 
   /**
    * @var array
@@ -139,7 +147,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function formatResult(iterable $result): array {
     $rows = [];
-    $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+    $keyName = $this->getRowKeyName();
     if ($this->savedSearch['api_entity'] === 'RelationshipCache') {
       $keyName = 'relationship_id';
     }
@@ -148,8 +156,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       foreach ($this->getSelectClause() as $key => $item) {
         $data[$key] = $this->getValue($key, $record, $index);
       }
-      foreach ($this->display['settings']['columns'] as $column) {
-        $columns[] = $this->formatColumn($column, $data, $this->display['settings']);
+      foreach ($this->display['settings']['columns'] as $index => $column) {
+        $columns[] = $this->isColumnEnabled($index) ? $this->formatColumn($column, $data, $this->display['settings']) : NULL;
       }
       $row = [
         'data' => $data,
@@ -284,6 +292,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     if (!empty($column['alignment'])) {
       $cssClass[] = $column['alignment'];
+    }
+    if (!empty($column['nowrap'])) {
+      $cssClass[] = 'nowrap';
     }
     if (!empty($column['show_linebreaks'])) {
       if ($column['type'] === 'html') {
@@ -836,7 +847,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * Fills in info about each link in the search display.
    */
   protected function preprocessLinks(): void {
-    foreach ($this->display['settings']['columns'] as &$column) {
+    foreach ($this->display['settings']['columns'] as $index => &$column) {
+      if (!$this->isColumnEnabled($index)) {
+        continue;
+      }
       if (!empty($column['link'])) {
         $this->preprocessLink($column['link']);
       }
@@ -1006,7 +1020,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array{entity: string, action: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, record: array, value_path: string}|null
    */
   protected function formatEditableColumn($column, $data) {
-    $editable = $this->getEditableInfo($column['key']);
+    $editable = $this->getEditableInfo($column);
     $editable['record'] = [];
     // Generate params to edit existing record
     if (!empty($data[$editable['id_path']])) {
@@ -1110,30 +1124,34 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param $key
+   * @param array $column
+   *   Column definition
+   * @param null|string $key
+   *   Internal use only
    * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string, explicit_join: string, grouping_fields: array}|null
    */
-  protected function getEditableInfo($key) {
-    // Strip pseudoconstant suffix
-    [$key] = explode(':', $key);
+  protected function getEditableInfo(array $column, ?string $key = NULL) {
+    $key ??= $column['key'];
     if (array_key_exists($key, $this->editableInfo)) {
       return $this->editableInfo[$key];
     }
+    // Strip pseudoconstant suffix
+    [$baseKey] = explode(':', $key);
     $getModeField = $this->getField($key);
     $fieldName = $getModeField['name'] ?? NULL;
     // If field is an implicit join to another entity, use the original fk field
     // UNLESS it's a custom field (which the api treats the same as core fields) or a virtual join like `address_primary.city`
     if (!empty($getModeField['implicit_join']) && empty($getModeField['custom_field_id'])) {
-      $baseFieldName = substr($key, 0, -1 - strlen($getModeField['name']));
+      $baseFieldName = substr($baseKey, 0, -1 - strlen($getModeField['name']));
       $baseField = $this->getField($baseFieldName);
-      $baseInfo = $this->getEditableInfo($baseFieldName);
+      $baseInfo = $this->getEditableInfo($column, $baseFieldName);
       // Implicit join to real field
       if ($baseField && !empty($baseField['fk_entity']) && $baseField['type'] === 'Field') {
         return $baseInfo;
       }
       elseif ($getModeField) {
         $getModeField['entity'] = $baseField['entity'];
-        $getModeField['name'] = $key;
+        $getModeField['name'] = $baseKey;
       }
     }
     $result = NULL;
@@ -1156,6 +1174,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $field['entity'] = 'Relationship';
         $idPath = $path . 'relationship_id';
       }
+      // Allow date/time elements to be represented as date-only
+      if ($field['data_type'] === 'Timestamp' && ($column['format'] ?? '') === 'dateformatFull') {
+        $field['data_type'] = 'Date';
+      }
       $result = [
         'entity' => $field['entity'],
         'input_type' => $field['input_type'],
@@ -1166,7 +1188,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'nullable' => !empty($field['nullable']),
         'fk_entity' => $field['fk_entity'],
         'value_key' => $field['name'],
-        'value_path' => $key,
+        'value_path' => $baseKey,
         'id_key' => $idKey,
         'id_path' => $idPath,
         'explicit_join' => $field['explicit_join'],
@@ -1240,7 +1262,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param mixed $rawValue
    * @param array $data
    * @param string $dataType
-   * @param string|null $format
+   * @param string|array|null $format
    * @return array|string
    */
   protected function formatViewValue(string $key, $rawValue, $data, $dataType, $format = NULL) {
@@ -1273,7 +1295,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         break;
 
       case 'Float':
-        $formatted = \CRM_Utils_Number::formatLocaleNumeric($rawValue);
+        $format = $format ?: [];
+        // Ignore null values in format array
+        $format = array_filter($format, 'is_int');
+        $formatted = \CRM_Utils_Number::formatLocaleNumeric($rawValue, NULL, $format);
         break;
 
       case 'Date':
@@ -1294,7 +1319,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Allow all filters that are included in SELECT clause or are fields on the Afform.
     $fieldFilters = $this->getAfformFilterFields();
     $directiveFilters = $this->getAfformDirectiveFilters();
-    $allowedFilters = array_merge($this->getSelectAliases(), $fieldFilters, $directiveFilters);
+    $allowedFilters = array_merge($this->getSelectAliases(), array_keys($fieldFilters), $directiveFilters);
 
     // Ignore empty strings
     $filters = array_filter($this->filters, [$this, 'hasValue']);
@@ -1312,7 +1337,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     foreach ($filters as $key => $value) {
       $fieldNames = explode(',', $key);
       if (in_array($key, $allowedFilters, TRUE) || !array_diff($fieldNames, $allowedFilters)) {
-        $this->applyFilter($fieldNames, $value);
+        $this->applyFilter($fieldNames, $value, $fieldFilters);
       }
     }
     // After adding filters, set filter labels
@@ -1360,9 +1385,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
     // Add requested sort after verifying it corresponds to sortable columns
     foreach ($this->sort as $item) {
-      $column = array_column($this->display['settings']['columns'], NULL, 'key')[$item[0]] ?? NULL;
-      if ($column && !(isset($column['sortable']) && !$column['sortable'])) {
-        $currentSort[] = $item;
+      foreach ($this->display['settings']['columns'] as $index => $column) {
+        if (($column['key'] ?? NULL) === $item[0] && $this->isColumnEnabled($index) && !(isset($column['sortable']) && !$column['sortable'])) {
+          $currentSort[] = $item;
+          break;
+        }
       }
     }
 
@@ -1410,7 +1437,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $this->addSelectExpression($addition);
     }
     $possibleTokens = '';
-    foreach ($this->display['settings']['columns'] as $column) {
+    foreach ($this->display['settings']['columns'] as $index => $column) {
+      if (!$this->isColumnEnabled($index)) {
+        continue;
+      }
       // Collect display values in which a token is allowed
       $possibleTokens .= ($column['rewrite'] ?? '');
       $possibleTokens .= ($column['title'] ?? '');
@@ -1433,7 +1463,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Select id, value & grouping for in-place editing
       if (!empty($column['editable'])) {
         $isEditable = TRUE;
-        $editable = $this->getEditableInfo($column['key']);
+        $editable = $this->getEditableInfo($column);
         if ($editable) {
           foreach (array_merge($editable['grouping_fields'], [$editable['value_path'], $editable['id_path']]) as $addition) {
             $this->addSelectExpression($addition);
@@ -1634,7 +1664,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return array_column(\CRM_Utils_Array::findAll(
         $afform['searchDisplay']['fieldset'],
         ['#tag' => 'af-field']
-      ), 'name');
+      ), NULL, 'name');
     }
     return [];
   }
@@ -1724,6 +1754,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           // TODO: This just uses the first fieldset, but there could be multiple. Potentially could use filters to match it.
           $afform['searchDisplay']['fieldset'] = $key === 'form' ? [] : $fieldset;
         }
+      }
+      // For security, Afform must contain the search display.
+      if (!$afform['searchDisplay']) {
+        throw new UnauthorizedException('Afform does not contain search display');
       }
       $this->_afform = $afform;
     }
@@ -1845,6 +1879,20 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     return $values;
   }
 
+  protected function getRowKeyName(): string {
+    // If grouping by a primary key, use that field
+    $groupBy = $this->savedSearch['api_params']['groupBy'] ?? [];
+    foreach ($groupBy as $fieldName) {
+      $field = $this->getField($fieldName);
+      if ($field && (CoreUtil::getIdFieldName($field['entity']) === $field['name'])) {
+        return $fieldName;
+      }
+    }
+    // Use primary key of main entity
+    $entityName = $this->savedSearch['api_entity'];
+    return CoreUtil::getIdFieldName($entityName);
+  }
+
   /**
    * Given an entity name, returns the data fieldName used to identify it.
    * @param string|null $entityName
@@ -1856,6 +1904,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return 'relationship_id';
     }
     return CoreUtil::getIdFieldName($entityName);
+  }
+
+  protected function isColumnEnabled(int $columnIndex): bool {
+    if (!$this->toggleColumns) {
+      return TRUE;
+    }
+    return in_array($columnIndex, $this->toggleColumns);
   }
 
   /**

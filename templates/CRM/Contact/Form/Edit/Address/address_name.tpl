@@ -10,7 +10,8 @@
 {if array_key_exists('name', $form.address.$blockId)}
   <tr>
       <td colspan="2">
-        {$form.address.$blockId.name.label} {help id="id-address-name" file="CRM/Contact/Form/Contact.hlp"}<br />
+        {$form.address.$blockId.name.label}
+        {help id="id-address-name" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.name.textLabel}<br />
         {$form.address.$blockId.name.html}
       </td>
   </tr>

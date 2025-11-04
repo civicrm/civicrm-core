@@ -3,6 +3,10 @@
     <li class="list-group-item">
       <fieldset>
         <legend>{{:: ts('New Batch') }}</legend>
+        <div class="form-inline" title="{{:: ts('Name of new batch') }}">
+          <label for="crm-create-new-batch-name">{{:: ts('Name') }}</label>
+          <input type="text" class="form-control" id="crm-create-new-batch-label" ng-model="$ctrl.newBatch.label" >
+        </div>
         <div class="form-inline" title="{{:: ts('Initial row count for new batch') }}">
           <label for="crm-create-new-batch-row-count">{{:: ts('Rows') }}</label>
           <input type="number" min="1" step="1" class="form-control" required id="crm-create-new-batch-row-count" ng-model="$ctrl.newBatch.rowCount" >
@@ -12,15 +16,15 @@
           <input type="number" class="form-control" id="crm-create-new-batch-target-{{ $index }}" ng-model="$ctrl.newBatch.targets[col.key]">
         </div>
         <button type="button" class="btn btn-primary" ng-click="$ctrl.createNewBatch()" ng-disabled="$ctrl.creatingBatch">
-          <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner"></i>
-          <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus"></i>
+          <i ng-if="$ctrl.creatingBatch" class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i>
+          <i ng-if="!$ctrl.creatingBatch" class="crm-i fa-plus" role="img" aria-hidden="true"></i>
           {{:: ts('Start New Batch') }}
         </button>
       </fieldset>
     </li>
     <li class="list-group-item" ng-repeat="link in $ctrl.reportLinks">
       <a href ng-href="{{:: link.href }}">
-        <i class="crm-i {{:: link.icon }}"></i>
+        <i class="crm-i {{:: link.icon }}" role="img" aria-hidden="true"></i>
         {{:: link.title }}
       </a>
     </li>
@@ -35,7 +39,7 @@
       <th ng-repeat="col in $ctrl.settings.columns">
         <span class="crm-search-display-table-column-label">{{:: col.label }}<span ng-if=":: col.required" class="crm-marker">*</span></span>
         <button type="button" ng-if="$ctrl.results.editable[col.key] && $ctrl.results.editable[col.key].input_type !== 'DisplayOnly'" class="btn btn-xs" ng-click="$ctrl.copyCol($index)" title="{{:: ts('Copy value from first row to all rows') }}">
-          <i class="crm-i fa-arrows-down-to-line"></i>
+          <i class="crm-i fa-arrows-down-to-line" role="img" aria-hidden="true"></i>
         </button>
       </th>
       <th>&nbsp;</th>
@@ -49,8 +53,8 @@
   <div>
     <div class="btn-group" ng-if="!$ctrl.loading">
       <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="$ctrl.addingRows" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="crm-i fa-plus" ng-if="!$ctrl.addingRows"></i>
-        <i class="crm-i fa-spin fa-spinner" ng-if="$ctrl.addingRows"></i>
+        <i class="crm-i fa-plus" ng-if="!$ctrl.addingRows" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-spin fa-spinner" ng-if="$ctrl.addingRows" role="img" aria-hidden="true"></i>
         {{:: ts('Add Rows...') }}
         <span class="caret"></span>
       </button>
@@ -62,13 +66,13 @@
       </ul>
     </div>
     <button type="button" ng-if="$ctrl.userJobId" class="btn btn-primary" ng-click="$ctrl.saveRows()" ng-disabled="!$ctrl.unsaved.length || $ctrl.saving">
-      <i ng-if="$ctrl.unsaved.length && !$ctrl.saving" class="crm-i fa-save"></i>
-      <i ng-if="!$ctrl.unsaved.length && !$ctrl.saving" class="crm-i fa-check"></i>
-      <i ng-if="$ctrl.saving" class="crm-i fa-spin fa-spinner"></i>
+      <i ng-if="$ctrl.unsaved.length && !$ctrl.saving" class="crm-i fa-save" role="img" aria-hidden="true"></i>
+      <i ng-if="!$ctrl.unsaved.length && !$ctrl.saving" class="crm-i fa-check" role="img" aria-hidden="true"></i>
+      <i ng-if="$ctrl.saving" class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i>
       {{ $ctrl.unsaved.length || $ctrl.saving ? ts('Save Changes') : ts('Changes Saved') }}
     </button>
     <button type="button" ng-if="$ctrl.userJobId" class="btn btn-{{ $ctrl.isValid() ? 'success' : 'warning' }}" ng-click="$ctrl.doImport()">
-      <i class="crm-i fa-download"></i>
+      <i class="crm-i fa-download" role="img" aria-hidden="true"></i>
       {{:: ts('Run Import') }}
     </button>
   </div>

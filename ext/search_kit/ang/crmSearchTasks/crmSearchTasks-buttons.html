@@ -4,5 +4,5 @@
     ng-repeat="action in $ctrl.taskManager.tasks"
     title="{{ $ctrl.getActionTitle(action) }}"
     ng-click="$ctrl.doAction(action)">
-  <i class="crm-i {{:: action.icon }}"></i> {{:: action.title }}
+  <i class="crm-i {{:: action.icon }}" role="img" aria-hidden="true"></i> {{:: action.title }}
 </button>

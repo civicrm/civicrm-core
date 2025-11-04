@@ -142,10 +142,10 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
     }
 
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Case', $case->id, $case);
+      CRM_Utils_Hook::post('edit', 'Case', $case->id, $case, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'Case', $case->id, $case);
+      CRM_Utils_Hook::post('create', 'Case', $case->id, $case, $params);
     }
     $transaction->commit();
 
@@ -720,7 +720,7 @@ HERESQL;
           }
         }
         if (isset($case['activity_type_id']) && self::checkPermission($actId, 'edit', $case['activity_type_id'], $userID)) {
-          $casesList[$key]['date'] .= sprintf('<a class="action-item crm-hover-button" href="%s" title="%s"><i class="crm-i fa-pencil" aria-hidden="true"></i></a>',
+          $casesList[$key]['date'] .= sprintf('<a class="action-item crm-hover-button" href="%s" title="%s"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i></a>',
             CRM_Utils_System::url('civicrm/case/activity', ['reset' => 1, 'cid' => $case['contact_id'], 'caseid' => $case['case_id'], 'action' => 'update', 'id' => $actId]),
             ts('Edit activity')
           );
@@ -1134,7 +1134,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
       $caseActivities[$caseActivityId]['subject'] = $dao->subject;
 
       //Activity Type
-      $caseActivities[$caseActivityId]['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '"></span> ' : '')
+      $caseActivities[$caseActivityId]['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '" role="img" aria-hidden="true"></span> ' : '')
         . $activityTypes[$dao->type]['label'];
 
       // Activity Target (With Contact) (There can be more than one)

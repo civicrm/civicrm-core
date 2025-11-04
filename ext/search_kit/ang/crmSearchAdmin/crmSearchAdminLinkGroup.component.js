@@ -13,7 +13,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminLinkGroup.html',
     controller: function ($scope, $element, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'conditions'];
 
@@ -45,6 +45,10 @@
         return {results: permissionField.concat(selectFields)};
       };
 
+      this.addCondition = function(item, selection) {
+        item.conditions.push([selection, '=']);
+      };
+
       this.onChangeCondition = function(item, index) {
         if (item.conditions[index][0]) {
           item.conditions[index][1] = '=';
@@ -54,8 +58,7 @@
       };
 
       this.sortableOptions = {
-        containment: $element,
-        axis: 'y',
+        containment: $element.children('table').first(),
         helper: function(e, ui) {
           // Prevent table row width from changing during drag
           ui.children().each(function() {

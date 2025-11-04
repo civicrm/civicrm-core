@@ -4,7 +4,7 @@
   <ul role="tablist" class="nav nav-tabs">
     <li role="tab" ng-repeat="tab in $ctrl.tabs" ng-class="{active: tab.name === $ctrl.tab}">
       <a href ng-click="$ctrl.tab = tab.name; $ctrl.searchAfformList = ''">
-        <i class="crm-i {{ tab.icon }}"></i> {{:: tab.plural }}
+        <i class="crm-i {{ tab.icon }}" role="img" aria-hidden="true"></i> {{:: tab.plural }}
         <span class="badge">{{ $ctrl.afforms[tab.name].length }}</span>
       </a>
     </li>
@@ -24,12 +24,12 @@
       <ul class="dropdown-menu" ng-if="menu.open">
         <li ng-class="{disabled: !types[$ctrl.tab].options || !types[$ctrl.tab].options.length}">
           <input ng-if="types[$ctrl.tab].options && types[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#x1f50d;" ng-model="searchCreateLinks.label">
-          <a href ng-if="!types[$ctrl.tab].options"><i class="crm-i fa-spinner fa-spin"></i></a>
+          <a href ng-if="!types[$ctrl.tab].options"><i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i></a>
           <a href ng-if="types[$ctrl.tab].options && !types[$ctrl.tab].options.length">{{:: ts('None Found') }}</a>
         </li>
         <li ng-repeat="link in types[$ctrl.tab].options | filter:searchCreateLinks" class="{{:: link.class }}">
           <a ng-if=":: link.url" ng-href="{{:: link.url }}">
-            <i class="crm-i {{:: link.icon }}"></i>
+            <i class="crm-i {{:: link.icon }}" role="img" aria-hidden="true"></i>
             {{:: link.label }}
           </a>
         </li>
@@ -39,45 +39,45 @@
 
   <table class="table table-striped">
     <thead>
-    <tr>
+    <tr class="nowrap">
       <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('title')">
-        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'title'"></i>
-        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'title'"></i>
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'title'" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'title'" role="img" aria-hidden="true"></i>
         {{:: ts('Title') }}
       </th>
       <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('name')">
-        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'name'"></i>
-        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'name'"></i>
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'name'" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'name'" role="img" aria-hidden="true"></i>
         {{:: ts('Name') }}
       </th>
       <th  ng-if="$ctrl.tab !== 'block'" title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('server_route')">
-        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'server_route'"></i>
-        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'server_route'"></i>
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'server_route'" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'server_route'" role="img" aria-hidden="true"></i>
         {{:: ts('Page') }}
       </th>
       <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('placement.length')">
-        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'placement.length'"></i>
-        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'placement.length'"></i>
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'placement.length'" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'placement.length'" role="img" aria-hidden="true"></i>
         {{:: ts('Placement') }}
       </th>
       <th ng-if="$ctrl.tab === 'form'" title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('submit_currently_open')">
-        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'submit_currently_open'"></i>
-        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'submit_currently_open'"></i>
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'submit_currently_open'" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'submit_currently_open'" role="img" aria-hidden="true"></i>
         {{:: ts('Status') }}
       </th>
       <th ng-if="$ctrl.tab === 'form'" title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('submission_count')">
-        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'submission_count'"></i>
-        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'submission_count'"></i>
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'submission_count'" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'submission_count'" role="img" aria-hidden="true"></i>
         {{:: ts('Submissions') }}
       </th>
       <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('base_module')">
-        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'base_module'"></i>
-        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'base_module'"></i>
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'base_module'" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'base_module'" role="img" aria-hidden="true"></i>
         {{:: ts('Package') }}
       </th>
       <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('tags')">
-        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'tags'"></i>
-        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'tags'"></i>
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'tags'" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'tags'" role="img" aria-hidden="true"></i>
         {{:: ts('Tags') }}
       </th>
       <th>{{:: ts('Actions') }}</th>
@@ -91,7 +91,7 @@
       </td>
       <td ng-if="$ctrl.tab !== 'block'">
         <a ng-if=":: afform.server_route" ng-href="{{:: crmUrl(afform.server_route, null, afform.is_public ? 'front' : 'back') }}" target="_blank">
-          <i class="crm-i fa-external-link"></i>
+          <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
           {{:: afform.server_route }}
         </a>
       </td>
@@ -119,9 +119,9 @@
         {{:: afform.tags.join(', ') }}
       </td>
       <td class="text-right">
-        <a ng-if="afform.type !== 'system'" ng-href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
+        <a ng-if="afform.type !== 'system' && afform.can_manage" ng-href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
         <a ng-if="afform.type !== 'system'" ng-href="#/clone/{{:: afform.name }}" class="btn btn-xs btn-secondary">{{:: ts('Clone') }}</a>
-        <a href ng-if="afform.has_local" class="btn btn-xs btn-{{ afform.has_base ? 'warning' : 'danger' }}" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
+        <a href ng-if="afform.has_local && afform.can_manage" class="btn btn-xs btn-{{ afform.has_base ? 'warning' : 'danger' }}" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
           {{ afform.has_base ? ts('Revert') : ts('Delete') }}
         </a>
       </td>

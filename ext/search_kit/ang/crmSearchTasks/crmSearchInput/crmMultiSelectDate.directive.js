@@ -8,7 +8,7 @@
         require: 'ngModel',
         link: function (scope, element, attrs, ngModel) {
 
-          var defaultDate = null;
+          let defaultDate = null;
 
           function getDisplayDate(date) {
             return $.datepicker.formatDate(CRM.config.dateInputFormat, $.datepicker.parseDate('yy-mm-dd', date));
@@ -23,7 +23,7 @@
               multiple: true,
               data: [],
               initSelection: function(element, callback) {
-                var values = [];
+                const values = [];
                 $.each($(element).val().split(','), function(k, v) {
                   values.push({
                     text: getDisplayDate(v),
@@ -34,7 +34,7 @@
               }
             })
             .on('select2-opening', function(e) {
-              var $el = $(this),
+              const $el = $(this),
                 $input = $('.select2-search-field input', $el.select2('container'));
               // Prevent select2 from opening and show a datepicker instead
               e.preventDefault();
@@ -42,14 +42,14 @@
                 $input
                   .datepicker({
                     beforeShow: function() {
-                      var existingSelections = _.pluck($el.select2('data') || [], 'id');
+                      const existingSelections = _.pluck($el.select2('data') || [], 'id');
                       return {
                         changeMonth: true,
                         changeYear: true,
                         defaultDate: defaultDate,
                         beforeShowDay: function(date) {
                           // Don't allow the same date to be selected twice
-                          var dateStr = $.datepicker.formatDate('yy-mm-dd', date);
+                          const dateStr = $.datepicker.formatDate('yy-mm-dd', date);
                           if (_.includes(existingSelections, dateStr)) {
                             return [false, '', ''];
                           }
@@ -61,7 +61,7 @@
                   .datepicker('show')
                   .on('change.crmDate', function() {
                     if ($(this).val()) {
-                      var data = $el.select2('data') || [];
+                      const data = $el.select2('data') || [];
                       defaultDate = $(this).datepicker('getDate');
                       data.push({
                         text: $.datepicker.formatDate(CRM.config.dateInputFormat, defaultDate),

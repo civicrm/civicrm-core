@@ -13,6 +13,7 @@ use Civi\Api4\Email;
 use Civi\Api4\Import;
 use Civi\Api4\Note;
 use Civi\Api4\OptionValue;
+use Civi\Api4\Payment;
 use Civi\Api4\UserJob;
 use Civi\Import\ContributionParser;
 
@@ -144,10 +145,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'external_identifier' => 'ext-1',
       'contact_type' => 'Individual',
     ]);
-    $softCreditContactID = $this->individualCreate([
+    $softCreditContactID = $this->organizationCreate([
       'organization_name' => 'The firm',
       'external_identifier' => 'ext-2',
-      'email' => 'the-firm@example.com',
+      'email_primary.email' => 'the-firm@example.com',
       'contact_type' => 'Organization',
     ]);
 
@@ -160,7 +161,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contact.email_primary.email'],
       ['name' => 'SoftCreditContact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 1]]],
     ];
-    $this->importCSV('contributions_amount_validate.csv', $mapping);
+    $this->importCSV('contributions_amount_validate.csv', $mapping, [], 'create', ['SoftCreditContact' => ['dedupe_rule' => ['OrganizationUnsupervised'], 'contact_type' => 'Organization', 'action' => 'save']]);
 
     $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $mainContactID)->execute();
     // Although there are 2 rows in the csv, 1 should fail each time due to conflicting money formats.
@@ -171,10 +172,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test payment types are passed.
+   * Test importing a payment field (pan_truncation).
    *
-   * Note that the expected result should logically be CRM_Import_Parser::valid
-   * but writing test to reflect not fix here
+   * We also check that if the total_amount is modified in a pre hook on the
+   * contribution that is reflected in the payment.
    *
    * @throws \CRM_Core_Exception
    */
@@ -191,6 +192,46 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['payment_instrument']);
+  }
+
+  /**
+   * Test payment field is imported (pan_truncation).
+   *
+   * Also test that if the amount is altered by a hook the altered amount is used
+   * to create the contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentField(): void {
+    \Civi::dispatcher()->addListener('hook_civicrm_pre', [__CLASS__, 'preHook'], 100);
+
+    $values = [
+      'Contribution.contact_id' => $this->individualCreate([], 'donor'),
+      'Contribution.total_amount' => 10,
+      'Contribution.financial_type_id' => 'Donation',
+      'Contribution.payment_instrument_id' => 'Credit Card',
+      'Payment.pan_truncation' => 567,
+    ];
+    $this->runImport($values, 'create');
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['Contribution.contact_id' => $this->ids['Contact']['donor']]);
+    $this->assertEquals('Credit Card', $contribution['payment_instrument']);
+    // Changed from 10 to 9 in the hook.
+    $this->assertEquals(9, $contribution['total_amount']);
+
+    $payment = Payment::get()
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+    $this->assertEquals(567, $payment['pan_truncation']);
+    $this->assertEquals(9, $payment['total_amount']);
+  }
+
+  public static function preHook($event): void {
+    if ($event->entity === 'Contribution' && $event->action === 'create') {
+      // Alter the amount in the hook to simulate a currency adjustment.
+      // We want to check the payment is made for the adjusted amount.
+      $line = &$event->params['line_item'][0][0];
+      $event->params['total_amount'] = $line['line_total'] = $line['line_total_inclusive'] = $line['unit_price'] = 9;
+    }
   }
 
   /**
@@ -306,12 +347,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'Contact' => [
         'action' => 'create',
         'contact_type' => 'Organization',
-        'dedupe_rule' => 'OrganizationUnsupervised',
+        'dedupe_rule' => ['OrganizationUnsupervised'],
       ],
       'SoftCreditContact' => [
         'contact_type' => 'Individual',
         'action' => 'create',
-        'dedupe_rule' => 'IndividualSupervised',
+        'dedupe_rule' => ['IndividualSupervised'],
         'soft_credit_type_id' => 1,
       ],
     ];
@@ -420,7 +461,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.financial_type_id'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $this->assertEquals(1, $dataSource->getRowCount([\CRM_Import_Parser::PLEDGE_PAYMENT]));
+    $this->assertEquals(1, $dataSource->getRowCount([\CRM_Import_Parser::PLEDGE_PAYMENT]), $dataSource->getRow()['_status_message']);
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->callAPISuccessGetSingle('PledgePayment', ['pledge_id' => $pledgeID, 'contribution_id' => $contribution['id']]);
@@ -621,7 +662,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     }
     $contactType = 'Individual';
     $this->submitDataSourceForm('contributions.csv');
-    $this->updateJobMetadata($mappings, $contactType);
+    $this->updateJobMetadata($mappings, $contactType, ['IndividualUnsupervised']);
     $form = $this->getMapFieldForm();
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
@@ -675,7 +716,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
     $this->submitDataSourceForm('contributions.csv');
-    $this->updateJobMetadata($fieldMappings, 'Individual');
+    $this->updateJobMetadata($fieldMappings, 'Individual', ['IndividualUnsupervised']);
     $form = $this->getMapFieldForm([
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'contactType' => 'Individual',
@@ -873,11 +914,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       }
       $submittedValues['sqlQuery'] .= implode(',', $submittedClauses);
     }
+    $queryFields = ['first_name'];
+    foreach (array_keys($importMappings) as $key) {
+      if ($key > 0) {
+        $queryFields[] = '"value_' . $key . '" AS field_' . $key;
+      }
+    }
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
           'dataSource' => 'CRM_Import_DataSource_SQL',
-          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
+          'sqlQuery' => 'SELECT ' . implode(', ', $queryFields) . ' FROM civicrm_contact',
           'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
         'import_mappings' => $importMappings,

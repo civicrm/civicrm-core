@@ -50,6 +50,9 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertSame('new_custom_group.testFld', CRM_Core_BAO_CustomField::getLongNameFromShortName("custom_{$customFieldID}_123"));
     $this->assertSame("custom_$customFieldID", CRM_Core_BAO_CustomField::getShortNameFromLongName('new_custom_group.testFld'));
 
+    $this->assertEquals('testFld', CRM_Core_BAO_CustomField::getField($customFieldID)['name']);
+    $this->assertEquals($customFieldID, CRM_Core_BAO_CustomField::getFieldByName('new_custom_group.testFld')['id']);
+
     $this->customGroupDelete($customGroup['id']);
   }
 
@@ -239,7 +242,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       unset($params['tests']);
       $createdField = $this->callAPISuccess('customField', 'create', $params);
       foreach ($field['tests'] as $expected => $input) {
-        $this->assertEquals($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
+        $this->assertSame($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
       }
     }
 

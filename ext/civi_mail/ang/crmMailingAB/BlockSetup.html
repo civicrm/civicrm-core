@@ -12,7 +12,7 @@
         placeholder="A/B Test Name"
         required/>
     </div>
-    <div crm-ui-field="{name: 'setupForm.campaign', title: ts('Campaign'), help: hs({id: 'id-campaign_id', file: 'CRM/Campaign/Form/addCampaignToComponent'})}" ng-show="crmMailingConst.campaignEnabled"
+    <div crm-ui-field="{name: 'setupForm.campaign', title: ts('Campaign'), help: hs({id: 'campaign_id', file: 'CRM/Campaign/Form/addCampaignToComponent'})}" ng-show="crmMailingConst.campaignEnabled"
          ng-if="fields.campaign">
       <input
         crm-entityref="{entity: 'Campaign', select: {allowClear: true, placeholder: ts('Select Campaign')}}"

@@ -7,10 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-label_format-title"}
-  {ts}Label Formats{/ts}
-{/htxt}
-{htxt id="id-label_format"}
+
+{htxt id='label_format_name'}
   {capture assign=labelURL}href="{crmURL p='civicrm/admin/labelFormats' q='reset=1&action=browse'}"{/capture}
   {ts 1=$labelURL}Select a pre-defined name badge label format from the list. <a %1>Label formats</a> control paper size and page configuration (e.g. 2 labels per row, 4 per column). New label formats may require additional programming to produce expected results for event badges.{/ts}
 {/htxt}

@@ -10,27 +10,19 @@ class Utils {
         continue;
       }
 
-      // use /civicrm/home rather than /civicrm/dashboard
-      foreach ($item['child'] as &$subitem) {
-        if ($subitem['attributes']['name'] === 'CiviCRM Home') {
-          $subitem['attributes']['url'] = 'civicrm/home?reset=1';
-        }
-      }
+      // remove Hide Menu and View My Contact
+      $item['child'] = array_filter($item['child'], fn ($subitem) => !in_array($subitem['attributes']['name'], ['Hide Menu', 'View My Contact']));
 
-      // remove hide menu
-      $item['child'] = array_filter($item['child'], fn ($subitem) => ($subitem['attributes']['name'] !== 'Hide Menu'));
-
-      // add change password
+      // Add My Account.
       $item['child'][] = [
         'attributes' => [
-          'label' => ts('Change Password'),
-          'name' => 'Change Password',
-          'url' => 'civicrm/admin/user/password?reset=1',
-          'icon' => 'crm-i fa-keyboard',
+          'label' => ts('My Account'),
+          'name' => 'My Account',
+          'url' => 'civicrm/my-account',
+          'icon' => 'crm-i fa-user',
           'weight' => 2,
         ],
       ];
-
       return;
 
     }

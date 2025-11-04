@@ -7,12 +7,6 @@
     <access_arguments>*always allow*</access_arguments>
   </item>
   <item>
-    <path>civicrm/admin/user/password</path>
-    <page_callback>CRM_Standaloneusers_Page_ChangePassword</page_callback>
-    <title>Change Password</title>
-    <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
     <path>civicrm/login/password</path>
     <page_callback>CRM_Standaloneusers_Page_ResetPassword</page_callback>
     <title>Reset Password</title>
@@ -29,5 +23,11 @@
     <page_callback>CRM_Standaloneusers_Page_TOTPSetup</page_callback>
     <title>Multi Factor Authentication: Set-up</title>
     <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/my-account/password</path>
+    <page_callback>CRM_Standaloneusers_Page_ChangePassword</page_callback>
+    <title>Change Password</title>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

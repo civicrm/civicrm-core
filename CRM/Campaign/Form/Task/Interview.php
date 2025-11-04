@@ -123,7 +123,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     if (!empty($this->_contactIds) && $orderClause) {
       $clause = 'contact_a.id IN ( ' . implode(',', $this->_contactIds) . ' ) ';
       $sql = "
-SELECT contact_a.id
+SELECT DISTINCT(contact_a.id)
 FROM civicrm_contact contact_a
 LEFT JOIN civicrm_address ON contact_a.id = civicrm_address.contact_id
 WHERE {$clause}
@@ -536,7 +536,7 @@ WHERE {$clause}
     $activity->save();
     //really this should use Activity BAO& not be here but refactoring will have to be later
     //actually the whole ajax call could be done as an api ajax call & post hook would be sorted
-    CRM_Utils_Hook::post('edit', 'Activity', $activity->id, $activity);
+    CRM_Utils_Hook::post('edit', 'Activity', $activity->id, $activity, $params);
 
     return $activityId;
   }

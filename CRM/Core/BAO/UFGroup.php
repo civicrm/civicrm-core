@@ -908,13 +908,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @param bool $absolute
    *   Return urls in absolute form (useful when sending an email).
    * @param null $additionalWhereClause
+   * @param string|null $context
+   *   If this is email then groups should be handled differently.
    *
    * @return null|array
    */
   public static function getValues(
     $cid, &$fields, &$values,
     $searchable = TRUE, $componentWhere = NULL,
-    $absolute = FALSE, $additionalWhereClause = NULL
+    $absolute = FALSE, $additionalWhereClause = NULL,
+    $context = NULL
   ) {
     if (empty($cid) && empty($componentWhere)) {
       return NULL;
@@ -996,20 +999,28 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
           $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $details->$name);
         }
         elseif ($name == 'group') {
-          $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE);
+          $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE, FALSE, TRUE, NULL, FALSE, $context === 'email');
           $title = $ids = [];
 
           foreach ($groups as $g) {
             // CRM-8362: User and User Admin visibility groups should be included in display if user has
             // VIEW permission on that group
+            // dev/core#5854 - BUT if this is for an email being resent by an admin, then
+            // we only want public groups.
             $groupPerm = CRM_Contact_BAO_Group::checkPermission($g['group_id'], TRUE);
 
             if ($g['visibility'] != 'User and User Admin Only' ||
               CRM_Utils_Array::key(CRM_Core_Permission::VIEW, $groupPerm)
             ) {
-              $title[] = $g['title'];
+              if ($context != 'email') {
+                $title[] = $g['title'];
+              }
               if ($g['visibility'] == 'Public Pages') {
                 $ids[] = $g['group_id'];
+                if ($context == 'email') {
+                  // Note above when we called getContactGroup(), we passed in $public=true when context was email, which tells it to retrieve frontend_title, it just puts it in the field called title.
+                  $title[] = $g['title'];
+                }
               }
             }
           }
@@ -1776,13 +1787,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $selectAttributes = ['class' => 'crm-select2', 'placeholder' => TRUE];
 
     if ($fieldName == 'image_URL' && $mode == CRM_Profile_Form::MODE_EDIT) {
-      $deleteExtra = json_encode(ts('Are you sure you want to delete the contact image?'));
       $deleteURL = [
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
-          'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete&qfKey=%%key%%',
-          'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
+          'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete',
         ],
       ];
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
@@ -1790,7 +1799,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         [
           'id' => $form->get('id'),
           'gid' => $form->get('gid'),
-          'key' => $form->controller->_key,
         ],
         ts('more'),
         FALSE,
@@ -1906,7 +1914,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       else {
         $profileType = $gId ? CRM_Core_BAO_UFField::getProfileType($gId) : NULL;
         if ($profileType == 'Contact') {
-          $profileType = 'Individual';
+          if ($contactId) {
+            $profileType = \Civi\Api4\Contact::get(FALSE)
+              ->addWhere('id', '=', $contactId)
+              ->addSelect('contact_type')
+              ->execute()->first()['contact_type'];
+          }
+          else {
+            $profileType = 'Individual';
+          }
         }
       }
 
@@ -2965,17 +2981,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return string
    * @throws CRM_Core_Exception
+   *
+   * @deprecated in CiviCRM 6.6
    */
   public static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $groupTypeExpr = '';
     if ($coreTypes) {
       $groupTypeExpr .= implode(',', $coreTypes);
     }
     if ($subTypes) {
-      //CRM-15427 Allow Multiple subtype filtering
-      //if (count($subTypes) > 1) {
-      //throw new CRM_Core_Exception("Multiple subtype filtering is not currently supported by widget.");
-      //}
       foreach ($subTypes as $subType => $subTypeIds) {
         $groupTypeExpr .= $delim . $subType . ':' . implode(':', $subTypeIds);
       }
@@ -3495,6 +3510,53 @@ SELECT  group_id
       }
     }
     return $value;
+  }
+
+  /**
+   * Returns a string describing which forms/modules are using a given profile
+   * Ex: Used in Forms: CiviContribute (1, 3, 5), CiviEvent (40, 42, 55, 123 and XX more)
+   *
+   * @return string|null
+   */
+  public static function getProfileUsedByString($profileID) {
+    $otherModules = \Civi\Api4\UFJoin::get(TRUE)
+      ->addWhere('uf_group_id', '=', $profileID)
+      ->addWhere('module', '!=', 'Profile')
+      ->addOrderBy('entity_id', 'ASC')
+      ->execute();
+    if (empty($otherModules)) {
+      return NULL;
+    }
+    $otherModulesTranslations = [
+      'on_behalf' => ts('On Behalf Of Organization'),
+      'User Account' => ts('User Account'),
+      'User Registration' => ts('User Registration'),
+      'CiviContribute' => ts('CiviContribute'),
+      'CiviEvent' => ts('CiviEvent'),
+      'CiviEvent_Additional' => ts('CiviEvent Additional Participant'),
+    ];
+    $modulesByComponent = [];
+    foreach ($otherModules as $join) {
+      $modulesByComponent[$join['module']][] = $join['entity_id'];
+    }
+    $modulesByComponentReformat = [];
+    foreach ($modulesByComponent as $key => $vals) {
+      $count = count($vals);
+      // Specific use-case for User Registration, Search Profile, etc, which will
+      // return an empty vals[0], so it would display "User Registration ()"
+      if ($count == 1 && empty($vals[0])) {
+        $modulesByComponentReformat[] = $otherModulesTranslations[$key] ?? $key;
+      }
+      elseif ($count > 7) {
+        // Keep only 5 and say "and X more"
+        $vals = array_slice($vals, 0, 5);
+        $modulesByComponentReformat[] = ($otherModulesTranslations[$key] ?? $key) . ' (' . implode(', ', $vals) . ' ' . ts('and %count more', ['count' => $count - 5, 'plural' => 'and %count more']) . ')';
+      }
+      else {
+        $modulesByComponentReformat[] = ($otherModulesTranslations[$key] ?? $key) . ' (' . implode(', ', $vals) . ')';
+      }
+    }
+    return implode(', ', $modulesByComponentReformat);
   }
 
 }

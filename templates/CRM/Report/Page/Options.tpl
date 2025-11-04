@@ -12,7 +12,7 @@
 </div>
 {if $action ne 1 and $action ne 2}
   <div class="action-link">
-    <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
+    <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
   </div>
   <div class="spacer"></div>
 {/if}
@@ -58,7 +58,7 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-        <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
+        <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
       </div>
     {/if}
   </div>

@@ -12,7 +12,7 @@
 {if $registerClosed}
 <div class="spacer"></div>
 <div class="messages status no-popup">
-  <i class="crm-i fa-info-circle" aria-hidden="true"></i>&nbsp;
+  <i class="crm-i fa-info-circle" role="img" aria-hidden="true"></i>&nbsp;
   {if $registerStartDate}
     {ts 1=$registerStartDate|crmDate}Registration will open on %1{/ts}
   {else}
@@ -242,7 +242,7 @@
 
     {if $event.is_share}
         {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}
-        {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl emailMode=true}
+        {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl emailMode=false}
     {/if}
     </div>
 </div>

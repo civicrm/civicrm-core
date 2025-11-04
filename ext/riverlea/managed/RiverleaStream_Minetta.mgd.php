@@ -16,8 +16,8 @@ return [
         'label' => E::ts('Minetta'),
         'is_reserved' => TRUE,
         'extension' => E::SHORT_NAME,
-        'file_prefix' => 'streams/minetta/css/',
-        'css_file' => '_variables.css',
+        'file_prefix' => 'streams/minetta/',
+        'css_file' => '_main.css',
         'css_file_dark' => '_dark.css',
         'vars' => [
           '--crm-version' => "'Minetta, v' var(--crm-release)",

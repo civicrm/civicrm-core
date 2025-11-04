@@ -393,9 +393,9 @@ return [
       ],
       'default' => NULL,
       'localizable' => 0,
-      'html' => [
-        'type' => 'Select Date',
-        'formatType' => 'activityDateTime',
+      'input_type' => 'Select Date',
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
       ],
       'readonly' => TRUE,
       'add' => 5.76,
@@ -413,9 +413,9 @@ return [
       ],
       'default' => NULL,
       'localizable' => 0,
-      'html' => [
-        'type' => 'Select Date',
-        'formatType' => 'activityDateTime',
+      'input_type' => 'Select Date',
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
       ],
       'readonly' => TRUE,
       'add' => 5.76,
@@ -434,9 +434,7 @@ return [
       ],
       'default' => 'Draft',
       'localizable' => 0,
-      'html' => [
-        'type' => 'Select',
-      ],
+      'input_type' => 'Select',
       'pseudoconstant' => [
         'callback' => ['CRM_Core_SelectValues', 'getMailingJobStatus'],
       ],
@@ -608,6 +606,21 @@ return [
         'option_group_name' => 'languages',
         'key_column' => 'name',
       ],
+    ],
+    'unsubscribe_mode' => [
+      'title' => ts('One Click Unsubscribe Mode'),
+      'sql_type' => 'varchar(70)',
+      'input_type' => 'Select',
+      'description' => ts('One Click Unsubscribe mode either unsubscribe or opt-out'),
+      'add' => '6.7',
+      'input_attrs' => [
+        'label' => ts('One Click Unsubscribe Mode'),
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Mailing_Service_ListUnsubscribe', 'unsubscribeModes'],
+      ],
+      'default' => 'unsubscribe',
+      'required' => TRUE,
     ],
   ],
 ];

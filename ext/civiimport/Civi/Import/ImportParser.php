@@ -17,7 +17,9 @@ use Civi\Api4\CustomField;
 use Civi\Api4\DedupeRule;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
+use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Phone;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  *
@@ -78,6 +80,26 @@ abstract class ImportParser extends \CRM_Import_Parser {
   }
 
   /**
+   * @param string $entity
+   * @param string $condition
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getApplicableBundledActions(string $entity, string $condition): array {
+    $allActions = $this->getUserJob()['metadata']['bundled_actions'] ?? [];
+    $bundledActions = [];
+    foreach ($allActions as $action) {
+      $isApplies = isset($action['entity']) && $action['entity'] === $entity;
+      // FIXME: Evaluate action condition
+      if ($isApplies && $action['condition'] === $condition) {
+        $bundledActions[] = $action;
+      }
+    }
+    return $bundledActions;
+  }
+
+  /**
    * Get the actions to display in the rich UI.
    *
    * Filter by the input actions - e.g ['update' 'select'] will only return those keys.
@@ -124,13 +146,47 @@ abstract class ImportParser extends \CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException|\CRM_Core_Exception
    */
   protected function saveContact(string $entity, array $contact): ?int {
+    $api = NULL;
     if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])) {
-      return Contact::save()
-        ->setRecords([$contact])
-        ->execute()
+      $api = Contact::save()
+        ->setRecords([$contact]);
+    }
+
+    $bundledActions = $this->getApplicableBundledActions($entity, 'always');
+    foreach ($bundledActions as $action) {
+      if (!$api) {
+        $api = Contact::get()
+          ->addWhere('id', '=', $contact['id']);
+      }
+      $this->addAction($api, $action['action'], 'Contact');
+    }
+    if ($api) {
+      return $api->execute()
         ->first()['id'];
     }
     return NULL;
+  }
+
+  protected function addAction(AbstractAction $api, $action, $entityType) {
+    $apiCall = $this->getBundledAction($action, $entityType)['api'] ?? NULL;
+    if ($apiCall) {
+      $api->addChain($action, $apiCall);
+    }
+  }
+
+  protected function getBundledAction($action, $entityType): ?array {
+    $actions = self::getBundledActions();
+    return $actions[$entityType][$action] ?? NULL;
+  }
+
+  public static function getBundledActions(): array {
+    if (!isset(\Civi::$statics['civi.import.bundledActions'])) {
+      \Civi::$statics['civi.import.bundledActions'] = [];
+      $hookParams = ['actions' => &\Civi::$statics['civi.import.bundledActions']];
+      $event = GenericHookEvent::create($hookParams);
+      \Civi::dispatcher()->dispatch('civi.import.bundledActions', $event);
+    }
+    return \Civi::$statics['civi.import.bundledActions'];
   }
 
   /**
@@ -302,7 +358,8 @@ abstract class ImportParser extends \CRM_Import_Parser {
       $name = $this->getDefaultRuleForContactType($contactType);
     }
     if (empty($this->dedupeRules[$name])) {
-      $where = [['name', '=', $name]];
+      $canonicalName = str_ends_with($name, '.first') ? substr($name, 0, -6) : $name;
+      $where = [['name', '=', $canonicalName]];
       $this->loadRules($where);
     }
     return $this->dedupeRules[$name];
@@ -456,10 +513,10 @@ abstract class ImportParser extends \CRM_Import_Parser {
         continue;
       }
       $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-      // If there is no column header we are dealing with an added value mapping, do not use
-      // the database value as it will be for (e.g.) `_status`
-      $headers = $this->getUserJob()['metadata']['DataSource']['column_headers'];
-      if (array_key_exists($i, $headers) && empty($headers[$i])) {
+      // $values has some system fields in it. We can identify these as their index
+      // will be greater than the number_of_columns.
+      $numberOfColumns = $this->getUserJob()['metadata']['DataSource']['number_of_columns'];
+      if (($i + 1) > $numberOfColumns) {
         $fieldValue = '';
       }
       else {
@@ -475,6 +532,173 @@ abstract class ImportParser extends \CRM_Import_Parser {
       $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
     }
     return $this->removeEmptyValues($params);
+  }
+
+  /**
+   * Get the contact ID for the imported row.
+   *
+   * If we have a contact ID we check it is valid and, if there is also
+   * an external identifier we check it does not conflict.
+   *
+   * Failing those we try a dedupe lookup.
+   *
+   * @param array $contactParams
+   * @param int|null $contactID
+   * @param string $entity
+   *   Entity, as described in getImportEntities.
+   * @param array|null $dedupeRules
+   *   Dedupe rules to apply (will default to unsupervised rule)
+   *
+   * @return int|null
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactID(array $contactParams, ?int $contactID, string $entity, ?array $dedupeRules = NULL): ?int {
+    $contactType = $contactParams['contact_type'] ?? NULL;
+    if ($contactID) {
+      $this->validateContactID($contactID, $contactType);
+    }
+    if (!empty($contactParams['external_identifier'])) {
+      $contactID = $this->lookupExternalIdentifier($contactParams['external_identifier'], $contactType, $contactID ?? NULL);
+    }
+    if (!$contactID) {
+      $action = $this->getActionForEntity($entity);
+      $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams, $dedupeRules, $entity);
+      if (count($possibleMatches) === 1) {
+        $contactID = array_key_first($possibleMatches);
+      }
+      elseif (count($possibleMatches) > 1) {
+        throw new \CRM_Core_Exception(ts('Record duplicates multiple contacts:') . ' ' . implode(',', $possibleMatches));
+      }
+      elseif (!in_array($action, ['create', 'ignore', 'save'], TRUE)) {
+        throw new \CRM_Core_Exception(ts('No matching %1 found', [1 => $entity]));
+      }
+    }
+    if ($contactID && !isset($contactParams['is_deleted']) && $this->getExistingContactValue($contactID, 'is_deleted')) {
+      // The contact may have been merged since the contact ID was determined (common in cases where
+      // a list of contacts is exported and the some time later imported with augmented data.
+      // As long as is_deleted is not set (ie the importer is not trying to undelete the contact) we can
+      // use the merged to contact instead, if exists.
+      // Note using checkPermissions = FALSE as currently this requires administer CiviCRM
+      // but potentially reviewing that.
+      $result = Contact::getMergedTo(FALSE)
+        ->setContactId($contactID)
+        ->execute()->first();
+      if ($result) {
+        $contactID = $result['id'];
+      }
+      else {
+        throw new \CRM_Core_Exception(ts('Cannot import to a deleted contact %1', [1 => $contactID]));
+      }
+    }
+    return $contactID;
+  }
+
+  /**
+   * Get contacts that match the input parameters, using a dedupe rule.
+   *
+   * @param array $params
+   * @param int|null|array $dedupeRuleNames
+   * @param string $entity
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPossibleMatchesByDedupeRule(array $params, ?array $dedupeRuleNames, string $entity): array {
+    $matchIDs = [];
+    $dedupeRules = $this->getDedupeRules($dedupeRuleNames, $this->guessContactType($params));
+    foreach ($dedupeRules as $dedupeRule) {
+      if ($dedupeRule === 'unique_email_match') {
+        if (empty($params['email_primary.email'])) {
+          continue;
+        }
+        // This is a pseudo-rule that works across contact type...
+        foreach (Email::get()
+          ->addWhere('email', '=', $params['email_primary.email'])
+          ->addWhere('contact_id.is_deleted', '=', FALSE)
+          // More than 10 gets a bit silly.
+          ->setLimit(10)
+          ->execute()->indexBy('contact_id') as $match) {
+
+          $matchIDs[$match['contact_id']] = $match['contact_id'];
+        }
+      }
+      elseif ($dedupeRule !== 'unique_identifier_match') {
+        $isMatchFirst = str_ends_with($dedupeRule, '.first');
+        if ($isMatchFirst) {
+          $dedupeRule = substr($dedupeRule, 0, -6);
+        }
+        $possibleMatches = Contact::getDuplicates(FALSE)
+          ->setValues($params)
+          ->setDedupeRule($dedupeRule)
+          ->execute();
+
+        foreach ($possibleMatches as $possibleMatch) {
+          $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+          if ($isMatchFirst) {
+            if (count($possibleMatches) > 1) {
+              // Here is where the action kicks in - more than one was found so put them in a group.
+              $bundledActions = $this->getApplicableBundledActions($entity, 'on_multiple_match');
+              $api = NULL;
+              foreach ($bundledActions as $action) {
+                $api = Contact::get()
+                  ->addWhere('id', 'IN', $matchIDs);
+                $this->addAction($api, $action['action'], 'Contact');
+              }
+              if ($api) {
+                $api->execute();
+              }
+            }
+            return $matchIDs;
+          }
+        }
+      }
+    }
+
+    return $matchIDs;
+  }
+
+  /**
+   * Get the dedupe rules to use to lookup a contact.
+   *
+   * @param array|null $dedupeRuleNames
+   * @param string $contact_type
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDedupeRules(?array $dedupeRuleNames, string $contact_type) {
+    $dedupeRules = [];
+    if (!empty($dedupeRuleNames)) {
+      foreach ($dedupeRuleNames as $dedupeRuleName) {
+        $ruleInfo = $this->getDedupeRule($contact_type, $dedupeRuleName);
+        if (!$ruleInfo['contact_type'] || $contact_type === $ruleInfo['contact_type']) {
+          $dedupeRules[] = $dedupeRuleName;
+        }
+      }
+      return $dedupeRules;
+    }
+    if (empty($dedupeRules)) {
+      $dedupeRules[] = 'unique_identifier_match';
+    }
+    return $dedupeRules;
+  }
+
+  /**
+   * Get the dedupe rule name.
+   *
+   * @param int $id
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDedupeRuleName(int $id): string {
+    return DedupeRuleGroup::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->addSelect('name')
+      ->execute()->first()['name'];
   }
 
 }

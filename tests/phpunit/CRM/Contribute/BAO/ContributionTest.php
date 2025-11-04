@@ -25,6 +25,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_Financial_FinancialACLTrait;
   use CRMTraits_Financial_PriceSetTrait;
 
+  protected $iniSet = [];
+
   /**
    * Clean up after tests.
    */
@@ -32,6 +34,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->disableFinancialACLs();
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_campaign']);
+    foreach ($this->iniSet as $key => $value) {
+      ini_set($key, $value);
+    }
     parent::tearDown();
   }
 
@@ -1492,6 +1497,33 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $activityContact = $this->callAPISuccessGetSingle('ActivityContact', $activityContactParams);
 
     $this->assertEquals($activityContact['contact_id'], $contactId_2, 'Check target contact ID matches the second contact');
+  }
+
+  public function testPrecisionSettingUpdate(): void {
+    $this->iniSet['serialize_precision'] = ini_get('serialize_precision');
+    ini_set('serialize_precision', 17);
+    $this->createTestEntity('Contribution', [
+      'total_amount' => 7.71,
+      'fee_amount' => .20,
+      'contact_id' => $this->individualCreate(),
+      'financial_type_id:name' => 'Donation',
+      'contribution_status_id:name' => 'Completed',
+    ]);
+    // We can expect this to fail if the code was unable to retrieve
+    // the contribution due to a rounding issue.
+    // Directly after saving there is a contribution->find(TRUE)
+    // if this does not find the contribution then activity create will later
+    // fail
+    $net = '7.4500000000000002';
+    $contribution = Contribution::update(FALSE)
+      ->setValues([
+        'id' => $this->ids['Contribution']['default'],
+        'net_amount' => $net,
+        'fee_amount' => .26,
+        'total_amount' => 7.71,
+      ])
+      ->execute();
+    $this->assertCount(1, $contribution);
   }
 
   /**

@@ -35,7 +35,7 @@
       {/section}
     </table>
     <div id="optionFieldLink" class="add-remove-link">
-      <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another column{/ts}</a>
+      <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" role="img" aria-hidden="true"></i> {ts}another column{/ts}</a>
     </div>
     <script type="text/javascript">
       var showRows   = new Array({$showBlocks});

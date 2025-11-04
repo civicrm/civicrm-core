@@ -7,10 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-is_show_location-title"}
-  {ts}Show Location{/ts}
-{/htxt}
-{htxt id="id-is_show_location"}
+
+{htxt id='is_show_location'}
   {ts}If this option is selected, the location will be shown in various places including:
     <ul>
       <li>Event information page</li>

@@ -16,10 +16,10 @@
          {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
          {assign var='editUrlParams' value="reset=1&id=$participantId&cid=$contactId&action=update&context=$context&selectedChild=event&key=$searchKey"}
          {/if}
-             <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$editUrlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
+             <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$editUrlParams}" accesskey="e"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
           {/crmPermission}
           {crmPermission has='delete in CiviEvent'}
-            <a class="button" href="{crmURL p='civicrm/participant/delete' q="reset=1&id=$participantId"}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
+            <a class="button" href="{crmURL p='civicrm/participant/delete' q="reset=1&id=$participantId"}"><span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
           {/crmPermission}
 
         </div>
@@ -30,8 +30,8 @@
       <td>
         <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId"}" title="{ts escape='htmlattribute'}View contact record{/ts}">{$displayName|escape}</a></strong>
         <div>
-            <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}Print Name Badge{/ts}</a>
-            <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/participant/print' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}PDF letter - print for participant{/ts}</a>
+            <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" role="img" aria-hidden="true"></i> {ts}Print Name Badge{/ts}</a>
+            <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/participant/print' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" role="img" aria-hidden="true"></i> {ts}PDF letter - print for participant{/ts}</a>
         </div>
       </td>
   </tr>
@@ -88,12 +88,12 @@
         {include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount hookDiscount=false}
         {crmPermission has='edit event participants'}
           {if $hasPayment or $parentHasPayment}
-            <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
+            <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
           {else}
-            <a class="action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/participant" q=$editUrlParams}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
+            <a class="action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/participant" q=$editUrlParams}'><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
           {/if}
           {if $transferOrCancelLink}
-            <a class="action-item crm-hover-button" href={$transferOrCancelLink}><i class="crm-i fa-times" aria-hidden="true"></i> {ts}Transfer or Cancel{/ts}</a>
+            <a class="action-item crm-hover-button" href={$transferOrCancelLink}><i class="crm-i fa-times" role="img" aria-hidden="true"></i> {ts}Transfer or Cancel{/ts}</a>
           {/if}
         {/crmPermission}
         <div class="clear"></div>
@@ -109,7 +109,7 @@
       <div class="messages status no-popup">{icon icon="fa-info-circle"}{/icon} {ts}Note:{/ts} {$rec|escape|nl2br}</div>
     {/if}
   {/foreach}
-    {if $participantId and $hasPayment}
+    {if $participantId and $hasPayment and $accessCiviContribute}
       <div id="payment-info"></div>
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
     {/if}
@@ -119,10 +119,10 @@
     {/if}
     <div class="crm-submit-buttons">
       {crmPermission has='edit event participants'}
-        <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$editUrlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
+        <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$editUrlParams}" accesskey="e"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
       {/crmPermission}
       {crmPermission has='delete in CiviEvent'}
-        <a class="button" href="{crmURL p='civicrm/participant/delete' q="reset=1&id=$participantId"}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
+        <a class="button" href="{crmURL p='civicrm/participant/delete' q="reset=1&id=$participantId"}"><span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
       {/crmPermission}
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>

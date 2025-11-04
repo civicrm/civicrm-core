@@ -2,7 +2,7 @@
 <extension key="scheduled_communications" type="module">
   <file>scheduled_communications</file>
   <name>Scheduled Communications</name>
-  <description>Schedule communications using SearchKit</description>
+  <description>Schedule communications using SearchKit. This extension allows you to send standard scheduled reminders to contacts that you have selected in a SearchKit, relative to the dates of other entities, like activities, that are also in your SearchKit.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM</author>
@@ -18,6 +18,16 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>Click on the chat link above to discuss development, report problems or ask questions.</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>

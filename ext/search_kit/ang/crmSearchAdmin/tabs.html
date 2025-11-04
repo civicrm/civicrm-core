@@ -1,46 +1,46 @@
 <li role="tab" ng-class="{active: controls.tab === tab.key}" ng-repeat="tab in $ctrl.mainTabs">
   <a href ng-click="selectTab(tab.key)">
-    <i class="crm-i {{:: tab.icon }}"></i>
+    <i class="crm-i {{:: tab.icon }}" role="img" aria-hidden="true"></i>
     {{:: tab.title }}
   </a>
 </li>
 <li role="separator" class="disabled"></li>
 <li role="tab" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.groups.length" title="{{ !$ctrl.groupExists ? ts('Group will be deleted.') : '' }}">
   <a href ng-click="selectTab('group')" ng-disabled="!$ctrl.groupExists">
-    <i class="crm-i fa-users"></i>
+    <i class="crm-i fa-users" role="img" aria-hidden="true"></i>
     {{:: ts('Smart Group') }} {{ $ctrl.savedSearch.groups[0].title }}
   </a>
   <button type="button" class="btn btn-xs btn-danger-outline crm-search-display-control" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
-    <i class="crm-i fa-{{ $ctrl.groupExists ? 'trash' : 'undo' }}"></i>
+    <i class="crm-i fa-{{ $ctrl.groupExists ? 'trash' : 'undo' }}" role="img" aria-hidden="true"></i>
   </button>
 </li>
 <li role="tab" ng-repeat="display in $ctrl.savedSearch.displays" ng-class="{active: controls.tab === ('display_' + $index)}" title="{{ display.trashed ? ts('Display will be deleted.') : '' }}">
   <a href ng-click="selectTab('display_' + $index)" ng-disabled="display.trashed">
-    <i class="crm-i {{ $ctrl.displayTypes[display.type].icon }}"></i>
+    <i class="crm-i {{ $ctrl.displayTypes[display.type].icon }}" role="img" aria-hidden="true"></i>
     {{ display.label || ts('Untitled') }}
   </a>
   <button type="button" class="btn btn-xs btn-danger-outline crm-search-display-control" ng-click="$ctrl.removeDisplay($index)" title="{{ display.trashed ? ts('Undelete') : ts('Delete') }}">
-    <i class="crm-i fa-{{ display.trashed ? 'undo' : 'trash' }}"></i>
+    <i class="crm-i fa-{{ display.trashed ? 'undo' : 'trash' }}" role="img" aria-hidden="true"></i>
   </button>
   <button type="button" class="btn btn-xs btn-primary-outline crm-search-display-control" ng-if="!display.trashed" ng-click="$ctrl.cloneDisplay(display)" title="{{:: ts('Clone display') }}">
-    <i class="crm-i fa-copy"></i>
+    <i class="crm-i fa-copy" role="img" aria-hidden="true"></i>
   </button>
 </li>
 <li role="tab">
   <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="crm-i fa-plus"></i> {{:: ts('Add...') }} <span class="caret"></span>
+    <i class="crm-i fa-plus" role="img" aria-hidden="true"></i> {{:: ts('Add...') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
     <li ng-if="$ctrl.canAddSmartGroup()" title="{{:: ts('Smart group of contacts based on search results') }}">
       <a href ng-click="$ctrl.addGroup()">
-        <i class="crm-i fa-users"></i>
+        <i class="crm-i fa-users" role="img" aria-hidden="true"></i>
         {{:: ts('Smart Group') }}
       </a>
     </li>
     <li class="dropdown-header">{{:: ts('Display') }}</li>
     <li ng-repeat="type in ::$ctrl.displayTypes">
       <a href ng-click="$ctrl.addDisplay(type.id)" title="{{:: type.description }}">
-        <i class="crm-i {{:: type.icon }}"></i>
+        <i class="crm-i {{:: type.icon }}" role="img" aria-hidden="true"></i>
         {{:: type.label }}
       </a>
     </li>

@@ -314,7 +314,7 @@ class civicrm_cli {
     $out .= "  --output will pretty print the result from the api call\n";
     $out .= "  --json will print the result from the api call as JSON\n";
     $out .= "  PARAMS is one or more --param=value combinations to pass to the api\n";
-    return ts($out);
+    return $out;
   }
 
   /**
@@ -351,7 +351,6 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
     }
 
     $out = fopen("php://output", 'w');
-    fputcsv($out, $this->columns, $this->separator, '"');
 
     $this->row = 1;
     $result = civicrm_api($this->_entity, 'Get', $this->_params);
@@ -366,7 +365,7 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
       foreach ($row as &$field) {
         if (is_array($field)) {
           //convert to string
-          $field = implode($field, CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
+          $field = implode(CRM_Core_DAO::VALUE_SEPARATOR, $field) . CRM_Core_DAO::VALUE_SEPARATOR;
         }
       }
       fputcsv($out, $row, $this->separator, '"');

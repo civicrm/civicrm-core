@@ -41,7 +41,12 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       $savedSearch = [
         'api_entity' => 'Contact',
       ];
-      $apiParams = [];
+      $apiParams = [
+        'where' => [
+          // Api4 automatically adds this to most Contact queries, but not within Unions.
+          ['is_deleted', '=', FALSE],
+        ],
+      ];
 
       $allowedFilters = \Civi::settings()->get('quicksearch_options');
       foreach ($apiRequest->getFilters() as $filterField => $val) {
@@ -149,7 +154,11 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         $prefix = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
         foreach ($filterFields as $field) {
           $params = $apiParams;
-          $params['where'] = [[$field, 'LIKE', $prefix . $apiRequest->getInput() . '%']];
+          $params['where'][] = [$field, 'LIKE', $prefix . $apiRequest->getInput() . '%'];
+          // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
+          $params['select'] = array_map(function ($field) {
+            return explode(':', $field)[0];
+          }, $params['select']);
           $savedSearch['api_params']['sets'][] = ['UNION DISTINCT', 'Contact', 'get', $params];
         }
         // Remove filter as we've already embedded it in the WHERE clauses of each UNION

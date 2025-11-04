@@ -7,8 +7,8 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminExport.html',
     controller: function ($scope, $element, crmApi4) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
+      const ctrl = this;
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
 
       this.types = [
@@ -21,39 +21,52 @@
         this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?_format=php&cleanup=always&id=' + ctrl.savedSearch.id);
         this.simpleLink = CRM.url('civicrm/admin/search#/create/' + ctrl.savedSearch.api_entity + '?params=' + encodeURI(angular.toJson(ctrl.savedSearch.api_params)));
 
-        let apiCalls = [
+        const apiCalls = [
           ['SavedSearch', 'export', {id: ctrl.savedSearch.id}],
         ];
         if (ctrl.afformEnabled) {
-          let findDisplays = [['search_displays', 'CONTAINS', ctrl.savedSearch.name]];
+          const findDisplays = [['search_displays', 'CONTAINS', ctrl.savedSearch.name]];
           if (ctrl.savedSearch.display_name) {
             ctrl.savedSearch.display_name.forEach(displayName => {
               findDisplays.push(['search_displays', 'CONTAINS', `${ctrl.savedSearch.name}.${displayName}`]);
             });
           }
+          apiCalls.push(['Afform', 'getFields', {action: 'create', select: ['name'], where: [['readonly', '=', false], ['type', '=', 'Field']]}, ['name']]);
           apiCalls.push(['Afform', 'get', {layoutFormat: 'html', where: [['type', '=', 'search'], ['OR', findDisplays]]}]);
         }
         crmApi4(apiCalls)
           .then(function(result) {
-            _.each(ctrl.types, function (type) {
-              var params = _.pluck(_.where(result[0], {entity: type.entity}), 'params');
-              type.values = _.pluck(params, 'values');
+            ctrl.types.forEach(type => {
+              const params = result[0]
+                .filter(item => item.entity === type.entity)
+                .map(item => item.params);
+              type.values = params.map(param => param.values);
               type.match = params[0] && params[0].match;
               type.enabled = !!params.length;
             });
             // Afforms are not included in the export and are fetched separately
             if (ctrl.afformEnabled) {
-              ctrl.types.push({entity: 'Afform', enabled: !!result[1].length, values: _.toArray(result[1]), title: ts('1 Form'), plural: ts('%1 Forms')});
+              const afformFields = result[1];
+              // Filter out readonly and null fields
+              const afforms = result[2].map(afform => {
+                return afformFields.reduce((obj, key) => {
+                  if (key in afform && afform[key] !== null) {
+                    obj[key] = afform[key];
+                  }
+                  return obj;
+                }, {});
+              });
+              ctrl.types.push({entity: 'Afform', enabled: !!afforms.length, values: afforms, title: ts('1 Form'), plural: ts('%1 Forms')});
             }
             ctrl.refreshOutput();
           });
       };
 
       this.refreshOutput = function() {
-        var data = [];
-        _.each(ctrl.types, function(type) {
+        const data = [];
+        ctrl.types.forEach(function(type) {
           if (type.enabled) {
-            var params = {records: type.values};
+            const params = {records: type.values};
             if (type.match && type.match.length) {
               params.match = type.match;
             }
@@ -65,9 +78,36 @@
       };
 
       this.copyToClipboard = function() {
-        document.getElementById('crm-search-admin-export-output-code').select();
-        document.execCommand('copy');
-        ctrl.copied = true;
+        const textElement = document.getElementById('crm-search-admin-export-output-code');
+
+        function copyWithClipboardApi() {
+          navigator.clipboard.writeText(textElement.value)
+            .then(() => {
+              $scope.$evalAsync(() => {
+                ctrl.copied = true;
+              });
+            })
+            .catch(error => {
+              $scope.$evalAsync(legacyCopy);
+            });
+        }
+
+        function legacyCopy() {
+          textElement.select();
+          document.execCommand('copy');
+          ctrl.copied = true;
+        }
+
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            copyWithClipboardApi();
+          } else {
+            legacyCopy();
+          }
+        } catch (error) {
+          console.error('Failed to copy text: ', error);
+          ctrl.copied = false;
+        }
       };
     }
   });

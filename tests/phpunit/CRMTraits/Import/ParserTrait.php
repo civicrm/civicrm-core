@@ -42,11 +42,9 @@ trait CRMTraits_Import_ParserTrait {
     $submittedValues = array_merge([
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => 'Individual',
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
-      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'groups' => [],
     ], $submittedValues);
     $this->submitDataSourceForm($csv, $submittedValues);
@@ -56,7 +54,8 @@ trait CRMTraits_Import_ParserTrait {
       ->addWhere('id', '=', $this->userJobID)
       ->execute()->first()['metadata'];
     $userJobMetadata['entity_configuration'][$userJobMetadata['base_entity']]['action'] = $action;
-    $userJobMetadata['entity_configuration']['Contact']['contact_type'] = $submittedValues['contactType'];
+    $userJobMetadata['entity_configuration']['Contact']['contact_type'] = $submittedValues['contactType'] ?? 'Individual';
+    $userJobMetadata['entity_configuration']['Contact']['dedupe_rule'] = ['IndividualUnsupervised'];
     foreach ($fieldMappings as $index => $mapping) {
       if (isset($mapping['entity_data'])) {
         $userJobMetadata['entity_configuration']['SoftCreditContact'] = $mapping['entity_data']['soft_credit'];
@@ -81,7 +80,7 @@ trait CRMTraits_Import_ParserTrait {
       ])
       ->execute();
     $form->buildForm();
-    $this->assertTrue($form->validate());
+    $this->assertTrue($form->validate(), 'Form failed to validate that the fields submitted met the form / dedupe rule requirements ' . print_r($form->_errors, TRUE));
     $form->postProcess();
     $this->submitPreviewForm($submittedValues);
   }
@@ -216,11 +215,11 @@ trait CRMTraits_Import_ParserTrait {
    *
    * @param array $mappings
    * @param string $contactType
+   * @param array|null $dedupeRules
    *
    * @return void
-   *
    */
-  public function updateJobMetadata(array $mappings, string $contactType): void {
+  public function updateJobMetadata(array $mappings, string $contactType, ?array $dedupeRules = NULL): void {
     try {
       $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)
         ->execute()->single()['metadata'];
@@ -229,6 +228,9 @@ trait CRMTraits_Import_ParserTrait {
       }
       if ($contactType) {
         $metadata['entity_configuration']['Contact']['contact_type'] = $contactType;
+      }
+      if ($dedupeRules) {
+        $metadata['entity_configuration']['Contact']['dedupe_rule'] = $dedupeRules;
       }
       UserJob::update()
         ->addWhere('id', '=', $this->userJobID)

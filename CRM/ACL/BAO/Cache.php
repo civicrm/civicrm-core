@@ -85,15 +85,20 @@ SELECT acl_id
    */
   protected static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
-      $dao = new CRM_ACL_BAO_Cache();
-      if ($id) {
-        $dao->contact_id = $id;
-      }
-      $dao->acl_id = $aclID;
-
       $cache[$aclID] = 1;
 
-      $dao->save();
+      if ($id) {
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_cache (acl_id, contact_id) VALUES (%1, %2)", [
+          1  => [$aclID, 'Integer'],
+          2 => [$id, 'Integer'],
+        ]);
+      }
+      else {
+        // contact_id is null if the user is not logged in. Not sure why we need to insert a record for NULL though?
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_cache (acl_id, contact_id) VALUES (%1, NULL)", [
+          1  => [$aclID, 'Integer'],
+        ]);
+      }
     }
   }
 

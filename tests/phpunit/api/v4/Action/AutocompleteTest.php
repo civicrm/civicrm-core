@@ -361,6 +361,24 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('Second Star', $result[0]['label']);
   }
 
+  public function testMailingAutocompleteWithSpecialCharacter(): void {
+    $this->createTestRecord('Group', [
+      'title' => 'Donors contributed > $100',
+      'frontend_title' => 'Donors contributed > $100',
+      'name' => 'Donors_contributed',
+      'group_type:name' => 'Mailing List',
+    ]);
+
+    // search by special character '>'
+    $result = EntitySet::autocomplete()
+      ->setInput('>')
+      ->setFieldName('Mailing.recipients_include')
+      ->setFormName('crmMailing.1')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('Donors contributed > $100', $result[0]['label']);
+  }
+
   /**
    * Emulates the behavior of `$.fn.crmAutocomplete` in Common.js
    *

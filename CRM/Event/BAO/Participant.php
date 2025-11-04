@@ -45,88 +45,11 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
   ];
 
   /**
-   * Takes an associative array and creates a participant object.
-   *
-   * the function extract all the params it needs to initialize the create a
-   * participant object. the params array could contain additional unused name/value
-   * pairs
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
+   * @deprecated
    * @return CRM_Event_BAO_Participant
    */
-  public static function &add(&$params) {
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'Participant', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Participant', NULL, $params);
-    }
-
-    // converting dates to mysql format
-    if (!empty($params['register_date'])) {
-      $params['register_date'] = CRM_Utils_Date::isoToMysql($params['register_date']);
-    }
-
-    if (!empty($params['participant_fee_amount'])) {
-      $params['participant_fee_amount'] = CRM_Utils_Rule::cleanMoney($params['participant_fee_amount']);
-    }
-
-    // ensure that role ids are encoded as a string
-    if (isset($params['role_id']) && is_array($params['role_id'])) {
-      if (in_array(key($params['role_id']), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-        $op = key($params['role_id']);
-        $params['role_id'] = $params['role_id'][$op];
-      }
-      else {
-        $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
-      }
-    }
-
-    $participantBAO = new CRM_Event_BAO_Participant();
-    if (!empty($params['id'])) {
-      $participantBAO->id = $params['id'] ?? NULL;
-      $participantBAO->find(TRUE);
-      $participantBAO->register_date = CRM_Utils_Date::isoToMysql($participantBAO->register_date);
-    }
-
-    $participantBAO->copyValues($params);
-
-    //CRM-6910
-    //1. If currency present, it should be valid one.
-    //2. We should have currency when amount is not null.
-    $currency = $participantBAO->fee_currency;
-    if ($currency ||
-      !CRM_Utils_System::isNull($participantBAO->fee_amount)
-    ) {
-      if (!CRM_Utils_Rule::currencyCode($currency)) {
-        $config = CRM_Core_Config::singleton();
-        $currency = $config->defaultCurrency;
-      }
-    }
-    $participantBAO->fee_currency = $currency;
-
-    $participantBAO->save();
-
-    // add custom field values
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participantBAO->id);
-    }
-
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Participant', $participantBAO->id, $participantBAO);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Participant', $participantBAO->id, $participantBAO);
-    }
-
-    return $participantBAO;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**
@@ -176,6 +99,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     }
 
     $participant = self::add($params);
+    $participant->find(TRUE);
 
     // Log activity when creating new participant or changing status
     if (empty($params['id']) ||
@@ -1672,9 +1596,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID = NULL) {
     $financialTypeID = $contributionParams['contribution']->financial_type_id;
     $total_amount = $contributionParams['total_amount'];
-    if (is_array($feeLevel)) {
-      CRM_Core_Error::deprecatedFunctionWarning('array passed for string value');
-      $feeLevel = (string) current($feeLevel);
+    if (empty($discountedPriceFieldOptionID)) {
+      CRM_Core_Error::deprecatedWarning('not passing the option ID is deprecated');
     }
 
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
@@ -1872,41 +1795,71 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    // Set the default role ID on create.
-    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['role_id'])) {
-      if (!empty($event->params['event_id'])) {
-        $event->params['role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->params['event_id'], 'default_role_id');
-      }
-      else {
-        $params['role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE id = %1', [
-          1 => [$event->params['event_id'], 'Integer'],
-        ]);
-      }
+    $params = &$event->params;
+
+    // Is this still necessary?
+    if (!empty($params['participant_fee_amount'])) {
+      $params['participant_fee_amount'] = CRM_Utils_Rule::cleanMoney($params['participant_fee_amount']);
     }
-    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['created_id'])) {
-      // Set the "created_id" field if not already set.
-      // The created_id should always be the person that actually did the registration.
-      // That might be the first participant, but it might be someone registering someone without registering themselves.
-      // 1. Prefer logged in contact id
-      // 2. Fall back to 'registered_by_id' param.
-      // 3. Fall back to participant contact_id (for anonymous person registering themselves)
-      $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
-      if (empty($event->params['created_id'])) {
-        if (!empty($event->params['registered_by_id'])) {
-          // No logged in contact but participant was registered by someone else.
-          // Look up the contact ID of that participant and record
-          $participant = \Civi\Api4\Participant::get(FALSE)
-            ->addSelect('contact_id')
-            ->addWhere('id', '=', $event->params['registered_by_id'])
-            ->execute()
-            ->first();
-          $event->params['created_id'] = $participant['contact_id'];
+
+    if ($event->action === 'create') {
+      //CRM-6910
+      //1. If currency present, it should be valid one.
+      //2. We should have currency when amount is not null.
+      $currency = $params['fee_currency'] ?? NULL;
+      if ($currency || !empty($params['fee_amount'])) {
+        if (!CRM_Utils_Rule::currencyCode($currency)) {
+          $config = CRM_Core_Config::singleton();
+          $currency = $config->defaultCurrency;
+        }
+        $params['fee_currency'] = $currency;
+      }
+
+      // Set the default role ID on create.
+      if (empty($params['role_id'])) {
+        if (!empty($params['event_id'])) {
+          $params['role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'default_role_id');
         }
         else {
-          $event->params['created_id'] = $event->params['contact_id'];
+          $params['role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE id = %1', [
+            1 => [$params['event_id'], 'Integer'],
+          ]);
+        }
+      }
+      if (empty($params['created_id'])) {
+        // Set the "created_id" field if not already set.
+        // The created_id should always be the person that actually did the registration.
+        // That might be the first participant, but it might be someone registering someone without registering themselves.
+        // 1. Prefer logged in contact id
+        // 2. Fall back to 'registered_by_id' param.
+        // 3. Fall back to participant contact_id (for anonymous person registering themselves)
+        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
+        if (empty($params['created_id'])) {
+          if (!empty($params['registered_by_id'])) {
+            // No logged in contact but participant was registered by someone else.
+            // Look up the contact ID of that participant and record
+            $participant = \Civi\Api4\Participant::get(FALSE)
+              ->addSelect('contact_id')
+              ->addWhere('id', '=', $params['registered_by_id'])
+              ->execute()
+              ->first();
+            $params['created_id'] = $participant['contact_id'];
+          }
+          else {
+            $params['created_id'] = $params['contact_id'];
+          }
         }
       }
     }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
   /**

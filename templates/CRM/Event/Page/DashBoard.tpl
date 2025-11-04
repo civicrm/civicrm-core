@@ -10,33 +10,29 @@
 {* CiviEvent DashBoard (launch page) *}
 {capture assign=newEventURL}{crmURL p="civicrm/event/add" q="action=add&reset=1"}{/capture}
 {capture assign=configPagesURL}{crmURL p="civicrm/event/manage" q="reset=1"}{/capture}
-
+<div class="crm-submit-buttons">
+  <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list" role="img" aria-hidden="true"></i> {ts}Manage Events{/ts}</span></a>
+  <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o" role="img" aria-hidden="true"></i> {ts}New Event{/ts}</span></a>
+</div>
+<div class="clear"></div>
 {if $eventSummary.total_events}
-    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list" aria-hidden="true"></i> {ts}Manage Events{/ts}</span></a>
-    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o" aria-hidden="true"></i> {ts}New Event{/ts}</span></a>
-    <div class="clear">&nbsp;</div>
-    <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
-      {help id="id-event-intro"}
-    </h3>
-    <div class="crm-clearfix">
-      {include file="CRM/Event/Page/iCalLinks.tpl"}
-    </div>
-    {include file="CRM/common/jsortable.tpl"}
-    <table id="options" class="display">
+  <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts} {help id="id-event-intro"}</h3>
+  {include file="CRM/common/jsortable.tpl"}
+  <table id="options" class="display">
     <thead>
-    <tr>
-  <th>{ts}Event{/ts}</th>
-  <th>{ts}ID{/ts}</th>
-  <th>{ts}Type{/ts}</th>
-  <th id="nosort">{ts}Public{/ts}</th>
-  <th id="nosort">{ts}Date(s){/ts}</th>
-  <th id="nosort">{ts}Participants{/ts}</th>
+      <tr>
+        <th>{ts}Event{/ts}</th>
+        <th>{ts}ID{/ts}</th>
+        <th>{ts}Type{/ts}</th>
+        <th id="nosort">{ts}Public{/ts}</th>
+        <th id="nosort">{ts}Date(s){/ts}</th>
+        <th id="nosort">{ts}Participants{/ts}</th>
         {if $actionColumn}<th></th>{/if}
-    </tr>
+      </tr>
     </thead>
     <tbody>
     {foreach from=$eventSummary.events item=values key=id}
-    <tr class="crm-event_{$id}">
+      <tr class="crm-event_{$id}">
         <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts escape='htmlattribute'}View event info page{/ts}">{$values.eventTitle|smarty:nodefaults|purify}</a>
             {if $values.is_repeating_event}
                 <br/>
@@ -89,7 +85,7 @@
       {if $actionColumn}
         <td class="crm-event-isMap">
           {if $values.isMap}
-            <a href="{$values.isMap}" title="{ts escape='htmlattribute'}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
+            <a href="{$values.isMap}" title="{ts escape='htmlattribute'}Map event location{/ts}"><i class="crm-i fa-map-marker" role="img" aria-hidden="true"></i> {ts}Map{/ts}</a>
             &nbsp;|&nbsp;
           {/if}
           {if $values.configure}
@@ -116,14 +112,16 @@
       {/if}
     </tr>
     {/foreach}
-
     </tbody>
     </table>
     {if $eventSummary.total_events GT 10}
-     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Browse more events{/ts}...</a></div>
+     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Browse more events{/ts}...</a></div>
     {/if}
+    <div class="float-right">
+      {include file="CRM/Event/Page/iCalLinks.tpl"}
+    </div>
+    <div class="clear"></div>
 {else}
-    <br />
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
       {ts}There are no active Events to display.{/ts}

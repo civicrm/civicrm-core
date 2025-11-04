@@ -16,14 +16,9 @@
  */
 
 /**
- * Adds inline help.
+ * Adds markup for inline help link.
  *
- * This function adds a call to the js function which loads the help text in a pop-up.
- *
- * It does a lot of work to get the title which it passes into the crmHelp function
- * but the main reason it gets that title is because it adds that to the css as
- * title & aria-label. Since it's loaded it somewhat makes sense to pass it into
- * CRM.help but .. it's confusing.
+ * Help-icon link calls js function which loads the help text in ajax pop-up.
  *
  * @param array $params
  *   The function params.
@@ -41,75 +36,35 @@ function smarty_function_help($params, $smarty) {
     unset($params['values']);
   }
 
-  if (!isset($params['id']) || !isset($smarty->getTemplateVars()['config'])) {
+  $tplVars = $smarty->getTemplateVars();
+
+  if (!isset($params['id']) || !isset($tplVars['config'])) {
     return NULL;
   }
 
-  if (empty($params['file']) && isset($smarty->getTemplateVars()['tplFile'])) {
-    $params['file'] = $smarty->getTemplateVars()['tplFile'];
+  if (empty($params['file']) && isset($tplVars['tplFile'])) {
+    $params['file'] = $tplVars['tplFile'];
   }
   elseif (empty($params['file'])) {
     return NULL;
   }
 
   $params['file'] = str_replace(['.tpl', '.hlp'], '', $params['file']);
-  $fieldID = str_replace('-', '_', preg_replace('/^id-/', '', $params['id']));
 
+  // Title passed in explicitly
   if (!empty($params['title'])) {
-    // Passing in title is preferable..... ideally we would always pass in title & remove from the .hlp files....
-    $helpTextTitle = trim(strip_tags($params['title'])) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
+    // Remove possible `<label>` markup
+    $helpTextTitle = trim(strip_tags($params['title']));
   }
-  else {
-    $vars = $smarty->getTemplateVars();
-
-    // The way this works is a bit bonkers. All the .hlp files are expecting an
-    // assign called $params (which is different from our php var here called
-    // $params), and it does get assigned via ajax via
-    // CRM_Core_Page_Inline_Help when you click the help bubble (i.e. the link
-    // that we return at the bottom below). But right now when we fetch the
-    // file on the next line, there is no params. So it gives a notice. So
-    // let's assign something.
-    // We also need to assign the id for the title we are looking for, which
-    // will not be present in Smarty 3 otherwise.
-    // It's also awkward since the ONLY reason we're fetching the file
-    // now is to get the help section's title and we don't care about the rest
-    // of the file, but that is a bit of a separate issue.
-    $temporary_vars = ['id' => $params['id'] . '-title'];
-    if (!array_key_exists('params', $vars)) {
-      // In the unlikely event that params already exists, we don't want to
-      // overwrite it, so only do this if not already set.
-      $temporary_vars += ['params' => []];
+  // Infer title from form field label
+  if (empty($helpTextTitle)) {
+    $fieldID = $params['id'];
+    // Support legacy naming convention in older `.hlp` files (convert e.g. `id-frontend-title` to `frontend_title`)
+    if (str_contains($fieldID, '-')) {
+      $fieldID = str_replace('-', '_', preg_replace('/^id-/', '', $fieldID));
     }
-
-    $helpFile = $params['file'] . '.hlp';
-    $additionalFile = $params['file'] . '.extra.hlp';
-    $coreSmarty = CRM_Core_Smarty::singleton();
-    $directories = $coreSmarty->getTemplateDir();
-    $helpText = '';
-    foreach ($directories as $directory) {
-      if (CRM_Utils_File::isIncludable($directory . $helpFile)) {
-        $helpText = file_get_contents($directory . $helpFile);
-        break;
-      }
-    }
-    $additionalTexts = [];
-    foreach ($directories as $directory) {
-      if (CRM_Utils_File::isIncludable($directory . $additionalFile)) {
-        $additionalTexts[] = file_get_contents($directory . $additionalFile);
-        break;
-      }
-    }
-    try {
-      $coreSmarty->pushScope($temporary_vars);
-      $helpTextTitle = trim(CRM_Utils_String::parseOneOffStringThroughSmarty($helpText) ?: $vars['form'][$fieldID]['textLabel'] ?? '');
-      foreach ($additionalTexts as $additionalText) {
-        $additionalTextTitle = trim(CRM_Utils_String::parseOneOffStringThroughSmarty($additionalText));
-        $helpTextTitle = ($smarty->getTemplateVars('override_help_text') || empty($helpTextTitle)) ? $additionalTextTitle : $helpTextTitle . ' ' . $additionalTextTitle;
-      }
-    }
-    finally {
-      $coreSmarty->popScope();
-    }
+    // Use fieldTitle... fall back to pageTitle if nothing else
+    $helpTextTitle = $tplVars['form'][$fieldID]['textLabel'] ?? $tplVars['docTitle'] ?? $tplVars['pageTitle'] ?? '';
   }
 
   $class = "helpicon";
@@ -123,7 +78,7 @@ function smarty_function_help($params, $smarty) {
   $helpTextTitle = htmlspecialchars(json_encode($helpTextTitle), ENT_QUOTES);
 
   // Format params to survive being passed through json & the url
-  unset($params['text'], $params['title']);
+  unset($params['text'], $params['title'], $params['class']);
   foreach ($params as &$param) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }

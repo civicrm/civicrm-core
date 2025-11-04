@@ -495,11 +495,6 @@ SELECT  id, html_type
               $optionFullTotalAmount += $option['amount'] ?? 0;
             }
           }
-          else {
-            if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
-              unset($optionFullIds[$optId]);
-            }
-          }
         }
         $option['is_full'] = $isFull;
         $option['total_option_count'] = $dbTotalCount + $currentTotalCount;

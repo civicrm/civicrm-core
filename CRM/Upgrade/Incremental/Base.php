@@ -804,6 +804,9 @@ class CRM_Upgrade_Incremental_Base {
   public static function createEntityTable($ctx, string $fileName): bool {
     $filePath = __DIR__ . "/schema/$fileName";
     $entityDefn = include $filePath;
+    if (empty($entityDefn)) {
+      throw new \CRM_Core_Exception("Upgrader cannot create table. File $filePath is malformed or nonexistent.");
+    }
     $sql = Civi::schemaHelper()->arrayToSql($entityDefn);
     CRM_Core_DAO::executeQuery($sql);
     return TRUE;

@@ -1,10 +1,10 @@
 <span ng-if="$ctrl.defn.display_format === 'file' && dataProvider.getFieldData()[$ctrl.fieldName].file_name">
   <a ng-if="dataProvider.getFieldData()[$ctrl.fieldName].url" ng-href="{{:: dataProvider.getFieldData()[$ctrl.fieldName].url }}">
-    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
+    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}" role="img" aria-hidden="true"></i>
     {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
   </a>
   <span ng-if="!dataProvider.getFieldData()[$ctrl.fieldName].url">
-    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
+    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}" role="img" aria-hidden="true"></i>
     {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
   </span>
 </span>

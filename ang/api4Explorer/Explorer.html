@@ -41,15 +41,15 @@
           <label class="radio-inline">
             <input type="radio" ng-model="params[name]" ng-value="false" />false
           </label>
-          <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="params[name] !== null"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+          <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="params[name] !== null"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
         </div>
         <fieldset class="api4-input" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select">
           <legend>select<span class="crm-marker" ng-if="::availableParams.select.required"> *</span></legend>
           <div ng-model="params.select" ui-sortable="{axis: 'y'}">
             <div class="api4-input form-inline" ng-repeat="item in params.select track by $index" ng-show="item !== 'row_count'">
-              <i class="crm-i fa-arrows" aria-hidden="true"></i>
+              <i class="crm-i fa-arrows" role="img" aria-hidden="true"></i>
               <input class="form-control" type="text" ng-model="params.select[$index]" />
-              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('select', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('select', $index)"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
             </div>
           </div>
           <div class="api4-input form-inline">
@@ -61,7 +61,7 @@
           <div ng-model="params.join" ui-sortable="{axis: 'y', containment: '#api4-join-fieldset'}">
             <fieldset ng-repeat="item in params.join track by $index">
               <div class="api4-input form-inline">
-                <i class="crm-i fa-arrows"></i>
+                <i class="crm-i fa-arrows" role="img" aria-hidden="true"></i>
                 <input class="form-control twenty" type="text" ng-model="params.join[$index][0]" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.buildFieldList()"/>
                 <label>{{:: ts('Required:') }}</label>
                 <select class="form-control eight" ng-model="params.join[$index][1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
@@ -69,7 +69,7 @@
                 <select class="form-control twelve" ng-model="params.join[$index][2]" ng-options="e.name as e.name for e in ::bridgeEntities" ng-change="$ctrl.buildFieldList()">
                   <option value="">{{:: ts('- none -') }}</option>
                 </select>
-                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('join', $index)"><i class="crm-i fa-times"></i></a>
+                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('join', $index)"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
               </div>
               <fieldset class="api4-clause-fieldset">
                 <crm-api4-clause clauses="params.join[$index]" format="plain" skip="3" op="AND" label="On" fields="fieldsAndJoins" ></crm-api4-clause>
@@ -92,7 +92,7 @@
           <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
           <input class="form-control twelve" ng-if="::!param.options" type="{{:: (param.type[0] === 'int' || param.type[0] === 'float') && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]"/>
           <select class="form-control crm-auto-width" ng-if="::param.options" ng-options="o for o in ::param.options" id="api4-param-{{:: name }}" ng-model="params[name]"></select>
-          <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="!!params[name]"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+          <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="!!params[name]"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
         </div>
         <div class="api4-input" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['array', 'mixed'])">
           <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
@@ -119,9 +119,9 @@
           <legend>groupBy<span class="crm-marker" ng-if="::availableParams.groupBy.required"> *</span></legend>
           <div ng-model="params.groupBy" ui-sortable="{axis: 'y'}">
             <div class="api4-input form-inline" ng-repeat="item in params.groupBy track by $index">
-              <i class="crm-i fa-arrows" aria-hidden="true"></i>
+              <i class="crm-i fa-arrows" role="img" aria-hidden="true"></i>
               <input class="form-control" type="text" ng-model="params.groupBy[$index]" />
-              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('groupBy', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('groupBy', $index)"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
             </div>
           </div>
           <div class="api4-input form-inline">
@@ -135,13 +135,13 @@
           <legend>orderBy<span class="crm-marker" ng-if="::availableParams.orderBy.required"> *</span></legend>
           <div ng-model="params.orderBy" ui-sortable="{axis: 'y'}">
             <div class="api4-input form-inline" ng-repeat="clause in params.orderBy">
-              <i class="crm-i fa-arrows" aria-hidden="true"></i>
+              <i class="crm-i fa-arrows" role="img" aria-hidden="true"></i>
               <input class="form-control" type="text" ng-model="clause[0]" />
               <select class="form-control crm-auto-width" ng-model="clause[1]">
                 <option value="ASC">ASC</option>
                 <option value="DESC">DESC</option>
               </select>
-              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('orderBy', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+              <a href class="crm-hover-button" title="Clear" ng-click="clearParam('orderBy', $index)"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
             </div>
           </div>
           <div class="api4-input form-inline">
@@ -158,7 +158,7 @@
               <label for="api4-param-offset">offset<span class="crm-marker" ng-if="::availableParams.offset.required"> *</span></label>
               <input class="form-control" type="number" min="0" id="api4-param-offset" ng-model="params.offset"/>
             </span>
-            <a href class="crm-hover-button" title="Clear" ng-click="clearParam('limit');clearParam('offset');" ng-show="!!params.limit || !!params.offset"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+            <a href class="crm-hover-button" title="Clear" ng-click="clearParam('limit');clearParam('offset');" ng-show="!!params.limit || !!params.offset"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
           </div>
         </fieldset>
         <fieldset ng-if="::availableParams.sets" ng-mouseenter="help('sets', availableParams.sets)" ng-mouseleave="help()">
@@ -214,26 +214,26 @@
           <p>
             {{:: ts('To enable REST authentication, the AuthX extension must be installed.') }}
             <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/extensions') }}">
-              <i class="crm-i fa-gear"></i> {{:: ts('Manage Extensions') }}
+              <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> {{:: ts('Manage Extensions') }}
             </a>
           </p>
         </div>
         <div class="alert alert-warning" ng-if="selectedTab.code === 'rest' && $ctrl.authxEnabled">
           <p>
             <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/setting/authx', {reset: 1}) }}">
-              <i class="crm-i fa-gear"></i> {{:: ts('Configure REST Authentication') }}
+              <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> {{:: ts('Configure REST Authentication') }}
             </a>
           </p>
           <p>
             <a target="_blank" href="https://docs.civicrm.org/dev/en/latest/api/v4/rest/">
-              <i class="crm-i fa-external-link"></i> {{:: ts('REST Documentation') }}
+              <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i> {{:: ts('REST Documentation') }}
             </a>
           </p>
         </div>
         <div ng-repeat="style in code[selectedTab.code]">
           <div class="clearfix">
             <button class="btn btn-xs btn-default pull-right" ng-click="$ctrl.copyCode('api4-code-' + selectedTab.code + '-' + style.name)">
-              <i class="crm-i fa-clipboard"></i>
+              <i class="crm-i fa-clipboard" role="img" aria-hidden="true"></i>
               {{:: ts('Copy') }}
             </button>
             <label>{{:: style.label }}</label>
@@ -257,18 +257,18 @@
           <li role="tab" ng-class="{active: selectedTab.result === 'result'}">
             <a href ng-click="selectedTab.result = 'result'">
               <span ng-switch="status">
-                <i class="fa fa-fw fa-circle-o" ng-switch-when="default"></i>
-                <i class="fa fa-fw fa-check-circle" ng-switch-when="success"></i>
-                <i class="fa fa-fw fa-check-circle" ng-switch-when="warning"></i>
-                <i class="fa fa-fw fa-minus-circle" ng-switch-when="danger"></i>
-                <i class="fa fa-fw fa-spinner fa-pulse" ng-switch-when="info"></i>
+                <i class="fa fa-fw fa-circle-o" ng-switch-when="default" role="img" aria-hidden="true"></i>
+                <i class="fa fa-fw fa-check-circle" ng-switch-when="success" role="img" aria-hidden="true"></i>
+                <i class="fa fa-fw fa-check-circle" ng-switch-when="warning" role="img" aria-hidden="true"></i>
+                <i class="fa fa-fw fa-minus-circle" ng-switch-when="danger" role="img" aria-hidden="true"></i>
+                <i class="fa fa-fw fa-spinner fa-spin" ng-switch-when="info" role="img" aria-hidden="true"></i>
               </span>
               <span>{{:: ts('Result') }}</span>
             </a>
           </li>
           <li role="tab" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
             <a href ng-click="selectedTab.result = 'debug'">
-              <i class="fa fa-fw fa-{{ debug ? (status === 'warning' || status === 'danger' ? 'warning' : 'bug') : 'circle-o' }}"></i>
+              <i class="fa fa-fw fa-{{ debug ? (status === 'warning' || status === 'danger' ? 'warning' : 'bug') : 'circle-o' }}" role="img" aria-hidden="true"></i>
               <span>{{:: ts('Debug') }}</span>
             </a>
           </li>
@@ -279,7 +279,7 @@
           <div ng-repeat="code in result">
             <div class="clearfix">
               <button ng-if="$index" class="btn btn-xs btn-default pull-right" ng-click="$ctrl.copyCode('api4-result-' + $index)">
-                <i class="crm-i fa-clipboard"></i>
+                <i class="crm-i fa-clipboard" role="img" aria-hidden="true"></i>
                 {{:: ts('Copy') }}
               </button>
             </div>
@@ -290,7 +290,7 @@
           <pre ng-if="debug" class="prettyprint" ng-bind-html="debug"></pre>
           <div ng-if="!debug">
             <p>
-              {{:: ts('To view debugging output, enable the debug param before executing.') }}
+              {{:: ts('Click "Execute" and debug info will be available here.') }}
             </p>
             <p>
               {{:: ts('Enable backtrace in system settings to see error backtraces.') }}

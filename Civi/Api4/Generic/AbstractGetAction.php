@@ -108,10 +108,15 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * @param string $field
    * @return array|null
    */
-  protected function _itemsToGet($field) {
+  protected function _itemsToGet(string $field): ?array {
     foreach ($this->where as $clause) {
-      // Look for exact-match operators (=, IN, or LIKE with no wildcard)
-      if ($clause[0] == $field && (in_array($clause[1], ['=', 'IN'], TRUE) || ($clause[1] == 'LIKE' && !(is_string($clause[2]) && str_contains($clause[2], '%'))))) {
+      if (
+        $clause[0] == $field &&
+        // Clause is not set to match an expression
+        empty($clause[3]) &&
+        // Clause uses exact-match operators (=, IN, or LIKE with no wildcard)
+        (in_array($clause[1], ['=', 'IN'], TRUE) || ($clause[1] === 'LIKE' && !(is_string($clause[2]) && str_contains($clause[2], '%'))))
+      ) {
         return (array) $clause[2];
       }
     }
@@ -131,7 +136,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * @return bool
    *   Returns true if any given fields are in use.
    */
-  protected function _isFieldSelected(string ...$fieldNames) {
+  protected function _isFieldSelected(string ...$fieldNames): bool {
     if ((!$this->select && !str_contains($fieldNames[0], ':')) || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
       return TRUE;
     }
@@ -147,7 +152,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * @return bool
    *   Returns true if any given fields are found in the where clause.
    */
-  protected function _whereContains($fieldName, $clauses = NULL) {
+  protected function _whereContains($fieldName, $clauses = NULL): bool {
     if ($clauses === NULL) {
       $clauses = $this->where;
     }

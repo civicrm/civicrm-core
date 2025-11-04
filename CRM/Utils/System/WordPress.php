@@ -272,9 +272,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   * @internal
+   * @deprecated
    */
   public function addHTMLHead($head) {
-    \CRM_Core_Error::deprecatedFunctionWarning("addHTMLHead is deprecated in WordPress and will be removed in a future version");
+    \CRM_Core_Error::deprecatedFunctionWarning('Civi::resources() or CRM_Core_Region::instance("html-header")');
     static $registered = FALSE;
     if (!$registered) {
       // front-end view
@@ -1313,6 +1315,18 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * Output JSON response to the client
+   *
+   * @param array $response
+   * @param int $httpResponseCode
+   *
+   * @return void
+   */
+  public static function sendJSONResponse(array $response, int $httpResponseCode): void {
+    wp_send_json($response, $httpResponseCode, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  }
+
+  /**
    * Start a new session if there's no existing session ID.
    *
    * Checks are needed to prevent sessions being started when not necessary.
@@ -1686,51 +1700,28 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * @inheritdoc
-   * @todo why are the environment checks here? could they be removed
    */
-  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+  public function theme($content, $print = FALSE, $maintenance = FALSE): void {
     if ($maintenance) {
       \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_Base::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
-    }
-    if (!$print) {
-      if (!function_exists('is_admin')) {
-        throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
-      }
-      if (!defined('ABSPATH')) {
-        throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
-      }
-      if (is_admin()) {
-        require_once ABSPATH . 'wp-admin/admin-header.php';
-      }
-      else {
-        // FIXME: we need to figure out to replace civicrm content on the frontend pages
-      }
-    }
-
-    print $content;
-    return NULL;
-  }
-
-  /**
-   * @inheritdoc
-   * @todo environment checks are copied from the original implementation of `theme` above and should probably
-   * be removed
-   */
-  public function renderMaintenanceMessage(string $content): string {
-    if (!function_exists('is_admin')) {
-      throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
-    }
-    if (!defined('ABSPATH')) {
-      throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
+      $this->renderMaintenanceMessage($content);
+      return;
     }
     if (is_admin()) {
       require_once ABSPATH . 'wp-admin/admin-header.php';
     }
-    else {
-      // FIXME: we need to figure out to replace civicrm content on the frontend pages
-    }
+    print $content;
+  }
 
-    return $content;
+  /**
+   * @inheritdoc
+   * be removed
+   */
+  public function renderMaintenanceMessage(string $content): void {
+    if (is_admin()) {
+      require_once ABSPATH . 'wp-admin/admin-header.php';
+    }
+    print $content;
   }
 
   /**

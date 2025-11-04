@@ -25,7 +25,7 @@ class SqlFunctionCONCAT extends SqlFunction {
       [
         'max_expr' => 99,
         'optional' => FALSE,
-        'must_be' => ['SqlField', 'SqlString'],
+        'must_be' => ['SqlField', 'SqlString', 'SqlFunction'],
         'label' => ts('And'),
       ],
     ];

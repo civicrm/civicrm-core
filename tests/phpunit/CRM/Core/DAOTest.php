@@ -559,6 +559,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testSupportedFields(): void {
     // Hack a different db version which will trigger getSupportedFields to filter out newer fields
     CRM_Core_BAO_Domain::getDomain()->version = '5.26.0';
+    Civi::$statics['CRM_Core_BAO_Domain']['version'] = '5.26.0';
 
     $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
     // 'icon' was added in 5.28
@@ -585,6 +586,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testTableHasBeenAdded(): void {
     // Hack a different db version
     CRM_Core_BAO_Domain::getDomain()->version = '5.28.0';
+    Civi::$statics['CRM_Core_BAO_Domain']['version'] = '5.28.0';
 
     // Table was added in 5.29
     $this->assertFalse(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
@@ -603,37 +605,37 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @throws CRM_Core_Exception
    */
   public function testUpdateTimestampWithBlankDate(): void {
-    // Arbitrarily using "Cache" since it has a desired type of timestamp field and is simple.
-    $dao = new CRM_Core_DAO_Cache();
+    // Arbitrarily using "ActionSchedule" since it has a desired type of timestamp field and is simple.
+    $dao = new CRM_Core_DAO_ActionSchedule();
     $fields = $dao->fields();
-    $this->assertSame(CRM_Utils_Type::T_TIMESTAMP, $fields['expired_date']['type'], 'Oh somebody changed the type, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
-    $this->assertFalse(!empty($fields['expired_date']['required']), 'Oh somebody changed the REQUIRED setting, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+    $this->assertSame(CRM_Utils_Type::T_TIMESTAMP, $fields['action_schedule_effective_end_date']['type'], 'Oh somebody changed the type, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+    $this->assertFalse(!empty($fields['action_schedule_effective_end_date']['required']), 'Oh somebody changed the REQUIRED setting, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
 
-    $dao->group_name = 'mytest';
-    $dao->path = 'mypath';
-    $dao->data = 'some data';
-    $dao->expired_date = '';
+    $dao->name = 'test_schedule_' . uniqid();
+    $dao->title = 'Test Schedule';
+    $dao->mapping_id = 'activity_type';
+    $dao->effective_end_date = '';
     $dao->save();
     $id = $dao->id;
 
     // Now retrieve it and update it with a blank timestamp.
-    $dao = new CRM_Core_DAO_Cache();
+    $dao = new CRM_Core_DAO_ActionSchedule();
     $dao->id = $id;
     $dao->find(TRUE);
     // sanity check we got the right one since otherwise checking null might falsely be true
-    $this->assertEquals('mytest', $dao->group_name);
-    $this->assertNull($dao->expired_date);
+    $this->assertEquals('Test Schedule', $dao->title);
+    $this->assertNull($dao->effective_end_date);
 
-    $dao->data = 'some updated data';
-    $dao->expired_date = '';
+    $dao->title = 'Updated Test Schedule';
+    $dao->effective_end_date = '';
     // would crash here on update
     $dao->save();
 
-    $dao = new CRM_Core_DAO_Cache();
+    $dao = new CRM_Core_DAO_ActionSchedule();
     $dao->id = $id;
     $dao->find(TRUE);
-    $this->assertEquals('some updated data', $dao->data);
-    $this->assertNull($dao->expired_date);
+    $this->assertEquals('Updated Test Schedule', $dao->title);
+    $this->assertNull($dao->effective_end_date);
   }
 
   public function testFillValues(): void {

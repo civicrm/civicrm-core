@@ -22,11 +22,21 @@ Civi\Setup::dispatcher()
 
 \Civi\Setup::dispatcher()
   ->addListener('civi.setup.installDatabase', function (\Civi\Setup\Event\InstallDatabaseEvent $e) {
-    \Civi\Setup::log()->info('[InstallComponents.civi-setup.php] Activate components: ' . implode(" ", $e->getModel()->components));
-
     if (empty($e->getModel()->components)) {
       throw new \Exception("System must have at least one active component.");
     }
 
-    \Civi::settings()->set('enable_components', $e->getModel()->components);
+    // Components now have inter-dependencies with extensions (e.g. `CiviCase` depends on `afform`).
+    // Defer installation to the next step (InstallExtensions.civi-setup.php) which handles both concurrently.
+    $components = CRM_Core_Component::getComponents();
+    $extensions = array_map(fn($c) => $components[$c]->getExtensionName(), $e->getModel()->components);
+
+    \Civi\Setup::log()->info(sprintf('[InstallComponents.civi-setup.php] Mapped components (%s) to extensions (%s)',
+      implode(" ", $e->getModel()->components),
+      implode(" ", $extensions)
+    ));
+
+    \Civi::settings()->set('enable_components', []);
+    $e->getModel()->extensions = array_unique(array_merge($e->getModel()->extensions, $extensions));
+
   }, \Civi\Setup::PRIORITY_LATE + 300);

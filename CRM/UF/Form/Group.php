@@ -36,26 +36,24 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       'frontend_title' => ['name' => 'frontend_title', 'required' => TRUE],
       'description' => [
         'name' => 'description',
-        'help' => ['id' => 'id-description', 'file' => 'CRM/UF/Form/Group.hlp'],
+        'help' => ['id' => 'description'],
       ],
       'uf_group_type' => [
         'name' => 'uf_group_type',
         'not-auto-addable' => TRUE,
-        'help' => ['id' => 'id-used_for', 'file' => 'CRM/UF/Form/Group.hlp'],
+        'help' => ['id' => 'uf_group_type'],
       ],
       'cancel_button_text' => [
         'name' => 'cancel_button_text',
         'help' => [
-          'id' => 'id-cancel_button_text',
-          'file' => 'CRM/UF/Form/Group.hlp',
+          'id' => 'cancel_button_text',
         ],
         'class' => 'cancel_button_section',
       ],
       'submit_button_text' => [
         'name' => 'submit_button_text',
         'help' => [
-          'id' => 'id-submit_button_text',
-          'file' => 'CRM/UF/Form/Group.hlp',
+          'id' => 'submit_button_text',
         ],
         'class' => '',
       ],
@@ -127,7 +125,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $this->setTitle(ts('New CiviCRM Profile'));
     }
 
-    $this->assign('uf_group_type_extra', $this->getOtherModuleString());
+    $this->assign('uf_group_type_extra', CRM_Core_BAO_UFGroup::getProfileUsedByString($this->_id));
   }
 
   /**
@@ -375,48 +373,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {
-  }
-
-  /**
-   * Returns a string describing which forms/modules are using this profile
-   * Ex: Used in Forms: CiviContribute (1, 3, 5), CiviEvent (40, 42, 55, 123 and XX more)
-   *
-   * @return string|null
-   */
-  protected function getOtherModuleString() {
-    $otherModules = \Civi\Api4\UFJoin::get(TRUE)
-      ->addWhere('uf_group_id', '=', $this->_id)
-      ->addWhere('module', '!=', 'Profile')
-      ->addOrderBy('entity_id', 'ASC')
-      ->execute();
-    if (empty($otherModules)) {
-      return NULL;
-    }
-    $otherModulesTranslations = [
-      'on_behalf' => ts('On Behalf Of Organization'),
-      'User Account' => ts('User Account'),
-      'User Registration' => ts('User Registration'),
-      'CiviContribute' => ts('CiviContribute'),
-      'CiviEvent' => ts('CiviEvent'),
-      'CiviEvent_Additional' => ts('CiviEvent Additional Participant'),
-    ];
-    $modulesByComponent = [];
-    foreach ($otherModules as $join) {
-      $modulesByComponent[$join['module']][] = $join['entity_id'];
-    }
-    $modulesByComponentReformat = [];
-    foreach ($modulesByComponent as $key => $vals) {
-      $count = count($vals);
-      if ($count > 7) {
-        // Keep only 5 and say "and X more"
-        $vals = array_slice($vals, 0, 5);
-        $modulesByComponentReformat[] = ($otherModulesTranslations[$key] ?? $key) . ' (' . implode(', ', $vals) . ' ' . ts('and %count more', ['count' => $count - 5, 'plural' => 'and %count more']) . ')';
-      }
-      else {
-        $modulesByComponentReformat[] = ($otherModulesTranslations[$key] ?? $key) . ' (' . implode(', ', $vals) . ')';
-      }
-    }
-    return implode(', ', $modulesByComponentReformat);
   }
 
 }

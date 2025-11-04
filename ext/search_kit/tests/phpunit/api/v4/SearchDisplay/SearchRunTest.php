@@ -2875,8 +2875,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $params = [
       'checkPermissions' => FALSE,
       'savedSearch' => [
-        'name' => 'Test_row_number',
-        'label' => 'Test row number',
         'api_entity' => 'Contact',
         'api_params' => [
           'version' => 4,
@@ -2942,6 +2940,62 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('', $row[3][3]['val']);
   }
 
+  public function testRunWithTagFilter(): void {
+    $contactId = $this->saveTestRecords('Contact', ['records' => 6])->column('id');
+    $tags = $this->saveTestRecords('Tag', [
+      'records' => [
+        ['label' => uniqid('a')],
+        ['label' => uniqid('b')],
+      ],
+    ]);
+    $tagId = $tags->column('id');
+    $this->saveTestRecords('EntityTag', [
+      'records' => [
+        ['entity_id' => $contactId[0], 'tag_id' => $tagId[0]],
+        ['entity_id' => $contactId[0], 'tag_id' => $tagId[1]],
+        ['entity_id' => $contactId[1], 'tag_id' => $tagId[0]],
+        ['entity_id' => $contactId[2], 'tag_id' => $tagId[1]],
+        ['entity_id' => $contactId[3], 'tag_id' => $tagId[0]],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'sort_name',
+            'tags',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['id', 'IN', $contactId],
+          ],
+          'groupBy' => [
+            'id',
+          ],
+        ],
+      ],
+      'display' => NULL,
+      'sort' => [
+        ['id', 'ASC'],
+      ],
+      'debug' => TRUE,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', ['filters' => ['tags' => [$tagId[0]]]] + $params);
+    $this->assertCount(3, $result);
+
+    $result = civicrm_api4('SearchDisplay', 'run', ['filters' => ['tags' => [$tagId[1]]]] + $params);
+    $this->assertCount(2, $result);
+
+    $result = civicrm_api4('SearchDisplay', 'run', ['filters' => ['tags:name' => $tags->column('name')]] + $params);
+    $this->assertCount(4, $result);
+  }
+
   /**
    * Returns all contacts in VIEW mode but only specified contact for EDIT.
    *
@@ -2981,7 +3035,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->saveTestRecords('Individual', [
       'defaults' => ['last_name' => $lastName],
       'records' => [
-        ['test_person_fields.float' => 12345678.89, 'test_person_fields.money' => 12345678.89, 'test_person_fields.floatopts' => 2],
+        ['test_person_fields.float' => .1234567889, 'test_person_fields.money' => 12345678.89, 'test_person_fields.floatopts' => 2],
+        ['test_person_fields.float' => 0, 'test_person_fields.money' => 1, 'test_person_fields.floatopts' => NULL],
       ],
     ]);
 
@@ -2998,16 +3053,250 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           ],
         ],
       ],
-      'display' => NULL,
+      'display' => [
+        'type' => 'table',
+        'settings' => [
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'test_person_fields.float',
+              'format' => [
+                \NumberFormatter::MAX_FRACTION_DIGITS => 5,
+                \NumberFormatter::MIN_FRACTION_DIGITS => 2,
+              ],
+            ],
+            [
+              'type' => 'field',
+              'key' => 'test_person_fields.money',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'test_person_fields.bool',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'test_person_fields.floatopts:label',
+            ],
+          ],
+        ],
+      ],
     ];
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
 
-    $this->assertCount(1, $result);
-    $this->assertSame('12,345,678.89', $result[0]['columns'][0]['val']);
+    $this->assertCount(2, $result);
+
+    $this->assertSame('0.12346', $result[0]['columns'][0]['val']);
     $this->assertSame('$12,345,678.89', $result[0]['columns'][1]['val']);
     $this->assertSame('', $result[0]['columns'][2]['val']);
     $this->assertSame('Two', $result[0]['columns'][3]['val']);
+
+    $this->assertSame('0.00', $result[1]['columns'][0]['val']);
+    $this->assertSame('$1.00', $result[1]['columns'][1]['val']);
+    $this->assertSame('', $result[1]['columns'][2]['val']);
+    $this->assertSame('', $result[1]['columns'][3]['val']);
+  }
+
+  public function testManageOwn(): void {
+    $config = \CRM_Core_Config::singleton();
+    $savedSearchAPI = \Civi\Api4\SavedSearch::create(FALSE)
+      ->addValue('name', ' API Test Search')
+      ->addValue('api_entity', 'Contact')
+      ->addValue('api_params', [
+        'version' => 4,
+        'select' => [
+          'id',
+          'sort_name',
+          'contact_type:label',
+          'contact_sub_type:label',
+        ],
+        'orderBy' => [],
+        'where' => [['contact_type:name', '=', 'Individual']],
+      ])
+      ->addValue('created_id', 1)
+      ->addValue('modified_id', 1)
+      ->execute()->first();
+    $savedSearchBAO = \CRM_Contact_BAO_SavedSearch::writeRecord([
+      'check_permission' => FALSE,
+      'name' => 'BAO Test Search',
+      'created_id' => 1,
+      'modified_id' => 1,
+    ]);
+    $config->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'manage own search_kit',
+    ];
+    $this->createLoggedInUser();
+
+    // Make sure a `manage own search_kit` user can't edit a SavedSearch owned by someone else using API4.
+    $error = '';
+    try {
+      $result = \Civi\Api4\SavedSearch::update(TRUE)
+        ->addValue('label', 'Update API Test Search')
+        ->addWhere('id', '=', $savedSearchAPI['id'])
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+
+    // Make sure a `manage own search_kit` user can't edit a SavedSearch owned by someone else using BAO.
+    $error = '';
+    try {
+      \CRM_Contact_BAO_SavedSearch::writeRecord([
+        'check_permission' => TRUE,
+        'label' => 'Update BAO Test Search',
+        'id' => $savedSearchBAO->id,
+      ]);
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('permission', $error);
+
+    // Make sure a `manage own search_kit` user can't delete a SavedSearch owned by someone else using API4.
+    $error = '';
+    try {
+      $result = \Civi\Api4\SavedSearch::delete(TRUE)
+        ->addWhere('id', '=', $savedSearchAPI['id'])
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+
+    // Make sure a `manage own search_kit` user can't delete a SavedSearch owned by someone else using BAO.
+    $error = '';
+    try {
+      \CRM_Contact_BAO_SavedSearch::deleteRecord([
+        'check_permission' => TRUE,
+        'id' => $savedSearchBAO->id,
+      ]);
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('permission', $error);
+
+    $config->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'administer search_kit',
+    ];
+
+    // Make sure a `administer search_kit` user can edit any SavedSearch record using API4.
+    try {
+      $result = \Civi\Api4\SavedSearch::update(TRUE)
+        ->addValue('label', 'Update Test Search')
+        ->addWhere('id', '=', $savedSearchAPI['id'])
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $this->fail();
+    }
+
+    // Make sure a `administer search_kit` user can edit any SavedSearch using BAO.
+    try {
+      \CRM_Contact_BAO_SavedSearch::writeRecord([
+        'check_permission' => TRUE,
+        'label' => 'Update BAO Test Search',
+        'id' => $savedSearchBAO->id,
+      ]);
+    }
+    catch (UnauthorizedException $e) {
+      $this->fail();
+    }
+
+    // Make sure a `administer search_kit` user can delete any SavedSearch record using API4.
+    try {
+      $result = \Civi\Api4\SavedSearch::delete(TRUE)
+        ->addWhere('id', '=', $savedSearchAPI['id'])
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $this->fail();
+    }
+
+    // Make sure a `administer search_kit` user can delete any SavedSearch using BAO.
+    try {
+      \CRM_Contact_BAO_SavedSearch::deleteRecord([
+        'check_permission' => TRUE,
+        'id' => $savedSearchBAO->id,
+      ]);
+    }
+    catch (UnauthorizedException $e) {
+      $this->fail();
+    }
+  }
+
+  public function testRunWithBooleanFunctionFilters(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $cids = $this->saveTestRecords('Individual', [
+      'records' => [
+        [],
+        [],
+        ['phone_primary.phone' => '1234567890'],
+        ['phone_primary.phone' => '2345678900'],
+      ],
+      'defaults' => ['last_name' => $lastName],
+    ])->column('id');
+
+    $params = [
+      'display' => NULL,
+      'savedSearch' => [
+        'api_entity' => 'Individual',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'last_name',
+            'Contact_Phone_contact_id_01.phone',
+            'ISNOTNULL(Contact_Phone_contact_id_01.id) AS notnull',
+          ],
+          'where' => [],
+          'groupBy' => [],
+          'join' => [
+            [
+              'Phone AS Contact_Phone_contact_id_01',
+              'LEFT',
+              [
+                'id',
+                '=',
+                'Contact_Phone_contact_id_01.contact_id',
+              ],
+              [
+                'Contact_Phone_contact_id_01.is_primary',
+                '=',
+                TRUE,
+              ],
+            ],
+          ],
+          'having' => [],
+        ],
+      ],
+      'sort' => [
+        ['id', 'ASC'],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params + [
+      'filters' => ['last_name' => $lastName],
+    ]);
+    $this->assertCount(4, $result);
+    $this->assertEquals($cids, $result->column('key'));
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params + [
+      'filters' => ['last_name' => $lastName, 'notnull' => TRUE],
+    ]);
+    $this->assertCount(2, $result);
+    $this->assertEquals([$cids[2], $cids[3]], $result->column('key'));
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params + [
+      'filters' => ['last_name' => $lastName, 'notnull' => FALSE],
+    ]);
+    $this->assertCount(2, $result);
+    $this->assertEquals([$cids[0], $cids[1]], $result->column('key'));
   }
 
 }

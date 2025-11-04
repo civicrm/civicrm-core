@@ -45,6 +45,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
       'civi.api.authorize' => [['onApiAuthorize', Events::W_EARLY]],
       'api.schema_map.build' => 'on_schema_map_build',
+      'civi.import.bundledActions' => 'getBundledActions',
     ];
   }
 
@@ -61,9 +62,9 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       /** @noinspection PhpUndefinedFieldInspection */
       $event->entities['Import_' . $userJobID] = [
         'name' => 'Import_' . $userJobID,
-        'title' => ts('Import Data') . ' ' . $userJobID . (empty($table['created_by']) ? '' : '(' . $table['created_by'] . ')'),
-        'title_plural' => ts('Import Data') . ' ' . $userJobID,
-        'description' => ts('Import Job temporary data'),
+        'title' => $table['title'],
+        'title_plural' => $table['title'],
+        'description' => $table['description'],
         'primary_key' => ['_id'],
         'type' => ['Import'],
         'table_name' => $table['table_name'],
@@ -86,7 +87,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
     $importEntities = Civi\BAO\Import::getImportTables();
     $jobTypes = array_column(\CRM_Core_BAO_UserJob::getTypes(), 'entity', 'id');
     foreach ($importEntities as $importEntity) {
-      $fkEntity = $jobTypes[$importEntity['job_type']] ?? NULL;
+      $fkEntity = $importEntity['entity'] ?? $jobTypes[$importEntity['job_type']] ?? NULL;
       $fkTable = $fkEntity ? CoreUtil::getTableName($fkEntity) : NULL;
       if ($fkEntity && $fkTable) {
         $table = $schema->getTableByName($importEntity['table_name']);
@@ -215,6 +216,23 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       ->selectRowCount()
       ->execute()
       ->count();
+  }
+
+  public function getBundledActions(GenericHookEvent $event): void {
+    // for now we check permissions so this always runs as the logged in user ....
+    // Tags, send workflow messages are also ones that could be added..
+    foreach (\Civi\Api4\Group::get()->execute() as $group) {
+      $event->actions['Contact']['add_to_group.' . $group['name']] = [
+        'category' => E::ts('Add to group'),
+        'label' => ts('Add to %1', [1 => $group['title']]),
+        'api' => \Civi\Api4\GroupContact::save()
+          ->addRecord([
+            'status' => 'Added',
+            'group_id' => $group['id'],
+            'contact_id' => '$id',
+          ])->setMatch(['contact_id', 'group_id']),
+      ];
+    }
   }
 
 }

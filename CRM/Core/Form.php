@@ -26,6 +26,7 @@ require_once 'HTML/QuickForm/Page.php';
  * Class CRM_Core_Form
  */
 class CRM_Core_Form extends HTML_QuickForm_Page {
+  use CRM_Core_SmartyPageTrait;
 
   /**
    * The state object that this form belongs to
@@ -122,13 +123,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @var object
    */
   protected $_renderer;
-
-  /**
-   * Cache the smarty template for efficiency reasons
-   *
-   * @var CRM_Core_Smarty
-   */
-  static protected $_template;
 
   /**
    *  Indicate if this form should warn users of unsaved changes
@@ -1230,27 +1224,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add an expected smarty variable to the array.
-   *
-   * @param string $elementName
-   */
-  public function addExpectedSmartyVariable(string $elementName): void {
-    $this->expectedSmartyVariables[] = $elementName;
-  }
-
-  /**
-   * Add an expected smarty variable to the array.
-   *
-   * @param array $elementNames
-   */
-  public function addExpectedSmartyVariables(array $elementNames): void {
-    foreach ($elementNames as $elementName) {
-      // Duplicates don't actually matter....
-      $this->addExpectedSmartyVariable($elementName);
-    }
-  }
-
-  /**
    * Render form and return contents.
    *
    * @return string
@@ -1291,6 +1264,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return string
    */
   public function getTemplateFileName() {
+    // TODO: Why is this bit missing from `CRM_Core_Page::getTemplateFileName`?
     $ext = CRM_Extension_System::singleton()->getMapper();
     if ($ext->isExtensionClass(CRM_Utils_System::getClassName($this))) {
       $filename = $ext->getTemplateName(CRM_Utils_System::getClassName($this));
@@ -1306,28 +1280,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       ) . '.tpl';
     }
     return $tplname;
-  }
-
-  /**
-   * A wrapper for getTemplateFileName.
-   *
-   * This includes calling the hook to prevent us from having to copy & paste the logic of calling the hook.
-   */
-  public function getHookedTemplateFileName() {
-    $pageTemplateFile = $this->getTemplateFileName();
-    CRM_Utils_Hook::alterTemplateFile(get_class($this), $this, 'page', $pageTemplateFile);
-    return $pageTemplateFile;
-  }
-
-  /**
-   * Default extra tpl file basically just replaces .tpl with .extra.tpl.
-   *
-   * i.e. we do not override.
-   *
-   * @return string
-   */
-  public function overrideExtraTemplateFileName() {
-    return NULL;
   }
 
   /**
@@ -1404,67 +1356,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       CRM_Core_Error::deprecatedWarning('action should be an integer');
       $this->_action = $action;
     }
-  }
-
-  /**
-   * Assign value to name in template.
-   *
-   * @param string $var
-   *   Name of variable.
-   * @param mixed $value
-   *   Value of variable.
-   */
-  public function assign($var, $value = NULL) {
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Assign value to name in template by reference.
-   *
-   * @param string $var
-   *   Name of variable.
-   * @param mixed $value
-   *   Value of variable.
-   *
-   * @deprecated since 5.72 will be removed around 5.84
-   */
-  public function assign_by_ref($var, &$value) {
-    CRM_Core_Error::deprecatedFunctionWarning('assign');
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Appends values to template variables.
-   *
-   * @param array|string $tpl_var the template variable name(s)
-   * @param mixed $value
-   *   The value to append.
-   * @param bool $merge
-   */
-  public function append($tpl_var, $value = NULL, $merge = FALSE) {
-    self::$_template->append($tpl_var, $value, $merge);
-  }
-
-  /**
-   * Returns an array containing template variables.
-   *
-   * @deprecated since 5.69 will be removed around 5.93. use getTemplateVars.
-   *
-   * @param string $name
-   *
-   * @return array
-   */
-  public function get_template_vars($name = NULL) {
-    return $this->getTemplateVars($name);
-  }
-
-  /**
-   * Get the value/s assigned to the Template Engine (Smarty).
-   *
-   * @param string|null $name
-   */
-  public function getTemplateVars($name = NULL) {
-    return self::$_template->getTemplateVars($name);
   }
 
   /**
@@ -2053,7 +1944,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add a widget for selecting/editing/creating/copying a profile form
+   * Add a widget for selecting a profile form
    *
    * @param string $name
    *   HTML form-element name.
@@ -2062,26 +1953,27 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $allowCoreTypes
    *   Only present a UFGroup if its group_type includes a subset of $allowCoreTypes; e.g. 'Individual', 'Activity'.
    * @param string $allowSubTypes
-   *   Only present a UFGroup if its group_type is compatible with $allowSubypes.
+   *   Deprecated: Only present a UFGroup if its group_type is compatible with $allowSubypes.
    * @param array $entities
+   *   Deprecated
    * @param bool $default
-   *   //CRM-15427.
+   *   Not used anymore.
    * @param string $usedFor
+   *   Deprecated: not clear what this was usedFor.
    */
-  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE, $usedFor = NULL) {
-    // Output widget
-    // FIXME: Instead of adhoc serialization, use a single json_encode()
-    CRM_UF_Page_ProfileEditor::registerProfileScripts();
-    CRM_UF_Page_ProfileEditor::registerSchemas(CRM_Utils_Array::collect('entity_type', $entities));
-    $this->add('text', $name, $label, [
-      'class' => 'crm-profile-selector',
-      // Note: client treats ';;' as equivalent to \0, and ';;' works better in HTML
-      'data-group-type' => CRM_Core_BAO_UFGroup::encodeGroupType($allowCoreTypes, $allowSubTypes, ';;'),
-      'data-entities' => json_encode($entities),
-      //CRM-15427
-      'data-default' => $default,
-      'data-usedfor' => json_encode($usedFor),
-    ]);
+  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes = NULL, $entities = NULL, $default = FALSE, $usedFor = NULL) {
+    $query = \Civi\Api4\UFGroup::get(TRUE)
+      ->addWhere('is_active', '=', 1);
+    if (!empty($allowCoreTypes)) {
+      $clauses = [];
+      foreach ($allowCoreTypes as $type) {
+        $clauses[] = ['group_type', 'LIKE', '%' . $type . '%'];
+      }
+      $query->addClause('OR', $clauses);
+    }
+    $profileGroups = $query->execute()->column('title', 'id');
+    $this->add('select', $name, $label, ['' => ts('- select profile -')] + $profileGroups, FALSE, ['class' => 'crm-select2 huge crm-form-select-profile']);
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.openRelatedConfig.js');
   }
 
   /**
@@ -2096,13 +1988,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function getCompleteTitle() {
     return $this->getRootTitle() . $this->getTitle();
-  }
-
-  /**
-   * @return CRM_Core_Smarty
-   */
-  public static function &getTemplate() {
-    return self::$_template;
   }
 
   /**
@@ -2236,7 +2121,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       Civi::log()->warning('addCurrency: Currency ' . $defaultCurrency . ' is disabled but still in use!');
       $currencies[$defaultCurrency] = $defaultCurrency;
     }
-    $options = ['class' => 'crm-select2 eight'];
+    $options = ['class' => 'crm-select2 crm-auto-width'];
     if (!$required) {
       $currencies = ['' => ''] + $currencies;
       $options['placeholder'] = ts('- none -');
@@ -2271,7 +2156,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'select' => [],
     ];
     $props['api'] += [
-      'formName' => 'qf:' . get_class($this),
+      'formName' => 'qf:' . get_class($this) . ':' . ($this->_id ?? $this->_contactId ?? ''),
     ];
     // If fieldName is missing and no default entity is set for the form, this will throw an excption.
     // In that case, you should explicitly supply api.fieldName in the format `EntityName.field_name`

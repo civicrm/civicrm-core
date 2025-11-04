@@ -11,6 +11,6 @@
 {* wrapper for the billing block including the div to make the block swappable & the js to make that happen
 This allows the billing block to change when the card type changes *}
 <div id="billing-payment-block">
-  {include file="CRM/Core/BillingBlock.tpl"}
+  {include file="CRM/Core/BillingBlock.tpl" showPaymentOnConfirm=$showPaymentOnConfirm}
 </div>
 {include file="CRM/common/paymentBlock.tpl"}

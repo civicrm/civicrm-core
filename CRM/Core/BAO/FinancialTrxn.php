@@ -348,54 +348,6 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
-   * get partial payment amount.
-   *
-   * @deprecated
-   *
-   * This function basically calls CRM_Contribute_BAO_Contribution::getContributionBalance
-   * - just do that. If need be we could have a fn to get the contribution id but
-   * chances are the calling functions already know it anyway.
-   *
-   * @param int $entityId
-   * @param string $entityName
-   * @param int $lineItemTotal
-   *
-   * @return array
-   */
-  public static function getPartialPaymentWithType($entityId, $entityName = 'participant', $lineItemTotal = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Contribution::getContributionBalance');
-    $value = NULL;
-    if (empty($entityName)) {
-      return $value;
-    }
-
-    // @todo - deprecate passing in entity & type - just figure out contribution id FIRST
-    if ($entityName == 'participant') {
-      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $entityId, 'contribution_id', 'participant_id');
-    }
-    elseif ($entityName == 'membership') {
-      $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($entityId);
-    }
-    else {
-      $contributionId = $entityId;
-    }
-    $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
-
-    if ($contributionId && $financialTypeId) {
-
-      $paymentVal = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionId, $lineItemTotal);
-      $value = [];
-      if ($paymentVal < 0) {
-        $value['refund_due'] = $paymentVal;
-      }
-      elseif ($paymentVal > 0) {
-        $value['amount_owed'] = $paymentVal;
-      }
-    }
-    return $value;
-  }
-
-  /**
    * Get the total sum of all payments (and optionally refunds) for a contribution record
    *
    * @param int $contributionID

@@ -9,7 +9,7 @@ return [
   // 'css' => ['ang/crmQueueMonitor.css'],
   'partials' => ['ang/crmChangePassword'],
   'requires' => ['crmUi', 'crmUtil', 'api4'],
-  'basePages' => ['civicrm/admin/user/password'],
+  'basePages' => ['civicrm/my-account/password'],
   'exports' => [
     // Export the module as an [E]lement
     'crm-change-password' => 'E',

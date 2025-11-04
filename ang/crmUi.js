@@ -1,7 +1,7 @@
 /// crmUi: Sundry UI helpers
 (function (angular, $, _) {
 
-  var uidCount = 0,
+  let uidCount = 0,
     pageTitleHTML = 'CiviCRM',
     documentTitle = 'CiviCRM';
 
@@ -40,13 +40,13 @@
     // Examples:
     //   crmUiAlert({text: 'My text', title: 'My title', type: 'error'});
     //   crmUiAlert({template: '<a ng-click="ok()">Hello</a>', scope: $scope.$new()});
-    //   var h = crmUiAlert({templateUrl: '~/crmFoo/alert.html', scope: $scope.$new()});
+    //   let h = crmUiAlert({templateUrl: '~/crmFoo/alert.html', scope: $scope.$new()});
     //   ... h.close(); ...
     .service('crmUiAlert', function($compile, $rootScope, $templateRequest, $q) {
-      var count = 0;
+      let count = 0;
       return function crmUiAlert(params) {
-        var id = 'crmUiAlert_' + (++count);
-        var tpl = null;
+        const id = 'crmUiAlert_' + (++count);
+        let tpl = null;
         if (params.templateUrl) {
           tpl = $templateRequest(params.templateUrl);
         }
@@ -56,11 +56,11 @@
         if (tpl) {
           params.text = '<div id="' + id + '"></div>'; // temporary stub
         }
-        var result = CRM.alert(params.text, params.title, params.type, params.options);
+        const result = CRM.alert(params.text, params.title, params.type, params.options);
         if (tpl) {
           $q.when(tpl, function(html) {
-            var scope = params.scope || $rootScope.$new();
-            var linker = $compile(html);
+            const scope = params.scope || $rootScope.$new();
+            const linker = $compile(html);
             $('#' + id).append($(linker(scope)));
           });
         }
@@ -106,7 +106,7 @@
                     requiredLength = 8;
                   }
                   else if (typeof settings.date === 'string') {
-                    var lowerFormat = settings.date.toLowerCase();
+                    const lowerFormat = settings.date.toLowerCase();
                     // FIXME: parseDate doesn't work with incomplete date formats; skip validation if no month, day or year in format
                     if (lowerFormat.indexOf('y') < 0 || lowerFormat.indexOf('m') < 0 || lowerFormat.indexOf('d') < 0) {
                       // skipping the validation by setting the actual length of datepicker value
@@ -131,15 +131,15 @@
           crmUiDebug: '@'
         },
         template: function() {
-          var args = $location.search();
+          const args = $location.search();
           if (args && args.angularDebug) {
-            var jsonTpl = (CRM.angular.modules.indexOf('jsonFormatter') < 0) ? '<pre>{{data|json}}</pre>' : '<json-formatter json="data" open="1"></json-formatter>';
+            const jsonTpl = (CRM.angular.modules.indexOf('jsonFormatter') < 0) ? '<pre>{{data|json}}</pre>' : '<json-formatter json="data" open="1"></json-formatter>';
             return '<div crm-ui-accordion=\'{title: ts("Debug (%1)", {1: crmUiDebug}), collapsed: true}\'>' + jsonTpl + '</div>';
           }
           return '';
         },
         link: function(scope, element, attrs) {
-          var args = $location.search();
+          const args = $location.search();
           if (args && args.angularDebug) {
             scope.ts = CRM.ts(null);
             scope.$parent.$watch(attrs.crmUiDebug, function(data) {
@@ -157,7 +157,7 @@
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name'), required: true}"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
-      var templateUrls = {
+      const templateUrls = {
         default: '~/crmUi/field.html',
         checkbox: '~/crmUi/field-cb.html'
       };
@@ -170,7 +170,7 @@
           crmUiField: '='
         },
         templateUrl: function(tElement, tAttrs){
-          var layout = tAttrs.crmLayout ? tAttrs.crmLayout : 'default';
+          const layout = tAttrs.crmLayout ? tAttrs.crmLayout : 'default';
           return templateUrls[layout];
         },
         transclude: true,
@@ -195,7 +195,7 @@
         restrict: 'EA',
         link: {
           pre: function (scope, element, attrs, crmUiIdCtrl) {
-            var id = crmUiIdCtrl.get(attrs.crmUiId);
+            const id = crmUiIdCtrl.get(attrs.crmUiId);
             element.attr('id', id);
           }
         }
@@ -204,7 +204,7 @@
 
     // for example, see crmUiHelp
     .service('crmUiHelp', function(){
-      // example: var h = new FieldHelp({id: 'foo'}); h.open();
+      // example: const h = new FieldHelp({id: 'foo'}); h.open();
       function FieldHelp(options) {
         this.options = options;
       }
@@ -220,12 +220,12 @@
         }
       });
 
-      // example: var hs = crmUiHelp({file: 'CRM/Foo/Bar'});
+      // example: const hs = crmUiHelp({file: 'CRM/Foo/Bar'});
       return function(defaults){
         // example: hs('myfield')
         // example: hs({id: 'myfield', title: 'Foo Bar', file: 'Whiz/Bang'})
         return function(options) {
-          if (_.isString(options)) {
+          if (typeof options === 'string') {
             options = {id: options};
           }
           return new FieldHelp(angular.extend({}, defaults, options));
@@ -244,8 +244,8 @@
         restrict: 'EA',
         link: function(scope, element, attrs) {
           setTimeout(function() {
-            var crmUiHelp = scope.$eval(attrs.crmUiHelp);
-            var title = crmUiHelp && crmUiHelp.get('title') ? ts('%1 Help', {1: crmUiHelp.get('title')}) : ts('Help');
+            const crmUiHelp = scope.$eval(attrs.crmUiHelp);
+            let title = crmUiHelp && crmUiHelp.get('title') ? ts('%1 Help', {1: crmUiHelp.get('title')}) : ts('Help');
             element.attr('title', title);
           }, 50);
 
@@ -273,18 +273,18 @@
 
           if (!attrs.crmUiFor) return;
 
-          var id = crmUiIdCtrl.get(attrs.crmUiFor);
+          const id = crmUiIdCtrl.get(attrs.crmUiFor);
           element.attr('for', id);
-          var ngModel = null;
+          let ngModel = null;
 
-          var updateCss = function () {
+          const updateCss = function () {
             scope.cssClasses['crm-error'] = !ngModel.$valid && !ngModel.$pristine;
           };
 
           // Note: if target element is dynamically generated (eg via ngInclude), then it may not be available
           // immediately for initialization. Use retries/retryDelay to initialize such elements.
-          var init = function (retries, retryDelay) {
-            var input = $('#' + id);
+          const init = function (retries, retryDelay) {
+            const input = $('#' + id);
             if (input.length === 0 && !attrs.crmUiForceRequired) {
               if (retries) {
                 $timeout(function(){
@@ -299,9 +299,9 @@
               return;
             }
 
-            var tgtScope = scope;//.$parent;
+            let tgtScope = scope;//.$parent;
             if (attrs.crmDepth) {
-              for (var i = attrs.crmDepth; i > 0; i--) {
+              for (let i = attrs.crmDepth; i > 0; i--) {
                 tgtScope = tgtScope.$parent;
               }
             }
@@ -337,7 +337,7 @@
         scope: {},
         controllerAs: 'crmUiIdCtrl',
         controller: function($scope) {
-          var ids = {};
+          const ids = {};
           this.get = function(name) {
             if (!ids[name]) {
               ids[name] = "crmUiId_" + (++uidCount);
@@ -359,19 +359,19 @@
           crmUiIframe: '@' // expression which evaluates to HTML content
         },
         link: function (scope, elm, attrs) {
-          var iframe = $(elm)[0];
+          const iframe = $(elm)[0];
           iframe.setAttribute('width', '100%');
           iframe.setAttribute('height', '250px');
           iframe.setAttribute('frameborder', '0');
 
-          var refresh = function () {
+          const refresh = function () {
             if (attrs.crmUiIframeSrc) {
               iframe.setAttribute('src', scope.$parent.$eval(attrs.crmUiIframeSrc));
             }
             else {
-              var iframeHtml = scope.$parent.$eval(attrs.crmUiIframe);
+              let iframeHtml = scope.$parent.$eval(attrs.crmUiIframe);
 
-              var doc = iframe.document;
+              let doc = iframe.document;
               if (iframe.contentDocument) {
                 doc = iframe.contentDocument;
               }
@@ -424,7 +424,7 @@
 
           // Wait for #id to stabilize so the wysiwyg doesn't init with an id like `cke_{{:: fieldId }}`
           $timeout(function() {
-            var editor = CRM.wysiwyg.create(elm);
+            const editor = CRM.wysiwyg.create(elm);
 
             if (!ngModel) {
               return;
@@ -455,8 +455,8 @@
     //            title-locked="ts('Boolfield is locked')"
     //            title-unlocked="ts('Boolfield is unlocked')"></a>
     .directive('crmUiLock', function ($parse, $rootScope) {
-      var defaultVal = function (defaultValue) {
-        var f = function (scope) {
+      const defaultVal = function (defaultValue) {
+        const f = function (scope) {
           return defaultValue;
         };
         f.assign = function (scope, value) {
@@ -466,20 +466,20 @@
       };
 
       // like $parse, but accepts a defaultValue in case expr is undefined
-      var parse = function (expr, defaultValue) {
+      const parse = function (expr, defaultValue) {
         return expr ? $parse(expr) : defaultVal(defaultValue);
       };
 
       return {
         template: '',
         link: function (scope, element, attrs) {
-          var binding = parse(attrs.binding, true);
-          var titleLocked = parse(attrs.titleLocked, ts('Locked'));
-          var titleUnlocked = parse(attrs.titleUnlocked, ts('Unlocked'));
+          const binding = parse(attrs.binding, true);
+          const titleLocked = parse(attrs.titleLocked, ts('Locked'));
+          const titleUnlocked = parse(attrs.titleUnlocked, ts('Unlocked'));
 
           $(element).addClass('crm-i lock-button');
-          var refresh = function () {
-            var locked = binding(scope);
+          const refresh = function () {
+            const locked = binding(scope);
             if (locked) {
               $(element)
                 .removeClass('fa-unlock')
@@ -536,7 +536,7 @@
         },
         // @return bool TRUE if something is removed
         remove: function remove(name) {
-          var idx = this.values.indexOf(name);
+          const idx = this.values.indexOf(name);
           if (idx >= 0) {
             this.values.splice(idx, 1);
             return true;
@@ -582,7 +582,7 @@
     .directive('crmUiOrder', function(CrmUiOrderCtrl) {
       return {
         link: function(scope, element, attrs){
-          var options = angular.extend({var: 'crmUiOrderBy'}, scope.$eval(attrs.crmUiOrder));
+          const options = angular.extend({var: 'crmUiOrderBy'}, scope.$eval(attrs.crmUiOrder));
           scope[options.var] = new CrmUiOrderCtrl(options.defaults);
         }
       };
@@ -593,7 +593,7 @@
       return {
         link: function(scope, element, attrs) {
           function updateClass(crmUiOrderCtrl, name) {
-            var dir = crmUiOrderCtrl.getDir(name);
+            const dir = crmUiOrderCtrl.getDir(name);
             element
               .toggleClass('sorting_asc', dir === '+')
               .toggleClass('sorting_desc', dir === '-')
@@ -601,14 +601,14 @@
           }
 
           element.on('click', function(e){
-            var tgt = scope.$eval(attrs.crmUiOrderBy);
+            const tgt = scope.$eval(attrs.crmUiOrderBy);
             tgt[0].toggle(tgt[1]);
             updateClass(tgt[0], tgt[1]);
             e.preventDefault();
             scope.$digest();
           });
 
-          var tgt = scope.$eval(attrs.crmUiOrderBy);
+          const tgt = scope.$eval(attrs.crmUiOrderBy);
           updateClass(tgt[0], tgt[1]);
         }
       };
@@ -632,7 +632,7 @@
               $timeout(function () {
                 // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
                 // new item is added before selection is made
-                var newVal = _.cloneDeep(ngModel.$modelValue);
+                let newVal = _.cloneDeep(ngModel.$modelValue);
                 // Fix possible data-type mismatch
                 if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
                   newVal = newVal.length ? newVal.split(scope.crmUiSelect.separator || ',') : [];
@@ -642,7 +642,8 @@
             };
           }
           function refreshModel() {
-            var oldValue = ngModel.$viewValue, newValue = element.select2('val');
+            const oldValue = ngModel.$viewValue;
+            let newValue = element.select2('val');
             // Let ng-list do the splitting
             if (Array.isArray(newValue) && attrs.ngList) {
               newValue = newValue.join(attrs.ngList);
@@ -714,7 +715,7 @@
             $timeout(function () {
               // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
               // new item is added before selection is made
-              var newVal = _.cloneDeep(ngModel.$modelValue);
+              let newVal = _.cloneDeep(ngModel.$modelValue);
               // Fix possible data-type mismatch
               if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
                 newVal = newVal.length ? newVal.split(',') : [];
@@ -723,7 +724,8 @@
             });
           };
           function refreshModel() {
-            var oldValue = ngModel.$viewValue, newValue = element.select2('val');
+            const oldValue = ngModel.$viewValue;
+            let newValue = element.select2('val');
             if (oldValue != newValue) {
               scope.$parent.$apply(function () {
                 ngModel.$setViewValue(newValue);
@@ -758,19 +760,22 @@
           multi: '<',
           autoOpen: '<',
           quickAdd: '<',
+          quickEdit: '<',
           staticOptions: '<'
         },
         link: function(scope, element, attr, ctrl) {
           // Copied from ng-list but applied conditionally if field is multi-valued
-          var parseList = function(viewValue) {
+          const parseList = function(viewValue) {
             // If the viewValue is invalid (say required but empty) it will be `undefined`
-            if (_.isUndefined(viewValue)) return;
+            if (typeof viewValue === 'undefined') {
+              return;
+            }
 
             if (!ctrl.crmAutocomplete.multi) {
               return viewValue;
             }
 
-            var list = [];
+            const list = [];
 
             if (viewValue) {
               _.each(viewValue.split(','), function(value) {
@@ -799,7 +804,7 @@
             // Copied from ng-list
             ctrl.ngModel.$parsers.push(parseList);
             ctrl.ngModel.$formatters.push(function(value) {
-              return _.isArray(value) ? value.join(',') : value;
+              return Array.isArray(value) ? value.join(',') : value;
             });
 
             // Copied from ng-list
@@ -809,7 +814,7 @@
           }
         },
         controller: function($element, $timeout) {
-          var ctrl = this;
+          const ctrl = this;
 
           // Intitialize widget, and re-render it every time params change
           this.$onChanges = function() {
@@ -824,6 +829,7 @@
                 minimumInputLength: autoOpen ? 0 : 1,
                 static: ctrl.staticOptions || [],
                 quickAdd: ctrl.quickAdd,
+                quickEdit: ctrl.quickEdit,
               });
             });
           };
@@ -845,11 +851,11 @@
             }
 
             // split email string on basis of comma
-            var emails = viewValue.split(',');
+            const emails = viewValue.split(',');
             // regex pattern for single email
-            var emailRegex = /\S+@\S+\.\S+/;
+            const emailRegex = /\S+@\S+\.\S+/;
 
-            var validityArr = emails.map(function(str){
+            const validityArr = emails.map(function(str){
               return emailRegex.test(str.trim());
             });
 
@@ -895,7 +901,7 @@
         transclude: true,
         controllerAs: 'crmUiTabSetCtrl',
         controller: function($scope, $element, $timeout) {
-          var init;
+          let init;
           $scope.tabs = [];
           this.add = function(tab) {
             if (!tab.id) throw "Tab is missing 'id'";
@@ -921,7 +927,7 @@
         restrict: 'EA',
         require: 'ngModel',
         link: function(scope, element, attrs, ngModel) {
-          var validationKey = attrs.crmUiValidateName ? attrs.crmUiValidateName : 'crmUiValidate';
+          const validationKey = attrs.crmUiValidateName ? attrs.crmUiValidateName : 'crmUiValidate';
           scope.$watch(attrs.crmUiValidate, function(newValue){
             ngModel.$setValidity(validationKey, !!newValue);
           });
@@ -938,7 +944,7 @@
           crmUiVisible: '@'
         },
         link: function (scope, element, attrs) {
-          var model = $parse(attrs.crmUiVisible);
+          const model = $parse(attrs.crmUiVisible);
           function updatecChildren() {
             element.css('visibility', model(scope.$parent) ? 'inherit' : 'hidden');
           }
@@ -964,13 +970,12 @@
         transclude: true,
         controllerAs: 'crmUiWizardCtrl',
         controller: function($scope, $parse) {
-          var steps = $scope.steps = []; // array<$scope>
-          var crmUiWizardCtrl = this;
-          var maxVisited = 0;
-          var selectedIndex = null;
+          const steps = $scope.steps = []; // array<$scope>
+          let maxVisited = 0;
+          let selectedIndex = null;
 
-          var findIndex = function() {
-            var found = null;
+          const findIndex = function() {
+            let found = null;
             angular.forEach(steps, function(step, stepKey) {
               if (step.selected) found = stepKey;
             });
@@ -1018,7 +1023,7 @@
             selectedIndex = findIndex();
           };
           this.remove = function(step) {
-            var key = null;
+            let key = null;
             angular.forEach(steps, function(otherStep, otherKey) {
               if (otherStep === step) key = otherKey;
             });
@@ -1044,8 +1049,8 @@
             // These values are captured inside the click handler to ensure the
             // positions/sizes of the elements are captured at the time of the
             // click vs. at the time this directive is initialized.
-            var topOfWizard = element.offset().top;
-            var heightOfMenu = $('#civicrm-menu').height() || 0;
+            const topOfWizard = element.offset().top;
+            const heightOfMenu = $('#civicrm-menu').height() || 0;
 
             $('html')
               // stop any other animations that might be happening...
@@ -1066,7 +1071,7 @@
         template: '<span ng-transclude></span>',
         transclude: true,
         link: function (scope, element, attrs, crmUiWizardCtrl) {
-          var realButtonsEl = $(element).closest('.crm-wizard').find('.crm-wizard-buttons');
+          const realButtonsEl = $(element).closest('.crm-wizard').find('.crm-wizard-buttons');
           $(element).appendTo(realButtonsEl);
         }
       };
@@ -1084,7 +1089,7 @@
           }
           if (attrs.crmIcon) {
             if (attrs.crmIcon.substring(0,3) == 'fa-') {
-              $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" aria-hidden="true"></i> ');
+              $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" role="img" aria-hidden="true"></i> ');
             }
             else {
               $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
@@ -1104,7 +1109,7 @@
     // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
     // example with custom classes: <div crm-ui-wizard-step="100" crm-ui-wizard-step-class="ng-animate-out ...">...content...</div>
     .directive('crmUiWizardStep', function() {
-      var nextWeight = 1;
+      let nextWeight = 1;
       return {
         require: ['^crmUiWizard', 'form'],
         restrict: 'EA',
@@ -1116,7 +1121,8 @@
         template: '<div class="crm-wizard-step {{crmUiWizardStepClass}}" ng-show="selected" ng-transclude/></div>',
         transclude: true,
         link: function (scope, element, attrs, ctrls) {
-          var crmUiWizardCtrl = ctrls[0], form = ctrls[1];
+          const crmUiWizardCtrl = ctrls[0];
+          const form = ctrls[1];
           if (scope.crmUiWizardStep) {
             scope.crmUiWizardStep = parseInt(scope.crmUiWizardStep);
           } else {
@@ -1139,7 +1145,7 @@
     // Example: <button crm-confirm="{confirmed: true}" on-yes="frobnicate(123)">Frobincate</button>
     .directive('crmConfirm', function ($compile, $rootScope, $templateRequest, $q) {
       // Helpers to calculate default options for CRM.confirm()
-      var defaultFuncs = {
+      const defaultFuncs = {
         'disable': function (options) {
           return {
             message: ts('Are you sure you want to disable this?'),
@@ -1171,17 +1177,18 @@
           };
         }
       };
-      var confirmCount = 0;
+      let confirmCount = 0;
       return {
         link: function (scope, element, attrs) {
           $(element).click(function () {
-            var options = scope.$eval(attrs.crmConfirm);
+            const options = scope.$eval(attrs.crmConfirm);
             if (attrs.title && !options.title) {
               options.title = attrs.title;
             }
-            var defaults = (options.type) ? defaultFuncs[options.type](options) : {};
+            const defaults = (options.type) ? defaultFuncs[options.type](options) : {};
 
-            var tpl = null, stubId = null;
+            let tpl = null;
+            let stubId = null;
             if (!options.message) {
               if (options.templateUrl) {
                 tpl = $templateRequest(options.templateUrl);
@@ -1206,11 +1213,11 @@
 
             if (tpl && stubId) {
               $q.when(tpl, function(html) {
-                var scope = options.scope || $rootScope.$new();
+                const scope = options.scope || $rootScope.$new();
                 if (options.export) {
                   angular.extend(scope, options.export);
                 }
-                var linker = $compile(html);
+                const linker = $compile(html);
                 $('#' + stubId).append($(linker(scope)));
               });
             }
@@ -1225,7 +1232,7 @@
     // set a custom title (i.e., it has an initial title of "CiviCRM"). See the
     // global variables pageTitleHTML and documentTitle.
     // Example (same title for both): <h1 crm-page-title>{{ts('Hello')}}</h1>
-    // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag" aria-hidden="true"></i>{{ts('Hello')}}</h1>
+    // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag" role="img" aria-hidden="true"></i>{{ts('Hello')}}</h1>
     .directive('crmPageTitle', function($timeout) {
       return {
         scope: {
@@ -1234,7 +1241,7 @@
         link: function(scope, $el, attrs) {
           function update() {
             $timeout(function() {
-              var newPageTitleHTML = $el.html().trim(),
+              const newPageTitleHTML = $el.html().trim(),
                 newDocumentTitle = scope.crmDocumentTitle || $el.text(),
                 dialog = $el.closest('.ui-dialog-content');
               if (dialog.length) {
@@ -1272,10 +1279,8 @@
           defaultValue: '='
         },
         link: function(scope, element, attrs, ngModel) {
-          var ts = CRM.ts();
-
           function read() {
-            var htmlVal = element.text();
+            let htmlVal = element.text();
             if (!htmlVal) {
               htmlVal = scope.defaultValue || '';
               element.text(htmlVal);
@@ -1339,12 +1344,16 @@
     // Reformat an array of objects for compatibility with select2
     .factory('formatForSelect2', function() {
       return function(input, key, label, extra) {
-        return _.transform(input, function(result, item) {
-          var formatted = {id: item[key], text: item[label]};
+        return input.reduce((result, item) => {
+          const formatted = {id: item[key], text: item[label]};
+
           if (extra) {
-            _.merge(formatted, _.pick(item, extra));
+            // Handle extra properties
+            extra.forEach(prop => formatted[prop] = item[prop]);
           }
+
           result.push(formatted);
+          return result;
         }, []);
       };
     })

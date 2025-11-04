@@ -88,8 +88,8 @@ class SKEntity {
     $permissions = [
       'meta' => ['access CiviCRM'],
       'default' => ['administer CiviCRM'],
-      'refresh' => ['administer search_kit'],
-      'getRefreshDate' => ['administer search_kit'],
+      'refresh' => ['manage own search_kit'],
+      'getRefreshDate' => ['manage own search_kit'],
     ];
     // Permissions based on search display
     [, $displayName] = explode('_', $entityName, 2);

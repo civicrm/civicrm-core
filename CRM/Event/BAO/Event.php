@@ -66,10 +66,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
     $result = $event->save();
 
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Event', $event->id, $event);
+      CRM_Utils_Hook::post('edit', 'Event', $event->id, $event, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'Event', $event->id, $event);
+      CRM_Utils_Hook::post('create', 'Event', $event->id, $event, $params);
     }
     if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);
@@ -1707,9 +1707,7 @@ WHERE  id = $cfID
           $address .= ($address ? ' :: ' : '') . $event[$field];
         }
       }
-      if ($address) {
-        $events[$event['loc_block_id']] = $address;
-      }
+      $events[$event['loc_block_id']] = $address ?: ts("(Location %1)", [1 => $event['loc_block_id']]);
     }
 
     return CRM_Utils_Array::asort($events);
@@ -2338,7 +2336,7 @@ WHERE  ce.loc_block_id = $locBlockId";
           }
         }
 
-        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
+        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params, FALSE, NULL, 'email');
 
         //dev/event#10
         //If the event profile includes a note field and the submitted value of

@@ -15,7 +15,7 @@
     {include file="CRM/Contribute/Form/SearchContribution.tpl"}
     {if NOT ($action eq 1 or $action eq 2)}
       <div class="action-link">
-        <a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a>
+        <a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a>
       </div>
     {/if}
 

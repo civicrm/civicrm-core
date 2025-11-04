@@ -271,6 +271,32 @@ class CRM_Utils_String {
   }
 
   /**
+   * @var string[]
+   *   Array(string $base64 => string $base64mbz)
+   */
+  private static $mbzTable = ['Z' => 'Z0', '+' => 'Z1', '/' => 'Z2'];
+
+  /**
+   * Encode string using Base64 with multibyte "Z"-escaping (MBZ).
+   *
+   * Base64-MBZ strings are -strictly- alphanumeric, but they may be slightly longer
+   * than standard Base64. For inputs with random-like data (such as crypto keys, signatures,
+   * ciphertext, and compressed-files), it should be 4-5% longer.
+   *
+   * @param string $raw
+   *
+   * @return string
+   *   Base64, but with some characters ('Z', '+', '/') replaced by multibyte expressions ("Z0", "Z1", "Z2").
+   */
+  public static function base64mbzEncode($raw) {
+    return strtr(rtrim(base64_encode($raw), '='), self::$mbzTable);
+  }
+
+  public static function base64mbzDecode($str) {
+    return base64_decode(strtr($str, array_flip(self::$mbzTable)));
+  }
+
+  /**
    * Determine the string replacements for redaction.
    * on the basis of the regular expressions
    *
@@ -653,6 +679,11 @@ class CRM_Utils_String {
       if (!empty($def)) {
         $def->addElement('figcaption', 'Block', 'Flow', 'Common');
         $def->addElement('figure', 'Block', 'Optional: (figcaption, Flow) | (Flow, figcaption) | Flow', 'Common');
+        // Allow `<summary>` and `<details>`
+        $def->addElement('details', 'Block', 'Flow', 'Common', [
+          'open' => new \HTMLPurifier_AttrDef_HTML_Bool('open'),
+        ]);
+        $def->addElement('summary', 'Inline', 'Inline', 'Common');
       }
       $_filter = new HTMLPurifier($config);
     }

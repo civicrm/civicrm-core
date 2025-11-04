@@ -17,7 +17,6 @@ use CRM_ACL_BAO_Cache;
 use CRM_Case_XMLRepository;
 use CRM_Contact_BAO_Contact;
 use CRM_Contribute_BAO_Contribution;
-use CRM_Core_BAO_Navigation;
 use CRM_Core_BAO_WordReplacement;
 use CRM_Core_Config;
 use CRM_Core_DAO;
@@ -72,8 +71,9 @@ class Rebuilder {
       'metadata' => TRUE,
       'system' => TRUE,
       'userjob' => TRUE,
-      'menu' => TRUE,
+      'navigation' => TRUE,
       'perms' => TRUE,
+      'router' => TRUE,
       'strings' => TRUE,
       'settings' => TRUE,
       'cases' => TRUE,
@@ -85,9 +85,18 @@ class Rebuilder {
       unset($targets['*']);
     }
 
+    if (isset($targets['menu'])) {
+      \CRM_Core_Error::deprecatedWarning("In Civi::rebuild(), the 'menu' option is deprecated. For CiviCRM 6.9+, please specify combination of 'router', 'navigation', and/or 'system'.");
+      $targets['router'] = $targets['router'] || $targets['menu'];
+      $targets['navigation'] = $targets['navigation'] || $targets['menu'];
+      $targets['system'] = $targets['system'] || $targets['menu'];
+      unset($targets['menu']);
+    }
+
     $config = CRM_Core_Config::singleton();
 
     if (!empty($targets['ext'])) {
+      // N.B. clearModuleList() includes call to CRM_Extension_System::singleton()->getCache()->flush();
       $config->clearModuleList();
 
       // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
@@ -131,7 +140,11 @@ class Rebuilder {
         Civi::cache('contactTypes')->clear();
         Civi::cache('metadata')->clear(); /* Again? Huh. */
         ClassScanner::cache('index')->flush();
-        CRM_Extension_System::singleton()->getCache()->flush();
+
+        // If ext=>TRUE, then we've already flushed ext system (10ms ago).
+        if (empty($targets['ext'])) {
+          CRM_Extension_System::singleton()->getCache()->flush();
+        }
       }
 
       // also reset the various static memory caches
@@ -170,9 +183,11 @@ class Rebuilder {
       $session = CRM_Core_Session::singleton();
       $session->reset(2);
     }
-    if (!empty($targets['menu'])) {
+    if (!empty($targets['router'])) {
       CRM_Core_Menu::store();
-      CRM_Core_BAO_Navigation::resetNavigation();
+    }
+    if (!empty($targets['navigation'])) {
+      Civi::cache('navigation')->flush();
     }
     if (!empty($targets['perms'])) {
       $config->cleanupPermissions();

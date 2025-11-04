@@ -9,7 +9,7 @@
   //     });
   //     return $delegate;
   //   });
-  var hook = {
+  const hook = {
     findCriticalChanges: [],
     preSaveDisplay: [],
     postSaveDisplay: []
@@ -27,15 +27,15 @@
   }
 
   // Controller function for main crmSearchAdmin component
-  var ctrl = function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, crmUiHelp) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-      ctrl = this,
-      afformLoad,
-      fieldsForJoinGetters = {};
+  const ctrl = function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, crmUiHelp) {
+    const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      ctrl = this;
+    let afformLoad;
+    const fieldsForJoinGetters = {};
     $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Compose'});
 
     this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
-    this.afformAdminEnabled = CRM.checkPerm('administer afform') &&
+    this.afformAdminEnabled = CRM.checkPerm('manage own afform') &&
       'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
     this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
     this.searchDisplayPath = CRM.url('civicrm/search');
@@ -119,7 +119,7 @@
       const path = $location.path();
       // In create mode, set defaults and bind params to route for easy copy/paste
       if (path.includes('create/')) {
-        var defaults = {
+        const defaults = {
           version: 4,
           select: searchMeta.getEntity(ctrl.savedSearch.api_entity).default_columns,
           orderBy: {},
@@ -210,7 +210,7 @@
         return;
       }
       $scope.status = 'saving';
-      var params = _.cloneDeep(ctrl.savedSearch),
+      const params = _.cloneDeep(ctrl.savedSearch),
         apiCalls = {},
         chain = {};
       if (ctrl.groupExists) {
@@ -254,7 +254,7 @@
           $location.url('edit/' + results.saved.id);
         }
         // Set new status to saved unless the user changed something in the interim
-        var newStatus = $scope.status === 'unsaved' ? 'unsaved' : 'saved';
+        const newStatus = $scope.status === 'unsaved' ? 'unsaved' : 'saved';
         if (results.saved.groups && results.saved.groups.length) {
           ctrl.savedSearch.groups[0].id = results.saved.groups[0].id;
         }
@@ -276,7 +276,7 @@
     };
 
     this.addDisplay = function(type) {
-      var count = _.filter(ctrl.savedSearch.displays, {type: type}).length,
+      const count = _.filter(ctrl.savedSearch.displays, {type: type}).length,
         searchLabel = ctrl.savedSearch.label || searchMeta.getEntity(ctrl.savedSearch.api_entity).title_plural;
       ctrl.savedSearch.displays.push({
         type: type,
@@ -286,7 +286,7 @@
     };
 
     this.removeDisplay = function(index) {
-      var display = ctrl.savedSearch.displays[index];
+      const display = ctrl.savedSearch.displays[index];
       if (display.id) {
         display.trashed = !display.trashed;
         if ($scope.controls.tab === ('display_' + index) && display.trashed) {
@@ -296,11 +296,11 @@
         }
         if (display.trashed && afformLoad) {
           afformLoad.then(function() {
-            var displayForms = _.filter(ctrl.afforms, function(form) {
+            const displayForms = _.filter(ctrl.afforms, function(form) {
               return _.includes(form.displays, ctrl.savedSearch.name + '.' + display.name);
             });
             if (displayForms.length) {
-              var msg = displayForms.length === 1 ?
+              let msg = displayForms.length === 1 ?
                 ts('Form "%1" will be deleted if the embedded display "%2" is deleted.', {1: displayForms[0].title, 2: display.label}) :
                 ts('%1 forms will be deleted if the embedded display "%2" is deleted.', {1: displayForms.length, 2: display.label});
               CRM.alert(msg, ts('Display embedded'), 'alert');
@@ -314,7 +314,7 @@
     };
 
     this.cloneDisplay = function(display) {
-      var newDisplay = angular.copy(display);
+      const newDisplay = angular.copy(display);
       delete newDisplay.name;
       delete newDisplay.id;
       newDisplay.label += ' ' + ts('(copy)');
@@ -337,7 +337,7 @@
       if (tab === 'group') {
         loadFieldOptions('Group');
         $scope.smartGroupColumns = searchMeta.getSmartGroupColumns(ctrl.savedSearch);
-        var smartGroupColumns = _.map($scope.smartGroupColumns, 'id');
+        const smartGroupColumns = _.map($scope.smartGroupColumns, 'id');
         if (smartGroupColumns.length && !_.includes(smartGroupColumns, ctrl.savedSearch.api_params.select[0])) {
           ctrl.savedSearch.api_params.select.unshift(smartGroupColumns[0]);
         }
@@ -357,6 +357,25 @@
       }
     };
 
+    // Because angular dropdowns must be a by-reference variable
+    const suffixOptionCache = {};
+
+    this.getSuffixOptions = function(expr) {
+      const info = searchMeta.parseExpr(expr);
+      if (!info.fn && info.args[0] && info.args[0].field && info.args[0].field.suffixes) {
+        let cacheKey = info.args[0].field.suffixes.join();
+        if (!(cacheKey in suffixOptionCache)) {
+          suffixOptionCache[cacheKey] = Object.keys(CRM.crmSearchAdmin.optionAttributes)
+            .filter(key => info.args[0].field.suffixes.includes(key))
+            .reduce((filteredOptions, key) => {
+              filteredOptions[key] = CRM.crmSearchAdmin.optionAttributes[key];
+              return filteredOptions;
+            }, {});
+        }
+        return suffixOptionCache[cacheKey];
+      }
+    };
+
     function addNum(name, num) {
       return name + (num < 10 ? '_0' : '_') + num;
     }
@@ -368,11 +387,11 @@
     }
 
     $scope.getJoinEntities = function() {
-      var existingJoins = getExistingJoins();
+      const existingJoins = getExistingJoins();
 
       function addEntityJoins(entity, stack, baseEntity) {
         return _.transform(CRM.crmSearchAdmin.joins[entity], function(joinEntities, join) {
-          var num = 0;
+          let num = 0;
           if (
             // Exclude joins that singly point back to the original entity
             !(baseEntity === join.entity && !join.multi) &&
@@ -387,7 +406,7 @@
       }
 
       function appendJoin(collection, join, num, stack, baseEntity) {
-        var alias = addNum((stack ? stack + '_' : '') + join.alias, num),
+        const alias = addNum((stack ? stack + '_' : '') + join.alias, num),
           opt = {
             id: join.entity + ' AS ' + alias,
             description: join.description,
@@ -407,7 +426,7 @@
     this.addJoin = function(value) {
       if (value) {
         ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
-        var join = searchMeta.getJoin(ctrl.savedSearch, value),
+        const join = searchMeta.getJoin(ctrl.savedSearch, value),
           entity = searchMeta.getEntity(join.entity),
           params = [value, $scope.controls.joinType || 'LEFT'];
         _.each(_.cloneDeep(join.conditions), function(condition) {
@@ -453,21 +472,21 @@
 
     // Remove an explicit join + all SELECT, WHERE & other JOINs that use it
     this.removeJoin = function(index) {
-      var alias = searchMeta.getJoin(ctrl.savedSearch, ctrl.savedSearch.api_params.join[index][0]).alias;
+      const alias = searchMeta.getJoin(ctrl.savedSearch, ctrl.savedSearch.api_params.join[index][0]).alias;
       ctrl.clearParam('join', index);
       removeJoinStuff(alias);
     };
 
     function removeJoinStuff(alias) {
       _.remove(ctrl.savedSearch.api_params.select, function(item) {
-        var pattern = new RegExp('\\b' + alias + '\\.');
+        const pattern = new RegExp('\\b' + alias + '\\.');
         return pattern.test(item.split(' AS ')[0]);
       });
       _.remove(ctrl.savedSearch.api_params.where, function(clause) {
         return clauseUsesJoin(clause, alias);
       });
       _.eachRight(ctrl.savedSearch.api_params.join, function(item, i) {
-        var joinAlias = searchMeta.getJoin(ctrl.savedSearch, item[0]).alias;
+        const joinAlias = searchMeta.getJoin(ctrl.savedSearch, item[0]).alias;
         if (joinAlias !== alias && joinAlias.indexOf(alias) === 0) {
           ctrl.removeJoin(i);
         }
@@ -491,7 +510,7 @@
 
     function reconcileAggregateColumns() {
       _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
-        var info = searchMeta.parseExpr(col),
+        const info = searchMeta.parseExpr(col),
           fieldExpr = (_.findWhere(info.args, {type: 'field'}) || {}).value;
         if (ctrl.mustAggregate(col)) {
           // Ensure all non-grouped columns are aggregated if using GROUP BY
@@ -538,8 +557,8 @@
     }
 
     function validate() {
-      var errors = [],
-        errorEl,
+      const errors = [];
+      let errorEl,
         label,
         tab;
       if (!ctrl.savedSearch.label) {
@@ -598,6 +617,9 @@
 
     // Is a column eligible to use an aggregate function?
     this.canAggregate = function(col) {
+      if (!ctrl.paramExists('groupBy')) {
+        return false;
+      }
       // If the query does not use grouping, it's always allowed
       if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
         return true;
@@ -611,7 +633,7 @@
       if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
         return false;
       }
-      var arg = _.findWhere(searchMeta.parseExpr(col).args, {type: 'field'}) || {};
+      const arg = _.findWhere(searchMeta.parseExpr(col).args, {type: 'field'}) || {};
       // If the column is not a database field, no
       if (!arg.field || !arg.field.entity || !_.includes(['Field', 'Custom', 'Extra'], arg.field.type)) {
         return false;
@@ -621,7 +643,7 @@
         return false;
       }
       // If the entity this column belongs to is being grouped by primary key, then also no
-      var idField = searchMeta.getEntity(arg.field.entity).primary_key[0];
+      const idField = searchMeta.getEntity(arg.field.entity).primary_key[0];
       return ctrl.savedSearch.api_params.groupBy.indexOf(arg.prefix + idField) < 0;
     };
 
@@ -665,7 +687,7 @@
       allowedTypes = allowedTypes || ['Field', 'Custom', 'Extra', 'Filter'];
 
       function formatEntityFields(entityName, join) {
-        var prefix = join ? join.alias + '.' : '',
+        const prefix = join ? join.alias + '.' : '',
           result = [];
 
         // Add extra searchable fields from bridge entity
@@ -682,7 +704,7 @@
       function formatFields(fields, result, prefix) {
         prefix = typeof prefix === 'undefined' ? '' : prefix;
         _.each(fields, function(field) {
-          var item = {
+          const item = {
             // Use options suffix if available.
             id: prefix + field.name + (_.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
             text: field.label,
@@ -698,7 +720,7 @@
         return result;
       }
 
-      var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
+      const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
         joinEntities = _.map(ctrl.savedSearch.api_params.join, 0),
         result = [];
 
@@ -741,8 +763,8 @@
     this.getSelectFields = function(disabledIf) {
       disabledIf = disabledIf || _.noop;
       return _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
-        var info = searchMeta.parseExpr(name);
-        var item = {
+        const info = searchMeta.parseExpr(name);
+        const item = {
           id: info.alias,
           text: ctrl.getFieldLabel(name),
           description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description
@@ -762,11 +784,11 @@
     // And an optional additional entity
     function loadFieldOptions(entity) {
       // Main entity
-      var entitiesToLoad = [ctrl.savedSearch.api_entity];
+      const entitiesToLoad = [ctrl.savedSearch.api_entity];
 
       // Join entities + bridge entities
       _.each(ctrl.savedSearch.api_params.join, function(join) {
-        var joinInfo = searchMeta.getJoin(ctrl.savedSearch, join[0]);
+        const joinInfo = searchMeta.getJoin(ctrl.savedSearch, join[0]);
         entitiesToLoad.push(joinInfo.entity);
         if (joinInfo.bridge) {
           entitiesToLoad.push(joinInfo.bridge);
@@ -789,7 +811,7 @@
       }
 
       // Links to main entity
-      var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
+      const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
         links = _.cloneDeep(mainEntity.links || []);
       _.each(links, function(link) {
         link.join = '';
@@ -797,7 +819,7 @@
       });
       // Links to explicitly joined entities
       _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
-        var join = searchMeta.getJoin(ctrl.savedSearch, joinClause[0]),
+        const join = searchMeta.getJoin(ctrl.savedSearch, joinClause[0]),
           joinEntity = searchMeta.getEntity(join.entity),
           bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
         _.each(_.cloneDeep(joinEntity.links), function(link) {
@@ -814,12 +836,12 @@
       // Links to implicit joins
       _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
         if (!_.includes(fieldName, ' AS ')) {
-          var info = searchMeta.parseExpr(fieldName).args[0];
+          const info = searchMeta.parseExpr(fieldName).args[0];
           if (info.field && !info.suffix && !info.fn && info.field.type === 'Field' && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
-            var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
+            const idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
               idField = searchMeta.parseExpr(idFieldName).args[0].field;
             if (!ctrl.mustAggregate(idFieldName)) {
-              var joinEntity = searchMeta.getEntity(idField.fk_entity),
+              const joinEntity = searchMeta.getEntity(idField.fk_entity),
                 label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
               _.each(_.cloneDeep(joinEntity && joinEntity.links), function(link) {
                 link.join = idFieldName;
@@ -837,7 +859,7 @@
     function loadAfforms() {
       ctrl.afforms = null;
       if (ctrl.afformEnabled && ctrl.savedSearch.id) {
-        var findDisplays = _.transform(ctrl.savedSearch.displays, function(findDisplays, display) {
+        const findDisplays = _.transform(ctrl.savedSearch.displays, function(findDisplays, display) {
           if (display.id && display.name) {
             findDisplays.push(['search_displays', 'CONTAINS', ctrl.savedSearch.name + '.' + display.name]);
           }

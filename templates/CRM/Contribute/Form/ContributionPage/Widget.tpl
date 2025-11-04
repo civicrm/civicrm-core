@@ -21,7 +21,7 @@
         <div class="description">{ts}Add this widget to any web page by copying and pasting the code below.{/ts}</div>
         <textarea rows="8" cols="50" name="widget_code" id="widget_code">{include file="CRM/Contribute/Page/Widget.tpl" widgetId=$widget_id cpageId=$cpageId}</textarea>
         <br />
-        <strong><a href="#" onclick="Widget.widget_code.select(); return false;"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Select Code{/ts}</a></strong>
+        <strong><a href="#" onclick="Widget.widget_code.select(); return false;"><i class="crm-i fa-code" role="img" aria-hidden="true"></i> {ts}Select Code{/ts}</a></strong>
       </div>
     {else}
       <div class="description">{ts}The code for adding this widget to web pages will be displayed here.{/ts}</div>

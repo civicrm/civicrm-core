@@ -29,6 +29,7 @@ class Api4EntitySetQuery extends Api4Query {
 
     $this->query = \CRM_Utils_SQL_Select::fromSet(['setAlias' => static::MAIN_TABLE_ALIAS]);
     $isAggregate = $this->isAggregateQuery();
+    $isDistinct = $this->isDistinctUnion();
 
     foreach ($api->getSets() as $index => $set) {
       [$type, $entity, $action, $params] = $set + [NULL, NULL, 'get', []];
@@ -41,7 +42,10 @@ class Api4EntitySetQuery extends Api4Query {
         if (!$apiRequest->getSelect()) {
           $apiRequest->addSelect('*');
         }
-        $apiRequest->addSelect($index . ' AS _api_set_index');
+        // Distinct unions cannot use tracking index (it would break the uniqueness), but they also don't need it,
+        // since all sets will be pulling from the same table.
+        $setIndex = $isDistinct ? 0 : $index;
+        $apiRequest->addSelect($setIndex . ' AS _api_set_index');
       }
       $apiRequest->expandSelectClauseWildcards();
       $subQuery = new Api4SelectQuery($apiRequest);
@@ -114,6 +118,7 @@ class Api4EntitySetQuery extends Api4Query {
       $this->addSpecField($alias, [
         'sql_name' => "`$alias`",
         'entity' => $field['entity'] ?? NULL,
+        'name' => $field['name'] ?? $alias,
         'data_type' => $field['data_type'] ?? $expr::getDataType(),
       ]);
     }
@@ -130,7 +135,7 @@ class Api4EntitySetQuery extends Api4Query {
    * @param string $expr
    * @return array|null
    */
-  public function getField($expr) {
+  public function getField(string $expr):? array {
     $col = strpos($expr, ':');
     $fieldName = $col ? substr($expr, 0, $col) : $expr;
     return $this->apiFieldSpec[$fieldName] ?? NULL;

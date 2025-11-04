@@ -270,6 +270,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   * @internal
    */
   public function addHTMLHead($string = NULL) {
     if ($string) {
@@ -699,63 +700,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @return bool
    */
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
-    $joomlaBase = self::getBasePath();
-
-    // load BootStrap here if needed
-    // We are a valid Joomla entry point.
-    // dev/core#1384 Use DS to ensure a correct JPATH_BASE in Windows
-    if (!defined('_JEXEC') && $loadDefines) {
-      define('_JEXEC', 1);
-      define('DS', DIRECTORY_SEPARATOR);
-      define('JPATH_BASE', $joomlaBase . DS . 'administrator');
-      require $joomlaBase . '/administrator/includes/defines.php';
-    }
-
-    // Get the framework.
-    if (file_exists($joomlaBase . '/libraries/import.legacy.php') && !file_exists($joomlaBase . '/libraries/bootstrap.php')) {
-      require $joomlaBase . '/libraries/import.legacy.php';
-    }
-
-    if (!file_exists($joomlaBase . '/libraries/bootstrap.php')) {
-      require $joomlaBase . '/libraries/cms.php';
-    }
-    else {
-      require $joomlaBase . '/libraries/bootstrap.php';
-      require_once $joomlaBase . '/includes/framework.php';
-    }
-    self::getJVersion($joomlaBase);
-
-    if (version_compare(JVERSION, '3.8', 'lt')) {
-      require $joomlaBase . '/libraries/import.php';
-      require $joomlaBase . '/libraries/joomla/event/dispatcher.php';
-    }
-
-    require_once $joomlaBase . '/configuration.php';
-
-    if (version_compare(JVERSION, '3.0', 'lt')) {
-      require $joomlaBase . '/libraries/joomla/environment/uri.php';
-      require $joomlaBase . '/libraries/joomla/application/component/helper.php';
-    }
-    elseif (version_compare(JVERSION, '3.8', 'lt')) {
-      jimport('joomla.environment.uri');
-    }
-
-    if (version_compare(JVERSION, '3.8', 'lt')) {
-      jimport('joomla.application.cli');
-    }
-
-    if (!defined('JDEBUG')) {
-      define('JDEBUG', FALSE);
-    }
-
-    if (version_compare(JVERSION, '4.0', '>=')) {
-      if (PHP_SAPI == 'cli') {
-        $this->loadJoomlaApplication('cli');
-      }
-      else {
-        $this->loadJoomlaApplication('admin');
-      }
-    }
+    $this->loadJoomlaFramework($loadDefines);
 
     // Set timezone for Joomla on Cron
     $factoryClassName = $this->factoryClassName();
@@ -1181,9 +1126,77 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return $profile;
   }
 
-  protected function loadJoomlaApplication(string $applicationName) {
+  /**
+   * Load the Joomla CMS framework, including the application.
+   * @param bool $loadDefines
+   */
+  public function loadJoomlaFramework(bool $loadDefines = TRUE):void {
+    $joomlaBase = self::getBasePath();
+
+    // load BootStrap here if needed
+    // We are a valid Joomla entry point.
+    // dev/core#1384 Use DS to ensure a correct JPATH_BASE in Windows
+    if (!defined('_JEXEC') && $loadDefines) {
+      define('_JEXEC', 1);
+      define('DS', DIRECTORY_SEPARATOR);
+      define('JPATH_BASE', $joomlaBase . DS . 'administrator');
+      require_once $joomlaBase . '/administrator/includes/defines.php';
+    }
+
+    // Get the framework.
+    if (file_exists($joomlaBase . '/libraries/import.legacy.php') && !file_exists($joomlaBase . '/libraries/bootstrap.php')) {
+      require_once $joomlaBase . '/libraries/import.legacy.php';
+    }
+
+    if (!file_exists($joomlaBase . '/libraries/bootstrap.php')) {
+      require_once $joomlaBase . '/libraries/cms.php';
+    }
+    else {
+      require_once $joomlaBase . '/libraries/bootstrap.php';
+      require_once $joomlaBase . '/includes/framework.php';
+    }
+    self::getJVersion($joomlaBase);
+
+    if (version_compare(JVERSION, '3.8', 'lt')) {
+      require_once $joomlaBase . '/libraries/import.php';
+      require_once $joomlaBase . '/libraries/joomla/event/dispatcher.php';
+    }
+
+    require_once $joomlaBase . '/configuration.php';
+
+    if (version_compare(JVERSION, '3.0', 'lt')) {
+      require_once $joomlaBase . '/libraries/joomla/environment/uri.php';
+      require_once $joomlaBase . '/libraries/joomla/application/component/helper.php';
+    }
+    elseif (version_compare(JVERSION, '3.8', 'lt')) {
+      jimport('joomla.environment.uri');
+    }
+
+    if (version_compare(JVERSION, '3.8', 'lt')) {
+      jimport('joomla.application.cli');
+    }
+
+    if (!defined('JDEBUG')) {
+      define('JDEBUG', FALSE);
+    }
+
+    if (version_compare(JVERSION, '4.0', 'ge')) {
+      if (PHP_SAPI == 'cli') {
+        $this->loadJoomlaApplication('cli');
+      }
+      else {
+        $this->loadJoomlaApplication('admin');
+      }
+    }
+  }
+
+  /**
+   * Load the Joomla CMS application.
+   * @param string $applicationName The application name: 'site', 'admin' or 'cli'.
+   */
+  protected function loadJoomlaApplication(string $applicationName):void {
     // Boot the DI container
-    if ($applicationName === 'site') {
+    if ($applicationName == 'site') {
       $applicationClass = \Joomla\CMS\Application\SiteApplication::class;
       $session = 'session.web.site';
     }

@@ -9,5 +9,5 @@
 *}
 
 <div id="billing-payment-block">
-  {include file="CRM/Core/BillingBlock.tpl"}
+  {include file="CRM/Core/BillingBlock.tpl" showPaymentOnConfirm=false}
 </div>

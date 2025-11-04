@@ -97,7 +97,7 @@ return [
         'saved_search_id.name' => 'ActivitySearch',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts(NULL),
+          'description' => NULL,
           'sort' => [
             [
               'activity_date_time',
@@ -186,7 +186,7 @@ return [
               'sortable' => TRUE,
             ],
             [
-              'text' => E::ts(''),
+              'text' => '',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',

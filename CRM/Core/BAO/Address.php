@@ -350,14 +350,16 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
    *
    * @param array $entityBlock
    *   Associated array of fields.
-   * @param bool $microformat
-   *   If microformat output is required.
+   * @param bool $useMarkup
+   *   If TRUE, then `$this->display` will be filled with an address summary -- using markup.
+   *   If FALSE, then `$this->display` will be filled with an address summary -- using plain-text.
+   *   NOTE: Regardless of the flag, `$this->display_text` will have an address summary -- using plain-text.
    * @param int|string $fieldName conditional field name
    *
    * @return array
    *   array with address fields
    */
-  public static function &getValues($entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
+  public static function &getValues($entityBlock, $useMarkup = FALSE, $fieldName = 'contact_id') {
     if (empty($entityBlock)) {
       return NULL;
     }
@@ -423,7 +425,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
         $values['world_region'] = CRM_Core_PseudoConstant::worldregion($regionId);
       }
 
-      $address->addDisplay($microformat);
+      $address->addDisplay($useMarkup);
 
       $values['display'] = $address->display;
       $values['display_text'] = $address->display_text;
@@ -431,7 +433,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
       if (isset($address->master_id) && !CRM_Utils_System::isNull($address->master_id)) {
         $values['use_shared_address'] = 1;
       }
-
+      // Ensure that for Event Info at least that geo_code array keys are always returned even if NULL in the database;
+      if (!array_key_exists('geo_code_1', $values)) {
+        $values['geo_code_1'] = NULL;
+        $values['geo_code_2'] = NULL;
+      }
       $addresses[$count] = $values;
 
       //There should never be more than one primary blocks, hence set is_primary = 0 other than first
@@ -449,10 +455,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
   /**
    * Add the formatted address to $this-> display.
    *
-   * @param bool $microformat
-   *   Unexplained parameter that I've always wondered about.
+   * @param bool $useMarkup
+   *   If TRUE, then `$this->display` will be filled with an address summary -- using markup.
+   *   If FALSE, then `$this->display` will be filled with an address summary -- using plain-text.
+   *   NOTE: Regardless of the flag, `$this->display_text` will have an address summary -- using plain-text.
    */
-  public function addDisplay($microformat = FALSE) {
+  public function addDisplay($useMarkup = FALSE) {
     $fields = [
       // added this for CRM 1200
       'address_id' => $this->id,
@@ -477,7 +485,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
     else {
       $fields['county'] = NULL;
     }
-    if ($microformat) {
+    if ($useMarkup) {
       $this->display = CRM_Utils_Address::formatVCard($fields);
       $this->display_text = CRM_Utils_Address::format($fields);
     }
@@ -1047,8 +1055,9 @@ SELECT is_primary,
       }
 
       // CRM-15120
+      $display_name_format = self::tryToDoSimilarToWhatItDidBeforeWithoutGettingTooComplicated(Civi::settings()->get('display_name_format'));
       $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['schema' => ['contactId'], 'smarty' => FALSE]);
-      $tokenProcessor->addMessage('name', Civi::settings()->get('display_name_format'), 'text/plain');
+      $tokenProcessor->addMessage('name', $display_name_format, 'text/plain');
       $tokenProcessor->addRow(['contact' => ['id' => $rowID] + $rows[$rowID]]);
       $tokenProcessor->evaluate();
       $firstNameWithPrefix = trim($tokenProcessor->getRow(0)->render('name'));
@@ -1424,6 +1433,47 @@ SELECT is_primary,
       $blocks[] = self::writeRecord($value);
     }
     return $blocks;
+  }
+
+  /**
+   * Before being converted to use tokens, it used CRM_Utils_Address::format to
+   * attempt to use the same format as the display_name pref, but only
+   * including the first name and prefix. Try to do something similar but
+   * compromise for simplicity.
+   *
+   * @param string $display_name_format The display name format as configured
+   *   under display preferences
+   * @return string
+   */
+  private static function tryToDoSimilarToWhatItDidBeforeWithoutGettingTooComplicated(string $display_name_format): string {
+    $pos_prefix = strpos($display_name_format, '{contact.prefix_id:label}');
+    $pos_firstname = strpos($display_name_format, '{contact.first_name}');
+    if ($pos_prefix === FALSE && $pos_firstname !== FALSE) {
+      // If the config contains first_name but not prefix.
+      $display_name_format = '{contact.first_name}';
+    }
+    elseif ($pos_prefix !== FALSE && $pos_firstname === FALSE) {
+      // If the config contains prefix but not first_name.
+      // This would be weird, and it breaks the algorithm because if there's no
+      // first name then it can't build the array properly. But it's
+      // technically a valid config, and would have been the same before.
+      $display_name_format = '{contact.prefix_id:label}';
+    }
+    elseif ($pos_prefix === FALSE && $pos_firstname === FALSE) {
+      // If the config contains neither. This also breaks things, but again
+      // is technically valid.
+      $display_name_format = '';
+    }
+    else {
+      // If the config contains both, try to preserve order and assume space separator.
+      if ($pos_prefix < $pos_firstname) {
+        $display_name_format = '{contact.prefix_id:label} {contact.first_name}';
+      }
+      else {
+        $display_name_format = '{contact.first_name} {contact.prefix_id:label}';
+      }
+    }
+    return $display_name_format;
   }
 
 }

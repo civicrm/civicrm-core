@@ -44,7 +44,7 @@ return [
         'saved_search_id.name' => 'Administer_Custom_Field_Options',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts(''),
+          'description' => '',
           'sort' => [],
           'limit' => 50,
           'pager' => [

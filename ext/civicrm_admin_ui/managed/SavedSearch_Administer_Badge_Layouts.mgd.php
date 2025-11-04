@@ -45,7 +45,7 @@ return [
         'saved_search_id.name' => 'Administer_Badge_Layouts',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts(''),
+          'description' => '',
           'sort' => [],
           'limit' => 50,
           'pager' => [
@@ -89,7 +89,7 @@ return [
               ],
             ],
             [
-              'text' => E::ts(''),
+              'text' => '',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',

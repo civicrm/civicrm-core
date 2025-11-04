@@ -17,11 +17,11 @@ namespace Civi\Import;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
-use Civi\Api4\Email;
 use Civi\Api4\Note;
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
 
 /**
  * Class to parse contribution csv files.
@@ -165,6 +165,12 @@ class ContributionParser extends ImportParser {
         $fields['Contribution.' . $fieldName] = $field;
       }
       $fields['Contribution.note']['entity_instance'] = 'Note';
+      foreach ($this->getImportFieldsForEntity('FinancialTrxn') as $paymentField) {
+        $paymentField['entity_name'] = 'Contribution';
+        $paymentField['entity_instance'] = 'Payment';
+        $fields['Payment.' . $paymentField['name']] = $paymentField;
+      }
+
       $contactFields = $this->getContactFields($this->getContactType(), 'Contact');
       $fields['Contribution.contact_id'] = $contactFields['Contact.id'];
       $fields['Contribution.contact_id']['match_rule'] = '*';
@@ -249,18 +255,19 @@ class ContributionParser extends ImportParser {
         'default_action' => 'create',
         'entity_name' => 'Contribution',
         'entity_title' => ts('Contribution'),
+        'entity_type' => 'Contribution',
         'selected' => ['action' => 'create'],
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
         'unique_fields' => ['external_identifier', 'id'],
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => 'Individual',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',
@@ -271,14 +278,14 @@ class ContributionParser extends ImportParser {
         // It turns out there is actually currently no limit - you can import multiple of the same type.
         'supports_multiple' => TRUE,
         'unique_fields' => ['external_identifier', 'id'],
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'is_required' => FALSE,
         'actions' => array_merge([['id' => 'ignore', 'text' => ts('Do not import')]], $this->getActions(['select', 'update', 'save'])),
         'selected' => [
           'contact_type' => 'Individual',
           'soft_credit_type_id' => $defaultSoftCreditTypeID,
           'action' => 'ignore',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'ignore',
         'entity_name' => 'SoftCreditContact',
@@ -325,11 +332,12 @@ class ContributionParser extends ImportParser {
       $contributionParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], $contributionParams['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
 
       $softCreditParams = [];
-      $softCreditEntities = isset($params['SoftCreditContact']) ? [$params['SoftCreditContact']] : [];
+      // A hook could have change it to be an array of arrays.
+      $softCreditEntities = isset($params['SoftCreditContact']['soft_credit_type_id']) ? [$params['SoftCreditContact']] : $params['SoftCreditContact'] ?? [];
       foreach ($softCreditEntities as $index => $softCreditContact) {
         $softCreditParams[$index]['soft_credit_type_id'] = $softCreditContact['soft_credit_type_id'];
-        $softCreditParams[$index]['contact_id'] = $this->getContactID($softCreditContact, !empty($softCreditContact['id']) ? $softCreditContact['id'] : NULL, 'SoftCreditContact', $this->getDedupeRulesForEntity('SoftCreditContact'));
-        if (empty($softCreditParams[$index]['contact_id']) && in_array($this->getActionForEntity('SoftCreditContact'), ['update', 'select'])) {
+        $softCreditEntities[$index]['id'] = $this->getContactID($softCreditContact, !empty($softCreditContact['id']) ? $softCreditContact['id'] : NULL, 'SoftCreditContact', $this->getDedupeRulesForEntity('SoftCreditContact'));
+        if (empty($softCreditEntities[$index]['id']) && in_array($this->getActionForEntity('SoftCreditContact'), ['update', 'select'])) {
           throw new \CRM_Core_Exception(ts('Soft Credit Contact not found'));
         }
       }
@@ -340,7 +348,7 @@ class ContributionParser extends ImportParser {
       // if the lookups failed.
 
       foreach ($softCreditEntities as $index => $softCreditContact) {
-        $softCreditParams[$index]['contact_id'] = $this->saveContact('SoftCreditContact', $softCreditContact) ?: $softCreditParams[$index]['contact_id'];
+        $softCreditParams[$index]['contact_id'] = $this->saveContact('SoftCreditContact', $softCreditContact) ?: $softCreditContact['id'];
       }
       $contributionParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $contributionParams['contact_id'];
 
@@ -350,10 +358,56 @@ class ContributionParser extends ImportParser {
       }
 
       if ($contributionParams['id']) {
+        if (!empty($params['Payment'])) {
+          throw new \CRM_Core_Exception(ts('pan_truncation is mapped but not importable'));
+        }
         $contributionID = Contribution::update()->setValues($contributionParams)->execute()->first()['id'];
       }
       else {
-        $contributionID = Contribution::create()->setValues($contributionParams)->execute()->first()['id'];
+        $contributionStatus = \CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionParams['contribution_status_id'] ?? NULL) ?? 'Completed';
+        if (in_array($contributionStatus, ['Cancelled', 'Refunded', 'Chargeback'])) {
+          if (!empty($params['Payment'])) {
+            throw new \CRM_Core_Exception(ts('pan_truncation is mapped but not importable'));
+          }
+          // Unit test testContributionStatusLabel shows an issue with doing Order->Update for
+          // Cancelled - in terms of the created financial entities not passing validatePayments().
+          // We should remove this & figure out te necessary for that test to pass but in the interim
+          // let us keep the pre-order-save behaviour.
+          $contributionID = Contribution::create()->setValues($contributionParams)->execute()->first()['id'];
+        }
+        else {
+          unset($contributionParams['contribution_status_id']);
+          $contributionID = Order::create()
+            ->setContributionValues($contributionParams)
+            ->addLineItem(['line_total_inclusive' => $contributionParams['total_amount']])
+            ->execute()->first()['id'];
+          if ($contributionStatus === 'Completed') {
+            // Use values from Contribution as saved, in case the hooks changed any.
+            $contribution = Contribution::get()
+              ->addWhere('id', '=', $contributionID)
+              ->execute()->single();
+            Payment::create()
+              ->setNotificationForCompleteOrder(FALSE)
+              ->setValues(($params['Payment'] ?? []) + [
+                'contribution_id' => $contributionID,
+                'check_number' => $contribution['check_number'],
+                'payment_instrument_id' => $contribution['payment_instrument_id'],
+                'total_amount' => $contribution['total_amount'],
+                'net_amount' => $contribution['net_amount'],
+                'fee_amount' => $contribution['fee_amount'],
+                'trxn_date' => $contribution['receive_date'],
+                'trxn_id' => $contribution['trxn_id'],
+                'currency' => $contribution['currency'],
+              ])
+              ->execute();
+          }
+          elseif ($contributionStatus !== 'Pending') {
+            Contribution::update()
+              ->addWhere('id', '=', $contributionID)
+              ->setValues(['contribution_status_id:name' => $contributionStatus])
+              ->execute();
+          }
+        }
       }
 
       if (!empty($softCreditParams)) {
@@ -398,7 +452,7 @@ class ContributionParser extends ImportParser {
    */
   private function lookupContribution(array $params): array {
     $where = [];
-    foreach (['id' => 'Contribution ID', 'trxn_id' => 'Transaction ID', 'invoice_id' => 'Invoice ID'] as $field => $label) {
+    foreach (['id' => 'Contribution ID', 'trxn_id' => 'Transaction ID', 'invoice_id' => 'Invoice Reference'] as $field => $label) {
       if (!empty($params[$field])) {
         $where[] = [$field, '=', $params[$field]];
       }
@@ -547,57 +601,6 @@ class ContributionParser extends ImportParser {
         }
       }
     }
-  }
-
-  /**
-   * Lookup matching contact.
-   *
-   * This looks up the matching contact from the contact id, external identifier
-   * or email. For the email a straight email search is done - this is equivalent
-   * to what happens on a dedupe rule lookup when the only field is 'email' - but
-   * we can't be sure the rule is 'just email' - and we are not collecting the
-   * fields for any other lookup in the case of soft credits (if we
-   * extend this function to main-contact-lookup we can handle full dedupe
-   * lookups - but note the error messages will need tweaking.
-   *
-   * @param array $params
-   *
-   * @return int
-   *   Contact ID
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function lookupMatchingContact(array $params): int {
-    $lookupField = !empty($params['contact_id']) ? 'contact_id' : (!empty($params['external_identifier']) ? 'external_identifier' : 'email');
-    if (empty($params['email'])) {
-      $contact = Contact::get(FALSE)->addSelect('id')
-        ->addWhere($lookupField === 'contact_id' ? 'id' : $lookupField, '=', $params[$lookupField])
-        ->execute();
-      if (count($contact) !== 1) {
-        throw new \CRM_Core_Exception(ts("Soft Credit %1 - %2 doesn't exist. Row was skipped.",
-          [
-            1 => $this->getFieldMetadata($lookupField),
-            2 => $params['contact_id'] ?? $params['external_identifier'],
-          ]));
-      }
-      return $contact->first()['id'];
-    }
-
-    if (!\CRM_Utils_Rule::email($params['email'])) {
-      throw new \CRM_Core_Exception(ts('Invalid email address %1 provided for Soft Credit. Row was skipped'), [1 => $params['email']]);
-    }
-    $emails = Email::get(FALSE)
-      ->addWhere('contact_id.is_deleted', '=', 0)
-      ->addWhere('contact_id.contact_type', '=', $this->getContactType())
-      ->addWhere('email', '=', $params['email'])
-      ->addSelect('contact_id')->execute();
-    if (count($emails) === 0) {
-      throw new \CRM_Core_Exception(ts("Invalid email address(doesn't exist) %1 for Soft Credit. Row was skipped", [1 => $params['email']]));
-    }
-    if (count($emails) > 1) {
-      throw new \CRM_Core_Exception(ts('Invalid email address(duplicate) %1 for Soft Credit. Row was skipped', [1 => $params['email']]));
-    }
-    return $emails->first()['contact_id'];
   }
 
   /**

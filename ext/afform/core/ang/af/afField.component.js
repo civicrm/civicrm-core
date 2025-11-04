@@ -224,7 +224,8 @@
       this.isMultiple = function() {
         return (
           (['Select', 'EntityRef', 'ChainSelect'].includes(ctrl.defn.input_type) && ctrl.defn.input_attrs.multiple) ||
-          (ctrl.defn.input_type === 'CheckBox' && ctrl.defn.data_type !== 'Boolean')
+          ((ctrl.defn.input_type === 'CheckBox' || ctrl.defn.input_type === 'Toggle') && ctrl.defn.data_type !== 'Boolean') ||
+          ((ctrl.defn.input_type === 'Hidden' || ctrl.defn.input_type === 'DisplayOnly') && (ctrl.defn.serialize || ctrl.defn.data_type === 'Array'))
         );
       };
 
@@ -233,6 +234,10 @@
         // For values passed from the url, split
         if (typeof value === 'string' && ctrl.isMultiple()) {
           value = value.split(',');
+        }
+        // Support "Select Current User" default
+        if (ctrl.defn.input_type === 'EntityRef' && ['Contact', 'Individual'].includes(ctrl.fkEntity) && value === 'user_contact_id') {
+          value = CRM.config.cid;
         }
         // correct the value type
         if (ctrl.defn.input_type !== 'DisplayOnly') {
@@ -297,7 +302,7 @@
       };
 
       ctrl.getDisplayValue = function(value) {
-        if (value === undefined || value === null || value === '') {
+        if (value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length)) {
           return '';
         }
         if (fieldOptions) {
@@ -307,13 +312,30 @@
         }
         if (ctrl.defn.data_type === 'Date' || ctrl.defn.data_type === 'Timestamp') {
           try {
-            return CRM.formatDate(value, null, ctrl.defn.data_type === 'Timestamp');
+            return CRM.utils.formatDate(value, null, ctrl.defn.data_type === 'Timestamp');
           } catch (e) {
             return '';
           }
         }
-        if (ctrl.defn.fk_entity) {
-          // TODO: EntityRef fields
+        if (ctrl.fkEntity) {
+          // EntityRef fields: fetch label via API if not already present
+          // This is async, so we return a placeholder and update later
+          const ids = Array.isArray(value) ? value : [value];
+          if (!ctrl._entityLabels) {
+            ctrl._entityLabels = {};
+          }
+          // Call autocomplete api
+          if (!(ids.join() in ctrl._entityLabels)) {
+            ctrl._entityLabels[ids.join()] = null;
+            const params = ctrl.getAutocompleteParams();
+            params.ids = ids;
+            crmApi4(ctrl.fkEntity, 'autocomplete', params)
+              .then(function(result) {
+                // Join all labels
+                ctrl._entityLabels[ids.join()] = result.map((item) => item.label).join(', ');
+              });
+          }
+          return ctrl._entityLabels[ids.join()] || ts('Loading...');
         }
         return value;
       };

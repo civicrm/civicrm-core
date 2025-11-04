@@ -115,7 +115,7 @@ class ActivityParser extends ImportParser {
       'Activity' => [
         'text' => ts('Activity Fields'),
         'entity_title' => ts('Activity'),
-        'is_contact' => FALSE,
+        'entity_type' => 'Activity',
         'actions' => [
           ['id' => 'save', 'text' => ts('Create or Update using ID'), 'description' => ts('Skip if no match found')],
         ],
@@ -128,14 +128,14 @@ class ActivityParser extends ImportParser {
       'TargetContact' => [
         'text' => ts('Target Contact Fields'),
         'entity_title' => ts('Target Contact'),
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => TRUE,
         'actions' => $this->getActions(['select', 'ignore', 'update']),
         'selected' => [
           'action' => 'select',
           'contact_type' => NULL,
-          'dedupe_rule' => 'unique_identifier_match',
+          'dedupe_rule' => ['unique_identifier_match'],
         ],
         'default_action' => 'select',
         'entity_name' => 'TargetContact',
@@ -143,7 +143,7 @@ class ActivityParser extends ImportParser {
       'SourceContact' => [
         'text' => ts('Source Contact Fields'),
         'entity_title' => ts('Source Contact'),
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore']) : $this->getActions(['ignore', 'select', 'update', 'save']),
@@ -157,7 +157,7 @@ class ActivityParser extends ImportParser {
       'AssigneeContact' => [
         'text' => ts('assignee Contact Fields'),
         'entity_title' => ts('Assignee Contact'),
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => TRUE,
         'actions' => $this->getActions(['select', 'ignore']),

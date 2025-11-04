@@ -38,4 +38,18 @@ class SqlField extends SqlExpression {
     return ts('Field');
   }
 
+  /**
+   * Returns the output dataType based on field definition
+   *
+   * @param
+   * @return string|null
+   */
+  public function getRenderedDataType(?Api4Query $query): ?string {
+    $field = $query?->getField($this->expr);
+    if (!empty($field['serialize'])) {
+      return 'Array';
+    }
+    return $field['data_type'] ?? NULL;
+  }
+
 }

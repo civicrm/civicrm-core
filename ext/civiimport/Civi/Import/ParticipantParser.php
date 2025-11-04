@@ -65,31 +65,32 @@ class ParticipantParser extends ImportParser {
     return [
       'Participant' => [
         'text' => ts('Participant Fields'),
-        'is_contact' => FALSE,
+        'entity_type' => 'Participant',
         'required_fields_update' => $this->getRequiredFieldsForMatch(),
         'required_fields_create' => $this->getRequiredFieldsForCreate(),
         'is_base_entity' => TRUE,
         'supports_multiple' => FALSE,
         'is_required' => TRUE,
         // For now we stick with the action selected on the DataSource page.
-        'actions' => $this->isUpdateExisting() ?
-          [['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')]] :
-          [['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')]],
-        'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
+        'actions' => [
+          ['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')],
+          ['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')],
+        ],
+        'default_action' => 'create',
         'entity_name' => 'Participant',
         'entity_title' => ts('Participant'),
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
       ],
       'Contact' => [
         'text' => ts('Contact Fields'),
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'unique_fields' => ['external_identifier', 'id'],
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => 'Individual',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',
@@ -120,7 +121,7 @@ class ParticipantParser extends ImportParser {
         $participantParams['contact_id'] = !empty($participantParams['contact_id']) ? (int) $participantParams['contact_id'] : $existingParticipant['contact_id'];
       }
 
-      $participantParams['contact_id'] = $this->getContactID($contactParams, $participantParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      $participantParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($contactParams, $participantParams['contact_id'] ?? $contactParams['id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
       $participantParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $participantParams['contact_id'];
       // don't add to recent items, CRM-4399
       $participantParams['skipRecentView'] = TRUE;

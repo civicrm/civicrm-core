@@ -27,6 +27,19 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
+  public function testBase64mbz(): void {
+    $examples = [
+      'Hello world',
+      file_get_contents(__FILE__),
+      'lic func',
+    ];
+    foreach ($examples as $raw) {
+      $encoded = CRM_Utils_String::base64mbzEncode($raw);
+      $decoded = CRM_Utils_String::base64mbzDecode($encoded);
+      $this->assertEquals($raw, $decoded);
+    }
+  }
+
   public function testStripPathChars(): void {
     $testSet = [
       '' => '',
@@ -360,8 +373,19 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
         '<p>To view your dashboard, <a href="https://mysite.org/civicrm/?civiwp=CiviCRM&amp;q=civicrm/user&reset=1&id={contact.contact_id}&{contact.checksum}">click here.</a></p>',
         '<p>To view your dashboard, <a href="https://mysite.org/civicrm/?civiwp=CiviCRM&amp;q=civicrm/user&amp;reset=1&amp;id={contact.contact_id}&amp;{contact.checksum}">click here.</a></p>',
       ],
-      'hover' => ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'],
-      'target' => ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>'],
+      'hover' => [
+        '<span onmouseover=alert(0)>HOVER</span>',
+        '<span>HOVER</span>',
+      ],
+      'target' => [
+        '<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>',
+        '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>',
+      ],
+      'details' => [
+        '<details class="foo" open><summary>hello</summary>world</details>',
+        // Meh, close enough. May need to be updated if HTMLPurifier gets prettier handing of booleans like `open`.
+        '<details class="foo" open="open"><summary>hello</summary>world</details>',
+      ],
     ];
   }
 

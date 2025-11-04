@@ -21,12 +21,15 @@ return [
           'version' => 4,
           'select' => [
             'id',
+            'label',
             'created_date',
             'expires_date',
             'start_date',
             'end_date',
             'status_id:label',
             'job_type:label',
+            'UserJob_SearchDisplay_search_display_id_01.name',
+            'UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.name',
           ],
           'orderBy' => [],
           'where' => [
@@ -47,7 +50,26 @@ return [
             ],
           ],
           'groupBy' => [],
-          'join' => [],
+          'join' => [
+            [
+              'SearchDisplay AS UserJob_SearchDisplay_search_display_id_01',
+              'LEFT',
+              [
+                'search_display_id',
+                '=',
+                'UserJob_SearchDisplay_search_display_id_01.id',
+              ],
+            ],
+            [
+              'SavedSearch AS UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01',
+              'LEFT',
+              [
+                'UserJob_SearchDisplay_search_display_id_01.saved_search_id',
+                '=',
+                'UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.id',
+              ],
+            ],
+          ],
           'having' => [],
         ],
         'expires_date' => NULL,
@@ -72,7 +94,9 @@ return [
         'type' => 'table',
         'settings' => [
           'description' => NULL,
-          'sort' => [],
+          'sort' => [
+            ['id', 'DESC'],
+          ],
           'limit' => 50,
           'pager' => [],
           'placeholder' => 5,
@@ -80,38 +104,45 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'label' => E::ts('User Job ID'),
+              'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
+              'key' => 'label',
+              'label' => E::ts('Name'),
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
               'key' => 'created_date',
-              'label' => E::ts('Import Job Created Date'),
+              'label' => E::ts('Created'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'expires_date',
-              'label' => E::ts('Import Job Expires Date'),
+              'label' => E::ts('Expires'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'end_date',
-              'label' => E::ts('Job Ended Date'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'status_id:label',
-              'label' => E::ts('Job Status'),
+              'label' => E::ts('Ended'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'job_type:label',
-              'label' => E::ts('Job Type'),
+              'label' => E::ts('Type'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'status_id:label',
+              'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
@@ -127,50 +158,70 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
-                  'condition' => [],
-                ],
-                [
-                  'size' => 'btn-xs',
-                  'links' => [
+                  'conditions' => [
                     [
-                      'entity' => 'UserJob',
-                      'action' => 'view',
-                      'join' => '',
-                      'target' => 'crm-popup',
-                      'icon' => '',
-                      'text' => E::ts('View User Job'),
-                      'style' => 'default',
-                      'path' => '',
-                      'task' => '',
-                      'conditions' => [
-                        [
-                          'status_id:name',
-                          '!=',
-                          'draft',
-                        ],
-                      ],
-                    ],
-                    [
-                      'path' => 'civicrm/import_mapping?id=[id]',
-                      'icon' => 'fa-external-link',
-                      'text' => E::ts('Continue'),
-                      'style' => 'default',
-                      'conditions' => [
-                        [
-                          'status_id:name',
-                          '=',
-                          'draft',
-                        ],
-                      ],
-                      'task' => '',
-                      'entity' => '',
-                      'action' => '',
-                      'join' => '',
-                      'target' => '',
+                      'status_id:name',
+                      '!=',
+                      'draft',
                     ],
                   ],
-                  'type' => 'buttons',
-                  'alignment' => 'text-right',
+                ],
+                [
+                  'path' => 'civicrm/import_mapping?id=[id]',
+                  'icon' => '',
+                  'text' => E::ts('Continue'),
+                  'style' => 'default',
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      'IN',
+                      [
+                        'draft',
+                        'complete_with_errors',
+                        'incomplete',
+                      ],
+                    ],
+                    [
+                      'job_type:name',
+                      'NOT IN',
+                      [
+                        'contact_import',
+                        'search_batch_import',
+                      ],
+                    ],
+                  ],
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                ],
+                [
+                  'path' => 'civicrm/search#/display/[UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.name]/[UserJob_SearchDisplay_search_display_id_01.name]?batch=[id]',
+                  'icon' => '',
+                  'text' => E::ts('Continue'),
+                  'style' => 'default',
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      'IN',
+                      [
+                        'draft',
+                        'complete_with_errors',
+                        'incomplete',
+                      ],
+                    ],
+                    [
+                      'job_type:name',
+                      '=',
+                      'search_batch_import',
+                    ],
+                  ],
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
                 ],
               ],
               'type' => 'buttons',
@@ -247,7 +298,9 @@ return [
         'type' => 'table',
         'settings' => [
           'description' => E::ts('Available import templates'),
-          'sort' => [],
+          'sort' => [
+            ['id', 'DESC'],
+          ],
           'limit' => 50,
           'pager' => [],
           'placeholder' => 5,
@@ -353,6 +406,7 @@ return [
           'version' => 4,
           'select' => [
             'id',
+            'label',
             'created_id.display_name',
             'created_date',
             'job_type:label',
@@ -360,6 +414,8 @@ return [
             'end_date',
             'expires_date',
             'status_id:label',
+            'UserJob_SearchDisplay_search_display_id_01.name',
+            'UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.name',
           ],
           'orderBy' => [],
           'where' => [
@@ -375,7 +431,26 @@ return [
             ],
           ],
           'groupBy' => [],
-          'join' => [],
+          'join' => [
+            [
+              'SearchDisplay AS UserJob_SearchDisplay_search_display_id_01',
+              'LEFT',
+              [
+                'search_display_id',
+                '=',
+                'UserJob_SearchDisplay_search_display_id_01.id',
+              ],
+            ],
+            [
+              'SavedSearch AS UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01',
+              'LEFT',
+              [
+                'UserJob_SearchDisplay_search_display_id_01.saved_search_id',
+                '=',
+                'UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.id',
+              ],
+            ],
+          ],
           'having' => [],
         ],
         'expires_date' => NULL,
@@ -400,7 +475,9 @@ return [
         'type' => 'table',
         'settings' => [
           'description' => E::ts('All import jobs'),
-          'sort' => [],
+          'sort' => [
+            ['id', 'DESC'],
+          ],
           'limit' => 50,
           'pager' => [],
           'placeholder' => 5,
@@ -413,35 +490,35 @@ return [
             ],
             [
               'type' => 'field',
+              'key' => 'label',
+              'label' => E::ts('Name'),
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
               'key' => 'created_id.display_name',
               'label' => E::ts('Created By'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'name',
-              'label' => E::ts('Import Name'),
-              'sortable' => TRUE,
-              'link' => [
-                'path' => '[job_type:url]?reset=1&template_id=[id]',
-                'entity' => '',
-                'action' => '',
-                'join' => '',
-                'target' => '',
-              ],
-            ],
-            [
-              'type' => 'field',
               'key' => 'created_date',
-              'label' => E::ts('Created Date'),
+              'label' => E::ts('Created'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'expires_date',
-              'label' => E::ts('Expires Date'),
+              'label' => E::ts('Expires'),
               'sortable' => TRUE,
               'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'end_date',
+              'label' => E::ts('Ended'),
+              'sortable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -478,14 +555,53 @@ return [
                 ],
                 [
                   'path' => 'civicrm/import_mapping?id=[id]',
-                  'icon' => 'fa-external-link',
+                  'icon' => '',
                   'text' => E::ts('Continue'),
                   'style' => 'default',
                   'conditions' => [
                     [
                       'status_id:name',
+                      'IN',
+                      [
+                        'draft',
+                        'complete_with_errors',
+                        'incomplete',
+                      ],
+                    ],
+                    [
+                      'job_type:name',
+                      'NOT IN',
+                      [
+                        'contact_import',
+                        'search_batch_import',
+                      ],
+                    ],
+                  ],
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                ],
+                [
+                  'path' => 'civicrm/search#/display/[UserJob_SearchDisplay_search_display_id_01_SearchDisplay_SavedSearch_saved_search_id_01.name]/[UserJob_SearchDisplay_search_display_id_01.name]?batch=[id]',
+                  'icon' => '',
+                  'text' => E::ts('Continue'),
+                  'style' => 'default',
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      'IN',
+                      [
+                        'draft',
+                        'complete_with_errors',
+                        'incomplete',
+                      ],
+                    ],
+                    [
+                      'job_type:name',
                       '=',
-                      'draft',
+                      'search_batch_import',
                     ],
                   ],
                   'task' => '',

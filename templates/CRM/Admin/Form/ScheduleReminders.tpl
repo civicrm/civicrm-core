@@ -8,6 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/scheduling reminders.  *}
+{capture assign='tokenTitle'}{ts}Tokens{/ts}{/capture}
 <div class="crm-block crm-form-block crm-scheduleReminder-form-block">
     {if $action eq 8}
       <div class="messages status no-popup">
@@ -37,7 +38,7 @@
           <td class="label">{$form.absolute_or_relative_date.label}</td>
           <td>
             {$form.absolute_or_relative_date.html}
-            {help id="relative_absolute_schedule_dates"}
+            {help id="absolute_or_relative_date"}
             {$form.absolute_date.html}
           </td>
         </tr>
@@ -77,7 +78,7 @@
           <td id="recipientLabel" class="label">{$form.recipient.label}</td>
           <td>
             <span>
-              {$form.limit_to.html}&nbsp;{help id="limit_to" class="limit_to" title=$form.recipient.label}
+              {$form.limit_to.html}&nbsp;{help id="limit_to" class="limit_to" title=$form.recipient.textLabel}
             </span>
             <span>
               {$form.recipient.html}
@@ -127,7 +128,7 @@
                   {$form.from_name.html}
                   {$form.from_email.label}
                   {$form.from_email.html}
-                  {help id="id-from_name_email"}
+                  {help id="from_name"}
               </td>
             </tr>
             <tr class="crm-scheduleReminder-form-block-template">
@@ -139,7 +140,7 @@
               <td>
                   {$form.subject.html|crmAddClass:huge}
                 <input class="crm-token-selector big" data-field="subject" />
-                  {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp"}
+                  {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
               </td>
             </tr>
           </table>

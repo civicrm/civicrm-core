@@ -185,6 +185,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
 
   /**
    * @inheritDoc
+   * @internal
    */
   public function addHTMLHead($header) {
     static $count = 0;
@@ -1207,33 +1208,14 @@ AND    u.status = 1
   /**
    * @inheritdoc
    */
-  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
-    if ($maintenance) {
-      \CRM_Core_Error::deprecatedWarning('CRM_Utils_System::theme called with $maintenance = TRUE - please use renderMaintenanceMessage instead');
-    }
-
-    if (!$print) {
-      if ($maintenance) {
-        print $this->renderMaintenanceMessage($content);
-        exit();
-      }
-      return $content;
-    }
-
-    print $content;
-    return NULL;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function renderMaintenanceMessage(string $content): string {
+  public function renderMaintenanceMessage(string $content): void {
     backdrop_set_breadcrumb('');
     backdrop_maintenance_theme();
     if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
       $this->addHTMLHead($region->render(''));
     }
-    return theme('maintenance_page', ['content' => $content]);
+    print theme('maintenance_page', ['content' => $content]);
+    exit();
   }
 
   /**

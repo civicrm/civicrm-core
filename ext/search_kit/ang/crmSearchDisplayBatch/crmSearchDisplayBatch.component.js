@@ -41,6 +41,7 @@
         // When previewing on the search admin screen, the display will be view-only
         this.isPreviewMode = typeof this.search !== 'string';
         this.userJobId = this.isPreviewMode ? null : $location.search().batch;
+        this.columns = _.cloneDeep(this.settings.columns);
         // Run search if a userJobId is given. Otherwise the "Start New Batch" button will be shown.
         if (this.userJobId) {
           this.runSearch();
@@ -57,14 +58,14 @@
           this.reportLinks = [
             {
               title: ts('View My Import Batches'),
-              href: CRM.url('civicrm/imports/my-listing'),
+              href: CRM.url('civicrm/imports/my-listing#/?job_type=search_batch_import'),
               icon: 'fa-user-tag',
             },
           ];
           if (CRM.checkPerm('administer queues')) {
             this.reportLinks.push({
               title: ts('View All Import Batches'),
-              href: CRM.url('civicrm/imports/all-imports'),
+              href: CRM.url('civicrm/imports/all-imports#/?job_type=search_batch_import'),
               icon: 'fa-list-alt',
             });
           }
@@ -116,6 +117,7 @@
           display: this.display,
           rowCount: this.newBatch.rowCount,
           targets: this.newBatch.targets,
+          label: this.newBatch.label,
         }, 0).then(function(userJob) {
           $location.search('batch', userJob.id);
           // Re-init display to switch modes from creating batch to editing batch
@@ -212,7 +214,7 @@
           let markup = '';
           // Run each item in array through _.escape
           tallyMismatches.forEach((item, index, array) => {
-            markup += '<p><i class="crm-i fa-warning"></i> ' + _.escape(item) + '</p>';
+            markup += '<p><i class="crm-i fa-warning" role="img" aria-hidden="true"></i> ' + _.escape(item) + '</p>';
           });
           CRM.confirm({
             title: ts('Tally Mismatch'),

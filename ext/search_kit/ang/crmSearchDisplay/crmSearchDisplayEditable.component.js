@@ -2,8 +2,6 @@
 (function(angular, $, _) {
   "use strict";
 
-  var optionsCache = {};
-
   angular.module('crmSearchDisplay').component('crmSearchDisplayEditable', {
     bindings: {
       row: '<?',
@@ -14,6 +12,7 @@
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
     controller: function($scope, $element, crmApi4, crmStatus) {
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
       const ctrl = this;
       let initialValue;
       let editableInfo;

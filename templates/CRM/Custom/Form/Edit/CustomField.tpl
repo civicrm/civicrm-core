@@ -21,17 +21,15 @@
   </tr>
 {elseif $element.options_per_line}
   <tr class="custom_field-row {$element.element_name}-row" {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element.element_name}_group"{/if}>
-    <td class="label"{if $element.html_type === "Radio"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
+    <td class="label"{if $element.html_type === "Radio" || $element.html_type === "CheckBox"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$formElement.textLabel}{/if}</td>
     <td class="html-adjust">
-
-      <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};">
+      <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};" {if $element.html_type === "CheckBox"}role="group" aria-labelledby="{$element_name}_group"{/if}>
         {foreach name=outer key=key item=item from=$formElement}
           {if is_array($item) && array_key_exists('html', $item)}
-            <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
+            {$formElement.$key.html}
           {/if}
         {/foreach}
       </div>
-
       {* Include the edit options list for admins *}
       {if $formElement.html|strstr:"crm-option-edit-link"}
         {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
@@ -41,11 +39,12 @@
   </tr>
 {else}
   <tr class="custom_field-row {$element.element_name}-row" {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element.element_name}_group"{/if}>
-    <td class="label"{if $element.html_type === "Radio"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}
-      {if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}
+    <td class="label"{if $element.html_type === "Radio" || $element.html_type === "CheckBox"} id="{$element.element_name}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}
+      {if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$formElement.textLabel}{/if}
     </td>
     <td class="html-adjust">
-      {$formElement.html}&nbsp;
+      {if $element.html_type === "CheckBox" || $element.html_type === "Radio"}<div class="crm-multiple-checkbox-radio-options" {if $element.html_type === "CheckBox"}role="group" aria-labelledby="{$element_name}_group"{/if}>{/if}
+      {$formElement.html}
       {if $element.data_type eq 'File'}
         {if array_key_exists('element_value', $element) && $element.element_value.data}
           <div class="crm-attachment-wrapper crm-entity" id="file_{$element.element_name}">
@@ -57,7 +56,7 @@
                        width="{$element.element_value.imageThumbWidth}">
                 </a>
               {else}
-                <a class="crm-attachment" href="{$element.element_value.fileURL}">{$element.element_value.fileName}</a>
+                <a class="crm-attachment" href="{$element.element_value.fileURL}" target="_blank">{$element.element_value.fileName}</a>
               {/if}
               {if $element.element_value.deleteURL}
                 <a href="#" class="crm-hover-button delete-attachment"
@@ -75,6 +74,7 @@
           {include file="CRM/Custom/Form/ContactReference.tpl"}
         {/if}
       {/if}
+      {if $element.html_type === "CheckBox" || $element.html_type === "Radio"}</div>{/if}
     </td>
   </tr>
 {/if}

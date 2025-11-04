@@ -16,9 +16,15 @@
  */
 
 /**
- *
+ * Joomla specific stuff goes here.
  */
 class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
+
+  /**
+   * The prefix for CiviCRM-related permissions in Joomla, when
+   * saving into the `#__assets` table for example.
+   */
+  const CIVICRM_PERMISSION_PREFIX = 'civicrm.';
 
   /**
    * Given a permission string, check for access requirements
@@ -56,7 +62,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         $user = JFactory::getUser($userId);
       }
       else {
-        if ($userId == NULL) {
+        if ($userId === NULL) {
           $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
         }
         else {
@@ -73,14 +79,13 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
           $user = JFactory::getUser($uid);
         }
         else {
-          if ($uid == NULL) {
+          if ($uid === NULL) {
             $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
           }
           else {
             $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($uid);
           }
         }
-
       }
 
       return $user->authorise($translated[0], $translated[1]);
@@ -117,7 +122,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
 
       case NULL:
-        return ['civicrm.' . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm'];
+        return [self::CIVICRM_PERMISSION_PREFIX . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm'];
 
       default:
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
@@ -154,7 +159,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     $associations = $this->getUserGroupPermsAssociations();
     $cmsPermsHaveGoneStale = FALSE;
     foreach (array_keys(get_object_vars($associations)) as $permName) {
-      if (!in_array($permName, $translatedPerms)) {
+      if (str_starts_with($permName, self::CIVICRM_PERMISSION_PREFIX) && !in_array($permName, $translatedPerms)) {
         unset($associations->$permName);
         $cmsPermsHaveGoneStale = TRUE;
       }

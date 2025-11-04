@@ -105,7 +105,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $feeAmount->freeze();
     }
 
-    $element = &$form->add('text', 'invoice_id', ts('Invoice ID'),
+    $element = &$form->add('text', 'invoice_id', ts('Invoice Reference'),
       $attributes['invoice_id']
     );
     if ($form->_online) {
@@ -113,7 +113,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
     else {
       $form->addRule('invoice_id',
-        ts('This Invoice ID already exists in the database.'),
+        ts('This Invoice Reference already exists in the database.'),
         'objectExists',
         ['CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id']
       );
@@ -348,21 +348,6 @@ class CRM_Contribute_Form_AdditionalInfo {
 
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
       $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
-    }
-    else {
-      //offline contribution
-      // assigned various dates to the templates
-      $form->assign('receipt_date', CRM_Utils_Date::processDate($params['receipt_date']));
-
-      if (!empty($params['cancel_date'])) {
-        $form->assign('cancel_date', CRM_Utils_Date::processDate($params['cancel_date']));
-      }
-      if (!empty($params['thankyou_date'])) {
-        $form->assign('thankyou_date', CRM_Utils_Date::processDate($params['thankyou_date']));
-      }
-      if ($form->_action & CRM_Core_Action::UPDATE) {
-        $form->assign('lineItem', empty($form->_lineItems) ? FALSE : $form->_lineItems);
-      }
     }
 
     //handle custom data

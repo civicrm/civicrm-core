@@ -13,7 +13,7 @@
 }
 .api4-explorer-row > .panel {
   margin: 0;
-  background: var(--crm-panel-background);
+  background: var(--crm-panel-bg);
 }
 .api4-explorer-page .panel-heading {
   display: flex;

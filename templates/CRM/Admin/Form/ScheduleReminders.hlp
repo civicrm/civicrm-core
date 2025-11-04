@@ -8,10 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 
-{htxt id='relative_absolute_schedule_dates-title'}
-  {ts}When scheduled reminders will or won't be sent{/ts}
-{/htxt}
-{htxt id="relative_absolute_schedule_dates"}
+{htxt id="absolute_or_relative_date"}
   <p>{ts}If you set a scheduled reminder for an event to be sent on a specific date, it will be sent only on that date.{/ts} {ts}Contacts who registered before that date will receive the scheduled reminder shortly after midnight and contacts who register on that date will receive the reminder shortly after they register. Contacts who register after that date will not receive the reminder.{/ts}</p>
   <p>{ts}If you set a scheduled reminder relative to the event start or end (e.g. 24 hours before the event start), reminders will generally also be sent to contacts who register after that time.{/ts} {ts}If you set a reminder for before the event start or end, it will be sent to all registrants who register before the event ends.{/ts} {ts}If you set a reminder for after the event start or end, it will be sent to any registrant, no matter when they register.{/ts}</p>
 <p>{ts}If you set a reminder for before the registration start or end, it will be sent to any contacts who register up to the registration end.{/ts} {ts}Reminders set for after the registration start or end won't be sent at all.{/ts}</p>
@@ -28,11 +25,7 @@
   <p>{ts}For Membership and Contact reminders, you can limit or additionally include recipients by choosing specific contacts, or choosing a group.{/ts}</p>
 {/htxt}
 
-{htxt id="id-from_name_email-title"}
-  {ts}Specify FROM Name and Email{/ts}
-{/htxt}
-
-{htxt id="id-from_name_email"}
+{htxt id="from_name"}
   {ts}You can set the FROM name and email address for this reminder in these fields. If you leave these fields blank, the default FROM name and email address for your site will be used (Administer > Communications > Site From Email Addresses).{/ts}
 {/htxt}
 

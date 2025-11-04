@@ -15,7 +15,7 @@
 {else}
   <div class="help">
     <p>{ts}Relationship types describe relationships between people, households and organizations. Relationship types labels describe the relationship from the perspective of each of the two entities (e.g. Parent &gt;-&lt; Child, Employer &gt;-&lt; Employee). For some types of relationships, the labels may be the same in both directions (e.g. Spouse &gt;-&lt; Spouse).{/ts} {$docLink}</p>
-    <p>{ts 1=$customURL}You can define as many additional relationships types as needed to cover the types of relationships you want to track. Once a relationship type is created, you may also define custom fields to extend relationship information for that type from <a href='%1'>Administer CiviCRM &raquo; Custom Data</a>.{/ts}{help id='id-relationship-types'} </p>
+    <p>{ts 1=$customURL}You can define as many additional relationships types as needed to cover the types of relationships you want to track. Once a relationship type is created, you may also define custom fields to extend relationship information for that type from <a href='%1'>Administer CiviCRM &raquo; Custom Data</a>.{/ts}</p>
   </div>
 
 <div class="crm-content-block crm-block">

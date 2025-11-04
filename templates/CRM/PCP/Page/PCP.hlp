@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-pcp-intro-title"}
-  {ts}Personal Campaign Pages{/ts}
-{/htxt}
 {htxt id="id-pcp-intro"}
 <p>{ts}Personal Campaign Pages (PCPs) allow your constituents to create their own fundraising page for your organization. This means that a donor, after donating to your organization, can elect to create a page with her own photo, text, and personal information. She can then send a link to the page to her friends, soliciting support for your organization. This is a powerful way to widely and quickly spread the message about your campaign.{/ts}</p>
 
@@ -23,5 +20,5 @@
   {ts}You can also create front-end links (or menu items) allowing constituents to create their own fundraising pages using the Menu Manager. Select <strong>Contributions &raquo; Personal Campaign Pages</strong> and then select this event.{/ts}
 {/if}
 <p>
-{/htxt} 
+{/htxt}
 

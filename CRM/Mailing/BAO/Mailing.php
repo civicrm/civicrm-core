@@ -1081,6 +1081,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'status' => 'Draft',
         'start_date' => NULL,
         'end_date' => NULL,
+        'unsubscribe_mode' => Civi::settings()->get('default_oneclick_unsubscribe_mode'),
       ];
       if (CRM_Utils_System::isNull($params['sms_provider_id'] ?? NULL)) {
         $defaults['header_id'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
@@ -1131,6 +1132,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // If we are scheduling vai Mailing.create then also update the status to scheduled.
     if (empty($params['skip_legacy_scheduling']) && !empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
       $mailing->status = 'Scheduled';
+      $mailing->save();
     }
     if (!empty($params['search_id']) && !empty($params['group_id'])) {
       $mg->reset();
@@ -1912,6 +1914,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $params['status'] ??= 'Draft';
       $params['start_date'] ??= 'null';
       $params['end_date'] ??= 'null';
+      $params['unsubscribe_mode'] ??= Civi::settings()->get('default_oneclick_unsubscribe_mode');
     }
     if ($event->action === 'delete' && $event->id) {
       // Delete all file attachments
@@ -2530,6 +2533,13 @@ ORDER BY civicrm_mailing.id DESC";
       ];
     }
     return $types;
+  }
+
+  public static function validateMailerJobSize($value): bool {
+    if ($value && $value < 1000) {
+      throw new CRM_Core_Exception(ts('The job size must be at least 1000 or set to 0 (unlimited).'));
+    }
+    return TRUE;
   }
 
 }

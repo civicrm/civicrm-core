@@ -1,10 +1,4 @@
 /******************
-   VARIABLES
-*******************/
-
-@import url(_variables.css); /* default variables */
-
-/******************
    RESETS
 *******************/
 
@@ -52,20 +46,25 @@ body {
 .crm-container table.dataTable.display tbody tr:hover {
   background-color: transparent;
 }
+.crm-container td:empty {
+  padding: 0 !important; /* allows empty cells to collapse to 0 width */
+}
 /* Remove list styles (bullets/numbers) */
 .crm-container ol,
 .crm-container ul {
   list-style: none;
 }
 /* Restores list styles for rich text output to UA stylesheet definition */
-.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body) :is(ol,ul) {
+.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body,.crm-search-col-type-html,.af-markup,.notify-content) :is(ol,ul) {
   list-style: revert;
   padding: revert;
+  margin: revert;
 }
 /* For images to not be able to exceed their container */
 .crm-container img {
   max-inline-size: 100%;
   max-block-size: 100%;
+  block-size: auto;
 }
 .crm-container img.olTileImage {
   max-block-size: unset; /* open street map exception */
@@ -160,7 +159,7 @@ body {
   font-size: var(--crm-font-size);
   line-height: 1.4;
   color: var(--crm-c-text);
-  background: var(--crm-c-page-background);
+  background: var(--crm-c-page-bg);
 }
 .crm-container table,
 .crm-container tr,
@@ -181,21 +180,24 @@ body.civicrm-iframe-page {
 
 /* Core type */
 
+.crm-container p:first-child {
+  margin-top: 0;
+}
+.crm-container p:last-child {
+  margin-bottom: 0;
+}
 .crm-container strong,
 .crm-container b,
 .crm-container .bold,
 .crm-container .font-bold {
-  font-family: var(--crm-font-bold);
   font-weight: bold;
 }
 .crm-container em,
 .crm-container .font-italic {
-  font-family: var(--crm-font-italic);
   font-style: italic;
 }
 .crm-container strong em,
 .crm-container em strong {
-  font-family: var(--crm-font-bold-italic);
   font-weight: bold;
   font-style: italic;
 }
@@ -209,7 +211,6 @@ body.civicrm-iframe-page {
 #bootstrap-theme h3 {
   background-color: var(--crm-heading-bg);
   font-size: var(--crm-r1);
-  font-family: var(--crm-font-bold);
   font-weight: bold;
   color: var(--crm-heading-col);
   padding: var(--crm-heading-padding);
@@ -280,7 +281,7 @@ dl dl {
 }
 .crm-container .disabled,
 .crm-container .crm-disabled,
-.crm-container .disabled *,
+.crm-container .disabled *:not(.btn,button,i,span,a),
 .crm-container .cancelled,
 .crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor {
@@ -290,13 +291,15 @@ dl dl {
 .crm-container tr.disabled,
 .crm-container tr:has(td.disabled),
 .crm-container .table-striped > tbody > tr:has(td.disabled) {
-  background-color: var(--crm-c-page-background);
+  --crm-striped-bg: var(--crm-c-page-bg) /* for striped rows */;
+  background-color: var(--crm-striped-bg) !important /* vs jquery */;
 }
-.crm-container tr.disabled td *:not(.btn,button),
-.crm-container td.disabled {
+.crm-container tr.disabled td *:not(.btn,button,i,a),
+.crm-container td.disabled,
+.crm-container #extensions-main table tr.disabled td {
   font-style: italic;
 }
-.crm-container tr.disabled td:first-of-type {
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label,.crm-job-name) {
   display: inline-flex;
 }
 
@@ -366,8 +369,8 @@ dl dl {
 }
 .crm-container code {
   display: inline;
-  background-color: var(--crm-c-code-background);
-  border: 1px solid var(--crm-c-background4);
+  background-color: var(--crm-c-code-bg);
+  border: var(--crm-c-code-border);
   color: var(--crm-c-text);
   border-radius: 2px;
   padding: 2px;
@@ -381,8 +384,8 @@ dl dl {
   font-size: var(--crm-font-size) !important /* vs inline css on api3 */;
   line-height: 1.4  !important /* vs inline css on api3 */;
   color: var(--crm-c-text);
-  background-color: var(--crm-c-code-background);
-  border: 1px solid var(--crm-c-background4);
+  background-color: var(--crm-c-code-bg);
+  border: var(--crm-c-code-border);
   border-radius: var(--crm-roundness);
 }
 .crm-container pre code {
@@ -514,6 +517,6 @@ dl dl {
 @media (max-width: 991px) {
   .crm-container .crm-flex-box,
   .api4-input /* sections/api4-explorer */ {
-    flex-direction: column;
+    flex-flow: column;
   }
 }

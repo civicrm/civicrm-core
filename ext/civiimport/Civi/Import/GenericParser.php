@@ -114,13 +114,13 @@ class GenericParser extends ImportParser {
       $entities['Contact'] = [
         'text' => ts('Contact Fields'),
         'unique_fields' => ['external_identifier', 'id'],
-        'is_contact' => TRUE,
+        'entity_type' => 'Contact',
         'supports_multiple' => FALSE,
         'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => 'Individual',
-          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+          'dedupe_rule' => (array) $this->getDedupeRule('Individual')['name'],
         ],
         'default_action' => 'select',
         'entity_name' => 'Contact',
@@ -176,10 +176,12 @@ class GenericParser extends ImportParser {
       \CRM_Utils_Hook::importAlterMappedRow('import', $this->getBaseEntity() . '_import', $params, $values, $this->getUserJobID());
 
       $existing = !isset($params[$this->getBaseEntity()]['id']) ? [] : civicrm_api4($this->getBaseEntity(), 'get', [
-        'where' => [['id', '=', $this->getBaseEntity()]['id']],
+        'where' => [
+          ['id', '=', $params[$this->getBaseEntity()]['id']],
+        ],
       ])->single();
       if (!empty($params['Contact'])) {
-        $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], ($existing['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
+        $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], ($params['Contact']['id'] ?? $existing['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
         $params[$this->getBaseEntity()]['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $params['Contact']['id'];
       }
       $entity = civicrm_api4($this->baseEntity, 'save', [

@@ -1,0 +1,11 @@
+<af-form ctrl="afform">
+  <af-entity data="{source: 'Hello world 2'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="FBAC" autofill="user" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <div class="af-container">
+      <div class="af-container af-layout-inline">
+        <af-field name="first_name" defn="{input_attrs: {placeholder: '(Your given name)'}, label: 'Given Name'}" />
+      </div>
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>

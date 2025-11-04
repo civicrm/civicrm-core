@@ -21,27 +21,27 @@
 
 - github      : agileware
   name        : Agileware Team
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-dev
   name        : Agileware Team
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-fj
   name        : Francis Whittle
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-iris
   name        : Iris
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-justin
   name        : Justin Freeman
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : agileware-pengyi
   name        : Pengyi Zhang
-  organization: Agileware
+  organization: Agileware Pty Ltd
 
 - github      : ahed-compucorp
   name        : Ahed Eid
@@ -258,6 +258,14 @@
 - github      : brianPHM
   name        : Brian Matemachani
 
+- github      : briangflett
+  name        : Brian Flett
+  organization: Non Profit Tech Advisor
+
+- github      : briennek
+  organization: Civil Justice, Inc.
+  name        : Brienne K.
+
 - github      : briennekordis
   name        : Brienne Kordis
   organization: Megaphone Technology Consulting
@@ -446,7 +454,7 @@
   organization: Giant Rabbit
 
 - github      : djnatedagreat
-  name        : Nate Harris
+  name        : Nate Frank
   organization: New York State Senate
 
 - github      : dkguru
@@ -500,6 +508,9 @@
 
 - github      : dsuguy2007
   name        : Tommy Sheppard
+
+- github      : duncan-s-white
+  name        : Duncan White
 
 - github      : dvhirst
   name        : Donald Hirst
@@ -969,7 +980,7 @@
 
 - github      : larssandergreen
   name        : Lars Sander-Green
-  organization: Wildsight
+  organization: Wikimedia Foundation
 
 - github      : laryn
   name        : Laryn Kragt Bakker
@@ -1240,6 +1251,10 @@
 
 - github      : netzih
 
+- github      : nfreesto
+  name        : Nathan Freestone
+  organization: Giant Rabbit
+
 - github      : nganivet
   name        : Nicolas Ganivet
   organization: CiviDesk
@@ -1369,6 +1384,10 @@
 
 - name        : Peter Davis
   organization: Fuzion
+
+- github      : pminf
+  name        : Philipp Michael
+  organization: Parlamentwatch e.V.
 
 - github      : powdevel
   name        : Beto Aveiga
@@ -1928,3 +1947,6 @@
 - github      : rafe-murray
   name        : Rafe Murray
   organization: JMA Consulting
+
+- github      : MundMBo
+  name        : Marvin Müller

@@ -325,5 +325,5 @@ crm-search-admin-import {
 }
 
 #bootstrap-theme .crm-search-admin-outer details summary ~ * {
-  margin-left: 1rem;
+  padding: 0.75rem 1rem;
 }

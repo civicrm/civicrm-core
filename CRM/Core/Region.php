@@ -143,12 +143,12 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
 
         case 'style':
           if (!$allowCmsOverride || !$cms->addStyle($snippet['style'], $this->_name)) {
-            $html .= sprintf("<style type=\"text/css\">\n%s\n</style>\n", $snippet['style']);
+            $html .= sprintf("<style>\n%s\n</style>\n", $snippet['style']);
           }
           break;
 
         case 'settings':
-          $settingsData = json_encode($this->getSettings());
+          $settingsData = CRM_Utils_JSON::encodeScriptVar($this->getSettings());
           $js = "(function(vars) {
             if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
             })($settingsData)";

@@ -18,7 +18,7 @@
     <table class="form-layout-compressed" >
         {if array_key_exists('communication_style_id', $form)}
           <tr><td colspan='4'>
-            <span class="label">{$form.communication_style_id.label} {help id="id-communication_style" file="CRM/Contact/Form/Contact.hlp"}</span>
+            <span class="label">{$form.communication_style_id.label} {help id="communication_style" file="CRM/Contact/Form/Contact.hlp"}</span>
             <span class="value">{$form.communication_style_id.html}</span>
           </td><tr>
         {/if}
@@ -33,7 +33,8 @@
             <td>{$form.addressee_id.label}</td>
           {/if}
           {if array_key_exists('email_greeting_id', $form) OR array_key_exists('postal_greeting_id', $form) OR array_key_exists('addressee_id', $form)}
-            <td>&nbsp;&nbsp;{help id="id-greeting" file="CRM/Contact/Form/Contact.hlp"}</td>
+            {capture assign='helpTitle'}{ts}Greeting{/ts}{/capture}
+            <td>&nbsp;&nbsp;{help id="greeting" file="CRM/Contact/Form/Contact.hlp" title=$helpTitle}</td>
           {/if}
         </tr>
         <tr>
@@ -93,7 +94,7 @@
         <tr>
           {foreach key=key item=item from=$commPreference}
             <td>
-              <br/><span class="label">{$form.$key.label}</span> {help id="id-$key" file="CRM/Contact/Form/Contact.hlp"}
+              <br/><span class="label">{$form.$key.label}</span> {help id=$key file="CRM/Contact/Form/Contact.hlp"}
               <br/>{$form.$key.html}
             </td>
           {/foreach}
@@ -103,7 +104,7 @@
           </td>
         </tr>
         <tr>
-          <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" title=$form.is_opt_out.label file="CRM/Contact/Form/Contact.hlp"}</td>
+          <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="is_opt_out" file="CRM/Contact/Form/Contact.hlp"}</td>
         </tr>
     </table>
  </div>

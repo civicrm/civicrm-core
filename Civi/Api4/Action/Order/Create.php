@@ -62,6 +62,10 @@ class Create extends AbstractAction {
         throw new \CRM_Core_Exception(ts('Invalid financial type %1', [1 => $financialType]));
       }
     }
+    if (empty($values['invoice_id'])) {
+      $values['invoice_id'] = \CRM_Contribute_BAO_Contribution::generateInvoiceID();
+    }
+    $this->setContributionValues($values);
     return $values;
   }
 

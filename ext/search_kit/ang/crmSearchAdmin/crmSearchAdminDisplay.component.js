@@ -11,16 +11,15 @@
     },
     template: function() {
       // Dynamic template generates switch condition for each display type
-      var html =
-        '<div ng-switch="$ctrl.display.type">\n';
-      _.each(CRM.crmSearchAdmin.displayTypes, function(type) {
+      let html = '<div ng-switch="$ctrl.display.type">\n';
+      CRM.crmSearchAdmin.displayTypes.forEach(function(type) {
         html +=
           '<div ng-switch-when="' + type.id + '">\n' +
-          '  <div class="help-block"><i class="crm-i ' + type.icon + '"></i> ' + _.escape(type.description) + '</div>' +
+          '  <div class="help-block"><i class="crm-i ' + type.icon + '" role="img" aria-hidden="true"></i> ' + _.escape(type.description) + '</div>' +
           '  <search-admin-display-' + type.id + ' api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params" display="$ctrl.display"></search-admin-display-' + type.id + '>\n' +
           '  <hr>\n' +
           '  <button type="button" class="btn btn-{{ !$ctrl.stale ? \'success\' : $ctrl.preview ? \'warning\' : \'primary\' }}" ng-click="$ctrl.previewDisplay()" ng-disabled="!$ctrl.stale">\n' +
-          '  <i class="crm-i ' + type.icon + '"></i>' +
+          '  <i class="crm-i ' + type.icon + '" role="img" aria-hidden="true"></i>' +
           '  {{ $ctrl.preview && $ctrl.stale ? ts("Refresh") : ts("Preview") }}\n' +
           '  </button>\n' +
           '  <hr>\n' +
@@ -33,7 +32,7 @@
       return html;
     },
     controller: function($scope, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       let initDefaults;
 
@@ -80,6 +79,7 @@
       };
 
       this.dateFormats = CRM.crmSearchAdmin.dateFormats;
+      this.numberAttributes = CRM.crmSearchAdmin.numberAttributes;
 
       // Drag-n-drop settings for reordering columns
       this.sortableOptions = {
@@ -99,7 +99,7 @@
       };
 
       this.addCol = function(type) {
-        var col = _.cloneDeep(this.colTypes[type].defaults);
+        const col = _.cloneDeep(this.colTypes[type].defaults);
         col.type = type;
         if (this.display.type === 'table') {
           col.alignment = 'text-right';
@@ -150,7 +150,7 @@
       };
 
       this.getFieldLabel = function(key) {
-        var expr = ctrl.getExprFromSelect(selectToKey(key));
+        const expr = ctrl.getExprFromSelect(selectToKey(key));
         return searchMeta.getDefaultLabel(expr, ctrl.savedSearch);
       };
 
@@ -202,24 +202,9 @@
         }
       };
 
-      // Because angular dropdowns must be a by-reference variable
-      const suffixOptionCache = {};
-
       this.getSuffixOptions = function(col) {
-        let expr = ctrl.getExprFromSelect(col.key),
-          info = searchMeta.parseExpr(expr);
-        if (!info.fn && info.args[0] && info.args[0].field && info.args[0].field.suffixes) {
-          let cacheKey = info.args[0].field.suffixes.join();
-          if (!(cacheKey in suffixOptionCache)) {
-            suffixOptionCache[cacheKey] = Object.keys(CRM.crmSearchAdmin.optionAttributes)
-              .filter(key => info.args[0].field.suffixes.includes(key))
-              .reduce((filteredOptions, key) => {
-                filteredOptions[key] = CRM.crmSearchAdmin.optionAttributes[key];
-                return filteredOptions;
-              }, {});
-          }
-          return suffixOptionCache[cacheKey];
-        }
+        let expr = ctrl.getExprFromSelect(col.key);
+        return ctrl.crmSearchAdmin.getSuffixOptions(expr);
       };
 
       function getSetSuffix(index, val) {
@@ -236,7 +221,7 @@
       };
 
       this.canBeImage = function(col) {
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
         return info.args[0] && info.args[0].field && info.args[0].field.input_type === 'File';
       };
@@ -250,7 +235,7 @@
       };
 
       this.canBeEditable = function(col) {
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
         return !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
@@ -262,7 +247,7 @@
         if (!col.key || ctrl.display.settings.draggable) {
           return false;
         }
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr),
           arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};
         return arg.field && arg.field.type !== 'Pseudo';
@@ -271,7 +256,7 @@
       // Aggregate functions (COUNT, AVG, MAX) cannot autogenerate links, except for GROUP_CONCAT
       // which gets special treatment in APIv4 to convert it to an array.
       function canUseLinks(colKey) {
-        var expr = ctrl.getExprFromSelect(colKey),
+        const expr = ctrl.getExprFromSelect(colKey),
           info = searchMeta.parseExpr(expr);
         return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
       }
@@ -283,7 +268,7 @@
           ctrl.onChangeLink(column, {});
         } else {
           delete column.editable;
-          var defaultLink = ctrl.getLinks(column.key)[0];
+          const defaultLink = ctrl.getLinks(column.key)[0];
           ctrl.onChangeLink(column, defaultLink || {path: 'civicrm/'});
         }
       };
@@ -316,9 +301,9 @@
           };
           ctrl.links[''] = _.filter(ctrl.links['*'], {join: ''});
           searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
-            _.each(tasks, function (task) {
+            tasks.forEach(function (task) {
               if (task.number === '> 0' || task.number === '=== 1') {
-                var link = {
+                const link = {
                   text: task.title,
                   icon: task.icon,
                   task: task.name,
@@ -339,7 +324,7 @@
         if (!canUseLinks(columnKey)) {
           return ctrl.links['0'];
         }
-        var expr = ctrl.getExprFromSelect(columnKey),
+        const expr = ctrl.getExprFromSelect(columnKey),
           info = searchMeta.parseExpr(expr),
           joinEntity = searchMeta.getJoinEntity(info);
         if (!ctrl.links[joinEntity]) {
@@ -442,8 +427,9 @@
 
       // Add or remove an item from an array
       this.toggle = function(collection, item) {
-        if (_.includes(collection, item)) {
-          _.pull(collection, item);
+        const index = collection.indexOf(item);
+        if (index > -1) {
+          collection.splice(index, 1);
         } else {
           collection.push(item);
         }

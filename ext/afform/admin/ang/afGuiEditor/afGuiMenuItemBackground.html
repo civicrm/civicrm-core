@@ -2,6 +2,6 @@
   <label>{{:: ts('Background:') }}</label>
   <input type="color" class="form-control" ng-model="getSetBackgroundColor" ng-model-options="{getterSetter: true}">
   <a href class="" ng-click="getSetBackgroundColor(null)" ng-if="container.getStyles($ctrl.node)['background-color']">
-    <i class="crm-i fa-times"></i>
+    <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
   </a>
 </div>

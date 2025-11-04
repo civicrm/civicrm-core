@@ -4,9 +4,6 @@
 
 .crm-container.crm-public {
   --crm-font: inherit;
-  --crm-font-bold: inherit;
-  --crm-font-italic: inherit;
-  --crm-font-bold-italic: inherit;
 }
 .crm-container.crm-public #crm-main-content-wrapper {
   margin-inline: auto;
@@ -45,13 +42,9 @@ af-form > fieldset > legend {
   background: var(--crm-c-secondary);
   color: var(--crm-c-text-light);
   padding: var(--crm-m1) var(--crm-f-fieldset-padding);
-  font-family: var(--crm-font-bold);
   font-weight: bold;
   font-size: var(--crm-r1);
   border-radius: var(--crm-roundness);
-}
-.crm-contribution-confirm-form-block fieldset legend:has(~ .header-dark) {
-  display: none; /* fix for duplication on confirmation screen of legend text with Header Dark text */
 }
 .crm-container.crm-public .crm-section:not(.alert) {
   padding: 0;

@@ -36,26 +36,26 @@
         <td class="label">{$form.label.label}</td><td>{$form.label.html}</td>
       </tr>
       <tr class="crm-navigation-form-block-url">
-        <td class="label">{$form.url.label} {help id="id-menu_url" file="CRM/Admin/Form/Navigation.hlp"}</td>
+        <td class="label">{$form.url.label} {help id="url" file="CRM/Admin/Form/Navigation.hlp"}</td>
         <td>{$form.url.html} </td>
       </tr>
       <tr class="crm-navigation-form-block-icon">
-        <td class="label">{$form.icon.label} {help id="id-menu_icon" file="CRM/Admin/Form/Navigation.hlp"}</td>
+        <td class="label">{$form.icon.label} {help id="icon" file="CRM/Admin/Form/Navigation.hlp"}</td>
         <td>{$form.icon.html} </td>
       </tr>
       {if !empty($form.parent_id.html)}
         <tr class="crm-navigation-form-block-parent_id">
-          <td class="label">{$form.parent_id.label} {help id="id-parent" file="CRM/Admin/Form/Navigation.hlp"}</td>
+          <td class="label">{$form.parent_id.label} {help id="parent_id" file="CRM/Admin/Form/Navigation.hlp"}</td>
           <td>{$form.parent_id.html}</td>
         </tr>
       {/if}
       <tr class="crm-navigation-form-block-has_separator">
-        <td class="label">{$form.has_separator.label} {help id="id-has_separator" file="CRM/Admin/Form/Navigation.hlp"}</td>
+        <td class="label">{$form.has_separator.label} {help id="has_separator" file="CRM/Admin/Form/Navigation.hlp"}</td>
         <td>{$form.has_separator.html} </td>
       </tr>
       <tr class="crm-navigation-form-block-permission">
-        <td class="label">{$form.permission.label} {help id="id-menu_permission" file="CRM/Admin/Form/Navigation.hlp"}</td>
-        <td>{$form.permission.html} <span class="permission_operator_wrapper">{$form.permission_operator.html}  {help id="id-permission_operator" file="CRM/Admin/Form/Navigation.hlp"}</span></td>
+        <td class="label">{$form.permission.label} {help id="permission" file="CRM/Admin/Form/Navigation.hlp"}</td>
+        <td>{$form.permission.html} <span class="permission_operator_wrapper">{$form.permission_operator.html}  {help id="permission_operator" file="CRM/Admin/Form/Navigation.hlp"}</span></td>
       </tr>
       <tr class="crm-navigation-form-block-is_active">
         <td class="label">{$form.is_active.label}</td><td>{$form.is_active.html}</td>

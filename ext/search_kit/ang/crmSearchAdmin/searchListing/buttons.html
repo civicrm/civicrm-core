@@ -1,54 +1,54 @@
 <div class="btn-group btn-group-xs crm-search-admin-search-listing-buttons">
   <a class="btn btn-primary" ng-href="#/edit/{{:: row.data.id }}" ng-if=":: row.permissionToEdit && !row.data.is_template" title="{{:: ts('Edit search and displays') }}">
-    <i class="crm-i fa-pencil fa-fw"></i>
+    <i class="crm-i fa-pencil fa-fw" role="img" aria-hidden="true"></i>
   </a>
   <a class="btn btn-primary" ng-href="#/clone/{{:: row.data.id }}?is_template=0" ng-if=":: !row.permissionToEdit || row.data.is_template" title="{{:: ts('Create a new search based on this one') }}">
-    <i class="crm-i fa-clone"></i>
+    <i class="crm-i fa-clone" role="img" aria-hidden="true"></i>
   </a>
   <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="row.menuOpen = true">
-    <i class="crm-i fa-bars"></i>
+    <i class="crm-i fa-bars" role="img" aria-hidden="true"></i>
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu dropdown-menu-right" ng-if=":: row.menuOpen">
     <li ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">
       <a ng-href="#/edit/{{:: row.data.id }}">
-        <i class="crm-i fa-pencil fa-fw"></i>
+        <i class="crm-i fa-pencil fa-fw" role="img" aria-hidden="true"></i>
         {{ row.data.is_template ? ts('Edit Template') : ts('Edit Search') }}
       </a>
     </li>
     <li title="{{:: ts('View search results table') }}">
       <a ng-href="{{:: $ctrl.searchDisplayPath + '#/display/' + row.data.name }}" target="_blank">
-        <i class="crm-i fa-table"></i>
+        <i class="crm-i fa-table" role="img" aria-hidden="true"></i>
         {{:: ts('View Results') }}
       </a>
     </li>
     <li title="{{:: ts('Create a new search based on this one') }}">
       <a ng-href="#/clone/{{:: row.data.id }}?is_template=0">
-        <i class="crm-i fa-clone"></i>
+        <i class="crm-i fa-clone" role="img" aria-hidden="true"></i>
         {{ row.data.is_template ? ts('Create from Template') : ts('Clone Search') }}
       </a>
     </li>
     <li title="{{:: ts('Create a new template based on this one') }}">
       <a ng-href="#/clone/{{:: row.data.id }}?is_template=1">
-        <i class="crm-i fa-paste"></i>
+        <i class="crm-i fa-paste" role="img" aria-hidden="true"></i>
         {{ row.data.is_template ? ts('Clone Template') : ts('Save as Template') }}
       </a>
     </li>
     <li title="{{:: ts('Export this saved search for sharing or reuse') }}">
       <a href crm-dialog-popup="crmSearchAdminExport" popup-data="row" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: row.data.label}) }}">
-        <i class="crm-i fa-download"></i>
+        <i class="crm-i fa-download" role="img" aria-hidden="true"></i>
         {{ row.data.is_template ? ts('Export Template') : ts('Export Search') }}
       </a>
     </li>
     <li ng-if="!row.data['base_module:label'] && row.permissionToDelete" title="{{:: ts('Delete search along with any displays and forms') }}">
       <a href ng-click="$ctrl.deleteOrRevert(row)">
-        <i class="crm-i fa-trash"></i>
+        <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
         {{:: ts('Delete') }}
       </a>
     </li>
     <li ng-if="row.data['base_module:label'] && row.data['local_modified_date']" title="{{:: ts('Revert search to its packaged state') }}">
       <a href ng-click="$ctrl.deleteOrRevert(row)">
-        <i class="crm-i fa-undo"></i>
+        <i class="crm-i fa-undo" role="img" aria-hidden="true"></i>
         {{:: ts('Revert') }}
       </a>
     </li>

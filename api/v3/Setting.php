@@ -48,11 +48,9 @@ function civicrm_api3_setting_getfields($params) {
   if ($domainID === 'current_domain') {
     $domainID = NULL;
   }
-  $result = CRM_Core_BAO_Setting::getSettingSpecification(
-    $params['component_id'] ?? NULL,
+  $result = \Civi\Core\SettingsMetadata::getMetadata(
     $params['filters'] ?? [],
     $domainID,
-    $params['profile'] ?? NULL
   );
   // find any supplemental information
   if (!empty($params['action'])) {
@@ -164,22 +162,21 @@ function civicrm_api3_setting_revert($params) {
   });
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = [];
-  $isError = FALSE;
+  $errors = [];
   foreach ($domains as $domainID) {
     $valuesToRevert = array_intersect_key($defaults['values'][$domainID], $revertable);
     if (!empty($valuesToRevert)) {
-      $valuesToRevert['version'] = $params['version'];
-      $valuesToRevert['domain_id'] = $domainID;
-      // note that I haven't looked at how the result would appear with multiple domains in play
-      $result = array_merge($result, civicrm_api('Setting', 'create', $valuesToRevert));
-      if ($result['is_error'] ?? FALSE) {
-        $isError = TRUE;
+      try {
+        Civi::settings($domainID)->add($valuesToRevert);
+      }
+      catch (CRM_Core_Exception $e) {
+        $errors[] = $e->getMessage();
       }
     }
   }
 
-  if ($isError) {
-    return civicrm_api3_create_error('Error reverting settings');
+  if ($errors) {
+    return civicrm_api3_create_error(implode(', ', $errors));
   }
 
   return civicrm_api3_create_success($result, $params, 'Setting', 'revert');

@@ -24,25 +24,7 @@
 
       // Live results for the select2 of filter fields
       this.getFilterFields = function() {
-        var fieldGroups = [],
-          entities = getEntities();
-        if (ctrl.display.settings.calc_fields && ctrl.display.settings.calc_fields.length) {
-          fieldGroups.push({
-            text: ts('Calculated Fields'),
-            children: _.transform(ctrl.display.settings.calc_fields, function(fields, el) {
-              fields.push({id: el.name, text: el.label, disabled: ctrl.fieldInUse(el.name)});
-            }, [])
-          });
-        }
-        _.each(entities, function(entity) {
-          fieldGroups.push({
-            text: entity.label,
-            children: _.transform(entity.fields, function(fields, field) {
-              fields.push({id: entity.prefix + field.name, text: entity.label + ' ' + field.label, disabled: ctrl.fieldInUse(entity.prefix + field.name)});
-            }, [])
-          });
-        });
-        return {results: fieldGroups};
+        return afGui.getSearchDisplayFields(ctrl.display.settings, ctrl.fieldInUse);
       };
 
       this.buildPaletteLists = function() {
@@ -108,54 +90,10 @@
         });
       }
 
-      // Fetch all entities used in search (main entity + joins)
-      function getEntities() {
-        var
-          mainEntity = afGui.getEntity(ctrl.display.settings['saved_search_id.api_entity']),
-          entityCount = {},
-          entities = [{
-            name: mainEntity.entity,
-            prefix: '',
-            label: mainEntity.label,
-            fields: mainEntity.fields
-          }];
-
-        // Increment count of entityName and return a suffix string if > 1
-        function countEntity(entityName) {
-          entityCount[entityName] = (entityCount[entityName] || 0) + 1;
-          return entityCount[entityName] > 1 ? ' ' + entityCount[entityName] : '';
-        }
-        countEntity(mainEntity.entity);
-
-        _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
-          const joinInfo = join[0].split(' AS ');
-          const entity = afGui.getEntity(joinInfo[0]);
-          const bridgeEntity = afGui.getEntity(join[2]);
-          const defaultLabel = entity.label + countEntity(entity.entity);
-          const formValues = ctrl.display.settings['saved_search_id.form_values'] || {};
-          entities.push({
-            name: entity.entity,
-            prefix: joinInfo[1] + '.',
-            label: (formValues && formValues.join && formValues.join[joinInfo[1]]) || defaultLabel,
-            fields: entity.fields,
-          });
-          if (bridgeEntity) {
-            entities.push({
-              name: bridgeEntity.entity,
-              prefix: joinInfo[1] + '.',
-              label: bridgeEntity.label + countEntity(bridgeEntity.entity),
-              fields: _.omit(bridgeEntity.fields, _.keys(entity.fields)),
-            });
-          }
-        });
-
-        return entities;
-      }
-
       function buildFieldList(search) {
         $scope.fieldList.length = 0;
-        var entities = getEntities();
-        _.each(entities, function(entity) {
+        const entities = afGui.getSearchDisplayEntities(ctrl.display.settings);
+        entities.forEach((entity) => {
           $scope.fieldList.push({
             entityType: entity.name,
             label: ts('%1 Fields', {1: entity.label}),

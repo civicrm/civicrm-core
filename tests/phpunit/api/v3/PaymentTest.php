@@ -105,12 +105,27 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contribution['contribution_status_id']);
 
     //Get Payment using options
-    $getParams = [
-      'sequential' => 1,
-      'contribution_id' => $contributionID,
-      'is_payment' => 1,
-      'options' => ['limit' => 0, 'sort' => 'total_amount DESC'],
-    ];
+    switch ($apiVersion) {
+      case 3:
+        $getParams = [
+          'sequential' => 1,
+          'contribution_id' => $contributionID,
+          'is_payment' => 1,
+          'options' => ['limit' => 0, 'sort' => 'total_amount DESC'],
+        ];
+        break;
+
+      case 4:
+        $getParams = [
+          'where' => [
+            ['contribution_id', '=', $contributionID],
+          ],
+          'orderBy' => [
+            'total_amount' => 'DESC',
+          ],
+        ];
+    }
+
     $payments = $this->callAPISuccess('Payment', 'get', $getParams);
     $this->assertEquals(3, $payments['count']);
     foreach ([50, 30, 20] as $key => $total_amount) {
@@ -210,7 +225,19 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'trxn_id' => 111111,
       'total_amount' => 10,
     ]);
-    $paymentParams = ['contribution_id' => $contributionID1];
+
+    switch ($apiVersion) {
+      case 3:
+        $paymentParams = ['contribution_id' => $contributionID1];
+        break;
+
+      case 4:
+        $paymentParams = [
+          'where' => [
+            ['contribution_id', '=', $contributionID1],
+          ],
+        ];
+    }
     $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
     $this->callAPISuccess('payment', 'get', $paymentParams);
     $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
@@ -589,8 +616,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'return' => ['contribution_status_id'],
       'id' => $contributionID,
     ]);
-    //Still we've a status of Completed after refunding a partial amount.
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    // We should now have a status of "Partially paid" after refunding a partial amount.
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
 
     //Refund the complete amount.
     $this->callAPISuccess('Payment', 'create', [

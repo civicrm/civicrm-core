@@ -25,6 +25,13 @@
       </div>
     {/if}
     <div id="field_page">
+      {if $uf_group_type_extra}
+        <p>
+          {capture assign='helpTitle'}{ts}Used in Forms{/ts}{/capture}
+          {$helpTitle} {help id='used-for-extra' title=$helpTitle file="CRM/UF/Form/Group.hlp"}<br>
+          {$uf_group_type_extra}
+        </p>
+      {/if}
       {strip}
       {* handle enable/disable actions*}
       {include file="CRM/common/enableDisableApi.tpl"}

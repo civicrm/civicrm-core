@@ -1,7 +1,4 @@
-{htxt id="id-from_email-title"}
-  {ts}From Address{/ts}
-{/htxt}
-{htxt id="id-from_email"}
+{htxt id='from_email_address'}
 {crmSetting var="allow_mail_from_logged_in_contact" name="allow_mail_from_logged_in_contact"}
 {if $allow_mail_from_logged_in_contact}
   <p>{ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, users with Administer CiviCRM permission can configure one or more general email addresses that can be selected as an alternative. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>

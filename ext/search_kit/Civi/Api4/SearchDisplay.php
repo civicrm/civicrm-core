@@ -55,6 +55,15 @@ class SearchDisplay extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\SearchDisplay\EmailReport
+   */
+  public static function emailReport($checkPermissions = TRUE) {
+    return (new Action\SearchDisplay\EmailReport(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\SearchDisplay\InlineEdit
    */
   public static function inlineEdit($checkPermissions = TRUE) {
@@ -73,13 +82,11 @@ class SearchDisplay extends Generic\DAOEntity {
 
   public static function permissions() {
     $permissions = parent::permissions();
-    $permissions['default'] = ['administer search_kit'];
+    $permissions['default'] = ['manage own search_kit'];
     // Anyone with access to CiviCRM can view search displays (but not necessarily the results)
     $permissions['get'] = $permissions['getDefault'] = ['access CiviCRM'];
-    // Anyone with access to CiviCRM can do search tasks (but not necessarily all of them)
-    $permissions['getSearchTasks'] = ['access CiviCRM'];
-    // Permission to run or download search results is checked internally
-    $permissions['run'] = $permissions['download'] = $permissions['inlineEdit'] = [];
+    // Permission to get search results is checked via `SavedSearchInspectorTrait::checkPermissionToLoadSearch`
+    $permissions['run'] = $permissions['download'] = $permissions['inlineEdit'] = $permissions['getSearchTasks'] = [];
     return $permissions;
   }
 

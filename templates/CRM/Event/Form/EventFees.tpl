@@ -32,7 +32,7 @@
           <tr>
             <td></td>
             <td>
-              <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
+              <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
             </td>
          </tr>
       {else} {* New participant *}
@@ -86,7 +86,7 @@
 {/if}
 
 {if $isShowBillingBlock}
-  {include file='CRM/Core/BillingBlockWrapper.tpl'}
+  {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=false}
 {/if}
 
 {if ($email OR $batchEmail) and $outBound_option != 2}
@@ -105,7 +105,7 @@
         </tr>
         <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+          <td>{$form.from_email_address.html}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
         <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
         <td class="label">{$form.receipt_text.label}</td>
@@ -132,7 +132,7 @@
       </tr>
       <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
         <td class="label">{$form.from_email_address.label}</td>
-        <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+        <td>{$form.from_email_address.html} {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
       </tr>
       <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
         <td class="label">{$form.receipt_text.label}</td>

@@ -67,7 +67,7 @@ class CRM_Core_Resources_Common {
       <div id="bootstrap-theme">
         <div class="messages warning no-popup collapse">
           <p>
-            <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+            <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>
             <strong>' . ts('Bootstrap theme not found.') . '</strong>
           </p>
           <p>' . ts('This screen may not work correctly without a bootstrap-based theme such as Shoreditch installed.') . '</p>
@@ -148,6 +148,7 @@ class CRM_Core_Resources_Common {
     $settings = [
       'config' => [
         'isFrontend' => $config->userFrameworkFrontend,
+        'includeWildCardInName' => $config->includeWildCardInName,
       ],
     ];
     // Disable profile creation if user lacks permission
