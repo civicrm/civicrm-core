@@ -295,25 +295,26 @@
         },
         {
             "name": "civicrm/composer-compile-plugin",
-            "version": "v0.21",
+            "version": "v0.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/composer-compile-plugin.git",
-                "reference": "9129c3588e15e7744be2d740d3aff6b3215dff09"
+                "reference": "608f4d69d88f9759f33d2f237381c485f9649ea0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/composer-compile-plugin/zipball/9129c3588e15e7744be2d740d3aff6b3215dff09",
-                "reference": "9129c3588e15e7744be2d740d3aff6b3215dff09",
+                "url": "https://api.github.com/repos/civicrm/composer-compile-plugin/zipball/608f4d69d88f9759f33d2f237381c485f9649ea0",
+                "reference": "608f4d69d88f9759f33d2f237381c485f9649ea0",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.1 || ^2.0",
-                "php": ">=7.2",
+                "composer-plugin-api": "^2.3",
+                "php": ">=7.3",
                 "totten/lurkerlite": "^1.3"
             },
             "require-dev": {
-                "composer/composer": "~1.0",
+                "composer/composer": "~2.3",
+                "phpunit/phpunit": "^8.5 || ^9.5",
                 "totten/process-helper": "^1.0.1"
             },
             "type": "composer-plugin",
@@ -338,9 +339,9 @@
             "description": "Define a 'compile' event for all packages in the dependency-graph",
             "support": {
                 "issues": "https://github.com/civicrm/composer-compile-plugin/issues",
-                "source": "https://github.com/civicrm/composer-compile-plugin/tree/v0.21"
+                "source": "https://github.com/civicrm/composer-compile-plugin/tree/v0.22"
             },
-            "time": "2025-05-05T07:08:54+00:00"
+            "time": "2025-11-01T14:24:14+00:00"
         },
         {
             "name": "civicrm/composer-downloads-plugin",
