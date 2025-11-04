@@ -11,6 +11,14 @@ return [
     'log' => TRUE,
     'add' => '6.7.alpha1',
   ],
+  'getIndices' => fn() => [
+    'index_source_key' => [
+      'fields' => [
+        'source_key' => TRUE,
+      ],
+      'add' => '6.7.alpha1',
+    ],
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Source ID'),

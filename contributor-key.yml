@@ -468,6 +468,9 @@
 - github      : dptarrant
   name        : Dave T
 
+- github      : duncan-s-white
+  name        : Duncan Stanley White
+
 - github      : dwoods-encircle
   organization: enCircle Solutions Ltd.
   name        : Darren Woods
@@ -963,6 +966,9 @@
 
 - name        : Kristine Chan
 
+- github      : krisztin
+  name        : Christina
+
 - github      : kryptothesuperdog
   name        : Andrew West
   organization: British Humanist Association
@@ -1318,10 +1324,6 @@
   name        : Phil Morice Brubaker
   organization: Just Hope
 
-- github      : pminf
-  name        : Philipp Michael
-  organization: Parlamentwatch e.V.
-
 - github      : pnbpss
   name        : Panu Boonpromsook
 
@@ -1551,6 +1553,10 @@
 - github      : scardinius
   name        : Tomasz Pietrzkowski
   organization: Caltha
+
+- github      : sdoijad
+  name        : Sachin Doijad
+  organization: Skvare
 
 - github      : seamuslee001
   name        : Seamus Lee
