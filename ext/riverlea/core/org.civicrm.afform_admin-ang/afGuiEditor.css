@@ -286,9 +286,6 @@
   opacity: 1;
   transition: opacity .2s;
 }
-#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover :is(.af-gui-container:not(.af-gui-container-type-fieldset),.af-gui-element,.af-gui-markup) {
-  border: 2px solid var(--crm-c-layout1-bg);
-}
 /* Dragging related */
 #afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar,
 #afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-container-title span:empty {
@@ -349,11 +346,7 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-element:hover,
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-markup:hover,
 #afGuiEditor .crm-editable-enabled:hover:not(:focus) {
-  outline: 2px dashed var(--crm-c-gray-700);
-}
-#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container .af-gui-element:hover,
-#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container .af-gui-markup:hover {
-  border-width: 1px;
+  outline: 2px dashed var(--crm-c-inverse-bg);
 }
 #afGuiEditor-canvas .af-entity-selected {
   outline: 2px dashed var(--crm-c-blue-dark);
