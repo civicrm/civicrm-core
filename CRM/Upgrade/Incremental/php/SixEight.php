@@ -37,4 +37,14 @@ class CRM_Upgrade_Incremental_php_SixEight extends CRM_Upgrade_Incremental_Base 
     ], 'name');
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_8_beta1($rev): void {
+    $this->addTask('Add index to civicrm_translation_source', 'addIndex', 'civicrm_translation_source', 'source_key');
+  }
+
 }
