@@ -52,7 +52,7 @@
             {if !empty($attachment)}
             {foreach from=$attachment key=attKey item=attVal}
             <div class="crm-attachment-wrapper crm-entity" id="file_{$attVal.fileID}">
-              <strong><a class="crm-attachment" href="{$attVal.url}">{$attVal.cleanName}</a></strong>
+              <strong><a class="crm-attachment" href="{$attVal.url}" target="_blank">{$attVal.cleanName}</a></strong>
               {if $attVal.description}&nbsp;-&nbsp;{$attVal.description}{/if}
               {if $attVal.deleteURLArgs}
                 <a href="#" class="crm-hover-button delete-attachment" data-mimetype="{$attVal.mime_type}" data-filename="{$attVal.cleanName}" data-args="{$attVal.deleteURLArgs}" title="{ts escape='htmlattribute'}Delete File{/ts}"><span class="icon delete-icon"></span></a>
