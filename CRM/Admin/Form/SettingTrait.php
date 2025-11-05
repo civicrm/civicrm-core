@@ -90,10 +90,7 @@ trait CRM_Admin_Form_SettingTrait {
     $unsetValues = array_diff_key($this->_settings, $params);
     foreach ($unsetValues as $key => $unsetValue) {
       $quickFormType = $this->getQuickFormType($this->getSettingMetadata($key));
-      if ($quickFormType === 'CheckBox') {
-        $setValues[$key] = [$key => 0];
-      }
-      elseif ($quickFormType === 'CheckBoxes') {
+      if ($quickFormType === 'CheckBoxes') {
         $setValues[$key] = [];
       }
     }
@@ -251,8 +248,13 @@ trait CRM_Admin_Form_SettingTrait {
       elseif ($add === 'addEntityRef') {
         $this->$add($settingName, $props['title'], $props['entity_reference_options']);
       }
-      elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-        $this->addRadio($settingName, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
+      elseif ($add === 'addToggle' && $props['type'] === 'Boolean') {
+        $attributes = $props['html_attributes'] ?? [];
+        $attributes += [
+          'on' => ts('Enabled'),
+          'off' => ts('Disabled'),
+        ];
+        $this->addToggle($settingName, $props['title'], $attributes);
       }
       elseif ($add === 'add') {
         $this->add($props['html_type'], $settingName, $props['title'], $options ?? $props['html_attributes'] ?? NULL, !empty($props['is_required']), $options ? ($props['html_attributes'] ?? NULL) : ($props['html_extra'] ?? NULL));
@@ -275,7 +277,11 @@ trait CRM_Admin_Form_SettingTrait {
     if (isset($spec['quick_form_type']) &&
     !($spec['quick_form_type'] === 'Element' && !empty($spec['html_type']))) {
       // This is kinda transitional
-      return $spec['quick_form_type'];
+      $mapTypes = [
+        'CheckBox' => 'Toggle',
+        'YesNo' => 'Toggle',
+      ];
+      return $mapTypes[$spec['quick_form_type']] ?? $spec['quick_form_type'];
     }
 
     // The spec for settings has been updated for consistency - we provide deprecation notices for sites that have
@@ -288,7 +294,7 @@ trait CRM_Admin_Form_SettingTrait {
     }
     $mapping = [
       'checkboxes' => 'CheckBoxes',
-      'checkbox' => 'CheckBox',
+      'checkbox' => 'Toggle',
       'radio' => 'Radio',
       'select' => 'Select',
       'textarea' => 'Element',
@@ -296,7 +302,8 @@ trait CRM_Admin_Form_SettingTrait {
       'entity_reference' => 'EntityRef',
       'advmultiselect' => 'Element',
       'chainselect' => 'ChainSelect',
-      'yesno' => 'YesNo',
+      'yesno' => 'Toggle',
+      'toggle' => 'Toggle',
     ];
     $mapping += array_fill_keys(CRM_Core_Form::$html5Types, '');
     return $mapping[$htmlType] ?? '';
@@ -346,15 +353,15 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   protected static function formatSettingValue(array $settingMetaData, $settingValue) {
+    $quickFormType = self::getQuickFormType($settingMetaData);
     if (!empty($settingMetaData['sortable'])) {
       $settingValue = self::getReorderedSettingData($settingMetaData['name'], $settingValue);
     }
-    elseif (self::getQuickFormType($settingMetaData) === 'CheckBoxes') {
+    elseif ($quickFormType === 'CheckBoxes') {
       $settingValue = array_keys($settingValue);
     }
-    elseif (self::getQuickFormType($settingMetaData) === 'CheckBox') {
-      // This will be an array with one value.
-      $settingValue = (bool) reset($settingValue);
+    elseif ($quickFormType === 'Toggle') {
+      $settingValue = (bool) $settingValue;
     }
     elseif ($settingMetaData['type'] === 'Integer') {
       // QuickForm is pretty slack when it comes to types, cast to an integer.
