@@ -46,7 +46,7 @@ class CRM_Mailing_Page_Open extends CRM_Core_Page {
     ]);
     $queue->createItem(new CRM_Queue_Task(
       ['CRM_Mailing_Event_BAO_MailingEventOpened', 'queuedOpen'],
-      [$queue_id],
+      [$queue_id, date('YmdHis')],
       'Processing tracked open for queue (#' . $queue_id . ')'
     ));
 

@@ -42,7 +42,7 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
     ]);
     $queue->createItem(new CRM_Queue_Task(
       ['CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen', 'queuedTrack'],
-      [$queue_id, $url_id],
+      [$queue_id, $url_id, date('YmdHis')],
       'Processing tracked url open for queue (#' . $queue_id . '), url (#' . $url_id . ')'
     ));
     $url = trim(CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track(NULL, $url_id));
