@@ -68,7 +68,7 @@
             });
         }
         else if (task.redirect) {
-          const mode = task.redirect.mode && task.crmPopup.mode == 'front'  ? 'front' : 'back';
+          const mode = ('mode' in task.redirect) ? task.redirect.mode : 'back';
           const redirectPath = $rootScope.$eval(task.redirect.path, data),
             redirectQuery = task.redirect.query && $rootScope.$eval(task.redirect.query, data) && $rootScope.$eval(task.redirect.data, data);
           $window.open(CRM.url(redirectPath, redirectQuery, mode), '_blank');
