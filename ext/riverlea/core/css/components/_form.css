@@ -358,25 +358,17 @@ input.crm-form-checkbox) + label {
 .crm-container .crm-multiple-checkbox-radio-options.crm-options-per-line .crm-option-label-pair {
   flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--crm-gap)) / var(--crm-opts-per-line));
 }
-/* Slider */
-.crm-container .ui-slider {
-  background: var(--crm-input-bg);
-  border: 1px solid var(--crm-input-border-color);
-}
-.crm-container .ui-slider .ui-slider-handle {
-  border: var(--crm-btn-border);
-  background: var(--crm-c-secondary);
-}
-.crm-container .ui-slider .ui-slider-range {
-  border: 0;
-  border-radius: 0;
-}
 
 /* Input types */
 
 .crm-container input[type="file"] {
   height: auto;
   padding: var(--crm-s);
+}
+.crm-container input[type="range"] {
+  accent-color: var(--crm-c-focus);
+  height: auto;
+  box-shadow: none;
 }
 
 /* Contact dashboard form */
