@@ -74,6 +74,7 @@ class TagFieldSpecProvider extends \Civi\Core\Service\AutoService implements Spe
       ->setDescription(ts('Tags applied to this record'))
       ->setType('Extra')
       ->setInputType('Select')
+      ->setInputAttrs(['multiple' => TRUE])
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getTagFilterSql'])
       ->setSqlRenderer([__CLASS__, 'getTagSelectSql'])
