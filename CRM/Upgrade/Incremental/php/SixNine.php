@@ -101,6 +101,39 @@ class CRM_Upgrade_Incremental_php_SixNine extends CRM_Upgrade_Incremental_Base {
     foreach ($tables as $table) {
       $this->addTask("dev/core#2290 - Remove id column from '$table' table", 'dropColumn', $table, 'id');
     }
+    $this->addTask("dev/core6087 - Add Schedule Job to process CiviMail Tracking Queue", 'addTrackingQueueJob');
+  }
+
+  public static function addTrackingQueueJob(\CRM_Queue_TaskContext $ctx): bool {
+    $civiMailingEnabled = \Civi\Api4\Extension::get(FALSE)->addWhere('key', '=', 'civi_mail')->execute()->first();
+    $job = \Civi\Api4\Job::save(FALSE);
+    $domains = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_domain");
+    while ($domains->fetch()) {
+      $job->addRecord([
+        'domain_id' => $domains->id,
+        'run_frequency' => 'Hourly',
+        'name' => 'Process CiviMail Queue items',
+        'api_entity' => 'Mailing',
+        'api_action' => 'runQueue',
+        'parameters' => 'version=4',
+        'is_active' => ($civiMailingEnabled['status'] === 'installed') ? TRUE : FALSE,
+      ]);
+    }
+    $job->setMatch([
+      'domain_id',
+      'api_entity',
+      'api_action',
+    ])->execute();
+    return TRUE;
+  }
+
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
+    if ($rev === '6.9.alpha1') {
+      $civiMailingEnabled = \Civi\Api4\Extension::get(FALSE)->addWhere('key', '=', 'civi_mail')->execute()->first();
+      if ($civiMailingEnabled) {
+        $postUpgradeMessage .= '<div class="messages warning"><p>' . ts('WARNING CiviCRM has now implemented a queue process for managing recording of Tracked Opens and Click Through tracking. If you do not call job.execute as part of your cron process you will need to manually create a new job entry to call the v4 API method Mailing.runQueue to ensure your statistics are processed.') . '</p></div>';
+      }
+    }
   }
 
 }
