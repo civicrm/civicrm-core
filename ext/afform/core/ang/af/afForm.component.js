@@ -368,6 +368,20 @@
         CRM.alert(errorMsg, ts('Sorry'), 'error');
       }
 
+      this.validate = () => {
+        if (!ctrl.ngForm.$valid || !validateFileFields()) {
+          return new Promise((resolve) => resolve({
+            is_error: true,
+            message: ts('Please fill all required fields.'),
+          }));
+        }
+        return crmApi4('Afform', 'validate', {
+          name: this.getFormMeta().name,
+          args: args,
+          values: data,
+        });
+      };
+
       this.submit = function () {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
