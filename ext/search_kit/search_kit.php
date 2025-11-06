@@ -95,6 +95,7 @@ function search_kit_civicrm_entityTypes(array &$entityTypes): void {
       'name' => $display['entityName'],
       'class' => \Civi\BAO\SK_Entity::class,
       'table' => $display['tableName'],
+      'module' => E::LONG_NAME,
       'metaProvider' => \Civi\Schema\SkEntityMetaProvider::class,
     ];
   }
