@@ -1950,7 +1950,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @return void
    */
-  protected function checkColumns(array &$settings): void {
+  protected function filterPrintableColumns(array &$settings): void {
     // Respect if user has disabled any columns, otherwise show all
     $this->toggleColumns = $this->toggleColumns ?: array_keys($settings['columns']);
 

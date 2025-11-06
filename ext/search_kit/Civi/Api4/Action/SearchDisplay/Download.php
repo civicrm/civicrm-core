@@ -25,7 +25,7 @@ class Download extends AbstractRunAction {
     $settings =& $this->display['settings'];
     $fileName = '';
 
-    $this->checkColumns($settings);
+    $this->filterPrintableColumns($settings);
 
     // Displays are only exportable if they have actions enabled
     if (empty($settings['actions'])) {
