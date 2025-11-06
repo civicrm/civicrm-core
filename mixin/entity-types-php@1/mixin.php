@@ -28,6 +28,7 @@ return function ($mixInfo, $bootCache) {
     foreach ($files as $file) {
       $entities = include $file;
       foreach ($entities as $entity) {
+        $entity += ['module' => $mixInfo->longName];
         $e->entityTypes[$entity['class']] = $entity;
       }
     }
