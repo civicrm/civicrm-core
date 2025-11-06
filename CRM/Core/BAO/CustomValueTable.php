@@ -234,11 +234,28 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @param string $type
    * @param int|null $maxLength
+   * @param bool $isSerialized (serialized fields must always have a textual mysql field)
    *
    * @return string
    *   the mysql data store placeholder
    */
-  public static function fieldToSQLType(string $type, $maxLength = NULL) {
+  public static function fieldToSQLType(string $type, $maxLength = NULL, bool $isSerialized = FALSE) {
+    if ($isSerialized) {
+      switch ($type) {
+        case 'Text':
+          return 'text';
+
+        case 'String':
+        default:
+          // ensure minimum varchar of 255
+          // TODO: this can still be insufficient if you try to serialize
+          // long text values. in this case a `text` field would be better
+          // but how to know? we could switch to only using varchar for serialized
+          // ints and text otherwise?
+          $maxLength = max(255, $maxLength ?: 255);
+          return "varchar($maxLength)";
+      }
+    }
     switch ($type) {
       case 'String':
         $maxLength = $maxLength ?: 255;
