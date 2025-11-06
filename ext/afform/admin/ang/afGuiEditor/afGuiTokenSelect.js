@@ -29,7 +29,7 @@
         var tokens = _.transform(ctrl.editor.getEntities(), function(tokens, entity) {
           const entityMeta = ctrl.editor.meta.entities[entity.type];
           if (entityMeta.submissionTokens) {
-            _.each(entityMeta.submissionTokens, function(submissionToken) {
+            entityMeta.submissionTokens.forEach((submissionToken) => {
               const description = submissionToken.description ? submissionToken.description : '';
               tokens.push({id: entity.name + '.0.' + submissionToken.token, text: entity.label + ' ' + submissionToken.label, description: description});  
             });
