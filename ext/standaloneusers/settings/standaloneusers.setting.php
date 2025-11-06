@@ -31,4 +31,19 @@ return [
     ],
     'pseudoconstant' => ['callback' => '\\Civi\\Standalone\\MFA\\Base::getMFAclasses'],
   ],
+  'standalone_mfa_remember' => [
+    'name' => 'standalone_mfa_remember',
+    'group' => 'standaloneusers',
+    'type' => 'Integer',
+    'title' => E::ts('Remember this device expiry (days)'),
+    'description' => E::ts('How many days should ‘remember this device’ allow a user to bypass MFA? Use zero to disable this feature.'),
+    'default' => '',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'html_type' => 'number',
+    'html_attributes' => [
+      'min' => 0,
+      'max' => 31,
+    ],
+  ],
 ];
