@@ -190,4 +190,39 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     $e->content = $render['content'] ?? '';
   }
 
+  /**
+   * Validate the font size setting: it should be a floating
+   * point number (CSS font size in rem)
+   */
+  public static function validateFontSize($value):bool {
+    $fontSize = \CRM_Utils_Type::validate($value, 'Float', FALSE);
+    if ($fontSize < 0.5 || $fontSize > 2) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * Get font size setting and add a variable for it
+   * to the CSS properties of every stream
+   */
+  public static function onChangeFontsize($oldValue, $newValue, $metadata) {
+    if ($oldValue != $newValue) {
+      $fontSize = floatval($newValue);
+      // Get current CSS properties for every stream
+      $riverleaStreams = \Civi\Api4\RiverleaStream::get(TRUE)
+        ->addSelect('vars')
+        ->execute();
+      // Add new font size to each stream as a CSS property
+      foreach ($riverleaStreams as $riverleaStream) {
+        $riverleaStream['vars']['--crm-font-size'] = $fontSize . "rem";
+        // Write the new value to the CSS vars of each stream
+        $results = \Civi\Api4\RiverleaStream::update(TRUE)
+          ->addValue('vars', $riverleaStream['vars'])
+          ->addWhere('id', '=', $riverleaStream['id'])
+          ->execute();
+      }
+    }
+  }
+
 }
