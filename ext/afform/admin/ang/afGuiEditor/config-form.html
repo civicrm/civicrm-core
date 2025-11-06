@@ -8,7 +8,7 @@
     <input ng-model="editor.afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" ng-model-options="editor.debounceMode" >
   </div>
 
-  <div class="form-group" ng-if="editor.meta.locales" ng-if="editor.meta.locales.length">
+  <div class="form-group" ng-if="editor.meta.locales && editor.meta.locales.length">
     <label for="afform_locale">
       {{:: ts('Locale') }} <span class="crm-marker">*</span>
     </label>
