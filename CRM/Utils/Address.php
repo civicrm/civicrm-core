@@ -297,24 +297,13 @@ class CRM_Utils_Address {
       $fields['postal_code'] .= "-$fields[postal_code_suffix]";
     }
 
-    $country = $fields['country_id:label'];
     //CRM-16876 Display countries in all caps when in mailing mode.
-    if ($country) {
-      if (Civi::settings()->get('hideCountryMailingLabels')) {
-        $domain = CRM_Core_BAO_Domain::getDomain();
-        $domainLocation = CRM_Core_BAO_Location::getValues(['contact_id' => $domain->contact_id]);
-        $domainAddress = $domainLocation['address'][1];
-        $domainCountryId = $domainAddress['country_id'];
-        if ($fields['country'] == CRM_Core_PseudoConstant::country($domainCountryId)) {
-          $fields['country'] = NULL;
-        }
-        else {
-          //Capitalization display on uppercase to contries with special characters
-          $fields['country'] = mb_convert_case($country, MB_CASE_UPPER, 'UTF-8');
-        }
+    if ($fields['country_id:label']) {
+      if ($fields['country_id:label'] === self::getDomainCountryToHide()) {
+        $fields['country'] = NULL;
       }
       else {
-        $fields['country'] = mb_convert_case($country, MB_CASE_UPPER, 'UTF-8');
+        $fields['country'] = mb_convert_case($fields['country_id:label'], MB_CASE_UPPER, 'UTF-8');
       }
     }
 
@@ -447,6 +436,25 @@ class CRM_Utils_Address {
     if (isset($address['state_province_id'])) {
       $address['state_province_id:label'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'state_province_id', $address['state_province_id']);
       $address['state_province_id:abbr'] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($address['state_province_id']);
+    }
+  }
+
+  /**
+   * Check if we should remove the domain contact's country from mailing labels and return it or null if not
+   *
+   * @return string | null
+   * @throws \CRM_Core_Exception
+   */
+  private static function getDomainCountryToHide() {
+    if (Civi::settings()->get('hideCountryMailingLabels')) {
+      $domain = CRM_Core_BAO_Domain::getDomain();
+      $domainLocation = CRM_Core_BAO_Location::getValues(['contact_id' => $domain->contact_id]);
+      $domainAddress = $domainLocation['address'][1];
+      $domainCountryId = $domainAddress['country_id'];
+      return CRM_Core_PseudoConstant::country($domainCountryId);
+    }
+    else {
+      return NULL;
     }
   }
 
