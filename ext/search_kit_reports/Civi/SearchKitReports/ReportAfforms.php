@@ -123,9 +123,12 @@ class ReportAfforms extends AutoSubscriber {
       }
       // remove pseudosuffixes to get the base field name
       $fieldName = explode(':', $column['key'])[0];
-      $filters[$fieldName] = array_filter([
+      $defn = array_filter([
         'label' => $column['label'],
       ]);
+      if ($defn) {
+        $filters[$fieldName] = \json_encode($defn);
+      }
     }
     return $filters;
   }
