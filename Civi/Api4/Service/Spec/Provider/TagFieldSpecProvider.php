@@ -76,7 +76,9 @@ class TagFieldSpecProvider extends \Civi\Core\Service\AutoService implements Spe
       ->setInputType('Select')
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getTagFilterSql'])
+      ->setSqlRenderer([__CLASS__, 'getTagSelectSql'])
       ->setSuffixes(['name', 'label', 'description', 'color'])
+      ->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA)
       ->setOptionsCallback([__CLASS__, 'getTagList']);
     $spec->addFieldSpec($field);
   }
@@ -121,7 +123,12 @@ class TagFieldSpecProvider extends \Civi\Core\Service\AutoService implements Spe
     }
     $tags = implode(',', $value);
     $tags = $tags && \CRM_Utils_Rule::commaSeparatedIntegers($tags) ? $tags : '0';
-    return "$fieldAlias $operator (SELECT entity_id FROM `civicrm_entity_tag` WHERE entity_table = '$tableName' AND tag_id IN ($tags))";
+    return "{$field['sql_name']} $operator (SELECT entity_id FROM `civicrm_entity_tag` WHERE entity_table = '$tableName' AND tag_id IN ($tags))";
+  }
+
+  public static function getTagSelectSql(array $field, Api4SelectQuery $query): string {
+    $tableName = CoreUtil::getTableName($field['entity']);
+    return "(SELECT GROUP_CONCAT(tag_id) FROM `civicrm_entity_tag` WHERE `entity_id` = {$field['sql_name']} AND `entity_table` = '{$tableName}' GROUP BY `entity_id`)";
   }
 
   /**
