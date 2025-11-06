@@ -200,4 +200,52 @@ EOHTML;
       ->execute();
   }
 
+  public function testValidateAction(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" defn="{required: true}" />
+    <af-field name="last_name" defn="{required: true}" />
+    <af-field name="middle_name" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Validate with empty first and last names. Should return 2 validation errors.
+    $submission = [
+      ['fields' => ['middle_name' => 'Person']],
+    ];
+    $result = Afform::validate()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $response = $result->first();
+    $this->assertTrue($response['is_error'] ?? FALSE);
+    $this->assertCount(2, $response['errors']);
+    $this->assertStringContainsString('First Name is a required field', implode("\n", $response['errors']));
+    $this->assertStringContainsString('Last Name is a required field', implode("\n", $response['errors']));
+
+    // Validate with valid values. Should return no errors.
+    $validSubmission = [
+      ['fields' => ['first_name' => 'John', 'last_name' => 'Doe']],
+    ];
+    $validResult = Afform::validate()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $validSubmission])
+      ->execute();
+
+    $this->assertCount(1, $validResult);
+    $validResponse = $validResult->first();
+    $this->assertEmpty($validResponse);
+  }
+
 }
