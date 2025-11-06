@@ -173,4 +173,12 @@ gt=addressee',
       'api_entity' => 'Job',
       'api_action' => 'process_batch_merge',
     ],
+    [
+      'run_frequency' => 'Hourly',
+      'name' => 'Process CiviMail Queue items',
+      'description' => '',
+      'api_entity' => 'Mailing',
+      'api_action' => 'runQueue',
+      'parameters' => 'version=4',
+    ],
   ]);
