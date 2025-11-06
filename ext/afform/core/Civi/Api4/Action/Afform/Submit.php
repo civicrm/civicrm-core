@@ -457,6 +457,7 @@ class Submit extends AbstractProcessor {
         $idField = CoreUtil::getIdFieldName($event->getEntityType());
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
         $event->setEntityId($index, $saved[$idField]);
+        $event->setSaved($index, $saved);
         self::saveJoins($event, $index, $saved[$idField], $record['joins'] ?? []);
       }
       catch (\CRM_Core_Exception $e) {
