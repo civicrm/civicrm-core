@@ -49,9 +49,9 @@
           const fieldElements = $element[0].querySelectorAll('af-field');
           fieldElements.forEach((field) => {
             const name = field.getAttribute('name');
-            // this is nasty but we cant parse the `defn` attribute directly
-            // because its not proper JSON, so this is least nasty for now
-            const defn = angular.element(field).controller('afField').defn;
+            // TODO: one day we might use regular JSON for defn
+            // and then switch to JSON.parse
+            const defn = $scope.$eval(field.getAttribute('defn'));
             meta[name] = defn;
           });
           return meta;
