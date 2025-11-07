@@ -31,8 +31,8 @@
         <td>{$form.weight.html}</td>
     </tr>
     <tr style="display:none" class="field-is_multiple">
-        <td class="right">{help id="is_multiple"}</td>
-        <td class="html-adjust">{$form.is_multiple.html}&nbsp;{$form.is_multiple.label}</td>
+        <td class="right">{$form.is_multiple.label} {help id="is_multiple"}</td>
+        <td class="html-adjust">{$form.is_multiple.html}</td>
     </tr>
     <tr style="display:none" class="field-max_multiple">
         <td class="label">{$form.max_multiple.label} {help id="max_multiple"}</td>
@@ -47,20 +47,20 @@
         <td>{$form.icon.html}</td>
     </tr>
     <tr class="html-adjust field-collapse_display">
-        <td class="right">{help id="collapse_display"}</td>
-        <td>{$form.collapse_display.html} {$form.collapse_display.label}</td>
+        <td class="right">{$form.collapse_display.label} {help id="collapse_display"}</td>
+        <td>{$form.collapse_display.html}</td>
     </tr>
     <tr>
-        <td class="right">{help id="collapse_adv_display"}</td>
-        <td>{$form.collapse_adv_display.html} {$form.collapse_adv_display.label}</td>
+        <td class="right">{$form.collapse_adv_display.label} {help id="collapse_adv_display"}</td>
+        <td>{$form.collapse_adv_display.html}</td>
     </tr>
     <tr>
-        <td>&nbsp;</td>
-        <td>{$form.is_active.html} {$form.is_active.label}</td>
+        <td class="right">{$form.is_active.label}</td>
+        <td>{$form.is_active.html}</td>
     </tr>
     <tr>
-        <td class="right">{help id="is_public"}</td>
-        <td>{$form.is_public.html} {$form.is_public.label}</td>
+        <td class="right">{$form.is_public.label}{help id="is_public"}</td>
+        <td>{$form.is_public.html}</td>
     </tr>
     <tr class="html-adjust">
         <td class="label">{$form.help_pre.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='help_pre' id=$gid}{/if} {help id="help_pre"}</td>
@@ -185,7 +185,7 @@ CRM.$(function($) {
     else {
       $('tr.field-max_multiple, tr.field-icon', $form).hide();
       if ($('select[name=style]', $form).val() === 'Tab with table') {
-        $('select[name=style]', $form).val('Inline');
+        $('select[name=style]', $form).val('Inline').change();
       }
       if (!tabWithTableOption) {
         tabWithTableOption = $("select[name=style] option[value='Tab with table']", $form).detach();
