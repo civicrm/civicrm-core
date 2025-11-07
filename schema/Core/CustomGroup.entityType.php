@@ -205,8 +205,9 @@ return [
       'title' => ts('Minimum Multiple Records'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
-      'description' => ts('minimum number of multiple records (typically 0?)'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '2.2',
+      'deprecated' => TRUE,
     ],
     'max_multiple' => [
       'title' => ts('Maximum Multiple Records'),
