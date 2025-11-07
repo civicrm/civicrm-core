@@ -5,6 +5,7 @@
 .crm-container.crm-public {
   --crm-font: inherit;
 }
+.crm-container.crm-public .crm-page-title-wrapper,
 .crm-container.crm-public #crm-main-content-wrapper {
   margin-inline: auto;
   width: clamp(calc(var(--crm-f-form-width) / 2),100%,var(--crm-f-form-width));
