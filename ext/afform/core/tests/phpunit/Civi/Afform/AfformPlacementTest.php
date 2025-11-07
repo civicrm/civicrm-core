@@ -153,12 +153,10 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     };
 
     $blockA = $getFromRegion($this->formNames[2]);
-    $this->assertStringContainsString("<af-search-tab-test2 options=", $blockA['markup']);
-    $this->assertStringContainsString("\"contact_id\":$cid", $blockA['markup']);
+    $this->assertStringContainsString("<af-search-tab-test2 options=\"{&quot;contact_id&quot;:$cid", $blockA['markup']);
 
     $blockB = $getFromRegion($this->formNames[1]);
-    $this->assertStringContainsString("<af-form-tab-test1 options=", $blockB['markup']);
-    $this->assertStringContainsString("\"contact_id\":$cid", $blockB['markup']);
+    $this->assertStringContainsString("<af-form-tab-test1 options=\"{&quot;contact_id&quot;:$cid", $blockB['markup']);
 
     // Block for wrong contact type should not appear
     $this->assertNull($getFromRegion($this->formNames[0]));
@@ -259,16 +257,16 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     $this->assertEmpty($blockA);
 
     $blockB = $getFromRegion($this->formNames[1]);
-    $this->assertStringContainsString("\"contact_id\":$cid", $blockB['markup']);
-    $this->assertStringContainsString("\"case_id\":{$cases[0]['id']}", $blockB['markup']);
+    $this->assertStringContainsString("&quot;contact_id&quot;:$cid", $blockB['markup']);
+    $this->assertStringContainsString("&quot;case_id&quot;:{$cases[0]['id']}", $blockB['markup']);
     $this->assertEquals(3, $blockB['weight']);
 
     $blockC = $getFromRegion($this->formNames[2]);
     $this->assertEmpty($blockC);
 
     $blockD = $getFromRegion($this->formNames[3]);
-    $this->assertStringContainsString("\"contact_id\":$cid", $blockD['markup']);
-    $this->assertStringContainsString("\"case_id\":{$cases[0]['id']}", $blockD['markup']);
+    $this->assertStringContainsString("&quot;contact_id&quot;:$cid", $blockD['markup']);
+    $this->assertStringContainsString("&quot;case_id&quot;:{$cases[0]['id']}", $blockD['markup']);
     $this->assertEquals(1, $blockD['weight']);
   }
 
