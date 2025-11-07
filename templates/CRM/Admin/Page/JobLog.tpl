@@ -14,7 +14,7 @@
 <div class="crm-content-block crm-block">
 
 {if $jobId}
-    <h3>{ts}List of log entries for:{/ts} {$jobName}</h3>
+    <h2>{ts}List of log entries for:{/ts} {$jobName}</h2>
 {/if}
 
   <div class="action-link">
@@ -29,20 +29,50 @@
         {strip}
         {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-        <table class="selector row-highlight">
+        <table class="selector row-highlight vertical-align-baseline">
         <tr class="columnheader">
             <th >{ts}Date{/ts}</th>
-            <th >{ts}Job Name{/ts}</th>
+            {if !$jobId}<th >{ts}Job Name{/ts}</th>{/if}
             <th >{ts}Command{/ts}/{ts}Job Status{/ts}/{ts}Additional Information{/ts}</th>
         </tr>
         {foreach from=$rows item=row}
         <tr id="job-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}">
             <td class="crm-joblog-run_datetime">{$row.run_time}</td>
-            <td class="crm-joblog-name">{$row.name}</td>
+            {if !$jobId}<td class="crm-joblog-name">{$row.name}</td>{/if}
             <td class="crm-joblog-details">
-                <div class="crm-joblog-command">{$row.command}</div>
-                {if $row.description}<div class="crm-joblog-description"><span class="bold">{ts}Summary{/ts}</span><br/>{$row.description}</div>{/if}
-                {if $row.data}<div class="crm-joblog-data" style="border-top:1px solid #ccc; margin-top: 10px;"><span class="bold">{ts}Details{/ts}</span><br/><pre>{$row.data}</pre></div>{/if}
+                {if $row.description}
+                  <!-- TODO:
+                    It would be nice to apply some CSS based on the messageType (success|error|info)
+                    We also have $row.logLevel (debug|info|error|...)
+                  -->
+                  <p class="crm-joblog-description {$row.statusClass}">
+                    <strong>{$row.description}</strong>
+                  </p>
+                  {if $row.resultValues}
+                    {if $row.resultIsMultiline}
+                    <details class="crm-joblog-data crm-accordion-light">
+                      <summary>{ts}Result{/ts}</summary>
+                      <div class="crm-accordion-body">
+                        <pre>
+                          {$row.resultValues|escape}
+                        </pre>
+                      </div>
+                    </details>
+                    {else}
+                      <p>{ts}Result:{/ts} <code>{$row.resultValues|escape}</code></p>
+                    {/if}
+                  {/if}
+                {/if}
+                {if $row.command}
+                <details class="crm-joblog-data crm-accordion-light">
+                  <summary class="crm-joblog-command">{ts}Api call details for{/ts} <code>{$row.command}</code></summary>
+                  <div class="crm-accordion-body">
+                    {if $row.data}
+                      <pre>{$row.data|trim}</pre>
+                    {/if}
+                  </div>
+                </details>
+                {/if}
             </td>
         </tr>
         {/foreach}

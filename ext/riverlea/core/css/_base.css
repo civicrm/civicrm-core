@@ -388,6 +388,9 @@ dl dl {
   border: var(--crm-c-code-border);
   border-radius: var(--crm-roundness);
 }
+.crm-container pre {
+  white-space: pre-wrap;
+}
 .crm-container pre code {
   display: block;
   padding: 0;
@@ -398,7 +401,7 @@ dl dl {
 }
 .crm-container pre.prettyprint {
   background: var(--crm-c-text-light); /* method to force light bg on prettyprint code as inverting is too complex */
-  white-space: pre;
+  white-space: pre-wrap;
   text-wrap: auto;
 }
 .crm-container pre.linenums {
@@ -448,6 +451,11 @@ dl dl {
   min-height: 100vh;
   padding: var(--crm-page-padding);
 }
+
+.crm-container .vertical-align-baseline {
+  vertical-align: baseline;
+}
+
 .crm-container .crm-flex-box {
   display: flex;
   flex-wrap: wrap;
