@@ -405,6 +405,12 @@
           status.reject();
           $element.unblock();
           CRM.alert(error.error_message || '', ts('Form Error'));
+          $element.trigger('crmFormError', {
+            afform: ctrl.getFormMeta(),
+            data: data,
+            submissionResponse: submissionResponse,
+            error: error
+          });
         });
       };
 
