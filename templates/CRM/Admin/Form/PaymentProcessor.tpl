@@ -56,9 +56,11 @@
 <fieldset>
 <legend>{ts}Processor Details for Live Payments{/ts}</legend>
     <table class="form-layout-compressed">
+{if !empty($form.user_name)}
         <tr class="crm-paymentProcessor-form-block-user_name">
             <td class="label">{$form.user_name.label}</td><td>{$form.user_name.html} {help id="{$ppTypeName}_live_user_name" title=$form.user_name.label file="CRM/Admin/Page/PaymentProcessor.hlp"}</td>
         </tr>
+{/if}
 {if !empty($form.password)}
         <tr class="crm-paymentProcessor-form-block-password">
             <td class="label">{$form.password.label}</td><td>{$form.password.html} {help id="{$ppTypeName}_live_password" title=$form.password.label file="CRM/Admin/Page/PaymentProcessor.hlp"}</td>
@@ -100,9 +102,11 @@
 <fieldset>
 <legend>{ts}Processor Details for Test Payments{/ts}</legend>
     <table class="form-layout-compressed">
+{if !empty($form.test_user_name)}
         <tr class="crm-paymentProcessor-form-block-test_user_name">
             <td class="label">{$form.test_user_name.label}</td><td>{$form.test_user_name.html} {help id="{$ppTypeName}_test_user_name" title=$form.test_user_name.label file="CRM/Admin/Page/PaymentProcessor.hlp"}</td>
         </tr>
+{/if}
 {if !empty($form.test_password)}
         <tr class="crm-paymentProcessor-form-block-test_password">
             <td class="label">{$form.test_password.label}</td><td>{$form.test_password.html} {help id="{$ppTypeName}_test_password" title=$form.test_password.label file="CRM/Admin/Page/PaymentProcessor.hlp"}</td>
