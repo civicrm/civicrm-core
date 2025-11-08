@@ -11,6 +11,7 @@
 
 namespace Civi\Afform;
 
+use Civi\Api4\Utils\FormattingUtil;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -40,6 +41,23 @@ class AfformMetadataInjector {
         $blockEntity = $meta['join_entity'] ?? $meta['entity_type'] ?? NULL;
         if (!$blockEntity) {
           $entities = self::getFormEntities($doc);
+        }
+
+        // Support API4 style suffixes on af-entity data arrays
+        foreach (pq('af-entity', $doc) as $afEntity) {
+          $entity = $afEntity->getAttribute('type') ?? '';
+          $data = $afEntity->getAttribute('data') ?? '';
+          $decodedData = \CRM_Utils_JS::decode($data);
+
+          foreach ((array) $decodedData as $fieldName => $value) {
+            $suffix = FormattingUtil::getSuffix($fieldName);
+            if ($suffix) {
+              $baseName = \CRM_Utils_Array::first(explode(':', $fieldName));
+              $decodedData[$baseName] = self::transformDataValue($value, $baseName, $fieldName, $entity);
+              unset($decodedData[$fieldName]);
+            }
+          }
+          $afEntity->setAttribute('data', \CRM_Utils_JS::encode($decodedData));
         }
 
         // Each field can be nested within a fieldset, a join or a block
@@ -230,6 +248,16 @@ class AfformMetadataInjector {
       ];
     }
     return $entities;
+  }
+
+  private static function transformDataValue($value, $baseName, $fieldName, $entityName) {
+    $fieldSpec = civicrm_api4($entityName, 'getFields', [
+      'checkPermissions' => FALSE,
+      'where' => [['name', '=', $baseName]],
+    ])->single();
+
+    $pseudoConstants = FormattingUtil::getPseudoconstantList($fieldSpec, $fieldName, [], 'get');
+    return FormattingUtil::replacePseudoconstant($pseudoConstants, $value, TRUE);
   }
 
 }
