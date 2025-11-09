@@ -4020,31 +4020,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Load entities related to the contribution into $this->_relatedObjects.
-   *
-   * @param array $ids
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated since 5.75 will be removed around 5.99.
-   */
-  protected function loadRelatedEntitiesByID($ids) {
-    CRM_Core_Error::deprecatedFunctionWarning('use api');
-    $entities = [
-      'contact' => 'CRM_Contact_BAO_Contact',
-    ];
-    foreach ($entities as $entity => $bao) {
-      if (!empty($ids[$entity])) {
-        $this->_relatedObjects[$entity] = new $bao();
-        $this->_relatedObjects[$entity]->id = $ids[$entity];
-        if (!$this->_relatedObjects[$entity]->find(TRUE)) {
-          throw new CRM_Core_Exception($entity . ' could not be loaded');
-        }
-      }
-    }
-  }
-
-  /**
    * Do not use - still called from CRM_Contribute_Form_Task_PDFLetter
    *
    * This needs to be refactored out of use & deprecated out of existence.
