@@ -3565,61 +3565,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Load related memberships.
-   *
-   * @param array $ids
-   *
-   * @return array $ids
-   *
-   * @throws Exception
-   * @deprecated since well before 5.75 will be removed around 5.99.
-   *  Note some universe usages exist but may be in unused extensions.
-   *
-   * Note that in theory it should be possible to retrieve these from the line_item table
-   * with the membership_payment table being deprecated. Attempting to do this here causes tests to fail
-   * as it seems the api is not correctly linking the line items when the contribution is created in the flow
-   * where the contribution is created in the API, followed by the membership (using the api) followed by the membership
-   * payment. The membership payment BAO does have code to address this but it doesn't appear to be working.
-   *
-   * I don't know if it never worked or broke as a result of https://issues.civicrm.org/jira/browse/CRM-14918.
-   *
-   */
-  public function loadRelatedMembershipObjects($ids = []) {
-    CRM_Core_Error::deprecatedFunctionWarning('use api');
-    $query = "
-      SELECT membership_id
-      FROM   civicrm_membership_payment
-      WHERE  contribution_id = %1 ";
-    $params = [1 => [$this->id, 'Integer']];
-    $ids['membership'] = (array) ($ids['membership'] ?? []);
-
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    while ($dao->fetch()) {
-      if ($dao->membership_id && !in_array($dao->membership_id, $ids['membership'])) {
-        $ids['membership'][$dao->membership_id] = $dao->membership_id;
-      }
-    }
-
-    if (array_key_exists('membership', $ids) && is_array($ids['membership'])) {
-      foreach ($ids['membership'] as $id) {
-        if (!empty($id)) {
-          $membership = new CRM_Member_BAO_Membership();
-          $membership->id = $id;
-          if (!$membership->find(TRUE)) {
-            throw new Exception("Could not find membership record: $id");
-          }
-          $membership->join_date = CRM_Utils_Date::isoToMysql($membership->join_date);
-          $membership->start_date = CRM_Utils_Date::isoToMysql($membership->start_date);
-          $membership->end_date = CRM_Utils_Date::isoToMysql($membership->end_date);
-          $this->_relatedObjects['membership'][$membership->id . '_' . $membership->membership_type_id] = $membership;
-
-        }
-      }
-    }
-    return $ids;
-  }
-
-  /**
    * Function use to store line item proportionally in in entity financial trxn table
    *
    * @param array $trxnParams
