@@ -55,92 +55,16 @@
   </table>
 <fieldset>
 <legend>{ts}Processor Details for Live Payments{/ts}</legend>
-    <table class="form-layout-compressed">
-        <tr class="crm-paymentProcessor-form-block-user_name">
-            <td class="label">{$form.user_name.label}</td><td>{$form.user_name.html} {help id="$ppTypeName-live-user-name" title=$form.user_name.label}</td>
-        </tr>
-{if !empty($form.password)}
-        <tr class="crm-paymentProcessor-form-block-password">
-            <td class="label">{$form.password.label}</td><td>{$form.password.html} {help id="$ppTypeName-live-password" title=$form.password.label}</td>
-        </tr>
-{/if}
-{if !empty($form.signature)}
-        <tr class="crm-paymentProcessor-form-block-signature">
-            <td class="label">{$form.signature.label}</td><td>{$form.signature.html} {help id="$ppTypeName-live-signature" title=$form.signature.label}</td>
-        </tr>
-{/if}
-{if !empty($form.subject)}
-        <tr class="crm-paymentProcessor-form-block-subject">
-            <td class="label">{$form.subject.label}</td><td>{$form.subject.html} {help id="$ppTypeName-live-subject" title=$form.subject.label}</td>
-        </tr>
-{/if}
-{if !empty($form.url_site)}
-        <tr class="crm-paymentProcessor-form-block-url_site">
-            <td class="label">{$form.url_site.label}</td><td>{$form.url_site.html|crmAddClass:huge} {help id="$ppTypeName-live-url-site" title=$form.url_site.label}</td>
-        </tr>
-{/if}
-{if !empty($form.url_api)}
-        <tr class="crm-paymentProcessor-form-block-url_api">
-            <td class="label">{$form.url_api.label}</td><td>{$form.url_api.html|crmAddClass:huge} {help id="$ppTypeName-live-url-api" title=$form.url_api.label}</td>
-        </tr>
-{/if}
-{if !empty($form.url_recur)}
-        <tr class="crm-paymentProcessor-form-block-url_recur">
-            <td class="label">{$form.url_recur.label}</td><td>{$form.url_recur.html|crmAddClass:huge} {help id="$ppTypeName-live-url-recur" title=$form.url_recur.label}</td>
-        </tr>
-{/if}
-{if !empty($form.url_button)}
-        <tr class="crm-paymentProcessor-form-block-url_button">
-            <td class="label">{$form.url_button.label}</td><td>{$form.url_button.html|crmAddClass:huge} {help id="$ppTypeName-live-url-button" title=$form.url_button.label}</td>
-        </tr>
-{/if}
-    </table>
+  {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$liveFieldNames}
 </fieldset>
 
 <fieldset>
 <legend>{ts}Processor Details for Test Payments{/ts}</legend>
-    <table class="form-layout-compressed">
-        <tr class="crm-paymentProcessor-form-block-test_user_name">
-            <td class="label">{$form.test_user_name.label}</td><td>{$form.test_user_name.html} {help id="$ppTypeName-test-user-name" title=$form.test_user_name.label}</td></tr>
-{if !empty($form.test_password)}
-        <tr class="crm-paymentProcessor-form-block-test_password">
-            <td class="label">{$form.test_password.label}</td><td>{$form.test_password.html} {help id="$ppTypeName-test-password" title=$form.test_password.label}</td>
-        </tr>
+  {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$testFieldNames}
+</fieldset>
 {/if}
-{if !empty($form.test_signature)}
-        <tr class="crm-paymentProcessor-form-block-test_signature">
-            <td class="label">{$form.test_signature.label}</td><td>{$form.test_signature.html} {help id="$ppTypeName-test-signature" title=$form.test_signature.label}</td>
-        </tr>
-{/if}
-{if !empty($form.test_subject)}
-        <tr class="crm-paymentProcessor-form-block-test_subject">
-            <td class="label">{$form.test_subject.label}</td><td>{$form.test_subject.html} {help id="$ppTypeName-test-subject" title=$form.test_subject.label}</td>
-        </tr>
-{/if}
-{if !empty($form.test_url_site)}
-        <tr class="crm-paymentProcessor-form-block-test_url_site">
-            <td class="label">{$form.test_url_site.label}</td><td>{$form.test_url_site.html|crmAddClass:huge} {help id="$ppTypeName-test-url-site" title=$form.test_url_site.label}</td>
-        </tr>
-{/if}
-{if !empty($form.test_url_api)}
-        <tr class="crm-paymentProcessor-form-block-test_url_api">
-            <td class="label">{$form.test_url_api.label}</td><td>{$form.test_url_api.html|crmAddClass:huge} {help id="$ppTypeName-test-url-api" title=$form.test_url_api.label}</td>
-        </tr>
-{/if}
-{if !empty($form.test_url_recur)}
-        <tr class="crm-paymentProcessor-form-block-test_url_recur">
-            <td class="label">{$form.test_url_recur.label}</td><td>{$form.test_url_recur.html|crmAddClass:huge} {help id="$ppTypeName-test-url-recur" title=$form.test_url_recur.label}</td>
-        </tr>
-{/if}
-{if !empty($form.test_url_button)}
-        <tr class="crm-paymentProcessor-form-block-test_url_button">
-            <td class="label">{$form.test_url_button.label}</td><td>{$form.test_url_button.html|crmAddClass:huge} {help id="$ppTypeName-test-url-button" title=$form.test_url_button.label}</td>
-        </tr>
-{/if}
-{/if}
-</table>
-       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-  </fieldset>
+
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
 {if $action eq 1  or $action eq 2}

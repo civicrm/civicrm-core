@@ -108,6 +108,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     $this->assign('is_recur', $this->_paymentProcessorDAO->is_recur);
 
+    // The list here is loosely redundant with $this->_fields, except that several parts of $this->_fields are conditioned on extant data.
+    $this->assign('liveFieldNames', ['user_name', 'password', 'signature', 'subject', 'url_site', 'url_api', 'url_recur', 'url_button']);
+    $this->assign('testFieldNames', array_map(fn($f) => "test_$f", $this->getTemplateVars('liveFieldNames')));
+
     $this->_fields = [
       [
         'name' => 'user_name',
