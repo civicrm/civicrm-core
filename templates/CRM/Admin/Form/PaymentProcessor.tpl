@@ -55,12 +55,12 @@
   </table>
 <fieldset>
 <legend>{ts}Processor Details for Live Payments{/ts}</legend>
-  {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$liveFieldNames helpSet="_live_"}
+  {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$liveFieldNames}
 </fieldset>
 
 <fieldset>
 <legend>{ts}Processor Details for Test Payments{/ts}</legend>
-  {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$testFieldNames helpSet="_"}
+  {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$testFieldNames}
 </fieldset>
 {/if}
 

@@ -1,6 +1,6 @@
 {*
  @param string[] $fieldNames
- @param string $helpSet
+ @param string $ppTypeName
  *}
 <table class="form-layout-compressed">
   {foreach from=$fieldNames item=fieldName}
@@ -9,7 +9,7 @@
         <td class="label">{$form.$fieldName.label}</td>
         <td>
           {$form.$fieldName.html}
-          {help id="`$ppTypeName``$helpSet``$fieldName`" title=$form.$fieldName.label file="CRM/Admin/Page/PaymentProcessor.hlp"}
+          {help id="`$ppTypeName`_`$fieldName`" title=$form.$fieldName.label file="CRM/Admin/Page/PaymentProcessor.hlp"}
         </td>
       </tr>
     {/if}
