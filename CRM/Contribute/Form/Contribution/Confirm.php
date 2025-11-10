@@ -1072,6 +1072,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     // Save note
     if ($contribution && !empty($params['contribution_note'])) {
+      throw new CRM_Core_Exception('note tested');
       $noteParams = [
         'entity_table' => 'civicrm_contribution',
         'note' => $params['contribution_note'],
@@ -1087,6 +1088,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $actParams = [];
     $targetContactID = NULL;
     if (!empty($params['onbehalf_contact_id'])) {
+      throw new CRM_Core_Exception('behalf tested');
       $actParams = [
         'source_contact_id' => $params['onbehalf_contact_id'],
         'on_behalf' => TRUE,
