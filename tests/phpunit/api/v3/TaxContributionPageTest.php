@@ -388,7 +388,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     foreach ($financialItems as $financialItem) {
       $amount += $financialItem['amount'];
     }
-    $this->assertEquals('320.00', $amount);
+    $this->assertEquals('300.00', $amount);
   }
 
   /**

@@ -297,7 +297,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       return $lineTotal;
     }
     elseif ($context === 'changeFinancialType') {
-      return -$lineItemDetails['line_total'];
+      return -$previousLineItemTotal;
     }
     elseif ($context === 'changedStatus') {
       $cancelledTaxAmount = 0;

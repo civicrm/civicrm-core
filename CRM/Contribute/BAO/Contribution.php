@@ -2808,11 +2808,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
           $financialProcessor->updateFinancialAccounts($params, 'changeFinancialType');
           $params['skipLineItem'] = FALSE;
-          foreach ($params['line_item'] as &$lineItems) {
-            foreach ($lineItems as &$line) {
-              $line['financial_type_id'] = $params['financial_type_id'];
-            }
-          }
           CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changeFinancialType');
           /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
           $params['financial_account_id'] = $financialProcessor->getUpdatedFinancialAccount();
@@ -2864,7 +2859,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $totalAmount = $contribution->total_amount ?? 0;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
-        if ($financialProcessor->isContributionTotalChanged()) {
+        if ($financialProcessor->isContributionTotalChanged() && !$financialProcessor->isFinancialAccountChanged()) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
