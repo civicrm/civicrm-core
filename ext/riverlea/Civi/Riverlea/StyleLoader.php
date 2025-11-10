@@ -20,6 +20,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
 
   public const CORE_FILES = [
     '_variables.css',
+    '_fonts.css',
     '_base.css',
     '_cms.css',
     'components/_accordion.css',

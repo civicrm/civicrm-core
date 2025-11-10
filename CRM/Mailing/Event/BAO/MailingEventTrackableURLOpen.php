@@ -69,7 +69,7 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
       return $urlSearch->url;
     }
 
-    self::recordUrlClick($queue_id, $url_id);
+    self::recordUrlClick($queue_id, $url_id, date('YmdHis'));
 
     return $urlSearch->url;
   }
@@ -341,7 +341,7 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
     return $results;
   }
 
-  public static function queuedTrack(\CRM_Queue_TaskContext $ctx, $queue_id, $url_id) {
+  public static function queuedTrack(\CRM_Queue_TaskContext $ctx, $queue_id, $url_id, $dateTime) {
     $queueCheck = CRM_Core_DAO::singleValueQuery("SELECT u.url as url
       FROM civicrm_mailing_trackable_url u
       INNER JOIN civicrm_mailing_event_queue q ON u.mailing_id = q.mailing_id
@@ -350,15 +350,15 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
         2 => [$url_id, 'Positive'],
       ]);
     if ($queueCheck) {
-      self::recordUrlClick($queue_id, $url_id);
+      self::recordUrlClick($queue_id, $url_id, $dateTime);
     }
   }
 
-  private static function recordUrlClick($queue_id, $url_id) {
+  private static function recordUrlClick($queue_id, $url_id, $dateTime) {
     self::writeRecord([
       'event_queue_id' => $queue_id,
       'trackable_url_id' => $url_id,
-      'time_stamp' => date('YmdHis'),
+      'time_stamp' => $dateTime,
     ]);
   }
 
