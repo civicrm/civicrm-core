@@ -1472,7 +1472,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     // process soft credit / pcp params first
-    CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($params, $form);
+    $this->formatSoftCreditParams($params, $form);
 
     //CRM-13981, processing honor contact into soft-credit contribution
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
@@ -1502,6 +1502,93 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $transaction->commit();
     return $contribution;
+  }
+
+  /**
+   * Function used to save pcp / soft credit entry.
+   * Previously shared function - probably can be largely cleaned up / removed.
+   *
+   * @param array $params
+   * @param object $form
+   *   Form object.
+   */
+  private function formatSoftCreditParams(&$params, &$form) {
+    $pcp = $softParams = $softIDs = [];
+    if (!empty($params['pcp_made_through_id'])) {
+      $fields = [
+        'pcp_made_through_id',
+        'pcp_display_in_roll',
+        'pcp_roll_nickname',
+        'pcp_personal_note',
+      ];
+      foreach ($fields as $f) {
+        $pcp[$f] = $params[$f] ?? NULL;
+      }
+    }
+
+    if (!empty($form->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
+      $honorId = NULL;
+
+      // @todo fix use of deprecated function.
+      $contributionSoftParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
+      //check if there is any duplicate contact
+      // honoree should never be the donor
+      $exceptKeys = [
+        'contactID' => 0,
+        'onbehalf_contact_id' => 0,
+      ];
+      $except = array_values(array_intersect_key($params, $exceptKeys));
+      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts(
+        $params['honor'],
+        CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']),
+        'Unsupervised',
+        $except,
+        FALSE
+      );
+      if (count($ids)) {
+        $honorId = $ids[0] ?? NULL;
+      }
+
+      $null = [];
+      $honorId = CRM_Contact_BAO_Contact::createProfileContact(
+        $params['honor'], $null,
+        $honorId, NULL,
+        $form->_values['honoree_profile_id']
+      );
+      $softParams[] = [
+        'contact_id' => $honorId,
+        'soft_credit_type_id' => $params['soft_credit_type_id'],
+      ];
+
+      if (!empty($form->_values['is_email_receipt'])) {
+        $form->_values['honor'] = [
+          'soft_credit_type' => CRM_Utils_Array::value(
+            $params['soft_credit_type_id'],
+            CRM_Core_OptionGroup::values("soft_credit_type")
+          ),
+          'honor_id' => $honorId,
+          'honor_profile_id' => $form->_values['honoree_profile_id'],
+          'honor_profile_values' => $params['honor'],
+        ];
+      }
+    }
+    elseif (!empty($params['soft_credit_contact_id'])) {
+      //build soft credit params
+      foreach ($params['soft_credit_contact_id'] as $key => $val) {
+        if ($val && $params['soft_credit_amount'][$key]) {
+          $softParams[$key]['contact_id'] = $val;
+          $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
+          $softParams[$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
+          if (!empty($params['soft_credit_id'][$key])) {
+            $softIDs[] = $softParams[$key]['id'] = $params['soft_credit_id'][$key];
+          }
+        }
+      }
+    }
+
+    $params['pcp'] = !empty($pcp) ? $pcp : NULL;
+    $params['soft_credit'] = $softParams;
+    $params['soft_credit_ids'] = $softIDs;
   }
 
   /**
@@ -2062,7 +2149,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ];
 
       //format soft-credit/pcp param first
-      CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($submittedValues, $this);
+      $this->formatSoftCreditParams($submittedValues, $this);
       $params = array_merge($params, $submittedValues);
 
       $fields = [
