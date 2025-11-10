@@ -2837,11 +2837,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param array $params
    *   Contribution object, line item array and params for trxn.
    * @param \CRM_Contribute_DAO_Contribution $contribution
-   *
-   * @return null|\CRM_Core_BAO_FinancialTrxn
+   * @throws CRM_Core_Exception
    */
-  public static function recordFinancialAccounts(&$params, CRM_Contribute_DAO_Contribution $contribution) {
-    $skipRecords = $return = FALSE;
+  private static function recordFinancialAccounts(array &$params, CRM_Contribute_DAO_Contribution $contribution): void {
+    $skipRecords = FALSE;
     $isUpdate = !empty($params['prevContribution']);
     $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution);
 
@@ -3057,7 +3056,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $financialProcessor->recordAlwaysAccountsReceivable($trxnParams, $params);
         $trxnParams['pan_truncation'] = $params['pan_truncation'] ?? NULL;
         $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
-        $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
+        $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
     }
@@ -3093,7 +3092,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     unset($params['line_item']);
-    return $return;
   }
 
   /**
