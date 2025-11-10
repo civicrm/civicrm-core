@@ -180,7 +180,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param string $context
    * @param array $fields
    * @param array $previousLineItems
-   * @param bool $isARefund
    * @param array $trxnIds
    * @param int $fieldId
    *
@@ -188,7 +187,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return array
    */
-  private function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, bool $isARefund, $trxnIds, $fieldId): array {
+  private function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, $trxnIds, $fieldId): array {
     $postUpdateContribution = $params['contribution'];
     foreach ($fields as $fieldValueId => $lineItemDetails) {
       $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
@@ -200,7 +199,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
         'contact_id' => $postUpdateContribution->contact_id,
         'currency' => $postUpdateContribution->currency,
-        'amount' => self::getFinancialItemAmountFromParams($isContributionStatusNegative, $context, $lineItemDetails, $isARefund, $previousLineItemTotal),
+        'amount' => $this->getFinancialItemAmountFromParams($isContributionStatusNegative, $context, $lineItemDetails, $previousLineItemTotal),
         'description' => $prevFinancialItem['description'] ?? NULL,
         'status_id' => $prevFinancialItem['status_id'],
         'financial_account_id' => $financialAccount,
@@ -272,15 +271,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *   changeFinancialType| changedAmount
    * @param array $lineItemDetails
    *   Line items.
-   * @param bool $isARefund
-   *   Is this a refund / negative transaction.
    * @param int $previousLineItemTotal
    *
    * @return float
    * @todo move recordFinancialAccounts & helper functions to their own class?
    *
    */
-  protected static function getFinancialItemAmountFromParams(bool $isContributionStatusNegative, $context, $lineItemDetails, $isARefund, $previousLineItemTotal) {
+  protected function getFinancialItemAmountFromParams(bool $isContributionStatusNegative, $context, $lineItemDetails, $previousLineItemTotal) {
     if ($context == 'changedAmount') {
       $lineTotal = $lineItemDetails['line_total'];
       if ($lineTotal != $previousLineItemTotal) {
@@ -293,7 +290,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
     elseif ($context == 'changedStatus') {
       $cancelledTaxAmount = 0;
-      if ($isARefund) {
+      if ($this->isContributionUpdateARefund()) {
         $cancelledTaxAmount = $lineItemDetails['tax_amount'] ?? '0.00';
       }
       return ($isContributionStatusNegative ? -1 : 1) * ((float) $lineItemDetails['line_total'] + (float) $cancelledTaxAmount);
@@ -319,8 +316,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    */
   public function updateFinancialAccounts(&$params, $context = NULL) {
-    $isARefund = self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id);
-
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
     $params['entity_id'] = $trxn->id;
@@ -328,23 +323,20 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $trxnIds['id'] = $params['entity_id'];
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
     foreach ($params['line_item'] as $fieldId => $fields) {
-      $params = $this->createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $isARefund, $trxnIds, $fieldId);
+      $params = $this->createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $trxnIds, $fieldId);
     }
   }
 
   /**
    * Does this contribution status update represent a refund.
    *
-   * @param int $previousContributionStatusID
-   * @param int $currentContributionStatusID
-   *
    * @return bool
    */
-  public static function isContributionUpdateARefund($previousContributionStatusID, $currentContributionStatusID): bool {
-    if ('Completed' !== CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $previousContributionStatusID)) {
+  private function isContributionUpdateARefund(): bool {
+    if ('Completed' !== $this->getOriginalContributionStatus()) {
       return FALSE;
     }
-    return CRM_Contribute_BAO_Contribution::isContributionStatusNegative($currentContributionStatusID);
+    return CRM_Contribute_BAO_Contribution::isContributionStatusNegative($this->getUpdatedContribution()->contribution_status_id);
   }
 
   /**
@@ -368,8 +360,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *   Return indicates whether the updateFinancialAccounts function should continue.
    */
   public function updateFinancialAccountsOnContributionStatusChange(&$params) {
-    $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
-    $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
+    $previousContributionStatus = $this->getOriginalContributionStatus();
+    $currentContributionStatus = $this->getUpdatedContributionStatus();
 
     if ((($previousContributionStatus === 'Partially paid' && $currentContributionStatus === 'Completed')
       || ($previousContributionStatus === 'Pending refund' && $currentContributionStatus === 'Completed')
@@ -381,7 +373,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       return FALSE;
     }
 
-    if (CRM_Contribute_BAO_FinancialProcessor::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id)) {
+    if ($this->isContributionUpdateARefund()) {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
     }
