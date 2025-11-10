@@ -2097,112 +2097,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Load objects relations to contribution object.
-   * Objects are stored in the $_relatedObjects property
-   * In the first instance we are just moving functionality from BASEIpn -
-   *
-   * @see http://issues.civicrm.org/jira/browse/CRM-9996
-   *
-   * Note that the unit test for the BaseIPN class tests this function
-   *
-   * @param int $paymentProcessorID
-   *   Payment Processor ID.
-   * @param array $ids
-   *   Ids as Loaded by Payment Processor.
-   *
-   * @deprecated since 5.75 will be removed around 5.99.
-   * Note some universe usages exist but may be in unused extensions.
-   *
-   * @return bool
-   * @throws CRM_Core_Exception
-   */
-  public function loadRelatedObjects($paymentProcessorID, &$ids) {
-    CRM_Core_Error::deprecatedFunctionWarning('use Payment.create to complete orders');
-    // @todo deprecate this function - we are slowly returning the functionality to
-    // the calling functions so this can be unravelled. It is only called from
-    // tests, composeMessage & transitionComponents. The last of these is itself
-    // deprecated, to be replaced by using Payment.create. Many parts of this are
-    // used by only one, or neither, of the actual calling functions.
-
-    $ids['contributionType'] = $this->financial_type_id;
-    $ids['financialType'] = $this->financial_type_id;
-    if ($this->contribution_page_id) {
-      $ids['contributionPage'] = $this->contribution_page_id;
-    }
-
-    $this->loadRelatedEntitiesByID($ids);
-
-    if (!empty($ids['pledge_payment'])) {
-      foreach ($ids['pledge_payment'] as $key => $paymentID) {
-        if (empty($paymentID)) {
-          continue;
-        }
-        $payment = new CRM_Pledge_BAO_PledgePayment();
-        $payment->id = $paymentID;
-        if (!$payment->find(TRUE)) {
-          throw new CRM_Core_Exception("Could not find pledge payment record: " . $paymentID);
-        }
-        $this->_relatedObjects['pledge_payment'][] = $payment;
-      }
-    }
-
-    // These are probably no longer accessed from anywhere
-    // @todo remove this line, after ensuring not used.
-    $ids = $this->loadRelatedMembershipObjects($ids);
-
-    if ($this->_component != 'contribute') {
-      // we are in event mode
-      // make sure event exists and is valid
-      $event = new CRM_Event_BAO_Event();
-      $event->id = $ids['event'];
-      if ($ids['event'] &&
-        !$event->find(TRUE)
-      ) {
-        throw new CRM_Core_Exception("Could not find event: " . $ids['event']);
-      }
-
-      $this->_relatedObjects['event'] = &$event;
-
-      $participant = new CRM_Event_BAO_Participant();
-      $participant->id = $ids['participant'];
-      if ($ids['participant'] &&
-        !$participant->find(TRUE)
-      ) {
-        throw new CRM_Core_Exception("Could not find participant: " . $ids['participant']);
-      }
-      $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
-
-      $this->_relatedObjects['participant'] = &$participant;
-
-      // get the payment processor id from event - this is inaccurate see CRM-16923
-      // in future we should look at throwing an exception here rather than an dubious guess.
-      if (!$paymentProcessorID) {
-        $paymentProcessorID = $this->_relatedObjects['event']->payment_processor;
-        if ($paymentProcessorID) {
-          $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromEvent;
-        }
-      }
-    }
-
-    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id);
-    if (!empty($relatedContact['individual_id'])) {
-      $ids['related_contact'] = $relatedContact['individual_id'];
-    }
-
-    if ($paymentProcessorID) {
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
-        $this->is_test ? 'test' : 'live'
-      );
-      $ids['paymentProcessor'] = $paymentProcessorID;
-      $this->_relatedObjects['paymentProcessor'] = $paymentProcessor;
-    }
-
-    // Add contribution id to $ids. CRM-20401
-    $ids['contribution'] = $this->id;
-    return TRUE;
-  }
-
-  /**
    * Create array of message information - ie. return html version, txt
    * version, to field
    *
@@ -3669,61 +3563,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Load related memberships.
-   *
-   * @param array $ids
-   *
-   * @return array $ids
-   *
-   * @throws Exception
-   * @deprecated since well before 5.75 will be removed around 5.99.
-   *  Note some universe usages exist but may be in unused extensions.
-   *
-   * Note that in theory it should be possible to retrieve these from the line_item table
-   * with the membership_payment table being deprecated. Attempting to do this here causes tests to fail
-   * as it seems the api is not correctly linking the line items when the contribution is created in the flow
-   * where the contribution is created in the API, followed by the membership (using the api) followed by the membership
-   * payment. The membership payment BAO does have code to address this but it doesn't appear to be working.
-   *
-   * I don't know if it never worked or broke as a result of https://issues.civicrm.org/jira/browse/CRM-14918.
-   *
-   */
-  public function loadRelatedMembershipObjects($ids = []) {
-    CRM_Core_Error::deprecatedFunctionWarning('use api');
-    $query = "
-      SELECT membership_id
-      FROM   civicrm_membership_payment
-      WHERE  contribution_id = %1 ";
-    $params = [1 => [$this->id, 'Integer']];
-    $ids['membership'] = (array) ($ids['membership'] ?? []);
-
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    while ($dao->fetch()) {
-      if ($dao->membership_id && !in_array($dao->membership_id, $ids['membership'])) {
-        $ids['membership'][$dao->membership_id] = $dao->membership_id;
-      }
-    }
-
-    if (array_key_exists('membership', $ids) && is_array($ids['membership'])) {
-      foreach ($ids['membership'] as $id) {
-        if (!empty($id)) {
-          $membership = new CRM_Member_BAO_Membership();
-          $membership->id = $id;
-          if (!$membership->find(TRUE)) {
-            throw new Exception("Could not find membership record: $id");
-          }
-          $membership->join_date = CRM_Utils_Date::isoToMysql($membership->join_date);
-          $membership->start_date = CRM_Utils_Date::isoToMysql($membership->start_date);
-          $membership->end_date = CRM_Utils_Date::isoToMysql($membership->end_date);
-          $this->_relatedObjects['membership'][$membership->id . '_' . $membership->membership_type_id] = $membership;
-
-        }
-      }
-    }
-    return $ids;
-  }
-
-  /**
    * Function use to store line item proportionally in in entity financial trxn table
    *
    * @param array $trxnParams
@@ -4174,31 +4013,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $entityParams['line_item_amount'] = $taxItems[$value['price_field_value_id']]['amount'];
         $eftParams['entity_id'] = $taxItems[$value['price_field_value_id']]['financial_item_id'];
         self::createProportionalEntry($entityParams, $eftParams);
-      }
-    }
-  }
-
-  /**
-   * Load entities related to the contribution into $this->_relatedObjects.
-   *
-   * @param array $ids
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated since 5.75 will be removed around 5.99.
-   */
-  protected function loadRelatedEntitiesByID($ids) {
-    CRM_Core_Error::deprecatedFunctionWarning('use api');
-    $entities = [
-      'contact' => 'CRM_Contact_BAO_Contact',
-    ];
-    foreach ($entities as $entity => $bao) {
-      if (!empty($ids[$entity])) {
-        $this->_relatedObjects[$entity] = new $bao();
-        $this->_relatedObjects[$entity]->id = $ids[$entity];
-        if (!$this->_relatedObjects[$entity]->find(TRUE)) {
-          throw new CRM_Core_Exception($entity . ' could not be loaded');
-        }
       }
     }
   }
