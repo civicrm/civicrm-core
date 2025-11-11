@@ -112,9 +112,9 @@ class LocalHttpClient implements ClientInterface {
       if (!isset($_GET[$var])) {
         $_GET[$var] = ltrim($request->getUri()->getPath(), '/');
       }
-      $body = $this->invoke($_GET[$var]);
+      $result = $this->invoke($_GET[$var]);
       // FIXME: There's probably a way to instrument CRM_Utils_System_UnitTests to do this better.
-      return new Response(200, [], $body);
+      return $result instanceof ResponseInterface ? $result : new Response(200, [], $result);
     }
     catch (\CRM_Core_Exception_PrematureExitException $e) {
       if (isset($e->errorData['response'])) {
@@ -226,7 +226,13 @@ class LocalHttpClient implements ClientInterface {
     return $result;
   }
 
-  protected function invoke(string $route): ?string {
+  /**
+   * @param string $route
+   *
+   * @return null|string|ResponseInterface
+   * @throws \CRM_Core_Exception
+   */
+  protected function invoke(string $route) {
     if ($this->htmlHeader) {
       \CRM_Core_Resources::singleton()->addCoreResources('html-header');
     }
@@ -237,6 +243,10 @@ class LocalHttpClient implements ClientInterface {
     }
     finally {
       $printedContent = ob_get_clean();
+    }
+
+    if ($pageContent && $pageContent instanceof ResponseInterface) {
+      return $pageContent;
     }
 
     if (empty($pageContent) && !empty($printedContent)) {
