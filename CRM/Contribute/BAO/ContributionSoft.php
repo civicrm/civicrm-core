@@ -92,8 +92,11 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $params
    * @param object $form
    *   Form object.
+   *
+   * @deprecated since 6.10 will be removed around 6.22
    */
   public static function formatSoftCreditParams(&$params, &$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $pcp = $softParams = $softIDs = [];
     if (!empty($params['pcp_made_through_id'])) {
       $fields = [
