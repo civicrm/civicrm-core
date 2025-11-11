@@ -1604,6 +1604,7 @@ class CRM_Utils_Token {
           '$paidBy' => 'contribution.payment_instrument_id:label',
           '$title' => 'event.title',
           '$lineItem' => '$lineItems',
+          '$participant_status' => '{participant.status_id:label}',
         ],
         'participant_transferred' => [
           '$location' => 'event.location',
