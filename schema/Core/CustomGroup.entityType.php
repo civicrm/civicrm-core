@@ -213,6 +213,9 @@ return [
       'title' => ts('Maximum Multiple Records'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
+      'input_attrs' => [
+        'min' => 1,
+      ],
       'description' => ts('maximum number of multiple records, if 0 - no max'),
       'add' => '2.2',
     ],
