@@ -13,6 +13,7 @@ use Civi\Api4\Membership;
 use Civi\Api4\MembershipLog;
 use Civi\Api4\MembershipStatus;
 use Civi\Test\ContributionPageTestTrait;
+use Civi\Api4\Payment;
 
 /**
  * Class CRM_Member_BAO_MembershipTest
@@ -679,10 +680,16 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
-      'contribution_status_id' => 'Completed',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 150)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $contributions = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $contributions);
     $this->assertEquals('Debit Card', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contributions[1]['payment_instrument_id']));

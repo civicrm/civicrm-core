@@ -1068,17 +1068,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
   /**
    * Should an email receipt be sent for this contribution on completion.
    *
-   * @param array $input
    * @param int $contributionID
    * @param int $recurringContributionID
    *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  protected static function isEmailReceipt(array $input, int $contributionID, $recurringContributionID): bool {
-    if (isset($input['is_email_receipt'])) {
-      return (bool) $input['is_email_receipt'];
-    }
+  protected static function isEmailReceipt(int $contributionID, $recurringContributionID): bool {
     if ($recurringContributionID) {
       //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
       // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
@@ -3440,7 +3436,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID && !$disableActionsOnCompleteOrder) {
       $orderCompleteEventParams = [
-        'effective_date' => $input['trxn_date'] ?? date('YmdHis'),
+        'effective_date' => $input['receive_date'] ?? date('YmdHis'),
       ];
       \Civi::dispatcher()->dispatch('civi.order.complete', new OrderCompleteEvent($contributionID, $orderCompleteEventParams));
     }
@@ -3471,7 +3467,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Contribute_BAO_ContributionSoft::pcpNotifyOwner($contributionID, $contributionSoft);
     }
 
-    if (self::isEmailReceipt($input, $contributionID, $recurringContributionID)) {
+    if (!empty($input['is_email_receipt']) || self::isEmailReceipt($contributionID, $recurringContributionID)) {
       try {
         civicrm_api3('Contribution', 'sendconfirmation', [
           'id' => $contributionID,
