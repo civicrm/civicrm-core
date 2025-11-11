@@ -4074,6 +4074,7 @@ span.crm-status-icon {
     font-size: inherit;
     width: 2.75em!important;
     height: 1.35em!important;
+    padding: 0.65!important;
     box-sizing: content-box;
     border-radius: 1em;
     vertical-align: text-bottom;
@@ -4105,7 +4106,7 @@ span.crm-status-icon {
     background-color: #20576f;
   }
   & input[type="checkbox"].crm-form-toggle:checked::before {
-    left: 1.2em;
+    left: 1em;
   }
   & input[type="checkbox"].crm-form-toggle:disabled {
     opacity: 0.4;
