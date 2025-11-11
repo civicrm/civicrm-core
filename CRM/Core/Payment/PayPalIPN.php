@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Payment\System;
 
 /**
  *
@@ -245,10 +246,16 @@ class CRM_Core_Payment_PayPalIPN {
       $this->getInput($input);
 
       $paymentProcessorID = $this->getPayPalPaymentProcessorID($input, $this->getContributionRecurID());
+      $paymentProcessor = System::singleton()->getById($paymentProcessorID);
 
       Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $this->getContactID() . '; trxn_id: ' . $input['trxn_id'] . ').');
 
       $input['payment_processor_id'] = $paymentProcessorID;
+
+      if (!$paymentProcessor->verifyIPN()) {
+        Civi::log()->warning('PayPalIPN: Verification failed; input {input}', ['input' => $input]);
+        return;
+      }
 
       if ($this->getContributionRecurID()) {
         $this->recur($input);
