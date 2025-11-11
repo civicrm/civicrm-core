@@ -3129,7 +3129,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID && !$disableActionsOnCompleteOrder) {
       $orderCompleteEventParams = [
-        'effective_date' => $input['trxn_date'] ?? date('YmdHis'),
+        'effective_date' => $input['receive_date'] ?? date('YmdHis'),
       ];
       \Civi::dispatcher()->dispatch('civi.order.complete', new OrderCompleteEvent($contributionID, $orderCompleteEventParams));
     }
