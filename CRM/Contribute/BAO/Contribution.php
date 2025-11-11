@@ -1068,16 +1068,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
   /**
    * Should an email receipt be sent for this contribution on completion.
    *
-   * @param array $input
+   * @param ?bool $isEmailReceipt
    * @param int $contributionID
    * @param int $recurringContributionID
    *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  protected static function isEmailReceipt(array $input, int $contributionID, $recurringContributionID): bool {
-    if (isset($input['is_email_receipt'])) {
-      return (bool) $input['is_email_receipt'];
+  protected static function isEmailReceipt(?bool $isEmailReceipt, int $contributionID, $recurringContributionID): bool {
+    if (isset($isEmailReceipt)) {
+      return $isEmailReceipt;
     }
     if ($recurringContributionID) {
       //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
@@ -3471,7 +3471,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Contribute_BAO_ContributionSoft::pcpNotifyOwner($contributionID, $contributionSoft);
     }
 
-    if (self::isEmailReceipt($input, $contributionID, $recurringContributionID)) {
+    if (self::isEmailReceipt($input['is_email_receipt'] ?? NULL, $contributionID, $recurringContributionID)) {
       try {
         civicrm_api3('Contribution', 'sendconfirmation', [
           'id' => $contributionID,
