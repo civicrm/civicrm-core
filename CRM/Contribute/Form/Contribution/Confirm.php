@@ -993,7 +993,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isRecur
   ) {
     $form = $this;
-    $transaction = new CRM_Core_Transaction();
     $contactID = $contributionParams['contact_id'];
 
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
@@ -1099,7 +1098,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution', $targetContactID, $actParams);
     }
 
-    $transaction->commit();
     return $contribution;
   }
 
@@ -1789,13 +1787,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // CRM-19792 : set necessary fields for payment processor
     CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $tempParams, TRUE);
-
+    $transaction = new CRM_Core_Transaction();
     $membershipContribution = $this->processFormContribution(
       $tempParams,
       $tempParams['payment_processor'] ?? NULL,
       $contributionParams,
       $isRecur
     );
+    $transaction->commit();
 
     $result = [];
 
@@ -2609,12 +2608,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($form->_paymentProcessor)) {
         $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
       }
+      $transaction = new CRM_Core_Transaction();
       $contribution = $this->processFormContribution(
         $paymentParams,
         NULL,
         $contributionParams,
         $isRecur
       );
+      $transaction->commit();
       // CRM-13074 - create the CMSUser after the transaction is completed as it
       // is not appropriate to delete a valid contribution if a user create problem occurs
       if (isset($this->_params['related_contact'])) {
