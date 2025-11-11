@@ -1502,6 +1502,7 @@ class CRM_Utils_Token {
           '$contribution_status_id' => 'contribution.contribution_status_id',
           '$contributionStatusName' => 'contribution.contribution_status_id:name',
           '$subTotal' => 'contribution.tax_amount',
+          '$totalTaxAmount' => 'contribution.tax_amount',
           '$is_pay_later' => 'contribution.is_pay_later|bool',
           '$domain_street_address' => 'domain.street_address',
           '$domain_city' => 'domain.city',
@@ -1517,6 +1518,7 @@ class CRM_Utils_Token {
         ],
         'contribution_online_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
+          '$totalTaxAmount' => 'contribution.tax_amount',
           '$first_name' => 'contact.first_name',
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
@@ -1554,6 +1556,7 @@ class CRM_Utils_Token {
           '$mem_status' => 'membership.membership_status_id:name',
           '$receive_date' => 'contribution.receive_date',
           '$currency' => 'contribution.currency',
+          '$totalTaxAmount' => 'contribution.tax_amount',
           '$lineItem' => '$lineItems',
         ],
         'contribution_offline_receipt' => [
@@ -1600,6 +1603,7 @@ class CRM_Utils_Token {
           '$location' => 'event.location',
           '$register_date' => 'participant.register_date',
           '$participant.role' => 'participant.role_id:label',
+          '$totalTaxAmount' => 'contribution.tax_amount',
           '$event.participant_role' => 'participant.role_id:label',
           '$paidBy' => 'contribution.payment_instrument_id:label',
           '$title' => 'event.title',
