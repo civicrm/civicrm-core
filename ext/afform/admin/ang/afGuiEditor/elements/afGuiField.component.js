@@ -33,22 +33,21 @@
         ctrl.hasDefaultValue = !!getSet('afform_default');
         setFieldDefn();
         ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputTypes), function(inputTypes, type) {
-          if (inputTypeCanBe(type.name)) {
-            // Change labels for EntityRef fields
-            if (ctrl.getDefn().input_type === 'EntityRef') {
-              const entity = ctrl.getFkEntity();
-              if (entity && type.name === 'EntityRef') {
-                type.label = ts('Autocomplete %1', {1: entity.label});
-              }
-              if (entity && type.name === 'Number') {
-                type.label = ts('%1 ID', {1: entity.label});
-              }
-              if (entity && type.name === 'Select') {
-                type.label = ts('Select Form %1', {1: entity.label});
-              }
+          type.enabled = inputTypeCanBe(type.name);
+          // Change labels for EntityRef fields
+          if (ctrl.getDefn().input_type === 'EntityRef') {
+            const entity = ctrl.getFkEntity();
+            if (entity && type.name === 'EntityRef') {
+              type.label = ts('Autocomplete %1', {1: entity.label});
             }
-            inputTypes.push(type);
+            if (entity && type.name === 'Number') {
+              type.label = ts('%1 ID', {1: entity.label});
+            }
+            if (entity && type.name === 'Select') {
+              type.label = ts('Select Form %1', {1: entity.label});
+            }
           }
+          inputTypes.push(type);
         });
         // Quick-add links for autocompletes
         this.quickAddLinks = [];
