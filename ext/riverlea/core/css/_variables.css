@@ -275,6 +275,7 @@
   --crm-fieldset-border: 1px 0 0 0;
   --crm-fieldset-padding: var(--crm-padding-reg) var(--crm-padding-small);
   --crm-checkbox-list-bg: var(--crm-table-row-hover);
+  --crm-form-toggle-width: 2.75rem;
   --crm-form-toggle-height: 1.5rem;
 /* Tabs */
   --crm-tabs-bg: var(--crm-c-gray-200);
