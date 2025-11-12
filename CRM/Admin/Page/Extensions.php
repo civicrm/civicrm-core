@@ -159,7 +159,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $localExtensionRows = [];
     $keys = array_keys($manager->getStatuses());
     sort($keys);
-    $hiddenExtensions = $mapper->getKeysByTag('mgmt:hidden');
+    $hiddenExtensions = array_unique(array_merge($mapper->getKeysByTag('mgmt:hidden'), $mapper->getKeysByTag('mgmt:submodule')));
     $requiredExtensions = $mapper->getKeysByTag('mgmt:required');
     foreach ($keys as $key) {
       if (in_array($key, $hiddenExtensions)) {

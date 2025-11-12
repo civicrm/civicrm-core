@@ -1,0 +1,11 @@
+<extension key='test.extension.childtest' type='module'>
+  <file>childtest</file>
+  <name>test_extension_childtest</name>
+  <tags>
+    <tag>mgmt:submodule</tag>
+  </tags>
+  <parent>test.extension.parenttest</parent>
+  <requires>
+    <ext>test.extension.uncletest</ext>
+  </requires>
+</extension>

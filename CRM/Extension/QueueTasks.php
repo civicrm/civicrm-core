@@ -118,9 +118,9 @@ class CRM_Extension_QueueTasks {
   }
 
   /**
-   * Scan the downloaded extensions and verify that their requirements are satisfied.
+   * Enable the listed extensions.
    */
-  public static function enable(CRM_Queue_TaskContext $ctx, string $stagingPath, array $keys): bool {
+  public static function enable(CRM_Queue_TaskContext $ctx, ?string $stagingPath, array $keys): bool {
     CRM_Extension_System::singleton()->getManager()->enable($keys);
     return TRUE;
   }
