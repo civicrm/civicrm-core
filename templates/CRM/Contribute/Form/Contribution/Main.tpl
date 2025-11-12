@@ -258,9 +258,11 @@
       <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
         <div class="crm-public-form-item crm-section payment_processor-section">
-          <div class="label">{$form.payment_processor_id.label}</div>
-          <div class="content">{$form.payment_processor_id.html}</div>
-          <div class="clear"></div>
+          <fieldset class="crm-sr-fieldset">
+            <legend class="label">{$form.payment_processor_id.label|strip_tags}</legend>
+            <div class="content">{$form.payment_processor_id.html}</div>
+            <div class="clear"></div>
+          </fieldset>
         </div>
       </fieldset>
     {/if}
