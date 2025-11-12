@@ -21,7 +21,7 @@ class OAuthTokenFacade {
    *   - grant_type: string, ex "authorization_code", "client_credentials",
    *   "password"
    *   - cred: array, extra credentialing options to pass to the "token" URL
-   *   (via getAccessToken($tokenOptions)), eg "username", "password", "code"
+   *   (via getAccessToken($tokenOptions)), eg "username", "password", "code", "code_verifier"
    *
    * @return array
    * @throws \CRM_Core_Exception
