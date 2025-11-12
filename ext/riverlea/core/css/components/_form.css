@@ -321,10 +321,6 @@ input.crm-form-checkbox + label,
   height: auto;
   box-shadow: none;
 }
-body.wp-admin .crm-container input[type="checkbox"],
-body.wp-admin .crm-container input[type="radio"] {
-  padding: var(--crm-input-padding)!important;
-}
 /* Checkbox/radio fields with n-per-line. */
 .crm-container .crm-multiple-checkbox-radio-options {
   --crm-gap: 0.5em;

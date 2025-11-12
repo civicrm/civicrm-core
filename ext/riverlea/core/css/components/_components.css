@@ -60,9 +60,8 @@
     appearance: none;
     position: relative;
     font-size: inherit;
-    width: 2.75rem;
-    height: auto;
-    padding: var(--crm-m2) 0;
+    width: var(--crm-form-toggle-width);
+    height: var(--crm-form-toggle-height);
     box-sizing: content-box;
     border-radius: 1rem;
     vertical-align: text-bottom;
@@ -105,9 +104,6 @@
   & input[type="checkbox"]:checked ~ .crm-form-toggle-text-off {
     display: none;
   }
-}
-body.wp-admin .crm-container .crm-form-toggle-container input[type="checkbox"].crm-form-toggle {
-  padding: var(--crm-m2) 0!important;
 }
 
 /* Action Links */
