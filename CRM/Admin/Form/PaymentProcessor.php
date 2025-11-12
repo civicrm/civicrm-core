@@ -188,6 +188,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       CRM_Financial_BAO_PaymentProcessor::buildOptions('payment_processor_type_id'),
       TRUE
     );
+    if ($this->_action !== CRM_Core_Action::ADD) {
+      $this->freeze('payment_processor_type_id');
+    }
 
     // Financial Account of account type asset CRM-11515
     $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
