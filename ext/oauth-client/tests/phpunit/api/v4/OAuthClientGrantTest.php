@@ -49,7 +49,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       $this->assertEquals('/one/auth', $url['path']);
       \parse_str($url['query'], $actualQuery);
       $this->assertEquals('code', $actualQuery['response_type']);
-      $this->assertMatchesRegularExpression(';^[cs]_[a-zA-Z0-9]+$;', $actualQuery['state']);
+      $this->assertMatchesRegularExpression(';^CC_[a-zA-Z0-9]+$;', $actualQuery['state']);
       $this->assertEquals('scope-1-foo,scope-1-bar', $actualQuery['scope']);
       // ? // $this->assertEquals('auto', $actualQuery['approval_prompt']);
       $this->assertEquals('example-id', $actualQuery['client_id']);
@@ -95,7 +95,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       $this->assertEquals('/three/auth', $url['path']);
       \parse_str($url['query'], $actualQuery);
       $this->assertEquals('code', $actualQuery['response_type']);
-      $this->assertMatchesRegularExpression(';^[cs]_[a-zA-Z0-9]+$;', $actualQuery['state']);
+      $this->assertMatchesRegularExpression(';^CC_[a-zA-Z0-9]+$;', $actualQuery['state']);
       $this->assertEquals('scope-3-foo,scope-3-bar', $actualQuery['scope']);
       // ? // $this->assertEquals('auto', $actualQuery['approval_prompt']);
       $this->assertEquals('example-id', $actualQuery['client_id']);
