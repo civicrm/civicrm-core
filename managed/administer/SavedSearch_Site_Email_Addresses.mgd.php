@@ -10,7 +10,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Site_Email_Addresses',
-        'label' => ts('Site From Email Addresses'),
+        'label' => 'Site From Email Addresses',
         'api_entity' => 'SiteEmailAddress',
         'api_params' => [
           'version' => 4,
@@ -42,7 +42,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Site_Email_Addresses',
-        'label' => ts('Site From Email Addresses'),
+        'label' => 'Site From Email Addresses',
         'saved_search_id.name' => 'Site_Email_Addresses',
         'type' => 'table',
         'settings' => [
@@ -61,31 +61,31 @@ return [
             [
               'type' => 'field',
               'key' => 'display_name',
-              'label' => ts('Display Name'),
+              'label' => 'Display Name',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'email',
-              'label' => ts('Email'),
+              'label' => 'Email',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
-              'label' => ts('Description'),
+              'label' => 'Description',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'label' => ts('Enabled'),
+              'label' => 'Enabled',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_default',
-              'label' => ts('Default'),
+              'label' => 'Default',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -108,7 +108,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => ts('Edit Email Address'),
+                  'text' => 'Edit Email Address',
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
@@ -120,7 +120,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-off',
-                  'text' => ts('Disable Email Addresses'),
+                  'text' => 'Disable Email Addresses',
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
@@ -132,7 +132,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-on',
-                  'text' => ts('Enable Email Addresses'),
+                  'text' => 'Enable Email Addresses',
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
@@ -152,7 +152,7 @@ return [
           'toolbar' => [
             [
               'entity' => 'SiteEmailAddress',
-              'text' => ts('Add Email Address'),
+              'text' => 'Add Email Address',
               'icon' => 'fa-plus',
               'target' => 'crm-popup',
               'action' => 'add',
