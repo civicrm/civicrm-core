@@ -106,6 +106,9 @@
     display: none;
   }
 }
+body.wp-admin .crm-container .crm-form-toggle-container input[type="checkbox"].crm-form-toggle {
+  padding: var(--crm-m2) 0!important;
+}
 
 /* Action Links */
 
