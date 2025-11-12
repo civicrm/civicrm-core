@@ -64,7 +64,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     'Money' => ['Text', 'Select', 'Radio', 'Hidden'],
     'Memo' => ['TextArea', 'RichTextEditor'],
     'Date' => ['Select Date'],
-    'Boolean' => ['Radio'],
+    'Boolean' => ['Toggle', 'Radio'],
     'StateProvince' => ['Select'],
     'Country' => ['Select'],
     'File' => ['File'],
