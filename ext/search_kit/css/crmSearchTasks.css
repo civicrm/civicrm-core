@@ -20,3 +20,17 @@
   left: 0;
   min-width: 50px;
 }
+
+/* .form-inline is used to override gap from .form-inline:has(.crm-form-date-wrapper) */
+.form-inline.crm-search-task-update-value {
+  display: flex;
+  align-items: center;
+  gap: var(--crm-m2, 0.75rem);
+}
+.crm-search-task-update-value > .crm-auto-width {
+  min-width: 10rem;
+}
+.crm-search-task-update-value .status {
+  font-size: var(--crm-small-font-size, 0.75rem);
+  padding: var(--crm-m2, 0.75rem);
+}
