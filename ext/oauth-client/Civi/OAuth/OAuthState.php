@@ -46,6 +46,7 @@ class OAuthState extends AutoService {
    *   - scopes (array), List of scopes being requested
    *   - tag (string, optional), The symbolic tag to apply to the new token
    *   - code_verifier (string, optional), An extra string that we will send to the token-endpoint to prove that we initiated the flow
+   *   - grant_type (string, optional), The kind of flow that we are pursuing. Default: authorization_code
    * @return string
    *   State token / identifier
    */

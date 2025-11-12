@@ -94,6 +94,7 @@ class AuthorizationCode extends AbstractGrantAction {
       'time' => \CRM_Utils_Time::time(),
       'ttl' => $this->getTtl(),
       'clientId' => $this->getClientDef()['id'],
+      'grant_type' => 'authorization_code',
       'landingUrl' => $this->getLandingUrl(),
       'storage' => $this->getStorage(),
       'scopes' => $scopes,
