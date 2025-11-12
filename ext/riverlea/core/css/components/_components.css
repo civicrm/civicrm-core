@@ -60,8 +60,8 @@
     appearance: none;
     position: relative;
     font-size: inherit;
-    width: var(--crm-form-toggle-width);
-    height: var(--crm-form-toggle-height);
+    width: var(--crm-input-toggle-width);
+    height: var(--crm-input-toggle-height);
     box-sizing: content-box;
     border-radius: 1rem;
     vertical-align: text-bottom;
