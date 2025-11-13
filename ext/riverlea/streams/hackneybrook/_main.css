@@ -1,11 +1,9 @@
 /*
     Name: HackneyBrook;
     Description: named after the Hackney Brook, a tributary of the River Lea that ran through Finsbury Park;
-    Riverlea version: 1.3.8;
 */
 
 :root {
-  --crm-version: 'Hackney, v' var(--crm-release);
   /* Fonts */
   --crm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
   /* Colour names */

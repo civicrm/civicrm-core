@@ -1,7 +1,6 @@
 /*
     Name: Empty stream;
     Description: duplicate this to create a new stream;
-    Riverlea version: 1.4.8;
     Some pointers:
       - Use this stream to replace the variables in '/core/css/_variables.css'.
         That's the file to study to understand how RL variables work.
@@ -41,7 +40,6 @@
 */
 
 :root {
-  --crm-version: 'Empty, v' var(--crm-release);
 /* Fonts '--crm-font-' */
 /* Colour names, e.g. green, red, blue '--crm-c-' */
 /* Practical colours, e.g. text, link '--crm-c-' */

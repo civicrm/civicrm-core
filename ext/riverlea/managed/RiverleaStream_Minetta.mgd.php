@@ -19,9 +19,6 @@ return [
         'file_prefix' => 'streams/minetta/',
         'css_file' => '_main.css',
         'css_file_dark' => '_dark.css',
-        'vars' => [
-          '--crm-version' => "'Minetta, v' var(--crm-release)",
-        ],
       ],
       'match' => ['name'],
     ],
