@@ -702,3 +702,11 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l), transparent var(--crm-l) 100%) no-repeat;
   border-radius: var(--crm-roundness);
 }
+/* Check boxes */
+
+.af-container ul.crm-checkbox-list {
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  height: auto;
+}
