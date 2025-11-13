@@ -1,11 +1,9 @@
 /*
     Name: Walbrook;
     Description: Based on Shoreditch theme. Named after after River Walbrook, which runs under Shoreditch, London;
-    Riverlea version: 1.3.8;
 */
 
 :root {
-  --crm-version: 'Walbrook, v' var(--crm-release);
 /* Fonts */
   --crm-system-fonts: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
   --crm-font: "Inter", "Open Sans", var(--crm-system-fonts);
