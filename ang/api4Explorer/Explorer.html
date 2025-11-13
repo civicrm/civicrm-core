@@ -247,6 +247,7 @@
     <div class="panel explorer-result-panel panel-{{ status }}" >
       <div class="panel-heading">
         <div class="form-inline pull-right">
+          <button class="btn" crm-icon="fa-sync" ng-disabled="!entity || !action || loading" ng-click="execute()" title="Refresh"></button>
           <select ng-show="selectedTab.result === 'result'" class="form-control crm-auto-width" ng-model="$ctrl.resultFormat" ng-change="$ctrl.formatResult()">
             <option ng-repeat="fmt in $ctrl.resultFormats" value="{{:: fmt.name }}">
               {{:: fmt.label }}
