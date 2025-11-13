@@ -76,6 +76,8 @@ class OAuthTokenFacade {
       \Civi::log()->warning("Failed to resolve resource_owner");
     }
 
+    \CRM_OAuth_Hook::hook_civicrm_oauthToken('init', $options['storage'], $tokenRecord);
+
     return civicrm_api4($options['storage'], 'create', [
       'checkPermissions' => FALSE,
       'values' => $tokenRecord,
