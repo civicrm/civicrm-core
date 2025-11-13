@@ -130,25 +130,6 @@
         return cssClass;
       };
 
-      this.getColumnToggleLabel = (col) => {
-        if (col.label) {
-          return col.label;
-        }
-        if (col.key) {
-          return `[${col.key}]`;
-        }
-        if (col.type === 'menu') {
-          return ts('Menu');
-        }
-        if (col.type === 'buttons') {
-          return ts('Buttons');
-        }
-        if (col.type === 'links') {
-          return ts('Links');
-        }
-        return ts('Column %1', {1: col.index});
-      };
-
       /**
        * Update the settings for which columns to include.
        *
@@ -161,9 +142,7 @@
       };
 
       this.resetColumnToggles = () => {
-        this.columns.forEach((col, index) => {
-          this.columns[index].enabled = true;
-        });
+        this.columns.forEach((col) => col.enabled = true);
         this.toggleColumns();
       };
 
