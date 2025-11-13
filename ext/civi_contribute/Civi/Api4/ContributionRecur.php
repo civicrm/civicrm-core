@@ -10,6 +10,8 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Action\ContributionRecur\UpdateAmountOnRecur;
+
 /**
  * ContributionRecur entity.
  *
@@ -18,5 +20,14 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class ContributionRecur extends Generic\DAOEntity {
+
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\ContributionRecur\UpdateAmountOnRecur
+   */
+  public static function updateAmountOnRecur($checkPermissions = TRUE) {
+    return (new UpdateAmountOnRecur(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
 
 }
