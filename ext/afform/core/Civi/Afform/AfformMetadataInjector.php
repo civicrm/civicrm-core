@@ -184,6 +184,34 @@ class AfformMetadataInjector {
       unset($fieldInfo['options'], $fieldDefn['options']);
     }
 
+    // Set min & max & step for options with range
+    if ($inputType === 'Range' && (!empty($fieldInfo['options']) || !empty($fieldDefn['options']))) {
+      $options = !empty($fieldDefn['options']) ? \CRM_Utils_JS::decode($fieldDefn['options']) : $fieldInfo['options'];
+      $optionRange = array_column($options, 'id');
+      sort($optionRange);
+      $fieldInfo['input_attrs']['min'] = min($optionRange);
+      $fieldInfo['input_attrs']['max'] = max($optionRange);
+      $fieldInfo['input_attrs']['step'] = 1;
+
+      // Calculate step from the spacing between numbers
+      if (count($optionRange) > 1) {
+        // Get the first difference between consecutive numbers
+        $step = $optionRange[1] - $optionRange[0];
+
+        // Verify that all differences are the same
+        for ($i = 1; $i < count($optionRange) - 1; $i++) {
+          $currentDiff = $optionRange[$i + 1] - $optionRange[$i];
+          if ($currentDiff != $step) {
+            // If differences aren't consistent, default to 1
+            $step = 1;
+            break;
+          }
+        }
+
+        $fieldInfo['input_attrs']['step'] = $step;
+      }
+    }
+
     foreach ($fieldInfo as $name => $prop) {
       // Merge array props 1 level deep
       if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
