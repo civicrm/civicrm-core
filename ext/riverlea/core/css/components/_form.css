@@ -217,8 +217,6 @@ select.crm-error {
   grid-gap: var(--crm-m2);
 
   & input[type="checkbox"].crm-form-toggle {
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     position: relative;
     font-size: inherit;
@@ -230,7 +228,6 @@ select.crm-error {
     color: inherit;
     border: 2px solid var(--crm-input-toggle-disabled-bg);
     background-color: var(--crm-input-toggle-disabled-bg);
-    -webkit-transition: 0.1s;
     transition: 0.1s;
   }
 

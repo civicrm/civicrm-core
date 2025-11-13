@@ -4067,8 +4067,6 @@ span.crm-status-icon {
   grid-gap: .5em;
 
   & input[type="checkbox"].crm-form-toggle {
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     position: relative;
     font-size: inherit;
@@ -4081,7 +4079,6 @@ span.crm-status-icon {
     color: inherit;
     border: 2px solid #919297;
     background-color: #adaeb3;
-    -webkit-transition: 0.1s;
     transition: 0.1s;
   }
 
