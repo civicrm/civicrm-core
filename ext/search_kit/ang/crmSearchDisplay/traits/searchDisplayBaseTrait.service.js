@@ -308,6 +308,12 @@
         }
         return '~/crmSearchDisplay/colType/' + colType + '.html';
       },
+
+      getSearchDisplayKey: function() {
+        // note: if using the default search then this.display may be empty
+        return this.display ? `${this.search}.${this.display}` : this.search;
+      }
+
     };
   });
 
