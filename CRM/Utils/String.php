@@ -672,6 +672,7 @@ class CRM_Utils_String {
       $config->set('HTML.DefinitionRev', 1);
       $config->set('HTML.MaxImgLength', NULL);
       $config->set('CSS.MaxImgLength', NULL);
+      $config->set('Attr.EnableID', true);
       $def = $config->maybeGetRawHTMLDefinition();
       $uri = $config->getDefinition('URI');
       $uri->addFilter(new CRM_Utils_HTMLPurifier_URIFilter(), $config);
