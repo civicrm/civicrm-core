@@ -246,6 +246,11 @@ class CRM_Utils_Address_USPS {
    * @return array|bool
    */
   public static function checkAddress(&$values): bool|array {
+    // Check if disabled due to import.
+    if (self::$_disabled) {
+      return FALSE;
+    }
+
     // Check if USPS is configured
     if (!self::isConfigured()) {
       return FALSE;
