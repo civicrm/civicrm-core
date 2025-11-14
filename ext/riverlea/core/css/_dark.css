@@ -2,7 +2,7 @@
 /* Colour names */
 /* Practical colours, e.g. text, link '--crm-c-' */
   --crm-c-text: var(--crm-c-text-light);
-  --crm-c-divider: 1px solid var(--crm-c-gray-500);
+  --crm-border-color: var(--crm-c-gray-500);
 /* Backgrounds, '--crm-c-X-bg' */
   --crm-c-code-bg: var(--crm-c-layer1-bg);
   --crm-c-layer1-bg: var(--crm-c-gray-800);

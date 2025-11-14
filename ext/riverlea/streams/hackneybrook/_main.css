@@ -13,7 +13,7 @@
   --crm-c-teal: #399389;
   /* Practical colours */
   --crm-c-text: #2b2b2b;
-  --crm-c-divider: 1px solid var(--crm-c-gray-200);
+  --crm-border-color: var(--crm-c-gray-200);
   --crm-c-container-bg: var(--crm-c-gray-025);
 /* Emphasis colours */
   --crm-c-primary: var(--crm-c-gray-025);
@@ -65,7 +65,7 @@
   --crm-input-label-width: 10em;
   --crm-fieldset-border: 1px;
   /* Tabs */
-  --crm-tabs-border: var(--crm-c-divider);
+  --crm-tabs-border: var(--crm-border);
   --crm-tab-count-bg: var(--crm-c-blue-dark);
   --crm-tab-count-col: var(--crm-c-text-light);
   --crm-tab-border: 1px solid var(--crm-c-gray-400);
@@ -82,7 +82,7 @@
   --crm-contact-tab-bg-hover: var(--crm-c-container-bg);
   --crm-contact-tab-padding: var(--crm-m2) var(--crm-m1) var(--crm-m2) var(--crm-r);
   --crm-contact-tab-border: 1px solid transparent;
-  --crm-contact-tab-border-hover: var(--crm-c-divider);
+  --crm-contact-tab-border-hover: var(--crm-border);
   --crm-contact-tab-border-width: 1px 0 1px 1px; /* to remove border on one side for hanging tabs */
   --crm-contact-tab-width: auto; /* 100% to fill column width, auto to only cover contents */
   --crm-contact-tab-align: right;
@@ -92,7 +92,7 @@
   --crm-contact-heading-inset: var(--crm-side-tabs-width);
   --crm-contact-panel-padding: var(--crm-r);
   --crm-contact-panel-bg: var(--crm-contact-tab-bg-hover);
-  --crm-contact-panel-border: var(--crm-c-divider);
+  --crm-contact-panel-border: var(--crm-border);
   --crn-dash-panel-radius: var(--crm-contact-radius);
   --crm-contact-image-size: 100px;
   --crm-contact-image-radius: 200px;
@@ -109,7 +109,7 @@
   --crm-dialog-body-bg: var(--crm-c-container-bg);
   --crm-dialog-body-padding: var(--crm-r);
   /* Dashlet */
-  --crm-dashlet-border: var(--crm-c-divider);
+  --crm-dashlet-border: var(--crm-border);
   --crm-dashlet-padding: 0;
   --crm-dashlet-content-padding: var(--crm-m);
   --crm-dashlet-tabs-border: 3px solid #fff;

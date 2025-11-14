@@ -44,7 +44,6 @@
   --crm-c-link-hover: var(--crm-c-blue-darker);
   --crm-c-focus: var(--crm-c-blue-dark);
   --crm-c-inactive: color-mix(in srgb,var(--crm-c-text) 95%,#fff 5%);
-  --crm-c-divider: 1px solid var(--crm-c-gray-300);
 /* Backgrounds */
   --crm-c-layer0-bg: #fff; /* The lightest bg in light mode */
   --crm-c-page-bg: var(--crm-c-layer0-bg);
@@ -53,8 +52,10 @@
   --crm-c-layer2-bg: color-mix(in srgb,var(--crm-c-layer1-bg) 95%,#000 5%);
   --crm-c-inverse-bg: var(--crm-c-gray-700); /* bg to light text */
   --crm-c-drag-bg: var(--crm-c-layer2-bg);
+  --crm-border-color: var(--crm-c-gray-300);
+  --crm-border: 1px solid var(--crm-border-color);
   --crm-c-code-bg: var(--crm-c-layer1-bg);
-  --crm-c-code-border: color-mix(in srgb,var(--crm-c-code-bg) 75%,#000 25%);
+  --crm-code-border-color: color-mix(in srgb,var(--crm-c-code-bg) 75%,#000 25%);
 /* Emphasis colours */
   --crm-c-primary: var(--crm-c-inverse-bg);
   --crm-c-primary-hover: color-mix(in srgb,var(--crm-c-primary) 75%,#000 25%);
@@ -159,14 +160,14 @@
   --crm-btn-icon-padding: var(--crm-btn-padding-block);
   --crm-btn-margin: 0; /* used to add padding block between multiple stacked buttons */
 /* Tables */
-  --crm-table-outside-border: var(--crm-c-divider);
+  --crm-table-outside-border: var(--crm-border);
   --crm-table-bg: var(--crm-c-layer0-bg);
-  --crm-table-row-border: var(--crm-c-divider);
+  --crm-table-row-border: var(--crm-border);
   --crm-table-column-border: 0 solid transparent;
   --crm-table-font-size: var(--crm-font-size);
   --crm-table-padding: var(--crm-m);
   --crm-table-header-border: 1px solid transparent;
-  --crm-table-header-bottom: 2px solid var(--crm-c-gray-300);
+  --crm-table-header-bottom: 2px solid var(--crm-border-color);
   --crm-table-header-bg: var(--crm-c-layer0-bg);
   --crm-table-header-col: var(--crm-c-text);
   --crm-table-header-txt: inherit;
@@ -180,12 +181,12 @@
   --crm-table-compressed-width: auto;
   --crm-table-nested-padding: var(--crm-r) var(--crm-m);
   --crm-table-nested-head-border: 0 solid transparent;
-  --crm-table-nested-border: var(--crm-c-divider);
+  --crm-table-nested-border: var(--crm-border);
   --crm-table-inset-bg: var(--crm-c-layer2-bg);
 /* Panels */
   --crm-panel-shadow: var(--crm-shadow-block);
   --crm-panel-bg: var(--crm-c-layer0-bg);
-  --crm-panel-border: var(--crm-c-divider);
+  --crm-panel-border: var(--crm-border);
   --crm-panel-head-margin: 0px;
   --crm-panel-head-height: 37px;
 /* Accordions */
@@ -202,9 +203,9 @@
   --crm-accordion-header-color: var(--crm-c-secondary-text);
   --crm-accordion-header-padding: var(--crm-s) var(--crm-m);
   --crm-accordion-header-weight: bold;
-  --crm-accordion-header-border: var(--crm-c-divider);
+  --crm-accordion-header-border: var(--crm-border);
   --crm-accordion-header-border-width: 0 0 1px 0;
-  --crm-accordion-border: var(--crm-c-divider);
+  --crm-accordion-border: var(--crm-border);
   --crm-accordion-border-width: 0 1px 1px 1px;
   --crm-accordion-body-bg: unset;
   --crm-accordion-body-box-shadow: unset;
@@ -291,7 +292,7 @@
   --crm-tab-count-bg: var(--crm-c-info-text);
   --crm-tab-count-col: var(--crm-c-info);
   --crm-tab-radius: var(--crm-s-radius);
-  --crm-tab-border: var(--crm-c-divider);
+  --crm-tab-border: var(--crm-border);
   --crm-tab-border-width: 0;
   --crm-tab-border-active: 0 solid transparent;
 /* Contact dashboard */
@@ -325,7 +326,7 @@
   --crm-contact-panel-bg: #fff;
   --crm-contact-panel-border: 0;
   --crm-contact-panel-radius: 0 0 var(--crm-contact-radius) var(--crm-contact-radius);
-  --crm-contact-edit-border: 1px dashed var(--crm-c-gray-300);
+  --crm-contact-edit-border: 1px dashed var(--crm-border-color);
   --crm-contact-block-padding: 0;
   --crm-contact-block-bg: unset;
   --crm-contact-block-radius: var(--crm-s-radius);
@@ -351,7 +352,7 @@
   --crm-dialog-header-size: var(--crm-r1);
   --crm-dialog-header-padding: var(--crm-m1) var(--crm-r);
   --crm-dialog-header-radius: var(--crm-dialog-radius);
-  --crm-dialog-header-border-col: transparent transparent var(--crm-c-gray-300) transparent; /* set a border color for each side of the header */
+  --crm-dialog-header-border-col: transparent transparent var(--crm-border-color) transparent; /* set a border color for each side of the header */
   --crm-dialog-body-bg: var(--crm-c-container-bg);
   --crm-dialog-body-padding: var(--crm-m);
 /* Dashlet */
@@ -417,7 +418,7 @@
   --crm-wizard-arrow-thickness: 1px;
   --crm-wizard-active-col: var(--crm-c-text-light);
   --crm-wizard-active-bg: var(--crm-c-link);
-  --crm-wizard-border: var(--crm-c-divider);
+  --crm-wizard-border: var(--crm-border);
   --crm-wizard-bg: var(--crm-c-layer0-bg);
   --crm-wizard-box-shadow: unset;
 /* Alpha filter */

@@ -845,7 +845,7 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 }
 .crm-mosaico-wizard .crm-mosaico-template-item.thumbnail {
   background: var(--crm-c-layer1-bg) !important /* vs _template-item.scss */;
-  border: var(--crm-c-divider) !important /* vs _template-item.scss */;
+  border: var(--crm-border) !important /* vs _template-item.scss */;
   border-radius: var(--crm-s-radius) !important /* vs _template-item.scss */;
 }
 .crm-mosaico-wizard .crm_wizard__title .nav-pills li.disabled a {

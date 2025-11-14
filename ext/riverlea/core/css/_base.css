@@ -370,7 +370,7 @@ dl dl {
 .crm-container code {
   display: inline;
   background-color: var(--crm-c-code-bg);
-  border: var(--crm-c-code-border);
+  border: var(--crm-code-border-color);
   color: var(--crm-c-text);
   border-radius: 2px;
   padding: 2px;
@@ -385,7 +385,7 @@ dl dl {
   line-height: 1.4  !important /* vs inline css on api3 */;
   color: var(--crm-c-text);
   background-color: var(--crm-c-code-bg);
-  border: var(--crm-c-code-border);
+  border: var(--crm-code-border-color);
   border-radius: var(--crm-s-radius);
 }
 .crm-container pre code {

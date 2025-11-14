@@ -8,7 +8,7 @@
   max-width: 30rem;
   height: 7.25rem;
   overflow: auto;
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
 }
 .crm-container ul.crm-checkbox-list {
   list-style: none;
@@ -255,7 +255,7 @@ table.advmultiselect {
   margin: 0;
 }
 .crm-container .panel-default {
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
 }
 .crm-container .panel-default > .panel-heading .badge {
   color: var(--crm-c-secondary-text);
@@ -611,7 +611,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #crm-recently-viewed li.crm-recently-viewed {
   margin-block: var(--crm-xs);
   padding: var(--crm-s);
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   background-color: var(--crm-input-bg);
   list-style-type: none;
   position: relative;

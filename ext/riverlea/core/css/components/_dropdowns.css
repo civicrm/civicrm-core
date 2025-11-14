@@ -227,7 +227,7 @@
   font-weight: bold;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr:nth-child(2) > td {
-  border-top: var(--crm-c-divider) !important;
+  border-top: var(--crm-border) !important;
   width: 50%;
   padding: var(--crm-r1) var(--crm-m1) 0;
 }

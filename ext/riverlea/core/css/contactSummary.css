@@ -224,7 +224,7 @@ div.crm-inline-edit-form div.crm-clear {
   width: 100%;
 }
 .crm-container div.contact_panel td.grouplabel {
-  border-bottom: var(--crm-c-divider);
+  border-bottom: var(--crm-border);
   border-width: 2px;
 }
 .crm-container .crm-summary-row:after {

@@ -31,7 +31,7 @@
 /* Mouse events */
 /* Buttons '--crm-btn-' */
 /* Tables '--crm-table-' */
-  --crm-table-outside-border: var(--crm-c-divider);
+  --crm-table-outside-border: var(--crm-border);
   --crm-table-row-border: 1px solid var(--crm-c-gray-200);
   --crm-table-row-hover: var(--crm-c-amber);
 /* Panels '--crm-panel-' */

@@ -98,7 +98,7 @@
 }
 /* Fieldset */
 .crm-container fieldset {
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
 }
 .crm-container fieldset:not(.collapsed,
 .crm-collapsible,
@@ -566,7 +566,7 @@ input.crm-form-checkbox) + label {
   line-height: unset;
   color: var(--crm-c-text);
   cursor: default;
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-radius: var(--crm-input-border-radius);
   background-clip: padding-box;
   user-select: none;
@@ -642,7 +642,7 @@ input.crm-form-checkbox) + label {
   margin: 0;
 }
 .select2-drop.select2-drop-active.crm-container .select2-results li:has(.crm-select2-row-description) {
-  border-top: var(--crm-c-divider);
+  border-top: var(--crm-border);
 }
 .select2-results .select2-ajax-error,
 .select2-results .select2-no-results,

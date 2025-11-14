@@ -36,7 +36,7 @@
   height: 1px;
   margin: var(--crm-m) 0;
   overflow: hidden;
-  background-color: var(--crm-c-divider);
+  background-color: var(--crm-border);
 }
 .crm-container .nav > li > a > img {
   max-width: none;
