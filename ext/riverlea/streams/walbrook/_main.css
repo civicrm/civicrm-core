@@ -31,7 +31,7 @@
   --crm-c-link: var(--crm-c-blue-dark);
   --crm-c-link-hover: var(--crm-c-blue-darker);
   --crm-c-page-bg: #e8eef0;
-  --crm-c-container-bg: var(--crm-c-layer0-bg);
+  --crm-c-container-bg: var(--crm-paper);
   --crm-c-drag-bg: var(--crm-c-gray-200); /* background for drag/drop regions, select2 highlight */
   --crm-c-code-bg: var(--crm-c-layer2-bg); /* bg for code blocks */
 /* Emphasis colours */
@@ -133,7 +133,7 @@
   --crm-tabs-padding: var(--crm-m) var(--crm-m) 0 var(--crm-m);
   --crm-tabs-border: var(--crm-border);
   --crm-tab-radius: 2px 2px 0 0;
-  --crm-tab-bg-hover: var(--crm-c-layer0-bg);
+  --crm-tab-bg-hover: var(--crm-paper);
   --crm-tab-bg-active: var(--crm-c-container-bg);
   --crm-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m);
@@ -191,7 +191,7 @@
   --crm-dashlet-header-padding: var(--crm-padding-reg);
   --crm-dashlet-tabs-border: var(--crm-tabs-border);
 /* Notifications */
-  --crm-notify-bg: var(--crm-c-layer0-bg);
+  --crm-notify-bg: var(--crm-paper);
   --crm-notify-col: var(--crm-c-text);
   --crm-notify-accent-border: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-danger: #d02e2e;

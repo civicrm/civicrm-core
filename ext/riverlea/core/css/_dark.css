@@ -3,6 +3,8 @@
 /* Practical colours, e.g. text, link '--crm-c-' */
   --crm-c-text: var(--crm-c-text-light);
   --crm-border-color: var(--crm-c-gray-500);
+  --crm-paper: var(--crm-c-gray-900); /* The darkest bg in dark mode */
+  --crm-ink: var(--crm-c-text-light); /* The lightest foreground in dark mode */
 /* Backgrounds, '--crm-c-X-bg' */
   --crm-c-code-bg: var(--crm-c-layer1-bg);
   --crm-c-layer1-bg: var(--crm-c-gray-800);

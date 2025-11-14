@@ -84,8 +84,8 @@
     height: 1.25rem;
     margin: 0 var(--crm-xs2);
     border-radius: 50%;
-    border: 1px solid var(--crm-c-layer0-bg);
-    background: var(--crm-c-layer0-bg);
+    border: 1px solid var(--crm-paper);
+    background: var(--crm-paper);
     -webkit-transition: 0.1s;
     transition: 0.1s;
   }

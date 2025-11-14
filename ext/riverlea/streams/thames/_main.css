@@ -141,7 +141,7 @@
   --crm-tabs-padding: 0;
   --crm-tabs-border: 4px solid var(--crm-c-blue-overlay2);
   --crm-tab-bg-hover: var(--crm-c-blue-overlay);
-  --crm-tab-bg-active: var(--crm-c-layer0-bg);
+  --crm-tab-bg-active: var(--crm-paper);
   --crm-tab-hang: 0 0 calc(-1 * var(--crm-s)) 0; /* thames todo check */
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m); /* thames todo check */
   --crm-tab-count-bg: var(--crm-c-info-text);
@@ -162,7 +162,7 @@
   --crm-contact-tabs-padding: unset;
   --crm-contact-tab-bg: transparent;
   --crm-contact-tabs-radius: var(--crm-contact-radius) 0 0 var(--crm-contact-radius);
-  --crm-contact-tab-bg-hover: var(--crm-c-layer0-bg);
+  --crm-contact-tab-bg-hover: var(--crm-paper);
   --crm-contact-tab-padding: var(--crm-m2) var(--crm-r1);
   --crm-contact-tab-border: var(--crm-contact-border);
   --crm-contact-tab-col: unset;
@@ -172,7 +172,7 @@
   --crm-contact-tab-radius: 0;
   --crm-contact-heading-inset: unset;
   --crm-contact-panel-padding: var(--crm-r2);
-  --crm-contact-panel-bg: var(--crm-c-layer0-bg);
+  --crm-contact-panel-bg: var(--crm-paper);
   --crm-contact-panel-radius: 0 var(--crm-contact-radius) var(--crm-contact-radius) 0;
   --crm-contact-edit-border: 1px solid var(--crm-c-blue-dark);
   --crm-contact-block-padding: var(--crm-m2);
@@ -195,13 +195,13 @@
 :root {
 /* Dashlet */
   --crm-dashlet-box-shadow: none;
-  --crm-dashlet-header-bg: var(--crm-c-layer0-bg);
+  --crm-dashlet-header-bg: var(--crm-paper);
   --crm-dashlet-tabs-bg: var(--crm-tabs-bg);
   --crm-dashlet-radius: var(--crm-r-3);
 }
 :root {
 /* Button dropdowns */
-  --crm-dropdown-bg: var(--crm-c-layer0-bg);
+  --crm-dropdown-bg: var(--crm-paper);
   --crm-dropdown-col: var(--crm-c-blue-darker);
   --crm-dropdown-hover: var(--crm-c-blue-dark);
   --crm-dropdown-hover-bg: var(--crm-c-blue-light);
@@ -209,7 +209,7 @@
 }
 :root {
 /* Notifications */
-  --crm-notify-bg: var(--crm-c-layer0-bg);
+  --crm-notify-bg: var(--crm-paper);
   --crm-notify-col: var(--crm-c-text);
   --crm-notify-accent-border: 0.875rem 0 0 0;
   --crm-notify-radius: 4px;

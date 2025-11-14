@@ -8,9 +8,8 @@
 /* Fonts '--crm-font-' */
 /* Colour names, e.g. green, red, blue '--crm-c-' */
 /* Practical colours, e.g. text, link '--crm-c-' */
-  --crm-c-text: #fff;
+  --crm-c-text: var(--crm-c-text-light);
 /* Backgrounds, '--crm-c-*-bg' */
-  --crm-c-page-bg: var(--crm-c-gray-900);
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
 /* Shadows */
 /* Sizes */
