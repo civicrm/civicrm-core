@@ -8,6 +8,7 @@ return [
   }",
   'icon' => 'fa-user',
   'boilerplate' => [
-    ['#tag' => 'afblock-name-individual'],
+    ['#tag' => 'af-field', 'name' => 'first_name'],
+    ['#tag' => 'af-field', 'name' => 'last_name'],
   ],
 ];
