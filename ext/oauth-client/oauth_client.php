@@ -31,10 +31,6 @@ function oauth_client_civicrm_permission(&$permissions) {
     'label' => $prefix . ts('manage OAuth system tokens'),
     'description' => ts('Access the secret content of OAuth system tokens'),
   ];
-  $permissions['create OAuth tokens via auth code flow'] = [
-    'label' => $prefix . ts('create OAuth tokens via auth code flow'),
-    'description' => ts('Create OAuth tokens via the authorization code flow'),
-  ];
   $permissions['manage my OAuth contact tokens'] = [
     'label' => $prefix . ts('manage my OAuth contact tokens'),
     'description' => ts("Manage user's own OAuth tokens"),
