@@ -47,6 +47,22 @@ class CRM_Utils_Address_USPS {
   protected static $tokenExpiry = 0;
 
   /**
+   * Whether USPS validation should be disabled during import.
+   *
+   * @var bool
+   */
+  protected static $_disabled = FALSE;
+
+  /**
+   * Disable the USPS validation.
+   *
+   * @param bool $disable
+   */
+  public static function disable($disable = TRUE): void {
+    self::$_disabled = $disable;
+  }
+
+  /**
    * Check if the USPS provider is configured and available
    *
    * @return bool
