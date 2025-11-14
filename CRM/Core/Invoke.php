@@ -10,6 +10,7 @@
  */
 
 use Civi\Core\Security\PharLoader;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  *
@@ -35,7 +36,11 @@ class CRM_Core_Invoke {
    */
   public static function invoke($args) {
     try {
-      return self::_invoke($args);
+      $result = self::_invoke($args);
+      if ($result && $result instanceof ResponseInterface) {
+        \CRM_Utils_System::sendResponse($result);
+      }
+      return $result;
     }
     catch (Exception $e) {
       CRM_Core_Config::singleton()->userSystem->handleUnhandledException($e);
@@ -49,8 +54,11 @@ class CRM_Core_Invoke {
    * @param array $args
    *   The parts of the URL which identify the intended CiviCRM page
    *   (e.g. array('civicrm', 'event', 'register')).
-   * @return string
-   *   HTML. For non-HTML content, invoke() may call print() and exit().
+   * @return string|\Psr\Http\Message\ResponseInterface
+   *   One of the following:
+   *   - string: HTML page-content
+   *   - ResponseInterface, exact content to send as HTTP response
+   *   - exit: invoke() may call print() and exit().
    */
   public static function _invoke($args) {
     if ($args[0] !== 'civicrm') {
@@ -150,7 +158,11 @@ class CRM_Core_Invoke {
    * @param array $item
    *   See CRM_Core_Menu.
    *
-   * @return string, HTML
+   * @return string|\Psr\Http\Message\ResponseInterface
+   *   One of the following:
+   *   - string: HTML page-content
+   *   - ResponseInterface, exact content to send as HTTP response
+   *   - exit: invoke() may call print() and exit().
    * @throws \CRM_Core_Exception
    */
   public static function runItem($item) {
@@ -236,7 +248,7 @@ class CRM_Core_Invoke {
       // page_callback via Civi\Core\Resolver and check the implemented interfaces. This
       // would require rethinking the default constructor.
       if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
-        $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']));
+        $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']), CRM_Utils_System::createRequestFromGlobals());
       }
       elseif (str_contains($item['page_callback'], '_Form')) {
         $wrapper = new CRM_Utils_Wrapper();
