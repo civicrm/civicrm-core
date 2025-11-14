@@ -58,7 +58,7 @@
   --crm-popup-shadow: 3px 3px 18px 0 rgba(0, 0, 0,.25);
   --crm-bottom-shadow: unset;
 /* SIZES - temporary */
-  --crm-roundness: 0; /* thames - this gets applied in too many places; so setting to 0 and positively re-applying, rather than using this and negatively unapplying. */
+  --crm-s-radius: 0; /* thames - this gets applied in too many places; so setting to 0 and positively re-applying, rather than using this and negatively unapplying. */
 /* thames: on standalone the following is overridden in cms.css */
   --crm-page-padding: clamp(0.5rem 2vw 4rem); /* Margin left/right */
 /* Type */
@@ -96,24 +96,24 @@
 }
 :root {
 /* Accordions */
-  --crm-expand-radius: 4px;
+  --crm-accordion-radius: 4px;
 /* .crm-accordion-bold */
-  --crm-expand-header-bg: var(--crm-c-blue-overlay);
-  --crm-expand-header-bg-active: var(--crm-c-blue-overlay);
-  --crm-expand-header-color: var(--crm-c-blue-darker);
-  --crm-expand-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem;
-  --crm-expand-header-border: unset;
-  --crm-expand-header-border-width: unset;
-  --crm-expand-border: unset;
-  --crm-expand-border-width: unset;
-  --crm-expand-body-bg: var(--crm-c-blue-overlay); /* thames - todo check*/
-  --crm-expand-body-padding: 0.25rem 2.8rem;
+  --crm-accordion-header-bg: var(--crm-c-blue-overlay);
+  --crm-accordion-header-bg-active: var(--crm-c-blue-overlay);
+  --crm-accordion-header-color: var(--crm-c-blue-darker);
+  --crm-accordion-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem;
+  --crm-accordion-header-border: unset;
+  --crm-accordion-header-border-width: unset;
+  --crm-accordion-border: unset;
+  --crm-accordion-border-width: unset;
+  --crm-accordion-body-bg: var(--crm-c-blue-overlay); /* thames - todo check*/
+  --crm-accordion-body-padding: 0.25rem 2.8rem;
 /* .crm-accordion-light */
-  --crm-expand2-header-bg: transparent;
-  --crm-expand2-header-bg-active: var(--crm-c-layer2-bg);
-  --crm-expand2-header-padding: .6rem 1.6rem 0.6rem 2.8rem;
-  --crm-expand2-body-bg: transparent;
-  --crm-expand2-body-padding: 0.25rem 2.8rem;
+  --crm-accordion2-header-bg: transparent;
+  --crm-accordion2-header-bg-active: var(--crm-c-layer2-bg);
+  --crm-accordion2-header-padding: .6rem 1.6rem 0.6rem 2.8rem;
+  --crm-accordion2-body-bg: transparent;
+  --crm-accordion2-body-padding: 0.25rem 2.8rem;
 }
 :root {
 /* Alerts */
@@ -149,43 +149,43 @@
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m); /* thames todo check */
   --crm-tab-count-bg: var(--crm-c-info-text);
   --crm-tab-count-col: var(--crm-c-info);
-  --crm-tab-roundness: var(--crm-r-3) var(--crm-r-3) 0 0;
+  --crm-tab-radius: var(--crm-r-3) var(--crm-r-3) 0 0;
   --crm-tab-border: none;
   --crm-tabs-2-border: var(--crm-tabs-border);
 }
 :root {
 /* Contact dashboard/summary */
-  --crm-dash-border: 0 solid transparent;
-  --crm-dash-roundness: var(--crm-r-5);
-  --crm-dash-direction: grid;
+  --crm-contact-border: 0 solid transparent;
+  --crm-contact-radius: var(--crm-r-5);
+  --crm-contact-direction: grid;
   --crm-side-tabs-width: 220px;
-  --crm-dash-tabs-flow: column;
-  --crm-dash-tabs-gap: 0;
-  --crm-dash-tabs-bg: var(--crm-c-blue-overlay);
-  --crm-dash-tabs-padding: unset;
-  --crm-dash-tab-bg: transparent;
-  --crm-dash-tabs-roundness: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
-  --crm-dash-tab-bg-hover: var(--crm-c-layer0-bg);
-  --crm-dash-tab-padding: var(--crm-m2) var(--crm-r1);
-  --crm-dash-tab-border: var(--crm-dash-border);
-  --crm-dash-tab-col: unset;
-  --crm-dash-tab-count-bg: var(--crm-c-primary);
-  --crm-dash-tab-count-col: var(--crm-c-text-light);
-  --crm-dash-tab-hang: 0 0 -1px 0;
-  --crm-dash-tab-radius: 0;
-  --crm-dash-heading-inset: unset;
-  --crm-dash-panel-padding: var(--crm-r2);
-  --crm-dash-panel-bg: var(--crm-c-layer0-bg);
-  --crm-dash-panel-radius: 0 var(--crm-dash-roundness) var(--crm-dash-roundness) 0;
-  --crm-dash-edit-border: 1px solid var(--crm-c-blue-dark);
-  --crm-dash-block-padding: var(--crm-m2);
-  --crm-dash-block-bg: var(--crm-c-container-bg);
-  --crm-dash-label-bg: var(--crm-c-container-bg);
-  --crm-dash-header-bg: unset;
-  --crm-dash-header-bg2: unset;
-  --crm-dash-header-col: var(--crm-c-blue-darker);
-  --crm-dash-header-padding: unset;
-  --crm-dash-image-right: 20px;
+  --crm-contact-tabs-flow: column;
+  --crm-contact-tabs-gap: 0;
+  --crm-contact-tabs-bg: var(--crm-c-blue-overlay);
+  --crm-contact-tabs-padding: unset;
+  --crm-contact-tab-bg: transparent;
+  --crm-contact-tabs-radius: var(--crm-contact-radius) 0 0 var(--crm-contact-radius);
+  --crm-contact-tab-bg-hover: var(--crm-c-layer0-bg);
+  --crm-contact-tab-padding: var(--crm-m2) var(--crm-r1);
+  --crm-contact-tab-border: var(--crm-contact-border);
+  --crm-contact-tab-col: unset;
+  --crm-contact-tab-count-bg: var(--crm-c-primary);
+  --crm-contact-tab-count-col: var(--crm-c-text-light);
+  --crm-contact-tab-hang: 0 0 -1px 0;
+  --crm-contact-tab-radius: 0;
+  --crm-contact-heading-inset: unset;
+  --crm-contact-panel-padding: var(--crm-r2);
+  --crm-contact-panel-bg: var(--crm-c-layer0-bg);
+  --crm-contact-panel-radius: 0 var(--crm-contact-radius) var(--crm-contact-radius) 0;
+  --crm-contact-edit-border: 1px solid var(--crm-c-blue-dark);
+  --crm-contact-block-padding: var(--crm-m2);
+  --crm-contact-block-bg: var(--crm-c-container-bg);
+  --crm-contact-label-bg: var(--crm-c-container-bg);
+  --crm-contact-header-bg: unset;
+  --crm-contact-header-bg2: unset;
+  --crm-contact-header-col: var(--crm-c-blue-darker);
+  --crm-contact-header-padding: unset;
+  --crm-contact-image-right: 20px;
 }
 :root {
 /* Dialog */
@@ -264,7 +264,7 @@ html.cms-standalone body {
 }
 
 .crm-container details {
-  /* background-color: var(--crm-expand-body-bg); Removed for FormBuilder clashes */
+  /* background-color: var(--crm-accordion-body-bg); Removed for FormBuilder clashes */
   border: var(--crm-c-divider);
 }
 
@@ -285,9 +285,9 @@ html.cms-standalone body {
 .crm-container details>summary::before /* accordion8 (recommended) */,
 .crm-container .crm-accordion-header::before, /* accordion1, accordion2, accordion6 */
 .crm-container .crm-collapsible .collapsible-title::before /* accordion3 */ {
-  --crm-expand-icon: '';
+  --crm-accordion-icon: '';
   border: .4rem solid transparent;
-  border-left-color: var(--crm-expand-icon-color);
+  border-left-color: var(--crm-accordion-icon-color);
   position: absolute;
   margin-left: -1.5rem;
   margin-top: 0.2rem;
@@ -344,7 +344,7 @@ html.cms-standalone body {
 }
 .crm-container :is(details,
 .crm-accordion-wrapper)>.crm-accordion-body {
-  padding: var(--crm-expand-body-padding);
+  padding: var(--crm-accordion-body-padding);
   animation: crm-details-show 240ms ease-in-out;
 }
 /* We don't want a different colour header bg on 'active' (open) but we do on hover
@@ -357,7 +357,7 @@ html.cms-standalone body {
 
 /* Alternate backgrounds */
 /* .crm-container details:not(.crm-accordion-light) details:not(.crm-accordion-light) { */
-/*   --crm-expand-header-bg: var(--crm-c-blue-overlay2); */
+/*   --crm-accordion-header-bg: var(--crm-c-blue-overlay2); */
 /* } */
 
 
@@ -388,7 +388,7 @@ html.cms-standalone body {
 .crm-container :is(.status,
 .alert-warning,
 .messages.warning) {
-  --crm-roundness: 0.25rem;
+  --crm-s-radius: 0.25rem;
 }
 
 /* BUTTONS */
@@ -504,11 +504,11 @@ html.cms-standalone body {
 /* CONTACT SUMMARY */
 /* Ensure the Summary tab's top left corner matches the radius of the container */
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list>li:first-child a {
-  border-radius: var(--crm-dash-roundness) 0 0 0;
+  border-radius: var(--crm-contact-radius) 0 0 0;
 }
 
 .crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor:has(.crm-i) {
-  grid-template-columns: var(--crm-dash-icon-size) 1fr auto;
+  grid-template-columns: var(--crm-contact-icon-size) 1fr auto;
   gap: 1ch;
 }
 
@@ -813,7 +813,7 @@ html.crm-standalone  nav.breadcrumb>ol {
 
 /* Support contact dashboard image float */
 .contactCardRight:has(#crm-contact-thumbnail) .float-left {
-  width: calc(100% - var(--crm-flex-gap) - var(--crm-dash-image-size));
+  width: calc(100% - var(--crm-flex-gap) - var(--crm-contact-image-size));
 }
 
 /* Quicksearch */
