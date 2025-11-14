@@ -22,7 +22,7 @@
 
 /* Extension management */
 .crm-container #mainTabContainer:has(.crm-extensions-tabs-list) {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
   margin-top: var(--crm-padding-reg);
 }
 .crm-container #extensions-main,

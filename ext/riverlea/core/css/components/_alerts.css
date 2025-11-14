@@ -83,7 +83,7 @@
   float: right;
   padding: 0;
   border: 0;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   background: transparent;
   appearance: none;
   font-size: var(--crm-r1);

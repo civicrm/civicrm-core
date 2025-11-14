@@ -8,7 +8,7 @@
 .crm-container .nav.nav-pills li.navitem a {
   white-space: nowrap;
   touch-action: manipulation;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   background-image: none;
   border: var(--crm-btn-border);
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
@@ -209,7 +209,7 @@
 .crm-container a.crm-hover-button {
   border-radius: var(--crm-btn-radius);
   color: var(--crm-c-link);
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
   background-color: var(--crm-c-primary);
   color: var(--crm-c-primary-text);
@@ -221,7 +221,7 @@
   color: var(--crm-c-text);
   padding: var(--crm-btn-small-padding);
   margin: 0;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   border-radius: var(--crm-btn-radius);
   display: inline;
   line-height: 1.5;
@@ -256,7 +256,7 @@
 /* Action links */
 
 .crm-container .ui-widget-content .action-link .button {
-  box-shadow: var(--crm-block-shadow) !important;
+  box-shadow: var(--crm-shadow-block) !important;
   margin: var(--crm-m) 0;
 }
 
@@ -408,7 +408,7 @@
   padding-left: 12px;
 }
 #bootstrap-theme .btn-group.open .dropdown-toggle {
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
 }
 #bootstrap-theme .btn-group.open .dropdown-toggle.btn-link {
   box-shadow: none;

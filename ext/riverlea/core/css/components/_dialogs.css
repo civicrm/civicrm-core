@@ -4,7 +4,7 @@
   background: var(--crm-dialog-bg);
   border: 0;
   border-radius: var(--crm-dialog-radius);
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
   color: var(--crm-c-text);
   max-height: 90%;
   padding: var(--crm-dialog-padding);
@@ -161,7 +161,7 @@
 }
 #crm-notification-container div.ui-notify-message-style {
   background: var(--crm-notify-bg);
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
   color: var(--crm-notify-col);
   border-radius: var(--crm-notify-radius);
   padding: var(--crm-notify-padding);

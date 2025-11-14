@@ -303,7 +303,7 @@ select.crm-error {
 .crm-container .crm-inline-edit:hover,
 .crm-container .crm-editable-enabled:hover {
   border: var(--crm-contact-edit-border);
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 .crm-container .crm-editable-enabled.crm-editable-editing:hover {
   border-color: transparent;
@@ -364,7 +364,7 @@ input.crm-form-checkbox + label,
 .crm-container input[type="checkbox"] + label[for],
 .crm-container input[type="radio"] + label[for] {
   margin: 0 var(--crm-m) 0 var(--crm-s);
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   width: unset;
   font-weight: normal;
   font-family: var(--crm-font);
@@ -760,7 +760,7 @@ input.crm-form-checkbox) + label {
 #ui-datepicker-div {
   background: var(--crm-input-bg);
   border-radius: 0;
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
   min-width: 30ch;
   padding: var(--crm-m1);
   width: auto;
@@ -777,7 +777,7 @@ input.crm-form-checkbox) + label {
 #ui-datepicker-div :is(.ui-datepicker-prev,.ui-datepicker-next) {
   border-radius: var(--crm-s-radius);
   box-shadow: none;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   text-align: center;
   top: var(--crm-s3);
   border: 0 solid transparent;
@@ -789,7 +789,7 @@ input.crm-form-checkbox) + label {
 #ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next)::before {
   font-family: "FontAwesome";
   color: var(--text);
-  font-size: var(--crm-small-font-size);
+  font-size: var(--crm-font-small-size);
   line-height: var(--crm-l);
   padding: 0;
 }
@@ -811,14 +811,14 @@ input.crm-form-checkbox) + label {
 }
 #ui-datepicker-div .ui-datepicker-calendar thead th {
   color: var(--crm-c-text);
-  font-size: var(--crm-small-font-size);
+  font-size: var(--crm-font-small-size);
 }
 #ui-datepicker-div .ui-datepicker-calendar tr {
   border-bottom: none;
 }
 #ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) {
   border: 0;
-  font-size: var(--crm-small-font-size);
+  font-size: var(--crm-font-small-size);
   opacity: 1;
   padding: var(--crm-s);
 }
@@ -837,7 +837,7 @@ input.crm-form-checkbox) + label {
 #ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) a {
   border: 0;
   border-radius: 20px;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   padding: var(--crm-s);
   text-align: center;
   color: var(--crm-c-text);
@@ -855,7 +855,7 @@ input.crm-form-checkbox) + label {
 .crm-container .ui-spinner a.ui-spinner-button {
   width: var(--crm-r2);
   margin: 1px;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   color: var(--crm-c-link);
   border-radius: 0;
   border-left: 1px solid var(--crm-input-border-color);
@@ -934,7 +934,7 @@ input.crm-form-checkbox) + label {
   padding-left: 20px;
   margin-bottom: 0;
   font-weight: 400;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 #bootstrap-theme .radio + .radio,
 #bootstrap-theme .checkbox + .checkbox {
@@ -947,7 +947,7 @@ input.crm-form-checkbox) + label {
   margin-bottom: 0;
   font-weight: 400;
   vertical-align: middle;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 #bootstrap-theme .radio-inline + .radio-inline,
 #bootstrap-theme .checkbox-inline + .checkbox-inline {

@@ -2,7 +2,7 @@
 .crm-table-group-summary) {
   border: var(--crm-table-outside-border);
   background: var(--crm-table-bg);
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
   margin: 0 0 var(--crm-r);
   border-collapse: collapse;
   width: 100%;
@@ -132,7 +132,7 @@ tbody .crm-row-child td {
 }
 tbody .crm-row-child:hover td {
   background: color-mix(in srgb, var(--crm-table-inset-bg) 95%, #000 5%);
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 tbody .crm-row-child ~ .crm-row-child td {
   box-shadow: none;
@@ -146,7 +146,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   width: var(--crm-table-compressed-width);
   border: var(--crm-table-outside-border);
   background: var(--crm-table-bg);
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
   margin: var(--crm-m) 0 var(--crm-l);
 }
 .crm-container table.form-layout-compressed th {

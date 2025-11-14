@@ -4,9 +4,6 @@
 ****************************/
 
 :root {
-/* Fonts */
-  --crm-system-fonts: unset;
-  --crm-font: unset;
 /* Colour names */
   --crm-c-gray-900: #2f2f2e;
   --crm-c-gray-800: #3e3e3e;
@@ -86,10 +83,9 @@
   --crm-c-info-light: hsl(from var(--crm-c-info) h s calc(l + 67));
   --crm-c-info-on-page-bg: var(--crm-c-info);
 /* Shadows */
-  --crm-block-shadow: unset;
-  --crm-popup-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
-  --crm-bottom-shadow: 0 0 16px 1px rgba(0,0,0,.1);
-  --crm-body-inset: unset;
+  --crm-shadow-block: unset;
+  --crm-shadow-popup: 0 3px 18px 0 rgba(48,40,40,.25);
+  --crm-shadow-bottom: 0 0 16px 1px rgba(0,0,0,.1);
 /* Sizes */
   --crm-s-radius: 0.25rem;
   --crm-xs: 0.1rem;
@@ -120,18 +116,19 @@
   --crm-page-width: 100%; /* Default that CMS can overwrite */
   --crm-flex-gap: 0.5rem;
 /* Type */
+  --crm-font-system: unset;
+  --crm-font: unset;
   --crm-font-size: var(--crm-r);
-  --crm-small-font-size: var(--crm-m2);
-  --crm-type-line-height: 1.5;
+  --crm-font-small-size: var(--crm-m2);
+  --crm-font-line-height: 1.5;
   --crm-link-decoration: none;
   --crm-link-decoration-hover: underline;
+  --crm-link-hover-cursor: pointer;
   --crm-heading-bg: var(--crm-c-info-light);
   --crm-heading-col: var(--crm-c-info-on-dark);
   --crm-heading-padding: var(--crm-s1) var(--crm-m1);
   --crm-heading-margin: var(--crm-m) 0;
   --crm-heading-radius: var(--crm-s-radius);
-/* Mouse events */
-  --crm-hover-clickable: pointer;
 /* Buttons */
   --crm-btn-box-shadow: none;
   --crm-btn-border: 0 solid transparent;
@@ -186,7 +183,7 @@
   --crm-table-nested-border: var(--crm-c-divider);
   --crm-table-inset-bg: var(--crm-c-layer2-bg);
 /* Panels */
-  --crm-panel-shadow: var(--crm-block-shadow);
+  --crm-panel-shadow: var(--crm-shadow-block);
   --crm-panel-bg: var(--crm-c-layer0-bg);
   --crm-panel-border: var(--crm-c-divider);
   --crm-panel-head-margin: 0px;
@@ -241,7 +238,7 @@
   --crm-alert-danger-border: color-mix(in srgb, var(--crm-alert-danger-bg) 90%,#000 10%);
   --crm-alert-danger-text: var(--crm-c-danger);
 /* Form */
-  --crm-form-block-box-shadow: var(--crm-block-shadow);
+  --crm-form-block-box-shadow: var(--crm-shadow-block);
   --crm-form-block-bg: var(--crm-c-container-bg);
   --crm-form-block-padding: var(--crm-m);
   --crm-form-block-border-radius: var(--crm-s-radius);
@@ -348,7 +345,7 @@
   --crm-dialog-padding: var(--crm-s);
   --crm-dialog-radius: var(--crm-s-radius);
   --crm-dialog-line: unset;
-  --crm-dialog-inner-shadow: var(--crm-bottom-shadow);
+  --crm-dialog-inner-shadow: var(--crm-shadow-bottom);
   --crm-dialog-header-bg: var(--crm-c-secondary);
   --crm-dialog-header-col: var(--crm-c-secondary-text);
   --crm-dialog-header-size: var(--crm-r1);
@@ -362,7 +359,7 @@
   --crm-dashlet-border: unset;
   --crm-dashlet-bg: var(--crm-c-layer0-bg);
   --crm-dashlet-padding: var(--crm-s2);
-  --crm-dashlet-box-shadow: var(--crm-popup-shadow);
+  --crm-dashlet-box-shadow: var(--crm-shadow-popup);
   --crm-dashlet-dashlets-bg: var(--crm-c-container-bg);
   --crm-dashlet-header-bg: var(--crm-accordion-header-bg);
   --crm-dashlet-header-col: var(--crm-accordion-header-color);
@@ -431,7 +428,7 @@
   --crm-filter-spacing: space-between; /* choose 'space-between' to spread out evenly, 'start' for left align, or 'end' for right. */
 /* Frontend */
   --crm-f-form-width: 800px;
-  --crm-f-box-shadow: var(--crm-block-shadow);
+  --crm-f-box-shadow: var(--crm-shadow-block);
   --crm-f-fieldset-bg: var(--crm-c-page-bg);
   --crm-f-fieldset-padding: var(--crm-r) 0;
   --crm-f-fieldset-margin: 0 0 var(--crm-padding-reg) 0;

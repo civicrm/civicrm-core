@@ -6,7 +6,7 @@
 .crm-container summary {
   display: list-item;
   list-style: none;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   font-size: var(--crm-font-size);
   font-weight: var(--crm-accordion-header-weight);
   color: var(--crm-c-text);
@@ -144,7 +144,7 @@
   color: var(--crm-c-text);
 }
 #contact-summary details .crm-summary-block {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
   margin-bottom: 0;
 }
 #contact-summary summary {

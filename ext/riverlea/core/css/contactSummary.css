@@ -39,7 +39,7 @@
   display: block;
   background-size: cover;
   border-radius: var(--crm-contact-image-radius);
-  box-shadow: var(--crm-bottom-shadow);
+  box-shadow: var(--crm-shadow-bottom);
   overflow: hidden;
   border: var(--crm-contact-image-border);
 }
@@ -114,7 +114,7 @@
   display: none;
 }
 .crm-container span.crm-custom-greeting {
-  font-size: var(--crm-small-font-size);
+  font-size: var(--crm-font-small-size);
 }
 .crm-container table.crm-inline-edit-form td,
 .crm-container div.crm-inline-edit-form {
@@ -161,7 +161,7 @@ div.crm-inline-edit-form div.crm-clear {
 }
 #contactname-block .crm-inline-edit.form {
   left: 0;
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
 }
 #contactname-block .crm-inline-edit .crm-container {
   overflow: scroll !important; /* vs inline css */
@@ -322,7 +322,7 @@ div.crm-inline-edit-form div.crm-clear {
   margin-top: 5px;
 }
 #tagtree ins.jstree-icon {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   position: relative;
   top: -3px;
 }
@@ -350,13 +350,13 @@ div.crm-inline-edit-form div.crm-clear {
   background-color: var(--crm-c-layer2-bg);
 }
 #crm-main-content-wrapper:has(.crm-contact-page) {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 .crm-contact-page .crm-summary-block {
   display: flow-root; /* to keep block position during edit */
   background: var(--crm-contact-block-bg);
   border-radius: var(--crm-s-radius);
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
   margin-bottom: var(--crm-contact-panel-padding);
   container-name: crm-summary-block;
   container-type: inline-size;

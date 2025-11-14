@@ -301,7 +301,7 @@
 }
 .crm-search .form-control label,
 .crm-search legend[ng-click] {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 .crm-search .api4-input-group {
   display: inline-block;
@@ -368,7 +368,7 @@ crm-search-admin-tags.btn-group-xs .crm-search-admin-tags-btn-label {
 }
 /* .dropdown-menu li > * > label {
     font-weight: normal;
-    cursor: var(--crm-hover-clickable);
+    cursor: var(--crm-link-hover-cursor);
 } */
 .crm-container .crm-container .dropdown-menu li .form-inline > select {
   max-width: 120px;

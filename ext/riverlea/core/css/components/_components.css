@@ -343,7 +343,7 @@ table.advmultiselect {
 .crm-container a.badge:focus {
   color: white;
   text-decoration: none;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 
 /* Footer */

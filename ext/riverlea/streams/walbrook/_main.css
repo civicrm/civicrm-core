@@ -4,9 +4,6 @@
 */
 
 :root {
-/* Fonts */
-  --crm-system-fonts: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
-  --crm-font: "Inter", "Open Sans", var(--crm-system-fonts);
 /* Colour names */
   --crm-c-gray-900: #222831;
   --crm-c-gray-800: #393a3f;
@@ -57,14 +54,15 @@
   --crm-c-info-light: var(--crm-c-blue-light);
   --crm-c-info-on-page-bg: var(--crm-c-blue-darker);
 /* Shadows */
-  --crm-block-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
-  --crm-popup-shadow: var(--crm-block-shadow);
-  --crm-body-inset: inset 0 10px 8px -10px rgba(0,0,0,.15),inset 0 -11px 8px -9px rgba(0,0,0,.15);
+  --crm-shadow-block: 0 3px 18px 0 rgba(48,40,40,.25);
+  --crm-shadow-popup: var(--crm-shadow-block);
 /* Sizes */
   --crm-s-radius: 2px;
   --crm-padding-inset: 0; /* to support flush theme variations */
   --crm-page-padding: 0; /* Margin left/right */
 /* Type */
+  --crm-font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
+  --crm-font: "Inter", "Open Sans", var(--crm-font-system);
   --crm-link-decoration-hover: none;
   --crm-heading-bg: var(--crm-c-layer2-bg);
   --crm-heading-col: var(--crm-c-text-dark);
@@ -100,7 +98,7 @@
   --crm-accordion-border: unset;
   --crm-accordion-border-width: unset;
   --crm-accordion-body-bg: transparent;
-  --crm-accordion-body-box-shadow: var(--crm-body-inset);
+  --crm-accordion-body-box-shadow: inset 0 10px 8px -10px rgba(0,0,0,.15),inset 0 -11px 8px -9px rgba(0,0,0,.15);
 /* .crm-accordion-light */
   --crm-accordion2-header-bg: var(--crm-c-primary);
   --crm-accordion2-header-bg-active: var(--crm-c-primary-hover);
