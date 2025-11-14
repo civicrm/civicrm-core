@@ -19,7 +19,7 @@
   border: var(--crm-dashlet-border);
 }
 .crm-container .ui-sortable-helper.crm-dashlet {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 .crm-container .crm-dashlet-header {
   background-color: var(--crm-dashlet-header-bg);
@@ -49,7 +49,7 @@
   padding: var(--crm-xs) var(--crm-s);
   text-decoration: none;
   font-size: var(--crm-font-size);
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   opacity: .7;
   float: right;
 }
@@ -109,7 +109,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   display: inline-block;
   width: 340px;
   height: var(--crm-xxl);
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
   background-color: color-mix(in srgb, var(--crm-dashlet-bg) 90%, #fff 10%);
   border-radius: var(--crm-dashlet-radius);
   margin: 0;

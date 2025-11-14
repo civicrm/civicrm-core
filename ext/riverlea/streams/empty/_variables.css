@@ -40,7 +40,6 @@
 */
 
 :root {
-/* Fonts '--crm-font-' */
 /* Colour names, e.g. green, red, blue '--crm-c-' */
 /* Practical colours, e.g. text, link '--crm-c-' */
   --crm-c-text-light: #fff;
@@ -51,7 +50,7 @@
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
 /* Shadows */
 /* Sizes */
-/* Type */
+/* Type - fonts, link, heading */
 /* Mouse events */
 /* Buttons '--crm-btn-' */
 /* Tables '--crm-table-' */

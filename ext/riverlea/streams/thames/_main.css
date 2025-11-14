@@ -11,10 +11,6 @@
 */
 
 :root {
-/* FONTS */
-  --crm-font: Lato, sans-serif;
-}
-:root {
 /* COLOUR NAMES */
   --crm-c-blue-overlay2: #edf4f7; /* thames only */
   --crm-c-blue-overlay: #dce9ef; /* thames only */
@@ -55,13 +51,14 @@
   --crm-r-2: 0.25em;
   --crm-r-1: 3px;
 /* SHADOWS */
-  --crm-popup-shadow: 3px 3px 18px 0 rgba(0, 0, 0,.25);
-  --crm-bottom-shadow: unset;
+  --crm-shadow-popup: 3px 3px 18px 0 rgba(0, 0, 0,.25);
+  --crm-shadow-bottom: unset;
 /* SIZES - temporary */
   --crm-s-radius: 0; /* thames - this gets applied in too many places; so setting to 0 and positively re-applying, rather than using this and negatively unapplying. */
 /* thames: on standalone the following is overridden in cms.css */
   --crm-page-padding: clamp(0.5rem 2vw 4rem); /* Margin left/right */
 /* Type */
+  --crm-font: Lato, sans-serif;
   --crm-heading-bg: unset;
   --crm-heading-col: var(--crm-c-text-dark);
   --crm-heading-padding: var(--crm-s1) var(--crm-m1); /* thames unset this? todo */

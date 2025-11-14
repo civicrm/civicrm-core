@@ -15,7 +15,7 @@
   --crm-c-danger-on-page-bg: var(--crm-c-danger-light);
   --crm-c-info-on-page-bg: var(--crm-c-info-light);
 /* Shadows */
-  --crm-popup-shadow: 0 3px 18px 0 rgb(0,0,0);
+  --crm-shadow-popup: 0 3px 18px 0 rgb(0,0,0);
 /* Sizes */
 /* Type */
   --crm-heading-col: var(--crm-c-text-light);

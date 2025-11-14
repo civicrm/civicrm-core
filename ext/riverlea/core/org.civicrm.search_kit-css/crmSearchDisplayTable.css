@@ -46,7 +46,7 @@ table.crm-sticky-header > thead > tr {
 }
 .crm-search-display-table table {
   border: var(--crm-table-outside-border);
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 
 /* Nested styling for hierarchical rows */

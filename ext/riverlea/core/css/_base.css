@@ -167,7 +167,7 @@ body {
 .crm-container p,
 .crm-container ul {
   font-size: var(--crm-font-size);
-  line-height: var(--crm-type-line-height);
+  line-height: var(--crm-font-line-height);
   color: var(--crm-c-text);
 }
 

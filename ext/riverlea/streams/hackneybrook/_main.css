@@ -4,8 +4,6 @@
 */
 
 :root {
-  /* Fonts */
-  --crm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
   /* Colour names */
   --crm-c-gray-025: #f9f9f9;
   --crm-c-green-light: #cff0be;
@@ -28,6 +26,7 @@
   --crm-c-secondary-on-page-bg: var(--crm-c-gray-900);
   --crm-c-info: var(--crm-c-blue-darker);
   /* Type */
+  --crm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
   --crm-heading-padding: var(--crm-s2) var(--crm-m2);
   /* Buttons */
   --crm-btn-border: 1px solid var(--crm-c-gray-300);

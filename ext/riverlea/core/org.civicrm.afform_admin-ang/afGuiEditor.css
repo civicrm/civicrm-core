@@ -4,7 +4,7 @@
 
 /* List page */
 .afadmin-list th[ng-click] {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 .afadmin-list th i.fa-sort-desc,
 .afadmin-list th i.fa-sort-asc {
@@ -543,7 +543,7 @@ af-gui-container > .af-gui-bar,
   top: 0;
 }
 .af-gui-conditional-dialog legend[ng-click] {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 i.crm-i.af-gui-conditional-dialog-move-icon {
   opacity: .5;
@@ -609,7 +609,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 #afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown label,
 #afGuiEditor .dropdown-menu li > * > label {
   font-weight: normal;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   color: var(--crm-dropdown-col);
 }
 #afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {

@@ -24,7 +24,7 @@
   --crm-c-primary-hover: var(--crm-c-gray-600);
   --crm-c-primary-text: var(--crm-c-text);
 /* Shadows */
-  --crm-block-shadow: 0;
+  --crm-shadow-block: 0;
 /* Sizes */
 /* Type */
   --crm-heading-bg: var(--crm-c-blue-dark);

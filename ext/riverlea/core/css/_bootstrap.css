@@ -1714,7 +1714,7 @@ fieldset[disabled] #bootstrap-theme .form-control {
 #bootstrap-theme input[type="reset"],
 #bootstrap-theme input[type="submit"] {
   -webkit-appearance: button;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 #bootstrap-theme button[disabled],
 #bootstrap-theme html input[disabled] {
@@ -1726,7 +1726,7 @@ fieldset[disabled] #bootstrap-theme .form-control {
   padding: 0;
 }
 #bootstrap-theme [role="button"] {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 #bootstrap-theme .input-group-btn {
   position: relative;
@@ -2979,13 +2979,13 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme .close:focus {
   color: black;
   text-decoration: none;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   filter: alpha(opacity=50);
   opacity: .5;
 }
 #bootstrap-theme button.close {
   padding: 0;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   background: transparent;
   border: 0;
   height: auto;
@@ -3396,7 +3396,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.label:hover,
 #bootstrap-theme a.label:focus {
   text-decoration: none;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 #bootstrap-theme .label-default {
   background: var(--crm-c-darkest);

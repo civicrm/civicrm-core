@@ -7,7 +7,7 @@
 }
 .crmMailing-recip-est {
   background: var(--crm-c-yellow-light);
-  font-size: var(--crm-small-font-size);
+  font-size: var(--crm-font-small-size);
   padding: var(--crm-padding-small);
   margin: 0 0 0 var(--crm-m);
   width: var(--crm-big-input);

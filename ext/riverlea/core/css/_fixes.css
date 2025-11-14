@@ -26,7 +26,7 @@
 }
 .accordion.ui-accordion.ui-widget.ui-helper-reset {
   border: 0 solid transparent;
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 
 /* Expand/collapse icons */
@@ -54,7 +54,7 @@ details.af-collapsible > .af-title::before,
   display: inline-block;
   transform-origin: center center;
   content: var(--crm-accordion-icon);
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 .crm-container .collapsed .crm-accordion-header::before,
 .crm-accordion-wrapper.collapsed .crm-master-accordion-header:before,
@@ -102,7 +102,7 @@ a.crm-expand-row:focus {
 .crm-container .crm-collapsible .collapsible-title,
 .af-collapsible > summary.af-title,
 .crm-container span.collapsed:not(.show-children) {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   padding: var(--crm-accordion-header-padding);
   border-radius: var(--crm-accordion-radius) var(--crm-accordion-radius) 0 0;
   background-color: var(--crm-accordion-header-bg);
@@ -193,7 +193,7 @@ a.crm-expand-row:focus {
   white-space: nowrap;
   vertical-align: middle;
   touch-action: manipulation;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   background-image: none;
   border: var(--crm-btn-border);
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
@@ -298,13 +298,13 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-container .btn-group-xs > a.button,
 .crm-container .btn-group-xs > input[type="button"] {
   padding: var(--crm-btn-small-padding);
-  font-size: var(--crm-small-font-size);
+  font-size: var(--crm-font-small-size);
   border-radius: var(--crm-s-radius);
   height: auto;
 }
 .crm-container .btn-group-xs button {
   padding: var(--crm-xs) var(--crm-s);
-  font-size: var(--crm-small-font-size);
+  font-size: var(--crm-font-small-size);
 }
 /* select all 'checkbox' on table th */
 .crm-container button.btn:has(.fa-square-o),
@@ -390,7 +390,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   display: none;
 }
 #crm-status-list {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 
 /******************
@@ -428,7 +428,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   position: relative;
   background: var(--crm-c-container-bg);
   border: 0 solid transparent;
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
   padding: var(--crm-padding-reg);
   font-family: var(--crm-font);
   border-radius: var(--crm-s-radius);
@@ -465,7 +465,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 }
 /* CiviContribute dashboard */
 .crm-container #ContributionCharts #mainTabContainer {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 .crm-container #ContributionCharts .ui-tabs-nav {
   gap: 1px; /* to handle white space in markup */
@@ -627,7 +627,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
   display: grid;
   background: var(--crm-c-container-bg);
   border: 0 solid transparent;
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
   padding: var(--crm-padding-reg);
   gap: var(--crm-m);
   margin-bottom: var(--crm-r);

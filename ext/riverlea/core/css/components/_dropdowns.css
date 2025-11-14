@@ -34,7 +34,7 @@
   background-color: var(--crm-dropdown-2-bg);
   color: var(--crm-dropdown-2-col);
   border-radius: var(--crm-s-radius);
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
   padding: var(--crm-dropdown-2-padding);
   min-width: var(--crm-dropdown-width);
 }
@@ -109,7 +109,7 @@
   background: var(--crm-dropdown-bg);
   border-radius: var(--crm-s-radius);
   border: var(--crm-dropdown-border);
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
 }
 .crm-container .btn-slide ul.panel::before,
 .crm-container .btn-group .dropdown-menu::before {
@@ -142,7 +142,7 @@
   text-decoration: none;
   padding: var(--crm-s);
   display: block;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   color: var(--crm-dropdown-col);
   text-align: left;
 }
@@ -177,7 +177,7 @@
   display: block;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip {
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
   background: var(--crm-c-container-bg);
   border-radius: var(--crm-s-radius);
 }
@@ -269,7 +269,7 @@
   background-clip: padding-box;
   border: var(--crm-dropdown-border);
   border-radius: var(--crm-s-radius);
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
 }
 .crm-container .crm-search .api4-add-where-group-menu {
   min-width: 80px;
@@ -399,7 +399,7 @@
   border: 1px solid var(--crm-dropdown-border);
   border: 1px solid rgba(0, 0, 0, .15);
   border-radius: var(--crm-s-radius);
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
 }
 .crm-container .dropdown-menu.dropdown-menu-right {
   right: 0;
@@ -438,7 +438,7 @@
   background-color: var(--crm-dropdown-bg) !important;
   border: 1px solid var(--crm-dropdown-border) !important;
   border-radius: var(--crm-s-radius);
-  box-shadow: var(--crm-popup-shadow) !important;
+  box-shadow: var(--crm-shadow-popup) !important;
   padding: var(--crm-dropdown-padding) !important;
 }
 .vakata-context li > a {

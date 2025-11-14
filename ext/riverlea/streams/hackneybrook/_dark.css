@@ -27,7 +27,7 @@
   --crm-c-primary-text: var(--crm-c-text);
   --crm-c-secondary: var(--crm-c-layer1-bg);
 /* Shadows */
-  --crm-block-shadow: 0;
+  --crm-shadow-block: 0;
 /* Sizes */
 /* Type */
   --crm-heading-bg: #354b55;
