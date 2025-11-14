@@ -36,19 +36,19 @@
   --crm-table-row-hover: var(--crm-c-amber);
 /* Panels '--crm-panel-' */
   --crm-panel-border-col: var(--crm-c-gray-200);
-/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
-  --crm-expand-header-bg: var(--crm-c-layer2-bg);
-  --crm-expand-header-bg-active: var(--crm-c-gray-600);
+/* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
+  --crm-accordion-header-bg: var(--crm-c-layer2-bg);
+  --crm-accordion-header-bg-active: var(--crm-c-gray-600);
 /* Alerts '--crm-alert' */
 /* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
   --crm-form-block-bg: var(--crm-c-layer1-bg);
   --crm-input-border-color: var(--crm-c-gray-200);
   --crm-input-radio-color: #38c4b4;
 /* Tabs '--crm-tabs'/
-/* Contact layout '--crm-dash-' */
-  --crm-dash-header-bg: transparent;
-  --crm-dash-block-bg: var(--crm-c-layer1-bg);
-  --crm-dash-panel-bg: #414141;
+/* Contact layout '--crm-contact-' */
+  --crm-contact-header-bg: transparent;
+  --crm-contact-block-bg: var(--crm-c-layer1-bg);
+  --crm-contact-panel-bg: #414141;
 /* Dialog '--crm-dialog-' */
   --crm-dialog-header-bg: var(--crm-c-layer1-bg);
   --crm-dialog-body-bg: var(--crm-c-layer1-bg);

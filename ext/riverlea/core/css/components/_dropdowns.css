@@ -33,7 +33,7 @@
 .vakata-context {
   background-color: var(--crm-dropdown-2-bg);
   color: var(--crm-dropdown-2-col);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   box-shadow: var(--crm-popup-shadow);
   padding: var(--crm-dropdown-2-padding);
   min-width: var(--crm-dropdown-width);
@@ -75,7 +75,7 @@
 #crm-create-new-list ul a {
   color: var(--crm-c-secondary-text);
   padding: var(--crm-xs2) var(--crm-s);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   display: block;
 }
 #crm-contact-actions-list ul a:is(:hover,:focus),
@@ -107,7 +107,7 @@
   margin: var(--crm-m) 0;
   min-width: var(--crm-dropdown-width);
   background: var(--crm-dropdown-bg);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   border: var(--crm-dropdown-border);
   box-shadow: var(--crm-popup-shadow);
 }
@@ -179,7 +179,7 @@
 .crm-container .crm-tooltip-wrapper .crm-tooltip {
   box-shadow: var(--crm-popup-shadow);
   background: var(--crm-c-container-bg);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 .crm-container .crm-tooltip-active:not(.crm-tooltip-down) .crm-tooltip-wrapper::after {
   border-top: 10px solid var(--crm-c-container-bg);
@@ -268,7 +268,7 @@
   background-color: var(--crm-dropdown-bg);
   background-clip: padding-box;
   border: var(--crm-dropdown-border);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   box-shadow: var(--crm-popup-shadow);
 }
 .crm-container .crm-search .api4-add-where-group-menu {
@@ -290,14 +290,14 @@
   color: var(--crm-dropdown-col);
 }
 .crm-container .dropdown-menu > li {
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 .crm-container .dropdown-menu > li > a {
   display: block;
   padding: var(--crm-dropdown-padding);
   clear: both;
   color: var(--crm-dropdown-col);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   white-space: nowrap;
 }
 .crm-container .dropdown-menu > li:not(.disabled) > a i.crm-i {
@@ -312,7 +312,7 @@
   color: var(--crm-dropdown-hover) !important; /* vs BS .btn-secondary:hover */
   background-color: var(--crm-dropdown-hover-bg);
   text-decoration: none;
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 .crm-container .dropdown-menu > li:not(.disabled) > a:hover i.crm-i,
 .crm-container .dropdown-menu > li:not(.disabled) > a:focus i.crm-i {
@@ -398,7 +398,7 @@
   background-clip: padding-box;
   border: 1px solid var(--crm-dropdown-border);
   border: 1px solid rgba(0, 0, 0, .15);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   box-shadow: var(--crm-popup-shadow);
 }
 .crm-container .dropdown-menu.dropdown-menu-right {
@@ -437,7 +437,7 @@
   min-width: var(--crm-dropdown-width);
   background-color: var(--crm-dropdown-bg) !important;
   border: 1px solid var(--crm-dropdown-border) !important;
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   box-shadow: var(--crm-popup-shadow) !important;
   padding: var(--crm-dropdown-padding) !important;
 }
@@ -448,7 +448,7 @@
   font-weight: normal !important;
   padding: 0 !important;
   border: 0 !important;
-  border-radius: var(--crm-roundness) !important;
+  border-radius: var(--crm-s-radius) !important;
 }
 .vakata-context li > a:hover,
 .vakata-context .vakata-context-hover > a {

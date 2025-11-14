@@ -4,7 +4,7 @@
 .crm-container .listing-box-tall,
 .crm-container ul.crm-checkbox-list {
   width: auto;
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   max-width: 30rem;
   height: 7.25rem;
   overflow: auto;
@@ -203,13 +203,13 @@ table.advmultiselect {
 .crm-container .panel {
   box-shadow: var(--crm-panel-shadow);
   border: var(--crm-panel-border);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   margin-bottom: calc(var(--crm-r) + var(--crm-panel-head-margin));
   background: transparent;
 }
 .crm-container .panel-heading {
   padding: var(--crm-m2) var(--crm-padding-reg);
-  border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+  border-radius: var(--crm-s-radius) var(--crm-s-radius) 0 0;
   border-bottom: var(--crm-panel-border);
 }
 .crm-container .panel-heading > .dropdown .dropdown-toggle {
@@ -219,7 +219,7 @@ table.advmultiselect {
   padding: var(--crm-padding-reg);
   background: var(--crm-panel-bg);
   box-shadow: none;
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 .crm-container .panel-body:before, #bootstrap-theme .panel-body:after {
   display: table;
@@ -241,7 +241,7 @@ table.advmultiselect {
   padding: var(--crm-padding-reg);
   background: var(--crm-panel-bg);
   border-top: var(--crm-panel-border);
-  border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
+  border-radius: 0 0 var(--crm-s-radius) var(--crm-s-radius);
   box-shadow: var(--crm-panel-shadow);
 }
 .crm-container .panel-default > .panel-heading {
@@ -365,7 +365,7 @@ table.advmultiselect {
   font-size: var(--crm-m2);
 }
 .crm-container #civicrm-footer .status {
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   padding: var(--crm-btn-small-padding);
   border-color: transparent;
 }
@@ -430,7 +430,7 @@ p.crm-upgrade-large-text:first-of-type {
   background: var(--crm-c-layer1-bg);
   padding: var(--crm-padding-reg);
   margin-block: var(--crm-r);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   display: inline-flex;
   flex-direction: row-reverse;
   justify-content: space-between;
@@ -586,7 +586,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #CKEditorConfig .cke_ltr.cke_button.cke_toolgroup {
   width: 30px;
   height: 30px;
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   background: var(--crm-c-container-bg);
 }
 #CKEditorConfig .move {
@@ -615,7 +615,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   background-color: var(--crm-input-bg);
   list-style-type: none;
   position: relative;
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 #crm-recently-viewed .crm-recentview-wrapper a {
   opacity: 0.6;

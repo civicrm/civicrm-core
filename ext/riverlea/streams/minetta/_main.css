@@ -15,5 +15,5 @@
 /* Custom CSS */
 
 .contactCardRight:has(#crm-contact-thumbnail) .float-left {
-  width: calc(100% - var(--crm-flex-gap) - var(--crm-dash-image-size));
+  width: calc(100% - var(--crm-flex-gap) - var(--crm-contact-image-size));
 }

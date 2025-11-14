@@ -52,8 +52,8 @@ af-form {
 
 /* Accordion */
 .crm-container details.af-container {
-  border: var(--crm-expand-border);
-  border-radius: var(--crm-expand-radius);
+  border: var(--crm-accordion-border);
+  border-radius: var(--crm-accordion-radius);
   padding-block: 0;
 }
 details.af-container > *:not(summary) { /* adds padding to Afform internal details */

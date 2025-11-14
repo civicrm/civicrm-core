@@ -186,7 +186,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   font-family: "Font Awesome 6 Free", "FontAwesome";
   font-style: normal;
   text-rendering: auto;
-  font-size: var(--crm-dash-icon-size);
+  font-size: var(--crm-contact-icon-size);
   content: var(--crm-icon-sort);
   color: var(--crm-table-sort-col);
   cursor: var(--crm-hover-clickable);
@@ -345,7 +345,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   font-family: "Font Awesome 6 Free", "FontAwesome";
   font-style: normal;
   text-rendering: auto;
-  font-size: var(--crm-dash-icon-size);
+  font-size: var(--crm-contact-icon-size);
   display: inline-block;
   content: '\f09d';
   font-size: 2.5rem;

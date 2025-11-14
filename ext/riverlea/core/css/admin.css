@@ -68,7 +68,7 @@
   background: var(--crm-alert-warning-bg);
   border: 1px solid var(--crm-alert-warning-border);
   padding: var(--crm-padding-small);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   color: var(--crm-alert-warning-text);
 }
 .crm-container .crm-extensions-version {

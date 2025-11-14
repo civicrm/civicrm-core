@@ -11,7 +11,7 @@
   color: var(--crm-alert-success-text);
   margin: var(--crm-alert-margin);
   padding: var(--crm-alert-padding);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 .crm-container .help > *:first-child {
   margin-top: 0;

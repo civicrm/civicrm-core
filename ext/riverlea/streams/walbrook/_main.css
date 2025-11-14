@@ -61,7 +61,7 @@
   --crm-popup-shadow: var(--crm-block-shadow);
   --crm-body-inset: inset 0 10px 8px -10px rgba(0,0,0,.15),inset 0 -11px 8px -9px rgba(0,0,0,.15);
 /* Sizes */
-  --crm-roundness: 2px;
+  --crm-s-radius: 2px;
   --crm-padding-inset: 0; /* to support flush theme variations */
   --crm-page-padding: 0; /* Margin left/right */
 /* Type */
@@ -88,28 +88,28 @@
   --crm-panel-head-margin: var(--crm-m2);
   --crm-panel-head-height: 48px;
 /* Accordions */
-  --crm-expand-icon: "\f105"; /* unicode value for FontAwesome icon */
-  --crm-expand-icon-color: unset;
-  --crm-expand-icon-spacing: var(--crm-m3);
-  --crm-expand-gap: 0;
+  --crm-accordion-icon: "\f105"; /* unicode value for FontAwesome icon */
+  --crm-accordion-icon-color: unset;
+  --crm-accordion-icon-spacing: var(--crm-m3);
+  --crm-accordion-gap: 0;
 /* .crm-accordion-bold */
-  --crm-expand-header-bg: var(--crm-c-layer1-bg);
-  --crm-expand-header-bg-active: var(--crm-c-layer2-bg);
-  --crm-expand-header-color: var(--crm-c-text);
-  --crm-expand-header-padding: var(--crm-m2) var(--crm-m3);
-  --crm-expand-border: unset;
-  --crm-expand-border-width: unset;
-  --crm-expand-body-bg: transparent;
-  --crm-expand-body-box-shadow: var(--crm-body-inset);
+  --crm-accordion-header-bg: var(--crm-c-layer1-bg);
+  --crm-accordion-header-bg-active: var(--crm-c-layer2-bg);
+  --crm-accordion-header-color: var(--crm-c-text);
+  --crm-accordion-header-padding: var(--crm-m2) var(--crm-m3);
+  --crm-accordion-border: unset;
+  --crm-accordion-border-width: unset;
+  --crm-accordion-body-bg: transparent;
+  --crm-accordion-body-box-shadow: var(--crm-body-inset);
 /* .crm-accordion-light */
-  --crm-expand2-header-bg: var(--crm-c-primary);
-  --crm-expand2-header-bg-active: var(--crm-c-primary-hover);
-  --crm-expand2-header-weight: bold;
-  --crm-expand2-header-color: var(--crm-c-primary-text);
-  --crm-expand2-header-padding: var(--crm-expand-header-padding);
-  --crm-expand2-border: 0;
-  --crm-expand2-body-bg: transparent;
-  --crm-expand2-body-padding: 0;
+  --crm-accordion2-header-bg: var(--crm-c-primary);
+  --crm-accordion2-header-bg-active: var(--crm-c-primary-hover);
+  --crm-accordion2-header-weight: bold;
+  --crm-accordion2-header-color: var(--crm-c-primary-text);
+  --crm-accordion2-header-padding: var(--crm-accordion-header-padding);
+  --crm-accordion2-border: 0;
+  --crm-accordion2-body-bg: transparent;
+  --crm-accordion2-body-padding: 0;
 /* Alerts */
   --crm-alert-padding: var(--crm-r) var(--crm-r2);
   --crm-alert-success-text: var(--crm-c-success-on-page-bg);
@@ -121,7 +121,7 @@
   --crm-input-bg: var(--crm-c-container-bg);
   --crm-input-bg-image: none;
   --crm-input-border-color: #c2cfd8;
-  --crm-input-border-radius: var(--crm-roundness);
+  --crm-input-border-radius: var(--crm-s-radius);
   --crm-input-box-shadow: inset 0 0 3px 0 rgba(0,0,0,.2);
   --crm-input-padding: var(--crm-xs1) var(--crm-m1);
   --crm-input-label-weight: bold;
@@ -134,7 +134,7 @@
   --crm-tabs-bg: var(--crm-c-layer1-bg);
   --crm-tabs-padding: var(--crm-m) var(--crm-m) 0 var(--crm-m);
   --crm-tabs-border: var(--crm-c-divider);
-  --crm-tab-roundness: 2px 2px 0 0;
+  --crm-tab-radius: 2px 2px 0 0;
   --crm-tab-bg-hover: var(--crm-c-layer0-bg);
   --crm-tab-bg-active: var(--crm-c-container-bg);
   --crm-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
@@ -144,40 +144,40 @@
   --crm-tab-count-col: var(--crm-c-text);
   --crm-tab-border-active: var(--crm-c-divider);
 /* Contact dashboard */
-  --crm-dash-border: 0 solid transparent;
-  --crm-dash-roundness: 0;
-  --crm-dash-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
+  --crm-contact-border: 0 solid transparent;
+  --crm-contact-radius: 0;
+  --crm-contact-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
   --crm-side-tabs-width: 220px;
-  --crm-dash-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
-  --crm-dash-tabs-gap: 0;
-  --crm-dash-tabs-bg: var(--crm-c-container-bg);
-  --crm-dash-tabs-padding: unset;
-  --crm-dash-tab-bg: transparent;
-  --crm-dash-tab-bg-hover: var(--crm-c-layer2-bg);
-  --crm-dash-tab-padding: var(--crm-r) var(--crm-r1);
-  --crm-dash-tab-border: var(--crm-dash-border);
-  --crm-dash-tab-border-hover: unset;
-  --crm-dash-tab-col: unset;
-  --crm-dash-tab-count-bg: var(--crm-c-primary);
-  --crm-dash-tab-count-col: var(--crm-c-text-light);
-  --crm-dash-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
-  --crm-dash-icon-size: var(--crm-m2);
-  --crm-dash-box-shadow: inset 0 3px 18px -5px rgba(0, 0, 0, 0.25);
-  --crm-dash-panel-padding: var(--crm-r2);
-  --crm-dash-edit-border: 1px dashed var(--crm-c-gray-900);
-  --crm-dash-block-padding: var(--crm-m2);
-  --crm-dash-block-bg: var(--crm-c-container-bg);
-  --crm-dash-label-bg: var(--crm-c-container-bg);
-  --crm-dash-header-bg: var(--crm-c-gray-900);
-  --crm-dash-header-bg2: var(--crm-c-gray-800);
-  --crm-dash-header-col: var(--crm-c-text-light);
-  --crm-dash-header-size: var(--crm-l);
-  --crm-dash-header-padding: var(--crm-r) var(--crm-r1);
-  --crm-dash-image-size: 100px;
-  --crm-dash-image-radius: 200px;
-  --crm-dash-image-right: 30px; /* distance from right of dashboard */
-  --crm-dash-image-top: 30px; /* distance from top of dashboard */
-  --crm-dash-image-border: 2px solid #fff;
+  --crm-contact-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
+  --crm-contact-tabs-gap: 0;
+  --crm-contact-tabs-bg: var(--crm-c-container-bg);
+  --crm-contact-tabs-padding: unset;
+  --crm-contact-tab-bg: transparent;
+  --crm-contact-tab-bg-hover: var(--crm-c-layer2-bg);
+  --crm-contact-tab-padding: var(--crm-r) var(--crm-r1);
+  --crm-contact-tab-border: var(--crm-contact-border);
+  --crm-contact-tab-border-hover: unset;
+  --crm-contact-tab-col: unset;
+  --crm-contact-tab-count-bg: var(--crm-c-primary);
+  --crm-contact-tab-count-col: var(--crm-c-text-light);
+  --crm-contact-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-contact-icon-size: var(--crm-m2);
+  --crm-contact-box-shadow: inset 0 3px 18px -5px rgba(0, 0, 0, 0.25);
+  --crm-contact-panel-padding: var(--crm-r2);
+  --crm-contact-edit-border: 1px dashed var(--crm-c-gray-900);
+  --crm-contact-block-padding: var(--crm-m2);
+  --crm-contact-block-bg: var(--crm-c-container-bg);
+  --crm-contact-label-bg: var(--crm-c-container-bg);
+  --crm-contact-header-bg: var(--crm-c-gray-900);
+  --crm-contact-header-bg2: var(--crm-c-gray-800);
+  --crm-contact-header-col: var(--crm-c-text-light);
+  --crm-contact-header-size: var(--crm-l);
+  --crm-contact-header-padding: var(--crm-r) var(--crm-r1);
+  --crm-contact-image-size: 100px;
+  --crm-contact-image-radius: 200px;
+  --crm-contact-image-right: 30px; /* distance from right of dashboard */
+  --crm-contact-image-top: 30px; /* distance from top of dashboard */
+  --crm-contact-image-border: 2px solid #fff;
 /* Dialog */
   --crm-dialog-bg: var(--crm-c-container-bg);
   --crm-dialog-padding: 0;

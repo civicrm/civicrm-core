@@ -229,7 +229,7 @@
   line-height: 1.428571429;
   background-color: white;
   border: var(--crm-c-divider);
-  border-radius: var(--crm-c-roundness);
+  border-radius: var(--crm-s-radius);
   transition: all .2s ease-in-out;
   display: inline-block;
   max-width: 100%;
@@ -1794,7 +1794,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
   text-align: left;
   background-color: var(--crm-input-bg);
   /* width: 100%; */
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 #bootstrap-theme .has-success .form-control,
 #bootstrap-theme .has-success .form-control:focus {
@@ -2593,7 +2593,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   margin-bottom: 20px;
   overflow: hidden;
   background-color: whitesmoke;
-  border-radius: var(--crm-c-roundness);
+  border-radius: var(--crm-s-radius);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
 }
 #bootstrap-theme .progress-bar {
@@ -2947,7 +2947,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   margin-bottom: 20px;
   background-color: var(--crm-c-container-bg);
   border: var(--crm-c-divider);
-  border-radius: var(--crm-c-roundness);
+  border-radius: var(--crm-s-radius);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
 }
 #bootstrap-theme .well blockquote {
@@ -3384,7 +3384,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 #bootstrap-theme .label:empty {
   display: none;

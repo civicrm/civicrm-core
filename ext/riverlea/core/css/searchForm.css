@@ -10,7 +10,7 @@
   padding: var(--crm-filter-padding);
   text-align: left;
   box-shadow: var(--crm-block-shadow);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 #crm-container #alpha-filter ul {
   margin: 0;

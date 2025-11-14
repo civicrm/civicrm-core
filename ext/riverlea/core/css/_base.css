@@ -386,7 +386,7 @@ dl dl {
   color: var(--crm-c-text);
   background-color: var(--crm-c-code-bg);
   border: var(--crm-c-code-border);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 .crm-container pre code {
   display: block;

@@ -91,7 +91,7 @@
   --crm-bottom-shadow: 0 0 16px 1px rgba(0,0,0,.1);
   --crm-body-inset: unset;
 /* Sizes */
-  --crm-roundness: 0.25rem;
+  --crm-s-radius: 0.25rem;
   --crm-xs: 0.1rem;
   --crm-xs1: 0.125rem;
   --crm-xs2: 0.15rem;
@@ -129,7 +129,7 @@
   --crm-heading-col: var(--crm-c-info-on-dark);
   --crm-heading-padding: var(--crm-s1) var(--crm-m1);
   --crm-heading-margin: var(--crm-m) 0;
-  --crm-heading-radius: var(--crm-roundness);
+  --crm-heading-radius: var(--crm-s-radius);
 /* Mouse events */
   --crm-hover-clickable: pointer;
 /* Buttons */
@@ -192,38 +192,38 @@
   --crm-panel-head-margin: 0px;
   --crm-panel-head-height: 37px;
 /* Accordions */
-  --crm-expand-icon: "\f0da"; /* unicode value for FontAwesome icon */
-  --crm-expand-icon-color: var(--text);
-  --crm-expand-icon-spacing: var(--crm-m);
-  --crm-expand-transform: rotate(90deg);
-  --crm-expand-transition: transform .3s;
-  --crm-expand-radius: var(--crm-roundness);
-  --crm-expand-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */
+  --crm-accordion-icon: "\f0da"; /* unicode value for FontAwesome icon */
+  --crm-accordion-icon-color: var(--crm-c-text);
+  --crm-accordion-icon-spacing: var(--crm-m);
+  --crm-accordion-transform: rotate(90deg);
+  --crm-accordion-transition: transform .3s;
+  --crm-accordion-radius: var(--crm-s-radius);
+  --crm-accordion-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */
 /* .crm-accordion-bold */
-  --crm-expand-header-bg: var(--crm-c-secondary);
-  --crm-expand-header-bg-active: var(--crm-c-gray-900);
-  --crm-expand-header-color: var(--crm-c-secondary-text);
-  --crm-expand-header-padding: var(--crm-s) var(--crm-m);
-  --crm-expand-header-weight: bold;
-  --crm-expand-header-border: var(--crm-c-divider);
-  --crm-expand-header-border-width: 0 0 1px 0;
-  --crm-expand-border: var(--crm-c-divider);
-  --crm-expand-border-width: 0 1px 1px 1px;
-  --crm-expand-body-bg: unset;
-  --crm-expand-body-box-shadow: unset;
-  --crm-expand-body-padding: var(--crm-padding-reg);
+  --crm-accordion-header-bg: var(--crm-c-secondary);
+  --crm-accordion-header-bg-active: var(--crm-c-gray-900);
+  --crm-accordion-header-color: var(--crm-c-secondary-text);
+  --crm-accordion-header-padding: var(--crm-s) var(--crm-m);
+  --crm-accordion-header-weight: bold;
+  --crm-accordion-header-border: var(--crm-c-divider);
+  --crm-accordion-header-border-width: 0 0 1px 0;
+  --crm-accordion-border: var(--crm-c-divider);
+  --crm-accordion-border-width: 0 1px 1px 1px;
+  --crm-accordion-body-bg: unset;
+  --crm-accordion-body-box-shadow: unset;
+  --crm-accordion-body-padding: var(--crm-padding-reg);
 /* .crm-accordion-light */
-  --crm-expand2-header-bg: unset;
-  --crm-expand2-header-bg-active: unset;
-  --crm-expand2-header-weight: normal;
-  --crm-expand2-header-color: var(--crm-c-text);
-  --crm-expand2-header-border: unset;
-  --crm-expand2-header-border-width: unset;
-  --crm-expand2-header-padding: var(--crm-s) var(--crm-m);
-  --crm-expand2-border: unset;
-  --crm-expand2-border-width: unset;
-  --crm-expand2-body-bg: unset;
-  --crm-expand2-body-padding: var(--crm-s);
+  --crm-accordion2-header-bg: unset;
+  --crm-accordion2-header-bg-active: unset;
+  --crm-accordion2-header-weight: normal;
+  --crm-accordion2-header-color: var(--crm-c-text);
+  --crm-accordion2-header-border: unset;
+  --crm-accordion2-header-border-width: unset;
+  --crm-accordion2-header-padding: var(--crm-s) var(--crm-m);
+  --crm-accordion2-border: unset;
+  --crm-accordion2-border-width: unset;
+  --crm-accordion2-body-bg: unset;
+  --crm-accordion2-body-padding: var(--crm-s);
 /* Alerts */
   --crm-alert-padding: var(--crm-m) var(--crm-m2);
   --crm-alert-margin: 0 0 var(--crm-m);
@@ -244,7 +244,7 @@
   --crm-form-block-box-shadow: var(--crm-block-shadow);
   --crm-form-block-bg: var(--crm-c-container-bg);
   --crm-form-block-padding: var(--crm-m);
-  --crm-form-block-border-radius: var(--crm-roundness);
+  --crm-form-block-border-radius: var(--crm-s-radius);
   --crm-form-block-header: var(--crm-c-inverse-bg);
   --crm-input-bg: var(--crm-c-layer0-bg);
   --crm-input-bg-image: linear-gradient(top, #eee 1%, #fff 15%);
@@ -257,7 +257,7 @@
   --crm-input-padding-large: var(--crm-s) var(--crm-m1);
   --crm-input-height: var(--crm-l);
   --crm-input-font-size: var(--crm-m3);
-  --crm-input-label-weight: 600;
+  --crm-input-label-weight: bold;
   --crm-input-label-font: var(--crm-font);
   --crm-input-label-size: var(--crm-font-size);
   --crm-input-label-width: var(--crm-big-input);
@@ -281,8 +281,8 @@
 /* Tabs */
   --crm-tabs-bg: var(--crm-c-gray-200);
   --crm-tabs-padding: var(--crm-s);
-  --crm-tabs-border: var(--crm-dash-border);
-  --crm-tabs-radius: var(--crm-roundness);
+  --crm-tabs-border: var(--crm-contact-border);
+  --crm-tabs-radius: var(--crm-s-radius);
   --crm-tabs-gap: var(--crm-s);
   --crm-tab-bg: var(--crm-c-layer1-bg);
   --crm-tab-bg-hover: color-mix(in srgb,var(--crm-c-layer1-bg) 75%,#000 25%);
@@ -293,60 +293,60 @@
   --crm-tab-weight: normal;
   --crm-tab-count-bg: var(--crm-c-info-text);
   --crm-tab-count-col: var(--crm-c-info);
-  --crm-tab-roundness: var(--crm-roundness);
+  --crm-tab-radius: var(--crm-s-radius);
   --crm-tab-border: var(--crm-c-divider);
   --crm-tab-border-width: 0;
   --crm-tab-border-active: 0 solid transparent;
 /* Contact dashboard */
-  --crm-dash-border: var(--crm-tab-border);
-  --crm-dash-roundness: var(--crm-roundness);
-  --crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
+  --crm-contact-border: var(--crm-tab-border);
+  --crm-contact-radius: var(--crm-s-radius);
+  --crm-contact-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
   --crm-side-tabs-width: unset;
-  --crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */
-  --crm-dash-tabs-gap: var(--crm-tabs-gap);
-  --crm-dash-tabs-bg: var(--crm-tabs-bg);
-  --crm-dash-tabs-padding: var(--crm-tabs-padding);
-  --crm-dash-tabs-roundness: var(--crm-dash-roundness) var(--crm-dash-roundness) 0 0;
-  --crm-dash-tab-bg: var(--crm-tab-bg);
-  --crm-dash-tab-bg-hover: var(--crm-tab-bg-hover);
-  --crm-dash-tab-padding: var(--crm-s3) var(--crm-m2);
-  --crm-dash-tab-border: 0 solid transparent;
-  --crm-dash-tab-border-hover: 0 solid transparent;
-  --crm-dash-tab-border-width: 0; /* to remove border on one side for hanging tabs */
-  --crm-dash-tab-col: var(--crm-tab-col);
-  --crm-dash-tab-count-bg: rgba(0,0,0,0.1);
-  --crm-dash-tab-count-col: var(--crm-c-text);
-  --crm-dash-tab-width: 100%;
-  --crm-dash-tab-align: none;
-  --crm-dash-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
-  --crm-dash-tab-radius: var(--crm-dash-roundness);
-  --crm-dash-icon-size: var(--crm-r);
-  --crm-dash-summary-row-bg: var(--crm-c-container-bg);
-  --crm-dash-heading-inset: 0;
-  --crm-dash-box-shadow: 0;
-  --crm-dash-panel-padding: var(--crm-m);
-  --crm-dash-panel-bg: #fff;
-  --crm-dash-panel-border: 0;
-  --crm-dash-panel-radius: 0 0 var(--crm-dash-roundness) var(--crm-dash-roundness);
-  --crm-dash-edit-border: 1px dashed var(--crm-c-gray-300);
-  --crm-dash-block-padding: 0;
-  --crm-dash-block-bg: unset;
-  --crm-dash-block-radius: var(--crm-roundness);
-  --crm-dash-label-bg: var(--crm-c-layer1-bg);
-  --crm-dash-header-bg: var(--crm-c-layer0-bg);
-  --crm-dash-header-bg2: transparent;
-  --crm-dash-header-col: var(--crm-c-text);
-  --crm-dash-header-size: var(--crm-r3);
-  --crm-dash-header-padding: 0 0 var(--crm-r) 0;
-  --crm-dash-image-size: 100px;
-  --crm-dash-image-radius: 0;
-  --crm-dash-image-right: var(--crm-dash-panel-padding); /* distance from right of dashboard */
-  --crm-dash-image-top: unset; /* distance from top of dashboard */
-  --crm-dash-image-border: 0;
+  --crm-contact-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */
+  --crm-contact-tabs-gap: var(--crm-tabs-gap);
+  --crm-contact-tabs-bg: var(--crm-tabs-bg);
+  --crm-contact-tabs-padding: var(--crm-tabs-padding);
+  --crm-contact-tabs-radius: var(--crm-contact-radius) var(--crm-contact-radius) 0 0;
+  --crm-contact-tab-bg: var(--crm-tab-bg);
+  --crm-contact-tab-bg-hover: var(--crm-tab-bg-hover);
+  --crm-contact-tab-padding: var(--crm-s3) var(--crm-m2);
+  --crm-contact-tab-border: 0 solid transparent;
+  --crm-contact-tab-border-hover: 0 solid transparent;
+  --crm-contact-tab-border-width: 0; /* to remove border on one side for hanging tabs */
+  --crm-contact-tab-col: var(--crm-tab-col);
+  --crm-contact-tab-count-bg: rgba(0,0,0,0.1);
+  --crm-contact-tab-count-col: var(--crm-c-text);
+  --crm-contact-tab-width: 100%;
+  --crm-contact-tab-align: none;
+  --crm-contact-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-contact-tab-radius: var(--crm-contact-radius);
+  --crm-contact-icon-size: var(--crm-r);
+  --crm-contact-summary-row-bg: var(--crm-c-container-bg);
+  --crm-contact-heading-inset: 0;
+  --crm-contact-box-shadow: 0;
+  --crm-contact-panel-padding: var(--crm-m);
+  --crm-contact-panel-bg: #fff;
+  --crm-contact-panel-border: 0;
+  --crm-contact-panel-radius: 0 0 var(--crm-contact-radius) var(--crm-contact-radius);
+  --crm-contact-edit-border: 1px dashed var(--crm-c-gray-300);
+  --crm-contact-block-padding: 0;
+  --crm-contact-block-bg: unset;
+  --crm-contact-block-radius: var(--crm-s-radius);
+  --crm-contact-label-bg: var(--crm-c-layer1-bg);
+  --crm-contact-header-bg: var(--crm-c-layer0-bg);
+  --crm-contact-header-bg2: transparent;
+  --crm-contact-header-col: var(--crm-c-text);
+  --crm-contact-header-size: var(--crm-r3);
+  --crm-contact-header-padding: 0 0 var(--crm-r) 0;
+  --crm-contact-image-size: 100px;
+  --crm-contact-image-radius: 0;
+  --crm-contact-image-right: var(--crm-contact-panel-padding); /* distance from right of dashboard */
+  --crm-contact-image-top: unset; /* distance from top of dashboard */
+  --crm-contact-image-border: 0;
 /* Dialog */
   --crm-dialog-bg: var(--crm-c-layer0-bg);
   --crm-dialog-padding: var(--crm-s);
-  --crm-dialog-radius: var(--crm-roundness);
+  --crm-dialog-radius: var(--crm-s-radius);
   --crm-dialog-line: unset;
   --crm-dialog-inner-shadow: var(--crm-bottom-shadow);
   --crm-dialog-header-bg: var(--crm-c-secondary);
@@ -364,18 +364,18 @@
   --crm-dashlet-padding: var(--crm-s2);
   --crm-dashlet-box-shadow: var(--crm-popup-shadow);
   --crm-dashlet-dashlets-bg: var(--crm-c-container-bg);
-  --crm-dashlet-header-bg: var(--crm-expand-header-bg);
-  --crm-dashlet-header-col: var(--crm-expand-header-color);
+  --crm-dashlet-header-bg: var(--crm-accordion-header-bg);
+  --crm-dashlet-header-col: var(--crm-accordion-header-color);
   --crm-dashlet-header-border: unset;
   --crm-dashlet-header-border-width: unset;
   --crm-dashlet-header-font-size: var(--crm-font-size);
   --crm-dashlet-header-padding: var(--crm-s);
   --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
   --crm-dashlet-tabs-border: 0;
-  --crm-dashlet-radius: var(--crm-roundness);
+  --crm-dashlet-radius: var(--crm-s-radius);
 /* Button dropdowns */
   --crm-dropdown-padding: var(--crm-s);
-  --crm-dropdown-radius: var(--crm-roundness);
+  --crm-dropdown-radius: var(--crm-s-radius);
   --crm-dropdown-bg: var(--crm-c-secondary-hover);
   --crm-dropdown-col: var(--crm-c-text-light);
   --crm-dropdown-hover: var(--crm-c-text);
@@ -391,7 +391,7 @@
   --crm-notify-padding: var(--crm-m2);
   --crm-notify-col: var(--crm-c-text-light);
   --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
-  --crm-notify-radius: var(--crm-roundness);
+  --crm-notify-radius: var(--crm-s-radius);
   --crm-notify-danger: hsl(from var(--crm-c-danger) h s calc(l + 20));
   --crm-notify-warning: hsl(from var(--crm-c-warning) h s calc(l + 20));
   --crm-notify-success: hsl(from var(--crm-c-success) h s calc(l + 30));
@@ -450,7 +450,7 @@
   --crm-f-label-margin: var(--crm-s);
   --crm-f-label-weight: bold;
   --crm-f-label-color: inherit;
-  --crm-f-input-radius: var(--crm-roundness);
+  --crm-f-input-radius: var(--crm-s-radius);
   --crm-f-input-padding: var(--crm-r2) var(--crm-m2);
   --crm-f-input-font-size: var(--crm-r1);
   --crm-f-input-width: 300px;

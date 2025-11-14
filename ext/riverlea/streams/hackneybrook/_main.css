@@ -50,10 +50,10 @@
   --crm-btn-icon-padding: 0px;
   /* Accordions */
   /* .crm-accordion-bold */
-  --crm-expand-header-bg: var(--crm-c-gray-200);
-  --crm-expand-header-bg-active: var(--crm-c-gray-300);
-  --crm-expand-header-color: var(--crm-c-text);
-  --crm-expand-header-border: 0 solid transparent;
+  --crm-accordion-header-bg: var(--crm-c-gray-200);
+  --crm-accordion-header-bg-active: var(--crm-c-gray-300);
+  --crm-accordion-header-color: var(--crm-c-text);
+  --crm-accordion-header-border: 0 solid transparent;
   /* Alerts */
   --crm-alert-padding: var(--crm-r);
   --crm-alert-success-text: var(--crm-c-text);
@@ -72,34 +72,34 @@
   --crm-tab-border: 1px solid var(--crm-c-gray-400);
   --crm-tab-bg-active: var(--crm-c-container-bg);
   /* Contact dashboard */
-  --crm-dash-border: 0;
-  --crm-dash-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
+  --crm-contact-border: 0;
+  --crm-contact-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
   --crm-side-tabs-width: 200px;
-  --crm-dash-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
-  --crm-dash-tabs-gap: var(--crm-m);
-  --crm-dash-tabs-bg: transparent;
-  --crm-dash-tabs-padding: var(--crm-r) 0;
-  --crm-dash-tab-bg: transparent;
-  --crm-dash-tab-bg-hover: var(--crm-c-container-bg);
-  --crm-dash-tab-padding: var(--crm-m2) var(--crm-m1) var(--crm-m2) var(--crm-r);
-  --crm-dash-tab-border: 1px solid transparent;
-  --crm-dash-tab-border-hover: var(--crm-c-divider);
-  --crm-dash-tab-border-width: 1px 0 1px 1px; /* to remove border on one side for hanging tabs */
-  --crm-dash-tab-width: auto; /* 100% to fill column width, auto to only cover contents */
-  --crm-dash-tab-align: right;
-  --crm-dash-tab-hang: 0 -1px 0 0; /* lip to extend tab flush with active region - set to 0 for no lip */
-  --crm-dash-tab-radius: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
-  --crm-dash-summary-row-bg: var(--crm-c-layer2-bg);
-  --crm-dash-heading-inset: var(--crm-side-tabs-width);
-  --crm-dash-panel-padding: var(--crm-r);
-  --crm-dash-panel-bg: var(--crm-dash-tab-bg-hover);
-  --crm-dash-panel-border: var(--crm-c-divider);
-  --crn-dash-panel-radius: var(--crm-dash-roundness);
-  --crm-dash-image-size: 100px;
-  --crm-dash-image-radius: 200px;
-  --crm-dash-image-right: 0; /* distance from right of dashboard */
-  --crm-dash-image-top: -10px; /* distance from top of dashboard */
-  --crm-dash-image-border: 0;
+  --crm-contact-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
+  --crm-contact-tabs-gap: var(--crm-m);
+  --crm-contact-tabs-bg: transparent;
+  --crm-contact-tabs-padding: var(--crm-r) 0;
+  --crm-contact-tab-bg: transparent;
+  --crm-contact-tab-bg-hover: var(--crm-c-container-bg);
+  --crm-contact-tab-padding: var(--crm-m2) var(--crm-m1) var(--crm-m2) var(--crm-r);
+  --crm-contact-tab-border: 1px solid transparent;
+  --crm-contact-tab-border-hover: var(--crm-c-divider);
+  --crm-contact-tab-border-width: 1px 0 1px 1px; /* to remove border on one side for hanging tabs */
+  --crm-contact-tab-width: auto; /* 100% to fill column width, auto to only cover contents */
+  --crm-contact-tab-align: right;
+  --crm-contact-tab-hang: 0 -1px 0 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-contact-tab-radius: var(--crm-contact-radius) 0 0 var(--crm-contact-radius);
+  --crm-contact-summary-row-bg: var(--crm-c-layer2-bg);
+  --crm-contact-heading-inset: var(--crm-side-tabs-width);
+  --crm-contact-panel-padding: var(--crm-r);
+  --crm-contact-panel-bg: var(--crm-contact-tab-bg-hover);
+  --crm-contact-panel-border: var(--crm-c-divider);
+  --crn-dash-panel-radius: var(--crm-contact-radius);
+  --crm-contact-image-size: 100px;
+  --crm-contact-image-radius: 200px;
+  --crm-contact-image-right: 0; /* distance from right of dashboard */
+  --crm-contact-image-top: -10px; /* distance from top of dashboard */
+  --crm-contact-image-border: 0;
   /* Dialog */
   --crm-dialog-header-bg: var(--crm-c-gray-200);
   --crm-dialog-header-border-col: transparent;
@@ -114,7 +114,7 @@
   --crm-dashlet-padding: 0;
   --crm-dashlet-content-padding: var(--crm-m);
   --crm-dashlet-tabs-border: 3px solid #fff;
-  --crm-dashlet-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+  --crm-dashlet-radius: var(--crm-s-radius) var(--crm-s-radius) 0 0;
   /* Button dropdowns */
   --crm-dropdown-bg: var(--crm-c-layer0-bg);
   --crm-dropdown-col: var(--crm-c-text);

@@ -292,7 +292,7 @@ select.crm-error {
 .crm-container .crm-inline-edit,
 .crm-container .crm-editable-disabled,
 .crm-container .crm-editable-enabled {
-  border: var(--crm-dash-edit-border);
+  border: var(--crm-contact-edit-border);
   border-color: transparent;
   background: none;
   position: relative;
@@ -302,7 +302,7 @@ select.crm-error {
 }
 .crm-container .crm-inline-edit:hover,
 .crm-container .crm-editable-enabled:hover {
-  border: var(--crm-dash-edit-border);
+  border: var(--crm-contact-edit-border);
   cursor: var(--crm-hover-clickable);
 }
 .crm-container .crm-editable-enabled.crm-editable-editing:hover {
@@ -701,13 +701,13 @@ input.crm-form-checkbox) + label {
   display: block;
 }
 .select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded > .select2-result-label:before {
-  transform: var(--crm-expand-transform);
-  transition: var(--crm-expand-transition);
+  transform: var(--crm-accordion-transform);
+  transition: var(--crm-accordion-transition);
 }
 .select2-drop.collapsible-optgroups-enabled .select2-result-with-children > .select2-result-label:before {
   font-size: var(--crm-font-size);
-  content: var(--crm-expand-icon);
-  color: var(--crm-expand-icon-color);
+  content: var(--crm-accordion-icon);
+  color: var(--crm-accordion-icon-color);
   font-style: normal;
   font-family: FontAwesome;
   text-rendering: auto;
@@ -715,7 +715,7 @@ input.crm-form-checkbox) + label {
   margin-right: 0.5rem;
   display: inline-block;
   transform-origin: center center;
-  transition: var(--crm-expand-transition);
+  transition: var(--crm-accordion-transition);
 }
 .select2-drop.select2-drop-active.crm-container li.select2-result-with-children {
   padding: 0;
@@ -775,7 +775,7 @@ input.crm-form-checkbox) + label {
   border: 0 solid transparent;
 }
 #ui-datepicker-div :is(.ui-datepicker-prev,.ui-datepicker-next) {
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   box-shadow: none;
   cursor: var(--crm-hover-clickable);
   text-align: center;

@@ -45,7 +45,7 @@ af-form > fieldset > legend {
   padding: var(--crm-m1) var(--crm-f-fieldset-padding);
   font-weight: bold;
   font-size: var(--crm-r1);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 .crm-container.crm-public .crm-section:not(.alert) {
   padding: 0;
@@ -69,7 +69,7 @@ af-form > fieldset > legend {
   display: table;
 }
 .crm-container.crm-public span#msgbox {
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   padding: var(--crm-padding-small);
 }
 .crm-container.crm-public #civicrm-footer::after {

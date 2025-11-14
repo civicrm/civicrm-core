@@ -168,7 +168,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   width: 100%;
   border: 0;
   padding: var(--crm-padding-reg);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   margin: 0;
 }
 #search-status table.form-layout-compressed tr {

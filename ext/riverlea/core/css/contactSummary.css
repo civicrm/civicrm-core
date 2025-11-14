@@ -10,10 +10,10 @@
 /* Contact name/header */
 
 .crm-summary-contactname-block {
-  background: var(--crm-dash-header-bg);
-  color: var(--crm-dash-header-col);
-  padding: var(--crm-dash-header-padding);
-  margin-left: var(--crm-dash-heading-inset);
+  background: var(--crm-contact-header-bg);
+  color: var(--crm-contact-header-col);
+  padding: var(--crm-contact-header-padding);
+  margin-left: var(--crm-contact-heading-inset);
 }
 .crm-summary-contactname-block .crm-summary-link {
   color: inherit;
@@ -29,19 +29,19 @@
 }
 .crm-inline-edit-container .crm-contact_image {
   position: absolute;
-  top: var(--crm-dash-image-top);
-  right: var(--crm-dash-image-right);
+  top: var(--crm-contact-image-top);
+  right: var(--crm-contact-image-right);
   z-index: 1;
 }
 .crm-inline-edit-container .crm-image-popup {
-  width: var(--crm-dash-image-size);
-  height: var(--crm-dash-image-size);
+  width: var(--crm-contact-image-size);
+  height: var(--crm-contact-image-size);
   display: block;
   background-size: cover;
-  border-radius: var(--crm-dash-image-radius);
+  border-radius: var(--crm-contact-image-radius);
   box-shadow: var(--crm-bottom-shadow);
   overflow: hidden;
-  border: var(--crm-dash-image-border);
+  border: var(--crm-contact-image-border);
 }
 .crm-container div.contact_panel {
   display: block;
@@ -58,7 +58,7 @@
 .crm-inline-edit.form {
   cursor: default;
   border: 1px solid var(--crm-c-focus);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   background: var(--crm-inline-edit-bg);
   padding: var(--crm-padding-reg);
   z-index: 99;
@@ -88,7 +88,7 @@
   color: var(--crm-c-text);
   display: block;
   opacity: 1;
-  background-color: var(--crm-dash-summary-row-bg);
+  background-color: var(--crm-contact-summary-row-bg);
   z-index: 3;
 }
 .crm-contact-page .crm-edit-help .crm-i.fa-pencil {
@@ -144,7 +144,7 @@
 }
 .CRM_Contact_Form_Inline_ContactName div.crm-inline-edit-form {
   white-space: nowrap;
-  padding: var(--crm-dash-block-padding);
+  padding: var(--crm-contact-block-padding);
   display: flex;
   flex-wrap: wrap;
   color: var(--crm-c-text);
@@ -195,14 +195,14 @@ div.crm-inline-edit-form div.crm-clear {
   border-color: var(--crm-c-gray-200);
 }
 #crm-contactname-content .crm-summary-display_name {
-  padding: var(--crm-dash-header-padding);
-  font-size: var(--crm-dash-header-size);
+  padding: var(--crm-contact-header-padding);
+  font-size: var(--crm-contact-header-size);
   padding-inline: 0;
 }
 .crm-container div.contact_panel {
   display: grid;
-  grid-template-columns: repeat(2, calc(50% - calc(var(--crm-dash-panel-padding) * 0.5)));
-  column-gap: var(--crm-dash-panel-padding);
+  grid-template-columns: repeat(2, calc(50% - calc(var(--crm-contact-panel-padding) * 0.5)));
+  column-gap: var(--crm-contact-panel-padding);
 }
 .crm-container div.contact_panel table {
   margin-bottom: 0;
@@ -235,12 +235,12 @@ div.crm-inline-edit-form div.crm-clear {
   visibility: hidden;
 }
 .crm-container .crm-summary-row {
-  background-color: var(--crm-dash-summary-row-bg);
-  border-top: 1px solid var(--crm-dash-summary-row-bg);
+  background-color: var(--crm-contact-summary-row-bg);
+  border-top: 1px solid var(--crm-contact-summary-row-bg);
   display: flex;
 }
 .crm-container .crm-summary-row .crm-label {
-  background-color: var(--crm-dash-label-bg);
+  background-color: var(--crm-contact-label-bg);
   color: var(--crm-input-label-color);
   font-weight: var(--crm-input-label-weight);
   font-family: var(--crm-input-label-font);
@@ -301,7 +301,7 @@ div.crm-inline-edit-form div.crm-clear {
 #crm-contact-actions-list a.delete {
   background: var(--crm-dropdown-danger-bg);
   color: var(--crm-c-danger-text);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
 }
 #crm-contact-actions-list a.delete .crm-i.fa-trash::before {
   color: var(--crm-c-danger-text);
@@ -345,7 +345,7 @@ div.crm-inline-edit-form div.crm-clear {
   align-items: center;
 }
 .crm-contact-page .crm-tag-item {
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-s-radius);
   padding: 0 var(--crm-m);
   background-color: var(--crm-c-layer2-bg);
 }
@@ -354,10 +354,10 @@ div.crm-inline-edit-form div.crm-clear {
 }
 .crm-contact-page .crm-summary-block {
   display: flow-root; /* to keep block position during edit */
-  background: var(--crm-dash-block-bg);
-  border-radius: var(--crm-roundness);
+  background: var(--crm-contact-block-bg);
+  border-radius: var(--crm-s-radius);
   box-shadow: var(--crm-block-shadow);
-  margin-bottom: var(--crm-dash-panel-padding);
+  margin-bottom: var(--crm-contact-panel-padding);
   container-name: crm-summary-block;
   container-type: inline-size;
 }
@@ -377,7 +377,7 @@ div.crm-inline-edit-form div.crm-clear {
   }
 }
 .crm-contact-page div.crm-clear {
-  padding: var(--crm-dash-block-padding);
+  padding: var(--crm-contact-block-padding);
 }
 #mainTabContainer .crm-summary-block .crm-container-snippet table {
   box-shadow: none;
@@ -386,18 +386,18 @@ div.crm-inline-edit-form div.crm-clear {
   margin: 0;
 }
 div.crm-summary-contactname-block + .crm-actions-ribbon {
-  color: var(--crm-dash-header-col);
-  background-color: var(--crm-dash-header-bg2);
+  color: var(--crm-contact-header-col);
+  background-color: var(--crm-contact-header-bg2);
   margin-bottom: 0;
   clear: both;
-  margin-left: var(--crm-dash-heading-inset);
+  margin-left: var(--crm-contact-heading-inset);
 }
 .crm-actions-ribbon ul#actions {
   display: grid;
   grid-template-columns: min-content min-content auto min-content min-content;
   gap: var(--crm-m);
   margin: 0;
-  padding: var(--crm-dash-header-padding);
+  padding: var(--crm-contact-header-padding);
 }
 .crm-actions-ribbon ul#actions > * {
   width: max-content;
@@ -425,7 +425,7 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
 }
 @media (max-width: 767px) {
   #crm-main-content-wrapper {
-    --crm-dash-heading-inset: 0; /* resets any inset on the title/action links */
+    --crm-contact-heading-inset: 0; /* resets any inset on the title/action links */
     --crm-side-tabs-width: auto; /* resets offset inline edit */
   }
   .crm-container #mainTabContainer {
