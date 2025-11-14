@@ -35,18 +35,19 @@
   --crm-c-yellow-less-light: #fffdb2;
   --crm-c-teal: #63c4b9;
   --crm-c-dark-teal: #3e8079;
-/* Practical colours */
   --crm-c-darkest: #0a0a0a;
+/* Practical colours */
   --crm-c-text-light: #fff;
   --crm-c-text-dark: #464354;
   --crm-c-text: var(--crm-c-text-dark);
   --crm-c-link: var(--crm-c-blue-dark);
   --crm-c-link-hover: var(--crm-c-blue-darker);
   --crm-c-focus: var(--crm-c-blue-dark);
-  --crm-c-inactive: color-mix(in srgb,var(--crm-c-text) 95%,#fff 5%);
+  --crm-paper: var(--crm-c-text-light); /* The lightest bg in light mode */
+  --crm-ink: var(--crm-c-darkest); /* The darkest foreground in light mode */
+  --crm-c-inactive: color-mix(in srgb,var(--crm-c-text) 95%,var(--crm-paper) 5%);
 /* Backgrounds */
-  --crm-c-layer0-bg: #fff; /* The lightest bg in light mode */
-  --crm-c-page-bg: var(--crm-c-layer0-bg);
+  --crm-c-page-bg: var(--crm-paper);
   --crm-c-container-bg: #f4f4ed;
   --crm-c-layer1-bg: var(--crm-c-gray-050);
   --crm-c-layer2-bg: color-mix(in srgb,var(--crm-c-layer1-bg) 95%,#000 5%);
@@ -161,14 +162,14 @@
   --crm-btn-margin: 0; /* used to add padding block between multiple stacked buttons */
 /* Tables */
   --crm-table-outside-border: var(--crm-border);
-  --crm-table-bg: var(--crm-c-layer0-bg);
+  --crm-table-bg: var(--crm-paper);
   --crm-table-row-border: var(--crm-border);
   --crm-table-column-border: 0 solid transparent;
   --crm-table-font-size: var(--crm-font-size);
   --crm-table-padding: var(--crm-m);
   --crm-table-header-border: 1px solid transparent;
   --crm-table-header-bottom: 2px solid var(--crm-border-color);
-  --crm-table-header-bg: var(--crm-c-layer0-bg);
+  --crm-table-header-bg: var(--crm-paper);
   --crm-table-header-col: var(--crm-c-text);
   --crm-table-header-txt: inherit;
   --crm-table-row-bg: var(--crm-table-bg); /* don't make transparent */
@@ -185,7 +186,7 @@
   --crm-table-inset-bg: var(--crm-c-layer2-bg);
 /* Panels */
   --crm-panel-shadow: var(--crm-shadow-block);
-  --crm-panel-bg: var(--crm-c-layer0-bg);
+  --crm-panel-bg: var(--crm-paper);
   --crm-panel-border: var(--crm-border);
   --crm-panel-head-margin: 0px;
   --crm-panel-head-height: 37px;
@@ -244,7 +245,7 @@
   --crm-form-block-padding: var(--crm-m);
   --crm-form-block-border-radius: var(--crm-s-radius);
   --crm-form-block-header: var(--crm-c-inverse-bg);
-  --crm-input-bg: var(--crm-c-layer0-bg);
+  --crm-input-bg: var(--crm-paper);
   --crm-input-bg-image: linear-gradient(top, #eee 1%, #fff 15%);
   --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: var(--crm-c-gray-400);
@@ -331,7 +332,7 @@
   --crm-contact-block-bg: unset;
   --crm-contact-block-radius: var(--crm-s-radius);
   --crm-contact-label-bg: var(--crm-c-layer1-bg);
-  --crm-contact-header-bg: var(--crm-c-layer0-bg);
+  --crm-contact-header-bg: var(--crm-paper);
   --crm-contact-header-bg2: transparent;
   --crm-contact-header-col: var(--crm-c-text);
   --crm-contact-header-size: var(--crm-r3);
@@ -342,7 +343,7 @@
   --crm-contact-image-top: unset; /* distance from top of dashboard */
   --crm-contact-image-border: 0;
 /* Dialog */
-  --crm-dialog-bg: var(--crm-c-layer0-bg);
+  --crm-dialog-bg: var(--crm-paper);
   --crm-dialog-padding: var(--crm-s);
   --crm-dialog-radius: var(--crm-s-radius);
   --crm-dialog-line: unset;
@@ -358,7 +359,7 @@
 /* Dashlet */
   --crm-dashlet-columns: 2fr 3fr;
   --crm-dashlet-border: unset;
-  --crm-dashlet-bg: var(--crm-c-layer0-bg);
+  --crm-dashlet-bg: var(--crm-paper);
   --crm-dashlet-padding: var(--crm-s2);
   --crm-dashlet-box-shadow: var(--crm-shadow-popup);
   --crm-dashlet-dashlets-bg: var(--crm-c-container-bg);
@@ -377,7 +378,7 @@
   --crm-dropdown-bg: var(--crm-c-secondary-hover);
   --crm-dropdown-col: var(--crm-c-text-light);
   --crm-dropdown-hover: var(--crm-c-text);
-  --crm-dropdown-hover-bg: var(--crm-c-layer0-bg);
+  --crm-dropdown-hover-bg: var(--crm-paper);
   --crm-dropdown-border: 0;
   --crm-dropdown-width: 180px;
   --crm-dropdown-danger-bg: var(--crm-c-danger); /* for delete links in dropdowns */
@@ -419,7 +420,7 @@
   --crm-wizard-active-col: var(--crm-c-text-light);
   --crm-wizard-active-bg: var(--crm-c-link);
   --crm-wizard-border: var(--crm-border);
-  --crm-wizard-bg: var(--crm-c-layer0-bg);
+  --crm-wizard-bg: var(--crm-paper);
   --crm-wizard-box-shadow: unset;
 /* Alpha filter */
   --crm-filter-bg: var(--crm-c-info-light);

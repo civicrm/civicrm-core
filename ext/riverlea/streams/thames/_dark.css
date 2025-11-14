@@ -12,8 +12,8 @@
   --crm-c-link: var(--crm-c-dkblue-08);
   --crm-c-link-hover: color-mix(in srgb, white, var(--crm-c-dkblue-08) 70%);
   --crm-border-color: var(--crm-c-dkblue-04);
+  --crm-paper: var(--crm-c-dkblue-01);
 /* Backgrounds, '--crm-c-*-bg' */
-  --crm-c-layer0-bg: var(--crm-c-dkblue-01);
   --crm-c-page-bg: var(--crm-c-dkblue-01);
   --crm-c-container-bg: var(--crm-c-dkblue-02);
   --crm-c-layer1-bg: var(--crm-c-dkblue-02);

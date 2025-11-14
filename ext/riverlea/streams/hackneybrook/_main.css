@@ -115,7 +115,7 @@
   --crm-dashlet-tabs-border: 3px solid #fff;
   --crm-dashlet-radius: var(--crm-s-radius) var(--crm-s-radius) 0 0;
   /* Button dropdowns */
-  --crm-dropdown-bg: var(--crm-c-layer0-bg);
+  --crm-dropdown-bg: var(--crm-paper);
   --crm-dropdown-col: var(--crm-c-text);
   --crm-dropdown-hover-bg: var(--crm-c-secondary-hover);
   --crm-dropdown-border: var(--crm-btn-border);

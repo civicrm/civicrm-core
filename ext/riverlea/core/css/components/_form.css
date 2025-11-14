@@ -967,5 +967,5 @@ input.crm-form-checkbox) + label {
   color: var(--crm-c-inactive);
 }
 .crm-container :is(input,textarea,option):disabled {
-  background-color: color-mix(in srgb, var(--crm-input-background) 90%, var(--crm-c-text) 10%);
+  background-color: color-mix(in srgb, var(--crm-input-background) 90%, var(--crm-ink) 10%);
 }

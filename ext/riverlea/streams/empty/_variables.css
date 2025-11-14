@@ -45,7 +45,7 @@
   --crm-c-text-light: #fff;
   --crm-c-text-dark: #302f35;
   --crm-c-text: var(--crm-c-text-dark);
-  --crm-c-page-bg: #fff;
+  --crm-c-page-bg: var(--crm-paper);
 /* Backgrounds, '--crm-c-*-bg' */
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
 /* Shadows */

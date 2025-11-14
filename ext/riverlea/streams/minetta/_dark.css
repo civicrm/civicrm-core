@@ -13,10 +13,8 @@
   --crm-c-focus: #8cd4cb;
   --crm-c-link: var(--crm-c-teal);
   --crm-c-link-hover: var(--crm-c-yellow);
-  --crm-c-inactive: color-mix(in srgb,var(--crm-c-text) 95%,#000 5%);
 /* Backgrounds, '--crm-c-*-bg' */
-  --crm-c-layer0-bg: var(--crm-c-gray-900);
-  --crm-c-page-bg: var(--crm-c-gray-900);
+  --crm-c-page-bg: var(--crm-paper);
   --crm-c-container-bg: var(--crm-c-gray-800);
   --crm-c-inverse-bg: var(--crm-c-gray-300);
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
