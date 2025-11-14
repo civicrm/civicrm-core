@@ -49,8 +49,30 @@ class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterfa
 
   public function getAll(): iterable {
     if (!$this->initialized) {
-      $this->addScriptUrl(Civi::service('asset_builder')->getUrl(static::JS_FILE));
-      $this->addStyleUrl(Civi::service('asset_builder')->getUrl(static::CSS_FILE));
+      $weight = 0;
+      // add bundled upstream dependencies
+      $this->addScriptUrl(Civi::service('asset_builder')->getUrl(static::JS_FILE), ['weight' => 0]);
+      $this->addStyleUrl(Civi::service('asset_builder')->getUrl(static::CSS_FILE), ['weight' => 0]);
+
+      // utils
+      $this->addScriptFile(E::SHORT_NAME, 'js/chartKitUtils.js', ['weight' => 10]);
+
+      // backends
+      $this->addScriptFile(E::SHORT_NAME, 'js/typeBackends/chartKitComposite.js', ['weight' => 20]);
+      $this->addScriptFile(E::SHORT_NAME, 'js/typeBackends/chartKitHeatMap.js', ['weight' => 20]);
+      $this->addScriptFile(E::SHORT_NAME, 'js/typeBackends/chartKitPie.js', ['weight' => 20]);
+      $this->addScriptFile(E::SHORT_NAME, 'js/typeBackends/chartKitRow.js', ['weight' => 20]);
+      $this->addScriptFile(E::SHORT_NAME, 'js/typeBackends/chartKitSeries.js', ['weight' => 20]);
+      $this->addScriptFile(E::SHORT_NAME, 'js/typeBackends/chartKitStack.js', ['weight' => 20]);
+
+      // types, options, column class
+      $this->addScriptFile(E::SHORT_NAME, 'js/chartKitChartTypes.js', ['weight' => 30]);
+      $this->addScriptFile(E::SHORT_NAME, 'js/chartKitColumnOptions.js', ['weight' => 40]);
+      $this->addScriptFile(E::SHORT_NAME, 'js/chartKitColumn.js', ['weight' => 50]);
+
+      // components
+      $this->addScriptFile(E::SHORT_NAME, 'js/components/civi-search-display.js', ['weight' => 60]);
+      $this->addScriptFile(E::SHORT_NAME, 'js/components/civi-search-display-chart-kit.js', ['weight' => 70]);
 
       CRM_Utils_Hook::alterBundle($this);
       $this->fillDefaults();
