@@ -131,7 +131,7 @@
 /* Tabs */
   --crm-tabs-bg: var(--crm-c-layer1-bg);
   --crm-tabs-padding: var(--crm-m) var(--crm-m) 0 var(--crm-m);
-  --crm-tabs-border: var(--crm-c-divider);
+  --crm-tabs-border: var(--crm-border);
   --crm-tab-radius: 2px 2px 0 0;
   --crm-tab-bg-hover: var(--crm-c-layer0-bg);
   --crm-tab-bg-active: var(--crm-c-container-bg);
@@ -140,7 +140,7 @@
   --crm-tab-weight: bold;
   --crm-tab-count-bg: transparent;
   --crm-tab-count-col: var(--crm-c-text);
-  --crm-tab-border-active: var(--crm-c-divider);
+  --crm-tab-border-active: var(--crm-border);
 /* Contact dashboard */
   --crm-contact-border: 0 solid transparent;
   --crm-contact-radius: 0;
@@ -179,7 +179,7 @@
 /* Dialog */
   --crm-dialog-bg: var(--crm-c-container-bg);
   --crm-dialog-padding: 0;
-  --crm-dialog-line: var(--crm-c-divider);
+  --crm-dialog-line: var(--crm-border);
   --crm-dialog-header-bg: var(--crm-c-layer2-bg);
   --crm-dialog-header-col: var(--crm-c-text);
 /* Dashlet */

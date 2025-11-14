@@ -40,7 +40,7 @@
 }
 #afGuiEditor fieldset legend {
   padding: var(--crm-s) 0 0 0;
-  border-bottom: var(--crm-c-divider);
+  border-bottom: var(--crm-border);
   width: 100%;
   margin-bottom: var(--crm-m);
 }
@@ -200,7 +200,7 @@
   font-family: sans-serif,'FontAwesome';
 }
 .af-gui-entity-palette-select-list {
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-radius: 0 0 var(--crm-s-radius) var(--crm-s-radius);
   padding: 0 var(--crm-s) var(--crm-s);
   max-height: 400px;
@@ -367,7 +367,7 @@ af-gui-container > .af-gui-bar,
 
 /* Card style */
 #afGuiEditor .af-gui-search-display {
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-style: dotted;
   color: var(--crm-c-text);
   padding: var(--crm-padding-reg);
@@ -534,7 +534,7 @@ af-gui-container > .af-gui-bar,
 }
 .af-gui-conditional-dialog fieldset fieldset {
   padding-top: 0;
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-top: 0;
 }
 #bootstrap-theme .af-gui-conditional-dialog af-gui-clause > .btn-group {

@@ -228,7 +228,7 @@
   padding: 4px;
   line-height: 1.428571429;
   background-color: white;
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-radius: var(--crm-s-radius);
   transition: all .2s ease-in-out;
   display: inline-block;
@@ -436,7 +436,7 @@
   margin-top: 20px;
   margin-bottom: 20px;
   border: 0;
-  border-top: var(--crm-c-divider);
+  border-top: var(--crm-border);
 }
 #bootstrap-theme address {
   margin-bottom: 20px;
@@ -2946,7 +2946,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   padding: 19px;
   margin-bottom: 20px;
   background-color: var(--crm-c-container-bg);
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-radius: var(--crm-s-radius);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
 }

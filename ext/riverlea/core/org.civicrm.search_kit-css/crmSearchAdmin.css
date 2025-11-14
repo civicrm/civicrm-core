@@ -72,13 +72,13 @@
   color: var(--crm-tab-col);
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-right: 0 none;
   box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 }
 .crm-search ul.nav-stacked li[role=separator] {
   height: var(--crm-m2);
-  border-top: var(--crm-c-divider);
+  border-top: var(--crm-border);
   margin: var(--crm-m) var(--crm-l) 0 var(--crm-r);
 }
 .crm-search ul.nav-stacked li a[disabled] {
@@ -107,7 +107,7 @@
   right: 28px;
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel {
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   margin: 0;
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel .panel-body {
@@ -139,14 +139,14 @@
 
 .crm-container .crm-search fieldset {
   padding: var(--crm-s);
-  border-top: var(--crm-c-divider);
+  border-top: var(--crm-border);
   margin-block: var(--crm-s);
   border-radius: var(--crm-s-radius);
   position: relative;
 }
 .crm-search fieldset fieldset {
   padding-top: 0;
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-width: 0 1px 1px 1px;
 }
 #bootstrap-theme.crm-search fieldset legend {

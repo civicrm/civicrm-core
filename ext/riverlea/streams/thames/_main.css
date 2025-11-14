@@ -28,7 +28,7 @@
   --crm-c-yellow-light: #f2deb9;
 /* PRACTICAL COLOURS */
   --crm-c-text-dark: #000000dd;
-  --crm-c-divider: 1px solid var(--crm-c-blue-overlay);
+  --crm-border-color: var(--crm-c-blue-overlay);
   --crm-c-page-bg: #f3f2ed;
   --crm-c-container-bg: #f8f8f8;
   --crm-c-layer2-bg: color-mix(in srgb,var(--crm-c-layer1-bg) 90%,#000 10%);
@@ -262,7 +262,7 @@ html.cms-standalone body {
 
 .crm-container details {
   /* background-color: var(--crm-accordion-body-bg); Removed for FormBuilder clashes */
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
 }
 
 .crm-container summary {
