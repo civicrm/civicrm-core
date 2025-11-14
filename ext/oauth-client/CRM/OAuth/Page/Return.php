@@ -39,8 +39,11 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
         'scope' => $state['scopes'],
         'tag' => $state['tag'],
         'storage' => $state['storage'],
-        'grant_type' => 'authorization_code',
-        'cred' => ['code' => $authCode],
+        'grant_type' => $state['grant_type'] ?? 'authorization_code',
+        'cred' => array_merge(
+          ['code' => $authCode],
+          empty($state['code_verifier']) ? [] : ['code_verifier' => $state['code_verifier']],
+        ),
       ]);
 
       $nextUrl = $state['landingUrl'] ?? NULL;

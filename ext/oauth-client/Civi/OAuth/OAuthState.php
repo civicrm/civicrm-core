@@ -40,6 +40,13 @@ class OAuthState extends AutoService {
    *   - session (string), automatically defined
    *   - time (int), creation time; seconds since epoch. Default: NOW
    *   - ttl (int), the number of seconds for which this record is valid. Default: LEGACY_TTL
+   *   - clientId (int), the OAuthClient.id which initiated this flow
+   *   - landingUrl (string, optional), If we want to ultimately redirect back to another part of our web UI
+   *   - storage (string), Where to store the resulting token. Ex: OAuthSysToken or OAuthContactToken
+   *   - scopes (array), List of scopes being requested
+   *   - tag (string, optional), The symbolic tag to apply to the new token
+   *   - code_verifier (string, optional), An extra string that we will send to the token-endpoint to prove that we initiated the flow
+   *   - grant_type (string, optional), The kind of flow that we are pursuing. Default: authorization_code
    * @return string
    *   State token / identifier
    */
