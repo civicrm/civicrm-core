@@ -5,7 +5,7 @@
 /* Alpha filter */
 
 .crm-container div#alpha-filter {
-  background-color: var(--crm-filter-bg);
+  background-color: var(--crm-filter-bg-color);
   margin: var(--crm-r) 0;
   padding: var(--crm-filter-padding);
   text-align: left;
@@ -19,11 +19,11 @@
   justify-content: var(--crm-filter-spacing);
 }
 .crm-container #alpha-filter li {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 .crm-container #alpha-filter a {
   font-weight: normal;
-  background: var(--crm-filter-item-bg);
+  background: var(--crm-filter-item-bg-color);
   padding: var(--crm-s) var(--crm-m);
   box-shadow: var(--crm-filter-item-shadow);
 }

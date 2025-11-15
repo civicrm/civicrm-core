@@ -18,24 +18,24 @@
 #crm-status-list .crm-severity-alert,
 #crm-status-list .crm-severity-critical,
 #crm-status-list .crm-severity-error {
-  background-color: var(--crm-c-danger);
-  color: var(--crm-c-danger-text);
+  background-color: var(--crm-danger-color);
+  color: var(--crm-danger-text-color);
 }
 /* Warning Severity */
 #crm-status-list .crm-severity-warning {
-  background-color: var(--crm-c-warning);
-  color: var(--crm-c-warning-text);
+  background-color: var(--crm-warning-color);
+  color: var(--crm-warning-text-color);
 }
 /* Not Okay - Not Warning */
 #crm-status-list .crm-severity-notice {
-  background-color: var(--crm-c-info);
-  color: var(--crm-c-info-text);
+  background-color: var(--crm-info-color);
+  color: var(--crm-info-text-color);
 }
 /* All OK Severity */
 #crm-status-list .crm-severity-info,
 #crm-status-list .crm-severity-debug {
-  background-color: var(--crm-c-success);
-  color: var(--crm-c-success-text);
+  background-color: var(--crm-success-color);
+  color: var(--crm-success-text-color);
 }
 #crm-status-list .crm-status-message-body {
   margin: var(--crm-r) 0;
@@ -53,7 +53,7 @@
 }
 #crm-status-list .hush-menu button {
   background-color: rgba(256,256,256,0.6);
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   font-size: initial;
   border-color: transparent;
 }
@@ -65,7 +65,7 @@
   margin: 0;
   padding: 0;
   z-index: 99;
-  background: var(--crm-dropdown-bg);
+  background: var(--crm-dropdown-bg-color);
   padding: var(--crm-dropdown-padding);
   border-radius: var(--crm-dropdown-radius);
   font-size: var(--crm-font-size);
@@ -73,14 +73,14 @@
 }
 #crm-status-list .hush-menu li {
   padding: var(--crm-dropdown-padding);
-  color: var(--crm-dropdown-col);
-  background-color: var(--crm-dropdown-bg);
+  color: var(--crm-dropdown-color);
+  background-color: var(--crm-dropdown-bg-color);
   font-weight: normal;
   border-radius: var(--crm-dropdown-radius);
 }
 #crm-status-list .hush-menu li:hover,
 #crm-status-list .hush-menu li:focus {
-  background-color: var(--crm-dropdown-hover-bg);
+  background-color: var(--crm-dropdown-hover-bg-color);
   color: var(--crm-dropdown-hover);
 }
 .status-debug-information {

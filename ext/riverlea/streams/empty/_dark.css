@@ -1,6 +1,6 @@
 /* Minimal dark mode settings
    - delete this file if you don't want dark-mode
-   - it's generally easier to change practical colours (ie '--crm-c-page-bg')
+   - it's generally easier to change practical colours (ie '--crm-page-bg-color')
      than to change the colours themesleves (ie '--crm-c-gray-900').
 */
 
@@ -8,7 +8,7 @@
 /* Fonts '--crm-font-' */
 /* Colour names, e.g. green, red, blue '--crm-c-' */
 /* Practical colours, e.g. text, link '--crm-c-' */
-  --crm-c-text: var(--crm-c-text-light);
+  --crm-text-color: var(--crm-text-light-color);
 /* Backgrounds, '--crm-c-*-bg' */
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
 /* Shadows */

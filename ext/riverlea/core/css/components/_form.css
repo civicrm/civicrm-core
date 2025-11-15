@@ -88,7 +88,7 @@
   margin-bottom: var(--crm-flex-gap);
 }
 .crm-container .crm-marker {
-  color: var(--crm-notify-danger);
+  color: var(--crm-notify-danger-color);
 }
 .crm-container .form-inline {
   padding: var(--crm-s) 0;
@@ -104,20 +104,20 @@
 .crm-collapsible,
 .crm-inactive-dashlet-fieldset,
 .crm-search-admin-edit-columns) {
-  padding: var(--crm-fieldset-padding);
+  padding: var(--crm-form-fieldset-padding);
   margin: var(--crm-padding-reg) 0;
-  border: 1px solid var(--crm-fieldset-border-color);
-  border-width: var(--crm-fieldset-border);
+  border: 1px solid var(--crm-form-fieldset-border-color);
+  border-width: var(--crm-form-fieldset-border);
 }
 .crm-container fieldset legend {
   font-weight: bold;
   padding-inline: var(--crm-s);
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 
 /* Required Mark */
 .crm-container .required-mark::after {
-  color: var(--crm-c-danger);
+  color: var(--crm-danger-color);
   content: "*";
   margin-left: var(--crm-s);
 }
@@ -136,9 +136,9 @@ select.crm-form-select,
 .crm-container .ui-widget input,
 .crm-container select,
 .ui-datepicker .ui-datepicker-header select {
-  transition: var(--crm-input-active-ani);
+  transition: var(--crm-input-active-transition);
   font-size: var(--crm-input-font-size);
-  background-color: var(--crm-input-bg);
+  background-color: var(--crm-input-bg-color);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   color: var(--crm-input-color);
@@ -162,7 +162,7 @@ select.crm-form-multiselect {
   border: 1px solid var(--crm-c-darkest);
 }
 .crm-container .replace-plain {
-  background-color: var(--crm-input-bg);
+  background-color: var(--crm-input-bg-color);
   min-width: var(--crm-huge-input);
 }
 input.crm-form-text:focus,
@@ -177,18 +177,18 @@ select.crm-form-select:focus,
 .crm-container select[aria-controls]:focus,
 .crm-container .select2-container-active *:focus,
 .crm-container .select2-container-active a.select2-choice {
-  border-color: var(--crm-c-focus);
+  border-color: var(--crm-focus-color);
   outline: 0;
   box-shadow: none;
 }
 .crm-container input.error,
 input.crm-error,
 select.crm-error {
-  border-color: var(--crm-c-danger);
+  border-color: var(--crm-danger-color);
 }
 .crm-container :focus,
 .crm-container .ui-dialog :focus {
-  border-color: var(--crm-c-focus);
+  border-color: var(--crm-focus-color);
   box-shadow: none;
 }
 .crm-container input.crm-placeholder-icon::placeholder {
@@ -284,10 +284,10 @@ select.crm-error {
   padding: var(--crm-padding-small);
 }
 .crm-container .crm-editable-form [type="submit"] {
-  color: var(--crm-c-success) !important;
+  color: var(--crm-success-color) !important;
 }
 .crm-container .crm-editable-form [type="cancel"] {
-  color: var(--crm-c-danger) !important;
+  color: var(--crm-danger-color) !important;
 }
 .crm-container .crm-inline-edit,
 .crm-container .crm-editable-disabled,
@@ -423,7 +423,7 @@ input.crm-form-checkbox) + label {
   padding: var(--crm-s);
 }
 .crm-container input[type="range"] {
-  accent-color: var(--crm-c-focus);
+  accent-color: var(--crm-focus-color);
   height: auto;
   box-shadow: none;
 }
@@ -452,7 +452,7 @@ input.crm-form-checkbox) + label {
 .crm-container select.form-control,
 .crm-container .select2-container-multi .select2-choices,
 .crm-container .select2-container .select2-choice {
-  background: var(--crm-input-bg);
+  background: var(--crm-input-bg-color);
   border: 1px solid var(--crm-input-border-color);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
@@ -490,7 +490,7 @@ input.crm-form-checkbox) + label {
   font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
   font-style: normal;
   text-rendering: auto;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   background: none;
   content: var(--crm-input-dropdown-icon);
 }
@@ -502,7 +502,7 @@ input.crm-form-checkbox) + label {
 .crm-container .select2-dropdown-open .select2-choices {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  border-color: var(--crm-c-focus);
+  border-color: var(--crm-focus-color);
   box-shadow: none;
 }
 .crm-container .select2-container-multi .select2-choices .select2-search-field input {
@@ -518,29 +518,29 @@ input.crm-form-checkbox) + label {
   color: var(--crm-input-color) !important /* vs important in select2.min.css */;
 }
 .crm-container .select2-default .select2-chosen { /* intended to target placeholder text */
-  color: var(--crm-c-inactive);
+  color: var(--crm-inactive-color);
 }
 .crm-container .select2-container-multi .select2-choices .select2-search-field input.select2-default {
   color: var(--crm-input-color);
 }
 .select2-container-disabled a {
   box-shadow: none;
-  background: var(--crm-c-layer1-bg);
+  background: var(--crm-layer1-bg-color);
 }
 .select2-container-disabled .select2-arrow {
   background: transparent;
 }
 .crm-container .select2-container.select2-container-disabled .select2-choice {
-  background-color: var(--crm-c-container-bg);
-  border: 1px dotted var(--crm-c-inactive);
+  background-color: var(--crm-container-bg-color);
+  border: 1px dotted var(--crm-inactive-color);
   cursor: default;
 }
 .select2-container.select2-container-disabled .select2-choice .select2-arrow {
   border-left: 0;
-  background: var(--crm-c-container-bg);
+  background: var(--crm-container-bg-color);
 }
 .select2-results .select2-disabled {
-  background: var(--crm-c-layer1-bg);
+  background: var(--crm-layer1-bg-color);
   cursor: not-allowed;
 }
 .select2-results .select2-disabled > * {
@@ -564,13 +564,13 @@ input.crm-form-checkbox) + label {
   margin: 0;
   position: relative;
   line-height: unset;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   cursor: default;
   border: var(--crm-border);
   border-radius: var(--crm-input-border-radius);
   background-clip: padding-box;
   user-select: none;
-  background-color: var(--crm-form-select-bg);
+  background-color: var(--crm-input-select-bg-color);
   background-image: none;
   box-shadow: none;
 }
@@ -599,11 +599,11 @@ input.crm-form-checkbox) + label {
 
 .select2-drop.select2-drop-active.crm-container {
   min-width: var(--crm-big-input);
-  background: var(--crm-input-bg);
+  background: var(--crm-input-bg-color);
   border-bottom-left-radius: var(--crm-input-border-radius);
   border-bottom-right-radius: var(--crm-input-border-radius);
-  border-color: var(--crm-c-focus);
-  border-top: 1px solid rgb(from var(--crm-c-focus) r g b / 25%);
+  border-color: var(--crm-focus-color);
+  border-top: 1px solid rgb(from var(--crm-focus-color) r g b / 25%);
 }
 .select2-drop.select2-drop-active.crm-container.select2-drop-above {
   border-bottom-left-radius: 0;
@@ -617,7 +617,7 @@ input.crm-form-checkbox) + label {
   font-style: normal;
   text-rendering: auto;
   font-size: .8em;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   content: "";
   font-size: 14px;
   position: relative;
@@ -637,7 +637,7 @@ input.crm-form-checkbox) + label {
   margin: 0;
 }
 .select2-drop.select2-drop-active.crm-container .select2-results li {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   padding: var(--crm-s) var(--crm-m);
   margin: 0;
 }
@@ -648,14 +648,14 @@ input.crm-form-checkbox) + label {
 .select2-results .select2-no-results,
 .select2-results .select2-searching,
 .select2-results .select2-selection-limit {
-  background: var(--crm-input-bg);
+  background: var(--crm-input-bg-color);
 }
 .select2-drop.select2-drop-active.crm-container .select2-results .select2-highlighted {
-  background: var(--crm-form-select-bg);
+  background: var(--crm-input-select-bg-color);
 }
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
-  background: var(--crm-c-container-bg);
+  background: var(--crm-container-bg-color);
   border: 1px solid var(--crm-input-border-color);
   border-radius: var(--crm-input-border-radius);
   box-sizing: border-box;
@@ -681,7 +681,7 @@ input.crm-form-checkbox) + label {
 }
 .select2-results li.select2-result-with-children > .select2-result-label {
   font-weight: bold;
-  background: var(--crm-c-layout2-bg);
+  background: var(--crm-c-layout2-bg-color);
   padding: var(--crm-s);
 }
 .crm-container .crm-select2-row-description p {
@@ -758,7 +758,7 @@ input.crm-form-checkbox) + label {
   height: unset;
 }
 #ui-datepicker-div {
-  background: var(--crm-input-bg);
+  background: var(--crm-input-bg-color);
   border-radius: 0;
   box-shadow: var(--crm-shadow-popup);
   min-width: 30ch;
@@ -794,7 +794,7 @@ input.crm-form-checkbox) + label {
   padding: 0;
 }
 #ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next):hover::before {
-  color: var(--crm-c-text-dark);
+  color: var(--crm-text-dark-color);
 }
 #ui-datepicker-div .ui-datepicker-prev::before {
   content: "";
@@ -810,7 +810,7 @@ input.crm-form-checkbox) + label {
   width: 9ch;
 }
 #ui-datepicker-div .ui-datepicker-calendar thead th {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   font-size: var(--crm-font-small-size);
 }
 #ui-datepicker-div .ui-datepicker-calendar tr {
@@ -824,15 +824,15 @@ input.crm-form-checkbox) + label {
 }
 #ui-datepicker-div .ui-state-default,
 #ui-datepicker-div .ui-widget-content .ui-state-default {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   text-align: center;
 }
 #ui-datepicker-div .ui-datepicker-calendar .ui-state-disabled {
   opacity: 0.35;
 }
 #ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) .ui-state-active {
-  background-color: var(--crm-c-primary);
-  color: var(--crm-c-primary-text);
+  background-color: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
 }
 #ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) a {
   border: 0;
@@ -840,11 +840,11 @@ input.crm-form-checkbox) + label {
   cursor: var(--crm-link-hover-cursor);
   padding: var(--crm-s);
   text-align: center;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 #ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-today a {
   background: var(--crm-c-gray-100);
-  color: var(--crm-c-text-dark);
+  color: var(--crm-text-dark-color);
 }
 
 /* JQ spinner */
@@ -856,13 +856,13 @@ input.crm-form-checkbox) + label {
   width: var(--crm-r2);
   margin: 1px;
   cursor: var(--crm-link-hover-cursor);
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
   border-radius: 0;
   border-left: 1px solid var(--crm-input-border-color);
 }
 .crm-container .ui-spinner a.ui-spinner-button:hover,
 .crm-container .ui-spinner a.ui-spinner-button:focus {
-  color: var(--crm-c-text-light);
+  color: var(--crm-text-light-color);
 }
 .crm-container .ui-spinner a.ui-spinner-button span::before {
   font-family: "FontAwesome";
@@ -964,7 +964,7 @@ input.crm-form-checkbox) + label {
 #bootstrap-theme .disabled:is(.radio-inline,.checkbox-inline),
 #bootstrap-theme fieldset[disabled] :is(.radio-inline,.checkbox-inline) {
   cursor: not-allowed;
-  color: var(--crm-c-inactive);
+  color: var(--crm-inactive-color);
 }
 .crm-container :is(input,textarea,option):disabled {
   background-color: color-mix(in srgb, var(--crm-input-background) 90%, var(--crm-ink) 10%);

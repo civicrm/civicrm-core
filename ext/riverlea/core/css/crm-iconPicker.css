@@ -17,7 +17,7 @@
   margin-top: 2rem;
 }
 #crmIconPicker a.ui-button {
-  color: var(--crm-c-text) !important;
+  color: var(--crm-text-color) !important;
   background: transparent;
   width: var(--crm-r2);
   height: var(--crm-r2);

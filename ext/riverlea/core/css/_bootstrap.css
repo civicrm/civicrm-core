@@ -68,7 +68,7 @@
 }
 #bootstrap-theme .help-block {
   display: block;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   font-style: italic;
   margin: var(--crm-s) 0 var(--crm-m);
   font-size: var(--crm-font-small-size);
@@ -82,7 +82,7 @@
   margin-top: var(--crm-m1);
   margin-bottom: var(--crm-m1);
   font-weight: bold;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   line-height: 1.2;
 }
 #bootstrap-theme h1,
@@ -126,7 +126,7 @@
 #bootstrap-theme mark,
 #bootstrap-theme .mark {
   background: var(--crm-c-yellow);
-  color: var(--crm-c-text-dark);
+  color: var(--crm-text-dark-color);
   padding: .2rem;
 }
 @media (min-width: 768px) {
@@ -256,28 +256,28 @@
   margin-top: 5px;
 }
 #bootstrap-theme .alert-success hr {
-  border-top-color: var(--crm-alert-success-border);
+  border-top-color: var(--crm-alert-success-border-color);
 }
 #bootstrap-theme .alert-success .alert-link {
-  color: var(--crm-alert-success-text);
+  color: var(--crm-alert-success-text-color);
 }
 #bootstrap-theme .alert-info hr {
-  border-top-color: var(--crm-alert-info-border);
+  border-top-color: var(--crm-alert-info-border-color);
 }
 #bootstrap-theme .alert-info .alert-link {
-  color: var(--crm-alert-info-text);
+  color: var(--crm-alert-info-text-color);
 }
 #bootstrap-theme .alert-warning hr {
-  border-top-color: var(--crm-alert-warning-border);
+  border-top-color: var(--crm-alert-warning-border-color);
 }
 #bootstrap-theme .alert-warning .alert-link {
-  color: var(--crm-alert-warning-text);
+  color: var(--crm-alert-warning-text-color);
 }
 #bootstrap-theme .alert-danger hr {
-  border-top-color: var(--crm-alert-danger-border);
+  border-top-color: var(--crm-alert-danger-border-color);
 }
 #bootstrap-theme .alert-danger .alert-link {
-  color: var(--crm-alert-danger-text);
+  color: var(--crm-alert-danger-text-color);
 }
 
 /* Screen reader */
@@ -1290,7 +1290,7 @@
 #bootstrap-theme .form-control[disabled],
 #bootstrap-theme .form-control[readonly],
 fieldset[disabled] #bootstrap-theme .form-control {
-  background-color: var(--crm-c-layer1-bg);
+  background-color: var(--crm-layer1-bg-color);
   opacity: 1;
 }
 #bootstrap-theme .form-control[disabled],
@@ -1755,7 +1755,7 @@ fieldset[disabled] #bootstrap-theme .form-control {
 }
 #bootstrap-theme .btn-link {
   font-weight: 400;
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
   border-radius: 0;
 }
 #bootstrap-theme .btn-link,
@@ -1774,7 +1774,7 @@ fieldset[disabled] #bootstrap-theme .btn-link {
 }
 #bootstrap-theme .btn-link:hover,
 #bootstrap-theme .btn-link:focus {
-  color: var(--crm-c-link-hover);
+  color: var(--crm-link-hover-color);
   text-decoration: var(--crm-link-decoration);
   background-color: transparent;
 }
@@ -1782,7 +1782,7 @@ fieldset[disabled] #bootstrap-theme .btn-link {
 #bootstrap-theme .btn-link[disabled]:focus,
 fieldset[disabled] #bootstrap-theme .btn-link:hover,
 fieldset[disabled] #bootstrap-theme .btn-link:focus {
-  color: var(--crm-c-inactive);
+  color: var(--crm-inactive-color);
   text-decoration: none;
 }
 #bootstrap-theme .input-group-addon {
@@ -1792,50 +1792,50 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
   line-height: inherit;
   color: var(--crm-input-color);
   text-align: left;
-  background-color: var(--crm-input-bg);
+  background-color: var(--crm-input-bg-color);
   /* width: 100%; */
   border-radius: var(--crm-s-radius);
 }
 #bootstrap-theme .has-success .form-control,
 #bootstrap-theme .has-success .form-control:focus {
-  border-color: var(--crm-alert-success-border);
+  border-color: var(--crm-alert-success-border-color);
 }
 #bootstrap-theme .has-success .input-group-addon {
-  color: var(--crm-alert-success-text);
-  background-color: var(--crm-alert-sucess-bg);
-  border-color: var(--crm-alert-success-border);
+  color: var(--crm-alert-success-text-color);
+  background-color: var(--crm-alert-sucess-bg-color);
+  border-color: var(--crm-alert-success-border-color);
 }
 #bootstrap-theme .has-success .form-control-feedback {
-  color: var(--crm-c-success-on-page-bg);
+  color: var(--crm-success-ink-color);
 }
 #bootstrap-theme .has-warning .form-control {
-  border-color: var(--crm-c-warning);
+  border-color: var(--crm-warning-color);
 }
 #bootstrap-theme .has-warning .form-control:focus {
-  border-color: var(--crm-c-warning);
+  border-color: var(--crm-warning-color);
 }
 #bootstrap-theme .has-warning .input-group-addon {
-  color: var(--crm-alert-warning-text);
-  background-color: var(--crm-alert-warning-bg);
-  border-color: var(--crm-alert-warning-border);
+  color: var(--crm-alert-warning-text-color);
+  background-color: var(--crm-alert-warning-bg-color);
+  border-color: var(--crm-alert-warning-border-color);
 }
 #bootstrap-theme .has-warning .form-control-feedback {
-  color: var(--crm-c-warning);
+  color: var(--crm-warning-color);
 }
 #bootstrap-theme .has-error .form-control,
 #bootstrap-theme .has-error .form-control a.select2-default {
-  border-color: var(--crm-c-danger);
+  border-color: var(--crm-danger-color);
 }
 #bootstrap-theme .has-error .form-control:focus {
-  border-color: var(--crm-c-danger);
+  border-color: var(--crm-danger-color);
 }
 #bootstrap-theme .has-error .input-group-addon {
-  color: var(--crm-alert-danger-text);
-  background-color: var(--crm-alert-danger-bg);
-  border-color: var(--crm-alert-danger-border);
+  color: var(--crm-alert-danger-text-color);
+  background-color: var(--crm-alert-danger-bg-color);
+  border-color: var(--crm-alert-danger-border-color);
 }
 #bootstrap-theme .has-error .form-control-feedback {
-  color: var(--crm-c-danger);
+  color: var(--crm-danger-color);
 }
 
 /* Nav */
@@ -1843,7 +1843,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 #bootstrap-theme .navbar-default {
   background-color: var(--crm-c-darkest);
   border-color: var(--crm-c-darkest);
-  color: var(--crm-c-text-light);
+  color: var(--crm-text-light-color);
 }
 #bootstrap-theme .nav-justified,
 #bootstrap-theme .nav-tabs.nav-justified {
@@ -2539,7 +2539,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   padding-bottom: 30px;
   margin-bottom: 30px;
   color: inherit;
-  background-color: var(--crm-c-container-bg);
+  background-color: var(--crm-container-bg-color);
 }
 #bootstrap-theme .jumbotron h1,
 #bootstrap-theme .jumbotron .h1 {
@@ -2618,25 +2618,25 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   animation: progress-bar-stripes 2s linear infinite;
 }
 #bootstrap-theme .progress-bar-success {
-  background-color: var(--crm-c-success);
+  background-color: var(--crm-success-color);
 }
 .progress-striped #bootstrap-theme .progress-bar-success {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
 }
 #bootstrap-theme .progress-bar-info {
-  background-color: var(--crm-c-info);
+  background-color: var(--crm-info-color);
 }
 .progress-striped #bootstrap-theme .progress-bar-info {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
 }
 #bootstrap-theme .progress-bar-warning {
-  background-color: var(--crm-c-warning);
+  background-color: var(--crm-warning-color);
 }
 .progress-striped #bootstrap-theme .progress-bar-warning {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
 }
 #bootstrap-theme .progress-bar-danger {
-  background-color: var(--crm-c-danger);
+  background-color: var(--crm-danger-color);
 }
 .progress-striped #bootstrap-theme .progress-bar-danger {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
@@ -2782,7 +2782,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item:focus {
   color: #555;
   text-decoration: none;
-  background-color: var(--crm-c-container-bg);
+  background-color: var(--crm-container-bg-color);
 }
 #bootstrap-theme button.list-group-item {
   width: 100%;
@@ -2790,7 +2790,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme a.list-group-item-success,
 #bootstrap-theme button.list-group-item-success {
-  color: var(--crm-alert-success-text);
+  color: var(--crm-alert-success-text-color);
 }
 #bootstrap-theme a.list-group-item-success .list-group-item-heading,
 #bootstrap-theme button.list-group-item-success .list-group-item-heading {
@@ -2801,8 +2801,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.list-group-item-success:focus,
 #bootstrap-theme button.list-group-item-success:hover,
 #bootstrap-theme button.list-group-item-success:focus {
-  color: var(--crm-alert-success-text);
-  background-color: var(--crm-alert-success-bg);
+  color: var(--crm-alert-success-text-color);
+  background-color: var(--crm-alert-success-bg-color);
 }
 #bootstrap-theme a.list-group-item-success.active,
 #bootstrap-theme a.list-group-item-success.active:hover,
@@ -2810,17 +2810,17 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-success.active,
 #bootstrap-theme button.list-group-item-success.active:hover,
 #bootstrap-theme button.list-group-item-success.active:focus {
-  color: var(--crm-alert-success-text);
-  background-color: var(--crm-alert-success-bg);
-  border-color: var(--crm-alert-success-border);
+  color: var(--crm-alert-success-text-color);
+  background-color: var(--crm-alert-success-bg-color);
+  border-color: var(--crm-alert-success-border-color);
 }
 #bootstrap-theme .list-group-item-info {
-  color: var(--crm-alert-info-text);
-  background-color: var(--crm-alert-info-bg);
+  color: var(--crm-alert-info-text-color);
+  background-color: var(--crm-alert-info-bg-color);
 }
 #bootstrap-theme a.list-group-item-info,
 #bootstrap-theme button.list-group-item-info {
-  color: var(--crm-alert-info-text);
+  color: var(--crm-alert-info-text-color);
 }
 #bootstrap-theme a.list-group-item-info .list-group-item-heading,
 #bootstrap-theme button.list-group-item-info .list-group-item-heading {
@@ -2830,8 +2830,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.list-group-item-info:focus,
 #bootstrap-theme button.list-group-item-info:hover,
 #bootstrap-theme button.list-group-item-info:focus {
-  color: var(--crm-alert-info-text);
-  background-color: var(--crm-alert-info-bg);
+  color: var(--crm-alert-info-text-color);
+  background-color: var(--crm-alert-info-bg-color);
 }
 #bootstrap-theme a.list-group-item-info.active,
 #bootstrap-theme a.list-group-item-info.active:hover,
@@ -2839,17 +2839,17 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-info.active,
 #bootstrap-theme button.list-group-item-info.active:hover,
 #bootstrap-theme button.list-group-item-info.active:focus {
-  color: var(--crm-alert-info-text);
-  background-color: var(--crm-alert-info-bg);
-  border-color: var(--crm-alert-info-border);
+  color: var(--crm-alert-info-text-color);
+  background-color: var(--crm-alert-info-bg-color);
+  border-color: var(--crm-alert-info-border-color);
 }
 #bootstrap-theme .list-group-item-warning {
-  color: var(--crm-alert-warning-text);
-  background-color: var(--crm-alert-warning-bg);
+  color: var(--crm-alert-warning-text-color);
+  background-color: var(--crm-alert-warning-bg-color);
 }
 #bootstrap-theme a.list-group-item-warning,
 #bootstrap-theme button.list-group-item-warning {
-  color: var(--crm-alert-warning-text);
+  color: var(--crm-alert-warning-text-color);
 }
 #bootstrap-theme a.list-group-item-warning .list-group-item-heading,
 #bootstrap-theme button.list-group-item-warning .list-group-item-heading {
@@ -2859,8 +2859,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.list-group-item-warning:focus,
 #bootstrap-theme button.list-group-item-warning:hover,
 #bootstrap-theme button.list-group-item-warning:focus {
-  color: var(--crm-alert-warning-text);
-  background-color: var(--crm-alert-warning-bg);
+  color: var(--crm-alert-warning-text-color);
+  background-color: var(--crm-alert-warning-bg-color);
 }
 #bootstrap-theme a.list-group-item-warning.active,
 #bootstrap-theme a.list-group-item-warning.active:hover,
@@ -2868,17 +2868,17 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-warning.active,
 #bootstrap-theme button.list-group-item-warning.active:hover,
 #bootstrap-theme button.list-group-item-warning.active:focus {
-  color: var(--crm-alert-warning-text);
-  background-color: var(--crm-alert-warning-bg);
-  border-color: var(--crm-alert-warning-border);
+  color: var(--crm-alert-warning-text-color);
+  background-color: var(--crm-alert-warning-bg-color);
+  border-color: var(--crm-alert-warning-border-color);
 }
 #bootstrap-theme .list-group-item-danger {
-  color: var(--crm-alert-danger-text);
-  background-color: var(--crm-alert-danger-bg);
+  color: var(--crm-alert-danger-text-color);
+  background-color: var(--crm-alert-danger-bg-color);
 }
 #bootstrap-theme a.list-group-item-danger,
 #bootstrap-theme button.list-group-item-danger {
-  color: var(--crm-alert-danger-text);
+  color: var(--crm-alert-danger-text-color);
 }
 #bootstrap-theme a.list-group-item-danger .list-group-item-heading,
 #bootstrap-theme button.list-group-item-danger .list-group-item-heading {
@@ -2888,8 +2888,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.list-group-item-danger:focus,
 #bootstrap-theme button.list-group-item-danger:hover,
 #bootstrap-theme button.list-group-item-danger:focus {
-  color: var(--crm-alert-danger-text);
-  background-color: var(--crm-alert-danger-bg);
+  color: var(--crm-alert-danger-text-color);
+  background-color: var(--crm-alert-danger-bg-color);
 }
 #bootstrap-theme a.list-group-item-danger.active,
 #bootstrap-theme a.list-group-item-danger.active:hover,
@@ -2897,9 +2897,9 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme button.list-group-item-danger.active,
 #bootstrap-theme button.list-group-item-danger.active:hover,
 #bootstrap-theme button.list-group-item-danger.active:focus {
-  color: var(--crm-alert-danger-text);
-  background-color: var(--crm-alert-danger-bg);
-  border-color: var(--crm-alert-danger-border);
+  color: var(--crm-alert-danger-text-color);
+  background-color: var(--crm-alert-danger-bg-color);
+  border-color: var(--crm-alert-danger-border-color);
 }
 #bootstrap-theme .list-group-item-heading {
   margin-top: 0;
@@ -2945,7 +2945,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   min-height: 20px;
   padding: 19px;
   margin-bottom: 20px;
-  background-color: var(--crm-c-container-bg);
+  background-color: var(--crm-container-bg-color);
   border: var(--crm-border);
   border-radius: var(--crm-s-radius);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
@@ -3380,7 +3380,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   display: inline;
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
   font-weight: normal;
-  color: var(--crm-c-text-light);
+  color: var(--crm-text-light-color);
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
@@ -3400,51 +3400,51 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .label-default {
   background: var(--crm-c-darkest);
-  color: var(--crm-c-text-light);
+  color: var(--crm-text-light-color);
 }
 #bootstrap-theme .label-default[href]:hover,
 #bootstrap-theme .label-default[href]:focus {
   background: color-mix(in srgb, var(--crm-c-darkest) 87.5%, #fff 12.5%);
 }
 #bootstrap-theme .label-primary {
-  background: var(--crm-c-primary);
-  color: var(--crm-c-primary-text);
+  background: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
 }
 #bootstrap-theme .label-primary[href]:hover,
 #bootstrap-theme .label-primary[href]:focus {
-  background: var(--crm-c-primary-hover);
+  background: var(--crm-primary-hover-color);
 }
 #bootstrap-theme .label-success {
-  background: var(--crm-c-success);
-  color: var(--crm-c-success-text);
+  background: var(--crm-success-color);
+  color: var(--crm-success-text-color);
 }
 #bootstrap-theme .label-success[href]:hover,
 #bootstrap-theme .label-success[href]:focus {
-  background: color-mix(in srgb, var(--crm-c-success) 87.5%, #000 12.5%);
+  background: color-mix(in srgb, var(--crm-success-color) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label-info {
-  background: var(--crm-c-info);
-  color: var(--crm-c-info-text);
+  background: var(--crm-info-color);
+  color: var(--crm-info-text-color);
 }
 #bootstrap-theme .label-info[href]:hover,
 #bootstrap-theme .label-info[href]:focus {
-  background: color-mix(in srgb, var(--crm-c-info) 87.5%, #000 12.5%);
+  background: color-mix(in srgb, var(--crm-info-color) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label-warning {
-  background: var(--crm-c-warning);
-  color: var(--crm-c-warning-text);
+  background: var(--crm-warning-color);
+  color: var(--crm-warning-text-color);
 }
 #bootstrap-theme .label-warning[href]:hover,
 #bootstrap-theme .label-warning[href]:focus {
-  background: color-mix(in srgb, var(--crm-c-warning) 87.5%, #000 12.5%);
+  background: color-mix(in srgb, var(--crm-warning-color) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label-danger {
-  background: var(--crm-c-danger);
-  color: var(--crm-c-danger-text);
+  background: var(--crm-danger-color);
+  color: var(--crm-danger-text-color);
 }
 #bootstrap-theme .label-danger[href]:hover,
 #bootstrap-theme .label-danger[href]:focus {
-  background: color-mix(in srgb, var(--crm-c-danger) 87.5%, #000 12.5%);
+  background: color-mix(in srgb, var(--crm-danger-color) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label i.crm-i {
   color: inherit; /* resets icons inside labels to use the label text colour */

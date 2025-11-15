@@ -31,8 +31,8 @@
 .crm-participant-list-inner,
 .crm-create-new-list-inner ul.ui-widget,
 .vakata-context {
-  background-color: var(--crm-dropdown-2-bg);
-  color: var(--crm-dropdown-2-col);
+  background-color: var(--crm-dropdown-2-bg-color);
+  color: var(--crm-dropdown-2-color);
   border-radius: var(--crm-s-radius);
   box-shadow: var(--crm-shadow-popup);
   padding: var(--crm-dropdown-2-padding);
@@ -47,7 +47,7 @@
   height: 0px;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-bottom: 5px solid var(--crm-dropdown-2-bg);
+  border-bottom: 5px solid var(--crm-dropdown-2-bg-color);
   top: -5px;
   left: 12px;
 }
@@ -73,7 +73,7 @@
 .crm-event-links-list-inner ul a,
 .crm-participant-list-inner ul a,
 #crm-create-new-list ul a {
-  color: var(--crm-c-secondary-text);
+  color: var(--crm-secondary-text-color);
   padding: var(--crm-xs2) var(--crm-s);
   border-radius: var(--crm-s-radius);
   display: block;
@@ -84,8 +84,8 @@
 .crm-participant-list-inner ul a:is(:hover,:focus),
 #crm-create-new-list ul a:is(:hover,:focus), {
   text-decoration: none;
-  color: var(--crm-c-text);
-  background-color: var(--crm-c-container-bg);
+  color: var(--crm-text-color);
+  background-color: var(--crm-container-bg-color);
 }
 
 /* In-table dropdown */
@@ -106,7 +106,7 @@
   padding: 0;
   margin: var(--crm-m) 0;
   min-width: var(--crm-dropdown-width);
-  background: var(--crm-dropdown-bg);
+  background: var(--crm-dropdown-bg-color);
   border-radius: var(--crm-s-radius);
   border: var(--crm-dropdown-border);
   box-shadow: var(--crm-shadow-popup);
@@ -120,7 +120,7 @@
   height: 0px;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-bottom: 5px solid var(--crm-dropdown-bg);
+  border-bottom: 5px solid var(--crm-dropdown-bg-color);
   top: -5px;
   right: var(--crm-r);
 }
@@ -143,13 +143,13 @@
   padding: var(--crm-s);
   display: block;
   cursor: var(--crm-link-hover-cursor);
-  color: var(--crm-dropdown-col);
+  color: var(--crm-dropdown-color);
   text-align: left;
 }
 .crm-container .btn-slide ul.panel li a:hover,
 .crm-container .btn-slide ul.panel li a:focus {
   color: var(--crm-dropdown-hover);
-  background-color: var(--crm-dropdown-hover-bg);
+  background-color: var(--crm-dropdown-hover-bg-color);
 }
 
 /* Tooltip - contact dashboard/contact search */
@@ -178,11 +178,11 @@
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip {
   box-shadow: var(--crm-shadow-popup);
-  background: var(--crm-c-container-bg);
+  background: var(--crm-container-bg-color);
   border-radius: var(--crm-s-radius);
 }
 .crm-container .crm-tooltip-active:not(.crm-tooltip-down) .crm-tooltip-wrapper::after {
-  border-top: 10px solid var(--crm-c-container-bg);
+  border-top: 10px solid var(--crm-container-bg-color);
   border-left: 10px solid rgba(0,0,0,0);
   border-right: 10px solid rgba(0,0,0,0);
   content: "";
@@ -191,7 +191,7 @@
   bottom: -7px;
 }
 .crm-container .crm-tooltip-active.crm-tooltip-down .crm-tooltip-wrapper::before {
-  border-bottom: 10px solid var(--crm-c-layer1-bg);
+  border-bottom: 10px solid var(--crm-layer1-bg-color);
   border-left: 10px solid rgba(0,0,0,0);
   border-right: 10px solid rgba(0,0,0,0);
   content: "";
@@ -206,9 +206,9 @@
 .crm-container .crm-tooltip table,
 .crm-container .crm-tooltip table tr,
 .crm-container .crm-tooltip table tr td {
-  background-color: var(--crm-c-container-bg);
+  background-color: var(--crm-container-bg-color);
   border: none;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   word-wrap: break-word;
   width: 100%;
 }
@@ -220,8 +220,8 @@
   padding: var(--crm-s) 0;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr:nth-child(1) > td {
-  background: var(--crm-c-layer1-bg);
-  color: var(--crm-c-text);
+  background: var(--crm-layer1-bg-color);
+  color: var(--crm-text-color);
   font-size: var(--crm-r1);
   padding: var(--crm-m2) var(--crm-r1);
   font-weight: bold;
@@ -265,7 +265,7 @@
   margin-top: var(--crm-s);
   text-align: left;
   list-style: none;
-  background-color: var(--crm-dropdown-bg);
+  background-color: var(--crm-dropdown-bg-color);
   background-clip: padding-box;
   border: var(--crm-dropdown-border);
   border-radius: var(--crm-s-radius);
@@ -273,7 +273,7 @@
 }
 .crm-container .crm-search .api4-add-where-group-menu {
   min-width: 80px;
-  background-color: var(--crm-dropdown-bg) !important;
+  background-color: var(--crm-dropdown-bg-color) !important;
 }
 .crm-container .dropdown-menu.pull-right {
   right: 0;
@@ -283,11 +283,11 @@
   height: 1px;
   margin: var(--crm-m) 0;
   overflow: hidden;
-  background-color: var(--crm-c-layout2-bg);
+  background-color: var(--crm-c-layout2-bg-color);
 }
 #bootstrap-theme .dropdown-menu li .form-inline,
 #bootstrap-theme .dropdown-menu li .form-inline a:not(.select2-choice) {
-  color: var(--crm-dropdown-col);
+  color: var(--crm-dropdown-color);
 }
 .crm-container .dropdown-menu > li {
   border-radius: var(--crm-s-radius);
@@ -296,13 +296,13 @@
   display: block;
   padding: var(--crm-dropdown-padding);
   clear: both;
-  color: var(--crm-dropdown-col);
+  color: var(--crm-dropdown-color);
   border-radius: var(--crm-s-radius);
   white-space: nowrap;
 }
 .crm-container .dropdown-menu > li:not(.disabled) > a i.crm-i {
   padding-right: var(--crm-s);
-  color: var(--crm-dropdown-col);
+  color: var(--crm-dropdown-color);
 }
 .crm-container .dropdown-menu > li > a:hover,
 .crm-container .dropdown-menu > li > a:focus,
@@ -310,7 +310,7 @@
 .crm-container .dropdown-menu > .active > a:hover,
 .crm-container .dropdown-menu > .active > a:focus {
   color: var(--crm-dropdown-hover) !important; /* vs BS .btn-secondary:hover */
-  background-color: var(--crm-dropdown-hover-bg);
+  background-color: var(--crm-dropdown-hover-bg-color);
   text-decoration: none;
   border-radius: var(--crm-s-radius);
 }
@@ -321,7 +321,7 @@
 .crm-container .dropdown-menu > .disabled > a,
 .crm-container .dropdown-menu > .disabled > a:hover,
 .crm-container .dropdown-menu > .disabled > a:focus {
-  color: var(--crm-c-inactive);
+  color: var(--crm-inactive-color);
 }
 .crm-container .dropdown-menu > .disabled > a:hover,
 .crm-container .dropdown-menu > .disabled > a:focus {
@@ -352,10 +352,10 @@
   display: block;
   padding: var(--crm-dropdown-padding);
   white-space: nowrap;
-  color: var(--crm-dropdown-col);
+  color: var(--crm-dropdown-color);
   font-weight: bold;
   padding: var(--crm-m) var(--crm-xs) var(--crm-xs) !important;
-  border-bottom: 1px solid var(--crm-dropdown-col);
+  border-bottom: 1px solid var(--crm-dropdown-color);
   border-radius: 0;
 }
 .crm-container .pull-right > .dropdown-menu {
@@ -394,7 +394,7 @@
   margin: 2px 0 0;
   text-align: left;
   list-style: none;
-  background-color: var(--crm-dropdown-bg);
+  background-color: var(--crm-dropdown-bg-color);
   background-clip: padding-box;
   border: 1px solid var(--crm-dropdown-border);
   border: 1px solid rgba(0, 0, 0, .15);
@@ -424,18 +424,18 @@
 #afGuiEditor .dropdown-menu a:has(.text-danger) {
   display: flex;
   justify-content: center;
-  background: var(--crm-dropdown-danger-bg);
+  background: var(--crm-dropdown-danger-bg-color);
 }
 #afGuiEditor .dropdown-menu .text-danger,
 #afGuiEditor .dropdown-menu .text-danger i.crm-i::before {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-danger-text-color);
 }
 
 /* JsTree Dropdown - all of Vakata Context, from jstree/dist has to be overwritten with !important */
 
 .vakata-context {
   min-width: var(--crm-dropdown-width);
-  background-color: var(--crm-dropdown-bg) !important;
+  background-color: var(--crm-dropdown-bg-color) !important;
   border: 1px solid var(--crm-dropdown-border) !important;
   border-radius: var(--crm-s-radius);
   box-shadow: var(--crm-shadow-popup) !important;
@@ -443,7 +443,7 @@
 }
 .vakata-context li > a {
   line-height: unset !important;
-  color: var(--crm-dropdown-col) !important;
+  color: var(--crm-dropdown-color) !important;
   text-shadow: none !important;
   font-weight: normal !important;
   padding: 0 !important;
@@ -452,7 +452,7 @@
 }
 .vakata-context li > a:hover,
 .vakata-context .vakata-context-hover > a {
-  background-color: var(--crm-dropdown-hover-bg) !important;
+  background-color: var(--crm-dropdown-hover-bg-color) !important;
   box-shadow: none !important;
   color: var(--crm-dropdown-hover) !important;
 }

@@ -12,7 +12,7 @@
 }
 .crm-container .crm-dashlet {
   border-radius: var(--crm-dashlet-radius);
-  background-color: var(--crm-dashlet-bg);
+  background-color: var(--crm-dashlet-bg-color);
   padding: var(--crm-dashlet-padding);
   box-shadow: var(--crm-dashlet-box-shadow);
   margin-bottom: var(--crm-padding-reg);
@@ -22,7 +22,7 @@
   box-shadow: var(--crm-shadow-block);
 }
 .crm-container .crm-dashlet-header {
-  background-color: var(--crm-dashlet-header-bg);
+  background-color: var(--crm-dashlet-header-bg-color);
   border-radius: var(--crm-dashlet-radius);
   border: var(--crm-dashlet-header-border);
   border-width: var(--crm-dashlet-header-border-width);
@@ -37,15 +37,15 @@
   cursor: move;
   margin: 0 auto 0 0 !important;
   padding: 0;
-  color: var(--crm-dashlet-header-col);
+  color: var(--crm-dashlet-header-color);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  color: var(--crm-dashlet-header-col);
+  color: var(--crm-dashlet-header-color);
   font-size: var(--crm-dashlet-header-font-size);
 }
 .crm-container .crm-dashlet-header a {
-  color: var(--crm-dashlet-header-col);
+  color: var(--crm-dashlet-header-color);
   padding: var(--crm-xs) var(--crm-s);
   text-decoration: none;
   font-size: var(--crm-font-size);
@@ -63,7 +63,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   height: calc(100% - 1em);
 }
 .crm-container .crm-dashlet-content {
-  background: var(--crm-dashlet-bg);
+  background: var(--crm-dashlet-bg-color);
   padding: var(--crm-dashlet-content-padding);
   overflow: auto;
 }
@@ -90,7 +90,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   box-shadow: none;
   margin: 0;
   padding: var(--crm-contact-block-padding);
-  background: var(--crm-dashlet-bg);
+  background: var(--crm-dashlet-bg-color);
 }
 .crm-dashlet table.dataTable {
   overflow: scroll;
@@ -110,7 +110,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   width: 340px;
   height: var(--crm-xxl);
   box-shadow: var(--crm-shadow-popup);
-  background-color: color-mix(in srgb, var(--crm-dashlet-bg) 90%, #fff 10%);
+  background-color: color-mix(in srgb, var(--crm-dashlet-bg-color) 90%, #fff 10%);
   border-radius: var(--crm-dashlet-radius);
   margin: 0;
 }
@@ -175,7 +175,7 @@ fieldset.crm-inactive-dashlet-fieldset {
   margin-bottom: var(--crm-r);
 }
 fieldset.crm-inactive-dashlet-fieldset > div {
-  background-color: var(--crm-dashlet-dashlets-bg) !important;
+  background-color: var(--crm-dashlet-dashlets-bg-color) !important;
   box-shadow: var(--crm-dashlet-box-shadow);
   border-radius: var(--crm-dashlet-radius);
   display: flex;
