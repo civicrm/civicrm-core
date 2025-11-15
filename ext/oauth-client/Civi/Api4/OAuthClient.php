@@ -84,6 +84,10 @@ class OAuthClient extends Generic\DAOEntity {
       // Probably need this for everyone who can 'get' records...
       'meta' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
 
+      // Access controlled via AbstractGrantAction::validate()
+      'authorizationCode' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+      'userPassword' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+      'clientCredential' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
     ];
   }
 
