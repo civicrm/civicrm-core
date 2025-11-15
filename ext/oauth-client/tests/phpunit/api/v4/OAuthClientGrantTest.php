@@ -88,10 +88,10 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);
     };
 
-    $usePerms(['manage OAuth client']);
+    $usePerms(['manage OAuth client', 'administer payment processors']);
     $client = $this->createClient('test_example_3');
 
-    $usePerms(['manage OAuth client']);
+    $usePerms(['manage OAuth client', 'administer payment processors']);
     $result = Civi\Api4\OAuthClient::authorizationCode()
       ->addWhere('id', '=', $client['id'])
       ->setResponseMode('web_message')
