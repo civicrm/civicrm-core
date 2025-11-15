@@ -25,8 +25,10 @@ function oauth_client_civicrm_permission(&$permissions) {
     'description' => ts('Create and delete OAuth client connections'),
   ];
   $permissions['manage OAuth client secrets'] = [
-    'label' => $prefix . ts('manage OAuth client secrets'),
-    'description' => ts('Access OAuth secrets'),
+    // NOTE: The original name here was misleading -- it actually confers access to
+    // sensitive parts of OAuthSysToken, e.g. `access_token`, `raw`, `refresh_token`
+    'label' => $prefix . ts('manage OAuth system tokens'),
+    'description' => ts('Access the secret content of OAuth system tokens'),
   ];
   $permissions['create OAuth tokens via auth code flow'] = [
     'label' => $prefix . ts('create OAuth tokens via auth code flow'),
