@@ -105,6 +105,59 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
     }
   }
 
+  /**
+   * Generate the URL to request an authorization code from a provider.
+   */
+  public function testAuthorizationCode_prohibited(): void {
+    $usePerms = function($ps) {
+      $base = ['access CiviCRM'];
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);
+    };
+
+    $usePerms(['manage OAuth client', 'administer payment processors']);
+    $client = $this->createClient('test_example_3');
+    $usePerms(['access CiviContribute']);
+
+    // With dropped privileges, we can see the client...
+    $get = Civi\Api4\OAuthClient::get()
+      ->addWhere('id', '=', $client['id'])
+      ->execute()
+      ->single();
+    $this->assertEquals('test_example_3', $get['provider']);
+
+    // But we cannot add new tokens... with any of the standard grant-types...
+
+    try {
+      Civi\Api4\OAuthClient::authorizationCode()
+        ->addWhere('id', '=', $client['id'])
+        ->execute();
+      $this->fail('test_example_3 should require a higher privilege (administer payment processors)');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertMatchesRegularExpression(';Insufficient.*authorizationCode.*test_example_3;', $e->getMessage());
+    }
+
+    try {
+      Civi\Api4\OAuthClient::clientCredential()
+        ->addWhere('id', '=', $client['id'])
+        ->execute();
+      $this->fail('test_example_3 should require a higher privilege (administer payment processors)');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertMatchesRegularExpression(';Insufficient.*clientCredential.*test_example_3;', $e->getMessage());
+    }
+
+    try {
+      Civi\Api4\OAuthClient::userPassword()
+        ->addWhere('id', '=', $client['id'])
+        ->execute();
+      $this->fail('test_example_3 should require a higher privilege (administer payment processors)');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertMatchesRegularExpression(';Insufficient.*userPassword.*test_example_3;', $e->getMessage());
+    }
+  }
+
   private function createClient(string $provider): array {
     $create = Civi\Api4\OAuthClient::create()->setValues([
       'provider' => $provider,
