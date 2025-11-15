@@ -61,28 +61,26 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
     if (defined('_JEXEC')) {
       if (version_compare(JVERSION, '4.0', 'ge')) {
         \Joomla\CMS\Plugin\PluginHelper::importPlugin('civicrm');
+        $app = \Joomla\CMS\Factory::getApplication();
       }
       else {
         //Invoke the Joomla plugin system to observe to civicrm events.
         jimport('joomla.plugin.helper');
         jimport('cms.plugin.helper');
         JPluginHelper::importPlugin('civicrm');
-      }
 
-      // get app based on cli or web
-      if (PHP_SAPI != 'cli') {
-        $app = JFactory::getApplication('administrator');
-      }
-      else {
-        // condition on Joomla version
-        if (version_compare(JVERSION, '3.0', 'lt')) {
-          $app = JCli::getInstance();
-        }
-        elseif (version_compare(JVERSION, '4.0', 'lt')) {
-          $app = JApplicationCli::getInstance();
+        // get app based on cli or web
+        if (PHP_SAPI != 'cli') {
+          $app = JFactory::getApplication('administrator');
         }
         else {
-          $app = \Joomla\CMS\Factory::getApplication();
+          // condition on Joomla version
+          if (version_compare(JVERSION, '3.0', 'lt')) {
+            $app = JCli::getInstance();
+          }
+          else {
+            $app = JApplicationCli::getInstance();
+          }
         }
       }
 
