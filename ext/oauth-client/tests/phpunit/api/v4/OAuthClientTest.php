@@ -62,6 +62,51 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
     $this->assertEquals(0, $get->count());
   }
 
+  /**
+   * We may provide general 'get' access to OAuthClient for several users, but the 'secret'
+   * field specifically requires 'manage OAuth client'.
+   *
+   * @return void
+   */
+  public function testRestrictedSecret(): void {
+    $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
+
+    $usePerms = function($ps) {
+      $base = ['access CiviCRM'];
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);
+    };
+
+    // With more perms, we can create the client...
+    $usePerms(['manage OAuth client', 'administer payment processors']);
+    $create = Civi\Api4\OAuthClient::create()->setValues([
+      'provider' => 'test_example_3',
+      'guid' => "example-id-$random" ,
+      'secret' => "example-secret-$random",
+    ])->execute();
+    $this->assertEquals(1, $create->count());
+    $client = $create->first();
+    $this->assertEquals("example-id-$random", $client['guid']);
+    $this->assertEquals("example-secret-$random", $client['secret']);
+
+    // With some perms, we can view the client... but not the secret...
+    $usePerms(['administer payment processors']);
+    $client = Civi\Api4\OAuthClient::get()
+      ->addWhere('provider', '=', 'test_example_3')
+      ->execute()
+      ->single();
+    $this->assertEquals("example-id-$random", $client['guid']);
+    $this->assertTrue(empty($client['secret']), 'Should not have read access to secret');
+
+    // And if we don't check perms, then the secret is visible...
+    $usePerms(['administer payment processors']);
+    $client = Civi\Api4\OAuthClient::get(FALSE)
+      ->addWhere('provider', '=', 'test_example_3')
+      ->execute()
+      ->single();
+    $this->assertEquals("example-id-$random", $client['guid']);
+    $this->assertEquals("example-secret-$random", $client['secret']);
+  }
+
   public function testCreateBadProvider() {
     $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
     $usePerms = function($ps) {
