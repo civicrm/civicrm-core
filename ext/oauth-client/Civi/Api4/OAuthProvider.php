@@ -2,8 +2,7 @@
 
 namespace Civi\Api4;
 
-use Civi\Core\Event\GenericHookEvent;
-use Civi\OAuth\CiviGenericProvider;
+use CRM_Core_Permission;
 
 class OAuthProvider extends Generic\AbstractEntity {
 
@@ -14,29 +13,7 @@ class OAuthProvider extends Generic\AbstractEntity {
    * @return Generic\BasicGetAction
    */
   public static function get($checkPermissions = TRUE) {
-    $action = new Generic\BasicGetAction('OAuthProvider', __FUNCTION__, function () {
-      $cache = \Civi::cache('long');
-      if (!$cache->has('OAuthProvider_list')) {
-        $providers = [];
-        $event = GenericHookEvent::create([
-          'providers' => &$providers,
-        ]);
-        \Civi::dispatcher()->dispatch('hook_civicrm_oauthProviders', $event);
-
-        foreach ($providers as $name => &$provider) {
-          if ($provider['name'] !== $name) {
-            throw new \CRM_Core_Exception(sprintf("Mismatched OAuth provider names: \"%s\" vs \"%s\"",
-              $provider['name'], $name));
-          }
-          if (!isset($provider['class'])) {
-            $provider['class'] = CiviGenericProvider::class;
-          }
-        }
-
-        $cache->set('OAuthProvider_list', $providers, self::TTL);
-      }
-      return $cache->get('OAuthProvider_list');
-    });
+    $action = new Action\OAuthProvider\GetProviders('OAuthProvider', __FUNCTION__);
     return $action->setCheckPermissions($checkPermissions);
   }
 
@@ -55,6 +32,9 @@ class OAuthProvider extends Generic\AbstractEntity {
         ],
         [
           'name' => 'class',
+        ],
+        [
+          'name' => 'permissions',
         ],
         [
           'name' => 'options',
@@ -79,8 +59,8 @@ class OAuthProvider extends Generic\AbstractEntity {
    */
   public static function permissions() {
     return [
-      "meta" => ["access CiviCRM"],
-      "get" => ["access CiviCRM"],
+      "meta" => [CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+      "get" => [CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
       "default" => ["administer CiviCRM"],
     ];
   }
