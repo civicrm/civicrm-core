@@ -730,7 +730,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     else {
       $user = $factoryClassName::getApplication()->getIdentity();
     }
-    return !$user->guest;
+    return isset($user) && !$user->guest;
   }
 
   /**
@@ -767,7 +767,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     else {
       $user = $factoryClassName::getApplication()->getIdentity();
     }
-    return ($user->guest) ? NULL : $user->id;
+    return (empty($user) || $user->guest) ? NULL : $user->id;
   }
 
   /**
@@ -811,7 +811,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getUniqueIdentifierFromUserObject($user) {
-    return ($user->guest) ? NULL : $user->email;
+    return (empty($user) || $user->guest) ? NULL : $user->email;
   }
 
   /**
@@ -960,7 +960,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $userRecordUrl = NULL;
     $factoryClassName = $this->factoryClassName();
     // if logged in user has user edit access, then allow link to other users joomla profile
-    if ($factoryClassName::getApplication()->getIdentity()->authorise('core.edit', 'com_users')) {
+    if ($factoryClassName::getApplication()->getIdentity()?->authorise('core.edit', 'com_users')) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
     }
     elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
@@ -973,7 +973,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function checkPermissionAddUser() {
     $factoryClassName = $this->factoryClassName();
-    if ($factoryClassName::getApplication()->getIdentity()->authorise('core.create', 'com_users')) {
+    if ($factoryClassName::getApplication()->getIdentity()?->authorise('core.create', 'com_users')) {
       return TRUE;
     }
   }
