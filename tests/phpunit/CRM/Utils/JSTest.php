@@ -247,8 +247,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   public static function encodeExamples() {
     return [
       [
-        ['a' => 'Apple', 'b' => 'Banana', 'c' => [0, -2, 3.15]],
-        "{a: 'Apple', b: 'Banana', c: [0, -2, 3.15]}",
+        ['a' => 'Apple', 'b' => '🍌Banana', 'c' => [0, -2, 3.15]],
+        "{a: 'Apple', b: '🍌Banana', c: [0, -2, 3.15]}",
       ],
       [
         ['a.b-c' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ["'a'" => ["fo\\'oo", '"bar"'], 'b' => []]]],

@@ -215,7 +215,7 @@ class CRM_Utils_JS {
     if (is_array($value)) {
       return self::writeObject($value, TRUE);
     }
-    $result = json_encode($value, JSON_UNESCAPED_SLASHES);
+    $result = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     // Convert double-quotes around string to single quotes
     if (is_string($value) && substr($result, 0, 1) === '"' && substr($result, -1) === '"') {
       $backslash = chr(0) . 'backslash' . chr(0);
