@@ -18,6 +18,14 @@ class CRM_OAuth_Hook {
    *         - scopes: array (e.g. "read_profile", "frobnicate_widgets")
    *         - responseModes: array (e.g. "query", "web_message")
    *     - tags: string[], list of free-tags describing the purpose/behavior of this provider
+   *     - permissions: array, list of actions and their required permissions
+   *         Ex: ['meta' => 'access CiviMail', 'get' => 'access CiviMail', 'authorizationCode' => 'schedule mailings']
+   *         Actions are generally based on OAuthClient API.
+   *         Valid keys include:
+   *         - meta: Permissions required to view metadata (e.g. OAuthProvider)
+   *         - get: Permissions required to inspect basic info about OAuthClient
+   *         Permissions will be checked via CRM_Core_Permission::check(). They may be strings or arrays.
+   *         NOTE: For more info about supported actions+permissions, review Civi\Api4\OAuthClient::permissions().
    */
   public static function oauthProviders(array &$providers): void {
     $event = GenericHookEvent::create([
