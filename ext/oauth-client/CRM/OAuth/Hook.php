@@ -24,6 +24,9 @@ class CRM_OAuth_Hook {
    *         Valid keys include:
    *         - meta: Permissions required to view metadata (e.g. OAuthProvider)
    *         - get: Permissions required to inspect basic info about OAuthClient
+   *         - authorizationCode: Permissions required to add token using web page-flow
+   *         - userPassword: Permissions required to add token with username/password flow
+   *         - clientCredential: Permissions required to add token with client-credential flow
    *         Permissions will be checked via CRM_Core_Permission::check(). They may be strings or arrays.
    *         NOTE: For more info about supported actions+permissions, review Civi\Api4\OAuthClient::permissions().
    */
