@@ -27,22 +27,22 @@
   --crm-c-yellow: #fcfc5a; /* todo change this horrible yellow! */
   --crm-c-yellow-light: #f2deb9;
 /* PRACTICAL COLOURS */
-  --crm-c-text-dark: #000000dd;
+  --crm-text-dark-color: #000000dd;
   --crm-border-color: var(--crm-c-blue-overlay);
-  --crm-c-page-bg: #f3f2ed;
-  --crm-c-container-bg: #f8f8f8;
-  --crm-c-layer2-bg: color-mix(in srgb,var(--crm-c-layer1-bg) 90%,#000 10%);
-  --crm-c-drag-bg: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
-  --crm-c-code-bg: var(--crm-c-blue-overlay2); /* background for code regions */
+  --crm-page-bg-color: #f3f2ed;
+  --crm-container-bg-color: #f8f8f8;
+  --crm-layer2-bg-color: color-mix(in srgb,var(--crm-layer1-bg-color) 90%,#000 10%);
+  --crm-drag-bg-color: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
+  --crm-code-bg-color: var(--crm-c-blue-overlay2); /* background for code regions */
   /* Emphasis colours */
-  --crm-c-primary: var(--crm-c-blue-dark); /* primary button bgs */
-  --crm-c-primary-hover: var(--crm-c-blue-darker);
-  --crm-c-secondary: #c9e1f1; /* buttons */
-  --crm-c-secondary-hover: #a1cef3;
-  --crm-c-secondary-text: var(--crm-c-blue-darker);
-  --crm-c-secondary-hover-text: var(--crm-c-text-light); /* thames todo */
-  --crm-c-secondary-on-page-bg: var(--crm-c-blue-darker);
-  --crm-c-warning-text: var(--crm-c-text-dark);
+  --crm-primary-color: var(--crm-c-blue-dark); /* primary button bgs */
+  --crm-primary-hover-color: var(--crm-c-blue-darker);
+  --crm-secondary-color: #c9e1f1; /* buttons */
+  --crm-secondary-hover-color: #a1cef3;
+  --crm-secondary-text-color: var(--crm-c-blue-darker);
+  --crm-secondary-hover-text-color: var(--crm-text-light-color); /* thames todo */
+  --crm-secondary-ink-color: var(--crm-c-blue-darker);
+  --crm-warning-text-color: var(--crm-text-dark-color);
 }
 :root {
 /* thames only radii */
@@ -59,8 +59,8 @@
   --crm-page-padding: clamp(0.5rem 2vw 4rem); /* Margin left/right */
 /* Type */
   --crm-font: Lato, sans-serif;
-  --crm-heading-bg: unset;
-  --crm-heading-col: var(--crm-c-text-dark);
+  --crm-heading-bg-color: unset;
+  --crm-heading-color: var(--crm-text-dark-color);
   --crm-heading-padding: var(--crm-s1) var(--crm-m1); /* thames unset this? todo */
 }
 :root {
@@ -69,23 +69,23 @@
   --crm-btn-padding-inline: var(--crm-m2);
   --crm-btn-height: 1.825rem;
   --crm-btn-icon-spacing: var(--crm-xs2);
-  --crm-btn-cancel-bg: var(--crm-c-red-light);
-  --crm-btn-cancel-text: var(--crm-c-red-dark);
-  --crm-btn-info-bg: var(--crm-c-secondary);
-  --crm-btn-info-text: var(--crm-c-secondary-text);
-  --crm-btn-success-bg: var(--crm-c-info);
-  --crm-btn-success-text: #fff;
-  --crm-btn-danger-bg: var(--crm-c-red);
-  --crm-btn-danger-text: var(--crm-c-red-dark);
+  --crm-btn-cancel-bg-color: var(--crm-c-red-light);
+  --crm-btn-cancel-text-color: var(--crm-c-red-dark);
+  --crm-btn-info-bg-color: var(--crm-secondary-color);
+  --crm-btn-info-text-color: var(--crm-secondary-text-color);
+  --crm-btn-success-bg-color: var(--crm-info-color);
+  --crm-btn-success-text-color: #fff;
+  --crm-btn-danger-bg-color: var(--crm-c-red);
+  --crm-btn-danger-text-color: var(--crm-c-red-dark);
   --crm-btn-margin: var(--crm-m) 0;
 }
 :root {
 /* Tables */
-  --crm-table-outside-border: 1px solid var(--crm-c-layer2-bg);
-  --crm-table-bg: var(--crm-c-page-bg);
-  --crm-table-header-bg: var(--crm-c-page-bg);
-  --crm-table-row-bg: var(--crm-c-gray-025);
-  --crm-table-row-hover: var(--crm-c-blue-overlay);
+  --crm-table-outside-border: 1px solid var(--crm-layer2-bg-color);
+  --crm-table-bg-color: var(--crm-page-bg-color);
+  --crm-table-header-bg-color: var(--crm-page-bg-color);
+  --crm-table-row-bg-color: var(--crm-c-gray-025);
+  --crm-table-row-hover-color: var(--crm-c-blue-overlay);
 }
 :root {
 /* Panels */
@@ -95,21 +95,21 @@
 /* Accordions */
   --crm-accordion-radius: 4px;
 /* .crm-accordion-bold */
-  --crm-accordion-header-bg: var(--crm-c-blue-overlay);
-  --crm-accordion-header-bg-active: var(--crm-c-blue-overlay);
+  --crm-accordion-header-bg-color: var(--crm-c-blue-overlay);
+  --crm-accordion-header-bg-active-color: var(--crm-c-blue-overlay);
   --crm-accordion-header-color: var(--crm-c-blue-darker);
   --crm-accordion-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem;
   --crm-accordion-header-border: unset;
   --crm-accordion-header-border-width: unset;
   --crm-accordion-border: unset;
   --crm-accordion-border-width: unset;
-  --crm-accordion-body-bg: var(--crm-c-blue-overlay); /* thames - todo check*/
+  --crm-accordion-body-bg-color: var(--crm-c-blue-overlay); /* thames - todo check*/
   --crm-accordion-body-padding: 0.25rem 2.8rem;
 /* .crm-accordion-light */
-  --crm-accordion2-header-bg: transparent;
-  --crm-accordion2-header-bg-active: var(--crm-c-layer2-bg);
+  --crm-accordion2-header-bg-color: transparent;
+  --crm-accordion2-header-bg-active-color: var(--crm-layer2-bg-color);
   --crm-accordion2-header-padding: .6rem 1.6rem 0.6rem 2.8rem;
-  --crm-accordion2-body-bg: transparent;
+  --crm-accordion2-body-bg-color: transparent;
   --crm-accordion2-body-padding: 0.25rem 2.8rem;
 }
 :root {
@@ -117,16 +117,16 @@
   --crm-alert-padding: var(--crm-r);
   --crm-alert-border-width: 0;
 /* Note 'help' suffix here is for the 'success' boxes. */
-  --crm-alert-success-bg: var(--crm-c-blue-light);
-  --crm-alert-success-border: unset;
-  --crm-alert-success-text: unset;
-  --crm-alert-warning-border: var(--crm-c-yellow);
-  --crm-alert-info-bg: var(--crm-c-blue-light);
-  --crm-alert-info-border: var(--crm-c-blue);
-  --crm-alert-info-text: var(--crm-c-blue-darker);
-  --crm-alert-danger-bg: var(--crm-c-red-light);
-  --crm-alert-danger-border: var(--crm-c-red);
-  --crm-alert-danger-text: var(--crm-c-red-dark);
+  --crm-alert-success-bg-color: var(--crm-c-blue-light);
+  --crm-alert-success-border-color: unset;
+  --crm-alert-success-text-color: unset;
+  --crm-alert-warning-border-color: var(--crm-c-yellow);
+  --crm-alert-info-bg-color: var(--crm-c-blue-light);
+  --crm-alert-info-border-color: var(--crm-c-blue);
+  --crm-alert-info-text-color: var(--crm-c-blue-darker);
+  --crm-alert-danger-bg-color: var(--crm-c-red-light);
+  --crm-alert-danger-border-color: var(--crm-c-red);
+  --crm-alert-danger-text-color: var(--crm-c-red-dark);
 }
 :root {
 /* Form */
@@ -137,15 +137,15 @@
 }
 :root {
 /* Tabs */
-  --crm-tabs-bg: var(--crm-c-blue-overlay2);
+  --crm-tabs-bg-color: var(--crm-c-blue-overlay2);
   --crm-tabs-padding: 0;
   --crm-tabs-border: 4px solid var(--crm-c-blue-overlay2);
-  --crm-tab-bg-hover: var(--crm-c-blue-overlay);
+  --crm-tab-hover-bg-color: var(--crm-c-blue-overlay);
   --crm-tab-bg-active: var(--crm-paper);
   --crm-tab-hang: 0 0 calc(-1 * var(--crm-s)) 0; /* thames todo check */
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m); /* thames todo check */
-  --crm-tab-count-bg: var(--crm-c-info-text);
-  --crm-tab-count-col: var(--crm-c-info);
+  --crm-tab-count-bg-color: var(--crm-info-text-color);
+  --crm-tab-count-color: var(--crm-info-color);
   --crm-tab-radius: var(--crm-r-3) var(--crm-r-3) 0 0;
   --crm-tab-border: none;
   --crm-tabs-2-border: var(--crm-tabs-border);
@@ -158,65 +158,63 @@
   --crm-side-tabs-width: 220px;
   --crm-contact-tabs-flow: column;
   --crm-contact-tabs-gap: 0;
-  --crm-contact-tabs-bg: var(--crm-c-blue-overlay);
+  --crm-contact-tabs-bg-color: var(--crm-c-blue-overlay);
   --crm-contact-tabs-padding: unset;
-  --crm-contact-tab-bg: transparent;
+  --crm-contact-tab-bg-color: transparent;
   --crm-contact-tabs-radius: var(--crm-contact-radius) 0 0 var(--crm-contact-radius);
-  --crm-contact-tab-bg-hover: var(--crm-paper);
+  --crm-contact-tab-hover-bg-color: var(--crm-paper);
   --crm-contact-tab-padding: var(--crm-m2) var(--crm-r1);
   --crm-contact-tab-border: var(--crm-contact-border);
-  --crm-contact-tab-col: unset;
-  --crm-contact-tab-count-bg: var(--crm-c-primary);
-  --crm-contact-tab-count-col: var(--crm-c-text-light);
+  --crm-contact-tab-count-bg-color: var(--crm-primary-color);
+  --crm-contact-tab-count-color: var(--crm-text-light-color);
   --crm-contact-tab-hang: 0 0 -1px 0;
   --crm-contact-tab-radius: 0;
   --crm-contact-heading-inset: unset;
   --crm-contact-panel-padding: var(--crm-r2);
-  --crm-contact-panel-bg: var(--crm-paper);
   --crm-contact-panel-radius: 0 var(--crm-contact-radius) var(--crm-contact-radius) 0;
   --crm-contact-edit-border: 1px solid var(--crm-c-blue-dark);
   --crm-contact-block-padding: var(--crm-m2);
-  --crm-contact-block-bg: var(--crm-c-container-bg);
-  --crm-contact-label-bg: var(--crm-c-container-bg);
-  --crm-contact-header-bg: unset;
-  --crm-contact-header-bg2: unset;
-  --crm-contact-header-col: var(--crm-c-blue-darker);
+  --crm-contact-block-bg-color: var(--crm-container-bg-color);
+  --crm-contact-label-bg-color: var(--crm-container-bg-color);
+  --crm-contact-header-bg-color: unset;
+  --crm-contact-header2-bg-color: unset;
+  --crm-contact-header-color: var(--crm-c-blue-darker);
   --crm-contact-header-padding: unset;
   --crm-contact-image-right: 20px;
 }
 :root {
 /* Dialog */
-  --crm-dialog-bg: var(--crm-c-page-bg);
+  --crm-dialog-bg-color: var(--crm-page-bg-color);
   --crm-dialog-padding: 0;
-  --crm-dialog-header-bg: var(--crm-c-blue-overlay);
-  --crm-dialog-header-col: var(--crm-c-blue-darker);
-  --crm-dialog-header-border-col: transparent;
+  --crm-dialog-header-bg-color: var(--crm-c-blue-overlay);
+  --crm-dialog-header-color: var(--crm-c-blue-darker);
+  --crm-dialog-header-border-color: transparent;
 }
 :root {
 /* Dashlet */
   --crm-dashlet-box-shadow: none;
-  --crm-dashlet-header-bg: var(--crm-paper);
-  --crm-dashlet-tabs-bg: var(--crm-tabs-bg);
+  --crm-dashlet-header-bg-color: var(--crm-paper);
+  --crm-dashlet-tabs-bg-color: var(--crm-tabs-bg-color);
   --crm-dashlet-radius: var(--crm-r-3);
 }
 :root {
 /* Button dropdowns */
-  --crm-dropdown-bg: var(--crm-paper);
-  --crm-dropdown-col: var(--crm-c-blue-darker);
+  --crm-dropdown-bg-color: var(--crm-paper);
+  --crm-dropdown-color: var(--crm-c-blue-darker);
   --crm-dropdown-hover: var(--crm-c-blue-dark);
-  --crm-dropdown-hover-bg: var(--crm-c-blue-light);
+  --crm-dropdown-hover-bg-color: var(--crm-c-blue-light);
   --crm-dropdown-width: 23ch;
 }
 :root {
 /* Notifications */
-  --crm-notify-bg: var(--crm-paper);
-  --crm-notify-col: var(--crm-c-text);
+  --crm-notify-bg-color: var(--crm-paper);
+  --crm-notify-color: var(--crm-text-color);
   --crm-notify-accent-border: 0.875rem 0 0 0;
   --crm-notify-radius: 4px;
-  --crm-notify-danger: var(--crm-c-danger);
-  --crm-notify-warning: var(--crm-c-warning);
-  --crm-notify-success: var(--crm-c-success);
-  --crm-notify-info: var(--crm-c-info);
+  --crm-notify-danger-color: var(--crm-danger-color);
+  --crm-notify-warning-color: var(--crm-warning-color);
+  --crm-notify-success-color: var(--crm-success-color);
+  --crm-notify-info-color: var(--crm-info-color);
 }
 :root {
 /* Icons */
@@ -228,40 +226,40 @@
 }
 :root {
 /* Wizard */
-  --crm-wizard-bg: var(--crm-c-page-bg);
+  --crm-wizard-bg-color: var(--crm-page-bg-color);
 }
 :root {
 /* Alpha filter */
-  --crm-filter-bg: var(--crm-c-blue-overlay);
-  --crm-filter-item-bg: transparent;
+  --crm-filter-bg-color: var(--crm-c-blue-overlay);
+  --crm-filter-item-bg-color: transparent;
   --crm-filter-item-shadow: none;
 }
 :root {
 /* Frontend */
   --crm-f-form-width: 700px;
-  --crm-f-fieldset-bg: var(--crm-c-container-bg);
+  --crm-f-fieldset-bg-color: var(--crm-container-bg-color);
   --crm-f-fieldset-padding: var(--crm-r);
   --crm-f-legend-align: center;
   --crm-f-label-position: unset;
   --crm-f-label-align: left;
   --crm-f-label-width: unset;
   --crm-f-input-width: 100%;
-  --crm-f-form-focus-bg: var(--crm-c-green);
-  --crm-f-form-error-bg: var(--crm-c-red);
+  --crm-f-form-focus-bg-color: var(--crm-c-green);
+  --crm-f-form-error-bg-color: var(--crm-c-red);
 }
 
 /* Only affect body colour in standalone */
 html.cms-standalone body {
-  background-color: var(--crm-c-page-bg);
+  background-color: var(--crm-page-bg-color);
 }
 
 #crm-container {
   min-height: 100vh;
-  background-color: var(--crm-c-page-bg);
+  background-color: var(--crm-page-bg-color);
 }
 
 .crm-container details {
-  /* background-color: var(--crm-accordion-body-bg); Removed for FormBuilder clashes */
+  /* background-color: var(--crm-accordion-body-bg-color); Removed for FormBuilder clashes */
   border: var(--crm-border);
 }
 
@@ -354,7 +352,7 @@ html.cms-standalone body {
 
 /* Alternate backgrounds */
 /* .crm-container details:not(.crm-accordion-light) details:not(.crm-accordion-light) { */
-/*   --crm-accordion-header-bg: var(--crm-c-blue-overlay2); */
+/*   --crm-accordion-header-bg-color: var(--crm-c-blue-overlay2); */
 /* } */
 
 
@@ -473,7 +471,7 @@ html.cms-standalone body {
 /* OTHER */
 /* 'alpha-filter' is the alphabetical pager you see, for example, on adv search results */
 .crm-container #alpha-filter li {
-  --crm-c-text: #0002; /* referenced in searchForm.css */
+  --crm-text-color: #0002; /* referenced in searchForm.css */
 }
 
 .crm-container .description:not(#help),
@@ -488,7 +486,7 @@ html.cms-standalone body {
     background-color: var(--crm-c-blue-overlay);
 }
   50% {
-    background-color: var(--crm-c-page-bg);
+    background-color: var(--crm-page-bg-color);
 }
   100% {
     background-color: var(--crm-c-blue-overlay);
@@ -665,8 +663,8 @@ div:has(> table .dropdown-toggle[aria-expanded="true"]) {
 /* breadcrumbs - links not accessibile using the nromal blue. */
 #civicrm-footer a,
 nav.breadcrumb a {
-  --crm-c-link: var(--crm-c-blue-darker);
-  --crm-c-link-hover: var(--crm-c-blue-dark);
+  --crm-link-color: var(--crm-c-blue-darker);
+  --crm-link-hover-color: var(--crm-c-blue-dark);
 }
 #crm-contactname-content .crm-edit-help {
   color: var(--crm-c-blue-dark) !important; /* override */
@@ -787,22 +785,22 @@ html.crm-standalone  nav.breadcrumb>ol {
   /*issue https://lab.civicrm.org/extensions/riverlea/-/issues/102 */
   margin-left: 1rem;
   /* crmSearchAdmin applies this var as the bg here and it does not suit us. */
-  --crm-c-page-bg: transparent;
+  --crm-page-bg-color: transparent;
 }
 
 /* Override contactSummary.css */
 #crm-contact-actions-list a.delete {
-  --crm-c-danger-text: var(--crm-c-red-dark);
+  --crm-danger-text-color: var(--crm-c-red-dark);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
   /* the hover state gives crm-c-red-dark to the background */
-  --crm-c-danger-text: var(--crm-c-red-light);
+  --crm-danger-text-color: var(--crm-c-red-light);
 }
 
 /* Fix Mosaico wizard */
 .crm_wizard__tille {
-  --crm-panel-bg: transparent;
+  --crm-panel-bg-color: transparent;
 }
 .crmb-wizard-button-right {
   gap: 1rem;
@@ -817,11 +815,11 @@ html.crm-standalone  nav.breadcrumb>ol {
 ul.crm-quickSearch-results a {
   padding: 0.25rem 1rem;
   text-decoration: none;
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
 }
 ul.crm-quickSearch-results .ui-state-active a /* mouse,keyboard nav */ {
   background: var(--crm-c-blue);
-  color: var(--crm-c-link-hover);
+  color: var(--crm-link-hover-color);
 }
 ul.crm-quickSearch-results a:active {
   background: white;
@@ -845,7 +843,7 @@ ul.crm-quickSearch-results a:active {
   min-width: 8rem;
   max-width: 13rem;
   text-align: left;
-  --crm-c-layer1-bg: transparent;
+  --crm-layer1-bg-color: transparent;
 
   .crm-status-box-msg {
     color: white;

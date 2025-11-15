@@ -7,9 +7,9 @@
 /* Tables */
   --crm-table-outside-border: 1px solid var(--crm-c-gray-200);
 /* Alerts */
-  --crm-alert-warning-bg: var(--crm-c-yellow-light);
+  --crm-alert-warning-bg-color: var(--crm-c-yellow-light);
 /* Tabs */
-  --crm-tab-bg-hover: var(--crm-c-container-bg);
+  --crm-tab-hover-bg-color: var(--crm-container-bg-color);
 }
 
 /* Custom CSS */

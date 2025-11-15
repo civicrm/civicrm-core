@@ -9,7 +9,7 @@
   cursor: var(--crm-link-hover-cursor);
   font-size: var(--crm-font-size);
   font-weight: var(--crm-accordion-header-weight);
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   border-radius: var(--crm-accordion-radius);
   padding: var(--crm-accordion-header-padding);
 }
@@ -30,9 +30,9 @@
 }
 .crm-container details:has(input.crm-inline-error) summary,
 .crm-container details:has(input.crm-inline-error) summary.active {
-  background-color: var(--crm-alert-danger-bg);
-  color: var(--crm-alert-danger-text);
-  border-color: var(--crm-alert-danger-border);
+  background-color: var(--crm-alert-danger-bg-color);
+  color: var(--crm-alert-danger-text-color);
+  border-color: var(--crm-alert-danger-border-color);
 }
 
 /* Expand/collapse icons */
@@ -57,10 +57,10 @@
 
 /* Style 1 'bold' */
 .crm-container .crm-accordion-bold {
-  background-color: var(--crm-accordion-body-bg);
+  background-color: var(--crm-accordion-body-bg-color);
 }
 .crm-container .crm-accordion-bold > summary {
-  background-color: var(--crm-accordion-header-bg);
+  background-color: var(--crm-accordion-header-bg-color);
   color: var(--crm-accordion-header-color);
   border: var(--crm-accordion-header-border);
   border-width: var(--crm-accordion-header-border-width);
@@ -72,7 +72,7 @@
 .crm-container .crm-accordion-bold > summary.active,
 .crm-container .crm-accordion-bold > summary:hover,
 .crm-container .crm-accordion-bold > summary:focus { /* hover version of that */
-  background-color: var(--crm-accordion-header-bg-active);
+  background-color: var(--crm-accordion-header-bg-active-color);
 }
 .crm-container .crm-accordion-bold > .crm-accordion-body {
   padding: var(--crm-accordion-body-padding);
@@ -88,11 +88,11 @@
 
 /* Style 2 'light' */
 .crm-container .crm-accordion-light {
-  background-color: var(--crm-accordion2-body-bg);
+  background-color: var(--crm-accordion2-body-bg-color);
 }
 .crm-container .crm-accordion-light > summary {
   font-weight: var(--crm-accordion2-header-weight);
-  background-color: var(--crm-accordion2-header-bg);
+  background-color: var(--crm-accordion2-header-bg-color);
   color: var(--crm-accordion2-header-color);
   border: var(--crm-accordion2-header-border);
   border-width: var(--crm-accordion2-header-border-width);
@@ -101,14 +101,14 @@
 .crm-container .crm-accordion-light > summary.active,
 .crm-container .crm-accordion-light > summary:hover,
 .crm-container .crm-accordion-light > summary:focus { /* hover version of that */
-  background-color: var(--crm-accordion2-header-bg-active);
+  background-color: var(--crm-accordion2-header-bg-active-color);
 }
 .crm-container .crm-accordion-light > summary a {
   color: var(--crm-accordion2-header-color);
 }
 .crm-container .crm-accordion-light > .crm-accordion-body {
   padding: var(--crm-accordion2-body-padding);
-  background: var(--crm-accordion2-body-bg);
+  background: var(--crm-accordion2-body-bg-color);
   border: var(--crm-accordion2-border);
   border-width: var(--crm-accordion2-border-width);
   border-radius: 0 0 var(--crm-accordion-radius) var(--crm-accordion-radius);
@@ -141,7 +141,7 @@
   box-shadow: none;
   border: 0 solid transparent;
   background-color: transparent;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 #contact-summary details .crm-summary-block {
   box-shadow: var(--crm-shadow-block);

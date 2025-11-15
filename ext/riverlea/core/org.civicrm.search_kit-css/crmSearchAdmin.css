@@ -69,7 +69,7 @@
 }
 .crm-search-admin-main-tabs ul.nav-stacked li.active a {
   background-color: var(--crm-tab-bg-active);
-  color: var(--crm-tab-col);
+  color: var(--crm-tab-color);
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
   border: var(--crm-border);
@@ -95,7 +95,7 @@
 }
 #bootstrap-theme .crm-search-admin-main-tabs button.btn-xs {
   background: transparent;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   font-size: var(--crm-font-size);
 }
 .crm-search-display-control {
@@ -174,7 +174,7 @@
 /* Tab: Select Fields */
 
 .crm-search fieldset.crm-draggable {
-  background-color: var(--crm-c-drag-bg);
+  background-color: var(--crm-drag-bg-color);
   border-radius: var(--crm-s-radius);
   border: 0 solid transparent;
 }
@@ -243,7 +243,7 @@
   display: block;
 }
 .crm-search crm-search-admin-link-group {
-  background: var(--crm-c-layout1-bg);
+  background: var(--crm-c-layout1-bg-color);
 }
 .crm-search crm-search-admin-link-group table {
   margin: var(--crm-padding-reg);
@@ -278,7 +278,7 @@
   cursor: not-allowed;
 }
 .crm-search input.ng-invalid::placeholder {
-  color: var(--crm-c-warning);
+  color: var(--crm-warning-color);
 }
 #bootstrap-theme.crm-search crm-search-clause > .btn-group {
   position: absolute;

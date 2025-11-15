@@ -29,16 +29,16 @@ table.crm-sticky-header > thead > tr {
   width: 1px; /* shrinks cell to width of button/menu */
 }
 #bootstrap-theme th.crm-search-result-select button.btn {
-  background-color: color-mix(in srgb,var(--crm-c-text) 15%,transparent);
-  color: var(--crm-c-text);
+  background-color: color-mix(in srgb,var(--crm-text-color) 15%,transparent);
+  color: var(--crm-text-color);
   padding: var(--crm-xs1) var(--crm-m1);
 }
 #bootstrap-theme th.crm-search-result-select button.btn:hover,
 #bootstrap-theme th.crm-search-result-select button.btn:focus {
-  background-color: color-mix(in srgb,var(--crm-c-text) 25%,transparent);
+  background-color: color-mix(in srgb,var(--crm-text-color) 25%,transparent);
 }
 #bootstrap-theme th.crm-search-result-select button.btn i.crm-i {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   min-width: fit-content;
   padding: 0;
   border: 0;

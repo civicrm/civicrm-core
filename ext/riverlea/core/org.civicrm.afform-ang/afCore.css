@@ -74,7 +74,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 
 /* Card style */
 .af-container-style-pane {
-  background-color: var(--crm-form-block-bg);
+  background-color: var(--crm-form-block-bg-color);
   border-radius: var(--crm-form-block-border-radius);
   box-shadow: var(--crm-form-block-box-shadow);
   position: relative;
@@ -82,8 +82,8 @@ details.af-container.af-layout-inline > *:not(summary) {
   padding-top: 50px !important;
 }
 #bootstrap-theme .af-container-style-pane > .af-title {
-  background-color: var(--crm-form-block-header);
-  color: var(--crm-c-text-light);
+  background-color: var(--crm-form-block-header-color);
+  color: var(--crm-text-light-color);
   border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
   position: absolute;
   top: 0;
@@ -104,7 +104,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 }
 #bootstrap-theme .af-admin-edit-form-link > button {
   background: transparent;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   border-radius: 2rem;
   height: inherit;
   padding: 0 !important;
@@ -115,7 +115,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 #bootstrap-theme .af-admin-edit-form-link button:hover,
 #bootstrap-theme .af-admin-edit-form-link button:focus {
   background: transparent;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   opacity: 1;
   box-shadow: none !important; /* vs dropdown-toggle */
 }
