@@ -2,7 +2,7 @@
   "title": "Third Test Example",
   "permissions": {
     "meta": "administer payment processors",
-    "get": "administer payment processors",
+    "get": [["administer payment processors", "access CiviContribute"]],
     "default": "administer payment processors"
   },
   "options": {
