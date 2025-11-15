@@ -62,15 +62,13 @@ class OAuthClient extends Generic\DAOEntity {
 
   public static function permissions(): array {
     return [
-      'meta' => ['access CiviCRM'],
+      // addSelectWhereClause() enforces limits on visibility...
+      'get' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+
+      // Probably need this for everyone who can 'get' records...
+      'meta' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+
       'default' => ['manage OAuth client'],
-      'get' => [
-        [
-          'manage OAuth client',
-          'manage my OAuth contact tokens',
-          'manage all OAuth contact tokens',
-        ],
-      ],
     ];
   }
 
