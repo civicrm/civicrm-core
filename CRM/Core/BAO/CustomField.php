@@ -720,6 +720,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       'Select',
       'CheckBox',
       'Radio',
+      'Toggle',
     ])) {
       $options = $field->getOptions($search ? 'search' : 'create');
 
@@ -825,6 +826,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
           }
           $qf->addRadio($elementName, $label, $options, $fieldAttributes, $separator, $useRequired);
         }
+        break;
+
+      case 'Toggle':
+        $fieldAttributes = array_merge($fieldAttributes, $customFieldAttributes);
+        $fieldAttributes['off'] = $options[0];
+        $fieldAttributes['on'] = $options[1];
+        $qf->addToggle($elementName, $label, $fieldAttributes, $useRequired && !$search);
         break;
 
       // For all select elements
@@ -1123,6 +1131,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       case 'Autocomplete-Select':
       case 'Radio':
       case 'CheckBox':
+      case 'Toggle':
         if ($field['data_type'] == 'ContactReference' && (is_array($value) || is_numeric($value))) {
           // Issue #2939 - guard against passing empty values to CRM_Core_DAO::getFieldValue(), which would throw an exception
           if (empty($value)) {
@@ -1682,7 +1691,9 @@ SELECT $columnName
     $customFormatted[$customFieldId][$index] = [
       'id' => $customValueId > 0 ? $customValueId : NULL,
       'value' => $value,
+      // 'type' is the data type, 'html_type' is the input type.
       'type' => $customFields[$customFieldId]['data_type'],
+      'html_type' => $customFields[$customFieldId]['html_type'],
       'custom_field_id' => $customFieldId,
       'custom_group_id' => $groupID,
       'table_name' => $tableName,

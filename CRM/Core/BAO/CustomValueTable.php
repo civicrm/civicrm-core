@@ -148,8 +148,13 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'Boolean':
-              //fix for CRM-3290
-              $value = CRM_Utils_String::strtoboolstr($value);
+              if ($field['html_type'] === 'Toggle') {
+                $value = (int) $value;
+              }
+              else {
+                // fix for CRM-3290
+                $value = CRM_Utils_String::strtoboolstr($value);
+              }
               if ($value === FALSE) {
                 $type = 'Timestamp';
               }
@@ -319,6 +324,7 @@ class CRM_Core_BAO_CustomValueTable {
           'entity_id' => $entityID,
           'value' => $customValue['value'],
           'type' => $customValue['type'],
+          'html_type' => $customValue['html_type'],
           'custom_field_id' => $customValue['custom_field_id'],
           'custom_group_id' => $customValue['custom_group_id'],
           'table_name' => $customValue['table_name'],
@@ -578,6 +584,7 @@ class CRM_Core_BAO_CustomValueTable {
           'entity_id' => $params['entityID'],
           'value' => $fieldValue['value'],
           'type' => $dataType,
+          'html_type' => $fieldInfo['html_type'],
           'custom_field_id' => $fieldInfo['id'],
           'custom_group_id' => $fieldInfo['custom_group']['id'],
           'table_name' => $fieldInfo['custom_group']['table_name'],

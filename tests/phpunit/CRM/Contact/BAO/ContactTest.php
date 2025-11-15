@@ -588,6 +588,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
         -1 => [
           'value' => 'Test custom value',
           'type' => 'String',
+          'html_type' => 'Text',
           'custom_field_id' => $customField['id'],
           'custom_group_id' => $customGroup['id'],
           'table_name' => $customGroupTableName,

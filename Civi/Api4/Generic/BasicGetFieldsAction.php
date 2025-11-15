@@ -346,6 +346,7 @@ class BasicGetFieldsAction extends BasicGetAction {
           'Select' => ts('Select'),
           'Text' => ts('Single-Line Text'),
           'TextArea' => ts('Multi-Line Text'),
+          'Toggle' => ts('Toggle Switch'),
           'Url' => ts('URL'),
         ],
       ],

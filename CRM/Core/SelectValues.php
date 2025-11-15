@@ -207,6 +207,11 @@ class CRM_Core_SelectValues {
         'label' => ts('Drop-down (select list)'),
       ],
       [
+        'id' => 'Toggle',
+        'name' => 'Toggle',
+        'label' => ts('Toggle Switch'),
+      ],
+      [
         'id' => 'Radio',
         'name' => 'Radio buttons',
         'label' => ts('Radio buttons'),
