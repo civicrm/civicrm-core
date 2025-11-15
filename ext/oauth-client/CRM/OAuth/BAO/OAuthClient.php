@@ -50,4 +50,20 @@ class CRM_OAuth_BAO_OAuthClient extends CRM_OAuth_DAO_OAuthClient {
       \CRM_Utils_System::url('civicrm/oauth-client/return', NULL, TRUE, NULL, FALSE, FALSE, TRUE);
   }
 
+  /**
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
+   * @inheritDoc
+   */
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
+    $clauses = parent::addSelectWhereClause($entityName, $userId, $conditions);
+
+    $allowProviders = _oauth_client_providers_by_perm('get');
+    $none = [chr(0)];
+    $clauses['provider'][] = 'IN (' . CRM_Core_DAO::escapeStrings(empty($allowProviders) ? $none : $allowProviders) . ')';
+
+    return $clauses;
+  }
+
 }
