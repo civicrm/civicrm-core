@@ -165,13 +165,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if (version_compare(JVERSION, '4.0', 'lt')) {
       $JUserTable = &JTable::getInstance('User', 'JTable');
+      $db = $JUserTable->getDbo();
     }
     else {
       $factoryClassName = $this->factoryClassName();
       $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
       $JUserTable = new \Joomla\CMS\Table\User($db);
     }
-    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select('username, email');
     $query->from($JUserTable->getTableName());
@@ -380,13 +380,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     global $database;
     if (version_compare(JVERSION, '4.0', 'lt')) {
       $JUserTable = &JTable::getInstance('User', 'JTable');
+      $db = $JUserTable->getDbo();
     }
     else {
       $factoryClassName = $this->factoryClassName();
       $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
       $JUserTable = new \Joomla\CMS\Table\User($db);
     }
-    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select($db->quoteName('email'))
       ->from($db->quoteName('#__users'))
@@ -428,6 +428,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       jimport('joomla.database.table');
       jimport('joomla.user.helper');
       $JUserTable = &JTable::getInstance('User', 'JTable');
+      $db = $JUserTable->getDbo();
     }
     else {
       $factoryClassName = $this->factoryClassName();
@@ -435,7 +436,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $JUserTable = new \Joomla\CMS\Table\User($db);
     }
 
-    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select('id, name, username, email, password');
     $query->from($JUserTable->getTableName());
@@ -992,13 +992,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if (version_compare(JVERSION, '4.0', 'lt')) {
       $JUserTable = &JTable::getInstance('User', 'JTable');
+      $db = $JUserTable->getDbo();
     }
     else {
       $factoryClassName = $this->factoryClassName();
       $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
       $JUserTable = new \Joomla\CMS\Table\User($db);
     }
-    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select($id . ', ' . $mail . ', ' . $name);
     $query->from($JUserTable->getTableName());
