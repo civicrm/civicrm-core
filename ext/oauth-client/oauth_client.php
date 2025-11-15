@@ -1,7 +1,9 @@
 <?php
 
 require_once 'oauth_client.civix.php';
-use CRM_OauthClient_ExtensionUtil as E;
+
+use Civi\Core\Event\GenericHookEvent;
+use CRM_OAuth_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
@@ -25,8 +27,10 @@ function oauth_client_civicrm_permission(&$permissions) {
     'description' => ts('Create and delete OAuth client connections'),
   ];
   $permissions['manage OAuth client secrets'] = [
-    'label' => $prefix . ts('manage OAuth client secrets'),
-    'description' => ts('Access OAuth secrets'),
+    // NOTE: The original name here was misleading -- it actually confers access to
+    // sensitive parts of OAuthSysToken, e.g. `access_token`, `raw`, `refresh_token`
+    'label' => $prefix . ts('manage OAuth system tokens'),
+    'description' => ts('Access the secret content of OAuth system tokens'),
   ];
   $permissions['create OAuth tokens via auth code flow'] = [
     'label' => $prefix . ts('create OAuth tokens via auth code flow'),
@@ -79,6 +83,26 @@ function oauth_client_civicrm_oauthProviders(&$providers) {
 }
 
 /**
+ * Get a list of providers for which the user has permission to do "X".
+ *
+ * @param string $perm
+ *   Ex: 'meta', 'get', or 'authorizationCode'
+ * @return array
+ *   List of provider names
+ */
+function _oauth_client_providers_by_perm(string $perm): array {
+  $cacheKey = $perm . '_' . CRM_Core_Session::getLoggedInContactID();
+  if (!isset(Civi::$statics[__FUNCTION__][$cacheKey])) {
+    $allProviders = \Civi\Api4\OAuthProvider::get(FALSE)->addSelect('name', 'permissions')->execute();
+    $allowProviders = array_filter($allProviders->getArrayCopy(), function ($provider) use ($perm) {
+      return CRM_Core_Permission::check($provider['permissions'][$perm] ?? $provider['permissions']['default']);
+    });
+    Civi::$statics[__FUNCTION__][$cacheKey] = array_values(array_column($allowProviders, 'name'));
+  }
+  return Civi::$statics[__FUNCTION__][$cacheKey];
+}
+
+/**
  * Implements hook_civicrm_mailSetupActions().
  *
  * @see CRM_Utils_Hook::mailSetupActions()
@@ -101,4 +125,37 @@ function oauth_client_civicrm_oauthReturn($token, &$nextUrl) {
  */
 function oauth_client_civicrm_alterMailStore(&$mailSettings) {
   CRM_OAuth_MailSetup::alterMailStore($mailSettings);
+}
+
+/**
+ * @see CRM_Utils_Hook::managed()
+ */
+function oauth_client_civicrm_managed(array &$entities, ?array $modules = NULL): void {
+  if ($modules !== NULL && !in_array(E::LONG_NAME, $modules)) {
+    return;
+  }
+
+  $providers = [];
+  $event = GenericHookEvent::create(['providers' => &$providers]);
+  \Civi::dispatcher()->dispatch('hook_civicrm_oauthProviders', $event);
+
+  foreach ($providers as $provider) {
+    if (array_intersect($provider['tags'] ?? [], ['CiviConnect', 'CiviConnectSandbox', 'CiviConnectLocal'])) {
+      $entities[] = [
+        'module' => E::LONG_NAME,
+        'name' => 'CiviConnect_' . $provider['name'],
+        'entity' => 'OAuthClient',
+        'params' => [
+          'version' => 4,
+          'values' => [
+            'provider' => $provider['name'],
+            'guid' => '{civi_connect}',
+            'secret' => '{civi_connect}',
+          ],
+        ],
+        'update' => 'always',
+        'cleanup' => 'unused',
+      ];
+    }
+  }
 }
