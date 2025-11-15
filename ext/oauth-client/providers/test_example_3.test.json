@@ -1,5 +1,10 @@
 {
   "title": "Third Test Example",
+  "permissions": {
+    "meta": "administer payment processors",
+    "get": "administer payment processors",
+    "default": "administer payment processors"
+  },
   "options": {
     "urlAuthorize": "https://example.com/three/auth",
     "urlAccessToken": "https://example.com/three/token",
