@@ -45,16 +45,13 @@
 
           getDataType();
 
-          // Decide whether the input should be multivalued
+          // Decide whether the input should be multivalued:
+          // On a search form, it's based on the search operator
           if (ctrl.op) {
             multi = ['IN', 'NOT IN'].includes(ctrl.op);
-          } else if (inputType && dataType !== 'Boolean') {
-            multi = (inputType === 'CheckBox' || (field.input_attrs && field.input_attrs.multiple));
-            // Hidden fields are multi-select if the original input type is.
-            if (inputType === 'Hidden' || inputType === 'DisplayOnly') {
-              multi = _.contains(['CheckBox', 'Radio', 'Select'], field.original_input_type);
-            }
-          } else {
+          }
+          // On an input form, it's based on the field's data type
+          else {
             multi = field.serialize || dataType === 'Array';
           }
           $el.crmAutocomplete('destroy').crmDatepicker('destroy');
