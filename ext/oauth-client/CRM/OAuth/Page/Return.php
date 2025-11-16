@@ -17,13 +17,12 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
     if (CRM_Utils_Request::retrieve('error', 'String')) {
       CRM_Utils_System::setTitle(ts('OAuth Error'));
       $error = CRM_Utils_Array::subset($_GET, ['error', 'error_description', 'error_uri']);
-      $event = \Civi\Core\Event\GenericHookEvent::create([
-        'error' => $error['error'] ?? NULL,
-        'description' => $error['description'] ?? NULL,
-        'uri' => $error['uri'] ?? NULL,
-        'state' => $state,
-      ]);
-      Civi::dispatcher()->dispatch('hook_civicrm_oauthReturnError', $event);
+      CRM_OAuth_Hook::oauthReturnError(
+        $error['error'] ?? NULL,
+        $error['description'] ?? NULL,
+        $error['uri'] ?? NULL,
+        $state,
+      );
 
       Civi::log()->info('OAuth returned error', [
         'error' => $error,

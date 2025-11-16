@@ -64,4 +64,23 @@ class CRM_OAuth_Hook {
     Civi::dispatcher()->dispatch('hook_civicrm_oauthReturn', $event);
   }
 
+  /**
+   * Fires whenever a user returns to our site (from an unsuccessful AuthCode flow).
+   *
+   * @param string|null $error
+   * @param string|null $description
+   * @param string|null $uri
+   * @param string $state
+   * @return void
+   */
+  public static function oauthReturnError(?string $error, ?string $description, ?string $uri, string $state): void {
+    $event = \Civi\Core\Event\GenericHookEvent::create([
+      'error' => $error,
+      'description' => $description,
+      'uri' => $uri,
+      'state' => $state,
+    ]);
+    Civi::dispatcher()->dispatch('hook_civicrm_oauthReturnError', $event);
+  }
+
 }
