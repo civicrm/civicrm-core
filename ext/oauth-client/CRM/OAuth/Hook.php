@@ -46,4 +46,22 @@ class CRM_OAuth_Hook {
     \Civi::dispatcher()->dispatch('hook_civicrm_oauthToken', $event);
   }
 
+  /**
+   * Fires whenever a user returns to our site (from a successful AuthCode flow).
+   *
+   * @param array $tokenRecord
+   *   The newly created token record (e.g OAuthSysToken or OAuthContactToken)
+   * @param string|null $nextUrl
+   *   When the user returns from an OAuth provider, we can redirect them to an internal page.
+   *   This alterable string identifies the next page.
+   * @return void
+   */
+  public static function oauthReturn(array $tokenRecord, ?string &$nextUrl): void {
+    $event = \Civi\Core\Event\GenericHookEvent::create([
+      'token' => $tokenRecord,
+      'nextUrl' => &$nextUrl,
+    ]);
+    Civi::dispatcher()->dispatch('hook_civicrm_oauthReturn', $event);
+  }
+
 }

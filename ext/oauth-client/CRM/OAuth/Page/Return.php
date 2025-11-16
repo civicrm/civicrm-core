@@ -47,11 +47,7 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
       ]);
 
       $nextUrl = $state['landingUrl'] ?? NULL;
-      $event = \Civi\Core\Event\GenericHookEvent::create([
-        'token' => $tokenRecord,
-        'nextUrl' => &$nextUrl,
-      ]);
-      Civi::dispatcher()->dispatch('hook_civicrm_oauthReturn', $event);
+      CRM_OAuth_Hook::oauthReturn($tokenRecord, $nextUrl);
       if ($nextUrl !== NULL) {
         CRM_Utils_System::redirect($nextUrl);
       }
