@@ -37,7 +37,7 @@ class CRM_OAuth_Hook {
    *   Ex: ['tag' => 'foo', 'client_id' => 123]
    * @return void
    */
-  public static function hook_civicrm_oauthToken(string $flow, string $type, array &$token) {
+  public static function oauthToken(string $flow, string $type, array &$token) {
     $event = GenericHookEvent::create([
       'flow' => $flow,
       'type' => $type,
