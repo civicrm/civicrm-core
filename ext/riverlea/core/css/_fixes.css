@@ -303,7 +303,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   height: auto;
 }
 .crm-container .btn-group-xs button {
-  padding: var(--crm-xs) var(--crm-s);
+  padding: var(--crm-s-xsmall) var(--crm-s-small);
   font-size: var(--crm-font-small-size);
 }
 /* select all 'checkbox' on table th */
@@ -349,7 +349,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   background-color: var(--crm-tabs-bg-color);
 }
 .crm-container .panel-heading:has(.nav-tabs) .pull-right {
-  margin-right: var(--crm-m);
+  margin-right: var(--crm-s-medium);
 }
 .crm-container .afadmin-list .nav.nav-tabs { /* Fix for AForm tabs border */
   border-radius: var(--crm-s-radius) var(--crm-s-radius) 0 0;
@@ -383,7 +383,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 }
 .afadmin-list .nav-tabs + .form-inline,
 .crm-search-nav-tabs ~ .ng-scope > .form-inline {
-  padding: var(--crm-r);
+  padding: var(--crm-s-reg);
   background: var(--crm-tab-bg-active);
 }
 .crm-container .ui-tabs ul.crm-extensions-tabs-list a em {
@@ -418,7 +418,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-container .tag-tree-wrapper {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  margin: var(--crm-m) 0;
+  margin: var(--crm-s-medium) 0;
 }
 .crm-container .tag-tree-wrapper div.tag-tree {
   width: auto;
@@ -439,7 +439,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   color: var(--crm-text-color);
 }
 .crm-container .tag-tree-wrapper div.tag-info .crm-submit-buttons {
-  margin: var(--crm-m) 0 0;
+  margin: var(--crm-s-medium) 0 0;
   padding: 0;
 }
 .crm-container .tag-tree-wrapper .tag-tree a.crm-tag-item {
@@ -457,7 +457,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 /* Dedupe change usage */
 .crm-container label:has(.dedupe-rules-dialog-desc) input {
   float: left;
-  margin: var(--crm-s) var(--crm-m) 0 0;
+  margin: var(--crm-s-small) var(--crm-s-medium) 0 0;
 }
 .crm-container .dedupe-rules-dialog-desc {
   font-weight: normal;
@@ -471,7 +471,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   gap: 1px; /* to handle white space in markup */
 }
 .crm-container #ContributionCharts .ui-tabs-nav .float-right td {
-  padding: 0 var(--crm-s);
+  padding: 0 var(--crm-s-small);
 }
 #ContributionCharts ul.ui-tabs-nav li.crm-tab-button {
   padding: var(--crm-tab-padding);
@@ -485,8 +485,8 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 }
 #ContributionCharts ul.ui-tabs-nav .float-right {
   position: absolute;
-  right: var(--crm-s);
-  top: var(--crm-s);
+  right: var(--crm-s-small);
+  top: var(--crm-s-small);
 }
 #ContributionCharts ul.ui-tabs-nav .float-right table,
 #ContributionCharts ul.ui-tabs-nav .float-right table tr {
@@ -507,13 +507,13 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 /* Event dashboard */
 .CRM_Event_Form_Search .button {
   float: left;
-  margin-right: var(--crm-m);
+  margin-right: var(--crm-s-medium);
 }
 #crm-event-dashboard-heading + div a,
 .CRM_Event_Form_SearchEvent .crm-content-block .float-right a {
   display: flex;
-  padding: 0 0 var(--crm-m) 0;
-  gap: var(--crm-m);
+  padding: 0 0 var(--crm-s-medium) 0;
+  gap: var(--crm-s-medium);
   align-items: center;
 }
 /* Dedupe page */
@@ -523,7 +523,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   float: none !important; /* overwrites inline 'float' that breaks page wrapper */
   display: flex;
   justify-content: flex-end;
-  padding: 0 0 var(--crm-l) 0;
+  padding: 0 0 var(--crm-s-large) 0;
 }
 
 /* CiviCase  */
@@ -585,7 +585,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
 }
 .crm-container .form-layout td:has(#_qf_Advanced_refresh-bottom) {
   display: flex;
-  gap: var(--crm-m);
+  gap: var(--crm-s-medium);
   align-items: center;
 }
 .crm-container .adv-search-top-submit .crm-submit-buttons,
@@ -606,7 +606,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
   display: none !important;
 }
 .crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr #s2id_case_status_id {
-  margin-bottom: var(--crm-r1);
+  margin-bottom: var(--crm-s-reg-1);
 }
 .crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr:nth-of-type(1) > td:nth-of-type(1) label {
   display: block;
@@ -616,7 +616,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
 }
 /* Member */
 .page-civicrm-member-search .CRM_Member_Form_Search .crm-accordion-body tr:last-child td {
-  padding-top: var(--crm-r);
+  padding-top: var(--crm-s-reg);
 }
 /* Find Participants */
 .crm-container div#searchForm table.form-layout td {
@@ -629,8 +629,8 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
   border: 0 solid transparent;
   box-shadow: var(--crm-shadow-block);
   padding: var(--crm-padding-reg);
-  gap: var(--crm-m);
-  margin-bottom: var(--crm-r);
+  gap: var(--crm-s-medium);
+  margin-bottom: var(--crm-s-reg);
 }
 .crm-container > #crm-main-content-wrapper > fieldset > * {
   margin: 0;
@@ -643,7 +643,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
 /* General */
 .crm-container .crm-form-block .crm-form-block {
   padding: var(--crm-form-block-padding);
-  margin-bottom: var(--crm-r);
+  margin-bottom: var(--crm-s-reg);
 }
 /* Save as template text on new email form */
 .crm-container #editMessageDetails {
@@ -654,7 +654,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
   padding: 0;
 }
 #mainTabContainer .form-group.pull-right  > .btn-group {
-  margin-bottom: var(--crm-m2);
+  margin-bottom: var(--crm-s-medium-2);
 }
 /* Contact dashboard page */
 .crm-actions-ribbon .crm-next-action,
@@ -662,7 +662,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
   margin-left: auto;
 }
 .crm-container .view-contact-groups .description {
-  margin: var(--crm-r) 0;
+  margin: var(--crm-s-reg) 0;
 }
 /* Contacts - new */
 .CRM_Contact_Form_Contact > .crm-form-block .crm-submit-buttons:first-of-type {
@@ -691,14 +691,14 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
   margin-bottom: 0;
 }
 .crm-search-form .crm-submit-buttons {
-  padding: 0 0 var(--crm-m);
+  padding: 0 0 var(--crm-s-medium);
 }
 .crm-search-form .crm-search-form-block {
-  margin-bottom: var(--crm-r);
+  margin-bottom: var(--crm-s-reg);
 }
 /* Dedupe exceptions */
 details + .crm-content-block:has(.dataTables_wrapper) {
-  margin-top: var(--crm-r);
+  margin-top: var(--crm-s-reg);
 }
 /* Contribution page edit/create */
 .crm-container .crm-premium-settings-accordion {
@@ -808,7 +808,7 @@ details + .crm-content-block:has(.dataTables_wrapper) {
   height: auto;
 }
 .crm-mosaico-page .select2-container {
-  min-width: var(--crm-big-input);
+  min-width: var(--crm-input-width);
 }
 .mosaico-templates-wrapper {
   margin: 0 !important;
@@ -833,7 +833,7 @@ details + .crm-content-block:has(.dataTables_wrapper) {
   border-radius: 0 0 var(--crm-tab-radius) var(--crm-tab-radius);
 }
 .select2-drop.select2-drop-active.crm-container {
-  max-width: var(--crm-huge-input); /* Mosaico fix - https://lab.civicrm.org/extensions/riverlea/-/issues/23 */
+  max-width: var(--crm-input-large-width); /* Mosaico fix - https://lab.civicrm.org/extensions/riverlea/-/issues/23 */
 }
 .crmb-wizard-button-right {
   display: flex;
@@ -864,5 +864,5 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 *******************/
 
 .af-container.af-layout-cols { /* vs afCore */
-  column-gap: var(--crm-m);
+  column-gap: var(--crm-s-medium);
 }

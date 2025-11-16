@@ -74,7 +74,7 @@
 .crm-participant-list-inner ul a,
 #crm-create-new-list ul a {
   color: var(--crm-secondary-text-color);
-  padding: var(--crm-xs2) var(--crm-s);
+  padding: var(--crm-s-xsmall-2) var(--crm-s-small);
   border-radius: var(--crm-s-radius);
   display: block;
 }
@@ -104,7 +104,7 @@
   position: absolute;
   right: 0;
   padding: 0;
-  margin: var(--crm-m) 0;
+  margin: var(--crm-s-medium) 0;
   min-width: var(--crm-dropdown-width);
   background: var(--crm-dropdown-bg-color);
   border-radius: var(--crm-s-radius);
@@ -122,15 +122,15 @@
   border-right: 5px solid transparent;
   border-bottom: 5px solid var(--crm-dropdown-bg-color);
   top: -5px;
-  right: var(--crm-r);
+  right: var(--crm-s-reg);
 }
 .crm-container .btn-group .dropdown-menu::before {
-  left: var(--crm-l);
+  left: var(--crm-s-large);
   right: auto;
 }
 .crm-container .btn-group .dropdown-menu-right::before,
 .crm-container .btn-group.pull-right .dropdown-menu::before {
-  right: var(--crm-r);
+  right: var(--crm-s-reg);
   left: auto;
 }
 .crm-container .btn-slide ul.panel li {
@@ -140,7 +140,7 @@
 }
 .crm-container .btn-slide ul.panel li a {
   text-decoration: none;
-  padding: var(--crm-s);
+  padding: var(--crm-s-small);
   display: block;
   cursor: var(--crm-link-hover-cursor);
   color: var(--crm-dropdown-color);
@@ -186,7 +186,7 @@
   border-left: 10px solid rgba(0,0,0,0);
   border-right: 10px solid rgba(0,0,0,0);
   content: "";
-  left: var(--crm-m2);
+  left: var(--crm-s-medium-2);
   position: relative;
   bottom: -7px;
 }
@@ -195,7 +195,7 @@
   border-left: 10px solid rgba(0,0,0,0);
   border-right: 10px solid rgba(0,0,0,0);
   content: "";
-  left: var(--crm-m2);
+  left: var(--crm-s-medium-2);
   position: relative;
   top: -7px;
 }
@@ -217,22 +217,22 @@
   white-space: normal;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr > td.crm-section {
-  padding: var(--crm-s) 0;
+  padding: var(--crm-s-small) 0;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr:nth-child(1) > td {
   background: var(--crm-layer1-bg-color);
   color: var(--crm-text-color);
-  font-size: var(--crm-r1);
-  padding: var(--crm-m2) var(--crm-r1);
+  font-size: var(--crm-s-reg-1);
+  padding: var(--crm-s-medium-2) var(--crm-s-reg-1);
   font-weight: bold;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr:nth-child(2) > td {
   border-top: var(--crm-border) !important;
   width: 50%;
-  padding: var(--crm-r1) var(--crm-m1) 0;
+  padding: var(--crm-s-reg-1) var(--crm-s-medium-1) 0;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr:nth-child(2) > td:first-child {
-  padding-left: var(--crm-r1);
+  padding-left: var(--crm-s-reg-1);
 }
 
 /* BS3 Dropdowns */
@@ -262,7 +262,7 @@
   display: none;
   min-width: var(--crm-dropdown-width);
   padding: var(--crm-dropdown-padding) !important;
-  margin-top: var(--crm-s);
+  margin-top: var(--crm-s-small);
   text-align: left;
   list-style: none;
   background-color: var(--crm-dropdown-bg-color);
@@ -281,7 +281,7 @@
 }
 .crm-container .dropdown-menu .divider {
   height: 1px;
-  margin: var(--crm-m) 0;
+  margin: var(--crm-s-medium) 0;
   overflow: hidden;
   background-color: var(--crm-c-layout2-bg-color);
 }
@@ -301,7 +301,7 @@
   white-space: nowrap;
 }
 .crm-container .dropdown-menu > li:not(.disabled) > a i.crm-i {
-  padding-right: var(--crm-s);
+  padding-right: var(--crm-s-small);
   color: var(--crm-dropdown-color);
 }
 .crm-container .dropdown-menu > li > a:hover,
@@ -335,7 +335,7 @@
 .crm-container .open .btn.dropdown-toggle + .dropdown-menu {
   display: flex;
   flex-direction: column;
-  gap: var(--crm-s);
+  gap: var(--crm-s-small);
 }
 .crm-container .open > a {
   outline: 0;
@@ -354,7 +354,7 @@
   white-space: nowrap;
   color: var(--crm-dropdown-color);
   font-weight: bold;
-  padding: var(--crm-m) var(--crm-xs) var(--crm-xs) !important;
+  padding: var(--crm-s-medium) var(--crm-s-xsmall) var(--crm-s-xsmall) !important;
   border-bottom: 1px solid var(--crm-dropdown-color);
   border-radius: 0;
 }

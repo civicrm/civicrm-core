@@ -1,5 +1,5 @@
 .crm-container .messages > .crm-i {
-  padding: 0 var(--crm-m) var(--crm-s) 0;
+  padding: 0 var(--crm-s-medium) var(--crm-s-small) 0;
   float: left;
 }
 .crm-container div:not(.crm-search-display-editable-buttons) > button.btn-xs:has(.fa-times),
@@ -40,7 +40,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   font-weight: normal;
   text-rendering: auto;
   font-size: var(--crm-font-size);
-  margin: 0 var(--crm-m) 0 0;
+  margin: 0 var(--crm-s-medium) 0 0;
 }
 .crm-container #crm-notification-container div.ui-notify-message.error h1::before,
 .crm-container span.batch-invalid::before {
@@ -245,7 +245,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .jstree-wholerow-ul {
   display: flex;
   flex-direction: column;
-  gap: var(--crm-xs);
+  gap: var(--crm-s-xsmall);
 }
 .jstree-default > .jstree-wholerow-ul > li.jstree-node {
   margin-inline: 0;
@@ -256,7 +256,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container .jstree-default .jstree-icon {
   background-image: inherit;
-  font-size: var(--crm-r1);
+  font-size: var(--crm-s-reg-1);
   margin-right: var(--btn-icon-spacing);
 }
 .crm-container .jstree-default .jstree-checkbox::before {
@@ -318,19 +318,19 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container #crmIconPicker a.ui-button .ui-icon {
   margin-top: 0;
-  font-size: var(--crm-r2);
+  font-size: var(--crm-s-reg-2);
 }
 .crm-container #crmIconPicker .icons {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--crm-m2);
+  gap: var(--crm-s-medium-2);
   margin-top: 1rem;
 }
 .crm-container #crmIconPicker a.ui-button {
   color: var(--crm-text-color) !important;
   background: transparent;
-  width: var(--crm-r2);
-  height: var(--crm-r2);
+  width: var(--crm-s-reg-2);
+  height: var(--crm-s-reg-2);
   border: 0;
   padding: 0;
   display: inline-block;

@@ -6,7 +6,7 @@
 
 .crm-container div#alpha-filter {
   background-color: var(--crm-filter-bg-color);
-  margin: var(--crm-r) 0;
+  margin: var(--crm-s-reg) 0;
   padding: var(--crm-filter-padding);
   text-align: left;
   box-shadow: var(--crm-shadow-block);
@@ -24,7 +24,7 @@
 .crm-container #alpha-filter a {
   font-weight: normal;
   background: var(--crm-filter-item-bg-color);
-  padding: var(--crm-s) var(--crm-m);
+  padding: var(--crm-s-small) var(--crm-s-medium);
   box-shadow: var(--crm-filter-item-shadow);
 }
 
@@ -35,8 +35,8 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: 100%;
-    column-gap: var(--crm-r);
-    row-gap: var(--crm-s);
+    column-gap: var(--crm-s-reg);
+    row-gap: var(--crm-s-small);
   }
 }
 .advanced-search-fields .search-field__span-2 {

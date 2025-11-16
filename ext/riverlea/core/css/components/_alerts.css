@@ -86,7 +86,7 @@
   cursor: var(--crm-link-hover-cursor);
   background: transparent;
   appearance: none;
-  font-size: var(--crm-r1);
+  font-size: var(--crm-s-reg-1);
   line-height: 1;
   color: var(--crm-c-darkest) !important;
   text-shadow: 0 1px 0 #fff;

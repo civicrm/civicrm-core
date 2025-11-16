@@ -27,7 +27,7 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--crm-m3);
+  gap: var(--crm-s-medium-3);
 }
 .crm-container.ui-dialog .ui-dialog-header .ui-dialog-title,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-dialog-title {
@@ -89,7 +89,7 @@
   padding: var(--crm-dialog-body-padding);
 }
 .crm-container.ui-dialog:has(.ui-dialog-buttonpane) .ui-dialog-content {
-  margin-bottom: calc(var(--crm-btn-height) + var(--crm-m) + var(--crm-m));
+  margin-bottom: calc(var(--crm-btn-height) + var(--crm-s-medium) + var(--crm-s-medium));
 }
 .crm-container.ui-dialog .ui-dialog-content .crm-container {
   background: var(--crm-dialog-bg-color);
@@ -136,8 +136,8 @@
 .crm-container.ui-dialog .ui-dialog-buttonset {
   width: 100%;
   display: flex;
-  gap: var(--crm-m);
-  padding: var(--crm-m);
+  gap: var(--crm-s-medium);
+  padding: var(--crm-s-medium);
   justify-content: flex-end;
   flex-wrap: wrap;
 }
@@ -155,7 +155,7 @@
   width: 350px;
   position: fixed;
   top: 64px;
-  right: var(--crm-r2);
+  right: var(--crm-s-reg-2);
   /* one less than #civicrm-menu */
   z-index: 99998;
 }
@@ -165,7 +165,7 @@
   color: var(--crm-notify-color);
   border-radius: var(--crm-notify-radius);
   padding: var(--crm-notify-padding);
-  margin-bottom: var(--crm-r);
+  margin-bottom: var(--crm-s-reg);
   max-height: 600px;
   overflow: auto;
   border-width: var(--crm-notify-accent-border);
@@ -207,8 +207,8 @@
   color: var(--crm-notify-color);
 }
 #crm-notification-container div.ui-notify-message .notify-content :is(ul,ol) {
-  padding-left: var(--crm-r2);
-  margin-block: var(--crm-m);
+  padding-left: var(--crm-s-reg-2);
+  margin-block: var(--crm-s-medium);
 }
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,

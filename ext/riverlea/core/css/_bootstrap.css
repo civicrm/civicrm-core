@@ -70,7 +70,7 @@
   display: block;
   color: var(--crm-text-color);
   font-style: italic;
-  margin: var(--crm-s) 0 var(--crm-m);
+  margin: var(--crm-s-small) 0 var(--crm-s-medium);
   font-size: var(--crm-font-small-size);
 }
 #bootstrap-theme h4,
@@ -79,8 +79,8 @@
 #bootstrap-theme .h5,
 #bootstrap-theme h6,
 #bootstrap-theme .h6 {
-  margin-top: var(--crm-m1);
-  margin-bottom: var(--crm-m1);
+  margin-top: var(--crm-s-medium-1);
+  margin-bottom: var(--crm-s-medium-1);
   font-weight: bold;
   color: var(--crm-text-color);
   line-height: 1.2;

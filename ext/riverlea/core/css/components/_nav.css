@@ -13,7 +13,7 @@
   display: block;
 }
 .crm-container .nav > li > a {
-  padding: var(--crm-m) var(--crm-r);
+  padding: var(--crm-s-medium) var(--crm-s-reg);
 }
 .crm-container .nav > li > a:is(:hover,:focus) {
   text-decoration: none;
@@ -34,7 +34,7 @@
 }
 .crm-container .nav .nav-divider {
   height: 1px;
-  margin: var(--crm-m) 0;
+  margin: var(--crm-s-medium) 0;
   overflow: hidden;
   background-color: var(--crm-border);
 }

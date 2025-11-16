@@ -210,7 +210,7 @@ body.civicrm-iframe-page {
 .crm-container h3,
 #bootstrap-theme h3 {
   background-color: var(--crm-heading-bg-color);
-  font-size: var(--crm-r1);
+  font-size: var(--crm-s-reg-1);
   font-weight: bold;
   color: var(--crm-heading-color);
   padding: var(--crm-heading-padding);
@@ -222,8 +222,8 @@ body.civicrm-iframe-page {
 
 dl dd,
 dl dl {
-  margin-block-end: var(--crm-m1);
-  margin-inline-start: var(--crm-r1);
+  margin-block-end: var(--crm-s-medium-1);
+  margin-inline-start: var(--crm-s-reg-1);
 }
 
 /* Practical colors */

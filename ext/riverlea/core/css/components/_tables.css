@@ -3,7 +3,7 @@
   border: var(--crm-table-outside-border);
   background: var(--crm-table-bg-color);
   box-shadow: var(--crm-shadow-block);
-  margin: 0 0 var(--crm-r);
+  margin: 0 0 var(--crm-s-reg);
   border-collapse: collapse;
   width: 100%;
   max-width: 100%;
@@ -76,8 +76,8 @@
   box-shadow: none;
 }
 .crm-selection-reset {
-  padding: var(--crm-m) 0;
-  margin-bottom: var(--crm-m);
+  padding: var(--crm-s-medium) 0;
+  margin-bottom: var(--crm-s-medium);
   display: block;
 }
 
@@ -87,7 +87,7 @@
   background-color: var(--crm-table-header-bg-color);
 }
 .crm-container thead div.sticky-header {
-  height: var(--crm-r);
+  height: var(--crm-s-reg);
 }
 .crm-sticky thead,
 .crm-container thead div.sticky-header {
@@ -147,7 +147,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   border: var(--crm-table-outside-border);
   background: var(--crm-table-bg-color);
   box-shadow: var(--crm-shadow-block);
-  margin: var(--crm-m) 0 var(--crm-l);
+  margin: var(--crm-s-medium) 0 var(--crm-s-large);
 }
 .crm-container table.form-layout-compressed th {
   background: transparent;
@@ -279,7 +279,7 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table {
   width: 100%;
   max-width: 100%;
-  margin-bottom: var(--crm-r1);
+  margin-bottom: var(--crm-s-reg-1);
 }
 .crm-container .table > :is(thead,tbody,tfoot) > tr > :is(th,td) {
   padding: var(--crm-table-padding);
@@ -288,7 +288,7 @@ tbody.scrollContent tr.alternateRow:hover,
   border-top: var(--crm-table-header-border-bottom);
 }
 .crm-container .table-condensed > :is(thead,tbody,tfoot) > tr > :is(th,td) {
-  padding: var(--crm-s1);
+  padding: var(--crm-s-small-1);
 }
 .crm-container .table-bordered {
   border: var(--crm-table-outside-border);
@@ -387,7 +387,7 @@ tbody.scrollContent tr.alternateRow:hover,
   .crm-container .table-responsive,
   .crm-container table {
     width: 100%;
-    margin-bottom: var(--crm-r);
+    margin-bottom: var(--crm-s-reg);
     overflow-y: hidden;
     border: var(--crm-table-outside-border);
     display: contents; /* expirmental addition to provide more responsive behaviour */
