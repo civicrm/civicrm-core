@@ -4120,5 +4120,5 @@ html.crm-standalone body {
   margin: 0;
   padding: 0;
   font-family: var(--crm-font, sans-serif);
-  background-color: var(--crm-c-page-background, #f8f8f8);
+  background-color: var(--crm-page-bg-color, #f8f8f8);
 }

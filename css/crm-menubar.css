@@ -2,11 +2,11 @@
 
 :root {
   --crm-menubar-height: $menubarHeight;
-  --crm-c-menubar-bg: $menubarColor;
-  --crm-c-menubar-item: $menuItemColor;
-  --crm-c-menubar-text: $textColor;
-  --crm-c-menubar-highlight: $highlightColor;
-  --crm-c-menubar-highlight-text: $highlightTextColor;
+  --crm-menubar-color: $menubarColor;
+  --crm-menubar-item-color: $menuItemColor;
+  --crm-menubar-text-color: $textColor;
+  --crm-menubar-highlight-color: $highlightColor;
+  --crm-menubar-highlight-text-color: $highlightTextColor;
 }
 #civicrm-menu-nav {
   line-height: 0;
@@ -14,7 +14,7 @@
   font-size: 13px;
 }
 #civicrm-menu {
-  background-color: var(--crm-c-menubar-bg);
+  background-color: var(--crm-menubar-color);
   width: 100%;
   z-index: 500;
   height: auto;
@@ -47,8 +47,8 @@
 #civicrm-menu li a:hover,
 #civicrm-menu li a.highlighted {
   text-decoration: none;
-  background-color: var(--crm-c-menubar-highlight);
-  color: var(--crm-c-menubar-highlight-text);
+  background-color: var(--crm-menubar-highlight-color);
+  color: var(--crm-menubar-highlight-text-color);
 }
 #civicrm-menu li li .sub-arrow:before {
   content: "\f0da";
@@ -185,7 +185,7 @@ ul.crm-quickSearch-results.ui-state-disabled {
 }
 #civicrm-menu #crm-menubar-toggle-position a i {
   margin: 0;
-  border-top: 2px solid var(--crm-c-menubar-text);
+  border-top: 2px solid var(--crm-menubar-text-color);
   font-size: 11px;
   opacity: .8;
 }
@@ -264,8 +264,8 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 
   #civicrm-menu li a {
-    background-color: var(--crm-c-menubar-item);
-    color: var(--crm-c-menubar-text);
+    background-color: var(--crm-menubar-item-color);
+    color: var(--crm-menubar-text-color);
   }
 
   #civicrm-menu > li > a {
