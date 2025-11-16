@@ -89,47 +89,45 @@
   --crm-shadow-popup: 0 3px 18px 0 rgba(48,40,40,.25);
   --crm-shadow-bottom: 0 0 16px 1px rgba(0,0,0,.1);
 /* Sizes */
+  --crm-s-xsmall: 0.1rem; /* default extra-small */
+  --crm-s-xsmall-1: 0.125rem;
+  --crm-s-xsmall-2: 0.15rem;
+  --crm-s-small: 0.25rem; /* default small */
+  --crm-s-small-1: 0.275rem;
+  --crm-s-small-2: 0.325rem;
+  --crm-s-small-3: 0.375rem;
+  --crm-s-medium: 0.5rem; /* default medium */
+  --crm-s-medium-1: 0.625rem;
+  --crm-s-medium-2: 0.75rem;
+  --crm-s-medium-3: 0.875rem;
+  --crm-s-reg: 1rem;  /* default size */
+  --crm-s-reg-1: 1.125rem;
+  --crm-s-reg-2: 1.25rem;
+  --crm-s-reg-3: 1.375rem;
+  --crm-s-reg-4: 1.5rem;
+  --crm-s-large: 2rem;  /* default large */
+  --crm-s-large-1: 3rem;
+  --crm-s-large-2: 4rem;
   --crm-s-radius: 0.25rem;
-  --crm-xs: 0.1rem;
-  --crm-xs1: 0.125rem;
-  --crm-xs2: 0.15rem;
-  --crm-s: 0.25rem;
-  --crm-s1: 0.275rem;
-  --crm-s2: 0.325rem;
-  --crm-s3: 0.375rem;
-  --crm-m: 0.5rem;
-  --crm-m1: 0.625rem;
-  --crm-m2: 0.75rem;
-  --crm-m3: 0.875rem;
-  --crm-r: 1rem;
-  --crm-r1: 1.125rem;
-  --crm-r2: 1.25rem;
-  --crm-r3: 1.375rem;
-  --crm-r4: 1.5rem;
-  --crm-l: 2rem;
-  --crm-xl: 3rem;
-  --crm-xxl: 4rem;
-  --crm-big-input: 15em;
-  --crm-huge-input: 25em;
-  --crm-padding-reg: var(--crm-r);
-  --crm-padding-small: var(--crm-s);
-  --crm-padding-inset: var(--crm-m);
-  --crm-page-padding: var(--crm-xl); /* Margin left/right */
+  --crm-padding-reg: var(--crm-s-reg);
+  --crm-padding-small: var(--crm-s-small);
+  --crm-padding-inset: var(--crm-s-medium);
+  --crm-page-padding: var(--crm-s-large-1); /* Margin left/right */
   --crm-page-width: 100%; /* Default that CMS can overwrite */
-  --crm-flex-gap: 0.5rem;
+  --crm-flex-gap: var(--crm-s-medium);
 /* Type */
   --crm-font-system: unset;
   --crm-font: unset;
-  --crm-font-size: var(--crm-r);
-  --crm-font-small-size: var(--crm-m2);
+  --crm-font-size: var(--crm-s-reg);
+  --crm-font-small-size: var(--crm-s-medium-2);
   --crm-font-line-height: 1.5;
   --crm-link-decoration: none;
   --crm-link-decoration-hover: underline;
   --crm-link-hover-cursor: pointer;
   --crm-heading-bg-color: var(--crm-info-light-color);
   --crm-heading-color: var(--crm-info-color-on-dark);
-  --crm-heading-padding: var(--crm-s1) var(--crm-m1);
-  --crm-heading-margin: var(--crm-m) 0;
+  --crm-heading-padding: var(--crm-s-small-1) var(--crm-s-medium-1);
+  --crm-heading-margin: var(--crm-s-medium) 0;
   --crm-heading-radius: var(--crm-s-radius);
 /* Buttons */
   --crm-btn-box-shadow: none;
@@ -138,13 +136,13 @@
   --crm-btn-weight: inherit;
   --crm-btn-font: inherit;
   --crm-btn-radius: 3px;
-  --crm-btn-padding-block: var(--crm-xs1); /* padding for top and bottom, one value */
-  --crm-btn-padding-inline: var(--crm-m1); /* padding for left and right, one value */
-  --crm-btn-small-padding: var(--crm-xs) var(--crm-s);
-  --crm-btn-large-padding: var(--crm-m) var(--crm-r);
+  --crm-btn-padding-block: var(--crm-s-xsmall-1); /* padding for top and bottom, one value */
+  --crm-btn-padding-inline: var(--crm-s-medium-1); /* padding for left and right, one value */
+  --crm-btn-small-padding: var(--crm-s-xsmall) var(--crm-s-small);
+  --crm-btn-large-padding: var(--crm-s-medium) var(--crm-s-reg);
   --crm-btn-align: center;
   --crm-btn-height: 28px;
-  --crm-btn-icon-spacing: var(--crm-s);
+  --crm-btn-icon-spacing: var(--crm-s-small);
   --crm-btn-icon-size: auto;
   --crm-btn-cancel-bg-color: var(--crm-danger-color);
   --crm-btn-cancel-text-color: var(--crm-danger-text-color);
@@ -166,7 +164,7 @@
   --crm-table-row-border: var(--crm-border);
   --crm-table-column-border: 0 solid transparent;
   --crm-table-font-size: var(--crm-font-size);
-  --crm-table-padding: var(--crm-m);
+  --crm-table-padding: var(--crm-s-medium);
   --crm-table-header-border: 1px solid transparent;
   --crm-table-header-border-bottom: 2px solid var(--crm-border-color);
   --crm-table-header-bg-color: var(--crm-paper);
@@ -180,7 +178,7 @@
   --crm-table-sort-float: left; /* 'left', 'right' or 'none' */
   --crm-table-sort-active-color: var(--crm-link-color);
   --crm-table-compressed-width: auto;
-  --crm-table-nested-padding: var(--crm-r) var(--crm-m);
+  --crm-table-nested-padding: var(--crm-s-reg) var(--crm-s-medium);
   --crm-table-nested-head-border: 0 solid transparent;
   --crm-table-nested-border: var(--crm-border);
   --crm-table-inset-bg-color: var(--crm-layer2-bg-color);
@@ -193,16 +191,16 @@
 /* Accordions */
   --crm-accordion-icon: "\f0da"; /* unicode value for FontAwesome icon */
   --crm-accordion-icon-color: var(--crm-text-color);
-  --crm-accordion-icon-spacing: var(--crm-m);
+  --crm-accordion-icon-spacing: var(--crm-s-medium);
   --crm-accordion-transform: rotate(90deg);
   --crm-accordion-transition: transform .3s;
   --crm-accordion-radius: var(--crm-s-radius);
-  --crm-accordion-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */
+  --crm-accordion-gap: var(--crm-s-xsmall-2) 0 0; /* space between multiple accordions */
 /* .crm-accordion-bold */
   --crm-accordion-header-bg-color: var(--crm-secondary-color);
   --crm-accordion-header-bg-active-color: var(--crm-c-gray-900);
   --crm-accordion-header-color: var(--crm-secondary-text-color);
-  --crm-accordion-header-padding: var(--crm-s) var(--crm-m);
+  --crm-accordion-header-padding: var(--crm-s-small) var(--crm-s-medium);
   --crm-accordion-header-weight: bold;
   --crm-accordion-header-border: var(--crm-border);
   --crm-accordion-header-border-width: 0 0 1px 0;
@@ -218,14 +216,14 @@
   --crm-accordion2-header-color: var(--crm-text-color);
   --crm-accordion2-header-border: unset;
   --crm-accordion2-header-border-width: unset;
-  --crm-accordion2-header-padding: var(--crm-s) var(--crm-m);
+  --crm-accordion2-header-padding: var(--crm-s-small) var(--crm-s-medium);
   --crm-accordion2-border: unset;
   --crm-accordion2-border-width: unset;
   --crm-accordion2-body-bg-color: unset;
-  --crm-accordion2-body-padding: var(--crm-s);
+  --crm-accordion2-body-padding: var(--crm-s-small);
 /* Alerts */
-  --crm-alert-padding: var(--crm-m) var(--crm-m2);
-  --crm-alert-margin: 0 0 var(--crm-m);
+  --crm-alert-padding: var(--crm-s-medium) var(--crm-s-medium-2);
+  --crm-alert-margin: 0 0 var(--crm-s-medium);
   --crm-alert-border-width: 1px;
   --crm-alert-success-bg-color: var(--crm-success-light-color);
   --crm-alert-success-border-color: color-mix(in srgb, var(--crm-alert-success-bg-color) 90%,#000 10%);
@@ -242,7 +240,7 @@
 /* Form */
   --crm-form-block-box-shadow: var(--crm-shadow-block);
   --crm-form-block-bg-color: var(--crm-container-bg-color);
-  --crm-form-block-padding: var(--crm-m);
+  --crm-form-block-padding: var(--crm-s-medium);
   --crm-form-block-border-radius: var(--crm-s-radius);
   --crm-form-block-header-color: var(--crm-inverse-bg-color);
   --crm-form-fieldset-border-color: var(--crm-c-gray-400);
@@ -256,14 +254,16 @@
   --crm-input-border-radius: 3px;
   --crm-input-active-transition: border-color .15s ease-in-out 0s;
   --crm-input-box-shadow: inset 0 1px 2px 0 rgba(0,0,0,.1);
-  --crm-input-padding: var(--crm-xs1) var(--crm-s2);
-  --crm-input-padding-large: var(--crm-s) var(--crm-m1);
-  --crm-input-height: var(--crm-l);
-  --crm-input-font-size: var(--crm-m3);
+  --crm-input-padding: var(--crm-s-xsmall-1) var(--crm-s-small-2);
+  --crm-input-padding-large: var(--crm-s-small) var(--crm-s-medium-1);
+  --crm-input-height: var(--crm-s-large);
+  --crm-input-width: 15em;
+  --crm-input-large-width: 25em;
+  --crm-input-font-size: var(--crm-s-medium-3);
   --crm-input-label-weight: bold;
   --crm-input-label-font: var(--crm-font);
   --crm-input-label-size: var(--crm-font-size);
-  --crm-input-label-width: var(--crm-big-input);
+  --crm-input-label-width: var(--crm-input-width);
   --crm-input-label-align: right;
   --crm-input-label-color: var(--crm-text-color);
   --crm-input-description: var(--crm-inactive-color);
@@ -283,15 +283,15 @@
   --crm-input-toggle-button-bg: var(--crm-paper);
 /* Tabs */
   --crm-tabs-bg-color: var(--crm-c-gray-200);
-  --crm-tabs-padding: var(--crm-s);
+  --crm-tabs-padding: var(--crm-s-small);
   --crm-tabs-border: var(--crm-contact-border);
   --crm-tabs-radius: var(--crm-s-radius);
-  --crm-tabs-gap: var(--crm-s);
+  --crm-tabs-gap: var(--crm-s-small);
   --crm-tab-bg-color: var(--crm-layer1-bg-color);
   --crm-tab-hover-bg-color: color-mix(in srgb,var(--crm-layer1-bg-color) 75%,#000 25%);
   --crm-tab-bg-active: var(--crm-container-bg-color);
   --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
-  --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
+  --crm-tab-padding: var(--crm-s-small-3) var(--crm-s-medium) var(--crm-s-small) var(--crm-s-medium);
   --crm-tab-color: var(--crm-text-color);
   --crm-tab-weight: normal;
   --crm-tab-count-bg-color: var(--crm-info-text-color);
@@ -312,7 +312,7 @@
   --crm-contact-tabs-radius: var(--crm-contact-radius) var(--crm-contact-radius) 0 0;
   --crm-contact-tab-bg-color: var(--crm-tab-bg-color);
   --crm-contact-tab-hover-bg-color: var(--crm-tab-hover-bg-color);
-  --crm-contact-tab-padding: var(--crm-s3) var(--crm-m2);
+  --crm-contact-tab-padding: var(--crm-s-small-3) var(--crm-s-medium-2);
   --crm-contact-tab-border: 0 solid transparent;
   --crm-contact-tab-border-hover: 0 solid transparent;
   --crm-contact-tab-border-width: 0; /* to remove border on one side for hanging tabs */
@@ -322,11 +322,11 @@
   --crm-contact-tab-align: none;
   --crm-contact-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-contact-tab-radius: var(--crm-contact-radius);
-  --crm-contact-icon-size: var(--crm-r);
+  --crm-contact-icon-size: var(--crm-s-reg);
   --crm-contact-summary-row-bg-color: var(--crm-container-bg-color);
   --crm-contact-heading-inset: 0;
   --crm-contact-box-shadow: 0;
-  --crm-contact-panel-padding: var(--crm-m);
+  --crm-contact-panel-padding: var(--crm-s-medium);
   --crm-contact-panel-bg-color: var(--crm-paper);
   --crm-contact-panel-border: 0;
   --crm-contact-panel-radius: 0 0 var(--crm-contact-radius) var(--crm-contact-radius);
@@ -338,8 +338,8 @@
   --crm-contact-header-bg-color: var(--crm-paper);
   --crm-contact-header2-bg-color: transparent;
   --crm-contact-header-color: var(--crm-text-color);
-  --crm-contact-header-size: var(--crm-r3);
-  --crm-contact-header-padding: 0 0 var(--crm-r) 0;
+  --crm-contact-header-size: var(--crm-s-reg-3);
+  --crm-contact-header-padding: 0 0 var(--crm-s-reg) 0;
   --crm-contact-image-size: 100px;
   --crm-contact-image-radius: 0;
   --crm-contact-image-right: var(--crm-contact-panel-padding); /* distance from right of dashboard */
@@ -347,23 +347,23 @@
   --crm-contact-image-border: 0;
 /* Dialog */
   --crm-dialog-bg-color: var(--crm-paper);
-  --crm-dialog-padding: var(--crm-s);
+  --crm-dialog-padding: var(--crm-s-small);
   --crm-dialog-radius: var(--crm-s-radius);
   --crm-dialog-line: unset;
   --crm-dialog-inner-shadow: var(--crm-shadow-bottom);
   --crm-dialog-header-bg-color: var(--crm-secondary-color);
   --crm-dialog-header-color: var(--crm-secondary-text-color);
-  --crm-dialog-header-size: var(--crm-r1);
-  --crm-dialog-header-padding: var(--crm-m1) var(--crm-r);
+  --crm-dialog-header-size: var(--crm-s-reg-1);
+  --crm-dialog-header-padding: var(--crm-s-medium-1) var(--crm-s-reg);
   --crm-dialog-header-radius: var(--crm-dialog-radius);
   --crm-dialog-header-border-color: transparent transparent var(--crm-border-color) transparent; /* set a border color for each side of the header */
   --crm-dialog-body-bg-color: var(--crm-container-bg-color);
-  --crm-dialog-body-padding: var(--crm-m);
+  --crm-dialog-body-padding: var(--crm-s-medium);
 /* Dashlet */
   --crm-dashlet-columns: 2fr 3fr;
   --crm-dashlet-border: unset;
   --crm-dashlet-bg-color: var(--crm-paper);
-  --crm-dashlet-padding: var(--crm-s2);
+  --crm-dashlet-padding: var(--crm-s-small-2);
   --crm-dashlet-box-shadow: var(--crm-shadow-popup);
   --crm-dashlet-dashlets-bg-color: var(--crm-container-bg-color);
   --crm-dashlet-header-bg-color: var(--crm-accordion-header-bg-color);
@@ -371,12 +371,12 @@
   --crm-dashlet-header-border: unset;
   --crm-dashlet-header-border-width: unset;
   --crm-dashlet-header-font-size: var(--crm-font-size);
-  --crm-dashlet-header-padding: var(--crm-s);
+  --crm-dashlet-header-padding: var(--crm-s-small);
   --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
   --crm-dashlet-tabs-border: 0;
   --crm-dashlet-radius: var(--crm-s-radius);
 /* Button dropdowns */
-  --crm-dropdown-padding: var(--crm-s);
+  --crm-dropdown-padding: var(--crm-s-small);
   --crm-dropdown-radius: var(--crm-s-radius);
   --crm-dropdown-bg-color: var(--crm-secondary-hover-color);
   --crm-dropdown-color: var(--crm-text-light-color);
@@ -390,7 +390,7 @@
   --crm-dropdown-2-padding: var(--crm-padding-small);
 /* Notifications */
   --crm-notify-bg-color: rgba(0,0,0,0.85);
-  --crm-notify-padding: var(--crm-m2);
+  --crm-notify-padding: var(--crm-s-medium-2);
   --crm-notify-color: var(--crm-text-light-color);
   --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: var(--crm-s-radius);
@@ -417,7 +417,7 @@
   --crm-wizard-width: fit-content;
   --crm-wizard-margin: 0.5rem auto;
   --crm-wizard-height: 30px;
-  --crm-wizard-radius: var(--crm-l);
+  --crm-wizard-radius: var(--crm-s-large);
   --crm-wizard-angle: 0px;
   --crm-wizard-arrow-thickness: 1px;
   --crm-wizard-active-color: var(--crm-text-light-color);
@@ -427,7 +427,7 @@
   --crm-wizard-box-shadow: unset;
 /* Alpha filter */
   --crm-filter-bg-color: var(--crm-info-light-color);
-  --crm-filter-padding: var(--crm-m);
+  --crm-filter-padding: var(--crm-s-medium);
   --crm-filter-item-bg-color: var( --crm-layer1-bg-color);
   --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
   --crm-filter-spacing: space-between; /* choose 'space-between' to spread out evenly, 'start' for left align, or 'end' for right. */
@@ -435,26 +435,26 @@
   --crm-f-form-width: 800px;
   --crm-f-box-shadow: var(--crm-shadow-block);
   --crm-f-fieldset-bg-color: var(--crm-page-bg-color);
-  --crm-f-fieldset-padding: var(--crm-r) 0;
+  --crm-f-fieldset-padding: var(--crm-s-reg) 0;
   --crm-f-fieldset-margin: 0 0 var(--crm-padding-reg) 0;
   --crm-f-fieldset-border: 0;
   --crm-f-fieldset-box-shadow: var(--crm-f-box-shadow);
   --crm-f-legend-position: left; /* chose 'left', 'right' or 'inherit' for browser-default of mid fieldset border */
   --crm-f-legend-align: left;
-  --crm-f-legend-size: var(--crm-r3);
+  --crm-f-legend-size: var(--crm-s-reg-3);
   --crm-f-legend-padding: 0;
   --crm-f-form-padding: var(--crm-padding-reg);
   --crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
   --crm-f-label-position: left; /* 'unset' = stacked, 'left' = left align, in combination with width/margin below */
   --crm-f-label-align: right;
   --crm-f-label-width: 200px;
-  --crm-f-label-gap: var(--crm-m); /* applies for inline label + input */
-  --crm-f-label-margin: var(--crm-s);
+  --crm-f-label-gap: var(--crm-s-medium); /* applies for inline label + input */
+  --crm-f-label-margin: var(--crm-s-small);
   --crm-f-label-weight: bold;
   --crm-f-label-color: inherit;
   --crm-f-input-radius: var(--crm-s-radius);
-  --crm-f-input-padding: var(--crm-r2) var(--crm-m2);
-  --crm-f-input-font-size: var(--crm-r1);
+  --crm-f-input-padding: var(--crm-s-reg-2) var(--crm-s-medium-2);
+  --crm-f-input-font-size: var(--crm-s-reg-1);
   --crm-f-input-width: 300px;
   --crm-f-form-focus-bg-color: var(--crm-c-green-light);
   --crm-f-form-error-bg-color: var(--crm-c-gray-200);

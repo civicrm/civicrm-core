@@ -70,20 +70,20 @@
 .crm-datatable-pager-bottom {
   display: flex;
   justify-content: space-between;
-  font-size: var(--crm-m3);
-  margin-inline: var(--crm-m);
+  font-size: var(--crm-s-medium-3);
+  margin-inline: var(--crm-s-medium);
 }
 .crm-datatable-pager-top {
-  margin-block: var(--crm-r);
+  margin-block: var(--crm-s-reg);
 }
 .crm-datatable-pager-bottom {
-  margin-top: var(--crm-r);
+  margin-top: var(--crm-s-reg);
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
   background: var(--crm-secondary-color);
   color: var(--crm-secondary-text-color) !important;
   border: 0 solid transparent;
-  padding: var(--crm-s);
+  padding: var(--crm-s-small);
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
   background: var(--crm-secondary-hover-color);
@@ -127,7 +127,7 @@
 .crm-container .pagination > li > :is(a,span) {
   position: relative;
   float: left;
-  padding: var(--crm-s) var(--crm-m);
+  padding: var(--crm-s-small) var(--crm-s-medium);
   margin-left: -1px;
   line-height: 1.4;
   color: var(--crm-link-color);
@@ -163,8 +163,8 @@
   border: var(--crm-border);
 }
 .crm-container .pagination-lg > li > :is(a,span) {
-  padding: var(--crm-m2) var(--crm-r);
-  font-size: var(--crm-r1);
+  padding: var(--crm-s-medium-2) var(--crm-s-reg);
+  font-size: var(--crm-s-reg-1);
   line-height: 1.3;
 }
 .crm-container .pagination-lg > li:first-child > :is(a,span) {

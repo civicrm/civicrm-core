@@ -4,7 +4,7 @@
 .crm-container .afadmin-list .nav.nav-tabs { /* entire tab region */
   border: var(--crm-tabs-border);
   border-radius: var(--crm-tabs-radius);
-  margin-bottom: var(--crm-r1);
+  margin-bottom: var(--crm-s-reg-1);
 }
 .crm-container .ui-widget-header,
 .crm-container .ui-tabs .ui-tabs-nav,
@@ -60,7 +60,7 @@
   padding: var(--crm-tab-padding);
   font-weight: var(--crm-tab-weight);
   font-size: var(--crm-font-size);
-  line-height: var(--crm-r1);
+  line-height: var(--crm-s-reg-1);
   text-decoration: none;
   border-radius: var(--crm-tab-radius);
   display: block;
@@ -76,11 +76,11 @@
   font-style: inherit;
   background: var(--crm-tab-count-bg-color);
   color: var(--crm-tab-count-color);
-  border-radius: var(--crm-m2);
-  min-width: var(--crm-r2);
+  border-radius: var(--crm-s-medium-2);
+  min-width: var(--crm-s-reg-2);
   display: inline-block;
   text-align: center;
-  font-size: var(--crm-m2);
+  font-size: var(--crm-s-medium-2);
   padding: 0 0.2rem;
 }
 .crm-container #mainTabContainer ul.ui-tabs-nav a em {
@@ -153,7 +153,7 @@
   display: grid;
   grid-template-columns: min-content auto;
   width: var(--crm-contact-tab-width);
-  gap: var(--crm-m);
+  gap: var(--crm-s-medium);
   align-items: center;
   float: var(--crm-contact-tab-align);
   border-radius: var(--crm-contact-tab-radius);

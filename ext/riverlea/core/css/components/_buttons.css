@@ -165,23 +165,23 @@
 
 #bootstrap-theme .btn-lg,
 #bootstrap-theme .btn-group-lg > .btn {
-  padding: var(--crm-m3) var(--crm-r);
-  font-size: var(--crm-r1);
+  padding: var(--crm-s-medium-3) var(--crm-s-reg);
+  font-size: var(--crm-s-reg-1);
   line-height: 1.3;
   border-radius: calc(var(--crm-btn-radius) * 2);
 }
 #bootstrap-theme.btn-sm,
 #bootstrap-theme .btn-group-sm > .btn {
-  padding: var(--crm-s2) var(--crm-m1);
-  font-size: var(--crm-m2);
+  padding: var(--crm-s-small-2) var(--crm-s-medium-1);
+  font-size: var(--crm-s-medium-2);
   line-height: 1.5;
   border-radius: var(--crm-btn-radius);
   height: auto;
 }
 #bootstrap-theme .btn-xs,
 #bootstrap-theme .btn-group-xs > .btn {
-  padding: var(--crm-xs) var(--crm-s2);
-  font-size: var(--crm-m2);
+  padding: var(--crm-s-xsmall) var(--crm-s-small-2);
+  font-size: var(--crm-s-medium-2);
   border-radius: var(--crm-btn-radius);
   height: auto;
 }
@@ -199,7 +199,7 @@
   width: 100%;
 }
 .crm-submit-buttons {
-  padding: var(--crm-s);
+  padding: var(--crm-s-small);
   display: inline-flex;
   align-items: center;
   gap: var(--crm-flex-gap);
@@ -228,10 +228,10 @@
   white-space: nowrap;
 }
 .crm-container td a.crm-hover-button + .crm-hover-button:not(:last-of-type) {
-  margin-inline: var(--crm-m);
+  margin-inline: var(--crm-s-medium);
 }
 .crm-container td:has(.btn-slide) a.crm-hover-button + .crm-hover-button {
-  margin-inline: var(--crm-m);
+  margin-inline: var(--crm-s-medium);
 }
 .crm-container .crm-submit-buttons .crm-hover-button {
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
@@ -257,7 +257,7 @@
 
 .crm-container .ui-widget-content .action-link .button {
   box-shadow: var(--crm-shadow-block) !important;
-  margin: var(--crm-m) 0;
+  margin: var(--crm-s-medium) 0;
 }
 
 /* Modal buttons */
@@ -295,7 +295,7 @@
 #bootstrap-theme td.text-right:has(.btn + .btn),
 .crm-container .crm-buttons {
   display: flex;
-  gap: var(--crm-s);
+  gap: var(--crm-s-small);
   flex-wrap: wrap;
 }
 #bootstrap-theme td.text-right:has(.btn + .btn) {
@@ -575,22 +575,22 @@
 /* Small buttons with icons */
 #bootstrap-theme .btn-sm:has(i.crm-i),
 #bootstrap-theme .btn-group-sm > .btn:has(i.crm-i) {
-  padding: 0 var(--crm-m1) 0 0;
+  padding: 0 var(--crm-s-medium-1) 0 0;
 }
 #bootstrap-theme .btn-sm i.crm-i,
 #bootstrap-theme .btn-group-sm > .btn i.crm-i {
   min-width: fit-content;
   height: auto;
-  padding: var(--crm-s2) var(--crm-btn-icon-spacing) var(--crm-s2) var(--crm-m1);
+  padding: var(--crm-s-small-2) var(--crm-btn-icon-spacing) var(--crm-s-small-2) var(--crm-s-medium-1);
 }
 #bootstrap-theme .btn-group-xs button:has(i.crm-i) {
-  padding: 0 var(--crm-s2) 0 0;
+  padding: 0 var(--crm-s-small-2) 0 0;
 }
 #bootstrap-theme .btn-xs:has(i.crm-i),
 #bootstrap-theme .btn-group > .btn-xs + .dropdown-toggle:has(i.crm-i),
 #bootstrap-theme .btn-group-xs > .btn + .dropdown-toggle:has(i.crm-i),
 .crm-container button.dropdown-toggle.btn-xs:has(i.crm-i) {
-  padding: var(--crm-btn-icon-padding) var(--crm-m) var(--crm-btn-icon-padding) 0
+  padding: var(--crm-btn-icon-padding) var(--crm-s-medium) var(--crm-btn-icon-padding) 0
 }
 #bootstrap-theme .btn-xs i.crm-i,
 #bootstrap-theme .btn-group-xs > .btn i.crm-i {

@@ -141,7 +141,7 @@
 
 /* override standalone.css */
 #login-form {
-  --crm-big-input: 100%;
+  --crm-input-width: 100%;
 }
 /* Override _fixes.scss */
 .crm-container del,
