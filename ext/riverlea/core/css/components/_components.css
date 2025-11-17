@@ -46,67 +46,6 @@
   margin: 0 0 0 var(--crm-s);
 }
 
-/* Toggle Inputs */
-
-.crm-container .crm-form-toggle-container {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  grid-gap: var(--crm-m2);
-
-  & input[type="checkbox"].crm-form-toggle {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    position: relative;
-    font-size: inherit;
-    width: 2.75rem;
-    height: auto;
-    padding: var(--crm-m2) 0;
-    box-sizing: content-box;
-    border-radius: 1rem;
-    vertical-align: text-bottom;
-    color: inherit;
-    border: 2px solid var(--crm-c-inverse-bg);
-    background-color: var(--crm-c-inverse-bg);
-    -webkit-transition: 0.1s;
-    transition: 0.1s;
-  }
-
-  & input[type="checkbox"].crm-form-toggle::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translate(0, -50%);
-    box-sizing: border-box;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin: 0 var(--crm-xs2);
-    border-radius: 50%;
-    border: 1px solid var(--crm-c-layer0-bg);
-    background: var(--crm-c-layer0-bg);
-    -webkit-transition: 0.1s;
-    transition: 0.1s;
-  }
-  & input[type="checkbox"].crm-form-toggle:checked {
-    border: 2px solid var(--crm-c-focus);
-    background-color: var(--crm-c-focus);
-  }
-  & input[type="checkbox"].crm-form-toggle:checked::before {
-    left: 1.2rem;
-  }
-  & input[type="checkbox"].crm-form-toggle:disabled {
-    opacity: 0.4;
-  }
-  & input[type="checkbox"]:not(:checked) ~ .crm-form-toggle-text-on {
-    display: none;
-  }
-  & input[type="checkbox"]:checked ~ .crm-form-toggle-text-off {
-    display: none;
-  }
-}
-
 /* Action Links */
 
 .crm-container .action-link,
