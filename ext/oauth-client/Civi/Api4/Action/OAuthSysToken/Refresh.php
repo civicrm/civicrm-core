@@ -63,7 +63,7 @@ class Refresh extends BasicBatchAction {
       }
     }
 
-    \CRM_OAuth_Hook::hook_civicrm_oauthToken('refresh', $this->getEntityName(), $row);
+    \CRM_OAuth_Hook::oauthToken('refresh', $this->getEntityName(), $row);
 
     civicrm_api4($this->getEntityName(), 'update', [
       // You may have permission to refresh even if you can't inspect/update secrets directly.
