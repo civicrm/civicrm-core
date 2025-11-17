@@ -9,7 +9,7 @@
   background: var(--crm-c-yellow-light);
   font-size: var(--crm-font-small-size);
   padding: var(--crm-padding-small);
-  margin: 0 0 0 var(--crm-s-medium);
+  margin: 0 0 0 var(--crm-l-medium);
   width: var(--crm-input-width);
   text-align: center;
 }
@@ -29,7 +29,7 @@
   flex-direction: column;
   height: auto;
   align-items: center;
-  gap: var(--crm-s-medium);
+  gap: var(--crm-l-medium);
   width: 100%;
 }
 .crmMailing .preview-popup,
@@ -52,8 +52,8 @@ input[name=preview_test_email]::placeholder {
   text-decoration: line-through;
 }
 .crm-container #crm-main-content-wrapper a.crmMailing-submit-button {
-  margin-top: var(--crm-s-reg);
-  font-size: var(--crm-s-reg-1);
+  margin-top: var(--crm-l-reg);
+  font-size: var(--crm-l-reg-1);
 }
 .crm-container a.crmMailing-submit-button.disabled,
 .crm-container a.crmMailing-submit-button.blocking {

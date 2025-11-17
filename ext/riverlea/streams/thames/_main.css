@@ -54,21 +54,21 @@
   --crm-shadow-popup: 3px 3px 18px 0 rgba(0, 0, 0,.25);
   --crm-shadow-bottom: unset;
 /* SIZES - temporary */
-  --crm-s-radius: 0; /* thames - this gets applied in too many places; so setting to 0 and positively re-applying, rather than using this and negatively unapplying. */
+  --crm-l-radius: 0; /* thames - this gets applied in too many places; so setting to 0 and positively re-applying, rather than using this and negatively unapplying. */
 /* thames: on standalone the following is overridden in cms.css */
   --crm-page-padding: clamp(0.5rem 2vw 4rem); /* Margin left/right */
 /* Type */
   --crm-font: Lato, sans-serif;
   --crm-heading-bg-color: unset;
   --crm-heading-color: var(--crm-text-dark-color);
-  --crm-heading-padding: var(--crm-s-small-1) var(--crm-s-medium-1); /* thames unset this? todo */
+  --crm-heading-padding: var(--crm-l-small-1) var(--crm-l-medium-1); /* thames unset this? todo */
 }
 :root {
 /* Buttons */
-  --crm-btn-padding-block: var(--crm-s-small);
-  --crm-btn-padding-inline: var(--crm-s-medium-2);
+  --crm-btn-padding-block: var(--crm-l-small);
+  --crm-btn-padding-inline: var(--crm-l-medium-2);
   --crm-btn-height: 1.825rem;
-  --crm-btn-icon-spacing: var(--crm-s-xsmall-2);
+  --crm-btn-icon-spacing: var(--crm-l-xsmall-2);
   --crm-btn-cancel-bg-color: var(--crm-c-red-light);
   --crm-btn-cancel-text-color: var(--crm-c-red-dark);
   --crm-btn-info-bg-color: var(--crm-secondary-color);
@@ -77,7 +77,7 @@
   --crm-btn-success-text-color: #fff;
   --crm-btn-danger-bg-color: var(--crm-c-red);
   --crm-btn-danger-text-color: var(--crm-c-red-dark);
-  --crm-btn-margin: var(--crm-s-medium) 0;
+  --crm-btn-margin: var(--crm-l-medium) 0;
 }
 :root {
 /* Tables */
@@ -114,7 +114,7 @@
 }
 :root {
 /* Alerts */
-  --crm-alert-padding: var(--crm-s-reg);
+  --crm-alert-padding: var(--crm-l-reg);
   --crm-alert-border-width: 0;
 /* Note 'help' suffix here is for the 'success' boxes. */
   --crm-alert-success-bg-color: var(--crm-c-blue-light);
@@ -142,8 +142,8 @@
   --crm-tabs-border: 4px solid var(--crm-c-blue-overlay2);
   --crm-tab-hover-bg-color: var(--crm-c-blue-overlay);
   --crm-tab-bg-active: var(--crm-paper);
-  --crm-tab-hang: 0 0 calc(-1 * var(--crm-s-small)) 0; /* thames todo check */
-  --crm-tab-padding: var(--crm-s-medium-2) var(--crm-s-reg-1) var(--crm-s-medium); /* thames todo check */
+  --crm-tab-hang: 0 0 calc(-1 * var(--crm-l-small)) 0; /* thames todo check */
+  --crm-tab-padding: var(--crm-l-medium-2) var(--crm-l-reg-1) var(--crm-l-medium); /* thames todo check */
   --crm-tab-count-bg-color: var(--crm-info-text-color);
   --crm-tab-count-color: var(--crm-info-color);
   --crm-tab-radius: var(--crm-r-3) var(--crm-r-3) 0 0;
@@ -163,17 +163,17 @@
   --crm-contact-tab-bg-color: transparent;
   --crm-contact-tabs-radius: var(--crm-contact-radius) 0 0 var(--crm-contact-radius);
   --crm-contact-tab-hover-bg-color: var(--crm-paper);
-  --crm-contact-tab-padding: var(--crm-s-medium-2) var(--crm-s-reg-1);
+  --crm-contact-tab-padding: var(--crm-l-medium-2) var(--crm-l-reg-1);
   --crm-contact-tab-border: var(--crm-contact-border);
   --crm-contact-tab-count-bg-color: var(--crm-primary-color);
   --crm-contact-tab-count-color: var(--crm-text-light-color);
   --crm-contact-tab-hang: 0 0 -1px 0;
   --crm-contact-tab-radius: 0;
   --crm-contact-heading-inset: unset;
-  --crm-contact-panel-padding: var(--crm-s-reg-2);
+  --crm-contact-panel-padding: var(--crm-l-reg-2);
   --crm-contact-panel-radius: 0 var(--crm-contact-radius) var(--crm-contact-radius) 0;
   --crm-contact-edit-border: 1px solid var(--crm-c-blue-dark);
-  --crm-contact-block-padding: var(--crm-s-medium-2);
+  --crm-contact-block-padding: var(--crm-l-medium-2);
   --crm-contact-block-bg-color: var(--crm-container-bg-color);
   --crm-contact-label-bg-color: var(--crm-container-bg-color);
   --crm-contact-header-bg-color: unset;
@@ -201,7 +201,7 @@
 /* Button dropdowns */
   --crm-dropdown-bg-color: var(--crm-paper);
   --crm-dropdown-color: var(--crm-c-blue-darker);
-  --crm-dropdown-hover: var(--crm-c-blue-dark);
+  --crm-dropdown-hover-text-color: var(--crm-c-blue-dark);
   --crm-dropdown-hover-bg-color: var(--crm-c-blue-light);
   --crm-dropdown-width: 23ch;
 }
@@ -238,7 +238,7 @@
 /* Frontend */
   --crm-f-form-width: 700px;
   --crm-f-fieldset-bg-color: var(--crm-container-bg-color);
-  --crm-f-fieldset-padding: var(--crm-s-reg);
+  --crm-f-fieldset-padding: var(--crm-l-reg);
   --crm-f-legend-align: center;
   --crm-f-label-position: unset;
   --crm-f-label-align: left;
@@ -383,7 +383,7 @@ html.cms-standalone body {
 .crm-container :is(.status,
 .alert-warning,
 .messages.warning) {
-  --crm-s-radius: 0.25rem;
+  --crm-l-radius: 0.25rem;
 }
 
 /* BUTTONS */
@@ -395,7 +395,7 @@ html.cms-standalone body {
 .crm-container [type="reset"],
 .crm-container [type="submit"] {
   Sometimes we have lots of buttons and they wrap to a 2nd line. This puts some vertical space betwixt.
-  margin: var(--crm-s-medium) 0;
+  margin: var(--crm-l-medium) 0;
 }
 
 /* Make it clear when you're hovering delete. */
@@ -517,7 +517,7 @@ html.cms-standalone body {
 
 /* RL has no margin-bottom so the actions ribbon touches the main contact block */
 div.crm-summary-contactname-block+.crm-actions-ribbon {
-  margin-bottom: var(--crm-s-reg-1) !important;
+  margin-bottom: var(--crm-l-reg-1) !important;
 }
 
 /* Use subgrid? No. Not responsive enough. */
@@ -698,11 +698,11 @@ nav.breadcrumb a {
 /* Breadcrumbs */
 html.crm-standalone  nav.breadcrumb>ol {
   display: flex;
-  gap: var(--crm-s-medium);
+  gap: var(--crm-l-medium);
 }
 .breadcrumb ol li:not(:first-child)::before {
   content: " \BB ";
-  margin-inline-end: var(--crm-s-medium);
+  margin-inline-end: var(--crm-l-medium);
   color: var(--crm-c-blue-dark);
 }
 
@@ -726,7 +726,7 @@ html.crm-standalone  nav.breadcrumb>ol {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--crm-s-medium);
+  gap: var(--crm-l-medium);
 }
 
 /* Spinner. Replace the fa icon with something nicer. */

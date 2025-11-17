@@ -148,7 +148,7 @@
   margin-bottom: 0;
 }
 #contact-summary summary {
-  padding: var(--crm-s-medium) !important;
+  padding: var(--crm-l-medium) !important;
 }
 #contact-summary details .crm-accordion-body {
   box-shadow: none;

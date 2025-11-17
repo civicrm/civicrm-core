@@ -42,10 +42,10 @@ af-form > fieldset > legend {
 .crm-container.crm-public .header-dark {
   background: var(--crm-secondary-color);
   color: var(--crm-text-light-color);
-  padding: var(--crm-s-medium-1) var(--crm-f-fieldset-padding);
+  padding: var(--crm-l-medium-1) var(--crm-f-fieldset-padding);
   font-weight: bold;
-  font-size: var(--crm-s-reg-1);
-  border-radius: var(--crm-s-radius);
+  font-size: var(--crm-l-reg-1);
+  border-radius: var(--crm-l-radius);
 }
 .crm-container.crm-public .crm-section:not(.alert) {
   padding: 0;
@@ -69,7 +69,7 @@ af-form > fieldset > legend {
   display: table;
 }
 .crm-container.crm-public span#msgbox {
-  border-radius: var(--crm-s-radius);
+  border-radius: var(--crm-l-radius);
   padding: var(--crm-padding-small);
 }
 .crm-container.crm-public #civicrm-footer::after {
@@ -138,7 +138,7 @@ af-form > fieldset > legend {
 .crm-container.crm-public .select2-search input,
 .crm-container.crm-public .select2-results select,
 .crm-container.crm-public .select2-results input {
-  padding: var(--crm-s-small) var(--crm-s-reg-1) var(--crm-s-small);
+  padding: var(--crm-l-small) var(--crm-l-reg-1) var(--crm-l-small);
 }
 .crm-container.crm-public .select2-dropdown-open .select2-choice,
 .crm-container.crm-public .select2-dropdown-open .select2-choices {
@@ -168,12 +168,12 @@ af-form > fieldset > legend {
   padding: var(--crm-f-form-padding);
 }
 .crm-container.crm-public #attachments table.form-layout-compressed {
-  margin-block: var(--crm-s-medium) 0;
+  margin-block: var(--crm-l-medium) 0;
 }
 .crm-container.crm-public #attachments table.form-layout-compressed tr {
   display: flex;
   flex-direction: column;
-  gap: var(--crm-s-small);
+  gap: var(--crm-l-small);
 }
 .crm-container.crm-public #attachments table.form-layout-compressed td {
   width: 100%;
@@ -182,7 +182,7 @@ af-form > fieldset > legend {
 }
 .crm-container.crm-public .crm-profile-view-title {
   padding-inline: var(--crm-f-form-padding);
-  font-size: var(--crm-s-reg-1);
+  font-size: var(--crm-l-reg-1);
 }
 /* Empowered by logo */
 
@@ -190,7 +190,7 @@ af-form > fieldset > legend {
   display: flex;
   align-items: center;
   justify-content: var(--crm-f-logo-align);
-  gap: var(--crm-s-small);
+  gap: var(--crm-l-small);
   width: var(--crm-f-form-width);
   margin: 0 auto;
 }

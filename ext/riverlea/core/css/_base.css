@@ -210,7 +210,7 @@ body.civicrm-iframe-page {
 .crm-container h3,
 #bootstrap-theme h3 {
   background-color: var(--crm-heading-bg-color);
-  font-size: var(--crm-s-reg-1);
+  font-size: var(--crm-l-reg-1);
   font-weight: bold;
   color: var(--crm-heading-color);
   padding: var(--crm-heading-padding);
@@ -222,8 +222,8 @@ body.civicrm-iframe-page {
 
 dl dd,
 dl dl {
-  margin-block-end: var(--crm-s-medium-1);
-  margin-inline-start: var(--crm-s-reg-1);
+  margin-block-end: var(--crm-l-medium-1);
+  margin-inline-start: var(--crm-l-reg-1);
 }
 
 /* Practical colors */
@@ -386,7 +386,7 @@ dl dl {
   color: var(--crm-text-color);
   background-color: var(--crm-code-bg-color);
   border: var(--crm-code-border-color);
-  border-radius: var(--crm-s-radius);
+  border-radius: var(--crm-l-radius);
 }
 .crm-container pre code {
   display: block;

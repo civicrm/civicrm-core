@@ -55,7 +55,7 @@
 }
 .crm-container #extensions table.dataTable a.crm-hover-button,
 .crm-container #extensions-addnew table.dataTable a.crm-hover-button {
-  padding: 0 var(--crm-s-medium-1);
+  padding: 0 var(--crm-l-medium-1);
 }
 .crm-container .disabled .crm-hover-button:hover,
 .crm-container .disabled .crm-hover-button:focus {
@@ -68,14 +68,14 @@
   background: var(--crm-alert-warning-bg-color);
   border: 1px solid var(--crm-alert-warning-border-color);
   padding: var(--crm-padding-small);
-  border-radius: var(--crm-s-radius);
+  border-radius: var(--crm-l-radius);
   color: var(--crm-alert-warning-text-color);
 }
 .crm-container .crm-extensions-version {
   white-space: nowrap;
 }
 .crm-container .crm-extensions-stage {
-  margin-left: var(--crm-s-small);
+  margin-left: var(--crm-l-small);
 }
 .crm-container .crm-extensions-stage.fa-flask,
 .crm-container .crm-extensions-stage.fa-warning {

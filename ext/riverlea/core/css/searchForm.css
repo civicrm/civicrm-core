@@ -6,11 +6,11 @@
 
 .crm-container div#alpha-filter {
   background-color: var(--crm-filter-bg-color);
-  margin: var(--crm-s-reg) 0;
+  margin: var(--crm-l-reg) 0;
   padding: var(--crm-filter-padding);
   text-align: left;
   box-shadow: var(--crm-shadow-block);
-  border-radius: var(--crm-s-radius);
+  border-radius: var(--crm-l-radius);
 }
 #crm-container #alpha-filter ul {
   margin: 0;
@@ -24,7 +24,7 @@
 .crm-container #alpha-filter a {
   font-weight: normal;
   background: var(--crm-filter-item-bg-color);
-  padding: var(--crm-s-small) var(--crm-s-medium);
+  padding: var(--crm-l-small) var(--crm-l-medium);
   box-shadow: var(--crm-filter-item-shadow);
 }
 
@@ -35,8 +35,8 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: 100%;
-    column-gap: var(--crm-s-reg);
-    row-gap: var(--crm-s-small);
+    column-gap: var(--crm-l-reg);
+    row-gap: var(--crm-l-small);
   }
 }
 .advanced-search-fields .search-field__span-2 {

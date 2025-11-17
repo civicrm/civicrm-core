@@ -55,12 +55,12 @@
   --crm-dashlet-header-bg-color: var(--crm-layer2-bg-color);
 /* Button dropdowns '--crm-dropdown-' */
   --crm-dropdown-bg-color: var(--crm-layer1-bg-color);
-  --crm-dropdown-2-bg-color: var(--crm-layer1-bg-color);
+  --crm-dropdown2-bg-color: var(--crm-layer1-bg-color);
 /* Notifications '--crm-notify-' */
   --crm-notify-bg-color: var(--crm-c-darkest);
 /* Icons '--crm-icon-' */
 /* Wizard '--crm-wizard-' */
-  --crm-wizard-active-bg-color: var(--crm-c-dark-teal);
+  --crm-wizard-active-bg-color: var(--crm-c-teal-dark);
 /* Alpha filter '--crm-filter-' */
   --crm-filter-item-bg-color: var(--crm-layer1-bg-color);
 /* Frontend '--crm-f- */

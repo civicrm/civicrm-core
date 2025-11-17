@@ -11,7 +11,7 @@
   color: var(--crm-alert-success-text-color);
   margin: var(--crm-alert-margin);
   padding: var(--crm-alert-padding);
-  border-radius: var(--crm-s-radius);
+  border-radius: var(--crm-l-radius);
 }
 .crm-container .help > *:first-child {
   margin-top: 0;
@@ -86,7 +86,7 @@
   cursor: var(--crm-link-hover-cursor);
   background: transparent;
   appearance: none;
-  font-size: var(--crm-s-reg-1);
+  font-size: var(--crm-l-reg-1);
   line-height: 1;
   color: var(--crm-c-darkest) !important;
   text-shadow: 0 1px 0 #fff;
