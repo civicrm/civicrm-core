@@ -1311,7 +1311,6 @@ class CRM_Core_Permission {
         'delete in CiviEvent',
       ],
       'get' => [
-        'access CiviCRM',
         'access CiviEvent',
         'view event info',
       ],
