@@ -3,7 +3,7 @@
   border: var(--crm-table-outside-border);
   background: var(--crm-table-bg-color);
   box-shadow: var(--crm-shadow-block);
-  margin: 0 0 var(--crm-s-reg);
+  margin: 0 0 var(--crm-l-reg);
   border-collapse: collapse;
   width: 100%;
   max-width: 100%;
@@ -76,8 +76,8 @@
   box-shadow: none;
 }
 .crm-selection-reset {
-  padding: var(--crm-s-medium) 0;
-  margin-bottom: var(--crm-s-medium);
+  padding: var(--crm-l-medium) 0;
+  margin-bottom: var(--crm-l-medium);
   display: block;
 }
 
@@ -87,7 +87,7 @@
   background-color: var(--crm-table-header-bg-color);
 }
 .crm-container thead div.sticky-header {
-  height: var(--crm-s-reg);
+  height: var(--crm-l-reg);
 }
 .crm-sticky thead,
 .crm-container thead div.sticky-header {
@@ -147,7 +147,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   border: var(--crm-table-outside-border);
   background: var(--crm-table-bg-color);
   box-shadow: var(--crm-shadow-block);
-  margin: var(--crm-s-medium) 0 var(--crm-s-large);
+  margin: var(--crm-l-medium) 0 var(--crm-l-large);
 }
 .crm-container table.form-layout-compressed th {
   background: transparent;
@@ -168,7 +168,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   width: 100%;
   border: 0;
   padding: var(--crm-padding-reg);
-  border-radius: var(--crm-s-radius);
+  border-radius: var(--crm-l-radius);
   margin: 0;
 }
 #search-status table.form-layout-compressed tr {
@@ -279,7 +279,7 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table {
   width: 100%;
   max-width: 100%;
-  margin-bottom: var(--crm-s-reg-1);
+  margin-bottom: var(--crm-l-reg-1);
 }
 .crm-container .table > :is(thead,tbody,tfoot) > tr > :is(th,td) {
   padding: var(--crm-table-padding);
@@ -288,7 +288,7 @@ tbody.scrollContent tr.alternateRow:hover,
   border-top: var(--crm-table-header-border-bottom);
 }
 .crm-container .table-condensed > :is(thead,tbody,tfoot) > tr > :is(th,td) {
-  padding: var(--crm-s-small-1);
+  padding: var(--crm-l-small-1);
 }
 .crm-container .table-bordered {
   border: var(--crm-table-outside-border);
@@ -387,7 +387,7 @@ tbody.scrollContent tr.alternateRow:hover,
   .crm-container .table-responsive,
   .crm-container table {
     width: 100%;
-    margin-bottom: var(--crm-s-reg);
+    margin-bottom: var(--crm-l-reg);
     overflow-y: hidden;
     border: var(--crm-table-outside-border);
     display: contents; /* expirmental addition to provide more responsive behaviour */

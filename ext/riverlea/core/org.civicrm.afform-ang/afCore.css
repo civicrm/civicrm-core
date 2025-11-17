@@ -57,13 +57,13 @@ af-form {
   padding-block: 0;
 }
 details.af-container > *:not(summary) { /* adds padding to Afform internal details */
-  padding-inline: var(--crm-s-reg);
+  padding-inline: var(--crm-l-reg);
 }
 details.af-container > *:nth-of-type(1):not(summary) {
-  padding-top: var(--crm-s-medium);
+  padding-top: var(--crm-l-medium);
 }
 details.af-container > *:last-of-type {
-  padding-bottom: var(--crm-s-medium);
+  padding-bottom: var(--crm-l-medium);
 }
 details.af-container.af-layout-inline {
   flex-direction: column;
@@ -89,7 +89,7 @@ details.af-container.af-layout-inline > *:not(summary) {
   top: 0;
   left: 0;
   width: 100%;
-  padding: var(--crm-s-medium) var(--crm-s-reg);
+  padding: var(--crm-l-medium) var(--crm-l-reg);
   margin-top: 0;
 }
 

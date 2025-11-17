@@ -5,9 +5,9 @@
   opacity: .85;
   display: flex;
   justify-content: space-between;
-  gap: var(--crm-s-reg);
+  gap: var(--crm-l-reg);
   align-items: center;
-  padding: var(--crm-padding-small) var(--crm-padding-small) var(--crm-padding-small) var(--crm-s-reg);
+  padding: var(--crm-padding-small) var(--crm-padding-small) var(--crm-padding-small) var(--crm-l-reg);
 }
 #crm-status-list h3:hover,
 #crm-status-list h3.menuopen {
@@ -38,12 +38,12 @@
   color: var(--crm-success-text-color);
 }
 #crm-status-list .crm-status-message-body {
-  margin: var(--crm-s-reg) 0;
+  margin: var(--crm-l-reg) 0;
 }
 #crm-status-list .hidden-until {
   font-weight: normal;
   font-size: var(--crm-font-small-size);
-  margin-right: var(--crm-s-reg);
+  margin-right: var(--crm-l-reg);
 }
 #crm-status-list .hush-menu {
   margin-left: auto;
@@ -81,7 +81,7 @@
 #crm-status-list .hush-menu li:hover,
 #crm-status-list .hush-menu li:focus {
   background-color: var(--crm-dropdown-hover-bg-color);
-  color: var(--crm-dropdown-hover);
+  color: var(--crm-dropdown-hover-text-color);
 }
 .status-debug-information {
   font-size: var(--crm-font-small-size);

@@ -71,7 +71,7 @@
   float: inherit;
 }
 .crm-contact-page .crm-search-display-pager {
-  padding: 0 var(--crm-s-reg) var(--crm-s-reg) var(--crm-s-reg);
+  padding: 0 var(--crm-l-reg) var(--crm-l-reg) var(--crm-l-reg);
 }
 /* Inline Edit */
 
