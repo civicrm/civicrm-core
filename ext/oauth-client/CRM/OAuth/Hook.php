@@ -35,6 +35,29 @@ class CRM_OAuth_Hook {
    *   Ex: 'OAuthSysToken', 'OAuthContactToken', 'OAuthSessionToken'
    * @param array $token
    *   Ex: ['tag' => 'foo', 'client_id' => 123]
+   *
+   *   The following fields are equally applicable to all storage-types:
+   *
+   *   - access_token
+   *   - client_id
+   *   - expires
+   *   - grant_type
+   *   - raw
+   *   - refresh_token
+   *   - resource_owner
+   *   - resource_owner_name
+   *   - scopes
+   *   - tag
+   *   - token_type
+   *
+   *   Some fields depend on the storage-type:
+   *
+   *    - id (OAuthSysToken, OAuthContactToken)
+   *    - contact_id (OAuthContactToken)
+   *    - cardinal (OAuthSessionToken)
+   *    - created_date (extant records; OAuthSysToken, OAuthContactToken)
+   *    - modified_date (extant records; OAuthSysToken, OAuthContactToken)
+   *
    * @return void
    */
   public static function oauthToken(string $flow, string $type, array &$token) {
