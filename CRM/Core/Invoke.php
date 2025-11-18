@@ -10,6 +10,7 @@
  */
 
 use Civi\Core\Security\PharLoader;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -225,11 +226,6 @@ class CRM_Core_Invoke {
         CRM_Utils_System::appendBreadCrumb($item['breadcrumb']);
       }
 
-      $pageArgs = NULL;
-      if (!empty($item['page_arguments'])) {
-        $pageArgs = CRM_Core_Menu::getArrayForPathArgs($item['page_arguments']);
-      }
-
       $template = CRM_Core_Smarty::singleton();
 
       $template->assign('urlIsPublic', CRM_Core_Config::singleton()->userSystem->isFrontEndPage());
@@ -243,54 +239,11 @@ class CRM_Core_Invoke {
         $session->pushUserContext(CRM_Utils_System::url($item['return_url'], $args));
       }
 
-      $result = NULL;
-      // WISHLIST: Refactor this. Instead of pattern-matching on page_callback, lookup
-      // page_callback via Civi\Core\Resolver and check the implemented interfaces. This
-      // would require rethinking the default constructor.
-      if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
-        $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']), CRM_Utils_System::createRequestFromGlobals());
+      [$callback, $callbackArgs] = self::findCallback($item);
+      if (static::isPsr7Handler($callback)) {
+        array_unshift($callbackArgs, CRM_Utils_System::createRequestFromGlobals());
       }
-      elseif (str_contains($item['page_callback'], '_Form')) {
-        $wrapper = new CRM_Utils_Wrapper();
-        $result = $wrapper->run(
-          $item['page_callback'] ?? NULL,
-          $item['title'] ?? NULL,
-          $pageArgs ?? NULL
-        );
-      }
-      else {
-        $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
-        $mode = 'null';
-        if (isset($pageArgs['mode'])) {
-          $mode = $pageArgs['mode'];
-          unset($pageArgs['mode']);
-        }
-        $title = $item['title'] ?? NULL;
-        if (str_contains($item['page_callback'], '_Page') || str_contains($item['page_callback'], '\\Page\\')) {
-          $object = new $item['page_callback']($title, $mode);
-          $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
-        }
-        elseif (str_contains($item['page_callback'], '_Controller') || str_contains($item['page_callback'], '\\Controller\\')) {
-          $addSequence = 'false';
-          if (isset($pageArgs['addSequence'])) {
-            $addSequence = $pageArgs['addSequence'];
-            $addSequence = $addSequence ? 'true' : 'false';
-            unset($pageArgs['addSequence']);
-          }
-          if ($item['page_callback'] === 'CRM_Import_Controller') {
-            // Let the generic import controller have the page arguments.... so we don't need
-            // one class per import.
-            $object = new CRM_Import_Controller($title, $pageArgs ?? []);
-          }
-          else {
-            $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
-          }
-        }
-        else {
-          throw new CRM_Core_Exception('Execute supplied menu action');
-        }
-        $result = $object->run($newArgs, $pageArgs);
-      }
+      $result = call_user_func_array($callback, $callbackArgs);
 
       CRM_Core_Session::storeSessionObjects();
       return $result;
@@ -382,6 +335,92 @@ class CRM_Core_Invoke {
       'entities' => TRUE,
     ])->execute();
 
+  }
+
+  /**
+   * @param array $item
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function findCallback(array $item): array {
+    $config = CRM_Core_Config::singleton();
+
+    $pageArgs = NULL;
+    if (!empty($item['page_arguments'])) {
+      $pageArgs = CRM_Core_Menu::getArrayForPathArgs($item['page_arguments']);
+    }
+
+    if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
+      $callback = Civi\Core\Resolver::singleton()->get($item['page_callback']);
+      $callbackArgs = [CRM_Utils_System::createRequestFromGlobals()];
+    }
+    elseif (str_contains($item['page_callback'], '_Form')) {
+      $callback = [new CRM_Utils_Wrapper(), 'run'];
+      $callbackArgs = [
+        $item['page_callback'] ?? NULL,
+        $item['title'] ?? NULL,
+        $pageArgs ?? NULL,
+      ];
+    }
+    else {
+      $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
+      $mode = 'null';
+      if (isset($pageArgs['mode'])) {
+        $mode = $pageArgs['mode'];
+        unset($pageArgs['mode']);
+      }
+      $title = $item['title'] ?? NULL;
+      if (str_contains($item['page_callback'], '_Page') || str_contains($item['page_callback'], '\\Page\\')) {
+        $object = new $item['page_callback']($title, $mode);
+        $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
+      }
+      elseif (str_contains($item['page_callback'], '_Controller') || str_contains($item['page_callback'], '\\Controller\\')) {
+        $addSequence = 'false';
+        if (isset($pageArgs['addSequence'])) {
+          $addSequence = $pageArgs['addSequence'];
+          $addSequence = $addSequence ? 'true' : 'false';
+          unset($pageArgs['addSequence']);
+        }
+        if ($item['page_callback'] === 'CRM_Import_Controller') {
+          // Let the generic import controller have the page arguments.... so we don't need
+          // one class per import.
+          $object = new CRM_Import_Controller($title, $pageArgs ?? []);
+        }
+        else {
+          $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
+        }
+      }
+      else {
+        throw new CRM_Core_Exception('Execute supplied menu action');
+      }
+      $callback = [$object, 'run'];
+      $callbackArgs = [$newArgs, $pageArgs];
+    }
+    return [$callback, $callbackArgs];
+  }
+
+  private static function isPsr7Handler($callback): bool {
+    $resolver = Civi\Core\Resolver::singleton();
+    $function = $resolver->getReflector($callback);
+
+    $params = $function->getParameters();
+    if (empty($params)) {
+      return FALSE;
+    }
+
+    $param = $params[0]->getType();
+    $typeList = match(TRUE) {
+      $param instanceof ReflectionUnionType => array_map(fn($t) => $t->getName(), $param->getTypes()),
+      $param instanceof ReflectionNamedType => [$param->getName()],
+      default => [],
+    };
+    foreach ($typeList as $type) {
+      if (is_a($type, RequestInterface::class, TRUE)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 <menu>
   <item>
+    <path>civicrm/route-test/page-with-psr7</path>
+    <page_callback>CRM_RouterTest_Page_PageWithPsr7</page_callback>
+    <title>ExamplePage</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
     <path>civicrm/route-test/page-with-path</path>
     <page_callback>CRM_RouterTest_Page_PageWithPath</page_callback>
     <title>ExamplePage</title>
