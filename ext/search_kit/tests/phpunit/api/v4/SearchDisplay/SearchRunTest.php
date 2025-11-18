@@ -660,7 +660,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           ],
           'where' => [
             ['id', 'IN', $cids],
-            ['Contact_RelationshipCache_Contact_01.near_relation:name', '=', '"Child of"'],
+            ['Contact_RelationshipCache_Contact_01.near_relation:name', '=', 'Child of'],
             ['Contact_RelationshipCache_Contact_01.test_rel_fields.Opts', '=', 'r'],
           ],
           'join' => [
