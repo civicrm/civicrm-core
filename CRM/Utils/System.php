@@ -41,6 +41,7 @@ use GuzzleHttp\Psr7\Response;
  * @method static void alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
  * @method static bool shouldExitAfterFatal() Should the current execution exit after a fatal error?
  * @method static string|null currentPath() Path of the current page e.g. 'civicrm/contact/view'
+ * @method static \Psr\Http\Message\ServerRequestInterface createRequestFromGlobals()
  */
 class CRM_Utils_System {
 
