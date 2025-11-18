@@ -118,7 +118,7 @@ class PasswordReset extends AbstractAction {
     else {
       $userID = (int) substr($decodedToken['sub'], 4);
     }
-    if (!$userID > 0) {
+    if (!($userID > 0)) {
       // Hacker
       Civi::log()->warning("Rejected passwordResetToken with invalid userID.", compact('token', 'userID'));
       return NULL;
