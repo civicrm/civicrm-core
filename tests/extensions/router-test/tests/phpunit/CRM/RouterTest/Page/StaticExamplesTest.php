@@ -70,4 +70,36 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
     $this->assertEquals('OK', $parsed['systemSendJsonResponse']);
   }
 
+  /**
+   * @see \CRM_RouterTest_Page_StaticExamples::psr7()
+   */
+  public function testPsr7(): void {
+    $result = $this->client->get('frontend://civicrm/route-test/psr7?whiz=bang', [
+      'http_errors' => FALSE,
+      \GuzzleHttp\RequestOptions::JSON => ['number' => 456.78],
+    ]);
+    $this->assertEquals(498, $result->getStatusCode());
+    $this->assertEquals('Bar', $result->getHeader('X-Foo')[0]);
+    $this->assertContentType('application/json', $result);
+    $parsed = json_decode((string) $result->getBody(), TRUE);
+    $this->assertEquals('hello 456.78', $parsed['psr7']);
+    $this->assertEquals('bang', $parsed['input']);
+  }
+
+  /**
+   * @see \CRM_RouterTest_Page_StaticExamples::psr7()
+   */
+  public function testPsr7OldInput(): void {
+    $result = $this->client->get('frontend://civicrm/route-test/psr7-old-input?whiz=bang', [
+      'http_errors' => FALSE,
+      \GuzzleHttp\RequestOptions::JSON => ['number' => 111],
+    ]);
+    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertEquals('Bar', $result->getHeader('X-Foo')[0]);
+    $this->assertContentType('application/json', $result);
+    $parsed = json_decode((string) $result->getBody(), TRUE);
+    $this->assertEquals('hello 111', $parsed['psr7OldInput']);
+    $this->assertEquals('bang', $parsed['input']);
+  }
+
 }

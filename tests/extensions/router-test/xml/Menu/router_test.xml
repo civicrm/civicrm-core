@@ -30,4 +30,16 @@
     <title>ExamplePage</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/route-test/psr7</path>
+    <page_callback>CRM_RouterTest_Page_StaticExamples::psr7</page_callback>
+    <title>ExamplePage</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/route-test/psr7-old-input</path>
+    <page_callback>CRM_RouterTest_Page_StaticExamples::psr7OldInput</page_callback>
+    <title>ExamplePage</title>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
 </menu>

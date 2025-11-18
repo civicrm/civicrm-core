@@ -1,5 +1,8 @@
 <?php
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
 class CRM_RouterTest_Page_StaticExamples {
 
   public static function textAndExit() {
@@ -27,6 +30,28 @@ class CRM_RouterTest_Page_StaticExamples {
     CRM_Utils_System::sendJSONResponse([
       __FUNCTION__ => 'OK',
     ], 499);
+  }
+
+  public static function psr7(ServerRequestInterface $request): ResponseInterface {
+    $parsed = json_decode($request->getBody()->getContents(), TRUE);
+    return new \GuzzleHttp\Psr7\Response(498,
+      ['X-Foo' => 'Bar', 'Content-Type' => 'application/json'],
+      json_encode([
+        __FUNCTION__ => 'hello ' . (is_numeric($parsed['number']) ? $parsed['number'] : ''),
+        'input' => $request->getQueryParams()['whiz'],
+      ])
+    );
+  }
+
+  public static function psr7OldInput(ServerRequestInterface $request): ResponseInterface {
+    $parsed = json_decode(file_get_contents('php://input'), TRUE);
+    return new \GuzzleHttp\Psr7\Response(200,
+      ['X-Foo' => 'Bar', 'Content-Type' => 'application/json'],
+      json_encode([
+        __FUNCTION__ => 'hello ' . (is_numeric($parsed['number']) ? $parsed['number'] : ''),
+        'input' => $request->getQueryParams()['whiz'],
+      ])
+    );
   }
 
 }
