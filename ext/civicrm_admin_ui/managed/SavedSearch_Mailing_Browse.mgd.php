@@ -6,11 +6,23 @@ if (!CRM_Core_Component::isEnabled('CiviMail')) {
   return [];
 }
 
+$select = [
+  'id',
+  'name',
+  'language:label',
+  'created_id.display_name',
+  'created_date',
+  'scheduled_id.display_name',
+  'MIN(Mailing_MailingJob_mailing_id_01.scheduled_date) AS MIN_Mailing_MailingJob_mailing_id_01_scheduled_date',
+  'MIN(Mailing_MailingJob_mailing_id_01.start_date) AS MIN_Mailing_MailingJob_mailing_id_01_start_date',
+  'MAX(Mailing_MailingJob_mailing_id_01.end_date) AS MAX_Mailing_MailingJob_mailing_id_01_end_date',
+  'status:label',
+];
+
 $columns = [
   [
     'type' => 'field',
     'key' => 'name',
-    'dataType' => 'String',
     'label' => E::ts('Mailing Name'),
     'sortable' => TRUE,
     'icons' => [],
@@ -18,7 +30,6 @@ $columns = [
   [
     'type' => 'field',
     'key' => 'status:label',
-    'dataType' => 'String',
     'label' => E::ts('Status'),
     'sortable' => TRUE,
     'icons' => [],
@@ -31,7 +42,6 @@ if (CRM_Core_I18n::isMultilingual()) {
   $columns[] = [
     'type' => 'field',
     'key' => 'language:label',
-    'dataType' => 'String',
     'label' => E::ts('Language'),
     'sortable' => TRUE,
   ];
@@ -41,42 +51,36 @@ $columns = array_merge($columns, [
   [
     'type' => 'field',
     'key' => 'created_id.display_name',
-    'dataType' => 'String',
     'label' => E::ts('Created By'),
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
     'key' => 'created_date',
-    'dataType' => 'Timestamp',
     'label' => E::ts('Created Date'),
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
     'key' => 'scheduled_id.display_name',
-    'dataType' => 'String',
     'label' => E::ts('Sent By'),
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
-    'key' => 'Mailing_MailingJob_mailing_id_01.scheduled_date',
-    'dataType' => 'Timestamp',
+    'key' => 'MIN_Mailing_MailingJob_mailing_id_01_scheduled_date',
     'label' => E::ts('Scheduled'),
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
-    'key' => 'Mailing_MailingJob_mailing_id_01.start_date',
-    'dataType' => 'Timestamp',
+    'key' => 'MIN_Mailing_MailingJob_mailing_id_01_start_date',
     'label' => E::ts('Started'),
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
-    'key' => 'Mailing_MailingJob_mailing_id_01.end_date',
-    'dataType' => 'Timestamp',
+    'key' => 'MAX_Mailing_MailingJob_mailing_id_01_end_date',
     'label' => E::ts('Completed'),
     'sortable' => TRUE,
   ],
@@ -84,10 +88,10 @@ $columns = array_merge($columns, [
 
 // campaign only if component is enabled
 if (CRM_Core_Component::isEnabled('CiviCampaign')) {
+  $select[] = 'campaign_id:label';
   $columns[] = [
     'type' => 'field',
     'key' => 'campaign_id:label',
-    'dataType' => 'String',
     'label' => E::ts('Campaign'),
     'sortable' => TRUE,
   ];
@@ -242,24 +246,14 @@ return [
         'api_entity' => 'Mailing',
         'api_params' => [
           'version' => 4,
-          'select' => [
-            'id',
-            'name',
-            'language:label',
-            'campaign_id:label',
-            'created_id.display_name',
-            'created_date',
-            'scheduled_id.display_name',
-            'Mailing_MailingJob_mailing_id_01.scheduled_date',
-            'Mailing_MailingJob_mailing_id_01.start_date',
-            'Mailing_MailingJob_mailing_id_01.end_date',
-            'status:label',
-          ],
+          'select' => $select,
           'orderBy' => [],
           'where' => [
             ['sms_provider_id', 'IS EMPTY'],
           ],
-          'groupBy' => [],
+          'groupBy' => [
+            'id',
+          ],
           'join' => [
             [
               'MailingJob AS Mailing_MailingJob_mailing_id_01',
@@ -292,7 +286,7 @@ return [
           'description' => NULL,
           'sort' => [
             [
-              'Mailing_MailingJob_mailing_id_01.scheduled_date',
+              'MIN_Mailing_MailingJob_mailing_id_01_scheduled_date',
               'DESC',
             ],
           ],
