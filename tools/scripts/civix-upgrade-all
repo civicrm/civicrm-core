@@ -24,7 +24,9 @@ process_directory() {
 
     # Check if info.xml exists in current directory
     if [ -f "info.xml" ]; then
+        echo
         echo "Executing 'civix upgrade' in $dir"
+        echo
         "$CIVIX" upgrade
     fi
 
