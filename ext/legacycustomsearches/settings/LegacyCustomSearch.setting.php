@@ -5,7 +5,7 @@ return [
     'group' => 'Search Preferences',
     'name' => 'enable_innodb_fts',
     'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
+    'html_type' => 'toggle',
     'default' => 0,
     'add' => '4.4',
     'title' => ts('InnoDB Full Text Search'),
