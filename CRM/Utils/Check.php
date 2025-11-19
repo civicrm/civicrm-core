@@ -103,11 +103,9 @@ class CRM_Utils_Check {
         }
 
         if ($statusMessages) {
-          if (count($statusMessages) > 1) {
-            $maxSeverity = self::getMaxSeverity(TRUE);
-            $statusTitle = self::toStatusLabel($maxSeverity);
-            $statusMessage = '<ul><li>' . implode('</li><li>', $statusMessages) . '</li></ul>';
-          }
+          $maxSeverity = self::getMaxSeverity(TRUE);
+          $statusTitle = self::toStatusLabel($maxSeverity);
+          $statusMessage = '<ul><li>' . implode('</li><li>', $statusMessages) . '</li></ul>';
 
           $statusMessage .= '<p><a href="' . CRM_Utils_System::url('civicrm/a/#/status') . '">' . ts('View details and manage alerts') . '</a></p>';
 
