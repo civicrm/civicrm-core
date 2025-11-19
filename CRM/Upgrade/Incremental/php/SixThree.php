@@ -52,7 +52,7 @@ class CRM_Upgrade_Incremental_php_SixThree extends CRM_Upgrade_Incremental_Base 
         'key' => 'id',
         'fk' => FALSE,
       ],
-    ], 'queue_id');
+    ], 'AFTER queue_id');
   }
 
   /**

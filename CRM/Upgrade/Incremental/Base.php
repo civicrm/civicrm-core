@@ -398,20 +398,21 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $fieldName
    * @param array $fieldSpec
    *   As definied in the .entityType.php file for $entityName
-   * @param string|null $after
+   * @param string|null $position
+   *   E.g. "AFTER `another_column_name`" or "FIRST"
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public static function alterSchemaField($ctx, string $entityName, string $fieldName, array $fieldSpec, ?string $after = NULL): bool {
+  public static function alterSchemaField($ctx, string $entityName, string $fieldName, array $fieldSpec, ?string $position = NULL): bool {
     $tableName = Civi::entity($entityName)->getMeta('table');
     $fieldSql = Civi::schemaHelper()->arrayToSql($fieldSpec);
+    if ($position) {
+      $fieldSql .= " $position";
+    }
     if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
       return self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
     }
     else {
-      if ($after) {
-        $fieldSql .= " AFTER `$after`";
-      }
       return self::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
     }
   }
