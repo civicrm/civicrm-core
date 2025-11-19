@@ -1754,18 +1754,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - multiple - bool
    *   - context - @see CRM_Core_DAO::buildOptionsContext
    * @param bool $required
-   * @param bool $legacyDate
-   *   Temporary param to facilitate the conversion of fields to use the datepicker in
-   *   a controlled way. To convert the field the jcalendar code needs to be removed from the
-   *   tpl as well. That file is intended to be EOL.
    *
-   * @throws \CRM_Core_Exception
-   * @throws \Exception
    * @return mixed
    *   HTML_QuickForm_element
    *   void
    */
-  public function addField($name, $props = [], $required = FALSE, $legacyDate = TRUE) {
+  public function addField($name, $props = [], $required = FALSE) {
     // Resolve context.
     if (empty($props['context'])) {
       $props['context'] = $this->getDefaultContext();
@@ -1873,19 +1867,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->add('textarea', $name, $label, $props, $required);
 
       case 'Select Date':
-        // This is a white list for fields that have been tested with
-        // date picker. We should be able to remove the other
-        if ($legacyDate) {
-          //TODO: add range support
-          //TODO: Add date formats
-          //TODO: Add javascript template for dates.
-          return $this->addDate($name, $label, $required, $props);
-        }
-        else {
-          $fieldSpec = CRM_Utils_Date::addDateMetadataToField($fieldSpec, $fieldSpec);
-          $attributes = ['format' => $fieldSpec['date_format']];
-          return $this->add('datepicker', $name, $label, $attributes, $required, $fieldSpec['datepicker']['extra']);
-        }
+        $fieldSpec = CRM_Utils_Date::addDateMetadataToField($fieldSpec, $fieldSpec);
+        $attributes = ['format' => $fieldSpec['date_format']];
+        return $this->add('datepicker', $name, $label, $attributes, $required, $fieldSpec['datepicker']['extra']);
 
       case 'Radio':
         $separator = $props['separator'] ?? NULL;
