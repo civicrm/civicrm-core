@@ -37,10 +37,10 @@
   </classloader>
   <civix>
     <namespace>CRM/UserDashboard</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
     <angularModule>crmUserDashboard</angularModule>
   </civix>
   <mixins>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
   </mixins>
 </extension>

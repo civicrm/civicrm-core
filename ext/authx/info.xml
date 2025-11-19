@@ -46,7 +46,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Authx</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
     <setting-page-title>Authentication</setting-page-title>
   </civix>
 </extension>

@@ -33,17 +33,17 @@
   <smarty_compatibility>
     <ver>5</ver>
   </smarty_compatibility>
-  <comments></comments>
+  <comments/>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
     <namespace>CRM/BatchEntry</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
     <angularModule>crmBatchEntry</angularModule>
   </civix>
   <mixins>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
   </mixins>
 </extension>

@@ -42,7 +42,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Report</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
     <angularModule>civiReport</angularModule>
   </civix>
 </extension>

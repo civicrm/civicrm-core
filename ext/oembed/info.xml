@@ -43,11 +43,11 @@
   </requires>
   <civix>
     <namespace>CRM/Oembed</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
     <angularModule>crmOembed</angularModule>
   </civix>
   <mixins>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>

@@ -40,11 +40,11 @@
   </classloader>
   <civix>
     <namespace>CRM/SearchKitReports</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
     <angularModule>crmSearchKitReports</angularModule>
   </civix>
   <mixins>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>smarty@1.0.3</mixin>
     <mixin>ang-php@1.0.0</mixin>
