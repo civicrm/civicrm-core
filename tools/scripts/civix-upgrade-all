@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Check if directory path argument is provided
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <directory_path>"
+    exit 1
+fi
+
+# Check if the provided path exists and is a directory
+if [ ! -d "$1" ]; then
+    echo "Error: '$1' is not a valid directory"
+    exit 1
+fi
+
+# Function to process directories recursively
+process_directory() {
+    local dir="$1"
+
+    # Change to the current directory
+    cd "$dir" || exit 1
+
+    # Check if info.xml exists in current directory
+    if [ -f "info.xml" ]; then
+        echo "Executing 'civix upgrade' in $dir"
+        civix upgrade
+    fi
+
+    # Iterate through subdirectories
+    for subdir in */; do
+        if [ -d "$subdir" ]; then
+            # Process subdirectory recursively
+            (process_directory "$(pwd)/$subdir")
+        fi
+    done
+
+    # Return to parent directory
+    cd ..
+}
+
+# Start processing from the provided directory
+process_directory "$1"

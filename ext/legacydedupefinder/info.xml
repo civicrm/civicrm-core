@@ -40,7 +40,7 @@
   </classloader>
   <civix>
     <namespace>CRM/Legacydedupefinder</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
     <angularModule>crmLegacydedupefinder</angularModule>
   </civix>
 </extension>
