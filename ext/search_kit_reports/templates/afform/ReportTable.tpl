@@ -4,7 +4,7 @@
     <af-search-param-sets></af-search-param-sets>
   *}
   <details class="af-container af-layout-inline" af-title="Filters">
-    {foreach $fieldDefns as $name=>$defn}
+    {foreach from=$fieldDefns key="name" item="defn"}
       <af-field name='{$name}' defn='{$defn|@json_encode|escape}' />
     {/foreach}
   </details>
