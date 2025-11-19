@@ -1,19 +1,16 @@
 #!/bin/bash
+{
 
 ## Optional: Override the reference to civix.
 CIVIX=${CIVIX:-civix}
 
-# Check if directory path argument is provided
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <directory_path>"
-    exit 1
-fi
+###############################################################################
+## Helpers
 
-# Check if the provided path exists and is a directory
-if [ ! -d "$1" ]; then
-    echo "Error: '$1' is not a valid directory"
-    exit 1
-fi
+fatal() {
+  echo >&2 "$@"
+  exit 1
+}
 
 # Function to process directories recursively
 process_directory() {
@@ -42,5 +39,21 @@ process_directory() {
     cd ..
 }
 
+###############################################################################
+## Main
+
+# Check if directory path argument is provided
+if [ $# -ne 1 ]; then
+    fatal "Usage: $0 <directory_path>"
+fi
+
+# Check if the provided path exists and is a directory
+if [ ! -d "$1" ]; then
+    fatal "Error: '$1' is not a valid directory"
+fi
+
 # Start processing from the provided directory
 process_directory "$1"
+
+exit
+}
