@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## Optional: Override the reference to civix.
+CIVIX=${CIVIX:-civix}
+
 # Check if directory path argument is provided
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <directory_path>"
@@ -22,7 +25,7 @@ process_directory() {
     # Check if info.xml exists in current directory
     if [ -f "info.xml" ]; then
         echo "Executing 'civix upgrade' in $dir"
-        civix upgrade
+        "$CIVIX" upgrade
     fi
 
     # Iterate through subdirectories
