@@ -48,7 +48,7 @@ return [
     'group' => 'developer',
     'name' => 'userFrameworkLogging',
     'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
+    'html_type' => 'toggle',
     'default' => '0',
     'add' => '4.3',
     'title' => ts('Send CiviCRM errors to CMS logs'),
@@ -68,7 +68,7 @@ return [
     // we can't call the setting debug as that has other meanings in api
     'config_key' => 'debug',
     'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
+    'html_type' => 'toggle',
     // default to TRUE for demo or localhost sites.
     'default' => str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'demo.civicrm.org'),
     'add' => '4.3',
@@ -89,7 +89,7 @@ return [
     'group' => 'developer',
     'name' => 'backtrace',
     'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
+    'html_type' => 'toggle',
     'default' => '0',
     'add' => '4.3',
     'title' => ts('Display Backtrace'),

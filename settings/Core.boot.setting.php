@@ -24,7 +24,7 @@ return [
     'group' => 'core',
     'name' => 'installed',
     'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
+    'html_type' => 'toggle',
     'default' => FALSE,
     'add' => '4.7',
     'title' => ts('System Installed'),

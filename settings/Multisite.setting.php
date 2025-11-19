@@ -25,7 +25,7 @@ return [
     'group' => 'multisite',
     'name' => 'multisite_is_enabled',
     'title' => ts('Enable Multi Site Configuration'),
-    'html_type' => 'checkbox',
+    'html_type' => 'toggle',
     'type' => 'Boolean',
     'default' => '0',
     'add' => '4.1',
