@@ -436,6 +436,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function createUserJob(): int {
+    // Override the template date format with the submitted date format on the contact import form.
+    // This could be removed once the contact import is migrated to civiimport.
+    $submittedValues = $this->getSubmittedValues();
+    $importOptions = $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_options'] : [];
+    if (isset($submittedValues['dateFormats'])) {
+      $importOptions['date_format'] = $submittedValues['dateFormats'];
+    };
+
     $id = UserJob::create(FALSE)
       ->setValues([
         'created_id' => CRM_Core_Session::getLoggedInContactID(),
@@ -444,12 +452,12 @@ class CRM_Import_Forms extends CRM_Core_Form {
         // This suggests the data could be cleaned up after this.
         'expires_date' => '+ 1 week',
         'metadata' => [
-          'submitted_values' => $this->getSubmittedValues(),
+          'submitted_values' => $submittedValues,
           'template_id' => $this->getTemplateID(),
           // @todo - this Template key is obsolete - definitely in Civiimport - probably entirely.
           'Template' => ['mapping_id' => $this->getSavedMappingID()],
           'import_mappings' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_mappings'] : [],
-          'import_options' => $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_options'] : [],
+          'import_options' => $importOptions,
           'entity_configuration' => $this->getTemplateJob() ? ($this->getTemplateJob()['metadata']['entity_configuration'] ?? []) : [],
           'bundled_actions' => $this->getTemplateJob() ? ($this->getTemplateJob()['metadata']['bundled_actions'] ?? []) : [],
           'base_entity' => $this->getBaseEntity(),
