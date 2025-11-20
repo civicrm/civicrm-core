@@ -620,6 +620,79 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('Red', $result[1]['columns'][1]['val']);
   }
 
+  public function testRelatedContactSearchWithRelationshipCustomFieldFilter(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Relationship',
+      'name' => 'test_rel_fields',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_rel_fields',
+      'label' => 'Opts',
+      'html_type' => 'Select',
+      'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'],
+    ]);
+
+    $cids = $this->saveTestRecords('Individual', [
+      'records' => 3,
+    ])->column('id');
+
+    $this->saveTestRecords('Relationship', [
+      'defaults' => [
+        'contact_id_a' => $cids[0],
+        'relationship_type_id:name' => 'Child of',
+      ],
+      'records' => [
+        ['contact_id_b' => $cids[1], 'test_rel_fields.Opts' => 'r'],
+        ['contact_id_b' => $cids[2], 'test_rel_fields.Opts' => 'g'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Individual',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'Contact_RelationshipCache_Contact_01.test_rel_fields.Opts:label',
+          ],
+          'where' => [
+            ['id', 'IN', $cids],
+          ],
+          'join' => [
+            [
+              "Contact AS Contact_RelationshipCache_Contact_01",
+              "INNER",
+              "RelationshipCache",
+              [
+                "id",
+                "=",
+                "Contact_RelationshipCache_Contact_01.far_contact_id",
+              ],
+              [
+                "Contact_RelationshipCache_Contact_01.near_relation:name",
+                "=",
+                "\"Child of\"",
+              ],
+              [
+                "Contact_RelationshipCache_Contact_01.test_rel_fields.Opts",
+                "=",
+                "\"r\"",
+              ],
+            ],
+          ],
+        ],
+      ],
+      'display' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals('Red', $result[0]['columns'][1]['val']);
+  }
+
   /**
    * Test smarty rewrite syntax.
    */
