@@ -2206,6 +2206,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
 
     $customEntityMap = self::getCustomEntityTypeMap();
     foreach ($customEntityMap as $customEntity) {
+
+      if (!\Civi\Schema\EntityRepository::tableExists($customEntity['table_name'])) {
+        // If we just deleted an ECK entity we'll get here with a NULL table_name
+        // when Managed entity reconcile is triggered as part of the delete process.
+        // ECK already deleted the CustomFields anyway.
+        return;
+      }
       // Go by table_name for the sake of contact types and complex entities with alternate tables
       $field = Civi::table($customEntity['table_name'])->getField($customEntity['grouping']);
       if (array_intersect_assoc($field[$mode] ?? [], $property)) {
