@@ -32,7 +32,7 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
       'last_name' => 'Contact',
     ];
     $customFields = $ids['custom_field_id'];
-    $result = $this->callAPISuccess('contact', 'create', $params);
+    $result = $this->callAPISuccess('Contact', 'create', $params);
     $contactId = $result['id'];
 
     //enter values for custom fields
@@ -47,7 +47,7 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
       "custom_{$customFields[2]}_-2" => "test value {$customFields[2]} two",
       "custom_{$customFields[2]}_-3" => "test value {$customFields[2]} three",
     ];
-    CRM_Core_BAO_CustomValueTable::postProcess($customParams, "civicrm_contact", $contactId, NULL);
+    CRM_Core_BAO_CustomValueTable::postProcess($customParams, "civicrm_contact", $contactId, 'Contact');
 
     $_GET = [
       'cid' => $contactId,
