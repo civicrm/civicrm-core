@@ -25,10 +25,14 @@ process_directory() {
 
     # Check if info.xml exists in current directory
     if [ -f "info.xml" ]; then
-        echo
-        echo "Executing 'civix upgrade' in $dir"
-        echo
-        "$CIVIX" upgrade
+      if grep -q type=.module. info.xml ; then
+        if grep -q '<civix>' info.xml ; then
+          echo
+          echo "Executing 'civix upgrade' in $dir"
+          echo
+          "$CIVIX" upgrade
+        fi
+      fi
     fi
 
     # Iterate through subdirectories
