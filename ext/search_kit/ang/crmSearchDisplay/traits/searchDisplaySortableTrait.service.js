@@ -9,7 +9,7 @@
     return {
 
       isSortable: function(col) {
-        return !this.settings.draggable && col.type === 'field' && col.sortable !== false;
+        return !this.settings.draggable && col.type && col.type === 'field' && col.sortable !== false;
       },
 
       getSort: function(col) {
