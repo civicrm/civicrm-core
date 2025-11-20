@@ -27,7 +27,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     $fields = [
       'custom_group_id' => $customGroup['id'],
       'data_type' => 'Country',
-      'html_type' => 'Select Country',
+      'html_type' => 'Select',
       'default_value' => '',
     ];
 
@@ -37,6 +37,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
       $customField['id'] => [
         'value' => 1228,
         'type' => 'Country',
+        'html_type' => 'Select',
         'custom_field_id' => $customField['id'],
         'custom_group_id' => $customGroup['id'],
         'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
@@ -68,6 +69,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
       $customField['id'] => [
         'value' => 'i/contact_house.png',
         'type' => 'File',
+        'html_type' => 'File',
         'custom_field_id' => $customField['id'],
         'custom_group_id' => $customGroup['id'],
         'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
@@ -98,6 +100,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
       $customField['id'] => [
         'value' => 1029,
         'type' => 'StateProvince',
+        'html_type' => 'Select',
         'custom_field_id' => $customField['id'],
         'custom_group_id' => $customGroup['id'],
         'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
@@ -129,6 +132,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
       $customField['id'] => [
         'value' => '20080608000000',
         'type' => 'Date',
+        'html_type' => 'Select Date',
         'custom_field_id' => $customField['id'],
         'custom_group_id' => $customGroup['id'],
         'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
@@ -159,6 +163,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
       $customField['id'] => [
         'value' => '<p><strong>This is a <u>test</u></p>',
         'type' => 'Memo',
+        'html_type' => 'RichTextEditor',
         'custom_field_id' => $customField['id'],
         'custom_group_id' => $customGroup['id'],
         'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
@@ -196,6 +201,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
         $customField['id'] => [
           'value' => CRM_Core_DAO::VALUE_SEPARATOR . '1' . CRM_Core_DAO::VALUE_SEPARATOR . '2' . CRM_Core_DAO::VALUE_SEPARATOR,
           'type' => 'Int',
+          'html_type' => 'Select',
           'custom_field_id' => $customField['id'],
           'custom_group_id' => $customGroup['id'],
           'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
@@ -233,6 +239,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
       $customField['id'] => [
         'value' => '<p><strong>This is a <u>test</u></p>',
         'type' => 'Memo',
+        'html_type' => 'RichTextEditor',
         'custom_field_id' => $customField['id'],
         'custom_group_id' => $customGroup['id'],
         'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],

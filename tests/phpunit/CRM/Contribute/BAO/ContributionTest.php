@@ -128,6 +128,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
         -1 => [
           'value' => 'Test custom value',
           'type' => 'String',
+          'html_type' => 'Text',
           'custom_field_id' => $customFieldID,
           'custom_group_id' => $customGroupID,
           'table_name' => $customGroup['table_name'],
