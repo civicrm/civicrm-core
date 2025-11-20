@@ -74,7 +74,7 @@ return [
     'group' => 'address',
     'name'  => 'hideCountryMailingLabels',
     'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
+    'html_type' => 'toggle',
     'default' => 0,
     'add' => '4.7',
     'title' => ts('Hide Country in Mailing Labels when same as domain country'),

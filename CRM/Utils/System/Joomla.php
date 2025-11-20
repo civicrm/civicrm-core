@@ -46,15 +46,15 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function createUser(&$params, $mailParam) {
     $baseDir = JPATH_SITE;
-    $userParams = JComponentHelper::getParams('com_users');
 
     if (version_compare(JVERSION, '4.0.0', 'ge')) {
+      $userParams = \Joomla\CMS\Component\ComponentHelper::getParams('com_users');
       $factoryClassName = $this->factoryClassName();
-
       $model = $factoryClassName::getApplication()->bootComponent('com_users')->getMVCFactory()->createModel('Registration', 'Site');
       $model->set('data', new \stdClass());
     }
     else {
+      $userParams = JComponentHelper::getParams('com_users');
       require_once $baseDir . '/components/com_users/models/registration.php';
       $model = new UsersModelRegistration();
     }
@@ -165,13 +165,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if (version_compare(JVERSION, '4.0', 'lt')) {
       $JUserTable = &JTable::getInstance('User', 'JTable');
+      $db = $JUserTable->getDbo();
     }
     else {
       $factoryClassName = $this->factoryClassName();
       $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
       $JUserTable = new \Joomla\CMS\Table\User($db);
     }
-    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select('username, email');
     $query->from($JUserTable->getTableName());
@@ -323,7 +323,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     if ($config->userFrameworkFrontend) {
       $script = 'index.php';
 
-      // Get Itemid using JInput::get()
+      // Get Itemid using Input::get()
       $factoryClassName = $this->factoryClassName();
       $input = $factoryClassName::getApplication()->getInput();
       $itemIdNum = $input->get("Itemid");
@@ -380,13 +380,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     global $database;
     if (version_compare(JVERSION, '4.0', 'lt')) {
       $JUserTable = &JTable::getInstance('User', 'JTable');
+      $db = $JUserTable->getDbo();
     }
     else {
       $factoryClassName = $this->factoryClassName();
       $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
       $JUserTable = new \Joomla\CMS\Table\User($db);
     }
-    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select($db->quoteName('email'))
       ->from($db->quoteName('#__users'))
@@ -428,6 +428,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       jimport('joomla.database.table');
       jimport('joomla.user.helper');
       $JUserTable = &JTable::getInstance('User', 'JTable');
+      $db = $JUserTable->getDbo();
     }
     else {
       $factoryClassName = $this->factoryClassName();
@@ -435,7 +436,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $JUserTable = new \Joomla\CMS\Table\User($db);
     }
 
-    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select('id, name, username, email, password');
     $query->from($JUserTable->getTableName());
@@ -474,7 +474,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
           return FALSE;
         }
 
-        if (version_compare(JVERSION, '3.8.0', 'ge')) {
+        if (version_compare(JVERSION, '4.0.0', 'ge')) {
+          // legacy imports not required for J4+
+        }
+        elseif (version_compare(JVERSION, '3.8.0', 'ge')) {
           jimport('joomla.application.helper');
           jimport('joomla.application.cms');
           jimport('joomla.application.administrator');
@@ -727,7 +730,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     else {
       $user = $factoryClassName::getApplication()->getIdentity();
     }
-    return !$user->guest;
+    return isset($user) && !$user->guest;
   }
 
   /**
@@ -764,7 +767,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     else {
       $user = $factoryClassName::getApplication()->getIdentity();
     }
-    return ($user->guest) ? NULL : $user->id;
+    return (empty($user) || $user->guest) ? NULL : $user->id;
   }
 
   /**
@@ -808,7 +811,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getUniqueIdentifierFromUserObject($user) {
-    return ($user->guest) ? NULL : $user->email;
+    return (empty($user) || $user->guest) ? NULL : $user->email;
   }
 
   /**
@@ -957,7 +960,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $userRecordUrl = NULL;
     $factoryClassName = $this->factoryClassName();
     // if logged in user has user edit access, then allow link to other users joomla profile
-    if ($factoryClassName::getApplication()->getIdentity()->authorise('core.edit', 'com_users')) {
+    if ($factoryClassName::getApplication()->getIdentity()?->authorise('core.edit', 'com_users')) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
     }
     elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
@@ -970,7 +973,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function checkPermissionAddUser() {
     $factoryClassName = $this->factoryClassName();
-    if ($factoryClassName::getApplication()->getIdentity()->authorise('core.create', 'com_users')) {
+    if ($factoryClassName::getApplication()->getIdentity()?->authorise('core.create', 'com_users')) {
       return TRUE;
     }
   }
@@ -989,13 +992,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if (version_compare(JVERSION, '4.0', 'lt')) {
       $JUserTable = &JTable::getInstance('User', 'JTable');
+      $db = $JUserTable->getDbo();
     }
     else {
       $factoryClassName = $this->factoryClassName();
       $db = $factoryClassName::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
       $JUserTable = new \Joomla\CMS\Table\User($db);
     }
-    $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
     $query->select($id . ', ' . $mail . ', ' . $name);
     $query->from($JUserTable->getTableName());
@@ -1089,7 +1092,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $jAccessParams = 'rel="{handler: \'iframe\', size: {x: 875, y: 550}, onClose: function() {}}" class="modal"';
     }
     else {
-      $uri = (string) JUri::getInstance();
+      if (version_compare(JVERSION, '4.0', 'lt')) {
+        $uri = (string) JUri::getInstance();
+      }
+      else {
+        $uri = (string) \Joomla\CMS\Uri\Uri::getInstance();
+      }
       $return = urlencode(base64_encode($uri));
       $ufAccessURL = $config->userFrameworkBaseURL . 'index.php?option=com_config&view=component&component=com_civicrm&return=' . $return;
     }

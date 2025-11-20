@@ -4067,20 +4067,18 @@ span.crm-status-icon {
   grid-gap: .5em;
 
   & input[type="checkbox"].crm-form-toggle {
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     position: relative;
     font-size: inherit;
     width: 2.75em!important;
     height: 1.35em!important;
+    padding: 0.65em!important;
     box-sizing: content-box;
     border-radius: 1em;
     vertical-align: text-bottom;
     color: inherit;
     border: 2px solid #919297;
     background-color: #adaeb3;
-    -webkit-transition: 0.1s;
     transition: 0.1s;
   }
 
@@ -4105,7 +4103,7 @@ span.crm-status-icon {
     background-color: #20576f;
   }
   & input[type="checkbox"].crm-form-toggle:checked::before {
-    left: 1.2em;
+    left: 1em;
   }
   & input[type="checkbox"].crm-form-toggle:disabled {
     opacity: 0.4;

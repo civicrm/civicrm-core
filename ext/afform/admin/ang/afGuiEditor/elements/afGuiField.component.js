@@ -92,10 +92,15 @@
         ));
       };
 
-      this.canBeMultiple = function() {
-        return this.isSearch() &&
-          !_.includes(['Date', 'Timestamp'], ctrl.getDefn().data_type) &&
-          _.includes(['Select', 'EntityRef', 'ChainSelect'], $scope.getProp('input_type'));
+      this.canBeMultiple = () => {
+        if (!this.isSearch() ||
+          ['Date', 'Timestamp'].includes(ctrl.getDefn().data_type) ||
+          !(['Select', 'EntityRef', 'ChainSelect'].includes($scope.getProp('input_type')))
+        ) {
+          return false;
+        }
+        const op = $scope.getSetOperator();
+        return (!op || ['_EXPOSE_', 'IN', 'NOT IN'].includes(op));
       };
 
       this.getRangeElements = function(type) {
@@ -431,6 +436,10 @@
             getSet('search_operator', _.keys(ctrl.searchOperators)[0]);
           } else {
             getSet('search_operator', val);
+          }
+          // Ensure multiselect is only used when compatible with operator
+          if (['_EXPOSE_', 'IN', 'NOT IN'].includes(val) != getSet('input_attrs.multiple')) {
+            $scope.toggleMultiple();
           }
           return val;
         }

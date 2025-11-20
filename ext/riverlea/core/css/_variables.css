@@ -271,6 +271,11 @@
   --crm-input-select-bg-color: var(--crm-layer1-bg-color);
   --crm-input-inline-edit-border: 0 solid transparent;
   --crm-input-inline-edit-bg-color: var(--crm-container-bg-color);
+  --crm-input-toggle-width: 2.75rem;
+  --crm-input-toggle-height: var(--crm-l-reg-4);
+  --crm-input-toggle-disabled-bg: var(--crm-inverse-bg-color);
+  --crm-input-toggle-enabled-bg: var(--crm-focus-color);
+  --crm-input-toggle-button-bg: var(--crm-layer0-bg-color);
 /* Tabs */
   --crm-tabs-bg-color: var(--crm-c-gray-200);
   --crm-tabs-padding: var(--crm-l-small);

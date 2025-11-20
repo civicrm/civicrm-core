@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Http\Message\ServerRequestInterface;
+
 /**
  * Base class for UF system integrations
  */
@@ -1035,6 +1037,13 @@ abstract class CRM_Utils_System_Base {
     else {
       return [];
     }
+  }
+
+  public function createRequestFromGlobals(): ServerRequestInterface {
+    $config = CRM_Core_Config::singleton();
+    $request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+    $request = $request->withUri($request->getUri()->withPath($_GET[$config->userFrameworkURLVar]));
+    return $request;
   }
 
   /**

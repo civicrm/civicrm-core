@@ -2,6 +2,7 @@
   <file>moduletest</file>
   <name>test_extension_manager_moduletest</name>
   <tags>
+    <tag>mgmt:hidden</tag>
     <tag>mock</tag>
   </tags>
 </extension>

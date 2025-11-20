@@ -35,7 +35,7 @@
   </requires>
   <civix>
     <namespace>CRM/AfformAdmin</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -45,7 +45,7 @@
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>menu-xml@1.0.0</mixin>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
     <mixin>afform-entity-php@1.0.0</mixin>
     <mixin>smarty@1.0.3</mixin>
   </mixins>

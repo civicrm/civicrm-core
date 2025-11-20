@@ -1434,6 +1434,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @param string $name
+   * @param string $title
+   * @param array $attributes
+   * @param bool $required
+   * @return HTML_QuickForm_Element
+   */
   public function addToggle(string $name, string $title, array $attributes = [], bool $required = FALSE) {
     $attributes += [
       'on' => ts('Yes'),
@@ -1448,10 +1455,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $value = htmlspecialchars($value);
       $toggleText .= "<span class='crm-form-toggle-text crm-form-toggle-text-{$key}'>{$value}</span>";
     }
-    $this->addElement('advcheckbox', $name, $title, $toggleText, $attributes);
+    $element = $this->addElement('advcheckbox', $name, $title, $toggleText, $attributes);
     if ($required) {
       $this->addRule($name, ts('%1 is a required field.', [1 => $title]), 'required');
     }
+    return $element;
   }
 
   /**
@@ -1754,18 +1762,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - multiple - bool
    *   - context - @see CRM_Core_DAO::buildOptionsContext
    * @param bool $required
-   * @param bool $legacyDate
-   *   Temporary param to facilitate the conversion of fields to use the datepicker in
-   *   a controlled way. To convert the field the jcalendar code needs to be removed from the
-   *   tpl as well. That file is intended to be EOL.
    *
-   * @throws \CRM_Core_Exception
-   * @throws \Exception
    * @return mixed
    *   HTML_QuickForm_element
    *   void
    */
-  public function addField($name, $props = [], $required = FALSE, $legacyDate = TRUE) {
+  public function addField($name, $props = [], $required = FALSE) {
     // Resolve context.
     if (empty($props['context'])) {
       $props['context'] = $this->getDefaultContext();
@@ -1873,19 +1875,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->add('textarea', $name, $label, $props, $required);
 
       case 'Select Date':
-        // This is a white list for fields that have been tested with
-        // date picker. We should be able to remove the other
-        if ($legacyDate) {
-          //TODO: add range support
-          //TODO: Add date formats
-          //TODO: Add javascript template for dates.
-          return $this->addDate($name, $label, $required, $props);
-        }
-        else {
-          $fieldSpec = CRM_Utils_Date::addDateMetadataToField($fieldSpec, $fieldSpec);
-          $attributes = ['format' => $fieldSpec['date_format']];
-          return $this->add('datepicker', $name, $label, $attributes, $required, $fieldSpec['datepicker']['extra']);
-        }
+        $fieldSpec = CRM_Utils_Date::addDateMetadataToField($fieldSpec, $fieldSpec);
+        $attributes = ['format' => $fieldSpec['date_format']];
+        return $this->add('datepicker', $name, $label, $attributes, $required, $fieldSpec['datepicker']['extra']);
 
       case 'Radio':
         $separator = $props['separator'] ?? NULL;
@@ -1929,6 +1921,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $text = $props['text'] ?? NULL;
         unset($props['text']);
         return $this->addElement('advcheckbox', $name, $label, $text, $props);
+
+      case 'Toggle':
+        return $this->addToggle($name, $label, $props, $required);
 
       case 'File':
         // We should not build upload file in search mode.

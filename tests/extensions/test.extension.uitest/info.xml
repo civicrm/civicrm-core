@@ -1,4 +1,7 @@
 <extension key='test.extension.uitest' type='module'>
   <file>uitest</file>
   <name>test_extension_uitest</name>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
 </extension>

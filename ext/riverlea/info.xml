@@ -34,13 +34,13 @@
   </classloader>
   <civix>
     <namespace>CRM/riverlea</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
   </civix>
   <mixins>
     <mixin>theme-php@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>setting-admin@1.0.1</mixin>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>entity-types-php@2.0.0</mixin>
   </mixins>

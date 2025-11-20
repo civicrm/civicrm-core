@@ -27,7 +27,15 @@
 
       this.getTokens = function() {
         var tokens = _.transform(ctrl.editor.getEntities(), function(tokens, entity) {
-          tokens.push({id: entity.name + '.0.id', text: entity.label + ' ' + ts('ID')});
+          const entityMeta = ctrl.editor.meta.entities[entity.type];
+          if (entityMeta.submissionTokens) {
+            entityMeta.submissionTokens.forEach((submissionToken) => {
+              const description = submissionToken.description ? submissionToken.description : '';
+              tokens.push({id: entity.name + '.0.' + submissionToken.token, text: entity.label + ' ' + submissionToken.label, description: description});  
+            });
+          } else {
+            tokens.push({id: entity.name + '.0.id', text: entity.label + ' ' + ts('ID')});
+          }
         }, []);
         tokens.push({id: 'token', text: ts('Submission JWT')});
         return {

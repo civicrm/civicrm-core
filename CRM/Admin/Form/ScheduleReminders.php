@@ -168,14 +168,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->addField('absolute_date', [], FALSE, FALSE);
     $this->addField('start_action_offset', ['class' => 'four']);
     $this->addField('start_action_condition', ['placeholder' => FALSE])->setAttribute('class', 'crm-form-select');
-    $this->addField('record_activity', ['type' => 'advcheckbox']);
-    $this->addField('is_repeat', ['type' => 'advcheckbox']);
+    $this->addField('record_activity');
+    $this->addField('is_repeat');
     $this->addField('repetition_frequency_interval', ['label' => ts('Every'), 'class' => 'four']);
     $this->addField('end_frequency_interval', ['label' => ts('Until'), 'class' => 'four']);
     $this->addField('end_action', ['placeholder' => FALSE])->setAttribute('class', 'crm-form-select');
     $this->addField('effective_start_date', ['label' => ts('Effective From')], FALSE, FALSE);
     $this->addField('effective_end_date', ['label' => ts('To')], FALSE, FALSE);
-    $this->addField('is_active', ['type' => 'advcheckbox']);
+    $this->addField('is_active', ['on' => ts('On'), 'off' => ts('Off')]);
     $this->addAutocomplete('recipient_manual', ts('Manual Recipients'), ['select' => ['multiple' => TRUE]]);
     $this->addAutocomplete('group_id', ts('Group'), ['entity' => 'Group', 'select' => ['minimumInputLength' => 0]]);
 

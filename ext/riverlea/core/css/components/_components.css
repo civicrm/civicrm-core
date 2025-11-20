@@ -55,8 +55,6 @@
   grid-gap: var(--crm-l-medium-2);
 
   & input[type="checkbox"].crm-form-toggle {
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     position: relative;
     font-size: inherit;
@@ -69,10 +67,8 @@
     color: inherit;
     border: 2px solid var(--crm-inverse-bg-color);
     background-color: var(--crm-inverse-bg-color);
-    -webkit-transition: 0.1s;
     transition: 0.1s;
   }
-
   & input[type="checkbox"].crm-form-toggle::before {
     content: "";
     position: absolute;
@@ -86,7 +82,6 @@
     border-radius: 50%;
     border: 1px solid var(--crm-paper);
     background: var(--crm-paper);
-    -webkit-transition: 0.1s;
     transition: 0.1s;
   }
   & input[type="checkbox"].crm-form-toggle:checked {
