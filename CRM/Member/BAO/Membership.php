@@ -811,16 +811,18 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     // CRM-8141
     if ($onlySameParentOrg && $memType) {
       // require the same parent org as the $memType
-      $params = ['id' => $memType];
-      $membershipType = [];
-      if (CRM_Member_BAO_MembershipType::retrieve($params, $membershipType)) {
-        $memberTypesSameParentOrg = civicrm_api3('MembershipType', 'get', [
-          'member_of_contact_id' => $membershipType['member_of_contact_id'],
-          'options' => [
-            'limit' => 0,
-          ],
-        ]);
-        $memberTypesSameParentOrgList = implode(',', array_keys($memberTypesSameParentOrg['values'] ?? []));
+      $membershipType = MembershipType::get(FALSE)
+        ->addSelect('member_of_contact_id')
+        ->addWhere('id', '=', $memType)
+        ->execute()
+        ->first();
+      if (!empty($membershipType)) {
+        $membershipTypesSameParentOrg = MembershipType::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('member_of_contact_id', '=', $membershipType['member_of_contact_id'])
+          ->execute()
+          ->column('id', 'id');
+        $memberTypesSameParentOrgList = implode(',', $membershipTypesSameParentOrg);
         $dao->whereAdd('membership_type_id IN (' . $memberTypesSameParentOrgList . ')');
       }
     }
