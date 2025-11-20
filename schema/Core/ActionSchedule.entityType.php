@@ -167,7 +167,7 @@ return [
     'is_repeat' => [
       'title' => ts('Repeat'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'add' => '3.4',
       'default' => FALSE,
@@ -254,7 +254,7 @@ return [
     'is_active' => [
       'title' => ts('Schedule is Active?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this option active?'),
       'add' => '3.4',
@@ -322,7 +322,7 @@ return [
     'record_activity' => [
       'title' => ts('Record Activity'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Record Activity for this reminder?'),
       'add' => '3.4',
