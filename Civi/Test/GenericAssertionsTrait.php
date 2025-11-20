@@ -103,4 +103,21 @@ trait GenericAssertionsTrait {
     $this->assertEquals($array1, $array2);
   }
 
+  /**
+   * Assert 2 sql strings are the same, ignoring double spaces.
+   *
+   * @param string $expectedSQL
+   * @param string $actualSQL
+   * @param string $message
+   */
+  protected function assertLike(string $expectedSQL, string $actualSQL, string $message = 'different sql'): void {
+    // Normalize whitespace around brackets
+    $expected = str_replace(['(', ')'], [' ( ', ' ) '], $expectedSQL);
+    $actual = str_replace(['(', ')'], [' ( ', ' ) '], $actualSQL);
+    // Normalize all whitespace
+    $expected = trim(preg_replace('/\s+/', ' ', $expected));
+    $actual = trim(preg_replace('/\s+/', ' ', $actual));
+    $this->assertEquals($expected, $actual, $message);
+  }
+
 }
