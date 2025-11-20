@@ -175,7 +175,7 @@ class CRM_Financial_BAO_Payment {
         }
         CRM_Contribute_BAO_Contribution::completeOrder([
           'is_email_receipt' => $params['is_send_contribution_notification'],
-          'trxn_date' => $params['trxn_date'],
+          'receive_date' => $contribution['receive_date'],
           'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'],
           'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? '',
         ], $contributionBAO->contribution_recur_id, $contribution['id'], TRUE, $disableActionsOnCompleteOrder);
