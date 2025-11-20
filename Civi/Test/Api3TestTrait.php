@@ -262,13 +262,7 @@ trait Api3TestTrait {
    * @param string $entity
    * @param array $params
    * @param string $type
-   *   Per http://php.net/manual/en/function.gettype.php possible types.
-   *   - boolean
-   *   - integer
-   *   - double
-   *   - string
-   *   - array
-   *   - object
+   *   Only 'integer' is supported
    *
    * @return array|int
    */
@@ -286,7 +280,7 @@ trait Api3TestTrait {
         $this->assertTrue(is_numeric($result), "expected a numeric value but got " . print_r($result, 1));
       }
       else {
-        $this->assertType($type, $result, "returned result should have been of type $type but was ");
+        throw new \CRM_Core_Exception("Unsupported type '$type' for callAPISuccessGetValue");
       }
     }
     return $result;
