@@ -12,17 +12,6 @@ namespace Civi\Test;
 trait GenericAssertionsTrait {
 
   /**
-   * @param string $expected
-   *   Ex: 'array', 'object', 'int'
-   * @param $actual
-   *   The variable/item to check.
-   * @param string $message
-   */
-  public function assertType($expected, $actual, $message = '') {
-    return $this->assertInternalType($expected, $actual, $message);
-  }
-
-  /**
    * Assert that two array-trees are exactly equal.
    *
    * The ordering of keys do not affect the outcome (within either the roots
