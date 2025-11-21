@@ -64,19 +64,6 @@ trait GenericAssertionsTrait {
   }
 
   /**
-   * @param string|int $key
-   * @param array $list
-   */
-  public function assertArrayValueNotNull($key, &$list) {
-    $this->assertArrayKeyExists($key, $list);
-
-    $value = $list[$key] ?? NULL;
-    $this->assertTrue($value,
-      sprintf("%s element not null?", $key)
-    );
-  }
-
-  /**
    * Assert the 2 arrays have the same values.
    *
    * The order of arrays, and keys of the arrays, do not affect the outcome.
