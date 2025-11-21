@@ -13,20 +13,13 @@ class AfformValidateEvent extends AfformBaseEvent {
   private $errors = [];
 
   /**
-   * @var array
-   */
-  private $entityValues;
-
-  /**
    * AfformValidateEvent constructor.
    *
    * @param array $afform
    * @param \Civi\Afform\FormDataModel $formDataModel
    * @param \Civi\Api4\Action\Afform\Submit $apiRequest
-   * @param array $entityValues
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, array $entityValues) {
-    $this->entityValues = $entityValues;
+  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest) {
     parent::__construct($afform, $formDataModel, $apiRequest);
   }
 
@@ -45,10 +38,20 @@ class AfformValidateEvent extends AfformBaseEvent {
   }
 
   /**
+   * @deprecated
    * @return array
    */
   public function getEntityValues(): array {
-    return $this->entityValues;
+    \CRM_Core_Error::deprecatedFunctionWarning("getSubmittedValues");
+    return $this->getSubmittedValues();
+  }
+
+  /**
+   * Get submitted values for all entities on the form
+   * @return array
+   */
+  public function getSubmittedValues() {
+    return $this->getApiRequest()->getSubmittedValues();
   }
 
 }
