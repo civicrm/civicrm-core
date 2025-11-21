@@ -51,10 +51,10 @@ class SearchDisplayTasksSubscriber extends \Civi\Core\Service\AutoService implem
     $entityName = ($entityName === 'RelationshipCache') ? 'Relationship' : $entityName;
     if (is_array($enabledActions)) {
       if ($entityName) {
-        $event->tasks[$entityName] = array_intersect_key($event->tasks[$entityName], array_flip($enabledActions));
+        $event->tasks[$entityName] = array_intersect_key($event->tasks[$entityName] ?? [], array_flip($enabledActions));
       }
       if (CoreUtil::isContact($entityName)) {
-        $event->tasks['Contact'] = array_intersect_key($event->tasks['Contact'], array_flip($enabledActions));
+        $event->tasks['Contact'] = array_intersect_key($event->tasks['Contact'] ?? [], array_flip($enabledActions));
       }
     }
 
