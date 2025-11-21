@@ -65,6 +65,8 @@
 - github      : akosgarai
   name        : Akos Garai
 
+- github      : akwizgran
+
 - github      : AlainBenbassat
   name        : Alain Benbassat
   organization: Business & Code
@@ -83,6 +85,10 @@
 
 - github      : alexymik
   name        : Alexy Mikhailichenko
+
+- github      : alietz
+  name        : Andreas Lietz
+  organization: OrtmannTeam GmbH
 
 - github      : alifrumin
   name        : Alice Frumin
@@ -362,6 +368,9 @@
   name        : Dan Cruson
   organization: CrusonWeb
 
+- github      : cs-bennwas
+  organization: civiservice.de
+
 - github      : CsarRamos
   name        : César Ramos
   organization: iXiam
@@ -512,9 +521,6 @@
 - github      : dsuguy2007
   name        : Tommy Sheppard
 
-- github      : duncan-s-white
-  name        : Duncan White
-
 - github      : dvhirst
   name        : Donald Hirst
 
@@ -588,6 +594,9 @@
 
 - name        : Fernando Rodríguez
   organization: Amnistía Internacional España
+
+- github      : fhs2qqp9ws-ux
+  name        : Nadaillac
 
 - github      : fkohrt
   name        : Florian Kohrt
@@ -776,6 +785,8 @@
 - github      : jackrabbithanna
   name        : Mark Hanna
   organization: Skvare
+
+- github      : JacquesVanH
 
 - github      : JadeGaunt
   name        : Jade Gaunt
@@ -1461,6 +1472,10 @@
 
 - name        : Lutz Frommberger
 
+- github      : RhiCircle
+  name        : Rhiannon Davies
+  organization: Circle Interactive
+
 - github      : rgilman
   name        : Robert Gilman
   organization: Context Institute
@@ -1501,6 +1516,9 @@
 - github      : sadashivdalvi
   name        : Sadashiv
   organization: Gokhalemethod
+
+- github      : SarahFG
+  name        : Sarah Farrell-Graham
 
 - github      : savionlee
   name        : Savion Lee
