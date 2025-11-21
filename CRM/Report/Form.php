@@ -26,6 +26,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat', 'chartEnabled', 'uniqueId', 'rows', 'group_bys_freq'];
 
   /**
+   * 64 characters is the max for some versions of SQL
+   */
+  const MAX_COLUMN_NAME_LENGTH = 64;
+
+  /**
    * Deprecated constant, Reports should be updated to use the getRowCount function.
    */
   const ROW_COUNT_LIMIT = 50;
@@ -5351,6 +5356,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @return array
    */
   protected function addBasicFieldToSelect($tableName, $fieldName, $field, $select) {
+    $tableName = substr($tableName, 0, self::MAX_COLUMN_NAME_LENGTH - strlen("_{$fieldName}"));
     $alias = "{$tableName}_{$fieldName}";
     $select[] = "{$field['dbAlias']} as $alias";
     $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
