@@ -99,15 +99,9 @@ class CRM_Core_I18n {
     $this->locale = $locale;
     if ($locale != '' and $locale != 'en_US') {
       if (defined('CIVICRM_GETTEXT_NATIVE') && CIVICRM_GETTEXT_NATIVE && function_exists('gettext')) {
-        // Note: the file hierarchy for .po must be, for example: l10n/fr_FR/LC_MESSAGES/civicrm.mo
-
         $this->_nativegettext = TRUE;
-        $this->setNativeGettextLocale($locale);
-        return;
       }
-
-      // Otherwise, use PHP-gettext
-      $this->setPhpGettextLocale($locale);
+      $this->setGettextLocale($locale);
     }
   }
 
@@ -119,6 +113,20 @@ class CRM_Core_I18n {
    */
   public function isNative() {
     return $this->_nativegettext;
+  }
+
+  /**
+   * Set the gettext locale.
+   *
+   * @param string $locale
+   */
+  public function setGettextLocale(string $locale) {
+    if ($this->isNative()) {
+      $this->setNativeGettextLocale($locale);
+    }
+    else {
+      $this->setPhpGettextLocale($locale);
+    }
   }
 
   /**
