@@ -12,7 +12,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Activities',
-        'label' => ts('Contact Summary Activities'),
+        'label' => 'Contact Summary Activities',
         'api_entity' => 'Activity',
         'api_params' => [
           'version' => 4,
@@ -104,7 +104,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Activities_Tab',
-        'label' => ts('Contact Summary Activities Tab'),
+        'label' => 'Contact Summary Activities Tab',
         'saved_search_id.name' => 'Contact_Summary_Activities',
         'type' => 'table',
         'settings' => [
@@ -126,7 +126,7 @@ return [
             [
               'type' => 'field',
               'key' => 'activity_type_id:label',
-              'label' => ts('Type'),
+              'label' => 'Type',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -138,27 +138,27 @@ return [
             [
               'type' => 'field',
               'key' => 'subject',
-              'label' => ts('Subject'),
+              'label' => 'Subject',
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'activity_date_time',
-              'label' => ts('Date'),
+              'label' => 'Date',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'label' => ts('Status'),
+              'label' => 'Status',
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_02_sort_name',
-              'label' => ts('Added By'),
+              'label' => 'Added By',
               'sortable' => TRUE,
               'link' => [
                 'entity' => 'Contact',
@@ -170,7 +170,7 @@ return [
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_03_sort_name',
-              'label' => ts('With'),
+              'label' => 'With',
               'sortable' => TRUE,
               'link' => [
                 'entity' => 'Contact',
@@ -182,7 +182,7 @@ return [
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_04_sort_name',
-              'label' => ts('Assigned'),
+              'label' => 'Assigned',
               'sortable' => TRUE,
               'link' => [
                 'entity' => 'Contact',
@@ -202,7 +202,7 @@ return [
                   'action' => 'view',
                   'target' => 'crm-popup',
                   'icon' => 'fa-external-link',
-                  'text' => ts('View Activity'),
+                  'text' => 'View Activity',
                   'style' => 'default',
                 ],
                 [
@@ -210,7 +210,7 @@ return [
                   'action' => 'update',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => ts('Update Activity'),
+                  'text' => 'Update Activity',
                   'style' => 'default',
                 ],
                 [
@@ -218,7 +218,7 @@ return [
                   'action' => 'delete',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => ts('Delete Activity'),
+                  'text' => 'Delete Activity',
                   'style' => 'danger',
                 ],
               ],
@@ -234,7 +234,7 @@ return [
             [
               'action' => 'add',
               'entity' => 'Activity',
-              'text' => ts('Add Activity'),
+              'text' => 'Add Activity',
               'icon' => 'fa-plus',
               'style' => 'primary',
               'target' => 'crm-popup',
