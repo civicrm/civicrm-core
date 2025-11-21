@@ -1,8 +1,10 @@
-(function (angular, $, _, dc, d3) {
-  "use strict";
+(function (dc, d3) {
+  CRM.chart_kit = CRM.chart_kit || {};
 
-  angular.module('crmChartKit').factory('chartKitHeatMap', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitHeatMapAdmin.html',
+  CRM.chart_kit.typeBackends = CRM.chart_kit.typeBackends || {};
+
+  CRM.chart_kit.typeBackends.heatmap = {
+    adminTemplate: '~/crmChartKitAdmin/typeBackends/chartKitHeatMapAdmin.html',
 
     getAxes: () => ({
       'w': {
@@ -62,7 +64,7 @@
       displayCtrl.chart
         .colorAccessor((d) => colorColumn.valueAccessor(d))
         .calculateColorDomain();
-      const colorScale = d3.scaleLinear(displayCtrl.chart.colorDomain(), [displayCtrl.settings.colorScaleMin, displayCtrl.settings.colorScaleMax]);
+      const colorScale = d3.scaleLinear(displayCtrl.chart.colorDomain(), [displayCtrl._settings.colorScaleMin, displayCtrl._settings.colorScaleMax]);
       displayCtrl.chart.colors(colorScale);
 
 
@@ -86,7 +88,7 @@
             label.classList.add('heat-box-label');
             label.setAttribute('x', x);
             label.setAttribute('y', y);
-            label.setAttribute('fill', displayCtrl.settings.format.labelColor);
+            label.setAttribute('fill', displayCtrl._settings.format.labelColor);
             label.style.textAnchor = 'middle';
 
             return label;
@@ -96,6 +98,6 @@
           boxGroups.select('.heat-box-label').text((d) => displayCtrl.renderDataLabel(d, 'label').replaceAll('\n', ' - '));
         });
     }
-  }));
-})(angular, CRM.$, CRM._, CRM.chart_kit.dc, CRM.chart_kit.d3);
+  };
+})(CRM.chart_kit.dc, CRM.chart_kit.d3);
 
