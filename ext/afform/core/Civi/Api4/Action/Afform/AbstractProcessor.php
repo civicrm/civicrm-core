@@ -84,11 +84,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $_submissionTokenValues = [];
 
   /**
-   * Get the (submitted) values from all the entities on the form
+   * Get the submitted values from all the entities on the form
    *
    * @return array
    */
-  public function getEntityValues() {
+  public function getSubmittedValues() {
     return $this->_entityValues;
   }
 
