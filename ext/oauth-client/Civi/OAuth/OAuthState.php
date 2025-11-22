@@ -47,11 +47,13 @@ class OAuthState extends AutoService {
    *   - tag (string, optional), The symbolic tag to apply to the new token
    *   - code_verifier (string, optional), An extra string that we will send to the token-endpoint to prove that we initiated the flow
    *   - grant_type (string, optional), The kind of flow that we are pursuing. Default: authorization_code
+   * @param string|null $stateId
+   *   If specified, use the given state ID.
    * @return string
    *   State token / identifier
    */
-  public function store($state): string {
-    $stateId = 'CC_' . \CRM_Utils_String::createRandom(29, \CRM_Utils_String::ALPHANUMERIC);
+  public function store($state, ?string $stateId = NULL): string {
+    $stateId ??= 'CC_' . \CRM_Utils_String::createRandom(29, \CRM_Utils_String::ALPHANUMERIC);
 
     $state['session'] = $this->getSessionId();
     $state['time'] = \CRM_Utils_Time::time();

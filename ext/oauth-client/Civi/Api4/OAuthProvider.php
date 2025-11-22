@@ -2,6 +2,8 @@
 
 namespace Civi\Api4;
 
+use CRM_Core_Permission;
+
 class OAuthProvider extends Generic\AbstractEntity {
 
   const TTL = 600;
@@ -32,6 +34,9 @@ class OAuthProvider extends Generic\AbstractEntity {
           'name' => 'class',
         ],
         [
+          'name' => 'permissions',
+        ],
+        [
           'name' => 'options',
         ],
         [
@@ -40,9 +45,15 @@ class OAuthProvider extends Generic\AbstractEntity {
         ],
         [
           'name' => 'contactTemplate',
+          // TODO: Migrate to templates['Contact']
         ],
         [
           'name' => 'mailSettingsTemplate',
+          // TODO: Migrate to templates['MailStore']
+        ],
+        [
+          'name' => 'templates',
+          'description' => 'Open-ended list of templates. Generally, these will be used after an OAuth connection is established. Details vary by tag/workflow.',
         ],
       ];
     });
@@ -54,8 +65,8 @@ class OAuthProvider extends Generic\AbstractEntity {
    */
   public static function permissions() {
     return [
-      "meta" => ["access CiviCRM"],
-      "get" => ["access CiviCRM"],
+      "meta" => [CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+      "get" => [CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
       "default" => ["administer CiviCRM"],
     ];
   }
