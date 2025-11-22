@@ -244,7 +244,11 @@ class CRM_Core_BAO_CustomValueTable {
    * @return string
    *   the mysql data store placeholder
    */
-  public static function fieldToSQLType(string $type, $maxLength = NULL, bool $isSerialized = FALSE) {
+  public static function fieldToSQLType(string $type, $maxLength = NULL, bool $isSerialized = FALSE, string $fkEntity = '') {
+    if ($fkEntity === 'Afform' && $type === 'EntityReference') {
+      $type = 'String';
+    }
+
     if ($isSerialized) {
       switch ($type) {
         case 'Text':
