@@ -84,6 +84,14 @@ function _civiimport_civicrm_get_import_tables(): array {
   if (isset(Civi::$statics['civiimport_tables'])) {
     return Civi::$statics['civiimport_tables'];
   }
+  $old_mode = $GLOBALS['_PEAR_default_error_mode'];
+  $old_opt = $GLOBALS['_PEAR_default_error_options'];
+  $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
+  // temporarily set a do-nothing error-handler
+  $GLOBALS['_PEAR_default_error_options'] = function() {
+    // probably during boot - don't care
+    // e.g. a column has been added to the table but the upgrade hasn't run yet
+  };
   // We need to avoid the api here as it is called early & could cause loops.
   $tables = CRM_Core_DAO::executeQuery('
     SELECT `user_job`.`id` AS id, `metadata`, `user_job`.`name`, `user_job`.`label`, `job_type`, `user_job`.`created_id`, `created_id`.`display_name`, `user_job`.`created_date`, `user_job`.`expires_date`, `ss`.`api_entity` as entity
@@ -99,6 +107,8 @@ function _civiimport_civicrm_get_import_tables(): array {
       -- also more of a feature than a specification - but we need a table
       -- to do this pseudo-api
       AND metadata LIKE "%table_name%"');
+  $GLOBALS['_PEAR_default_error_mode'] = $old_mode;
+  $GLOBALS['_PEAR_default_error_options'] = $old_opt;
   $importEntities = [];
   while ($tables->fetch()) {
     $tableName = json_decode($tables->metadata, TRUE)['DataSource']['table_name'];
