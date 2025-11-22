@@ -38,6 +38,23 @@ class CRM_OAuth_Hook {
   }
 
   /**
+   * Determine whether the user is allowed to generate the given token.
+   *
+   * @param \Civi\Api4\Action\OAuthClient\AbstractGrantAction $action
+   *   The proposed token parameters.
+   * @param array $client
+   * @param bool $allowed
+   */
+  public static function oauthGrant($action, array $client, bool &$allowed) {
+    $event = GenericHookEvent::create([
+      'action' => $action,
+      'client' => $client,
+      'allowed' => &$allowed,
+    ]);
+    \Civi::dispatcher()->dispatch('hook_civicrm_oauthGrant', $event);
+  }
+
+  /**
    * Fires a hook whenever we receive an updated OAuth token.
    *
    * @param string $flow
