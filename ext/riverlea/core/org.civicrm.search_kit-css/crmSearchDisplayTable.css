@@ -8,7 +8,7 @@ table.crm-sticky-header > thead > tr {
   z-index: 2;
 }
 .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
-  padding-inline: var(--crm-m);
+  padding-inline: var(--crm-l-medium);
   text-transform: none;
   color: initial;
   min-width: 95px; /* Don't allow button to be split on 2 lines */
@@ -22,23 +22,23 @@ table.crm-sticky-header > thead > tr {
 
 /* Afform tables */
 #bootstrap-theme td.crm-search-col-type-buttons {
-  padding: var(--crm-table-padding) calc(var(--crm-table-padding) - var(--crm-s)) calc(var(--crm-table-padding) - var(--crm-s)) var(--crm-table-padding);
-  --crm-btn-margin: 0 var(--crm-s) var(--crm-s) 0;
+  padding: var(--crm-table-padding) calc(var(--crm-table-padding) - var(--crm-l-small)) calc(var(--crm-table-padding) - var(--crm-l-small)) var(--crm-table-padding);
+  --crm-btn-margin: 0 var(--crm-l-small) var(--crm-l-small) 0;
 }
 #bootstrap-theme td:is(.crm-search-col-type-buttons,.crm-search-col-type-menu) {
   width: 1px; /* shrinks cell to width of button/menu */
 }
 #bootstrap-theme th.crm-search-result-select button.btn {
-  background-color: color-mix(in srgb,var(--crm-c-text) 15%,transparent);
-  color: var(--crm-c-text);
-  padding: var(--crm-xs1) var(--crm-m1);
+  background-color: color-mix(in srgb,var(--crm-text-color) 15%,transparent);
+  color: var(--crm-text-color);
+  padding: var(--crm-l-xsmall-1) var(--crm-l-medium-1);
 }
 #bootstrap-theme th.crm-search-result-select button.btn:hover,
 #bootstrap-theme th.crm-search-result-select button.btn:focus {
-  background-color: color-mix(in srgb,var(--crm-c-text) 25%,transparent);
+  background-color: color-mix(in srgb,var(--crm-text-color) 25%,transparent);
 }
 #bootstrap-theme th.crm-search-result-select button.btn i.crm-i {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   min-width: fit-content;
   padding: 0;
   border: 0;
@@ -46,7 +46,7 @@ table.crm-sticky-header > thead > tr {
 }
 .crm-search-display-table table {
   border: var(--crm-table-outside-border);
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 
 /* Nested styling for hierarchical rows */

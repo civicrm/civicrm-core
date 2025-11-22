@@ -1,5 +1,5 @@
 .crm-container .messages > .crm-i {
-  padding: 0 var(--crm-m) var(--crm-s) 0;
+  padding: 0 var(--crm-l-medium) var(--crm-l-small) 0;
   float: left;
 }
 .crm-container div:not(.crm-search-display-editable-buttons) > button.btn-xs:has(.fa-times),
@@ -7,7 +7,7 @@
 .crm-container .crm-hover-button:has(.crm-i):hover,
 .crm-container .crm-hover-button:has(.crm-i):focus {
   background: transparent;
-  color: var(--crm-c-link) !important;
+  color: var(--crm-link-color) !important;
   padding: var(--crm-btn-small-padding);
 }
 .crm-container .select2-container[class*=" fa-"]::before,
@@ -40,27 +40,27 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   font-weight: normal;
   text-rendering: auto;
   font-size: var(--crm-font-size);
-  margin: 0 var(--crm-m) 0 0;
+  margin: 0 var(--crm-l-medium) 0 0;
 }
 .crm-container #crm-notification-container div.ui-notify-message.error h1::before,
 .crm-container span.batch-invalid::before {
   content: var(--crm-icon-danger);
-  color: var(--crm-notify-danger);
+  color: var(--crm-notify-danger-color);
 }
 .crm-container #crm-notification-container div.ui-notify-message.success h1::before,
 .crm-container span.batch-valid::before {
   content: var(--crm-icon-success);
-  color: var(--crm-notify-success);
+  color: var(--crm-notify-success-color);
 }
 .crm-container #crm-notification-container div.ui-notify-message.info h1::before,
 .crm-container .messages.crm-empty-table::before {
   content: var(--crm-icon-info);
-  color: var(--crm-notify-info);
+  color: var(--crm-notify-info-color);
 }
 .crm-container #crm-notification-container div.ui-notify-message.alert h1::before,
 .crm-container #crm-notification-container div.ui-notify-message.warning h1::before {
   content: var(--crm-icon-danger);
-  color: var(--crm-notify-warning);
+  color: var(--crm-notify-warning-color);
 }
 .crm-container .messages.crm-empty-table > i.crm-i {
   display: none; /* removes double icon when markup uses both */
@@ -102,7 +102,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .ui-icon-circle-close::before {
   content: var(--crm-icon-close);
-  color: var(--crm-notify-col);
+  color: var(--crm-notify-color);
 }
 .crm-container .ui-icon-circle-close:hover,
 .crm-container .ui-icon-circle-close:focus,
@@ -117,7 +117,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   color: var(--crm-icon-danger-color);
 }
 .crm-container .crm-dashlet-header a.fa-times {
-  color: var(--crm-dashlet-header-col);
+  color: var(--crm-dashlet-header-color);
 }
 
 /* Info icon */
@@ -141,7 +141,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container table.dataTable thead th.sorting_asc,
 .crm-container table.dataTable thead th.sorting_desc {
   background-image: none;
-  color: var(--crm-table-header-col);
+  color: var(--crm-table-header-color);
   box-shadow: none;
   line-height: 1;
 }
@@ -162,14 +162,14 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   /* Bootstrap & SearchKit sort resets */
   position: absolute;
   margin-left: -1.5ch;
-  color: var(--crm-table-sort-col);
+  color: var(--crm-table-sort-color);
   line-height: inherit;
   font-style: normal;
   text-rendering: auto;
   font-family: "Font Awesome 6 Free", "FontAwesome";
   font-style: normal;
   font-weight: normal;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   opacity: 1;
 }
 .crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
@@ -186,10 +186,10 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   font-family: "Font Awesome 6 Free", "FontAwesome";
   font-style: normal;
   text-rendering: auto;
-  font-size: var(--crm-dash-icon-size);
+  font-size: var(--crm-contact-icon-size);
   content: var(--crm-icon-sort);
-  color: var(--crm-table-sort-col);
-  cursor: var(--crm-hover-clickable);
+  color: var(--crm-table-sort-color);
+  cursor: var(--crm-link-hover-cursor);
 }
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
 .crm-container table.dataTable thead th.sorting::before,
@@ -203,20 +203,20 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-asc::before,
 .crm-container table.dataTable thead th.sorting_asc::before {
   content: var(--crm-icon-sort-asc);
-  color: var(--crm-table-sort-active-col);
+  color: var(--crm-table-sort-active-color);
 }
 .crm-container a.sorting_desc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-desc::before,
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-desc::before,
 .crm-container table.dataTable thead th.sorting_desc::before {
   content: var(--crm-icon-sort-desc);
-  color: var(--crm-table-sort-active-col);
+  color: var(--crm-table-sort-active-color);
 }
 
 /* Trash icons */
 .crm-container .delete-icon {
   background-image: none;
-  color: var(--crm-alert-danger-text);
+  color: var(--crm-alert-danger-text-color);
 }
 .crm-container .delete-button > .delete-icon {
   color: inherit;
@@ -245,7 +245,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .jstree-wholerow-ul {
   display: flex;
   flex-direction: column;
-  gap: var(--crm-xs);
+  gap: var(--crm-l-xsmall);
 }
 .jstree-default > .jstree-wholerow-ul > li.jstree-node {
   margin-inline: 0;
@@ -256,7 +256,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container .jstree-default .jstree-icon {
   background-image: inherit;
-  font-size: var(--crm-r1);
+  font-size: var(--crm-l-reg-1);
   margin-right: var(--btn-icon-spacing);
 }
 .crm-container .jstree-default .jstree-checkbox::before {
@@ -265,22 +265,22 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .jstree-default.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox::before,
 .crm-container .jstree-default .jstree-checked > .jstree-checkbox::before {
   content: '\f046';
-  color: var(--crm-c-success-on-page-bg);
+  color: var(--crm-success-ink-color);
 }
 .jstree-default > .jstree-no-dots .jstree-closed > .jstree-ocl::before,
 .jstree .jstree-closed > .jstree-ocl::before {
   display: block;
   content: '\f105';
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 .jstree-default > .jstree-no-dots .jstree-open > .jstree-ocl::before,
 .jstree .jstree-open > .jstree-ocl::before {
   display: block;
   content: '\f107';
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 .crm-container .jstree-default .jstree-search {
-  color: var(--crm-c-danger);
+  color: var(--crm-danger-color);
   font-weight: normal;
 }
 .crm-container #navigation-tree li.jstree-node {
@@ -318,19 +318,19 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container #crmIconPicker a.ui-button .ui-icon {
   margin-top: 0;
-  font-size: var(--crm-r2);
+  font-size: var(--crm-l-reg-2);
 }
 .crm-container #crmIconPicker .icons {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--crm-m2);
+  gap: var(--crm-l-medium-2);
   margin-top: 1rem;
 }
 .crm-container #crmIconPicker a.ui-button {
-  color: var(--crm-c-text) !important;
+  color: var(--crm-text-color) !important;
   background: transparent;
-  width: var(--crm-r2);
-  height: var(--crm-r2);
+  width: var(--crm-l-reg-2);
+  height: var(--crm-l-reg-2);
   border: 0;
   padding: 0;
   display: inline-block;
@@ -345,7 +345,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   font-family: "Font Awesome 6 Free", "FontAwesome";
   font-style: normal;
   text-rendering: auto;
-  font-size: var(--crm-dash-icon-size);
+  font-size: var(--crm-contact-icon-size);
   display: inline-block;
   content: '\f09d';
   font-size: 2.5rem;

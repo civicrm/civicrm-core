@@ -5,12 +5,12 @@
 /* Alpha filter */
 
 .crm-container div#alpha-filter {
-  background-color: var(--crm-filter-bg);
-  margin: var(--crm-r) 0;
+  background-color: var(--crm-filter-bg-color);
+  margin: var(--crm-l-reg) 0;
   padding: var(--crm-filter-padding);
   text-align: left;
-  box-shadow: var(--crm-block-shadow);
-  border-radius: var(--crm-roundness);
+  box-shadow: var(--crm-shadow-block);
+  border-radius: var(--crm-l-radius);
 }
 #crm-container #alpha-filter ul {
   margin: 0;
@@ -19,12 +19,12 @@
   justify-content: var(--crm-filter-spacing);
 }
 .crm-container #alpha-filter li {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 .crm-container #alpha-filter a {
   font-weight: normal;
-  background: var(--crm-filter-item-bg);
-  padding: var(--crm-s) var(--crm-m);
+  background: var(--crm-filter-item-bg-color);
+  padding: var(--crm-l-small) var(--crm-l-medium);
   box-shadow: var(--crm-filter-item-shadow);
 }
 
@@ -35,8 +35,8 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: 100%;
-    column-gap: var(--crm-r);
-    row-gap: var(--crm-s);
+    column-gap: var(--crm-l-reg);
+    row-gap: var(--crm-l-small);
   }
 }
 .advanced-search-fields .search-field__span-2 {

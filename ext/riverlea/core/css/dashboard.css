@@ -6,23 +6,23 @@
 #civicrm-dashboard > .crm-flex-box {
   display: grid;
   grid-template-columns: var(--crm-dashlet-columns);
-  gap: var(--crm-r);
+  gap: var(--crm-l-reg);
   /* avoid total collapse else no droppable area if all widgets removed */
-  min-height: var(--crm-r);
+  min-height: var(--crm-l-reg);
 }
 .crm-container .crm-dashlet {
   border-radius: var(--crm-dashlet-radius);
-  background-color: var(--crm-dashlet-bg);
+  background-color: var(--crm-dashlet-bg-color);
   padding: var(--crm-dashlet-padding);
   box-shadow: var(--crm-dashlet-box-shadow);
   margin-bottom: var(--crm-padding-reg);
   border: var(--crm-dashlet-border);
 }
 .crm-container .ui-sortable-helper.crm-dashlet {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 .crm-container .crm-dashlet-header {
-  background-color: var(--crm-dashlet-header-bg);
+  background-color: var(--crm-dashlet-header-bg-color);
   border-radius: var(--crm-dashlet-radius);
   border: var(--crm-dashlet-header-border);
   border-width: var(--crm-dashlet-header-border-width);
@@ -37,19 +37,19 @@
   cursor: move;
   margin: 0 auto 0 0 !important;
   padding: 0;
-  color: var(--crm-dashlet-header-col);
+  color: var(--crm-dashlet-header-color);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  color: var(--crm-dashlet-header-col);
+  color: var(--crm-dashlet-header-color);
   font-size: var(--crm-dashlet-header-font-size);
 }
 .crm-container .crm-dashlet-header a {
-  color: var(--crm-dashlet-header-col);
-  padding: var(--crm-xs) var(--crm-s);
+  color: var(--crm-dashlet-header-color);
+  padding: var(--crm-l-xsmall) var(--crm-l-small);
   text-decoration: none;
   font-size: var(--crm-font-size);
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   opacity: .7;
   float: right;
 }
@@ -63,16 +63,16 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   height: calc(100% - 1em);
 }
 .crm-container .crm-dashlet-content {
-  background: var(--crm-dashlet-bg);
+  background: var(--crm-dashlet-bg-color);
   padding: var(--crm-dashlet-content-padding);
   overflow: auto;
 }
 .crm-container .crm-dashlet-content > .ng-scope { /* for FormBuilder dashlets */
-  padding: var(--crm-dash-block-padding);
+  padding: var(--crm-contact-block-padding);
 }
 .crm-container .crm-dashlet details.crm-accordion-bold > .crm-accordion-body {
   padding: 0;
-  border-bottom: var(--crm-expand-border);
+  border-bottom: var(--crm-accordion-border);
 }
 .crm-container .crm-dashlet .crm-accordion-body table {
   margin: 0;
@@ -80,17 +80,17 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   box-shadow: var(--crm-input-box-shadow);
 }
 .crm-container .crm-dashlet .crm-accordion-body table tr {
-  padding: var(--crm-dash-block-padding);
+  padding: var(--crm-contact-block-padding);
   display: flex;
   border: 0 solid transparent;
-  gap: var(--crm-r);
+  gap: var(--crm-l-reg);
 }
 .crm-dashlet .dataTables_wrapper {
   border-radius: 0;
   box-shadow: none;
   margin: 0;
-  padding: var(--crm-dash-block-padding);
-  background: var(--crm-dashlet-bg);
+  padding: var(--crm-contact-block-padding);
+  background: var(--crm-dashlet-bg-color);
 }
 .crm-dashlet table.dataTable {
   overflow: scroll;
@@ -99,7 +99,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   width: 99% !important;
 }
 .crm-dashlet #help {
-  margin: var(--crm-dash-block-padding);
+  margin: var(--crm-contact-block-padding);
 }
 .crm-container .crm-inactive-dashlet-fieldset .help {
   width: 100%;
@@ -108,9 +108,9 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 .crm-container .crm-inactive-dashlet {
   display: inline-block;
   width: 340px;
-  height: var(--crm-xxl);
-  box-shadow: var(--crm-popup-shadow);
-  background-color: color-mix(in srgb, var(--crm-dashlet-bg) 90%, #fff 10%);
+  height: var(--crm-l-large-2);
+  box-shadow: var(--crm-shadow-popup);
+  background-color: color-mix(in srgb, var(--crm-dashlet-bg-color) 90%, #fff 10%);
   border-radius: var(--crm-dashlet-radius);
   margin: 0;
 }
@@ -119,7 +119,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 }
 .crm-container .crm-inactive-dashlet .crm-dashlet-header h3 {
   font-size: 75%;
-  padding-left: var(--crm-s1);
+  padding-left: var(--crm-l-small-1);
 }
 #civicrm-dashboard .ui-sortable-placeholder {
   border: 2px dashed var(--crm-c-gray-700);
@@ -139,13 +139,13 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 }
 #civicrm-news-feed ul {
   border-bottom: var(--crm-dashlet-tabs-border);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-l-radius);
 }
 #civicrm-news-feed .ui-tabs-panel {
-  padding: var(--crm-s) 0 0;
+  padding: var(--crm-l-small) 0 0;
 }
 .crm-container #civicrm-news-feed .crm-accordion-body {
-  padding: var(--crm-expand-body-padding);
+  padding: var(--crm-accordion-body-padding);
 }
 
 /* Getting statrted */
@@ -172,26 +172,26 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 fieldset.crm-inactive-dashlet-fieldset {
   padding: 0;
   border: 0;
-  margin-bottom: var(--crm-r);
+  margin-bottom: var(--crm-l-reg);
 }
 fieldset.crm-inactive-dashlet-fieldset > div {
-  background-color: var(--crm-dashlet-dashlets-bg) !important;
+  background-color: var(--crm-dashlet-dashlets-bg-color) !important;
   box-shadow: var(--crm-dashlet-box-shadow);
   border-radius: var(--crm-dashlet-radius);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--crm-r);
-  padding: var(--crm-r);
+  gap: var(--crm-l-reg);
+  padding: var(--crm-l-reg);
 }
 fieldset.crm-inactive-dashlet-fieldset legend {
   background-color: transparent;
   display: block;
-  margin-bottom: var(--crm-r);
-  top: var(--crm-s);
+  margin-bottom: var(--crm-l-reg);
+  top: var(--crm-l-small);
 }
 fieldset.crm-inactive-dashlet-fieldset legend .crm-hover-button {
   padding: var(--crm-btn-large-padding);
-  margin-right: var(--crm-r);
+  margin-right: var(--crm-l-reg);
 }
 /* Searchkit Dashlets */
 

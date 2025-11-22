@@ -4,7 +4,7 @@
 
 /* Sortable headers */
 .crm-search-display th.crm-sortable-col {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   white-space: nowrap;
 }
 .crm-search-display th.crm-sortable-col span {
@@ -13,7 +13,7 @@
 }
 .crm-search-display th i.fa-sort-desc,
 .crm-search-display th i.fa-sort-asc {
-  color: var(--crm-c-primary);
+  color: var(--crm-primary-color);
 }
 .crm-search-display th:not(:hover) i.fa-sort {
   opacity: .5;
@@ -21,7 +21,7 @@
 .crm-search input.ng-invalid,
 .crm-search-display input.ng-invalid,
 .crm-search-task-dialog input.ng-invalid {
-  border-color: var(--crm-c-warning);
+  border-color: var(--crm-warning-color);
 }
 .crm-search-display button.dropdown-toggle {
   white-space: nowrap;
@@ -71,7 +71,7 @@
   float: inherit;
 }
 .crm-contact-page .crm-search-display-pager {
-  padding: 0 var(--crm-r) var(--crm-r) var(--crm-r);
+  padding: 0 var(--crm-l-reg) var(--crm-l-reg) var(--crm-l-reg);
 }
 /* Inline Edit */
 
