@@ -58,6 +58,13 @@ abstract class AbstractGrantAction extends \Civi\Api4\Generic\AbstractBatchActio
       if (empty($def['provider']) || !in_array($def['provider'], $allowedProviders)) {
         throw new UnauthorizedException(sprintf("Insufficient privileges for %s on provider %s", $this->getActionName(), $def['provider']));
       }
+
+      $allowed = \CRM_Core_Permission::check('manage OAuth client')
+        || \CRM_Core_Permission::check('manage OAuth client secrets');
+      \CRM_OAuth_Hook::oauthGrant($this, $def, $allowed);
+      if (!$allowed) {
+        throw new OAuthException("Grant parameters not allowed");
+      }
     }
     if (!preg_match(OAuthTokenFacade::STORAGE_TYPES, $this->storage)) {
       throw new \CRM_Core_Exception("Invalid token storage ($this->storage)");
