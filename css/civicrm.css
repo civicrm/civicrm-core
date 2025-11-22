@@ -4091,7 +4091,7 @@ span.crm-status-icon {
     width: 1.25em;
     height: 1.25em;
     margin: 0 0.1em;
-    border: 1px solid;
+    border: 1px solid #fff;
     border-radius: 50%;
     background: #fff;
     -webkit-transition: 0.1s;
@@ -4102,7 +4102,7 @@ span.crm-status-icon {
     background-color: #20576f;
   }
   & input[type="checkbox"].crm-form-toggle:checked::before {
-    left: 1em;
+    left: 1.3em;
   }
   & input[type="checkbox"].crm-form-toggle:disabled {
     opacity: 0.4;
