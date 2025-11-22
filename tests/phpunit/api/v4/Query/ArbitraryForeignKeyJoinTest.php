@@ -65,7 +65,8 @@ namespace api\v4\Query {
         ->setDebug(TRUE)
         ->execute();
       $sql = $apiCall->debug['sql'];
-      $this->assertStringEndsWith('LEFT JOIN (`civicrm_phone` `Phone`) ON `Phone`.`phone_numeric` = `a`.`phone_fk`', rtrim($sql[0]));
+      [$select, $join] = explode('LEFT JOIN', $sql[0]);
+      $this->assertLike('(`civicrm_phone` `Phone`) ON `Phone`.`phone_numeric` = `a`.`phone_fk`', $join);
 
       // Make sure it works both ways
       $apiCall = PhoneNumberJoin::get(FALSE)
@@ -74,7 +75,8 @@ namespace api\v4\Query {
         ->setDebug(TRUE)
         ->execute();
       $sql = $apiCall->debug['sql'];
-      $this->assertStringEndsWith('LEFT JOIN (`civicrm_phone` `Phone`) ON `a`.`phone_fk` = `Phone`.`phone_numeric`', rtrim($sql[0]));
+      [$select, $join] = explode('LEFT JOIN', $sql[0]);
+      $this->assertLike('(`civicrm_phone` `Phone`) ON `a`.`phone_fk` = `Phone`.`phone_numeric`', $join);
 
       // Joining without any ON conditions specified, ensure the API automatically adds the correct FK.
       $apiCall = PhoneNumberJoin::get(FALSE)
@@ -82,7 +84,8 @@ namespace api\v4\Query {
         ->setDebug(TRUE)
         ->execute();
       $sql = $apiCall->debug['sql'];
-      $this->assertStringEndsWith('LEFT JOIN (`civicrm_phone` `Phone`) ON `a`.`phone_fk` = `Phone`.`phone_numeric`', rtrim($sql[0]));
+      [$select, $join] = explode('LEFT JOIN', $sql[0]);
+      $this->assertLike('(`civicrm_phone` `Phone`) ON `a`.`phone_fk` = `Phone`.`phone_numeric`', $join);
     }
 
     /**
