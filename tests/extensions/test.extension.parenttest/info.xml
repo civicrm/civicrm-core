@@ -1,0 +1,7 @@
+<extension key='test.extension.parenttest' type='module'>
+  <file>parenttest</file>
+  <name>test_extension_parenttest</name>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+</extension>
