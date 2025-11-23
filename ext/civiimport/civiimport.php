@@ -84,9 +84,12 @@ function _civiimport_civicrm_get_import_tables(): array {
   if (isset(Civi::$statics['civiimport_tables'])) {
     return Civi::$statics['civiimport_tables'];
   }
+  // label may not exist yet as a field in the table, e.g. if the upgrade
+  // hasn't run yet. If so, then always use '' as label.
+  $labelField = CRM_Core_BAO_Domain::isDBVersionAtLeast('6.8.alpha1') ? '`user_job`.`label`, ' : "'' AS `label`, ";
   // We need to avoid the api here as it is called early & could cause loops.
   $tables = CRM_Core_DAO::executeQuery('
-    SELECT `user_job`.`id` AS id, `metadata`, `user_job`.`name`, `user_job`.`label`, `job_type`, `user_job`.`created_id`, `created_id`.`display_name`, `user_job`.`created_date`, `user_job`.`expires_date`, `ss`.`api_entity` as entity
+    SELECT `user_job`.`id` AS id, `metadata`, `user_job`.`name`, ' . $labelField . '`job_type`, `user_job`.`created_id`, `created_id`.`display_name`, `user_job`.`created_date`, `user_job`.`expires_date`, `ss`.`api_entity` as entity
     FROM civicrm_user_job user_job
     LEFT JOIN civicrm_contact created_id ON created_id.id = user_job.created_id
     LEFT JOIN civicrm_search_display sd ON sd.id = user_job.search_display_id
