@@ -930,7 +930,7 @@ class Api4SelectQuery extends Api4Query {
     foreach ($this->openJoin['subjoins'] as $subjoin) {
       $subjoinClause .= " INNER JOIN {$subjoin['table']} `{$subjoin['alias']}` ON (" . implode(' AND ', $subjoin['conditions']) . ")";
     }
-    $this->query->join($tableAlias, "$side JOIN ($tableExpr `$tableAlias`$subjoinClause) ON " . implode(' AND ', $conditions));
+    $this->query->join($tableAlias, "$side JOIN ($tableExpr `$tableAlias`$subjoinClause)\n  ON " . implode("\n  AND ", $conditions));
     $this->openJoin = NULL;
   }
 
@@ -951,7 +951,7 @@ class Api4SelectQuery extends Api4Query {
       ];
     }
     else {
-      $this->query->join($tableAlias, "$side JOIN $tableExpr `$tableAlias` ON " . implode(' AND ', $conditions));
+      $this->query->join($tableAlias, "$side JOIN $tableExpr `$tableAlias`\n  ON " . implode("\n  AND ", $conditions));
     }
   }
 

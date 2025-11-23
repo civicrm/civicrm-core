@@ -31,6 +31,7 @@ use PHPUnit\Framework\TestCase;
 class Api4TestBase extends TestCase implements HeadlessInterface {
 
   use Api4TestTrait;
+  use Test\GenericAssertionsTrait;
 
   /**
    * @see CiviUnitTestCase

@@ -2450,19 +2450,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Assert 2 sql strings are the same, ignoring double spaces.
-   *
-   * @param string $expectedSQL
-   * @param string $actualSQL
-   * @param string $message
-   */
-  protected function assertLike(string $expectedSQL, string $actualSQL, string $message = 'different sql'): void {
-    $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expectedSQL)));
-    $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actualSQL)));
-    $this->assertEquals($expected, $actual, $message);
-  }
-
-  /**
    * Create a price set for an event.
    *
    * @param float $feeTotal
