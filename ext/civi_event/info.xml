@@ -33,6 +33,9 @@
   </smarty_compatibility>
   <comments>Core Component</comments>
   <upgrader>CRM_Extension_Upgrader_Component</upgrader>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+  </requires>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
