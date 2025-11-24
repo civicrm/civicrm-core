@@ -307,6 +307,13 @@ class FormDataModel {
    */
   public static function getSearchEntities(array $savedSearch): array {
     $entityList = [$savedSearch['api_entity']];
+    if ($entityList === ['EntitySet']) {
+      $firstSet = array_shift($savedSearch['api_params']['sets']);
+      return self::getSearchEntities([
+        'api_entity' => $firstSet[1],
+        'api_params' => $firstSet[3]
+      ]);
+    }
     foreach ($savedSearch['api_params']['join'] ?? [] as $join) {
       $entityList[] = $join[0];
       if (is_string($join[2] ?? NULL)) {
