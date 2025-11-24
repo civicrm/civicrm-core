@@ -56,15 +56,26 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
    */
   public static function getContactDashlets(): array {
     $cid = CRM_Core_Session::getLoggedInContactID();
-    if ($cid && !isset(Civi::$statics[__CLASS__][__FUNCTION__][$cid])) {
-      $results = [];
+    $results = [];
 
-      // Get all dashlets we have access to
-      $availableDashlets = (array) \Civi\Api4\Dashboard::get(TRUE)
-        ->addWhere('domain_id', '=', 'current_domain')
-        ->addWhere('is_active', '=', TRUE)
-        ->execute()
-        ->indexBy('id');
+    // Get all dashlets we have access to
+    $availableDashlets = (array) \Civi\Api4\Dashboard::get(TRUE)
+      ->addWhere('domain_id', '=', 'current_domain')
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->indexBy('id');
+
+    $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addWhere('dashboard_id', 'IN', array_keys($availableDashlets))
+      ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
+      ->addOrderBy('weight')
+      ->execute();
+
+    if (!$dashletsUsed->count()) {
+      // if none used this may be the first time using the dashboard
+      // for this contact - initialise then fetch again
+      self::initializeDashlets();
 
       $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
         ->addWhere('contact_id', '=', $cid)
@@ -72,49 +83,36 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
         ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
         ->addOrderBy('weight')
         ->execute();
-
-      if (!$dashletsUsed->count()) {
-        // if none used this may be the first time using the dashboard
-        // for this contact - initialise then fetch again
-        self::initializeDashlets();
-
-        $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
-          ->addWhere('contact_id', '=', $cid)
-          ->addWhere('dashboard_id', 'IN', array_keys($availableDashlets))
-          ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
-          ->addOrderBy('weight')
-          ->execute();
-      }
-
-      // first add linked dashlet records, in order to respect the linked weights
-      foreach ($dashletsUsed as $dashletUsed) {
-        $dashletRecord = $availableDashlets[$dashletUsed['dashboard_id']];
-        $results[] = array_merge($dashletRecord, [
-          'dashboard_contact.id' => $dashletUsed['id'],
-          'dashboard_contact.contact_id' => $dashletUsed['contact_id'],
-          'dashboard_contact.weight' => $dashletUsed['weight'],
-          'dashboard_contact.column_no' => $dashletUsed['column_no'],
-          'dashboard_contact.is_active' => $dashletUsed['is_active'],
-        ]);
-        // remove from availableDashlets so we dont add again below
-        unset($availableDashlets[$dashletUsed['dashboard_id']]);
-      }
-      // now add the remaining unlinked dashlets
-      foreach ($availableDashlets as $dashlet) {
-        $results[] = array_merge($dashlet, [
-          'dashboard_contact.id' => NULL,
-          'dashboard_contact.contact_id' => NULL,
-          'dashboard_contact.weight' => NULL,
-          'dashboard_contact.column_no' => NULL,
-          'dashboard_contact.is_active' => NULL,
-        ]);
-      }
-
-      // TODO: move this permission check to the row level access in Api4
-      $results = array_values(array_filter($results, fn ($record) => self::checkPermission($record['permission'], $record['permission_operator'])));
-      Civi::$statics[__CLASS__][__FUNCTION__][$cid] = $results;
     }
-    return Civi::$statics[__CLASS__][__FUNCTION__][$cid] ?? [];
+
+    // first add linked dashlet records, in order to respect the linked weights
+    foreach ($dashletsUsed as $dashletUsed) {
+      $dashletRecord = $availableDashlets[$dashletUsed['dashboard_id']];
+      $results[] = array_merge($dashletRecord, [
+        'dashboard_contact.id' => $dashletUsed['id'],
+        'dashboard_contact.contact_id' => $dashletUsed['contact_id'],
+        'dashboard_contact.weight' => $dashletUsed['weight'],
+        'dashboard_contact.column_no' => $dashletUsed['column_no'],
+        'dashboard_contact.is_active' => $dashletUsed['is_active'],
+      ]);
+      // remove from availableDashlets so we dont add again below
+      unset($availableDashlets[$dashletUsed['dashboard_id']]);
+    }
+    // now add the remaining unlinked dashlets
+    foreach ($availableDashlets as $dashlet) {
+      $results[] = array_merge($dashlet, [
+        'dashboard_contact.id' => NULL,
+        'dashboard_contact.contact_id' => NULL,
+        'dashboard_contact.weight' => NULL,
+        'dashboard_contact.column_no' => NULL,
+        'dashboard_contact.is_active' => NULL,
+      ]);
+    }
+
+    // TODO: move this permission check to the row level access in Api4
+    $results = array_values(array_filter($results, fn ($record) => self::checkPermission($record['permission'], $record['permission_operator'])));
+
+    return $results;
   }
 
   /**
