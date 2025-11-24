@@ -14,5 +14,5 @@ return [
   'requires' => ['crmUi', 'crmUtil', 'ui.sortable', 'dialogService', 'api4'],
   'settingsFactory' => ['CRM_Core_BAO_Dashboard', 'angularSettings'],
   'permissions' => ['administer CiviCRM'],
-  'bundles' => ['visual'],
+  'bundles' => ['bootstrap3', 'visual'],
 ];

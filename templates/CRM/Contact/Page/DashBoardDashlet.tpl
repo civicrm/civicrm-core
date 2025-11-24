@@ -10,7 +10,7 @@
 {* Alerts for critical configuration settings. *}
 {$communityMessages}
 <div class="clear"></div>
-<div class="crm-block crm-content-block">
+<div id="bootstrap-theme" class="crm-block crm-content-block">
 
   <crm-angular-js modules="crmDashboard">
     <crm-dashboard></crm-dashboard>
