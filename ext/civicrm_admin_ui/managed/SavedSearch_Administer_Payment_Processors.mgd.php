@@ -165,7 +165,8 @@ return [
                   'entity' => 'PaymentProcessor',
                   'action' => 'update',
                   'join' => '',
-                  'target' => 'crm-popup',
+                  // NOTE: CiviConnect behaviors currently incompatbile with loading manage form in AJAX popup
+                  // 'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
@@ -211,7 +212,8 @@ return [
             [
               'entity' => 'PaymentProcessor',
               'action' => 'add',
-              'target' => 'crm-popup',
+              // NOTE: CiviConnect behaviors currently incompatbile with loading manage form in AJAX popup
+              // 'target' => 'crm-popup',
               'style' => 'primary',
               'text' => E::ts('Add Payment Processor'),
               'icon' => 'fa-plus',
