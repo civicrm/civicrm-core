@@ -15,11 +15,22 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\Event\GenericHookEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class contains Contact dashboard related functions.
  */
-class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
+class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubscriberInterface {
+
+  /**
+   * @inheritdoc
+   */
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_angularModules' => ['addDashboardModuleDependencies', -2000],
+    ];
+  }
 
   /**
    * Create or update Dashboard.
@@ -138,6 +149,35 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       $partials["~/{$moduleName}/directives/{$directive}.html"] = "<{$directive}></{$directive}>";
     }
     return $partials;
+  }
+
+  /**
+   * Add modules that provide dashlet directives as dependencies to crmDashboard
+   */
+  public static function addDashboardModuleDependencies(GenericHookEvent $e): void {
+    $dashletDirectives = \Civi\Api4\Dashboard::get(FALSE)
+      ->addWhere('directive', 'IS NOT EMPTY')
+      ->addSelect('directive', '')
+      ->execute()
+      ->column('directive');
+
+    $dashletModules = [];
+
+    // Find (the first) module that provides each directive
+    foreach ($dashletDirectives as $directive) {
+      foreach ($e->angularModules as $moduleName => $module) {
+        if (!empty($module['exports'][$directive])) {
+          $dashletModules[] = $moduleName;
+          continue;
+        }
+      }
+      \Civi::log()->warning("No Angular module found to provide crmDashboard dashlet directive: {$directive}");
+    }
+
+    $e->angularModules['crmDashboard']['requires'] = array_unique(array_merge(
+      $e->angularModules['crmDashboard']['requires'],
+      $dashletModules
+    ));
   }
 
   /**

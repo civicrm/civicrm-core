@@ -42,18 +42,6 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $loader->addModules('crmDashboard');
     $loader->setPageName('civicrm/dashboard');
 
-    // For each dashlet that requires an angular directive, load the angular module which provides that directive
-    foreach (CRM_Core_BAO_Dashboard::getContactDashlets() as $dashlet) {
-      if (!empty($dashlet['directive'])) {
-        foreach ($loader->getAngular()->getModules() as $name => $module) {
-          if (!empty($module['exports'][$dashlet['directive']])) {
-            $loader->addModules($name);
-            continue;
-          }
-        }
-      }
-    }
-
     return parent::run();
   }
 
