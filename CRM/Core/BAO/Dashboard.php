@@ -126,12 +126,16 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param $module
    * @return array
    */
-  public static function angularPartials($moduleName, $module) {
+  public static function angularPartials($moduleName, $module): array {
+    $angularDashletDirectives = \Civi\Api4\Dashboard::get(FALSE)
+      ->addWhere('directive', 'IS NOT EMPTY')
+      ->addSelect('directive', '')
+      ->execute()
+      ->column('directive');
+
     $partials = [];
-    foreach (self::getContactDashlets() as $dashlet) {
-      if (!empty($dashlet['directive'])) {
-        $partials["~/$moduleName/directives/{$dashlet['directive']}.html"] = "<{$dashlet['directive']}></{$dashlet['directive']}>";
-      }
+    foreach ($angularDashletDirectives as $directive) {
+      $partials["~/{$moduleName}/directives/{$directive}.html"] = "<{$directive}></{$directive}>";
     }
     return $partials;
   }
