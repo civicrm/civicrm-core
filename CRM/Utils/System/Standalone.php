@@ -731,6 +731,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function postContainerBoot(): void {
     $sess = \CRM_Core_Session::singleton();
     $sess->initialize();
+
+    \CRM_Core_Config::singleton()->userFrameworkFrontend = self::isFrontEndPage();
   }
 
 }
