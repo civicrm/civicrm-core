@@ -49,16 +49,12 @@ foreach ($importEntities as $importEntity) {
       ],
     ],
   ];
-  $pseudoconstants = civicrm_api4($fields['_entity_id']['fk_entity'], 'getFields', [
-    'where' => [['options', 'IS NOT EMPTY']],
-    'select' => ['name'],
-    'checkPermissions' => FALSE,
-  ])->column('name');
+
   $columns = [];
   foreach ($fields as $field) {
     $columns[] = [
       'type' => 'field',
-      'key' => in_array($field['name'], $pseudoconstants) ? $field['name'] . ':label' : $field['name'],
+      'key' => $field['name'],
       'dataType' => $field['data_type'] ?? 'String',
       'label' => $field['title'] ?? $field['label'],
       'sortable' => TRUE,
