@@ -57,29 +57,17 @@ class ReportInstance extends Generic\DAOEntity implements EventSubscriberInterfa
   }
 
   public static function onGetReports(GenericHookEvent $e) {
-    if (!is_null($e->getTypes) && !in_array('classic', $e->getTypes)) {
-      return;
-    }
-
-    // check permissions to respect row level permission checks
-    $fetch = \Civi\Api4\ReportInstance::get(TRUE)
-      ->addSelect('id', 'title', 'report_id', 'name', 'description', 'permission', 'is_active', 'report_id:name', 'report_id:icon', 'base_module', 'local_modified_date', 'created_id');
-
-    if (!is_null($e->getNames)) {
-      // we pass up either name or ID
-      $fetch->addClause('OR', [
-        ['name', 'IN', $e->getNames],
-        ['id', 'IN', $e->getNames],
-      ]);
-    }
-
-    if (!is_null($e->getIsActive)) {
-      $fetch->addWhere('is_active', 'IN', $e->getIsActive);
-    }
+    $reportInstances = (array) \Civi\Api4\ReportInstance::get(FALSE)
+      ->addSelect(
+        'id', 'title', 'report_id', 'name', 'description', 'permission',
+        'is_active', 'report_id:name', 'report_id:icon', 'base_module',
+        'local_modified_date', 'created_id'
+      )
+      ->execute();
 
     $reports = [];
 
-    foreach ($fetch->execute() as $reportInstance) {
+    foreach ($reportInstances as $reportInstance) {
       // could this be useful for deriving meta?
       // $class = $reportInstance['report_id:name'];
 
@@ -109,16 +97,14 @@ class ReportInstance extends Generic\DAOEntity implements EventSubscriberInterfa
       ];
     }
 
-    if ($e->fetchTags) {
-      $tags = \Civi\Api4\EntityTag::get(FALSE)
-        ->addSelect('entity_id', 'tag_id.name')
-        ->addWhere('entity_table', '=', 'civicrm_report_instance')
-        ->addWhere('entity_id', 'IN', array_keys($reports))
-        ->execute();
+    $tags = \Civi\Api4\EntityTag::get(FALSE)
+      ->addSelect('entity_id', 'tag_id.name')
+      ->addWhere('entity_table', '=', 'civicrm_report_instance')
+      ->addWhere('entity_id', 'IN', array_keys($reports))
+      ->execute();
 
-      foreach ($tags as $tag) {
-        $reports[$tag['entity_id']]['tags'][] = $tag['tag_id.name'];
-      }
+    foreach ($tags as $tag) {
+      $reports[$tag['entity_id']]['tags'][] = $tag['tag_id.name'];
     }
 
     // pass back to the hook
