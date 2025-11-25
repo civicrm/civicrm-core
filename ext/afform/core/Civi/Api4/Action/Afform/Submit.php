@@ -448,6 +448,11 @@ class Submit extends AbstractProcessor {
       if (empty($record['fields'])) {
         continue;
       }
+      if ($event->getEntityType() === 'Contribution') {
+        // "Contribution" requires more specialised processing using Order API and is handled by extensions like Afform Payments.
+        // We add a specific check here to ensure that it is not processed by the generic entity save.
+        continue;
+      }
       try {
         $idField = CoreUtil::getIdFieldName($event->getEntityType());
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
