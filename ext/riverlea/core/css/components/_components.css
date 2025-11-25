@@ -246,7 +246,7 @@ table.advmultiselect {
 }
 .crm-container .panel-default > .panel-heading {
   color: var(--crm-c-text);
-  background-color: var(--crm-c-layout1-bg);
+  background-color: var(--crm-c-layer1-bg);
   border-bottom: var(--crm-panel-border);
 }
 .crm-container .panel-title {

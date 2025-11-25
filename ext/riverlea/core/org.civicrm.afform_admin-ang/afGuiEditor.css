@@ -215,7 +215,7 @@
   cursor: auto;
 }
 .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover {
-  background-color: var(--crm-c-layout2-bg);
+  background-color: var(--crm-c-layer2-bg);
 }
 
 /* Edit canvas (right side) */
@@ -371,7 +371,7 @@ af-gui-container > .af-gui-bar,
   border-style: dotted;
   color: var(--crm-c-text);
   padding: var(--crm-padding-reg);
-  background-color: var(--crm-c-layout1-bg);
+  background-color: var(--crm-c-layer1-bg);
 }
 
 /* Markup area */
@@ -393,7 +393,7 @@ af-gui-container > .af-gui-bar,
 }
 #afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar {
   width: 100%;
-  background-color: var(--crm-c-layout2-bg);
+  background-color: var(--crm-c-layer2-bg);
   display: flex;
   align-items: center;
   padding: var(--crm-m);
@@ -419,7 +419,7 @@ af-gui-container > .af-gui-bar,
   color: var(--crm-c-link);
 }
 #bootstrap-theme #afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
-  border-color: var(--crm-c-layout1-bg) !important;
+  border-color: var(--crm-c-layer1-bg) !important;
 }
 #bootstrap-theme #afGuiEditor .af-gui-button > .btn-default.disabled {
   background-color: var(--crm-c-layer1-bg) !important;

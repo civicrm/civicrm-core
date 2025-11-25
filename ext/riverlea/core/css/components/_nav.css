@@ -17,7 +17,7 @@
 }
 .crm-container .nav > li > a:is(:hover,:focus) {
   text-decoration: none;
-  background-color: var(--crm-c-layout1-bg);
+  background-color: var(--crm-c-layer1-bg);
 }
 .crm-container .nav > li.disabled > a {
   color: var(--crm-c-inactive);
@@ -29,7 +29,7 @@
   background-color: transparent;
 }
 .crm-container .nav .open > :is(a,a:hover,a:focus) {
-  background-color: var(--crm-c-layout1-bg);
+  background-color: var(--crm-c-layer1-bg);
   border-color: var(--crm-c-link);
 }
 .crm-container .nav .nav-divider {
