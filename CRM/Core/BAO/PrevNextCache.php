@@ -352,7 +352,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    *
    * @throws \CRM_Core_Exception
    */
-  public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
+  public static function refillCache($rgid, $gid, $criteria, bool $checkPermissions, $searchLimit = 0) {
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);
 
     // 1. Clear cache if any
@@ -376,7 +376,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
           ->execute()->first()['contact_type'];
         if (isset($criteria['where'])) {
           // API v4 criteria.
-          $contacts = (array) Contact::get()
+          $contacts = (array) Contact::get($checkPermissions)
             ->addSelect('id')
             ->setLimit($searchLimit)
             ->setWhere($criteria['where'])
@@ -394,7 +394,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
           $contacts = civicrm_api3('Contact', 'get', array_merge([
             'options' => ['limit' => $searchLimit],
             'return' => 'id',
-            'check_permissions' => TRUE,
+            'check_permissions' => $checkPermissions,
             'contact_type' => $contactType,
           ], $filteredCriteria))['values'];
         }
