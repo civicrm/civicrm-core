@@ -90,4 +90,12 @@ class AfformSubmitEvent extends AfformBaseEvent {
     return $this;
   }
 
+  /**
+   * Get submitted values for all entities on the form
+   * @return array
+   */
+  public function getSubmittedValues() {
+    return $this->getApiRequest()->getSubmittedValues();
+  }
+
 }
