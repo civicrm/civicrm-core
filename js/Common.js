@@ -1498,12 +1498,32 @@ if (!CRM.vars) CRM.vars = {};
       return $('#crm-notification-container').notify('create', params, options);
     }
     else {
+      // TODO: add icon/styling appropriate to type?
+      // TODO: allow specifying notices which dont need to block the user
+      const alert = document.createElement('dialog');
+      alert.classList.add('crm-dialog');
+
       if (title.length) {
-        text = title + "\n" + text;
+        const header = document.createElement('h1');
+        header.innerText = title;
+        alert.append(header);
       }
-      // strip html tags as they are not parsed in standard alerts
-      alert($("<div/>").html(text).text());
-      return null;
+      if (text.length) {
+        const body = document.createElement('p');
+        body.innerText = text;
+        alert.append(body);
+      }
+      const alertButtons = document.createElement('div');
+      alertButtons.classList.add('crm-buttons', 'crm-flex-justify-end');
+      alertButtons.innerHTML = `
+          <button class="crm-button" autofocus onclick="this.closest('dialog').remove()">
+            OK
+          </button>
+      `;
+      alert.append(alertButtons);
+
+      document.querySelector('.crm-container').append(alert);
+      alert.showModal();
     }
   };
 

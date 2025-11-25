@@ -225,3 +225,15 @@
     width: 90vw !important;
   }
 }
+
+/* HTML5 dialogs */
+.crm-container .crm-dialog {
+  margin: auto;
+  min-width: 10rem;
+  border-radius: var(--crm-dialog-radius);
+  border-width: 0;
+  background-color: var(--crm-dialog-body-bg-color);
+}
+.crm-container .crm-dialog h1 {
+  font-size: var(--crm-font-size);
+}
