@@ -243,7 +243,7 @@
   display: block;
 }
 .crm-search crm-search-admin-link-group {
-  background: var(--crm-c-layout1-bg-color);
+  background: var(--crm-layer1-bg-color);
 }
 .crm-search crm-search-admin-link-group table {
   margin: var(--crm-padding-reg);

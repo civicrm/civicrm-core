@@ -283,7 +283,7 @@
   height: 1px;
   margin: var(--crm-l-medium) 0;
   overflow: hidden;
-  background-color: var(--crm-c-layout2-bg-color);
+  background-color: var(--crm-layer2-bg-color);
 }
 #bootstrap-theme .dropdown-menu li .form-inline,
 #bootstrap-theme .dropdown-menu li .form-inline a:not(.select2-choice) {
