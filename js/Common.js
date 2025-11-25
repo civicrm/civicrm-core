@@ -1500,18 +1500,18 @@ if (!CRM.vars) CRM.vars = {};
     else {
       // TODO: add icon/styling appropriate to type?
       // TODO: allow specifying notices which dont need to block the user
-      const alert = document.createElement('dialog');
-      alert.classList.add('crm-dialog');
+      const alertDialog = document.createElement('dialog');
+      alertDialog.classList.add('crm-dialog');
 
       if (title.length) {
         const header = document.createElement('h1');
         header.innerText = title;
-        alert.append(header);
+        alertDialog.append(header);
       }
       if (text.length) {
         const body = document.createElement('p');
         body.innerText = text;
-        alert.append(body);
+        alertDialog.append(body);
       }
       const alertButtons = document.createElement('div');
       alertButtons.classList.add('crm-buttons', 'crm-flex-justify-end');
@@ -1520,10 +1520,13 @@ if (!CRM.vars) CRM.vars = {};
             OK
           </button>
       `;
-      alert.append(alertButtons);
+      alertDialog.append(alertButtons);
 
-      document.querySelector('.crm-container').append(alert);
-      alert.showModal();
+      // ideally append to crmContainer for styling. fallback to body if not available
+      const crmContainer = document.querySelector('.crm-container');
+      (crmContainer ? crmContainer : document.body).append(alertDialog);
+      alertDialog.showModal();
+      return null;
     }
   };
 
