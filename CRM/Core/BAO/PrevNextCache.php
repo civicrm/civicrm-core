@@ -352,7 +352,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    *
    * @throws \CRM_Core_Exception
    */
-  public static function refillCache($rgid, $gid, $criteria, bool $checkPermissions, $searchLimit = 0) {
+  public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);
 
     // 1. Clear cache if any
