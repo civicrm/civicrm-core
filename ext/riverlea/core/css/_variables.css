@@ -430,7 +430,7 @@
   --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
   --crm-filter-spacing: space-between; /* choose 'space-between' to spread out evenly, 'start' for left align, or 'end' for right. */
 /* Frontend */
-  --crm-f-form-width: 800px;
+  --crm-f-form-width: unset;
   --crm-f-box-shadow: var(--crm-shadow-block);
   --crm-f-fieldset-bg-color: var(--crm-page-bg-color);
   --crm-f-fieldset-padding: var(--crm-l-reg) 0;
@@ -439,23 +439,29 @@
   --crm-f-fieldset-box-shadow: var(--crm-f-box-shadow);
   --crm-f-legend-position: left; /* chose 'left', 'right' or 'inherit' for browser-default of mid fieldset border */
   --crm-f-legend-align: left;
-  --crm-f-legend-size: var(--crm-l-reg-3);
-  --crm-f-legend-padding: 0;
-  --crm-f-form-padding: var(--crm-padding-reg);
-  --crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
+  --crm-f-legend-size: var(--crm-l-reg-2);
+  --crm-f-legend-padding: 0 0 var(--crm-l-small) 0;
+  --crm-f-legend-margin: var(--crm-f-legend-padding);
+  --crm-f-legend-border: 0;
+  --crm-f-form-padding: var(--crm-l-medium);
+  --crm-f-form-layout: grid; /* 'grid' = inline, 'block' = stacked */
   --crm-f-label-position: left; /* 'unset' = stacked, 'left' = left align, in combination with width/margin below */
   --crm-f-label-align: right;
   --crm-f-label-width: 200px;
   --crm-f-label-gap: var(--crm-l-medium); /* applies for inline label + input */
-  --crm-f-label-margin: var(--crm-l-small);
+  --crm-f-label-margin: 0;
   --crm-f-label-weight: bold;
   --crm-f-label-color: inherit;
   --crm-f-input-radius: var(--crm-l-radius);
   --crm-f-input-padding: var(--crm-l-reg-2) var(--crm-l-medium-2);
   --crm-f-input-font-size: var(--crm-l-reg-1);
   --crm-f-input-width: 300px;
-  --crm-f-form-focus-bg-color: var(--crm-c-green-light);
-  --crm-f-form-error-bg-color: var(--crm-c-gray-200);
+  --crm-f-form-focus-bg-color: unset;
+  --crm-f-form-focus-border-color: var(--crm-success-light-color);
+  --crm-f-form-focus-outline-color: var(--crm-success-light-color);
+  --crm-f-form-error-bg-color: unset;
+  --crm-f-form-error-border-color: var(--crm-danger-light-color);
+  --crm-f-form-error-outline-color: var(--crm-danger-light-color);
   --crm-f-logo-height: 40px;
   --crm-f-logo-align: center; /* left, right or center */
 }

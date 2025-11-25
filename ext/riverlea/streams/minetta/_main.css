@@ -10,6 +10,9 @@
   --crm-alert-warning-bg-color: var(--crm-c-yellow-light);
 /* Tabs */
   --crm-tab-hover-bg-color: var(--crm-container-bg-color);
+/* Front */
+  --crm-f-legend-border: var(--crm-border);
+  --crm-f-logo-align: right;
 }
 
 /* Custom CSS */

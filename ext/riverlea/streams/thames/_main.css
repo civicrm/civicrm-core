@@ -244,8 +244,12 @@
   --crm-f-label-align: left;
   --crm-f-label-width: unset;
   --crm-f-input-width: 100%;
-  --crm-f-form-focus-bg-color: var(--crm-c-green);
-  --crm-f-form-error-bg-color: var(--crm-c-red);
+  --crm-f-form-focus-border-color: unset;
+  --crm-f-form-focus-bg-color: unset;
+  --crm-f-form-focus-outline-color: var(--crm-c-green);
+  --crm-f-form-error-border-color: unset;
+  --crm-f-form-error-bg-color: unset;
+  --crm-f-form-error-outline-color: var(--crm-c-red);
 }
 
 /* Only affect body colour in standalone */

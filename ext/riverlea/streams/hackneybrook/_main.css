@@ -62,7 +62,6 @@
   --crm-input-border-color: var(--crm-c-gray-300);
   --crm-input-box-shadow: 0;
   --crm-input-label-weight: normal;
-  --crm-input-label-width: 10em;
   --crm-form-fieldset-border: 1px;
   /* Tabs */
   --crm-tabs-border: var(--crm-border);
@@ -132,6 +131,7 @@
   --crm-icon-warning-color: var(--crm-warning-color);
   --crm-icon-info-color: var(--crm-notify-info-color);
   /* Frontend */
+  --crm-f-form-width: 800px;
   --crm-f-legend-align: unset;
   --crm-f-legend-size: var(--crm-l-reg-2);
   --crm-f-form-width: 50vw;
@@ -140,4 +140,10 @@
   --crm-f-label-margin: 0 var(--crm-l-small);
   --crm-f-label-width: unset;
   --crm-f-label-weight: bold;
+  --crm-f-form-focus-bg-color: var(--crm-success-light-color);
+  --crm-f-form-focus-border-color: var(--crm-success-color);
+  --crm-f-form-focus-outline-color: unset;
+  --crm-f-form-error-bg-color: var(--crm-danger-light-color);
+  --crm-f-form-error-border-color: var(--crm-danger-color);
+  --crm-f-form-error-outline-color: unset;
 }
