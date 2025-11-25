@@ -61,4 +61,23 @@ class StateTest extends \PHPUnit\Framework\TestCase implements
     }
   }
 
+  public function testModifyState(): void {
+    $stateId = \Civi::service('oauth2.state')->store([
+      'clientId' => 123,
+      'storage' => 'OAuthSysToken',
+      'ttl' => 5 * 60 * 60,
+      'breakfast' => 'green eggs',
+    ]);
+    $state = \Civi::service('oauth2.state')->load($stateId);
+    $this->assertEquals(123, $state['clientId']);
+    $this->assertEquals('green eggs', $state['breakfast']);
+
+    $state['breakfast'] = 'green eggs and ham';
+    \Civi::service('oauth2.state')->store($state, $stateId);
+
+    $state2 = \Civi::service('oauth2.state')->load($stateId);
+    $this->assertEquals(123, $state2['clientId']);
+    $this->assertEquals('green eggs and ham', $state2['breakfast']);
+  }
+
 }
