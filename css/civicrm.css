@@ -3250,6 +3250,7 @@ span.crm-select-item-color {
   background-image: url("../packages/jquery/css/images/pbar-ani.gif");
 }
 
+.crm-container .crm-dialog,
 .crm-container.ui-dialog {
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
@@ -4121,4 +4122,19 @@ html.crm-standalone body {
   padding: 0;
   font-family: var(--crm-font, sans-serif);
   background-color: var(--crm-page-bg-color, #f8f8f8);
+}
+
+/* HTML5 dialogs */
+.crm-container .crm-dialog {
+  margin: auto;
+  min-width: 10rem;
+  border-radius: 8px;
+  border-width: 0;
+}
+.crm-container .crm-dialog h1 {
+  font-size: 1rem;
+}
+.crm-container .crm-dialog .crm-buttons {
+  display: flex;
+  justify-content: flex-end;
 }
