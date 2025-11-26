@@ -304,6 +304,9 @@ class Submit extends AbstractProcessor {
     }
     if ($isRequired && $isVisible) {
       $label = $attributes['defn']['label'] ?? $fullDefn['label'] ?? $fieldName;
+      if (empty($label)) {
+        $label = $attributes['name'];
+      }
       return E::ts('%1 is a required field.', [1 => $label]);
     }
     return NULL;
