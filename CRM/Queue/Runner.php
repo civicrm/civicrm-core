@@ -275,7 +275,7 @@ class CRM_Queue_Runner {
 
       $exception = NULL;
       try {
-        CRM_Core_Error::debug_log_message("Running task: " . $this->lastTaskTitle);
+        \Civi::log('queue_runner')->debug("Running task: " . $this->lastTaskTitle);
         $isOK = $item->data->run($this->getTaskContext());
         if (!$isOK) {
           $exception = new Exception('Task returned false');
@@ -451,7 +451,7 @@ class CRM_Queue_Runner {
         return static::ERROR_ABORT;
 
       default:
-        Civi::log()->warning('Unrecognized queue error mode: {mode}', [
+        Civi::log('queue_runner')->warning('Unrecognized queue error mode: {mode}', [
           'mode' => $queue->getSpec('error'),
         ]);
         return static::ERROR_ABORT;
