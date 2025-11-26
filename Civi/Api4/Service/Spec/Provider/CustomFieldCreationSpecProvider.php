@@ -30,6 +30,7 @@ class CustomFieldCreationSpecProvider extends \Civi\Core\Service\AutoService imp
     $optionField->setDescription('Pass an array of options (value => label) to create this field\'s option values');
     $spec->addFieldSpec($optionField);
     $spec->getFieldByName('data_type')->setDefaultValue('String')->setRequired(FALSE);
+    $spec->getFieldByName('name')->setRequired(FALSE);
   }
 
   /**

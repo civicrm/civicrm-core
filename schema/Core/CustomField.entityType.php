@@ -73,6 +73,7 @@ return [
       'title' => ts('Custom Field Name'),
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
+      'required' => TRUE,
       'description' => ts('Variable name/programmatic handle for this field.'),
       'add' => '3.3',
     ],
