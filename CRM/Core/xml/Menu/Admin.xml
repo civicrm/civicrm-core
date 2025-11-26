@@ -700,6 +700,11 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+     <path>civicrm/admin/price/copy</path>
+     <title>Price Set Copy</title>
+     <page_callback>CRM_Price_Page_Set</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/price/field</path>
      <title>Price Fields</title>
      <page_callback>CRM_Price_Page_Field</page_callback>
