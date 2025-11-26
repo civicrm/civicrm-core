@@ -394,7 +394,7 @@ class CRM_Core_Payment_PayPalProIPN {
       $input['invoice'] = $this->getValue('i');
       if ($this->getContributionObject()->contact_id !== $this->getContactID()) {
         // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
-        CRM_Core_Error::debug_log_message('Contact ID in IPN ' . $this->getContactID() . ' not found but contact_id found in contribution ' . $this->getContributionID() . ' used instead');
+        Civi::log('paypal_pro')->debug('Contact ID in IPN ' . $this->getContactID() . ' not found but contact_id found in contribution ' . $this->getContributionID() . ' used instead');
         echo 'WARNING: Could not find contact record: ' . $this->getContactID() . '<p>';
       }
 
