@@ -549,8 +549,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $sendTemplateParams['tplParams'] = $tplParams;
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
-        $sendTemplateParams['cc'] = $values['cc_confirm'] ?? NULL;
-        $sendTemplateParams['bcc'] = $values['bcc_confirm'] ?? NULL;
+        $sendTemplateParams['cc'] = $values['cc_receipt'] ?? NULL;
+        $sendTemplateParams['bcc'] = $values['bcc_receipt'] ?? NULL;
 
         [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
