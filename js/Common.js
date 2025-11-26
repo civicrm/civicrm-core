@@ -1498,10 +1498,17 @@ if (!CRM.vars) CRM.vars = {};
       return $('#crm-notification-container').notify('create', params, options);
     }
     else {
+      if (document.querySelectorAll('dialog.crm-alert').length > 3) {
+        // something is producing alerts faster than user can close them
+        console.warn('Too many calls to CRM.alert! Diverting messages to console rather than creating more popups');
+        console.warn(title.length ? `${title}: ${text}` : text);
+        return null;
+      }
+
       // TODO: add icon/styling appropriate to type?
       // TODO: allow specifying notices which dont need to block the user
       const alertDialog = document.createElement('dialog');
-      alertDialog.classList.add('crm-dialog');
+      alertDialog.classList.add('crm-dialog', 'crm-alert');
 
       if (title.length) {
         const header = document.createElement('h1');
