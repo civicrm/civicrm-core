@@ -40,9 +40,15 @@ class OAuthProvider extends Generic\AbstractEntity {
         ],
         [
           'name' => 'contactTemplate',
+          // TODO: Migrate to templates['Contact']
         ],
         [
           'name' => 'mailSettingsTemplate',
+          // TODO: Migrate to templates['MailStore']
+        ],
+        [
+          'name' => 'templates',
+          'description' => 'Open-ended list of templates. Generally, these will be used after an OAuth connection is established. Details vary by tag/workflow.',
         ],
       ];
     });
