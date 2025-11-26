@@ -10,7 +10,7 @@
   border: 2px dashed #d1d1d1;
   cursor: pointer;
   background-color: white !important;
-  color: var(--crm-c-text-dark);
+  color: var(--crm-text-dark-color);
 }
 .crm-container span[crm-ui-editable] {
   display: inline-block !important;

@@ -1,6 +1,6 @@
 /* Minimal dark mode settings
    - delete this file if you don't want dark-mode
-   - it's generally easier to change practical colours (ie '--crm-c-page-bg')
+   - it's generally easier to change practical colours (ie '--crm-page-bg-color')
      than to change the colours themesleves (ie '--crm-c-gray-900').
 */
 
@@ -8,9 +8,8 @@
 /* Fonts '--crm-font-' */
 /* Colour names, e.g. green, red, blue '--crm-c-' */
 /* Practical colours, e.g. text, link '--crm-c-' */
-  --crm-c-text: #fff;
+  --crm-text-color: var(--crm-text-light-color);
 /* Backgrounds, '--crm-c-*-bg' */
-  --crm-c-page-bg: var(--crm-c-gray-900);
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
 /* Shadows */
 /* Sizes */
@@ -19,11 +18,11 @@
 /* Buttons '--crm-btn-' */
 /* Tables '--crm-table-' */
 /* Panels '--crm-panel-' */
-/* Accordions '--crm-expand-' and '--crm-expand2-' for .crm-accrdion-light */
+/* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
 /* Alerts '--crm-alert' */
 /* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
 /* Tabs '--crm-tabs' */
-/* Contact layout '--crm-dash-' */
+/* Contact layout '--crm-contact-' */
 /* Dialog '--crm-dialog-' */
 /* Dashlet for main dashboard '--crm-dashlet-' */
 /* Button dropdowns '--crm-dropdown-' */

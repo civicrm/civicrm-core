@@ -1,30 +1,30 @@
 .crm-container table:not(.crm-inline-edit-form,
 .crm-table-group-summary) {
   border: var(--crm-table-outside-border);
-  background: var(--crm-table-bg);
-  box-shadow: var(--crm-block-shadow);
-  margin: 0 0 var(--crm-r);
+  background: var(--crm-table-bg-color);
+  box-shadow: var(--crm-shadow-block);
+  margin: 0 0 var(--crm-l-reg);
   border-collapse: collapse;
   width: 100%;
   max-width: 100%;
 }
 .crm-container table thead {
-  background-color: var(--crm-table-header-bg);
+  background-color: var(--crm-table-header-bg-color);
 }
 .crm-container th,
 .crm-container table thead.sticky th,
 .crm-container table.dataTable thead th,
 .crm-container tr.columnheader td {
-  background-color: var(--crm-table-header-bg);
-  border-bottom: var(--crm-table-header-bottom);
-  color: var(--crm-table-header-col);
+  background-color: var(--crm-table-header-bg-color);
+  border-bottom: var(--crm-table-header-border-bottom);
+  color: var(--crm-table-header-color);
   font-weight: bold;
   padding: var(--crm-table-padding);
   text-align: left;
 }
 .crm-container table:not(thead) tr {
   border-bottom: var(--crm-table-row-border);
-  background-color: var(--crm-table-row-bg);
+  background-color: var(--crm-table-row-bg-color);
 }
 .crm-container td,
 .crm-container table.dataTable thead td {
@@ -76,23 +76,23 @@
   box-shadow: none;
 }
 .crm-selection-reset {
-  padding: var(--crm-m) 0;
-  margin-bottom: var(--crm-m);
+  padding: var(--crm-l-medium) 0;
+  margin-bottom: var(--crm-l-medium);
   display: block;
 }
 
 /* Sticky header */
 .crm-sticky thead > tr > th,
 .crm-container table thead.sticky {
-  background-color: var(--crm-table-header-bg);
+  background-color: var(--crm-table-header-bg-color);
 }
 .crm-container thead div.sticky-header {
-  height: var(--crm-r);
+  height: var(--crm-l-reg);
 }
 .crm-sticky thead,
 .crm-container thead div.sticky-header {
   border-bottom: 2px solid #cfcec3;
-  background-color: var(--crm-table-header-bg);
+  background-color: var(--crm-table-header-bg-color);
   z-index: 10;
 }
 .crm-sticky thead {
@@ -104,7 +104,7 @@
 /* Data Tables */
 .crm-container .dataTables_wrapper :is(.dataTables_length,.dataTables_filter,.dataTables_info,.dataTables_processing,.dataTables_paginate),
 .crm-container .dataTables_wrapper .dataTables_paginate :is(.paginate_button.disabled,.paginate_button.disabled:hover,.paginate_button.disabled:active) {
-  color: var(--crm-c-text) !important; /* vs jqueery.dataTables.css */
+  color: var(--crm-text-color) !important; /* vs jqueery.dataTables.css */
 }
 
 /* Nested table */
@@ -121,18 +121,18 @@
 }
 .crm-container tr.crm-child-row > td {
   box-shadow: inset 0 10px 8px -10px rgba(0,0,0,.3), inset 0 -11px 8px -9px rgba(0,0,0,.15);
-  background: var(--crm-table-inset-bg);
+  background: var(--crm-table-inset-bg-color);
 }
 
 /* Nested, inset table - groups page */
 
 tbody .crm-row-child td {
   box-shadow: inset 0 10px 8px -10px rgba(0,0,0,.15);
-  background: var(--crm-table-inset-bg);
+  background: var(--crm-table-inset-bg-color);
 }
 tbody .crm-row-child:hover td {
-  background: color-mix(in srgb, var(--crm-table-inset-bg) 95%, #000 5%);
-  cursor: var(--crm-hover-clickable);
+  background: color-mix(in srgb, var(--crm-table-inset-bg-color) 95%, #000 5%);
+  cursor: var(--crm-link-hover-cursor);
 }
 tbody .crm-row-child ~ .crm-row-child td {
   box-shadow: none;
@@ -145,9 +145,9 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container table.form-layout-compressed {
   width: var(--crm-table-compressed-width);
   border: var(--crm-table-outside-border);
-  background: var(--crm-table-bg);
-  box-shadow: var(--crm-block-shadow);
-  margin: var(--crm-m) 0 var(--crm-l);
+  background: var(--crm-table-bg-color);
+  box-shadow: var(--crm-shadow-block);
+  margin: var(--crm-l-medium) 0 var(--crm-l-large);
 }
 .crm-container table.form-layout-compressed th {
   background: transparent;
@@ -164,11 +164,11 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 /* Advance search compressed table */
 #search-status table.form-layout-compressed {
   border: 0;
-  background: var(--crm-c-container-bg);
+  background: var(--crm-container-bg-color);
   width: 100%;
   border: 0;
   padding: var(--crm-padding-reg);
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-l-radius);
   margin: 0;
 }
 #search-status table.form-layout-compressed tr {
@@ -191,8 +191,8 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   background-color: var(--crm-table-alternate-row);
 }
 .crm-container tr.columnheader-dark th {
-  background-color: var(--crm-c-dark-bg);
-  color: var(--crm-c-text-light);
+  background-color: var(--crm-c-dark-bg-color);
+  color: var(--crm-text-light-color);
 }
 
 /* Batch entry table */
@@ -200,7 +200,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   display: table;
   border-collapse: collapse;
   border: var(--crm-table-outside-border);
-  background-color: var(--crm-table-bg);
+  background-color: var(--crm-table-bg-color);
 }
 .crm-container .crm-grid-row,
 .crm-container .crm-grid-header {
@@ -227,7 +227,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 
 .crm-container table#payLater table#payLaterOptions.form-layout {
   border: var(--c-crm-table-nested-border);
-  background: var(--crm-c-table-bg);
+  background: var(--crm-c-table-bg-color);
 }
 
 /* Striped rows */
@@ -236,17 +236,17 @@ tbody.scrollContent:has(.alternateRow),
 .crm-container table:has(.odd-row,.even-row),
 .crm-container table.dataTable tbody,
 .crm-container .table-striped > tbody {
-  --crm-striped-bg: var(--crm-table-row-bg);
+  --crm-striped-bg-color: var(--crm-table-row-bg-color);
 }
 .crm-container table.dataTable:is(.stripe,.display) tbody tr.odd:not(.disabled),
 .crm-container table tbody:has(.odd,.even,.even-row,.odd-row) tr:not(.disabled),
 .crm-container .table-striped > tbody > tr:not(.disabled) {
-  background-color: var(--crm-striped-bg) !important;
+  background-color: var(--crm-striped-bg-color) !important;
 }
 .crm-container table.dataTable:is(.stripe,.display) tbody tr.even:not(.disabled),
 tbody.scrollContent tr.alternateRow:not(.disabled),
 .crm-container .table-striped > tbody > tr:nth-of-type(2n):not(.disabled) {
-  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-bg) 0%, (--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
+  --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-bg-color) 0%, (--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix));
 }
 .crm-container table.dataTable.hover tbody tr.odd:hover,
 .crm-container table.dataTable.display tbody tr.odd:hover,
@@ -255,7 +255,7 @@ tbody.scrollContent tr.alternateRow:not(.disabled),
 .crm-container .odd-row:hover,
 .crm-container .odd:hover,
 .crm-container .table-striped > tbody > tr:hover {
-  --crm-striped-bg: var(--crm-table-row-hover);
+  --crm-striped-bg-color: var(--crm-table-row-hover-color);
 }
 .crm-container table.dataTable.hover tbody tr.even:hover,
 .crm-container table.dataTable.display tbody tr.even:hover,
@@ -267,11 +267,11 @@ tbody.scrollContent tr.alternateRow:not(.disabled),
 .crm-container .even:hover,
 tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table-striped > tbody > tr:nth-of-type(2n):hover {
-  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-hover) 100%, #000 6%);
+  --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-hover-color) 100%, #000 6%);
 }
 .crm-container table.dataTable.display tbody tr > .sorting_1,
 .crm-container table.dataTable.order-column.stripe tbody tr > .sorting_1 {
-  background-color: color-mix(in srgb, var(--crm-striped-bg) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix)) !important;
+  background-color: color-mix(in srgb, var(--crm-striped-bg-color) 100%, var(--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix)) !important;
 }
 
 /* Table bg colours */
@@ -279,16 +279,16 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table {
   width: 100%;
   max-width: 100%;
-  margin-bottom: var(--crm-r1);
+  margin-bottom: var(--crm-l-reg-1);
 }
 .crm-container .table > :is(thead,tbody,tfoot) > tr > :is(th,td) {
   padding: var(--crm-table-padding);
 }
 .crm-container .table > tbody + tbody {
-  border-top: var(--crm-table-header-bottom);
+  border-top: var(--crm-table-header-border-bottom);
 }
 .crm-container .table-condensed > :is(thead,tbody,tfoot) > tr > :is(th,td) {
-  padding: var(--crm-s1);
+  padding: var(--crm-l-small-1);
 }
 .crm-container .table-bordered {
   border: var(--crm-table-outside-border);
@@ -301,10 +301,10 @@ tbody.scrollContent tr.alternateRow:hover,
   border-bottom-width: 2px;
 }
 .crm-container .table > :is(thead,tbody,tfoot) > :is(tr > td.active,tr > th.active,tr.active > td,tr.active > th) {
-  background-color: var(--crm-table-row-bg);
+  background-color: var(--crm-table-row-bg-color);
 }*/
 .crm-container .table-hover > tbody > :is(tr > td.active:hover,th.active:hover,tr.active:hover > td,tr:hover > .active,tr.active:hover > th) {
-  background-color: var(--crm-table-row-hover);
+  background-color: var(--crm-table-row-hover-color);
 }
 .crm-container .table td.success,
 .crm-container .table th.success,
@@ -312,8 +312,8 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table tr.success > th,
 .crm-container table tr.crm-row-ok,
 .crm-container table tr.crm-row-ok > td {
-  background-color: var(--crm-alert-success-bg);
-  color: var(--crm-alert-success-text);
+  background-color: var(--crm-alert-success-bg-color);
+  color: var(--crm-alert-success-text-color);
 }
 .crm-container .table-hover > tbody > tr > td.success:hover,
 .crm-container .table-hover > tbody > tr > th.success:hover,
@@ -322,21 +322,21 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table-hover > tbody > tr.success:hover > th,
 .crm-container table tr.crm-row-ok:hover > td,
 .crm-container table tr.crm-row-ok > td:hover {
-  background-color: var(--crm-alert-success-border);
+  background-color: var(--crm-alert-success-border-color);
 }
 .crm-container .table td.warning,
 .crm-container .table th.warning,
 .crm-container .table tr.warning > td,
 .crm-container .table tr.warning > th {
-  background-color: var(--crm-alert-warning-bg);
-  color: var(--crm-alert-warning-text);
+  background-color: var(--crm-alert-warning-bg-color);
+  color: var(--crm-alert-warning-text-color);
 }
 .crm-container .table-hover > tbody > tr > td.warning:hover,
 .crm-container .table-hover > tbody > tr > th.warning:hover,
 .crm-container .table-hover > tbody > tr.warning:hover > td,
 .crm-container .table-hover > tbody > tr:hover > .warning,
 .crm-container .table-hover > tbody > tr.warning:hover > th {
-  background-color: var(--crm-alert-warning-border);
+  background-color: var(--crm-alert-warning-border-color);
 }
 .crm-container .table td.danger,
 .crm-container .table th.danger,
@@ -346,8 +346,8 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container table tr.error,
 .crm-container table tr.crm-row-error,
 .crm-container table tr.crm-row-error > td {
-  background-color: var(--crm-alert-danger-bg);
-  color: var(--crm-alert-danger-text);
+  background-color: var(--crm-alert-danger-bg-color);
+  color: var(--crm-alert-danger-text-color);
 }
 .crm-container .table-hover > tbody > tr > td.danger:hover,
 .crm-container .table-hover > tbody > tr > th.danger:hover,
@@ -356,7 +356,7 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table-hover > tbody > tr.danger:hover > th,
 .crm-container table tr.crm-row-error:hover > td,
 .crm-container table tr.crm-row-error > td:hover {
-  background-color: var(--crm-alert-danger-border);
+  background-color: var(--crm-alert-danger-border-color);
 }
 .crm-container .table td.info,
 .crm-container .table th.info,
@@ -364,8 +364,8 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table tr.info > th,
 .crm-container table tr.crm-row-selected,
 .crm-container table tr.crm-row-selected > td {
-  background-color: var(--crm-alert-info-bg);
-  color: var(--crm-alert-info-text);
+  background-color: var(--crm-alert-info-bg-color);
+  color: var(--crm-alert-info-text-color);
 }
 .crm-container .table-hover > tbody > tr > td.info:hover,
 .crm-container .table-hover > tbody > tr > th.info:hover,
@@ -374,7 +374,7 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table-hover > tbody > tr.info:hover > th,
 .crm-container table tr.crm-row-selected:hover > td,
 .crm-container table tr.crm-row-selected > td:hover {
-  background-color: var(--crm-alert-info-border);
+  background-color: var(--crm-alert-info-border-color);
 }
 .crm-container .table-responsive {
   min-height: .01%;
@@ -387,7 +387,7 @@ tbody.scrollContent tr.alternateRow:hover,
   .crm-container .table-responsive,
   .crm-container table {
     width: 100%;
-    margin-bottom: var(--crm-r);
+    margin-bottom: var(--crm-l-reg);
     overflow-y: hidden;
     border: var(--crm-table-outside-border);
     display: contents; /* expirmental addition to provide more responsive behaviour */

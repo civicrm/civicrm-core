@@ -11,18 +11,18 @@
   width: 20%;
 }
 .crm-container td.tasklist a:visited {
-  color: var(--crm-c-success);
+  color: var(--crm-success-color);
 }
 
 /* Class for successful upgrade */
 .crm-container .upgrade-success {
-  background-color: var(--crm-alert-success-bg);
-  color: var(--crm-alert-success-text);
+  background-color: var(--crm-alert-success-bg-color);
+  color: var(--crm-alert-success-text-color);
 }
 
 /* Extension management */
 .crm-container #mainTabContainer:has(.crm-extensions-tabs-list) {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
   margin-top: var(--crm-padding-reg);
 }
 .crm-container #extensions-main,
@@ -45,77 +45,77 @@
 .crm-container #extensions-addnew table.dataTable summary {
   padding: 0;
   background-color: unset;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   font-weight: unset;
   font-family: var(--crm-font);
 }
 .crm-container #extensions table.dataTable summary a,
 .crm-container #extensions-addnew table.dataTable summary a {
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
 }
 .crm-container #extensions table.dataTable a.crm-hover-button,
 .crm-container #extensions-addnew table.dataTable a.crm-hover-button {
-  padding: 0 var(--crm-m1);
+  padding: 0 var(--crm-l-medium-1);
 }
 .crm-container .disabled .crm-hover-button:hover,
 .crm-container .disabled .crm-hover-button:focus {
-  color: var(--crm-c-secondary-text);
+  color: var(--crm-secondary-text-color);
 }
 .crm-container .extension-missing {
-  color: var(--crm-c-warning);
+  color: var(--crm-warning-color);
 }
 .crm-container .crm-extensions-upgrade {
-  background: var(--crm-alert-warning-bg);
-  border: 1px solid var(--crm-alert-warning-border);
+  background: var(--crm-alert-warning-bg-color);
+  border: 1px solid var(--crm-alert-warning-border-color);
   padding: var(--crm-padding-small);
-  border-radius: var(--crm-roundness);
-  color: var(--crm-alert-warning-text);
+  border-radius: var(--crm-l-radius);
+  color: var(--crm-alert-warning-text-color);
 }
 .crm-container .crm-extensions-version {
   white-space: nowrap;
 }
 .crm-container .crm-extensions-stage {
-  margin-left: var(--crm-s);
+  margin-left: var(--crm-l-small);
 }
 .crm-container .crm-extensions-stage.fa-flask,
 .crm-container .crm-extensions-stage.fa-warning {
-  color: var(--crm-notify-warning);
+  color: var(--crm-notify-warning-color);
 }
 .crm-container .crm-extensions-stage.fa-check-circle,
 .crm-container .crm-extensions-stage.fa-trophy {
-  color: var(--crm-notify-success);
+  color: var(--crm-notify-success-color);
 }
 .crm-container .extension-installed {
-  background: var(--crm-alert-success-bg);
-  color: var(--crm-alert-success-text);
+  background: var(--crm-alert-success-bg-color);
+  color: var(--crm-alert-success-text-color);
 }
 .crm-container .extension-installed summary {
-  color: var(--crm-alert-success-text);
+  color: var(--crm-alert-success-text-color);
 }
 .crm-container table.dataTable.display tbody {
-  --crm-striped-bg: var(--crm-table-row-bg);
+  --crm-striped-bg-color: var(--crm-table-row-bg-color);
 }
 .crm-container table.dataTable.display tbody tr:not(.disabled) {
-  background-color: var(--crm-striped-bg) !important;
+  background-color: var(--crm-striped-bg-color) !important;
 }
 .crm-container table.dataTable.display tbody tr.even:not(.disabled) {
-  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-bg) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
+  --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-bg-color) 100%, var(--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix));
 }
 .crm-container table.dataTable.display tbody tr.extension-installed {
-  --crm-striped-bg: var(--crm-alert-success-bg);
+  --crm-striped-bg-color: var(--crm-alert-success-bg-color);
 }
 .crm-container table.dataTable.display tbody tr.extension-installed.even {
-  --crm-striped-bg: color-mix(in srgb, var(--crm-alert-success-bg) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
+  --crm-striped-bg-color: color-mix(in srgb, var(--crm-alert-success-bg-color) 100%, var(--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix));
 }
 .crm-container table.dataTable.display tbody tr:hover {
-  --crm-striped-bg: var(--crm-table-row-hover);
+  --crm-striped-bg-color: var(--crm-table-row-hover-color);
 }
 .crm-container table.dataTable.display tbody tr.even:hover {
-  --crm-striped-bg: color-mix(in srgb, var(--crm-table-row-hover) 100%, var(--crm-table-row-alternate-bg) var(--crm-table-row-alternate-mix));
+  --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-hover-color) 100%, var(--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix));
 }
 .crm-container table.dataTable.display tbody tr > .sorting_1,
 .crm-container table.dataTable.order-column.stripe tbody tr > .sorting_1 {
-  background-color: color-mix(in srgb, var(--crm-striped-bg) 100%, var(--crm-table-row-alternate-bg)  6%) !important;
+  background-color: color-mix(in srgb, var(--crm-striped-bg-color) 100%, var(--crm-table-row-alternate-bg-color)  6%) !important;
 }
 
 /* Navigation Menu Editor */

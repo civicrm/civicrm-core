@@ -158,8 +158,8 @@ body {
   font-family: var(--crm-font);
   font-size: var(--crm-font-size);
   line-height: 1.4;
-  color: var(--crm-c-text);
-  background: var(--crm-c-page-bg);
+  color: var(--crm-text-color);
+  background: var(--crm-page-bg-color);
 }
 .crm-container table,
 .crm-container tr,
@@ -167,8 +167,8 @@ body {
 .crm-container p,
 .crm-container ul {
   font-size: var(--crm-font-size);
-  line-height: var(--crm-type-line-height);
-  color: var(--crm-c-text);
+  line-height: var(--crm-font-line-height);
+  color: var(--crm-text-color);
 }
 
 /* iFrame */
@@ -209,10 +209,10 @@ body.civicrm-iframe-page {
 }
 .crm-container h3,
 #bootstrap-theme h3 {
-  background-color: var(--crm-heading-bg);
-  font-size: var(--crm-r1);
+  background-color: var(--crm-heading-bg-color);
+  font-size: var(--crm-l-reg-1);
   font-weight: bold;
-  color: var(--crm-heading-col);
+  color: var(--crm-heading-color);
   padding: var(--crm-heading-padding);
   border-radius: var(--crm-heading-radius);
   margin: var(--crm-heading-margin);
@@ -222,8 +222,8 @@ body.civicrm-iframe-page {
 
 dl dd,
 dl dl {
-  margin-block-end: var(--crm-m1);
-  margin-inline-start: var(--crm-r1);
+  margin-block-end: var(--crm-l-medium-1);
+  margin-inline-start: var(--crm-l-reg-1);
 }
 
 /* Practical colors */
@@ -251,8 +251,8 @@ dl dl {
 #bootstrap-theme .has-error.checkbox label,
 #bootstrap-theme .has-error.radio-inline label,
 #bootstrap-theme .has-error.checkbox-inline label {
-  color: var(--crm-c-danger-on-page-bg);
-  --crm-c-text: var(--crm-c-danger-on-page-bg);
+  color: var(--crm-danger-ink-color);
+  --crm-text-color: var(--crm-danger-ink-color);
 }
 .crm-container td.tasklist a:visited,
 #bootstrap-theme .has-success .help-block,
@@ -265,7 +265,7 @@ dl dl {
 #bootstrap-theme .has-success.checkbox label,
 #bootstrap-theme .has-success.radio-inline label,
 #bootstrap-theme .has-success.checkbox-inline label {
-  color: var(--crm-c-success-on-page-bg);
+  color: var(--crm-success-ink-color);
 }
 #bootstrap-theme .has-warning .help-block,
 #bootstrap-theme .has-warning .control-label,
@@ -277,7 +277,7 @@ dl dl {
 #bootstrap-theme .has-warning.checkbox label,
 #bootstrap-theme .has-warning.radio-inline label,
 #bootstrap-theme .has-warning.checkbox-inline label {
-  color: var(--crm-c-warning-on-page-bg);
+  color: var(--crm-warning-ink-color);
 }
 .crm-container .disabled,
 .crm-container .crm-disabled,
@@ -285,14 +285,14 @@ dl dl {
 .crm-container .cancelled,
 .crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor {
-  color: var(--crm-c-inactive);
+  color: var(--crm-inactive-color);
   opacity: 1;
 }
 .crm-container tr.disabled,
 .crm-container tr:has(td.disabled),
 .crm-container .table-striped > tbody > tr:has(td.disabled) {
-  --crm-striped-bg: var(--crm-c-page-bg) /* for striped rows */;
-  background-color: var(--crm-striped-bg) !important /* vs jquery */;
+  --crm-striped-bg-color: var(--crm-page-bg-color) /* for striped rows */;
+  background-color: var(--crm-striped-bg-color) !important /* vs jquery */;
 }
 .crm-container tr.disabled td *:not(.btn,button,i,a),
 .crm-container td.disabled,
@@ -333,45 +333,45 @@ dl dl {
 }
 .crm-container .text-muted,
 .crm-container .diasbled {
-  color: var(--crm-c-inactive);
+  color: var(--crm-inactive-color);
 }
 .crm-container .text-primary {
-  color: var(--crm-c-primary);
+  color: var(--crm-primary-color);
 }
 .crm-container a.text-primary:hover,
 .crm-container a.text-primary:focus {
-  color: var(--crm-c-primary-hover);
+  color: var(--crm-primary-hover-color);
 }
 .crm-container .text-success {
-  color: var(--crm-c-success-on-page-bg);
+  color: var(--crm-success-ink-color);
 }
 .crm-container .text-info {
-  color: var(--crm-c-info-on-page-bg);
+  color: var(--crm-info-ink-color);
 }
 .crm-container .text-warning {
-  color: var(--crm-c-warning-on-page-bg);
+  color: var(--crm-warning-ink-color);
 }
 .crm-container .text-danger {
-  color: var(--crm-c-danger-on-page-bg);
+  color: var(--crm-danger-ink-color);
 }
 .crm-container .text-primary {
-  color: var(--crm-c-primary-on-page-bg);
+  color: var(--crm-primary-ink-color);
 }
 .crm-container .text-secondary {
-  color: var(--crm-c-secondary-on-page-bg);
+  color: var(--crm-secondary-ink-color);
 }
 .crm-container h1,
 .crm-container h2,
 .crm-container h4,
 .crm-container h5,
 .crm-container h6 {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 .crm-container code {
   display: inline;
-  background-color: var(--crm-c-code-bg);
-  border: var(--crm-c-code-border);
-  color: var(--crm-c-text);
+  background-color: var(--crm-code-bg-color);
+  border: var(--crm-code-border-color);
+  color: var(--crm-text-color);
   border-radius: 2px;
   padding: 2px;
 }
@@ -383,10 +383,10 @@ dl dl {
   margin: 0 0 var(--crm-padding-small);
   font-size: var(--crm-font-size) !important /* vs inline css on api3 */;
   line-height: 1.4  !important /* vs inline css on api3 */;
-  color: var(--crm-c-text);
-  background-color: var(--crm-c-code-bg);
-  border: var(--crm-c-code-border);
-  border-radius: var(--crm-roundness);
+  color: var(--crm-text-color);
+  background-color: var(--crm-code-bg-color);
+  border: var(--crm-code-border-color);
+  border-radius: var(--crm-l-radius);
 }
 .crm-container pre code {
   display: block;
@@ -397,13 +397,13 @@ dl dl {
   border-radius: 0;
 }
 .crm-container pre.prettyprint {
-  background: var(--crm-c-text-light); /* method to force light bg on prettyprint code as inverting is too complex */
+  background: var(--crm-text-light-color); /* method to force light bg on prettyprint code as inverting is too complex */
   white-space: pre;
   text-wrap: auto;
 }
 .crm-container pre.linenums {
-  background: var(--crm-c-text-light);
-  color: var(--crm-c-text-dark);
+  background: var(--crm-text-light-color);
+  color: var(--crm-text-dark-color);
 }
 .crm-container ol.linenums {
   list-style-type: decimal;
@@ -426,12 +426,12 @@ dl dl {
 *******************/
 
 .crm-container a {
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
   text-decoration: var(--crm-link-decoration);
 }
 .crm-container a:hover,
 .crm-container a:focus {
-  color: var(--crm-c-link-hover);
+  color: var(--crm-link-hover-color);
   text-decoration: var(--crm-link-decoration-hover);
 }
 .crm-container a:focus {

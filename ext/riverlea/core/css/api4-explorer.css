@@ -13,16 +13,16 @@
 }
 .api4-explorer-row > .panel {
   margin: 0;
-  background: var(--crm-panel-bg);
+  background: var(--crm-panel-bg-color);
 }
 .api4-explorer-page .panel-heading {
   display: flex;
   align-items: center;
-  padding: var(--crm-m);
+  padding: var(--crm-l-medium);
 }
 #bootstrap-theme .api4-explorer-row .panel-heading h3 {
   background-color: transparent;
-  color: var(--crm-alert-info-text);
+  color: var(--crm-alert-info-text-color);
   background: transparent;
   margin: 0 !important /* vs bootstrap3 */;
   padding: 0 !important /* vs bootstrap3 */;
@@ -32,7 +32,7 @@
   padding: 0;
   display: flex;
   align-items: center;
-  gap: var(--crm-m);
+  gap: var(--crm-l-medium);
   flex-wrap: wrap;
 }
 .api4-explorer-row .panel-heading .form-inline .pull-right {
@@ -70,7 +70,7 @@
 .api4-explorer-page .explorer-code-panel pre {
   word-break: break-all;
   white-space: pre-wrap;
-  min-height: var(--crm-xxl);
+  min-height: var(--crm-l-large-2);
 }
 .api4-explorer-page .explorer-code-panel .panel-heading > .nav li a {
   text-transform: uppercase;
@@ -160,7 +160,7 @@
   background-color: rgba(186, 225, 251, 0.94);
 }
 .api4-explorer-page .api4-add-where-group-menu a {
-  padding: var(--crm-s) var(--crm-m);
+  padding: var(--crm-l-small) var(--crm-l-medium);
 }
 /* Responsive (move to own file at some point) */
 

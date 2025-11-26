@@ -17,7 +17,7 @@
 .crm-container.crm-public #crm-profile-block,
 .crm-container.crm-public .crm-container.crm-public .af-container:not(.af-container-style-pane),
 .crm-container.crm-public .email-5-section {
-  background-color: var(--crm-f-fieldset-bg);
+  background-color: var(--crm-f-fieldset-bg-color);
   margin: var(--crm-f-fieldset-margin);
   padding: var(--crm-f-fieldset-padding);
   border: var(--crm-f-fieldset-border);
@@ -40,12 +40,12 @@ af-form > fieldset > legend {
   float: none;
 }
 .crm-container.crm-public .header-dark {
-  background: var(--crm-c-secondary);
-  color: var(--crm-c-text-light);
-  padding: var(--crm-m1) var(--crm-f-fieldset-padding);
+  background: var(--crm-secondary-color);
+  color: var(--crm-text-light-color);
+  padding: var(--crm-l-medium-1) var(--crm-f-fieldset-padding);
   font-weight: bold;
-  font-size: var(--crm-r1);
-  border-radius: var(--crm-roundness);
+  font-size: var(--crm-l-reg-1);
+  border-radius: var(--crm-l-radius);
 }
 .crm-container.crm-public .crm-section:not(.alert) {
   padding: 0;
@@ -69,7 +69,7 @@ af-form > fieldset > legend {
   display: table;
 }
 .crm-container.crm-public span#msgbox {
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-l-radius);
   padding: var(--crm-padding-small);
 }
 .crm-container.crm-public #civicrm-footer::after {
@@ -87,7 +87,7 @@ af-form > fieldset > legend {
 .crm-container.crm-public .crm-section:has( > .content input:focus),
 .crm-container.crm-public .crm-section:has( > .content select:focus),
 .crm-container.crm-public .crm-section:has( > .content textarea:focus) {
-  background-color: var(--crm-f-form-focus-bg);
+  background-color: var(--crm-f-form-focus-bg-color);
 }
 .crm-container.crm-public .crm-section:has( > .content input.error),
 .crm-container.crm-public .crm-section:has( > .content textarea.error),
@@ -95,7 +95,7 @@ af-form > fieldset > legend {
 .crm-container.crm-public .crm-section:has( > .content input.crm-inline-error),
 .crm-container.crm-public .crm-section:has( > .content textarea.crm-inline-error),
 .crm-container.crm-public .crm-section:has( > .content select.crm-inline-error) {
-  background-color: var(--crm-f-form-error-bg);
+  background-color: var(--crm-f-form-error-bg-color);
 }
 .crm-container.crm-public input[type="text"],
 .crm-container.crm-public input[type="password"],
@@ -138,7 +138,7 @@ af-form > fieldset > legend {
 .crm-container.crm-public .select2-search input,
 .crm-container.crm-public .select2-results select,
 .crm-container.crm-public .select2-results input {
-  padding: var(--crm-s) var(--crm-r1) var(--crm-s);
+  padding: var(--crm-l-small) var(--crm-l-reg-1) var(--crm-l-small);
 }
 .crm-container.crm-public .select2-dropdown-open .select2-choice,
 .crm-container.crm-public .select2-dropdown-open .select2-choices {
@@ -168,12 +168,12 @@ af-form > fieldset > legend {
   padding: var(--crm-f-form-padding);
 }
 .crm-container.crm-public #attachments table.form-layout-compressed {
-  margin-block: var(--crm-m) 0;
+  margin-block: var(--crm-l-medium) 0;
 }
 .crm-container.crm-public #attachments table.form-layout-compressed tr {
   display: flex;
   flex-direction: column;
-  gap: var(--crm-s);
+  gap: var(--crm-l-small);
 }
 .crm-container.crm-public #attachments table.form-layout-compressed td {
   width: 100%;
@@ -182,7 +182,7 @@ af-form > fieldset > legend {
 }
 .crm-container.crm-public .crm-profile-view-title {
   padding-inline: var(--crm-f-form-padding);
-  font-size: var(--crm-r1);
+  font-size: var(--crm-l-reg-1);
 }
 /* Empowered by logo */
 
@@ -190,7 +190,7 @@ af-form > fieldset > legend {
   display: flex;
   align-items: center;
   justify-content: var(--crm-f-logo-align);
-  gap: var(--crm-s);
+  gap: var(--crm-l-small);
   width: var(--crm-f-form-width);
   margin: 0 auto;
 }

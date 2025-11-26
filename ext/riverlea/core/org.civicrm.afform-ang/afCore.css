@@ -7,7 +7,7 @@
   color: var(--crm-c-darkest);
 }
 a.af-api4-action-idle {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 .crm-container .af-container.af-layout-cols,
 .af-container.af-layout-inline {
@@ -52,18 +52,18 @@ af-form {
 
 /* Accordion */
 .crm-container details.af-container {
-  border: var(--crm-expand-border);
-  border-radius: var(--crm-expand-radius);
+  border: var(--crm-accordion-border);
+  border-radius: var(--crm-accordion-radius);
   padding-block: 0;
 }
 details.af-container > *:not(summary) { /* adds padding to Afform internal details */
-  padding-inline: var(--crm-r);
+  padding-inline: var(--crm-l-reg);
 }
 details.af-container > *:nth-of-type(1):not(summary) {
-  padding-top: var(--crm-m);
+  padding-top: var(--crm-l-medium);
 }
 details.af-container > *:last-of-type {
-  padding-bottom: var(--crm-m);
+  padding-bottom: var(--crm-l-medium);
 }
 details.af-container.af-layout-inline {
   flex-direction: column;
@@ -74,7 +74,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 
 /* Card style */
 .af-container-style-pane {
-  background-color: var(--crm-form-block-bg);
+  background-color: var(--crm-form-block-bg-color);
   border-radius: var(--crm-form-block-border-radius);
   box-shadow: var(--crm-form-block-box-shadow);
   position: relative;
@@ -82,14 +82,14 @@ details.af-container.af-layout-inline > *:not(summary) {
   padding-top: 50px !important;
 }
 #bootstrap-theme .af-container-style-pane > .af-title {
-  background-color: var(--crm-form-block-header);
-  color: var(--crm-c-text-light);
+  background-color: var(--crm-form-block-header-color);
+  color: var(--crm-text-light-color);
   border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  padding: var(--crm-m) var(--crm-r);
+  padding: var(--crm-l-medium) var(--crm-l-reg);
   margin-top: 0;
 }
 
@@ -104,7 +104,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 }
 #bootstrap-theme .af-admin-edit-form-link > button {
   background: transparent;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   border-radius: 2rem;
   height: inherit;
   padding: 0 !important;
@@ -115,7 +115,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 #bootstrap-theme .af-admin-edit-form-link button:hover,
 #bootstrap-theme .af-admin-edit-form-link button:focus {
   background: transparent;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   opacity: 1;
   box-shadow: none !important; /* vs dropdown-toggle */
 }
