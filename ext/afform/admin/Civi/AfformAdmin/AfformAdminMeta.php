@@ -249,7 +249,7 @@ class AfformAdminMeta {
         $name = basename($file, '.html');
         $inputTypes[] = [
           'name' => $name,
-          'label' => $inputTypeLabels[$name] ?? $name,
+          'label' => $inputTypeLabels[$name] ?? _ts($name),
           'template' => '~/af/fields/' . $name . '.html',
           'admin_template' => '~/afGuiEditor/inputType/' . $name . '.html',
         ];
