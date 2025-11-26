@@ -681,7 +681,7 @@ input.crm-form-checkbox) + label {
 }
 .select2-results li.select2-result-with-children > .select2-result-label {
   font-weight: bold;
-  background: var(--crm-c-layout2-bg);
+  background: var(--crm-c-layer2-bg);
   padding: var(--crm-s);
 }
 .crm-container .crm-select2-row-description p {
