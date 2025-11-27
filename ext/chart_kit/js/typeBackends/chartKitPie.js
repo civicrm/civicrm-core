@@ -1,8 +1,10 @@
-(function (angular, $, _, dc) {
-  "use strict";
+(function (dc) {
+  CRM.chart_kit = CRM.chart_kit || {};
 
-  angular.module('crmChartKit').factory('chartKitPie', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitPieAdmin.html',
+  CRM.chart_kit.typeBackends = CRM.chart_kit.typeBackends || {};
+
+  CRM.chart_kit.typeBackends.pie = {
+    adminTemplate: '~/crmChartKitAdmin/typeBackends/chartKitPieAdmin.html',
 
     getAxes: () => ({
       'w': {
@@ -28,14 +30,13 @@
 
     hasCoordinateGrid: () => false,
 
-    showLegend: (displayCtrl) => (displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
+    showLegend: (displayCtrl) => (displayCtrl._settings.showLegend && displayCtrl._settings.showLegend !== 'none'),
 
-    // for pie chart the legend is showing column values, which benefit from rendering
+    // the legend is cross product of column values from w columns
     legendTextAccessor: (displayCtrl) => ((d) =>
       (d.name === 'Others') ?
-        ts('Others') :
-        displayCtrl.getColumnsForAxis('w').map((col) => displayCtrl.renderColumnValue(d.data, col)).join(' - ')
-    ),
+      ts('Others') :
+      displayCtrl.getColumnsForAxis('w').map((col) => col.renderedValueAccessor(d)).join(' - ')),
 
     getInitialDisplaySettings: () => ({
       showLegend: 'left',
@@ -43,6 +44,6 @@
     }),
 
     getChartConstructor: () => dc.pieChart,
-  }));
-})(angular, CRM.$, CRM._, CRM.chart_kit.dc);
+  };
+})(CRM.chart_kit.dc);
 

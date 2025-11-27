@@ -60,13 +60,28 @@
           return CRM.cache.get(getCacheKey(), {})[fieldName];
         };
         this.$onInit = function() {
-          if (this.storeValues) {
-            $scope.$watch(ctrl.getFieldData, function(newVal, oldVal) {
+          $scope.$watch(ctrl.getFieldData, function(newVal, oldVal) {
+            $element[0].dispatchEvent(new Event('crmFormChangeFilters'));
+            if (this.storeValues) {
               if (typeof newVal === 'object' && typeof oldVal === 'object' && Object.keys(newVal).length) {
                 CRM.cache.set(getCacheKey(), newVal);
               }
-            }, true);
-          }
+            }
+          }, true);
+        };
+
+        /**
+         * Get fieldset values to use for afform filters
+         * @returns Object
+         */
+        this.getFilterValues = () => {
+          const data = this.getFieldData();
+          // filter out unset values
+          // intended to be equivalent to previous lodash implementation
+          // (typeof val !== 'undefined' && val !== null && (_.includes(['boolean', 'number', 'object'], typeof val) || val.length));
+          return Object.fromEntries(Object.entries(data).filter(([key, value]) =>
+            (['boolean', 'number', 'object'].includes(typeof value) && value !== null) || (value && value.length)
+          ));
         };
       }
     };
