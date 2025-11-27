@@ -123,8 +123,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'sequential' => 1,
       'visibility' => 'Public',
     ];
-    $membershipType2 = $this->callAPISuccess('MembershipType', 'create', $params);
-    $this->membershipTypeID2 = $membershipType2['id'];
+    $this->membershipTypeID2 = $this->membershipTypeCreate($params);
 
     $this->membershipStatusCreate('test status');
     $this->contactID = $this->individualCreate();

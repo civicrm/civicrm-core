@@ -278,8 +278,8 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
    *
    */
   public function setUpMembershipPriceSet(): void {
-    $this->membershipTypeCreate(['name' => 'First'], 'first');
-    $this->membershipTypeCreate(['name' => 'Second'], 'second');
+    $this->membershipTypeCreate(['title' => 'First'], 'first');
+    $this->membershipTypeCreate(['title' => 'Second'], 'second');
     $this->createTestEntity('PriceSet', [
       'name' => 'price_set',
       'title' => 'membership price set',

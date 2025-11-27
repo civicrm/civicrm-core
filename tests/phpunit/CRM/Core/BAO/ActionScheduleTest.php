@@ -864,16 +864,16 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $this->membershipTypeID = $generalTypeID;
     }
     else {
-      $this->membershipTypeID = (int) MembershipType::create()
-        ->setValues([
-          'name' => 'General',
-          'period_type' => 'rolling',
-          'member_of_contact_id' => 1,
-          'financial_type_id:name' => 'Member Dues',
-          'duration_unit' => 'month',
-        ]
-      )->execute()->first()['id'];
+      $membershipTypeParams = [
+        'title' => 'General',
+        'period_type' => 'rolling',
+        'member_of_contact_id' => 1,
+        'financial_type_id:name' => 'Member Dues',
+        'duration_unit' => 'month',
+      ];
+      $this->membershipTypeID = $this->membershipTypeCreate($membershipTypeParams);
     }
+
     return $this->membershipTypeID;
   }
 
