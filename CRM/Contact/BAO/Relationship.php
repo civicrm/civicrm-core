@@ -179,7 +179,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
     if (!empty($params['id'])) {
       $relationship->id = $params['id'];
       // Only load the relationship if we're missing required params
-      $requiredParams = ['contact_id_a', 'contact_id_b', 'relationship_type_id'];
+      $requiredParams = ['contact_id_a', 'contact_id_b', 'relationship_type_id', 'is_active'];
       foreach ($requiredParams as $requiredKey) {
         if (!isset($params[$requiredKey])) {
           $relationship->find(TRUE);
