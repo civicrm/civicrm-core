@@ -98,7 +98,7 @@ function _civicrm_api3_custom_field_flush_static_caches() {
 function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['label']['api.required'] = 1;
   $params['custom_group_id']['api.required'] = 1;
-  $params['is_active']['api.default'] = 1;
+  $params['name']['api.required'] = 0;
   $params['option_values'] = [
     'title' => 'Option Values',
     'description' => "Pass an array of options (value => label) to create this field's option values",
