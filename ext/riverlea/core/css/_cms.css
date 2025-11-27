@@ -85,7 +85,6 @@ body.page-civicrm .breadcrumb__link {
 }
 #block-claro-content {
   --crm-page-padding: 3rem;
-  --crm-page-width: calc(100% - var(--crm-page-padding) - var(--crm-page-padding));
 }
 #block-claro-content .crm-container:not(.crm-public) .form-item,
 #block-claro-content .crm-container .button {
@@ -200,7 +199,6 @@ body.wp-admin .crm-sticky thead {
 *******************/
 
 html.crm-standalone {
-  --crm-page-width: 94vw;
   --crm-page-padding: 1px 3vw 1rem;
 }
 html.crm-standalone body {
