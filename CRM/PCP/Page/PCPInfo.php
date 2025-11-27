@@ -21,15 +21,6 @@
 class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
   public $_component;
 
-  /**
-   * Run the page.
-   *
-   * This method is called after the page is created. It checks for the
-   * type of action and executes that action.
-   * Finally it calls the parent's run method.
-   *
-   * @return void
-   */
   public function run() {
     $session = CRM_Core_Session::singleton();
     $config = CRM_Core_Config::singleton();
@@ -37,9 +28,8 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     $statusMessage = '';
 
     $permissionCheck = CRM_Core_Permission::check('administer CiviCRM');
-    //get the pcp id.
+    // PCP id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
     $prms = ['id' => $this->_id];
@@ -55,6 +45,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
 
     CRM_Utils_System::setTitle($pcpInfo['title']);
+
     $this->assign('pcp', $pcpInfo);
     $this->assign('currency', $pcpInfo['currency']);
 
@@ -132,19 +123,17 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     elseif ($pcpBlock->entity_table == 'civicrm_contribution_page') {
       $page_class = 'CRM_Contribute_DAO_ContributionPage';
       $this->assign('pageName', CRM_Contribute_PseudoConstant::contributionPage($pcpInfo['page_id'], TRUE));
-      CRM_Core_DAO::commonRetrieveAll($page_class, 'id',
-        $pcpInfo['page_id'], $default, ['start_date', 'end_date']
-      );
+      CRM_Core_DAO::commonRetrieveAll($page_class, 'id', $pcpInfo['page_id'], $default, ['start_date', 'end_date']);
     }
 
     $pageInfo = $default[$pcpInfo['page_id']];
+    $owner = $pageInfo;
+    $owner['status'] = $pcpStatus[$pcpInfo['status_id']] ?? NULL;
+    $owner['viewAdminLinks'] = ($pcpInfo['contact_id'] == $session->get('userID')) || $permissionCheck;
+    // Make sure this is set to avoid Smarty/PHP notices
+    $owner['start_date'] = $owner['start_date'] ?? NULL;
 
-    if ($pcpInfo['contact_id'] == $session->get('userID')) {
-      $owner = $pageInfo;
-      $owner['status'] = $pcpStatus[$pcpInfo['status_id']] ?? NULL;
-
-      $this->assign('owner', $owner);
-
+    if ($owner['viewAdminLinks']) {
       $link = CRM_PCP_BAO_PCP::pcpLinks($pcpInfo['id']);
 
       $hints = [
@@ -163,7 +152,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         'pageComponent' => $this->_component,
       ];
 
-      if (!$pcpBlock->is_tellfriend_enabled || ($pcpInfo['status_id'] ?? NULL) != $approvedId) {
+      if (!function_exists('tellafriend_civicrm_config') || !$pcpBlock->is_tellfriend_enabled || ($pcpInfo['status_id'] ?? NULL) != $approvedId) {
         unset($link['all'][CRM_Core_Action::DETACH]);
       }
 
@@ -209,6 +198,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     $this->assign('linkTextUrl', $linkTextUrl ?? NULL);
     $this->assign('linkText', $pcpBlock->link_text ?? NULL);
 
+    $this->assign('owner', $owner);
     $this->assign('honor', $honor);
     $this->assign('total', $totalAmount ?: '0.0');
     $this->assign('achieved', $achieved <= 100 ? $achieved : 100);

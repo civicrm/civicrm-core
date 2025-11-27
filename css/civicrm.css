@@ -1377,7 +1377,7 @@ input.crm-form-entityref {
 }
 
 #crm-container .pcp-image img {
-  max-width: 360px;
+  max-height: 360px;
 }
 
 #crm-container .pcp-widgets {
@@ -1385,6 +1385,11 @@ input.crm-form-entityref {
   float: right;
   margin: 0 0 1em 1em;
   padding: 0.5em;
+}
+
+#crm-container .pcp-donate {
+  text-align: center;
+  padding: 1rem 0;
 }
 
 #crm-container .pcp_honor_roll_entry {
@@ -1395,15 +1400,7 @@ input.crm-form-entityref {
   font-weight: bold;
 }
 
-#crm-container .pcp-donate {
-  height: 24px;
-}
-#crm-container a.pcp-contribute-button {
-  font-weight: bold;
-}
-
 #crm-container .pcp-create-your-own {
-  clear: left;
   margin: 1em 0;
 }
 

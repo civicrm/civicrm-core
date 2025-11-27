@@ -114,7 +114,7 @@ ORDER BY page_type, page_id';
 
       if ($pcpInfoDao->status_id != $approved || $pcpInfoDao->is_active != 1) {
         $class = 'disabled';
-        if (!$pcpInfoDao->is_tellfriend_enabled) {
+        if (!function_exists('tellafriend_civicrm_config') || !$pcpInfoDao->is_tellfriend_enabled) {
           $mask -= CRM_Core_Action::DETACH;
         }
       }
