@@ -112,7 +112,6 @@
   --crm-padding-small: var(--crm-l-small);
   --crm-padding-inset: var(--crm-l-medium);
   --crm-page-padding: var(--crm-l-large-1); /* Margin left/right */
-  --crm-page-width: 100%; /* Default that CMS can overwrite */
   --crm-flex-gap: var(--crm-l-medium);
 /* Type */
   --crm-font-system: unset;
@@ -137,7 +136,7 @@
   --crm-btn-radius: 3px;
   --crm-btn-padding-block: var(--crm-l-xsmall-1); /* padding for top and bottom, one value */
   --crm-btn-padding-inline: var(--crm-l-medium-1); /* padding for left and right, one value */
-  --crm-btn-small-padding: var(--crm-l-xsmall) var(--crm-l-small);
+  --crm-btn-small-padding: var(--crm-l-xsmall) var(--crm-l-medium);
   --crm-btn-large-padding: var(--crm-l-medium) var(--crm-l-reg);
   --crm-btn-align: center;
   --crm-btn-height: 28px;
