@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function (angular, $, _, chartKitChartTypes, chartKitTypeBackends, chartKitColumnOptions, chartKitUtils) {
   "use strict";
 
   angular.module('crmChartKitAdmin').component('searchAdminDisplayChartKit', {
@@ -12,12 +12,10 @@
       crmSearchAdmin: '^crmSearchAdmin'
     },
     templateUrl: '~/crmChartKitAdmin/searchAdminDisplayChartKit.html',
-    controller: function ($scope, searchMeta, chartKitChartTypes, chartKitColumn) {
+    controller: function ($scope, searchMeta) {
       const ts = $scope.ts = CRM.ts('chart_kit');
 
-      const columnConfigOptions = chartKitColumn.configOptions();
-
-      this.getChartTypeOptions = () => chartKitChartTypes.types.map((type) => ({ key: type.key, label: type.label, icon: type.icon }));
+      this.getChartTypeOptions = () => chartKitChartTypes;
 
       this.getInitialDisplaySettings = () => ({
         columns: [],
@@ -69,7 +67,7 @@
         }
         else {
           // run initial settings through our legacy adaptor
-          this.display.settings = chartKitChartTypes.legacySettingsAdaptor(this.display.settings);
+          this.display.settings = chartKitUtils.legacySettingsAdaptor(this.display.settings);
         }
 
         this.chartTypeOptions = this.getChartTypeOptions();
@@ -90,8 +88,8 @@
       };
 
       this.initChartType = () => {
-        const type = chartKitChartTypes.types.find((type) => type.key === this.display.settings.chartType);
-        this.chartType = type.service;
+        const type = chartKitChartTypes.find((type) => type.key === this.display.settings.chartType);
+        this.chartType = chartKitTypeBackends[type.backend];
       };
 
       this.initAxesForChartType = () => {
@@ -186,12 +184,12 @@
 
       this.axisDefaults = ({
         // by default allow all types we know
-        reduceTypes: columnConfigOptions.reduceType.map((type) => type.key),
-        scaleTypes: columnConfigOptions.scaleType.map((type) => type.key),
-        dataLabelTypes: columnConfigOptions.dataLabelType.map((type) => type.key),
+        reduceTypes: chartKitColumnOptions.reduceType.map((type) => type.key),
+        scaleTypes: chartKitColumnOptions.scaleType.map((type) => type.key),
+        dataLabelTypes: chartKitColumnOptions.dataLabelType.map((type) => type.key),
         // by default no option
         seriesTypes: [],
-        dataLabelFormatters: columnConfigOptions.dataLabelFormatter.map((type) => type.key),
+        dataLabelFormatters: chartKitColumnOptions.dataLabelFormatter.map((type) => type.key),
         multiColumn: false,
         prepopulate: true,
       });
@@ -279,7 +277,7 @@
 
       this.getColumnDatePrecisionOptions = (col) => {
         if (this.getColumnSourceDataTypeIsDate(col)) {
-          return columnConfigOptions.datePrecision.map((option) => option.key);
+          return chartKitColumnOptions.datePrecision.map((option) => option.key);
         }
         return [];
       };
@@ -357,7 +355,7 @@
         if (configKey === 'searchColumn') {
           return this.searchColumns;
         }
-        return columnConfigOptions[configKey];
+        return chartKitColumnOptions[configKey];
       };
 
       this.getOptionDetailsForKey = (configKey, optionKey) => this.getAllOptionDetails(configKey).find((option) => option.key === optionKey);
@@ -414,4 +412,4 @@
 
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$, CRM._, CRM.chart_kit.chartTypes, CRM.chart_kit.typeBackends, CRM.chart_kit.columnOptions, CRM.chart_kit.utils);
