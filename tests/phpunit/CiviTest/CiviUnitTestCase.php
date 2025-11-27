@@ -700,7 +700,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     Civi::rebuild(['tables' => TRUE])->execute();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge([
-      'name' => 'General',
+      'title' => 'General',
       'duration_unit' => 'year',
       'duration_interval' => 1,
       'period_type' => 'rolling',
@@ -2359,6 +2359,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $recurParams['frequency_unit'] = $params['frequency_unit'];
     }
 
+    \Civi\Api4\MembershipType::delete()
+      ->addWhere('name', '=', $membershipParams['name'] ?? 'General')
+      ->execute();
     $this->membershipTypeCreate($membershipParams);
     //create a contribution so our membership & contribution don't both have id = 1
     if ($this->callAPISuccess('Contribution', 'getcount') === 0) {

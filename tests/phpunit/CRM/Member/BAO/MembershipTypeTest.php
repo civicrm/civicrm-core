@@ -62,7 +62,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testAdd(): void {
     $params = [
-      'name' => 'test type',
+      'title' => 'test type',
       'domain_id' => 1,
       'description' => NULL,
       'minimum_fee' => 10,
@@ -78,10 +78,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     MembershipType::create()->setValues($params)->execute();
 
     $membership = $this->assertDBNotNull('CRM_Member_BAO_MembershipType', $this->ids['Contact']['organization'],
-      'name', 'member_of_contact_id',
+      'title', 'member_of_contact_id',
       'Database check on updated membership record.'
     );
-    $this->assertEquals('test type', $membership, 'Verify membership type name.');
+    $this->assertEquals('test type', $membership, 'Verify membership type title.');
   }
 
   /**
@@ -91,7 +91,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testRetrieve(): void {
     $params = [
-      'name' => 'General',
+      'title' => 'General',
       'description' => NULL,
       'domain_id' => 1,
       'minimum_fee' => 100,
@@ -105,10 +105,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     ];
     MembershipType::create()->setValues($params)->execute();
 
-    $params = ['name' => 'General'];
+    $params = ['title' => 'General'];
     $default = [];
     $result = CRM_Member_BAO_MembershipType::retrieve($params, $default);
-    $this->assertEquals('General', $result->name, 'Verify membership type name.');
+    $this->assertEquals('General', $result->title, 'Verify membership type name.');
   }
 
   /**
@@ -129,7 +129,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testConvertDayFormat(): void {
     $params = [
-      'name' => 'General',
+      'title' => 'General',
       'description' => NULL,
       'minimum_fee' => 100,
       'domain_id' => 1,
@@ -158,7 +158,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testGetMembershipTypes(): void {
     $params = [
-      'name' => 'General',
+      'title' => 'General',
       'description' => NULL,
       'minimum_fee' => 100,
       'domain_id' => 1,
@@ -200,7 +200,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testGetDatesForMembershipType(): void {
     $params = [
-      'name' => 'General',
+      'title' => 'General',
       'description' => NULL,
       'minimum_fee' => 100,
       'domain_id' => 1,
@@ -226,7 +226,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testGetRenewalDatesForMembershipType(): void {
     $params = [
-      'name' => 'General',
+      'title' => 'General',
       'domain_id' => 1,
       'description' => NULL,
       'minimum_fee' => 100,
@@ -270,7 +270,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testGetMembershipTypesByOrg(): void {
     $params = [
-      'name' => 'General',
+      'title' => 'General',
       'description' => NULL,
       'domain_id' => 1,
       'minimum_fee' => 100,
@@ -309,7 +309,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   private function createGeneralMembershipType(): int {
     $params = [
-      'name' => 'General',
+      'title' => 'General',
       'description' => NULL,
       'minimum_fee' => 100,
       'domain_id' => 1,
