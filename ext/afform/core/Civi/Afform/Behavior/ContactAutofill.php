@@ -47,9 +47,9 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     return '~/afGuiEditor/behaviors/autofillRelationshipBehavior.html';
   }
 
-  public static function getModes(string $contactType):array {
+  public static function getModes(string $entityName):array {
     $modes = [];
-    if ($contactType === 'Individual') {
+    if ($entityName === 'Individual') {
       $modes[] = [
         'name' => 'user',
         'label' => E::ts('Current User'),
@@ -66,10 +66,10 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     $relationshipTypes = \Civi\Api4\RelationshipType::get(FALSE)
       ->addSelect('name_a_b', 'name_b_a', 'label_a_b', 'label_b_a', 'description', 'contact_type_a', 'contact_type_b')
       ->addWhere('is_active', '=', TRUE)
-      ->addClause('OR', ['contact_type_a', '=', $contactType], ['contact_type_a', 'IS NULL'], ['contact_type_b', '=', $contactType], ['contact_type_b', 'IS NULL'])
+      ->addClause('OR', ['contact_type_a', '=', $entityName], ['contact_type_a', 'IS NULL'], ['contact_type_b', '=', $entityName], ['contact_type_b', 'IS NULL'])
       ->execute();
     foreach ($relationshipTypes as $relationshipType) {
-      if (!$relationshipType['contact_type_a'] || $relationshipType['contact_type_a'] === $contactType) {
+      if (!$relationshipType['contact_type_a'] || $relationshipType['contact_type_a'] === $entityName) {
         $modes[] = [
           'name' => 'relationship:' . $relationshipType['name_a_b'],
           'label' => $relationshipType['label_a_b'],
@@ -80,7 +80,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
       }
       if (
         $relationshipType['name_b_a'] && $relationshipType['name_a_b'] != $relationshipType['name_b_a'] &&
-        (!$relationshipType['contact_type_b'] || $relationshipType['contact_type_b'] === $contactType)
+        (!$relationshipType['contact_type_b'] || $relationshipType['contact_type_b'] === $entityName)
       ) {
         $modes[] = [
           'name' => 'relationship:' . $relationshipType['name_b_a'],
