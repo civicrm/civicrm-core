@@ -41,7 +41,7 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('is_default', TRUE)
       ->execute()->first()['id'];
 
-    $this->assertTrue(OptionValue::get(FALSE)->addWhere('id', '=', $defaultId)->execute()->first()['is_default']);
+    $this->assertTrue($this->getTestRecord('OptionValue', $defaultId)['is_default']);
 
     // Now create a second option with is_default set to null.
     // This should not interfere with the default setting in option one
@@ -52,7 +52,7 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('is_default', NULL)
       ->execute();
 
-    $this->assertTrue(OptionValue::get(FALSE)->addWhere('id', '=', $defaultId)->execute()->first()['is_default']);
+    $this->assertTrue($this->getTestRecord('OptionValue', $defaultId)['is_default']);
   }
 
   public function testUpdateWeights(): void {

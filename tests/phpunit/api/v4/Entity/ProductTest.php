@@ -43,11 +43,7 @@ class ProductTest extends Api4TestBase implements TransactionalInterface {
       'options' => $options,
     ]);
 
-    $p2 = \Civi\Api4\Product::get(FALSE)
-      ->addSelect('options')
-      ->addWhere('id', '=', $p1['id'])
-      ->execute()
-      ->single();
+    $p2 = $this->getTestRecord('Product', $p1['id'], ['options']);
 
     $this->assertEquals($options, $p2['options']);
   }

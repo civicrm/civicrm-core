@@ -21,7 +21,6 @@ namespace api\v4\Entity;
 use api\v4\Api4TestBase;
 use Civi\Api4\Queue;
 use Civi\Api4\QueueItem;
-use Civi\Api4\UserJob;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\QueueTestTrait;
 
@@ -614,20 +613,20 @@ class QueueTest extends Api4TestBase {
     $this->assertQueueStats(2, 2, 0, $queue);
     $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
     $this->assertEquals(TRUE, $queue->isActive());
-    $this->assertEquals(4, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
+    $this->assertEquals(4, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
 
     // OK, let's run both items - and check status afterward.
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
     $this->assertQueueStats(1, 1, 0, $queue);
     $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
     $this->assertEquals(TRUE, $queue->isActive());
-    $this->assertEquals(4, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
+    $this->assertEquals(4, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
 
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
     $this->assertQueueStats(0, 0, 0, $queue);
     $this->assertEquals('completed', $firedQueueStatus[$queueName]);
     $this->assertEquals(FALSE, $queue->isActive());
-    $this->assertEquals(1, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
+    $this->assertEquals(1, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
   }
 
   /**
@@ -743,8 +742,7 @@ class QueueTest extends Api4TestBase {
       ['first']
     ));
 
-    $item = QueueItem::get(FALSE)->addWhere('queue_name', '=', 'test-queue')
-      ->execute()->single();
+    $item = $this->getTestRecord('QueueItem', ['queue_name' => 'test-queue']);
 
     $queueCreateFields = QueueItem::getFields(TRUE)->setAction('create')->execute()->indexBy('name');
     $this->assertArrayNotHasKey('data', $queueCreateFields);
@@ -762,8 +760,7 @@ class QueueTest extends Api4TestBase {
       ->setValues(['release_time' => '2025-12-12'])
       ->execute();
 
-    $item = QueueItem::get(FALSE)->addWhere('queue_name', '=', 'test-queue')
-      ->execute()->single();
+    $item = $this->getTestRecord('QueueItem', ['queue_name' => 'test-queue']);
     $this->assertEquals('2025-12-12 00:00:00', $item['release_time']);
 
     QueueItem::update(TRUE)->addWhere('id', '=', $item['id'])

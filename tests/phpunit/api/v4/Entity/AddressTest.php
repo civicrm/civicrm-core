@@ -65,10 +65,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertFalse($addresses[0]['is_primary']);
     $this->assertTrue($addresses[1]['is_primary']);
 
-    $contact = Contact::get(FALSE)
-      ->addWhere('id', '=', $cid)
-      ->addSelect('address_primary')
-      ->execute()->single();
+    $contact = $this->getTestRecord('Contact', $cid, ['address_primary']);
     $this->assertEquals($a2['id'], $contact['address_primary']);
   }
 
@@ -115,9 +112,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     // Child address should be updated
-    $result = Address::get(FALSE)
-      ->addWhere('id', '=', $address['id'])
-      ->execute()->single();
+    $result = $this->getTestRecord('Address', $address['id']);
     // Should still retain master id
     $this->assertEquals($master['id'], $result['master_id']);
     $this->assertEquals('Somewhere 234', $result['street_address']);
@@ -129,9 +124,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     // Child address should be unlinked
-    $result = Address::get(FALSE)
-      ->addWhere('id', '=', $address['id'])
-      ->execute()->single();
+    $result = $this->getTestRecord('Address', $address['id']);
     // Should still retain master id
     $this->assertNull($result['master_id']);
     $this->assertEquals('Somewhere 234', $result['street_address']);

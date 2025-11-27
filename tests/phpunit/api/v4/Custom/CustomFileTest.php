@@ -70,10 +70,7 @@ class CustomFileTest extends Api4TestBase {
     // No EntityFile records should have been created
     $this->assertSame($entityFileCount, EntityFile::get(FALSE)->selectRowCount()->execute()->count());
 
-    $result = File::get(FALSE)
-      ->addSelect('uri', 'file_name', 'url', 'content')
-      ->addWhere('id', '=', $file['id'])
-      ->execute()->single();
+    $result = $this->getTestRecord('File', $file['id'], ['uri', 'file_name', 'url', 'content']);
     $this->assertEquals($file['uri'], $result['uri']);
     $this->assertEquals('test123.txt', $result['file_name']);
     $this->assertEquals('Hello World 123', $result['content']);

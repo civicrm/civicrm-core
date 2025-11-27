@@ -20,11 +20,9 @@
 namespace api\v4\Custom;
 
 use api\v4\Api4TestBase;
-use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomValue;
 use Civi\Api4\IM;
-use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 use Civi\Api4\Activity;
 
@@ -58,10 +56,7 @@ class CreateCustomValueTest extends Api4TestBase {
     $this->assertNotNull($customField['option_group_id']);
     $optionGroupId = $customField['option_group_id'];
 
-    $optionGroup = OptionGroup::get(FALSE)
-      ->addWhere('id', '=', $optionGroupId)
-      ->execute()
-      ->first();
+    $optionGroup = $this->getTestRecord('OptionGroup', $optionGroupId);
 
     $this->assertEquals('MyContactFields :: Color', $optionGroup['title']);
 
@@ -81,10 +76,7 @@ class CreateCustomValueTest extends Api4TestBase {
     // Test that failing to pass value as array will still serialize correctly
     $contact = $this->createTestRecord('Contact', [$fieldName => 'r']);
 
-    $contact = Contact::get(FALSE)
-      ->addSelect($fieldName)
-      ->addWhere('id', '=', $contact['id'])
-      ->execute()->single();
+    $contact = $this->getTestRecord('Contact', $contact['id'], [$fieldName]);
     $this->assertSame(['r'], $contact[$fieldName]);
 
     // Ensure serialization really did happen correctly in the DB

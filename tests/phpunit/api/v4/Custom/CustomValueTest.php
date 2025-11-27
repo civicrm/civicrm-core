@@ -81,9 +81,7 @@ class CustomValueTest extends Api4TestBase {
     $address2 = $this->createTestRecord('Address')['id'];
 
     // Ensure virtual api entity has been created
-    $entity = Entity::get(FALSE)
-      ->addWhere('name', '=', "Custom_$group")
-      ->execute()->single();
+    $entity = $this->getTestRecord('Entity', ['name' => "Custom_$group"]);
     $this->assertEquals(['CustomValue', 'DAOEntity'], $entity['type']);
     $this->assertEquals(['id'], $entity['primary_key']);
     $this->assertEquals($customGroup['table_name'], $entity['table_name']);
@@ -361,10 +359,7 @@ class CustomValueTest extends Api4TestBase {
       'test_nulls.entityref' => NULL,
     ])['id'];
 
-    $contact = Contact::get(FALSE)
-      ->addWhere('id', '=', $cid)
-      ->addSelect('test_nulls.*')
-      ->execute()->single();
+    $contact = $this->getTestRecord('Contact', $cid, ['test_nulls.*']);
 
     $this->assertSame(NULL, $contact['test_nulls.string']);
     $this->assertSame(NULL, $contact['test_nulls.select']);
@@ -395,10 +390,7 @@ class CustomValueTest extends Api4TestBase {
       ->addValue('test_nulls.entityref', 1)
       ->execute();
 
-    $contact = Contact::get(FALSE)
-      ->addWhere('id', '=', $cid)
-      ->addSelect('test_nulls.*')
-      ->execute()->single();
+    $contact = $this->getTestRecord('Contact', $cid, ['test_nulls.*']);
 
     // Assert all values were set correctly
     $this->assertSame('test', $contact['test_nulls.string']);
@@ -433,10 +425,7 @@ class CustomValueTest extends Api4TestBase {
       ->execute();
 
     // Get the updated contact
-    $contact = Contact::get(FALSE)
-      ->addWhere('id', '=', $cid)
-      ->addSelect('test_nulls.*')
-      ->execute()->single();
+    $contact = $this->getTestRecord('Contact', $cid, ['test_nulls.*']);
 
     // Assert all values are NULL again
     $this->assertSame(NULL, $contact['test_nulls.string']);

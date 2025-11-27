@@ -131,11 +131,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
    * @dataProvider getRenderExamples
    */
   public function testRenderExamples(string $name): void {
-    $example = ExampleData::get(FALSE)
-      ->addWhere('name', '=', $name)
-      ->addSelect('name', 'file', 'data', 'asserts')
-      ->execute()
-      ->single();
+    $example = $this->getTestRecord('ExampleData', ['name' => $name], ['name', 'file', 'data', 'asserts']);
 
     $this->assertNotEmpty($example['data']['modelProps'], sprintf('Example (%s) is tagged phpunit. It should have modelProps.', $example['name']));
     $this->assertNotEmpty($example['asserts']['default'], sprintf('Example (%s) is tagged phpunit. It should have assertions.', $example['name']));

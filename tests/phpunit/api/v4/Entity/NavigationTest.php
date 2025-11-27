@@ -33,9 +33,7 @@ class NavigationTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('name', 'Test menu item')
       ->execute()->single();
 
-    $fetched = Navigation::get(FALSE)
-      ->addWhere('id', '=', $created['id'])
-      ->execute()->single();
+    $fetched = $this->getTestRecord('Navigation', $created['id']);
 
     $this->assertEquals(['administer CiviCRM', 'access CiviCRM'], $created['permission']);
     $this->assertEquals(\CRM_Core_Config::domainID(), $fetched['domain_id']);
