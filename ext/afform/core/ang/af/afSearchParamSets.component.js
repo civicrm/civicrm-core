@@ -23,7 +23,14 @@
           where: [['afform_name', '=', this.formName]],
           orderBy: {'label': 'ASC'}
         })
-        .then((results) => this.savedSets = results)
+        .then((results) => this.savedSets = results.map((paramSet) => {
+          // format date or time
+          const created = new Date(paramSet.created_date);
+          const createdDate = created.toLocaleDateString();
+          const isToday = createdDate === (new Date()).toLocaleDateString();
+          paramSet.created_date_or_time = isToday ? ts('%1 today', {1: created.toLocaleTimeString()}) : createdDate;
+          return paramSet;
+        }))
         .catch(() => this.savedSets = [{id: '', label: ts('Error fetching Saved Searches')}]);
 
       this.applySearchParamSet = (id) => $window.location.hash = `#?_s=${id ? id : 0}`;
@@ -72,12 +79,10 @@
         return params;
       };
 
-      this.renderSearchParamSetDescription = (paramSet) => {
-        return ts('Created %1 by %2', {
-          1: (new Date(paramSet.created_date)).toLocaleDateString(),
-          2: (paramSet['created_by.display_name'] ? paramSet['created_by.display_name'] : 'UNKNOWN')
-        })
-      };
+      this.renderSearchParamSetDescription = (paramSet) => ts('Created %1 by %2', {
+        1: paramSet.created_date_or_time,
+        2: (paramSet['created_by.display_name'] ? paramSet['created_by.display_name'] : 'UNKNOWN')
+      });
 
       this.renderSearchParamSetDetails = (paramSet) => {
         const rendered = {};
