@@ -50,7 +50,7 @@
   </button>
 </div>
 
-<dialog class="af-search-param-set-new">
+<dialog class="crm-dialog af-search-param-set-new">
   <div ng-show="$ctrl.saveDialog.inProgress" class="crm-loading-spinner">
     <div class="sr-only">{{:: ts('Saving...') }}</div>
   </div>
@@ -88,7 +88,7 @@
   </div>
 </dialog>
 
-<dialog class="af-search-param-set-update">
+<dialog class="crm-dialog af-search-param-set-update">
   <div ng-show="$ctrl.updateDialog.inProgress" class="crm-loading-spinner">
     <div class="sr-only">{{:: ts('Saving...') }}</div>
   </div>
@@ -130,7 +130,7 @@
   </div>
 </dialog>
 
-<dialog class="af-search-param-sets-manage">
+<dialog class="crm-dialog af-search-param-sets-manage">
   <h2>{{ ts('Saved searches') }}</h2>
   <div ng-if="!$ctrl.savedSets.length" class="status status-warning">
     {{:: ts('No filter sets have been created for this form.')}}
