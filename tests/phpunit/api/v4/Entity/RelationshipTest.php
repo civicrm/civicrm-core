@@ -276,4 +276,46 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey('duplicate_id', $new[1]);
   }
 
+  /**
+   * Test Current Employer is correctly set.
+   */
+  public function testCurrentEmployerRelationship(): void {
+    $cid = $this->createTestRecord('Individual')['id'];
+    $oid = $this->createTestRecord('Organization')['id'];
+
+    $relationship = Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $cid,
+        'contact_id_b' => $oid,
+        'relationship_type_id:name' => 'Employee of',
+        'is_current_employer' => TRUE,
+      ])->execute()->first();
+
+    // Random update to relationship shouldn't affect current employer
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->addValue('description', 'Employee of organization')
+      ->execute();
+
+    $contact = $this->getTestRecord('Contact', $cid);
+    $this->assertEquals($oid, $contact['employer_id']);
+
+    // Disable relationship should clear employer
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->addValue('is_active', FALSE)
+      ->execute();
+    $contact = $this->getTestRecord('Contact', $cid);
+    $this->assertNull($contact['employer_id']);
+
+    // Re-enable relationship
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->addValue('is_active', TRUE)
+      ->addValue('is_current_employer', TRUE)
+      ->execute();
+    $contact = $this->getTestRecord('Contact', $cid);
+    $this->assertEquals($oid, $contact['employer_id']);
+  }
+
 }
