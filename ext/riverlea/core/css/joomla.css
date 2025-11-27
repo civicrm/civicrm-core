@@ -8,7 +8,6 @@ body.com_civicrm {
 }
 body.admin.com_civicrm {
   --crm-page-padding: 3rem;
-  --crm-page-width: 100%;
 }
 body.admin.com_civicrm #subhead-container,
 body.admin.com_civicrm .subhead-collapse,
