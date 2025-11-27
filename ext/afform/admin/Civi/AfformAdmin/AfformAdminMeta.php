@@ -18,33 +18,38 @@ class AfformAdminMeta {
     if (!\CRM_Core_Permission::check('manage own afform')) {
       return [];
     }
-    $afformPlacement = \CRM_Utils_Array::formatForSelect2(PlacementUtils::getPlacements(), 'label', 'value');
-    $afformTags = \CRM_Utils_Array::formatForSelect2((array) \Civi\Api4\Utils\AfformTags::getTagOptions());
-    $afformTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
-      ->addSelect('name', 'label', 'icon')
-      ->addWhere('is_active', '=', TRUE)
-      ->addWhere('option_group_id:name', '=', 'afform_type')
-      ->addOrderBy('weight', 'ASC')
-      ->execute();
-    // Pluralize tabs (too bad option groups only store a single label)
-    $plurals = [
-      'form' => E::ts('Submission Forms'),
-      'search' => E::ts('Search Forms'),
-      'block' => E::ts('Field Blocks'),
-      'system' => E::ts('System Forms'),
-    ];
-    foreach ($afformTypes as $index => $type) {
-      $afformTypes[$index]['plural'] = $plurals[$type['name']] ?? \CRM_Utils_String::pluralize($type['label']);
+    $key = __CLASS__ . __FUNCTION__;
+    if (!\Civi::cache('metadata')->has($key)) {
+      $afformPlacement = \CRM_Utils_Array::formatForSelect2(PlacementUtils::getPlacements(), 'label', 'value');
+      $afformTags = \CRM_Utils_Array::formatForSelect2((array)\Civi\Api4\Utils\AfformTags::getTagOptions());
+      $afformTypes = (array)\Civi\Api4\OptionValue::get(FALSE)
+        ->addSelect('name', 'label', 'icon')
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('option_group_id:name', '=', 'afform_type')
+        ->addOrderBy('weight', 'ASC')
+        ->execute();
+      // Pluralize tabs (too bad option groups only store a single label)
+      $plurals = [
+        'form' => E::ts('Submission Forms'),
+        'search' => E::ts('Search Forms'),
+        'block' => E::ts('Field Blocks'),
+        'system' => E::ts('System Forms'),
+      ];
+      foreach ($afformTypes as $index => $type) {
+        $afformTypes[$index]['plural'] = $plurals[$type['name']] ?? \CRM_Utils_String::pluralize($type['label']);
+      }
+      \Civi::cache('metadata')->set($key, [
+        'afform_type' => $afformTypes,
+        'afform_placement' => $afformPlacement,
+        'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
+        'placement_filters' => self::getPlacementFilterOptions(),
+        'afform_tags' => $afformTags,
+        'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
+        'confirmation_types' => self::getConfirmationTypes(),
+      ]);
     }
-    return [
-      'afform_type' => $afformTypes,
-      'afform_placement' => $afformPlacement,
-      'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
-      'placement_filters' => self::getPlacementFilterOptions(),
-      'afform_tags' => $afformTags,
-      'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
-      'confirmation_types' => self::getConfirmationTypes(),
-    ];
+    return \Civi::cache('metadata')->get($key);
+
   }
 
   /**
