@@ -142,15 +142,15 @@ af-search-param-sets {
   display: inline-flex;
   gap: var(--crm-flex-gap, 0.5rem);
   padding: var(--crm-flex-gap, 0.5rem) 0;
-  background-color: var(--crm-c-background2);
+  background-color: var(--crm-layer1-bg-color);
   align-items: center;
 }
 af-search-param-sets dialog {
-  background: var(--crm-c-container-bg);
+  background: var(--crm-dialog-bg-color);
   border: 0;
   border-radius: var(--crm-dialog-radius);
-  box-shadow: var(--crm-popup-shadow);
-  color: var(--crm-c-text);
+  box-shadow: var(--crm-shadow-popup);
+  color: var(--crm-text-color);
   max-height: 90%;
   padding: 1rem;
 }
