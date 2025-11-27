@@ -102,6 +102,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => $employerRelationshipID,
       'is_current_employer' => 1,
     ]);
+    // Update relationship
+    $this->callAPISuccess('Relationship', 'create', [
+      'id' => $employerRelationship['id'],
+      'description' => 'Employer of',
+    ]);
 
     //Check if current employer is correctly set.
     $employer = $this->callAPISuccessGetValue('Contact', [
