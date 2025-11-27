@@ -72,6 +72,13 @@
         return params;
       };
 
+      this.renderSearchParamSetDescription = (paramSet) => {
+        return ts('Created %1 by %2', {
+          1: (new Date(paramSet.created_date)).toLocaleDateString(),
+          2: (paramSet['created_by.display_name'] ? paramSet['created_by.display_name'] : 'UNKNOWN')
+        })
+      };
+
       this.renderSearchParamSetDetails = (paramSet) => {
         const rendered = {};
 
