@@ -180,7 +180,7 @@
 }
 #bootstrap-theme .btn-xs,
 #bootstrap-theme .btn-group-xs > .btn {
-  padding: var(--crm-l-xsmall) var(--crm-l-small-2);
+  padding: var(--crm-btn-small-padding);
   font-size: var(--crm-l-medium-2);
   border-radius: var(--crm-btn-radius);
   height: auto;
