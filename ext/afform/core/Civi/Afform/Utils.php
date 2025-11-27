@@ -38,6 +38,13 @@ class Utils {
     $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
 
     foreach ($formEntities as $entityName => $entity) {
+      if ($entity['type'] === 'Contribution') {
+        // Contribution is a special entity that will be processed by extensions such as Afform Payments.
+        // We need to process Contribution after all the other entities because the processing
+        //   uses data from the other entities (eg. PriceFields to generate LineItems on Membership, Participant etc.)
+        $entitiesLast[] = $entity['name'];
+        continue;
+      }
       $references = [];
       foreach ($entityValues[$entityName] as $record) {
         foreach ($record['fields'] as $fieldName => $fieldValue) {
@@ -51,7 +58,8 @@ class Utils {
       $sorter->add($entityName, $references);
     }
     // Return the list of entities ordered by weight
-    return $sorter->sort();
+    $entityWeights = $sorter->sort();
+    return array_merge($entityWeights, $entitiesLast ?? []);
   }
 
   /**
