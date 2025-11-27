@@ -87,9 +87,9 @@ class Rebuilder {
 
     if (isset($targets['menu'])) {
       \CRM_Core_Error::deprecatedWarning("In Civi::rebuild(), the 'menu' option is deprecated. For CiviCRM 6.9+, please specify combination of 'router', 'navigation', and/or 'system'.");
-      $targets['router'] = $targets['router'] || $targets['menu'];
-      $targets['navigation'] = $targets['navigation'] || $targets['menu'];
-      $targets['system'] = $targets['system'] || $targets['menu'];
+      $targets['router'] = !empty($targets['router']) || $targets['menu'];
+      $targets['navigation'] = !empty($targets['navigation']) || $targets['menu'];
+      $targets['system'] = !empty($targets['system']) || $targets['menu'];
       unset($targets['menu']);
     }
 
