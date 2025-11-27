@@ -25,7 +25,6 @@ use Civi\Api4\Contribution;
 use Civi\Api4\Email;
 use Civi\Api4\OptionValue;
 use api\v4\Api4TestBase;
-use Civi\Api4\Phone;
 
 /**
  * @group headless
@@ -140,11 +139,7 @@ class ContactJoinTest extends Api4TestBase {
       'address_billing.state_province_id:abbr' => 'AK',
       'address_billing.country_id:abbr' => 'NG',
     ]);
-    $addr = Address::get(FALSE)
-      ->addSelect('country_id:label', 'state_province_id:label')
-      ->addWhere('contact_id', '=', $contact['id'])
-      ->execute()
-      ->single();
+    $addr = $this->getTestRecord('Address', ['contact_id' => $contact['id']], ['country_id:label', 'state_province_id:label']);
     $this->assertEquals('Hello', $contact['address_billing.city']);
     $this->assertEquals('Akwa Ibom', $addr['state_province_id:label']);
     $this->assertEquals('Nigeria', $addr['country_id:label']);
@@ -165,10 +160,7 @@ class ContactJoinTest extends Api4TestBase {
       'phone_billing' => $billingPhone['id'],
     ]);
     // Ensure billing phone was assigned to contact
-    $contactGet = Contact::get(FALSE)
-      ->addWhere('id', '=', $contact['id'])
-      ->addSelect('phone_primary.phone', 'phone_billing.phone')
-      ->execute()->single();
+    $contactGet = $this->getTestRecord('Contact', $contact['id'], ['phone_primary.phone', 'phone_billing.phone']);
     $this->assertEquals('12345', $contactGet['phone_primary.phone']);
     $this->assertEquals('54321', $contactGet['phone_billing.phone']);
     $billingPhone = $this->getTestRecord('Phone', $billingPhone['id']);
@@ -179,20 +171,13 @@ class ContactJoinTest extends Api4TestBase {
       ->addValue('phone_primary.phone', NULL)
       ->addValue('phone_billing.phone', 99999)
       ->execute();
-    $phone = Phone::get(FALSE)
-      ->addWhere('contact_id', '=', $contact['id'])
-      ->execute()
-      ->single();
+    $phone = $this->getTestRecord('Phone', ['contact_id' => $contact['id']]);
     $this->assertEquals('99999', $phone['phone']);
     $this->assertTrue($phone['is_billing']);
     // Contact only has one phone now, so it should be auto-set to primary
     $this->assertTrue($phone['is_primary']);
 
-    $get = Contact::get(FALSE)
-      ->addWhere('id', '=', $contact['id'])
-      ->addSelect('phone_primary.*')
-      ->addSelect('phone_billing.*')
-      ->execute()->single();
+    $get = $this->getTestRecord('Contact', $contact['id'], ['phone_primary.*', 'phone_billing.*']);
     $this->assertEquals('99999', $get['phone_primary.phone']);
     $this->assertEquals('99999', $get['phone_billing.phone']);
     $this->assertEquals($get['phone_primary.id'], $get['phone_billing.id']);
@@ -211,10 +196,7 @@ class ContactJoinTest extends Api4TestBase {
       'contact_id' => $contact['id'],
     ]);
 
-    $result = Contribution::get(FALSE)
-      ->addWhere('contact_id', '=', $contact['id'])
-      ->addSelect('contact_id.email_primary')
-      ->execute()->single();
+    $result = $this->getTestRecord('Contribution', ['contact_id' => $contact['id']], ['contact_id.email_primary']);
     $this->assertEquals($emails[0], $result['contact_id.email_primary']);
 
     $result = Contribution::get(FALSE)

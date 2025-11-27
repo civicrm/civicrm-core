@@ -161,17 +161,12 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
    */
   public function testCreateOK(array $record): void {
     $record = $this->fillRecord($record);
-    $createResults = \civicrm_api4('Translation', 'create', [
+    $createResult = civicrm_api4('Translation', 'create', [
       'checkPermissions' => FALSE,
       'values' => $record,
-    ]);
-    $this->assertEquals(1, $createResults->count());
-    foreach ($createResults as $createResult) {
-      $getResult = \civicrm_api4('Translation', 'get', [
-        'where' => [['id', '=', $createResult['id']]],
-      ]);
-      $this->assertEquals($record['string'], $getResult->single()['string']);
-    }
+    ])->single();
+    $getResult = $this->getTestRecord('Translation', $createResult['id']);
+    $this->assertEquals($record['string'], $getResult['string']);
   }
 
   /**

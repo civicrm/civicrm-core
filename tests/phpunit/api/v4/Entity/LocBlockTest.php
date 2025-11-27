@@ -77,9 +77,7 @@ class LocBlockTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->first()['id'];
 
     // Get locBlock
-    $locBlock = LocBlock::get(FALSE)
-      ->addWhere('id', '=', $locBlockId)
-      ->execute()->single();
+    $locBlock = $this->getTestRecord('LocBlock', $locBlockId);
 
     $this->assertNotEmpty($locBlock['address_id']);
     $this->assertEmpty($locBlock['phone_id']);
@@ -92,10 +90,7 @@ class LocBlockTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('address_id.street_address', '123')
       ->execute();
 
-    $updatedLocBlock = LocBlock::get(FALSE)
-      ->addWhere('id', '=', $locBlockId)
-      ->addSelect('*', 'address_id.street_address', 'phone_id.phone', 'email_id.email')
-      ->execute()->single();
+    $updatedLocBlock = $this->getTestRecord('LocBlock', $locBlockId, ['*', 'address_id.street_address', 'phone_id.phone', 'email_id.email']);
 
     $this->assertEquals($locBlock['address_id'], $updatedLocBlock['address_id']);
     $this->assertEquals('123', $updatedLocBlock['address_id.street_address']);

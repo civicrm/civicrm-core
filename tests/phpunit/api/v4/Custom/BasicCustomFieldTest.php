@@ -503,9 +503,7 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addValue('weight', $originalControlGroupWeight)
       ->execute()->first()['weight'];
     // The other group's weight should have auto-adjusted
-    $newControlGroupWeight = CustomGroup::get(FALSE)
-      ->addWhere('id', '=', $customGroups['controlGroup']['id'])
-      ->execute()->first()['weight'];
+    $newControlGroupWeight = $this->getTestRecord('CustomGroup', $customGroups['controlGroup']['id'])['weight'];
     $this->assertEquals($newExperimentalGroupWeight + 1, $newControlGroupWeight);
 
     // Testing custom field weights

@@ -72,9 +72,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
         'is_permission_a_b' => 1,
         'is_permission_b_a:name' => 'View only',
       ])->execute()->first();
-    $relationship = Relationship::get(FALSE)
-      ->addWhere('id', '=', $relationship['id'])
-      ->execute()->first();
+    $relationship = $this->getTestRecord('Relationship', $relationship['id']);
     $cacheRecords = RelationshipCache::get(FALSE)
       ->addWhere('near_contact_id', 'IN', [$c1, $c2])
       ->addSelect('near_contact_id', 'orientation', 'description', 'relationship_created_date', 'relationship_modified_date', 'permission_near_to_far:name', 'permission_far_to_near:name')
@@ -113,9 +111,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
         'is_permission_a_b' => 1,
         'is_permission_b_a:name' => 'View only',
       ])->execute()->first();
-    $relationship = Relationship::get(FALSE)
-      ->addWhere('id', '=', $relationship['id'])
-      ->execute()->first();
+    $relationship = $this->getTestRecord('Relationship', $relationship['id']);
     Relationship::update(FALSE)
       ->addWhere('id', '=', $relationship['id'])
       ->addValue('is_active', FALSE)

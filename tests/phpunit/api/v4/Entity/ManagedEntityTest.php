@@ -112,10 +112,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
     Managed::reconcile(FALSE)->addModule('civicrm')->execute();
 
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('*', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestManagedSavedSearch'], ['*', 'local_modified_date']);
     foreach ($originalState as $fieldName => $originalValue) {
       $this->assertEquals($originalValue, $search[$fieldName]);
     }
@@ -129,10 +126,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->execute();
 
     $time = $this->getCurrentTimestamp();
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('*', 'has_base', 'base_module', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestManagedSavedSearch'], ['*', 'has_base', 'base_module', 'local_modified_date']);
     $this->assertEquals('Altered state', $search['description']);
     // Check calculated fields
     $this->assertTrue($search['has_base']);
@@ -168,10 +162,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->addValue('name', $newName)
       ->addValue('label', 'Whatever')
       ->execute();
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', $newName)
-      ->addSelect('label', 'has_base', 'base_module', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => $newName], ['label', 'has_base', 'base_module', 'local_modified_date']);
     $this->assertEquals('Whatever', $search['label']);
     // Check calculated fields
     $this->assertEquals(NULL, $search['base_module']);
@@ -208,10 +199,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->_managedEntities[] = $autoUpdateSearch;
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
-      ->addSelect('description', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
     $this->assertEquals('Original state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
@@ -241,10 +229,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals('civicrm', $search['base_module']);
     $this->assertNull($search['local_modified_date']);
 
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
-      ->addSelect('description', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
     $this->assertEquals('Original state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
@@ -254,10 +239,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     // Because the entity was not modified, it will be updated to match the new packaged version
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
-      ->addSelect('description', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
     $this->assertEquals('New packaged state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
@@ -273,10 +255,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     // Because the entity was  modified, it will not be updated
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
-      ->addSelect('description', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
     $this->assertEquals('Altered state', $search['description']);
     $this->assertNotNull($search['local_modified_date']);
 
@@ -750,9 +729,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     ];
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
-    $created = Group::get(FALSE)
-      ->addWhere('name', '=', $original['name'])
-      ->execute()->single();
+    $created = $this->getTestRecord('Group', ['name' => $original['name']]);
 
     $this->assertEquals('My Managed Group', $created['title']);
     $this->assertEquals($original['name'], $created['name']);
@@ -802,10 +779,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->_managedEntities = [$managed];
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
-    $managedGroup = OptionGroup::get(FALSE)
-      ->addWhere('name', '=', $optionGroup['name'])
-      ->addSelect('id', 'title', 'description', 'base_module')
-      ->execute()->single();
+    $managedGroup = $this->getTestRecord('OptionGroup', ['name' => $optionGroup['name']], ['id', 'title', 'description', 'base_module']);
 
     $this->assertEquals($optionGroup['id'], $managedGroup['id']);
     $this->assertEquals('Cool new title', $managedGroup['title']);
