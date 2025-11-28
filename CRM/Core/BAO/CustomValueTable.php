@@ -605,8 +605,13 @@ class CRM_Core_BAO_CustomValueTable {
       $dataType = $fieldInfo['data_type'] == 'Date' ? 'Timestamp' : $fieldInfo['data_type'];
       foreach ($fieldVals as $fieldValue) {
         // Serialize array values
-        if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($fieldInfo)) {
+        $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldInfo);
+        if (is_array($fieldValue['value']) && $isSerialized) {
           $fieldValue['value'] = CRM_Utils_Array::implodePadded($fieldValue['value']);
+        }
+        if ($isSerialized) {
+          // Serialized numbers are stored as value-separated strings
+          $dataType = 'String';
         }
         // Format null values correctly
         if ($fieldValue['value'] === NULL || $fieldValue['value'] === '') {
