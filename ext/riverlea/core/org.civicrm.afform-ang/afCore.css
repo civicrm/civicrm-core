@@ -129,6 +129,11 @@ fieldset.af-container.af-layout-inline {
   border: 0;
 }
 
+/* Hidden fields */
+.af-field-type-hidden {
+  display: none;
+}
+
 /* Radio buttons */
 .af-field-type-radio .crm-af-field {
   display: flex;
