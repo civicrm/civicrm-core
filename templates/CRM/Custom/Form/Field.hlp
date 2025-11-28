@@ -7,6 +7,53 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{htxt id='option_type'}
+  <p>
+    {ts}You can create new multiple choice options for this field, or select an existing set of options which you've already created for another custom field.{/ts}
+  </p>
+{/htxt}
+
 {htxt id='in_selector'}
-  {ts}Display in Table controls which columns are included in the listing of custom data records. If your custom data set has a large number of fields, uncheck this box to exclude less important fields from the listing. All fields will still be included when viewing a single record. You may also want to exclude Note type fields from the table listing.{/ts}
+  <p>
+    {ts}Display in Table controls which columns are included in the listing of custom data records. If your custom data set has a large number of fields, uncheck this box to exclude less important fields from the listing. All fields will still be included when viewing a single record. You may also want to exclude Note type fields from the table listing.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='note_length'}
+  <p>
+    {ts}Leave blank for unlimited. This limit is not implemented by all browsers and rich text editors.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='weight'}
+  <p>
+    {ts}Controls the order in which fields are displayed in a group. Lower numbers are displayed ahead of higher numbers.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='default_value'}
+  <p>
+    {ts}If you want to provide a default value for this field, enter it here.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='is_required'}
+  <p>
+    {ts}Do not make custom fields required unless you want to force all users to enter a value anytime they add or edit this type of record. You can always make the field required when used in a specific Profile form.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='is_searchable'}
+  <p>
+    {ts}Adds a database index which helps speed up searches on this field significantly. However, it can require more storage and can slow down the system if the data is frequently updated.{/ts}
+  </p>
+  <p>
+    {ts}This setting is not recommended for Multi-Select or Checkboxes, as indexes are usually not helpful for fields that store multiple values.{/ts}
+  </p>
+{/htxt}
+
+{htxt id='is_view'}
+  <p>
+    {ts}Is this field set by PHP code (via a custom hook). This field will not be updated by CiviCRM.{/ts}
+  </p>
 {/htxt}

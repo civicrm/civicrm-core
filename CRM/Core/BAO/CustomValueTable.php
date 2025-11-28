@@ -308,20 +308,8 @@ class CRM_Core_BAO_CustomValueTable {
     }
 
     if ($isSerialized) {
-      switch ($type) {
-        case 'Text':
-          return 'text';
-
-        case 'String':
-        default:
-          // ensure minimum varchar of 255
-          // TODO: this can still be insufficient if you try to serialize
-          // long text values. in this case a `text` field would be better
-          // but how to know? we could switch to only using varchar for serialized
-          // ints and text otherwise?
-          $maxLength = max(255, $maxLength ?: 255);
-          return "varchar($maxLength)";
-      }
+      // Always use 'text' for serialized fields as their length cannot be known
+      return 'text';
     }
     switch ($type) {
       case 'String':

@@ -194,11 +194,6 @@ class CRM_Core_BAO_SchemaHandler {
   public static function buildSearchIndexSQL($params, $separator, $prefix = '', $existingIndex = '') {
     $sql = '';
 
-    // Don't index blob
-    if ($params['type'] == 'text') {
-      return NULL;
-    }
-
     // Perform case-insensitive match to see if index name begins with "index_" or "INDEX_"
     // (for legacy reasons it could be either)
     $searchIndexExists = stripos($existingIndex ?? '', 'index_') === 0;
@@ -207,7 +202,7 @@ class CRM_Core_BAO_SchemaHandler {
     // (skip indexing FK fields because it would be redundant to have 2 indexes)
     if (!empty($params['searchable']) && empty($params['fk_table_name']) && !$searchIndexExists) {
       $indexName = $params['name'];
-      if (self::getFieldLength($params['type']) > self::MAX_INDEX_LENGTH) {
+      if ($params['type'] === 'text' || self::getFieldLength($params['type']) > self::MAX_INDEX_LENGTH) {
         $indexName .= '(' . self::MAX_INDEX_LENGTH . ')';
       }
       $sql .= $separator;
