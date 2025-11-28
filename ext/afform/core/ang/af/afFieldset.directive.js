@@ -98,7 +98,7 @@
             if (v === null || v === '') {
               return true;
             }
-            if (v && v.length === 0) {
+            if (Array.isArray(v) && v.length === 0) {
               return true;
             }
             if (typeof v === 'object' && Object.keys(v).length === 0) {
