@@ -9,7 +9,7 @@
 *}
 {htxt id="email-delivery-settings"}
 <p>
-  {ts}A copy of this report can be automatically generated and delivered via email to specified recipients. Use the settings in this section to control Subject of the email containing the report, as well as the recipient list (To and Cc fields). Separate multiple 'To' or 'CC' email addresses with commas.{/ts}
+  {ts}A copy of this report can be automatically generated and delivered via email to specified recipients. Use the settings in this section to control Subject of the email containing the report, as well as the recipient list (To and Cc fields). You can only specify one 'To' email, but you can separate multiple 'CC' email addresses with commas.{/ts}
 </p>
 <p>
   {ts}Your site administrator will need to setup an instance of the Scheduled Job "Mail Reports" to trigger creation and delivery of each report. When invoked, this job will deliver email to the recipients specified for the report. The report can be attached to the email as a PDF file (default), as a CSV file, or included in HTML format.{/ts} {docURL page="user/initial-set-up/scheduled-jobs"}
