@@ -88,7 +88,6 @@
         const rendered = {};
 
         if (paramSet.filters) {
-          // TODO: move meta getter to afFieldset?
           const fieldMeta = this.afFieldset.getFieldMeta();
 
           Object.keys(paramSet.filters).forEach((key) => {
@@ -96,18 +95,27 @@
             const rawValue = paramSet.filters[key];
 
             const formatValue = (v) => {
+              // if an array, format items and concat
+              if (v && v.map) {
+                return v.map(formatValue).join(' OR ');
+              }
               if (defn.options && defn.options.length) {
                 const selected = defn.options.find((o) => o.id == v);
                 if (selected) {
                   return selected.label;
                 }
               }
-              return v;
+              switch (typeof v) {
+                case 'number':
+                case 'string':
+                  return v;
+              }
+              return Object.entries(v)
+                .filter((e) => e[1])
+                .map((e) => `${e[0]} ${e[1]}`)
+                .join(' AND ');
             };
-
-            const value = (rawValue && rawValue.map) ? rawValue.map(formatValue).join(', ') : formatValue(rawValue);
-
-            rendered[defn.label] = value;
+            rendered[defn.label] = formatValue(rawValue);
           });
         }
 
