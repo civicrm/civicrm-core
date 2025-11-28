@@ -380,7 +380,8 @@ class CRM_Contact_Form_Edit_Address {
   private static function enforceRequired(CRM_Core_Form $form): bool {
     if ($form->isSubmitted()) {
       $addresses = (array) $form->getSubmittedValue('address');
-      foreach ($addresses as $address) {
+      foreach ($addresses as $idx => $address) {
+        $address['id'] = $form->_values['address'][$idx]['id'] ?? "";
         if (!empty($address['master_id']) || CRM_Core_BAO_Address::dataExists($address)) {
           return TRUE;
         }

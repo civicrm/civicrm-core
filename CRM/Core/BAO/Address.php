@@ -312,7 +312,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
       }
       elseif (!CRM_Utils_System::isNull($value)) {
         // name could be country or country id
-        if (substr($name, 0, 7) == 'country') {
+        if (substr($name, 0, 7) == 'country' && empty($params['id'])) {
           // make sure its different from the default country
           // iso code
           $defaultCountry = CRM_Core_BAO_Country::defaultContactCountry();
