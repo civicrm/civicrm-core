@@ -1492,15 +1492,21 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       }
     }
 
-    $customFields = CRM_Core_BAO_CustomField::getFields($customFieldExtend,
-      FALSE,
-      $inline,
-      $customDataSubType,
-      NULL,
-      FALSE,
-      FALSE,
-      $checkPermission ? CRM_Core_Permission::EDIT : FALSE
-    );
+    $customFields = [];
+    $filters = [
+      'extends' => $customFieldExtend,
+      'is_active' => TRUE,
+    ];
+    if ($inline) {
+      $filters['style'] = 'Inline';
+    }
+    $customFieldGroups = CRM_Core_BAO_CustomGroup::getAll($filters, $checkPermission ? CRM_Core_Permission::EDIT : NULL);
+    foreach ($customFieldGroups as $customFieldGroup) {
+      foreach ($customFieldGroup['fields'] as $customFieldID => $customField) {
+        $customField['is_multiple'] = $customFieldGroup['is_multiple'];
+        $customFields[$customFieldID] = $customField;
+      }
+    }
 
     if (!array_key_exists($customFieldId, $customFields)) {
       return NULL;
