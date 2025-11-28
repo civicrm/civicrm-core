@@ -69,4 +69,5 @@
 /* Alpha filter '--crm-filter-' */
   --crm-filter-bg-color: var(--crm-c-blue-dark);
 /* Frontend '--crm-f- */
+  --crm-f-page-bg-color: var(--crm-c-darkest);
 }
