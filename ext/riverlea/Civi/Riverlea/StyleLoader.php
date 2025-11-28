@@ -129,6 +129,10 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
       foreach (self::CORE_FILES as $i => $file) {
         $bundle->addStyleFile('riverlea', "core/css/{$file}", ['weight' => -100 + ($i / $j)]);
       }
+      if (\CRM_Utils_Request::retrieve('safe_css', 'Boolean')) {
+        // safe mode - dont load dynamic styles
+        return;
+      }
       // get the URL for dynamic css asset (aka "the river")
       $riverUrl = \Civi::service('asset_builder')->getUrl(
         self::DYNAMIC_FILE,
