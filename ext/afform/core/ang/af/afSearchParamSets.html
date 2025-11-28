@@ -63,7 +63,7 @@
     </div>
 
     <dl>
-      <div ng-repeat="(key, value) in $ctrl.renderSearchParamSetFilters($ctrl.getCurrentFilterValues())">
+      <div ng-repeat="(key, value) in $ctrl.renderSearchParamSetDetails($ctrl.getCurrentParams())">
         <dt>{{:: key }}</dt><dd>{{ value }}</dd>
       </div>
     </dl>
