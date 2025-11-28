@@ -208,6 +208,7 @@
   --crm-wizard-active-bg-color: var(--crm-page-bg-color);
   --crm-wizard-border: 1px solid var(--crm-page-bg-color);
 /* Frontend */
+  --crm-f-page-bg-color: #e8eef0;
   --crm-f-fieldset-padding: var(--crm-padding-reg);
   --crm-f-fieldset-bg-color: var(--crm-container-bg-color);
   --crm-f-legend-size: var(--crm-l-reg-2);

@@ -76,4 +76,8 @@
 /* Alpha filter '--crm-filter-' */
   --crm-filter-item-bg-color: var(--crm-layer1-bg-color);
 /* Frontend '--crm-f- */
+  --crm-f-form-focus-bg-color: var(--crm-success-color);
+  --crm-f-form-focus-border-color: var(--crm-alert-success-border-color);
+  --crm-f-form-error-bg-color: var(--crm-danger-color);
+  --crm-f-form-error-border-color: var(--crm-alert-danger-border-color);
 }

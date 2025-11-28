@@ -236,6 +236,7 @@
 }
 :root {
 /* Frontend */
+  --crm-f-page-bg-color: #f3f2ed;
   --crm-f-form-width: 700px;
   --crm-f-fieldset-bg-color: var(--crm-container-bg-color);
   --crm-f-fieldset-padding: var(--crm-l-reg);
