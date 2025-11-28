@@ -18,6 +18,7 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class ReportInstance extends Generic\DAOEntity {
+
   use Generic\Traits\ManagedEntity;
 
   /**
