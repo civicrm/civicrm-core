@@ -46,6 +46,13 @@ class Run extends AbstractRunAction {
   protected function processResult(SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->_apiParams;
+    if (!empty($this->display['settings']['useDefaultSearchColumns'])) {
+      $defaultDisplay = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+        ->setSavedSearch($this->savedSearch)
+        ->setType($this->display['type'])
+        ->execute()->single();
+      $this->display['settings']['columns'] = $defaultDisplay['settings']['columns'];
+    }
     $page = $index = NULL;
     $key = $this->return;
     // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
