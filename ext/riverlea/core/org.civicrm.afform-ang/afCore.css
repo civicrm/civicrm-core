@@ -141,40 +141,25 @@ af-search-param-sets {
   --crm-btn-margin: 0;
   display: inline-flex;
   gap: var(--crm-flex-gap, 0.5rem);
-  padding: var(--crm-flex-gap, 0.5rem) 0;
-  background-color: var(--crm-c-background2);
+  padding: var(--crm-flex-gap, 0.5rem);
+  margin: var(--crm-flex-gap, 0.5rem) 0;
+  background-color: var(--crm-layer1-bg-color);
+  border-radius: var(--crm-l-radius);
   align-items: center;
-}
-af-search-param-sets dialog {
-  background: var(--crm-c-container-bg);
-  border: 0;
-  border-radius: var(--crm-dialog-radius);
-  box-shadow: var(--crm-popup-shadow);
-  color: var(--crm-c-text);
-  max-height: 90%;
-  padding: 1rem;
 }
 af-search-param-sets dialog ul {
   list-style: none;
   padding-left: 0;
 }
-af-search-param-sets details > summary.crm-accordion-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-}
-af-search-param-sets details > summary.crm-accordion-header .af-search-param-set-description {
-  font-weight: lighter;
-  font-style: italic;
-}
-af-search-param-sets dialog .crm-buttons {
-  justify-content: flex-end;
+af-search-param-sets summary .description {
+  margin-left: 2rem;
 }
 #bootstrap-theme af-search-param-sets dl {
-  margin-top: var(--crm-flex-gap);
+  margin: var(--crm-flex-gap) 0;
 }
 af-search-param-sets dl > div {
   display: flex;
-  gap: var(--crm-flex-gap, 0.5rem);
+}
+af-search-param-sets dl > div > dt {
+  min-width: 10rem;
 }

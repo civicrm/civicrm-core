@@ -23,7 +23,14 @@
           where: [['afform_name', '=', this.formName]],
           orderBy: {'label': 'ASC'}
         })
-        .then((results) => this.savedSets = results)
+        .then((results) => this.savedSets = results.map((paramSet) => {
+          // format date or time
+          const created = new Date(paramSet.created_date);
+          const createdDate = created.toLocaleDateString();
+          const isToday = createdDate === (new Date()).toLocaleDateString();
+          paramSet.created_date_or_time = isToday ? ts('%1 today', {1: created.toLocaleTimeString()}) : createdDate;
+          return paramSet;
+        }))
         .catch(() => this.savedSets = [{id: '', label: ts('Error fetching Saved Searches')}]);
 
       this.applySearchParamSet = (id) => $window.location.hash = `#?_s=${id ? id : 0}`;
@@ -72,11 +79,15 @@
         return params;
       };
 
+      this.renderSearchParamSetDescription = (paramSet) => ts('Created %1 by %2', {
+        1: paramSet.created_date_or_time,
+        2: (paramSet['created_by.display_name'] ? paramSet['created_by.display_name'] : 'UNKNOWN')
+      });
+
       this.renderSearchParamSetDetails = (paramSet) => {
         const rendered = {};
 
         if (paramSet.filters) {
-          // TODO: move meta getter to afFieldset?
           const fieldMeta = this.afFieldset.getFieldMeta();
 
           Object.keys(paramSet.filters).forEach((key) => {
@@ -84,18 +95,27 @@
             const rawValue = paramSet.filters[key];
 
             const formatValue = (v) => {
+              // if an array, format items and concat
+              if (v && v.map) {
+                return v.map(formatValue).join(' OR ');
+              }
               if (defn.options && defn.options.length) {
                 const selected = defn.options.find((o) => o.id == v);
                 if (selected) {
                   return selected.label;
                 }
               }
-              return v;
+              switch (typeof v) {
+                case 'number':
+                case 'string':
+                  return v;
+              }
+              return Object.entries(v)
+                .filter((e) => e[1])
+                .map((e) => `${e[0]} ${e[1]}`)
+                .join(' AND ');
             };
-
-            const value = (rawValue && rawValue.map) ? rawValue.map(formatValue).join(', ') : formatValue(rawValue);
-
-            rendered[defn.label] = value;
+            rendered[defn.label] = formatValue(rawValue);
           });
         }
 
