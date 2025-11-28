@@ -9,10 +9,8 @@
 *}
 {* Included in Custom/Form/Field.tpl - used for fields with multiple choice options. *}
 <tr>
-<td class="label">{$form.option_type.label}</td>
-<td class="html-adjust">{$form.option_type.html}<br />
-    <span class="description">{ts}You can create new multiple choice options for this field, or select an existing set of options which you've already created for another custom field.{/ts}</span>
-</td>
+  <td class="label">{$form.option_type.label} {help id="option_type" file="CRM/Custom/Form/Field"}</td>
+  <td class="html-adjust">{$form.option_type.html}</td>
 </tr>
 
 <tr id="option_group" {if empty($form.option_group_id)}class="hiddenElement"{/if}>
