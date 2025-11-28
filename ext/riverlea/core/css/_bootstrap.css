@@ -2715,8 +2715,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   display: block;
   padding: 10px 15px;
   margin-bottom: -1px;
-  background-color: white;
-  border: 1px solid #ddd;
+  background-color: transparent;
+  border: 1px solid var(--crm-border-color);
 }
 #bootstrap-theme .list-group-item:first-child {
   border-top-left-radius: 4px;
