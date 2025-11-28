@@ -120,6 +120,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     if ($dataType === 'Date' && !empty($customField['time_format'])) {
       $dataType = 'Timestamp';
     }
+    if (!empty($customField['fk_entity'])) {
+      $dataType = CRM_Core_BAO_CustomValueTable::getDataTypeForPrimaryKey($customField['fk_entity'], $dataType);
+    }
+
     return $dataType;
   }
 
@@ -2787,7 +2791,8 @@ WHERE      f.id IN ($ids)";
       'type' => CRM_Core_BAO_CustomValueTable::fieldToSQLType(
         $field->data_type,
         $field->text_length,
-        $field->serialize
+        $field->serialize,
+        $field->fk_entity ?? ''
       ),
       'required' => $field->is_required,
       'searchable' => $field->is_searchable && $field->is_active,

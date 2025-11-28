@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\CustomField;
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  *
  * @package CRM
@@ -135,7 +138,7 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'EntityReference':
-              $type = 'Integer';
+              $type = self::getDataTypeForField($field['custom_field_id'], $type);
               // An empty value should be stored as NULL
               if (!$value) {
                 $type = 'Timestamp';
@@ -235,16 +238,75 @@ class CRM_Core_BAO_CustomValueTable {
   }
 
   /**
+   * Most entities have an Int id field, but non-database ones
+   *   eg. Afform have a String "name" field as primary key
+   *
+   * @param string $entityName
+   * @param string $type
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public static function getDataTypeForPrimaryKey(string $entityName, string $type): string {
+    $primaryKey = CoreUtil::getInfoItem($entityName, 'primary_key');
+    if (isset($primaryKey[0]) && $primaryKey[0] !== 'id') {
+      $type = civicrm_api4($entityName, 'getFields', [
+        'where' => [
+          ['name', '=', $primaryKey[0]],
+        ],
+        'checkPermissions' => FALSE,
+        'select' => [
+          'data_type',
+        ],
+      ], 0)['data_type'] ?? $type;
+    }
+    return $type;
+  }
+
+  /**
+   * Get the actual data type for a customField based on the entity metadata
+   *
+   * @param int $customFieldID
+   * @param string $type
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getDataTypeForField(int $customFieldID, string $type): string {
+    if ($type !== 'EntityReference') {
+      return $type;
+    }
+    $customField = CustomField::get(FALSE)
+      ->setUseCache(TRUE)
+      ->addSelect('fk_entity', 'name')
+      ->addWhere('id', '=', $customFieldID)
+      ->execute()
+      ->first();
+    if (empty($customField)) {
+      return $type;
+    }
+    return self::getDataTypeForPrimaryKey($customField['fk_entity'], $type) ?? $type;
+  }
+
+  /**
    * Given a field return the mysql data type associated with it.
    *
    * @param string $type
    * @param int|null $maxLength
    * @param bool $isSerialized (serialized fields must always have a textual mysql field)
+   * @param string|null $fkEntity The entity that the CustomField (CustomGroup) extends. eg. Activity
    *
    * @return string
    *   the mysql data store placeholder
    */
-  public static function fieldToSQLType(string $type, $maxLength = NULL, bool $isSerialized = FALSE) {
+  public static function fieldToSQLType(string $type, $maxLength = NULL, bool $isSerialized = FALSE, ?string $fkEntity = NULL) {
+    if ($fkEntity) {
+      $type = self::getDataTypeForPrimaryKey($fkEntity, $type);
+    }
+
     if ($isSerialized) {
       switch ($type) {
         case 'Text':
@@ -370,12 +432,12 @@ class CRM_Core_BAO_CustomValueTable {
    * Post process function.
    *
    * @param array $params
-   * @param $entityTable
+   * @param string $entityTable
    * @param int $entityID
-   * @param $customFieldExtends
-   * @param $parentOperation
+   * @param string $customFieldExtends
+   * @param ?string $parentOperation
    */
-  public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends, $parentOperation = NULL) {
+  public static function postProcess(array &$params, string $entityTable, int $entityID, string $customFieldExtends, ?string $parentOperation = NULL) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
       $entityID,
       $customFieldExtends
