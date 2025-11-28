@@ -147,7 +147,7 @@
         // this also kicks off the first run of the search (if there's no search button).
         function setUpWatches() {
           if (ctrl.afFieldset) {
-            $scope.$watch(ctrl.afFieldset.getFieldData, onChangeFilters, true);
+            $scope.$watch(ctrl.afFieldset.getFilterValues, onChangeFilters, true);
           }
           if (ctrl.settings.pager && ctrl.settings.pager.expose_limit) {
             $scope.$watch('$ctrl.limit', onChangePageSize);
