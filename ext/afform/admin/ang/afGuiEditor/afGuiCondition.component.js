@@ -32,6 +32,7 @@
         'IS EMPTY': ts('Is Empty'),
         'IS NOT EMPTY': ts('Not Empty'),
         'IS NOT NULL': ts('Any Value'),
+        'IS NULL': ts('No Value'),
       };
 
       this.$onInit = function() {
@@ -80,7 +81,7 @@
         var field = ctrl.field || {},
           allowedOps = field.operators;
         if (!allowedOps && field.data_type === 'Boolean') {
-          allowedOps = ['=', '!=', 'IS EMPTY', 'IS NOT NULL'];
+          allowedOps = ['=', '!=', 'IS EMPTY', 'IS NOT NULL', 'IS NULL'];
         }
         if (!allowedOps && _.includes(['Boolean', 'Float', 'Date'], field.data_type)) {
           allowedOps = ['=', '!=', '<', '>', '<=', '>=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS EMPTY', 'IS NOT EMPTY'];
