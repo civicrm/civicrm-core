@@ -1367,13 +1367,30 @@ input.crm-form-entityref {
   line-height: 1em;
 }
 
+/* Mobile-friendly layout for two columns */
+@media (min-width: 768px) {
+  #crm-container .pcp-page-pcpinfo-intro {
+    float: left;
+    max-width: calc(100% - 370px);
+  }
+  #crm-container .pcp-widgets {
+    float: right;
+    max-width: 360px;
+  }
+}
+
 #crm-container .pcp-intro-text {
   padding-bottom: 1em;
 }
 
 #crm-container .pcp-image {
-  float: left;
-  margin: 0 1em 1em 0;
+  text-align: center;
+  margin-bottom: 1em;
+}
+@media (min-width: 768px) {
+  #crm-container .pcp-image {
+    margin: 0 1em 1em 0;
+  }
 }
 
 #crm-container .pcp-image img {
@@ -1382,7 +1399,6 @@ input.crm-form-entityref {
 
 #crm-container .pcp-widgets {
   border: 1px solid #cccccc;
-  float: right;
   margin: 0 0 1em 1em;
   padding: 0.5em;
 }
