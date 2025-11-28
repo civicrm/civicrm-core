@@ -152,12 +152,8 @@
       </td>
     </tr>
     <tr id ="searchable" class="crm-custom-field-form-block-is_searchable">
-      <td class="label">{$form.is_searchable.label}</td>
-      <td class="html-adjust">{$form.is_searchable.html}
-        {if $action neq 4}
-          <br /><span class="description">{ts}Adds a database index which helps speed up searches on this field significantly. However, it can require more storage and can slow down the system if the data is frequently updated.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.is_searchable.label} {help id="is_searchable"}</td>
+      <td class="html-adjust">{$form.is_searchable.html}</td>
     </tr>
     <tr id="searchByRange" class="crm-custom-field-form-block-is_search_range">
       <td class="label">{$form.is_search_range.label}</td>
