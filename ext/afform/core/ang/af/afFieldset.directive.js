@@ -57,7 +57,10 @@
           if (!this.storeValues) {
             return;
           }
-          return CRM.cache.get(getCacheKey(), {})[fieldName];
+          if (!this.reloadedStoredValues) {
+            this.reloadedStoredValues = CRM.cache.get(getCacheKey(), {});
+          }
+          return this.reloadedStoredValues[fieldName];
         };
         this.$onInit = function() {
           if (this.storeValues) {
