@@ -265,7 +265,8 @@ class CRM_Core_I18n_Schema {
    *   Are we upgrading our database
    */
   public static function rebuildMultilingualSchema($locales, $version = NULL, $isUpgradeMode = FALSE) {
-    if ($version) {
+    // As of 6.10 we've stopped doing versioned SchemaStructure files
+    if ($version && version_compare($version, '6.10.alpha1', '<')) {
       $latest = self::getLatestSchema($version);
       require_once "CRM/Core/I18n/SchemaStructure_{$latest}.php";
       $class = "CRM_Core_I18n_SchemaStructure_{$latest}";
