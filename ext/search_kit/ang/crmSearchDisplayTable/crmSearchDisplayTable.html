@@ -8,15 +8,14 @@
     <details ng-if="$ctrl.settings.toggleColumns">
       <summary>{{:: ts('Pick Columns') }}</summary>
       <div class="crm-accordion-body">
-        <!-- TODO: select2 might be nicer here? -->
-        <label ng-repeat="(index, col) in $ctrl.columns">
+        <label ng-repeat="(index, col) in $ctrl.columns" ng-if="col.label">
           <input type="checkbox"
             ng-model="$ctrl.columns[index].enabled"
             ng-change="$ctrl.toggleColumns()"
             >
-            {{:: $ctrl.getColumnToggleLabel(col) }}
+            {{:: col.label }}
         </label>
-        <button type="button" class="btn btn-secondary" ng-click="$ctrl.resetColumnToggles()">
+        <button type="button" class="btn btn-sm btn-secondary" ng-click="$ctrl.resetColumnToggles()">
           {{:: ts('Select All') }}
         </button>
       </div>
