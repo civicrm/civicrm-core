@@ -291,8 +291,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testMembershipTypeGetList(): void {
     $this->membershipTypeCreate();
-    $this->membershipTypeCreate(['name' => 'cheap-skates']);
-    $this->membershipTypeCreate(['name' => 'disabled cheap-skates', 'is_active' => 0]);
+    $this->membershipTypeCreate(['title' => 'cheap-skates']);
+    $this->membershipTypeCreate(['title' => 'disabled cheap-skates', 'is_active' => 0]);
     $result = $this->callAPISuccess('MembershipType', 'getlist', []);
     $this->assertEquals(2, $result['count']);
     $this->assertEquals('cheap-skates', $result['values'][0]['label']);

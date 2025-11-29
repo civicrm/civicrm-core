@@ -22,6 +22,7 @@ class CRM_Member_Page_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testMembershipTypePage(): void {
     $page = new CRM_Member_Page_MembershipType();
+
     $id = $this->membershipTypeCreate(['weight' => 1]);
     $page->browse();
     $assigned = CRM_Core_Smarty::singleton()->getTemplateVars();
@@ -29,7 +30,8 @@ class CRM_Member_Page_MembershipTypeTest extends CiviUnitTestCase {
       $id => [
         'id' => '1',
         'domain_id' => '1',
-        'name' => 'General',
+        'title' => 'General',
+        'frontend_title' => 'General',
         'member_of_contact_id' => '3',
         'financial_type_id' => '2',
         'minimum_fee' => 0.0,

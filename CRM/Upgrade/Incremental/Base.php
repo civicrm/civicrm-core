@@ -409,7 +409,7 @@ class CRM_Upgrade_Incremental_Base {
     if ($position) {
       $fieldSql .= " $position";
     }
-    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName)) {
       return self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
     }
     else {
