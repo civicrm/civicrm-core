@@ -3,6 +3,7 @@
 namespace Civi\Core;
 
 use Civi\Core\Exception\UnknownAssetException;
+use CRM_Utils_Time;
 
 /**
  * Class AssetBuilder
@@ -191,12 +192,13 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
       // No file locking, but concurrent writers should produce
       // the same data, so we'll just plow ahead.
 
-      if (!file_exists($this->getCachePath())) {
-        mkdir($this->getCachePath());
+      $filePath = $this->getCachePath($fileName);
+      if (!file_exists(dirname($filePath))) {
+        mkdir(dirname($filePath), 0777, TRUE);
       }
       try {
         $rendered = $this->render($name, $params);
-        file_put_contents($this->getCachePath($fileName), $rendered['content']);
+        file_put_contents($filePath, $rendered['content']);
         return $fileName;
       }
       catch (UnknownAssetException $e) {
@@ -245,6 +247,49 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
   }
 
   /**
+   * Mark all cache files as stale. We can still serve the files for a brief grace period.
+   *
+   * @param int $grace
+   *   How long to wait before deleting old datasets. (Duration, seconds)
+   * @return void
+   */
+  public function invalidate(int $grace = 90 * 60): void {
+    // To create a grace period, we simultaneously invalidate two things:
+    //
+    // 1. Invalidate all folders/buckets to ensure that files will be deleted (eventually).
+    // 2. Invalidate all resCacheCode's to prevent new processes from hyperlinking to the old folders.
+    //
+    // It would be nice to support selective invalidation (e.g. per-locale). The folders/buckets
+    // support some decent selectors (`if $bucket['locale'] == $targetLocale`), but `resCacheCode`
+    // has cruder selectors (`where domain_id=X`). For selective invalidation, both layers need
+    // the same selectors.
+
+    foreach ($this->getCacheBuckets() as $bucket) {
+      $flag = $bucket['path'] . '/expiration.txt';
+      if (!file_exists($flag)) {
+        file_put_contents($flag, (\CRM_Utils_Time::time() + $grace) . "\n");
+      }
+    }
+
+    \CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "resCacheCode"');
+  }
+
+  /**
+   * Clear out old cache files.
+   *
+   * FIXME: Add some process to call prune() periodically...
+   */
+  public function prune(): void {
+    $allBuckets = $this->getCacheBuckets();
+    $staleBuckets = array_filter($allBuckets,
+      fn($b) => file_exists($b['path'] . '/expiration.txt') && trim(file_get_contents($b['path'] . '/expiration.txt')) < CRM_Utils_Time::time()
+    );
+    foreach ($staleBuckets as $bucket) {
+      \CRM_Utils_File::cleanDir($bucket['path'], TRUE);
+    }
+  }
+
+  /**
    * Determine the local path of a cache file.
    *
    * @param string|null $fileName
@@ -255,9 +300,7 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
    */
   protected function getCachePath($fileName = NULL) {
     // imageUploadDir has the correct functional properties but a wonky name.
-    $suffix = ($fileName === NULL) ? '' : (DIRECTORY_SEPARATOR . $fileName);
-    return \CRM_Core_Config::singleton()->imageUploadDir
-      . 'dyn' . $suffix;
+    return \CRM_Core_Config::singleton()->imageUploadDir . 'dyn' . $this->getCacheRelPath($fileName);
   }
 
   /**
@@ -271,9 +314,35 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
    */
   protected function getCacheUrl($fileName = NULL) {
     // imageUploadURL has the correct functional properties but a wonky name.
-    $suffix = ($fileName === NULL) ? '' : ('/' . $fileName);
+    $suffix = $this->getCacheRelPath($fileName);
     return \CRM_Utils_File::addTrailingSlash(\CRM_Core_Config::singleton()->imageUploadURL, '/')
       . 'dyn' . $suffix;
+  }
+
+  protected function getCacheRelPath(?string $fileName): string {
+    if ($fileName === NULL) {
+      return '';
+    }
+    else {
+      $rev = \CRM_Core_BAO_Domain::getDomain()->id . '-' . \Civi::resources()->getCacheCode();
+      return DIRECTORY_SEPARATOR . $rev . DIRECTORY_SEPARATOR . $fileName;
+    }
+  }
+
+  /**
+   * @return array
+   *   Each item is array{domain: int, cacheCode: string, locale: string, path: string, ctime: int}
+   */
+  protected function getCacheBuckets(): array {
+    $basePath = $this->getCachePath();
+    $buckets = [];
+    // This pattern is based on the combination of getCacheRelPath() with Resources::getCacheCode()
+    foreach (glob($basePath . '/*-*-*_*') as $folder) {
+      if (is_dir($folder) && preg_match(';/(\d+)-([a-z0-9]+)-([a-z]{2}_[a-z]{2})$;i', $folder, $m)) {
+        $buckets[] = ['domain' => $m[1], 'cacheCode' => $m[2], 'locale' => $m[3], 'path' => $folder];
+      }
+    }
+    return $buckets;
   }
 
   /**
