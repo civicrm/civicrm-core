@@ -1028,7 +1028,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $editable['record'][$editable['id_key']] = $data[$editable['id_path']];
       // Ensure field is appropriate to this entity sub-type
       $entityValues = FormattingUtil::filterByPath($data, $editable['id_path'], $editable['id_key']);
-      if (!$this->fieldBelongsToEntity($editable['entity'], $editable['value_key'], $entityValues)) {
+      if (!$this->fieldBelongsToEntity($editable['entity'], $editable['value_key'], $entityValues, empty($this->display['acl_bypass']))) {
         return NULL;
       }
     }
