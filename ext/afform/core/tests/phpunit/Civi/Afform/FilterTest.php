@@ -71,4 +71,22 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     $this->assertEquals('Text', $myField['defn']['input_type']);
   }
 
+  public function testEntityDataSuffixes(): void {
+    $status_id = \Civi\Api4\MembershipStatus::create(TRUE)
+      ->addValue('name', 'testEntityDataSuffixes')
+      ->execute()
+      ->first()['id'];
+
+    $inputHtml = sprintf(
+      '<af-form ctrl="afform">' .
+      '<af-entity actions="{create: true, update: true}" type="Membership" name="Membership1" label="Membership 1" security="RBAC" data="{\'status_id:name\': \'testEntityDataSuffixes\'}" />' .
+      '</af-form>');
+    $filteredHtml = $this->htmlFilter('~/afform/MyForm.aff.html', $inputHtml);
+    $converter = new \CRM_Afform_ArrayHtml(TRUE);
+    $parsed = $converter->convertHtmlToArray($filteredHtml);
+
+    $myEntity = $parsed[0]['#children'][0];
+    $this->assertEquals($status_id, $myEntity['data']['status_id']);
+  }
+
 }
