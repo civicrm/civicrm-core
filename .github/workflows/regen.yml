@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: shivammathur/setup-php@v2
         with:
-            php-version: 8.1
+            php-version: 8.3
             extensions: dom, curl, libxml, mbstring, zip, pdo, mysql, pdo_mysql, bcmath, soap, intl, gd, exif, iconv
             coverage: none
             tools: composer:v2
@@ -75,6 +75,8 @@ jobs:
           tar xzf drupal.tgz
           mv drupal-$DRUPVER drupal
           cd drupal
+          # allow packages with security advisories
+          echo '{"config":{"audit":{"block-insecure": false}}}' > composer.json
           composer require drush/drush:'^8'
           ./vendor/drush/drush/drush -y -l http://civi.localhost site-install standard --db-url='mysql://root:passpasspw@127.0.0.1:${{ job.services.mysql.ports[3306] }}/db' --site-name=TestCivi --account-pass=admin
           chmod +w sites/default
