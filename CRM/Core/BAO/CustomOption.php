@@ -81,7 +81,7 @@ class CRM_Core_BAO_CustomOption {
     $options = [];
 
     $field = CRM_Core_BAO_CustomField::getFieldObject($params['fid']);
-    $defVal = CRM_Utils_Array::explodePadded($field->default_value);
+    $defVal = (array) CRM_Utils_Array::explodePadded($field->default_value);
 
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
@@ -130,8 +130,8 @@ class CRM_Core_BAO_CustomOption {
         $action -= CRM_Core_Action::DELETE;
       }
 
-      if ($field->html_type == 'CheckBox' || ($field->html_type == 'Select' && $field->serialize == 1)) {
-        $options[$dao->id]['is_default'] = (isset($defVal) && in_array($dao->value, $defVal));
+      if (CRM_Core_BAO_CustomField::isSerialized($field)) {
+        $options[$dao->id]['is_default'] = in_array($dao->value, $defVal);
       }
       else {
         $options[$dao->id]['is_default'] = ($field->default_value == $dao->value);
