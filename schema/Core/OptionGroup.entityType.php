@@ -35,6 +35,9 @@ return [
       'add' => '1.5',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'import',
+      ],
     ],
     'name' => [
       'title' => ts('Option Group Name'),
@@ -51,6 +54,9 @@ return [
       'localizable' => TRUE,
       'description' => ts('Option Group title.'),
       'add' => '1.5',
+      'usage' => [
+        'import',
+      ],
     ],
     'description' => [
       'title' => ts('Option Group Description'),
@@ -59,6 +65,9 @@ return [
       'localizable' => TRUE,
       'description' => ts('Option group description.'),
       'add' => '1.5',
+      'usage' => [
+        'import',
+      ],
     ],
     'data_type' => [
       'title' => ts('Data Type'),
@@ -68,6 +77,9 @@ return [
       'add' => '4.7',
       'pseudoconstant' => [
         'callback' => ['CRM_Utils_Type', 'dataTypes'],
+      ],
+      'usage' => [
+        'import',
       ],
     ],
     'is_reserved' => [
