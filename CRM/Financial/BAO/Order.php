@@ -1572,9 +1572,6 @@ class CRM_Financial_BAO_Order {
       if (str_starts_with($fieldName, 'entity_id.')) {
         $entityValues[substr($fieldName, 10)] = $fieldValue;
       }
-      if ($fieldName === 'membership_type_id' && $entity === 'Membership') {
-        $entityValues['membership_type_id'] = $fieldValue;
-      }
     }
     if (empty($entityValues['id'])) {
       // Not an update, include any relevant values (e.g. contact_id) from the contribution
@@ -1584,17 +1581,31 @@ class CRM_Financial_BAO_Order {
       $entityValues += $carryOverFields;
 
       if ($entity === 'Membership') {
-        // We can pass in API4 style pseudoconstant, eg. status_id:name but that won't work if we also
-        //   calculate status_id. So if we passed it in don't calculate status.
-        $statusIDKeys = array_filter($entityValues, function($key) {
-          return str_starts_with($key, 'status_id');
-        }, ARRAY_FILTER_USE_KEY);
-        $statusIDKey = array_key_first($statusIDKeys);
+        // We can pass in API4 pseudoconstant, eg. membership_type_id:name but that will be overridden if we
+        //   also pass in membership_type_id on the lineItem.
+        // membership_type_id is a special-case because it has it's own field on PriceFieldValue.
+        // If a membership_type_id pseudoconstant was passed in use that, otherwise fall back to membership_type_id on lineitem if set.
+        if (!empty($lineItem['membership_type_id'])) {
+          $membershipTypeKeys = array_filter($entityValues, function($key) {
+            return str_starts_with($key, 'membership_type_id');
+          }, ARRAY_FILTER_USE_KEY);
+          $membershipTypeKey = array_key_first($membershipTypeKeys);
+          if (empty($membershipTypeKey)) {
+            $entityValues['membership_type_id'] = $lineItem['membership_type_id'];
+          }
+        }
 
         if (empty($entityValues['join_date']) && !empty($this->contributionValues['receive_date'])) {
           // Prefer Membership.join_date, if not set use Contribution receive_date
           $entityValues['join_date'] = $this->contributionValues['receive_date'];
         }
+
+        // We can pass in API4 pseudoconstant, eg. status_id:name but that will be overridden if we
+        //   calculate and set status_id. Check if we already have a pseudoconstant-style status_id first.
+        $statusIDKeys = array_filter($entityValues, function($key) {
+          return str_starts_with($key, 'status_id');
+        }, ARRAY_FILTER_USE_KEY);
+        $statusIDKey = array_key_first($statusIDKeys);
         if (empty($statusIDKey) || empty($entityValues[$statusIDKey])) {
           // For the Membership entity, we didn't pass in a value for "status" so we are going to calculate membership status
           //   from membership dates and membership type.
