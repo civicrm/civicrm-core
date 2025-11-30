@@ -721,7 +721,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     for ($i = 0; $i < 70; $i++) {
       $longString .= 'Blah';
     }
-    $this->createCustomGroupWithFieldsOfAllTypes([], ['select_string' => ['text_length' => strlen($longString)], ['checkbox' => ['text_length' => 10]], ['radio' => ['text_length' => 4]]]);
+    $this->createCustomGroupWithFieldsOfAllTypes([], [
+      'select_string' => ['text_length' => strlen($longString)],
+      'checkbox' => ['text_length' => 10],
+      'radio' => ['text_length' => strlen($longString)],
+    ]);
     $this->addOptionToCustomField('select_string', ['label' => $longString, 'name' => 'blah']);
     $this->addOptionToCustomField('radio', ['label' => $longString, 'name' => 'blah', 'value' => 6]);
     $longUrl = 'https://stage.example.org/system/files/webform/way_too_long_url_that_still_fits_in_a_link_custom_field_but_would_fail_to_export_with_html.jpg';
@@ -745,7 +749,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['name' => $this->getCustomFieldName('checkbox')],
       ['name' => $this->getCustomFieldName('radio')],
     ];
-
     $this->doExportTest([
       'fields' => $selectedFields,
       'ids' => [$this->contactIDs[1]],
@@ -1952,7 +1955,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'currency' => '`currency` varchar(3)',
       'componentpaymentfield_received_date' => '`componentpaymentfield_received_date` varchar(32)',
       'default_role_id' => '`default_role_id` varchar(64)',
-      'participant_discount_name' => '`participant_discount_name` text',
+      'participant_discount_name' => '`participant_discount_name` varchar(64)',
       'event_id' => '`event_id` varchar(64)',
       'event_end_date' => '`event_end_date` varchar(32)',
       'event_start_date' => '`event_start_date` varchar(32)',
@@ -1965,7 +1968,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_is_pay_later' => '`participant_is_pay_later` varchar(64)',
       'participant_id' => '`participant_id` varchar(64)',
       'participant_note' => '`participant_note` longtext',
-      'participant_role_id' => '`participant_role_id` text',
+      'participant_role_id' => '`participant_role_id` varchar(128)',
       'participant_role' => '`participant_role` varchar(255)',
       'participant_source' => '`participant_source` varchar(128)',
       'participant_status_id' => '`participant_status_id` varchar(64)',
@@ -2515,7 +2518,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $columns = [
       'civicrm_primary_id' => '`civicrm_primary_id` varchar(64)',
       'contact_type' => '`contact_type` varchar(64)',
-      'contact_sub_type' => '`contact_sub_type` text',
+      'contact_sub_type' => '`contact_sub_type` varchar(255)',
       'do_not_email' => '`do_not_email` varchar(64)',
       'do_not_phone' => '`do_not_phone` varchar(64)',
       'do_not_mail' => '`do_not_mail` varchar(64)',
@@ -2529,7 +2532,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'nick_name' => '`nick_name` varchar(128)',
       'legal_name' => '`legal_name` varchar(128)',
       'image_url' => '`image_url` longtext',
-      'preferred_communication_method' => '`preferred_communication_method` text',
+      'preferred_communication_method' => '`preferred_communication_method` varchar(255)',
       'preferred_language' => '`preferred_language` varchar(5)',
       'hash' => '`hash` varchar(32)',
       'contact_source' => '`contact_source` varchar(255)',
@@ -2585,7 +2588,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'phone_ext' => '`phone_ext` varchar(16)',
       'phone_type_id' => '`phone_type_id` varchar(64)',
       'email' => '`email` varchar(254)',
-      'on_hold' => '`on_hold` text',
+      'on_hold' => '`on_hold` varchar(64)',
       'is_bulkmail' => '`is_bulkmail` varchar(64)',
       'signature_text' => '`signature_text` longtext',
       'signature_html' => '`signature_html` longtext',
@@ -2657,7 +2660,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'activity_is_test' => '`activity_is_test` varchar(64)',
       'activity_campaign_id' => '`activity_campaign_id` varchar(64)',
       'result' => '`result` text',
-      'activity_engagement_level' => '`activity_engagement_level` text',
+      'activity_engagement_level' => '`activity_engagement_level` varchar(64)',
       'parent_id' => '`parent_id` varchar(255)',
     ];
   }
@@ -2678,7 +2681,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_status' => '`participant_status` varchar(255)',
       'participant_status_id' => '`participant_status_id` varchar(64)',
       'participant_role' => '`participant_role` varchar(255)',
-      'participant_role_id' => '`participant_role_id` text',
+      'participant_role_id' => '`participant_role_id` varchar(128)',
       'participant_note' => '`participant_note` longtext',
       'participant_register_date' => '`participant_register_date` varchar(32)',
       'participant_source' => '`participant_source` varchar(128)',
@@ -2686,7 +2689,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_is_test' => '`participant_is_test` varchar(64)',
       'participant_is_pay_later' => '`participant_is_pay_later` varchar(64)',
       'participant_fee_amount' => '`participant_fee_amount` varchar(32)',
-      'participant_discount_name' => '`participant_discount_name` text',
+      'participant_discount_name' => '`participant_discount_name` varchar(64)',
       'participant_fee_currency' => '`participant_fee_currency` varchar(3)',
       'participant_registered_by_id' => '`participant_registered_by_id` varchar(64)',
       'participant_campaign_id' => '`participant_campaign_id` varchar(64)',
@@ -2702,7 +2705,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     return [
       'civicrm_primary_id' => '`civicrm_primary_id` varchar(64)',
       'contact_type' => '`contact_type` varchar(64)',
-      'contact_sub_type' => '`contact_sub_type` text',
+      'contact_sub_type' => '`contact_sub_type` varchar(255)',
       'do_not_email' => '`do_not_email` varchar(64)',
       'do_not_phone' => '`do_not_phone` varchar(64)',
       'do_not_mail' => '`do_not_mail` varchar(64)',
@@ -2716,7 +2719,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'nick_name' => '`nick_name` varchar(128)',
       'legal_name' => '`legal_name` varchar(128)',
       'image_url' => '`image_url` longtext',
-      'preferred_communication_method' => '`preferred_communication_method` text',
+      'preferred_communication_method' => '`preferred_communication_method` varchar(255)',
       'preferred_language' => '`preferred_language` varchar(5)',
       'hash' => '`hash` varchar(32)',
       'contact_source' => '`contact_source` varchar(255)',
@@ -2769,7 +2772,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'phone' => '`phone` varchar(32)',
       'phone_ext' => '`phone_ext` varchar(16)',
       'email' => '`email` varchar(254)',
-      'on_hold' => '`on_hold` text',
+      'on_hold' => '`on_hold` varchar(64)',
       'is_bulkmail' => '`is_bulkmail` varchar(64)',
       'signature_text' => '`signature_text` longtext',
       'signature_html' => '`signature_html` longtext',

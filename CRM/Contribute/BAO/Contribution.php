@@ -887,12 +887,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
           'title' => ts('Soft Credit For Contribution ID'),
           'where' => 'civicrm_contribution_soft.contribution_id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contribute_DAO_Contribution',
+          'FKColumnName' => 'id',
         ],
         'contribution_soft_credit_contact_id' => [
           'name' => 'contribution_soft_credit_contact_id',
           'title' => ts('Soft Credit For Contact ID'),
           'where' => 'civicrm_contact_d.id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'FKColumnName' => 'id',
         ],
       ];
 

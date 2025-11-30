@@ -687,6 +687,8 @@ GROUP BY  currency
           'title' => ts('Pledge Contribution Page Id'),
           'name' => 'pledge_contribution_page_id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
+          'FKColumnName' => 'id',
         ],
       ];
 

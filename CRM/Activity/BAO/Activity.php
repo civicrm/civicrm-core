@@ -1947,6 +1947,9 @@ AND cl.modified_id  = c.id
         'case_activity_medium_id' => [
           'title' => ts('Activity Medium'),
           'type' => CRM_Utils_Type::T_INT,
+          'pseudoconstant' => [
+            'optionGroupName' => 'encounter_medium',
+          ],
         ],
         'case_activity_is_auto' => [
           'title' => ts('Activity Auto-generated?'),
