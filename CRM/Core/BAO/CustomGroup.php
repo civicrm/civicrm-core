@@ -332,8 +332,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $group->save();
     if (!isset($params['id'])) {
       if (!isset($params['table_name'])) {
-        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 13));
-        $tableName = "civicrm_value_{$munged_title}_{$group->id}";
+        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 45));
+        $tableName = "civicrm_value_{$munged_title}";
+        // only add custom group ID if table name is not unique at this point
+        if (CRM_Core_DAO::checkTableExists($tableName)) {
+          $tableName .= "_{$group->id}";
+        }
       }
       $group->table_name = $tableName;
       CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomGroup',
