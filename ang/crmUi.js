@@ -116,6 +116,12 @@
                   ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
                 });
               });
+
+              // Add HTML5 required attribute to datepicker input
+              const visibleInput = element.next('input.crm-form-date');
+              if (attrs.required === true && visibleInput.length) {
+                visibleInput.attr('required', 'required');
+              }
           });
         }
       };
