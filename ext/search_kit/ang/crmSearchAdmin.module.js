@@ -354,6 +354,38 @@
           }
         }
       }
+      const parseWildcardArgs = (expr) => {
+        // note: valid wildcards are *,custom_*,[join_alias].*,[join_alias].custom_*
+        const parts = expr.split('.', 2);
+        const prefix = parts.length > 1 ? parts[0] : null;
+        const wildcard = parts.length > 1 ? parts[1] : parts[0];
+
+        let label = null;
+        let fieldTypes = null;
+        switch (wildcard) {
+          case '*':
+            label = ts('All Fields');
+            fieldTypes = ['Field', 'Custom'];
+            break;
+
+          case 'custom_*':
+            label = ts('All Custom Fields');
+            fieldTypes = ['Custom'];
+            break;
+
+          default:
+            throw new Error('Unrecognised wildcard in select expression');
+        }
+
+        const arg = {
+          wildcardFieldTypes: fieldTypes,
+          value: label,
+        };
+        if (prefix) {
+          arg.join = {alias: prefix};
+        }
+        return [arg];
+      }
       function parseExpr(expr) {
         if (!expr) {
           return;
@@ -365,7 +397,7 @@
           return info;
         }
         if (expr.includes('*')) {
-          info.args = parseWildcardArgs(info);
+          info.args = parseWildcardArgs(expr);
           return info;
         }
         const arg = parseArg(splitAs[0]);

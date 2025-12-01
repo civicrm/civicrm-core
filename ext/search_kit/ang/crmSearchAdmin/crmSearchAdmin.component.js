@@ -789,9 +789,7 @@
       });
     };
 
-    this.isPseudoField = function(name) {
-      return _.findIndex(CRM.crmSearchAdmin.pseudoFields, {name: name}) >= 0;
-    };
+    this.isPseudoField = (name) => !!CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === name);
 
     // Ensure options are loaded for main entity + joined entities
     // And an optional additional entity
@@ -843,27 +841,13 @@
           return;
         }
 
-        // note: valid wildcards are *,custom_*,[join_alias].*,[join_alias].custom_*
-        const parts = selectExpr.split('.', 2);
-        const prefix = parts.length > 1 ? parts[0] : '__sk_main_entity__';
-        const wildcard = parts.length > 1 ? parts[1] : parts[0];
-
-        let fields = null;
-        switch (wildcard) {
-          case '*':
-            fields = this.getAllFields(':label', ['Field']);
-            break;
-
-          case 'custom_*':
-            fields = this.getAllFields(':label', ['Custom']);
-            break;
-
-          default:
-            throw new Error('Unrecognised wildcard in select');
-        }
+        const info = searchMeta.parseExpr(selectExpr);
+        const arg = info.args[0];
+        const fields = this.getAllFields(':label', arg.wildcardFieldTypes);
+        const fieldGroupId = arg.join ? arg.join.alias : '__sk_main_entity__';
 
         // use the prefix to get fields for the right entity
-        const entityFields = fields.find((group) => group.id === prefix).children;
+        const entityFields = fields.find((group) => group.id === fieldGroupId).children;
         const keys = entityFields.map((f) => f.id)
           // filter explicitly excluded fields
           // (this handily also filters the wildcard itself)
