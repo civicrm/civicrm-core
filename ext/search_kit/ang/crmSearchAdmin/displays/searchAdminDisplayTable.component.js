@@ -34,7 +34,28 @@
         // Table can be draggable if the main entity is a SortableEntity.
         ctrl.sortableEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
         ctrl.hierarchicalEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'HierarchicalEntity');
-        ctrl.parent.initColumns({label: true, sortable: true});
+        // if this is a brand new display, start with default columns
+        // instead of adding columns array
+        if (!ctrl.display.settings.columns) {
+          ctrl.display.settings.useDefaultSearchColumns = true;
+        }
+        // otherwise run the default columns initialiser
+        else {
+          ctrl.parent.initColumns({label: true, sortable: true});
+        }
+      };
+
+      this.getSetCustomColumns = (value) => {
+        if (value !== undefined) {
+          this.display.settings.useDefaultSearchColumns = !value;
+          // if switching to custom columns and no columns already exist then
+          // initialise with all the columns to start
+          if (value && !(this.display.settings.columns && this.display.settings.columns.length)) {
+            this.parent.initColumns({label: true, sortable: true});
+          }
+          return value;
+        }
+        return !this.display.settings.useDefaultSearchColumns;
       };
 
       this.toggleEditableRowMode = function(name, value) {
