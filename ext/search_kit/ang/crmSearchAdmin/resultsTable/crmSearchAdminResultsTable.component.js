@@ -79,6 +79,20 @@
         ctrl.crmSearchAdmin.clearParam('select', index);
       };
 
+      this.getColumnDecoration = (index) => {
+        if (this.crmSearchAdmin.groupExists && !index) {
+          return 'locked';
+        }
+        const key = this.columns[index].key;
+        if (key && !this.search.api_params.select.includes(key)) {
+          return 'wildcard';
+        }
+        else if (key) {
+          // explicitly included field, can be removed
+          return 'removable';
+        }
+      }
+
     }
   });
 

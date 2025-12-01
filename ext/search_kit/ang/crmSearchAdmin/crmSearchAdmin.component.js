@@ -155,8 +155,6 @@
 
       $scope.mainEntitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
-      $scope.$watchCollection('$ctrl.savedSearch.api_params.select', onChangeSelect);
-
       $scope.$watch('$ctrl.savedSearch', onChangeAnything, true);
 
       // After watcher runs for the first time and messes up the status, set it correctly
@@ -176,8 +174,11 @@
       return !ctrl.savedSearch.groups.length && !ctrl.savedSearch.is_template;
     };
 
-    function onChangeAnything() {
+    function onChangeAnything(newVal, oldVal) {
       $scope.status = 'unsaved';
+      if (JSON.stringify(newVal.api_params.select) !== JSON.stringify(oldVal.api_params.select)) {
+        onChangeSelect();
+      }
     }
 
     // Generate the confirmation dialog
@@ -701,12 +702,17 @@
 
         // if there are any fields for this entity, add "All Fields" psuedofield
         if (result.length && allowedTypes.includes('Extra')) {
+          const customFieldsSelector = {
+            id: `${prefix}custom_*`,
+            text: ts('All Custom Fields for %1', {1: searchMeta.getEntity(entityName).title}),
+          };
+          customFieldsSelector.disabled = disabledIf(customFieldsSelector.id);
           const allFieldsSelector = {
             id: `${prefix}*`,
-            text: ts('All %1 Fields', {1: searchMeta.getEntity(entityName).title}),
+            text: ts('All Fields for %1', {1: searchMeta.getEntity(entityName).title}),
           };
           allFieldsSelector.disabled = disabledIf(allFieldsSelector.id);
-          result.push(allFieldsSelector);
+          result.push(customFieldsSelector, allFieldsSelector);
         }
 
         return result;
@@ -734,13 +740,12 @@
         let joinInfo = searchMeta.getJoin(ctrl.savedSearch, join),
           joinEntity = searchMeta.getEntity(joinInfo.entity);
 
-        const prefix = joinInfo.alias;
         result.push({
-          id: prefix,
+          id: joinInfo.alias,
           text: joinInfo.label,
           description: joinInfo.description,
           icon: joinEntity.icon,
-          children: formatEntityFields(joinEntity.name, prefix, joinInfo)
+          children: formatEntityFields(joinEntity.name, joinInfo.alias + '.', joinInfo)
         });
       }
 
@@ -770,19 +775,17 @@
       return result;
     };
 
-    this.getSelectFields = function(disabledIf) {
-      disabledIf = disabledIf || _.noop;
-      return _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
-        const info = searchMeta.parseExpr(name);
-        const item = {
+    this.getSelectFields = (disabledIf) => {
+      disabledIf = disabledIf || (() => false);
+      return this.getExpandedSelect()
+        .map((fieldExpr) => {
+        const info = searchMeta.parseExpr(fieldExpr);
+        return {
           id: info.alias,
-          text: ctrl.getFieldLabel(name),
-          description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description
+          text: ctrl.getFieldLabel(fieldExpr),
+          description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description,
+          disabled: disabledIf(info.alias)
         };
-        if (disabledIf(item.id)) {
-          item.disabled = true;
-        }
-        fields.push(item);
       });
     };
 
@@ -815,37 +818,62 @@
 
     /**
      * Get the default columns for a saved_search
+     *
+     * TODO: if https://github.com/civicrm/civicrm-core/pull/34178 is merged then
+     * we dont need to reimplement this client side
      * @param Object search
      * @returns Object[]
      */
-    this.getDefaultSearchColumns = (search) => {
-      const columns = [];
-
-      // used for expanding wildcards below
-      const allFields = this.getAllFields(':label', ['Field', 'Custom', 'Extra']);
-
-      const select = search.api_params.select;
-      select.forEach((fieldExpr) => {
-        if (fieldExpr.includes('*')) {
-          const prefix = fieldExpr.split('*')[0];
-          const fieldGroupId = prefix ? prefix : '__sk_main_entity__';
-          const fields = allFields.find((fieldGroup) => fieldGroup.id === fieldGroupId).children;
-          const idsToAdd = fields.map((f) => f.id)
-            // filter explicitly excluded fields
-            // (this also filters the wildcard itself)
-            .filter((id) => !select.includes(id));
-          const colsToAdd = idsToAdd.map((id) => searchMeta.fieldToColumn(id, {label: true, sortable: true}));
-          console.log(colsToAdd)
-          columns.push(...colsToAdd);
-        }
-        else {
-          columns.push(searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
-        }
-      });
+    this.getDefaultSearchColumns = () => {
+      const keys = this.getExpandedSelect();
+      const columns = keys.map((key) => searchMeta.fieldToColumn(key, {label: true, sortable: true}));
       // add the defaultDisplay columns (= menu)
       columns.push(...CRM.crmSearchAdmin.defaultDisplay.settings.columns);
       return columns;
     };
+
+    this.getExpandedSelect = () => {
+      const select = this.savedSearch.api_params.select;
+      const expanded = [];
+
+      select.forEach((selectExpr) => {
+        // simple field, just add the single field
+        if (!selectExpr.includes('*')) {
+          expanded.push(selectExpr);
+          return;
+        }
+
+        // note: valid wildcards are *,custom_*,[join_alias].*,[join_alias].custom_*
+        const parts = selectExpr.split('.', 2);
+        const prefix = parts.length > 1 ? parts[0] : '__sk_main_entity__';
+        const wildcard = parts.length > 1 ? parts[1] : parts[0];
+
+        let fields = null;
+        switch (wildcard) {
+          case '*':
+            fields = this.getAllFields(':label', ['Field']);
+            break;
+
+          case 'custom_*':
+            fields = this.getAllFields(':label', ['Custom']);
+            break;
+
+          default:
+            throw new Error('Unrecognised wildcard in select');
+        }
+
+        // use the prefix to get fields for the right entity
+        const entityFields = fields.find((group) => group.id === prefix).children;
+        const keys = entityFields.map((f) => f.id)
+          // filter explicitly excluded fields
+          // (this handily also filters the wildcard itself)
+          .filter((id) => !select.includes(id));
+
+        expanded.push(...keys);
+      });
+
+      return expanded;
+    }
 
     // Build a list of all possible links to main entity & join entities
     // @return {Array}
