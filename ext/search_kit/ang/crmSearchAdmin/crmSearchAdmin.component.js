@@ -803,6 +803,18 @@
       searchMeta.loadFieldOptions(entitiesToLoad);
     }
 
+    /**
+     * Get the default columns for a saved_search
+     * @param Object search
+     * @returns Object[]
+     */
+    this.getDefaultSearchColumns = (search) => {
+      const columns = search.api_params.select.map((fieldExpr) => searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
+      // add the defaultDisplay columns (= menu)
+      columns.push(...CRM.crmSearchAdmin.defaultDisplay.settings.columns);
+      return columns;
+    };
+
     // Build a list of all possible links to main entity & join entities
     // @return {Array}
     this.buildLinks = function(isRow) {
