@@ -213,45 +213,76 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * @throws CRM_Core_Exception
    */
   public static function writeRecords(array $records): array {
-    $addedColumns = $sql = $customFields = $pre = $post = [];
-    foreach ($records as $index => $params) {
-      CRM_Utils_Hook::pre(empty($params['id']) ? 'create' : 'edit', 'CustomField', $params['id'] ?? NULL, $params);
+    $customFields = [];
+    $affectedSchema = [];
 
+    foreach ($records as $index => $params) {
+      $isCreate = empty($params['id']);
+
+      CRM_Utils_Hook::pre($isCreate ? 'create' : 'edit', 'CustomField', $params['id'] ?? NULL, $params);
+
+      // check if we are changing serialization
+      // NOTE: this must be called before we write to `civicrm_custom_field`
+      // because it compares $params value with the prior value in the DB
       $changeSerialize = self::getChangeSerialize($params);
+
+      // create/update the record
       $customField = self::createCustomFieldRecord($params);
-      // Serialize/deserialize sql must run after/before the table is altered
-      if ($changeSerialize === 0) {
-        $pre[] = self::getAlterSerializeSQL($customField);
-      }
-      if ($changeSerialize === 1) {
-        $post[] = self::getAlterSerializeSQL($customField);
-      }
-      $fieldSQL = self::getAlterFieldSQL($customField, empty($params['id']) ? 'add' : 'modify');
+      $customFields[$index] = $customField;
 
       $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customField->custom_group_id, 'table_name');
-      $sql[$tableName][] = $fieldSQL;
-      $addedColumns[$tableName][] = $customField->column_name;
-      $customFields[$index] = $customField;
+
+      // deserialize must run before the table is altered
+      if ($changeSerialize === 0) {
+        CRM_Core_DAO::executeQuery(self::getAlterSerializeSQL($customField));
+      }
+
+      $fieldSql = self::getAlterFieldSQL($customField, $isCreate ? 'add' : 'modify');
+      try {
+        // CRM-7007: do not i18n-rewrite this query
+        CRM_Core_DAO::executeQuery("ALTER TABLE $tableName " . $fieldSql, [], TRUE, NULL, FALSE, FALSE);
+      }
+      catch (\CRM_Core_Exception $e) {
+        if ($isCreate) {
+          // ensure we dont leave a hanging record in `civicrm_custom_field`
+          // if the column create failed as this breaks select queries
+          \CRM_Core_DAO::executeQuery("DELETE FROM `civicrm_custom_field` WHERE `id` = %1", [1 => [$customField->id, 'Integer']]);
+          // we need to clear the cache as this otherwise holds the deleted custom field
+          // (we can't use the normal post delete hook because this also tries to delete the column, and fails)
+          \Civi::cache('metadata')->clear();
+          \Civi::log()->warning("Custom Field create failed attempting to add column to {$tableName}: {$e->getMessage()}");
+        }
+        else {
+          \Civi::log()->error("
+            Custom Field update failed attempting to alter column in {$tableName}!\n
+            You should check for any mismatches between records in civicrm_custom_field and database columns in {$tableName}.\n
+            Full error was: {$e->getMessage()}"
+          );
+          // TODO: can we rollback unsuccessful updates? (we cant use a db
+          // transaction because ALTER TABLE cannot be wrapped in transaction)
+        }
+        throw $e;
+      }
+
+      // serialize must run after the table is altered
+      if ($changeSerialize === 1) {
+        CRM_Core_DAO::executeQuery(self::getAlterSerializeSQL($customField));
+      }
+
+      // track what has changed so we can rebuild logging and triggers
+      $affectedSchema[$tableName] ??= [];
+      $affectedSchema[$tableName][] = $customField->column_name;
     }
 
-    foreach ($pre as $query) {
-      CRM_Core_DAO::executeQuery($query);
-    }
-
-    foreach ($sql as $tableName => $statements) {
-      // CRM-7007: do not i18n-rewrite this query
-      CRM_Core_DAO::executeQuery("ALTER TABLE $tableName " . implode(', ', $statements), [], TRUE, NULL, FALSE, FALSE);
-
+    foreach ($affectedSchema as $tableName => $columns) {
       if (CRM_Core_Config::singleton()->logging) {
         $logging = new CRM_Logging_Schema();
-        $logging->fixSchemaDifferencesFor($tableName, ['ADD' => $addedColumns[$tableName]]);
+        // NOTE: some of these columns might be updated rather than ADDed
+        // but this preserves pre-existing behaviour
+        $logging->fixSchemaDifferencesFor($tableName, ['ADD' => $columns]);
       }
 
       Civi::service('sql_triggers')->rebuild($tableName, TRUE);
-    }
-
-    foreach ($post as $query) {
-      CRM_Core_DAO::executeQuery($query);
     }
 
     Civi::rebuild(['system' => TRUE])->execute();
