@@ -686,38 +686,44 @@
       disabledIf = disabledIf || _.noop;
       allowedTypes = allowedTypes || ['Field', 'Custom', 'Extra', 'Filter'];
 
-      function formatEntityFields(entityName, join) {
-        const prefix = join ? join.alias + '.' : '',
-          result = [];
+      function formatEntityFields(entityName, prefix = '', join = null) {
+        const result = [];
 
         // Add extra searchable fields from bridge entity
         if (join && join.bridge) {
-          formatFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
-            return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && field.fk_entity !== entityName);
-          }), result, prefix);
+          const joinFields = searchMeta.getEntity(join.bridge).fields.filter((field) =>
+            (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && field.fk_entity !== entityName)
+          );
+          result.push(...formatFields(joinFields, prefix));
         }
 
-        formatFields(searchMeta.getEntity(entityName).fields, result, prefix);
+        result.push(...formatFields(searchMeta.getEntity(entityName).fields, prefix));
+
+        // if there are any fields for this entity, add "All Fields" psuedofield
+        if (result.length && allowedTypes.includes('Extra')) {
+          const allFieldsSelector = {
+            id: `${prefix}*`,
+            text: ts('All %1 Fields', {1: searchMeta.getEntity(entityName).title}),
+          };
+          allFieldsSelector.disabled = disabledIf(allFieldsSelector.id);
+          result.push(allFieldsSelector);
+        }
+
         return result;
       }
 
-      function formatFields(fields, result, prefix) {
-        prefix = typeof prefix === 'undefined' ? '' : prefix;
-        _.each(fields, function(field) {
-          const item = {
+      function formatFields(fields, prefix = '') {
+        return fields.filter((field) => allowedTypes.includes(field.type))
+          .map((field) => {
             // Use options suffix if available.
-            id: prefix + field.name + (_.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
-            text: field.label,
-            description: field.description
-          };
-          if (disabledIf(item.id)) {
-            item.disabled = true;
-          }
-          if (_.includes(allowedTypes, field.type)) {
-            result.push(item);
-          }
-        });
-        return result;
+            const id = prefix + field.name + ((field.suffixes || []).includes(suffix.replace(':', '')) ? suffix : '');
+            return {
+              id: id,
+              text: field.label,
+              description: field.description,
+              disabled: disabledIf(id)
+            };
+          });
       }
 
       const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
@@ -727,11 +733,14 @@
       function addJoin(join) {
         let joinInfo = searchMeta.getJoin(ctrl.savedSearch, join),
           joinEntity = searchMeta.getEntity(joinInfo.entity);
+
+        const prefix = joinInfo.alias;
         result.push({
+          id: prefix,
           text: joinInfo.label,
           description: joinInfo.description,
           icon: joinEntity.icon,
-          children: formatEntityFields(joinEntity.name, joinInfo)
+          children: formatEntityFields(joinEntity.name, prefix, joinInfo)
         });
       }
 
@@ -742,6 +751,7 @@
       }
 
       result.push({
+        id: '__sk_main_entity__',
         text: mainEntity.title_plural,
         icon: mainEntity.icon,
         children: formatEntityFields(ctrl.savedSearch.api_entity)
@@ -752,7 +762,7 @@
         result.push({
           text: ts('Extra'),
           icon: 'fa-gear',
-          children: formatFields(CRM.crmSearchAdmin.pseudoFields, [])
+          children: formatFields(CRM.crmSearchAdmin.pseudoFields)
         });
       }
 
@@ -809,7 +819,29 @@
      * @returns Object[]
      */
     this.getDefaultSearchColumns = (search) => {
-      const columns = search.api_params.select.map((fieldExpr) => searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
+      const columns = [];
+
+      // used for expanding wildcards below
+      const allFields = this.getAllFields(':label', ['Field', 'Custom', 'Extra']);
+
+      const select = search.api_params.select;
+      select.forEach((fieldExpr) => {
+        if (fieldExpr.includes('*')) {
+          const prefix = fieldExpr.split('*')[0];
+          const fieldGroupId = prefix ? prefix : '__sk_main_entity__';
+          const fields = allFields.find((fieldGroup) => fieldGroup.id === fieldGroupId).children;
+          const idsToAdd = fields.map((f) => f.id)
+            // filter explicitly excluded fields
+            // (this also filters the wildcard itself)
+            .filter((id) => !select.includes(id));
+          const colsToAdd = idsToAdd.map((id) => searchMeta.fieldToColumn(id, {label: true, sortable: true}));
+          console.log(colsToAdd)
+          columns.push(...colsToAdd);
+        }
+        else {
+          columns.push(searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
+        }
+      });
       // add the defaultDisplay columns (= menu)
       columns.push(...CRM.crmSearchAdmin.defaultDisplay.settings.columns);
       return columns;
