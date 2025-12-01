@@ -30,13 +30,11 @@
         for (let p=0; p < placeholderCount; ++p) {
           this.placeholders.push({});
         }
-        this.columns = this.settings.columns.map((column) => {
-          // Break reference so original settings are preserved
-          const col = _.cloneDeep(column);
-          // Used by crmSearchDisplayTable.toggleColumns
+        // Break reference so original settings are preserved
+        this.columns = _.cloneDeep(this.settings.columns);
+        this.columns.forEach((col) => {
           col.enabled = true;
           col.fetched = true;
-          return col;
         });
         _.each(ctrl.onInitialize, function(callback) {
           callback.call(ctrl, $scope, $element);
