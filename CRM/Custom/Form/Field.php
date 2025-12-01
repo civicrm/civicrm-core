@@ -440,7 +440,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     $this->addToggle('is_required', ts('Required'));
     $this->addToggle('is_searchable', ts('Optimize for Search'));
-    $this->addRadio('is_search_range', ts('Search by Range'), [ts('No'), ts('Yes')]);
+    $this->addToggle('is_search_range', ts('Search by Range'));
     $this->addToggle('is_active', ts('Enabled'));
     $this->addToggle('is_view', ts('View Only'));
 

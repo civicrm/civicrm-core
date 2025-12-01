@@ -172,7 +172,7 @@ return [
     'is_active' => [
       'title' => ts('Custom Group Is Active?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this property active?'),
       'add' => '1.1',
@@ -193,9 +193,9 @@ return [
       ],
     ],
     'is_multiple' => [
-      'title' => ts('Supports Multiple Records'),
+      'title' => ts('Allow multiple records'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Does this group hold multiple values?'),
       'add' => '2.0',
@@ -253,7 +253,7 @@ return [
     'is_reserved' => [
       'title' => ts('Reserved Group?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this a reserved Custom Group?'),
       'add' => '4.4',
@@ -262,7 +262,7 @@ return [
     'is_public' => [
       'title' => ts('Custom Group Is Public?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this property public?'),
       'add' => '4.7',
