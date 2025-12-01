@@ -496,7 +496,9 @@ class CRM_Core_Component {
     }
     if ($toEnable) {
       static::protectTestEnv(
-        fn() => CRM_Extension_System::singleton()->getManager()->install($toEnable)
+        fn() => CRM_Extension_System::singleton()->getManager()->install(
+          CRM_Extension_System::singleton()->getManager()->findInstallRequirements($toEnable)
+        )
       );
     }
     if ($toDisable) {
