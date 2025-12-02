@@ -39,8 +39,8 @@
     </tr>
     {if array_key_exists('in_selector', $form)}
       <tr class='crm-custom-field-form-block-in_selector'>
-        <td class='label'>{$form.in_selector.label}</td>
-        <td class='html-adjust'>{$form.in_selector.html} {help id="in_selector"}</td>
+        <td class='label'>{$form.in_selector.label} {help id="in_selector"}</td>
+        <td class='html-adjust'>{$form.in_selector.html}</td>
       </tr>
     {/if}
     <tr class="crm-custom-field-form-block-text_length"  id="textLength">
@@ -110,25 +110,16 @@
       <td class="html-adjust">{$form.note_columns.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-note_length" id="noteLength" >
-      <td class="label">{$form.note_length.label}</td>
-      <td class="html-adjust">{$form.note_length.html} <span class="description">{ts}Leave blank for unlimited. This limit is not implemented by all browsers and rich text editors.{/ts}</span></td>
+      <td class="label">{$form.note_length.label} {help id="note_length"}</td>
+      <td class="html-adjust">{$form.note_length.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-weight" >
-      <td class="label">{$form.weight.label}</td>
-      <td>{$form.weight.html|crmAddClass:two}
-        {if $action neq 4}
-          <br />
-          <span class="description">{ts}Weight controls the order in which fields are displayed in a group. Enter a positive or negative integer - lower numbers are displayed ahead of higher numbers.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.weight.label} {help id="weight"}</td>
+      <td>{$form.weight.html|crmAddClass:two}</td>
     </tr>
     <tr class="crm-custom-field-form-block-default_value" id="hideDefault" >
-      <td class="label">{$form.default_value.label}</td>
+      <td class="label">{$form.default_value.label} {help id="default_value"}</td>
       <td class="html-adjust">{$form.default_value.html}</td>
-    </tr>
-    <tr class="crm-custom-field-form-block-description"  id="hideDesc" >
-      <td class="label">&nbsp;</td>
-      <td class="html-adjust"><span class="description">{ts}If you want to provide a default value for this field, enter it here. For date fields, format is YYYY-MM-DD.{/ts}</span></td>
     </tr>
     <tr class="crm-custom-field-form-block-help_pre">
       <td class="label">{$form.help_pre.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_field' field='help_pre' id=$id}{/if}</td>
@@ -144,20 +135,12 @@
       </td>
     </tr>
     <tr class="crm-custom-field-form-block-is_required">
-      <td class="label">{$form.is_required.label}</td>
-      <td class="html-adjust">{$form.is_required.html}
-        {if $action neq 4}
-          <br /><span class="description">{ts}Do not make custom fields required unless you want to force all users to enter a value anytime they add or edit this type of record. You can always make the field required when used in a specific Profile form.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.is_required.label} {help id="is_required"}</td>
+      <td class="html-adjust">{$form.is_required.html}</td>
     </tr>
     <tr id ="searchable" class="crm-custom-field-form-block-is_searchable">
-      <td class="label">{$form.is_searchable.label}</td>
-      <td class="html-adjust">{$form.is_searchable.html}
-        {if $action neq 4}
-          <br /><span class="description">{ts}Adds a database index which helps speed up searches on this field significantly. However, it can require more storage and can slow down the system if the data is frequently updated.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.is_searchable.label} {help id="is_searchable"}</td>
+      <td class="html-adjust">{$form.is_searchable.html}</td>
     </tr>
     <tr id="searchByRange" class="crm-custom-field-form-block-is_search_range">
       <td class="label">{$form.is_search_range.label}</td>
@@ -168,13 +151,8 @@
       <td class="html-adjust">{$form.is_active.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-is_view">
-      <td class="label">{$form.is_view.label}</td>
-      <td class="html-adjust">{$form.is_view.html}
-        {if $action neq 4}
-          <br />
-          <span class="description">{ts}Is this field set by PHP code (via a custom hook). This field will not be updated by CiviCRM.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.is_view.label} {help id="is_view"}</td>
+      <td class="html-adjust">{$form.is_view.html}</td>
     </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
@@ -273,19 +251,19 @@
       if (_.includes(['String', 'Int', 'Float', 'Money'], dataType)) {
         if (!['Text', 'Hidden'].includes(htmlType)) {
           $("#showoption, #searchable", $form).show();
-          $("#hideDefault, #hideDesc, #searchByRange", $form).hide();
+          $("#hideDefault, #searchByRange", $form).hide();
         } else {
           $("#showoption").hide();
-          $("#hideDefault, #hideDesc, #searchable", $form).show();
+          $("#hideDefault, #searchable", $form).show();
         }
       } else {
         if (dataType === 'File') {
           $("#default_value", $form).val('');
-          $("#hideDefault, #searchable, #hideDesc", $form).hide();
+          $("#hideDefault, #searchable", $form).hide();
         } else if (dataType === 'ContactReference') {
           $("#hideDefault").hide();
         } else {
-          $("#hideDefault, #searchable, #hideDesc", $form).show();
+          $("#hideDefault, #searchable", $form).show();
         }
         $("#showoption").hide();
       }
