@@ -2415,7 +2415,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * @param CRM_Core_Exception $exception
+   * @param Throwable $exception
    */
   public static function unhandledException($exception) {
     $null = NULL;
