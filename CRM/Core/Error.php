@@ -761,6 +761,22 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * Get a helper to format complex error data (backtraces, exceptions, etc).
+   *
+   * @param string $format
+   *   Desired output format.
+   *   Ex: 'text', 'html', or 'array'
+   * @param bool $showArgs
+   *   TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument.
+   * @param int $maxArgLen
+   *   Maximum number of characters to show from each argument string.
+   * @return CRM_Core_Error_Formatter
+   */
+  public static function formatter(string $format, bool $showArgs = TRUE, int $maxArgLen = 80): CRM_Core_Error_Formatter {
+    return (new CRM_Core_Error_Formatter($format, $showArgs, $maxArgLen));
+  }
+
+  /**
    * Render a backtrace array as a string.
    *
    * @param array $backTrace
@@ -773,12 +789,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   printable plain-text
    */
   public static function formatBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
-    $message = '';
-    foreach (self::parseBacktrace($backTrace, $showArgs, $maxArgLen) as $idx => $trace) {
-      $message .= sprintf("#%s %s\n", $idx, $trace);
-    }
-    $message .= sprintf("#%s {main}\n", 1 + $idx);
-    return $message;
+    return static::formatter('text', $showArgs, $maxArgLen)->formatBacktrace($backTrace);
   }
 
   /**
@@ -795,68 +806,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @see Exception::getTrace()
    */
   public static function parseBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
-    $ret = [];
-    foreach ($backTrace as $trace) {
-      $args = [];
-      $fnName = $trace['function'] ?? NULL;
-      $className = isset($trace['class']) ? ($trace['class'] . $trace['type']) : '';
-
-      // Do not show args for a few password related functions
-      $skipArgs = $className == 'DB::' && $fnName == 'connect';
-
-      if (!empty($trace['args'])) {
-        foreach ($trace['args'] as $arg) {
-          if (!$showArgs || $skipArgs) {
-            $args[] = '(' . gettype($arg) . ')';
-            continue;
-          }
-          switch ($type = gettype($arg)) {
-            case 'boolean':
-              $args[] = $arg ? 'TRUE' : 'FALSE';
-              break;
-
-            case 'integer':
-            case 'double':
-              $args[] = $arg;
-              break;
-
-            case 'string':
-              $args[] = '"' . CRM_Utils_String::ellipsify(addcslashes((string) $arg, "\r\n\t\""), $maxArgLen) . '"';
-              break;
-
-            case 'array':
-              $args[] = '(Array:' . count($arg) . ')';
-              break;
-
-            case 'object':
-              $args[] = 'Object(' . get_class($arg) . ')';
-              break;
-
-            case 'resource':
-              $args[] = 'Resource';
-              break;
-
-            case 'NULL':
-              $args[] = 'NULL';
-              break;
-
-            default:
-              $args[] = "($type)";
-              break;
-          }
-        }
-      }
-
-      $ret[] = sprintf(
-        "%s(%s): %s%s(%s)",
-        $trace['file'] ?? '[internal function]',
-        $trace['line'] ?? '',
-        $className,
-        $fnName,
-        implode(", ", $args)
-      );
-    }
-    return $ret;
+    return static::formatter('array', $showArgs, $maxArgLen)->formatBacktrace($backTrace);
   }
 
   /**
