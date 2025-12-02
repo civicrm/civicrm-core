@@ -161,10 +161,14 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     $streamMeta = $this->getAvailableStreamMeta()[$stream] ?? [];
     $streamModified = $streamMeta['modified_date'] ?? NULL;
 
+    $isFrontend = \CRM_Utils_System::isFrontendPage();
+    $darkMode = $isFrontend ? \Civi::settings()->get('riverlea_dark_mode_frontend') : \Civi::settings()->get('riverlea_dark_mode_backend');
+
     return [
       'stream' => $stream,
       'modified' => $streamModified,
-      'is_frontend' => \CRM_Utils_System::isFrontendPage(),
+      'is_frontend' => $isFrontend,
+      'dark_mode' => $darkMode,
     ];
   }
 
