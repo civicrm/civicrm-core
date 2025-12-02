@@ -344,7 +344,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if (php_sapi_name() == "cli") {
       print ("Sorry. A non-recoverable error has occurred.\n$message \n$code\n$email\n\n");
       // Fix for CRM-16899
-      echo static::formatBacktrace(debug_backtrace());
+      echo static::formatter('text')->formatBacktrace(debug_backtrace());
       die("\n");
       // FIXME: Why doesn't this call abend()?
       // Difference: abend() will cleanup transaction and (via civiExit) store session state
@@ -409,7 +409,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     catch (Exception $other) {
       // if the exception-handler generates an exception, then that sucks! oh, well. carry on.
-      CRM_Core_Error::debug_var('handleUnhandledException_nestedException', self::formatTextException($other), TRUE, TRUE, '', PEAR_LOG_ERR);
+      CRM_Core_Error::debug_var('handleUnhandledException_nestedException', self::formatter('text')->formatException($other), TRUE, TRUE, '', PEAR_LOG_ERR);
     }
     $config = CRM_Core_Config::singleton();
     $vars = [
@@ -427,7 +427,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // Case A: CLI
     if (php_sapi_name() == "cli") {
       printf("Sorry. A non-recoverable error has occurred.\n%s\n", $vars['message']);
-      print self::formatTextException($exception);
+      print self::formatter('text')->formatException($exception);
       die("\n");
       // FIXME: Why doesn't this call abend()?
       // Difference: abend() will cleanup transaction and (via civiExit) store session state
@@ -459,7 +459,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $content = $template->fetch('CRM/common/fatal.tpl');
 
     if ($config->backtrace) {
-      $content = self::formatHtmlException($exception) . $content;
+      $content = self::formatter('html')->formatException($exception) . $content;
     }
 
     // set the response code before starting the request
@@ -751,7 +751,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function backtrace($msg = 'backTrace', $log = FALSE) {
     $backTrace = debug_backtrace();
-    $message = self::formatBacktrace($backTrace);
+    $message = self::formatter('text')->formatBacktrace($backTrace);
     if (!$log) {
       CRM_Core_Error::debug($msg, $message);
     }
@@ -877,7 +877,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     try {
       $messageWithDetails = $message . ' ' . $pearError->getUserInfo();
 
-      \Civi::log()->debug($messageWithDetails . "\n\n" . self::formatBacktrace($pearError->getBacktrace()));
+      \Civi::log()->debug($messageWithDetails . "\n\n" . static::formatter('text')->formatBacktrace($pearError->getBacktrace()));
     }
     catch (\Exception $e) {
       // well we tried
