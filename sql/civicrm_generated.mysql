@@ -4454,9 +4454,11 @@ INSERT INTO `civicrm_mailing_bounce_pattern` (`id`, `bounce_type_id`, `pattern`)
  (160,10,'Local Policy Violation'),
  (161,10,'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika'),
  (162,10,'abuse report'),
- (163,11,'nonstandard smtp line terminator'),
- (164,11,'syntax error in from address'),
- (165,11,'unknown smtp code');
+ (163,10,'unsolicited mail'),
+ (164,10,'Complaint via SES'),
+ (165,11,'nonstandard smtp line terminator'),
+ (166,11,'syntax error in from address'),
+ (167,11,'unknown smtp code');
 /*!40000 ALTER TABLE `civicrm_mailing_bounce_pattern` ENABLE KEYS */;
 UNLOCK TABLES;
 
