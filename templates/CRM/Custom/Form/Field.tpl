@@ -160,19 +160,19 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var _ = CRM._,
+    const
       $form = $('form.{/literal}{$form.formClass}{literal}'),
-      dataToHTML = {/literal}{$dataToHTML|@json_encode}{literal},
+      dataToHTML = {/literal}{$dataToHTML|json}{literal},
       originalHtmlType = '{/literal}{$originalHtmlType}{literal}',
       existingMultiValueCount = {/literal}{if empty($existingMultiValueCount)}null{else}{$existingMultiValueCount}{/if}{literal},
       originalSerialize = {/literal}{if empty($originalSerialize)}false{else}true{/if}{literal},
       htmlTypes = CRM.utils.getOptions($('#html_type', $form));
 
     function onChangeDataType() {
-      var dataType = $(this).val(),
-        allowedHtmlTypes = _.filter(htmlTypes, function(type) {
-          return _.includes(dataToHTML[dataType], type.key);
-        });
+      const dataType = $(this).val();
+      const allowedHtmlTypes = htmlTypes.filter(type =>
+        dataToHTML[dataType].includes(type.key)
+      );
       CRM.utils.setOptions($('#html_type', $form), allowedHtmlTypes);
       if (!$('#html_type', $form).val()) {
         $('#html_type', $form).val(dataToHTML[dataType][0]).change();
@@ -188,10 +188,10 @@
     }
 
     function onChangeHtmlType() {
-      var htmlType = $(this).val(),
-        dataType = $('#data_type', $form).val();
+      const htmlType = $(this).val();
+      const dataType = $('#data_type', $form).val();
 
-      if (htmlType === 'CheckBox' || htmlType === 'Radio') {
+      if (['CheckBox', 'Radio'].includes(htmlType)) {
         $('#serialize', $form).prop('checked', htmlType === 'CheckBox');
       }
       else {
@@ -206,17 +206,14 @@
     $('#html_type', $form).each(onChangeHtmlType).change(onChangeHtmlType);
 
     function showSearchRange(dataType) {
-      if (_.includes(['Date', 'Int', 'Float', 'Money'], dataType)) {
-        $("#searchByRange", $form).show();
-      } else {
-        $("#searchByRange", $form).hide();
-      }
+      const showRange = ['Date', 'Int', 'Float', 'Money'].includes(dataType);
+      $("#searchByRange", $form).toggle(showRange);
     }
 
     function toggleContactRefFilter(e) {
-      var setSelected = $(this).attr('href');
+      let setSelected = $(this).attr('href');
       if (!setSelected) {
-        setSelected =  $('#filter_selected').val();
+        setSelected = $('#filter_selected').val();
       } else {
         $('#filter_selected').val(setSelected.slice(1));
       }
@@ -232,8 +229,8 @@
     $('.toggle-contact-ref-mode', $form).click(toggleContactRefFilter);
 
     function customOptionHtmlType(dataType) {
-      var htmlType = $("#html_type", $form).val(),
-        serialize = $("#serialize", $form).is(':checked');
+      const htmlType = $("#html_type", $form).val();
+      const serialize = $("#serialize", $form).is(':checked');
 
       if (!htmlType) {
         return;
@@ -248,7 +245,7 @@
         $('#field_advance_filter, #contact_reference_group', $form).hide();
       }
 
-      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType)) {
+      if (['String', 'Int', 'Float', 'Money'].includes(dataType)) {
         if (!['Text', 'Hidden'].includes(htmlType)) {
           $("#showoption, #searchable", $form).show();
           $("#hideDefault, #searchByRange", $form).hide();
@@ -268,7 +265,7 @@
         $("#showoption").hide();
       }
 
-      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType) && !['Text', 'Hidden'].includes(htmlType)) {
+      if (['String', 'Int', 'Float', 'Money'].includes(dataType) && !['Text', 'Hidden'].includes(htmlType)) {
         if (serialize) {
           $('div[id^=checkbox]', '#optionField').show();
           $('div[id^=radio]', '#optionField').hide();
@@ -290,36 +287,36 @@
     }
 
     function makeDefaultValueField(dataType) {
-      var field = $('#default_value', $form);
+      const field = $('#default_value', $form);
       field.crmDatepicker('destroy');
       field.crmSelect2('destroy');
       switch (dataType) {
         case 'Date':
           field.crmDatepicker({date: 'yy-mm-dd', time: false});
-          break;
+          return;
 
         case 'Boolean':
           field.crmSelect2({data: [{id: '1', text: ts('Yes')}, {id: '0', text: ts('No')}], placeholder: ' '});
-          break;
+          return;
 
         case 'Country':
           field.crmEntityRef({entity: 'Country'});
-          break;
+          return;
 
         case 'StateProvince':
           field.crmEntityRef({entity: 'StateProvince', api: {description_field: ['country_id.name']}});
-          break;
+          return;
       }
     }
 
     $('#is_searchable, #serialize', $form).change(onChangeHtmlType);
 
     $form.submit(function() {
-      var htmlType = $('#html_type', $form).val(),
-        serialize = $("#serialize", $form).is(':checked'),
-        htmlTypeLabel = (serialize && _.includes(['Select', 'Autocomplete-Select'], htmlType)) ? ts('Multi-Select') : _.find(htmlTypes, {key: htmlType}).value;
+      const htmlType = $('#html_type', $form).val();
+      const serialize = $("#serialize", $form).is(':checked');
+      let htmlTypeLabel = (serialize && ['Select', 'Autocomplete-Select'].includes(htmlType)) ? ts('Multi-Select') : htmlTypes.find(item => item.key === htmlType).value;
       if (originalHtmlType && (originalHtmlType !== htmlType || originalSerialize !== serialize)) {
-        var origHtmlTypeLabel = (originalSerialize && originalHtmlType === 'Select') ? ts('Multi-Select') : _.find(htmlTypes, {key: originalHtmlType}).value;
+        let origHtmlTypeLabel = (originalSerialize && originalHtmlType === 'Select') ? ts('Multi-Select') : htmlTypes.find(item => item.key === originalHtmlType).value;
         if (originalSerialize && !serialize && existingMultiValueCount) {
           return confirm(ts('WARNING: Changing this multivalued field to singular will result in the loss of data!')
             + "\n" + ts('%1 existing records contain multiple values - the data in each of these fields will be truncated to a single value.', {1: existingMultiValueCount})
