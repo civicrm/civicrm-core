@@ -43,7 +43,7 @@ class CRM_Core_Invoke {
       }
       return $result;
     }
-    catch (Exception $e) {
+    catch (Throwable $e) {
       CRM_Core_Config::singleton()->userSystem->handleUnhandledException($e);
     }
   }
