@@ -379,7 +379,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         'content' => '<div class="messages status no-popup">' . CRM_Core_Page::crmIcon('fa-info-circle') . ' ' . ts('Sorry but we are not able to provide this at the moment.') . '</div>',
       ];
       if ($config->backtrace && CRM_Core_Permission::check('view debug output')) {
-        $out['backtrace'] = self::parseBacktrace(debug_backtrace());
+        $out['backtrace'] = static::formatter('array')->formatBacktrace(debug_backtrace());
         $message .= '<p><em>See console for backtrace</em></p>';
       }
       CRM_Core_Session::setStatus($message, ts('Sorry an error occurred'), 'error');
@@ -790,23 +790,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function formatBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
     return static::formatter('text', $showArgs, $maxArgLen)->formatBacktrace($backTrace);
-  }
-
-  /**
-   * Render a backtrace array as an array.
-   *
-   * @param array $backTrace
-   *   Array of stack frames.
-   * @param bool $showArgs
-   *   TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument.
-   * @param int $maxArgLen
-   *   Maximum number of characters to show from each argument string.
-   * @return array
-   * @see debug_backtrace
-   * @see Exception::getTrace()
-   */
-  public static function parseBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
-    return static::formatter('array', $showArgs, $maxArgLen)->formatBacktrace($backTrace);
   }
 
   /**
