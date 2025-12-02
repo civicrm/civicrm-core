@@ -82,10 +82,8 @@
   border-radius: var(--crm-dialog-radius);
   background: var(--crm-dialog-body-bg);
   color: var(--crm-c-text);
-  height: auto !important;
   margin: var(--crm-dialog-padding) 0;
-  position: static;
-  z-index: 1;
+  position: relative;
   padding: var(--crm-dialog-body-padding);
 }
 .crm-container.ui-dialog:has(.ui-dialog-buttonpane) .ui-dialog-content {
