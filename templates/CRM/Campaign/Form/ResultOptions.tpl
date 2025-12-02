@@ -78,12 +78,6 @@
     var surveyId   = {if $surveyId}{$surveyId}{else}''{/if};
 
     {literal}
-    if (navigator.appName == "Microsoft Internet Explorer") {
-  for ( var count = 0; count < hideBlocks.length; count++ ) {
-      var r = document.getElementById(hideBlocks[count]);
-            r.style.display = 'none';
-        }
-    }
 
     function showOptionSelect( ) {
         if ( document.getElementsByName("option_type")[0].checked ) {
