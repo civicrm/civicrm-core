@@ -46,6 +46,9 @@
       "cweagans/composer-patches": true
     }
   },
+  "conflict": {
+    "padaliyajay/php-autoprefixer": "1.5"
+  },
   "require": {
     "php": "~8.0",
     "ext-bcmath": "*",

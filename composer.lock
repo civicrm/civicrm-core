@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f5091886efcda6a51c86dac19fbcf6d",
+    "content-hash": "2e8e4a0522781735a2eb5f235acedb17",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -1983,16 +1983,16 @@
         },
         {
             "name": "padaliyajay/php-autoprefixer",
-            "version": "1.3",
+            "version": "1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padaliyajay/php-autoprefixer.git",
-                "reference": "f05f374f0c1e463db62209613f52b38bf4b52430"
+                "reference": "17ac9d20c0e4521163a061d4f99f3d31f88e797e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padaliyajay/php-autoprefixer/zipball/f05f374f0c1e463db62209613f52b38bf4b52430",
-                "reference": "f05f374f0c1e463db62209613f52b38bf4b52430",
+                "url": "https://api.github.com/repos/padaliyajay/php-autoprefixer/zipball/17ac9d20c0e4521163a061d4f99f3d31f88e797e",
+                "reference": "17ac9d20c0e4521163a061d4f99f3d31f88e797e",
                 "shasum": ""
             },
             "require": {
@@ -2016,9 +2016,9 @@
             "description": "CSS Autoprefixer written in pure PHP.",
             "support": {
                 "issues": "https://github.com/padaliyajay/php-autoprefixer/issues",
-                "source": "https://github.com/padaliyajay/php-autoprefixer/tree/1.3"
+                "source": "https://github.com/padaliyajay/php-autoprefixer/tree/1.4"
             },
-            "time": "2019-11-26T09:55:37+00:00"
+            "time": "2022-08-02T02:37:28+00:00"
         },
         {
             "name": "pear/auth_sasl",
