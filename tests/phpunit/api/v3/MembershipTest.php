@@ -567,9 +567,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
 
     // Tear down - reverse of creation to be safe
+    $this->contactDelete($memberContactId[3]);
     $this->contactDelete($memberContactId[2]);
     $this->contactDelete($memberContactId[1]);
     $this->contactDelete($memberContactId[0]);
+    $this->contactDelete($employerId[2]);
     $this->contactDelete($employerId[1]);
     $this->contactDelete($employerId[0]);
     $this->membershipTypeDelete(['id' => $membershipTypeId]);
