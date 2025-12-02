@@ -38,6 +38,20 @@ class CRM_Core_Error_Formatter {
   }
 
   /**
+   * @param \Throwable $e
+   *   The exception.
+   * @return mixed
+   *   Varies by $format.
+   */
+  public function formatException(Throwable $e) {
+    return match($this->format) {
+      'text' => $this->formatTextException($e),
+      'html' => $this->formatHtmlException($e),
+      default => throw new \RuntimeException("Cannot format exception as {$this->format}", 0, $e),
+    };
+  }
+
+  /**
    * @param array $trace
    *   The backtrace. (List of stack-frames.)
    * @return mixed
@@ -54,6 +68,72 @@ class CRM_Core_Error_Formatter {
 
   protected function formatHtmlBacktrace(array $trace): string {
     return '<pre>' . htmlentities($this->formatTextBacktrace($trace)) . '</pre>';
+  }
+
+  /**
+   * Render an exception as HTML string.
+   *
+   * @param Throwable $e
+   * @return string
+   *   printable HTML text
+   */
+  protected function formatHtmlException(Throwable $e): string {
+    $msg = '';
+    if ($e instanceof PEAR_Exception) {
+      $ei = $e;
+      if (is_callable([$ei, 'getCause'])) {
+        // DB_ERROR doesn't have a getCause but does have a __call function which tricks is_callable.
+        if (!$ei instanceof DB_Error) {
+          if ($ei->getCause() instanceof PEAR_Error) {
+            $msg .= '<table class="crm-db-error">';
+            $msg .= sprintf('<thead><tr><th>%s</th><th>%s</th></tr></thead>', ts('Error Field'), ts('Error Value'));
+            $msg .= '<tbody>';
+            foreach (['Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo'] as $f) {
+              $msg .= sprintf('<tr><td>%s</td><td>%s</td></tr>', $f, call_user_func([$ei->getCause(), "get$f"]));
+            }
+            $msg .= '</tbody></table>';
+          }
+          $ei = $ei->getCause();
+        }
+      }
+      $msg .= $e->toHtml();
+    }
+    else {
+      $msg .= '<p><b>' . get_class($e) . ': "' . htmlentities($e->getMessage()) . '"</b></p>';
+      $msg .= $this->formatHtmlBacktrace($e->getTrace());
+    }
+    return $msg;
+
+  }
+
+  /**
+   * Write details of an exception to the log.
+   *
+   * @param Throwable $e
+   * @return string
+   *   printable plain text
+   */
+  protected function formatTextException(Throwable $e): string {
+    $msg = get_class($e) . ": \"" . $e->getMessage() . "\"\n";
+
+    $ei = $e;
+    while (is_callable([$ei, 'getCause'])) {
+      // DB_ERROR doesn't have a getCause but does have a __call function which tricks is_callable.
+      if (!$ei instanceof DB_Error) {
+        if ($ei->getCause() instanceof PEAR_Error) {
+          foreach (['Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo'] as $f) {
+            $msg .= sprintf(" * ERROR %s: %s\n", strtoupper($f), call_user_func([$ei->getCause(), "get$f"]));
+          }
+        }
+        $ei = $ei->getCause();
+      }
+      // if we have reached a DB_Error assume that is the end of the road.
+      else {
+        $ei = NULL;
+      }
+    }
+    $msg .= $this->formatTextBacktrace($e->getTrace());
+    return $msg;
   }
 
   /**

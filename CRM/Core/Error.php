@@ -817,35 +817,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   printable HTML text
    */
   public static function formatHtmlException(Throwable $e) {
-    $msg = '';
-
-    // Exception metadata
-
-    // Exception backtrace
-    if ($e instanceof PEAR_Exception) {
-      $ei = $e;
-      if (is_callable([$ei, 'getCause'])) {
-        // DB_ERROR doesn't have a getCause but does have a __call function which tricks is_callable.
-        if (!$ei instanceof DB_Error) {
-          if ($ei->getCause() instanceof PEAR_Error) {
-            $msg .= '<table class="crm-db-error">';
-            $msg .= sprintf('<thead><tr><th>%s</th><th>%s</th></tr></thead>', ts('Error Field'), ts('Error Value'));
-            $msg .= '<tbody>';
-            foreach (['Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo'] as $f) {
-              $msg .= sprintf('<tr><td>%s</td><td>%s</td></tr>', $f, call_user_func([$ei->getCause(), "get$f"]));
-            }
-            $msg .= '</tbody></table>';
-          }
-          $ei = $ei->getCause();
-        }
-      }
-      $msg .= $e->toHtml();
-    }
-    else {
-      $msg .= '<p><b>' . get_class($e) . ': "' . htmlentities($e->getMessage()) . '"</b></p>';
-      $msg .= '<pre>' . htmlentities(self::formatBacktrace($e->getTrace())) . '</pre>';
-    }
-    return $msg;
+    return static::formatter('html')->formatException($e);
   }
 
   /**
@@ -856,26 +828,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   printable plain text
    */
   public static function formatTextException(Throwable $e) {
-    $msg = get_class($e) . ": \"" . $e->getMessage() . "\"\n";
-
-    $ei = $e;
-    while (is_callable([$ei, 'getCause'])) {
-      // DB_ERROR doesn't have a getCause but does have a __call function which tricks is_callable.
-      if (!$ei instanceof DB_Error) {
-        if ($ei->getCause() instanceof PEAR_Error) {
-          foreach (['Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo'] as $f) {
-            $msg .= sprintf(" * ERROR %s: %s\n", strtoupper($f), call_user_func([$ei->getCause(), "get$f"]));
-          }
-        }
-        $ei = $ei->getCause();
-      }
-      // if we have reached a DB_Error assume that is the end of the road.
-      else {
-        $ei = NULL;
-      }
-    }
-    $msg .= self::formatBacktrace($e->getTrace());
-    return $msg;
+    return static::formatter('text')->formatException($e);
   }
 
   /**
