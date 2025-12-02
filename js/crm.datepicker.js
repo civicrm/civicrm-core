@@ -35,7 +35,7 @@
       if (settings.time !== false) {
         $timeField = $('<input>').insertAfter($dataField);
         placeholder = settings.timePlaceholder || $dataField.attr('time-placeholder');
-        CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled']);
+        CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled', 'required']);
         $timeField
           .removeClass('two four eight twelve twenty medium big huge crm-auto-width')
           .addClass('crm-form-text crm-form-time six')
@@ -55,7 +55,7 @@
       if (settings.date !== false) {
         // Render "number" field for year-only format, calendar popup for all other formats
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
-        CRM.utils.copyAttributes($dataField, $dateField, ['style', 'class', 'disabled', 'aria-label']);
+        CRM.utils.copyAttributes($dataField, $dateField, ['style', 'class', 'disabled', 'aria-label', 'required']);
         placeholder = settings.placeholder || $dataField.attr('placeholder');
         $dateField.addClass('crm-form-' + type);
         if (!settings.minDate && isInt(settings.start_date_years)) {
