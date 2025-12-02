@@ -6,7 +6,6 @@
   border-radius: var(--crm-dialog-radius);
   box-shadow: var(--crm-popup-shadow);
   color: var(--crm-c-text);
-  max-height: 90%;
   padding: var(--crm-dialog-padding);
 }
 .crm-container.ui-dialog .ui-dialog-header,
@@ -78,7 +77,9 @@
   background: var(--crm-dialog-body-bg);
 }
 .crm-container.ui-dialog .ui-dialog-content {
-  max-height: calc(100vh - 280px) !important;
+  max-height: calc(100vh - 280px) !important; /* vs JQuery */
+  height: calc(100% - 94px) !important;
+  width: 100% !important;
   border-radius: var(--crm-dialog-radius);
   background: var(--crm-dialog-body-bg);
   color: var(--crm-c-text);
