@@ -89,16 +89,45 @@
 
         /**
          * Get fieldset values to use for afform filters
+         *
+         * Filter out empty values (null, '', [], {}) at top level and one level
+         * below for object values (fields with ranges/operators)
+         *
          * @returns Object
          */
         this.getFilterValues = () => {
-          const data = this.getFieldData();
-          // filter out unset values
-          // intended to be equivalent to previous lodash implementation
-          // (typeof val !== 'undefined' && val !== null && (_.includes(['boolean', 'number', 'object'], typeof val) || val.length));
-          return Object.fromEntries(Object.entries(data).filter(([key, value]) =>
-            (['boolean', 'number', 'object'].includes(typeof value) && value !== null) || (value && value.length)
-          ));
+          // find null, '', [], {}
+          const isEmpty = (v) => {
+            if (v === null || v === '') {
+              return true;
+            }
+            if (Array.isArray(v) && v.length === 0) {
+              return true;
+            }
+            if (typeof v === 'object' && Object.keys(v).length === 0) {
+              return true;
+            }
+          };
+
+          // get a copy of the object
+          const data = _.cloneDeep(this.getFieldData());
+
+          Object.keys(data).forEach((key) => {
+            // first filter sub objects
+            if (typeof data[key] === 'object' && data[key] !== null) {
+              Object.keys(data[key]).forEach((subKey) => {
+                if (isEmpty(data[key][subKey])) {
+                  delete data[key][subKey];
+                }
+              });
+            }
+            // then filter top level
+            if (isEmpty(data[key])) {
+              delete data[key];
+            }
+          });
+
+          return data;
         };
 
         /**
