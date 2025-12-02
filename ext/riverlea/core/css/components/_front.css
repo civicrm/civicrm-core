@@ -152,6 +152,9 @@ af-form > fieldset > legend {
   padding-block: var(--crm-f-form-padding);
   display: block;
 }
+.crm-container.crm-public .af-field-type-hidden {
+  display: none;
+}
 .crm-container.crm-public .af-container.af-layout-inline,
 .crm-container.crm-public .af-container.af-layout-cols {
   padding: var(--crm-f-form-padding);
