@@ -787,6 +787,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   Maximum number of characters to show from each argument string.
    * @return string
    *   printable plain-text
+   * @deprecated See formatter()
    */
   public static function formatBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
     return static::formatter('text', $showArgs, $maxArgLen)->formatBacktrace($backTrace);
@@ -798,6 +799,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param Throwable $e
    * @return string
    *   printable HTML text
+   * @deprecated See formatter()
    */
   public static function formatHtmlException(Throwable $e) {
     return static::formatter('html')->formatException($e);
@@ -809,6 +811,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param Throwable $e
    * @return string
    *   printable plain text
+   * @deprecated See formatter()
    */
   public static function formatTextException(Throwable $e) {
     return static::formatter('text')->formatException($e);
