@@ -681,3 +681,96 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
     transform: rotate(360deg);
   }
 }
+
+/* PCP Pages */
+
+.crm-container .campaign {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-padding-reg);
+  align-items: start;
+}
+.campaign > * {
+  min-width: 100%;
+}
+.crm-container .pcp-page-pcpinfo-intro {
+  flex: 1;
+  min-width: min(100%, 300px);
+}
+.crm-container .pcp-intro-text {
+  padding-bottom: var(--crm-padding-reg);
+  font-size: var(--crm-l-reg-4);
+}
+.crm-container .pcp-image {
+  float: left;
+  margin: 0 var(--crm-padding-reg) var(--crm-padding-reg) 0;
+  width: max(50%, 150px);
+}
+.crm-container .pcp-widgets {
+  border: var(--crm-border);
+  border-radius: var(--crm-l-radius);
+  padding: var(--crm-padding-reg);
+  display: grid;
+  grid-template-columns: 9rem 9rem;
+  gap: var(--crm-padding-reg);
+  background: var(--crm-container-bg-color);
+  min-width: auto;
+}
+.crm-container .pcp-donate {
+  grid-column: 1 / span 2;
+}
+.crm-container .pcp-donate .button {
+  width: 100% !important; /* vs _buttons.css */
+  justify-content: center;
+}
+.crm-container .goal-amount,
+.crm-container .raised-amount {
+  font-weight: bold;
+  color: var(--crm-success-ink-color);
+}
+.crm-container .thermometer-fill-wrapper {
+  background: var(--crm-layer1-bg-color);
+  height: 220px;
+  position: relative;
+  margin: var(--crm-l-reg-4) 0;
+  width: var(--crm-l-large-1);
+  outline: var(--crm-border);
+}
+.crm-container .thermometer-fill {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  width: var(--crm-l-large-1);
+  background: var(--crm-success-color);
+}
+.crm-container .thermometer-pointer {
+  padding-left: 3.5rem;
+  position: absolute;
+  line-height: 1;
+  color: var(--crm-success-ink-color);
+  font-size: var(--crm-font-small-size);
+  width: 9rem;
+  top: -0.75rem;
+}
+.crm-container .honor_roll {
+  margin: var(--crm-l-reg-4) 0;
+  padding: var(--crm-padding-inset);
+  background-color: var(--crm-page-bg-color);
+  border: var(--crm-border);
+  border-radius: var(--crm-l-radius);
+  height: 220px;
+  overflow: hidden;
+}
+.crm-container .honor_roll marquee {
+  background-color: transparent;
+}
+.crm-container .pcp-honor_roll-nickname {
+  font-weight: bold;
+}
+.crm-container .pcp-create-your-own {
+  text-align: center;
+}
+.crm-container .pcp_honor_roll_entry,
+.crm-container .pcp-page-text {
+  margin-bottom: var(--crm-padding-reg);
+}
