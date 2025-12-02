@@ -401,7 +401,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * entire CRM_Core_Error system can be hollowed out and replaced with
    * something that follows a cleaner separation of concerns.
    *
-   * @param Exception $exception
+   * @param Throwable $exception
    */
   public static function handleUnhandledException($exception) {
     try {
