@@ -44,6 +44,11 @@ class AfformBehavior extends Generic\AbstractEntity {
           'description' => 'Unique identifier in dashed-format, name of entity attribute for selected mode',
         ],
         [
+          'name' => 'attributes',
+          'data_type' => 'Array',
+          'description' => 'Array of attributes added to the entity by this behavior, keyed by attribute name',
+        ],
+        [
           'name' => 'title',
           'data_type' => 'String',
           'description' => 'Localized title displayed on admin screen',
