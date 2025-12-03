@@ -62,12 +62,11 @@ class CRM_Dedupe_Finder {
   }
 
   private static function getIdTable($ids): CRM_Utils_SQL_TempTable {
-    $table = new CRM_Utils_SQL_TempTable();
-    $table->setAutodrop();
-    $table->setDurable();
-    $table->createWithColumns(
-      'id int(10)'
-    );
+    $table = CRM_Utils_SQL_TempTable::build()
+      ->setAutodrop()
+      ->setDurable()
+      ->setCategory('dedupetable')
+      ->createWithColumns('id int(10)');
     CRM_Core_DAO::executeQuery('ALTER TABLE ' . $table->getName() . ' ADD index(id)');
     $insert = ' INSERT INTO ' . $table->getName() . ' (`id`)
       VALUES (' . implode('), (', $ids) . ')';
