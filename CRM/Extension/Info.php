@@ -61,6 +61,16 @@ class CRM_Extension_Info {
   public $requires = [];
 
   /**
+   * (Optional) The parent of a submodule.
+   *
+   * If the parent is installed, then the submodule becomes eligible for auto-installation.
+   * If the parent is uninstalled, then the submodule must be uninstalled.
+   *
+   * @var string|null
+   */
+  public $parent = NULL;
+
+  /**
    * @var array
    *   List of expected mixins.
    *   Ex: ['civix@2.0.0']
@@ -363,6 +373,15 @@ class CRM_Extension_Info {
         $this->$attr = $eval(CRM_Utils_XML::xmlObjToArray($val));
       }
     }
+
+    if (in_array('mgmt:enable-when-satisfied', $this->tags)) {
+      if ($this->parent && !in_array($this->parent, $this->requires)) {
+        $this->requires[] = $this->parent;
+      }
+      else {
+        \Civi::log()->warning("Extension ($info->key) is tagged \"mgmt:enable-when-satisfied\", but no parent is declared.");
+      }
+    }
   }
 
   private function interpolate($value, $vars) {
@@ -375,6 +394,16 @@ class CRM_Extension_Info {
     else {
       return $value;
     }
+  }
+
+  public function isInstallable(): bool {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    foreach ($this->requires as $require) {
+      if (!$manager->isEnabled($require)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**
