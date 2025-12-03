@@ -113,7 +113,7 @@ trait CRM_Queue_BasicHandlerTrait {
       $exception = new \CRM_Core_Exception(sprintf('Skipping exhausted task after %d tries: %s', $item->run_count, print_r($this->getItemDetails($item), TRUE)), 'queue_retry_exhausted');
     }
     else {
-      \Civi::log()->debug('Running task: ' . $this->getItemTitle($item));
+      \Civi::log('queue_runner')->debug('Running task: ' . $this->getItemTitle($item));
       try {
         $this->runItem($item, $queue);
         $outcome = 'ok';
