@@ -166,10 +166,18 @@
       originalHtmlType = '{/literal}{$originalHtmlType}{literal}',
       existingMultiValueCount = {/literal}{if empty($existingMultiValueCount)}null{else}{$existingMultiValueCount}{/if}{literal},
       originalSerialize = {/literal}{if empty($originalSerialize)}false{else}true{/if}{literal},
-      htmlTypes = CRM.utils.getOptions($('#html_type', $form));
+      htmlTypes = CRM.utils.getOptions($('#html_type', $form)),
+      htmlTypesWithOptionalSerialize = {/literal}{$htmlTypesWithOptionalSerialize|json}{literal},
+      htmlTypesWithMandatorySerialize = {/literal}{$htmlTypesWithMandatorySerialize|json}{literal};
+
+    // Vars used by makeDefaultValueField()
+    let oldDataType = null,
+      oldSerialize = null,
+      oldHasOptionGroup = null,
+      oldOptionGroupId = null;
 
     function onChangeDataType() {
-      const dataType = $(this).val();
+      const dataType = $('#data_type', $form).val();
       const allowedHtmlTypes = htmlTypes.filter(type =>
         dataToHTML[dataType].includes(type.key)
       );
@@ -180,7 +188,6 @@
       // Hide html_type if there is only one option
       $('.crm-custom-field-form-block-html_type').toggle(allowedHtmlTypes.length > 1);
       customOptionHtmlType(dataType);
-      makeDefaultValueField(dataType);
 
       // Show/hide entityReference selector
       $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
@@ -188,22 +195,23 @@
     }
 
     function onChangeHtmlType() {
-      const htmlType = $(this).val();
+      const htmlType = $('#html_type', $form).val();
       const dataType = $('#data_type', $form).val();
 
-      if (['CheckBox', 'Radio'].includes(htmlType)) {
-        $('#serialize', $form).prop('checked', htmlType === 'CheckBox');
+      if (htmlTypesWithMandatorySerialize.includes(htmlType)) {
+        $('#serialize', $form).prop('checked', true);
       }
-      else {
+      else if (!htmlTypesWithOptionalSerialize.includes(htmlType)) {
+        $('#serialize', $form).prop('checked', false);
+      }
+
+      if (!['CheckBox', 'Radio'].includes(htmlType)) {
         $("#options_per_line", $form).val('');
       }
 
       showSearchRange(dataType);
-      customOptionHtmlType(dataType);
+      customOptionHtmlType();
     }
-
-    $('#data_type', $form).each(onChangeDataType).change(onChangeDataType);
-    $('#html_type', $form).each(onChangeHtmlType).change(onChangeHtmlType);
 
     function showSearchRange(dataType) {
       const showRange = ['Date', 'Int', 'Float', 'Money'].includes(dataType);
@@ -228,7 +236,14 @@
     }
     $('.toggle-contact-ref-mode', $form).click(toggleContactRefFilter);
 
-    function customOptionHtmlType(dataType) {
+    function hasOptionGroup() {
+      const dataType = $("#data_type", $form).val();
+      const htmlType = $("#html_type", $form).val();
+      return (['String', 'Int', 'Float', 'Money'].includes(dataType)) && !['Text', 'Hidden'].includes(htmlType);
+    }
+
+    function customOptionHtmlType() {
+      const dataType = $("#data_type", $form).val();
       const htmlType = $("#html_type", $form).val();
       const serialize = $("#serialize", $form).is(':checked');
 
@@ -245,14 +260,14 @@
         $('#field_advance_filter, #contact_reference_group', $form).hide();
       }
 
-      if (['String', 'Int', 'Float', 'Money'].includes(dataType)) {
-        if (!['Text', 'Hidden'].includes(htmlType)) {
-          $("#showoption, #searchable", $form).show();
-          $("#hideDefault, #searchByRange", $form).hide();
-        } else {
-          $("#showoption").hide();
-          $("#hideDefault, #searchable", $form).show();
-        }
+      if (hasOptionGroup()) {
+        $("#showoption", $form).show();
+        $("#searchByRange", $form).hide();
+        const reuseOptions = $('[name=option_type]:checked', $form).val() === '2';
+        $("#hideDefault", $form).toggle(reuseOptions);
+      }
+      else if (['String', 'Int', 'Float', 'Money'].includes(dataType)) {
+        $("#hideDefault, #searchable", $form).show();
       } else {
         if (dataType === 'File') {
           $("#default_value", $form).val('');
@@ -262,7 +277,6 @@
         } else {
           $("#hideDefault, #searchable", $form).show();
         }
-        $("#showoption").hide();
       }
 
       if (['String', 'Int', 'Float', 'Money'].includes(dataType) && !['Text', 'Hidden'].includes(htmlType)) {
@@ -283,14 +297,38 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Autocomplete-Select' && dataType !== 'EntityReference');
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlTypesWithOptionalSerialize.includes(htmlType) && dataType !== 'EntityReference');
+
+      makeDefaultValueField(dataType);
     }
 
-    function makeDefaultValueField(dataType) {
+    function makeDefaultValueField(newDataType) {
       const field = $('#default_value', $form);
+      const newSerialize = $("#serialize", $form).is(':checked');
+      const newHasOptionGroup = hasOptionGroup();
+      const newOptionGroupId = $('[name=option_group_id]', $form).val();
+
+      // First, check if this function needs to run by comparing old values with new values
+      if (oldDataType === newDataType && oldSerialize === newSerialize && oldHasOptionGroup === newHasOptionGroup && oldOptionGroupId === newOptionGroupId) {
+        return;
+      }
+      // Store values for next time to ensure function doesn't run more often than necessary
+      // This prevents rapidly creating/destroying/creating/destroying select2 element which can cause race condition errors
+      oldDataType = newDataType;
+      oldSerialize = newSerialize;
+      oldHasOptionGroup = newHasOptionGroup;
+      oldOptionGroupId = newOptionGroupId;
+
+      const autocompeteApiParams = {
+        formName: 'qf:{/literal}{$form.formClass}{literal}',
+        fieldName: 'CustomField.default_value',
+      };
+      const autocompleteSelectParams = {
+        multiple: newSerialize,
+      };
       field.crmDatepicker('destroy');
-      field.crmSelect2('destroy');
-      switch (dataType) {
+      field.crmAutocomplete('destroy');
+      switch (newDataType) {
         case 'Date':
           field.crmDatepicker({date: 'yy-mm-dd', time: false});
           return;
@@ -300,16 +338,33 @@
           return;
 
         case 'Country':
-          field.crmEntityRef({entity: 'Country'});
+          field.crmAutocomplete('Country', autocompeteApiParams, autocompleteSelectParams);
           return;
 
         case 'StateProvince':
-          field.crmEntityRef({entity: 'StateProvince', api: {description_field: ['country_id.name']}});
+          field.crmAutocomplete('StateProvince', autocompeteApiParams, autocompleteSelectParams);
           return;
+      }
+      if (newHasOptionGroup && newOptionGroupId) {
+        autocompeteApiParams.filters = {option_group_id: newOptionGroupId};
+        autocompeteApiParams.key = 'value';
+        field.crmAutocomplete('OptionValue', autocompeteApiParams, autocompleteSelectParams);
       }
     }
 
-    $('#is_searchable, #serialize', $form).change(onChangeHtmlType);
+    // Watch changes
+    $('#html_type, #is_searchable', $form).change(onChangeHtmlType);
+    $('#data_type', $form).change(onChangeDataType);
+
+    // Set initial form state
+    onChangeDataType();
+    onChangeHtmlType();
+
+    // When changing the set of options, clear & rebuild the default value selector
+    $('[name=option_type],[name=option_group_id],[name=serialize]', $form).click(() => {
+      $('#default_value', $form).val('');
+      customOptionHtmlType();
+    });
 
     $form.submit(function() {
       const htmlType = $('#html_type', $form).val();
