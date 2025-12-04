@@ -62,7 +62,7 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
 
     //check sorting
     foreach ($customFields as $fieldId) {
-      $columnName = "field_{$fieldId}{$ids['custom_group_id']}_{$fieldId}";
+      $columnName = "field_{$fieldId}{$ids['custom_group_id']}";
       $_GET['columns'][] = [
         'data' => $columnName,
       ];
@@ -84,7 +84,7 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
     $this->assertEquals(3, $sortedRecords['recordsTotal']);
     $this->assertEquals(3, $multiRecordFields['recordsTotal']);
     foreach ($customFields as $fieldId) {
-      $columnName = "field_{$fieldId}{$ids['custom_group_id']}_{$fieldId}";
+      $columnName = "field_{$fieldId}{$ids['custom_group_id']}";
       $this->assertEquals("test value {$fieldId} one", $multiRecordFields['data'][0][$columnName]['data']);
       $this->assertEquals("test value {$fieldId} two", $multiRecordFields['data'][1][$columnName]['data']);
       $this->assertEquals("test value {$fieldId} three", $multiRecordFields['data'][2][$columnName]['data']);
