@@ -4,14 +4,14 @@ namespace Civi\Afform\Behavior;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Token\TokenRow;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service
  * @internal
  */
-class ActivityAutofill extends AbstractBehavior implements EventSubscriberInterface {
+class EventAutofill extends AbstractBehavior implements EventSubscriberInterface {
 
   /**
    * @return array
@@ -24,7 +24,7 @@ class ActivityAutofill extends AbstractBehavior implements EventSubscriberInterf
   }
 
   public static function getEntities(): array {
-    return ['Activity'];
+    return ['Event'];
   }
 
   public static function getTitle():string {
@@ -32,16 +32,16 @@ class ActivityAutofill extends AbstractBehavior implements EventSubscriberInterf
   }
 
   public static function getDescription(): string {
-    return E::ts('Automatically identify this activity.');
+    return E::ts('Automatically identify this event.');
   }
 
   public static function getModes(string $entityName): array {
     $modes = [];
-    if ($entityName === 'Activity') {
+    if ($entityName === 'Event') {
       $modes[] = [
         'name' => 'entity_id',
-        'label' => E::ts('Activity being Viewed'),
-        'description' => E::ts('For use on the activity page'),
+        'label' => E::ts('Event being Viewed'),
+        'description' => E::ts('For use on the event page'),
         'icon' => 'fa-tasks',
       ];
     }
@@ -51,13 +51,13 @@ class ActivityAutofill extends AbstractBehavior implements EventSubscriberInterf
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
     /* @var \Civi\Api4\Action\Afform\Prefill $apiRequest */
     $apiRequest = $event->getApiRequest();
-    if ($event->getEntityType() == 'Activity') {
+    if ($event->getEntityType() === 'Event') {
       $entity = $event->getEntity();
       $id = $event->getEntityId();
-      $autoFillMode = $entity['activity-autofill'] ?? '';
-      // Autofill with current entity (e.g. on the activity page)
+      $autoFillMode = $entity['event-autofill'] ?? '';
+      // Autofill with current entity (e.g. on the event page)
       if (!$id && $autoFillMode === 'entity_id' && $apiRequest->getFillMode() === 'form') {
-        $id = $apiRequest->getArgs()['activity_id'] ?? NULL;
+        $id = $apiRequest->getArgs()['event_id'] ?? NULL;
         if ($id) {
           $apiRequest->loadEntity($entity, [['id' => $id]]);
         }
@@ -66,8 +66,8 @@ class ActivityAutofill extends AbstractBehavior implements EventSubscriberInterf
   }
 
   public function onCreateToken(TokenRow $row, array &$afformArgs) {
-    if (!empty($row->context['activityId'])) {
-      $afformArgs['activity_id'] = $row->context['activityId'];
+    if (!empty($row->context['eventId'])) {
+      $afformArgs['event_id'] = $row->context['eventId'];
     }
   }
 
