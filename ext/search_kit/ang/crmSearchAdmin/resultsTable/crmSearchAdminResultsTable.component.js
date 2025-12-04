@@ -20,10 +20,10 @@
         ctrl.apiEntity = ctrl.search.api_entity;
         ctrl.settings = _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings);
         ctrl.settings.button = ts('Search');
-        // The default-display settings contain just one column (the last one, with the links menu)
-        ctrl.settings.columns = _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
-          columns.push(searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
-        }).concat(ctrl.settings.columns);
+        // TODO if https://github.com/civicrm/civicrm-core/pull/34178 is merged
+        // we can just set ctrl.settings.column_mode = 'auto' and the columns
+        // will be autoloaded
+        ctrl.settings.columns = ctrl.crmSearchAdmin.getDefaultSearchColumns(ctrl.search);
         ctrl.columns = _.cloneDeep(ctrl.settings.columns);
         ctrl.columns.forEach((col) => {
           col.enabled = true;
@@ -79,9 +79,19 @@
         ctrl.crmSearchAdmin.clearParam('select', index);
       };
 
-      $scope.getColumnLabel = function(index) {
-        return searchMeta.getDefaultLabel(ctrl.search.api_params.select[index], ctrl.search);
-      };
+      this.getColumnDecoration = (index) => {
+        if (this.crmSearchAdmin.groupExists && !index) {
+          return 'locked';
+        }
+        const key = this.columns[index].key;
+        if (key && !this.search.api_params.select.includes(key)) {
+          return 'wildcard';
+        }
+        else if (key) {
+          // explicitly included field, can be removed
+          return 'removable';
+        }
+      }
 
     }
   });

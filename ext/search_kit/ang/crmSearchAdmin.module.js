@@ -354,27 +354,65 @@
           }
         }
       }
+      const parseWildcardArgs = (expr) => {
+        // note: valid wildcards are *,custom_*,[join_alias].*,[join_alias].custom_*
+        const parts = expr.split('.', 2);
+        const prefix = parts.length > 1 ? parts[0] : null;
+        const wildcard = parts.length > 1 ? parts[1] : parts[0];
+
+        let label = null;
+        let fieldTypes = null;
+        switch (wildcard) {
+          case '*':
+            label = ts('All Fields');
+            fieldTypes = ['Field', 'Custom'];
+            break;
+
+          case 'custom_*':
+            label = ts('All Custom Fields');
+            fieldTypes = ['Custom'];
+            break;
+
+          default:
+            throw new Error('Unrecognised wildcard in select expression');
+        }
+
+        const arg = {
+          wildcardFieldTypes: fieldTypes,
+          value: label,
+        };
+        if (prefix) {
+          arg.join = {alias: prefix};
+        }
+        return [arg];
+      }
       function parseExpr(expr) {
         if (!expr) {
           return;
         }
-        const splitAs = expr.split(' AS '),
-          info = {fn: null, args: [], alias: _.last(splitAs), data_type: null},
-          bracketPos = expr.indexOf('(');
-        if (bracketPos >= 0 && !_.findWhere(CRM.crmSearchAdmin.pseudoFields, {name: expr})) {
+        const splitAs = expr.split(' AS ', 2);
+        const info = {fn: null, args: [], alias: splitAs[splitAs.length - 1], data_type: null};
+        if (expr.includes('(') && !CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === expr)) {
           parseFnArgs(info, splitAs[0]);
-        } else {
-          const arg = parseArg(splitAs[0]);
-          if (arg) {
-            arg.param = 0;
-            info.data_type = arg.data_type;
-            info.args.push(arg);
-          }
+          return info;
+        }
+        if (expr.includes('*')) {
+          info.args = parseWildcardArgs(expr);
+          return info;
+        }
+        const arg = parseArg(splitAs[0]);
+        if (arg) {
+          arg.param = 0;
+          info.data_type = arg.data_type;
+          info.args.push(arg);
         }
         return info;
       }
       function getDefaultLabel(col, savedSearch) {
         const info = parseExpr(col);
+        if (col.includes('*')) {
+          console.log(info);
+        }
         let label = '';
         if (info.fn) {
           label = '(' + info.fn.title + ')';

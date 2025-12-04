@@ -155,8 +155,6 @@
 
       $scope.mainEntitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
-      $scope.$watchCollection('$ctrl.savedSearch.api_params.select', onChangeSelect);
-
       $scope.$watch('$ctrl.savedSearch', onChangeAnything, true);
 
       // After watcher runs for the first time and messes up the status, set it correctly
@@ -176,8 +174,11 @@
       return !ctrl.savedSearch.groups.length && !ctrl.savedSearch.is_template;
     };
 
-    function onChangeAnything() {
+    function onChangeAnything(newVal, oldVal) {
       $scope.status = 'unsaved';
+      if (JSON.stringify(newVal.api_params.select) !== JSON.stringify(oldVal.api_params.select)) {
+        onChangeSelect();
+      }
     }
 
     // Generate the confirmation dialog
@@ -686,38 +687,49 @@
       disabledIf = disabledIf || _.noop;
       allowedTypes = allowedTypes || ['Field', 'Custom', 'Extra', 'Filter'];
 
-      function formatEntityFields(entityName, join) {
-        const prefix = join ? join.alias + '.' : '',
-          result = [];
+      function formatEntityFields(entityName, prefix = '', join = null) {
+        const result = [];
 
         // Add extra searchable fields from bridge entity
         if (join && join.bridge) {
-          formatFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
-            return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && field.fk_entity !== entityName);
-          }), result, prefix);
+          const joinFields = searchMeta.getEntity(join.bridge).fields.filter((field) =>
+            (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && field.fk_entity !== entityName)
+          );
+          result.push(...formatFields(joinFields, prefix));
         }
 
-        formatFields(searchMeta.getEntity(entityName).fields, result, prefix);
+        result.push(...formatFields(searchMeta.getEntity(entityName).fields, prefix));
+
+        // if there are any fields for this entity, add "All Fields" psuedofield
+        if (result.length && allowedTypes.includes('Extra')) {
+          const customFieldsSelector = {
+            id: `${prefix}custom_*`,
+            text: ts('All Custom Fields for %1', {1: searchMeta.getEntity(entityName).title}),
+          };
+          customFieldsSelector.disabled = disabledIf(customFieldsSelector.id);
+          const allFieldsSelector = {
+            id: `${prefix}*`,
+            text: ts('All Fields for %1', {1: searchMeta.getEntity(entityName).title}),
+          };
+          allFieldsSelector.disabled = disabledIf(allFieldsSelector.id);
+          result.push(customFieldsSelector, allFieldsSelector);
+        }
+
         return result;
       }
 
-      function formatFields(fields, result, prefix) {
-        prefix = typeof prefix === 'undefined' ? '' : prefix;
-        _.each(fields, function(field) {
-          const item = {
+      function formatFields(fields, prefix = '') {
+        return fields.filter((field) => allowedTypes.includes(field.type))
+          .map((field) => {
             // Use options suffix if available.
-            id: prefix + field.name + (_.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
-            text: field.label,
-            description: field.description
-          };
-          if (disabledIf(item.id)) {
-            item.disabled = true;
-          }
-          if (_.includes(allowedTypes, field.type)) {
-            result.push(item);
-          }
-        });
-        return result;
+            const id = prefix + field.name + ((field.suffixes || []).includes(suffix.replace(':', '')) ? suffix : '');
+            return {
+              id: id,
+              text: field.label,
+              description: field.description,
+              disabled: disabledIf(id)
+            };
+          });
       }
 
       const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
@@ -727,11 +739,13 @@
       function addJoin(join) {
         let joinInfo = searchMeta.getJoin(ctrl.savedSearch, join),
           joinEntity = searchMeta.getEntity(joinInfo.entity);
+
         result.push({
+          id: joinInfo.alias,
           text: joinInfo.label,
           description: joinInfo.description,
           icon: joinEntity.icon,
-          children: formatEntityFields(joinEntity.name, joinInfo)
+          children: formatEntityFields(joinEntity.name, joinInfo.alias + '.', joinInfo)
         });
       }
 
@@ -742,6 +756,7 @@
       }
 
       result.push({
+        id: '__sk_main_entity__',
         text: mainEntity.title_plural,
         icon: mainEntity.icon,
         children: formatEntityFields(ctrl.savedSearch.api_entity)
@@ -752,7 +767,7 @@
         result.push({
           text: ts('Extra'),
           icon: 'fa-gear',
-          children: formatFields(CRM.crmSearchAdmin.pseudoFields, [])
+          children: formatFields(CRM.crmSearchAdmin.pseudoFields)
         });
       }
 
@@ -760,25 +775,21 @@
       return result;
     };
 
-    this.getSelectFields = function(disabledIf) {
-      disabledIf = disabledIf || _.noop;
-      return _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
-        const info = searchMeta.parseExpr(name);
-        const item = {
+    this.getSelectFields = (disabledIf) => {
+      disabledIf = disabledIf || (() => false);
+      return this.getExpandedSelect()
+        .map((fieldExpr) => {
+        const info = searchMeta.parseExpr(fieldExpr);
+        return {
           id: info.alias,
-          text: ctrl.getFieldLabel(name),
-          description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description
+          text: ctrl.getFieldLabel(fieldExpr),
+          description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description,
+          disabled: disabledIf(info.alias)
         };
-        if (disabledIf(item.id)) {
-          item.disabled = true;
-        }
-        fields.push(item);
       });
     };
 
-    this.isPseudoField = function(name) {
-      return _.findIndex(CRM.crmSearchAdmin.pseudoFields, {name: name}) >= 0;
-    };
+    this.isPseudoField = (name) => !!CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === name);
 
     // Ensure options are loaded for main entity + joined entities
     // And an optional additional entity
@@ -801,6 +812,51 @@
       }
 
       searchMeta.loadFieldOptions(entitiesToLoad);
+    }
+
+    /**
+     * Get the default columns for a saved_search
+     *
+     * TODO: if https://github.com/civicrm/civicrm-core/pull/34178 is merged then
+     * we dont need to reimplement this client side
+     * @param Object search
+     * @returns Object[]
+     */
+    this.getDefaultSearchColumns = () => {
+      const keys = this.getExpandedSelect();
+      const columns = keys.map((key) => searchMeta.fieldToColumn(key, {label: true, sortable: true}));
+      // add the defaultDisplay columns (= menu)
+      columns.push(...CRM.crmSearchAdmin.defaultDisplay.settings.columns);
+      return columns;
+    };
+
+    this.getExpandedSelect = () => {
+      const select = this.savedSearch.api_params.select;
+      const expanded = [];
+
+      select.forEach((selectExpr) => {
+        // simple field, just add the single field
+        if (!selectExpr.includes('*')) {
+          expanded.push(selectExpr);
+          return;
+        }
+
+        const info = searchMeta.parseExpr(selectExpr);
+        const arg = info.args[0];
+        const fields = this.getAllFields(':label', arg.wildcardFieldTypes);
+        const fieldGroupId = arg.join ? arg.join.alias : '__sk_main_entity__';
+
+        // use the prefix to get fields for the right entity
+        const entityFields = fields.find((group) => group.id === fieldGroupId).children;
+        const keys = entityFields.map((f) => f.id)
+          // filter explicitly excluded fields
+          // (this handily also filters the wildcard itself)
+          .filter((id) => !select.includes(id));
+
+        expanded.push(...keys);
+      });
+
+      return expanded;
     }
 
     // Build a list of all possible links to main entity & join entities
