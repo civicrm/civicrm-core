@@ -160,7 +160,7 @@ return [
                 [
                   'path' => 'civicrm/admin/uf/group/field#/?gid=[id]',
                   'icon' => 'fa-list-alt',
-                  'text' => E::ts('Fields') . ' ([COUNT_UFGroup_UFField_uf_group_id_01_id])',
+                  'text' => E::ts('Fields (%1)', [1 => '[COUNT_UFGroup_UFField_uf_group_id_01_id]']),
                   'style' => 'default',
                   'condition' => [],
                   'entity' => '',
