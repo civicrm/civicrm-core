@@ -62,8 +62,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       Civi::paths()->register('cms', $cmsRoot);
       Civi::paths()->register('cms.root', $cmsRoot);
       Civi::paths()->register('civicrm.root', function () {
+        global $civicrm_root;
         return [
-          'path' => CIVICRM_PLUGIN_DIR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'path' => $civicrm_root,
           'url' => CIVICRM_PLUGIN_URL . 'civicrm/',
         ];
       });
