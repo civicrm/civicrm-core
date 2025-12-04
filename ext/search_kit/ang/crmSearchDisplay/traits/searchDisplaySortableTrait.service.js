@@ -13,9 +13,7 @@
       },
 
       getSort: function(col) {
-        const dir = _.reduce(this.sort, function(dir, item) {
-          return item[0] === col.key ? item[1] : dir;
-        }, null);
+        const dir = this.sort.reduce((dir, item) => item[0] === col.key ? item[1] : dir, null);
         if (dir) {
           return 'fa-sort-' + dir.toLowerCase();
         }
@@ -30,7 +28,7 @@
         if (!$event.shiftKey || !this.sort) {
           this.sort = [];
         }
-        const index = _.findIndex(this.sort, [col.key]);
+        const index = this.sort.findIndex(item => item[0] === col.key);
         if (index > -1) {
           this.sort[index][1] = dir;
         } else {

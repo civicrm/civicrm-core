@@ -36,9 +36,7 @@
           col.enabled = true;
           col.fetched = true;
         });
-        _.each(ctrl.onInitialize, function(callback) {
-          callback.call(ctrl, $scope, $element);
-        });
+        ctrl.onInitialize.forEach(callback => callback.call(ctrl, $scope, $element));
 
         // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
         this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
@@ -96,9 +94,7 @@
         function onChangeFilters() {
           ctrl.page = 1;
           ctrl.rowCount = null;
-          _.each(ctrl.onChangeFilters, function(callback) {
-            callback.call(ctrl);
-          });
+          ctrl.onChangeFilters.forEach(callback => callback.call(ctrl));
           if (!ctrl.settings.button) {
             ctrl.getResultsSoon();
           }
@@ -243,9 +239,8 @@
         }
         apiCalls = apiCalls || {};
         apiCalls.run = ['SearchDisplay', 'run', apiParams];
-        _.each(ctrl.onPreRun, function(callback) {
-          callback.call(ctrl, apiCalls);
-        });
+        // Run all preRun callbacks
+        ctrl.onPreRun.forEach(callback => callback.call(ctrl, apiCalls));
         const apiRequest = crmApi4(apiCalls);
         apiRequest.then(function(apiResults) {
           if (requestId < ctrl._runCount) {
@@ -269,18 +264,16 @@
               });
             }
           }
-          _.each(ctrl.onPostRun, function(callback) {
-            callback.call(ctrl, apiResults, 'success', editedRow);
-          });
+          // Run all postRun callbacks on success
+          ctrl.onPostRun.forEach(callback => callback.call(ctrl, apiResults, 'success', editedRow));
         }, function(error) {
           if (requestId < ctrl._runCount) {
             return; // Another request started after this one
           }
           ctrl.results = [];
           ctrl.loading = false;
-          _.each(ctrl.onPostRun, function(callback) {
-            callback.call(ctrl, error, 'error', editedRow);
-          });
+          // Run all postRun callbacks on error
+          ctrl.onPostRun.forEach(callback => callback.call(ctrl, error, 'error', editedRow));
         });
         if (statusParams) {
           crmStatus(statusParams, apiRequest);
