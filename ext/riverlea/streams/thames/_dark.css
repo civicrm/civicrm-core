@@ -81,6 +81,7 @@
 /* Alpha filter '--crm-filter-' */
   --crm-filter-bg-color: var(--crm-c-dkblue-02);
 /* Frontend '--crm-f- */
+  --crm-f-page-bg-color: var(--crm-c-dkblue-01);
 }
 
 .crm-container div.crm-summary-row div.crm-label {
