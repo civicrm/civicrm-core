@@ -254,7 +254,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
       ';^\w+ autocomplete$;' => [
-        'allowFields' => ['fieldName', 'filters', 'formName', 'ids', 'input', 'page', 'values'],
+        'allowFields' => ['fieldName', 'filters', 'formName', 'ids', 'input', 'page', 'values', 'searchField', 'key', 'exclude', 'quickEdit'],
         'checkRequest' => fn($request, $jwt) => ('afform:' . $jwt['afform']) === $request['formName'],
       ],
       ';^SearchDisplay run$;' => [
