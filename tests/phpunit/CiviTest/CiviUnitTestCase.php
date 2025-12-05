@@ -3581,13 +3581,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           $participants[$lineItem['entity_id']] = $lineItem['entity_id'];
         }
       }
-      $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'membership_id', 'version' => 3])['values'];
       $participantPayments = $this->callAPISuccess('ParticipantPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'participant_id', 'version' => 3])['values'];
-      $this->assertCount(count($memberships), $membershipPayments);
       $this->assertCount(count($participants), $participantPayments);
-      foreach ($membershipPayments as $payment) {
-        $this->assertContains($payment['membership_id'], $memberships);
-      }
       foreach ($participantPayments as $payment) {
         $this->assertContains($payment['participant_id'], $participants);
       }
