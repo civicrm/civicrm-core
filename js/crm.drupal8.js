@@ -5,10 +5,18 @@ localStorage.setItem('Drupal.toolbar.activeTabID', JSON.stringify('toolbar-item-
 
 (function($) {
   function adjustToggle() {
-    if ($(window).width() < 768 && $('#toolbar-item-civicrm').length) {
-      $('#civicrm-menu-nav .crm-menubar-toggle-btn').css({
-        left: '' + $('#toolbar-item-civicrm').offset().left + 'px',
-        width: '' + $('#toolbar-item-civicrm').innerWidth() + 'px'
+    if ($('#toolbar-item-civicrm').length) {
+      if ($(window).width() < 768) {
+        $('#civicrm-menu-nav .crm-menubar-toggle-btn').css({
+          left: '' + $('#toolbar-item-civicrm').offset().left + 'px',
+          width: '' + $('#toolbar-item-civicrm').innerWidth() + 'px'
+        });
+      }
+    } else {
+      // we don't have a toolbar item (such as using when using Navigation module),
+      // "float" the toggle right
+      $('#civicrm-menu-nav').css({
+        'text-align': 'right'
       });
     }
   }
