@@ -216,6 +216,9 @@ class CRM_Core_Page {
     CRM_Utils_Hook::pageRun($this);
 
     if ($this->_print) {
+      if ($this->_print === CRM_Core_Smarty::PRINT_JSON) {
+        $this->addAjaxResources();
+      }
       if (in_array($this->_print, [
         CRM_Core_Smarty::PRINT_SNIPPET,
         CRM_Core_Smarty::PRINT_PDF,
@@ -461,6 +464,42 @@ class CRM_Core_Page {
 
   public function invalidKey() {
     throw new CRM_Core_Exception(ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, [ts("Could not find a valid session key.")]);
+  }
+
+  /**
+   * For ajax-loaded pages, this returns scripts, styles and settings as structured data
+   * rather than as markup. Those resources are handled clientside by civi.crmSnippet.refresh().
+   */
+  private function addAjaxResources() {
+    $ajaxRegion = CRM_Core_Region::instance('ajax-snippet');
+    // Ensure all resources are added to the region before processing it
+    $ajaxRegion->getFinalItems();
+    // Add settings, which is stored in a single snippet with a special getter
+    $settings = $ajaxRegion->getSettings();
+    $ajaxRegion->update('settings', ['disabled' => TRUE]);
+    if ($settings) {
+      $this->ajaxResponse['settings'] = $settings;
+    }
+    // Add styles and scripts
+    foreach ($ajaxRegion->getAll() as $snippet) {
+      if ($snippet['disabled']) {
+        continue;
+      }
+      // Add style urls
+      if ($snippet['type'] === 'styleUrl') {
+        $this->ajaxResponse['styleUrls'][] = $snippet['styleUrl'];
+        $ajaxRegion->update($snippet['name'], ['disabled' => TRUE]);
+      }
+      if ($snippet['type'] === 'styleFile') {
+        $this->ajaxResponse['styleUrls'] = array_merge($this->ajaxResponse['styleUrls'] ?? [], $snippet['styleFileUrls']);
+        $ajaxRegion->update($snippet['name'], ['disabled' => TRUE]);
+      }
+      // Add script urls; TODO: Handle ESM modules
+      if ($snippet['type'] === 'scriptUrl' && empty($snippet['esm'])) {
+        $this->ajaxResponse['scriptUrls'][] = $snippet['scriptUrl'];
+        $ajaxRegion->update($snippet['name'], ['disabled' => TRUE]);
+      }
+    }
   }
 
 }
