@@ -282,7 +282,7 @@
 
       $("#startDateRange, #endDateRange, #includedDatePart", $form).toggle(dataType === 'Date');
 
-      $("#textLength", $form).toggle(dataType === 'String');
+      $("#textLength", $form).toggle(dataType === 'String' && !serialize);
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 

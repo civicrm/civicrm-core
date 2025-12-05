@@ -47,6 +47,9 @@
   <p>
     {ts}Adds a database index which helps speed up searches on this field significantly. However, it can require more storage and can slow down the system if the data is frequently updated.{/ts}
   </p>
+  <p>
+    {ts}This setting is not recommended for Multi-Select or Checkboxes, as indexes are usually not helpful for fields that store multiple values.{/ts}
+  </p>
 {/htxt}
 
 {htxt id='is_view'}
