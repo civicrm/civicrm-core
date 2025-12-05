@@ -222,7 +222,7 @@ class BasicGetFieldsAction extends BasicGetAction {
    */
   protected function getPseudoconstantOptions(array $field): array {
     if (!empty($field['pseudoconstant']['optionGroupName'])) {
-      return $this->fetchOptionValues($field['pseudoconstant']['optionGroupName']);
+      return $this->getOptionValues($field['pseudoconstant']['optionGroupName']);
     }
     if (!empty($field['pseudoconstant']['callback'])) {
       return call_user_func(
@@ -234,12 +234,27 @@ class BasicGetFieldsAction extends BasicGetAction {
     throw new \CRM_Core_Exception('Unsupported pseudoconstant type for field "' . $field['name'] . '"');
   }
 
-  private function fetchOptionValues(string $optionGroupName): array {
-    $options = \CRM_Core_OptionValue::getValues(['name' => $optionGroupName]);
-    foreach ($options as &$option) {
+  private function getOptionValues(string $optionGroupName): array {
+    $cacheKey = implode('_', [
+      \CRM_Core_Config::domainID(),
+      \CRM_Core_I18n::getLocale(),
+      'optionGroup',
+      $optionGroupName,
+    ]);
+    $optionValues = \Civi::cache('metadata')->get($cacheKey);
+
+    if (!is_array($optionValues)) {
+      $optionValues = \CRM_Core_OptionValue::getValues(['name' => $optionGroupName]);
+      \Civi::cache('metadata')->set($cacheKey, $optionValues);
+    }
+
+    // for field options, we want to use `value` key as the `id`
+    // (rather than global id from civicrm_option_value table)
+    foreach ($optionValues as &$option) {
       $option['id'] = $option['value'];
     }
-    return $options;
+
+    return $optionValues;
   }
 
   /**
