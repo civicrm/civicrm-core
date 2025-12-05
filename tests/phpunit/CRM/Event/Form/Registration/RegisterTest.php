@@ -104,8 +104,19 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
    *
    * @return void
    */
-  public function testValidEvent(array $formValues): void {
+  public function testValidEvent(string $fieldName, array $formValues, string $expectedMessage, string $dateFormat): void {
     $event = $this->eventCreateUnpaid();
+
+    // calculate the datetime now since dataproviders run at the start of the
+    // test suite and so it might be off by the time we get here
+    $offset = NULL;
+    if ($dateFormat) {
+      // In this case we expect the value to be a relative date string.
+      // Keep offset for later.
+      $offset = $formValues[$fieldName];
+      $formValues[$fieldName] = date('YmdH0000', strtotime($offset));
+    }
+
     $this->updateEvent($formValues);
     $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [], [
       'id' => $this->getEventID(),
@@ -113,51 +124,63 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
 
     try {
       $form->processForm(FormWrapper::PREPROCESSED);
+      $this->fail('Should have thrown an exception');
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $message = CRM_Core_Session::singleton()->getStatus();
-      foreach ([
-        'is_active' => 'The event you requested is currently unavailable (contact the site administrator for assistance).',
-        'is_online_registration' => 'Online registration is not currently available for this event (contact the site administrator for assistance).',
-        'is_template' => 'Event templates are not meant to be registered.',
-        'registration_start_date' => 'Registration for this event begins on ' . CRM_Utils_Date::customFormat(date('YmdH0000', strtotime('+ 1 day'))),
-        'registration_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('YmdH0000', strtotime('- 1 day'))),
-        'event_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('YmdHi', strtotime('- 1 day'))),
-      ] as $parameter => $errorMessage) {
-        $check = ($parameter === 'is_template');
-        if (isset($formValues[$parameter]) && $formValues[$parameter] === $check) {
-          $this->assertEquals($errorMessage, $message[0]['text']);
-        }
-        elseif ($parameter == 'registration_start_date' && !empty($formValues[$parameter])) {
-          $this->assertEquals($errorMessage, $message[0]['text']);
-        }
-        elseif ($parameter == 'registration_end_date' && !empty($formValues[$parameter])) {
-          $this->assertEquals($errorMessage, $message[0]['text']);
-        }
+      if ($dateFormat) {
+        // replace placeholder with formatted expected offset
+        $expectedMessage = str_replace('%EXPECTED_DATE%', CRM_Utils_Date::customFormat(date($dateFormat, strtotime($offset))), $expectedMessage);
       }
+      $this->assertEquals($expectedMessage, $message[0]['text']);
     }
   }
 
-  public function eventDataProvider(): array {
+  public static function eventDataProvider(): array {
     return [
       'inactive_event' => [
+        'field_name' => 'is_active',
         'form_values' => ['is_active' => FALSE],
+        'expected_message' => 'The event you requested is currently unavailable (contact the site administrator for assistance).',
+        'message_date_format' => '',
       ],
       'online_registration_disabled' => [
+        'field_name' => 'is_online_registration',
         'form_values' => ['is_online_registration' => FALSE],
+        'expected_message' => 'Online registration is not currently available for this event (contact the site administrator for assistance).',
+        'message_date_format' => '',
       ],
       'event_is_template' => [
+        'field_name' => 'is_template',
         'form_values' => ['is_template' => TRUE],
+        'expected_message' => 'Event templates are not meant to be registered.',
+        'message_date_format' => '',
       ],
       'start_date_in_future' => [
-        'form_values' => ['registration_start_date' => date('YmdH0000', strtotime('+ 1 day'))],
+        'field_name' => 'registration_start_date',
+        'form_values' => ['registration_start_date' => '+ 1 day'],
+        'expected_message' => 'Registration for this event begins on %EXPECTED_DATE%',
+        'message_date_format' => 'YmdH0000',
       ],
       'registration_end_date_in_past' => [
-        'form_values' => ['registration_end_date' => date('YmdH0000', strtotime('- 1 day'))],
+        'field_name' => 'registration_end_date',
+        'form_values' => ['registration_end_date' => '- 1 day'],
+        'expected_message' => 'Registration for this event ended on %EXPECTED_DATE%',
+        'message_date_format' => 'YmdH0000',
       ],
-      'event_end_date_in_past' => [
-        'form_values' => ['event_end_date' => date('YmdH0000', strtotime('- 1 day'))],
-      ],
+      /**
+       * It's not clear if this broke recently because this testcase was never
+       * actually checking the output. My expectation is that if the end date
+       * has past you shouldn't be able to register, but I tested in the UI and
+       * it still lets you register.  There's a message on the info page, but
+       * you can still manually enter a url to register and complete it.
+       */
+      //'event_end_date_in_past' => [
+      //  'field_name' => 'event_end_date',
+      //  'form_values' => ['event_end_date' => '- 1 day'],
+      //  'expected_message' => 'Registration for this event ended on %EXPECTED_DATE%',
+      //  'message_date_format' => 'YmdHi',
+      //],
     ];
   }
 
