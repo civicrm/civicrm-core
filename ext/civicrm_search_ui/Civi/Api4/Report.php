@@ -176,35 +176,23 @@ class Report extends Generic\AbstractEntity {
   }
 
   public static function getEntityOptions(): array {
-    $cacheKey = __CLASS__ . __FUNCTION__;
-    $options = \Civi::cache()->get($cacheKey);
-    if (!is_array($options)) {
-      $options = Entity::get(FALSE)
-        ->addSelect('name', 'title')
-        ->addWhere('searchable', '!=', 'none')
-        ->addOrderBy('title')
-        ->execute()
-        ->indexBy('name')
-        ->column('title');
-      \Civi::cache()->set($cacheKey, $options);
-    }
-    return $options;
+    return Entity::get(FALSE)
+      ->addSelect('name', 'title')
+      ->addWhere('searchable', '!=', 'none')
+      ->addOrderBy('title')
+      ->execute()
+      ->indexBy('name')
+      ->column('title');
   }
 
   public static function getExtensionOptions(): array {
-    $cacheKey = __CLASS__ . __FUNCTION__;
-    $options = \Civi::cache()->get($cacheKey);
-    if (!is_array($options)) {
-      $options = Extension::get(FALSE)
-        ->addSelect('key', 'label')
-        ->addWhere('status', '=', 'installed')
-        ->addOrderBy('label')
-        ->execute()
-        ->indexBy('key')
-        ->column('label');
-      \Civi::cache()->set($cacheKey, $options);
-    }
-    return $options;
+    return Extension::get(FALSE)
+      ->addSelect('key', 'label')
+      ->addWhere('status', '=', 'installed')
+      ->addOrderBy('label')
+      ->execute()
+      ->indexBy('key')
+      ->column('label');
   }
 
   /**
