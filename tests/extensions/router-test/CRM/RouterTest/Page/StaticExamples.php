@@ -29,12 +29,12 @@ class CRM_RouterTest_Page_StaticExamples {
   public static function systemSendJsonResponse() {
     CRM_Utils_System::sendJSONResponse([
       __FUNCTION__ => 'OK',
-    ], 499);
+    ], 429);
   }
 
   public static function psr7(ServerRequestInterface $request): ResponseInterface {
     $parsed = json_decode($request->getBody()->getContents(), TRUE);
-    return new \GuzzleHttp\Psr7\Response(498,
+    return new \GuzzleHttp\Psr7\Response(428,
       ['X-Foo' => 'Bar', 'Content-Type' => 'application/json'],
       json_encode([
         __FUNCTION__ => 'hello ' . (is_numeric($parsed['number']) ? $parsed['number'] : ''),
