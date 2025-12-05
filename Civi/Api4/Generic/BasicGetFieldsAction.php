@@ -225,13 +225,56 @@ class BasicGetFieldsAction extends BasicGetAction {
       return $this->getOptionValues($field['pseudoconstant']['optionGroupName']);
     }
     if (!empty($field['pseudoconstant']['callback'])) {
-      return call_user_func(
-        \Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']),
-       $field['name'],
-       ['values' => $this->getValues()]
-      );
+      return $this->getCallbackOptions($field);
     }
     throw new \CRM_Core_Exception('Unsupported pseudoconstant type for field "' . $field['name'] . '"');
+  }
+
+  private function getCallbackOptions(array $field): array {
+    // first inspect the callback to see whether it varies based on row values or not
+    $cacheKey = $this->getCallbackCacheKey($field);
+    if ($cacheKey) {
+      $cacheValue = $cacheKey ? \Civi::cache('metadata')->get($cacheKey) : NULL;
+      if (is_array($cacheValue)) {
+        return $cacheValue;
+      }
+    }
+    $args = [$field['name'], ['values' => $this->getValues()]];
+    $value = \Civi\Core\Resolver::singleton()->call($field['pseudoconstant']['callback'], $args);
+    if ($cacheKey) {
+      \Civi::cache('metadata')->set($cacheKey, $value);
+    }
+    return $value;
+  }
+
+  private function getCallbackCacheKey($field): ?string {
+    $reflector = \Civi\Core\Resolver::singleton()->getReflector($field['pseudoconstant']['callback']);
+    // we need to stringify the callback itself - depends on why
+    $callbackName = match ($reflector::class) {
+      'ReflectionMethod' => "{$reflector->class}::{$reflector->name}",
+      default => NULL,
+    };
+    // if we dont know how to stringify the callback then we cant cache
+    if (!$callbackName) {
+      return NULL;
+    }
+    switch ($reflector->getNumberOfParameters()) {
+      case 0:
+        // no args are passed, can cache using just the callback name
+        return implode('_', [\CRM_Core_Config::domainID(), \CRM_Core_I18n::getLocale(), 'pseudoconstantCallback', $callbackName]);
+
+      case 1:
+        // callback takes field name, include that in the cache key
+        return implode('_', [\CRM_Core_Config::domainID(), \CRM_Core_I18n::getLocale(), 'pseudoconstantCallback', $callbackName, $field['name']]);
+
+      default:
+        // callback takes row values - dont attempt to cache
+        return NULL;
+    };
+    if ($cacheKeyParts) {
+      return implode('_', $cacheKeyParts);
+    }
+
   }
 
   private function getOptionValues(string $optionGroupName): array {
