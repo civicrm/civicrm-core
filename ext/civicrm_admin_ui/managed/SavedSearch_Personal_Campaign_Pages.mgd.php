@@ -1,4 +1,5 @@
 <?php
+
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
@@ -18,18 +19,17 @@ return [
           'select' => [
             'title',
             'PCP_Contact_contact_id_01.sort_name',
-            'IFNULL(PCP_ContributionPage_page_id_01.title, PCP_Event_page_id_01.title) AS IFNULL_PCP_ContributionPage_page_id_01_title_PCP_Event_page_id_01_title',
-            'PCP_Event_page_id_01.title',
-            'PCP_ContributionPage_page_id_01.start_date',
-            'PCP_ContributionPage_page_id_01.end_date',
-            'PCP_Event_page_id_01.start_date',
-            'PCP_Event_page_id_01.end_date',
+            'IFNULL(PCP_ContributionPage_page_id_01.title, PCP_Event_page_id_01.title) AS PCP_Event_page_id_01_title',
+            'goal_amount',
             'status_id:label',
             'is_active',
+            'SUM(PCP_Contact_contact_id_01_Contact_ContributionSoft_contact_id_01.amount) AS SUM_PCP_Contact_contact_id_01_Contact_ContributionSoft_contact_id_01_amount',
           ],
           'orderBy' => [],
           'where' => [],
-          'groupBy' => [],
+          'groupBy' => [
+            'id',
+          ],
           'join' => [
             [
               'ContributionPage AS PCP_ContributionPage_page_id_01',
@@ -42,7 +42,7 @@ return [
               [
                 'page_type',
                 '=',
-                '\'contribute\'',
+                "'contribute'",
               ],
             ],
             [
@@ -65,7 +65,16 @@ return [
               [
                 'page_type',
                 '=',
-                '\'event\'',
+                "'event'",
+              ],
+            ],
+            [
+              'ContributionSoft AS PCP_Contact_contact_id_01_Contact_ContributionSoft_contact_id_01',
+              'LEFT',
+              [
+                'PCP_Contact_contact_id_01.id',
+                '=',
+                'PCP_Contact_contact_id_01_Contact_ContributionSoft_contact_id_01.contact_id',
               ],
             ],
           ],
@@ -99,6 +108,7 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
+              'dataType' => 'String',
               'label' => E::ts('Page Title'),
               'sortable' => TRUE,
               'link' => [
@@ -112,6 +122,7 @@ return [
             [
               'type' => 'field',
               'key' => 'PCP_Contact_contact_id_01.sort_name',
+              'dataType' => 'String',
               'label' => E::ts('Supporter'),
               'sortable' => TRUE,
               'link' => [
@@ -120,34 +131,38 @@ return [
                 'action' => 'view',
                 'join' => 'PCP_Contact_contact_id_01',
                 'target' => '',
+                'task' => '',
               ],
-              'title' => E::ts('View Personal Campaign Page Contact'),
             ],
             [
               'type' => 'field',
-              'key' => 'IFNULL_PCP_ContributionPage_page_id_01_title_PCP_Event_page_id_01_title',
+              'key' => 'PCP_Event_page_id_01_title',
+              'dataType' => 'String',
               'label' => E::ts('Contribution Page/Event'),
               'sortable' => TRUE,
-              'rewrite' => '',
-            ],
-            [
-              'type' => 'field',
-              'key' => 'PCP_ContributionPage_page_id_01.start_date',
-              'label' => E::ts('Start Date'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'PCP_ContributionPage_page_id_01.end_date',
-              'label' => E::ts('End Date'),
-              'sortable' => TRUE,
-              'empty_value' => '(ongoing)',
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
+              'dataType' => 'Integer',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'goal_amount',
+              'dataType' => 'Money',
+              'label' => E::ts('Goal'),
+              'sortable' => TRUE,
+              'alignment' => 'text-right',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'SUM_PCP_Contact_contact_id_01_Contact_ContributionSoft_contact_id_01_amount',
+              'dataType' => 'Money',
+              'label' => E::ts('Raised'),
+              'sortable' => TRUE,
+              'alignment' => 'text-right',
             ],
             [
               'text' => '',
@@ -166,60 +181,67 @@ return [
                   'path' => '',
                   'action' => 'update',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => 'civicrm/admin/pcp?action=revert&id=[id]',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Reject'),
                   'style' => 'default',
-                  'condition' => [
-                    'status_id:name',
-                    'IN',
-                    [
-                      'Waiting Review',
-                      'Approved',
-                    ],
-                  ],
                   'task' => '',
                   'entity' => '',
                   'action' => '',
                   'join' => '',
                   'target' => '_blank',
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      'IN',
+                      [
+                        'Waiting Review',
+                        'Approved',
+                      ],
+                    ],
+                  ],
                 ],
                 [
                   'path' => 'civicrm/admin/pcp?action=renew&id=[id]',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Approve'),
                   'style' => 'default',
-                  'condition' => [
-                    'status_id:name',
-                    'IN',
-                    [
-                      'Waiting Review',
-                      'Not Approved',
-                    ],
-                  ],
                   'task' => '',
                   'entity' => '',
                   'action' => '',
                   'join' => '',
                   'target' => '_blank',
+                  'conditions' => [
+                    [
+                      'status_id:name',
+                      'IN',
+                      [
+                        'Waiting Review',
+                        'Not Approved',
+                      ],
+                    ],
+                  ],
                 ],
                 [
                   'path' => '',
                   'icon' => 'fa-toggle-on',
                   'text' => E::ts('Enable'),
                   'style' => 'default',
-                  'condition' => [
-                    'is_active',
-                    '=',
-                    FALSE,
-                  ],
                   'task' => 'enable',
                   'entity' => 'PCP',
                   'action' => '',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [
+                    [
+                      'is_active',
+                      '=',
+                      FALSE,
+                    ],
+                  ],
                 ],
                 [
                   'task' => 'disable',
@@ -231,10 +253,12 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => [
-                    'is_active',
-                    '=',
-                    TRUE,
+                  'conditions' => [
+                    [
+                      'is_active',
+                      '=',
+                      TRUE,
+                    ],
                   ],
                 ],
                 [
@@ -248,6 +272,7 @@ return [
                   'path' => '',
                   'action' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
               ],
               'type' => 'menu',
@@ -267,6 +292,7 @@ return [
               FALSE,
             ],
           ],
+          'actions_display_mode' => 'menu',
         ],
       ],
       'match' => [

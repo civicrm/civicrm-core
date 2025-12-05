@@ -45,7 +45,7 @@
 {/if}
 <div class="campaign">
   {crmRegion name="pcp-page-pcpinfo"}
-    <div class="pcp-page-pcpinfo-intro float-left">
+    <div class="pcp-page-pcpinfo-intro">
       {if $image}
         <div class="pcp-image">{$image}</div>
       {/if}
@@ -87,6 +87,7 @@
           <div class="description">[<a href="#" onclick="roll_start_stop(); return false;" id="roll" title="{ts escape='htmlattribute'}Stop scrolling{/ts}">{ts}Stop{/ts}</a>]</div>
         </div>
       {/if}
+      <div style="clear: both;"></div>
     </div>
     <div style="clear: both;"></div>
     {if $linkText}

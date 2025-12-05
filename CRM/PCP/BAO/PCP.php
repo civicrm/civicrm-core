@@ -334,14 +334,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
           'title' => ts('Disable'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/pcp',
-          'qs' => 'action=delete&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
-          'title' => ts('Delete'),
-          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
-        ],
       ];
 
       // pcp.user.actions emits a malformed set of $links. But it is locked-in via unit-test, so we'll grandfather
