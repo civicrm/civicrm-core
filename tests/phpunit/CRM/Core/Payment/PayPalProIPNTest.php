@@ -102,6 +102,16 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   public function testIPNPaymentMembershipRecurSuccess(): void {
     $durationUnit = 'year';
     $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
+    // I can't see where the membership is created? But the dates need to start within the range of contributions received by the IPN
+    //   or we'll get issues with "fixMembershipStatusBeforeRenew()" throwing an exception and membership not being renewed.
+    // Since the IPN dates are 2013 we set initial membership to start at the beginning of that year.
+    \Civi\Api4\Membership::update(FALSE)
+      ->addValue('join_date', '20130101000000')
+      ->addValue('start_date', '20130101000000')
+      ->addValue('end_date', '20140101000000')
+      ->addWhere('id', '=', $this->ids['membership'])
+      ->execute();
+
     $this->callAPISuccessGetSingle('membership_payment', []);
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
     $paypalIPN->main();
