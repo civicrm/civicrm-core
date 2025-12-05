@@ -180,7 +180,7 @@ class BasicGetFieldsAction extends BasicGetAction {
     }
     if (!empty($field['pseudoconstant'])) {
       if (!empty($field['pseudoconstant']['optionGroupName'])) {
-        $field['options'] = self::pseudoconstantOptions($field['pseudoconstant']['optionGroupName']);
+        $field['options'] = $this->pseudoconstantOptions($field['pseudoconstant']['optionGroupName']);
       }
       elseif (!empty($field['pseudoconstant']['callback'])) {
         $field['options'] = call_user_func(\Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']), $field['name'], ['values' => $this->getValues()]);
@@ -225,17 +225,27 @@ class BasicGetFieldsAction extends BasicGetAction {
    *
    * @param string $optionGroupName
    */
-  public function pseudoconstantOptions(string $optionGroupName) {
+  protected function pseudoconstantOptions(string $optionGroupName) {
     if ($this->getLoadOptions()) {
-      $options = \CRM_Core_OptionValue::getValues(['name' => $optionGroupName]);
-      foreach ($options as &$option) {
-        $option['id'] = $option['value'];
+      $options = \Civi::cache('metadata')->get("pseudoconstant_options_$optionGroupName");
+      if (!isset($options)) {
+        $options = self::getPseudoconstantOptions($optionGroupName);
+        \Civi::cache('metadata')->set("pseudoconstant_options_$optionGroupName", $options);
       }
     }
     else {
       $options = TRUE;
     }
     return $options;
+  }
+
+  private function getPseudoconstantOptions(string $optionGroupName): array {
+    $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name');
+    $select = CoreUtil::getOptionValueFields($optionGroupName);
+    unset($select['id'], $select['value']);
+    array_unshift($select, 'value AS id');
+    $query = "SELECT " . implode(', ', $select) . " FROM civicrm_option_value WHERE option_group_id = %1";
+    return \CRM_Core_DAO::executeQuery($query, [1 => [$optionGroupId, 'Int']])->fetchAll();
   }
 
   public function fields() {
