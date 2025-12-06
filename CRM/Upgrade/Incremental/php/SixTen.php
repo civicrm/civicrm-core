@@ -29,6 +29,7 @@ class CRM_Upgrade_Incremental_php_SixTen extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_10_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
     $this->addTask('Ensure custom fields all have a name', 'ensureCustomFieldsHaveName');
     $this->addTask('Set custom field name as required', 'alterSchemaField', 'CustomField', 'name', [
       'title' => ts('Custom Field Name'),
@@ -38,7 +39,6 @@ class CRM_Upgrade_Incremental_php_SixTen extends CRM_Upgrade_Incremental_Base {
       'description' => ts('Variable name/programmatic handle for this field.'),
       'add' => '3.3',
     ]);
-
   }
 
   public static function ensureCustomFieldsHaveName() {
