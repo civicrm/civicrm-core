@@ -512,7 +512,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     if ($log) {
       // Log the output to error_log with a unique reference.
-      $unique = bin2hex(random_bytes(6));
+      $unique = static::createErrorId();
       error_log("errorID:$unique\n$out");
 
       if (!$checkPermission) {
@@ -832,6 +832,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $error = CRM_Core_Error::singleton();
     $error->push($code, $level, [$params], $message);
     return $error;
+  }
+
+  /**
+   * Create a random identifier for an error.
+   *
+   * @return string
+   */
+  public static function createErrorId(): string {
+    return rtrim(chunk_split(CRM_Utils_String::createRandom(12, CRM_Utils_String::ALPHANUMERIC), 4, '-'), '-');
   }
 
   /**
