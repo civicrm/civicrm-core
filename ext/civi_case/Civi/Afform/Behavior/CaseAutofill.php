@@ -35,9 +35,9 @@ class CaseAutofill extends AbstractBehavior implements EventSubscriberInterface 
     return E::ts('Automatically identify this case based on the case being viewed when this form is placed on the case summary screen or when email with the link to the form is send from the Case.');
   }
 
-  public static function getModes(string $type):array {
+  public static function getModes(string $entityName):array {
     $modes = [];
-    if ($type == 'Case') {
+    if ($entityName === 'Case') {
       $modes[] = [
         'name' => 'entity_id',
         'label' => E::ts('Case being Viewed'),
@@ -51,7 +51,7 @@ class CaseAutofill extends AbstractBehavior implements EventSubscriberInterface 
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
     /* @var \Civi\Api4\Action\Afform\Prefill $apiRequest */
     $apiRequest = $event->getApiRequest();
-    if ($event->getEntityType() == 'Case') {
+    if ($event->getEntityType() === 'Case') {
       $entity = $event->getEntity();
       $id = $event->getEntityId();
       $autoFillMode = $entity['case-autofill'] ?? '';
