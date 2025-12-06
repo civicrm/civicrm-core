@@ -900,8 +900,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    */
   public function testGetLastFinancialItemIDs(): void {
     [$contribution] = $this->createContributionWithTax();
-    [$ftIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
-    $this->assertCount(1, $ftIds, 'Invalid count.');
+    [$financialItemIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
+    $this->assertCount(1, $financialItemIds, 'Invalid count.');
     $this->assertCount(1, $taxItems, 'Invalid count.');
     foreach ($taxItems as $value) {
       $this->assertEquals(10, $value['amount'], 'Invalid tax amount.');
