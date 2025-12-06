@@ -552,7 +552,7 @@ function civicrm_api3_job_process_batch_merge($params) {
   $gid = $params['gid'] ?? NULL;
   $mode = $params['mode'] ?? 'safe';
 
-  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, $params['criteria'] ?? [], $params['check_permissions'] ?? FALSE, NULL, $params['search_limit']);
+  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, $params['criteria'] ?? [], $params['check_permissions'] ?? FALSE, NULL, $params['search_limit'], (bool) $params['is_force_new_search']);
 
   return civicrm_api3_create_success($result, $params);
 }
@@ -586,6 +586,12 @@ function _civicrm_api3_job_process_batch_merge_spec(&$params) {
     'title' => ts('Number of contacts to look for matches for.'),
     'type' => CRM_Utils_Type::T_INT,
     'api.default' => (int) Civi::settings()->get('dedupe_default_limit'),
+  ];
+  $params['is_force_new_search'] = [
+    'title' => ts('Force a new search, refreshing any cached search'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    // Arguably for batch mode we should default to TRUE...
+    'api.default' => FALSE,
   ];
 
 }
