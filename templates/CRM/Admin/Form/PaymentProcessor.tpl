@@ -53,16 +53,54 @@
     </tr>
     {/if}
   </table>
-<fieldset>
-<legend>{ts}Processor Details for Live Payments{/ts}</legend>
-  {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$liveFieldNames}
-</fieldset>
 
-<fieldset>
-<legend>{ts}Processor Details for Test Payments{/ts}</legend>
-  {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$testFieldNames}
-</fieldset>
-{/if}
+  {if !empty($live_initiator_list)}
+    <fieldset class="crm-paymentProcessor-details">
+      <legend>{ts}Connection{/ts}</legend>
+
+      {if $action eq 1}
+        {* The PaymentProcessor doesn't exist yet -- our OAuth flow uses `tag=PaymentProcessor::123`, so need to save first.*}
+        <div class="alert alert-info">
+          {ts}After saving this payment processor, you will be prompted to login and establish the full connection.{/ts}
+        </div>
+      {elseif empty($form.user_name.value) && empty($form.password.value) }
+        <div class="alert alert-warning crm-initiators-block">
+          <p>{ts}This connection is not fully established. Use this button to login and authorize the connection.{/ts}</p>
+          {crmRegion name='live_initiator_region'}{/crmRegion}
+        </div>
+        <details>
+          <summary>{ts}Connection Details{/ts}</summary>
+          {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$liveFieldNames}
+        </details>
+      {elseif !(empty($form.user_name.value) && empty($form.password.value))}
+        <div class="alert alert-success">
+          <p>{ts}This connection has been initialized.{/ts}</p>
+        </div>
+        <details>
+          <summary>{ts}Connection Details{/ts}</summary>
+          {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$liveFieldNames}
+        </details>
+        <details>
+          <summary>{ts}Re-connect{/ts}</summary>
+          <div class="alert alert-info crm-initiators-block">
+            <p>{ts}If you have encountered a problem with this connection, then you may re-connect. This button will prompt you to login again and re-approve.{/ts}</p>
+            {crmRegion name='live_initiator_region'}{/crmRegion}
+          </div>
+        </details>
+      {/if}
+
+    </fieldset>
+  {else}
+    <fieldset class="crm-paymentProcessor-details">
+      <legend>{ts}Processor Details for Live Payments{/ts}</legend>
+      {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$liveFieldNames}
+    </fieldset>
+    <fieldset class="crm-paymentProcessor-details">
+      <legend>{ts}Processor Details for Test Payments{/ts}</legend>
+      {include file="CRM/Admin/Form/PaymentProcessor/Details.tpl" fieldNames=$testFieldNames}
+    </fieldset>
+  {/if}
+  {/if}
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
@@ -83,6 +121,14 @@
       if ($elements.length === 2) {
         CRM.utils.syncFields($elements.first(), $elements.last());
       }
+      var disableInitiators = false;
+      $('input,select', $form).change(function(){
+        if (disableInitiators) return;
+        disableInitiators = true;
+        $('.crm-initiators-block').obscureInitiator({
+          message: CRM.ts()('Please save changes before updating the connection.')
+        });
+      });
     });
   {/literal}
   </script>
