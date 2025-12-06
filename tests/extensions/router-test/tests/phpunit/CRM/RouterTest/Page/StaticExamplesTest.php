@@ -64,7 +64,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
    */
   public function testSystemSendJsonResponse(): void {
     $result = $this->client->get('frontend://civicrm/route-test/system-send-json-response', ['http_errors' => FALSE]);
-    $this->assertEquals(499, $result->getStatusCode());
+    $this->assertEquals(429, $result->getStatusCode());
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
     $this->assertEquals('OK', $parsed['systemSendJsonResponse']);
@@ -78,7 +78,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
       'http_errors' => FALSE,
       \GuzzleHttp\RequestOptions::JSON => ['number' => 456.78],
     ]);
-    $this->assertEquals(498, $result->getStatusCode());
+    $this->assertEquals(428, $result->getStatusCode());
     $this->assertEquals('Bar', $result->getHeader('X-Foo')[0]);
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
