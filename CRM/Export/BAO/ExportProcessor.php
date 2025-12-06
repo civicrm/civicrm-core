@@ -635,7 +635,7 @@ class CRM_Export_BAO_ExportProcessor {
     $queryFields['country']['context'] = 'country';
     $queryFields['world_region']['context'] = 'country';
     $queryFields['state_province']['context'] = 'province';
-    $queryFields['contact_id'] = ['title' => ts('Contact ID'), 'type' => CRM_Utils_Type::T_INT];
+    $queryFields['contact_id'] = ['title' => ts('Contact ID'), 'type' => CRM_Utils_Type::T_INT, 'FKClassName' => 'CRM_Contact_DAO_Contact', 'FKColumnName' => 'id'];
     $queryFields['tags']['type'] = CRM_Utils_Type::T_LONGTEXT;
     $queryFields['groups']['type'] = CRM_Utils_Type::T_LONGTEXT;
     $queryFields['notes']['type'] = CRM_Utils_Type::T_LONGTEXT;
@@ -1439,20 +1439,44 @@ class CRM_Export_BAO_ExportProcessor {
     // tests will fail on the enotices until they all are & then all the 'else'
     // below can go.
     $fieldSpec = $queryFields[$columnName] ?? [];
+    if (empty($fieldSpec['html_type']) && !empty($fieldSpec['html'])) {
+      $fieldSpec['html_type'] = $fieldSpec['html']['type'];
+    }
+    elseif (empty($fieldSpec['html_type'])) {
+      $fieldSpec['html_type'] = '';
+    }
     $type = $fieldSpec['type'] ?? ($fieldSpec['data_type'] ?? '');
     // set the sql columns
     if ($type) {
       switch ($type) {
         case CRM_Utils_Type::T_INT:
-        case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($fieldSpec['data_type'] ?? NULL, ['Country', 'StateProvince', 'ContactReference', 'EntityReference'])) {
-            return "`$fieldName` text";
+          if (isset($fieldSpec['maxlength'])) {
+            return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
+          // 1. If it is a foreign key field
+          // 2. If its is a pseudoconstant field derive its value from optionValue
+          // 3. If its a primary field
+          // 4. Special field that has a pseudoconstant callback attribute but cannot derive a foreign entity from it
+          if (!empty($fieldSpec['FKColumnName']) ||
+            (!empty($fieldSpec['pseudoconstant']) && array_intersect(array_keys($fieldSpec['pseudoconstant']), ['optionGroupName'])) ||
+            ($fieldSpec['name'] == 'id') ||
+            in_array($fieldName, ['activity_engagement_level', 'on_hold'])
+          ) {
+            return "`$fieldName` varchar(64)";
+          }
+          return "`$fieldName` text";
+
+        case CRM_Utils_Type::T_BOOLEAN:
           // some of those will be exported as a (localisable) string
           // @see https://lab.civicrm.org/dev/core/-/issues/2164
           return "`$fieldName` varchar(64)";
 
         case CRM_Utils_Type::T_STRING:
+          // dev/issue#6073 : The exported comma-separated checkbox labels sometimes exceed the maximum length set for the field.
+          //To accommodate this, we are increasing the column type to TEXT.
+          if (str_starts_with($fieldName, 'custom_') && CRM_Core_BAO_CustomField::isSerialized($fieldSpec)) {
+            return "`$fieldName` text";
+          }
           if (isset($fieldSpec['maxlength'])) {
             return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }

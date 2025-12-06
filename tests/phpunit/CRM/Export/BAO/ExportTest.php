@@ -717,12 +717,17 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportCustomData(): void {
     $this->setUpContactExportData();
-    $this->createCustomGroupWithFieldsOfAllTypes();
     $longString = 'Blah';
     for ($i = 0; $i < 70; $i++) {
       $longString .= 'Blah';
     }
+    $this->createCustomGroupWithFieldsOfAllTypes([], [
+      'select_string' => ['text_length' => strlen($longString)],
+      'checkbox' => ['text_length' => 10],
+      'radio' => ['text_length' => strlen($longString)],
+    ]);
     $this->addOptionToCustomField('select_string', ['label' => $longString, 'name' => 'blah']);
+    $this->addOptionToCustomField('radio', ['label' => $longString, 'name' => 'blah', 'value' => 6]);
     $longUrl = 'https://stage.example.org/system/files/webform/way_too_long_url_that_still_fits_in_a_link_custom_field_but_would_fail_to_export_with_html.jpg';
 
     $this->callAPISuccess('Contact', 'create', [
@@ -732,6 +737,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->getCustomFieldName('select_string') => 'blah',
       'api.Address.create' => ['location_type_id' => 'Billing', 'city' => 'Waipu'],
       $this->getCustomFieldName('link') => $longUrl,
+      $this->getCustomFieldName('checkbox') => ['L', 'P', 'M', 'V'],
+      $this->getCustomFieldName('radio') => 6,
     ]);
     $selectedFields = [
       ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
@@ -739,8 +746,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['name' => $this->getCustomFieldName('country')],
       ['name' => $this->getCustomFieldName('select_string')],
       ['name' => $this->getCustomFieldName('link')],
+      ['name' => $this->getCustomFieldName('checkbox')],
+      ['name' => $this->getCustomFieldName('radio')],
     ];
-
     $this->doExportTest([
       'fields' => $selectedFields,
       'ids' => [$this->contactIDs[1]],
@@ -751,6 +759,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
     $this->assertEquals($longString, $row['Pick Color']);
     $this->assertEquals($longUrl, $row['test_link']);
+    $this->assertEquals("Lilac, Purple, Mauve, Violet", $row['Pick Shade']);
+    $this->assertEquals($longString, $row['Integer radio']);
   }
 
   /**
@@ -2556,7 +2566,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'location_type' => '`location_type` varchar(255)',
       'address_id' => '`address_id` varchar(64)',
       'street_address' => '`street_address` varchar(96)',
-      'street_number' => '`street_number` varchar(64)',
+      'street_number' => '`street_number` text',
       'street_number_suffix' => '`street_number_suffix` varchar(8)',
       'street_name' => '`street_name` varchar(64)',
       'street_unit' => '`street_unit` varchar(16)',
@@ -2612,7 +2622,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'case_subject' => '`case_subject` varchar(128)',
       'case_source_contact_id' => '`case_source_contact_id` varchar(255)',
       'case_activity_status' => '`case_activity_status` varchar(255)',
-      'case_activity_duration' => '`case_activity_duration` varchar(64)',
+      'case_activity_duration' => '`case_activity_duration` text',
       'case_activity_medium_id' => '`case_activity_medium_id` varchar(64)',
       'case_activity_details' => '`case_activity_details` longtext',
       'case_activity_is_auto' => '`case_activity_is_auto` varchar(64)',
@@ -2640,7 +2650,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'activity_type_id' => '`activity_type_id` varchar(64)',
       'activity_subject' => '`activity_subject` varchar(255)',
       'activity_date_time' => '`activity_date_time` varchar(32)',
-      'activity_duration' => '`activity_duration` varchar(64)',
+      'activity_duration' => '`activity_duration` text',
       'activity_location' => '`activity_location` varchar(2048)',
       'activity_details' => '`activity_details` longtext',
       'activity_status' => '`activity_status` varchar(255)',
@@ -2742,7 +2752,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'current_employer' => '`current_employer` varchar(255)',
       'location_type' => '`location_type` varchar(255)',
       'street_address' => '`street_address` varchar(96)',
-      'street_number' => '`street_number` varchar(64)',
+      'street_number' => '`street_number` text',
       'street_number_suffix' => '`street_number_suffix` varchar(8)',
       'street_name' => '`street_name` varchar(64)',
       'street_unit' => '`street_unit` varchar(16)',
@@ -2826,7 +2836,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'pledge_is_test' => '`pledge_is_test` varchar(64)',
       'pledge_contribution_page_id' => '`pledge_contribution_page_id` varchar(64)',
       'pledge_financial_type' => '`pledge_financial_type` text',
-      'pledge_frequency_interval' => '`pledge_frequency_interval` varchar(64)',
+      'pledge_frequency_interval' => '`pledge_frequency_interval` text',
       'pledge_frequency_unit' => '`pledge_frequency_unit` varchar(255)',
       'pledge_currency' => '`pledge_currency` text',
       'pledge_campaign_id' => '`pledge_campaign_id` varchar(64)',
@@ -2837,7 +2847,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'pledge_payment_paid_amount' => '`pledge_payment_paid_amount` text',
       'pledge_payment_paid_date' => '`pledge_payment_paid_date` text',
       'pledge_payment_reminder_date' => '`pledge_payment_reminder_date` varchar(32)',
-      'pledge_payment_reminder_count' => '`pledge_payment_reminder_count` varchar(64)',
+      'pledge_payment_reminder_count' => '`pledge_payment_reminder_count` text',
       'pledge_payment_status' => '`pledge_payment_status` varchar(255)',
     ];
   }
@@ -2859,7 +2869,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'membership_status' => '`membership_status` varchar(255)',
       'membership_id' => '`membership_id` varchar(64)',
       'owner_membership_id' => '`owner_membership_id` varchar(64)',
-      'max_related' => '`max_related` varchar(64)',
+      'max_related' => '`max_related` text',
       'membership_recur_id' => '`membership_recur_id` varchar(64)',
       'member_campaign_id' => '`member_campaign_id` varchar(64)',
       'member_is_override' => '`member_is_override` varchar(64)',
