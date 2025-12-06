@@ -396,7 +396,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       CRM_Contribute_BAO_ContributionPage::setValues($this->_id, $this->_values);
       if (empty($this->_values['is_active'])) {
-        throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
+        if ($this->isTest() && CRM_Core_Permission::check('administer CiviCRM')) {
+          CRM_Core_Session::setStatus(ts('This page is disabled. It is accessible in test mode to administrators only.'), '', 'alert', ['expires' => 0]);
+        }
+        else {
+          throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
+        }
       }
 
       $endDate = CRM_Utils_Date::processDate($this->_values['end_date'] ?? NULL);
