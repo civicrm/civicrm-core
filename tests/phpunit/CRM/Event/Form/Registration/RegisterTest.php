@@ -114,7 +114,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
       // In this case we expect the value to be a relative date string.
       // Keep offset for later.
       $offset = $formValues[$fieldName];
-      $formValues[$fieldName] = date('YmdH0000', strtotime($offset));
+      $formValues[$fieldName] = date($dateFormat, strtotime($offset));
     }
 
     $this->updateEvent($formValues);
@@ -168,19 +168,18 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
         'expected_message' => 'Registration for this event ended on %EXPECTED_DATE%',
         'message_date_format' => 'YmdH0000',
       ],
-      /**
-       * It's not clear if this broke recently because this testcase was never
-       * actually checking the output. My expectation is that if the end date
-       * has past you shouldn't be able to register, but I tested in the UI and
-       * it still lets you register.  There's a message on the info page, but
-       * you can still manually enter a url to register and complete it.
-       */
-      //'event_end_date_in_past' => [
-      //  'field_name' => 'event_end_date',
-      //  'form_values' => ['event_end_date' => '- 1 day'],
-      //  'expected_message' => 'Registration for this event ended on %EXPECTED_DATE%',
-      //  'message_date_format' => 'YmdHi',
-      //],
+      'event_end_date_in_past' => [
+        'field_name' => 'end_date',
+        // the stock event always puts the registration end in the future, so
+        // we need to get rid of that to test this properly.
+        'form_values' => [
+          'end_date' => '- 1 day',
+          'registration_start_date' => NULL,
+          'registration_end_date' => NULL,
+        ],
+        'expected_message' => 'Registration for this event ended on %EXPECTED_DATE%',
+        'message_date_format' => 'YmdHi',
+      ],
     ];
   }
 
