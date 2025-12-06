@@ -1,10 +1,10 @@
-(function (angular, $, _, dc) {
-  "use strict";
+(function (dc) {
+  CRM.chart_kit = CRM.chart_kit || {};
 
-  // common renderer for line/bar/area charts, which will stack by default
-  // (compare with composite chart, where each column can be line/bar/area )
-  angular.module('crmChartKit').factory('chartKitStack', () => ({
-    adminTemplate: '~/crmChartKitAdmin/chartTypes/chartKitStackAdmin.html',
+  CRM.chart_kit.typeBackends = CRM.chart_kit.typeBackends || {};
+
+  CRM.chart_kit.typeBackends.stack = {
+    adminTemplate: '~/crmChartKitAdmin/typeBackends/chartKitStackAdmin.html',
 
     getInitialDisplaySettings: () => ({}),
 
@@ -32,9 +32,9 @@
 
     hasCoordinateGrid: () => true,
 
-    showLegend: (displayCtrl) => (displayCtrl.getColumnsForAxis('y').length > 1 && displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
+    showLegend: (displayCtrl) => (displayCtrl.getColumnsForAxis('y').length > 1 && displayCtrl._settings.showLegend && displayCtrl._settings.showLegend !== 'none'),
 
-    getChartConstructor: (displayCtrl) => (displayCtrl.settings.chartType === 'bar') ? dc.barChart : dc.lineChart,
+    getChartConstructor: (displayCtrl) => (displayCtrl._settings.chartType === 'bar') ? dc.barChart : dc.lineChart,
 
     loadChartData: (displayCtrl) => {
       displayCtrl.chart
@@ -54,11 +54,11 @@
 
       displayCtrl.chart.colors(displayCtrl.buildColumnColorScale(yAxisColumns));
 
-      if (displayCtrl.settings.chartType === 'area') {
+      if (displayCtrl._settings.chartType === 'area') {
         // chart should be a line chart by this point
         displayCtrl.chart.renderArea(true);
       }
     }
-  }));
-})(angular, CRM.$, CRM._, CRM.chart_kit.dc);
+  };
+})(CRM.chart_kit.dc);
 
