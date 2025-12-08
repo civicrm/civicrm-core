@@ -1,8 +1,9 @@
-<div af-fieldset="" af-title="Personal Campaign Pages">
+<div af-fieldset="">
   <div class="af-container af-layout-inline">
     <af-field name="status_id" defn="{input_attrs: {multiple: true}, required: false, label: 'Status'}" />
-    <af-field name="IFNULL_PCP_ContributionPage_page_id_01_title_PCP_Event_page_id_01_title" defn="{label: 'Contribution Page/Event', input_attrs: {}}" />
+    <af-field name="PCP_Event_page_id_01_title" defn="{label: 'Contribution Page/Event', input_attrs: {}}" />
     <af-field name="page_type" defn="{input_attrs: {multiple: true}, label: 'Page Type'}" />
+    <af-field name="is_active" defn="{afform_default: true}" />
   </div>
   <crm-search-display-table search-name="Personal_Campaign_Pages" display-name="Personal_Campaign_Pages"></crm-search-display-table>
 </div>
