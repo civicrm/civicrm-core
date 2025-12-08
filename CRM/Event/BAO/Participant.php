@@ -992,11 +992,11 @@ WHERE  civicrm_participant.id = {$participantId}
     }
 
     $regEndDate = CRM_Utils_Date::processDate($event['registration_end_date'] ?? NULL);
-    $eventEndDate = CRM_Utils_Date::processDate($event['event_end_date'] ?? NULL);
+    $eventEndDate = CRM_Utils_Date::processDate($event['end_date'] ?? NULL);
     if (($regEndDate && ($regEndDate < $now)) || (empty($regEndDate) && !empty($eventEndDate) && ($eventEndDate < $now))) {
       $endDate = CRM_Utils_Date::customFormat($event['registration_end_date'] ?? NULL);
       if (empty($regEndDate)) {
-        $endDate = CRM_Utils_Date::customFormat($event['event_end_date'] ?? NULL);
+        $endDate = CRM_Utils_Date::customFormat($event['end_date'] ?? NULL);
       }
       $errors[] = ts('Registration for this event ended on %1', [1 => $endDate]);
     }
