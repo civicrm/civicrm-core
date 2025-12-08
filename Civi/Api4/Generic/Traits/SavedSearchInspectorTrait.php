@@ -181,6 +181,8 @@ trait SavedSearchInspectorTrait {
   public function getSelectClause() {
     if (!isset($this->_selectClause)) {
       $this->_selectClause = [];
+
+      $this->expandSelectParamWildcards();
       foreach ($this->_apiParams['select'] as $selectExpr) {
         $expr = SqlExpression::convert($selectExpr, TRUE);
         $item = [
@@ -485,6 +487,55 @@ trait SavedSearchInspectorTrait {
       }
     }
     return $this->_joinMap[$joinAlias];
+  }
+
+  protected function expandSelectParamWildcards(): void {
+    $select = $this->_apiParams['select'];
+    $expanded = [];
+
+    foreach ($select as $expr) {
+      if (!\str_contains($expr, '*')) {
+        $expanded[] = $expr;
+        continue;
+      }
+
+      $parts = explode('.', $expr, 2);
+      $prefix = count($parts) > 1 ? $parts[0] : NULL;
+      $wildcard = count($parts) > 1 ? $parts[1] : $parts[0];
+
+      $entity = $prefix ? $this->getJoinEntity($prefix) : $this->savedSearch['api_entity'];
+
+      $fieldTypes = match ($wildcard) {
+        '*' => ['Field'],
+        'custom_*' => ['Custom'],
+      };
+      $getFields = civicrm_api4($entity, 'getFields', [
+        'checkPermissions' => FALSE,
+        'where' => [['type', 'IN', $fieldTypes]],
+        'select' => ['name'],
+      ])->column('name');
+      foreach ($getFields as $field) {
+        if ($prefix) {
+          $field = $prefix . '.' . $field;
+        }
+        if (!in_array($field, $expanded)) {
+          $expanded[] = $field;
+        }
+      }
+    }
+
+    // replace property
+    $this->_apiParams['select'] = $expanded;
+  }
+
+  private function getJoinEntity(string $alias): string {
+    foreach ($this->savedSearch['api_params']['join'] ?? [] as $join) {
+      [$entityName, $joinAlias] = explode(' AS ', $join[0]);
+      if ($joinAlias === $alias) {
+        return $entityName;
+      }
+    }
+    throw new \CRM_Core_Exception("Could not determine join entity for {$alias}");
   }
 
 }
