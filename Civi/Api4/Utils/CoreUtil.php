@@ -390,14 +390,7 @@ class CoreUtil {
    * @return array
    */
   public static function getOptionValueFields($optionGroup, $key = 'name'): array {
-    // Prevent crash during upgrade
-    if (array_key_exists('option_value_fields', \CRM_Core_DAO_OptionGroup::getSupportedFields())) {
-      $fields = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroup, 'option_value_fields', $key);
-    }
-    if (!isset($fields)) {
-      return ['name', 'label', 'description'];
-    }
-    return explode(',', $fields);
+    return \CRM_Core_DAO_OptionGroup::getDbVal('option_value_fields', $optionGroup, $key) ?: ['name', 'label', 'description'];
   }
 
   /**
