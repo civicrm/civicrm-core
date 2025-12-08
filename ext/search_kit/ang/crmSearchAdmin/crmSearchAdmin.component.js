@@ -155,8 +155,6 @@
 
       $scope.mainEntitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
-      $scope.$watchCollection('$ctrl.savedSearch.api_params.select', onChangeSelect);
-
       $scope.$watch('$ctrl.savedSearch', onChangeAnything, true);
 
       // After watcher runs for the first time and messes up the status, set it correctly
@@ -176,8 +174,12 @@
       return !ctrl.savedSearch.groups.length && !ctrl.savedSearch.is_template;
     };
 
-    function onChangeAnything() {
+    function onChangeAnything(newVal, oldVal) {
       $scope.status = 'unsaved';
+      /* jshint -W119 */
+      if (JSON.stringify(newVal?.api_params?.select) !== JSON.stringify(oldVal?.api_params?.select)) {
+        onChangeSelect();
+      }
     }
 
     // Generate the confirmation dialog
