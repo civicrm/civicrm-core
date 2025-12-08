@@ -256,7 +256,7 @@ class BasicGetFieldsAction extends BasicGetAction {
     $select = CoreUtil::getOptionValueFields($optionGroupName);
     unset($select['id'], $select['value']);
     array_unshift($select, 'value AS id');
-    $query = "SELECT " . implode(', ', $select) . " FROM civicrm_option_value WHERE option_group_id = %1";
+    $query = "SELECT " . implode(', ', $select) . " FROM civicrm_option_value WHERE option_group_id = %1 ORDER BY weight";
     return \CRM_Core_DAO::executeQuery($query, [1 => [$optionGroupId, 'Int']])->fetchAll();
   }
 
