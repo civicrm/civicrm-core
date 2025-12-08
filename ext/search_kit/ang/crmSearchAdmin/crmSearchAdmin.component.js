@@ -683,102 +683,100 @@
     };
 
     this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
-      disabledIf = disabledIf || _.noop;
+      disabledIf = disabledIf || (() => false);
       allowedTypes = allowedTypes || ['Field', 'Custom', 'Extra', 'Filter'];
 
-      function formatEntityFields(entityName, join) {
-        const prefix = join ? join.alias + '.' : '',
-          result = [];
+      const getFieldOptionsForFields = (fields, prefix = '') => {
+        return fields
+          .filter((field) => allowedTypes.includes(field.type))
+          .map((field) => {
+            // Use options suffix if available.
+            const id = prefix + field.name + ((field.suffixes || []).includes(suffix.replace(':', '')) ? suffix : '');
+            return {
+              id: id,
+              text: field.label,
+              description: field.description,
+              disabled: disabledIf(id)
+            };
+          });
+      };
+
+      const getFieldOptionsForEntity = (entityName, join = null) => {
+        const result = [];
+        const prefix = join ? (join.alias + '.') : '';
 
         // Add extra searchable fields from bridge entity
         if (join && join.bridge) {
-          formatFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
-            return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && field.fk_entity !== entityName);
-          }), result, prefix);
+          const joinFields = searchMeta.getEntity(join.bridge).fields.filter((field) =>
+            field.name !== 'id' &&
+            field.name !== 'entity_id' &&
+            field.name !== 'entity_table' &&
+            field.fk_entity !== entityName
+          );
+          result.push(...getFieldOptionsForFields(joinFields, prefix));
         }
 
-        formatFields(searchMeta.getEntity(entityName).fields, result, prefix);
+        result.push(...getFieldOptionsForFields(searchMeta.getEntity(entityName).fields, prefix));
         return result;
-      }
+      };
 
-      function formatFields(fields, result, prefix) {
-        prefix = typeof prefix === 'undefined' ? '' : prefix;
-        _.each(fields, function(field) {
-          const item = {
-            // Use options suffix if available.
-            id: prefix + field.name + (_.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
-            text: field.label,
-            description: field.description
-          };
-          if (disabledIf(item.id)) {
-            item.disabled = true;
-          }
-          if (_.includes(allowedTypes, field.type)) {
-            result.push(item);
-          }
-        });
-        return result;
-      }
+      const getFieldGroupForJoin = (join) => {
+        const joinInfo = searchMeta.getJoin(ctrl.savedSearch, join);
+        const joinEntity = searchMeta.getEntity(joinInfo.entity);
 
-      const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
-        joinEntities = _.map(ctrl.savedSearch.api_params.join, 0),
-        result = [];
-
-      function addJoin(join) {
-        let joinInfo = searchMeta.getJoin(ctrl.savedSearch, join),
-          joinEntity = searchMeta.getEntity(joinInfo.entity);
-        result.push({
+        return {
           text: joinInfo.label,
           description: joinInfo.description,
           icon: joinEntity.icon,
-          children: formatEntityFields(joinEntity.name, joinInfo)
-        });
-      }
+          children: getFieldOptionsForEntity(joinEntity.name, joinInfo),
+          alias: joinInfo.alias
+        };
+      };
 
-      // Place specified join at top of list
-      if (topJoin) {
-        addJoin(topJoin);
-        _.pull(joinEntities, topJoin);
-      }
+      const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity);
+      const joins = (ctrl.savedSearch.api_params.join || []).map((joinDef) => joinDef[0]);
+
+      const result = [];
 
       result.push({
         text: mainEntity.title_plural,
         icon: mainEntity.icon,
-        children: formatEntityFields(ctrl.savedSearch.api_entity)
+        children: getFieldOptionsForEntity(ctrl.savedSearch.api_entity)
       });
 
       // Include SearchKit's pseudo-fields if specifically requested
-      if (_.includes(allowedTypes, 'Pseudo')) {
+      if (allowedTypes.includes('Pseudo')) {
         result.push({
           text: ts('Extra'),
           icon: 'fa-gear',
-          children: formatFields(CRM.crmSearchAdmin.pseudoFields, [])
+          children: getFieldOptionsForFields(CRM.crmSearchAdmin.pseudoFields)
         });
       }
 
-      _.each(joinEntities, addJoin);
+      joins.forEach((join) => result.push(getFieldGroupForJoin(join)));
+
+      // Place specified join at top of list
+      if (topJoin) {
+        const topAlias = topJoin.split(' AS ')[1];
+        result.sort((a, b) => (a.alias === topAlias) ? -1 : ((b.alias === topAlias) ? 1 : 0));
+      }
       return result;
     };
 
-    this.getSelectFields = function(disabledIf) {
-      disabledIf = disabledIf || _.noop;
-      return _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
-        const info = searchMeta.parseExpr(name);
-        const item = {
+    this.getSelectFields = (disabledIf) => {
+      disabledIf = disabledIf || (() => false);
+      return ctrl.savedSearch.api_params.select.map((fieldExpr) => {
+        const info = searchMeta.parseExpr(fieldExpr);
+        return {
           id: info.alias,
-          text: ctrl.getFieldLabel(name),
-          description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description
+          text: ctrl.getFieldLabel(fieldExpr),
+          description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description,
+          disabled: disabledIf(info.alias)
         };
-        if (disabledIf(item.id)) {
-          item.disabled = true;
-        }
-        fields.push(item);
       });
     };
 
-    this.isPseudoField = function(name) {
-      return _.findIndex(CRM.crmSearchAdmin.pseudoFields, {name: name}) >= 0;
-    };
+    this.isPseudoField = (name) => !!CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === name);
 
     // Ensure options are loaded for main entity + joined entities
     // And an optional additional entity
