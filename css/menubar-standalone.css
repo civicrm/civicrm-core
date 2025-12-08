@@ -1,4 +1,3 @@
-/* The title of this file is menubar-standalone, but the CSS is more general than that. @todo fixme */
 @media (min-width: $breakMin) {
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu {
@@ -10,6 +9,10 @@
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-bar {
     visibility: hidden;
+  }
+  /* ignore the crm-menubar-below-cms-menu setting */
+  body.crm-menubar-below-cms-menu > #civicrm-menu-nav #civicrm-menu {
+    top: 0;
   }
 
 }
