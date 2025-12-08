@@ -358,18 +358,17 @@
         if (!expr) {
           return;
         }
-        const splitAs = expr.split(' AS '),
-          info = {fn: null, args: [], alias: _.last(splitAs), data_type: null},
-          bracketPos = expr.indexOf('(');
-        if (bracketPos >= 0 && !_.findWhere(CRM.crmSearchAdmin.pseudoFields, {name: expr})) {
+        const splitAs = expr.split(' AS ', 2);
+        const info = {fn: null, args: [], alias: splitAs[splitAs.length - 1], data_type: null};
+        if (expr.includes('(') && !CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === expr)) {
           parseFnArgs(info, splitAs[0]);
-        } else {
-          const arg = parseArg(splitAs[0]);
-          if (arg) {
-            arg.param = 0;
-            info.data_type = arg.data_type;
-            info.args.push(arg);
-          }
+          return info;
+        }
+        const arg = parseArg(splitAs[0]);
+        if (arg) {
+          arg.param = 0;
+          info.data_type = arg.data_type;
+          info.args.push(arg);
         }
         return info;
       }
