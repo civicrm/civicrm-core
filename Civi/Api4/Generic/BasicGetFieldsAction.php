@@ -174,20 +174,14 @@ class BasicGetFieldsAction extends BasicGetAction {
     if (!empty($field['pseudoconstant']['optionGroupName'])) {
       $field['suffixes'] = CoreUtil::getOptionValueFields($field['pseudoconstant']['optionGroupName']);
     }
+    // no need to load options, or no way to do so
     if (!$this->loadOptions || (!$optionsExist && empty($field['pseudoconstant']))) {
       $field['options'] = (bool) $field['options'];
       return;
     }
+    // need to load options AND either options already exist or a pseudoconstant is defined)
     if (!empty($field['pseudoconstant'])) {
-      if (!empty($field['pseudoconstant']['optionGroupName'])) {
-        $field['options'] = self::pseudoconstantOptions($field['pseudoconstant']['optionGroupName']);
-      }
-      elseif (!empty($field['pseudoconstant']['callback'])) {
-        $field['options'] = call_user_func(\Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']), $field['name'], ['values' => $this->getValues()]);
-      }
-      else {
-        throw new \CRM_Core_Exception('Unsupported pseudoconstant type for field "' . $field['name'] . '"');
-      }
+      $field['options'] = $this->getPseudoconstantOptions($field);
     }
     $field['options'] = CoreUtil::formatOptionList($field['options'], $this->loadOptions);
   }
@@ -221,21 +215,49 @@ class BasicGetFieldsAction extends BasicGetAction {
   }
 
   /**
-   * Helper function to retrieve options from an option group (for non-DAO entities).
+   * Resolve pseudoconstant options
    *
-   * @param string $optionGroupName
+   * @param array $field
+   * @throws \CRM_Core_Exception
    */
-  public function pseudoconstantOptions(string $optionGroupName) {
-    if ($this->getLoadOptions()) {
-      $options = \CRM_Core_OptionValue::getValues(['name' => $optionGroupName]);
-      foreach ($options as &$option) {
-        $option['id'] = $option['value'];
-      }
+  protected function getPseudoconstantOptions(array $field): array {
+    if (!empty($field['pseudoconstant']['optionGroupName'])) {
+      return $this->getOptionValues($field['pseudoconstant']['optionGroupName']);
     }
-    else {
-      $options = TRUE;
+    if (!empty($field['pseudoconstant']['callback'])) {
+      return call_user_func(
+        \Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']),
+       $field['name'],
+       ['values' => $this->getValues()]
+      );
     }
+    throw new \CRM_Core_Exception('Unsupported pseudoconstant type for field "' . $field['name'] . '"');
+  }
+
+  private function getOptionValues(string $optionGroupName): array {
+    $cacheKey = implode('_', [
+      \CRM_Core_Config::domainID(),
+      \CRM_Core_I18n::getLocale(),
+      'optionGroup',
+      $optionGroupName,
+    ]);
+    $options = \Civi::cache('metadata')->get($cacheKey);
+
+    if (!is_array($options)) {
+      $options = $this->fetchOptionValues($optionGroupName);
+      \Civi::cache('metadata')->set($cacheKey, $options);
+    }
+
     return $options;
+  }
+
+  private function fetchOptionValues(string $optionGroupName): array {
+    $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name');
+    $select = CoreUtil::getOptionValueFields($optionGroupName);
+    unset($select['id'], $select['value']);
+    array_unshift($select, 'value AS id');
+    $query = "SELECT " . implode(', ', $select) . " FROM civicrm_option_value WHERE option_group_id = %1 ORDER BY weight";
+    return \CRM_Core_DAO::executeQuery($query, [1 => [$optionGroupId, 'Int']])->fetchAll();
   }
 
   public function fields() {
