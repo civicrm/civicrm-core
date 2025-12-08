@@ -4,7 +4,7 @@
     {{:: ts('Add/Remove Fields') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li ng-repeat="item in $ctrl.parent.savedSearch.api_params.select track by $index">
+    <li ng-repeat="item in $ctrl.parent.crmSearchAdmin.getExpandedSelect() track by $index">
       <a href ng-click="$ctrl.parent.toggleColumn(item); $event.stopPropagation()">
         <i class="crm-i fa-{{ $ctrl.parent.columnExists(item) ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
         {{ $ctrl.parent.getFieldLabel(item) }}
