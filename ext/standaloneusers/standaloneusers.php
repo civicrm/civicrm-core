@@ -127,4 +127,7 @@ function standaloneusers_civicrm_searchKitTasks(array &$tasks, bool $checkPermis
 function standaloneusers_civicrm_alterSettingsMetaData(&$settings) {
   $settings['inheritLocale']['title'] = E::ts('Use User Language');
   $settings['inheritLocale']['description'] = E::ts('If Yes, the system will use the Language set on the logged-in user\'s record. This can be changed later if using the CiviCRM language switcher.');
+
+  // below-cms-menu doesn't make sense on Standalone
+  unset($settings['menubar_position']['options']['below-cms-menu']);
 }
