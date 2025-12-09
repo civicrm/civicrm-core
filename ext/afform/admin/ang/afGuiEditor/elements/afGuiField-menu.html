@@ -25,7 +25,7 @@
     <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.max" ng-change="$ctrl.onChangeMax()" title="{{:: ts('Maximum value') }}" placeholder="{{:: ts('Max') }}">
   </div>
 </li>
-<li ng-if="($ctrl.fieldDefn.input_type === 'Number' || $ctrl.fieldDefn.input_type === 'Range') && $ctrl.fieldDefn.data_type === 'Float' && !hasOptions()">
+<li ng-if="['Number', 'Range'].includes($ctrl.fieldDefn.input_type) && ['Float', 'Money'].includes($ctrl.fieldDefn.data_type) && !hasOptions()">
   <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Decimal places:') }}</label>
     <select class="form-control" ng-model="getSet('input_attrs.step')" ng-model-options="{getterSetter: true}" title="{{:: ts('Decimal places') }}">
