@@ -339,31 +339,44 @@ SET    version = '$version'
    * @return mixed, a string error message or boolean 'false' if OK
    */
   public function checkUpgradeableVersion($currentVer, $latestVer) {
-    $error = FALSE;
+    $errors = $this->getUpgradeBlockers($currentVer, $latestVer);
+    return empty($errors) ? FALSE : strip_tags(array_pop($errors));
+  }
+
+  /**
+   * Determine if $currentVer can be upgraded to $latestVer
+   *
+   * @param $currentVer
+   * @param $latestVer
+   *
+   * @return mixed, a string error message or boolean 'false' if OK
+   */
+  public function getUpgradeBlockers($currentVer, $latestVer): array {
+    $errors = [];
     // since version is suppose to be in valid format at this point, especially after conversion ($convertVer),
     // lets do a pattern check -
     if (!CRM_Utils_System::isVersionFormatValid($currentVer)) {
-      $error = ts('Database is marked with invalid version format. You may want to investigate this before you proceed further.');
+      $errors[] = ts('Database is marked with invalid version format. You may want to investigate this before you proceed further.');
     }
     elseif (version_compare($currentVer, $latestVer) > 0) {
       // DB version number is higher than codebase being upgraded to. This is unexpected condition-fatal error.
-      $error = ts('Your database is marked with an unexpected version number: %1. The automated upgrade to version %2 can not be run - and the %2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using prior to beginning this upgrade until you resolve this problem.',
+      $errors[] = ts('Your database is marked with an unexpected version number: %1. The automated upgrade to version %2 can not be run - and the %2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using prior to beginning this upgrade until you resolve this problem.',
         [1 => $currentVer, 2 => $latestVer]
       );
     }
     elseif (version_compare($currentVer, $latestVer) == 0) {
-      $error = ts('Your database has already been upgraded to CiviCRM %1',
+      $errors[] = ts('Your database has already been upgraded to CiviCRM %1',
         [1 => $latestVer]
       );
     }
     elseif (version_compare($currentVer, self::MINIMUM_UPGRADABLE_VERSION) < 0) {
-      $error = ts('CiviCRM versions prior to %1 cannot be upgraded directly to %2. This upgrade will need to be done in stages. First download an intermediate version (the LTS may be a good choice) and upgrade to that before proceeding to this version.',
+      $errors[] = ts('CiviCRM versions prior to %1 cannot be upgraded directly to %2. This upgrade will need to be done in stages. First download an intermediate version (the LTS may be a good choice) and upgrade to that before proceeding to this version.',
         [1 => self::MINIMUM_UPGRADABLE_VERSION, 2 => $latestVer]
       );
     }
 
     if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) < 0) {
-      $error = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
+      $errors[] = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER,
           2 => phpversion(),
@@ -372,7 +385,7 @@ SET    version = '$version'
     }
 
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER) < 0) {
-      $error = ts('CiviCRM %4 requires MySQL version v%1 or MariaDB v%3 (or newer), but the current system uses %2 ',
+      $errors[] = ts('CiviCRM %4 requires MySQL version v%1 or MariaDB v%3 (or newer), but the current system uses %2 ',
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           2 => CRM_Utils_SQL::getDatabaseVersion(),
@@ -383,18 +396,51 @@ SET    version = '$version'
 
     // check for mysql trigger privileges
     if (!\Civi::settings()->get('logging_no_trigger_permission') && !CRM_Core_DAO::checkTriggerViewPermission(FALSE, TRUE)) {
-      $error = ts('CiviCRM %1 requires MySQL trigger privileges.',
+      $errors[] = ts('CiviCRM %1 requires MySQL trigger privileges.',
         [1 => $latestVer]);
     }
 
     if (CRM_Core_DAO::getGlobalSetting('thread_stack', 0) < (1024 * self::MINIMUM_THREAD_STACK)) {
-      $error = ts('CiviCRM %1 requires MySQL thread stack >= %2k', [
+      $errors[] = ts('CiviCRM %1 requires MySQL thread stack >= %2k', [
         1 => $latestVer,
         2 => self::MINIMUM_THREAD_STACK,
       ]);
     }
 
-    return $error;
+    // CIVICRM_CRED_KEYS was introduced in 5.34. We make it required in 6.10+.
+    // Some sites may not have it (if installed before 5.34; or if manually disabled).
+    if (!defined('CIVICRM_CRED_KEYS') || in_array(trim(CIVICRM_CRED_KEYS), ['', 'plain'])) {
+
+      // Aaarg. We want the help-text to point you to the actual settings file, but it's not reliable.
+      // In 5.76+ on Standalone, CIVICRM_SETTINGS_PATH is sometimes overloaded as `civicrm.standalone.php`.
+      // We'll degrade gracefully.
+      $settingsPath = (basename(CIVICRM_SETTINGS_PATH) === 'civicrm.settings.php') ? CIVICRM_SETTINGS_PATH : NULL;
+
+      // Same generator formula as new installations (GenerateCredKey.civi-setup.php). Slightly oversizes to compensate for alphanumeric filter.
+      $newKey = 'aes-cbc:hkdf-sha256:' . preg_replace(';[^a-zA-Z0-9];', '', base64_encode(random_bytes(37)));
+
+      $code = [];
+      if ($settingsPath) {
+        $code[] = "// FILE: " . CIVICRM_SETTINGS_PATH;
+        $code[] = "";
+      }
+      $code[] = "if (!defined('CIVICRM_CRED_KEYS')) {";
+      $code[] = sprintf("  define('CIVICRM_CRED_KEYS', %s);", var_export($newKey, TRUE));
+      $code[] = "}";
+
+      $parts = [];
+      $parts[] = ts('CiviCRM %1 requires <code>CIVICRM_CRED_KEYS</code>. Please add it to <code>civicrm.settings.php</code>.', [
+        1 => $latestVer,
+      ]);
+      $parts[] = sprintf("<pre>\n%s\n</pre>", htmlentities(implode("\n", $code), ENT_COMPAT));
+      $parts[] = ts("This example includes a randomly generated key. You may copy it directly or create your own random value.");
+      $parts[] = ts('For details, see <a %1>Sysadmin Guide: Secret Keys</a>.', [
+        1 => 'target="_blank" href="https://docs.civicrm.org/sysadmin/en/latest/setup/secret-keys/"',
+      ]);
+      $errors[] = implode("<br />\n", $parts);
+    }
+
+    return $errors;
   }
 
   /**
