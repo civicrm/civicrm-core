@@ -188,19 +188,12 @@ class CRM_Core_I18n {
     static $enabled = NULL;
 
     if (!$all) {
-      $optionValues = [];
       // Use `getValues`, not `buildOptions` to bypass hook_civicrm_fieldOptions.  See dev/core#1132.
-      CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'weight', TRUE);
-      $all = array_column($optionValues, 'label', 'name');
+      $optionValues = CRM_Core_OptionValue::getValues(['name' => 'languages']);
+      $activeOptionValues = array_filter($optionValues, fn ($row) => $row['is_active']);
 
-      // FIXME: How is this not duplicative of the lines above?
-      // get labels
-      $rows = [];
-      $labels = [];
-      CRM_Core_OptionValue::getValues(['name' => 'languages'], $rows);
-      foreach ($rows as $id => $row) {
-        $labels[$row['name']] = $row['label'];
-      }
+      $all = array_column($activeOptionValues, 'label', 'name');
+      $labels = array_column($optionValues, 'label', 'name');
 
       // check which ones are available; add them to $all if not there already
       $codes = [];
