@@ -394,6 +394,39 @@ SET    version = '$version'
       ]);
     }
 
+    // CIVICRM_CRED_KEYS was introduced in 5.34. We make it required in 6.10+.
+    // Some sites may not have it (if installed before 5.34; or if manually disabled).
+    if (!defined('CIVICRM_CRED_KEYS') || in_array(trim(CIVICRM_CRED_KEYS), ['', 'plain'])) {
+
+      // Aaarg. We want the help-text to point you to the actual settings file, but it's not reliable.
+      // In 5.76+ on Standalone, CIVICRM_SETTINGS_PATH is sometimes overloaded as `civicrm.standalone.php`.
+      // We'll degrade gracefully.
+      $settingsPath = (basename(CIVICRM_SETTINGS_PATH) === 'civicrm.settings.php') ? CIVICRM_SETTINGS_PATH : NULL;
+
+      // Same generator formula as new installations (GenerateCredKey.civi-setup.php). Slightly oversizes to compensate for alphanumeric filter.
+      $newKey = 'aes-cbc:hkdf-sha256:' . preg_replace(';[^a-zA-Z0-9];', '', base64_encode(random_bytes(37)));
+
+      $code = [];
+      if ($settingsPath) {
+        $code[] = "// FILE: " . CIVICRM_SETTINGS_PATH;
+        $code[] = "";
+      }
+      $code[] = "if (!defined('CIVICRM_CRED_KEYS')) {";
+      $code[] = sprintf("  define('CIVICRM_CRED_KEYS', %s);", var_export($newKey, TRUE));
+      $code[] = "}";
+
+      $parts = [];
+      $parts[] = ts('CiviCRM %1 requires <code>CIVICRM_CRED_KEYS</code>. Please add it to <code>civicrm.settings.php</code>.', [
+        1 => $latestVer,
+      ]);
+      $parts[] = sprintf("<pre>\n%s\n</pre>", htmlentities(implode("\n", $code), ENT_COMPAT));
+      $parts[] = ts("This example includes a randomly generated key. You may copy it directly or create your own random value.");
+      $parts[] = ts('For details, see <a %1>Sysadmin Guide: Secret Keys</a>.', [
+        1 => 'target="_blank" href="https://docs.civicrm.org/sysadmin/en/latest/setup/secret-keys/"',
+      ]);
+      $error = implode("<br />\n", $parts);
+    }
+
     return $error;
   }
 
