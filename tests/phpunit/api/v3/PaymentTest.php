@@ -876,7 +876,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'card_type_id' => 'Visa',
       'pan_truncation' => '1234',
       'trxn_result_code' => 'Startling success',
-      'payment_instrument_id' => $processorID,
+      'payment_processor_id' => $processorID,
       'trxn_id' => 1234,
     ];
     $payment = $this->callAPISuccess('Payment', 'create', $params);
@@ -891,7 +891,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'pan_truncation' => '1234',
         'trxn_result_code' => 'Startling success',
         'trxn_id' => 1234,
-        'payment_instrument_id' => 1,
+        'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Debit Card'),
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
@@ -944,7 +944,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'card_type_id' => 'Visa',
       'pan_truncation' => '1234',
       'trxn_result_code' => 'Startling success',
-      'payment_instrument_id' => $processorID,
+      'payment_processor_id' => $processorID,
       'trxn_id' => 'trxn_2',
     ];
     $payment = $this->callAPISuccess('Payment', 'create', $params);
@@ -959,7 +959,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'pan_truncation' => '1234',
         'trxn_result_code' => 'Startling success',
         'trxn_id' => 'trxn_2',
-        'payment_instrument_id' => 1,
+        'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Debit Card'),
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
