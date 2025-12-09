@@ -883,7 +883,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $expectedResult = [
       $payment['id'] => [
         'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'to_financial_account_id' => 12,
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
@@ -951,7 +951,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $expectedResult = [
       $payment['id'] => [
         'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'to_financial_account_id' => 12,
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
