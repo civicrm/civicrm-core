@@ -383,10 +383,15 @@ class RecipientBuilder {
     $filter_contact_language = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $actionSchedule->filter_contact_language);
     $w = '';
     if (($key = array_search(\CRM_Core_I18n::NONE, $filter_contact_language)) !== FALSE) {
-      $w .= "{$contactTableAlias}.preferred_language IS NULL OR {$contactTableAlias}.preferred_language = '' OR ";
+      // @todo Deprecate this, since contacts should always have a preferred language (the site default)
+      // It was removed from the interface in 2025-12
+      $w .= "{$contactTableAlias}.preferred_language IS NULL OR {$contactTableAlias}.preferred_language = ''";
       unset($filter_contact_language[$key]);
     }
     if (count($filter_contact_language) > 0) {
+      if ($w) {
+        $w .= ' OR ';
+      }
       $w .= "{$contactTableAlias}.preferred_language IN ('" . implode("','", $filter_contact_language) . "')";
     }
     $w = "($w)";
