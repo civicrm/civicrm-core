@@ -11,7 +11,7 @@
     },
     templateUrl: '~/afGuiEditor/afGuiTokenSelect.html',
     controller: function ($scope, $element) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
       this.$onInit = function() {
@@ -31,7 +31,7 @@
           if (entityMeta.submissionTokens) {
             entityMeta.submissionTokens.forEach((submissionToken) => {
               const description = submissionToken.description ? submissionToken.description : '';
-              tokens.push({id: entity.name + '.0.' + submissionToken.token, text: entity.label + ' ' + submissionToken.label, description: description});  
+              tokens.push({id: entity.name + '.0.' + submissionToken.token, text: entity.label + ' ' + submissionToken.label, description: description});
             });
           } else {
             tokens.push({id: entity.name + '.0.id', text: entity.label + ' ' + ts('ID')});

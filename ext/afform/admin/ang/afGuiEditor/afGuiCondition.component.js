@@ -11,7 +11,7 @@
     },
     templateUrl: '~/afGuiEditor/afGuiCondition.html',
     controller: function ($scope) {
-      let ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
       let conditionValue;
       let operatorCache = {};
@@ -130,9 +130,9 @@
           }
           // Change multi/single value to/from an array
           var shouldBeArray = _.includes(['IN', 'NOT IN'], getOperator());
-          if (!_.isArray(getValue()) && shouldBeArray) {
+          if (!Array.isArray(getValue()) && shouldBeArray) {
             setValue([]);
-          } else if (_.isArray(getValue()) && !shouldBeArray) {
+          } else if (Array.isArray(getValue()) && !shouldBeArray) {
             setValue('');
           }
         }

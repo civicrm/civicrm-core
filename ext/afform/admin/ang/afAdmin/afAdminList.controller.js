@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('afAdmin').controller('afAdminList', function($scope, afforms, crmApi4, crmStatus, afGui) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+    const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
     this.sortField = 'title';
     this.sortDir = false;
@@ -13,7 +13,7 @@
 
     this.tabs = CRM.afAdmin.afform_type;
     $scope.types = _.indexBy(ctrl.tabs, 'name');
-    _.each(['form', 'block', 'search'], function(type) {
+    ['form', 'block', 'search'].forEach(type => {
       if ($scope.types[type]) {
         if (type === 'form') {
           $scope.types.form.default = '#create/form/Individual';
@@ -65,7 +65,7 @@
         return;
       }
       $scope.types[ctrl.tab].options = null;
-      var links = [];
+      const links = [];
 
       if (ctrl.tab === 'form') {
         _.each(CRM.afGuiEditor.entities, function(entity, name) {
@@ -105,17 +105,21 @@
     };
 
     this.revert = function(afform) {
-      var index = _.findIndex(ctrl.afforms[ctrl.tab], {name: afform.name});
+      const index = ctrl.afforms[ctrl.tab].findIndex(item => item.name === afform.name);
       if (index > -1) {
-        var apiOps = [['Afform', 'revert', {where: [['name', '=', afform.name]]}]];
+        const apiOps = [['Afform', 'revert', {where: [['name', '=', afform.name]]}]];
         if (afform.has_base) {
           apiOps.push(['Afform', 'get', {
             where: [['name', '=', afform.name]],
             select: ['name', 'title', 'type', 'is_public', 'server_route', 'has_local', 'has_base', 'base_module', 'base_module:label']
           }, 0]);
         }
-        var apiCall = crmStatus(
-          afform.has_base ? {start: ts('Reverting...')} : {start: ts('Deleting...'), success: ts('Deleted'), error: ts('Error deleting')},
+        const apiCall = crmStatus(
+          afform.has_base ? {start: ts('Reverting...')} : {
+            start: ts('Deleting...'),
+            success: ts('Deleted'),
+            error: ts('Error deleting')
+          },
           crmApi4(apiOps)
         );
         if (afform.has_base) {
