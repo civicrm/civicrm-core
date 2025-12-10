@@ -11,6 +11,19 @@ class CRM_RouterTest_Page_StaticExamples {
     CRM_Utils_System::civiExit();
   }
 
+  public static function pathWithData() {
+    header('Content-type: text/plain');
+    echo "Path Data " . base64_encode(CRM_Utils_System::currentPath());
+    CRM_Utils_System::civiExit();
+  }
+
+  public static function psr7PathWithData(ServerRequestInterface $request): ResponseInterface {
+    return new \GuzzleHttp\Psr7\Response(200,
+      ['Content-Type' => 'text/plain'],
+      "Path Data " . base64_encode($request->getUri()->getPath())
+    );
+  }
+
   public static function submitJson() {
     $data = file_get_contents('php://input');
     $parsed = json_decode($data, TRUE);
