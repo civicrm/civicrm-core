@@ -113,20 +113,11 @@ class AuthorizationCode extends AbstractGrantAction {
     if (!in_array($output['response_mode'], $allowResponseModes)) {
       throw new \CRM_Core_Exception('Unsupported response mode: ' . $output['response_mode']);
     }
-    switch ($output['response_mode']) {
-      case 'query':
-        // This is standard/default. No need to pass literal `?response_mode=query`.
-        break;
-
-      case 'web_message':
-        $authOptions['response_mode'] = $this->getResponseMode();
-        $output['response_origin'] = \CRM_Utils_Url::toOrigin($provider->getBaseAuthorizationUrl());
-        $output['continue_url'] = \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
-        break;
-
-      default:
-        throw new \CRM_Core_Exception('Unsupported response mode: ' . $output['response_mode']);
+    if ($output['response_mode'] !== 'query') {
+      $authOptions['response_mode'] = $this->getResponseMode();
     }
+    $output['authorization_url'] = $provider->getBaseAuthorizationUrl();
+    $output['redirect_uri'] = \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
 
     $result[] = $output + [
       'url' => $provider->getAuthorizationUrl($authOptions),
