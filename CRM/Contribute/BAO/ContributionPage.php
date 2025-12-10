@@ -391,11 +391,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
         $template->assign('onBehalfProfile', NULL);
         if (!empty($values['onbehalf_profile_id'])) {
-          [$groupTitle, $values] = self::getProfileNameAndFields($values['onbehalf_profile_id'], $contactID, $params['onbehalf_profile'], $fieldTypes);
-          if (!empty($values)) {
-            $template->assign('onBehalfProfile', $values);
+          [$onBehalfGroupTitle, $onBehalfProfileFields] = self::getProfileNameAndFields($values['onbehalf_profile_id'], $contactID, $params['onbehalf_profile'], $fieldTypes);
+          if (!empty($onBehalfProfileFields)) {
+            $template->assign('onBehalfProfile', $onBehalfProfileFields);
           }
-          $template->assign('onBehalfProfile_grouptitle', $groupTitle);
+          $template->assign('onBehalfProfile_grouptitle', $onBehalfGroupTitle);
         }
       }
 
