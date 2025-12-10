@@ -41,7 +41,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
 
   public function setUp(): void {
     parent::setUp();
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client'));
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_contact_token'));
   }
 
