@@ -35,22 +35,28 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
       ->addWhere('name', 'LIKE', 'test_example%')
       ->addOrderBy('name', 'DESC')
       ->execute();
-    $this->assertEquals(3, $examples->count());
+    $this->assertEquals(4, $examples->count());
+    [$ex4, $ex3, $ex2, $ex1] = $examples->getArrayCopy();
 
-    $this->assertEquals('test_example_3', $examples[0]['name']);
-    $this->assertEquals('Civi\OAuth\CiviGenericProvider', $examples[0]['class']);
-    $this->assertEquals('https://example.com/three/auth', $examples[0]['options']['urlAuthorize']);
-    $this->assertTrue(isset($examples[0]['permissions']['meta']));
+    $this->assertEquals('test_example_4_sandbox', $ex4['name']);
+    $this->assertEquals('Civi\OAuth\CiviGenericProvider', $ex4['class']);
+    $this->assertEquals('https://sandbox.connect.civicrm.org/four/auth', $ex4['options']['urlAuthorize']);
+    $this->assertTrue(isset($ex4['permissions']['meta']));
 
-    $this->assertEquals('test_example_2', $examples[1]['name']);
-    $this->assertEquals('My\Example2', $examples[1]['class']);
-    $this->assertEquals('https://example.com/two', $examples[1]['options']['urlAuthorize']);
-    $this->assertTrue(isset($examples[1]['permissions']['meta']));
+    $this->assertEquals('test_example_3', $ex3['name']);
+    $this->assertEquals('Civi\OAuth\CiviGenericProvider', $ex3['class']);
+    $this->assertEquals('https://example.com/three/auth', $ex3['options']['urlAuthorize']);
+    $this->assertTrue(isset($ex3['permissions']['meta']));
 
-    $this->assertEquals('test_example_1', $examples[2]['name']);
-    $this->assertEquals('Civi\OAuth\CiviGenericProvider', $examples[2]['class']);
-    $this->assertEquals('https://example.com/one/auth', $examples[2]['options']['urlAuthorize']);
-    $this->assertTrue(isset($examples[2]['permissions']['meta']));
+    $this->assertEquals('test_example_2', $ex2['name']);
+    $this->assertEquals('My\Example2', $ex2['class']);
+    $this->assertEquals('https://example.com/two', $ex2['options']['urlAuthorize']);
+    $this->assertTrue(isset($ex2['permissions']['meta']));
+
+    $this->assertEquals('test_example_1', $ex1['name']);
+    $this->assertEquals('Civi\OAuth\CiviGenericProvider', $ex1['class']);
+    $this->assertEquals('https://example.com/one/auth', $ex1['options']['urlAuthorize']);
+    $this->assertTrue(isset($ex1['permissions']['meta']));
   }
 
   /**
@@ -68,7 +74,7 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
       ->addWhere('name', 'LIKE', 'test_example%')
       ->addOrderBy('name', 'DESC')
       ->execute();
-    $this->assertExamples(['test_example_3', 'test_example_2', 'test_example_1'], $examples);
+    $this->assertExamples(['test_example_4_sandbox', 'test_example_3', 'test_example_2', 'test_example_1'], $examples);
 
     $usePerms(['access CiviCRM']);
     $examples = Civi\Api4\OAuthProvider::get()
@@ -82,7 +88,7 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
       ->addWhere('name', 'LIKE', 'test_example%')
       ->addOrderBy('name', 'DESC')
       ->execute();
-    $this->assertExamples(['test_example_3'], $examples);
+    $this->assertExamples(['test_example_4_sandbox', 'test_example_3'], $examples);
   }
 
   protected function assertExamples(array $expected, \Civi\Api4\Generic\Result $actual) {
