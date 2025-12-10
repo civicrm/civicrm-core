@@ -258,14 +258,27 @@ class CRM_Core_Payment_PayPalProIPN {
             throw new CRM_Core_Exception('Ignore all IPN payments that are not completed');
           }
 
-          // In future moving to create pending & then complete, but this OK for now.
-          // Also consider accepting 'Failed' like other processors.
-          $input['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+          // Consider accepting 'Failed' like other processors.
           $input['invoice_id'] = bin2hex(random_bytes(16));
           $input['original_contribution_id'] = $this->getContributionID();
           $input['contribution_recur_id'] = $this->getContributionRecurID();
 
-          civicrm_api3('Contribution', 'repeattransaction', $input);
+          $newContribution = civicrm_api3('Contribution', 'repeattransaction', $input);
+
+          $isEmailReceipt = \Civi\Api4\ContributionRecur::get(FALSE)
+            ->addSelect('is_email_receipt')
+            ->addWhere('id', '=', $this->getContributionRecurID())
+            ->execute()
+            ->first()['is_email_receipt'];
+
+          \Civi\Api4\Payment::create(FALSE)
+            ->setNotificationForCompleteOrder($isEmailReceipt)
+            ->addValue('contribution_id', $newContribution['id'])
+            ->addValue('total_amount', $input['total_amount'])
+            ->addValue('payment_processor_id', $input['payment_processor_id'])
+            ->addValue('trxn_date', date('YmdHis', strtotime($input['payment_date'])))
+            ->addValue('trxn_id', $input['trxn_id'])
+            ->execute();
           return;
         }
 
