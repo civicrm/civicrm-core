@@ -389,8 +389,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['onBehalfName'] = $displayName;
         $tplParams['onBehalfEmail'] = $email;
 
+        $template->assign('onBehalfProfile', NULL);
         if (!empty($values['onbehalf_profile_id'])) {
-          self::buildCustomDisplay($values['onbehalf_profile_id'], 'onBehalfProfile', $contactID, $template, $params['onbehalf_profile'], $fieldTypes);
+          [$groupTitle, $values] = self::getProfileNameAndFields($values['onbehalf_profile_id'], $contactID, $params['onbehalf_profile'], $fieldTypes);
+          if (!empty($values)) {
+            $template->assign('onBehalfProfile', $values);
+          }
+          $template->assign('onBehalfProfile_grouptitle', $groupTitle);
         }
       }
 
@@ -592,33 +597,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         CRM_Core_Error::debug_log_message('Failure: mail not sent for recurring notification.');
       }
     }
-  }
-
-  /**
-   * Add the custom fields for contribution page (ie profile).
-   *
-   * @deprecated assigning values to smarty like this is risky because
-   *  - it is hard to debug since $name is used in the assign
-   *  - it is potentially 'leaky' - it's better to do this on the form
-   *  or close to where it is used / required. See CRM-17519 for leakage e.g.
-   *
-   * @param int $gid
-   *   Uf group id.
-   * @param string $name
-   * @param int $cid
-   *   Contact id.
-   * @param $template
-   * @param array $params
-   *   Params to build component whereclause.
-   *
-   * @param array|null $fieldTypes
-   */
-  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
-    [$groupTitle, $values] = self::getProfileNameAndFields($gid, $cid, $params, $fieldTypes);
-    if (!empty($values)) {
-      $template->assign($name, $values);
-    }
-    $template->assign($name . "_grouptitle", $groupTitle);
   }
 
   /**
