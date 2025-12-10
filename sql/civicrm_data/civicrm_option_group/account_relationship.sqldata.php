@@ -102,4 +102,13 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'is_reserved' => 1,
       'component_id' => 2,
     ],
+    [
+      'label' => ts('Accounts Payable Account is'),
+      'value' => 13,
+      'name' => 'Accounts Payable Account is',
+      'description' => 'Accounts Payable Account is',
+      'is_reserved' => 1,
+      'component_id' => 2,
+      'is_active' => 0,
+    ],
   ]);
