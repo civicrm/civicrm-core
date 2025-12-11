@@ -9,7 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\CustomField;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -242,18 +241,20 @@ class CRM_Core_BAO_CustomValueTable {
    *   eg. Afform have a String "name" field as primary key
    *
    * @param string $entityName
-   * @param string $type
    *
    * @return string
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public static function getDataTypeForPrimaryKey(string $entityName, string $type): string {
-    $primaryKey = CoreUtil::getInfoItem($entityName, 'primary_key');
-    if (isset($primaryKey[0]) && $primaryKey[0] !== 'id') {
+  public static function getDataTypeForPrimaryKey(string $entityName): string {
+    $primaryKey = CoreUtil::getIdFieldName($entityName);
+    $type = 'Integer';
+    // Todo: Maybe we shouldn't assume every field named "id" is an integer
+    if ($primaryKey && $primaryKey !== 'id') {
+      // Todo: Use Civi::entity() once Afform is converted to EFv2
       $type = civicrm_api4($entityName, 'getFields', [
         'where' => [
-          ['name', '=', $primaryKey[0]],
+          ['name', '=', $primaryKey],
         ],
         'checkPermissions' => FALSE,
         'select' => [
@@ -279,16 +280,11 @@ class CRM_Core_BAO_CustomValueTable {
     if ($type !== 'EntityReference') {
       return $type;
     }
-    $customField = CustomField::get(FALSE)
-      ->setUseCache(TRUE)
-      ->addSelect('fk_entity', 'name')
-      ->addWhere('id', '=', $customFieldID)
-      ->execute()
-      ->first();
-    if (empty($customField)) {
-      return $type;
+    $customField = CRM_Core_BAO_CustomField::getField($customFieldID);
+    if (!isset($customField)) {
+      return 'Integer';
     }
-    return self::getDataTypeForPrimaryKey($customField['fk_entity'], $type) ?? $type;
+    return self::getDataTypeForPrimaryKey($customField['fk_entity']);
   }
 
   /**
@@ -304,7 +300,7 @@ class CRM_Core_BAO_CustomValueTable {
    */
   public static function fieldToSQLType(string $type, $maxLength = NULL, bool $isSerialized = FALSE, ?string $fkEntity = NULL) {
     if ($fkEntity) {
-      $type = self::getDataTypeForPrimaryKey($fkEntity, $type);
+      $type = self::getDataTypeForPrimaryKey($fkEntity);
     }
 
     if ($isSerialized) {
@@ -329,7 +325,7 @@ class CRM_Core_BAO_CustomValueTable {
         return 'int';
 
       // the below three are FK's, and have constraints added to them
-
+      case 'Integer':
       case 'ContactReference':
       case 'EntityReference':
       case 'StateProvince':

@@ -10,6 +10,12 @@ class CRM_RouterTest_Page_PageWithPath extends CRM_Core_Page {
       throw new \Exception("Expected path array");
     }
 
+    $expected = 'civicrm/route-test/page-with-path';
+    $actual = CRM_Utils_system::currentPath();
+    if ($actual !== $expected) {
+      throw new \Exception("currentPath() reports wrong path. Actual=$actual Expected=$expected");
+    }
+
     parent::run();
   }
 
