@@ -24,6 +24,7 @@ use Civi\WorkflowMessage\GenericWorkflowMessage;
  */
 class CRM_Contribute_WorkflowMessage_ContributionOnlineReceipt extends GenericWorkflowMessage {
   use CRM_Contribute_WorkflowMessage_ContributionTrait;
+
   public const WORKFLOW = 'contribution_online_receipt';
 
 }
