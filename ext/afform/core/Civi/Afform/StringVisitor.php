@@ -4,6 +4,10 @@ namespace Civi\Afform;
 
 /**
  * Utility to walk through an Afform document and perform some action on every localizable string.
+ *
+ * This class is copied into civistrings. Please make sure it is self-contained.
+ * If this file is updated, then the composer.json file of civistrings must also
+ * be updated to use the latest version.
  */
 class StringVisitor {
 
