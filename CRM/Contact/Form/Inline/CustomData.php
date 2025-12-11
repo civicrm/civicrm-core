@@ -28,13 +28,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   public $_groupID;
 
   /**
-   * Entity type of the table id.
-   *
-   * @var string
-   */
-  protected $_entityType;
-
-  /**
    * Build the form object elements for custom data.
    *
    * @throws \CRM_Core_Exception
@@ -123,7 +116,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
       $this->getContactID(),
-      $this->_entityType
+      $this->_contactType
     );
 
     $this->log();
