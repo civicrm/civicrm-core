@@ -13,7 +13,9 @@ namespace Civi\Api4\Subscriber;
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Utils\AfformSaveTrait;
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
+use Civi\Schema\BasicEntityMetadata;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -21,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @service
  * @internal
  */
-class AfformAccessSubscriber extends AutoService implements EventSubscriberInterface {
+class AfformEntitySubscriber extends AutoService implements EventSubscriberInterface {
   use AfformSaveTrait;
 
   /**
@@ -29,8 +31,19 @@ class AfformAccessSubscriber extends AutoService implements EventSubscriberInter
    */
   public static function getSubscribedEvents() {
     return [
+      'hook_civicrm_entityTypes' => 'onEntityTypes',
       'civi.api4.authorizeRecord::Afform' => ['onApiAuthorizeRecord', 500],
     ];
+  }
+
+  // TODO: generalise this:
+  // - use the classscanner to find classes that implement EntityInterface
+  // - check if they are BasicEntity / implement getBasicMeta method
+  // - loop them in
+  public function onEntityTypes(GenericHookEvent $event) {
+    $meta = \Civi\Api4\Afform::getBasicMeta();
+    $meta['metaProvider'] = new BasicEntityMetadata('Afform');
+    $event->entityTypes[] = $meta;
   }
 
   /**

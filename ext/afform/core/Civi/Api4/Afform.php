@@ -4,6 +4,8 @@ namespace Civi\Api4;
 
 use Civi\Api4\Generic\AutocompleteAction;
 use Civi\Api4\Generic\BasicGetFieldsAction;
+use Civi\Schema\EntityRepository;
+use Civi\Schema\FileEntityMetadata;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -147,273 +149,220 @@ class Afform extends Generic\AbstractEntity {
    * @return Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
-    return (new Generic\BasicGetFieldsAction('Afform', __FUNCTION__, function(BasicGetFieldsAction $self) {
-      $fields = [
-        [
-          'name' => 'name',
+    return (new Generic\BasicGetFieldsAction('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  public static function getBasicMeta() {
+    return [
+      'name' => 'Afform',
+      'getInfo' => fn() => [
+        'title' => E::ts('Afform'),
+        'title_plural' => E::ts('Afforms'),
+        'description' => E::ts('FormBuilder forms'),
+        'log' => FALSE,
+      ],
+      'getPaths' => fn() => [
+        'view' => '[server_route]',
+        'edit' => 'civicrm/admin/afform#/edit/[name]',
+      ],
+      // TODO: ensure this is updated to most recent list!
+      'getFields' => fn() => [
+        'name' => [
           'title' => E::ts('Name'),
+          'data_type' => 'String',
           'input_type' => 'Text',
+          'required' => TRUE,
+          'description' => E::ts('Afform file name'),
+          'primary_key' => TRUE,
         ],
-        [
-          'name' => 'type',
+        'type' => [
           'title' => E::ts('Type'),
-          'pseudoconstant' => ['optionGroupName' => 'afform_type'],
+          'data_type' => 'String',
+          'pseudoconstant' => ['option_group_name' => 'afform_type'],
           'default_value' => 'form',
-          'input_type' => 'Select',
         ],
-        [
-          'name' => 'requires',
+        'requires' => [
           'title' => E::ts('Requires'),
           'data_type' => 'Array',
-          'description' => 'Angular module dependencies; calculated at runtime',
         ],
-        [
-          'name' => 'entity_type',
+        'entity_type' => [
           'title' => E::ts('Block Entity'),
-          'description' => 'Block used for this entity type',
+          'data_type' => 'String',
+          'description' => E::ts('Block used for this entity type'),
         ],
-        [
-          'name' => 'join_entity',
+        'join_entity' => [
           'title' => E::ts('Join Entity'),
-          'description' => 'Used for blocks that join a sub-entity (e.g. Emails for a Contact)',
+          'data_type' => 'String',
+          'description' => E::ts('Used for blocks that join a sub-entity (e.g. Emails for a Contact)'),
         ],
-        [
-          'name' => 'title',
+        'title' => [
           'title' => E::ts('Title'),
-          'required' => $self->getAction() === 'create',
-          'input_type' => 'Text',
+          'data_type' => 'String',
+          'required' => TRUE,
         ],
-        [
-          'name' => 'description',
+        'description' => [
           'title' => E::ts('Description'),
-          'input_type' => 'Text',
+          'data_type' => 'String',
         ],
-        [
-          'name' => 'placement',
+        'placement' => [
           'title' => E::ts('Placement'),
-          'pseudoconstant' => ['optionGroupName' => 'afform_placement'],
+          'pseudoconstant' => ['option_group_name' => 'afform_placement'],
           'data_type' => 'Array',
         ],
-        [
-          'name' => 'placement_filters',
-          'title' => E::ts('Placement Filters'),
+        'summary_contact_type' => [
+          'title' => E::ts('Summary Contact Type'),
           'data_type' => 'Array',
-          'description' => 'E.g. contact_type, case_type, event_type, etc.',
+          'pseudoconstant' => [
+            'table' => 'civicrm_contact_type',
+            'key_column' => 'name',
+            'label_column' => 'label',
+            'icon_column' => 'icon',
+          ],
         ],
-        [
-          'name' => 'placement_weight',
-          'title' => E::ts('Placement Order'),
+        'summary_weight' => [
+          'title' => E::ts('Order'),
           'data_type' => 'Integer',
         ],
-        [
-          'name' => 'tags',
-          'title' => E::ts('Tags'),
-          'pseudoconstant' => [
-            'callback' => [Utils\AfformTags::class, 'getTagOptions'],
-          ],
-          'data_type' => 'Array',
-          'input_type' => 'Select',
-        ],
-        [
-          'name' => 'icon',
+        'icon' => [
           'title' => E::ts('Icon'),
-          'description' => 'Icon shown in the placement',
+          'data_type' => 'String',
+          'description' => E::ts('Icon shown in the contact summary tab'),
         ],
-        [
-          'name' => 'server_route',
+        'server_route' => [
           'title' => E::ts('Page Route'),
+          'data_type' => 'String',
         ],
-        [
-          'name' => 'is_public',
+        'is_public' => [
           'title' => E::ts('Is Public'),
           'data_type' => 'Boolean',
           'default_value' => FALSE,
         ],
-        [
-          'name' => 'permission',
+        'permission' => [
           'title' => E::ts('Permission'),
           'data_type' => 'Array',
           'default_value' => ['access CiviCRM'],
         ],
-        [
-          'name' => 'permission_operator',
+        'permission_operator' => [
           'title' => E::ts('Permission Operator'),
           'data_type' => 'String',
           'default_value' => 'AND',
-          'options' => \CRM_Core_SelectValues::andOr(),
+          'pseudoconstant' => [
+            'callback' => ['CRM_Core_SelectValues', 'andOr'],
+          ],
         ],
-        [
-          'name' => 'redirect',
+        'redirect' => [
           'title' => E::ts('Post-Submit Page'),
+          'data_type' => 'String',
         ],
-        [
-          'name' => 'submit_enabled',
+        'submit_enabled' => [
           'title' => E::ts('Allow Submissions'),
           'data_type' => 'Boolean',
           'default_value' => TRUE,
         ],
-        [
-          'name' => 'submit_limit',
-          'title' => E::ts('Max Submissions (total)'),
+        'submit_limit' => [
+          'title' => E::ts('Maximum Submissions'),
           'data_type' => 'Integer',
         ],
-        [
-          'name' => 'submit_limit_per_user',
-          'title' => E::ts('Max Submissions (per user)'),
-          'data_type' => 'Integer',
-        ],
-        [
-          'name' => 'create_submission',
+        'create_submission' => [
           'title' => E::ts('Log Submissions'),
           'data_type' => 'Boolean',
-          'description' => E::ts('Keep a log of the date, time, user, and items saved by each form submission.'),
         ],
-        [
-          'name' => 'manual_processing',
+        'manual_processing' => [
+          'title' => E::ts('Manual Processing'),
           'data_type' => 'Boolean',
         ],
-        [
-          'name' => 'allow_verification_by_email',
+        'allow_verification_by_email' => [
+          'title' => E::ts('Allow Verification by Email'),
           'data_type' => 'Boolean',
         ],
-        [
-          'name' => 'email_confirmation_template_id',
+        'email_confirmation_template_id' => [
+          'title' => E::ts('Email Confirmation Template'),
           'data_type' => 'Integer',
         ],
-        [
-          'title' => E::ts('Autosave Draft'),
-          'name' => 'autosave_draft',
-          'data_type' => 'Boolean',
-          'description' => E::ts('For authenticated users, form will auto-save periodically.'),
-        ],
-        [
-          'name' => 'navigation',
+        'navigation' => [
           'title' => E::ts('Navigation Menu'),
           'data_type' => 'Array',
-          'description' => 'Insert into navigation menu {parent: string, label: string, weight: int}',
+          'description' => E::ts('Insert into navigation menu {parent: string, label: string, weight: int}'),
         ],
-        [
-          'name' => 'layout',
+        'layout' => [
           'title' => E::ts('Layout'),
           'data_type' => 'Array',
-          'description' => 'HTML form layout; format is controlled by layoutFormat param',
+          'description' => E::ts('HTML form layout; format is controlled by layoutFormat param'),
         ],
-        [
-          'name' => 'modified_date',
+        // Calculated readonly fields
+        'modified_date' => [
           'title' => E::ts('Date Modified'),
           'data_type' => 'Timestamp',
           'readonly' => TRUE,
+        ],
+        'module_name' => [
+          'title' => E::ts('Module Name'),
+          'data_type' => 'String',
+          'description' => E::ts('Name of generated Angular module (CamelCase)'),
+          'readonly' => TRUE,
+        ],
+        'directive_name' => [
+          'title' => E::ts('Directive Name'),
+          'data_type' => 'String',
+          'description' => E::ts('Html tag name to invoke this form (dash-case)'),
+          'readonly' => TRUE,
+        ],
+        'submission_count' => [
+          'title' => E::ts('Submission Count'),
+          'data_type' => 'Integer',
+          'input_type' => 'Number',
+          'description' => E::ts('Number of submission records for this form'),
+          'readonly' => TRUE,
+        ],
+        'submission_date' => [
+          'title' => E::ts('Submission Date'),
+          'data_type' => 'Timestamp',
+          'input_type' => 'Date',
+          'description' => E::ts('Date & time of last form submission'),
+          'readonly' => TRUE,
+        ],
+        'submit_currently_open' => [
+          'title' => E::ts('Submit Currently Open'),
+          'data_type' => 'Boolean',
+          'input_type' => 'Select',
+          'description' => E::ts('Based on settings and current submission count, is the form open for submissions'),
+          'readonly' => TRUE,
+        ],
+        'has_local' => [
+          'title' => E::ts('Saved Locally'),
+          'data_type' => 'Boolean',
+          'description' => E::ts('Whether a local copy is saved on site'),
+          'readonly' => TRUE,
+        ],
+        'has_base' => [
+          'title' => E::ts('Packaged'),
+          'data_type' => 'Boolean',
+          'description' => E::ts('Is provided by an extension'),
+          'readonly' => TRUE,
+        ],
+        'base_module' => [
+          'title' => E::ts('Extension'),
+          'data_type' => 'String',
+          'description' => E::ts('Name of extension which provides this form'),
+          'readonly' => TRUE,
+          'pseudoconstant' => [
+            'callback' => ['CRM_Core_BAO_Managed', 'getBaseModules'],
+          ],
+        ],
+        'search_displays' => [
+          'title' => E::ts('Search Displays'),
+          'data_type' => 'Array',
+          'readonly' => TRUE,
+          'description' => E::ts('Embedded search displays, formatted like ["search-name.display-name"]'),
         ],
         [
           'name' => 'confirmation_type',
           'pseudoconstant' => ['optionGroupName' => 'afform_confirmation_type'],
           'default_value' => 'redirect_to_url',
         ],
-        [
-          'name' => 'confirmation_message',
-          'title' => E::ts('Confirmation Message'),
-          'input_type' => 'Text',
-        ],
-        [
-          'name' => 'created_id',
-          'title' => ts('Created By Contact ID'),
-          'data_type' => 'Integer',
-          'fk_entity' => 'Contact',
-          'fk_column' => 'id',
-          'input_type' => 'EntityRef',
-          'label' => ts('Created By'),
-          'default_value' => NULL,
-          'readonly' => TRUE,
-          'required' => FALSE,
-        ],
-        [
-          'name' => 'locale',
-          'title' => ts('Locale'),
-          'data_type' => 'String',
-          'input_type' => 'Select',
-          'required' => \CRM_Core_I18n::isMultiLingual(),
-        ],
-      ];
-      // Calculated fields returned by get action
-      if ($self->getAction() === 'get') {
-        $fields[] = [
-          'name' => 'module_name',
-          'type' => 'Extra',
-          'description' => 'Name of generated Angular module (CamelCase)',
-          'readonly' => TRUE,
-        ];
-        $fields[] = [
-          'name' => 'directive_name',
-          'type' => 'Extra',
-          'description' => 'Html tag name to invoke this form (dash-case)',
-          'readonly' => TRUE,
-        ];
-        $fields[] = [
-          'name' => 'submission_count',
-          'type' => 'Extra',
-          'data_type' => 'Integer',
-          'input_type' => 'Number',
-          'description' => 'Number of submission records for this form',
-          'readonly' => TRUE,
-        ];
-        $fields[] = [
-          'name' => 'user_submission_count',
-          'type' => 'Extra',
-          'data_type' => 'Integer',
-          'input_type' => 'Number',
-          'description' => 'Number of submission records for the current user',
-          'readonly' => TRUE,
-        ];
-        $fields[] = [
-          'name' => 'submission_date',
-          'type' => 'Extra',
-          'data_type' => 'Timestamp',
-          'input_type' => 'Date',
-          'description' => 'Date & time of last form submission',
-          'readonly' => TRUE,
-        ];
-        $fields[] = [
-          'name' => 'submit_currently_open',
-          'type' => 'Extra',
-          'data_type' => 'Boolean',
-          'input_type' => 'Select',
-          'description' => 'Based on settings and current submission count, is the form open for submissions',
-          'readonly' => TRUE,
-        ];
-        $fields[] = [
-          'name' => 'has_local',
-          'type' => 'Extra',
-          'data_type' => 'Boolean',
-          'description' => 'Whether a local copy is saved on site',
-          'readonly' => TRUE,
-        ];
-        $fields[] = [
-          'name' => 'has_base',
-          'type' => 'Extra',
-          'data_type' => 'Boolean',
-          'description' => 'Is provided by an extension',
-          'readonly' => TRUE,
-        ];
-        $fields[] = [
-          'name' => 'base_module',
-          'type' => 'Extra',
-          'data_type' => 'String',
-          'description' => 'Name of extension which provides this form',
-          'readonly' => TRUE,
-          'pseudoconstant' => ['callback' => ['CRM_Core_BAO_Managed', 'getBaseModules']],
-          'input_type' => 'Select',
-        ];
-        $fields[] = [
-          'name' => 'search_displays',
-          'type' => 'Extra',
-          'data_type' => 'Array',
-          'readonly' => TRUE,
-          'description' => 'Embedded search displays, formatted like ["search-name.display-name"]',
-        ];
-      }
-
-      return $fields;
-    }))->setCheckPermissions($checkPermissions);
+      ],
+    ];
   }
 
   /**

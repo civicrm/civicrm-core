@@ -71,6 +71,25 @@ class BasicGetFieldsAction extends BasicGetAction {
   protected $includeCustom;
 
   /**
+   * @inheritdoc
+   *
+   * By default we get fields from the entity repository
+   */
+  public function __construct($entityName, $actionName, $getter = NULL) {
+    if (!$getter) {
+      // default getter uses entity metadata
+      $getter = function ($action) use ($entityName) {
+        $fields = \Civi::entity($entityName)->getFields();
+        foreach ($fields as $name => &$field) {
+          $field['name'] = $name;
+        }
+        return $fields;
+      };
+    }
+    parent::__construct($entityName, $actionName, $getter);
+  }
+
+  /**
    * To implement getFields for your own entity:
    *
    * 1. From your entity class add a static getFields method.
