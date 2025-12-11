@@ -12,7 +12,7 @@
       editor: '^^afGuiEditor',
     },
     controller: function($scope, afGui) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
       $scope.tags = {
@@ -34,11 +34,11 @@
       };
 
       $scope.getAlign = function() {
-        return _.intersection(afGui.splitClass(ctrl.node['class']), _.keys($scope.alignments))[0] || 'text-left';
+        return _.intersection(afGui.splitClass(ctrl.node['class']), Object.keys($scope.alignments))[0] || 'text-left';
       };
 
       $scope.setAlign = function(val) {
-        afGui.modifyClasses(ctrl.node, _.keys($scope.alignments), val === 'text-left' ? null : val);
+        afGui.modifyClasses(ctrl.node, Object.keys($scope.alignments), val === 'text-left' ? null : val);
       };
 
       $scope.styles = _.transform(CRM.afGuiEditor.styles, function(styles, val, key) {
@@ -48,9 +48,9 @@
       // Getter/setter for ng-model
       $scope.getSetStyle = function(val) {
         if (arguments.length) {
-          return afGui.modifyClasses(ctrl.node, _.keys($scope.styles), val === 'text-default' ? null : val);
+          return afGui.modifyClasses(ctrl.node, Object.keys($scope.styles), val === 'text-default' ? null : val);
         }
-        return _.intersection(afGui.splitClass(ctrl.node['class']), _.keys($scope.styles))[0] || 'text-default';
+        return _.intersection(afGui.splitClass(ctrl.node['class']), Object.keys($scope.styles))[0] || 'text-default';
       };
 
     }

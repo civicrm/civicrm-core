@@ -3,7 +3,7 @@
   "use strict";
 
   angular.module('afGuiEditor').controller('AfGuiConditionalDialog', function($scope, $parse, afGui, dialogService) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+    const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
     this.node = $scope.model.node;
     this.editor = $scope.model.editor;

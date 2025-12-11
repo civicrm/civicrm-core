@@ -442,7 +442,7 @@
 
       $scope.toggleDefaultValueItem = function(val) {
         if (defaultValueShouldBeArray()) {
-          if (!_.isArray(getSet('afform_default'))) {
+          if (!Array.isArray(getSet('afform_default'))) {
             ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
           }
@@ -471,7 +471,7 @@
           // _EXPOSE_ is not a real option for search_operator, instead it sets the expose_operator boolean
           getSet('expose_operator', val === '_EXPOSE_');
           if (val === '_EXPOSE_') {
-            getSet('search_operator', _.keys(ctrl.searchOperators)[0]);
+            getSet('search_operator', Object.keys(ctrl.searchOperators)[0]);
           } else {
             getSet('search_operator', val);
           }
@@ -523,7 +523,7 @@
           // When changing the multiple property, force-reset the default value widget
           if (ctrl.hasDefaultValue && _.includes(['input_type', 'input_attrs.multiple'], propName)) {
             ctrl.hasDefaultValue = false;
-            if (!defaultValueShouldBeArray() && _.isArray(getSet('afform_default'))) {
+            if (!defaultValueShouldBeArray() && Array.isArray(getSet('afform_default'))) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default[0];
             } else if (defaultValueShouldBeArray() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default.split(',');

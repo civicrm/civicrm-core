@@ -9,8 +9,8 @@
     },
     require: {editor: '^^afGuiEditor'},
     controller: function ($scope, $timeout, afGui, formatForSelect2) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
-      var ctrl = this;
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+      const ctrl = this;
       $scope.controls = {};
       $scope.fieldList = [];
       $scope.blockList = [];
@@ -29,9 +29,11 @@
       $scope.getField = afGui.getField;
 
       $scope.valuesFields = function() {
-        var fields = _.transform($scope.getMeta().fields, function(fields, field) {
-          fields.push({id: field.name, text: field.label, disabled: $scope.fieldInUse(field.name)});
-        }, []);
+        const fields = Object.values($scope.getMeta().fields).map(field => ({
+          id: field.name,
+          text: field.label,
+          disabled: $scope.fieldInUse(field.name)
+        }));
         return {results: fields};
       };
 
