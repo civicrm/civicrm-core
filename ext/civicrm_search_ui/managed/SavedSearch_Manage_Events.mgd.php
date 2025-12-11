@@ -153,13 +153,13 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'label' => E::ts('ID'),
+              'label' => 'ID',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'title',
-              'label' => E::ts('Event'),
+              'label' => 'Event',
               'sortable' => TRUE,
               'link' => [
                 'path' => 'civicrm/event/manage/settings?reset=1&action=update&id=[id]',
@@ -168,51 +168,51 @@ return [
                 'join' => '',
                 'target' => '',
               ],
-              'title' => E::ts('Event info and settings'),
+              'title' => 'Event info and settings',
             ],
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_city',
-              'label' => E::ts('Location'),
+              'label' => 'Location',
               'sortable' => TRUE,
               'rewrite' => '{if \'[GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_state_province_id_label]\'} [GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_city] ([GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_state_province_id_label]) {else} [GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_city] {/if}',
             ],
             [
               'type' => 'field',
               'key' => 'event_type_id:label',
-              'label' => E::ts('Type'),
+              'label' => 'Type',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'start_date',
-              'label' => E::ts('Start Date'),
+              'label' => 'Start Date',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'end_date',
-              'label' => E::ts('End Date'),
+              'label' => 'End Date',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_public',
-              'label' => E::ts('Public?'),
+              'label' => 'Public?',
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'label' => E::ts('Active?'),
+              'label' => 'Active?',
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'COUNT_Event_Participant_event_id_01_Participant_ParticipantStatusType_status_id_01_id',
-              'label' => E::ts('#Registered, Attended...'),
+              'label' => '#Registered, Attended...',
               'sortable' => TRUE,
               'link' => [
                 'path' => 'civicrm/event/search?reset=1&force=1&status=true&event=[id]',
@@ -225,7 +225,7 @@ return [
             [
               'type' => 'field',
               'key' => 'COUNT_Event_Participant_event_id_01_Participant_ParticipantStatusType_status_id_02_id',
-              'label' => E::ts('#Cancelled, No-show...'),
+              'label' => '#Cancelled, No-show...',
               'sortable' => TRUE,
               'link' => [
                 'path' => 'civicrm/event/search?reset=1&force=1&status=false&event=[id]',
@@ -236,7 +236,7 @@ return [
               ],
             ],
             [
-              'text' => E::ts('Configure'),
+              'text' => 'Configure',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
@@ -244,7 +244,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage/settings?reset=1&action=update&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Info and Settings'),
+                  'text' => 'Info and Settings',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -256,7 +256,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage/location?reset=1&action=update&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Location'),
+                  'text' => 'Location',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -271,7 +271,7 @@ return [
                   'join' => '',
                   'target' => '',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Fees'),
+                  'text' => 'Fees',
                   'style' => 'default',
                   'path' => 'civicrm/event/manage/fee?reset=1&action=update&id=[id]',
                   'task' => '',
@@ -280,7 +280,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage/registration?reset=1&action=update&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Online Registration'),
+                  'text' => 'Online Registration',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -292,7 +292,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage/reminder?reset=1&action=browse&setTab=1&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Schedule Reminders'),
+                  'text' => 'Schedule Reminders',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -304,7 +304,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage/friend?reset=1&action=update&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Tell a Friend'),
+                  'text' => 'Tell a Friend',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -316,7 +316,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage/pcp?reset=1&action=update&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Personal Campaign Pages'),
+                  'text' => 'Personal Campaign Pages',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -328,7 +328,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage/repeat?reset=1&action=update&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Repeat'),
+                  'text' => 'Repeat',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -342,7 +342,7 @@ return [
               'alignment' => '',
             ],
             [
-              'text' => E::ts('Event Links'),
+              'text' => 'Event Links',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
@@ -353,7 +353,7 @@ return [
                   'join' => '',
                   'target' => '',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Register Participant'),
+                  'text' => 'Register Participant',
                   'style' => 'default',
                   'path' => 'civicrm/participant/add?reset=1&action=add&context=standalone&eid=[id]',
                   'task' => '',
@@ -362,7 +362,7 @@ return [
                 [
                   'path' => '',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('View Event'),
+                  'text' => 'View Event',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -374,7 +374,7 @@ return [
                 [
                   'path' => 'civicrm/event/register?reset=1&action=preview&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Registration (Test-drive)'),
+                  'text' => 'Registration (Test-drive)',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -386,7 +386,7 @@ return [
                 [
                   'path' => 'civicrm/event/register?reset=1&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Registration (Live)'),
+                  'text' => 'Registration (Live)',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -398,7 +398,7 @@ return [
                 [
                   'path' => 'civicrm/event/participant?reset=1&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Public Participant Listing'),
+                  'text' => 'Public Participant Listing',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -412,7 +412,7 @@ return [
               'alignment' => '',
             ],
             [
-              'text' => E::ts('More'),
+              'text' => 'More',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
@@ -420,7 +420,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage?reset=1&action=copy&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Copy'),
+                  'text' => 'Copy',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -432,7 +432,7 @@ return [
                 [
                   'path' => 'civicrm/event/manage?action=delete&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -456,7 +456,7 @@ return [
             [
               'action' => 'add',
               'entity' => 'Event',
-              'text' => E::ts('Add Event'),
+              'text' => 'Add Event',
               'icon' => 'fa-plus',
               'style' => 'primary',
               'target' => '',
