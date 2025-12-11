@@ -56,6 +56,14 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
       'limit' => $this->limit,
       'offset' => $this->offset,
     ];
+
+    // Add optional join
+    // Required if you need to specify fields in getSelect() that are from joined tables.
+    $params['join'] = $this->getJoin();
+    if (empty($params['join'])) {
+      unset($params['join']);
+    }
+
     // If reload not needed, only select necessary fields
     if (empty($this->reload)) {
       $params['select'] = $this->getSelect();
@@ -77,6 +85,21 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
    */
   protected function getSelect() {
     return CoreUtil::getInfoItem($this->getEntityName(), 'primary_key');
+  }
+
+  /**
+   * Determines what joins are required for fields returned by getBatchRecords
+   *
+   * Defaults to NULL
+   *
+   * @return array
+   */
+  protected function getJoin(): array {
+    return [];
+    // Example:
+    // return [
+    //   ['PriceSet AS price_set', 'LEFT', ['price_set.id', '=', 'price_field.price_set_id']],
+    // ];
   }
 
 }
