@@ -278,7 +278,9 @@
         }
 
         // Cancel the below $watch expressions if already set
-        block.listeners.forEach(deregister => deregister());
+        if (Array.isArray(block.listeners)) {
+          block.listeners.forEach(deregister => deregister());
+        }
 
         block = $scope.block = {
           directive: null,
