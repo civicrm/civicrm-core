@@ -93,7 +93,7 @@ class CRM_Core_Key {
     if ($addSequence) {
       // now generate a random number between 1 and 10000 and add it to the key
       // so that we can have forms in mutiple tabs etc
-      $key = $key . '_' . mt_rand(1, 10000);
+      $key .= '_' . mt_rand(1, 10000);
     }
     return $key;
   }

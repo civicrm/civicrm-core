@@ -209,7 +209,7 @@ AND    ac.case_id = %1
     $index = $activityID . '_' . (int) $anyActivity;
 
     if ($clientID) {
-      $index = $index . '_' . $clientID;
+      $index .= '_' . $clientID;
     }
 
     if (!array_key_exists($index, \Civi::$statics[__CLASS__][__FUNCTION__]['activityInfos'] ?? [])) {

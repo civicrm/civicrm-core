@@ -826,7 +826,7 @@ final class Url implements \JsonSerializable {
       $value = ltrim($value, $separator);
     }
 
-    $var = $var . $separator . $value;
+    $var .= $separator . $value;
   }
 
 }

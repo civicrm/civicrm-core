@@ -184,7 +184,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       // definitely different for different forms
       $name = $scope;
     }
-    $name = $name . '_' . $this->key($name, $addSequence, $ignoreKey);
+    $name .= '_' . $this->key($name, $addSequence, $ignoreKey);
     $this->_title = $title;
     if ($scope) {
       $this->_scope = $scope;
