@@ -11,60 +11,78 @@
   <table class="form-layout">
     <tr>
       <td>
-        <div id="streetAddress" class="crm-field-wrapper">
-          {$form.street_address.label}<br />
-          {$form.street_address.html|crmAddClass:big}
+        {if !empty($form.street_address.html)}
+          <div id="streetAddress" class="crm-field-wrapper">
+            {$form.street_address.label}<br />
+            {$form.street_address.html|crmAddClass:big}
+            {if $parseStreetAddress}
+              <div>
+                <a href="#" title="{ts escape='htmlattribute'}Use Address Elements{/ts}" rel="addressElements" class="address-elements-toggle">{ts}Use Address Elements{/ts}</a>
+              </div>
+            {/if}
+          </div>
           {if $parseStreetAddress}
-            <div>
-              <a href="#" title="{ts escape='htmlattribute'}Use Address Elements{/ts}" rel="addressElements" class="address-elements-toggle">{ts}Use Address Elements{/ts}</a>
-            </div>
+          <div id="addressElements" class="crm-field-wrapper" style="display: none;">
+            <table class="crm-block crm-form-block advanced-search-address-elements">
+              <tr><td>{$form.street_number.label}<br />{$form.street_number.html}<br /><span class="description nowrap">{ts}or ODD / EVEN{/ts}</td>
+                <td>{$form.street_name.label}<br />{$form.street_name.html}</td>
+                <td>{$form.street_unit.label}<br />{$form.street_unit.html|crmAddClass:four}</td>
+              </tr>
+              <tr>
+                <td colspan="3"><a href="#" title="{ts escape='htmlattribute'}Use Complete Address{/ts}" rel="streetAddress" class="address-elements-toggle">{ts}Use Street Address{/ts}</a></td>
+              </tr>
+            </table>
+          </div>
           {/if}
-        </div>
-        {if $parseStreetAddress}
-        <div id="addressElements" class="crm-field-wrapper" style="display: none;">
-          <table class="crm-block crm-form-block advanced-search-address-elements">
-            <tr><td>{$form.street_number.label}<br />{$form.street_number.html}<br /><span class="description nowrap">{ts}or ODD / EVEN{/ts}</td>
-              <td>{$form.street_name.label}<br />{$form.street_name.html}</td>
-              <td>{$form.street_unit.label}<br />{$form.street_unit.html|crmAddClass:four}</td>
-            </tr>
-            <tr>
-              <td colspan="3"><a href="#" title="{ts escape='htmlattribute'}Use Complete Address{/ts}" rel="streetAddress" class="address-elements-toggle">{ts}Use Street Address{/ts}</a></td>
-            </tr>
-          </table>
-        </div>
         {/if}
-        <div class="crm-field-wrapper">
-          {$form.supplemental_address_1.label}<br />
-          {$form.supplemental_address_1.html}
-        </div>
-        <div class="crm-field-wrapper">
-          {$form.supplemental_address_2.label}<br />
-          {$form.supplemental_address_2.html}
-        </div>
-        <div class="crm-field-wrapper">
-          {$form.supplemental_address_3.label}<br />
-          {$form.supplemental_address_3.html}
-        </div>
-        <div class="crm-field-wrapper">
-          {$form.city.label}<br />
-          {$form.city.html}
-        </div>
-        <div class="crm-field-wrapper">
-          {$form.country.label}<br />
-          {$form.country.html}
-        </div>
-        <div class="crm-field-wrapper">
-          {$form.state_province.label}<br />
-          {$form.state_province.html}
-        </div>
-        <div class="crm-field-wrapper">
-          {$form.county.label}<br />
-          {$form.county.html}
-        </div>
-        <div class="crm-field-wrapper">
-          {$form.world_region.label}<br />
-          {$form.world_region.html}
-        </div>
+        {if !empty($form.supplemental_address_1.html)}
+          <div class="crm-field-wrapper">
+            {$form.supplemental_address_1.label}<br />
+            {$form.supplemental_address_1.html}
+          </div>
+        {/if}
+        {if !empty($form.supplemental_address_2.html)}
+          <div class="crm-field-wrapper">
+            {$form.supplemental_address_2.label}<br />
+            {$form.supplemental_address_2.html}
+          </div>
+        {/if}
+        {if !empty($form.supplemental_address_3.html)}
+          <div class="crm-field-wrapper">
+            {$form.supplemental_address_3.label}<br />
+            {$form.supplemental_address_3.html}
+          </div>
+        {/if}
+        {if !empty($form.city.html)}
+          <div class="crm-field-wrapper">
+            {$form.city.label}<br />
+            {$form.city.html}
+          </div>
+        {/if}
+        {if !empty($form.country.html)}
+          <div class="crm-field-wrapper">
+            {$form.country.label}<br />
+            {$form.country.html}
+          </div>
+        {/if}
+        {if !empty($form.state_province.html)}
+          <div class="crm-field-wrapper">
+            {$form.state_province.label}<br />
+            {$form.state_province.html}
+          </div>
+        {/if}
+        {if !empty($form.county.html)}
+          <div class="crm-field-wrapper">
+            {$form.county.label}<br />
+            {$form.county.html}
+          </div>
+        {/if}
+        {if !empty($form.world_region.html)}
+          <div class="crm-field-wrapper">
+            {$form.world_region.label}<br />
+            {$form.world_region.html}
+          </div>
+        {/if}
       </td>
 
       <td>
