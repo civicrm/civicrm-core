@@ -208,7 +208,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
         $templateParams['id'] = $formValues['SMStemplate'];
 
-        $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
+        $msgTemplate = CRM_Core_BAO_MessageTemplate::writeRecord($templateParams);
       }
 
       if (!empty($composeParams['SMSsaveTemplate'])) {
@@ -220,7 +220,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
         $templateParams['msg_title'] = $composeParams['SMSsaveTemplateName'];
 
-        $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
+        $msgTemplate = CRM_Core_BAO_MessageTemplate::writeRecord($templateParams);
       }
 
       if (isset($msgTemplate->id)) {
