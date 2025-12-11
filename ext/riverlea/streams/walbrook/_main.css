@@ -209,10 +209,10 @@
   --crm-wizard-border: 1px solid var(--crm-page-bg-color);
 /* Frontend */
   --crm-f-fieldset-padding: var(--crm-padding-reg);
-  --crm-f-legend-align: unset;
+  --crm-f-fieldset-bg-color: var(--crm-container-bg-color);
   --crm-f-legend-size: var(--crm-l-reg-2);
   --crm-f-label-position: unset; /* 'unset' = stacked, 'left' = left align, in combination with width below */
   --crm-f-label-align: left;
-  --crm-f-label-margin: var(--crm-l-small);
+  --crm-f-label-margin: 0;
   --crm-f-label-width: unset;
 }
