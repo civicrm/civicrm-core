@@ -756,9 +756,6 @@ class CRM_Core_I18n {
    */
   public static  function getContactDefaultLanguage() {
     $language = Civi::settings()->get('contact_default_language');
-    if ($language == 'undefined') {
-      return NULL;
-    }
     if (empty($language) || $language === '*default*') {
       $language = civicrm_api3('setting', 'getvalue', [
         'name' => 'lcMessages',
@@ -768,7 +765,6 @@ class CRM_Core_I18n {
     elseif ($language == 'current_site_language') {
       return CRM_Core_I18n::getLocale();
     }
-
     return $language;
   }
 
