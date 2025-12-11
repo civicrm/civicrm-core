@@ -390,7 +390,7 @@
   --crm-notify-bg-color: rgba(0,0,0,0.85);
   --crm-notify-padding: var(--crm-l-medium-2);
   --crm-notify-color: var(--crm-text-light-color);
-  --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
+  --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides, 0 for none */
   --crm-notify-radius: var(--crm-l-radius);
   --crm-notify-danger-color: hsl(from var(--crm-danger-color) h s calc(l + 20));
   --crm-notify-warning-color: hsl(from var(--crm-warning-color) h s calc(l + 20));
@@ -457,11 +457,13 @@
   --crm-f-input-font-size: var(--crm-l-reg-1);
   --crm-f-input-width: 300px;
   --crm-f-form-focus-bg-color: unset;
-  --crm-f-form-focus-border-color: var(--crm-success-light-color);
   --crm-f-form-focus-outline-color: var(--crm-success-light-color);
+  --crm-f-form-focus-border-color: var(--crm-f-form-focus-outline-color);
+  --crm-f-form-focus-border-width: 0 5px 0 0; /* adds a border to one/several sides, 0 for none */
   --crm-f-form-error-bg-color: unset;
-  --crm-f-form-error-border-color: var(--crm-danger-light-color);
   --crm-f-form-error-outline-color: var(--crm-danger-light-color);
+  --crm-f-form-error-border-color: var(--crm-f-form-error-outline-color);
+  --crm-f-form-error-border-width: 0 5px 0 0;
   --crm-f-logo-height: 40px;
   --crm-f-logo-align: center; /* left, right or center */
 }

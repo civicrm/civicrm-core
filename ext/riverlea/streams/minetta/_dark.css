@@ -14,7 +14,6 @@
   --crm-link-color: var(--crm-c-teal);
   --crm-link-hover-color: var(--crm-c-yellow);
 /* Backgrounds, '--crm-c-*-bg' */
-  --crm-page-bg-color: var(--crm-paper);
   --crm-container-bg-color: var(--crm-c-gray-800);
   --crm-inverse-bg-color: var(--crm-c-gray-300);
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
