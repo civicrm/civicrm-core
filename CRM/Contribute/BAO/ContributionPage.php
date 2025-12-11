@@ -382,10 +382,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
         $tplParams['onBehalfName'] = $displayName;
         $tplParams['onBehalfEmail'] = $email;
-
-        if (!empty($values['onbehalf_profile_id'])) {
-          self::buildCustomDisplay($values['onbehalf_profile_id'], 'onBehalfProfile', $contactID, $template, $params['onbehalf_profile'], $fieldTypes);
-        }
       }
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
@@ -464,6 +460,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $fieldTypes
    *
    * @return array
+   *
+   * @deprecated move this to the contribution receipt class fully.
    *
    * @throws \CRM_Core_Exception
    */
