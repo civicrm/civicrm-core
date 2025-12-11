@@ -255,7 +255,7 @@ WHERE li.contribution_id = %1";
    * @param int $fid
    *   Price set field id.
    * @param array $params
-   *   Reference to form values.
+   *   Array of [price_FIELDID => [optionValueID => Quantity]]
    * @param array $fields
    *   Array of fields belonging to the price set used for particular event
    * @param array $values
