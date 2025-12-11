@@ -68,7 +68,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
    */
   public function getProfiles(): array {
     if (!isset($this->profiles)) {
-      if ($this->getEventID()) {
+      if (method_exists($this, 'getEventID') && $this->getEventID()) {
         $joins = (array) UFJoin::get(FALSE)
           ->addWhere('entity_table', '=', 'civicrm_event')
           ->addWhere('entity_id', '=', $this->getEventID())
@@ -131,6 +131,27 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
           $this->profiles[] = $profile;
         }
       }
+      elseif (isset($this->getContribution()['contribution_page_id'])) {
+        $joins = (array) UFJoin::get(FALSE)
+          ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+          ->addWhere('entity_id', '=', $this->getContribution()['contribution_page_id'])
+          ->addWhere('is_active', '=', TRUE)
+          ->addSelect('module', 'weight', 'uf_group_id', 'uf_group_id.frontend_title')
+          ->addOrderBy('weight')
+          ->execute();
+        $profiles = UFGroup::get(FALSE)
+          ->addWhere('id', 'IN', CRM_Utils_Array::collect('uf_group_id', $joins))
+          ->execute()->indexBy('id');
+        foreach ($joins as $join) {
+          // The thing we want to order by is on the join not the profile
+          // hence we iterate the joins.
+          $profile = $profiles[$join['uf_group_id']];
+          $profile['placement'] = $join['weight'] === 1 ? 'pre' : 'post';
+          $profile['module'] = $join['module'];
+          $profile['title'] = $join['uf_group_id.frontend_title'];
+          $this->profiles[] = $profile;
+        }
+      }
     }
     return $this->profiles ?: [];
   }
@@ -182,7 +203,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
   public function getProfilesAdditionalParticipants(): array {
     $profiles = [];
     foreach ($this->getProfiles() as $profile) {
-      if ($profile['is_additional_participant'] && !empty($profile['fields'])) {
+      if (!empty($profile['is_additional_participant']) && !empty($profile['fields'])) {
         foreach ($profile['fields'] as $participantIndex => $fields) {
           $profiles['profile'][$participantIndex][$profile['id']] = $profile['fields'][$participantIndex];
         }
@@ -209,6 +230,20 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
       }
     }
     return $profiles;
+  }
+
+  /**
+   * @param string $module
+   * @return array|null
+   * @throws CRM_Core_Exception
+   */
+  protected function getProfileByType(string $module): ?array {
+    foreach ($this->getProfiles() as $profile) {
+      if ($profile['module'] === $module) {
+        return $profile;
+      }
+    }
+    return NULL;
   }
 
 }
