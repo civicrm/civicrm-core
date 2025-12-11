@@ -249,7 +249,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
 
             $smartSql = CRM_Contact_BAO_SearchCustom::contactIDSQL(NULL, $ssId);
 
-            $smartSql = $smartSql . " AND contact_a.id NOT IN (
+            $smartSql .= " AND contact_a.id NOT IN (
                               SELECT contact_id FROM civicrm_group_contact
                               WHERE civicrm_group_contact.group_id = {$values} AND civicrm_group_contact.status = 'Removed')";
 

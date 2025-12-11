@@ -133,7 +133,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       $title = $activitySubject . ' - ';
     }
 
-    $title = $title . $recentContactDisplay . ' (' . $activityTypes[$activityTypeID] . ')';
+    $title .= $recentContactDisplay . ' (' . $activityTypes[$activityTypeID] . ')';
 
     $recentOther = [];
     if (CRM_Case_BAO_Case::checkPermission($activityID, 'edit')) {

@@ -6832,7 +6832,7 @@ AND   displayRelType.is_active = 1
     [$select, $from, $where, $having] = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
     if ($additionalWhereClause) {
-      $where = $where . ' AND ' . $additionalWhereClause;
+      $where .= ' AND ' . $additionalWhereClause;
     }
 
     //additional from clause should be w/ proper joins.

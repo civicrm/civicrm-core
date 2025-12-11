@@ -982,7 +982,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
         elseif (in_array($name, CRM_Contact_BAO_Contact::$_greetingTypes)) {
           $dname = $name . '_display';
           $values[$index] = $details->$dname;
-          $name = $name . '_id';
+          $name .= '_id';
           $params[$index] = $details->$name;
         }
         elseif (in_array($name, [

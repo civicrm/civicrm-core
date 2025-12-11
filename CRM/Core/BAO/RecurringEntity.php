@@ -825,7 +825,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
         $repetitionStartDate = $formParams['repetition_start_date'];
       }
       if (!empty($formParams['repetition_start_date_time'])) {
-        $repetitionStartDate = $repetitionStartDate . " " . $formParams['repetition_start_date_time'];
+        $repetitionStartDate .= " " . $formParams['repetition_start_date_time'];
       }
       $repetition_start_date = new DateTime($repetitionStartDate);
       $dbParams['start_action_date'] = $repetition_start_date->format('YmdHis');
@@ -946,7 +946,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
       if ($repetition_frequency_unit == "day") {
         $repetition_frequency_unit = "dai";
       }
-      $repetition_frequency_unit = $repetition_frequency_unit . 'ly';
+      $repetition_frequency_unit .= 'ly';
       $r->startDate($start)
         ->exclusions([$start])
         ->freq($repetition_frequency_unit);

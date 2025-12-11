@@ -778,10 +778,10 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     if ($isDisplayAmounts) {
       $optionLabel = !empty($optionLabel) ? $optionLabel . '<span class="crm-price-amount-label-separator">&nbsp;-&nbsp;</span>' : '';
       if ($opt['tax_amount'] && $invoicing) {
-        $optionLabel = $optionLabel . self::getTaxLabel($opt, $valueFieldName);
+        $optionLabel .= self::getTaxLabel($opt, $valueFieldName);
       }
       else {
-        $optionLabel = $optionLabel . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
+        $optionLabel .= '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
       }
     }
 

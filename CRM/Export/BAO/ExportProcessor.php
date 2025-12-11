@@ -2145,7 +2145,7 @@ WHERE  id IN ( $deleteIDString )
     $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
     $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
     $i18n = CRM_Core_I18n::singleton();
-    $field = $field . '_';
+    $field .= '_';
 
     foreach ($value as $relationField => $relationValue) {
       if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
