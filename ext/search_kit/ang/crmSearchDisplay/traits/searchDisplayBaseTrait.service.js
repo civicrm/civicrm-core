@@ -22,7 +22,7 @@
         const ctrl = this;
         this.$element = $element;
         this.limit = this.settings.limit;
-        this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
+        this.sort = Array.isArray(this.settings.sort) ? _.cloneDeep(this.settings.sort) : [];
         this.seed = Date.now();
         this.uniqueId = generateUniqueId(20);
         this.placeholders = [];
