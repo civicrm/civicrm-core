@@ -14,6 +14,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Generic\BasicGetFieldsAction;
 use Civi\Api4\Generic\Traits\HierarchicalEntity;
+use CRM_Standaloneusers_BAO_Role;
 use CRM_Standaloneusers_ExtensionUtil as E;
 
 /**
@@ -54,7 +55,7 @@ class RolePermission extends Generic\AbstractEntity {
     return (new BasicGetFieldsAction(static::getEntityName(), __FUNCTION__, function($getFields) {
       $roles = \Civi\Api4\Role::get(FALSE)
         ->addSelect('name', 'label')
-        ->addWhere('name', '!=', 'admin')
+        ->addWhere('name', '!=', CRM_Standaloneusers_BAO_Role::SUPERADMIN_ROLE_NAME)
         ->execute()
         ->column('label', 'name');
 
