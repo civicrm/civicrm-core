@@ -25,8 +25,10 @@ namespace Civi\Api4;
  * @searchable primary
  * @since 5.19
  * @iconField activity_type_id:icon
+ * @parentField parent_id
  * @package Civi\Api4
  */
 class Activity extends Generic\DAOEntity {
+  use Generic\Traits\HierarchicalEntity;
 
 }
