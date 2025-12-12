@@ -386,7 +386,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         }
         $templateParams['id'] = $params[$prefix . 'template'];
 
-        $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
+        $msgTemplate = CRM_Core_BAO_MessageTemplate::writeRecord($templateParams);
       }
 
       // Save new template
@@ -407,7 +407,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         }
         $templateParams['msg_title'] = $params[$prefix . 'saveTemplateName'];
 
-        $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
+        $msgTemplate = CRM_Core_BAO_MessageTemplate::writeRecord($templateParams);
       }
 
       if (isset($msgTemplate->id)) {
