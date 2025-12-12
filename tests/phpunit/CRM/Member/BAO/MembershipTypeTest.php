@@ -172,7 +172,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $membershipTypeID = MembershipType::create()->setValues($params)->execute()->first()['id'];
-    $result = CRM_Member_BAO_MembershipType::getMembershipTypes();
+    $result = \Civi\Api4\MembershipType::get(FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('weight', 'ASC')
+      ->execute()
+      ->column('title', 'id');
     $this->assertEquals('General', $result[$membershipTypeID], 'Verify membership types.');
   }
 

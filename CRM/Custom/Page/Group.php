@@ -144,7 +144,11 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
 
     $subTypes['Activity'] = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
     $subTypes['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
-    $subTypes['Membership'] = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
+    $subTypes['Membership'] = \Civi\Api4\MembershipType::get(FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('weight', 'ASC')
+      ->execute()
+      ->column('title', 'id');
     $subTypes['Event'] = CRM_Core_OptionGroup::values('event_type');
     $subTypes['Campaign'] = CRM_Campaign_PseudoConstant::campaignType();
     $subTypes['Participant'] = [];
