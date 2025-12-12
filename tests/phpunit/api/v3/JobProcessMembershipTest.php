@@ -43,8 +43,8 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
     parent::setUp();
     $this->yesterday = date('Y-m-d', time() - 60 * 60 * 24);
     $this->tomorrow = date('Y-m-d', time() + 60 * 60 * 24);
-    $this->membershipTypeCreate(['name' => 'General'], 'General');
-    $this->membershipTypeCreate(['name' => 'Old'], 'Old');
+    $this->membershipTypeCreate(['title' => 'General'], 'General');
+    $this->membershipTypeCreate(['title' => 'Old'], 'Old');
   }
 
   public function tearDown(): void {

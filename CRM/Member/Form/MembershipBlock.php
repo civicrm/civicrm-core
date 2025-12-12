@@ -97,7 +97,11 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    $membershipTypes = CRM_Member_BAO_MembershipType::getMembershipTypes();
+    $membershipTypes = \Civi\Api4\MembershipType::get(FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('weight', 'ASC')
+      ->execute()
+      ->column('title', 'id');
 
     if (!empty($membershipTypes)) {
       $this->addElement('checkbox', 'member_is_active', ts('Membership Section Enabled?'));
@@ -412,7 +416,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             unset($options[$priceFieldID]);
           }
           $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($memType);
-          $fieldParams['option_label'][$rowCount] = $membetype['name'] ?? NULL;
+          $fieldParams['option_label'][$rowCount] = $membetype['frontend_title'] ?? $membetype['title'];
           $fieldParams['option_amount'][$rowCount] = $membetype['minimum_fee'] ?? 0;
           $fieldParams['option_weight'][$rowCount] = $membetype['weight'] ?? NULL;
           $fieldParams['option_description'][$rowCount] = $membetype['description'] ?? NULL;

@@ -76,9 +76,11 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     $monthStart = $ym . '-01';
     $yearStart = substr($ym, 0, 4) . '-01-01';
 
-    $membershipTypes = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
-    // added
-    //$membership = new CRM_Member_BAO_Membership;
+    $membershipTypes = \Civi\Api4\MembershipType::get(FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('weight', 'ASC')
+      ->execute()
+      ->column('title', 'id');
 
     foreach ($membershipTypes as $key => $value) {
 
