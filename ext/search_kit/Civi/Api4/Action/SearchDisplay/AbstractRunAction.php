@@ -5,6 +5,7 @@ namespace Civi\Api4\Action\SearchDisplay;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
 use Civi\Api4\Query\SqlField;
+use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
