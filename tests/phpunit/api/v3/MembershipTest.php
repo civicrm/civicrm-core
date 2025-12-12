@@ -570,7 +570,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // there is an inactive existing membership of the
     // same type.  civicrm/civicrm-core/pull/24866
     $employerId[3] = $this->organizationCreate([], 1);
-    $memberContactId[4] = $this->individualCreate(['employer_id' => $employerId[0]], 0);
+    $memberContactId[4] = $this->individualCreate([], 0);
 
     $activeMembershipParams = [
       'contact_id' => $employerId[3],
@@ -603,6 +603,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // Check no current membership
     $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
     $this->assertEquals(0, $result['count']);
+
+    // Add new employer relationship to contact
+    $this->callAPISuccess('Contact', 'create', ['id' => $memberContactId[4], 'employer_id' => $employerId[3]]);
 
     // Add inherited membership
     $this->contactMembershipCreate($activeMembershipParams);
