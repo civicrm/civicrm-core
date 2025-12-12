@@ -23,8 +23,8 @@
         this.$element = $element;
         this.limit = this.settings.limit;
         this.sort = Array.isArray(this.settings.sort) ? _.cloneDeep(this.settings.sort) : [];
-        this.seed = Date.now();
-        this.uniqueId = generateUniqueId(20);
+        // Used to make dom ids unique, and as a seed for ORDER BY RAND() to stabilize random results
+        this.uniqueId = Math.floor(Math.random() * 10e10);
         this.placeholders = [];
         const placeholderCount = 'placeholder' in this.settings ? this.settings.placeholder : 5;
         for (let p=0; p < placeholderCount; ++p) {
@@ -73,15 +73,6 @@
           if (contactTab) {
             CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
           }
-        }
-
-        function generateUniqueId(length) {
-          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-          let result = "";
-          for (let i = 0; i < length; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-          }
-          return result;
         }
 
         // Popup forms in this display or surrounding Afform trigger a refresh
@@ -206,7 +197,7 @@
           display: this.display,
           sort: this.sort,
           limit: this.limit,
-          seed: this.seed,
+          seed: this.uniqueId,
           filters: this.getFilters(),
           afform: this.afFieldset ? this.afFieldset.getFormName() : null
         };
