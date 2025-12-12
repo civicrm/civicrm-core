@@ -4,8 +4,8 @@ namespace Civi\Afform\Behavior;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Token\TokenRow;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service
@@ -35,9 +35,9 @@ class ParticipantAutofill extends AbstractBehavior implements EventSubscriberInt
     return E::ts('Automatically identify this participant.');
   }
 
-  public static function getModes(string $type): array {
+  public static function getModes(string $entityName): array {
     $modes = [];
-    if ($type == 'Participant') {
+    if ($entityName === 'Participant') {
       $modes[] = [
         'name' => 'entity_id',
         'label' => E::ts('Participant being Viewed'),
@@ -51,7 +51,7 @@ class ParticipantAutofill extends AbstractBehavior implements EventSubscriberInt
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
     /* @var \Civi\Api4\Action\Afform\Prefill $apiRequest */
     $apiRequest = $event->getApiRequest();
-    if ($event->getEntityType() == 'Participant') {
+    if ($event->getEntityType() === 'Participant') {
       $entity = $event->getEntity();
       $id = $event->getEntityId();
       $autoFillMode = $entity['participant-autofill'] ?? '';
