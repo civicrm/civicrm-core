@@ -596,6 +596,14 @@ input.crm-form-checkbox) + label {
   animation-timing-function: var(--fa-animation-timing,linear);
 }
 
+span.crm-select-item-color {
+  display: inline-block;
+  width: .7rem;
+  height: .7rem;
+  border-radius: .35rem;
+  border: 1px solid var(--crm-text-color);
+}
+
 /* Select dropdown */
 
 .select2-drop.select2-drop-active.crm-container {
