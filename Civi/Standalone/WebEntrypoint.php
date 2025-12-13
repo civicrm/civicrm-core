@@ -48,7 +48,8 @@ class WebEntrypoint {
     // parse the request uri (should we use URL for this?)
     $requestUri = $_SERVER['REQUEST_URI'] ?? '';
     $parts = explode('?', $requestUri);
-    $args = explode('/', $parts[0] ?? '');
+    $path = urldecode($parts[0] ?? ''); /* Civi's route model is canonically built around $_GET[$var]. Therefore, routes are canonically decoded. */
+    $args = explode('/', $path);
     // Remove empty path segments, a//b becomes equivalent to a/b
     $args = array_values(array_filter($args));
 
