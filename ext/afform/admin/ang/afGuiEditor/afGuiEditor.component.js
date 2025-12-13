@@ -18,8 +18,9 @@
       mode: '@'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, afGui, $parse, $timeout, $location, $route, $rootScope) {
+    controller: function($scope, crmApi4, crmUiHelp, afGui, $parse, $timeout, $location, $route, $rootScope, formatForSelect2) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+      $scope.hs = crmUiHelp({file: 'CRM/AfformAdmin/afformBuilder'});
 
       this.afform = null;
       $scope.saving = false;
@@ -32,6 +33,7 @@
       let undoAction = null;
       let lastSaved = {};
       const sortableOptions = {};
+      this.afformTags = formatForSelect2(this.meta.afform_fields.tags.options || [], 'id', 'label', ['description', 'color']);
 
       // ngModelOptions to debounce input
       // Used to prevent cluttering the undo history with every keystroke
@@ -145,8 +147,8 @@
 
         editor.afform.permission_operator = editor.afform.permission_operator || 'AND';
         // set redirect to url as default if not set
-        if (!editor.afform.confirmation_type && editor.meta.confirmation_types.length > 0) {
-          editor.afform.confirmation_type = editor.meta.confirmation_types[0].value;
+        if (!editor.afform.confirmation_type && editor.meta.afform_fields.confirmation_type.options.length > 0) {
+          editor.afform.confirmation_type = editor.meta.afform_fields.confirmation_type.options[0].id;
         }
 
         // Initialize undo history

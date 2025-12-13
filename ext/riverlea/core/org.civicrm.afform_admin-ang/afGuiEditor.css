@@ -115,8 +115,7 @@
 
 /* Edit palette (left side) */
 #afGuiEditor-palette input,
-#afGuiEditor-palette textarea,
-#afGuiEditor-palette select {
+#afGuiEditor-palette textarea {
   width: 100%;
 }
 #afGuiEditor-palette input[type="checkbox"],
