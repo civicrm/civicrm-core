@@ -2,67 +2,64 @@
 
   <div class="form-group">
     <label for="af_config_form_title">
-      {{:: ts('Title') }} <span class="crm-marker">*</span>
+      {{:: editor.meta.afform_fields.title.title }} <span class="crm-marker">*</span>
+      <a crm-ui-help="hs({id: 'title', title: editor.meta.afform_fields.title.title})"></a>
     </label>
-    <p class="help-block" ng-if=":: editor.afform.type !== 'block'">{{:: ts('Public title (usually displayed at the top of the form).') }}</p>
     <input ng-model="editor.afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" ng-model-options="editor.debounceMode" >
   </div>
 
   <div class="form-group" ng-if="editor.meta.locales && editor.meta.locales.length">
     <label for="afform_locale">
-      {{:: ts('Locale') }} <span class="crm-marker">*</span>
+      {{:: editor.meta.afform_fields.afform_locale.title }} <span class="crm-marker">*</span>
     </label>
+    <a crm-ui-help="hs({id: 'afform_locale', title: editor.meta.afform_fields.afform_locale.title})"></a>
     <input ng-list crm-ui-select="{multiple: false, data: editor.meta.locales}" class="form-control" id="afform_locale" ng-model="editor.afform.locale">
-    <p class="help-block">
-      {{:: ts('Any custom text (label, placeholder, help...) is assumed to be in the locale you set. You are then able to translate the strings by going to Administer -> Localization -> Translations to ...') }}
-    </p>
   </div>
 
   <div class="form-group">
     <label for="af_config_form_description">
-      {{:: ts('Description') }}
+      {{:: editor.meta.afform_fields.description.title }}
+      <a crm-ui-help="hs({id: 'description', title: editor.meta.afform_fields.description.title})"></a>
     </label>
-    <textarea ng-model="editor.afform.description" class="form-control" id="af_config_form_description" ng-model-options="editor.debounceMode"></textarea>
-    <p class="help-block">{{:: ts("Internal note about the form's purpose (not displayed on form).") }}</p>
+    <textarea ng-model="editor.afform.description" class="form-control" id="af_config_form_description" ng-model-options="editor.debounceMode" rows="1"></textarea>
     <!-- Description is "semi-private": not generally public, but not audited for secrecy -->
   </div>
 
   <!-- Form permissions do not apply to blocks -->
   <div class="form-group" ng-if=":: editor.afform.type !== 'block'">
     <label for="af_config_form_permission">
-      {{:: ts('Permission') }}
+      {{:: editor.meta.afform_fields.permission.title }}
+      <a crm-ui-help="hs({id: 'permission', title: editor.meta.afform_fields.permission.title})"></a>
     </label>
     <div class="form-inline" >
       <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, multiple: true, separator: '\u0001'}" ng-list="" >
+      <label class="sr-only" for="af_config_form_permission_operator">
+        {{:: editor.meta.afform_fields.permission_operator.title }}
+      </label>
       <select ng-model="editor.afform.permission_operator" class="form-control" id="af_config_form_permission_operator" >
-        <option value="AND">{{:: ts('And') }}</option>
-        <option value="OR">{{:: ts('Or') }}</option>
+        <option ng-repeat="opt in editor.meta.afform_fields.permission_operator.options" value="{{ opt.id }}">{{ opt.label }}</option>
       </select>
     </div>
-    <p class="help-block">
-      {{:: ts('What permission is required to use this form?') }}
-      {{:: ts('Join multiple permissions with "And" to require all, or "Or" to require at least one.') }}
-    </p>
   </div>
 
   <div class="form-group">
     <label for="afform_tags">
-      {{:: ts('Tags') }}
+      {{:: editor.meta.afform_fields.tags.title }}
+      <a crm-ui-help="hs({id: 'tags', title: editor.meta.afform_fields.tags.title})"></a>
     </label>
-    <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_tags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
-    <p class="help-block">{{:: ts('Tags can be used to keep track of your forms if Used For is set to include Afform.') }} <a target="_blank" href="/civicrm/tag?reset=1">{{:: ts('Manage Tags') }}</a></p>
+    <input ng-list crm-ui-select="{multiple: true, data: editor.afformTags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
   </div>
 
   <!-- Placement options do not apply to blocks -->
   <fieldset ng-if=":: editor.afform.type !== 'block'">
-    <legend>{{:: ts('Placement') }}</legend>
+    <legend>{{:: ts('Placement Options') }}</legend>
 
     <div class="form-group" ng-class="{'has-error': !!config_form.server_route.$error.pattern}">
       <label for="af_config_form_server_route">
-        {{:: ts('Page Route') }}
+        {{:: editor.meta.afform_fields.server_route.title }}
+        <a crm-ui-help="hs({id: 'server_route', title: editor.meta.afform_fields.server_route.title})"></a>
       </label>
       <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[\-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" placeholder="{{:: ts('None') }}" ng-model-options="editor.debounceMode" ng-required="!!editor.placementRequiresServerRoute()">
-      <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
     </div>
 
     <div class="form-group" ng-if="!!editor.afform.server_route">
@@ -96,19 +93,19 @@
 
     <div class="form-group" ng-show="!!editor.afform.navigation || editor.hasPlacementEntities()">
       <div class="form-inline">
-        <label for="afform_icon">{{:: ts('Icon') }}</label>
+        <label for="afform_icon">
+          {{:: editor.meta.afform_fields.icon.title }}
+        </label>
         <input required id="afform_icon" ng-model="editor.afform.icon" crm-ui-icon-picker class="form-control">
       </div>
     </div>
 
     <div class="form-group">
       <label for="afform_placement">
-        {{:: ts('Expose To') }}
+        {{:: editor.meta.afform_fields.placement.title }}
+        <a crm-ui-help="hs({id: 'placement', title: editor.meta.afform_fields.placement.title})"></a>
       </label>
       <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_placement, placeholder: ts('None')}" class="form-control" id="afform_placement" ng-model="editor.afform.placement" ng-change="editor.onChangePlacement()">
-      <p class="help-block" ng-if="editor.afform.server_route || !editor.placementRequiresServerRoute()">
-        {{:: ts('Additional contexts in which the form can be embedded.') }}
-      </p>
       <p class="text-warning" ng-if="!editor.afform.server_route && editor.placementRequiresServerRoute()">
         <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>{{ ts('%1 placement requires a page route.', {1: editor.placementRequiresServerRoute()}) }}
       </p>
@@ -120,8 +117,11 @@
         <input class="form-control" ng-list crm-ui-select="{multiple: true, placeholder: ts('Any'), data: entity.filter.options}" id="placement-filter-{{:: entity.filter.name }}" ng-model="editor.afform.placement_filters[entity.filter.name]" >
       </div>
       <div class="form-inline">
-        <label for="afform_placement_weight">{{:: ts('Position') }}</label>
-        <input class="form-control" type="number" id="afform_placement_weight" ng-model="editor.afform.placement_weight" placeholder="{{:: ts('Auto') }}">
+        <label for="afform_placement_weight">
+          {{:: editor.meta.afform_fields.placement_weight.title }}
+          <a crm-ui-help="hs({id: 'placement_weight', title: editor.meta.afform_fields.placement_weight.title})"></a>
+        </label>
+        <input class="form-control six" type="number" id="afform_placement_weight" ng-model="editor.afform.placement_weight" placeholder="{{:: ts('Auto') }}">
       </div>
     </div>
 
@@ -148,20 +148,17 @@
       <div class="form-group">
         <label>
           <input type="checkbox" ng-model="editor.afform.autosave_draft">
-          {{:: ts('Autosave Draft') }}
+          {{:: editor.meta.afform_fields.autosave_draft.title }}
+          <a crm-ui-help="hs({id: 'autosave_draft', title: editor.meta.afform_fields.autosave_draft.title})"></a>
         </label>
-        <p class="help-block">
-          {{:: ts('For authenticated users, form will auto-save periodically.') }}
-          {{:: ts('You may also place a "Save Draft" button on the form, with or without Autosave enabled.') }}
-        </p>
       </div>
 
       <div class="form-group">
         <label>
           <input type="checkbox" ng-model="editor.afform.create_submission" ng-class="{'disabled': !!editor.afform.require_email_confirmation}">
-          {{:: ts('Log Submissions') }}
+          {{:: editor.meta.afform_fields.create_submission.title }}
+          <a crm-ui-help="hs({id: 'create_submission', title: editor.meta.afform_fields.create_submission.title})"></a>
         </label>
-        <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
       </div>
 
       <div class="crm-flex-box" ng-if="editor.afform.create_submission">
@@ -178,17 +175,17 @@
       <div class="form-group">
         <label>
           <input type="checkbox" ng-model="editor.afform.manual_processing" ng-click="editor.toggleManualProcessing()" ng-class="{'disabled': !!editor.afform.allow_verification_by_email}">
-          {{:: ts('Verify submission before processing') }}
+          {{:: editor.meta.afform_fields.manual_processing.title }}
+          <a crm-ui-help="hs({id: 'manual_processing', title: editor.meta.afform_fields.manual_processing.title})"></a>
         </label>
-        <p class="help-block">{{:: ts('The data will need to be processed manually using Form Submission action.') }}</p>
       </div>
 
       <div class="form-group" ng-if="!!editor.afform.manual_processing">
         <label>
           <input type="checkbox" ng-model="editor.afform.allow_verification_by_email" ng-click="editor.toggleEmailVerification()">
-          {{:: ts('Allow verification by email') }}
+          {{:: editor.meta.afform_fields.allow_verification_by_email.title }}
+          <a crm-ui-help="hs({id: 'allow_verification_by_email', title: editor.meta.afform_fields.allow_verification_by_email.title})"></a>
         </label>
-        <p class="help-block">{{:: ts('The data can be processed via email verification. Email field should be included in the form for this functionality.') }}</p>
         <div class="form-inline" ng-if="editor.afform.allow_verification_by_email">
           <label>{{:: ts('Email template') }}</label>
           <input class="form-control" crm-autocomplete="'MessageTemplate'" id="afform_email_confirmation_template_id" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('- select -') }}">
@@ -197,11 +194,12 @@
 
       <div class="form-group">
         <label>
-          {{:: ts('Confirmation type') }}
+          {{:: editor.meta.afform_fields.confirmation_type.title }}
+          <a crm-ui-help="hs({id: 'confirmation_type', title: editor.meta.afform_fields.confirmation_type.title})"></a>
         </label>
         <p class="form-inline">
-          <label class="radio" ng-repeat="ctype in editor.meta.confirmation_types">
-            <input class="crm-form-radio" type="radio" name="confirmation_type" ng-model="editor.afform.confirmation_type" ng-value="ctype.value">
+          <label class="radio" ng-repeat="ctype in editor.meta.afform_fields.confirmation_type.options">
+            <input class="crm-form-radio" type="radio" name="confirmation_type" ng-model="editor.afform.confirmation_type" ng-value="ctype.id">
             {{:: ctype.label }}
           </label>
         </p>

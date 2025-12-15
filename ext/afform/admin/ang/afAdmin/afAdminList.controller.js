@@ -11,7 +11,7 @@
 
     $scope.searchCreateLinks = {};
 
-    this.tabs = CRM.afAdmin.afform_type;
+    this.tabs = CRM.afAdmin.afform_fields.type.options;
     $scope.types = _.indexBy(ctrl.tabs, 'name');
     ['form', 'block', 'search'].forEach(type => {
       if ($scope.types[type]) {
