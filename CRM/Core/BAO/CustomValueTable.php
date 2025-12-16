@@ -430,10 +430,11 @@ class CRM_Core_BAO_CustomValueTable {
    * @param array $params
    * @param string $entityTable
    * @param int $entityID
-   * @param string $customFieldExtends
+   * @param ?string $customFieldExtends
+   *   Can be null for multivalued fields
    * @param ?string $parentOperation
    */
-  public static function postProcess(array &$params, string $entityTable, int $entityID, string $customFieldExtends, ?string $parentOperation = NULL) {
+  public static function postProcess(array &$params, string $entityTable, int $entityID, ?string $customFieldExtends, ?string $parentOperation = NULL) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
       $entityID,
       $customFieldExtends
