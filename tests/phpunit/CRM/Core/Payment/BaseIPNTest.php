@@ -124,7 +124,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, ['invoice_id' => 'abc']));
     $this->_contributionId = $contribution['id'];
 
-    $this->_membershipTypeID = $this->membershipTypeCreate(['name' => 'Fowl']);
+    $this->_membershipTypeID = $this->membershipTypeCreate(['title' => 'Fowl']);
     $this->_setUpMembershipObjects();
     $this->input['invoiceID'] = 'abc';
     $contribution = new CRM_Contribute_BAO_Contribution();

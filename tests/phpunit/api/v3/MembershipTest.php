@@ -52,7 +52,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'fixed_period_start_day' => '301',
       // Ie. 11 Nov.
       'fixed_period_rollover_day' => '1111',
-      'name' => 'Another one',
+      'title' => 'Another one',
     ]);
     $this->_membershipStatusID = $this->membershipStatusCreate();
 

@@ -23,6 +23,7 @@
       <thead>
       <tr>
         <th>{ts}Membership{/ts}</th>
+        <th>{ts}Frontend Title{/ts}</th>
         <th>{ts}Period{/ts}</th>
         <th>{ts}Fixed Start{/ts}</th>
         <th>{ts}Minimum Fee{/ts}</th>
@@ -38,7 +39,8 @@
       </thead>
       {foreach from=$rows item=row}
         <tr id="membership_type-{$row.id}" class="crm-entity {cycle values='odd-row,even-row'} crm-membership-type {if NOT $row.is_active} disabled{/if}">
-          <td class="crmf-name crm-editable" data-field="name">{$row.name}</td>
+          <td class="crm-editable" data-field="title">{$row.title}</td>
+          <td class="crm-editable" data-field="frontend_title">{$row.frontend_title}</td>
           <td class="crmf-period_type crm-editable" data-type="select">{$row.period_type}</td>
           <td class="crmf-fixed_period_start_day">{$row.fixed_period_start_day}</td>
           <td class="crmf-minimum_fee" align="right">{$row.minimum_fee|crmMoney}</td>
@@ -64,7 +66,7 @@
 {else}
   {if $action ne 1}
   <div class="messages status no-popup">
-    {icon icon="fa-info-circle"}{/icon} 
+    {icon icon="fa-info-circle"}{/icon}
     {capture assign=crmURL}{crmURL p='civicrm/admin/member/membershipType/add' q="action=add&reset=1"}{/capture}{ts 1=$crmURL}There are no membership types entered. You can <a href='%1'>add one</a>.{/ts}
   </div>
   {/if}

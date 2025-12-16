@@ -416,7 +416,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipBlockTwoTypesIsSeparatePayment(): void {
     $this->ids['MembershipType'] = [$this->membershipTypeCreate(['minimum_fee' => 6])];
-    $this->ids['MembershipType'][] = $this->membershipTypeCreate(['name' => 'Student', 'minimum_fee' => 50]);
+    $this->ids['MembershipType'][] = $this->membershipTypeCreate(['title' => 'Student', 'minimum_fee' => 50]);
     $this->setUpMembershipContributionPage(TRUE);
     $submitParams = $this->getSubmitParamsContributionPlusMembership(FALSE, 'student');
 
@@ -755,7 +755,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['recur_frequency_unit'] = 'year';
     $this->setUpMembershipContributionPage();
     $this->setDummyProcessorResult(['payment_status_id' => 2]);
-    $this->membershipTypeCreate(['name' => 'Student']);
+    $this->membershipTypeCreate(['title' => 'Student']);
 
     // Add a contribution & a couple of memberships so the id will not be 1 & will differ from membership id.
     // This saves us from 'accidental success'.

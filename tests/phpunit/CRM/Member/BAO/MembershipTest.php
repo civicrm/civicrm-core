@@ -59,7 +59,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'duration_unit' => 'year',
       'duration_interval' => 1,
       'period_type' => 'rolling',
-      'name' => 'Organization Membership Type',
+      'name' => 'Organization Membership Type' . ($withRelationship ? '1' : '0'),
+      'title' => 'Organization Membership Type',
       'relationship_type_id' => ($withRelationship) ? 5 : NULL,
       'relationship_direction' => ($withRelationship) ? 'b_a' : NULL,
       'max_related' => $maxRelated ?: NULL,
@@ -263,7 +264,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   public function testGetAllContactMembership(): void {
     $lifetimeTypeId = $this->membershipTypeCreate([
-      'name' => 'Lifetime',
+      'title' => 'Lifetime',
       'duration_unit' => 'lifetime',
     ]);
 
@@ -558,8 +559,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testMembershipPaymentForSingleContributionMultipleMembership(): void {
-    $membershipTypeID1 = $this->membershipTypeCreate(['name' => 'Parent']);
-    $membershipTypeID2 = $this->membershipTypeCreate(['name' => 'Child']);
+    $membershipTypeID1 = $this->membershipTypeCreate(['title' => 'Parent']);
+    $membershipTypeID2 = $this->membershipTypeCreate(['title' => 'Child']);
     $financialTypeId = $this->getFinancialTypeID('Member Dues');
     $priceSet = $this->callAPISuccess('price_set', 'create', [
       'is_quick_config' => 0,
@@ -703,7 +704,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'id' => 1,
       'minimum_fee' => 100.00,
       'name' => 'General',
-      'is_active' => 1,
+      'is_active' => TRUE,
       'description' => 'Regular annual membership.',
       'financial_type_id' => 2,
       'auto_renew' => 0,
@@ -723,6 +724,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'fixed_period_rollover_day' => NULL,
       'receipt_text_signup' => NULL,
       'receipt_text_renewal' => NULL,
+      'title' => 'General',
+      'frontend_title' => 'General',
     ], $values[1]);
   }
 

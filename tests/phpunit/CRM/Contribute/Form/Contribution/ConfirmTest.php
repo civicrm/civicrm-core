@@ -810,14 +810,14 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   public function setUpMultiIntervalMembershipContributionPage(): void {
     // These all have auto_renew set to 2 - ie require auto-renew.
     $this->membershipTypeCreate([
-      'name' => 'monthly',
+      'title' => 'monthly',
       'auto_renew' => 2,
       'duration_unit' => 'month',
       'minimum_fee' => 10,
     ], 'monthly');
 
     $this->membershipTypeCreate([
-      'name' => 'bi_monthly',
+      'title' => 'bi_monthly',
       'auto_renew' => 2,
       'duration_unit' => 'month',
       'duration_interval' => 2,
@@ -826,7 +826,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $this->membershipTypeCreate([
       'auto_renew' => 2,
-      'name' => 'yearly',
+      'title' => 'yearly',
       'duration_unit' => 'year',
       'minimum_fee' => 100,
     ], 'yearly');
