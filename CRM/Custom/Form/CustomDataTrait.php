@@ -73,7 +73,8 @@ trait CRM_Custom_Form_CustomDataTrait {
         $groupField['custom_group_id.is_multiple'] = $customGroup['is_multiple'];
         $groupField['table_name'] = $customGroup['table_name'];
         $groupField['custom_field_id'] = $groupField['id'];
-        $groupField['required'] = $groupField['is_required'];
+        // dev/core#6124 QuickForms set 'required' based on other criteria
+        $groupField['required'] = FALSE;
         $groupField['input_type'] = $groupField['html_type'];
         $fields[$groupField['id']] = $groupField;
       }
