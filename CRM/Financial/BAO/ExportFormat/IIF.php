@@ -96,7 +96,6 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
    * @return Object
    */
   public function generateExportQuery($batchId) {
-
     $sql = "SELECT
       ft.id as financial_trxn_id,
       ft.trxn_date,
@@ -136,10 +135,13 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
       LEFT JOIN civicrm_contact contact_to ON contact_to.id = fa_to.contact_id
       LEFT JOIN civicrm_entity_financial_trxn efti ON (efti.financial_trxn_id  = ft.id AND efti.entity_table = 'civicrm_financial_item')
       LEFT JOIN civicrm_financial_item fi ON fi.id = efti.entity_id
-      WHERE eb.batch_id = ( %1 )";
+      WHERE eb.batch_id = ( %1 )
+      GROUP BY ft.id";
 
     $params = [1 => [$batchId, 'String']];
+    CRM_Core_DAO::disableFullGroupByMode();
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     return $dao;
   }

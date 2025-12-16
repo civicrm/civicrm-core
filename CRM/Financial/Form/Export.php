@@ -16,9 +16,8 @@
  */
 
 /**
- * This class provides the functionality to delete a group of
- * contributions. This class provides functionality for the actual
- * deletion.
+ * This class provides the functionality to export batches to file
+ *
  */
 class CRM_Financial_Form_Export extends CRM_Core_Form {
 

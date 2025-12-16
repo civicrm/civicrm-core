@@ -97,12 +97,15 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       LEFT JOIN civicrm_financial_item fi ON fi.id = efti.entity_id
       LEFT JOIN civicrm_financial_account fac ON fac.id = fi.financial_account_id
       LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
-      WHERE eb.batch_id = ( %1 )";
+      WHERE eb.batch_id = ( %1 )
+      GROUP BY ft.id";
 
     CRM_Utils_Hook::batchQuery($sql);
 
     $params = [1 => [$batchId, 'String']];
+    CRM_Core_DAO::disableFullGroupByMode();
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     return $dao;
   }
