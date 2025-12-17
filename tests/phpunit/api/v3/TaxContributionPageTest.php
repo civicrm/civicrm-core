@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\EntityFinancialAccount;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\FinancialAccount;
@@ -87,7 +88,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     // Financial type having 'Sales Tax Account is' with liability financial account
     $this->financialTypeID = $this->callAPISuccess('FinancialType', 'create', [
-      'name' => 'grass_variety_1',
+      'name' => 'type_with_tax',
       'is_reserved' => 0,
       'is_active' => 1,
     ])['id'];
@@ -353,27 +354,24 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['individual'],
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->financialTypeID,
+      'financial_type_id' => 'type_with_tax',
       'source' => 'SSF',
-      'contribution_status_id' => 1,
+      'contribution_status_id' => 'Completed',
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
-    $lineItems = $this->callAPISuccess('line_item', 'getvalue', [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'sequential' => 1,
-      'return' => 'line_total',
-    ]);
-    $this->assertEquals('100.00', $lineItems);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->first();
+    $this->assertEquals('100', $lineItem['line_total']);
+    $this->assertEquals('20', $lineItem['tax_amount']);
     $trxnAmount = $this->getFinancialTrxnAmount($contribution['id']);
     $this->assertEquals('120.00', $trxnAmount);
-    $newParams = [
-      'id' => $contribution['id'],
+
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
       // without tax rate i.e Donation
-      'financial_type_id' => 1,
-      'total_amount' => '300',
-    ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+      ->setValues(['total_amount' => 300, 'financial_type_id:name' => 'Donation'])
+      ->execute();
 
     $lineItem = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['id'])
@@ -384,6 +382,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $financialItems = FinancialItem::get(FALSE)
       ->addWhere('entity_id', '=', $lineItem['id'])
       ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addSelect('amount', 'financial_account_id:name', 'description')
       ->execute();
     $amount = 0;
     foreach ($financialItems as $financialItem) {
