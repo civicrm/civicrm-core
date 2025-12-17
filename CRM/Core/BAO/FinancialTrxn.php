@@ -559,6 +559,7 @@ WHERE ceft.entity_id = %1";
    *
    * @param array $inputParams
    *
+   * @deprecated since 6.10 will be removed around 6.16
    */
   public static function updateFinancialAccountsOnPaymentInstrumentChange($inputParams) {
     $prevContribution = $inputParams['prevContribution'];
