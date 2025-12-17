@@ -330,7 +330,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // of Payment.create handling of trxn_date will tighten up.
       'trxn_date' => $this->getInputValue('receive_date') ?: date('YmdHis'),
       'currency' => $this->getUpdatedContribution()->currency,
-      'trxn_id' => $this->getUpdatedContribution()->trxn_id,
+      // CRM-17751
+      'trxn_id' => $this->getInputValue('trxn_id') ?: $this->getUpdatedContribution()->trxn_id ?: $this->getOriginalContributionValue('trxn_id'),
       'payment_instrument_id' => $this->getInputValue('payment_instrument_id') ?: $this->getUpdatedContribution()->payment_instrument_id,
       'check_number' => $this->getInputValue('check_number'),
       'pan_truncation' => $this->getInputValue('pan_truncation'),
