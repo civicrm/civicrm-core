@@ -2818,7 +2818,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['net_amount'] = $params['net_amount'] ?? NULL;
         $totalAmount = $contribution->total_amount ?? 0;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
-        $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
         if ($financialProcessor->isContributionTotalChanged() && !$financialProcessor->isFinancialAccountChanged()) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
