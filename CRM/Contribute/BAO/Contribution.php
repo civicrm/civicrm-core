@@ -2809,12 +2809,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $updated = TRUE;
         }
 
-        // change Payment Instrument for a Completed contribution
-        // first handle special case when contribution is changed from Pending to Completed status when initial payment
-        // instrument is null and now new payment instrument is added along with the payment
-        $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
-        $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
-
         if ($financialProcessor->isPaymentInstrumentChange($params)) {
           $updated = $financialProcessor->updateFinancialAccountsOnPaymentInstrumentChange($params);
         }
