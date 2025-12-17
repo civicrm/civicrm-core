@@ -145,8 +145,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       }
     }
 
-    $setPrevContribution = TRUE;
-    if ($contributionID && $setPrevContribution) {
+    if ($contributionID) {
       $params['prevContribution'] = self::getOriginalContribution($contributionID);
     }
     $previousContributionStatus = ($contributionID && !empty($params['prevContribution'])) ? CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['prevContribution']->contribution_status_id) : NULL;
@@ -176,7 +175,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     if (($params['tax_amount'] ?? '') === 'null') {
       CRM_Core_Error::deprecatedWarning('tax_amount should be not passed in (preferable) or a float');
     }
-    if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) ||
+    if (!isset($params['tax_amount']) && (isset($params['total_amount']) ||
      isset($params['financial_type_id']))) {
       $params['tax_amount'] = $taxAmount;
     }
