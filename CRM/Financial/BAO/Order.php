@@ -981,16 +981,7 @@ class CRM_Financial_BAO_Order {
    */
   protected function calculateLineItems(): array {
     $lineItems = [];
-    $params = $this->getPriceSelection();
-    if ($this->getOverrideTotalAmount() !== FALSE) {
-      // We need to do this to keep getLine from doing weird stuff but the goal
-      // is to ditch getLine next round of refactoring
-      // and make the code more sane.
-      $params['total_amount'] = $this->getOverrideTotalAmount();
-    }
 
-    // Dummy value to prevent e-notice in getLine. We calculate tax in this class.
-    $params['financial_type_id'] = 0;
     if ($this->getTemplateContributionID()) {
       $lineItems = $this->getLinesFromTemplateContribution();
       // Set the price set ID from the first line item (we need to set this here
@@ -1013,13 +1004,9 @@ class CRM_Financial_BAO_Order {
       }
     }
     else {
-      foreach ($this->getPriceOptions() as $fieldID => $valueID) {
-        if ($valueID !== '') {
-          $this->setPriceSetIDFromSelectedField($fieldID);
-          $throwAwayArray = [];
-          $temporaryParams = $params;
-          // @todo - still using getLine for now but better to bring it to this class & do a better job.
-          $newLines = CRM_Price_BAO_PriceSet::getLine($temporaryParams, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
+      foreach ($this->getPriceOptions() as $priceFieldID => $priceFieldValueID) {
+        if ($priceFieldValueID !== '') {
+          $newLines = $this->getLine($priceFieldID);
           foreach ($newLines as $newLine) {
             $lineItems[$newLine['price_field_value_id']] = $newLine;
           }
@@ -1636,6 +1623,97 @@ class CRM_Financial_BAO_Order {
 
   public function setExistingContributionID(?int $existingContributionID): void {
     $this->existingContributionID = $existingContributionID;
+  }
+
+  /**
+   * Get the relevant line item.
+   *
+   * @param int $priceFieldID
+   *
+   * @return array
+   *
+   * @todo: Copied from CRM_Price_BAO_PriceSet so we can refactor/simplify/remove
+   */
+  private function getLine(int $priceFieldID): array {
+    $priceSelection = $this->getPriceSelection();
+    $priceField = $this->getPriceFieldSpec($priceFieldID);
+
+    switch ($priceField['html_type']) {
+      case 'Text':
+        $firstOption = reset($priceField['options']);
+        $params = [
+          "price_{$priceFieldID}" => [$firstOption['id'] => $priceSelection["price_{$priceFieldID}"]],
+        ];
+        CRM_Price_BAO_LineItem::format($priceFieldID, $params, $priceField, $lineItem);
+        $optionValueId = key($priceField['options']);
+        if (!empty($priceField['options'][$optionValueId]['tax_rate'])) {
+          $lineItem = self::setTaxOnLineItem($priceField, $lineItem, $optionValueId);
+        }
+        break;
+
+      case 'Select':
+      case 'Radio':
+        // special case if user select -none-
+        if ($priceSelection["price_{$priceFieldID}"] <= 0) {
+          break;
+        }
+
+        // Sometimes the amount is overridden by the amount on the form.
+        // This is notably the case with memberships and we need to put this amount
+        // on the line item rather than the calculated amount.
+        // This seems to only affect radio link items as that is the use case for the 'quick config'
+        // set up (which allows a free form field).
+        // Can only override if there is only one priceField
+        if (is_array($priceSelection["price_{$priceFieldID}"]) && count($priceSelection["price_{$priceFieldID}"]) === 1) {
+          $amountOverride = $this->getOverrideTotalAmount() ? $this->getOverrideTotalAmount() : NULL;
+        }
+
+        $params = [
+          "price_{$priceFieldID}" => [$priceSelection["price_{$priceFieldID}"] => 1],
+        ];
+        CRM_Price_BAO_LineItem::format($priceFieldID, $params, $priceField, $lineItem, $amountOverride ?? NULL);
+        $optionValueId = CRM_Utils_Array::key(1, $params["price_{$priceFieldID}"]);
+        if (!empty($priceField['options'][$optionValueId]['tax_rate'])) {
+          $lineItem = self::setTaxOnLineItem($priceField, $lineItem, $optionValueId);
+        }
+        break;
+
+      case 'CheckBox':
+        CRM_Price_BAO_LineItem::format($priceFieldID, $priceSelection, $priceField, $lineItem);
+        foreach ($priceSelection["price_{$priceFieldID}"] as $optionValueId => $option) {
+          if (!empty($priceField['options'][$optionValueId]['tax_rate'])) {
+            $lineItem = self::setTaxOnLineItem($priceField, $lineItem, $optionValueId);
+          }
+        }
+        break;
+    }
+
+    return $lineItem ?? [];
+  }
+
+  /**
+   * Function to set tax_amount and tax_rate in LineItem.
+   *
+   * @param array $priceField
+   * @param array $lineItem
+   * @param int $optionValueId
+   *
+   * @return array
+   *
+   * @todo: Copied from CRM_Price_BAO_PriceSet so we can refactor/simplify/remove
+   */
+  private static function setTaxOnLineItem(array $priceField, array $lineItem, int $optionValueId): array {
+    // Here we round - i.e. after multiplying by quantity
+    if ($priceField['html_type'] === 'Text') {
+      $taxAmount = round($priceField['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'], 2);
+    }
+    else {
+      $taxAmount = round($priceField['options'][$optionValueId]['tax_amount'], 2);
+    }
+    $taxRate = $priceField['options'][$optionValueId]['tax_rate'];
+    $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
+    $lineItem[$optionValueId]['tax_rate'] = $taxRate;
+    return $lineItem;
   }
 
 }
