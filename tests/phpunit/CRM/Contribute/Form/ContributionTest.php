@@ -1078,7 +1078,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1000, $lineItem['line_total']);
     $this->assertEquals(100, $lineItem['tax_amount']);
 
-    // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same
+    // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same,
+    // given it is being changed to a financial type with the same tax calculation.
+    $this->addTaxAccountToFinancialType(3);
     $this->submitContributionForm([
       'id' => $contribution['id'],
       'financial_type_id' => 3,
