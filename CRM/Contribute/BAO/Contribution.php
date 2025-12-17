@@ -2779,17 +2779,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           if (isset($params['fee_amount'])) {
             $params['trxnParams']['fee_amount'] = 0 - $params['fee_amount'];
           }
-          if ($financialProcessor->isAccountsReceivableTransaction()) {
-            $accountRelationship = $contribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
-            $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-              $params['prevContribution']->financial_type_id, $accountRelationship);
-          }
-          else {
-            $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC');
-            if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
-              $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
-            }
-          }
           $financialProcessor->updateFinancialAccounts($params, 'changeFinancialType');
           $params['skipLineItem'] = FALSE;
           CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changeFinancialType');

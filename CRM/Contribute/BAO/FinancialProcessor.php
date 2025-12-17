@@ -376,6 +376,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $trxnParams['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
         $trxnParams['check_number'] = $params['prevContribution']->check_number;
       }
+      // It's unclear why we only set these on update.
+      if ($this->isAccountsReceivableTransaction()) {
+        $accountRelationship = $this->getUpdatedContribution()->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
+        $trxnParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+          $this->getOriginalContribution()->financial_type_id, $accountRelationship);
+      }
+      else {
+        $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getUpdatedContribution()->id, 'DESC');
+        if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
+          $trxnParams['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
+        }
+      }
     }
     return $trxnParams;
   }
