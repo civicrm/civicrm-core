@@ -2805,13 +2805,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
             }
           }
-          $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
           $financialProcessor->updateFinancialAccounts($params, 'changeFinancialType');
           $params['skipLineItem'] = FALSE;
           CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changeFinancialType');
           /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
           $params['financial_account_id'] = $financialProcessor->getUpdatedFinancialAccount();
-          $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
           // Set the transaction fee amount back to the original value for creating the new positive financial trxn.
           if (isset($params['fee_amount'])) {
             $params['trxnParams']['fee_amount'] = $params['fee_amount'];
