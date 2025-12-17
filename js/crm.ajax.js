@@ -323,6 +323,23 @@
           that._onError(data);
           return;
         }
+        if (data.settings) {
+          $.extend(true, CRM, data.settings);
+        }
+        if (data.scriptUrls) {
+          data.scriptUrls.forEach(function(scriptUrl) {
+            if ($('script[src="' + scriptUrl + '"]').length === 0) {
+              $('<script type="text/javascript" src="' + scriptUrl + '"></script>').appendTo('head');
+            }
+          });
+        }
+        if (data.styleUrls) {
+          data.styleUrls.forEach(function(styleUrl) {
+            if ($('link[href="' + styleUrl + '"]').length === 0) {
+              $('<link rel="stylesheet" href="' + styleUrl + '">').appendTo('head');
+            }
+          });
+        }
         data.url = url;
         that.element.trigger('crmUnload').trigger('crmBeforeLoad', data);
         that._beforeRemovingContent();
