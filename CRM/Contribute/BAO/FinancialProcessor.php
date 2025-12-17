@@ -369,6 +369,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // to the only place it is actually used - maybe it makes more sense?
       $trxnParams['status_id'] = $this->updatedContribution->contribution_status_id;
     }
+    else {
+      if (!(($this->getOriginalContributionStatus() === 'Pending' || $this->getOriginalContributionStatus() === 'In Progress')
+        && $this->getUpdatedContributionStatus() === 'Completed')
+      ) {
+        $trxnParams['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+        $trxnParams['check_number'] = $params['prevContribution']->check_number;
+      }
+    }
     return $trxnParams;
   }
 

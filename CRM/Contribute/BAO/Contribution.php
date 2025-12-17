@@ -2770,13 +2770,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
-        $previousContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['prevContribution']->contribution_status_id);
-        if (!(($previousContributionStatus === 'Pending' || $previousContributionStatus === 'In Progress')
-          && $contributionStatus === 'Completed')
-        ) {
-          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
-          $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
-        }
 
         //if financial account is changed
         if ($financialProcessor->isFinancialAccountChanged()) {
