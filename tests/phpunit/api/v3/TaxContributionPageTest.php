@@ -384,11 +384,30 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_line_item')
       ->addSelect('amount', 'financial_account_id:name', 'description')
       ->execute();
-    $amount = 0;
-    foreach ($financialItems as $financialItem) {
-      $amount += $financialItem['amount'];
-    }
-    $this->assertEquals('300.00', $amount);
+
+    // The first 2 financial items are the Original 100 line item
+    // and the $20 sales tax on that line.
+    $this->assertEquals([
+      'id' => $financialItems[0]['id'],
+      'amount' => 100,
+      'description' => 'Contribution Amount',
+      'financial_account_id:name' => 'type_with_tax',
+    ], $financialItems[0]);
+    $this->assertEquals([
+      'id' => $financialItems[1]['id'],
+      'amount' => 20,
+      'description' => 'Sales Tax',
+      'financial_account_id:name' => 'vat full tax rate account',
+    ], $financialItems[1]);
+
+    // Next these lines are reversed...
+    $this->assertEquals([
+      'id' => $financialItems[1]['id'],
+      'amount' => -100,
+      'description' => 'Sales Tax',
+      'financial_account_id:name' => 'Sales Tax',
+    ], $financialItems[2]);
+
   }
 
   /**
