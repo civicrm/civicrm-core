@@ -145,9 +145,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       }
     }
 
-    $setPrevContribution = TRUE;
-    if ($contributionID && $setPrevContribution) {
+    $previousLineItems = [];
+    if ($contributionID) {
       $params['prevContribution'] = self::getOriginalContribution($contributionID);
+      $order = new CRM_Financial_BAO_Order();
+      $order->setExistingContributionID($contributionID);
+      $previousLineItems = $order->getLineItems();
     }
     $previousContributionStatus = ($contributionID && !empty($params['prevContribution'])) ? CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['prevContribution']->contribution_status_id) : NULL;
 
@@ -176,7 +179,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     if (($params['tax_amount'] ?? '') === 'null') {
       CRM_Core_Error::deprecatedWarning('tax_amount should be not passed in (preferable) or a float');
     }
-    if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) ||
+    if (!isset($params['tax_amount']) && (isset($params['total_amount']) ||
      isset($params['financial_type_id']))) {
       $params['tax_amount'] = $taxAmount;
     }
@@ -232,7 +235,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       // Note that leveraging this parameter for any other code flow is not supported and
       // is likely to break in future and / or cause serious problems in your data.
       // https://github.com/civicrm/civicrm-core/pull/14673
-      self::recordFinancialAccounts($params, $contribution);
+      $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems);
+      self::recordFinancialAccounts($params, $contribution, $financialProcessor);
     }
 
     if (self::isUpdateToRecurringContribution($params)) {
@@ -2737,13 +2741,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @param array $params
    *   Contribution object, line item array and params for trxn.
-   * @param \CRM_Contribute_DAO_Contribution $contribution
+   * @param CRM_Contribute_DAO_Contribution $contribution
+   * @param CRM_Contribute_BAO_FinancialProcessor $financialProcessor
    * @throws CRM_Core_Exception
    */
-  private static function recordFinancialAccounts(array &$params, CRM_Contribute_DAO_Contribution $contribution): void {
+  private static function recordFinancialAccounts(array &$params, CRM_Contribute_DAO_Contribution $contribution, CRM_Contribute_BAO_FinancialProcessor $financialProcessor): void {
     $skipRecords = FALSE;
     $isUpdate = !empty($params['prevContribution']);
-    $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution);
 
     $contributionStatus = $financialProcessor->getUpdatedContributionStatus();
 
