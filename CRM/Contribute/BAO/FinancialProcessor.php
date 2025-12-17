@@ -197,12 +197,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $financialAccount = CRM_Contribute_BAO_FinancialProcessor::getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
 
       $previousLineItemTotal = $previousLineItem['line_total'] ?? 0;
-      $isContributionStatusNegative = CRM_Contribute_BAO_Contribution::isContributionStatusNegative($postUpdateContribution->contribution_status_id);
       $itemParams = [
         'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
         'contact_id' => $postUpdateContribution->contact_id,
         'currency' => $postUpdateContribution->currency,
-        'amount' => $this->getFinancialItemAmountFromParams($isContributionStatusNegative, $context, $lineItemDetails, $previousLineItemTotal),
+        'amount' => $this->getFinancialItemAmountFromParams($context, $lineItemDetails, $previousLineItemTotal),
         'description' => $prevFinancialItem['description'] ?? NULL,
         'status_id' => $prevFinancialItem['status_id'],
         'financial_account_id' => $financialAccount,
@@ -267,9 +266,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * for historical reasons. Going forwards we can hope to add tests & improve readibility
    * of that function
    *
-   * @param bool $isContributionStatusNegative
-   *  Is the (new) contribution status negative
-   *
    * @param string $context
    *   changeFinancialType| changedAmount
    * @param array $lineItemDetails
@@ -280,22 +276,23 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @todo move recordFinancialAccounts & helper functions to their own class?
    *
    */
-  protected function getFinancialItemAmountFromParams(bool $isContributionStatusNegative, $context, $lineItemDetails, $previousLineItemTotal) {
-    if ($context == 'changedAmount') {
+  protected function getFinancialItemAmountFromParams($context, $lineItemDetails, $previousLineItemTotal) {
+    if ($context === 'changedAmount') {
       $lineTotal = $lineItemDetails['line_total'];
       if ($lineTotal != $previousLineItemTotal) {
         $lineTotal -= $previousLineItemTotal;
       }
       return $lineTotal;
     }
-    elseif ($context == 'changeFinancialType') {
+    elseif ($context === 'changeFinancialType') {
       return -$lineItemDetails['line_total'];
     }
-    elseif ($context == 'changedStatus') {
+    elseif ($context === 'changedStatus') {
       $cancelledTaxAmount = 0;
       if ($this->isContributionUpdateARefund()) {
         $cancelledTaxAmount = $lineItemDetails['tax_amount'] ?? '0.00';
       }
+      $isContributionStatusNegative = CRM_Contribute_BAO_Contribution::isContributionStatusNegative($this->updatedContribution->contribution_status_id);
       return ($isContributionStatusNegative ? -1 : 1) * ((float) $lineItemDetails['line_total'] + (float) $cancelledTaxAmount);
     }
     elseif ($context === NULL) {
