@@ -518,30 +518,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * assignProportionalLineItems() method (add and edit modes of participant)
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testAssignProportionalLineItems(): void {
-    // This test doesn't seem to manage financials properly, possibly by design
-    $this->isValidateFinancialsOnPostAssert = FALSE;
-    $contribution = $this->addParticipantWithContribution();
-    // Delete existing financial_trxns. This is because we are testing a code flow we
-    // want to deprecate & remove & the test relies on bad data asa starting point.
-    // End goal is the Order.create->Payment.create flow.
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_entity_financial_trxn WHERE entity_table = "civicrm_financial_item"');
-    $params = [
-      'contribution_id' => $contribution->id,
-      'total_amount' => 150.00,
-    ];
-    $trxn = new CRM_Financial_DAO_FinancialTrxn();
-    $trxn->orderBy('id DESC');
-    $trxn->find(TRUE);
-    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution->total_amount);
-    $this->checkItemValues($contribution);
-  }
-
-  /**
    * Add participant with contribution
    *
    * @return CRM_Contribute_BAO_Contribution
@@ -815,84 +791,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $expectedResult[$financialAccount->financial_account_id] = $financialAccount->financial_account_id;
     $salesTaxFinancialAccount = CRM_Contribute_BAO_Contribution::getSalesTaxFinancialAccounts();
     $this->assertEquals($salesTaxFinancialAccount, $expectedResult);
-  }
-
-  /**
-   * Test for function createProportionalEntry().
-   *
-   * @param string $thousandSeparator
-   *   punctuation used to refer to thousands.
-   *
-   * @dataProvider getThousandSeparators
-   * @throws \CRM_Core_Exception
-   */
-  public function testCreateProportionalEntry(string $thousandSeparator): void {
-    $this->setCurrencySeparators($thousandSeparator);
-    [$contribution, $financialAccount] = $this->createContributionWithTax();
-    $params = [
-      'total_amount' => 55,
-      'to_financial_account_id' => $financialAccount->financial_account_id,
-      'payment_instrument_id' => 1,
-      'trxn_date' => date('Ymd'),
-      'status_id' => 1,
-      'entity_id' => $contribution['id'],
-    ];
-    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $entityParams = [
-      'contribution_total_amount' => $contribution['total_amount'],
-      'trxn_total_amount' => 55,
-      'line_item_amount' => 100,
-    ];
-    $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
-    $eftParams = [
-      'entity_table' => 'civicrm_financial_item',
-      'entity_id' => $previousLineItem['id'],
-      'financial_trxn_id' => (string) $financialTrxn['id'],
-    ];
-    CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
-    $trxnTestArray = array_merge($eftParams, [
-      'amount' => '50.00',
-    ]);
-    $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
-  }
-
-  /**
-   * Test for function createProportionalEntry with zero amount().
-   *
-   * @param string $thousandSeparator
-   *   punctuation used to refer to thousands.
-   *
-   * @throws \CRM_Core_Exception
-   * @dataProvider getThousandSeparators
-   */
-  public function testCreateProportionalEntryZeroAmount(string $thousandSeparator): void {
-    $this->setCurrencySeparators($thousandSeparator);
-    [$contribution, $financialAccount] = $this->createContributionWithTax(['total_amount' => 0]);
-    $params = [
-      'total_amount' => 0,
-      'to_financial_account_id' => $financialAccount->financial_account_id,
-      'payment_instrument_id' => 1,
-      'trxn_date' => date('Ymd'),
-      'status_id' => 1,
-      'entity_id' => $contribution['id'],
-    ];
-    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $entityParams = [
-      'contribution_total_amount' => $contribution['total_amount'],
-      'trxn_total_amount' => 0,
-      'line_item_amount' => 0,
-    ];
-    $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
-    $eftParams = [
-      'entity_table' => 'civicrm_financial_item',
-      'entity_id' => $previousLineItem['id'],
-      'financial_trxn_id' => (string) $financialTrxn['id'],
-    ];
-    CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
-    $trxnTestArray = array_merge($eftParams, [
-      'amount' => '0.00',
-    ]);
-    $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
   }
 
   /**

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialTrxn;
+
 /**
  * Class for handling processing of financial records.
  *
@@ -553,6 +555,127 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * The function is responsible for handling financial entries if payment instrument is changed
+   *
+   * @param array $inputParams
+   *
+   */
+  public function updateFinancialAccountsOnPaymentInstrumentChange($inputParams) {
+    $prevContribution = $inputParams['prevContribution'];
+    $currentContribution = $inputParams['contribution'];
+    // ensure that there are all the information in updated contribution object identified by $currentContribution
+    $currentContribution->find(TRUE);
+
+    $deferredFinancialAccount = $inputParams['deferred_financial_account_id'] ?? NULL;
+    if (empty($deferredFinancialAccount)) {
+      $deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($prevContribution->financial_type_id, 'Deferred Revenue Account is');
+    }
+
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($prevContribution->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
+
+    // there is no point to proceed as we can't find the last payment made
+    // @todo we should throw an exception here rather than return false.
+    if (empty($lastFinancialTrxnId['financialTrxnId'])) {
+      return FALSE;
+    }
+
+    // If payment instrument is changed reverse the last payment
+    //  in terms of reversing financial item and trxn
+    $lastFinancialTrxn = civicrm_api3('FinancialTrxn', 'getsingle', ['id' => $lastFinancialTrxnId['financialTrxnId']]);
+    unset($lastFinancialTrxn['id']);
+    $lastFinancialTrxn['trxn_date'] = $inputParams['trxnParams']['trxn_date'];
+    $lastFinancialTrxn['total_amount'] = -$inputParams['trxnParams']['total_amount'];
+    $lastFinancialTrxn['net_amount'] = -$inputParams['trxnParams']['net_amount'];
+    $lastFinancialTrxn['fee_amount'] = -$inputParams['trxnParams']['fee_amount'];
+    $lastFinancialTrxn['contribution_id'] = $prevContribution->id;
+    foreach ([$lastFinancialTrxn, $inputParams['trxnParams']] as $financialTrxnParams) {
+      $trxn = CRM_Core_BAO_FinancialTrxn::create($financialTrxnParams);
+      $trxnParams = [
+        'total_amount' => $trxn->total_amount,
+        'contribution_id' => $currentContribution->id,
+      ];
+      $this->assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
+    }
+
+    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($inputParams['line_item'] ?? NULL, $currentContribution, TRUE, 'changePaymentInstrument');
+
+    return TRUE;
+  }
+
+  /**
+   * Create proportional entries in civicrm_entity_financial_trxn.
+   *
+   * @param array $entityParams
+   * @param array $lineItems
+   * @param array $financialItemIds
+   * @param array $taxItems
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function createProportionalFinancialEntries(array $entityParams, array $lineItems, array $financialItemIds, array $taxItems) {
+    $eftParams = [
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $entityParams['trxn_id'],
+    ];
+    foreach ($lineItems as $lineItem) {
+      if ($lineItem['qty'] == 0) {
+        continue;
+      }
+      $eftParams['entity_id'] = $financialItemIds[$lineItem['price_field_value_id']];
+      $entityParams['line_item_amount'] = $lineItem['line_total'];
+      $this->createProportionalEntry($entityParams, $eftParams);
+      if (array_key_exists($lineItem['price_field_value_id'], $taxItems)) {
+        $entityParams['line_item_amount'] = $taxItems[$lineItem['price_field_value_id']]['amount'];
+        $eftParams['entity_id'] = $taxItems[$lineItem['price_field_value_id']]['financial_item_id'];
+        self::createProportionalEntry($entityParams, $eftParams);
+      }
+    }
+  }
+
+  /**
+   * Create tax entry in civicrm_entity_financial_trxn table.
+   *
+   * @param array $entityParams
+   *
+   * @param array $eftParams
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function createProportionalEntry(array $entityParams, array $eftParams): void {
+    $eftParams['amount'] = 0;
+    if ($entityParams['contribution_total_amount'] != 0) {
+      $eftParams['amount'] = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+    }
+    // Record Entity Financial Trxn; CRM-20145
+    EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
+  }
+
+  /**
+   * Function use to store line item proportionally in in entity financial trxn table
+   *
+   * @param array $trxnParams
+   *
+   * @param int $trxnId
+   *
+   * @param float $contributionTotalAmount
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function assignProportionalLineItems($trxnParams, $trxnId, $contributionTotalAmount) {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
+    if (!empty($lineItems)) {
+      // get financial item
+      [$financialItemIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($trxnParams['contribution_id']);
+      $entityParams = [
+        'contribution_total_amount' => $contributionTotalAmount,
+        'trxn_total_amount' => $trxnParams['total_amount'],
+        'trxn_id' => $trxnId,
+      ];
+      $this->createProportionalFinancialEntries($entityParams, $lineItems, $financialItemIds, $taxItems);
+    }
   }
 
 }

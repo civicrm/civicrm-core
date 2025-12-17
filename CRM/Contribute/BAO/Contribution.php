@@ -2899,7 +2899,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
 
         if ($financialProcessor->isPaymentInstrumentChange($params)) {
-          $updated = CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
+          $updated = $financialProcessor->updateFinancialAccountsOnPaymentInstrumentChange($params);
         }
 
         //if Change contribution amount
@@ -3576,8 +3576,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param float $contributionTotalAmount
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 6.10 will be removed around 6.16
    */
   public static function assignProportionalLineItems($trxnParams, $trxnId, $contributionTotalAmount) {
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
     if (!empty($lineItems)) {
       // get financial item
@@ -3943,8 +3946,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param array $eftParams
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 6.10 will be removed around 6.16
    */
   public static function createProportionalEntry(array $entityParams, array $eftParams): void {
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     $eftParams['amount'] = 0;
     if ($entityParams['contribution_total_amount'] != 0) {
       $eftParams['amount'] = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
@@ -3997,8 +4003,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param array $taxItems
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 6.10 will be removed around 6.16
    */
   public static function createProportionalFinancialEntries(array $entityParams, array $lineItems, array $financialItemIds, array $taxItems) {
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     $eftParams = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $entityParams['trxn_id'],
