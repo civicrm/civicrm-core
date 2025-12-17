@@ -9,19 +9,10 @@ body.crm-menubar-visible.crm-menubar-below-cms-menu {
 
 nav#civicrm-menu-nav .crm-menubar-toggle-btn {
   margin: 0;
-  position: absolute;
-  top: 0;
   height: 38px;
-}
-#crm-menubar-state:checked ~ .crm-menubar-toggle-btn {
-  left: 0!important;
 }
 nav#civicrm-menu-nav .crm-menubar-toggle-btn span.crm-menu-logo {
   top: 10px;
-  left: 20px;
-}
-nav#civicrm-menu-nav .crm-menubar-toggle-btn-icon {
-  left: 44px;
 }
 
 @media (min-width: $breakMin) {
