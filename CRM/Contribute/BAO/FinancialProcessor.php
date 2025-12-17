@@ -376,6 +376,19 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // to the only place it is actually used - maybe it makes more sense?
       $trxnParams['status_id'] = $this->updatedContribution->contribution_status_id;
     }
+    else {
+      if (!(
+        ($this->getOriginalContributionStatus() === 'Pending' || $this->getOriginalContributionStatus() === 'In Progress')
+        && $this->getUpdatedContributionStatus() === 'Completed')
+      ) {
+        // The implies that we should take the payment_instrument_id and check_number
+        // from the original contribution, if we are not processing an incoming payment (change to completed).
+        // It likely should be the updated contribution we look at and the reason for looking at the
+        // original is that historically the updated record was unreliable.
+        $trxnParams['payment_instrument_id'] = $this->originalContribution->payment_instrument_id;
+        $trxnParams['check_number'] = $this->originalContribution->check_number;
+      }
+    }
     return $trxnParams;
   }
 
