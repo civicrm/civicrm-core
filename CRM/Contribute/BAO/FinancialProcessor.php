@@ -26,7 +26,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
   private ?CRM_Contribute_BAO_Contribution $originalContribution;
 
-  public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution) {
+  private array $originalLineItems;
+
+  public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems) {
     // Deal with slopping typing first.
     if ($originalContribution) {
       $originalContribution->contribution_status_id = (int) $originalContribution->contribution_status_id;
@@ -34,6 +36,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $updatedContribution->contribution_status_id = (int) $updatedContribution->contribution_status_id;
     $this->originalContribution = $originalContribution;
     $this->updatedContribution = $updatedContribution;
+    $this->originalLineItems = $originalLineItems;
   }
 
   public function getUpdatedContribution(): CRM_Contribute_DAO_Contribution {
@@ -179,7 +182,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param array $params
    * @param string $context
    * @param array $fields
-   * @param array $previousLineItems
    * @param array $trxnIds
    * @param int $fieldId
    *
@@ -187,13 +189,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return array
    */
-  private function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, $trxnIds, $fieldId): array {
+  private function createFinancialItemsForLine($params, $context, $fields, $trxnIds, $fieldId): array {
     $postUpdateContribution = $params['contribution'];
     foreach ($fields as $fieldValueId => $lineItemDetails) {
+      $previousLineItem = $this->originalLineItems[$lineItemDetails['id'] ?? NULL] ?? [];
       $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
       $financialAccount = CRM_Contribute_BAO_FinancialProcessor::getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
 
-      $previousLineItemTotal = $previousLineItems[$fieldValueId]['line_total'] ?? 0;
+      $previousLineItemTotal = $previousLineItem['line_total'] ?? 0;
       $isContributionStatusNegative = CRM_Contribute_BAO_Contribution::isContributionStatusNegative($postUpdateContribution->contribution_status_id);
       $itemParams = [
         'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
@@ -214,10 +217,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
         if ($context === 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
           // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
-          $taxAmount = $previousLineItems[$fieldValueId]['tax_amount'] ?? 0;
+          $taxAmount = $previousLineItem['tax_amount'] ?? 0;
         }
         elseif ($previousLineItemTotal != $lineItemDetails['line_total']) {
-          $taxAmount -= $previousLineItems[$fieldValueId]['tax_amount'] ?? 0;
+          $taxAmount -= $previousLineItem['tax_amount'] ?? 0;
         }
         if ($taxAmount != 0) {
           $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id, $context) * $taxAmount;
@@ -321,9 +324,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $params['entity_id'] = $trxn->id;
 
     $trxnIds['id'] = $params['entity_id'];
-    $previousLineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
     foreach ($params['line_item'] as $fieldId => $fields) {
-      $params = $this->createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $trxnIds, $fieldId);
+      $params = $this->createFinancialItemsForLine($params, $context, $fields, $trxnIds, $fieldId);
     }
   }
 
