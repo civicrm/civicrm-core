@@ -342,12 +342,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
     if ($this->getInputValue('payment_processor')) {
       $trxnParams['payment_processor_id'] = $this->getInputValue('payment_processor');
-      if (!$this->isAccountsReceivableTransaction()) {
-        $trxnParams['payment_instrument_id'] = PaymentProcessor::get(FALSE)
-          ->addWhere('id', '=', $this->getInputValue('payment_processor'))
-          ->addSelect('payment_instrument_id')
-          ->execute()->single()['payment_instrument_id'];
-      }
     }
 
     if (empty($trxnParams['payment_processor_id'])) {
@@ -362,6 +356,17 @@ class CRM_Contribute_BAO_FinancialProcessor {
         // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
         $trxnParams['trxn_id'] = $this->getInputValue('refund_trxn_id');
       }
+    }
+    if (empty($this->originalContribution)) {
+      // New contribution - populate amounts too
+      $trxnParams['total_amount'] = $this->updatedContribution->total_amount;
+      $trxnParams['fee_amount'] = $this->updatedContribution->fee_amount;
+      $trxnParams['net_amount'] = $this->updatedContribution->net_amount;
+      // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
+      // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
+      // this should really default to completed (after discussion). But after moving this
+      // to the only place it is actually used - maybe it makes more sense?
+      $trxnParams['status_id'] = $this->updatedContribution->contribution_status_id;
     }
     return $trxnParams;
   }

@@ -2761,11 +2761,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $skipRecords = TRUE;
 
       //build financial transaction params
-      $trxnParams = $financialProcessor->getTrxnParams($params);
-
-      $params['trxnParams'] = $trxnParams;
 
       if ($isUpdate) {
+        $trxnParams = $financialProcessor->getTrxnParams($params);
+        $params['trxnParams'] = $trxnParams;
         $updated = FALSE;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
@@ -2889,14 +2888,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
 
       else {
-        $trxnParams['total_amount'] = $contribution->total_amount;
-        $trxnParams['fee_amount'] = $contribution->fee_amount;
-        $trxnParams['net_amount'] = $contribution->net_amount;
-        // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
-        // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
-        // this should really default to completed (after discussion). But after moving this
-        // to the only place it is actually used - maybe it makes more sense?
-        $trxnParams['status_id'] = $contribution->contribution_status_id;;
+        $trxnParams = $financialProcessor->getTrxnParams($params);
         // records finanical trxn and entity financial trxn
         // also make it available as return value
         $financialProcessor->recordAlwaysAccountsReceivable($trxnParams, $params);
