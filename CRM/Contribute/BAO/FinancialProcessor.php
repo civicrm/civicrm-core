@@ -637,10 +637,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   public function updateFinancialAccountsOnPaymentInstrumentChange($inputParams) {
     $prevContribution = $inputParams['prevContribution'];
-    $currentContribution = $inputParams['contribution'];
-    // ensure that there are all the information in updated contribution object identified by $currentContribution
-    $currentContribution->find(TRUE);
-
     $deferredFinancialAccount = $inputParams['deferred_financial_account_id'] ?? NULL;
     if (empty($deferredFinancialAccount)) {
       $deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($prevContribution->financial_type_id, 'Deferred Revenue Account is');
@@ -667,14 +663,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $trxn = CRM_Core_BAO_FinancialTrxn::create($financialTrxnParams);
       $trxnParams = [
         'total_amount' => $trxn->total_amount,
-        'contribution_id' => $currentContribution->id,
+        'contribution_id' => $this->getUpdatedContribution()->id,
       ];
       $this->assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
     }
 
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($inputParams['line_item'] ?? NULL, $currentContribution, TRUE, 'changePaymentInstrument');
+    $this->createDeferredTrxn($inputParams['line_item'] ?? NULL, TRUE, 'changePaymentInstrument');
 
     return TRUE;
+  }
+
+  public function createDeferredTrxn($lineItems, $update = FALSE, $context = NULL) {
+    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $this->getUpdatedContribution(), $update, $context);
   }
 
   /**

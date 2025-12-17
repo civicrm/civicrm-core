@@ -2813,7 +2813,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $line['financial_type_id'] = $params['financial_type_id'];
             }
           }
-          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changeFinancialType');
+          $financialProcessor->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changeFinancialType');
           /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
           $params['financial_account_id'] = $financialProcessor->getUpdatedFinancialAccount();
           $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
@@ -2822,7 +2822,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $params['trxnParams']['fee_amount'] = $params['fee_amount'];
           }
           $financialProcessor->updateFinancialAccounts($params);
-          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE);
+          $financialProcessor->createDeferredTrxn($params['line_item'] ?? NULL, TRUE);
           $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
           $updated = TRUE;
           $params['deferred_financial_account_id'] = $financialProcessor->getUpdatedFinancialAccount();
@@ -2843,7 +2843,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $callUpdateFinancialAccounts = $financialProcessor->updateFinancialAccountsOnContributionStatusChange($params);
           if ($callUpdateFinancialAccounts) {
             $financialProcessor->updateFinancialAccounts($params, 'changedStatus');
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedStatus');
+            $financialProcessor->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedStatus');
           }
           $updated = TRUE;
         }
@@ -2869,7 +2869,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['trxnParams']['from_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
           $financialProcessor->updateFinancialAccounts($params, 'changedAmount');
-          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedAmount');
+          $financialProcessor->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedAmount');
           $updated = TRUE;
         }
 
