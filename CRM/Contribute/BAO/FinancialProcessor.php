@@ -27,8 +27,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
   private ?CRM_Contribute_BAO_Contribution $originalContribution;
 
   private array $originalLineItems;
+  private array $inputValues;
 
-  public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems) {
+  public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems, array $inputValues) {
     // Deal with slopping typing first.
     if ($originalContribution) {
       $originalContribution->contribution_status_id = (int) $originalContribution->contribution_status_id;
@@ -37,6 +38,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $this->originalContribution = $originalContribution;
     $this->updatedContribution = $updatedContribution;
     $this->originalLineItems = $originalLineItems;
+    $this->inputValues = $inputValues;
   }
 
   public function getUpdatedContribution(): CRM_Contribute_DAO_Contribution {
@@ -63,6 +65,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
       return NULL;
     }
     return $this->originalContribution->payment_instrument_id;
+  }
+
+  public function getOriginalContributionValue(string $key): mixed {
+    if (!$this->originalContribution) {
+      return NULL;
+    }
+    return $this->originalContribution->$key;
   }
 
   public function isNegativeTransaction(): bool {
@@ -303,6 +312,20 @@ class CRM_Contribute_BAO_FinancialProcessor {
       return $lineItemDetails['line_total'];
     }
     throw new CRM_Core_Exception('unreachable');
+  }
+
+  /**
+   * Get a value input to the Contribution.
+   *
+   * This function should be used when rather than looking for the final value
+   * (ie stored on the original contribution) we care whether the value was input
+   * into the function. (In practice many historical uses could probably be
+   * replaces with $this->updatedContribution->)
+   * @param string $string
+   * @return mixed
+   */
+  private function getInputValue(string $string): mixed {
+    return $this->inputValues[$string] ?? NULL;
   }
 
   /**
