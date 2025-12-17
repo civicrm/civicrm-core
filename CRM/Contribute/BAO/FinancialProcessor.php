@@ -331,7 +331,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       'trxn_date' => $this->getInputValue('receive_date') ?: date('YmdHis'),
       'currency' => $this->getUpdatedContribution()->currency,
       // CRM-17751, Fallback to original contribution is historical and probably not needed now as it was probably because updatedContribution
-      // we not always reliable. when we were not consistently reloading it.
+      // was not historically always reliably reloaded.
       'trxn_id' => $this->getInputValue('trxn_id') ?: $this->getUpdatedContribution()->trxn_id ?: $this->getOriginalContributionValue('trxn_id'),
       'payment_instrument_id' => $this->getInputValue('payment_instrument_id') ?: $this->getUpdatedContribution()->payment_instrument_id,
       'check_number' => $this->getInputValue('check_number'),
@@ -364,6 +364,17 @@ class CRM_Contribute_BAO_FinancialProcessor {
         // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
         $trxnParams['trxn_id'] = $this->getInputValue('refund_trxn_id');
       }
+    }
+    if (empty($this->originalContribution)) {
+      // New contribution - populate amounts too
+      $trxnParams['total_amount'] = $this->updatedContribution->total_amount;
+      $trxnParams['fee_amount'] = $this->updatedContribution->fee_amount;
+      $trxnParams['net_amount'] = $this->updatedContribution->net_amount;
+      // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
+      // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
+      // this should really default to completed (after discussion). But after moving this
+      // to the only place it is actually used - maybe it makes more sense?
+      $trxnParams['status_id'] = $this->updatedContribution->contribution_status_id;
     }
     return $trxnParams;
   }
