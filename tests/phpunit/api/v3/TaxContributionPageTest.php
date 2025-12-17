@@ -378,17 +378,60 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       ->execute()->single();
 
     $this->assertEquals('300.00', $lineItem['line_total']);
+    $financialTransactions = EntityFinancialTrxn::get()
+      ->addSelect('*', 'financial_trxn_id.amount')
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addWhere('entity_id', '=', $contribution['id'])
+      ->execute();
+    $this->assertCount(3, $financialTransactions);
     $this->assertEquals('300.00', $this->getFinancialTrxnAmount($contribution['id']));
     $financialItems = FinancialItem::get(FALSE)
       ->addWhere('entity_id', '=', $lineItem['id'])
       ->addWhere('entity_table', '=', 'civicrm_line_item')
       ->addSelect('amount', 'financial_account_id:name', 'description')
+      ->addOrderBy('id')
       ->execute();
-    $amount = 0;
-    foreach ($financialItems as $financialItem) {
-      $amount += $financialItem['amount'];
-    }
-    $this->assertEquals('300.00', $amount);
+
+    $this->assertCount(5, $financialItems);
+
+    // The first 2 financial items are the Original 100 line item
+    // and the $20 sales tax on that line.
+    $this->assertEquals([
+      'id' => $financialItems[0]['id'],
+      'amount' => 100,
+      'description' => 'Contribution Amount',
+      'financial_account_id:name' => 'type_with_tax',
+    ], $financialItems[0]);
+    $this->assertEquals([
+      'id' => $financialItems[1]['id'],
+      'amount' => 20,
+      'description' => 'Sales Tax',
+      'financial_account_id:name' => 'vat full tax rate account',
+    ], $financialItems[1]);
+
+    // Next these lines are reversed...
+    $this->assertEquals([
+      'id' => $financialItems[2]['id'],
+      'amount' => -100,
+      'description' => 'Contribution Amount',
+      'financial_account_id:name' => 'type_with_tax',
+    ], $financialItems[2]);
+
+    $this->assertEquals([
+      'id' => $financialItems[3]['id'],
+      'amount' => -20.0,
+      'description' => 'Sales Tax',
+      'financial_account_id:name' => 'vat full tax rate account',
+    ], $financialItems[3]);
+
+    // And a new item is crated for the new line.
+    $this->assertEquals([
+      'id' => $financialItems[4]['id'],
+      'amount' => 300,
+      'description' => 'Contribution Amount',
+      'financial_account_id:name' => 'Donation',
+    ], $financialItems[4]);
+
   }
 
   /**
