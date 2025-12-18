@@ -367,6 +367,9 @@ WHERE li.contribution_id = %1";
     ) {
       return;
     }
+    if (!empty($contributionDetails)) {
+      throw new CRM_Core_Exception('this test is the trick');
+    }
 
     foreach ($lineItems as &$values) {
 
