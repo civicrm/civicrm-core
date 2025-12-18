@@ -150,6 +150,7 @@ class CRM_Utils_VersionCheck {
         'PHP' => phpversion(),
         'MySQL' => CRM_Core_DAO::singleValueQuery('SELECT VERSION()'),
         'communityMessagesUrl' => Civi::settings()->get('communityMessagesUrl'),
+        'Smarty' => CRM_Core_Smarty::singleton()->getVersion(),
       ];
       $this->getDomainStats();
       $this->getPayProcStats();
