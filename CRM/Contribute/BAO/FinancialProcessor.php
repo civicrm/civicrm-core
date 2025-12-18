@@ -673,8 +673,103 @@ class CRM_Contribute_BAO_FinancialProcessor {
     return TRUE;
   }
 
+  /**
+   * Create transaction for deferred revenue. Previously shared function being refactored
+   *
+   * @param array $lineItems
+   * @param bool $update
+   * @param string $context
+   *
+   */
   public function createDeferredTrxn($lineItems, $update = FALSE, $context = NULL) {
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $this->getUpdatedContribution(), $update, $context);
+    $contributionDetails = $this->getUpdatedContribution();
+    if (empty($lineItems)) {
+      return;
+    }
+    $revenueRecognitionDate = $contributionDetails->revenue_recognition_date;
+    if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
+      if (!$update
+        && ($contributionDetails->contribution_status_id != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')
+          || ($contributionDetails->contribution_status_id != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
+            && $contributionDetails->is_pay_later)
+        )
+      ) {
+        return;
+      }
+      $trxnParams = [
+        'contribution_id' => $contributionDetails->id,
+        'fee_amount' => '0.00',
+        'currency' => $contributionDetails->currency,
+        'trxn_id' => $contributionDetails->trxn_id,
+        'status_id' => $contributionDetails->contribution_status_id,
+        'payment_instrument_id' => $contributionDetails->payment_instrument_id,
+        'check_number' => $contributionDetails->check_number,
+      ];
+
+      $deferredRevenues = [];
+      foreach ($lineItems as $priceSetID => $lineItem) {
+        if (!$priceSetID) {
+          continue;
+        }
+        foreach ($lineItem as $key => $item) {
+          $lineTotal = !empty($item['deferred_line_total']) ? $item['deferred_line_total'] : $item['line_total'];
+          if ($lineTotal <= 0 && !$update) {
+            continue;
+          }
+          $deferredRevenues[$key] = $item;
+          if ($context == 'changeFinancialType') {
+            $deferredRevenues[$key]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $item['id'], 'financial_type_id');
+          }
+          if (in_array($item['entity_table'],
+            ['civicrm_participant', 'civicrm_contribution'])
+          ) {
+            $deferredRevenues[$key]['revenue'][] = [
+              'amount' => $lineTotal,
+              'revenue_date' => $revenueRecognitionDate,
+            ];
+          }
+          else {
+            // for membership
+            $item['line_total'] = $lineTotal;
+            $deferredRevenues[$key]['revenue'] = CRM_Core_BAO_FinancialTrxn::getMembershipRevenueAmount($item);
+          }
+        }
+      }
+      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
+
+      CRM_Utils_Hook::alterDeferredRevenueItems($deferredRevenues, $contributionDetails, $update, $context);
+
+      foreach ($deferredRevenues as $key => $deferredRevenue) {
+        $results = civicrm_api3('EntityFinancialAccount', 'get', [
+          'entity_table' => 'civicrm_financial_type',
+          'entity_id' => $deferredRevenue['financial_type_id'],
+          'account_relationship' => ['IN' => ['Income Account is', 'Deferred Revenue Account is']],
+        ]);
+        if ($results['count'] != 2) {
+          continue;
+        }
+        foreach ($results['values'] as $result) {
+          if ($result['account_relationship'] == $accountRel) {
+            $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
+          }
+          else {
+            $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
+          }
+        }
+        foreach ($deferredRevenue['revenue'] as $revenue) {
+          $trxnParams['total_amount'] = $trxnParams['net_amount'] = $revenue['amount'];
+          $trxnParams['trxn_date'] = CRM_Utils_Date::isoToMysql($revenue['revenue_date']);
+          $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
+          $entityParams = [
+            'entity_id' => $deferredRevenue['financial_item_id'],
+            'entity_table' => 'civicrm_financial_item',
+            'amount' => $revenue['amount'],
+            'financial_trxn_id' => $financialTxn->id,
+          ];
+          civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
+        }
+      }
+    }
   }
 
   /**
