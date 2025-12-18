@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\EntityFinancialTrxn;
+use Civi\Api4\PaymentProcessor;
 
 /**
  * Class for handling processing of financial records.
@@ -311,6 +312,58 @@ class CRM_Contribute_BAO_FinancialProcessor {
       return $lineItemDetails['line_total'];
     }
     throw new CRM_Core_Exception('unreachable');
+  }
+
+  /**
+   * @param array $params
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  public function getTrxnParams(array $params): array {
+    $trxnParams = [
+      'contribution_id' => $this->getUpdatedContribution()->id,
+      'to_financial_account_id' => $this->getToFinancialAccount($params),
+      // If receive_date is not deliberately passed in we assume 'now'.
+      // test testCompleteTransactionWithReceiptDateSet ensures we don't
+      // default to loading the stored contribution receive_date.
+      // Note that as we deprecate completetransaction in favour
+      // of Payment.create handling of trxn_date will tighten up.
+      'trxn_date' => $this->getInputValue('receive_date') ?: date('YmdHis'),
+      'currency' => $this->getUpdatedContribution()->currency,
+      'trxn_id' => $this->getUpdatedContribution()->trxn_id,
+      'payment_instrument_id' => $this->getInputValue('payment_instrument_id') ?: $this->getUpdatedContribution()->payment_instrument_id,
+      'check_number' => $this->getInputValue('check_number'),
+      'pan_truncation' => $this->getInputValue('pan_truncation'),
+      'card_type_id' => $this->getInputValue('card_type_id'),
+    ];
+    //CRM-16259, set is_payment flag for non pending status
+    if (!$this->isAccountsReceivableTransaction()) {
+      $trxnParams['is_payment'] = 1;
+    }
+    if ($this->getInputValue('payment_processor')) {
+      $trxnParams['payment_processor_id'] = $this->getInputValue('payment_processor');
+      if (!$this->isAccountsReceivableTransaction()) {
+        $trxnParams['payment_instrument_id'] = PaymentProcessor::get(FALSE)
+          ->addWhere('id', '=', $this->getInputValue('payment_processor'))
+          ->addSelect('payment_instrument_id')
+          ->execute()->single()['payment_instrument_id'];
+      }
+    }
+
+    if (empty($trxnParams['payment_processor_id'])) {
+      unset($trxnParams['payment_processor_id']);
+    }
+    if ($this->isNegativeTransaction()) {
+      $trxnParams['trxn_date'] = !empty($this->getUpdatedContribution()->cancel_date) ? $this->getUpdatedContribution()->cancel_date : date('YmdHis');
+      // See testCreateUpdateContributionRefundRefundNullTrxnIDPassedIn - if refund_trxn_id isset, even if empty
+      // it takes precedence. Unclear whether there is a reason or the test was just written
+      // to protect behaviour during refactoring.
+      if (isset($this->inputValues['refund_trxn_id'])) {
+        // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
+        $trxnParams['trxn_id'] = $this->getInputValue('refund_trxn_id');
+      }
+    }
+    return $trxnParams;
   }
 
   /**

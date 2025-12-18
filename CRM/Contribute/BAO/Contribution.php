@@ -2759,48 +2759,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $isIncompletePending = $financialProcessor->isPendingTransaction() && !$isPayLater;
     if (!$isIncompletePending && !$financialProcessor->isFailedTransaction()) {
       $skipRecords = TRUE;
-      if (!$financialProcessor->isAccountsReceivableTransaction() && !empty($params['payment_processor'])) {
-        $params['payment_instrument_id'] = civicrm_api3('PaymentProcessor', 'getvalue', [
-          'id' => $params['payment_processor'],
-          'return' => 'payment_instrument_id',
-        ]);
-      }
 
       //build financial transaction params
-      $trxnParams = [
-        'contribution_id' => $contribution->id,
-        'to_financial_account_id' => $financialProcessor->getToFinancialAccount($params),
-        // If receive_date is not deliberately passed in we assume 'now'.
-        // test testCompleteTransactionWithReceiptDateSet ensures we don't
-        // default to loading the stored contribution receive_date.
-        // Note that as we deprecate completetransaction in favour
-        // of Payment.create handling of trxn_date will tighten up.
-        'trxn_date' => $params['receive_date'] ?? date('YmdHis'),
-        'currency' => $contribution->currency,
-        'trxn_id' => $contribution->trxn_id,
-        'payment_instrument_id' => $params['payment_instrument_id'] ?? $contribution->payment_instrument_id,
-        'check_number' => $params['check_number'] ?? NULL,
-        'pan_truncation' => $params['pan_truncation'] ?? NULL,
-        'card_type_id' => $params['card_type_id'] ?? NULL,
-      ];
-      if ($financialProcessor->isNegativeTransaction()) {
-        $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
-        if (isset($params['refund_trxn_id'])) {
-          // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
-          $trxnParams['trxn_id'] = $params['refund_trxn_id'];
-        }
-      }
-      //CRM-16259, set is_payment flag for non pending status
-      if (!$financialProcessor->isAccountsReceivableTransaction()) {
-        $trxnParams['is_payment'] = 1;
-      }
-      if (!empty($params['payment_processor'])) {
-        $trxnParams['payment_processor_id'] = $params['payment_processor'];
-      }
-
-      if (empty($trxnParams['payment_processor_id'])) {
-        unset($trxnParams['payment_processor_id']);
-      }
+      $trxnParams = $financialProcessor->getTrxnParams($params);
 
       $params['trxnParams'] = $trxnParams;
 
@@ -2949,8 +2910,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // records finanical trxn and entity financial trxn
         // also make it available as return value
         $financialProcessor->recordAlwaysAccountsReceivable($trxnParams, $params);
-        $trxnParams['pan_truncation'] = $params['pan_truncation'] ?? NULL;
-        $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
