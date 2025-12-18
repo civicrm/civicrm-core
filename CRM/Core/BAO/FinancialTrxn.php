@@ -416,7 +416,7 @@ WHERE ceft.entity_id = %1";
    *
    * @param array $lineItems
    *
-   * @param CRM_Contribute_BAO_Contribution $contributionDetails
+   * @param CRM_Contribute_BAO_Contribution|CRM_Contribute_DAO_Contribution $contributionDetails
    *
    * @param bool $update
    *
