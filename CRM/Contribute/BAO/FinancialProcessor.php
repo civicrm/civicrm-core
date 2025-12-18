@@ -417,6 +417,25 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
+   * Is the financial account changed on the contribution.
+   *
+   * @todo - this should only matter at the line item level.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function isFinancialAccountChanged(): bool {
+    $oldFinancialAccount = $this->getOriginalFinancialAccount();
+    $newFinancialAccount = $this->getUpdatedFinancialAccount();
+    return $oldFinancialAccount !== $newFinancialAccount;
+  }
+
+  public function isContributionTotalChanged(): bool {
+    $newAmount = $this->updatedContribution->total_amount;
+    $previousAmount = $this->originalContribution->total_amount;
+    return bccomp($newAmount, $previousAmount, 5) !== 0;
+  }
+
+  /**
    * Do any accounting updates required as a result of a contribution status change.
    *
    * Currently we have a bit of a roundabout where adding a payment results in this being called &
