@@ -99,7 +99,7 @@ trait Api3TestTrait {
    * @param string $prefix
    *   Extra test to add to message.
    */
-  public function assertAPISuccess($apiResult, $prefix = '') {
+  public function assertAPISuccess($apiResult, $prefix = ''): void {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
@@ -122,10 +122,9 @@ trait Api3TestTrait {
    * @param array $params
    * @param string $expectedErrorMessage
    *   Error.
-   * @param null $extraOutput
-   * @return array|int
+   * @return array
    */
-  public function callAPIFailure($entity, $action, $params = [], $expectedErrorMessage = NULL, $extraOutput = NULL) {
+  public function callAPIFailure($entity, $action, $params = [], $expectedErrorMessage = NULL): array {
     if (is_array($params)) {
       $params += [
         'version' => $this->_apiversion,
@@ -261,12 +260,12 @@ trait Api3TestTrait {
    *
    * @param string $entity
    * @param array $params
-   * @param string $type
+   * @param string|null $type
    *   Only 'integer' is supported
    *
-   * @return array|int
+   * @return mixed
    */
-  public function callAPISuccessGetValue($entity, $params, $type = NULL) {
+  public function callAPISuccessGetValue(string $entity, array $params, ?string $type = NULL): mixed {
     $params += [
       'version' => $this->_apiversion,
     ];
@@ -277,10 +276,10 @@ trait Api3TestTrait {
     if ($type) {
       if ($type === 'integer') {
         // api seems to return integers as strings
-        $this->assertTrue(is_numeric($result), "expected a numeric value but got " . print_r($result, 1));
+        $this->assertIsNumeric($result, "expected a numeric value but got " . print_r($result, 1));
       }
       else {
-        throw new \CRM_Core_Exception("Unsupported type '$type' for callAPISuccessGetValue");
+        $this->fail("Unsupported type '$type' for callAPISuccessGetValue");
       }
     }
     return $result;
@@ -289,12 +288,13 @@ trait Api3TestTrait {
   /**
    * A stub for the API interface. This can be overriden by subclasses to change how the API is called.
    *
-   * @param $entity
-   * @param $action
+   * @param string $entity
+   * @param string $action
    * @param array $params
-   * @return array|int
+   * @return mixed
+   * @throws \CRM_Core_Exception
    */
-  public function civicrm_api($entity, $action, $params = []) {
+  public function civicrm_api(string $entity, string $action, array $params = []): mixed {
     if (($params['version'] ?? 0) == 4) {
       return $this->runApi4Legacy($entity, $action, $params);
     }
