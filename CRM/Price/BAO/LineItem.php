@@ -372,12 +372,19 @@ WHERE li.contribution_id = %1";
 
       foreach ($values as &$line) {
         if (empty($line['entity_table'])) {
-          $line['entity_table'] = $entityTable;
+          if ($line['entity_table'] !== $entityTable) {
+            $line['entity_table'] = $entityTable;
+            CRM_Core_Error::deprecatedWarning('not setting entity table in line item before calling this (deprecated) function is deprecated');
+          }
         }
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
+          CRM_Core_Error::deprecatedWarning('not setting entity id in line item before calling this (deprecated) function is deprecated');
         }
         if (!empty($contributionDetails->id)) {
+          if (empty($line['contribution_id'])) {
+            CRM_Core_Error::deprecatedWarning('not setting contribution id in line item before calling this (deprecated) function is deprecated');
+          }
           $line['contribution_id'] = $contributionDetails->id;
           if ($line['entity_table'] === 'civicrm_contribution') {
             $line['entity_id'] = $contributionDetails->id;
@@ -387,6 +394,7 @@ WHERE li.contribution_id = %1";
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
+          CRM_Core_Error::deprecatedWarning('not setting financial type id in line item before calling this (deprecated) function is deprecated');
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
