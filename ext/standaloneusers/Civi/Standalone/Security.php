@@ -93,10 +93,8 @@ class Security {
    * High level function to encrypt password using the site-default mechanism.
    */
   public function hashPassword(string $plaintext): string {
-    // For now, we just implement D7's but this should be configurable.
-    // Sites should be able to move from one password hashing algo to another
-    // e.g. if a vulnerability is discovered.
-    $algo = new \Civi\Standalone\PasswordAlgorithms\Drupal7();
+    // use PHP standard library hashing by default
+    $algo = new \Civi\Standalone\PasswordAlgorithms\PhpStandard();
     return $algo->hashPassword($plaintext);
   }
 
