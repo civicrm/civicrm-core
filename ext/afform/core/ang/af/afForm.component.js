@@ -368,6 +368,26 @@
         CRM.alert(errorMsg, ts('Sorry'), 'error');
       }
 
+      function handleError(status, $element, error) {
+        status.reject();
+        $element.unblock();
+        // see: CRM/Api4/Page/AJAX.php
+        if (error.error_code == 42) {
+          if (typeof Swal === 'function') {
+            Swal.fire({
+              icon: 'warning',
+              html: error.error_message.replace("\n", '<br>')
+            });
+          }
+          else {
+            CRM.alert(error.error_message, ts('Form Error'));
+          }
+        }
+        else {
+          CRM.alert(error.error_message, ts('Form Error'));
+        }
+      }
+
       this.submit = function () {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
@@ -385,6 +405,10 @@
           args: args,
           values: data,
         }).then(function(response) {
+          if (response.error_code) {
+            handleError(status, $element, response);
+            return;
+          }
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
@@ -402,15 +426,7 @@
           }
         })
         .catch(function(error) {
-          status.reject();
-          $element.unblock();
-          CRM.alert(error.error_message || '', ts('Form Error'));
-          $element.trigger('crmFormError', {
-            afform: ctrl.getFormMeta(),
-            data: data,
-            submissionResponse: submissionResponse,
-            error: error
-          });
+          handleError(status, $element, error);
         });
       };
 
@@ -425,6 +441,11 @@
           args: args,
           values: data,
         }).then(function(response) {
+          if (response.error_code) {
+            handleError(status, $element, response);
+            setDraftStatus('unsaved');
+            return;
+          }
           status.resolve();
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             uploadingDraftFiles = true;
@@ -439,6 +460,10 @@
           } else {
             setDraftStatus('saved');
           }
+        })
+        .catch(function(error) {
+          handleError(status, $element, error);
+          setDraftStatus('unsaved');
         });
       };
 

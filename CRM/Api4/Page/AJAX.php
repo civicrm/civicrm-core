@@ -207,6 +207,16 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
         ]);
       }
       $response['status'] = $status;
+
+      // Detect if it's an afform validation error and format it in a way
+      // that ext/afform/core/ang/af/afForm.component.js can handle it
+      if (method_exists($e, 'getErrorData')) {
+        $errorData = $e->getErrorData();
+        if (!empty($errorData['validation'])) {
+          $response['error_code'] = 42;
+          $response['error_message'] = implode("\n", $errorData['validation']);
+        }
+      }
     }
     return $response;
   }
