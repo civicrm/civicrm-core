@@ -196,7 +196,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   public function recordFinancialAccounts(array &$params): void {
-    $financialProcessor = $this;
     $skipRecords = FALSE;
     $isUpdate = !empty($params['prevContribution']);
 
@@ -208,13 +207,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
     // less obviously as it checked a partially populated contribution object.
     $isPayLater = !empty($params['is_pay_later']);
     $isIncompletePending = $this->isPendingTransaction() && !$isPayLater;
-    if (!$isIncompletePending && !$financialProcessor->isFailedTransaction()) {
+    if (!$isIncompletePending && !$this->isFailedTransaction()) {
       $skipRecords = TRUE;
 
       //build financial transaction params
 
       if ($isUpdate) {
-        $trxnParams = $financialProcessor->getTrxnParams($params);
+        $trxnParams = $this->getTrxnParams($params);
         $params['trxnParams'] = $trxnParams;
         $updated = FALSE;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
@@ -230,14 +229,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
         }
 
         //if financial account is changed
-        if ($financialProcessor->isFinancialAccountChanged()) {
+        if ($this->isFinancialAccountChanged()) {
           $params['trxnParams']['trxn_date'] = date('YmdHis');
           $params['total_amount'] = 0;
           // If we have a fee amount set reverse this as well.
           if (isset($params['fee_amount'])) {
             $params['trxnParams']['fee_amount'] = 0 - $params['fee_amount'];
           }
-          if ($financialProcessor->isAccountsReceivableTransaction()) {
+          if ($this->isAccountsReceivableTransaction()) {
             $accountRelationship = $this->getUpdatedContribution()->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
             $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
               $params['prevContribution']->financial_type_id, $accountRelationship);
@@ -249,26 +248,26 @@ class CRM_Contribute_BAO_FinancialProcessor {
             }
           }
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-          $financialProcessor->updateFinancialAccounts($params, 'changeFinancialType');
+          $this->updateFinancialAccounts($params, 'changeFinancialType');
           $params['skipLineItem'] = FALSE;
           foreach ($params['line_item'] as &$lineItems) {
             foreach ($lineItems as &$line) {
               $line['financial_type_id'] = $params['financial_type_id'];
             }
           }
-          $financialProcessor->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changeFinancialType');
+          $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changeFinancialType');
           /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
-          $params['financial_account_id'] = $financialProcessor->getUpdatedFinancialAccount();
+          $params['financial_account_id'] = $this->getUpdatedFinancialAccount();
           $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
           // Set the transaction fee amount back to the original value for creating the new positive financial trxn.
           if (isset($params['fee_amount'])) {
             $params['trxnParams']['fee_amount'] = $params['fee_amount'];
           }
-          $financialProcessor->updateFinancialAccounts($params);
-          $financialProcessor->createDeferredTrxn($params['line_item'] ?? NULL, TRUE);
+          $this->updateFinancialAccounts($params);
+          $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE);
           $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
           $updated = TRUE;
-          $params['deferred_financial_account_id'] = $financialProcessor->getUpdatedFinancialAccount();
+          $params['deferred_financial_account_id'] = $this->getUpdatedFinancialAccount();
         }
 
         //Update contribution status
@@ -283,10 +282,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {
           //Update Financial Records
-          $callUpdateFinancialAccounts = $financialProcessor->updateFinancialAccountsOnContributionStatusChange($params);
+          $callUpdateFinancialAccounts = $this->updateFinancialAccountsOnContributionStatusChange($params);
           if ($callUpdateFinancialAccounts) {
-            $financialProcessor->updateFinancialAccounts($params, 'changedStatus');
-            $financialProcessor->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedStatus');
+            $this->updateFinancialAccounts($params, 'changedStatus');
+            $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedStatus');
           }
           $updated = TRUE;
         }
@@ -297,8 +296,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
 
-        if ($financialProcessor->isPaymentInstrumentChange($params)) {
-          $updated = $financialProcessor->updateFinancialAccountsOnPaymentInstrumentChange($params);
+        if ($this->isPaymentInstrumentChange($params)) {
+          $updated = $this->updateFinancialAccountsOnPaymentInstrumentChange($params);
         }
 
         //if Change contribution amount
@@ -307,12 +306,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $totalAmount = $this->getUpdatedContribution()->total_amount ?? 0;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
-        if ($financialProcessor->isContributionTotalChanged()) {
+        if ($this->isContributionTotalChanged()) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-          $financialProcessor->updateFinancialAccounts($params, 'changedAmount');
-          $financialProcessor->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedAmount');
+          $this->updateFinancialAccounts($params, 'changedAmount');
+          $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedAmount');
           $updated = TRUE;
         }
 
@@ -339,10 +338,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
 
       else {
-        $trxnParams = $params['trxnParams'] = $financialProcessor->getTrxnParams($params);
+        $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
         // records finanical trxn and entity financial trxn
         // also make it available as return value
-        $financialProcessor->recordAlwaysAccountsReceivable($trxnParams, $params);
+        $this->recordAlwaysAccountsReceivable($trxnParams, $params);
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
@@ -359,7 +358,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $entityId = $this->getUpdatedContribution()->id;
         $entityTable = 'civicrm_contribution';
       }
-      $financialProcessor->createLineItems($entityId, $params['line_item'] ?? NULL, $entityTable, $isUpdate);
+      $this->createLineItems($entityId, $params['line_item'] ?? NULL, $entityTable, $isUpdate);
     }
 
     // create batch entry if batch_id is passed and
@@ -375,7 +374,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     // when a fee is charged
     if (!empty($params['fee_amount']) && (empty($params['prevContribution']) || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount) && $skipRecords) {
-      CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $financialProcessor->getToFinancialAccount($params)]);
+      CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)]);
     }
 
     unset($params['line_item']);
