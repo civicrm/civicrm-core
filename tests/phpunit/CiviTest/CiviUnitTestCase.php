@@ -2521,14 +2521,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @param string $name
    * @param int $contributionPageID
    * @param string $module
+   * @param int $weight
    */
-  protected function addProfile($name, $contributionPageID, $module = 'CiviContribute') {
+  protected function addProfile(string $name, int $contributionPageID, string $module = 'CiviContribute', $weight = 1): void {
     $params = [
       'uf_group_id' => $name,
       'module' => $module,
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contributionPageID,
-      'weight' => 1,
+      'weight' => $weight,
+      'is_active' => TRUE,
     ];
     if ($module !== 'CiviContribute') {
       $params['module_data'] = [$module => []];

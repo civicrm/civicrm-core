@@ -29,46 +29,11 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
   protected string $note = '';
 
   /**
-   * @var array
-   *
-   * @scope tplParams as customPre
-   */
-  public $profilesPreForm;
-
-  /**
-   * @var array
-   *
-   * @scope tplParams as customPost
-   */
-  public $profilesPostForm;
-
-  /**
-   * @var array
-   *
-   * @scope tplParams as customPre_grouptitle
-   */
-  public $profileTitlesPreForm;
-
-  /**
-   * @var array
-   *
-   * @scope tplParams as customPost_grouptitle
-   */
-  public $profileTitlesPostForm;
-
-  /**
-   * @var array
-   *
-   * @scope tplParams as customProfile
-   */
-  public $profilesAdditionalParticipants;
-
-  /**
    * @throws \CRM_Core_Exception
    */
   public function getProfiles(): array {
     if (!isset($this->profiles)) {
-      if ($this->getEventID()) {
+      if ($this->isEventPage()) {
         $joins = (array) UFJoin::get(FALSE)
           ->addWhere('entity_table', '=', 'civicrm_event')
           ->addWhere('entity_id', '=', $this->getEventID())
@@ -85,6 +50,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
           $profile = $profiles[$join['uf_group_id']];
           $profile['placement'] = $join['weight'] === 1 ? 'pre' : 'post';
           $profile['is_additional_participant'] = $join['module'] === 'CiviEvent_Additional';
+          $profile['module'] = $join['module'];
           if ($join['module'] === 'CiviEvent') {
             $profile['participant_id'] = $this->getParticipantID();
             try {
@@ -131,8 +97,91 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
           $this->profiles[] = $profile;
         }
       }
+      elseif (isset($this->getContribution()['contribution_page_id'])) {
+        $joins = (array) UFJoin::get(FALSE)
+          ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+          ->addWhere('entity_id', '=', $this->getContribution()['contribution_page_id'])
+          ->addWhere('is_active', '=', TRUE)
+          ->addSelect('module', 'weight', 'uf_group_id', 'uf_group_id.frontend_title')
+          ->addOrderBy('weight')
+          ->execute();
+        $profiles = UFGroup::get(FALSE)
+          ->addWhere('id', 'IN', CRM_Utils_Array::collect('uf_group_id', $joins))
+          ->execute()->indexBy('id');
+        foreach ($joins as $join) {
+          // The thing we want to order by is on the join not the profile
+          // hence we iterate the joins.
+          $profile = $profiles[$join['uf_group_id']];
+          $profile['placement'] = $join['weight'] === 1 ? 'pre' : 'post';
+          $profile['module'] = $join['module'];
+          $profile['title'] = $join['uf_group_id.frontend_title'];
+          $profile['fields'] = $this->getContactID() ? $this->getProfileFields($join['uf_group_id'], $this->getContactID()) : [];
+          $this->profiles[] = $profile;
+        }
+      }
     }
     return $this->profiles ?: [];
+  }
+
+  /**
+   * Get the profile title and fields.
+   *
+   * @param int $ufGroupID
+   * @param int $contactID
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getProfileFields(int $ufGroupID, int $contactID): array {
+    $values = [];
+    $params = [];
+
+    $preProfileType = CRM_Core_BAO_UFField::getProfileType($ufGroupID);
+    if ($this->isMembershipReceipt() && $preProfileType == 'Membership') {
+      $params = [
+        [
+          'member_id',
+          '=',
+          $this->getMembershipID(),
+          0,
+          0,
+        ],
+      ];
+    }
+    elseif ($preProfileType == 'Contribution' && $this->getContributionID()) {
+      $params = [
+        [
+          'contribution_id',
+          '=',
+          $this->getContributionID(),
+          0,
+          0,
+        ],
+      ];
+      if ($this->getIsTest()) {
+        $params[] = [
+          'contribution_test',
+          '=',
+          1,
+          0,
+          0,
+        ];
+      }
+    }
+
+    if (CRM_Core_BAO_UFGroup::filterUFGroups($ufGroupID, $contactID)) {
+      $fields = CRM_Core_BAO_UFGroup::getFields($ufGroupID, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
+      foreach ($fields as $k => $v) {
+        // suppress all file fields from display and formatting fields
+        if (
+          $v['data_type'] === 'File' || $v['name'] === 'image_URL' || $v['field_type'] === 'Formatting') {
+          unset($fields[$k]);
+        }
+      }
+      CRM_Core_BAO_UFGroup::getValues($contactID, $fields, $values, FALSE, $params, FALSE, NULL, 'email');
+    }
+    return $values;
   }
 
   /**
@@ -149,12 +198,52 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
   /**
    * @throws \CRM_Core_Exception
    */
+  public function getProfilePreForm(): array {
+    foreach ($this->getProfilesPreForm() as $profile) {
+      return $profile;
+    }
+    return [];
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function getProfilePostForm(): array {
+    foreach ($this->getProfilesPostForm() as $profile) {
+      return $profile;
+    }
+    return [];
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function getProfileTitlesPreForm(): array {
     $titles = [];
     foreach ($this->getProfilesByPlacement('pre') as $profile) {
       $titles[] = $profile['frontend_title'];
     }
     return $titles;
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function getProfileTitlePreForm(): string {
+    foreach ($this->getProfilesByPlacement('pre') as $profile) {
+      return $profile['frontend_title'];
+    }
+    return '';
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function getProfileTitlePostForm(): string {
+    foreach ($this->getProfilesByPlacement('post') as $profile) {
+      return $profile['frontend_title'];
+    }
+    return '';
   }
 
   /**
@@ -182,7 +271,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
   public function getProfilesAdditionalParticipants(): array {
     $profiles = [];
     foreach ($this->getProfiles() as $profile) {
-      if ($profile['is_additional_participant'] && !empty($profile['fields'])) {
+      if (!empty($profile['is_additional_participant']) && !empty($profile['fields'])) {
         foreach ($profile['fields'] as $participantIndex => $fields) {
           $profiles['profile'][$participantIndex][$profile['id']] = $profile['fields'][$participantIndex];
         }
@@ -202,13 +291,29 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
   private function getProfilesByPlacement(string $placement): array {
     $profiles = [];
     foreach ($this->getProfiles() as $profile) {
-      if (!empty($profile['participant_id']) && $profile['participant_id'] === $this->getParticipantID()) {
+      if (
+        !$this->isEventPage()
+        || (!empty($profile['participant_id']) && $profile['participant_id'] === $this->getParticipantID())) {
         if ($profile['placement'] === $placement) {
           $profiles[] = $profile;
         }
       }
     }
     return $profiles;
+  }
+
+  /**
+   * @return bool
+   */
+  private function isEventPage(): bool {
+    return property_exists($this, 'eventID') && $this->getEventID();
+  }
+
+  /**
+   * @return bool
+   */
+  private function isMembershipReceipt(): bool {
+    return property_exists($this, 'membership') && $this->getMembershipID();
   }
 
 }

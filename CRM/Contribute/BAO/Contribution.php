@@ -3310,8 +3310,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'receipt_from_email',
       'receipt_from_name',
       'receipt_text',
-      'custom_pre_id',
-      'custom_post_id',
       'honoree_profile_id',
       'onbehalf_profile_id',
       'honor_block_is_active',

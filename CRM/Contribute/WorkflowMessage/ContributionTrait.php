@@ -2,6 +2,8 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionProduct;
+use Civi\API\EntityLookupTrait;
+use Civi\Api4\ContributionPage;
 use Civi\Api4\Membership;
 
 /**
@@ -12,6 +14,7 @@ use Civi\Api4\Membership;
  * @method $this setFinancialTrxnID(?int $financialTrxnID)
  */
 trait CRM_Contribute_WorkflowMessage_ContributionTrait {
+  use EntityLookupTrait;
   /**
    * The contribution.
    *
@@ -20,6 +23,8 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * @scope tokenContext as contribution
    */
   public $contribution;
+
+  private $contributionPage;
 
   /**
    * The contribution product (premium) if any.
@@ -46,9 +51,36 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
 
   /**
    * @return array|null
+   * @throws CRM_Core_Exception
    */
   public function getContribution(): ?array {
-    return $this->contribution;
+    if (!isset($this->contribution) && $this->getContributionID()) {
+      $this->contribution = Contribution::get(FALSE)
+        ->addWhere('id', '=', $this->getContributionID())
+        ->execute()->first();
+
+    }
+    return $this->contribution ?? NULL;
+  }
+
+  private function getContributionPageValue($field): mixed {
+    if (!isset($this->contributionPage)) {
+      $this->contributionPage = [];
+      if ($this->getContributionPageID()) {
+        $this->contributionPage = ContributionPage::get(FALSE)->addWhere('id', '=', $this->getContributionID())->execute()->first() ?? NULL;
+      }
+    }
+    return $this->contributionPage[$field] ?? NULL;
+  }
+
+  private function getContributionPageID(): ?int {
+    if ($this->contributionID || !$this->getContribution()) {
+      return NULL;
+    }
+    if (!array_key_exists('contribution_page_id', $this->contribution)) {
+      $this->contribution += Contribution::get(FALSE)->addWhere('id', '=', $this->getContributionID())->execute()->first() ?? NULL;
+    }
+    return $this->contribution['contribution_page_id'];
   }
 
   /**

@@ -136,10 +136,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     // @todo add to this until all tpl params are explicit in this function and not waltzing around the codebase.
     // Next stage is to remove this & ensure there are no e-notices - ie. all are set before they hit this fn.
     $valuesRequiredForTemplate = [
-      'customPre',
-      'customPost',
-      'customPre_grouptitle',
-      'customPost_grouptitle',
       'amount',
       'receipt_date',
       'is_pay_later',
@@ -330,10 +326,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'title' => $title,
         'isShare' => $values['is_share'] ?? NULL,
         'thankyou_title' => $values['thankyou_title'] ?? NULL,
-        'customPre' => $values['customPre'],
-        'customPre_grouptitle' => $values['customPre_grouptitle'],
-        'customPost' => $values['customPost'],
-        'customPost_grouptitle' => $values['customPost_grouptitle'],
         'amount' => $values['amount'],
         'is_pay_later' => $values['is_pay_later'],
         'receipt_date' => !$values['receipt_date'] ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
