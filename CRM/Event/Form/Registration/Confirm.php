@@ -858,12 +858,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             if ($lineItemValue = ($lineItems[$participantNum] ?? NULL)) {
               $lineItem[] = $lineItemValue;
             }
-            if (\Civi::settings()->get('invoicing')) {
-              $individual = $this->get('individual');
-              $this->assign('totalAmount', $individual[$participantNum]['totalAmtWithTax']);
-              $this->assign('totalTaxAmount', $individual[$participantNum]['totalTaxAmt']);
-              $this->assign('individual', [$individual[$participantNum]]);
-            }
             $this->assign('lineItem', $lineItem);
           }
           $this->_values['params']['additionalParticipant'] = TRUE;
