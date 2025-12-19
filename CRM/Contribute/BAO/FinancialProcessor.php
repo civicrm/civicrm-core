@@ -358,7 +358,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $entityId = $this->getUpdatedContribution()->id;
         $entityTable = 'civicrm_contribution';
       }
-      $this->createLineItems($entityId, $params['line_item'] ?? NULL, $entityTable);
+      $this->createLineItems($entityId, $params['line_item'], $entityTable);
     }
 
     // create batch entry if batch_id is passed and
@@ -1063,14 +1063,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @throws \CRM_Core_Exception
    */
-  private function createLineItems($entityId, $lineItems, $entityTable = 'civicrm_contribution') {
-    if (!$entityId || !is_array($lineItems)
-      || CRM_Utils_System::isNull($lineItems)
-    ) {
-      return;
-    }
-
-    $contributionDetails = $this->getUpdatedContribution();
+  private function createLineItems(int $entityId, array $lineItems, $entityTable = 'civicrm_contribution') {
+    $contributionID = $this->getUpdatedContribution()->id;
     foreach ($lineItems as &$values) {
 
       foreach ($values as &$line) {
@@ -1080,11 +1074,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
         }
-        if (!empty($contributionDetails->id)) {
-          $line['contribution_id'] = $contributionDetails->id;
-          if ($line['entity_table'] === 'civicrm_contribution') {
-            $line['entity_id'] = $contributionDetails->id;
-          }
+        $line['contribution_id'] = $contributionID;
+        if ($line['entity_table'] === 'civicrm_contribution') {
+          $line['entity_id'] = $contributionID;
         }
 
         // if financial type is not set and if price field value is NOT NULL
@@ -1093,16 +1085,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
-        if (!$this->isUpdate() && $contributionDetails) {
-          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
+        if (!$this->isUpdate()) {
+          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $this->getUpdatedContribution());
           $line['financial_item_id'] = $financialItem->id;
           if (!empty($line['tax_amount'])) {
-            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, TRUE);
+            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $this->getUpdatedContribution(), TRUE);
           }
         }
       }
     }
-    if (!$this->isUpdate() && $contributionDetails) {
+    if (!$this->isUpdate()) {
       $this->createDeferredTrxn($lineItems);
     }
   }
