@@ -1574,7 +1574,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           // Need to check that it's not actually doing anything useful in other scenarios
           // For getExistingContributionID()/invoice mode it does nothing helpful!
           // Most (all?) of this functionality is handled in OrderCompleteSubscriber::updateMembershipBasedOnCompletionOfContribution
-          [$membership, $renewalMode, $dates] = self::legacyProcessMembership(
+          [$membership, $renewalMode] = self::legacyProcessMembership(
             $contactID, $membershipTypeID, $isTest,
             date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
             $customFieldsFormatted,
@@ -2939,7 +2939,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
     $membership->find(TRUE);
 
-    return [$membership, $renewalMode, $dates];
+    return [$membership, $renewalMode];
   }
 
   /**
