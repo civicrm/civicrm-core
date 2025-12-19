@@ -2923,7 +2923,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $entityId = $contribution->id;
         $entityTable = 'civicrm_contribution';
       }
-      CRM_Price_BAO_LineItem::processPriceSet($entityId, $params['line_item'] ?? NULL, $params['contribution'], $entityTable, $isUpdate);
+      $financialProcessor->createLineItems($entityId, $params['line_item'] ?? NULL, $entityTable, $isUpdate);
     }
 
     // create batch entry if batch_id is passed and

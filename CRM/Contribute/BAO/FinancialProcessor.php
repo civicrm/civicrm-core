@@ -750,4 +750,63 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
   }
 
+  /**
+   * Process price set and line items.
+   *
+   * @internal
+   *
+   * @param int $entityId
+   * @param array $lineItems
+   *   Line item array.
+   * @param string $entityTable
+   *   Entity table.
+   *
+   * @param bool $update
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function createLineItems($entityId, $lineItems, $entityTable = 'civicrm_contribution', $update = FALSE) {
+    if (!$entityId || !is_array($lineItems)
+      || CRM_Utils_System::isNull($lineItems)
+    ) {
+      return;
+    }
+
+    $contributionDetails = $this->getUpdatedContribution();
+    foreach ($lineItems as &$values) {
+
+      foreach ($values as &$line) {
+        if (empty($line['entity_table'])) {
+          $line['entity_table'] = $entityTable;
+        }
+        if (empty($line['entity_id'])) {
+          $line['entity_id'] = $entityId;
+        }
+        if (!empty($contributionDetails->id)) {
+          $line['contribution_id'] = $contributionDetails->id;
+          if ($line['entity_table'] === 'civicrm_contribution') {
+            $line['entity_id'] = $contributionDetails->id;
+          }
+        }
+
+        // if financial type is not set and if price field value is NOT NULL
+        // get financial type id of price field value
+        if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
+          $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
+        }
+        $createdLineItem = CRM_Price_BAO_LineItem::create($line);
+        if (!$update && $contributionDetails) {
+          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
+          $line['financial_item_id'] = $financialItem->id;
+          if (!empty($line['tax_amount'])) {
+            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, TRUE);
+          }
+        }
+      }
+    }
+    if (!$update && $contributionDetails) {
+      $this->createDeferredTrxn($lineItems);
+    }
+  }
+
 }
