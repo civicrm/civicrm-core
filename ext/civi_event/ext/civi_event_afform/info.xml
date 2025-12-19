@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<extension key="civi_event_afform" type="module">
+  <file>civi_event_afform</file>
+  <name>civi_event_afform</name>
+  <description>FormBuilder functionality for CiviEvent</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <php_compatibility mode="list">
+    <comments>Listed versions. For example, specify both "8.1" and "8.2".</comments>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility mode="list">
+    <comments>Listed versions. For example, specify both "4" and "5".</comments>
+    <ver>5</ver>
+  </smarty_compatibility>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/CiviEventAfform</namespace>
+    <format>25.10.2</format>
+    <angularModule>crmCiviEventAfform</angularModule>
+  </civix>
+  <tags>
+    <tag>mgmt:hidden</tag>
+    <tag>mgmt:enable-when-satisfied</tag>
+  </tags>
+  <parent>civi_event</parent>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+  </requires>
+  <mixins>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+</extension>
