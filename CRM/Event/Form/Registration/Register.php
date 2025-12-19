@@ -987,7 +987,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           $url = CRM_Utils_System::url('civicrm/event/info',
             "reset=1&id={$form->_values['event']['id']}&noFullMsg=true"
           );
-          if ($form->_action & CRM_Core_Action::PREVIEW) {
+          if ($form->isTest()) {
             $url .= '&action=preview';
           }
           if ($form->_pcpId) {

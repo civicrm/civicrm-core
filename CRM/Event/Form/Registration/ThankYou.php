@@ -53,7 +53,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    * @return int
    */
   public function getAction(): int {
-    if ($this->_action & CRM_Core_Action::PREVIEW) {
+    if ($this->isTest()) {
       return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
     }
 
@@ -165,7 +165,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       CRM_Friend_BAO_Friend::retrieve($params, $data);
       if (!empty($data['is_active'])) {
         $friendText = $data['title'];
-        if ($this->_action & CRM_Core_Action::PREVIEW) {
+        if ($this->isTest()) {
           $friendURL = CRM_Utils_System::url('civicrm/friend',
             "eid={$this->getEventID()}&reset=1&action=preview&pcomponent=event"
           );
