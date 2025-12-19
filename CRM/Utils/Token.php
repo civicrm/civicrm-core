@@ -772,33 +772,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Replace subscription-confirmation-request tokens
-   *
-   * @deprecated
-   *
-   * @param string $str
-   *   The string with tokens to be replaced.
-   * @param string $group
-   *   The name of the group being subscribed.
-   * @param $url
-   * @param bool $html
-   *   Replace tokens with html or plain text.
-   *
-   * @return string
-   *   The processed string
-   */
-  public static function &replaceSubscribeTokens($str, $group, $url, $html) {
-    CRM_Core_Error::deprecatedFunctionWarning('use token processor');
-    if (self::token_match('subscribe', 'group', $str)) {
-      self::token_replace('subscribe', 'group', $group, $str);
-    }
-    if (self::token_match('subscribe', 'url', $str)) {
-      self::token_replace('subscribe', 'url', $url, $str);
-    }
-    return $str;
-  }
-
-  /**
    * Replace subscription-invitation tokens
    *
    * @param string $str
