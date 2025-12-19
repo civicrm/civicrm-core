@@ -1585,6 +1585,7 @@ class CRM_Utils_Token {
           '$dataArray' => ts('see default template for how to show this'),
           '$individual' => ts('see default template for how to show this'),
           '$amount' => ts('see default template for how to show this'),
+          '$additionalParticipant' => ts('see default template for how to show this'),
           '$location' => 'event.location',
           '$register_date' => 'participant.register_date',
           '$participant.role' => 'participant.role_id:label',

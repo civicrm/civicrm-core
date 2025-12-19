@@ -830,7 +830,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $this->assign('customProfile', $customProfile);
             $this->set('customProfile', $customProfile);
           }
-          $this->_values['params']['additionalParticipant'] = FALSE;
         }
         else {
           //take the Additional participant number.
@@ -852,17 +851,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             // @todo - unused in core offline receipt template from 5.67. Remove at somepoint
             $this->assign('amounts', $amount);
           }
-          if ($this->_lineItem) {
-            $lineItems = $this->_lineItem;
-            $lineItem = [];
-            if ($lineItemValue = ($lineItems[$participantNum] ?? NULL)) {
-              $lineItem[] = $lineItemValue;
-            }
-            $this->assign('lineItem', $lineItem);
-          }
-          $this->_values['params']['additionalParticipant'] = TRUE;
-          // Removed from tpl in 5.67
-          $this->assign('isAdditionalParticipant', $this->_values['params']['additionalParticipant']);
         }
 
         //pass these variables since these are run time calculated.
