@@ -197,7 +197,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   public function recordFinancialAccounts(array &$params): void {
     $skipRecords = FALSE;
-    $isUpdate = !empty($params['prevContribution']);
+    $isUpdate = $this->isUpdate();
 
     $contributionStatus = $this->getUpdatedContributionStatus();
 
@@ -212,7 +212,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
       //build financial transaction params
 
-      if ($isUpdate) {
+      if ($this->isUpdate()) {
         $trxnParams = $this->getTrxnParams($params);
         $params['trxnParams'] = $trxnParams;
         $updated = FALSE;
@@ -358,7 +358,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $entityId = $this->getUpdatedContribution()->id;
         $entityTable = 'civicrm_contribution';
       }
-      $this->createLineItems($entityId, $params['line_item'] ?? NULL, $entityTable, $isUpdate);
+      $this->createLineItems($entityId, $params['line_item'] ?? NULL, $entityTable);
     }
 
     // create batch entry if batch_id is passed and
@@ -1061,11 +1061,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param string $entityTable
    *   Entity table.
    *
-   * @param bool $update
-   *
    * @throws \CRM_Core_Exception
    */
-  private function createLineItems($entityId, $lineItems, $entityTable = 'civicrm_contribution', $update = FALSE) {
+  private function createLineItems($entityId, $lineItems, $entityTable = 'civicrm_contribution') {
     if (!$entityId || !is_array($lineItems)
       || CRM_Utils_System::isNull($lineItems)
     ) {
@@ -1095,7 +1093,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
-        if (!$update && $contributionDetails) {
+        if (!$this->isUpdate() && $contributionDetails) {
           $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
           $line['financial_item_id'] = $financialItem->id;
           if (!empty($line['tax_amount'])) {
@@ -1104,9 +1102,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
         }
       }
     }
-    if (!$update && $contributionDetails) {
+    if (!$this->isUpdate() && $contributionDetails) {
       $this->createDeferredTrxn($lineItems);
     }
+  }
+
+  /**
+   * @return bool
+   */
+  private function isUpdate(): bool {
+    return !empty($this->originalContribution);
   }
 
 }
