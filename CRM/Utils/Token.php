@@ -1588,6 +1588,7 @@ class CRM_Utils_Token {
           '$location' => 'event.location',
           '$register_date' => 'participant.register_date',
           '$participant.role' => 'participant.role_id:label',
+          '$totalAmount' => 'contribution.total_amount',
           '$totalTaxAmount' => 'contribution.tax_amount',
           '$event.participant_role' => 'participant.role_id:label',
           '$paidBy' => 'contribution.payment_instrument_id:label',
