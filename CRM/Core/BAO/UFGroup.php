@@ -914,7 +914,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @return null|array
    */
   public static function getValues(
-    $cid, &$fields, &$values,
+    $cid, $fields, &$values,
     $searchable = TRUE, $componentWhere = NULL,
     $absolute = FALSE, $additionalWhereClause = NULL,
     $context = NULL
@@ -973,7 +973,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $params[$index] = $values[$index] = '';
       $customFieldName = NULL;
       // hack for CRM-665
-      if (isset($details->$name) || $name == 'group' || $name == 'tag') {
+      if (isset($details->$name) || $name === 'group' || $name === 'tag') {
         // to handle gender / suffix / prefix
         if (in_array(substr($name, 0, -3), ['gender', 'prefix', 'suffix'])) {
           $params[$index] = $details->$name;
