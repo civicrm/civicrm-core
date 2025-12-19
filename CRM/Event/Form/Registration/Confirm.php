@@ -935,6 +935,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // For pay-later contributions it will be the pay-later processor.
       'payment_processor' => $this->_paymentProcessor ? $this->_paymentProcessor['id'] : NULL,
       'payment_instrument_id' => $this->_paymentProcessor ? $this->_paymentProcessor['payment_instrument_id'] : NULL,
+      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
     ];
 
     if (!$pending && $result) {
@@ -964,12 +965,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       );
     }
 
-    if (Civi::settings()->get('deferred_revenue_enabled')) {
-      $eventStartDate = $form->_values['event']['start_date'] ?? NULL;
-      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
-        $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
-      }
-    }
     $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
 
     $contribParams['skipLineItem'] = 1;
@@ -977,11 +972,28 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($form->getEventID(), $contribParams, '', CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
+    CRM_Event_BAO_Participant::createDiscountTrxn($this->getEventID(), $contribParams, '', CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
     $transaction->commit();
 
     return $contribution;
+  }
+
+  /**
+   * Get the value for the revenue recognition date field.
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRevenueRecognitionDate(): string {
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
+      $eventStartDate = $this->getEventValue('start_date');
+      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
+        return date('Ymd', strtotime($eventStartDate));
+      }
+    }
+    return '';
   }
 
   /**
