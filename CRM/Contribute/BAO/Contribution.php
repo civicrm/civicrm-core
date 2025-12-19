@@ -2355,11 +2355,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public function _gatherMessageValues($values, ?int $eventID, ?int $participantID) {
     // set display address of contributor
-    $values['billingName'] = '';
     if ($this->address_id) {
       $addressDetails = CRM_Core_BAO_Address::getValues(['id' => $this->address_id], FALSE, 'id');
       $addressDetails = reset($addressDetails);
-      $values['billingName'] = $addressDetails['name'] ?? '';
     }
     // Else we assign the billing address of the contribution contact.
     else {
@@ -2485,7 +2483,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // and this function should assign them (assigning null if not set).
     // the way the pcpParams & honor Params section works is a baby-step towards this.
     $template = CRM_Core_Smarty::singleton();
-    $template->assign('billingName', $values['billingName']);
     // It is unclear if onBehalfProfile is still assigned & where - but
     // it is still referred to in templates so avoid an e-notice.
     // Credit card type is assigned on the form layer but should also be
