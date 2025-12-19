@@ -2388,38 +2388,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // Handle re-print receipt for offline contributions (call from PDF.php - no contribution_page_id)
         $values['title'] = 'Contribution';
       }
-      // set lineItem for contribution
-      if ($this->id) {
-        $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->id);
-        if (!empty($lineItems)) {
-          $firstLineItem = reset($lineItems);
-          $priceSet = [];
-          if (!empty($firstLineItem['price_set_id'])) {
-            $priceSet = civicrm_api3('PriceSet', 'getsingle', [
-              'id' => $firstLineItem['price_set_id'],
-              'return' => 'is_quick_config, id',
-            ]);
-            $values['priceSetID'] = $priceSet['id'];
-          }
-          foreach ($lineItems as &$eachItem) {
-            if ($eachItem['entity_table'] === 'civicrm_membership') {
-              $membership = reset(civicrm_api3('Membership', 'get', [
-                'id' => $eachItem['entity_id'],
-                'return' => ['join_date', 'start_date', 'end_date'],
-              ])['values']);
-              if ($membership) {
-                $eachItem['join_date'] = CRM_Utils_Date::customFormat($membership['join_date']);
-                $eachItem['start_date'] = CRM_Utils_Date::customFormat($membership['start_date']);
-                $eachItem['end_date'] = CRM_Utils_Date::customFormat($membership['end_date']);
-              }
-            }
-            // This is actually used in conjunction with is_quick_config in the template & we should deprecate it.
-            // However, that does create upgrade pain so would be better to be phased in.
-            $values['useForMember'] = empty($priceSet['is_quick_config']);
-          }
-          $values['lineItem'][0] = $lineItems;
-        }
-      }
 
       $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds(
         $this->id,

@@ -29,7 +29,6 @@
   {if !empty($labelStyle)}
   labelStyle:::{$labelStyle}
   {/if}
-  priceSetID:::{$priceSetID}
   currency:::{$currency}
   {if !empty($is_quick_config)}
   is_quick_config:::{$is_quick_config}
@@ -72,10 +71,7 @@
   onBehalfProfile_grouptitle:::{$onBehalfProfile_grouptitle}
   {/if}
   email:::{$email}
-  {if !empty($contributionPageId)}
-  contributionPageId:::{$contributionPageId}
   title:::{$title}
-  {/if}
   {if !empty($isBillingAddressRequiredForPayLater)}
   isBillingAddressRequiredForPayLater:::{$isBillingAddressRequiredForPayLater}
   {/if}
