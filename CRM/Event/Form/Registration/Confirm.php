@@ -715,7 +715,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       //build an array of custom profile and assigning it to template
       $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $this->isTest());
       if (count($customProfile)) {
-        $this->assign('customProfile', $customProfile);
+        // @todo - calculate this on the thank you page, where it is used rather than here & passing through.
         $this->set('customProfile', $customProfile);
       }
 
@@ -827,7 +827,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $this->isTest());
 
           if (count($customProfile)) {
-            $this->assign('customProfile', $customProfile);
+            // @todo - calculate this on the thank you page, where it is used rather than here & passing through.
             $this->set('customProfile', $customProfile);
           }
           $this->_values['params']['additionalParticipant'] = FALSE;
@@ -842,7 +842,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $participantParams = ['id' => $participantID];
           CRM_Event_BAO_Participant::getValues($participantParams, $participantValues, $ids);
           $this->_values['participant'] = $participantValues[$participantID];
-          $this->assign('customProfile', NULL);
           //Additional Participant should get only it's payment information
           if (!empty($this->_amount)) {
             $amount = [];

@@ -2625,13 +2625,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
 
-      //build an array of custom profile and assigning it to template
-      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($this->_relatedObjects['participant']->id, $values, NULL, $isTest);
-
-      if (count($customProfile)) {
-        $template->assign('customProfile', $customProfile);
-      }
-
       // for primary contact
       $values['params']['additionalParticipant'] = FALSE;
       $template->assign('isPrimary', 1);
