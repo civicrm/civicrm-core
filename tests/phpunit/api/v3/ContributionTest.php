@@ -1989,7 +1989,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_pay_later:::1',
       'email:::anthony_anderson@civicrm.org',
       'pay_later_receipt:::This is a pay later receipt',
-      'contributionPageId:::' . $contributionPageID,
       'title:::Test Contribution Page',
       'amount:::CA$100.00',
     ]);

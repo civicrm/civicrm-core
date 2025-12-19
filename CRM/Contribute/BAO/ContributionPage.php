@@ -142,7 +142,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'customPost',
       'customPre_grouptitle',
       'customPost_grouptitle',
-      'useForMember',
       'amount',
       'receipt_date',
       'is_pay_later',
@@ -330,10 +329,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'displayName' => $displayName,
         'contributionID' => $values['contribution_id'] ?? NULL,
         'contributionOtherID' => $values['contribution_other_id'] ?? NULL,
-        // CRM-5095
-        'lineItem' => $values['lineItem'] ?? NULL,
-        // CRM-5095
-        'priceSetID' => $values['priceSetID'] ?? NULL,
         'title' => $title,
         'isShare' => $values['is_share'] ?? NULL,
         'thankyou_title' => $values['thankyou_title'] ?? NULL,
@@ -341,7 +336,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'customPre_grouptitle' => $values['customPre_grouptitle'],
         'customPost' => $values['customPost'],
         'customPost_grouptitle' => $values['customPost_grouptitle'],
-        'useForMember' => $values['useForMember'],
         'amount' => $values['amount'],
         'is_pay_later' => $values['is_pay_later'],
         'receipt_date' => !$values['receipt_date'] ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
