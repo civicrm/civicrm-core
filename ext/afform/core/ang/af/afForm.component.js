@@ -108,7 +108,7 @@
               });
               $element.unblock();
             }, (error) => {
-              disableForm(error.error_message);
+              disableForm(error.error_message, ts('Sorry'), 'error');
               $element.unblock();
             });
         }
@@ -365,26 +365,18 @@
         $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
           .addClass('disabled')
           .find('button[ng-click="afform.submit()"]').prop('disabled', true);
-        CRM.alert(errorMsg, ts('Sorry'), 'error');
+        displayError(errorMsg, ts('Sorry'), 'error');
       }
 
-      function handleError(status, $element, error) {
-        status.reject();
-        $element.unblock();
-        // see: CRM/Api4/Page/AJAX.php
-        if (error.error_code == 42) {
-          if (typeof Swal === 'function') {
-            Swal.fire({
-              icon: 'warning',
-              html: error.error_message.replace("\n", '<br>')
-            });
-          }
-          else {
-            CRM.alert(error.error_message, ts('Form Error'));
-          }
+     function displayError(error, title, type) {
+        if (typeof Swal === 'function') {
+          Swal.fire({
+            icon: type,
+            html: error.error_message.replace("\n", '<br>')
+          });
         }
         else {
-          CRM.alert(error.error_message, ts('Form Error'));
+          CRM.alert(error.error_message, title, type);
         }
       }
 
@@ -426,7 +418,16 @@
           }
         })
         .catch(function(error) {
-          handleError(status, $element, error);
+          status.reject();
+          $element.unblock();
+
+          // see: CRM/Api4/Page/AJAX.php
+          if (error.error_code !== '1') {
+            displayError(error.error_message, ts('Please resolve these issues'), 'warning');
+          }
+          else {
+            displayError(error.error_message, ts('There is a problem'), 'error');
+          }
         });
       };
 
@@ -462,7 +463,13 @@
           }
         })
         .catch(function(error) {
-          handleError(status, $element, error);
+          // see: CRM/Api4/Page/AJAX.php
+          if (error.error_code !== '1') {
+            displayError(error.error_message, ts('Please resolve these issues'), 'warning');
+          }
+          else {
+            displayError(error.error_message, ts('There is a problem'), 'error');
+          }
           setDraftStatus('unsaved');
         });
       };
