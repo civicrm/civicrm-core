@@ -1,5 +1,8 @@
 <?php
 
+use Civi\API\EntityLookupTrait;
+use Civi\Api4\Contribution;
+use Civi\Api4\ContributionPage;
 use Civi\Api4\Membership;
 
 /**
@@ -9,6 +12,9 @@ use Civi\Api4\Membership;
  * @method $this setFinancialTrxnID(?int $financialTrxnID)
  */
 trait CRM_Contribute_WorkflowMessage_ContributionTrait {
+  use CRM_Core_WorkflowMessage_ProfileTrait;
+  use EntityLookupTrait;
+
   /**
    * The contribution.
    *
@@ -18,11 +24,39 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    */
   public $contribution;
 
+  private $contributionPage;
+
   /**
    * @return array|null
    */
   public function getContribution(): ?array {
-    return $this->contribution;
+    if (!isset($this->contribution) && $this->getContributionID()) {
+      $this->contribution = Contribution::get(FALSE)
+        ->addWhere('id', '=', $this->getContributionID())
+        ->execute()->first();
+
+    }
+    return $this->contribution ?? NULL;
+  }
+
+  private function getContributionPageValue($field): mixed {
+    if (!isset($this->contributionPage)) {
+      $this->contributionPage = [];
+      if ($this->getContributionPageID()) {
+        $this->contributionPage = ContributionPage::get(FALSE)->addWhere('id', '=', $this->getContributionID())->execute()->first() ?? NULL;
+      }
+    }
+    return $this->contributionPage[$field] ?? NULL;
+  }
+
+  private function getContributionPageID(): ?int {
+    if ($this->contributionID || !$this->getContribution()) {
+      return NULL;
+    }
+    if (!array_key_exists('contribution_page_id', $this->contribution)) {
+      $this->contribution += Contribution::get(FALSE)->addWhere('id', '=', $this->getContributionID())->execute()->first() ?? NULL;
+    }
+    return $this->contribution['contribution_page_id'];
   }
 
   /**
@@ -271,6 +305,91 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public function setOrder(CRM_Financial_BAO_Order $order): self {
     $this->order = $order;
     return $this;
+  }
+
+  /**
+   * Title from on behalf profile.
+   *
+   * @var string|null
+   *
+   * @scope tokenContext as onBehalfProfile_grouptitle
+   */
+  public ?string $onBehalfProfileTitle;
+
+  public function getOnBehalfProfileTitle(): ?string {
+    if ($this->isEventPage()) {
+      return NULL;
+    }
+    $profile = $this->getProfileByType('on_behalf');
+    if ($profile) {
+      return $profile['title'];
+    }
+    return NULL;
+  }
+
+  /**
+   * Title from on behalf profile.
+   *
+   * @var string|null
+   *
+   * @scope tokenContext as onBehalfProfile
+   */
+  public ?string $onBehalfProfile;
+
+  public function getOnBehalfProfile(): ?array {
+    if ($this->isEventPage()) {
+      return NULL;
+    }
+    return $this->getProfileOutput('on_behalf');
+  }
+
+  /**
+   * @param string $module
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  protected function getProfileOutput(string $module): array {
+    $output = [];
+    $profile = $this->getProfileByType($module);
+    if (!empty($profile) && CRM_Core_BAO_UFGroup::filterUFGroups($profile['id'], $this->getContactID())) {
+      $fields = CRM_Core_BAO_UFGroup::getFields($profile['id'], FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
+      foreach ($fields as $fieldName => $fieldSpec) {
+        // suppress all file fields from display and formatting fields
+        if (
+          $fieldSpec['data_type'] === 'File' || $fieldSpec['name'] === 'image_URL' || $fieldSpec['field_type'] === 'Formatting') {
+          unset($fields[$fieldName]);
+        }
+
+        // Not too sure what these search filters are but they relate to
+        // when it is being done on behalf of an organization to restrict
+        // the included membership or contribution ID....
+        $isAddSearchFilter = $module === 'on_behalf' && $this->getContributionPageValue('is_for_organization');
+        $searchFilters = $isAddSearchFilter ? ['contribution_id', '=', $this->getContributionID(), 0, 0] : [];
+
+        if (property_exists($this, 'membership')) {
+          // This is code that has been present for a long time & may or may not make
+          // sense not but the intent appears to be to keep contribution profile fields
+          // off membership receipts.
+          if (!in_array($fieldSpec['field_type'], ['Contact', 'Organization', 'Membership'])) {
+            unset($fields[$fieldName]);
+          }
+          if ($isAddSearchFilter) {
+            $searchFilters = [
+              [
+                'member_id',
+                '=',
+                $this->getMembershipID(),
+                0,
+                0,
+              ],
+            ];
+          }
+        }
+      }
+
+      $output = CRM_Core_BAO_UFGroup::getValues($this->getContactID(), $fields, $values, FALSE, $searchFilters, FALSE, NULL, 'email');
+    }
+    return $output;
   }
 
   /**
