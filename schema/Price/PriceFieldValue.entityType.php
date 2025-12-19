@@ -157,7 +157,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_membership_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'title',
       ],
       'entity_reference' => [
         'entity' => 'MembershipType',
