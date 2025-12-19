@@ -422,8 +422,13 @@ WHERE ceft.entity_id = %1";
    *
    * @param string $context
    *
+   * @deprecated only called from deprecated / discouraged paths.
+   *
    */
   public static function createDeferredTrxn($lineItems, $contributionDetails, $update = FALSE, $context = NULL) {
+    if ($update || $context) {
+      CRM_Core_Error::deprecatedWarning('deprecated parameter passed to (deprecated) function ' . __FUNCTION__);
+    }
     if (empty($lineItems)) {
       return;
     }
