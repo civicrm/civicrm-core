@@ -912,32 +912,28 @@ class CRM_Contribute_BAO_FinancialProcessor {
       ];
 
       $deferredRevenues = [];
-      foreach ($lineItems as $priceSetID => $lineItem) {
-        if (!$priceSetID) {
+      $lineItems = reset($lineItems);
+      foreach ($lineItems as $key => $lineItem) {
+        $lineTotal = !empty($lineItem['deferred_line_total']) ? $lineItem['deferred_line_total'] : $lineItem['line_total'];
+        if ($lineTotal <= 0 && !$update) {
           continue;
         }
-        foreach ($lineItem as $key => $item) {
-          $lineTotal = !empty($item['deferred_line_total']) ? $item['deferred_line_total'] : $item['line_total'];
-          if ($lineTotal <= 0 && !$update) {
-            continue;
-          }
-          $deferredRevenues[$key] = $item;
-          if ($context == 'changeFinancialType') {
-            $deferredRevenues[$key]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $item['id'], 'financial_type_id');
-          }
-          if (in_array($item['entity_table'],
-            ['civicrm_participant', 'civicrm_contribution'])
-          ) {
-            $deferredRevenues[$key]['revenue'][] = [
-              'amount' => $lineTotal,
-              'revenue_date' => $revenueRecognitionDate,
-            ];
-          }
-          else {
-            // for membership
-            $item['line_total'] = $lineTotal;
-            $deferredRevenues[$key]['revenue'] = CRM_Core_BAO_FinancialTrxn::getMembershipRevenueAmount($item);
-          }
+        $deferredRevenues[$key] = $lineItem;
+        if ($context === 'changeFinancialType') {
+          $deferredRevenues[$key]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $lineItem['id'], 'financial_type_id');
+        }
+        if (in_array($lineItem['entity_table'],
+          ['civicrm_participant', 'civicrm_contribution'])
+        ) {
+          $deferredRevenues[$key]['revenue'][] = [
+            'amount' => $lineTotal,
+            'revenue_date' => $revenueRecognitionDate,
+          ];
+        }
+        else {
+          // for membership
+          $lineItem['line_total'] = $lineTotal;
+          $deferredRevenues[$key]['revenue'] = CRM_Core_BAO_FinancialTrxn::getMembershipRevenueAmount($lineItem);
         }
       }
       $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
