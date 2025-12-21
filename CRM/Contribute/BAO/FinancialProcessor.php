@@ -355,7 +355,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $entityTable = 'civicrm_membership';
       }
       else {
-        $entityId = $this->getUpdatedContribution()->id;
+        $entityId = $this->getContributionID();
         $entityTable = 'civicrm_contribution';
       }
       $this->createLineItems($entityId, $params['line_item'], $entityTable);
@@ -513,7 +513,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function getTrxnParams(array $params): array {
     $trxnParams = [
-      'contribution_id' => $this->getUpdatedContribution()->id,
+      'contribution_id' => $this->getContributionID(),
       'to_financial_account_id' => $this->getToFinancialAccount($params),
       // If receive_date is not deliberately passed in we assume 'now'.
       // test testCompleteTransactionWithReceiptDateSet ensures we don't
@@ -844,10 +844,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $prevContribution = $inputParams['prevContribution'];
     $deferredFinancialAccount = $inputParams['deferred_financial_account_id'] ?? NULL;
     if (empty($deferredFinancialAccount)) {
-      $deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($prevContribution->financial_type_id, 'Deferred Revenue Account is');
+      $deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getOriginalContributionValue('financial_type_id'), 'Deferred Revenue Account is');
     }
 
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($prevContribution->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getContributionID(), 'DESC', FALSE, NULL, $deferredFinancialAccount);
 
     // there is no point to proceed as we can't find the last payment made
     // @todo we should throw an exception here rather than return false.
@@ -863,12 +863,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $lastFinancialTrxn['total_amount'] = -$inputParams['trxnParams']['total_amount'];
     $lastFinancialTrxn['net_amount'] = -$inputParams['trxnParams']['net_amount'];
     $lastFinancialTrxn['fee_amount'] = -$inputParams['trxnParams']['fee_amount'];
-    $lastFinancialTrxn['contribution_id'] = $prevContribution->id;
+    $lastFinancialTrxn['contribution_id'] = $this->getContributionID();
     foreach ([$lastFinancialTrxn, $inputParams['trxnParams']] as $financialTrxnParams) {
       $trxn = CRM_Core_BAO_FinancialTrxn::create($financialTrxnParams);
       $trxnParams = [
         'total_amount' => $trxn->total_amount,
-        'contribution_id' => $this->getUpdatedContribution()->id,
+        'contribution_id' => $this->getContributionID(),
       ];
       $this->assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
     }
@@ -902,7 +902,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         return;
       }
       $trxnParams = [
-        'contribution_id' => $contributionDetails->id,
+        'contribution_id' => $this->getContributionID(),
         'fee_amount' => '0.00',
         'currency' => $contributionDetails->currency,
         'trxn_id' => $contributionDetails->trxn_id,
@@ -1033,10 +1033,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    */
   private function assignProportionalLineItems($trxnParams, $trxnId, $contributionTotalAmount) {
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->getContributionID());
     if (!empty($lineItems)) {
       // get financial item
-      [$financialItemIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($trxnParams['contribution_id']);
+      [$financialItemIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($this->getContributionID());
       $entityParams = [
         'contribution_total_amount' => $contributionTotalAmount,
         'trxn_total_amount' => $trxnParams['total_amount'],
@@ -1060,7 +1060,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    */
   private function createLineItems(int $entityId, array $lineItems, $entityTable = 'civicrm_contribution') {
-    $contributionID = $this->getUpdatedContribution()->id;
     foreach ($lineItems as &$values) {
 
       foreach ($values as &$line) {
@@ -1070,9 +1069,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
         }
-        $line['contribution_id'] = $contributionID;
+        $line['contribution_id'] = $this->getContributionID();
         if ($line['entity_table'] === 'civicrm_contribution') {
-          $line['entity_id'] = $contributionID;
+          $line['entity_id'] = $this->getContributionID();
         }
 
         // if financial type is not set and if price field value is NOT NULL
@@ -1100,6 +1099,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function isUpdate(): bool {
     return !empty($this->originalContribution);
+  }
+
+  /**
+   * @return int|string|null
+   */
+  public function getContributionID(): string|int|null {
+    return $this->getUpdatedContribution()->id;
   }
 
 }
