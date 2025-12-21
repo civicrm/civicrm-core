@@ -247,7 +247,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
               $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
             }
           }
-          $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
+          $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
+          $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
+
           $this->updateFinancialAccounts($params, 'changeFinancialType');
           $params['skipLineItem'] = FALSE;
           foreach ($params['line_item'] as &$lineItems) {
@@ -258,11 +260,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changeFinancialType');
           /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
           $params['financial_account_id'] = $this->getUpdatedFinancialAccount();
-          $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
-          // Set the transaction fee amount back to the original value for creating the new positive financial trxn.
-          if (isset($params['fee_amount'])) {
-            $params['trxnParams']['fee_amount'] = $params['fee_amount'];
-          }
+          // Set the amounts back to the original value for creating the new positive financial trxn.
+          $params['total_amount'] = $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'] = $this->getUpdatedContribution()->total_amount;
+          $params['trxnParams']['fee_amount'] = $this->getUpdatedContribution()->fee_amount;
           $this->updateFinancialAccounts($params);
           $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE);
           $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
@@ -306,7 +306,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $totalAmount = $this->getUpdatedContribution()->total_amount ?? 0;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
-        if ($this->isContributionTotalChanged()) {
+        // If the total has changed then create adjustments, but it the financial
+        // account has ALSO changed this will already have been dealt with using reverse & recreate above.
+        if ($this->isContributionTotalChanged() && !$this->isFinancialAccountChanged()) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
@@ -481,6 +483,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    */
   protected function getFinancialItemAmountFromParams($context, $lineItemDetails, $previousLineItemTotal) {
+    $originalLineItem = $this->originalLineItems[$lineItemDetails['id'] ?? NULL] ?? [];
     if ($context === 'changedAmount') {
       $lineTotal = $lineItemDetails['line_total'];
       if ($lineTotal != $previousLineItemTotal) {
@@ -488,8 +491,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
       return $lineTotal;
     }
-    elseif ($context === 'changeFinancialType') {
-      return -$lineItemDetails['line_total'];
+    if ($context === 'changeFinancialType') {
+      // This is a reversal that will be followed by a replacement line. We should also
+      // do this when currency changes or, perhaps we should always reverse & redo to mitigate
+      // complexity / error risk.
+      return -$originalLineItem['line_total'];
     }
     elseif ($context === 'changedStatus') {
       $cancelledTaxAmount = 0;
