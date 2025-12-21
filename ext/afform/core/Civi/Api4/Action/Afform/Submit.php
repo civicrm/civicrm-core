@@ -46,7 +46,7 @@ class Submit extends AbstractProcessor {
         ->execute()->count();
 
       if ($afformSubmissionData > 0) {
-        throw new \CRM_Core_Exception(ts('Submission is already processed.'));
+        throw new \CRM_Core_Exception(ts('Submission Processed'), 0, ['validation' => ts('Submission is already processed.')]);
       }
     }
 
