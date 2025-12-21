@@ -44,6 +44,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $this->inputValues = $inputValues;
   }
 
+  public function getContributionID(): int {
+    return $this->getUpdatedContribution()['id'];
+  }
+
   public function getUpdatedContribution(): CRM_Contribute_DAO_Contribution {
     return $this->updatedContribution;
   }
@@ -271,15 +275,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
         }
 
         //Update contribution status
-        $params['trxnParams']['status_id'] = $params['contribution']->contribution_status_id;
+        $params['trxnParams']['status_id'] = $this->getUpdatedContribution()->contribution_status_id;
         if (!isset($params['refund_trxn_id'])) {
           // CRM-17751 This has previously been deliberately set. No explanation as to why one variant
           // gets preference over another so I am only 'protecting' a very specific tested flow
           // and letting natural justice take care of the rest.
-          $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
+          $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
         }
         if (!empty($params['contribution_status_id']) &&
-          $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
+          $this->getOriginalContributionStatus() !== $this->getUpdatedContributionStatus()
         ) {
           //Update Financial Records
           $callUpdateFinancialAccounts = $this->updateFinancialAccountsOnContributionStatusChange($params);
@@ -293,7 +297,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         // change Payment Instrument for a Completed contribution
         // first handle special case when contribution is changed from Pending to Completed status when initial payment
         // instrument is null and now new payment instrument is added along with the payment
-        $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
+        $params['trxnParams']['payment_instrument_id'] = $this->getUpdatedContribution()->payment_instrument_id;
         $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
 
         if ($this->isPaymentInstrumentChange($params)) {
@@ -305,7 +309,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $params['trxnParams']['net_amount'] = $params['net_amount'] ?? NULL;
         $totalAmount = $this->getUpdatedContribution()->total_amount ?? 0;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
-        $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
+        $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
         if ($this->isContributionTotalChanged()) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
@@ -355,7 +359,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $entityTable = 'civicrm_membership';
       }
       else {
-        $entityId = $this->getUpdatedContribution()->id;
+        $entityId = $this->getContributionID();
         $entityTable = 'civicrm_contribution';
       }
       $this->createLineItems($entityId, $params['line_item'], $entityTable);
@@ -513,7 +517,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function getTrxnParams(array $params): array {
     $trxnParams = [
-      'contribution_id' => $this->getUpdatedContribution()->id,
+      'contribution_id' => $this->getContributionID(),
       'to_financial_account_id' => $this->getToFinancialAccount($params),
       // If receive_date is not deliberately passed in we assume 'now'.
       // test testCompleteTransactionWithReceiptDateSet ensures we don't
@@ -1060,7 +1064,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    */
   private function createLineItems(int $entityId, array $lineItems, $entityTable = 'civicrm_contribution') {
-    $contributionID = $this->getUpdatedContribution()->id;
+    $contributionID = $this->getContributionID();
     foreach ($lineItems as &$values) {
 
       foreach ($values as &$line) {
