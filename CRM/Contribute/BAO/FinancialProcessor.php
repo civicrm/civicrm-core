@@ -1065,6 +1065,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
       foreach ($values as &$line) {
         if (empty($line['entity_table'])) {
+          CRM_Core_Error::deprecatedWarning('set the entity_table before here');
           $line['entity_table'] = $entityTable;
         }
         if (empty($line['entity_id'])) {
