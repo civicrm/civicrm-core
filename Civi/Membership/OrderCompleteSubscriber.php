@@ -82,16 +82,16 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         'membership_activity_status' => 'Completed',
       ];
 
-      // CRM-8141 update the membership type with the value recorded in log when membership created/renewed
-      // this picks up membership type changes during renewals
-      $preChangeMembership = MembershipLog::get(FALSE)
-        ->addSelect('membership_type_id')
-        ->addWhere('membership_id', '=', $membershipParams['id'])
-        ->addOrderBy('id', 'DESC')
+      // Update the membership type with the LineItem membership_type_id for potential membership type changes during renewals
+      $preChangeMembership = LineItem::get(FALSE)
+        ->addSelect('price_field_value.membership_type_id')
+        ->addJoin('PriceFieldValue AS price_field_value', 'LEFT')
+        ->addWhere('contribution_id', '=', $contributionID)
+        ->addWhere('entity_table', '=', 'civicrm_membership')
         ->execute()
         ->first();
-      if (!empty($preChangeMembership) && !empty($preChangeMembership['membership_type_id'])) {
-        $membershipParams['membership_type_id'] = $preChangeMembership['membership_type_id'];
+      if (!empty($preChangeMembership) && !empty($preChangeMembership['price_field_value.membership_type_id'])) {
+        $membershipParams['membership_type_id'] = $preChangeMembership['price_field_value.membership_type_id'];
       }
       if (empty($membership['end_date']) || (int) $membership['status_id'] !== \CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
         // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
