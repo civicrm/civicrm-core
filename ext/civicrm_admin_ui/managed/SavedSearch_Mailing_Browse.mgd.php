@@ -23,14 +23,14 @@ $columns = [
   [
     'type' => 'field',
     'key' => 'name',
-    'label' => E::ts('Mailing Name'),
+    'label' => 'Mailing Name',
     'sortable' => TRUE,
     'icons' => [],
   ],
   [
     'type' => 'field',
     'key' => 'status:label',
-    'label' => E::ts('Status'),
+    'label' => 'Status',
     'sortable' => TRUE,
     'icons' => [],
     'cssRules' => [],
@@ -42,7 +42,7 @@ if (CRM_Core_I18n::isMultilingual()) {
   $columns[] = [
     'type' => 'field',
     'key' => 'language:label',
-    'label' => E::ts('Language'),
+    'label' => 'Language',
     'sortable' => TRUE,
   ];
 }
@@ -51,37 +51,37 @@ $columns = array_merge($columns, [
   [
     'type' => 'field',
     'key' => 'created_id.display_name',
-    'label' => E::ts('Created By'),
+    'label' => 'Created By',
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
     'key' => 'created_date',
-    'label' => E::ts('Created Date'),
+    'label' => 'Created Date',
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
     'key' => 'scheduled_id.display_name',
-    'label' => E::ts('Sent By'),
+    'label' => 'Sent By',
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
     'key' => 'MIN_Mailing_MailingJob_mailing_id_01_scheduled_date',
-    'label' => E::ts('Scheduled'),
+    'label' => 'Scheduled',
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
     'key' => 'MIN_Mailing_MailingJob_mailing_id_01_start_date',
-    'label' => E::ts('Started'),
+    'label' => 'Started',
     'sortable' => TRUE,
   ],
   [
     'type' => 'field',
     'key' => 'MAX_Mailing_MailingJob_mailing_id_01_end_date',
-    'label' => E::ts('Completed'),
+    'label' => 'Completed',
     'sortable' => TRUE,
   ],
 ]);
@@ -92,7 +92,7 @@ if (CRM_Core_Component::isEnabled('CiviCampaign')) {
   $columns[] = [
     'type' => 'field',
     'key' => 'campaign_id:label',
-    'label' => E::ts('Campaign'),
+    'label' => 'Campaign',
     'sortable' => TRUE,
   ];
 }
@@ -112,7 +112,7 @@ $columns = array_merge($columns, [
         'join' => '',
         'target' => '',
         'icon' => 'fa-pencil',
-        'text' => E::ts('Continue'),
+        'text' => 'Continue',
         'style' => 'default',
         'path' => '',
         'condition' => [
@@ -123,7 +123,7 @@ $columns = array_merge($columns, [
       ],
       [
         'icon' => 'fa-clone',
-        'text' => E::ts('Copy'),
+        'text' => 'Copy',
         'style' => 'default',
         'condition' => [
           'status:name',
@@ -141,7 +141,7 @@ $columns = array_merge($columns, [
         'join' => '',
         'target' => 'crm-popup',
         'icon' => 'fa-bar-chart',
-        'text' => E::ts('Report'),
+        'text' => 'Report',
         'style' => 'default',
         'path' => '',
         'condition' => [],
@@ -149,7 +149,7 @@ $columns = array_merge($columns, [
       [
         'path' => 'civicrm/mailing/browse?action=reopen&mid=[id]&reset=1',
         'icon' => 'fa-play',
-        'text' => E::ts('Resume'),
+        'text' => 'Resume',
         'style' => 'default',
         'condition' => [
           'status:name',
@@ -164,7 +164,7 @@ $columns = array_merge($columns, [
       [
         'path' => 'civicrm/mailing/browse?action=disable&mid=[id]&reset=1',
         'icon' => 'fa-ban',
-        'text' => E::ts('Cancel'),
+        'text' => 'Cancel',
         'style' => 'default',
         'condition' => [
           'status:name',
@@ -182,7 +182,7 @@ $columns = array_merge($columns, [
         'join' => '',
         'target' => 'crm-popup',
         'icon' => 'fa-eye',
-        'text' => E::ts('Preview Mailing'),
+        'text' => 'Preview Mailing',
         'style' => 'default',
         'path' => '',
         'condition' => [],
@@ -190,7 +190,7 @@ $columns = array_merge($columns, [
       [
         'path' => 'civicrm/mailing/browse?action=close&mid=[id]&reset=1',
         'icon' => 'fa-pause',
-        'text' => E::ts('Pause'),
+        'text' => 'Pause',
         'style' => 'default',
         'condition' => [
           'status:name',
@@ -205,7 +205,7 @@ $columns = array_merge($columns, [
       [
         'path' => 'civicrm/mailing/browse?action=disable&mid=[id]&reset=1',
         'icon' => 'fa-ban',
-        'text' => E::ts('Cancel'),
+        'text' => 'Cancel',
         'style' => 'default',
         'condition' => [
           'status:name',
@@ -223,7 +223,7 @@ $columns = array_merge($columns, [
         'join' => '',
         'target' => 'crm-popup',
         'icon' => 'fa-trash',
-        'text' => E::ts('Delete'),
+        'text' => 'Delete',
         'style' => 'danger',
         'path' => 'civicrm/mailing/browse?action=delete&mid=[id]&reset=1',
         'condition' => [],
@@ -327,7 +327,7 @@ return [
             [
               'entity' => 'Mailing',
               'action' => 'add',
-              'text' => E::ts('Add Mailing'),
+              'text' => 'Add Mailing',
               'icon' => 'fa-plus',
               'style' => 'primary',
               'target' => '',

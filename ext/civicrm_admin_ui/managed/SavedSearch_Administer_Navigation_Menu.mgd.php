@@ -89,7 +89,7 @@ return [
                 [
                   'path' => '',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -101,7 +101,7 @@ return [
                 [
                   'path' => 'civicrm/admin/menu/item?action=add&parent_id=[id]&reset=1',
                   'icon' => 'fa-folder-tree',
-                  'text' => E::ts('Add subitem'),
+                  'text' => 'Add subitem',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -116,7 +116,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-off',
-                  'text' => E::ts('Disable'),
+                  'text' => 'Disable',
                   'style' => 'warning',
                   'path' => '',
                   'action' => '',
@@ -127,7 +127,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-on',
-                  'text' => E::ts('Enable'),
+                  'text' => 'Enable',
                   'style' => 'success',
                   'path' => '',
                   'action' => '',
@@ -138,7 +138,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger',
                   'path' => '',
                   'action' => 'delete',
@@ -168,7 +168,7 @@ return [
           'toolbar' => [
             [
               'entity' => 'Navigation',
-              'text' => E::ts('Add Menu Item'),
+              'text' => 'Add Menu Item',
               'icon' => 'fa-plus',
               'target' => 'crm-popup',
               'action' => 'add',
