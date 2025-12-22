@@ -2864,7 +2864,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $memParams['membership_activity_status'] = ($pending || $isPayLater) ? 'Scheduled' : 'Completed';
       }
     }
-    else if ($currentMembership && $contribution->contribution_status_id !== $completedStatusId) {
+    elseif ($currentMembership && $contribution->contribution_status_id !== $completedStatusId) {
       // We have an existing membership and payment isn't complete, we just need to record the contribution
       // with the membership for creating the LineItem. Membership renewals and changes will be handled in the
       // Civi\Member\OrderCompleteSubscriber. This prevents memberships from being renewed or changed when payment isn't completed.
@@ -2880,7 +2880,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
       // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
-      $membership->find(true);
+      $membership->find(TRUE);
 
       return [$membership, FALSE];
     }

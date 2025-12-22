@@ -4,7 +4,6 @@ namespace Civi\Membership;
 use Civi\Api4\Activity;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
-use Civi\Api4\MembershipLog;
 use Civi\Core\Service\AutoService;
 use Civi\Core\Service\IsActiveTrait;
 use Civi\Order\Event\OrderCompleteEvent;
