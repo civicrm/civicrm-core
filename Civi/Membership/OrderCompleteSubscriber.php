@@ -4,7 +4,6 @@ namespace Civi\Membership;
 use Civi\Api4\Activity;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
-use Civi\Api4\MembershipLog;
 use Civi\Core\Service\AutoService;
 use Civi\Core\Service\IsActiveTrait;
 use Civi\Order\Event\OrderCompleteEvent;
@@ -82,31 +81,26 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         'membership_activity_status' => 'Completed',
       ];
 
-      // CRM-8141 update the membership type with the value recorded in log when membership created/renewed
-      // this picks up membership type changes during renewals
-      $preChangeMembership = MembershipLog::get(FALSE)
-        ->addSelect('membership_type_id')
-        ->addWhere('membership_id', '=', $membershipParams['id'])
-        ->addOrderBy('id', 'DESC')
+      // Update the membership type with the LineItem membership_type_id for potential membership type changes during renewals
+      $membershipLineItem = LineItem::get(FALSE)
+        ->addSelect('price_field_value.membership_type_id', 'membership_num_terms')
+        ->addJoin('PriceFieldValue AS price_field_value', 'LEFT')
+        ->addWhere('contribution_id', '=', $contributionID)
+        ->addWhere('entity_table', '=', 'civicrm_membership')
+        ->addWhere('contribution_id.contact_id', '=', $membershipParams['contact_id'])
         ->execute()
         ->first();
-      if (!empty($preChangeMembership) && !empty($preChangeMembership['membership_type_id'])) {
-        $membershipParams['membership_type_id'] = $preChangeMembership['membership_type_id'];
+      if (!empty($membershipLineItem) && !empty($membershipLineItem['price_field_value.membership_type_id'])) {
+        $membershipParams['membership_type_id'] = $membershipLineItem['price_field_value.membership_type_id'];
       }
       if (empty($membership['end_date']) || (int) $membership['status_id'] !== \CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
         // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
         // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
         // ... except testCompleteTransactionMembershipPriceSetTwoTerms hits this line so the above is obviously not true....
-        $lineItem = LineItem::get(FALSE)
-          ->addSelect('membership_num_terms')
-          ->addJoin('PriceFieldValue AS price_field_value', 'LEFT')
-          ->addWhere('contribution_id', '=', $contributionID)
-          ->addWhere('price_field_value.membership_type_id', '=', $membershipParams['membership_type_id'])
-          ->execute()
-          ->first();
+
         // default of 1 is precautionary
-        $membershipParams['num_terms'] = empty($lineItem['membership_num_terms']) ? 1 : $lineItem['membership_num_terms'];
+        $membershipParams['num_terms'] = empty($membershipLineItem['membership_num_terms']) ? 1 : $membershipLineItem['membership_num_terms'];
       }
 
       if ('Pending' === $membership['status_id:name']) {

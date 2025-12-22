@@ -2694,7 +2694,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
       $this->isTest(), $membershipID, TRUE
     );
-    if ($currentMembership) {
+    $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    // We only want to allow for renewal or upgrades when payment is completed.
+    if ($currentMembership && $contribution->contribution_status_id == $completedStatusId) {
       $renewalMode = TRUE;
 
       // Do NOT do anything.
@@ -2797,6 +2799,26 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
         $memParams['membership_activity_status'] = ($pending || $isPayLater) ? 'Scheduled' : 'Completed';
       }
+    }
+    elseif ($currentMembership && $contribution->contribution_status_id !== $completedStatusId) {
+      // We have an existing membership and payment isn't complete, we just need to record the contribution
+      // with the membership for creating the LineItem. Membership renewals and changes will be handled in the
+      // Civi\Member\OrderCompleteSubscriber. This prevents memberships from being renewed or changed when payment isn't completed.
+      $memParams = [
+        'id' => $currentMembership['id'],
+        'contribution' => $contribution,
+        'line_item' => $lineItems,
+      ];
+      if ($contributionRecurID) {
+        $memParams['contribution_recur_id'] = $contributionRecurID;
+      }
+      $membership = CRM_Member_BAO_Membership::create($memParams);
+
+      // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
+      // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
+      $membership->find(TRUE);
+
+      return [$membership, FALSE];
     }
     else {
       // NEW Membership
