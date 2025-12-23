@@ -83,10 +83,11 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
 
       // Update the membership type with the LineItem membership_type_id for potential membership type changes during renewals
       $preChangeMembership = LineItem::get(FALSE)
-        ->addSelect('price_field_value.membership_type_id')
+        ->addSelect('price_field_value.membership_type_id', 'membership_num_terms')
         ->addJoin('PriceFieldValue AS price_field_value', 'LEFT')
         ->addWhere('contribution_id', '=', $contributionID)
         ->addWhere('entity_table', '=', 'civicrm_membership')
+        ->addWhere('contribution_id.contact_id', '=', $membershipParams['contact_id'])
         ->execute()
         ->first();
       if (!empty($preChangeMembership) && !empty($preChangeMembership['price_field_value.membership_type_id'])) {
@@ -97,15 +98,9 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
         // ... except testCompleteTransactionMembershipPriceSetTwoTerms hits this line so the above is obviously not true....
-        $lineItem = LineItem::get(FALSE)
-          ->addSelect('membership_num_terms')
-          ->addJoin('PriceFieldValue AS price_field_value', 'LEFT')
-          ->addWhere('contribution_id', '=', $contributionID)
-          ->addWhere('price_field_value.membership_type_id', '=', $membershipParams['membership_type_id'])
-          ->execute()
-          ->first();
+
         // default of 1 is precautionary
-        $membershipParams['num_terms'] = empty($lineItem['membership_num_terms']) ? 1 : $lineItem['membership_num_terms'];
+        $membershipParams['num_terms'] = empty($preChangeMembership['membership_num_terms']) ? 1 : $preChangeMembership['membership_num_terms'];
       }
 
       if ('Pending' === $membership['status_id:name']) {
