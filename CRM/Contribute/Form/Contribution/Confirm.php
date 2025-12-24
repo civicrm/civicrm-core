@@ -1049,8 +1049,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // lets store it in the form variable so postProcess hook can access it via getContributionID()
       $this->_contributionID = $contribution->id;
     }
-    // @fixme: This is assigned to the smarty template for the receipt. It's value should be calculated and not taken from $params.
-    $form->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
 
     // process soft credit / pcp params first
     $this->formatSoftCreditParams($params);

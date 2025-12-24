@@ -1576,8 +1576,6 @@ DESC limit 1");
     $customValues = $this->getCustomValuesForReceipt();
     $this->assign('customValues', $customValues);
     $this->assign('total_amount', $this->order->getTotalAmount());
-    $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
-    $this->assign('taxTerm', $this->getSalesTaxTerm());
 
     if ($this->_mode) {
       // @todo move this outside shared code as Batch entry just doesn't

@@ -1463,12 +1463,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contributionParams['total_amount'] = $params['amount'];
 
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
-
-      if (Civi::settings()->get('invoicing')) {
-        $smarty = CRM_Core_Smarty::singleton();
-        // @todo - probably this assign is no longer needed as we use a token.
-        $smarty->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
-      }
     }
 
     // process soft credit / pcp params first
@@ -2239,8 +2233,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
 
-      $this->invoicingPostProcessHook($submittedValues, $action);
-
       //send receipt mail.
       //FIXME: 'payment.create' could send a receipt.
       if ($contribution->id && !empty($formValues['is_email_receipt'])) {
@@ -2298,35 +2290,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_defaults['contribution_status_id'] ?? NULL
     );
     return $contribution;
-  }
-
-  /**
-   * Assign tax calculations to contribution receipts.
-   *
-   * @param array $submittedValues
-   * @param int $action
-   */
-  protected function invoicingPostProcessHook($submittedValues, $action): void {
-    if (!Civi::settings()->get('invoicing')) {
-      return;
-    }
-    // @todo - all of the below is obsolete - it supports old templates that have tokens that
-    // have not been used in core since 2022-ish
-
-    if ($action & CRM_Core_Action::UPDATE) {
-      $totalTaxAmount = $submittedValues['tax_amount'] ?? $this->_values['tax_amount'];
-      // Assign likely replaced by a token
-      $this->assign('totalTaxAmount', $totalTaxAmount);
-    }
-    else {
-      if (!empty($submittedValues['price_set_id'])) {
-        $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
-        $this->assign('getTaxDetails', (bool) $this->getOrder()->getTotalTaxAmount());
-      }
-      else {
-        $this->assign('totalTaxAmount', $submittedValues['tax_amount'] ?? NULL);
-      }
-    }
   }
 
   /**
