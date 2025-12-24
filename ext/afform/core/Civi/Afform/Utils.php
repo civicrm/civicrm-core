@@ -100,6 +100,7 @@ class Utils {
     };
 
     return $isChanged('server_route') ||
+      $isChanged('is_public') ||
       (!empty($updatedAfform['server_route']) && $isChanged('title'));
   }
 
