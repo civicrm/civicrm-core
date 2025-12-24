@@ -1867,19 +1867,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('isRequireApproval', $this->_requireApproval);
 
     foreach ($additionalIDs as $participantID => $contactId) {
-      if ($participantID == $registerByID) {
-        $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $isTest);
-
-        if (count($customProfile)) {
-          $this->assign('customProfile', $customProfile);
-          $this->set('customProfile', $customProfile);
-        }
-      }
-      else {
-        $this->assign('customProfile', NULL);
-      }
-
-      //send Confirmation mail to Primary & additional Participants if exists
+      // Send Confirmation mail to Primary & additional Participants if exists
       CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
     }
   }
