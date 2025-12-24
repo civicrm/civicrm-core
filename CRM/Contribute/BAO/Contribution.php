@@ -2598,7 +2598,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $template->assign('isPrimary', 0);
         $template->assign('customProfile', NULL);
         //set additionalParticipant true
-        $values['params']['additionalParticipant'] = TRUE;
         foreach ($additionalIDs as $participantID) {
           $amount = [];
           //to change the status pending to completed
@@ -2633,7 +2632,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
 
       // for primary contact
-      $values['params']['additionalParticipant'] = FALSE;
       $template->assign('isPrimary', 1);
       $template->assign('amount', $primaryAmount);
       $template->assign('register_date', CRM_Utils_Date::isoToMysql($this->_relatedObjects['participant']->register_date));
@@ -3886,18 +3884,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $values['custom_pre_id'] = $custom_pre_id;
     $values['custom_post_id'] = $custom_post_ids;
 
-    // set lineItem for event contribution
-    if ($contributionID) {
-      $participantIds = CRM_Event_BAO_Participant::getParticipantIds($contributionID);
-      if (!empty($participantIds)) {
-        foreach ($participantIds as $pIDs) {
-          $lineItem = CRM_Price_BAO_LineItem::getLineItems($pIDs);
-          if (!CRM_Utils_System::isNull($lineItem)) {
-            $values['lineItem'][] = $lineItem;
-          }
-        }
-      }
-    }
     return $values;
   }
 
