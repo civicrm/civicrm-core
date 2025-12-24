@@ -191,13 +191,16 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         && empty($dao->owner_membership_id)
       ) {
         // not an related membership
-        $query = "
- SELECT COUNT(m.id)
-   FROM civicrm_membership m
-     LEFT JOIN civicrm_membership_status ms ON ms.id = m.status_id
-     LEFT JOIN civicrm_contact ct ON ct.id = m.contact_id
-  WHERE m.owner_membership_id = {$dao->id} AND m.is_test = 0 AND ms.is_current_member = 1 AND ct.is_deleted = 0";
-        $num_related = CRM_Core_DAO::singleValueQuery($query);
+        $num_related = \Civi\Api4\Membership::get(FALSE)
+          ->selectRowCount()
+          ->addJoin('MembershipStatus AS membership_status', 'LEFT')
+          ->addWhere('owner_membership_id', '=', $dao->id)
+          ->addWhere('is_test', '=', FALSE)
+          ->addWhere('membership_status.is_current_member', '=', TRUE)
+          ->addWhere('contact_id.is_deleted', '=', FALSE)
+          ->execute()
+          ->count();
+
         $max_related = $membership[$dao->id]['max_related'] ?? NULL;
         $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', [1 => $num_related]) : ts('%1 out of %2', [
           1 => $num_related,
