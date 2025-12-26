@@ -36,6 +36,38 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
   }
 
   /**
+   * @see \CRM_RouterTest_Page_StaticExamples::pathWithData()
+   */
+  public function testPathWithData(): void {
+    $result = $this->client->get('frontend://civicrm/route-test/path-with-data/foo%2Abar%25whiz%2Fbang');
+    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertContentType('text/plain', $result);
+    $resultData = (string) $result->getBody();
+    $this->assertTrue(str_starts_with($resultData, 'Path Data '), "Response should start with 'Path Data'. Received: $resultData");
+    [, , $resultPath64] = explode(' ', $resultData);
+    $resultPath = base64_decode($resultPath64);
+    // CRM_Utils_System::currentPath() provides the decoded path, so %2A (etc) is replaced.
+    $this->assertEquals('civicrm/route-test/path-with-data/foo*bar%whiz/bang', $resultPath);
+  }
+
+  /**
+   * @see \CRM_RouterTest_Page_StaticExamples::psr7PathWithData()
+   */
+  public function testPsr7PathWithData(): void {
+    $result = $this->client->get('frontend://civicrm/route-test/psr7-path-with-data/foo%2Abar%25whiz%2Fbang');
+    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertContentType('text/plain', $result);
+    $resultData = (string) $result->getBody();
+    $this->assertTrue(str_starts_with($resultData, 'Path Data '), "Response should start with 'Path Data'. Received: $resultData");
+    [, , $resultPath64] = explode(' ', $resultData);
+    $resultPath = base64_decode($resultPath64);
+
+    // PSR7 getPath() provides the encoded-path, so we see %2A and %25. However, Civi normalizes %2F as /.
+    // (Civi has clean+dirty URLs across multiple CMSs, and we can't guarantee %2F-vs-/ distinction across all configurations.)
+    $this->assertEquals('/civicrm/route-test/psr7-path-with-data/foo%2Abar%25whiz/bang', $resultPath);
+  }
+
+  /**
    * @see \CRM_RouterTest_Page_StaticExamples::submitJson()
    */
   public function testSubmitJson(): void {
