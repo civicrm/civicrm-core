@@ -471,6 +471,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
     ], 0);
+
+    // Check we can update it even without line items.
+    $this->callAPISuccess('Contribution', 'create', ['id' => $contribution['id'], 'source' => 'SSF2']);
+    $updatedContribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $contribution['id']]);
+    $this->assertEquals('SSF2', $updatedContribution['contribution_source']);
   }
 
   /**
