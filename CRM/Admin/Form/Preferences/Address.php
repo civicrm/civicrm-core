@@ -68,8 +68,8 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Generic {
    */
   public static function formRule($fields) {
     $p = $fields['address_standardization_provider'];
-    $u = $fields['address_standardization_userid'];
-    $w = $fields['address_standardization_url'];
+    $u = $fields['address_standardization_key'];
+    $w = $fields['address_standardization_secret'];
 
     // make sure that there is a value for all of them
     // if any of them are set
