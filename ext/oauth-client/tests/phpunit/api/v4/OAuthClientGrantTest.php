@@ -127,7 +127,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
     return $client;
   }
 
-  private static function scopeProvider(): array {
+  public static function scopeProvider(): array {
     return [[NULL], ['scope-1-bar']];
   }
 
