@@ -29,8 +29,10 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
 
   /**
    * Generate the URL to request an authorization code from a provider.
+   * @param ?string $scopeToUse
+   * @dataProvider scopeProvider
    */
-  public function testAuthorizationCode(): void {
+  public function testAuthorizationCode(?string $scopeToUse): void {
     $usePerms = function($ps) {
       $base = ['access CiviCRM'];
       \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);
@@ -40,7 +42,15 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
     $client = $this->createClient('test_example_1');
 
     $usePerms(['manage OAuth client']);
-    $result = Civi\Api4\OAuthClient::authorizationCode()->addWhere('id', '=', $client['id'])->execute();
+    // This `if` block could be optimized a little but then it wouldn't be
+    // checking that setScopes is chainable. Is that important? :shrug: But it's
+    // what led to this addition.
+    if ($scopeToUse) {
+      $result = Civi\Api4\OAuthClient::authorizationCode()->addWhere('id', '=', $client['id'])->setScopes($scopeToUse)->execute();
+    }
+    else {
+      $result = Civi\Api4\OAuthClient::authorizationCode()->addWhere('id', '=', $client['id'])->execute();
+    }
     $this->assertEquals(1, $result->count());
     foreach ($result as $ac) {
       $this->assertEquals('query', $ac['response_mode']);
@@ -50,7 +60,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       \parse_str($url['query'], $actualQuery);
       $this->assertEquals('code', $actualQuery['response_type']);
       $this->assertMatchesRegularExpression(';^CC_[a-zA-Z0-9]+$;', $actualQuery['state']);
-      $this->assertEquals('scope-1-foo,scope-1-bar', $actualQuery['scope']);
+      $this->assertEquals($scopeToUse ?: 'scope-1-foo,scope-1-bar', $actualQuery['scope']);
       // ? // $this->assertEquals('auto', $actualQuery['approval_prompt']);
       $this->assertEquals('example-id', $actualQuery['client_id']);
       $this->assertTrue(empty($actualQuery['response_mode']), 'response_mode should be empty');
@@ -115,6 +125,10 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
     $client = $create->first();
     $this->assertTrue(!empty($client['id']));
     return $client;
+  }
+
+  private static function scopeProvider(): array {
+    return [[NULL], ['scope-1-bar']];
   }
 
 }
