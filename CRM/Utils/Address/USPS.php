@@ -243,9 +243,9 @@ class CRM_Utils_Address_USPS {
    * Format address values according to USPS
    *
    * @param array $values
-   * @return array|bool
+   * @return bool
    */
-  public static function checkAddress(&$values): bool|array {
+  public static function checkAddress(&$values): bool {
     // Check if disabled due to import.
     if (self::$_disabled) {
       return FALSE;
