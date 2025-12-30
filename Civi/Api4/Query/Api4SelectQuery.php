@@ -266,7 +266,8 @@ class Api4SelectQuery extends Api4Query {
           $options = FormattingUtil::getPseudoconstantList($field, $item);
           if ($options) {
             asort($options);
-            $column = "FIELD($column,'" . implode("','", array_keys($options)) . "')";
+            $keys = \CRM_Core_DAO::escapeStrings(array_keys($options));
+            $column = "FIELD($column, $keys)";
           }
         }
       }
