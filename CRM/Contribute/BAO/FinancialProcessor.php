@@ -418,6 +418,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
       $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
+      if ($lineItemDetails['tax_amount'] === 'null') {
+        throw new CRM_Core_Exception('unreachable');
+      }
       if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context === 'changeFinancialType')) {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
         if ($context === 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
