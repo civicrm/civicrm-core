@@ -418,14 +418,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
       $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
-      if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context === 'changeFinancialType')) {
+      if (($lineItemDetails['tax_amount']) || ($context === 'changeFinancialType')) {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
-        if ($context === 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
-          // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
-          $taxAmount = $previousLineItem['tax_amount'] ?? 0;
-          $itemParams['financial_account_id'] = $this->getExistingFinancialItemForLine($lineItemDetails['id'], TRUE)['financial_account_id'];
-        }
-        elseif ($previousLineItemTotal != $lineItemDetails['line_total']) {
+        if ($previousLineItemTotal != $lineItemDetails['line_total']) {
           $taxAmount -= $previousLineItem['tax_amount'] ?? 0;
           $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
         }
