@@ -8,7 +8,7 @@
   {if !empty($receipt_text)}
   receipt_text:::{$receipt_text}
   {/if}
-  is_pay_later:::{$is_pay_later}
+  is_pay_later:::{contribution.is_pay_later}
   financialTypeId:::{$financialTypeId}
   financialTypeName:::{$financialTypeName}
   contactID:::{$contactID}
