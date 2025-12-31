@@ -736,7 +736,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'from_email_address' => 'test@test.com',
       'hidden_Premium' => 1,
     ]);
-    $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', []);
+    $contributionProduct = $this->callAPISuccess('ContributionProduct', 'getsingle', []);
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
     $this->assertMailSentContainingStrings([
       'Premium Information',
