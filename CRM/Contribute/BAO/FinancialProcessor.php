@@ -407,7 +407,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
         'contact_id' => $postUpdateContribution->contact_id,
         'currency' => $postUpdateContribution->currency,
-        'amount' => $this->getFinancialItemAmountFromParams($context, $lineItemDetails, $previousLineItemTotal),
+        'amount' => $this->getFinancialItemAmountFromParams($context, $lineItemDetails),
         'description' => $prevFinancialItem['description'] ?? NULL,
         'status_id' => $prevFinancialItem['status_id'],
         'financial_account_id' => $financialAccount,
@@ -471,20 +471,17 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * for historical reasons. Going forwards we can hope to add tests & improve readibility
    * of that function
    *
-   * @param string $context
-   *   changeFinancialType| changedAmount
+   * @param string|null $context
+   *   changeFinancialType| changedAmount | changedStatus
    * @param array $lineItemDetails
-   *   Line items.
-   * @param int $previousLineItemTotal
    *
    * @return float
-   * @todo move recordFinancialAccounts & helper functions to their own class?
    *
    */
-  protected function getFinancialItemAmountFromParams($context, $lineItemDetails, $previousLineItemTotal) {
-    $originalLineItem = $this->originalLineItems[$lineItemDetails['id'] ?? NULL] ?? [];
+  protected function getFinancialItemAmountFromParams(?string $context, array $lineItemDetails) {
     if ($context === 'changedAmount') {
       $lineTotal = $lineItemDetails['line_total'];
+      $previousLineItemTotal = $this->getOriginalLineItemAmount($lineItemDetails['id'] ?? NULL, 'line_total');
       if ($lineTotal != $previousLineItemTotal) {
         $lineTotal -= $previousLineItemTotal;
       }
@@ -494,9 +491,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // This is a reversal that will be followed by a replacement line. We should also
       // do this when currency changes or, perhaps we should always reverse & redo to mitigate
       // complexity / error risk.
-      return -$originalLineItem['line_total'];
+      return -$this->getOriginalLineItemAmount($lineItemDetails['id'] ?? NULL, 'line_total');
     }
-    elseif ($context === 'changedStatus') {
+    if ($context === 'changedStatus') {
       $cancelledTaxAmount = 0;
       if ($this->isContributionUpdateARefund()) {
         $cancelledTaxAmount = $lineItemDetails['tax_amount'] ?? '0.00';
@@ -504,7 +501,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $isContributionStatusNegative = CRM_Contribute_BAO_Contribution::isContributionStatusNegative($this->updatedContribution->contribution_status_id);
       return ($isContributionStatusNegative ? -1 : 1) * ((float) $lineItemDetails['line_total'] + (float) $cancelledTaxAmount);
     }
-    elseif ($context === NULL) {
+    if ($context === NULL) {
       // erm, yes because? but, hey, it's tested.
       return $lineItemDetails['line_total'];
     }
@@ -1121,6 +1118,21 @@ class CRM_Contribute_BAO_FinancialProcessor {
       return [];
     }
     return CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemID, $isTax);
+  }
+
+  /**
+   * Get the amount from the original line item.
+   *
+   * @param int|null $lineItemID
+   * @param string $name
+   * @return float
+   */
+  public function getOriginalLineItemAmount(?int $lineItemID, string $name): float {
+    if (!$lineItemID) {
+      return 0.0;
+    }
+    $originalLineItem = $this->originalLineItems[$lineItemID] ?? [];
+    return $originalLineItem[$name] ?? 0;
   }
 
 }
