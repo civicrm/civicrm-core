@@ -1,6 +1,6 @@
 <div class="btn-group">
   <button type="button" ng-click="$ctrl.loadAfforms(); row.openAfformMenu = true;" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    {{ $ctrl.afforms ? (row.afform_count === 1 ? ts('1 Form') : ts('%1 Forms', {1: row.afform_count})) : ts('Forms...') }}
+    {{ $ctrl.afforms ? (ts('1 Form', {plural: '%1 Forms', count: row.afform_count})) : ts('Forms...') }}
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" ng-if=":: row.openAfformMenu">

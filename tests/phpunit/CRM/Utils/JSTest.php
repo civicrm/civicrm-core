@@ -98,6 +98,13 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       'alert(ts("Does the ts(\'example\') notation work?"));',
       ['Does the ts(\'example\') notation work?'],
     ];
+    $cases[] = [
+      ' ts("Singular \'%1\'", {
+        "1": "1",
+        "plural": "%count Plurals \'%1\'",
+      });',
+      ["Singular '%1'", "%count Plurals '%1'"],
+    ];
     return $cases;
   }
 

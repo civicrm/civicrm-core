@@ -14,16 +14,24 @@ CRM._ = _;
  */
 function ts(text, params) {
   "use strict";
-  var d = (params && params.domain) ? ('strings::' + params.domain) : null;
+  let d;
+  if (typeof params === 'object') {
+    if (params.plural && params.count > 1) {
+      text = params.plural;
+    }
+    if (params.domain) {
+      d = 'strings::' + params.domain;
+    }
+  }
   if (d && CRM[d] && CRM[d][text]) {
     text = CRM[d][text];
   }
   else if (CRM.strings[text]) {
     text = CRM.strings[text];
   }
-  if (typeof(params) === 'object') {
-    for (var i in params) {
-      if (typeof(params[i]) === 'string' || typeof(params[i]) === 'number') {
+  if (typeof params === 'object') {
+    for (let i in params) {
+      if (i !== 'plural' && ['string', 'number'].includes(typeof params[i])) {
         // sprintf emulation: escape % characters in the replacements to avoid conflicts
         text = text.replace(new RegExp('%' + i, 'g'), String(params[i]).replace(/%/g, '%-crmescaped-'));
       }

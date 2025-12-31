@@ -31,7 +31,7 @@
           <div class="btn-group" ng-if="$ctrl.afformEnabled && $ctrl.savedSearch.id && !$ctrl.savedSearch.is_template">
             <button type="button" ng-click="$ctrl.openAfformMenu = true;" class="btn dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i>
-              {{ ($ctrl.afformCount !== undefined) ? ($ctrl.afformCount === 1 ? ts('1 Form') : ts('%1 Forms', {1: $ctrl.afformCount})) : ts('Forms...') }}
+              {{ ($ctrl.afformCount !== undefined) ? (ts('1 Form', {plural: '%1 Forms', count: $ctrl.afformCount})) : ts('Forms...') }}
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openAfformMenu">

@@ -110,7 +110,7 @@
         crmApi4(apiCalls)
           .then(function(result) {
             CRM.alert(
-              result.length === 1 ? ts('1 record successfully imported.') : ts('%1 records successfully imported.', {1: result.length}),
+              ts('1 record successfully imported.', {plural: '%1 records successfully imported.', count: result.length}),
               ts('Saved'),
               'success'
             );
