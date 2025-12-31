@@ -225,7 +225,7 @@ $columns = array_merge($columns, [
         'icon' => 'fa-trash',
         'text' => E::ts('Delete'),
         'style' => 'danger',
-        'path' => 'civicrm/mailing/browse?action=delete&mid=[id]&reset=1',
+        'path' => 'civicrm/mailing/delete?id=[id]&reset=1',
         'condition' => [],
       ],
     ],

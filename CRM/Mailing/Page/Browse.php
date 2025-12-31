@@ -182,27 +182,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
       CRM_Utils_System::redirect($context);
     }
-    elseif ($this->_action & CRM_Core_Action::DELETE) {
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
-
-        // check for action permissions.
-        if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-          CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-        }
-
-        CRM_Mailing_BAO_Mailing::deleteRecord(['id' => $this->_mailingId]);
-        CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
-        CRM_Utils_System::redirect($context);
-      }
-      else {
-        $controller = new CRM_Core_Controller_Simple('CRM_Mailing_Form_Browse',
-          ts('Delete Mailing'),
-          $this->_action
-        );
-        $controller->setEmbedded(TRUE);
-        $controller->run();
-      }
-    }
     elseif ($this->_action & CRM_Core_Action::RENEW) {
       // archive this mailing, CRM-3752.
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {

@@ -205,4 +205,10 @@
     <access_arguments>*always allow*</access_arguments>
     <is_public>true</is_public>
   </item>
+  <item>
+    <path>civicrm/mailing/delete</path>
+    <page_callback>CRM_Mailing_Form_Delete</page_callback>
+    <title>Delete Mailing</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

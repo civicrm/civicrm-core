@@ -271,9 +271,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/mailing/browse',
-          'qs' => 'action=delete&mid=%%mid%%&reset=1',
-          'extra' => 'onclick="if (confirm(\'' . $deleteExtra . '\')) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          'url' => 'civicrm/mailing/delete',
+          'qs' => 'id=%%mid%%&reset=1',
           'title' => ts('Delete Mailing'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
