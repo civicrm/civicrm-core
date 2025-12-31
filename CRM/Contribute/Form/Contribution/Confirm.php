@@ -1494,7 +1494,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipParams,
         $contactID,
         $financialTypeID,
-        $isTest,
         $isRecurForFirstTransaction
       );
       if (!empty($paymentResult['contribution'])) {
@@ -2302,7 +2301,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $result = $this->processConfirm($paymentParams,
         $contactID,
         $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
-        ($this->_mode == 'test') ? 1 : 0,
         $paymentParams['is_recur'] ?? NULL
       );
 
@@ -2518,7 +2516,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   Contact id.
    * @param int $financialTypeID
    *   Financial type id.
-   * @param bool $isTest
    * @param bool $isRecur
    *
    * @throws CRM_Core_Exception
@@ -2530,7 +2527,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     &$paymentParams,
     $contactID,
     $financialTypeID,
-    $isTest,
     $isRecur
   ): array {
     $form = $this;
@@ -2570,7 +2566,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contributionParams = [
         'id' => $paymentParams['contribution_id'] ?? NULL,
         'contact_id' => $contactID,
-        'is_test' => $isTest,
+        'is_test' => $this->isTest(),
         'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
         'financial_type_id' => $financialTypeID,
       ];
