@@ -32,6 +32,15 @@ class CaseTasksProvider extends \Civi\Core\Service\AutoSubscriber {
    */
   public function addTasks(GenericHookEvent $event): void {
     if (\CRM_Core_Permission::access('CiviCase') || !$event->checkPermissions) {
+      $event->tasks['Contact']['contact.addCase'] = [
+        'title' => E::ts('Case - Open New Case'),
+        'uiDialog' => ['templateUrl' => '~/civiCaseTasks/civiCaseTaskOpenCase.html'],
+        'icon' => 'fa-folder-plus',
+        'module' => 'civiCaseTasks',
+        // Default values can be set via `hook_civicrm_searchKitTasks`
+        'values' => [],
+        'allowMultipleClients' => (bool) \Civi::settings()->get('civicaseAllowMultipleClients'),
+      ];
       $event->tasks['Case']['case.addRole'] = [
         'title' => E::ts('Case - Assign Role'),
         'uiDialog' => ['templateUrl' => '~/civiCaseTasks/civiCaseTaskCaseRole.html'],

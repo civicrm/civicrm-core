@@ -37,10 +37,17 @@
           select: ['paths']
         }, 0];
 
-        return crmApi4(apiCalls).then((results) => {
+        const apiResult = crmApi4(apiCalls);
+        apiResult.then((results) => {
           ctrl.fields.push(... results.getFields);
           paths = results.entityInfo.paths;
+          results.getFields.forEach(field => {
+            if (field.required && !field.default_value) {
+              this.addField(field.name);
+            }
+          });
         });
+        return apiResult;
       },
 
       getField: function(fieldName) {
