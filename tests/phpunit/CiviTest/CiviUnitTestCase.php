@@ -1091,13 +1091,12 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @param array $params
    *   Array of parameters.
-   *
+   * @param string $identifier
    * @return int
    *   id of created contribution
    */
-  public function contributionCreate(array $params): int {
+  public function contributionCreate(array $params, $identifier = 'default'): int {
     $params = array_merge([
-      'domain_id' => 1,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
       'fee_amount' => 5.00,
@@ -1106,8 +1105,12 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'non_deductible_amount' => 10.00,
       'source' => 'SSF',
       'contribution_status_id' => 'Completed',
+      'contribution_status_id:name' => 'Completed',
+      'version' => 3,
     ], $params);
-
+    if ($params['version'] === 4) {
+      $this->createTestEntity('Contribution', $params, $identifier);
+    }
     return $this->callAPISuccess('Contribution', 'create', $params)['id'];
   }
 
