@@ -297,11 +297,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $params['id'] ??= $ids['membership'] ?? NULL;
     $membership = self::add($params);
 
-    if (is_a($membership, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $membership;
-    }
-
     $params['membership_id'] = $membership->id;
     // For api v4 we skip all of this stuff. There is an expectation that v4 users either use
     // the order api, or handle any financial / related processing themselves.
