@@ -197,9 +197,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   public function recordFinancialAccounts(array &$params): void {
     $skipRecords = FALSE;
-    $isUpdate = $this->isUpdate();
-
-    $contributionStatus = $this->getUpdatedContributionStatus();
 
     // Checking $params['is_pay_later'] means we only pick this up if
     // is_pay_later has been passed in - this feels like a mistake but it
@@ -222,7 +219,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
         $previousContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['prevContribution']->contribution_status_id);
         if (!(($previousContributionStatus === 'Pending' || $previousContributionStatus === 'In Progress')
-          && $contributionStatus === 'Completed')
+          && $this->isCompletedTransaction())
         ) {
           $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
           $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
@@ -669,8 +666,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $previousContributionStatus = $this->getOriginalContributionStatus();
     $currentContributionStatus = $this->getUpdatedContributionStatus();
 
-    if ((($previousContributionStatus === 'Partially paid' && $currentContributionStatus === 'Completed')
-      || ($previousContributionStatus === 'Pending refund' && $currentContributionStatus === 'Completed')
+    if ((($previousContributionStatus === 'Partially paid' && $this->isCompletedTransaction())
+      || ($previousContributionStatus === 'Pending refund' && $this->isCompletedTransaction())
       // This concept of pay_later as different to any other sort of pending is deprecated & it's unclear
       // why it is here or where it is handled instead.
       || ($previousContributionStatus === 'Pending' && $params['prevContribution']->is_pay_later == TRUE
@@ -702,7 +699,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     if (($previousContributionStatus === 'Pending'
         || $previousContributionStatus === 'In Progress')
-      && ($currentContributionStatus === 'Completed')
+      && ($this->isCompletedTransaction())
     ) {
       if (empty($params['line_item'])) {
         //CRM-15296
@@ -778,12 +775,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if (!Civi::settings()->get('always_post_to_accounts_receivable')) {
       return NULL;
     }
-    $statusId = $contributionParams['contribution']->contribution_status_id;
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $contributionStatus = empty($statusId) ? NULL : $contributionStatuses[$statusId];
     $previousContributionStatus = empty($contributionParams['prevContribution']) ? NULL : $contributionStatuses[$contributionParams['prevContribution']->contribution_status_id];
     // Return if contribution status is not completed.
-    if (!($contributionStatus == 'Completed' && (empty($previousContributionStatus)
+    if (!($this->isCompletedTransaction() && (empty($previousContributionStatus)
         || (!empty($previousContributionStatus) && $previousContributionStatus == 'Pending'
           && $contributionParams['prevContribution']->is_pay_later == 0
         )))
@@ -899,7 +894,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $revenueRecognitionDate = $contributionDetails->revenue_recognition_date;
     if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
       if (!$update
-        && ($contributionDetails->contribution_status_id != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')
+        && (!$this->isCompletedTransaction()
           || ($contributionDetails->contribution_status_id != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
             && $contributionDetails->is_pay_later)
         )
