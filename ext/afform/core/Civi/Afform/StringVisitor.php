@@ -136,8 +136,8 @@ class StringVisitor {
 
   protected function isWorthy($value): bool {
     return !is_array($value)
-      && (strpos($value, '{{') === FALSE)
-      && (strpos($value, 'ts(') === FALSE)
+      && (!str_contains($value, '{{'))
+      && (!str_contains($value, 'ts('))
       && !empty($value);
   }
 

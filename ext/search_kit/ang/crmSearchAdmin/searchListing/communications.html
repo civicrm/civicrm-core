@@ -1,6 +1,6 @@
 <div class="btn-group">
   <button type="button" ng-click="row.openScheduleMenu = true" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    {{:: row.data.schedule_id.length === 1 ? ts('1 Communication') : ts('%1 Communications', {1: row.data.schedule_id ? row.data.schedule_id.length : 0}) }} <span class="caret"></span>
+    {{:: ts('1 Communication', {plural: '%1 Communications', count: row.data.schedule_id ? row.data.schedule_id.length : 0}) }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" ng-if=":: row.openScheduleMenu">
     <li ng-repeat="schedule_id in row.data.schedule_id" title="{{:: ts('Edit Scheduled Communication') }}">

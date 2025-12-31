@@ -72,9 +72,9 @@
           added++;
         }
       });
-      let msg = _.escape(added === 1 ? ts('1 relationship added.') : ts('%1 relationships added.', {1: added}));
+      let msg = _.escape(ts('1 relationship added.', {plural: '%1 relationships added.', count: added}));
       if (duplicate) {
-        msg += '<br>' + _.escape(duplicate === 1 ? ts('1 relationship already exists.') : ts('%1 relationships already exist.', {1: duplicate}));
+        msg += '<br>' + _.escape(ts('1 relationship already exists.', {plural: '%1 relationships already exist.', count: duplicate}));
       }
       CRM.alert(msg, ts('Saved'), 'success');
       this.close(result);

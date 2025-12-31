@@ -89,14 +89,14 @@
     this.onSuccess = function(result) {
       let msg;
       if (ctrl.action === 'delete') {
-        msg = result.batchCount === 1 ? ts('1 tag removed.') : ts('%1 tags removed.', {1: result.batchCount});
+        msg = ts('1 tag removed.', {plural: '%1 tags removed.', count: result.batchCount});
         CRM.alert(msg, ts('Saved'), 'success');
       } else {
         const added = result.batchCount - result.countMatched;
-        msg = added === 1 ? ts('1 tag added') : ts('%1 tags added.', {1: added});
+        msg = ts('1 tag added', {plural: '%1 tags added.', count: added});
         msg += '<br/>';
         if (result.countMatched > 0) {
-          msg += result.countMatched === 1 ? ts('1 tag already exists and was not added.') : ts('%1 tags already exist and were not added.', {1: result.countMatched});
+          msg += ts('1 tag already exists and was not added.', {plural: '%1 tags already exist and were not added.', count: result.countMatched});
         }
         CRM.alert(msg, ts('Saved'), 'success');
       }

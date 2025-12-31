@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('civiCaseTasks').controller('civiCaseTaskCaseRole', function($scope, crmApi4, searchTaskBaseTrait) {
-    const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
+    const ts = $scope.ts = CRM.ts('civi_case');
     // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
     const ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait);
 
@@ -89,9 +89,9 @@
           }
         });
       });
-      let msg = _.escape(added === 1 ? ts('1 case role added.') : ts('%1 case roles added.', {1: added}));
+      let msg = _.escape(ts('1 case role added.', {plural: '%count case roles added.', count: added}));
       if (duplicate) {
-        msg += '<br>' + _.escape(duplicate === 1 ? ts('1 case role already occupied by the selected contact.') : ts('%1 case roles already occupied by the selected contact.', {1: duplicate}));
+        msg += '<br>' + _.escape(ts('1 case role already occupied by the selected contact.', {plural: '%count case roles already occupied by the selected contact.', count: duplicate}));
       }
       CRM.alert(msg, ts('Saved'), 'success');
       this.close(result);
