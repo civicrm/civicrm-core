@@ -132,7 +132,7 @@ function removeFromBatch(financial_trxn_id) {
 }
 
 function noServerResponse() {
-  CRM.alert({/literal}'{ts escape="js"}No response from the server. Check your internet connection and try reloading the page.{/ts}', '{ts escape="js"}Network Error{/ts}'{literal}, 'error');
+  CRM.alert({/literal}'{ts escape="js"}Unable to complete the request. The server returned an error or could not be reached.{/ts}', '{ts escape="js"}Request Failed{/ts}'{literal}, 'error');
 }
 
 function saveRecord(recordID, op, recordBAO, entityID) {
@@ -169,7 +169,7 @@ function batchSummary(entityID) {
       CRM.$("#row_" + i).text(val);
     });
   },
-  'json');
+  'json').fail(noServerResponse);
 }
 
 function checkMismatch() {
