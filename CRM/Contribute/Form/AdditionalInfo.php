@@ -155,8 +155,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param int $contributionID
    * @param int $premiumID
    * @param array $options
+   *
+   * @deprecated since 6.11 will be removed around 6.20.
    */
   public static function processPremium($params, $contributionID, $premiumID = NULL, $options = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('take a copy');
     $selectedProductID = $params['product_name'][0];
     $selectedProductOptionID = $params['product_name'][1] ?? NULL;
 
@@ -227,8 +230,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param int $contributionNoteID
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 6.11 will be removed around 6.20.
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('take a copy');
     if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
       CRM_Core_BAO_Note::deleteRecord(['id' => $contributionNoteID]);
       $status = ts('Selected Note has been deleted successfully.');
