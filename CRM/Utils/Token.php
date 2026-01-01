@@ -1524,6 +1524,7 @@ class CRM_Utils_Token {
           '$paidBy' => 'contribution.payment_instrument_id:label',
           '$lineItem' => '$lineItems',
           '$billingName' => 'contribution.address_id.name',
+          '$address' => 'contribution.address_id.display',
         ],
         'membership_online_receipt' => [
           '$dataArray' => ts('see default template for how to show this'),
@@ -1552,6 +1553,7 @@ class CRM_Utils_Token {
           '$cancel_date' => 'contribution.cancel_date',
           '$lineItem' => '$lineItems',
           '$billingName' => 'contribution.address_id.name',
+          '$address' => 'contribution.address_id.display',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1579,6 +1581,7 @@ class CRM_Utils_Token {
           '$participant.role' => 'participant.role_id:label',
           '$lineItem' => '$lineItems',
           '$billingName' => 'contribution.address_id.name',
+          '$address' => 'contribution.address_id.display',
         ],
         'event_online_receipt' => [
           '`$participant.id`' => 'participant.id',
