@@ -528,6 +528,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (empty($extra['maxDate']) && !empty($dateAttributes['minYear'])) {
           $extra['maxDate'] = $dateAttributes['maxYear'] . '-12-31';
         }
+        if (!empty($dateAttributes['time'])) {
+          $extra['time'] = $dateAttributes['time'];
+        }
       }
       // Support minDate/maxDate properties
       if (isset($extra['minDate'])) {
