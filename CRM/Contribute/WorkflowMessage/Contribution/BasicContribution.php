@@ -191,9 +191,14 @@ United States';
 
     $product = Product::get(FALSE)->setLimit(1)->execute()->first();
     if ($product) {
+      $option = '';
+      if (is_array($product['options'])) {
+        $option = reset($product['options']);
+      }
       $messageTemplate->setContributionProduct([
         'product_id.name' => $product['name'],
         'product_id.sku' => $product['sku'],
+        'product_option:label' => $option,
         'id' => 1,
         'fulfilled_date' => 'yesterday',
       ]);

@@ -270,7 +270,7 @@
          {ts}Option{/ts}
         </td>
         <td {$valueStyle}>
-          {contribution_product.product_option}
+          {contribution_product.product_option:label}
         </td>
        </tr>
       {/if}

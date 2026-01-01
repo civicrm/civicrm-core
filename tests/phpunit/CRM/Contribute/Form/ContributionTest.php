@@ -787,7 +787,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2026],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
       'hidden_Premium' => 1,
