@@ -1870,7 +1870,7 @@ class CRM_Utils_Date {
           $field['smarty_view_format'] = $dateAttributes['smarty_view_format'];
         }
         $field['datepicker']['extra'] = self::getDatePickerExtra($field);
-        $field['datepicker']['extra']['time'] = $fieldMetaData['type'] == CRM_Utils_Type::T_TIMESTAMP || $fieldMetaData['type'] == (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME);
+        $field['datepicker']['extra']['time'] = $dateAttributes['time'];
         $field['datepicker']['attributes'] = self::getDatePickerAttributes($field);
       }
     }
