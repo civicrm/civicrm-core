@@ -115,6 +115,8 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals($result1, $result);
     $result = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, 'Big_Bank');
     $this->assertEquals($result1, $result);
+    $result = CRM_Core_BAO_CustomGroup::getTree('Contact', NULL, NULL, NULL, 'Big_Bank');
+    $this->assertEquals($result1, $result);
     try {
       CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, ['Small Kind Bank']);
     }
@@ -197,6 +199,47 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result = CRM_Core_BAO_CustomGroup::getTree('Activity', NULL, NULL, NULL, 1);
     $this->assertEquals('Custom Field', $result[$customGroup['id']]['fields'][$customField['id']]['label']);
+  }
+
+  /**
+   * @param string $inputEntity
+   * @param string $inputSubtype
+   * @param ?string $expected
+   * @dataProvider validateSubtypeProvider
+   */
+  public function testValidateSubTypeByEntity(string $inputEntity, string $inputSubtype, ?string $expected): void {
+    $contactType = $this->callAPISuccess('ContactType', 'create', [
+      'name' => 'qjx_42s',
+      'label' => 'Quack Quack',
+      'parent_id' => 'Individual',
+    ]);
+    if ($expected === NULL) {
+      try {
+        \Civi\Test\Invasive::call(['CRM_Core_BAO_CustomGroup', 'validateSubTypeByEntity'], [$inputEntity, $inputSubtype]);
+        $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType['id']]);
+        $this->fail('Should have thrown an exception');
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->assertEquals('Invalid Filter', $e->getMessage());
+      }
+    }
+    else {
+      $this->assertEquals($expected, \Civi\Test\Invasive::call(['CRM_Core_BAO_CustomGroup', 'validateSubTypeByEntity'], [$inputEntity, $inputSubtype]));
+    }
+    $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType['id']]);
+  }
+
+  public static function validateSubtypeProvider(): array {
+    return [
+      ['Individual', 'qjx_42s', 'qjx_42s'],
+      ['Individual', 'Qjx_42S', 'qjx_42s'],
+      ['Individual', 'Quack Quack', NULL],
+      ['Individual', 'duck', NULL],
+      ['Contact', 'qjx_42s', 'qjx_42s'],
+      ['Contact', 'Qjx_42S', 'qjx_42s'],
+      ['Contact', 'Quack Quack', NULL],
+      ['Contact', 'duck', NULL],
+    ];
   }
 
   /**
