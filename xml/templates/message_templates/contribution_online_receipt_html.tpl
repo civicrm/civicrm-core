@@ -27,7 +27,7 @@
        <p>{contribution.contribution_page_id.receipt_text}</p>
      {/if}
 
-    {if $is_pay_later}
+    {if {contribution.is_pay_later|boolean}}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
