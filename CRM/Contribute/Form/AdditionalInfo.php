@@ -169,13 +169,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    *   instance of Contribution form.
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param bool $ccContribution
-   *   is it credit card contribution.
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
+  public static function emailReceipt($form, &$params) {
     $form->assign('receiptType', 'contribution');
 
     // retrieve individual prefix value for honoree
@@ -215,14 +213,8 @@ class CRM_Contribute_Form_AdditionalInfo {
       }
     }
 
-    $form->assign('ccContribution', $ccContribution);
-    if ($ccContribution) {
-      $form->assignBillingName($params);
-      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
-
-      $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
-      $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
-    }
+    $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+    $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
 
     //handle custom data
     if (!empty($params['hidden_custom'])) {
