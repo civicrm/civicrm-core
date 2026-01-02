@@ -1567,4 +1567,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     return $currency;
   }
 
+  /**
+   * @return int[]
+   * @throws CRM_Core_Exception
+   */
+  protected function getMembershipTypeIDs(): array {
+    return array_keys($this->order->getMembershipTypes());
+  }
+
 }
