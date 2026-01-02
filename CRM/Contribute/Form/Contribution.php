@@ -2253,13 +2253,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($contribution->id && isset($formValues['product_name'][0])) {
-      CRM_Contribute_Form_AdditionalInfo::processPremium($submittedValues, $contribution->id,
+      $this->processPremium($submittedValues, $contribution->id,
         $this->_premiumID, $this->_options
       );
     }
 
     if ($contribution->id && array_key_exists('note', $submittedValues)) {
-      CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
+      $this->processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
 
     // If financial type has changed from non-deductible to deductible, let the user know so they can adjust the non-deductible amount
@@ -2571,6 +2571,107 @@ WHERE  contribution_id = {$id}
       $this->_premiumID = $dao->id;
       $this->_productDAO = $dao;
     }
+  }
+
+  /**
+   * Process the Premium Information.
+   *
+   * @param array $params
+   * @param int $contributionID
+   * @param int $premiumID
+   * @param array $options
+   */
+  private function processPremium($params, $contributionID, $premiumID = NULL, $options = []) {
+    $selectedProductID = $params['product_name'][0];
+    $selectedProductOptionID = $params['product_name'][1] ?? NULL;
+
+    $dao = new CRM_Contribute_DAO_ContributionProduct();
+    $dao->contribution_id = $contributionID;
+    $dao->product_id = $selectedProductID;
+    $dao->fulfilled_date = $params['fulfilled_date'];
+    $isDeleted = FALSE;
+
+    //CRM-11106
+    $premiumParams = [
+      'id' => $selectedProductID,
+    ];
+
+    $productDetails = [];
+    CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
+    $dao->financial_type_id = $productDetails['financial_type_id'] ?? NULL;
+    if (!empty($options[$selectedProductID])) {
+      $dao->product_option = $selectedProductOptionID;
+    }
+
+    // This IF condition codeblock does the following:
+    // 1. If premium is present then get previous contribution-product mapping record (if any) based on contribtuion ID.
+    //   If found and the product chosen doesn't matches with old done, then delete or else set the ID for update
+    // 2. If no product is chosen theb delete the previous contribution-product mapping record based on contribtuion ID.
+    if ($premiumID || empty($selectedProductID)) {
+      $ContributionProduct = new CRM_Contribute_DAO_ContributionProduct();
+      $ContributionProduct->contribution_id = $contributionID;
+      $ContributionProduct->find(TRUE);
+      // here $selectedProductID can be 0 in case one unselect the premium product on backoffice update form
+      if ($ContributionProduct->product_id == $selectedProductID) {
+        $dao->id = $premiumID;
+      }
+      else {
+        $ContributionProduct->delete();
+        $isDeleted = TRUE;
+      }
+    }
+
+    // only add/update contribution product when a product is selected
+    if (!empty($selectedProductID)) {
+      $dao->save();
+    }
+
+    //CRM-11106
+    if ($premiumID == NULL || $isDeleted) {
+      $premiumParams = [
+        'cost' => $productDetails['cost'] ?? NULL,
+        'currency' => $productDetails['currency'] ?? NULL,
+        'financial_type_id' => $productDetails['financial_type_id'] ?? NULL,
+        'contributionId' => $contributionID,
+      ];
+      if ($isDeleted) {
+        $premiumParams['oldPremium']['product_id'] = $ContributionProduct->product_id;
+        $premiumParams['oldPremium']['contribution_id'] = $ContributionProduct->contribution_id;
+      }
+      CRM_Core_BAO_FinancialTrxn::createPremiumTrxn($premiumParams);
+    }
+  }
+
+  /**
+   * Process the Note.
+   *
+   *
+   * @param array $params
+   * @param int $contactID
+   * @param int $contributionID
+   * @param int $contributionNoteID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
+    if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
+      CRM_Core_BAO_Note::deleteRecord(['id' => $contributionNoteID]);
+      $status = ts('Selected Note has been deleted successfully.');
+      CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
+      return;
+    }
+    //process note
+    $noteParams = [
+      'entity_table' => 'civicrm_contribution',
+      'note' => $params['note'],
+      'entity_id' => $contributionID,
+      'contact_id' => $contactID,
+      'id' => $contributionNoteID,
+    ];
+    if ($contributionNoteID) {
+      $noteParams['note'] = $noteParams['note'] ?: "null";
+    }
+    CRM_Core_BAO_Note::add($noteParams);
   }
 
   /**
