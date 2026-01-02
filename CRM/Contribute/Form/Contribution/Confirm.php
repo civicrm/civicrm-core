@@ -2739,7 +2739,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $format = '%Y%m%d';
     $statusFormat = '%Y-%m-%d';
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
-    $dates = [];
     $ids = [];
 
     $memParams = [
@@ -2781,7 +2780,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         $membership = CRM_Member_BAO_Membership::create($memParams);
-        return [$membership, $renewalMode, $dates];
+        return [$membership, $renewalMode];
       }
 
       // Check and fix the membership if it is STALE
