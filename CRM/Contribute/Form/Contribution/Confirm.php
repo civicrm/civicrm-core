@@ -1491,7 +1491,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipContribution = $paymentResult['contribution'];
         // Save the contribution ID so that I can be used in email receipts
         // For example, if you need to generate a tax receipt for the donation only.
-        $this->_values['contribution_other_id'] = $membershipContribution->id;
+        $membershipContributionID = $this->_values['contribution_other_id'] = $membershipContribution->id;
       }
     }
 
@@ -1504,17 +1504,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $membershipDetails['minimum_fee'] ?? 0, $membershipDetails['financial_type_id'] ?? NULL);
         $paymentResults[] = ['contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult];
         $totalAmount = $membershipContribution->total_amount;
+        $membershipContributionID = $membershipContribution->id;
       }
       catch (CRM_Core_Exception $e) {
         $errors[2] = $e->getMessage();
-        $membershipContribution = NULL;
+        $membershipContribution = $membershipContributionID = NULL;
       }
     }
 
     $membership = NULL;
-    if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
-      $membershipContributionID = $membershipContribution->id;
-    }
 
     if (!empty($membershipContributionID)) {
       $typesTerms = $membershipParams['types_terms'] ?? [];
