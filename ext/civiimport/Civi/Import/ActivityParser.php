@@ -180,7 +180,8 @@ class ActivityParser extends ImportParser {
     if (empty($this->importableFieldsMetadata)) {
       $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']];
       $activityFields = (array) Activity::getFields()
-        ->addWhere('readonly', '=', FALSE)
+        // Exclude readonly fields, except for the id
+        ->addClause('OR', ['readonly', '=', FALSE], ['name', '=', 'id'])
         ->addWhere('usage', 'CONTAINS', 'import')
         ->setAction('save')
         ->addOrderBy('title')
