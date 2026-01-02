@@ -242,10 +242,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
         if ($this->isFinancialAccountChanged()) {
           $params['trxnParams']['trxn_date'] = date('YmdHis');
           $params['total_amount'] = 0;
-          // If we have a fee amount set reverse this as well.
-          if (isset($params['fee_amount'])) {
-            $params['trxnParams']['fee_amount'] = 0 - $params['fee_amount'];
-          }
           if ($this->isAccountsReceivableTransaction()) {
             $accountRelationship = $this->getUpdatedContribution()->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
             $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
@@ -257,11 +253,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
               $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
             }
           }
+          $params['skipLineItem'] = FALSE;
+          // Set amounts to create a reversal transaction.
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
           $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
-
           $this->updateFinancialAccounts($params, 'changeFinancialType');
-          $params['skipLineItem'] = FALSE;
           foreach ($params['line_item'] as &$lineItems) {
             foreach ($lineItems as &$line) {
               $line['financial_type_id'] = $params['financial_type_id'];
