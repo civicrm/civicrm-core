@@ -108,7 +108,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       $form->_params,
       $individualID,
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
-      0, FALSE
+      FALSE
     );
 
     // Make sure that certain parameters are set on return from processConfirm
@@ -165,7 +165,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       $form->_params,
       $organizationID,
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
-      0, TRUE
+      TRUE
     );
     //check if contribution is created on org.
     $contribution = $this->callAPISuccessGetSingle('Contribution', [

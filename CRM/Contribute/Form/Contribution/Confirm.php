@@ -1494,7 +1494,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipParams,
         $contactID,
         $financialTypeID,
-        $isTest,
         $isRecurForFirstTransaction
       );
       if (!empty($paymentResult['contribution'])) {
@@ -1572,8 +1571,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           // Need to check that it's not actually doing anything useful in other scenarios
           // For getExistingContributionID()/invoice mode it does nothing helpful!
           // Most (all?) of this functionality is handled in OrderCompleteSubscriber::updateMembershipBasedOnCompletionOfContribution
-          [$membership, $renewalMode] = self::legacyProcessMembership(
-            $contactID, $membershipTypeID, $isTest,
+          [$membership, $renewalMode] = $this->legacyProcessMembership(
+            $contactID, $membershipTypeID,
             date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
             $customFieldsFormatted,
             $numTerms, $membershipID, $pending,
@@ -2302,7 +2301,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $result = $this->processConfirm($paymentParams,
         $contactID,
         $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
-        ($this->_mode == 'test') ? 1 : 0,
         $paymentParams['is_recur'] ?? NULL
       );
 
@@ -2518,7 +2516,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   Contact id.
    * @param int $financialTypeID
    *   Financial type id.
-   * @param bool $isTest
    * @param bool $isRecur
    *
    * @throws CRM_Core_Exception
@@ -2530,7 +2527,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     &$paymentParams,
     $contactID,
     $financialTypeID,
-    $isTest,
     $isRecur
   ): array {
     $form = $this;
@@ -2570,7 +2566,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contributionParams = [
         'id' => $paymentParams['contribution_id'] ?? NULL,
         'contact_id' => $contactID,
-        'is_test' => $isTest,
+        'is_test' => $this->isTest(),
         'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
         'financial_type_id' => $financialTypeID,
       ];
@@ -2721,7 +2717,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param int $contactID
    * @param int $membershipTypeID
-   * @param bool $is_test
    * @param string $changeToday
    * @param int $modifiedID
    * @param $customFieldsFormatted
@@ -2738,7 +2733,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function legacyProcessMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignID = NULL, $contribution = NULL, $lineItems = []) {
+  private function legacyProcessMembership($contactID, $membershipTypeID, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignID = NULL, $contribution = NULL, $lineItems = []) {
     $renewalMode = $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
@@ -2749,12 +2744,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $memParams = [
       'campaign_id' => $campaignID,
+      'is_test' => $this->isTest(),
     ];
 
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
-      $is_test, $membershipID, TRUE
+      $this->isTest(), $membershipID, TRUE
     );
     if ($currentMembership) {
       $renewalMode = TRUE;
@@ -2806,7 +2802,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         foreach (['start_date', 'end_date'] as $dateType) {
           $currentMembership[$dateType] = $dates[$dateType] ?? NULL;
         }
-        $currentMembership['is_test'] = $is_test;
+        $currentMembership['is_test'] = $this->isTest();
 
         if (!empty($membershipSource)) {
           $currentMembership['source'] = $membershipSource;
@@ -2898,7 +2894,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($membershipSource)) {
         $memParams['source'] = $membershipSource;
       }
-      $memParams['is_test'] = $is_test;
       $memParams['is_pay_later'] = $isPayLater;
     }
     // Putting this in an IF is precautionary as it seems likely that it would be ignored if empty, but
