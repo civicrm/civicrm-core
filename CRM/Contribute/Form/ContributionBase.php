@@ -54,6 +54,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The values for the contribution db object
    *
    * @var array
+   *
+   * @internal - avoid accessing from outside core.
    */
   public $_values;
 
@@ -495,16 +497,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $this->_values['initial_reminder_day'] = $this->getPledgeBlockValue('initial_reminder_day');
         $this->_values['additional_reminder_day'] = $this->getPledgeBlockValue('additional_reminder_day');
 
-        //set pledge id in values
-        $pledgeId = CRM_Utils_Request::retrieve('pledgeId', 'Positive', $this);
-
         //authenticate pledge user for pledge payment.
-        if ($pledgeId) {
-          $this->_values['pledge_id'] = $pledgeId;
+        if ($this->getPledgeID()) {
 
           //lets override w/ pledge campaign.
           $this->_values['campaign_id'] = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
-            $pledgeId,
+            $this->getPledgeID(),
             'campaign_id'
           );
           $this->authenticatePledgeUser();
@@ -623,6 +621,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     return $mainContributionLineItems;
+  }
+
+  /**
+   * @return int|null
+   * @throws CRM_Core_Exception
+   */
+  public function getPledgeID(): ?int {
+    if (!$this->getPledgeBlockValue('id')) {
+      // Pledges not configured for page.
+      return NULL;
+    }
+    $pledgeID = CRM_Utils_Request::retrieve('pledgeId', 'Positive', $this) ?: $this->_values['pledge_id'] ?? NULL;
+    if ($pledgeID) {
+      $this->setPledgeID($pledgeID);
+    }
+    return $pledgeID;
+  }
+
+  protected function setPledgeID(?int $pledgeID) {
+    $this->_values['pledge_id'] = $pledgeID;
+    $this->set('pledgeId', $pledgeID);
   }
 
   /**
@@ -1113,7 +1132,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     //get pledge status and contact id
     $pledgeValues = [];
-    $pledgeParams = ['id' => $this->_values['pledge_id']];
+    $pledgeParams = ['id' => $this->getPledgeID()];
     $returnProperties = ['contact_id', 'status_id'];
     CRM_Core_DAO::commonRetrieve('CRM_Pledge_DAO_Pledge', $pledgeParams, $pledgeValues, $returnProperties);
 

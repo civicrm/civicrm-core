@@ -12,6 +12,7 @@
 declare(strict_types = 1);
 
 use Civi\Api4\Contribution;
+use Civi\Api4\Pledge;
 use Civi\Test\ContributionPageTestTrait;
 
 /**
@@ -909,7 +910,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ];
     try {
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::writeRecord($params);
-      $this->_ids['pledge_block_id'] = $pledgeBlock->id;
+      $this->ids['PledgeBlock']['default'] = $pledgeBlock->id;
     }
     catch (CRM_Core_Exception $e) {
       $this->fail('Could not create pledge block : ' . $e->getMessage());
@@ -1027,7 +1028,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'pledge_frequency_unit' => 'week',
       'pledge_installments' => 3,
       'is_pledge' => TRUE,
-      'pledge_block_id' => (int) $this->_ids['pledge_block_id'],
+      'pledge_block_id' => $this->ids['PledgeBlock']['default'],
     ];
 
     $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
@@ -1074,10 +1075,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitPledgePayment(): void {
     $this->testSubmitPledgePaymentPaymentProcessorRecurFuturePayment();
-    $pledge = $this->callAPISuccess('Pledge', 'getsingle', []);
-    $params = [
-      'pledge_id' => $pledge['id'],
-    ];
+    $pledge = Pledge::get()->execute()->single();
     $submitParams = [
       'id' => $this->getContributionPageID(),
       'pledge_amount' => [2 => 1],
@@ -1095,23 +1093,25 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'cid' => $pledge['contact_id'],
       'contact_id' => $pledge['contact_id'],
       'is_pledge' => TRUE,
-      'pledge_block_id' => $this->_ids['pledge_block_id'],
+      'pledge_block_id' => $this->ids['PledgeBlock']['default'],
     ];
-    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params);
+    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', [
+      'pledge_id' => $pledge['id'],
+    ]);
     $this->assertEquals(2, $pledgePayment['values'][2]['status_id']);
 
     $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
 
     // Check if contribution created.
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
-      'contribution_page_id' => $pledge['pledge_contribution_page_id'],
+      'contribution_page_id' => $pledge['contribution_page_id'],
       'contribution_status_id' => 'Completed',
       'contact_id' => $pledge['contact_id'],
       'contribution_recur_id' => ['IS NULL' => 1],
     ]);
 
     $this->assertEquals(10.00, $contribution['total_amount']);
-    $pledgePayment = $this->callAPISuccess('PledgePayment', 'get', $params)['values'];
+    $pledgePayment = $this->callAPISuccess('PledgePayment', 'get', ['pledge_id' => $pledge['id']])['values'];
     $this->assertEquals(1, $pledgePayment[2]['status_id'], 'This pledge payment should have been completed');
     $this->assertEquals($contribution['id'], $pledgePayment[2]['contribution_id']);
   }
