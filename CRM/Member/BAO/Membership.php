@@ -337,6 +337,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       // hack whereby they are deleted and recreated
       if (empty($latestContributionID)) {
         if (!empty($params['lineItems'])) {
+          CRM_Core_Error::deprecatedWarning('do not pass in lineItems');
           $params['line_item'] = $params['lineItems'];
         }
         // do cleanup line items if membership edit the Membership type.
