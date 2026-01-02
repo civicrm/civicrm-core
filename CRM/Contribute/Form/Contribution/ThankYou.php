@@ -48,7 +48,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('thankyou_text', $this->_values['thankyou_text'] ?? NULL);
     $this->assign('thankyou_footer', $this->_values['thankyou_footer'] ?? NULL);
     $this->assign('max_reminders', $this->_values['max_reminders'] ?? NULL);
-    $this->assign('initial_reminder_day', $this->_values['initial_reminder_day'] ?? NULL);
+    $this->assign('initial_reminder_day', $this->getPledgeBlockValue('initial_reminder_day'));
     $this->assignTotalAmounts();
     // Link (button) for users to create their own Personal Campaign page
     if ($linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->getContributionPageID(), 'contribute')) {

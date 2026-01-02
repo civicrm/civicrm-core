@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\PledgeBlock;
 use Civi\Api4\PremiumsProduct;
 use Civi\Api4\PriceSet;
 
@@ -221,6 +222,16 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   protected $renewalMembershipID;
 
   /**
+   * Entities otherwise accessed through getters.
+   *
+   * These can't be tracked by the Lookup Trait because it expects them to exist
+   * but they might not.
+   *
+   * @var array
+   */
+  private array $entities;
+
+  /**
    * Is the price set quick config.
    *
    * @return bool
@@ -345,6 +356,30 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Get the selected Pledge Block ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getPledgeBlockID(): ?int {
+    if (isset($this->entities['PledgeBlock'])) {
+      return $this->entities['PledgeBlock'];
+    }
+    if ($this->getContributionPageID() && $this->isEntityEnabled('PledgeBlock')) {
+      $pledgeBlock = PledgeBlock::get(FALSE)
+        ->addWhere('entity_id', '=', $this->getContributionPageID())
+        ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+        ->execute()->first();
+      $this->entities['PledgeBlock'] = $pledgeBlock['id'] ?? FALSE;
+      if ($pledgeBlock) {
+        $this->define('PledgeBlock', 'PledgeBlock', $pledgeBlock);
+      }
+    }
+    return NULL;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Contribute_Exception_InactiveContributionPageException
@@ -454,13 +489,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
 
-      $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
-
-      if ($pledgeBlock) {
-        $this->_values['pledge_block_id'] = $pledgeBlock['id'] ?? NULL;
-        $this->_values['max_reminders'] = $pledgeBlock['max_reminders'] ?? NULL;
-        $this->_values['initial_reminder_day'] = $pledgeBlock['initial_reminder_day'] ?? NULL;
-        $this->_values['additional_reminder_day'] = $pledgeBlock['additional_reminder_day'] ?? NULL;
+      if ($this->getPledgeBlockValue('id')) {
+        $this->_values['pledge_block_id'] = $this->getPledgeBlockValue('id');
+        $this->_values['max_reminders'] = $this->getPledgeBlockValue('max_reminders');
+        $this->_values['initial_reminder_day'] = $this->getPledgeBlockValue('initial_reminder_day');
+        $this->_values['additional_reminder_day'] = $this->getPledgeBlockValue('additional_reminder_day');
 
         //set pledge id in values
         $pledgeId = CRM_Utils_Request::retrieve('pledgeId', 'Positive', $this);
