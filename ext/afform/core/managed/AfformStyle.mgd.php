@@ -35,13 +35,14 @@ return [
       'version' => 4,
       'values' => [
         'option_group_id.name' => 'afform_container_style',
+        'name' => 'afform_container_style_pane',
         'value' => 'af-container-style-pane',
         'label' => E::ts('Panel Pane'),
         'description' => NULL,
         'is_reserved' => TRUE,
         'is_active' => TRUE,
       ],
-      'match' => ['option_group_id', 'name'],
+      'match' => ['option_group_id', 'value'],
     ],
   ],
 ];
