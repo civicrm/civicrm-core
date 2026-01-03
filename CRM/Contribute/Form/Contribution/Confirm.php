@@ -1958,16 +1958,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_paymentProcessor = $form->_paymentProcessors[$form->_params['payment_processor_id']];
     }
 
-    if (!empty($params['useForMember'])) {
-      $form->set('useForMember', 1);
-      $form->_useForMember = 1;
-    }
     $priceFields = $priceFields[$priceSetID]['fields'];
     $membershipPriceFieldIDs = [];
     foreach ($form->order->getLineItems() as $lineItem) {
       if (!empty($lineItem['membership_type_id'])) {
-        $form->set('useForMember', 1);
-        $form->_useForMember = 1;
         $membershipPriceFieldIDs['id'] = $priceSetID;
         $membershipPriceFieldIDs[] = $lineItem['price_field_value_id'];
       }
