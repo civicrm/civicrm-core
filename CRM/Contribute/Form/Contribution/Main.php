@@ -24,8 +24,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   public $_paymentProcessors;
 
-  public $_membershipTypeValues;
-
   /**
    * Array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
    * @var array
@@ -642,19 +640,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       $separateMembershipPayment = $this->_membershipBlock['is_separate_payment'] ?? NULL;
 
-      $membershipTypeIds = $this->getAvailableMembershipTypeIDs();
-
-      //because we take first membership record id for renewal
-      if (!empty($membershipTypeIds)) {
-        // @todo = this hook should be called when loading the priceFieldMetadata in preProcess & incorporated
-        // There should be function to retrieve rather than property access.
-        $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
-        $this->_membershipTypeValues = $membershipTypeValues;
-      }
       $endDate = NULL;
 
-      foreach ($membershipTypeIds as $membershipTypeID) {
-        $memType = $membershipTypeValues[$membershipTypeID];
+      foreach ($this->getAvailableMembershipTypeIDs() as $membershipTypeID) {
+        $memType = $this->getMembershipType($membershipTypeID);
         if ($memType['is_active']) {
           $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$membershipTypeID}"] = $this->getConfiguredAutoRenewOptionForMembershipType($membershipTypeID);
           if ($this->isPageHasPaymentProcessorSupportForRecurring()) {
@@ -1797,24 +1786,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     return FALSE;
-  }
-
-  /**
-   * Get the membership type IDs available in the price set.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  private function getAvailableMembershipTypeIDs(): array {
-    $membershipTypeIDs = [];
-    foreach ($this->getPriceFieldMetaData() as $priceField) {
-      foreach ($priceField['options'] ?? [] as $option) {
-        if (!empty($option['membership_type_id'])) {
-          $membershipTypeIDs[$option['membership_type_id']] = $option['membership_type_id'];
-        }
-      }
-    }
-    return $membershipTypeIDs;
   }
 
   /**

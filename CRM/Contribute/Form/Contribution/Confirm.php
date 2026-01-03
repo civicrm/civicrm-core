@@ -681,7 +681,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
 
       if (!empty($membershipTypeIds)) {
-        $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
         $endDate = NULL;
 
         // Check if we support auto-renew on this contribution page
@@ -696,7 +695,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
         foreach ($membershipTypeIds as $value) {
-          $memType = $membershipTypeValues[$value];
+          $memType = $this->getMembershipType($value);
           if ($selectedMembershipTypeID != NULL) {
             if ($memType['id'] == $selectedMembershipTypeID) {
               $this->assign('minimum_fee', $memType['minimum_fee'] ?? NULL);
@@ -764,8 +763,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $autoRenewOption = CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($this->_priceSetId);
       //$selectedMembershipTypeID is retrieved as an array for membership priceset if multiple
       //options for different organisation is selected on the contribution page.
-      if (is_numeric($selectedMembershipTypeID) && isset($membershipTypeValues[$selectedMembershipTypeID]['auto_renew'])) {
-        $this->assign('autoRenewOption', $membershipTypeValues[$selectedMembershipTypeID]['auto_renew']);
+      if (is_numeric($selectedMembershipTypeID) && $this->getMembershipType($selectedMembershipTypeID)['auto_renew']) {
+        $this->assign('autoRenewOption', $this->getMembershipType($selectedMembershipTypeID)['auto_renew']);
       }
       else {
         $this->assign('autoRenewOption', $autoRenewOption);
@@ -1393,8 +1392,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams): void {
 
-    $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $this->getMembershipTypeIDs());
-    $membershipType = empty($membershipTypes) ? [] : reset($membershipTypes);
+    $membershipType = $this->getFirstSelectedMembershipType();
 
     $this->_values['membership_name'] = $membershipType['name'] ?? NULL;
 
@@ -1517,7 +1515,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($membershipContributionID)) {
       $typesTerms = $membershipParams['types_terms'] ?? [];
       $this->_params['createdMembershipIDs'] = [];
-      foreach ($this->getMembershipTypeIDs() as $membershipTypeID) {
+      foreach ($this->getSelectedMembershipTypeIDs() as $membershipTypeID) {
         $membershipLineItems = [$this->getPriceSetID() => $this->getLineItemsForMembershipCreate((int) $membershipTypeID)];
         $numTerms = $typesTerms[$membershipTypeID] ?? 1;
         $contributionRecurID = $this->_params['contributionRecurID'] ?? NULL;
@@ -2899,7 +2897,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   protected function getLineItemsForMembershipCreate(int $membershipTypeID): array {
-    $membershipTypeIDs = $this->getMembershipTypeIDs();
+    $membershipTypeIDs = $this->getSelectedMembershipTypeIDs();
     $defaultMembershipTypeID = (int) reset($membershipTypeIDs);
     $lineItemSplit = [];
     foreach ($this->getLineItems() as $lineItem) {
