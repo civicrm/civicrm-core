@@ -259,10 +259,10 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
    *
    * @param int $lineItemID
    * @param bool $isTax
-   * @return array
+   * @return array|null
    * @throws CRM_Core_Exception
    */
-  public static function getPreviousFinancialItem(int $lineItemID, bool $isTax = FALSE): array {
+  public static function getPreviousFinancialItem(int $lineItemID, bool $isTax = FALSE): ?array {
     $financialItemAPI = FinancialItem::get(FALSE)
       ->addWhere('entity_id', '=', $lineItemID)
       ->addWhere('entity_table', '=', 'civicrm_line_item')
