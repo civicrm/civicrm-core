@@ -415,16 +415,15 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             $fieldParams['option_id'][$rowCount] = $priceFieldID;
             unset($options[$priceFieldID]);
           }
-          $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($memType);
-          $fieldParams['option_label'][$rowCount] = $membetype['frontend_title'] ?? $membetype['title'];
-          $fieldParams['option_amount'][$rowCount] = $membetype['minimum_fee'] ?? 0;
-          $fieldParams['option_weight'][$rowCount] = $membetype['weight'] ?? NULL;
-          $fieldParams['option_description'][$rowCount] = $membetype['description'] ?? NULL;
+          $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($memType);
+          $fieldParams['option_label'][$rowCount] = $membershipType['frontend_title'];
+          $fieldParams['option_amount'][$rowCount] = $membershipType['minimum_fee'];
+          $fieldParams['option_weight'][$rowCount] = $membershipType['weight'];
+          $fieldParams['option_description'][$rowCount] = $membershipType['description'];
           $fieldParams['default_option'] = $params['membership_type_default'] ?? NULL;
-          $fieldParams['option_financial_type_id'][$rowCount] = $membetype['financial_type_id'] ?? NULL;
+          $fieldParams['option_financial_type_id'][$rowCount] = $membershipType['financial_type_id'];
 
           $fieldParams['membership_type_id'][$rowCount] = $memType;
-          // [$rowCount] = $membetype[''];
           $rowCount++;
         }
         foreach ($options as $priceFieldID => $memType) {
