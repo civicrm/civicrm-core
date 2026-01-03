@@ -65,14 +65,12 @@ trait CRM_Contribute_Form_ContributeFormTrait {
     if (!$this->getPledgeBlockID()) {
       return NULL;
     }
-    if ($this->isDefined('PledgeBlock')) {
-      return $this->lookup('PledgeBlock', $fieldName);
+    if (!$this->isDefined('PledgeBlock')) {
+      $this->define('PledgeBlock', 'PledgeBlock', [
+        'id' => $this->getPledgeBlockID(),
+        'entity_table' => 'civicrm_contribution_page',
+      ]);
     }
-
-    $this->define('PledgeBlock', 'PledgeBlock', [
-      'id' => $this->getPledgeBlockID(),
-      'entity_table' => 'civicrm_contribution_page',
-    ]);
     return $this->lookup('PledgeBlock', $fieldName);
   }
 
