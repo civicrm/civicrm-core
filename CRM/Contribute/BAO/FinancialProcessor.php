@@ -31,6 +31,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
   private array $originalLineItems;
   private array $inputValues;
+  private array $previousFinancialItems = [];
 
   public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems, array $inputValues) {
     // Deal with slopping typing first.
@@ -1118,7 +1119,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // new line which would not have one.
       return [];
     }
-    return CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemID, $isTax);
+    if (!isset($this->previousFinancialItems[$lineItemID][$isTax])) {
+      $this->previousFinancialItems[$lineItemID][$isTax] = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemID, $isTax);
+    }
+    return $this->previousFinancialItems[$lineItemID][$isTax] ?? [];
   }
 
   /**
