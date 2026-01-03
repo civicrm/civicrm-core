@@ -1363,14 +1363,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     // Send receipt mail.
     array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
-    if ($contribution->id && !empty($this->_params['is_email_receipt'])) {
-      $this->_params['trxn_id'] = $result['trxn_id'] ?? NULL;
-      $this->_params['contact_id'] = $contactID;
-      $this->_params['contribution_id'] = $contribution->id;
-      if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $this->_params, TRUE)) {
-        $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
-      }
-    }
 
     return $contribution;
   }
@@ -2232,22 +2224,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
       array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
-
-      //send receipt mail.
-      //FIXME: 'payment.create' could send a receipt.
-      if ($contribution->id && !empty($formValues['is_email_receipt'])) {
-        $formValues['contact_id'] = $this->_contactID;
-        $formValues['contribution_id'] = $contribution->id;
-
-        $formValues += CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id);
-
-        // to get 'from email id' for send receipt
-        $this->fromEmailId = $formValues['from_email_address'] ?? NULL;
-        if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
-          $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
-        }
-      }
-
       $this->statusMessageTitle = ts('Saved');
 
     }
@@ -2289,6 +2265,24 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $formValues['contribution_status_id'],
       $this->_defaults['contribution_status_id'] ?? NULL
     );
+
+    //send receipt mail.
+    //FIXME: 'payment.create' could send a receipt.
+    if ($contribution->id && $this->getSubmittedValue('is_email_receipt')) {
+      $receiptValues = $this->getSubmittedValues() + [
+        'trxn_id' => $result['trxn_id'] ?? NULL,
+        'contact_id' => $this->getContactID(),
+        'contribution_id' => $contribution->id,
+        'from_email_address' => $this->getSubmittedValue('from_email_address'),
+      ];
+
+      $receiptValues += CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id);
+
+      if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $receiptValues)) {
+        $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
+      }
+    }
+
     return $contribution;
   }
 
