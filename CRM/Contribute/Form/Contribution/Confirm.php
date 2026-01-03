@@ -1402,8 +1402,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams): void {
 
-    $membershipTypeIDs = array_keys($this->order->getMembershipTypes());
-    $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
+    $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $this->getMembershipTypeIDs());
     $membershipType = empty($membershipTypes) ? [] : reset($membershipTypes);
 
     $this->_values['membership_name'] = $membershipType['name'] ?? NULL;
@@ -1429,7 +1428,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $financialTypeID,);
+    $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $membershipType, $isPaidMembership, $this->_membershipId, $financialTypeID,);
 
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1447,8 +1446,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $membershipDetails
    *
-   * @param array $membershipTypeIDs
-   *
    * @param bool $isPaidMembership
    * @param int $membershipID
    *
@@ -1460,7 +1457,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function postProcessMembership(
     $membershipParams, $contactID, $premiumParams,
-    $customFieldsFormatted, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
+    $customFieldsFormatted, $membershipDetails, $isPaidMembership, $membershipID,
     $financialTypeID) {
     $membershipContribution = NULL;
     $isTest = $membershipParams['is_test'] ?? FALSE;
@@ -1532,13 +1529,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
       $this->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
     }
-    //@todo it should no longer be possible for it to get to this point & membership to not be an array
-    if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
+
+    if (!empty($membershipContributionID)) {
       $typesTerms = $membershipParams['types_terms'] ?? [];
       $this->_params['createdMembershipIDs'] = [];
-      $firstMembershipTypeID = reset($membershipTypeIDs);
-      foreach ($membershipTypeIDs as $membershipTypeID) {
-        $membershipLineItems = [$this->getPriceSetID() => $this->getLineItemsForMembershipCreate((int) $membershipTypeID, $firstMembershipTypeID)];
+      foreach ($this->getMembershipTypeIDs() as $membershipTypeID) {
+        $membershipLineItems = [$this->getPriceSetID() => $this->getLineItemsForMembershipCreate((int) $membershipTypeID)];
         $numTerms = $typesTerms[$membershipTypeID] ?? 1;
         $contributionRecurID = $this->_params['contributionRecurID'] ?? NULL;
 
@@ -2949,12 +2945,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * contribution.
    *
    * @param int $membershipTypeID
-   * @param int $defaultMembershipTypeID
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function getLineItemsForMembershipCreate(int $membershipTypeID, int $defaultMembershipTypeID): array {
+  protected function getLineItemsForMembershipCreate(int $membershipTypeID): array {
+    $membershipTypeIDs = $this->getMembershipTypeIDs();
+    $defaultMembershipTypeID = (int) reset($membershipTypeIDs);
     $lineItemSplit = [];
     foreach ($this->getLineItems() as $lineItem) {
       if (empty($lineItem['membership_type_id']) && $this->isSeparateMembershipPayment()) {
