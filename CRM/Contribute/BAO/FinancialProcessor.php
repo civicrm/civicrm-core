@@ -425,7 +425,17 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
       $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
-      if (($lineItemDetails['tax_amount']) || ($context === 'changeFinancialType')) {
+      // If changing the financial type we reverse & recreate but really we should do this
+      // a) if the line item financial type changes (not contribution) and
+      // b) if the currency changes....
+      $isReversePrior = $context === 'changeFinancialType';
+
+      if ($isReversePrior) {
+        // In this case we are on the first pass - reverse. Second pass will create new
+        // although would be better to restructure to a single pass.
+        $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnIds['id']);
+      }
+      elseif (($lineItemDetails['tax_amount'])) {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
         if ($previousLineItemTotal != $lineItemDetails['line_total']) {
           $taxAmount -= $previousLineItem['tax_amount'] ?? 0;
@@ -1138,6 +1148,60 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
     $originalLineItem = $this->originalLineItems[$lineItemID] ?? [];
     return $originalLineItem[$name] ?? 0;
+  }
+
+  /**
+   * @param array $newLineItem
+   * @param bool $isTax
+   * @param int $trxnID
+   *
+   * @throws CRM_Core_Exception
+   */
+  private function reverseLineFinancialItem(array $newLineItem, bool $isTax, int $trxnID): void {
+    $previousItem = $this->getExistingFinancialItemForLine($newLineItem['id'], $isTax);
+    $isReversalRequired = $this->isReversalRequired($newLineItem, $isTax);
+    if (!$isReversalRequired) {
+      return;
+    }
+    $itemParams = [
+      'transaction_date' => CRM_Utils_Date::isoToMysql($this->getUpdatedContribution()->receive_date),
+      'contact_id' => $this->getUpdatedContribution()->contact_id,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $newLineItem['id'],
+      'amount' => -$previousItem['amount'],
+      'financial_account_id' => $previousItem['financial_account_id'],
+      'currency' => $previousItem['currency'],
+      'description' => $previousItem['description'],
+      'status_id' => $previousItem['status_id'],
+    ];
+    CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, ['id' => $trxnID]);
+  }
+
+  /**
+   * @param array $newLineItem
+   * @param bool $isTax
+   * @return bool
+   * @throws CRM_Core_Exception
+   */
+  public function isReversalRequired(array $newLineItem, bool $isTax): bool {
+    $previousItem = $this->getExistingFinancialItemForLine($newLineItem['id'], $isTax);
+    if (!$previousItem || !$previousItem['amount']) {
+      return FALSE;
+    }
+    if ($previousItem['currency'] !== $this->updatedContribution->currency) {
+      return TRUE;
+    }
+    if ($previousItem['contact_id'] !== (int) $this->updatedContribution->contact_id) {
+      return TRUE;
+    }
+    if ($isTax && $previousItem['amount'] !== $newLineItem['tax_amount']) {
+      return TRUE;
+    }
+    if ($isTax && $previousItem['financial_account_id'] !== (int) CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($newLineItem['financial_type_id'])) {
+      return TRUE;
+    }
+    // @todo - compare line item financial account for normal ones- this has been a missing piece for a long time!
+    return FALSE;
   }
 
 }
