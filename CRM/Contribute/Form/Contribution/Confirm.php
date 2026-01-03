@@ -2373,7 +2373,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $premiumParams
    */
   protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams) {
-    if (!$this->_useForMember) {
+    if (!$this->isMembershipPriceSet()) {
       $this->set('membershipTypeID', $this->_params['selectMembership']);
     }
 

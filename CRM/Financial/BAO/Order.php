@@ -757,7 +757,7 @@ class CRM_Financial_BAO_Order {
     return $this->priceSetMetadata;
   }
 
-  public function isMembershipPriceSet() {
+  public function isMembershipPriceSet(): bool {
     if (!CRM_Core_Component::isEnabled('CiviMember')) {
       return FALSE;
     }
