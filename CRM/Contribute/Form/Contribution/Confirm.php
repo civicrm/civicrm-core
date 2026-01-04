@@ -492,16 +492,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->assign('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
     $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
     $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
-    $isDisplayLineItems = $this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
-    $this->assign('isDisplayLineItems', $isDisplayLineItems);
-
-    if (!$isDisplayLineItems) {
-      // quickConfig is deprecated in favour of isDisplayLineItems. Lots of logic has been harnessed to quick config
-      // whereas isDisplayLineItems is specific & clear.
-      $this->assign('is_quick_config', 1);
-      $this->_params['is_quick_config'] = 1;
-    }
-    else {
+    $this->assign('isDisplayLineItems', !$this->isQuickConfig());
+    $this->assign('is_quick_config', $this->isQuickConfig());
+    // Accessing this value in params is deprecated.
+    $this->_params['is_quick_config'] = $this->isQuickConfig();
+    if (!$this->isQuickConfig()) {
       $this->assign('lineItem', [$this->getPriceSetID() => $this->order->getLineItems()]);
     }
 
