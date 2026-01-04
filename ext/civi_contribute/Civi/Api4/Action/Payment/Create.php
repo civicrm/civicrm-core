@@ -164,12 +164,8 @@ class Create extends \Civi\Api4\Generic\AbstractCreateAction {
   public function _run(\Civi\Api4\Generic\Result $result) {
     $this->values['is_send_contribution_notification'] = $this->notificationForCompleteOrder;
     $this->formatWriteValues($this->values);
-    $fields = $this->entityFields();
-    foreach ($fields as $name => $field) {
-      if (!isset($params[$name]) && !empty($field['default_value'])) {
-        $params[$name] = $field['default_value'];
-      }
-    }
+    $this->fillDefaults($this->values);
+
     $this->validateValues();
     // This action bypasses the normal writeObjects()/write() pipeline (it calls the
     // Payment BAO directly, below), so the custom-field flattening that pipeline
