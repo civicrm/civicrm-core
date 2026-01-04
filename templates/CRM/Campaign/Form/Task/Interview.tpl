@@ -311,7 +311,9 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
         CRM.$('#responseErrors').show( ).html(allErrors);
       }
     }
-  }, 'json');
+  }, 'json').fail(function() {
+    CRM.alert('{/literal}{ts escape="js"}Unable to complete the request. The server returned an error or could not be reached.{/ts}{literal}', '{/literal}{ts escape="js"}Request Failed{/ts}{literal}', 'error');
+  });
 }
 
 function releaseOrReserveVoter(voterId) {
@@ -362,7 +364,9 @@ function releaseOrReserveVoter(voterId) {
         CRM.$( '#field_' + voterId + '_is_release_or_reserve' ).val( isReleaseOrReserve );
       }
     },
-  'json');
+  'json').fail(function() {
+    CRM.alert('{/literal}{ts escape="js"}Unable to complete the request. The server returned an error or could not be reached.{/ts}{literal}', '{/literal}{ts escape="js"}Request Failed{/ts}{literal}', 'error');
+  });
 }
 
 function registerInterviewforall( ) {
